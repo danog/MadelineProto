@@ -170,9 +170,9 @@ class Handler extends \danog\MadelineProto\Connection
                 $exception['rpc_message'] = $e->rpc;
                 $exception['message'] = $e->getMessage();
             }
-        } else if ($e instanceof \danog\MadelineProto\TL\Exception) {
+        } elseif ($e instanceof \danog\MadelineProto\TL\Exception) {
             $exception = ['_' => 'socketTLException', 'message' => $e->getMessage()];
-        } else if ($e instanceof \DOMException) {
+        } elseif ($e instanceof \DOMException) {
             $exception = ['_' => 'socketDOMException', 'message' => $e->getMessage()];
         } else {
             $exception = ['_' => 'socketException', 'message' => $e->getMessage()];

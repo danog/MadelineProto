@@ -10,7 +10,6 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 class HttpProxy implements \danog\MadelineProto\Proxy
 {
     private $domain;
@@ -18,7 +17,9 @@ class HttpProxy implements \danog\MadelineProto\Proxy
     private $protocol;
     private $extra;
     private $sock;
-    public function __construct($domain, $type, $protocol) {
+
+    public function __construct($domain, $type, $protocol)
+    {
         if (!in_array($domain, [AF_INET, AF_INET6])) {
             throw new \danog\MadelineProto\Exception('Wrong protocol family provided');
         }
@@ -32,41 +33,53 @@ class HttpProxy implements \danog\MadelineProto\Proxy
         $this->type = $type;
         $this->protocol = $protocol;
     }
-    public function setExtra(array $extra = []) {
+
+    public function setExtra(array $extra = [])
+    {
         $this->extra = $extra;
         $name = $this->protocol === PHP_INT_MAX ? '\\FSocket' : '\\Socket';
         $this->sock = new $name(strlen(@inet_pton($this->extra['address'])) !== 4 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, $this->protocol);
     }
-    public function setOption($level, $name, $value) {
+
+    public function setOption($level, $name, $value)
+    {
         return $this->sock->setOption($level, $name, $value);
     }
 
-    public function getOption($level, $name) {
+    public function getOption($level, $name)
+    {
         return $this->sock->getOption($level, $name);
     }
 
-    public function setBlocking($blocking) {
+    public function setBlocking($blocking)
+    {
         return $this->sock->setBlocking($blocking);
     }
 
-    public function bind($address, $port = 0) {
+    public function bind($address, $port = 0)
+    {
         throw new \danog\MadelineProto\Exception('Not Implemented');
     }
 
-    public function listen($backlog = 0) {
-        throw new \danog\MadelineProto\Exception('Not Implemented');
-    }
-    public function accept() {
+    public function listen($backlog = 0)
+    {
         throw new \danog\MadelineProto\Exception('Not Implemented');
     }
 
-
-    public function select(array &$read, array &$write, array &$except, $tv_sec, $tv_usec = 0) {
+    public function accept()
+    {
         throw new \danog\MadelineProto\Exception('Not Implemented');
     }
-    public function connect($address, $port = 0) {
+
+    public function select(array &$read, array &$write, array &$except, $tv_sec, $tv_usec = 0)
+    {
+        throw new \danog\MadelineProto\Exception('Not Implemented');
+    }
+
+    public function connect($address, $port = 0)
+    {
         $this->sock->connect($this->extra['address'], $this->extra['port']);
-        
+
         try {
             if (strlen(inet_pton($address)) !== 4) {
                 $address = '['.$address.']';
@@ -77,12 +90,16 @@ class HttpProxy implements \danog\MadelineProto\Proxy
         $response = $this->read_http_payload();
         if ($response['code'] !== 200) {
             \danog\MadelineProto\Logger::log(trim($response['body']));
+
             throw new \danog\MadelineProto\Exception($response['description'], $response['code']);
         }
         \danog\MadelineProto\Logger::log('Connected to '.$address.':'.$port.' via http');
+
         return true;
     }
-    private function http_read($length) {
+
+    private function http_read($length)
+    {
         $packet = '';
         while (strlen($packet) < $length) {
             $packet .= $this->sock->read($length - strlen($packet));
@@ -90,8 +107,10 @@ class HttpProxy implements \danog\MadelineProto\Proxy
                 throw new \danog\MadelineProto\NothingInTheSocketException(\danog\MadelineProto\Lang::$current_lang['nothing_in_socket']);
             }
         }
+
         return $packet;
     }
+
     public function read_http_line()
     {
         $line = '';
@@ -127,35 +146,43 @@ class HttpProxy implements \danog\MadelineProto\Proxy
 
         return ['protocol' => $protocol, 'code' => $code, 'description' => $description, 'body' => $read, 'headers' => $headers];
     }
-    
-    public function read($length, $flags = 0) {
+
+    public function read($length, $flags = 0)
+    {
         $read = $this->sock->read($length, $flags);
         if ($read === 0) {
             throw new \danog\MadelineProto\Exception('pls reconnect');
         }
+
         return $read;
     }
 
-    public function write($buffer, $length = -1) {
+    public function write($buffer, $length = -1)
+    {
         return $this->sock->write($buffer, $length);
     }
 
-    public function send($data, $length, $flags) {
+    public function send($data, $length, $flags)
+    {
         throw new \danog\MadelineProto\Exception('Not Implemented');
     }
 
-    public function close() {
+    public function close()
+    {
         $this->sock->close();
     }
 
-    public function getPeerName($port = true) {
+    public function getPeerName($port = true)
+    {
         throw new \danog\MadelineProto\Exception('Not Implemented');
     }
 
-    public function getSockName($port = true) {
+    public function getSockName($port = true)
+    {
         throw new \danog\MadelineProto\Exception('Not Implemented');
     }
-    public function getProxyHeaders() {
-    
+
+    public function getProxyHeaders()
+    {
     }
 }

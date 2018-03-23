@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelineProto/'));
 
-/**
+/*
  * Various ways to load MadelineProto
  */
 if (!file_exists(__DIR__.'/vendor/autoload.php')) {
@@ -29,12 +29,14 @@ class EventHandler extends \danog\MadelineProto\EventHandler
 {
     public function onAny($update)
     {
-        \danog\MadelineProto\Logger::log("Received an update of type ".$update['_']);
+        \danog\MadelineProto\Logger::log('Received an update of type '.$update['_']);
     }
+
     public function onUpdateNewChannelMessage($update)
     {
         $this->onUpdateNewMessage($update);
     }
+
     public function onUpdateNewMessage($update)
     {
         if (isset($update['message']['out']) && $update['message']['out']) {
@@ -62,7 +64,6 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         }
     }
 }
-
 
 $settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e'], 'updates' => ['handle_updates' => true]]; //, 'connection_settings' => ['all' => ['test_mode' => true]]];
 

@@ -41,7 +41,7 @@ trait MessageHandler
                 \danog\MadelineProto\Logger::log("Inside of msg_container, sending {$message['_']} as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 $message['_'] = 'MTmessage';
                 $messages[] = $message;
-                $this->datacenter->sockets[$datacenter]->outgoing_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'response' => -1];//, 'content' => $this->deserialize($message['body'], ['type' => '', 'datacenter' => $datacenter])];
+                $this->datacenter->sockets[$datacenter]->outgoing_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'response' => -1]; //, 'content' => $this->deserialize($message['body'], ['type' => '', 'datacenter' => $datacenter])];
             }
             $message_data = $this->serialize_object(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'lol');
             $message_id = $this->generate_message_id($datacenter);

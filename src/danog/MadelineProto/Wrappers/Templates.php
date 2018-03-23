@@ -43,6 +43,7 @@ trait Templates
             break;
         }
     }
+
     private $web_template = '<!DOCTYPE html>
         <html>
         <head>
@@ -62,10 +63,14 @@ trait Templates
     {
         return sprintf($this->web_template, $form, $message);
     }
-    public function get_web_template() {
+
+    public function get_web_template()
+    {
         return $this->web_template;
     }
-    public function set_web_template($template) {
+
+    public function set_web_template($template)
+    {
         $this->web_template = $template;
     }
 }

@@ -21,13 +21,15 @@ trait Events
     public $event_handler;
     private $event_handler_instance;
 
-    public function setEventHandler($event_handler) {
+    public function setEventHandler($event_handler)
+    {
         $this->event_handler = $event_handler;
         $this->settings['updates']['callback'] = [$this, 'event_update_handler'];
         $this->settings['updates']['handle_updates'] = true;
     }
 
-    public function event_update_handler($update) {
+    public function event_update_handler($update)
+    {
         if (!class_exists($this->event_handler) || !is_subclass_of($this->event_handler, '\danog\MadelineProto\EventHandler')) {
             throw new \danog\MadelineProto\Exception('Wrong event handler was defined');
         }
@@ -38,7 +40,7 @@ trait Events
         $method_name = 'on'.ucfirst($update['_']);
         if (method_exists($this->event_handler_instance, $method_name)) {
             $this->event_handler_instance->$method_name($update);
-        } else if (method_exists($this->event_handler_instance, 'onAny')) {
+        } elseif (method_exists($this->event_handler_instance, 'onAny')) {
             $this->event_handler_instance->onAny($update);
         }
     }

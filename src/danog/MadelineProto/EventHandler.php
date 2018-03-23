@@ -15,12 +15,14 @@ namespace danog\MadelineProto;
 
 class EventHandler extends APIFactory
 {
-    public function __construct($MadelineProto) {
+    public function __construct($MadelineProto)
+    {
         $this->API = $MadelineProto;
         foreach ($this->API->get_method_namespaces() as $namespace) {
             $this->{$namespace} = new APIFactory($namespace, $this->API);
         }
     }
+
     public function &__get($name)
     {
         if ($name === 'settings') {

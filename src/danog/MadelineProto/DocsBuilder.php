@@ -572,6 +572,7 @@ Any json-encodable data.
 ');
         \danog\MadelineProto\Logger::log('Done!', \danog\MadelineProto\Logger::NOTICE);
     }
+
     public $template = '<?php
     /*
     Copyright 2016-2018 Daniil Gentili
@@ -593,12 +594,12 @@ class Lang
     // THIS WILL BE OVERWRITTEN BY $lang["en"]
     public static $current_lang = %s;
 }';
-    
-    public function add_to_lang($key) {
+
+    public function add_to_lang($key)
+    {
         if (!isset(\danog\MadelineProto\Lang::$lang['en'][$key])) {
             \danog\MadelineProto\Lang::$lang['en'][$key] = '';
             file_put_contents(__DIR__.'/Lang.php', sprintf($this->template, var_export(\danog\MadelineProto\Lang::$lang, true), var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
         }
-
     }
 }

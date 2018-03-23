@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelineProto/'));
 
-/**
+/*
  * Various ways to load MadelineProto
  */
 if (!file_exists(__DIR__.'/vendor/autoload.php')) {
@@ -25,20 +25,23 @@ if (!file_exists(__DIR__.'/vendor/autoload.php')) {
     require_once 'vendor/autoload.php';
 }
 
-
 class EventHandler extends \danog\MadelineProto\EventHandler
 {
     private $sent = [-440592694 => true];
-    public function onUpdateNewEncryptedMessage($update) {
+
+    public function onUpdateNewEncryptedMessage($update)
+    {
         try {
-            if (isset($update['message']['decrypted_message']['media'])) \danog\MadelineProto\Logger::log($this->download_to_dir($update, '.'));
+            if (isset($update['message']['decrypted_message']['media'])) {
+                \danog\MadelineProto\Logger::log($this->download_to_dir($update, '.'));
+            }
             if (isset($this->sent[$update['message']['chat_id']])) {
                 return;
             }
             $secret_media = [];
 
             // Photo uploaded as document, secret chat
-            
+
             $inputEncryptedFile = $this->upload_encrypted('tests/faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
             $secret_media['document_photo'] = ['peer' => $update, 'file' => $inputEncryptedFile, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => mime_content_type('tests/faust.jpg'), 'caption' => 'This file was uploaded using MadelineProto', 'key' => $inputEncryptedFile['key'], 'iv' => $inputEncryptedFile['iv'], 'file_name' => 'faust.jpg', 'size' => filesize('tests/faust.jpg'), 'attributes' => [['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914]]]]];
 
@@ -87,9 +90,6 @@ class EventHandler extends \danog\MadelineProto\EventHandler
     }
 }
 
-
-
-
 if (file_exists('.env')) {
     echo 'Loading .env...'.PHP_EOL;
     $dotenv = new Dotenv\Dotenv(getcwd());
@@ -98,7 +98,6 @@ if (file_exists('.env')) {
 
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
-
 
 try {
     $MadelineProto = new \danog\MadelineProto\API('s.madeline', $settings);

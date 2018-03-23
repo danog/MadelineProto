@@ -81,7 +81,7 @@ class Serialization
         return $wrote;
     }
 
-    /**
+    /*
      * Deserialize API class.
      *
      * @param string $filename

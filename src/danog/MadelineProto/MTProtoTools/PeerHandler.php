@@ -267,6 +267,7 @@ trait PeerHandler
                     if (!isset($this->secret_chats[$id])) {
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
                     }
+
                     return $this->secret_chats[$id];
                 case 'updateNewMessage':
                 case 'updateNewChannelMessage':
@@ -753,6 +754,7 @@ trait PeerHandler
             if (strpos($e->rpc, 'FLOOD_WAIT_') === 0 || $e->rpc === 'AUTH_KEY_UNREGISTERED' || $e->rpc === 'USERNAME_INVALID') {
                 throw $e;
             }
+
             return false;
         }
         if ($res['_'] === 'contacts.resolvedPeer') {

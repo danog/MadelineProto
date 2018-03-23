@@ -16,5 +16,6 @@ namespace danog\MadelineProto;
 interface FileCallbackInterface
 {
     public function getFile();
+
     public function __invoke($percent);
 }

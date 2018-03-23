@@ -73,7 +73,7 @@ trait Methods
 ';
             if (!isset($this->td_descriptions['methods'][$data['method']])) {
                 $this->add_to_lang('method_'.$data['method']);
-                
+
                 if (\danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']] !== '') {
                     $this->td_descriptions['methods'][$data['method']]['description'] = \danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']];
                 }
@@ -106,19 +106,19 @@ trait Methods
                         $ptype = 'Bool';
                 }
                 $human_ptype = 'CLICK ME '.$ptype;
-                if (in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])&& !isset($this->settings['td'])) {
+                if (in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
                 }
-                if (in_array($ptype, ['InputMedia', 'InputPhoto', 'InputDocument'])&& !isset($this->settings['td'])) {
+                if (in_array($ptype, ['InputMedia', 'InputPhoto', 'InputDocument']) && !isset($this->settings['td'])) {
                     $human_ptype = 'MessageMedia, Update, Message or '.$ptype;
                 }
-                if (in_array($ptype, ['InputMessage'])&& !isset($this->settings['td'])) {
+                if (in_array($ptype, ['InputMessage']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Message ID or '.$ptype;
                 }
-                if (in_array($ptype, ['InputEncryptedChat'])&& !isset($this->settings['td'])) {
+                if (in_array($ptype, ['InputEncryptedChat']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Secret chat ID, Update, EncryptedMessage or '.$ptype;
                 }
-                if (in_array($ptype, ['InputFile'])&& !isset($this->settings['td'])) {
+                if (in_array($ptype, ['InputFile']) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
                 if (in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
@@ -132,7 +132,7 @@ trait Methods
                         $this->td_descriptions['methods'][$data['method']]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['method_'.$data['method'].'_param_'.$param['name'].'_type_'.$param['type']];
                     }
                 }
-                
+
                 if (isset($this->td_descriptions['methods'][$data['method']])) {
                     $table .= $this->td_descriptions['methods'][$data['method']]['params'][$param['name']].'|';
                 }

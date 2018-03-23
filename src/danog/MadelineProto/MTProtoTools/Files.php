@@ -87,7 +87,9 @@ trait Files
     {
         return $this->upload($file, $file_name, $cb, true);
     }
-    public function gen_all_file($media) {
+
+    public function gen_all_file($media)
+    {
         $res = [$this->constructors->find_by_predicate($media['_'])['type'] => $media];
         switch ($media['_']) {
             case 'messageMediaPhoto':
@@ -131,10 +133,12 @@ trait Files
             default:
                 throw new \danog\MadelineProto\Exception('Could not convert media object');
         }
-        return $res;
 
+        return $res;
     }
-    public function get_file_info($constructor) {
+
+    public function get_file_info($constructor)
+    {
         if (is_string($constructor)) {
             $constructor = $this->unpack_file_id($constructor)['MessageMedia'];
         }
@@ -146,8 +150,10 @@ trait Files
             case 'message':
             $constructor = $constructor['media'];
         }
+
         return $this->gen_all_file($constructor);
     }
+
     public function get_download_info($message_media)
     {
         if (is_string($message_media)) {

@@ -52,11 +52,11 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
         $param_type = isset($matches[2]) ? $matches[2] : '';
         if ($param_name === 'nonce' && $param_type === 'int128') {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = 'Random number for cryptographic security';
-        } else if ($param_name === 'server_nonce' && $param_type === 'int128') {
+        } elseif ($param_name === 'server_nonce' && $param_type === 'int128') {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = 'Random number for cryptographic security, given by server';
-        } else if ($param_name === 'random_id' && $param_type === 'long') {
+        } elseif ($param_name === 'random_id' && $param_type === 'long') {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = 'Random number for cryptographic security';
-        } else if (isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$method_name])) {
+        } elseif (isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$method_name])) {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = \danog\MadelineProto\MTProto::DISALLOWED_METHODS[$method_name];
         } else {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = readline($value.' => ');

@@ -198,7 +198,9 @@ trait CallHandler
                         $only_updates = false;
                         if ($last_recv === $this->datacenter->sockets[$aargs['datacenter']]->last_recv) { // the socket is dead, resend request
                             $this->close_and_reopen($aargs['datacenter']);
-                            if ($this->altervista) continue 2;
+                            if ($this->altervista) {
+                                continue 2;
+                            }
                         }
                         //if ($this->datacenter->sockets[$aargs['datacenter']]->last_recv < time() - 1 && $this->is_http($aargs['datacenter'])) {
                         //    $this->close_and_reopen($aargs['datacenter']);

@@ -82,6 +82,7 @@ class API extends APIFactory
                 if (isset($unserialized->API)) {
                     $this->API = $unserialized->API;
                     $this->APIFactory();
+
                     return;
                 }
             }
@@ -178,6 +179,7 @@ class API extends APIFactory
         if (is_null($this->session)) {
             return;
         }
+
         return Serialization::serialize($params, $this);
     }
 }

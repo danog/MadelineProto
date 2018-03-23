@@ -32,10 +32,10 @@ trait Start
                     }
                     $fp = fopen('php://stdin', 'r');
                     $line = rtrim(fgets($fp, 1024));
-            
+
                     return $line;
                 }
-            }            
+            }
             if (strpos(readline('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
                 $this->bot_login(readline('Enter your bot token: '));
             } else {
@@ -87,7 +87,6 @@ trait Start
             exit;
         }
     }
-
 
     public function web_phone_login()
     {
@@ -148,5 +147,4 @@ trait Start
             $this->web_echo('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
-
 }

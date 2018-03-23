@@ -34,13 +34,16 @@ trait ApiTemplates
     {
         return sprintf($this->web_api_template, $form, $message);
     }
-    public function get_web_api_template() {
+
+    public function get_web_api_template()
+    {
         return $this->web_template;
     }
-    public function set_web_api_template($template) {
+
+    public function set_web_api_template($template)
+    {
         $this->web_template = $template;
     }
-
 
     public function web_api_echo($message = '')
     {
@@ -58,5 +61,4 @@ trait ApiTemplates
             echo $this->web_api_echo_template('Enter your code<br><b>'.$message.'</b>', '<input type="text" name="code" placeholder="Code" required/>');
         }
     }
-
 }

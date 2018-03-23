@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * Various ways to load MadelineProto
+ * Various ways to load MadelineProto.
  */
 if (!file_exists(__DIR__.'/../vendor/autoload.php')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
@@ -24,7 +24,7 @@ if (!file_exists(__DIR__.'/../vendor/autoload.php')) {
     require_once 'vendor/autoload.php';
 }
 
-/**
+/*
  * Load .env for settings
  */
 if (file_exists('.env')) {
@@ -38,23 +38,24 @@ if (getenv('TEST_SECRET_CHAT') == '') {
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
-/**
+/*
  * Load MadelineProto
  */
 echo 'Loading MadelineProto...'.PHP_EOL;
+
 try {
     $MadelineProto = new \danog\MadelineProto\API(getcwd().'/testing.madeline', $settings);
 } catch (\danog\MadelineProto\Exception $e) {
     echo $e.PHP_EOL;
     unlink(getcwd().'/testing.madeline');
-    $MadelineProto = new \danog\MadelineProto\API(getcwd().'/testing.madeline', $settings);    
+    $MadelineProto = new \danog\MadelineProto\API(getcwd().'/testing.madeline', $settings);
 }
 
-/**
+/*
  * If this session is not logged in, login
  */
 if ($MadelineProto->get_self() === false) {
-    /**
+    /*
      * If a BOT_TOKEN is defined in .env, use it to login, else prompt for login info
      */
     if (getenv('BOT_TOKEN') == '') {
@@ -64,7 +65,7 @@ if ($MadelineProto->get_self() === false) {
     }
 }
 
-/**
+/*
  * Test logging
  */
 \danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
@@ -75,11 +76,11 @@ if ($MadelineProto->get_self() === false) {
 \danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::FATAL_ERROR);
 
 /**
- * A small example message to use for tests
+ * A small example message to use for tests.
  */
 $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.getenv('TRAVIS_COMMIT').', job '.getenv('TRAVIS_JOB_NUMBER').', PHP version: '.getenv('TRAVIS_PHP_VERSION'));
 
-/**
+/*
  * Try making a phone call
  */
 if (stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
@@ -93,7 +94,7 @@ if (stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
     }
 }
 
-/**
+/*
  * Try receiving a phone call
  */
 if (stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== false) {
@@ -115,17 +116,17 @@ if (stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== 
     }
 }
 
-/**
+/*
  * Secret chat usage
  */
 if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
     /**
-     * Request a secret chat
+     * Request a secret chat.
      */
     $secret_chat_id = $MadelineProto->API->request_secret_chat(getenv('TEST_SECRET_CHAT'));
     echo 'Waiting for '.getenv('TEST_SECRET_CHAT').' (secret chat id '.$secret_chat_id.') to accept the secret chat...'.PHP_EOL;
 
-    /**
+    /*
      * Wait until the other party accepts it
      */
     while ($MadelineProto->secret_chat_status($secret_chat_id) !== 2) {
@@ -133,68 +134,68 @@ if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y')
     }
 
     /**
-     * Send a markdown-formatted text message with expiration after 10 seconds
+     * Send a markdown-formatted text message with expiration after 10 seconds.
      */
     $sentMessage = $MadelineProto->messages->sendEncrypted([
-        'peer' => $secret_chat_id,
+        'peer'    => $secret_chat_id,
         'message' => [
-            '_' => 'decryptedMessage',
-            'media' => ['_' => 'decryptedMessageMediaEmpty'], // No media
-            'ttl' => 10, // This message self-destructs 10 seconds after reception
-            'message' => '```'.$message.'```', // Code Markdown
-            'parse_mode' => 'Markdown'
-        ]
+            '_'          => 'decryptedMessage',
+            'media'      => ['_' => 'decryptedMessageMediaEmpty'], // No media
+            'ttl'        => 10, // This message self-destructs 10 seconds after reception
+            'message'    => '```'.$message.'```', // Code Markdown
+            'parse_mode' => 'Markdown',
+        ],
     ]);
     \danog\MadelineProto\Logger::log($sentMessage, \danog\MadelineProto\Logger::NOTICE);
 
     /**
-     * Send secret media
+     * Send secret media.
      */
     $secret_media = [];
 
     // Photo uploaded as document, secret chat
     $secret_media['document_photo'] = [
-        'peer' => $secret_chat_id, 
-        'file' => 'tests/faust.jpg', // The file to send
+        'peer'    => $secret_chat_id,
+        'file'    => 'tests/faust.jpg', // The file to send
         'message' => [
-            '_' => 'decryptedMessage', 
-            'ttl' => 0, // This message does not self-destruct
+            '_'       => 'decryptedMessage',
+            'ttl'     => 0, // This message does not self-destruct
             'message' => '', // No text message, only media
-            'media' => [
-                '_' => 'decryptedMessageMediaDocument',
-                'thumb' => file_get_contents('tests/faust.preview.jpg'), // The thumbnail must be generated manually, it must be in jpg format, 90x90
-                'thumb_w' => 90,
-                'thumb_h' => 90,
-                'mime_type' => mime_content_type('tests/faust.jpg'), // The file's mime type
-                'caption' => 'This file was uploaded using @MadelineProto', // The caption
-                'file_name' => 'faust.jpg', // The file's name
-                'size' => filesize('tests/faust.jpg'), // The file's size
+            'media'   => [
+                '_'          => 'decryptedMessageMediaDocument',
+                'thumb'      => file_get_contents('tests/faust.preview.jpg'), // The thumbnail must be generated manually, it must be in jpg format, 90x90
+                'thumb_w'    => 90,
+                'thumb_h'    => 90,
+                'mime_type'  => mime_content_type('tests/faust.jpg'), // The file's mime type
+                'caption'    => 'This file was uploaded using @MadelineProto', // The caption
+                'file_name'  => 'faust.jpg', // The file's name
+                'size'       => filesize('tests/faust.jpg'), // The file's size
                 'attributes' => [
-                    ['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914] // Image's resolution
-                ]
-            ]
-        ]
+                    ['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914], // Image's resolution
+                ],
+            ],
+        ],
     ];
 
     // Photo, secret chat
     $secret_media['photo'] = [
-        'peer' => $secret_chat_id,
-        'file' => 'tests/faust.jpg',
+        'peer'    => $secret_chat_id,
+        'file'    => 'tests/faust.jpg',
         'message' => [
-            '_' => 'decryptedMessage',
-            'ttl' => 0,
-            'message' => '', 
-            'media' => [
-                '_' => 'decryptedMessageMediaPhoto',
-                'thumb' => file_get_contents('tests/faust.preview.jpg'),
+            '_'       => 'decryptedMessage',
+            'ttl'     => 0,
+            'message' => '',
+            'media'   => [
+                '_'       => 'decryptedMessageMediaPhoto',
+                'thumb'   => file_get_contents('tests/faust.preview.jpg'),
                 'thumb_w' => 90,
                 'thumb_h' => 90,
                 'caption' => 'This file was uploaded using @MadelineProto',
-                'size' => filesize('tests/faust.jpg'),
-                'w' => 1280,
-                'h' => 914
-            ]
-        ]
+                'size'    => filesize('tests/faust.jpg'),
+                'w'       => 1280,
+                'h'       => 914,
+            ],
+        ],
     ];
 
     // GIF, secret chat

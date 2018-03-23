@@ -130,7 +130,11 @@ class Logger
         }
         if (!is_string($param)) {
             $parame = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-            if ($parame == '') $param = var_export($param, true); else $param = $parame;
+            if ($parame == '') {
+                $param = var_export($param, true);
+            } else {
+                $param = $parame;
+            }
         }
         $param = str_pad(basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php').$prefix.': ', 16 + strlen($prefix))."\t".$param;
         /*if (self::$isatty) {

@@ -29,7 +29,7 @@ trait ApiStart
                     }
                     $fp = fopen('php://stdin', 'r');
                     $line = rtrim(fgets($fp, 1024));
-            
+
                     return $line;
                 }
             }
@@ -44,6 +44,7 @@ trait ApiStart
 4) Click on create application'.PHP_EOL;
                 $app['api_id'] = readline('5) Enter your API ID: ');
                 $app['api_hash'] = readline('6) Enter your API hash: ');
+
                 return $app;
             } else {
                 $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper(readline('Enter a phone number that is already registered on Telegram: '));
@@ -53,6 +54,7 @@ trait ApiStart
                 } else {
                     $app = $this->my_telegram_org_wrapper->get_app();
                 }
+
                 return $app;
             }
         } else {
@@ -62,16 +64,18 @@ trait ApiStart
                     $app['api_id'] = (int) $_POST['api_id'];
                     $app['api_hash'] = $_POST['api_hash'];
                     $this->getting_api_id = false;
+
                     return $app;
-                } else if (isset($_POST['phone_number'])) {
+                } elseif (isset($_POST['phone_number'])) {
                     $this->web_api_phone_login();
                 } else {
                     $this->web_api_echo();
                 }
-            } else if (!$this->my_telegram_org_wrapper->logged_in()) {
+            } elseif (!$this->my_telegram_org_wrapper->logged_in()) {
                 if (isset($_POST['code'])) {
                     $app = $this->web_api_complete_login();
                     $this->getting_api_id = false;
+
                     return $app;
                 } else {
                     $this->web_api_echo("You didn't provide a phone code!");
@@ -80,6 +84,7 @@ trait ApiStart
             exit;
         }
     }
+
     public function web_api_phone_login()
     {
         try {
@@ -101,6 +106,7 @@ trait ApiStart
             } else {
                 $app = $this->my_telegram_org_wrapper->get_app();
             }
+
             return $app;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             $this->web_api_echo('ERROR: '.$e->getMessage().'. Try again.');

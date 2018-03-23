@@ -17,7 +17,8 @@ namespace danog\MadelineProto;
  */
 trait Tools
 {
-    public function gen_vector_hash($ints) {
+    public function gen_vector_hash($ints)
+    {
         if (\danog\MadelineProto\Logger::$bigint) {
             $hash = new \phpseclib\Math\BigInteger(0);
             foreach ($ints as $int) {
@@ -30,8 +31,10 @@ trait Tools
                 $hash = (($hash * 20261) + 0x80000000 + $int) % 0x80000000;
             }
         }
+
         return $hash;
     }
+
     public function random($length)
     {
         return $length === 0 ? '' : \phpseclib\Crypt\Random::string($length);

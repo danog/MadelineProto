@@ -18,7 +18,8 @@ namespace danog\MadelineProto\Wrappers;
  */
 trait Callback
 {
-    public function setCallback($callback) {
+    public function setCallback($callback)
+    {
         $this->settings['updates']['callback'] = $callback;
         $this->settings['updates']['handle_updates'] = true;
     }

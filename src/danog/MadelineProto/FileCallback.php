@@ -17,14 +17,20 @@ class FileCallback implements FileCallbackInterface
 {
     private $file;
     private $callback;
-    public function __construct($file, $callback) {
+
+    public function __construct($file, $callback)
+    {
         $this->file = $file;
         $this->callback = $callback;
     }
-    public function getFile() {
+
+    public function getFile()
+    {
         return $this->file;
     }
-    public function __invoke($percent) {
+
+    public function __invoke($percent)
+    {
         $this->callback($percent);
     }
 }

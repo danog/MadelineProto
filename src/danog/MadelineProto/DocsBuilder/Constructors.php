@@ -130,22 +130,22 @@ trait Constructors
                         $ptype = 'Bool';
                 }
                 $human_ptype = $ptype;
-                if (strpos($type, 'Input') === 0 && in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])&& !isset($this->settings['td'])) {
+                if (strpos($type, 'Input') === 0 && in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
                 }
-                if (strpos($type, 'Input') === 0 && in_array($ptype, ['InputMedia', 'InputDocument', 'InputPhoto'])&& !isset($this->settings['td'])) {
+                if (strpos($type, 'Input') === 0 && in_array($ptype, ['InputMedia', 'InputDocument', 'InputPhoto']) && !isset($this->settings['td'])) {
                     $human_ptype = 'MessageMedia, Message, Update or '.$ptype;
                 }
-                if (in_array($ptype, ['InputMessage'])&& !isset($this->settings['td'])) {
+                if (in_array($ptype, ['InputMessage']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Message ID or '.$ptype;
                 }
-                if (in_array($ptype, ['InputEncryptedChat'])&& !isset($this->settings['td'])) {
+                if (in_array($ptype, ['InputEncryptedChat']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Secret chat ID, Update, EncryptedMessage or '.$ptype;
                 }
-                if (in_array($ptype, ['InputFile'])&& !isset($this->settings['td'])) {
+                if (in_array($ptype, ['InputFile']) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                if (in_array($ptype, ['InputEncryptedFile'])&& !isset($this->settings['td'])) {
+                if (in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
                 $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') || ($data['type'] === 'InputMedia' && $param['name'] === 'mime_type') || ($data['type'] === 'DocumentAttribute' && in_array($param['name'], ['w', 'h', 'duration'])) ? 'Optional' : 'Yes').'|';
