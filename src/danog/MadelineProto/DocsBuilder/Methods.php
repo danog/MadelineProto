@@ -70,9 +70,11 @@ trait Methods
             $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md)<a name="'.$method.'"></a>  
 
 ';
-            $this->human_docs_methods[$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$this->td_descriptions['methods'][$data['method']]['description'].'</a>  
+            if (!isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']])) {
+                $this->human_docs_methods[$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$this->td_descriptions['methods'][$data['method']]['description'].'</a>  
 
 ';
+            }
             $params = '';
             $lua_params = '';
             $pwr_params = '';
@@ -314,15 +316,8 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
         foreach ($this->docs_methods as $method => &$value) {
             $new_namespace = preg_replace('/_.*/', '', $method);
             $br = $new_namespace != $last_namespace ? '***
-<br><br>' : '';
-            $value = $br.$value;
-            $last_namespace = $new_namespace;
-        }
-        $last_namespace = '';
-        foreach ($this->human_docs_methods as $method => &$value) {
-            $new_namespace = preg_replace('/_.*/', '', $method);
-            $br = $new_namespace != $last_namespace ? '***
-<br><br>' : '';
+<br><br>
+' : '';
             $value = $br.$value;
             $last_namespace = $new_namespace;
         }

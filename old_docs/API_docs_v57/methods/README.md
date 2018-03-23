@@ -27,8 +27,7 @@ description: What do you want to do?
 
 * [Create a secret chat bot](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
 
-***
-<br><br>* <a href="account_changePhone.html" name="account_changePhone">Change the phone number associated to this account</a>  
+* <a href="account_changePhone.html" name="account_changePhone">Change the phone number associated to this account</a>  
 
 * <a href="account_checkUsername.html" name="account_checkUsername">Check if this username is available</a>  
 
@@ -80,24 +79,11 @@ description: What do you want to do?
 
 * <a href="account_updateUsername.html" name="account_updateUsername">Update this user's username</a>  
 
-***
-<br><br>* <a href="auth_bindTempAuthKey.html" name="auth_bindTempAuthKey">You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info</a>  
-
 * <a href="auth_cancelCode.html" name="auth_cancelCode">Invalidate sent phone code</a>  
-
-* <a href="auth_checkPassword.html" name="auth_checkPassword">You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)</a>  
 
 * <a href="auth_checkPhone.html" name="auth_checkPhone">Check if this phone number is registered on telegram</a>  
 
 * <a href="auth_dropTempAuthKeys.html" name="auth_dropTempAuthKeys">Delete all temporary authorization keys except the ones provided</a>  
-
-* <a href="auth_exportAuthorization.html" name="auth_exportAuthorization">You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html</a>  
-
-* <a href="auth_importAuthorization.html" name="auth_importAuthorization">You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html</a>  
-
-* <a href="auth_importBotAuthorization.html" name="auth_importBotAuthorization">You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)</a>  
-
-* <a href="auth_logOut.html" name="auth_logOut">You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info)</a>  
 
 * <a href="auth_recoverPassword.html" name="auth_recoverPassword">Use the code that was emailed to you after running $MadelineProto->auth->requestPasswordRecovery to login to your account</a>  
 
@@ -107,16 +93,9 @@ description: What do you want to do?
 
 * <a href="auth_resetAuthorizations.html" name="auth_resetAuthorizations">Delete all logged-in sessions.</a>  
 
-* <a href="auth_sendCode.html" name="auth_sendCode">Use phone_login instead</a>  
-
 * <a href="auth_sendInvites.html" name="auth_sendInvites">Invite friends to telegram!</a>  
 
-* <a href="auth_signIn.html" name="auth_signIn">You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)</a>  
-
-* <a href="auth_signUp.html" name="auth_signUp">You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)</a>  
-
-***
-<br><br>* <a href="channels_checkUsername.html" name="channels_checkUsername">Check if this username is free and can be assigned to a channel/supergroup</a>  
+* <a href="channels_checkUsername.html" name="channels_checkUsername">Check if this username is free and can be assigned to a channel/supergroup</a>  
 
 * <a href="channels_createChannel.html" name="channels_createChannel">Create channel/supergroup</a>  
 
@@ -141,8 +120,6 @@ description: What do you want to do?
 * <a href="channels_getAdminedPublicChannels.html" name="channels_getAdminedPublicChannels">Get all supergroups/channels where you're admin</a>  
 
 * <a href="channels_getChannels.html" name="channels_getChannels">Get info about multiple channels/supergroups</a>  
-
-* <a href="channels_getFullChannel.html" name="channels_getFullChannel">You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)</a>  
 
 * <a href="channels_getMessages.html" name="channels_getMessages">Get channel/supergroup messages</a>  
 
@@ -170,8 +147,7 @@ description: What do you want to do?
 
 * <a href="channels_updateUsername.html" name="channels_updateUsername">Update the username of a supergroup/channel</a>  
 
-***
-<br><br>* <a href="contacts_block.html" name="contacts_block">Block a user</a>  
+* <a href="contacts_block.html" name="contacts_block">Block a user</a>  
 
 * <a href="contacts_deleteContact.html" name="contacts_deleteContact">Delete a contact</a>  
 
@@ -193,14 +169,11 @@ description: What do you want to do?
 
 * <a href="contacts_resetTopPeerRating.html" name="contacts_resetTopPeerRating">Reset top peer rating for a certain category/peer</a>  
 
-* <a href="contacts_resolveUsername.html" name="contacts_resolveUsername">You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)</a>  
-
 * <a href="contacts_search.html" name="contacts_search">Search contacts</a>  
 
 * <a href="contacts_unblock.html" name="contacts_unblock">Unblock a user</a>  
 
-***
-<br><br>* <a href="help_getAppChangelog.html" name="help_getAppChangelog">Get the changelog of this app</a>  
+* <a href="help_getAppChangelog.html" name="help_getAppChangelog">Get the changelog of this app</a>  
 
 * <a href="help_getAppUpdate.html" name="help_getAppUpdate">Get info about app updates</a>  
 
@@ -216,23 +189,15 @@ description: What do you want to do?
 
 * <a href="help_saveAppLog.html" name="help_saveAppLog">Log data for developer of this app</a>  
 
-***
-<br><br>* <a href="initConnection.html" name="initConnection">Initializes connection and save information on the user's device and application.</a>  
+* <a href="initConnection.html" name="initConnection">Initializes connection and save information on the user's device and application.</a>  
 
-***
-<br><br>* <a href="invokeAfterMsg.html" name="invokeAfterMsg">Invokes a query after successfull completion of one of the previous queries.</a>  
+* <a href="invokeAfterMsg.html" name="invokeAfterMsg">Invokes a query after successfull completion of one of the previous queries.</a>  
 
-***
-<br><br>* <a href="invokeAfterMsgs.html" name="invokeAfterMsgs">Result type returned by a current query.</a>  
+* <a href="invokeAfterMsgs.html" name="invokeAfterMsgs">Result type returned by a current query.</a>  
 
-***
-<br><br>* <a href="invokeWithLayer.html" name="invokeWithLayer">Invoke this method with layer X</a>  
+* <a href="invokeWithLayer.html" name="invokeWithLayer">Invoke this method with layer X</a>  
 
-***
-<br><br>* <a href="invokeWithoutUpdates.html" name="invokeWithoutUpdates">Invoke with method without returning updates in the socket</a>  
-
-***
-<br><br>* <a href="messages_acceptEncryption.html" name="messages_acceptEncryption">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats</a>  
+* <a href="invokeWithoutUpdates.html" name="invokeWithoutUpdates">Invoke with method without returning updates in the socket</a>  
 
 * <a href="messages_addChatUser.html" name="messages_addChatUser">Add a user to a normal chat (use channels->inviteToChannel for supergroups)</a>  
 
@@ -247,8 +212,6 @@ description: What do you want to do?
 * <a href="messages_deleteHistory.html" name="messages_deleteHistory">Delete chat history</a>  
 
 * <a href="messages_deleteMessages.html" name="messages_deleteMessages">Delete messages</a>  
-
-* <a href="messages_discardEncryption.html" name="messages_discardEncryption">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats</a>  
 
 * <a href="messages_editChatAdmin.html" name="messages_editChatAdmin">Edit admin permissions</a>  
 
@@ -278,15 +241,11 @@ description: What do you want to do?
 
 * <a href="messages_getChats.html" name="messages_getChats">Get info about chats</a>  
 
-* <a href="messages_getDhConfig.html" name="messages_getDhConfig">You cannot use this method directly, instead use $MadelineProto->get_dh_config();</a>  
-
 * <a href="messages_getDialogs.html" name="messages_getDialogs">Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html</a>  
 
 * <a href="messages_getDocumentByHash.html" name="messages_getDocumentByHash">Get document by SHA256 hash</a>  
 
 * <a href="messages_getFeaturedStickers.html" name="messages_getFeaturedStickers">Get featured stickers</a>  
-
-* <a href="messages_getFullChat.html" name="messages_getFullChat">You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)</a>  
 
 * <a href="messages_getGameHighScores.html" name="messages_getGameHighScores">Get high scores of a game</a>  
 
@@ -334,13 +293,9 @@ description: What do you want to do?
 
 * <a href="messages_receivedMessages.html" name="messages_receivedMessages">Mark messages as read</a>  
 
-* <a href="messages_receivedQueue.html" name="messages_receivedQueue">You cannot use this method directly</a>  
-
 * <a href="messages_reorderStickerSets.html" name="messages_reorderStickerSets">Reorder sticker sets</a>  
 
 * <a href="messages_reportSpam.html" name="messages_reportSpam">Report a peer for spam</a>  
-
-* <a href="messages_requestEncryption.html" name="messages_requestEncryption">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats</a>  
 
 * <a href="messages_saveDraft.html" name="messages_saveDraft">Save a message draft</a>  
 
@@ -384,31 +339,13 @@ description: What do you want to do?
 
 * <a href="messages_uninstallStickerSet.html" name="messages_uninstallStickerSet">Remove a sticker set</a>  
 
-***
-<br><br>* <a href="photos_deletePhotos.html" name="photos_deletePhotos">Delete profile photos</a>  
+* <a href="photos_deletePhotos.html" name="photos_deletePhotos">Delete profile photos</a>  
 
 * <a href="photos_getUserPhotos.html" name="photos_getUserPhotos">Get the profile photos of a user</a>  
 
 * <a href="photos_updateProfilePhoto.html" name="photos_updateProfilePhoto">Update the profile photo (use photos->uploadProfilePhoto to upload the photo)</a>  
 
 * <a href="photos_uploadProfilePhoto.html" name="photos_uploadProfilePhoto">Upload profile photo</a>  
-
-***
-<br><br>* <a href="updates_getChannelDifference.html" name="updates_getChannelDifference">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates</a>  
-
-* <a href="updates_getDifference.html" name="updates_getDifference">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates</a>  
-
-* <a href="updates_getState.html" name="updates_getState">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates</a>  
-
-***
-<br><br>* <a href="upload_getFile.html" name="upload_getFile">You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info</a>  
-
-* <a href="upload_saveBigFilePart.html" name="upload_saveBigFilePart">You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info</a>  
-
-* <a href="upload_saveFilePart.html" name="upload_saveFilePart">You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info</a>  
-
-***
-<br><br>* <a href="users_getFullUser.html" name="users_getFullUser">You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)</a>  
 
 * <a href="users_getUsers.html" name="users_getUsers">Get info about users</a>  
 
