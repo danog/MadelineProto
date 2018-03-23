@@ -1,12 +1,12 @@
 ---
 title: messages.sendInlineBotResult
-description: Send a received bot result to the chat
+description: Send inline bot result obtained with messages.getInlineBotResults to the chat
 ---
 ## Method: messages.sendInlineBotResult  
 [Back to methods index](index.md)
 
 
-Send a received bot result to the chat
+Send inline bot result obtained with messages.getInlineBotResults to the chat
 
 ### Parameters:
 
@@ -18,7 +18,7 @@ Send a received bot result to the chat
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to send the message|
 |reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|Reply to message by ID|
 |query\_id|[CLICK ME long](../types/long.md) | Yes|The inline query ID|
-|id|[CLICK ME string](../types/string.md) | Yes|The result ID|
+|id|[CLICK ME string](../types/string.md) | Yes|The ID of one of the inline results|
 
 
 ### Return type: [Updates](../types/Updates.md)

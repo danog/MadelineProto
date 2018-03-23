@@ -281,11 +281,11 @@ description: What do you want to do?
 
 * <a href="messages_sendMessage.html" name="messages_sendMessage">Send a message: messages.sendMessage</a>  
 
-* <a href="messages_sendInlineBotResult.html" name="messages_sendInlineBotResult">Send a received bot result to the chat: messages.sendInlineBotResult</a>  
-
 * <a href="messages_sendEncryptedService.html" name="messages_sendEncryptedService">Send a service message to a secret chat: messages.sendEncryptedService</a>  
 
 * <a href="auth_requestPasswordRecovery.html" name="auth_requestPasswordRecovery">Send an email to recover the 2FA password: auth.requestPasswordRecovery</a>  
+
+* <a href="messages_sendInlineBotResult.html" name="messages_sendInlineBotResult">Send inline bot result obtained with messages.getInlineBotResults to the chat: messages.sendInlineBotResult</a>  
 
 * <a href="messages_sendEncrypted.html" name="messages_sendEncrypted">Send message to secret chat: messages.sendEncrypted</a>  
 
