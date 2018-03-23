@@ -19,7 +19,7 @@ namespace danog\MadelineProto\Wrappers;
 trait Webhook
 {
 
-    public function setWebhook($url, $pem_path = null) {
+    public function setWebhook($hook_url, $pem_path = null) {
         $this->pem_path = $pem_path;
         $this->hook_url = $hook_url;
         $this->settings['updates']['callback'] = [$this, 'pwr_webhook'];
