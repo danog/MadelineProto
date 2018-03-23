@@ -29,21 +29,21 @@ description: What do you want to do?
 
 * <a href="destroy_session.html" name="destroy_session">Destroy the current MTProto session: destroy_session</a>  
 
+* <a href="rpc_drop_answer.html" name="rpc_drop_answer">Do not send answer to provided request: rpc_drop_answer</a>  
+
 * <a href="get_future_salts.html" name="get_future_salts">Get future salts: get_future_salts</a>  
 
 * <a href="http_wait.html" name="http_wait">Makes the server send messages waiting in the buffer: http_wait</a>  
-
-* <a href="ping.html" name="ping">pings the server: ping</a>  
 
 * <a href="ping_delay_disconnect.html" name="ping_delay_disconnect">Pings the server and causes disconection if the same method is not called within ping_disconnect_delay: ping_delay_disconnect</a>  
 
 * <a href="req_DH_params.html" name="req_DH_params">Requests Diffie-hellman parameters for key exchange: req_DH_params</a>  
 
-* <a href="req_pq.html" name="req_pq">Requests PQ for factorization: req_pq</a>  
-
 * <a href="req_pq_multi.html" name="req_pq_multi">Requests PQ for factorization (new version): req_pq_multi</a>  
 
-* <a href="rpc_drop_answer.html" name="rpc_drop_answer">Do not send answer to provided request: rpc_drop_answer</a>  
+* <a href="req_pq.html" name="req_pq">Requests PQ for factorization: req_pq</a>  
 
 * <a href="set_client_DH_params.html" name="set_client_DH_params">Sets client diffie-hellman parameters: set_client_DH_params</a>  
+
+* <a href="ping.html" name="ping">pings the server: ping</a>  
 
