@@ -1,19 +1,21 @@
 ---
 title: channels.getParticipants
-description: channels.getParticipants parameters, return type and example
+description: Get channel/supergroup participants (you should use `$MadelineProto->get_pwr_chat($id)` instead)
 ---
 ## Method: channels.getParticipants  
 [Back to methods index](index.md)
 
 
+Get channel/supergroup participants (you should use `$MadelineProto->get_pwr_chat($id)` instead)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|filter|[CLICK ME ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) | Yes|
-|offset|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
+|filter|[CLICK ME ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) | Yes|Member filter|
+|offset|[CLICK ME int](../types/int.md) | Yes|Offset|
+|limit|[CLICK ME int](../types/int.md) | Yes|Limit|
 
 
 ### Return type: [channels\_ChannelParticipants](../types/channels_ChannelParticipants.md)

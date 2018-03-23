@@ -1,17 +1,19 @@
 ---
 title: messages.getRecentStickers
-description: messages.getRecentStickers parameters, return type and example
+description: Get recent stickers
 ---
 ## Method: messages.getRecentStickers  
 [Back to methods index](index.md)
 
 
+Get recent stickers
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|attached|[CLICK ME Bool](../types/Bool.md) | Optional|
-|hash|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|attached|[CLICK ME Bool](../types/Bool.md) | Optional|Get stickers attached to image?|
+|hash|[CLICK ME int](../types/int.md) | Yes|0 or $result['hash']|
 
 
 ### Return type: [messages\_RecentStickers](../types/messages_RecentStickers.md)

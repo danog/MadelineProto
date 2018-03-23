@@ -1,18 +1,20 @@
 ---
 title: payments.validateRequestedInfo
-description: payments.validateRequestedInfo parameters, return type and example
+description: Validate requested payment info
 ---
 ## Method: payments.validateRequestedInfo  
 [Back to methods index](index.md)
 
 
+Validate requested payment info
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|save|[CLICK ME Bool](../types/Bool.md) | Optional|
-|msg\_id|[CLICK ME int](../types/int.md) | Yes|
-|info|[CLICK ME PaymentRequestedInfo](../types/PaymentRequestedInfo.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|save|[CLICK ME Bool](../types/Bool.md) | Optional|Save payment info?|
+|msg\_id|[CLICK ME int](../types/int.md) | Yes|The message ID|
+|info|[CLICK ME PaymentRequestedInfo](../types/PaymentRequestedInfo.md) | Yes|The requested payment info|
 
 
 ### Return type: [payments\_ValidatedRequestedInfo](../types/payments_ValidatedRequestedInfo.md)

@@ -1,17 +1,19 @@
 ---
 title: stickers.addStickerToSet
-description: stickers.addStickerToSet parameters, return type and example
+description: Add sticker to stickerset
 ---
 ## Method: stickers.addStickerToSet  
 [Back to methods index](index.md)
 
 
+Add sticker to stickerset
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|
-|sticker|[CLICK ME InputStickerSetItem](../types/InputStickerSetItem.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|The stickerset|
+|sticker|[CLICK ME InputStickerSetItem](../types/InputStickerSetItem.md) | Yes|The sticker|
 
 
 ### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)

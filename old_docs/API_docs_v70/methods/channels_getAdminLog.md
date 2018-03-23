@@ -1,22 +1,24 @@
 ---
 title: channels.getAdminLog
-description: channels.getAdminLog parameters, return type and example
+description: Get admin log of a channel/supergruop
 ---
 ## Method: channels.getAdminLog  
 [Back to methods index](index.md)
 
 
+Get admin log of a channel/supergruop
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|q|[CLICK ME string](../types/string.md) | Yes|
-|events\_filter|[CLICK ME ChannelAdminLogEventsFilter](../types/ChannelAdminLogEventsFilter.md) | Optional|
-|admins|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|max\_id|[CLICK ME long](../types/long.md) | Yes|
-|min\_id|[CLICK ME long](../types/long.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|q|[CLICK ME string](../types/string.md) | Yes|Search query|
+|events\_filter|[CLICK ME ChannelAdminLogEventsFilter](../types/ChannelAdminLogEventsFilter.md) | Optional|Event filter|
+|admins|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|Fetch only actions from these admins|
+|max\_id|[CLICK ME long](../types/long.md) | Yes|Maximum message ID to fetch|
+|min\_id|[CLICK ME long](../types/long.md) | Yes|Minimum message ID to fetch|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to fetch|
 
 
 ### Return type: [channels\_AdminLogResults](../types/channels_AdminLogResults.md)

@@ -1,18 +1,20 @@
 ---
 title: upload.getWebFile
-description: upload.getWebFile parameters, return type and example
+description: Download a file through telegram
 ---
 ## Method: upload.getWebFile  
 [Back to methods index](index.md)
 
 
+Download a file through telegram
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|location|[CLICK ME InputWebFileLocation](../types/InputWebFileLocation.md) | Yes|
-|offset|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|location|[CLICK ME InputWebFileLocation](../types/InputWebFileLocation.md) | Yes|The file|
+|offset|[CLICK ME int](../types/int.md) | Yes|The offset in bytes|
+|limit|[CLICK ME int](../types/int.md) | Yes|The number of bytes to fetch|
 
 
 ### Return type: [upload\_WebFile](../types/upload_WebFile.md)

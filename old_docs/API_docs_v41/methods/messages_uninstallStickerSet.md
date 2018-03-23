@@ -1,16 +1,18 @@
 ---
 title: messages.uninstallStickerSet
-description: messages.uninstallStickerSet parameters, return type and example
+description: Remove a sticker set
 ---
 ## Method: messages.uninstallStickerSet  
 [Back to methods index](index.md)
 
 
+Remove a sticker set
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|The sticker set to remove|
 
 
 ### Return type: [Bool](../types/Bool.md)

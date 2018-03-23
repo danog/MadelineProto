@@ -1,19 +1,21 @@
 ---
 title: messages.setInlineGameScore
-description: messages.setInlineGameScore parameters, return type and example
+description: Set the game score of an inline message
 ---
 ## Method: messages.setInlineGameScore  
 [Back to methods index](index.md)
 
 
+Set the game score of an inline message
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|edit\_message|[CLICK ME Bool](../types/Bool.md) | Optional|
-|id|[CLICK ME InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|score|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|edit\_message|[CLICK ME Bool](../types/Bool.md) | Optional|Should the message with the game be edited?|
+|id|[CLICK ME InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|The ID of the inline message|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user that set the score|
+|score|[CLICK ME int](../types/int.md) | Yes|The score|
 
 
 ### Return type: [Bool](../types/Bool.md)

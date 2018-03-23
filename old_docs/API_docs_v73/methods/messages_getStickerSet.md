@@ -1,16 +1,18 @@
 ---
 title: messages.getStickerSet
-description: messages.getStickerSet parameters, return type and example
+description: Get a stickerset
 ---
 ## Method: messages.getStickerSet  
 [Back to methods index](index.md)
 
 
+Get a stickerset
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|The stickerset to get|
 
 
 ### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)

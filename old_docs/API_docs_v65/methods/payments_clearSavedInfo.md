@@ -1,17 +1,19 @@
 ---
 title: payments.clearSavedInfo
-description: payments.clearSavedInfo parameters, return type and example
+description: Clear saved payments info
 ---
 ## Method: payments.clearSavedInfo  
 [Back to methods index](index.md)
 
 
+Clear saved payments info
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|credentials|[CLICK ME Bool](../types/Bool.md) | Optional|
-|info|[CLICK ME Bool](../types/Bool.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|credentials|[CLICK ME Bool](../types/Bool.md) | Optional|Clear credentials?|
+|info|[CLICK ME Bool](../types/Bool.md) | Optional|Clear payment info?|
 
 
 ### Return type: [Bool](../types/Bool.md)

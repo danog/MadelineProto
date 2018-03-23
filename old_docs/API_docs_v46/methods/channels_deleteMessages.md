@@ -1,17 +1,19 @@
 ---
 title: channels.deleteMessages
-description: channels.deleteMessages parameters, return type and example
+description: Delete channel/supergroup messages
 ---
 ## Method: channels.deleteMessages  
 [Back to methods index](index.md)
 
 
+Delete channel/supergroup messages
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|The IDs of messages to delete|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)

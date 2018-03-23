@@ -1,17 +1,19 @@
 ---
 title: messages.uploadEncryptedFile
-description: messages.uploadEncryptedFile parameters, return type and example
+description: Upload a secret chat file without sending it to anyone
 ---
 ## Method: messages.uploadEncryptedFile  
 [Back to methods index](index.md)
 
 
+Upload a secret chat file without sending it to anyone
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
-|file|[File path or InputEncryptedFile](../types/InputEncryptedFile.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|Ignore this|
+|file|[File path or InputEncryptedFile](../types/InputEncryptedFile.md) | Optional|The file|
 
 
 ### Return type: [EncryptedFile](../types/EncryptedFile.md)

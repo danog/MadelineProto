@@ -1,10 +1,12 @@
 ---
 title: help.getAppChangelog
-description: help.getAppChangelog parameters, return type and example
+description: Get the changelog of this app
 ---
 ## Method: help.getAppChangelog  
 [Back to methods index](index.md)
 
+
+Get the changelog of this app
 
 
 

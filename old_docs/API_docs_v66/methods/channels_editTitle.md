@@ -1,17 +1,19 @@
 ---
 title: channels.editTitle
-description: channels.editTitle parameters, return type and example
+description: Edit the title of a supergroup/channel
 ---
 ## Method: channels.editTitle  
 [Back to methods index](index.md)
 
 
+Edit the title of a supergroup/channel
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|title|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
+|title|[CLICK ME string](../types/string.md) | Yes|The new channel/supergroup title|
 
 
 ### Return type: [Updates](../types/Updates.md)

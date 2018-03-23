@@ -1,10 +1,12 @@
 ---
 title: help.getSupport
-description: help.getSupport parameters, return type and example
+description: Get info of support user
 ---
 ## Method: help.getSupport  
 [Back to methods index](index.md)
 
+
+Get info of support user
 
 
 

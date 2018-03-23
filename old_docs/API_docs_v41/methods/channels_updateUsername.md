@@ -1,17 +1,19 @@
 ---
 title: channels.updateUsername
-description: channels.updateUsername parameters, return type and example
+description: Update the username of a supergroup/channel
 ---
 ## Method: channels.updateUsername  
 [Back to methods index](index.md)
 
 
+Update the username of a supergroup/channel
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|username|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|username|[CLICK ME string](../types/string.md) | Yes|The new username|
 
 
 ### Return type: [Bool](../types/Bool.md)

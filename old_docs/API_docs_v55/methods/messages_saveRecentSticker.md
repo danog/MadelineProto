@@ -1,17 +1,19 @@
 ---
 title: messages.saveRecentSticker
-description: messages.saveRecentSticker parameters, return type and example
+description: Add a sticker to recent stickers
 ---
 ## Method: messages.saveRecentSticker  
 [Back to methods index](index.md)
 
 
+Add a sticker to recent stickers
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|
-|unsave|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|The sticker|
+|unsave|[CLICK ME Bool](../types/Bool.md) | Yes|Remove the sticker from recent stickers?|
 
 
 ### Return type: [Bool](../types/Bool.md)

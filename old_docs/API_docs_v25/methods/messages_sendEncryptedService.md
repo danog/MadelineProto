@@ -1,17 +1,19 @@
 ---
 title: messages.sendEncryptedService
-description: messages.sendEncryptedService parameters, return type and example
+description: Send a service message to a secret chat
 ---
 ## Method: messages.sendEncryptedService  
 [Back to methods index](index.md)
 
 
+Send a service message to a secret chat
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
-|message|[CLICK ME DecryptedMessage](../types/DecryptedMessage.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|The chat where to send the service message|
+|message|[CLICK ME DecryptedMessage](../types/DecryptedMessage.md) | Yes|The service message|
 
 
 ### Return type: [messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)

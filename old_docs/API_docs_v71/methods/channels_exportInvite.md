@@ -1,16 +1,18 @@
 ---
 title: channels.exportInvite
-description: channels.exportInvite parameters, return type and example
+description: Export the invite link of a channel
 ---
 ## Method: channels.exportInvite  
 [Back to methods index](index.md)
 
 
+Export the invite link of a channel
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
 
 
 ### Return type: [ExportedChatInvite](../types/ExportedChatInvite.md)

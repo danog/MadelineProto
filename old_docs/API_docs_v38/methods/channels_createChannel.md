@@ -1,18 +1,20 @@
 ---
 title: channels.createChannel
-description: channels.createChannel parameters, return type and example
+description: Create channel/supergroup
 ---
 ## Method: channels.createChannel  
 [Back to methods index](index.md)
 
 
+Create channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|title|[CLICK ME string](../types/string.md) | Yes|
-|about|[CLICK ME string](../types/string.md) | Yes|
-|users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|title|[CLICK ME string](../types/string.md) | Yes|Supergroup/channel title|
+|about|[CLICK ME string](../types/string.md) | Yes|About text|
+|users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes||
 
 
 ### Return type: [Updates](../types/Updates.md)

@@ -1,17 +1,19 @@
 ---
 title: channels.editAbout
-description: channels.editAbout parameters, return type and example
+description: Edit the about text of a channel/supergroup
 ---
 ## Method: channels.editAbout  
 [Back to methods index](index.md)
 
 
+Edit the about text of a channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|about|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
+|about|[CLICK ME string](../types/string.md) | Yes|The new about text|
 
 
 ### Return type: [Bool](../types/Bool.md)

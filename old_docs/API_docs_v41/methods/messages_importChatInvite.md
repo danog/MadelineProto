@@ -1,16 +1,18 @@
 ---
 title: messages.importChatInvite
-description: messages.importChatInvite parameters, return type and example
+description: Import chat invite
 ---
 ## Method: messages.importChatInvite  
 [Back to methods index](index.md)
 
 
+Import chat invite
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|hash|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|hash|[CLICK ME string](../types/string.md) | Yes|The invite link in t.me/joinchat/aflakf format|
 
 
 ### Return type: [Updates](../types/Updates.md)

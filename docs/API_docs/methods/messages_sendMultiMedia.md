@@ -1,21 +1,23 @@
 ---
 title: messages.sendMultiMedia
-description: messages.sendMultiMedia parameters, return type and example
+description: Send an album
 ---
 ## Method: messages.sendMultiMedia  
 [Back to methods index](index.md)
 
 
+Send an album
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|silent|[CLICK ME Bool](../types/Bool.md) | Optional|
-|background|[CLICK ME Bool](../types/Bool.md) | Optional|
-|clear\_draft|[CLICK ME Bool](../types/Bool.md) | Optional|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|
-|multi\_media|Array of [CLICK ME InputSingleMedia](../types/InputSingleMedia.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|silent|[CLICK ME Bool](../types/Bool.md) | Optional|Disable notifications?|
+|background|[CLICK ME Bool](../types/Bool.md) | Optional|Disable background notification?|
+|clear\_draft|[CLICK ME Bool](../types/Bool.md) | Optional|Clear draft?|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to send the album|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|Reply to message by ID|
+|multi\_media|Array of [CLICK ME InputSingleMedia](../types/InputSingleMedia.md) | Yes|The album|
 
 
 ### Return type: [Updates](../types/Updates.md)

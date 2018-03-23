@@ -1,18 +1,20 @@
 ---
 title: messages.setBotShippingResults
-description: messages.setBotShippingResults parameters, return type and example
+description: Bots only: set shipping results
 ---
 ## Method: messages.setBotShippingResults  
 [Back to methods index](index.md)
 
 
+Bots only: set shipping results
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|query\_id|[CLICK ME long](../types/long.md) | Yes|
-|error|[CLICK ME string](../types/string.md) | Optional|
-|shipping\_options|Array of [CLICK ME ShippingOption](../types/ShippingOption.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|query\_id|[CLICK ME long](../types/long.md) | Yes|Query ID|
+|error|[CLICK ME string](../types/string.md) | Optional|Error|
+|shipping\_options|Array of [CLICK ME ShippingOption](../types/ShippingOption.md) | Optional|Shipping options|
 
 
 ### Return type: [Bool](../types/Bool.md)

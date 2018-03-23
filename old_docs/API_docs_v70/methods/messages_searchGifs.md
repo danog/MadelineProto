@@ -1,17 +1,19 @@
 ---
 title: messages.searchGifs
-description: messages.searchGifs parameters, return type and example
+description: Search gifs
 ---
 ## Method: messages.searchGifs  
 [Back to methods index](index.md)
 
 
+Search gifs
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|q|[CLICK ME string](../types/string.md) | Yes|
-|offset|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|q|[CLICK ME string](../types/string.md) | Yes|The search query|
+|offset|[CLICK ME int](../types/int.md) | Yes|The offset |
 
 
 ### Return type: [messages\_FoundGifs](../types/messages_FoundGifs.md)

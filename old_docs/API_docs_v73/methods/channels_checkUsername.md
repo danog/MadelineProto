@@ -1,17 +1,19 @@
 ---
 title: channels.checkUsername
-description: channels.checkUsername parameters, return type and example
+description: Check if this username is free and can be assigned to a channel/supergroup
 ---
 ## Method: channels.checkUsername  
 [Back to methods index](index.md)
 
 
+Check if this username is free and can be assigned to a channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|username|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|username|[CLICK ME string](../types/string.md) | Yes|The new username for this channel/supergroup|
 
 
 ### Return type: [Bool](../types/Bool.md)

@@ -1,16 +1,18 @@
 ---
 title: messages.getPeerDialogs
-description: messages.getPeerDialogs parameters, return type and example
+description: Get dialog info of peers
 ---
 ## Method: messages.getPeerDialogs  
 [Back to methods index](index.md)
 
 
+Get dialog info of peers
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peers|Array of [Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peers|Array of [Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Yes|The peers|
 
 
 ### Return type: [messages\_PeerDialogs](../types/messages_PeerDialogs.md)

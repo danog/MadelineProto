@@ -1,17 +1,19 @@
 ---
 title: help.setBotUpdatesStatus
-description: help.setBotUpdatesStatus parameters, return type and example
+description: Set the update status of webhook
 ---
 ## Method: help.setBotUpdatesStatus  
 [Back to methods index](index.md)
 
 
+Set the update status of webhook
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|pending\_updates\_count|[CLICK ME int](../types/int.md) | Yes|
-|message|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|pending\_updates\_count|[CLICK ME int](../types/int.md) | Yes|Pending update count|
+|message|[CLICK ME string](../types/string.md) | Yes|Message|
 
 
 ### Return type: [Bool](../types/Bool.md)

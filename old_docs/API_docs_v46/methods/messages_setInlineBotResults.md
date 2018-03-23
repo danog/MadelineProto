@@ -1,21 +1,23 @@
 ---
 title: messages.setInlineBotResults
-description: messages.setInlineBotResults parameters, return type and example
+description: Bots only: set the results of an inline query
 ---
 ## Method: messages.setInlineBotResults  
 [Back to methods index](index.md)
 
 
+Bots only: set the results of an inline query
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|gallery|[CLICK ME Bool](../types/Bool.md) | Optional|
-|private|[CLICK ME Bool](../types/Bool.md) | Optional|
-|query\_id|[CLICK ME long](../types/long.md) | Yes|
-|results|Array of [CLICK ME InputBotInlineResult](../types/InputBotInlineResult.md) | Yes|
-|cache\_time|[CLICK ME int](../types/int.md) | Yes|
-|next\_offset|[CLICK ME string](../types/string.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|gallery|[CLICK ME Bool](../types/Bool.md) | Optional|Is this a gallery?|
+|private|[CLICK ME Bool](../types/Bool.md) | Optional|Is this result private (not cached)?|
+|query\_id|[CLICK ME long](../types/long.md) | Yes|Query ID|
+|results|Array of [CLICK ME InputBotInlineResult](../types/InputBotInlineResult.md) | Yes|Results|
+|cache\_time|[CLICK ME int](../types/int.md) | Yes|Cache time|
+|next\_offset|[CLICK ME string](../types/string.md) | Optional|The next offset|
 
 
 ### Return type: [Bool](../types/Bool.md)

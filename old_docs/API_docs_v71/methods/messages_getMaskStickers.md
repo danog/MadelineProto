@@ -1,16 +1,18 @@
 ---
 title: messages.getMaskStickers
-description: messages.getMaskStickers parameters, return type and example
+description: Get masks
 ---
 ## Method: messages.getMaskStickers  
 [Back to methods index](index.md)
 
 
+Get masks
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|hash|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|hash|[CLICK ME int](../types/int.md) | Yes|0 or $result['hash']|
 
 
 ### Return type: [messages\_AllStickers](../types/messages_AllStickers.md)

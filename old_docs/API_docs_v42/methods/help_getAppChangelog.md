@@ -1,19 +1,21 @@
 ---
 title: help.getAppChangelog
-description: help.getAppChangelog parameters, return type and example
+description: Get the changelog of this app
 ---
 ## Method: help.getAppChangelog  
 [Back to methods index](index.md)
 
 
+Get the changelog of this app
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|device\_model|[CLICK ME string](../types/string.md) | Yes|
-|system\_version|[CLICK ME string](../types/string.md) | Yes|
-|app\_version|[CLICK ME string](../types/string.md) | Yes|
-|lang\_code|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|device\_model|[CLICK ME string](../types/string.md) | Yes||
+|system\_version|[CLICK ME string](../types/string.md) | Yes||
+|app\_version|[CLICK ME string](../types/string.md) | Yes||
+|lang\_code|[CLICK ME string](../types/string.md) | Yes||
 
 
 ### Return type: [help\_AppChangelog](../types/help_AppChangelog.md)

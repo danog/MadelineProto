@@ -1,17 +1,19 @@
 ---
 title: channels.inviteToChannel
-description: channels.inviteToChannel parameters, return type and example
+description: Add users to channel/supergroup
 ---
 ## Method: channels.inviteToChannel  
 [Back to methods index](index.md)
 
 
+Add users to channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|The users to add|
 
 
 ### Return type: [Updates](../types/Updates.md)

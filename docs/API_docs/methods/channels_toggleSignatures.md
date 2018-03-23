@@ -1,17 +1,19 @@
 ---
 title: channels.toggleSignatures
-description: channels.toggleSignatures parameters, return type and example
+description: Toggle channel signatures
 ---
 ## Method: channels.toggleSignatures  
 [Back to methods index](index.md)
 
 
+Toggle channel signatures
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|Enable or disable channel signatures?|
 
 
 ### Return type: [Updates](../types/Updates.md)

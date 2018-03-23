@@ -1,17 +1,19 @@
 ---
 title: messages.toggleDialogPin
-description: messages.toggleDialogPin parameters, return type and example
+description: Pin or unpin dialog
 ---
 ## Method: messages.toggleDialogPin  
 [Back to methods index](index.md)
 
 
+Pin or unpin dialog
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|pinned|[CLICK ME Bool](../types/Bool.md) | Optional|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|pinned|[CLICK ME Bool](../types/Bool.md) | Optional|Pin or unpin the dialog?|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The peer to pin|
 
 
 ### Return type: [Bool](../types/Bool.md)

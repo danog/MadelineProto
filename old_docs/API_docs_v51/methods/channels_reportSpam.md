@@ -1,18 +1,20 @@
 ---
 title: channels.reportSpam
-description: channels.reportSpam parameters, return type and example
+description: Report a supergroup/channel for spam
 ---
 ## Method: channels.reportSpam  
 [Back to methods index](index.md)
 
 
+Report a supergroup/channel for spam
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user that added you to this channel|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|The IDs of messages to report|
 
 
 ### Return type: [Bool](../types/Bool.md)

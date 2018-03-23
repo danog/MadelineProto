@@ -1,16 +1,18 @@
 ---
 title: help.getRecentMeUrls
-description: help.getRecentMeUrls parameters, return type and example
+description: Get recent t.me URLs
 ---
 ## Method: help.getRecentMeUrls  
 [Back to methods index](index.md)
 
 
+Get recent t.me URLs
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|referer|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|referer|[CLICK ME string](../types/string.md) | Yes|Referrer|
 
 
 ### Return type: [help\_RecentMeUrls](../types/help_RecentMeUrls.md)

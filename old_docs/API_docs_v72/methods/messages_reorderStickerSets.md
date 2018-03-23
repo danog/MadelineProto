@@ -1,17 +1,19 @@
 ---
 title: messages.reorderStickerSets
-description: messages.reorderStickerSets parameters, return type and example
+description: Reorder sticker sets
 ---
 ## Method: messages.reorderStickerSets  
 [Back to methods index](index.md)
 
 
+Reorder sticker sets
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|masks|[CLICK ME Bool](../types/Bool.md) | Optional|
-|order|Array of [CLICK ME long](../types/long.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|masks|[CLICK ME Bool](../types/Bool.md) | Optional|Reorder masks?|
+|order|Array of [CLICK ME long](../types/long.md) | Yes|The order|
 
 
 ### Return type: [Bool](../types/Bool.md)

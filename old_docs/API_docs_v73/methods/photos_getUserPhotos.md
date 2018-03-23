@@ -1,19 +1,21 @@
 ---
 title: photos.getUserPhotos
-description: photos.getUserPhotos parameters, return type and example
+description: Get the profile photos of a user
 ---
 ## Method: photos.getUserPhotos  
 [Back to methods index](index.md)
 
 
+Get the profile photos of a user
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|offset|[CLICK ME int](../types/int.md) | Yes|
-|max\_id|[CLICK ME long](../types/long.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user|
+|offset|[CLICK ME int](../types/int.md) | Yes|Offset|
+|max\_id|[CLICK ME long](../types/long.md) | Yes|Maximum ID of photo to return|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of photos to return|
 
 
 ### Return type: [photos\_Photos](../types/photos_Photos.md)

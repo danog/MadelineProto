@@ -1,18 +1,20 @@
 ---
 title: channels.editAdmin
-description: channels.editAdmin parameters, return type and example
+description: Edit admin permissions of a user in a channel/supergroup
 ---
 ## Method: channels.editAdmin  
 [Back to methods index](index.md)
 
 
+Edit admin permissions of a user in a channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|admin\_rights|[CLICK ME ChannelAdminRights](../types/ChannelAdminRights.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user|
+|admin\_rights|[CLICK ME ChannelAdminRights](../types/ChannelAdminRights.md) | Yes|The new admin rights|
 
 
 ### Return type: [Updates](../types/Updates.md)

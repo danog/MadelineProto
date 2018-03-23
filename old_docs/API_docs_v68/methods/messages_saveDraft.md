@@ -1,20 +1,22 @@
 ---
 title: messages.saveDraft
-description: messages.saveDraft parameters, return type and example
+description: Save a message draft
 ---
 ## Method: messages.saveDraft  
 [Back to methods index](index.md)
 
 
+Save a message draft
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|
-|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|message|[CLICK ME string](../types/string.md) | Yes|
-|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|Disable webpage preview|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|Reply to message by ID|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat|
+|message|[CLICK ME string](../types/string.md) | Yes|The message|
+|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|The entities (for styled text)|
 |parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
 
 

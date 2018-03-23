@@ -1,16 +1,18 @@
 ---
 title: messages.getFavedStickers
-description: messages.getFavedStickers parameters, return type and example
+description: Get favorite stickers
 ---
 ## Method: messages.getFavedStickers  
 [Back to methods index](index.md)
 
 
+Get favorite stickers
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|hash|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|hash|[CLICK ME int](../types/int.md) | Yes|0 or $result['hash']|
 
 
 ### Return type: [messages\_FavedStickers](../types/messages_FavedStickers.md)

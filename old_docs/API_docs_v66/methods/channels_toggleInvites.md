@@ -1,17 +1,19 @@
 ---
 title: channels.toggleInvites
-description: channels.toggleInvites parameters, return type and example
+description: Allow or disallow any user to invite users to this channel/supergroup
 ---
 ## Method: channels.toggleInvites  
 [Back to methods index](index.md)
 
 
+Allow or disallow any user to invite users to this channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|Allow or disallow|
 
 
 ### Return type: [Updates](../types/Updates.md)

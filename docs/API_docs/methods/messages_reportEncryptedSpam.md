@@ -1,16 +1,18 @@
 ---
 title: messages.reportEncryptedSpam
-description: messages.reportEncryptedSpam parameters, return type and example
+description: Report for spam a secret chat
 ---
 ## Method: messages.reportEncryptedSpam  
 [Back to methods index](index.md)
 
 
+Report for spam a secret chat
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|The chat to report|
 
 
 ### Return type: [Bool](../types/Bool.md)

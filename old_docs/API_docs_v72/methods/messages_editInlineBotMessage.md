@@ -1,20 +1,22 @@
 ---
 title: messages.editInlineBotMessage
-description: messages.editInlineBotMessage parameters, return type and example
+description: Edit a sent inline message
 ---
 ## Method: messages.editInlineBotMessage  
 [Back to methods index](index.md)
 
 
+Edit a sent inline message
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|
-|id|[CLICK ME InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
-|message|[CLICK ME string](../types/string.md) | Optional|
-|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|
-|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|Disable webpage preview|
+|id|[CLICK ME InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|The message ID|
+|message|[CLICK ME string](../types/string.md) | Optional|The new message|
+|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|The new keyboard|
+|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|The new entities (for styled text)|
 |parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
 
 

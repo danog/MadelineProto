@@ -1,20 +1,22 @@
 ---
 title: stickers.createStickerSet
-description: stickers.createStickerSet parameters, return type and example
+description: Create stickerset
 ---
 ## Method: stickers.createStickerSet  
 [Back to methods index](index.md)
 
 
+Create stickerset
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|masks|[CLICK ME Bool](../types/Bool.md) | Optional|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|title|[CLICK ME string](../types/string.md) | Yes|
-|short\_name|[CLICK ME string](../types/string.md) | Yes|
-|stickers|Array of [CLICK ME InputStickerSetItem](../types/InputStickerSetItem.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|masks|[CLICK ME Bool](../types/Bool.md) | Optional|Masks?|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user ID associated to this stickerset|
+|title|[CLICK ME string](../types/string.md) | Yes|The stickerset title|
+|short\_name|[CLICK ME string](../types/string.md) | Yes|The stickerset short name|
+|stickers|Array of [CLICK ME InputStickerSetItem](../types/InputStickerSetItem.md) | Yes|The stickers to add|
 
 
 ### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)

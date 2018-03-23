@@ -1,16 +1,18 @@
 ---
 title: messages.readMentions
-description: messages.readMentions parameters, return type and example
+description: Mark mentions as read
 ---
 ## Method: messages.readMentions  
 [Back to methods index](index.md)
 
 
+Mark mentions as read
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)

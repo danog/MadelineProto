@@ -1,17 +1,19 @@
 ---
 title: messages.readEncryptedHistory
-description: messages.readEncryptedHistory parameters, return type and example
+description: Mark messages as read in secret chats
 ---
 ## Method: messages.readEncryptedHistory  
 [Back to methods index](index.md)
 
 
+Mark messages as read in secret chats
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
-|max\_date|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|The secret chat where to mark messages as read|
+|max\_date|[CLICK ME int](../types/int.md) | Yes|Maximum date of messages to mark|
 
 
 ### Return type: [Bool](../types/Bool.md)

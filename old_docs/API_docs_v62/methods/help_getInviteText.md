@@ -1,10 +1,12 @@
 ---
 title: help.getInviteText
-description: help.getInviteText parameters, return type and example
+description: Get invitation text
 ---
 ## Method: help.getInviteText  
 [Back to methods index](index.md)
 
+
+Get invitation text
 
 
 

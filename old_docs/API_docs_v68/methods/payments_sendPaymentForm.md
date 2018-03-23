@@ -1,19 +1,21 @@
 ---
 title: payments.sendPaymentForm
-description: payments.sendPaymentForm parameters, return type and example
+description: Bots only: send payment form
 ---
 ## Method: payments.sendPaymentForm  
 [Back to methods index](index.md)
 
 
+Bots only: send payment form
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|msg\_id|[CLICK ME int](../types/int.md) | Yes|
-|requested\_info\_id|[CLICK ME string](../types/string.md) | Optional|
-|shipping\_option\_id|[CLICK ME string](../types/string.md) | Optional|
-|credentials|[CLICK ME InputPaymentCredentials](../types/InputPaymentCredentials.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|msg\_id|[CLICK ME int](../types/int.md) | Yes|Message ID|
+|requested\_info\_id|[CLICK ME string](../types/string.md) | Optional|ID of requested info|
+|shipping\_option\_id|[CLICK ME string](../types/string.md) | Optional|Shipping option ID|
+|credentials|[CLICK ME InputPaymentCredentials](../types/InputPaymentCredentials.md) | Yes|Payment credentials|
 
 
 ### Return type: [payments\_PaymentResult](../types/payments_PaymentResult.md)

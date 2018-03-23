@@ -1,16 +1,18 @@
 ---
 title: payments.getPaymentReceipt
-description: payments.getPaymentReceipt parameters, return type and example
+description: Get payment receipt
 ---
 ## Method: payments.getPaymentReceipt  
 [Back to methods index](index.md)
 
 
+Get payment receipt
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|msg\_id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|msg\_id|[CLICK ME int](../types/int.md) | Yes|The message ID|
 
 
 ### Return type: [payments\_PaymentReceipt](../types/payments_PaymentReceipt.md)

@@ -1,10 +1,12 @@
 ---
 title: messages.getAllDrafts
-description: messages.getAllDrafts parameters, return type and example
+description: Get all message drafts
 ---
 ## Method: messages.getAllDrafts  
 [Back to methods index](index.md)
 
+
+Get all message drafts
 
 
 

@@ -1,17 +1,19 @@
 ---
 title: channels.editPhoto
-description: channels.editPhoto parameters, return type and example
+description: Edit the photo of a supergroup/channel
 ---
 ## Method: channels.editPhoto  
 [Back to methods index](index.md)
 
 
+Edit the photo of a supergroup/channel
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|photo|[CLICK ME InputChatPhoto](../types/InputChatPhoto.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
+|photo|[CLICK ME InputChatPhoto](../types/InputChatPhoto.md) | Optional|The new photo|
 
 
 ### Return type: [Updates](../types/Updates.md)

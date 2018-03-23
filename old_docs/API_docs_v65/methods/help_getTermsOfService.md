@@ -1,10 +1,12 @@
 ---
 title: help.getTermsOfService
-description: help.getTermsOfService parameters, return type and example
+description: Get terms of service
 ---
 ## Method: help.getTermsOfService  
 [Back to methods index](index.md)
 
+
+Get terms of service
 
 
 

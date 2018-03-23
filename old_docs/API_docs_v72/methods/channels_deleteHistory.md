@@ -1,17 +1,19 @@
 ---
 title: channels.deleteHistory
-description: channels.deleteHistory parameters, return type and example
+description: Delete the history of a supergroup/channel
 ---
 ## Method: channels.deleteHistory  
 [Back to methods index](index.md)
 
 
+Delete the history of a supergroup/channel
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID to delete|
 
 
 ### Return type: [Bool](../types/Bool.md)

@@ -1,17 +1,19 @@
 ---
 title: channels.readMessageContents
-description: channels.readMessageContents parameters, return type and example
+description: Mark channel/supergroup messages as read
 ---
 ## Method: channels.readMessageContents  
 [Back to methods index](index.md)
 
 
+Mark channel/supergroup messages as read
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|List of message IDs|
 
 
 ### Return type: [Bool](../types/Bool.md)

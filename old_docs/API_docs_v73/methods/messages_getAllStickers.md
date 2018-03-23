@@ -1,16 +1,18 @@
 ---
 title: messages.getAllStickers
-description: messages.getAllStickers parameters, return type and example
+description: Get all stickerpacks
 ---
 ## Method: messages.getAllStickers  
 [Back to methods index](index.md)
 
 
+Get all stickerpacks
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|hash|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|hash|[CLICK ME int](../types/int.md) | Yes|0 or $result['hash']|
 
 
 ### Return type: [messages\_AllStickers](../types/messages_AllStickers.md)

@@ -1,16 +1,18 @@
 ---
 title: messages.migrateChat
-description: messages.migrateChat parameters, return type and example
+description: Convert chat to supergroup
 ---
 ## Method: messages.migrateChat  
 [Back to methods index](index.md)
 
 
+Convert chat to supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat to convert|
 
 
 ### Return type: [Updates](../types/Updates.md)

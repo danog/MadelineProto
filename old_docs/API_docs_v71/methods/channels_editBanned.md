@@ -1,18 +1,20 @@
 ---
 title: channels.editBanned
-description: channels.editBanned parameters, return type and example
+description: Kick or ban a user from a channel/supergroup
 ---
 ## Method: channels.editBanned  
 [Back to methods index](index.md)
 
 
+Kick or ban a user from a channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|banned\_rights|[CLICK ME ChannelBannedRights](../types/ChannelBannedRights.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user to kick/ban|
+|banned\_rights|[CLICK ME ChannelBannedRights](../types/ChannelBannedRights.md) | Yes|Banned/kicked permissions|
 
 
 ### Return type: [Updates](../types/Updates.md)

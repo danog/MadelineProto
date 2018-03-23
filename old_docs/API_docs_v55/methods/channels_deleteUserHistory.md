@@ -1,17 +1,19 @@
 ---
 title: channels.deleteUserHistory
-description: channels.deleteUserHistory parameters, return type and example
+description: Delete all messages of a user in a channel/supergroup
 ---
 ## Method: channels.deleteUserHistory  
 [Back to methods index](index.md)
 
 
+Delete all messages of a user in a channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)

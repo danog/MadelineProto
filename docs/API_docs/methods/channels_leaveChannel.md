@@ -1,16 +1,18 @@
 ---
 title: channels.leaveChannel
-description: channels.leaveChannel parameters, return type and example
+description: Leave a channel/supergroup
 ---
 ## Method: channels.leaveChannel  
 [Back to methods index](index.md)
 
 
+Leave a channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup to leave|
 
 
 ### Return type: [Updates](../types/Updates.md)

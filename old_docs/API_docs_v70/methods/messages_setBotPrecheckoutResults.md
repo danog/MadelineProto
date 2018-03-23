@@ -1,18 +1,20 @@
 ---
 title: messages.setBotPrecheckoutResults
-description: messages.setBotPrecheckoutResults parameters, return type and example
+description: Bots only: set precheckout results
 ---
 ## Method: messages.setBotPrecheckoutResults  
 [Back to methods index](index.md)
 
 
+Bots only: set precheckout results
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|success|[CLICK ME Bool](../types/Bool.md) | Optional|
-|query\_id|[CLICK ME long](../types/long.md) | Yes|
-|error|[CLICK ME string](../types/string.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|success|[CLICK ME Bool](../types/Bool.md) | Optional|Success?|
+|query\_id|[CLICK ME long](../types/long.md) | Yes|Query ID|
+|error|[CLICK ME string](../types/string.md) | Optional|Error|
 
 
 ### Return type: [Bool](../types/Bool.md)

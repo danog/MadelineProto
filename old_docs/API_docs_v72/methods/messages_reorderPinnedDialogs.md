@@ -1,17 +1,19 @@
 ---
 title: messages.reorderPinnedDialogs
-description: messages.reorderPinnedDialogs parameters, return type and example
+description: Reorder pinned dialogs
 ---
 ## Method: messages.reorderPinnedDialogs  
 [Back to methods index](index.md)
 
 
+Reorder pinned dialogs
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|force|[CLICK ME Bool](../types/Bool.md) | Optional|
-|order|Array of [Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|force|[CLICK ME Bool](../types/Bool.md) | Optional|Force reordering|
+|order|Array of [Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Yes|New order|
 
 
 ### Return type: [Bool](../types/Bool.md)

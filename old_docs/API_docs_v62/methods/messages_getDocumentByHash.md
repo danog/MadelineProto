@@ -1,18 +1,20 @@
 ---
 title: messages.getDocumentByHash
-description: messages.getDocumentByHash parameters, return type and example
+description: Get document by SHA256 hash
 ---
 ## Method: messages.getDocumentByHash  
 [Back to methods index](index.md)
 
 
+Get document by SHA256 hash
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|sha256|[CLICK ME bytes](../types/bytes.md) | Yes|
-|size|[CLICK ME int](../types/int.md) | Yes|
-|mime\_type|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|sha256|[CLICK ME bytes](../types/bytes.md) | Yes|`hash('sha256', $filename, true);`|
+|size|[CLICK ME int](../types/int.md) | Yes|The file size|
+|mime\_type|[CLICK ME string](../types/string.md) | Yes|The mime type of the file|
 
 
 ### Return type: [Document](../types/Document.md)

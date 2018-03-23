@@ -1,18 +1,20 @@
 ---
 title: messages.getGameHighScores
-description: messages.getGameHighScores parameters, return type and example
+description: Get high scores of a game
 ---
 ## Method: messages.getGameHighScores  
 [Back to methods index](index.md)
 
 
+Get high scores of a game
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|id|[CLICK ME int](../types/int.md) | Yes|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat|
+|id|[CLICK ME int](../types/int.md) | Yes|The message ID|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user that set the high scores|
 
 
 ### Return type: [messages\_HighScores](../types/messages_HighScores.md)

@@ -1,17 +1,19 @@
 ---
 title: stickers.changeStickerPosition
-description: stickers.changeStickerPosition parameters, return type and example
+description: Change sticker position in photo
 ---
 ## Method: stickers.changeStickerPosition  
 [Back to methods index](index.md)
 
 
+Change sticker position in photo
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|sticker|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|
-|position|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|sticker|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|The sticker|
+|position|[CLICK ME int](../types/int.md) | Yes|New position|
 
 
 ### Return type: [Bool](../types/Bool.md)

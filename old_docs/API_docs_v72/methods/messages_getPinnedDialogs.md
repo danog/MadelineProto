@@ -1,10 +1,12 @@
 ---
 title: messages.getPinnedDialogs
-description: messages.getPinnedDialogs parameters, return type and example
+description: Get pinned dialogs
 ---
 ## Method: messages.getPinnedDialogs  
 [Back to methods index](index.md)
 
+
+Get pinned dialogs
 
 
 

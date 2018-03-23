@@ -1,16 +1,18 @@
 ---
 title: messages.readFeaturedStickers
-description: messages.readFeaturedStickers parameters, return type and example
+description: Mark new featured stickers as read
 ---
 ## Method: messages.readFeaturedStickers  
 [Back to methods index](index.md)
 
 
+Mark new featured stickers as read
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|Array of [CLICK ME long](../types/long.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|Array of [CLICK ME long](../types/long.md) | Yes|The stickers to mark as read|
 
 
 ### Return type: [Bool](../types/Bool.md)

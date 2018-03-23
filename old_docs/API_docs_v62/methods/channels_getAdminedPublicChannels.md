@@ -1,10 +1,12 @@
 ---
 title: channels.getAdminedPublicChannels
-description: channels.getAdminedPublicChannels parameters, return type and example
+description: Get all supergroups/channels where you're admin
 ---
 ## Method: channels.getAdminedPublicChannels  
 [Back to methods index](index.md)
 
+
+Get all supergroups/channels where you're admin
 
 
 

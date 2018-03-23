@@ -1,16 +1,18 @@
 ---
 title: photos.deletePhotos
-description: photos.deletePhotos parameters, return type and example
+description: Delete profile photos
 ---
 ## Method: photos.deletePhotos  
 [Back to methods index](index.md)
 
 
+Delete profile photos
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|Array of [MessageMedia, Update, Message or InputPhoto](../types/InputPhoto.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|Array of [MessageMedia, Update, Message or InputPhoto](../types/InputPhoto.md) | Yes|The profile photos to delete|
 
 
 ### Return type: [Vector\_of\_long](../types/long.md)

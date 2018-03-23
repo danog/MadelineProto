@@ -12,8 +12,8 @@ Send typing notification to secret chat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes||
-|typing|[CLICK ME Bool](../types/Bool.md) | Yes||
+|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|The secret chat where to send the notification|
+|typing|[CLICK ME Bool](../types/Bool.md) | Yes|Set to true to enable the notification, false to disable it|
 
 
 ### Return type: [Bool](../types/Bool.md)

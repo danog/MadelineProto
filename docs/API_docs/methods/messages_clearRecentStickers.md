@@ -1,16 +1,18 @@
 ---
 title: messages.clearRecentStickers
-description: messages.clearRecentStickers parameters, return type and example
+description: Clear all recent stickers
 ---
 ## Method: messages.clearRecentStickers  
 [Back to methods index](index.md)
 
 
+Clear all recent stickers
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|attached|[CLICK ME Bool](../types/Bool.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|attached|[CLICK ME Bool](../types/Bool.md) | Optional|Clear recent stickers attached to images?|
 
 
 ### Return type: [Bool](../types/Bool.md)

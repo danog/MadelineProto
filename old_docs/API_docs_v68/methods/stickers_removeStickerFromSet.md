@@ -1,16 +1,18 @@
 ---
 title: stickers.removeStickerFromSet
-description: stickers.removeStickerFromSet parameters, return type and example
+description: Remove sticker from stickerset
 ---
 ## Method: stickers.removeStickerFromSet  
 [Back to methods index](index.md)
 
 
+Remove sticker from stickerset
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|sticker|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|sticker|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|The sticker to remove|
 
 
 ### Return type: [Bool](../types/Bool.md)

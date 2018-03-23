@@ -1,18 +1,20 @@
 ---
 title: messages.getCommonChats
-description: messages.getCommonChats parameters, return type and example
+description: Get chats in common with a user
 ---
 ## Method: messages.getCommonChats  
 [Back to methods index](index.md)
 
 
+Get chats in common with a user
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|The maximum chat ID to fetch|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to fetch|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)

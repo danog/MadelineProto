@@ -1,18 +1,20 @@
 ---
 title: messages.sendEncryptedFile
-description: messages.sendEncryptedFile parameters, return type and example
+description: Send a file to a secret chat
 ---
 ## Method: messages.sendEncryptedFile  
 [Back to methods index](index.md)
 
 
+Send a file to a secret chat
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|
-|message|[CLICK ME DecryptedMessage](../types/DecryptedMessage.md) | Yes|
-|file|[File path or InputEncryptedFile](../types/InputEncryptedFile.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|The chat where to send the file|
+|message|[CLICK ME DecryptedMessage](../types/DecryptedMessage.md) | Yes|The message with the file|
+|file|[File path or InputEncryptedFile](../types/InputEncryptedFile.md) | Optional|The file (optional)|
 
 
 ### Return type: [messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)

@@ -1,17 +1,19 @@
 ---
 title: bots.answerWebhookJSONQuery
-description: bots.answerWebhookJSONQuery parameters, return type and example
+description: Send webhook request via bot API
 ---
 ## Method: bots.answerWebhookJSONQuery  
 [Back to methods index](index.md)
 
 
+Send webhook request via bot API
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|query\_id|[CLICK ME long](../types/long.md) | Yes|
-|data|[CLICK ME DataJSON](../types/DataJSON.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|query\_id|[CLICK ME long](../types/long.md) | Yes|The query ID|
+|data|[CLICK ME DataJSON](../types/DataJSON.md) | Yes|The parameters|
 
 
 ### Return type: [Bool](../types/Bool.md)

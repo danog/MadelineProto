@@ -1,16 +1,18 @@
 ---
 title: messages.readMessageContents
-description: messages.readMessageContents parameters, return type and example
+description: Mark message as read
 ---
 ## Method: messages.readMessageContents  
 [Back to methods index](index.md)
 
 
+Mark message as read
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|The messages to mark as read (only users and normal chats, not supergroups)|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)

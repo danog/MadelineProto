@@ -1,16 +1,18 @@
 ---
 title: messages.getAttachedStickers
-description: messages.getAttachedStickers parameters, return type and example
+description: Get stickers attachable to images
 ---
 ## Method: messages.getAttachedStickers  
 [Back to methods index](index.md)
 
 
+Get stickers attachable to images
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|media|[CLICK ME InputStickeredMedia](../types/InputStickeredMedia.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|media|[CLICK ME InputStickeredMedia](../types/InputStickeredMedia.md) | Yes|The stickered media|
 
 
 ### Return type: [Vector\_of\_StickerSetCovered](../types/StickerSetCovered.md)

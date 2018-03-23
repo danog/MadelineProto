@@ -1,18 +1,20 @@
 ---
 title: messages.getArchivedStickers
-description: messages.getArchivedStickers parameters, return type and example
+description: Get all archived stickers
 ---
 ## Method: messages.getArchivedStickers  
 [Back to methods index](index.md)
 
 
+Get all archived stickers
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|masks|[CLICK ME Bool](../types/Bool.md) | Optional|
-|offset\_id|[CLICK ME long](../types/long.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|masks|[CLICK ME Bool](../types/Bool.md) | Optional|Get masks?|
+|offset\_id|[CLICK ME long](../types/long.md) | Yes|Sticker ID offset|
+|limit|[CLICK ME int](../types/int.md) | Yes|Number of stickers to fetch|
 
 
 ### Return type: [messages\_ArchivedStickers](../types/messages_ArchivedStickers.md)

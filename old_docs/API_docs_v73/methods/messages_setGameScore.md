@@ -1,21 +1,23 @@
 ---
 title: messages.setGameScore
-description: messages.setGameScore parameters, return type and example
+description: Set the game score
 ---
 ## Method: messages.setGameScore  
 [Back to methods index](index.md)
 
 
+Set the game score
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|edit\_message|[CLICK ME Bool](../types/Bool.md) | Optional|
-|force|[CLICK ME Bool](../types/Bool.md) | Optional|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|id|[CLICK ME int](../types/int.md) | Yes|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|score|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|edit\_message|[CLICK ME Bool](../types/Bool.md) | Optional|Should the message with the game be edited?|
+|force|[CLICK ME Bool](../types/Bool.md) | Optional|Force setting the game score|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat where the game was sent|
+|id|[CLICK ME int](../types/int.md) | Yes|The message ID|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user that set the score|
+|score|[CLICK ME int](../types/int.md) | Yes|The score|
 
 
 ### Return type: [Updates](../types/Updates.md)

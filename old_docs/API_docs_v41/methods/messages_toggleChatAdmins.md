@@ -1,17 +1,19 @@
 ---
 title: messages.toggleChatAdmins
-description: messages.toggleChatAdmins parameters, return type and example
+description: Enable all users are admins in normal groups (not supergroups)
 ---
 ## Method: messages.toggleChatAdmins  
 [Back to methods index](index.md)
 
 
+Enable all users are admins in normal groups (not supergroups)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Group ID|
+|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|Enable all users are admins|
 
 
 ### Return type: [Updates](../types/Updates.md)

@@ -1,16 +1,18 @@
 ---
 title: channels.deleteChannel
-description: channels.deleteChannel parameters, return type and example
+description: Delete a channel/supergroup
 ---
 ## Method: channels.deleteChannel  
 [Back to methods index](index.md)
 
 
+Delete a channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup to delete|
 
 
 ### Return type: [Updates](../types/Updates.md)

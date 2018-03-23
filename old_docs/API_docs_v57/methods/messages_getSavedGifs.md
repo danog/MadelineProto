@@ -1,16 +1,18 @@
 ---
 title: messages.getSavedGifs
-description: messages.getSavedGifs parameters, return type and example
+description: Get saved gifs
 ---
 ## Method: messages.getSavedGifs  
 [Back to methods index](index.md)
 
 
+Get saved gifs
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|hash|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|hash|[CLICK ME int](../types/int.md) | Yes|0 or $result['hash']|
 
 
 ### Return type: [messages\_SavedGifs](../types/messages_SavedGifs.md)

@@ -1,17 +1,19 @@
 ---
 title: messages.getWebPage
-description: messages.getWebPage parameters, return type and example
+description: Get webpage preview
 ---
 ## Method: messages.getWebPage  
 [Back to methods index](index.md)
 
 
+Get webpage preview
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|url|[CLICK ME string](../types/string.md) | Yes|
-|hash|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|url|[CLICK ME string](../types/string.md) | Yes|URL|
+|hash|[CLICK ME int](../types/int.md) | Yes|0 or $result['hash']|
 
 
 ### Return type: [WebPage](../types/WebPage.md)

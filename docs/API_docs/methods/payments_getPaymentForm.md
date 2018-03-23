@@ -1,16 +1,18 @@
 ---
 title: payments.getPaymentForm
-description: payments.getPaymentForm parameters, return type and example
+description: Get payment form
 ---
 ## Method: payments.getPaymentForm  
 [Back to methods index](index.md)
 
 
+Get payment form
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|msg\_id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|msg\_id|[CLICK ME int](../types/int.md) | Yes|Message ID|
 
 
 ### Return type: [payments\_PaymentForm](../types/payments_PaymentForm.md)

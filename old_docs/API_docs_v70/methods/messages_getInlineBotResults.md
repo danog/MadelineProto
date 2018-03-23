@@ -1,20 +1,22 @@
 ---
 title: messages.getInlineBotResults
-description: messages.getInlineBotResults parameters, return type and example
+description: Call inline bot
 ---
 ## Method: messages.getInlineBotResults  
 [Back to methods index](index.md)
 
 
+Call inline bot
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|bot|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|
-|query|[CLICK ME string](../types/string.md) | Yes|
-|offset|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|bot|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The bot to call|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat where to call the bot|
+|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|The current location|
+|query|[CLICK ME string](../types/string.md) | Yes|The query to send to the bot|
+|offset|[CLICK ME string](../types/string.md) | Yes|The offset to send to the bot|
 
 
 ### Return type: [messages\_BotResults](../types/messages_BotResults.md)

@@ -1,16 +1,18 @@
 ---
 title: help.getInviteText
-description: help.getInviteText parameters, return type and example
+description: Get invitation text
 ---
 ## Method: help.getInviteText  
 [Back to methods index](index.md)
 
 
+Get invitation text
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|lang\_code|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|lang\_code|[CLICK ME string](../types/string.md) | Yes||
 
 
 ### Return type: [help\_InviteText](../types/help_InviteText.md)

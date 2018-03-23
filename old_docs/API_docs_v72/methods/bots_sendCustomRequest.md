@@ -1,17 +1,19 @@
 ---
 title: bots.sendCustomRequest
-description: bots.sendCustomRequest parameters, return type and example
+description: Send a custom request to the bot API
 ---
 ## Method: bots.sendCustomRequest  
 [Back to methods index](index.md)
 
 
+Send a custom request to the bot API
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|custom\_method|[CLICK ME string](../types/string.md) | Yes|
-|params|[CLICK ME DataJSON](../types/DataJSON.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|custom\_method|[CLICK ME string](../types/string.md) | Yes|The method to call|
+|params|[CLICK ME DataJSON](../types/DataJSON.md) | Yes|Method parameters|
 
 
 ### Return type: [DataJSON](../types/DataJSON.md)

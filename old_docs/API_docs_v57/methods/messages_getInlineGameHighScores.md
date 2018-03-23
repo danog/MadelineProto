@@ -1,17 +1,19 @@
 ---
 title: messages.getInlineGameHighScores
-description: messages.getInlineGameHighScores parameters, return type and example
+description: Get high scores of a game sent in an inline message
 ---
 ## Method: messages.getInlineGameHighScores  
 [Back to methods index](index.md)
 
 
+Get high scores of a game sent in an inline message
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|[CLICK ME InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|[CLICK ME InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|The inline message|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user that set the high scores|
 
 
 ### Return type: [messages\_HighScores](../types/messages_HighScores.md)

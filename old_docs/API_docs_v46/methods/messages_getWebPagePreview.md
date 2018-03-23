@@ -1,16 +1,18 @@
 ---
 title: messages.getWebPagePreview
-description: messages.getWebPagePreview parameters, return type and example
+description: Get webpage preview
 ---
 ## Method: messages.getWebPagePreview  
 [Back to methods index](index.md)
 
 
+Get webpage preview
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|message|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|message|[CLICK ME string](../types/string.md) | Yes|Extract preview from this message|
 
 
 ### Return type: [MessageMedia](../types/MessageMedia.md)

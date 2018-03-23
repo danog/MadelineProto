@@ -1,10 +1,12 @@
 ---
 title: help.getConfig
-description: help.getConfig parameters, return type and example
+description: Get server configuration
 ---
 ## Method: help.getConfig  
 [Back to methods index](index.md)
 
+
+Get server configuration
 
 
 

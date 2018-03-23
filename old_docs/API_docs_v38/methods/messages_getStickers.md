@@ -1,17 +1,19 @@
 ---
 title: messages.getStickers
-description: messages.getStickers parameters, return type and example
+description: Get stickers
 ---
 ## Method: messages.getStickers  
 [Back to methods index](index.md)
 
 
+Get stickers
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|emoticon|[CLICK ME string](../types/string.md) | Yes|
-|hash|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|emoticon|[CLICK ME string](../types/string.md) | Yes|Search by emoji|
+|hash|[CLICK ME string](../types/string.md) | Yes|0 or $MadelineProto->gen_vector_hash(previously fetched sticker IDs)|
 
 
 ### Return type: [messages\_Stickers](../types/messages_Stickers.md)

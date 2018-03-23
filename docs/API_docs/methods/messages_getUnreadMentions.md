@@ -1,21 +1,23 @@
 ---
 title: messages.getUnreadMentions
-description: messages.getUnreadMentions parameters, return type and example
+description: Get unread mentions
 ---
 ## Method: messages.getUnreadMentions  
 [Back to methods index](index.md)
 
 
+Get unread mentions
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|offset\_id|[CLICK ME int](../types/int.md) | Yes|
-|add\_offset|[CLICK ME int](../types/int.md) | Yes|
-|limit|[CLICK ME int](../types/int.md) | Yes|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
-|min\_id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat where to get unread mentions|
+|offset\_id|[CLICK ME int](../types/int.md) | Yes|The offset|
+|add\_offset|[CLICK ME int](../types/int.md) | Yes|The additional offset|
+|limit|[CLICK ME int](../types/int.md) | Yes|The number of results to fetch|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|The maximum message ID to fetch|
+|min\_id|[CLICK ME int](../types/int.md) | Yes|The minumum message ID to fetch|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

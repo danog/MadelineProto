@@ -1,17 +1,19 @@
 ---
 title: messages.sendScreenshotNotification
-description: messages.sendScreenshotNotification parameters, return type and example
+description: Send screenshot notification
 ---
 ## Method: messages.sendScreenshotNotification  
 [Back to methods index](index.md)
 
 
+Send screenshot notification
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to send the notification|
+|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Yes|Reply to message by ID|
 
 
 ### Return type: [Updates](../types/Updates.md)

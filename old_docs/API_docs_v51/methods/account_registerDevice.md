@@ -12,8 +12,8 @@ Register device for push notifications
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|token\_type|[CLICK ME int](../types/int.md) | Yes|Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone, 6 - Blackberry, and other, see source code of official apps for more info|
-|token|[CLICK ME string](../types/string.md) | Yes|Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info|
+|token\_type|[CLICK ME int](../types/int.md) | Yes|Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone, 6 - Blackberry, and oTher, see source code of official apps for more info|
+|token|[CLICK ME string](../types/string.md) | Yes|Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and oTher, see source code of official apps for more info|
 |device\_model|[CLICK ME string](../types/string.md) | Yes||
 |system\_version|[CLICK ME string](../types/string.md) | Yes||
 |app\_version|[CLICK ME string](../types/string.md) | Yes||

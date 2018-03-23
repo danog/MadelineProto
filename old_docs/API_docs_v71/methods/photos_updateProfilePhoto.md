@@ -1,16 +1,18 @@
 ---
 title: photos.updateProfilePhoto
-description: photos.updateProfilePhoto parameters, return type and example
+description: Update the profile photo (use photos->uploadProfilePhoto to upload the photo)
 ---
 ## Method: photos.updateProfilePhoto  
 [Back to methods index](index.md)
 
 
+Update the profile photo (use photos->uploadProfilePhoto to upload the photo)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|[MessageMedia, Update, Message or InputPhoto](../types/InputPhoto.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|[MessageMedia, Update, Message or InputPhoto](../types/InputPhoto.md) | Optional|The photo to use|
 
 
 ### Return type: [UserProfilePhoto](../types/UserProfilePhoto.md)

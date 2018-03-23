@@ -1,17 +1,19 @@
 ---
 title: channels.getMessages
-description: channels.getMessages parameters, return type and example
+description: Get channel/supergroup messages
 ---
 ## Method: channels.getMessages  
 [Back to methods index](index.md)
 
 
+Get channel/supergroup messages
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|The message IDs|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

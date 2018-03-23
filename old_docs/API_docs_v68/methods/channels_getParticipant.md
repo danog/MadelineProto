@@ -1,17 +1,19 @@
 ---
 title: channels.getParticipant
-description: channels.getParticipant parameters, return type and example
+description: Get info about a certain channel/supergroup participant
 ---
 ## Method: channels.getParticipant  
 [Back to methods index](index.md)
 
 
+Get info about a certain channel/supergroup participant
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user to fetch info about|
 
 
 ### Return type: [channels\_ChannelParticipant](../types/channels_ChannelParticipant.md)

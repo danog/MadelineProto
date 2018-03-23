@@ -1,10 +1,12 @@
 ---
 title: messages.clearRecentStickers
-description: messages.clearRecentStickers parameters, return type and example
+description: Clear all recent stickers
 ---
 ## Method: messages.clearRecentStickers  
 [Back to methods index](index.md)
 
+
+Clear all recent stickers
 
 
 

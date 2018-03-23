@@ -1,17 +1,19 @@
 ---
 title: channels.togglePreHistoryHidden
-description: channels.togglePreHistoryHidden parameters, return type and example
+description: Enable or disable hidden history for new channel/supergroup users
 ---
 ## Method: channels.togglePreHistoryHidden  
 [Back to methods index](index.md)
 
 
+Enable or disable hidden history for new channel/supergroup users
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|Enable or disable hidden history for new channel/supergroup users|
 
 
 ### Return type: [Updates](../types/Updates.md)

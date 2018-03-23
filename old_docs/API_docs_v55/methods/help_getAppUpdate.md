@@ -1,10 +1,12 @@
 ---
 title: help.getAppUpdate
-description: help.getAppUpdate parameters, return type and example
+description: Get info about app updates
 ---
 ## Method: help.getAppUpdate  
 [Back to methods index](index.md)
 
+
+Get info about app updates
 
 
 

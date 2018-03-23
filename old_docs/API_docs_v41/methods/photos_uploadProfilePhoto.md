@@ -1,19 +1,21 @@
 ---
 title: photos.uploadProfilePhoto
-description: photos.uploadProfilePhoto parameters, return type and example
+description: Upload profile photo
 ---
 ## Method: photos.uploadProfilePhoto  
 [Back to methods index](index.md)
 
 
+Upload profile photo
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|file|[File path or InputFile](../types/InputFile.md) | Yes|
-|caption|[CLICK ME string](../types/string.md) | Yes|
-|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|
-|crop|[CLICK ME InputPhotoCrop](../types/InputPhotoCrop.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|file|[File path or InputFile](../types/InputFile.md) | Yes|The photo|
+|caption|[CLICK ME string](../types/string.md) | Yes||
+|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional||
+|crop|[CLICK ME InputPhotoCrop](../types/InputPhotoCrop.md) | Yes||
 
 
 ### Return type: [photos\_Photo](../types/photos_Photo.md)

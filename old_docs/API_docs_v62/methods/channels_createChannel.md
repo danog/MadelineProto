@@ -1,19 +1,21 @@
 ---
 title: channels.createChannel
-description: channels.createChannel parameters, return type and example
+description: Create channel/supergroup
 ---
 ## Method: channels.createChannel  
 [Back to methods index](index.md)
 
 
+Create channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional|
-|megagroup|[CLICK ME Bool](../types/Bool.md) | Optional|
-|title|[CLICK ME string](../types/string.md) | Yes|
-|about|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional|Set this to true to create a channel|
+|megagroup|[CLICK ME Bool](../types/Bool.md) | Optional|Set this to true to create a supergroup|
+|title|[CLICK ME string](../types/string.md) | Yes|Supergroup/channel title|
+|about|[CLICK ME string](../types/string.md) | Yes|About text|
 
 
 ### Return type: [Updates](../types/Updates.md)

@@ -1,10 +1,12 @@
 ---
 title: messages.readFeaturedStickers
-description: messages.readFeaturedStickers parameters, return type and example
+description: Mark new featured stickers as read
 ---
 ## Method: messages.readFeaturedStickers  
 [Back to methods index](index.md)
 
+
+Mark new featured stickers as read
 
 
 

@@ -1,16 +1,18 @@
 ---
 title: help.getTermsOfService
-description: help.getTermsOfService parameters, return type and example
+description: Get terms of service
 ---
 ## Method: help.getTermsOfService  
 [Back to methods index](index.md)
 
 
+Get terms of service
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|lang\_code|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|lang\_code|[CLICK ME string](../types/string.md) | Yes||
 
 
 ### Return type: [help\_TermsOfService](../types/help_TermsOfService.md)

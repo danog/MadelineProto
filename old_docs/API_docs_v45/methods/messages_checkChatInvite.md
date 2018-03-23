@@ -1,16 +1,18 @@
 ---
 title: messages.checkChatInvite
-description: messages.checkChatInvite parameters, return type and example
+description: Check if an invitation link is valid
 ---
 ## Method: messages.checkChatInvite  
 [Back to methods index](index.md)
 
 
+Check if an invitation link is valid
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|hash|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|hash|[CLICK ME string](../types/string.md) | Yes|The invite link in t.me/joinchat/aflakf format|
 
 
 ### Return type: [ChatInvite](../types/ChatInvite.md)

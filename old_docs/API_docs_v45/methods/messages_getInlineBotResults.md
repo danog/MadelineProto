@@ -1,18 +1,20 @@
 ---
 title: messages.getInlineBotResults
-description: messages.getInlineBotResults parameters, return type and example
+description: Call inline bot
 ---
 ## Method: messages.getInlineBotResults  
 [Back to methods index](index.md)
 
 
+Call inline bot
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|bot|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|query|[CLICK ME string](../types/string.md) | Yes|
-|offset|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|bot|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The bot to call|
+|query|[CLICK ME string](../types/string.md) | Yes|The query to send to the bot|
+|offset|[CLICK ME string](../types/string.md) | Yes|The offset to send to the bot|
 
 
 ### Return type: [messages\_BotResults](../types/messages_BotResults.md)

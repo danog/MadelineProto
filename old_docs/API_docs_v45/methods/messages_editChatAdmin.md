@@ -1,18 +1,20 @@
 ---
 title: messages.editChatAdmin
-description: messages.editChatAdmin parameters, return type and example
+description: Edit admin permissions
 ---
 ## Method: messages.editChatAdmin  
 [Back to methods index](index.md)
 
 
+Edit admin permissions
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|is\_admin|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat ID (no supergroups)|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user ID|
+|is\_admin|[CLICK ME Bool](../types/Bool.md) | Yes|Should the user be admin?|
 
 
 ### Return type: [Bool](../types/Bool.md)

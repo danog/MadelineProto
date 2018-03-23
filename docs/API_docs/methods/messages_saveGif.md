@@ -1,17 +1,19 @@
 ---
 title: messages.saveGif
-description: messages.saveGif parameters, return type and example
+description: Save a GIF
 ---
 ## Method: messages.saveGif  
 [Back to methods index](index.md)
 
 
+Save a GIF
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|
-|unsave|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|The GIF to save|
+|unsave|[CLICK ME Bool](../types/Bool.md) | Yes|Remove the gif?|
 
 
 ### Return type: [Bool](../types/Bool.md)

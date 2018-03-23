@@ -1,16 +1,18 @@
 ---
 title: channels.joinChannel
-description: channels.joinChannel parameters, return type and example
+description: Join a channel/supergroup
 ---
 ## Method: channels.joinChannel  
 [Back to methods index](index.md)
 
 
+Join a channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup to join|
 
 
 ### Return type: [Updates](../types/Updates.md)

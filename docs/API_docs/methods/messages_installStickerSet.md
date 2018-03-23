@@ -1,17 +1,19 @@
 ---
 title: messages.installStickerSet
-description: messages.installStickerSet parameters, return type and example
+description: Add a sticker set
 ---
 ## Method: messages.installStickerSet  
 [Back to methods index](index.md)
 
 
+Add a sticker set
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|
-|archived|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|The sticker set to add|
+|archived|[CLICK ME Bool](../types/Bool.md) | Yes|Archive this set?|
 
 
 ### Return type: [messages\_StickerSetInstallResult](../types/messages_StickerSetInstallResult.md)

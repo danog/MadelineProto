@@ -1,16 +1,18 @@
 ---
 title: help.saveAppLog
-description: help.saveAppLog parameters, return type and example
+description: Log data for developer of this app
 ---
 ## Method: help.saveAppLog  
 [Back to methods index](index.md)
 
 
+Log data for developer of this app
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|events|Array of [CLICK ME InputAppEvent](../types/InputAppEvent.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|events|Array of [CLICK ME InputAppEvent](../types/InputAppEvent.md) | Yes|Event list|
 
 
 ### Return type: [Bool](../types/Bool.md)

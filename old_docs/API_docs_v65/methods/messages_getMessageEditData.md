@@ -1,17 +1,19 @@
 ---
 title: messages.getMessageEditData
-description: messages.getMessageEditData parameters, return type and example
+description: Check if about to edit a message or a media caption
 ---
 ## Method: messages.getMessageEditData  
 [Back to methods index](index.md)
 
 
+Check if about to edit a message or a media caption
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat|
+|id|[CLICK ME int](../types/int.md) | Yes|The message ID|
 
 
 ### Return type: [messages\_MessageEditData](../types/messages_MessageEditData.md)

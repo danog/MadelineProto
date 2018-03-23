@@ -1,17 +1,19 @@
 ---
 title: channels.setStickers
-description: channels.setStickers parameters, return type and example
+description: Set the supergroup/channel stickerpack
 ---
 ## Method: channels.setStickers  
 [Back to methods index](index.md)
 
 
+Set the supergroup/channel stickerpack
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergoup|
+|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|The stickerset|
 
 
 ### Return type: [Bool](../types/Bool.md)

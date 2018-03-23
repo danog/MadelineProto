@@ -1,16 +1,18 @@
 ---
 title: messages.exportChatInvite
-description: messages.exportChatInvite parameters, return type and example
+description: Export chat invite 
 ---
 ## Method: messages.exportChatInvite  
 [Back to methods index](index.md)
 
 
+Export chat invite 
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat id |
 
 
 ### Return type: [ExportedChatInvite](../types/ExportedChatInvite.md)

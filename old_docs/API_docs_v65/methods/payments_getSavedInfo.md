@@ -1,10 +1,12 @@
 ---
 title: payments.getSavedInfo
-description: payments.getSavedInfo parameters, return type and example
+description: Get saved payments info
 ---
 ## Method: payments.getSavedInfo  
 [Back to methods index](index.md)
 
+
+Get saved payments info
 
 
 

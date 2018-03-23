@@ -1,17 +1,19 @@
 ---
 title: messages.uploadMedia
-description: messages.uploadMedia parameters, return type and example
+description: Upload a file without sending it to anyone
 ---
 ## Method: messages.uploadMedia  
 [Back to methods index](index.md)
 
 
+Upload a file without sending it to anyone
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Nothing|
+|media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|The media to upload|
 
 
 ### Return type: [MessageMedia](../types/MessageMedia.md)

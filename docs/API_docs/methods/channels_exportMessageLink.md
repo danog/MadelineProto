@@ -1,18 +1,20 @@
 ---
 title: channels.exportMessageLink
-description: channels.exportMessageLink parameters, return type and example
+description: Get the link of a message in a channel
 ---
 ## Method: channels.exportMessageLink  
 [Back to methods index](index.md)
 
 
+Get the link of a message in a channel
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|id|[CLICK ME int](../types/int.md) | Yes|
-|grouped|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|id|[CLICK ME int](../types/int.md) | Yes|The ID of the message|
+|grouped|[CLICK ME Bool](../types/Bool.md) | Yes|Is this an album?|
 
 
 ### Return type: [ExportedMessageLink](../types/ExportedMessageLink.md)

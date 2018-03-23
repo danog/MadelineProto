@@ -1,19 +1,21 @@
 ---
 title: help.getAppUpdate
-description: help.getAppUpdate parameters, return type and example
+description: Get info about app updates
 ---
 ## Method: help.getAppUpdate  
 [Back to methods index](index.md)
 
 
+Get info about app updates
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|device\_model|[CLICK ME string](../types/string.md) | Yes|
-|system\_version|[CLICK ME string](../types/string.md) | Yes|
-|app\_version|[CLICK ME string](../types/string.md) | Yes|
-|lang\_code|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|device\_model|[CLICK ME string](../types/string.md) | Yes||
+|system\_version|[CLICK ME string](../types/string.md) | Yes||
+|app\_version|[CLICK ME string](../types/string.md) | Yes||
+|lang\_code|[CLICK ME string](../types/string.md) | Yes||
 
 
 ### Return type: [help\_AppUpdate](../types/help_AppUpdate.md)

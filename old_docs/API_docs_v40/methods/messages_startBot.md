@@ -1,18 +1,20 @@
 ---
 title: messages.startBot
-description: messages.startBot parameters, return type and example
+description: Start a bot
 ---
 ## Method: messages.startBot  
 [Back to methods index](index.md)
 
 
+Start a bot
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|bot|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|
-|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|start\_param|[CLICK ME string](../types/string.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|bot|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The bot's ID or username|
+|chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional||
+|start\_param|[CLICK ME string](../types/string.md) | Yes|The bot's start parameter|
 
 
 ### Return type: [Updates](../types/Updates.md)

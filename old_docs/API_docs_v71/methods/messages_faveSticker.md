@@ -1,17 +1,19 @@
 ---
 title: messages.faveSticker
-description: messages.faveSticker parameters, return type and example
+description: Add a sticker to favorites
 ---
 ## Method: messages.faveSticker  
 [Back to methods index](index.md)
 
 
+Add a sticker to favorites
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|
-|unfave|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|The sticker to add to favorites|
+|unfave|[CLICK ME Bool](../types/Bool.md) | Yes|Remove it from favorites?|
 
 
 ### Return type: [Bool](../types/Bool.md)

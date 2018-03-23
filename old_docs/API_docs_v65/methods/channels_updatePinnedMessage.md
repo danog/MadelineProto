@@ -1,18 +1,20 @@
 ---
 title: channels.updatePinnedMessage
-description: channels.updatePinnedMessage parameters, return type and example
+description: Set the pinned message of a channel/supergroup
 ---
 ## Method: channels.updatePinnedMessage  
 [Back to methods index](index.md)
 
 
+Set the pinned message of a channel/supergroup
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|silent|[CLICK ME Bool](../types/Bool.md) | Optional|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|silent|[CLICK ME Bool](../types/Bool.md) | Optional|Pin silently|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|id|[CLICK ME int](../types/int.md) | Yes|The ID of the message to pin|
 
 
 ### Return type: [Updates](../types/Updates.md)

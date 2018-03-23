@@ -1,16 +1,18 @@
 ---
 title: messages.getAllChats
-description: messages.getAllChats parameters, return type and example
+description: Get all chats (not supergroups or channels)
 ---
 ## Method: messages.getAllChats  
 [Back to methods index](index.md)
 
 
+Get all chats (not supergroups or channels)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|except\_ids|Array of [CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|except\_ids|Array of [CLICK ME int](../types/int.md) | Yes|Do not fetch these chats (MTProto id)|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)

@@ -1,16 +1,18 @@
 ---
 title: channels.getChannels
-description: channels.getChannels parameters, return type and example
+description: Get info about multiple channels/supergroups
 ---
 ## Method: channels.getChannels  
 [Back to methods index](index.md)
 
 
+Get info about multiple channels/supergroups
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|id|Array of [Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|id|Array of [Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Yes|The channel/supergroup MTProto IDs|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)

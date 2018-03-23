@@ -1,17 +1,19 @@
 ---
 title: channels.readHistory
-description: channels.readHistory parameters, return type and example
+description: Mark channel/supergroup history as read
 ---
 ## Method: channels.readHistory  
 [Back to methods index](index.md)
 
 
+Mark channel/supergroup history as read
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
+|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID to mark as read|
 
 
 ### Return type: [Bool](../types/Bool.md)

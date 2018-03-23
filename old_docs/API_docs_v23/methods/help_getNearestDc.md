@@ -1,10 +1,12 @@
 ---
 title: help.getNearestDc
-description: help.getNearestDc parameters, return type and example
+description: Get nearest datacenter
 ---
 ## Method: help.getNearestDc  
 [Back to methods index](index.md)
 
+
+Get nearest datacenter
 
 
 

@@ -1,18 +1,20 @@
 ---
 title: messages.getMessagesViews
-description: messages.getMessagesViews parameters, return type and example
+description: Get and increase message views
 ---
 ## Method: messages.getMessagesViews  
 [Back to methods index](index.md)
 
 
+Get and increase message views
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|
-|increment|[CLICK ME Bool](../types/Bool.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat where the message is located|
+|id|Array of [CLICK ME int](../types/int.md) | Yes|The IDs messages to get|
+|increment|[CLICK ME Bool](../types/Bool.md) | Yes|Increase message views?|
 
 
 ### Return type: [Vector\_of\_int](../types/int.md)

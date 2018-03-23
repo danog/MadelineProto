@@ -1,19 +1,21 @@
 ---
 title: messages.getBotCallbackAnswer
-description: messages.getBotCallbackAnswer parameters, return type and example
+description: Get the callback answer of a bot (after clicking a button)
 ---
 ## Method: messages.getBotCallbackAnswer  
 [Back to methods index](index.md)
 
 
+Get the callback answer of a bot (after clicking a button)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|game|[CLICK ME Bool](../types/Bool.md) | Optional|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|msg\_id|[CLICK ME int](../types/int.md) | Yes|
-|data|[CLICK ME bytes](../types/bytes.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|game|[CLICK ME Bool](../types/Bool.md) | Optional|Is this a game?|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat|
+|msg\_id|[CLICK ME int](../types/int.md) | Yes|The message ID|
+|data|[CLICK ME bytes](../types/bytes.md) | Optional|The data to send to the bot|
 
 
 ### Return type: [messages\_BotCallbackAnswer](../types/messages_BotCallbackAnswer.md)

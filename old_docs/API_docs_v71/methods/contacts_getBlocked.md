@@ -12,7 +12,7 @@ Get blocked users
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|offset|[CLICK ME int](../types/int.md) | Yes|Initially 0, then set to the number of blocked contacts previously fetched|
+|offset|[CLICK ME int](../types/int.md) | Yes|Initially 0, Then set to the number of blocked contacts previously fetched|
 |limit|[CLICK ME int](../types/int.md) | Yes|How many blocked contacts to fetch|
 
 

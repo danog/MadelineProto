@@ -1,20 +1,22 @@
 ---
 title: messages.setBotCallbackAnswer
-description: messages.setBotCallbackAnswer parameters, return type and example
+description: Bots only: set the callback answer (after a button was clicked)
 ---
 ## Method: messages.setBotCallbackAnswer  
 [Back to methods index](index.md)
 
 
+Bots only: set the callback answer (after a button was clicked)
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|alert|[CLICK ME Bool](../types/Bool.md) | Optional|
-|query\_id|[CLICK ME long](../types/long.md) | Yes|
-|message|[CLICK ME string](../types/string.md) | Optional|
-|url|[CLICK ME string](../types/string.md) | Optional|
-|cache\_time|[CLICK ME int](../types/int.md) | Yes|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|alert|[CLICK ME Bool](../types/Bool.md) | Optional|Is this an alert?|
+|query\_id|[CLICK ME long](../types/long.md) | Yes|The query ID|
+|message|[CLICK ME string](../types/string.md) | Optional|The message|
+|url|[CLICK ME string](../types/string.md) | Optional|The URL|
+|cache\_time|[CLICK ME int](../types/int.md) | Yes|Cache time|
 
 
 ### Return type: [Bool](../types/Bool.md)

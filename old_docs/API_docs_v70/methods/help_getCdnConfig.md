@@ -1,10 +1,12 @@
 ---
 title: help.getCdnConfig
-description: help.getCdnConfig parameters, return type and example
+description: Get CDN configuration
 ---
 ## Method: help.getCdnConfig  
 [Back to methods index](index.md)
 
+
+Get CDN configuration
 
 
 

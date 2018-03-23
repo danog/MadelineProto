@@ -1,17 +1,19 @@
 ---
 title: messages.getWebPagePreview
-description: messages.getWebPagePreview parameters, return type and example
+description: Get webpage preview
 ---
 ## Method: messages.getWebPagePreview  
 [Back to methods index](index.md)
 
 
+Get webpage preview
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|message|[CLICK ME string](../types/string.md) | Yes|
-|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|message|[CLICK ME string](../types/string.md) | Yes|Extract preview from this message|
+|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|Entities for styled text|
 |parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
 
 

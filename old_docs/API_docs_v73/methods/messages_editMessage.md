@@ -1,24 +1,26 @@
 ---
 title: messages.editMessage
-description: messages.editMessage parameters, return type and example
+description: Edit a message
 ---
 ## Method: messages.editMessage  
 [Back to methods index](index.md)
 
 
+Edit a message
+
 ### Parameters:
 
-| Name     |    Type       | Required |
-|----------|---------------|----------|
-|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|
-|stop\_geo\_live|[CLICK ME Bool](../types/Bool.md) | Optional|
-|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|
-|id|[CLICK ME int](../types/int.md) | Yes|
-|message|[CLICK ME string](../types/string.md) | Optional|
-|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|
-|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|
+| Name     |    Type       | Required | Description |
+|----------|---------------|----------|-------------|
+|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|Disable webpage preview|
+|stop\_geo\_live|[CLICK ME Bool](../types/Bool.md) | Optional|Stop live location|
+|peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat|
+|id|[CLICK ME int](../types/int.md) | Yes|The message ID|
+|message|[CLICK ME string](../types/string.md) | Optional|The new message|
+|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|The new keyboard|
+|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|The new entities (for styled text)|
 |parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
-|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|
+|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|The new location|
 
 
 ### Return type: [Updates](../types/Updates.md)
