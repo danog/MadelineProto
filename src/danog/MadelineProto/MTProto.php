@@ -348,6 +348,14 @@ class MTProto
 
     public function parse_settings($settings)
     {
+        if (!isset($settings['app_info']['api_id']) || !$settings['app_info']['api_id']) {
+            if (isset($this->settings['app_info']['api_id']) && $this->settings['app_info']['api_id']) {
+                $settings['app_info']['api_id'] = $this->settings['app_info']['api_id'];
+                $settings['app_info']['api_hash'] = $this->settings['app_info']['api_hash'];
+            } else {
+                throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
+            }
+        }
         // Detect device model
         try {
             $device_model = php_uname('s');
@@ -568,9 +576,6 @@ class MTProto
         }
         $this->settings = $settings;
         if (!$this->settings['updates']['handle_updates']) $this->updates = [];
-        if (!isset($settings['app_info']['api_id']) || !$settings['app_info']['api_id']) {
-            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
-        }
         // Setup logger
         $this->setup_logger();
     }

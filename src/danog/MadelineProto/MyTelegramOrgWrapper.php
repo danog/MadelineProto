@@ -19,6 +19,9 @@ class MyTelegramOrgWrapper
 {
     private $logged = false;
     public function __construct($number) {
+        if (!extension_loaded('curl')) {
+            throw new Exception(['extension', 'curl']);
+        }
         $this->number = $number;
         $ch = curl_init();
 
