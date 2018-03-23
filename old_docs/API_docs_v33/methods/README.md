@@ -1,307 +1,302 @@
 ---
 title: Methods
-description: List of methods
+description: What do you want to do?
 ---
-# Methods  
-[Back to API documentation index](..)
+# What do you want to do?  
+[Go back to API documentation index](..)  
 
+[Go to the old code-version method index](api_index.html)  
 
-$MadelineProto->[logout](https://docs.madelineproto.xyz/logout.html)();
+* [Logout](https://docs.madelineproto.xyz/logout.html)
 
-$MadelineProto->[phone_login](https://docs.madelineproto.xyz/phone_login.html)($number);
+* [Login](https://docs.madelineproto.xyz/docs/LOGIN.html)
 
-$MadelineProto->[complete_phone_login](https://docs.madelineproto.xyz/complete_phone_login.html)($code);
+* [Get all chats, broadcast a message to all chats](https://docs.madelineproto.xyz/docs/DIALOGS.html)
 
-$MadelineProto->[complete_2FA_login](https://docs.madelineproto.xyz/complete_2FA_login.html)($password);
+* [Get the full participant list of a channel/group/supergroup](https://docs.madelineproto.xyz/get_pwr_chat.html)
 
-$MadelineProto->[bot_login](https://docs.madelineproto.xyz/bot_login.html)($token);
+* [Get full info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/get_full_info.html)
 
+* [Get info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/get_info.html)
 
-$MadelineProto->[get_dialogs](https://docs.madelineproto.xyz/get_dialogs.html)();
+* [Get info about the currently logged-in user](https://docs.madelineproto.xyz/get_self.html)
 
-$MadelineProto->[get_pwr_chat](https://docs.madelineproto.xyz/get_pwr_chat.html)($id);
+* [Upload or download files up to 1.5 GB](https://docs.madelineproto.xyz/docs/FILES.html)
 
-$MadelineProto->[get_info](https://docs.madelineproto.xyz/get_info.html)($id);
+* [Make a phone call and play a song](https://docs.madelineproto.xyz/docs/CALLS.html)
 
-$MadelineProto->[get_full_info](https://docs.madelineproto.xyz/get_full_info.html)($id);
-
-$MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
-
-
-$MadelineProto->[request_call](https://docs.madelineproto.xyz/request_call.html)($id);
-
-$MadelineProto->[request_secret_chat](https://docs.madelineproto.xyz/request_secret_chat.html)($id);
+* [Create a secret chat bot](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
 
 ***
-<br><br>$MadelineProto->[account->changePhone](account_changePhone.md)(\['phone_number' => [string](../types/string.md), 'phone_code_hash' => [string](../types/string.md), 'phone_code' => [string](../types/string.md), \]) === [$User](../types/User.md)<a name="account_changePhone"></a>  
+<br><br>* <a href="account_changePhone.html" name="account_changePhone">Change the phone number associated to this account</a>  
 
-$MadelineProto->[account->checkUsername](account_checkUsername.md)(\['username' => [string](../types/string.md), \]) === [$Bool](../types/Bool.md)<a name="account_checkUsername"></a>  
+* <a href="account_checkUsername.html" name="account_checkUsername">Check if this username is available</a>  
 
-$MadelineProto->[account->deleteAccount](account_deleteAccount.md)(\['reason' => [string](../types/string.md), \]) === [$Bool](../types/Bool.md)<a name="account_deleteAccount"></a>  
+* <a href="account_deleteAccount.html" name="account_deleteAccount">Delete this account</a>  
 
-$MadelineProto->[account->getAccountTTL](account_getAccountTTL.md)(\[\]) === [$AccountDaysTTL](../types/AccountDaysTTL.md)<a name="account_getAccountTTL"></a>  
+* <a href="account_getAccountTTL.html" name="account_getAccountTTL">Get account TTL</a>  
 
-$MadelineProto->[account->getAuthorizations](account_getAuthorizations.md)(\[\]) === [$account\_Authorizations](../types/account_Authorizations.md)<a name="account_getAuthorizations"></a>  
+* <a href="account_getAuthorizations.html" name="account_getAuthorizations">Get all logged-in authorizations</a>  
 
-$MadelineProto->[account->getNotifySettings](account_getNotifySettings.md)(\['peer' => [InputNotifyPeer](../types/InputNotifyPeer.md), \]) === [$PeerNotifySettings](../types/PeerNotifySettings.md)<a name="account_getNotifySettings"></a>  
+* <a href="account_getNotifySettings.html" name="account_getNotifySettings">Get notification settings</a>  
 
-$MadelineProto->[account->getPassword](account_getPassword.md)(\[\]) === [$account\_Password](../types/account_Password.md)<a name="account_getPassword"></a>  
+* <a href="account_getPassword.html" name="account_getPassword">Get the current password</a>  
 
-$MadelineProto->[account->getPasswordSettings](account_getPasswordSettings.md)(\['current_password_hash' => [bytes](../types/bytes.md), \]) === [$account\_PasswordSettings](../types/account_PasswordSettings.md)<a name="account_getPasswordSettings"></a>  
+* <a href="account_getPasswordSettings.html" name="account_getPasswordSettings">Get the current 2FA settings</a>  
 
-$MadelineProto->[account->getPrivacy](account_getPrivacy.md)(\['key' => [InputPrivacyKey](../types/InputPrivacyKey.md), \]) === [$account\_PrivacyRules](../types/account_PrivacyRules.md)<a name="account_getPrivacy"></a>  
+* <a href="account_getPrivacy.html" name="account_getPrivacy">Get privacy settings</a>  
 
-$MadelineProto->[account->getWallPapers](account_getWallPapers.md)(\[\]) === [$Vector\_of\_WallPaper](../types/WallPaper.md)<a name="account_getWallPapers"></a>  
+* <a href="account_getWallPapers.html" name="account_getWallPapers">Returns a list of available wallpapers.</a>  
 
-$MadelineProto->[account->registerDevice](account_registerDevice.md)(\['token_type' => [int](../types/int.md), 'token' => [string](../types/string.md), 'device_model' => [string](../types/string.md), 'system_version' => [string](../types/string.md), 'app_version' => [string](../types/string.md), 'app_sandbox' => [Bool](../types/Bool.md), 'lang_code' => [string](../types/string.md), \]) === [$Bool](../types/Bool.md)<a name="account_registerDevice"></a>  
+* <a href="account_registerDevice.html" name="account_registerDevice">Register device for push notifications</a>  
 
-$MadelineProto->[account->resetAuthorization](account_resetAuthorization.md)(\['hash' => [long](../types/long.md), \]) === [$Bool](../types/Bool.md)<a name="account_resetAuthorization"></a>  
+* <a href="account_resetAuthorization.html" name="account_resetAuthorization">Delete a certain session</a>  
 
-$MadelineProto->[account->resetNotifySettings](account_resetNotifySettings.md)(\[\]) === [$Bool](../types/Bool.md)<a name="account_resetNotifySettings"></a>  
+* <a href="account_resetNotifySettings.html" name="account_resetNotifySettings">Reset all notification settings</a>  
 
-$MadelineProto->[account->sendChangePhoneCode](account_sendChangePhoneCode.md)(\['phone_number' => [string](../types/string.md), \]) === [$account\_SentChangePhoneCode](../types/account_SentChangePhoneCode.md)<a name="account_sendChangePhoneCode"></a>  
+* <a href="account_sendChangePhoneCode.html" name="account_sendChangePhoneCode">Change the phone number</a>  
 
-$MadelineProto->[account->setAccountTTL](account_setAccountTTL.md)(\['ttl' => [AccountDaysTTL](../types/AccountDaysTTL.md), \]) === [$Bool](../types/Bool.md)<a name="account_setAccountTTL"></a>  
+* <a href="account_setAccountTTL.html" name="account_setAccountTTL">Set account TTL</a>  
 
-$MadelineProto->[account->setPrivacy](account_setPrivacy.md)(\['key' => [InputPrivacyKey](../types/InputPrivacyKey.md), 'rules' => \[[InputPrivacyRule](../types/InputPrivacyRule.md)\], \]) === [$account\_PrivacyRules](../types/account_PrivacyRules.md)<a name="account_setPrivacy"></a>  
+* <a href="account_setPrivacy.html" name="account_setPrivacy">Set privacy settings</a>  
 
-$MadelineProto->[account->unregisterDevice](account_unregisterDevice.md)(\['token_type' => [int](../types/int.md), 'token' => [string](../types/string.md), \]) === [$Bool](../types/Bool.md)<a name="account_unregisterDevice"></a>  
+* <a href="account_unregisterDevice.html" name="account_unregisterDevice">Stop sending PUSH notifications to app</a>  
 
-$MadelineProto->[account->updateDeviceLocked](account_updateDeviceLocked.md)(\['period' => [int](../types/int.md), \]) === [$Bool](../types/Bool.md)<a name="account_updateDeviceLocked"></a>  
+* <a href="account_updateDeviceLocked.html" name="account_updateDeviceLocked">Disable all notifications for a certain period</a>  
 
-$MadelineProto->[account->updateNotifySettings](account_updateNotifySettings.md)(\['peer' => [InputNotifyPeer](../types/InputNotifyPeer.md), 'settings' => [InputPeerNotifySettings](../types/InputPeerNotifySettings.md), \]) === [$Bool](../types/Bool.md)<a name="account_updateNotifySettings"></a>  
+* <a href="account_updateNotifySettings.html" name="account_updateNotifySettings">Change notification settings</a>  
 
-$MadelineProto->[account->updatePasswordSettings](account_updatePasswordSettings.md)(\['current_password_hash' => [bytes](../types/bytes.md), 'new_settings' => [account\_PasswordInputSettings](../types/account_PasswordInputSettings.md), \]) === [$Bool](../types/Bool.md)<a name="account_updatePasswordSettings"></a>  
+* <a href="account_updatePasswordSettings.html" name="account_updatePasswordSettings">Update the 2FA password settings</a>  
 
-$MadelineProto->[account->updateProfile](account_updateProfile.md)(\['first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), \]) === [$User](../types/User.md)<a name="account_updateProfile"></a>  
+* <a href="account_updateProfile.html" name="account_updateProfile">Update profile info</a>  
 
-$MadelineProto->[account->updateStatus](account_updateStatus.md)(\['offline' => [Bool](../types/Bool.md), \]) === [$Bool](../types/Bool.md)<a name="account_updateStatus"></a>  
+* <a href="account_updateStatus.html" name="account_updateStatus">Update online status</a>  
 
-$MadelineProto->[account->updateUsername](account_updateUsername.md)(\['username' => [string](../types/string.md), \]) === [$User](../types/User.md)<a name="account_updateUsername"></a>  
-
-***
-<br><br>$MadelineProto->[auth->bindTempAuthKey](auth_bindTempAuthKey.md)(\['perm_auth_key_id' => [long](../types/long.md), 'nonce' => [long](../types/long.md), 'expires_at' => [int](../types/int.md), 'encrypted_message' => [bytes](../types/bytes.md), \]) === [$Bool](../types/Bool.md)<a name="auth_bindTempAuthKey"></a>  
-
-$MadelineProto->[auth->checkPassword](auth_checkPassword.md)(\['password_hash' => [bytes](../types/bytes.md), \]) === [$auth\_Authorization](../types/auth_Authorization.md)<a name="auth_checkPassword"></a>  
-
-$MadelineProto->[auth->checkPhone](auth_checkPhone.md)(\['phone_number' => [string](../types/string.md), \]) === [$auth\_CheckedPhone](../types/auth_CheckedPhone.md)<a name="auth_checkPhone"></a>  
-
-$MadelineProto->[auth->exportAuthorization](auth_exportAuthorization.md)(\['dc_id' => [int](../types/int.md), \]) === [$auth\_ExportedAuthorization](../types/auth_ExportedAuthorization.md)<a name="auth_exportAuthorization"></a>  
-
-$MadelineProto->[auth->importAuthorization](auth_importAuthorization.md)(\['id' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \]) === [$auth\_Authorization](../types/auth_Authorization.md)<a name="auth_importAuthorization"></a>  
-
-$MadelineProto->[auth->importBotAuthorization](auth_importBotAuthorization.md)(\['api_id' => [int](../types/int.md), 'api_hash' => [string](../types/string.md), 'bot_auth_token' => [string](../types/string.md), \]) === [$auth\_Authorization](../types/auth_Authorization.md)<a name="auth_importBotAuthorization"></a>  
-
-$MadelineProto->[auth->logOut](auth_logOut.md)(\[\]) === [$Bool](../types/Bool.md)<a name="auth_logOut"></a>  
-
-$MadelineProto->[auth->recoverPassword](auth_recoverPassword.md)(\['code' => [string](../types/string.md), \]) === [$auth\_Authorization](../types/auth_Authorization.md)<a name="auth_recoverPassword"></a>  
-
-$MadelineProto->[auth->requestPasswordRecovery](auth_requestPasswordRecovery.md)(\[\]) === [$auth\_PasswordRecovery](../types/auth_PasswordRecovery.md)<a name="auth_requestPasswordRecovery"></a>  
-
-$MadelineProto->[auth->resetAuthorizations](auth_resetAuthorizations.md)(\[\]) === [$Bool](../types/Bool.md)<a name="auth_resetAuthorizations"></a>  
-
-$MadelineProto->[auth->sendCall](auth_sendCall.md)(\['phone_number' => [string](../types/string.md), 'phone_code_hash' => [string](../types/string.md), \]) === [$Bool](../types/Bool.md)<a name="auth_sendCall"></a>  
-
-$MadelineProto->[auth->sendCode](auth_sendCode.md)(\['phone_number' => [string](../types/string.md), 'sms_type' => [int](../types/int.md), 'api_id' => [int](../types/int.md), 'api_hash' => [string](../types/string.md), 'lang_code' => [string](../types/string.md), \]) === [$auth\_SentCode](../types/auth_SentCode.md)<a name="auth_sendCode"></a>  
-
-$MadelineProto->[auth->sendInvites](auth_sendInvites.md)(\['phone_numbers' => \[[string](../types/string.md)\], 'message' => [string](../types/string.md), \]) === [$Bool](../types/Bool.md)<a name="auth_sendInvites"></a>  
-
-$MadelineProto->[auth->sendSms](auth_sendSms.md)(\['phone_number' => [string](../types/string.md), 'phone_code_hash' => [string](../types/string.md), \]) === [$Bool](../types/Bool.md)<a name="auth_sendSms"></a>  
-
-$MadelineProto->[auth->signIn](auth_signIn.md)(\['phone_number' => [string](../types/string.md), 'phone_code_hash' => [string](../types/string.md), 'phone_code' => [string](../types/string.md), \]) === [$auth\_Authorization](../types/auth_Authorization.md)<a name="auth_signIn"></a>  
-
-$MadelineProto->[auth->signUp](auth_signUp.md)(\['phone_number' => [string](../types/string.md), 'phone_code_hash' => [string](../types/string.md), 'phone_code' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), \]) === [$auth\_Authorization](../types/auth_Authorization.md)<a name="auth_signUp"></a>  
+* <a href="account_updateUsername.html" name="account_updateUsername">Update this user's username</a>  
 
 ***
-<br><br>$MadelineProto->[contacts->block](contacts_block.md)(\['id' => [InputUser](../types/InputUser.md), \]) === [$Bool](../types/Bool.md)<a name="contacts_block"></a>  
+<br><br>* <a href="auth_bindTempAuthKey.html" name="auth_bindTempAuthKey">You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info</a>  
 
-$MadelineProto->[contacts->deleteContact](contacts_deleteContact.md)(\['id' => [InputUser](../types/InputUser.md), \]) === [$contacts\_Link](../types/contacts_Link.md)<a name="contacts_deleteContact"></a>  
+* <a href="auth_checkPassword.html" name="auth_checkPassword">You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)</a>  
 
-$MadelineProto->[contacts->deleteContacts](contacts_deleteContacts.md)(\['id' => \[[InputUser](../types/InputUser.md)\], \]) === [$Bool](../types/Bool.md)<a name="contacts_deleteContacts"></a>  
+* <a href="auth_checkPhone.html" name="auth_checkPhone">Check if this phone number is registered on telegram</a>  
 
-$MadelineProto->[contacts->exportCard](contacts_exportCard.md)(\[\]) === [$Vector\_of\_int](../types/int.md)<a name="contacts_exportCard"></a>  
+* <a href="auth_exportAuthorization.html" name="auth_exportAuthorization">You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html</a>  
 
-$MadelineProto->[contacts->getBlocked](contacts_getBlocked.md)(\['offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$contacts\_Blocked](../types/contacts_Blocked.md)<a name="contacts_getBlocked"></a>  
+* <a href="auth_importAuthorization.html" name="auth_importAuthorization">You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html</a>  
 
-$MadelineProto->[contacts->getContacts](contacts_getContacts.md)(\['hash' => [string](../types/string.md), \]) === [$contacts\_Contacts](../types/contacts_Contacts.md)<a name="contacts_getContacts"></a>  
+* <a href="auth_importBotAuthorization.html" name="auth_importBotAuthorization">You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)</a>  
 
-$MadelineProto->[contacts->getStatuses](contacts_getStatuses.md)(\[\]) === [$Vector\_of\_ContactStatus](../types/ContactStatus.md)<a name="contacts_getStatuses"></a>  
+* <a href="auth_logOut.html" name="auth_logOut">You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info)</a>  
 
-$MadelineProto->[contacts->getSuggested](contacts_getSuggested.md)(\['limit' => [int](../types/int.md), \]) === [$contacts\_Suggested](../types/contacts_Suggested.md)<a name="contacts_getSuggested"></a>  
+* <a href="auth_recoverPassword.html" name="auth_recoverPassword">Use the code that was emailed to you after running $MadelineProto->auth->requestPasswordRecovery to login to your account</a>  
 
-$MadelineProto->[contacts->importCard](contacts_importCard.md)(\['export_card' => \[[int](../types/int.md)\], \]) === [$User](../types/User.md)<a name="contacts_importCard"></a>  
+* <a href="auth_requestPasswordRecovery.html" name="auth_requestPasswordRecovery">Send an email to recover the 2FA password</a>  
 
-$MadelineProto->[contacts->importContacts](contacts_importContacts.md)(\['contacts' => \[[InputContact](../types/InputContact.md)\], 'replace' => [Bool](../types/Bool.md), \]) === [$contacts\_ImportedContacts](../types/contacts_ImportedContacts.md)<a name="contacts_importContacts"></a>  
+* <a href="auth_resetAuthorizations.html" name="auth_resetAuthorizations">Delete all logged-in sessions.</a>  
 
-$MadelineProto->[contacts->resolveUsername](contacts_resolveUsername.md)(\['username' => [string](../types/string.md), \]) === [$User](../types/User.md)<a name="contacts_resolveUsername"></a>  
+* <a href="auth_sendCall.html" name="auth_sendCall">Send verification phone call</a>  
 
-$MadelineProto->[contacts->search](contacts_search.md)(\['q' => [string](../types/string.md), 'limit' => [int](../types/int.md), \]) === [$contacts\_Found](../types/contacts_Found.md)<a name="contacts_search"></a>  
+* <a href="auth_sendCode.html" name="auth_sendCode">Use phone_login instead</a>  
 
-$MadelineProto->[contacts->unblock](contacts_unblock.md)(\['id' => [InputUser](../types/InputUser.md), \]) === [$Bool](../types/Bool.md)<a name="contacts_unblock"></a>  
+* <a href="auth_sendInvites.html" name="auth_sendInvites">Invite friends to telegram!</a>  
 
-***
-<br><br>$MadelineProto->[geochats->checkin](geochats_checkin.md)(\['peer' => [InputGeoChat](../types/InputGeoChat.md), \]) === [$geochats\_StatedMessage](../types/geochats_StatedMessage.md)<a name="geochats_checkin"></a>  
+* <a href="auth_sendSms.html" name="auth_sendSms">Send SMS verification code</a>  
 
-$MadelineProto->[geochats->createGeoChat](geochats_createGeoChat.md)(\['title' => [string](../types/string.md), 'geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), 'address' => [string](../types/string.md), 'venue' => [string](../types/string.md), \]) === [$geochats\_StatedMessage](../types/geochats_StatedMessage.md)<a name="geochats_createGeoChat"></a>  
+* <a href="auth_signIn.html" name="auth_signIn">You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)</a>  
 
-$MadelineProto->[geochats->editChatPhoto](geochats_editChatPhoto.md)(\['peer' => [InputGeoChat](../types/InputGeoChat.md), 'photo' => [InputChatPhoto](../types/InputChatPhoto.md), \]) === [$geochats\_StatedMessage](../types/geochats_StatedMessage.md)<a name="geochats_editChatPhoto"></a>  
-
-$MadelineProto->[geochats->editChatTitle](geochats_editChatTitle.md)(\['peer' => [InputGeoChat](../types/InputGeoChat.md), 'title' => [string](../types/string.md), 'address' => [string](../types/string.md), \]) === [$geochats\_StatedMessage](../types/geochats_StatedMessage.md)<a name="geochats_editChatTitle"></a>  
-
-$MadelineProto->[geochats->getFullChat](geochats_getFullChat.md)(\['peer' => [InputGeoChat](../types/InputGeoChat.md), \]) === [$messages\_ChatFull](../types/messages_ChatFull.md)<a name="geochats_getFullChat"></a>  
-
-$MadelineProto->[geochats->getHistory](geochats_getHistory.md)(\['peer' => [InputGeoChat](../types/InputGeoChat.md), 'offset' => [int](../types/int.md), 'max_id' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$geochats\_Messages](../types/geochats_Messages.md)<a name="geochats_getHistory"></a>  
-
-$MadelineProto->[geochats->getLocated](geochats_getLocated.md)(\['geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), 'radius' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$geochats\_Located](../types/geochats_Located.md)<a name="geochats_getLocated"></a>  
-
-$MadelineProto->[geochats->getRecents](geochats_getRecents.md)(\['offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$geochats\_Messages](../types/geochats_Messages.md)<a name="geochats_getRecents"></a>  
-
-$MadelineProto->[geochats->search](geochats_search.md)(\['peer' => [InputGeoChat](../types/InputGeoChat.md), 'q' => [string](../types/string.md), 'filter' => [MessagesFilter](../types/MessagesFilter.md), 'min_date' => [int](../types/int.md), 'max_date' => [int](../types/int.md), 'offset' => [int](../types/int.md), 'max_id' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$geochats\_Messages](../types/geochats_Messages.md)<a name="geochats_search"></a>  
-
-$MadelineProto->[geochats->sendMedia](geochats_sendMedia.md)(\['peer' => [InputGeoChat](../types/InputGeoChat.md), 'media' => [InputMedia](../types/InputMedia.md), \]) === [$geochats\_StatedMessage](../types/geochats_StatedMessage.md)<a name="geochats_sendMedia"></a>  
-
-$MadelineProto->[geochats->sendMessage](geochats_sendMessage.md)(\['peer' => [InputGeoChat](../types/InputGeoChat.md), 'message' => [string](../types/string.md), \]) === [$geochats\_StatedMessage](../types/geochats_StatedMessage.md)<a name="geochats_sendMessage"></a>  
-
-$MadelineProto->[geochats->setTyping](geochats_setTyping.md)(\['peer' => [InputGeoChat](../types/InputGeoChat.md), 'typing' => [Bool](../types/Bool.md), \]) === [$Bool](../types/Bool.md)<a name="geochats_setTyping"></a>  
+* <a href="auth_signUp.html" name="auth_signUp">You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)</a>  
 
 ***
-<br><br>$MadelineProto->[help->getAppChangelog](help_getAppChangelog.md)(\['device_model' => [string](../types/string.md), 'system_version' => [string](../types/string.md), 'app_version' => [string](../types/string.md), 'lang_code' => [string](../types/string.md), \]) === [$help\_AppChangelog](../types/help_AppChangelog.md)<a name="help_getAppChangelog"></a>  
+<br><br>* <a href="contacts_block.html" name="contacts_block">Block a user</a>  
 
-$MadelineProto->[help->getAppUpdate](help_getAppUpdate.md)(\['device_model' => [string](../types/string.md), 'system_version' => [string](../types/string.md), 'app_version' => [string](../types/string.md), 'lang_code' => [string](../types/string.md), \]) === [$help\_AppUpdate](../types/help_AppUpdate.md)<a name="help_getAppUpdate"></a>  
+* <a href="contacts_deleteContact.html" name="contacts_deleteContact">Delete a contact</a>  
 
-$MadelineProto->[help->getConfig](help_getConfig.md)(\[\]) === [$Config](../types/Config.md)<a name="help_getConfig"></a>  
+* <a href="contacts_deleteContacts.html" name="contacts_deleteContacts">Delete multiple contacts</a>  
 
-$MadelineProto->[help->getInviteText](help_getInviteText.md)(\['lang_code' => [string](../types/string.md), \]) === [$help\_InviteText](../types/help_InviteText.md)<a name="help_getInviteText"></a>  
+* <a href="contacts_exportCard.html" name="contacts_exportCard">Export contact as card</a>  
 
-$MadelineProto->[help->getNearestDc](help_getNearestDc.md)(\[\]) === [$NearestDc](../types/NearestDc.md)<a name="help_getNearestDc"></a>  
+* <a href="contacts_getBlocked.html" name="contacts_getBlocked">Get blocked users</a>  
 
-$MadelineProto->[help->getSupport](help_getSupport.md)(\[\]) === [$help\_Support](../types/help_Support.md)<a name="help_getSupport"></a>  
+* <a href="contacts_getContacts.html" name="contacts_getContacts">Get info about a certain contact</a>  
 
-$MadelineProto->[help->saveAppLog](help_saveAppLog.md)(\['events' => \[[InputAppEvent](../types/InputAppEvent.md)\], \]) === [$Bool](../types/Bool.md)<a name="help_saveAppLog"></a>  
+* <a href="contacts_getStatuses.html" name="contacts_getStatuses">Get online status of all users</a>  
 
-***
-<br><br>$MadelineProto->[initConnection](initConnection.md)(\['api_id' => [int](../types/int.md), 'device_model' => [string](../types/string.md), 'system_version' => [string](../types/string.md), 'app_version' => [string](../types/string.md), 'lang_code' => [string](../types/string.md), 'query' => [!X](../types/!X.md), \]) === [$X](../types/X.md)<a name="initConnection"></a>  
+* <a href="contacts_getSuggested.html" name="contacts_getSuggested">Get suggested contacts</a>  
 
-***
-<br><br>$MadelineProto->[invokeAfterMsg](invokeAfterMsg.md)(\['msg_id' => [long](../types/long.md), 'query' => [!X](../types/!X.md), \]) === [$X](../types/X.md)<a name="invokeAfterMsg"></a>  
+* <a href="contacts_importCard.html" name="contacts_importCard">Import card as contact</a>  
 
-***
-<br><br>$MadelineProto->[invokeAfterMsgs](invokeAfterMsgs.md)(\['msg_ids' => \[[long](../types/long.md)\], 'query' => [!X](../types/!X.md), \]) === [$X](../types/X.md)<a name="invokeAfterMsgs"></a>  
+* <a href="contacts_importContacts.html" name="contacts_importContacts">Add phone number as contact</a>  
 
-***
-<br><br>$MadelineProto->[invokeWithLayer](invokeWithLayer.md)(\['layer' => [int](../types/int.md), 'query' => [!X](../types/!X.md), \]) === [$X](../types/X.md)<a name="invokeWithLayer"></a>  
+* <a href="contacts_resolveUsername.html" name="contacts_resolveUsername">You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)</a>  
 
-***
-<br><br>$MadelineProto->[invokeWithoutUpdates](invokeWithoutUpdates.md)(\['query' => [!X](../types/!X.md), \]) === [$X](../types/X.md)<a name="invokeWithoutUpdates"></a>  
+* <a href="contacts_search.html" name="contacts_search">Search contacts</a>  
+
+* <a href="contacts_unblock.html" name="contacts_unblock">Unblock a user</a>  
 
 ***
-<br><br>$MadelineProto->[messages->acceptEncryption](messages_acceptEncryption.md)(\['peer' => [InputEncryptedChat](../types/InputEncryptedChat.md), 'g_b' => [bytes](../types/bytes.md), 'key_fingerprint' => [long](../types/long.md), \]) === [$EncryptedChat](../types/EncryptedChat.md)<a name="messages_acceptEncryption"></a>  
+<br><br>* <a href="geochats_checkin.html" name="geochats_checkin">Join a geochat</a>  
 
-$MadelineProto->[messages->addChatUser](messages_addChatUser.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'user_id' => [InputUser](../types/InputUser.md), 'fwd_limit' => [int](../types/int.md), \]) === [$Updates](../types/Updates.md)<a name="messages_addChatUser"></a>  
+* <a href="geochats_createGeoChat.html" name="geochats_createGeoChat">Create geochat</a>  
 
-$MadelineProto->[messages->checkChatInvite](messages_checkChatInvite.md)(\['hash' => [string](../types/string.md), \]) === [$ChatInvite](../types/ChatInvite.md)<a name="messages_checkChatInvite"></a>  
+* <a href="geochats_editChatPhoto.html" name="geochats_editChatPhoto">Edit geochat photo</a>  
 
-$MadelineProto->[messages->createChat](messages_createChat.md)(\['users' => \[[InputUser](../types/InputUser.md)\], 'title' => [string](../types/string.md), \]) === [$Updates](../types/Updates.md)<a name="messages_createChat"></a>  
+* <a href="geochats_editChatTitle.html" name="geochats_editChatTitle">Edit geochat title</a>  
 
-$MadelineProto->[messages->deleteChatUser](messages_deleteChatUser.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'user_id' => [InputUser](../types/InputUser.md), \]) === [$Updates](../types/Updates.md)<a name="messages_deleteChatUser"></a>  
+* <a href="geochats_getFullChat.html" name="geochats_getFullChat">Get full info about a geochat</a>  
 
-$MadelineProto->[messages->deleteHistory](messages_deleteHistory.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'offset' => [int](../types/int.md), \]) === [$messages\_AffectedHistory](../types/messages_AffectedHistory.md)<a name="messages_deleteHistory"></a>  
+* <a href="geochats_getHistory.html" name="geochats_getHistory">Get geochat history</a>  
 
-$MadelineProto->[messages->deleteMessages](messages_deleteMessages.md)(\['id' => \[[int](../types/int.md)\], \]) === [$messages\_AffectedMessages](../types/messages_AffectedMessages.md)<a name="messages_deleteMessages"></a>  
+* <a href="geochats_getLocated.html" name="geochats_getLocated">Get nearby geochats</a>  
 
-$MadelineProto->[messages->discardEncryption](messages_discardEncryption.md)(\['chat_id' => [int](../types/int.md), \]) === [$Bool](../types/Bool.md)<a name="messages_discardEncryption"></a>  
+* <a href="geochats_getRecents.html" name="geochats_getRecents">Get recent geochats</a>  
 
-$MadelineProto->[messages->editChatPhoto](messages_editChatPhoto.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'photo' => [InputChatPhoto](../types/InputChatPhoto.md), \]) === [$Updates](../types/Updates.md)<a name="messages_editChatPhoto"></a>  
+* <a href="geochats_search.html" name="geochats_search">Search messages in geocha</a>  
 
-$MadelineProto->[messages->editChatTitle](messages_editChatTitle.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), 'title' => [string](../types/string.md), \]) === [$Updates](../types/Updates.md)<a name="messages_editChatTitle"></a>  
+* <a href="geochats_sendMedia.html" name="geochats_sendMedia">Send media to geochat</a>  
 
-$MadelineProto->[messages->exportChatInvite](messages_exportChatInvite.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), \]) === [$ExportedChatInvite](../types/ExportedChatInvite.md)<a name="messages_exportChatInvite"></a>  
+* <a href="geochats_sendMessage.html" name="geochats_sendMessage">Send message to geochat</a>  
 
-$MadelineProto->[messages->forwardMessage](messages_forwardMessage.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'id' => [int](../types/int.md), \]) === [$Updates](../types/Updates.md)<a name="messages_forwardMessage"></a>  
-
-$MadelineProto->[messages->forwardMessages](messages_forwardMessages.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'id' => \[[int](../types/int.md)\], \]) === [$Updates](../types/Updates.md)<a name="messages_forwardMessages"></a>  
-
-$MadelineProto->[messages->getAllStickers](messages_getAllStickers.md)(\['hash' => [string](../types/string.md), \]) === [$messages\_AllStickers](../types/messages_AllStickers.md)<a name="messages_getAllStickers"></a>  
-
-$MadelineProto->[messages->getChats](messages_getChats.md)(\['id' => \[[int](../types/int.md)\], \]) === [$messages\_Chats](../types/messages_Chats.md)<a name="messages_getChats"></a>  
-
-$MadelineProto->[messages->getDhConfig](messages_getDhConfig.md)(\['version' => [int](../types/int.md), 'random_length' => [int](../types/int.md), \]) === [$messages\_DhConfig](../types/messages_DhConfig.md)<a name="messages_getDhConfig"></a>  
-
-$MadelineProto->[messages->getDialogs](messages_getDialogs.md)(\['offset' => [int](../types/int.md), 'max_id' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$messages\_Dialogs](../types/messages_Dialogs.md)<a name="messages_getDialogs"></a>  
-
-$MadelineProto->[messages->getFullChat](messages_getFullChat.md)(\['chat_id' => [InputPeer](../types/InputPeer.md), \]) === [$messages\_ChatFull](../types/messages_ChatFull.md)<a name="messages_getFullChat"></a>  
-
-$MadelineProto->[messages->getHistory](messages_getHistory.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'offset' => [int](../types/int.md), 'max_id' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$messages\_Messages](../types/messages_Messages.md)<a name="messages_getHistory"></a>  
-
-$MadelineProto->[messages->getMessages](messages_getMessages.md)(\['id' => \[[int](../types/int.md)\], \]) === [$messages\_Messages](../types/messages_Messages.md)<a name="messages_getMessages"></a>  
-
-$MadelineProto->[messages->getStickerSet](messages_getStickerSet.md)(\['stickerset' => [InputStickerSet](../types/InputStickerSet.md), \]) === [$messages\_StickerSet](../types/messages_StickerSet.md)<a name="messages_getStickerSet"></a>  
-
-$MadelineProto->[messages->getStickers](messages_getStickers.md)(\['emoticon' => [string](../types/string.md), 'hash' => [string](../types/string.md), \]) === [$messages\_Stickers](../types/messages_Stickers.md)<a name="messages_getStickers"></a>  
-
-$MadelineProto->[messages->getWebPagePreview](messages_getWebPagePreview.md)(\['message' => [string](../types/string.md), \]) === [$MessageMedia](../types/MessageMedia.md)<a name="messages_getWebPagePreview"></a>  
-
-$MadelineProto->[messages->importChatInvite](messages_importChatInvite.md)(\['hash' => [string](../types/string.md), \]) === [$Updates](../types/Updates.md)<a name="messages_importChatInvite"></a>  
-
-$MadelineProto->[messages->installStickerSet](messages_installStickerSet.md)(\['stickerset' => [InputStickerSet](../types/InputStickerSet.md), 'disabled' => [Bool](../types/Bool.md), \]) === [$Bool](../types/Bool.md)<a name="messages_installStickerSet"></a>  
-
-$MadelineProto->[messages->readEncryptedHistory](messages_readEncryptedHistory.md)(\['peer' => [InputEncryptedChat](../types/InputEncryptedChat.md), 'max_date' => [int](../types/int.md), \]) === [$Bool](../types/Bool.md)<a name="messages_readEncryptedHistory"></a>  
-
-$MadelineProto->[messages->readHistory](messages_readHistory.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'max_id' => [int](../types/int.md), 'offset' => [int](../types/int.md), \]) === [$messages\_AffectedHistory](../types/messages_AffectedHistory.md)<a name="messages_readHistory"></a>  
-
-$MadelineProto->[messages->readMessageContents](messages_readMessageContents.md)(\['id' => \[[int](../types/int.md)\], \]) === [$messages\_AffectedMessages](../types/messages_AffectedMessages.md)<a name="messages_readMessageContents"></a>  
-
-$MadelineProto->[messages->receivedMessages](messages_receivedMessages.md)(\['max_id' => [int](../types/int.md), \]) === [$Vector\_of\_ReceivedNotifyMessage](../types/ReceivedNotifyMessage.md)<a name="messages_receivedMessages"></a>  
-
-$MadelineProto->[messages->receivedQueue](messages_receivedQueue.md)(\['max_qts' => [int](../types/int.md), \]) === [$Vector\_of\_long](../types/long.md)<a name="messages_receivedQueue"></a>  
-
-$MadelineProto->[messages->requestEncryption](messages_requestEncryption.md)(\['user_id' => [InputUser](../types/InputUser.md), 'g_a' => [bytes](../types/bytes.md), \]) === [$EncryptedChat](../types/EncryptedChat.md)<a name="messages_requestEncryption"></a>  
-
-$MadelineProto->[messages->search](messages_search.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'q' => [string](../types/string.md), 'filter' => [MessagesFilter](../types/MessagesFilter.md), 'min_date' => [int](../types/int.md), 'max_date' => [int](../types/int.md), 'offset' => [int](../types/int.md), 'max_id' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$messages\_Messages](../types/messages_Messages.md)<a name="messages_search"></a>  
-
-$MadelineProto->[messages->sendBroadcast](messages_sendBroadcast.md)(\['contacts' => \[[InputUser](../types/InputUser.md)\], 'message' => [string](../types/string.md), 'media' => [InputMedia](../types/InputMedia.md), \]) === [$Updates](../types/Updates.md)<a name="messages_sendBroadcast"></a>  
-
-$MadelineProto->[messages->sendEncrypted](messages_sendEncrypted.md)(\['peer' => [InputEncryptedChat](../types/InputEncryptedChat.md), 'message' => [DecryptedMessage](../types/DecryptedMessage.md), \]) === [$messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)<a name="messages_sendEncrypted"></a>  
-
-$MadelineProto->[messages->sendEncryptedFile](messages_sendEncryptedFile.md)(\['peer' => [InputEncryptedChat](../types/InputEncryptedChat.md), 'message' => [DecryptedMessage](../types/DecryptedMessage.md), 'file' => [InputEncryptedFile](../types/InputEncryptedFile.md), \]) === [$messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)<a name="messages_sendEncryptedFile"></a>  
-
-$MadelineProto->[messages->sendEncryptedService](messages_sendEncryptedService.md)(\['peer' => [InputEncryptedChat](../types/InputEncryptedChat.md), 'message' => [DecryptedMessage](../types/DecryptedMessage.md), \]) === [$messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)<a name="messages_sendEncryptedService"></a>  
-
-$MadelineProto->[messages->sendMedia](messages_sendMedia.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'reply_to_msg_id' => [int](../types/int.md), 'media' => [InputMedia](../types/InputMedia.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \]) === [$Updates](../types/Updates.md)<a name="messages_sendMedia"></a>  
-
-$MadelineProto->[messages->sendMessage](messages_sendMessage.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'reply_to_msg_id' => [int](../types/int.md), 'message' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \]) === [$messages\_SentMessage](../types/messages_SentMessage.md)<a name="messages_sendMessage"></a>  
-
-$MadelineProto->[messages->setEncryptedTyping](messages_setEncryptedTyping.md)(\['peer' => [InputEncryptedChat](../types/InputEncryptedChat.md), 'typing' => [Bool](../types/Bool.md), \]) === [$Bool](../types/Bool.md)<a name="messages_setEncryptedTyping"></a>  
-
-$MadelineProto->[messages->setTyping](messages_setTyping.md)(\['peer' => [InputPeer](../types/InputPeer.md), 'action' => [SendMessageAction](../types/SendMessageAction.md), \]) === [$Bool](../types/Bool.md)<a name="messages_setTyping"></a>  
-
-$MadelineProto->[messages->startBot](messages_startBot.md)(\['bot' => [InputUser](../types/InputUser.md), 'chat_id' => [InputPeer](../types/InputPeer.md), 'start_param' => [string](../types/string.md), \]) === [$Updates](../types/Updates.md)<a name="messages_startBot"></a>  
-
-$MadelineProto->[messages->uninstallStickerSet](messages_uninstallStickerSet.md)(\['stickerset' => [InputStickerSet](../types/InputStickerSet.md), \]) === [$Bool](../types/Bool.md)<a name="messages_uninstallStickerSet"></a>  
+* <a href="geochats_setTyping.html" name="geochats_setTyping">Send typing notification to geochat</a>  
 
 ***
-<br><br>$MadelineProto->[photos->deletePhotos](photos_deletePhotos.md)(\['id' => \[[InputPhoto](../types/InputPhoto.md)\], \]) === [$Vector\_of\_long](../types/long.md)<a name="photos_deletePhotos"></a>  
+<br><br>* <a href="help_getAppChangelog.html" name="help_getAppChangelog">Get the changelog of this app</a>  
 
-$MadelineProto->[photos->getUserPhotos](photos_getUserPhotos.md)(\['user_id' => [InputUser](../types/InputUser.md), 'offset' => [int](../types/int.md), 'max_id' => [long](../types/long.md), 'limit' => [int](../types/int.md), \]) === [$photos\_Photos](../types/photos_Photos.md)<a name="photos_getUserPhotos"></a>  
+* <a href="help_getAppUpdate.html" name="help_getAppUpdate">Get info about app updates</a>  
 
-$MadelineProto->[photos->updateProfilePhoto](photos_updateProfilePhoto.md)(\['id' => [InputPhoto](../types/InputPhoto.md), 'crop' => [InputPhotoCrop](../types/InputPhotoCrop.md), \]) === [$UserProfilePhoto](../types/UserProfilePhoto.md)<a name="photos_updateProfilePhoto"></a>  
+* <a href="help_getConfig.html" name="help_getConfig">Get server configuration</a>  
 
-$MadelineProto->[photos->uploadProfilePhoto](photos_uploadProfilePhoto.md)(\['file' => [InputFile](../types/InputFile.md), 'caption' => [string](../types/string.md), 'geo_point' => [InputGeoPoint](../types/InputGeoPoint.md), 'crop' => [InputPhotoCrop](../types/InputPhotoCrop.md), \]) === [$photos\_Photo](../types/photos_Photo.md)<a name="photos_uploadProfilePhoto"></a>  
+* <a href="help_getInviteText.html" name="help_getInviteText">Get invitation text</a>  
 
-***
-<br><br>$MadelineProto->[updates->getDifference](updates_getDifference.md)(\['pts' => [int](../types/int.md), 'date' => [int](../types/int.md), 'qts' => [int](../types/int.md), \]) === [$updates\_Difference](../types/updates_Difference.md)<a name="updates_getDifference"></a>  
+* <a href="help_getNearestDc.html" name="help_getNearestDc">Get nearest datacenter</a>  
 
-$MadelineProto->[updates->getState](updates_getState.md)(\[\]) === [$updates\_State](../types/updates_State.md)<a name="updates_getState"></a>  
+* <a href="help_getSupport.html" name="help_getSupport">Get info of support user</a>  
 
-***
-<br><br>$MadelineProto->[upload->getFile](upload_getFile.md)(\['location' => [InputFileLocation](../types/InputFileLocation.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$upload\_File](../types/upload_File.md)<a name="upload_getFile"></a>  
-
-$MadelineProto->[upload->saveBigFilePart](upload_saveBigFilePart.md)(\['file_id' => [long](../types/long.md), 'file_part' => [int](../types/int.md), 'file_total_parts' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \]) === [$Bool](../types/Bool.md)<a name="upload_saveBigFilePart"></a>  
-
-$MadelineProto->[upload->saveFilePart](upload_saveFilePart.md)(\['file_id' => [long](../types/long.md), 'file_part' => [int](../types/int.md), 'bytes' => [bytes](../types/bytes.md), \]) === [$Bool](../types/Bool.md)<a name="upload_saveFilePart"></a>  
+* <a href="help_saveAppLog.html" name="help_saveAppLog">Log data for developer of this app</a>  
 
 ***
-<br><br>$MadelineProto->[users->getFullUser](users_getFullUser.md)(\['id' => [InputUser](../types/InputUser.md), \]) === [$UserFull](../types/UserFull.md)<a name="users_getFullUser"></a>  
+<br><br>* <a href="initConnection.html" name="initConnection">Initializes connection and save information on the user's device and application.</a>  
 
-$MadelineProto->[users->getUsers](users_getUsers.md)(\['id' => \[[InputUser](../types/InputUser.md)\], \]) === [$Vector\_of\_User](../types/User.md)<a name="users_getUsers"></a>  
+***
+<br><br>* <a href="invokeAfterMsg.html" name="invokeAfterMsg">Invokes a query after successfull completion of one of the previous queries.</a>  
+
+***
+<br><br>* <a href="invokeAfterMsgs.html" name="invokeAfterMsgs">Result type returned by a current query.</a>  
+
+***
+<br><br>* <a href="invokeWithLayer.html" name="invokeWithLayer">Invoke this method with layer X</a>  
+
+***
+<br><br>* <a href="invokeWithoutUpdates.html" name="invokeWithoutUpdates">Invoke with method without returning updates in the socket</a>  
+
+***
+<br><br>* <a href="messages_acceptEncryption.html" name="messages_acceptEncryption">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats</a>  
+
+* <a href="messages_addChatUser.html" name="messages_addChatUser">Add a user to a normal chat (use channels->inviteToChannel for supergroups)</a>  
+
+* <a href="messages_checkChatInvite.html" name="messages_checkChatInvite">Check if an invitation link is valid</a>  
+
+* <a href="messages_createChat.html" name="messages_createChat">Create a chat (not supergroup)</a>  
+
+* <a href="messages_deleteChatUser.html" name="messages_deleteChatUser">Delete a user from a chat (not supergroup)</a>  
+
+* <a href="messages_deleteHistory.html" name="messages_deleteHistory">Delete chat history</a>  
+
+* <a href="messages_deleteMessages.html" name="messages_deleteMessages">Delete messages</a>  
+
+* <a href="messages_discardEncryption.html" name="messages_discardEncryption">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats</a>  
+
+* <a href="messages_editChatPhoto.html" name="messages_editChatPhoto">Edit the photo of a normal chat (not supergroup)</a>  
+
+* <a href="messages_editChatTitle.html" name="messages_editChatTitle">Edit the title of a normal chat (not supergroup)</a>  
+
+* <a href="messages_exportChatInvite.html" name="messages_exportChatInvite">Export chat invite </a>  
+
+* <a href="messages_forwardMessage.html" name="messages_forwardMessage">Forward message</a>  
+
+* <a href="messages_forwardMessages.html" name="messages_forwardMessages">Forward messages</a>  
+
+* <a href="messages_getAllStickers.html" name="messages_getAllStickers">Get all stickerpacks</a>  
+
+* <a href="messages_getChats.html" name="messages_getChats">Get info about chats</a>  
+
+* <a href="messages_getDhConfig.html" name="messages_getDhConfig">You cannot use this method directly, instead use $MadelineProto->get_dh_config();</a>  
+
+* <a href="messages_getDialogs.html" name="messages_getDialogs">Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html</a>  
+
+* <a href="messages_getFullChat.html" name="messages_getFullChat">You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)</a>  
+
+* <a href="messages_getHistory.html" name="messages_getHistory">Get previous messages of a group</a>  
+
+* <a href="messages_getMessages.html" name="messages_getMessages">Get messages</a>  
+
+* <a href="messages_getStickerSet.html" name="messages_getStickerSet">Get a stickerset</a>  
+
+* <a href="messages_getStickers.html" name="messages_getStickers">Get stickers</a>  
+
+* <a href="messages_getWebPagePreview.html" name="messages_getWebPagePreview">Get webpage preview</a>  
+
+* <a href="messages_importChatInvite.html" name="messages_importChatInvite">Import chat invite</a>  
+
+* <a href="messages_installStickerSet.html" name="messages_installStickerSet">Add a sticker set</a>  
+
+* <a href="messages_readEncryptedHistory.html" name="messages_readEncryptedHistory">Mark messages as read in secret chats</a>  
+
+* <a href="messages_readHistory.html" name="messages_readHistory">Mark messages as read</a>  
+
+* <a href="messages_readMessageContents.html" name="messages_readMessageContents">Mark message as read</a>  
+
+* <a href="messages_receivedMessages.html" name="messages_receivedMessages">Mark messages as read</a>  
+
+* <a href="messages_receivedQueue.html" name="messages_receivedQueue">You cannot use this method directly</a>  
+
+* <a href="messages_requestEncryption.html" name="messages_requestEncryption">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats</a>  
+
+* <a href="messages_search.html" name="messages_search">Search peers or messages</a>  
+
+* <a href="messages_sendBroadcast.html" name="messages_sendBroadcast">Send a message to all users in the chat list</a>  
+
+* <a href="messages_sendEncrypted.html" name="messages_sendEncrypted">Send message to secret chat</a>  
+
+* <a href="messages_sendEncryptedFile.html" name="messages_sendEncryptedFile">Send a file to a secret chat</a>  
+
+* <a href="messages_sendEncryptedService.html" name="messages_sendEncryptedService">Send a service message to a secret chat</a>  
+
+* <a href="messages_sendMedia.html" name="messages_sendMedia">Send a media</a>  
+
+* <a href="messages_sendMessage.html" name="messages_sendMessage">Send a message</a>  
+
+* <a href="messages_setEncryptedTyping.html" name="messages_setEncryptedTyping">Send typing notification to secret chat</a>  
+
+* <a href="messages_setTyping.html" name="messages_setTyping">Change typing status</a>  
+
+* <a href="messages_startBot.html" name="messages_startBot">Start a bot</a>  
+
+* <a href="messages_uninstallStickerSet.html" name="messages_uninstallStickerSet">Remove a sticker set</a>  
+
+***
+<br><br>* <a href="photos_deletePhotos.html" name="photos_deletePhotos">Delete profile photos</a>  
+
+* <a href="photos_getUserPhotos.html" name="photos_getUserPhotos">Get the profile photos of a user</a>  
+
+* <a href="photos_updateProfilePhoto.html" name="photos_updateProfilePhoto">Update the profile photo (use photos->uploadProfilePhoto to upload the photo)</a>  
+
+* <a href="photos_uploadProfilePhoto.html" name="photos_uploadProfilePhoto">Upload profile photo</a>  
+
+***
+<br><br>* <a href="updates_getDifference.html" name="updates_getDifference">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates</a>  
+
+* <a href="updates_getState.html" name="updates_getState">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates</a>  
+
+***
+<br><br>* <a href="upload_getFile.html" name="upload_getFile">You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info</a>  
+
+* <a href="upload_saveBigFilePart.html" name="upload_saveBigFilePart">You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info</a>  
+
+* <a href="upload_saveFilePart.html" name="upload_saveFilePart">You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info</a>  
+
+***
+<br><br>* <a href="users_getFullUser.html" name="users_getFullUser">You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)</a>  
+
+* <a href="users_getUsers.html" name="users_getUsers">Get info about users</a>  
 

@@ -4,11 +4,11 @@ description: MadelineProto API documentation (td-lib)
 ---
 # MadelineProto API documentation (td-lib)  
 
+[Back to main documentation](..)  
+
+
 [Methods](methods/)
 
 [Constructors](constructors/)
 
 [Types](types/)
-
-
-[Back to main documentation](..)

@@ -59,11 +59,18 @@ trait Methods
                 $param[$type_or_subtype] = '['.$this->escape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $params .= "'".$param['name']."' => ".(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
+            if (!isset($this->td_descriptions['methods'][$data['method']])) {
+                $this->add_to_lang('method_'.$data['method']);
+
+                if (\danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']] !== '') {
+                    $this->td_descriptions['methods'][$data['method']]['description'] = \danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']];
+                }
+            }
             $md_method = '['.$php_method.']('.$method.'.md)';
             $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md)<a name="'.$method.'"></a>  
 
 ';
-            $this->human_docs_methods[$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$this->td_descriptions['methods'][$data['method']].'</a>  
+            $this->human_docs_methods[$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$this->td_descriptions['methods'][$data['method']]['description'].'</a>  
 
 ';
             $params = '';
@@ -75,13 +82,6 @@ trait Methods
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 ';
-            if (!isset($this->td_descriptions['methods'][$data['method']])) {
-                $this->add_to_lang('method_'.$data['method']);
-
-                if (\danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']] !== '') {
-                    $this->td_descriptions['methods'][$data['method']]['description'] = \danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']];
-                }
-            }
             if (isset($this->td_descriptions['methods'][$data['method']]) && !empty($data['params'])) {
                 $table = '### Parameters:
 
@@ -333,6 +333,7 @@ description: List of methods
 # Methods  
 [Back to API documentation index](..)
 
+[Go to the new description-version method index](index.html)
 
 $MadelineProto->[logout](https://docs.madelineproto.xyz/logout.html)();
 
@@ -367,7 +368,9 @@ title: Methods
 description: What do you want to do?
 ---
 # What do you want to do?  
-[Go back to API documentation index](..)
+[Go back to API documentation index](..)  
+
+[Go to the old code-version method index](api_index.html)  
 
 * [Logout](https://docs.madelineproto.xyz/logout.html)
 

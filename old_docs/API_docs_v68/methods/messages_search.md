@@ -50,12 +50,7 @@ if (!file_exists('madeline.php')) {
 }
 include 'madeline.php';
 
-// !!! This API id/API hash combination will not work !!!
-// !!! You must get your own @ my.telegram.org !!!
-$api_id = 0;
-$api_hash = '';
-
-$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto = new \danog\MadelineProto\API('session.madeline');
 $MadelineProto->start();
 
 $messages_Messages = $MadelineProto->messages->search(['peer' => InputPeer, 'q' => 'string', 'from_id' => InputUser, 'filter' => MessagesFilter, 'min_date' => int, 'max_date' => int, 'offset' => int, 'max_id' => int, 'limit' => int, ]);

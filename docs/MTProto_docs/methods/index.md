@@ -1,61 +1,56 @@
 ---
 title: Methods
-description: List of methods
+description: What do you want to do?
 ---
-# Methods  
-[Back to API documentation index](..)
+# What do you want to do?  
+[Go back to API documentation index](..)  
 
+[Go to the old code-version method index](api_index.html)  
 
-$MadelineProto->[logout](https://docs.madelineproto.xyz/logout.html)();
+* [Logout](https://docs.madelineproto.xyz/logout.html)
 
-$MadelineProto->[phone_login](https://docs.madelineproto.xyz/phone_login.html)($number);
+* [Login](https://docs.madelineproto.xyz/docs/LOGIN.html)
 
-$MadelineProto->[complete_phone_login](https://docs.madelineproto.xyz/complete_phone_login.html)($code);
+* [Get all chats, broadcast a message to all chats](https://docs.madelineproto.xyz/docs/DIALOGS.html)
 
-$MadelineProto->[complete_2FA_login](https://docs.madelineproto.xyz/complete_2FA_login.html)($password);
+* [Get the full participant list of a channel/group/supergroup](https://docs.madelineproto.xyz/get_pwr_chat.html)
 
-$MadelineProto->[bot_login](https://docs.madelineproto.xyz/bot_login.html)($token);
+* [Get full info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/get_full_info.html)
 
+* [Get info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/get_info.html)
 
-$MadelineProto->[get_dialogs](https://docs.madelineproto.xyz/get_dialogs.html)();
+* [Get info about the currently logged-in user](https://docs.madelineproto.xyz/get_self.html)
 
-$MadelineProto->[get_pwr_chat](https://docs.madelineproto.xyz/get_pwr_chat.html)($id);
+* [Upload or download files up to 1.5 GB](https://docs.madelineproto.xyz/docs/FILES.html)
 
-$MadelineProto->[get_info](https://docs.madelineproto.xyz/get_info.html)($id);
+* [Make a phone call and play a song](https://docs.madelineproto.xyz/docs/CALLS.html)
 
-$MadelineProto->[get_full_info](https://docs.madelineproto.xyz/get_full_info.html)($id);
-
-$MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
-
-
-$MadelineProto->[request_call](https://docs.madelineproto.xyz/request_call.html)($id);
-
-$MadelineProto->[request_secret_chat](https://docs.madelineproto.xyz/request_secret_chat.html)($id);
+* [Create a secret chat bot](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
 
 ***
-<br><br>$MadelineProto->[destroy_session](destroy_session.md)(\['session_id' => [long](../types/long.md), \]) === [$DestroySessionRes](../types/DestroySessionRes.md)<a name="destroy_session"></a>  
+<br><br>* <a href="destroy_session.html" name="destroy_session">Destroy the current MTProto session</a>  
 
 ***
-<br><br>$MadelineProto->[get_future_salts](get_future_salts.md)(\['num' => [int](../types/int.md), \]) === [$FutureSalts](../types/FutureSalts.md)<a name="get_future_salts"></a>  
+<br><br>* <a href="get_future_salts.html" name="get_future_salts">Get future salts</a>  
 
 ***
-<br><br>$MadelineProto->[http_wait](http_wait.md)(\['max_delay' => [int](../types/int.md), 'wait_after' => [int](../types/int.md), 'max_wait' => [int](../types/int.md), \]) === [$HttpWait](../types/HttpWait.md)<a name="http_wait"></a>  
+<br><br>* <a href="http_wait.html" name="http_wait">Makes the server send messages waiting in the buffer</a>  
 
 ***
-<br><br>$MadelineProto->[ping](ping.md)(\['ping_id' => [long](../types/long.md), \]) === [$Pong](../types/Pong.md)<a name="ping"></a>  
+<br><br>* <a href="ping.html" name="ping">pings the server</a>  
 
-$MadelineProto->[ping_delay_disconnect](ping_delay_disconnect.md)(\['ping_id' => [long](../types/long.md), 'disconnect_delay' => [int](../types/int.md), \]) === [$Pong](../types/Pong.md)<a name="ping_delay_disconnect"></a>  
-
-***
-<br><br>$MadelineProto->[req_DH_params](req_DH_params.md)(\['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'p' => [bytes](../types/bytes.md), 'q' => [bytes](../types/bytes.md), 'public_key_fingerprint' => [long](../types/long.md), 'encrypted_data' => [bytes](../types/bytes.md), \]) === [$Server\_DH\_Params](../types/Server_DH_Params.md)<a name="req_DH_params"></a>  
-
-$MadelineProto->[req_pq](req_pq.md)(\['nonce' => [int128](../types/int128.md), \]) === [$ResPQ](../types/ResPQ.md)<a name="req_pq"></a>  
-
-$MadelineProto->[req_pq_multi](req_pq_multi.md)(\['nonce' => [int128](../types/int128.md), \]) === [$ResPQ](../types/ResPQ.md)<a name="req_pq_multi"></a>  
+* <a href="ping_delay_disconnect.html" name="ping_delay_disconnect">Pings the server and causes disconection if the same method is not called within ping_disconnect_delay</a>  
 
 ***
-<br><br>$MadelineProto->[rpc_drop_answer](rpc_drop_answer.md)(\['req_msg_id' => [long](../types/long.md), \]) === [$RpcDropAnswer](../types/RpcDropAnswer.md)<a name="rpc_drop_answer"></a>  
+<br><br>* <a href="req_DH_params.html" name="req_DH_params">Requests Diffie-hellman parameters for key exchange</a>  
+
+* <a href="req_pq.html" name="req_pq">Requests PQ for factorization</a>  
+
+* <a href="req_pq_multi.html" name="req_pq_multi">Requests PQ for factorization (new version)</a>  
 
 ***
-<br><br>$MadelineProto->[set_client_DH_params](set_client_DH_params.md)(\['nonce' => [int128](../types/int128.md), 'server_nonce' => [int128](../types/int128.md), 'encrypted_data' => [bytes](../types/bytes.md), \]) === [$Set\_client\_DH\_params\_answer](../types/Set_client_DH_params_answer.md)<a name="set_client_DH_params"></a>  
+<br><br>* <a href="rpc_drop_answer.html" name="rpc_drop_answer">Do not send answer to provided request</a>  
+
+***
+<br><br>* <a href="set_client_DH_params.html" name="set_client_DH_params">Sets client diffie-hellman parameters</a>  
 

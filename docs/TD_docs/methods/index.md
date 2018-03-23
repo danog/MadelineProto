@@ -1,724 +1,719 @@
 ---
 title: Methods
-description: List of methods
+description: What do you want to do?
 ---
-# Methods  
-[Back to API documentation index](..)
+# What do you want to do?  
+[Go back to API documentation index](..)  
 
+[Go to the old code-version method index](api_index.html)  
 
-$MadelineProto->[logout](https://docs.madelineproto.xyz/logout.html)();
+* [Logout](https://docs.madelineproto.xyz/logout.html)
 
-$MadelineProto->[phone_login](https://docs.madelineproto.xyz/phone_login.html)($number);
+* [Login](https://docs.madelineproto.xyz/docs/LOGIN.html)
 
-$MadelineProto->[complete_phone_login](https://docs.madelineproto.xyz/complete_phone_login.html)($code);
+* [Get all chats, broadcast a message to all chats](https://docs.madelineproto.xyz/docs/DIALOGS.html)
 
-$MadelineProto->[complete_2FA_login](https://docs.madelineproto.xyz/complete_2FA_login.html)($password);
+* [Get the full participant list of a channel/group/supergroup](https://docs.madelineproto.xyz/get_pwr_chat.html)
 
-$MadelineProto->[bot_login](https://docs.madelineproto.xyz/bot_login.html)($token);
+* [Get full info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/get_full_info.html)
 
+* [Get info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/get_info.html)
 
-$MadelineProto->[get_dialogs](https://docs.madelineproto.xyz/get_dialogs.html)();
+* [Get info about the currently logged-in user](https://docs.madelineproto.xyz/get_self.html)
 
-$MadelineProto->[get_pwr_chat](https://docs.madelineproto.xyz/get_pwr_chat.html)($id);
+* [Upload or download files up to 1.5 GB](https://docs.madelineproto.xyz/docs/FILES.html)
 
-$MadelineProto->[get_info](https://docs.madelineproto.xyz/get_info.html)($id);
+* [Make a phone call and play a song](https://docs.madelineproto.xyz/docs/CALLS.html)
 
-$MadelineProto->[get_full_info](https://docs.madelineproto.xyz/get_full_info.html)($id);
+* [Create a secret chat bot](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
 
-$MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
-
-
-$MadelineProto->[request_call](https://docs.madelineproto.xyz/request_call.html)($id);
-
-$MadelineProto->[request_secret_chat](https://docs.madelineproto.xyz/request_secret_chat.html)($id);
-
 ***
-<br><br>$MadelineProto->[acceptCall](acceptCall.md)(\['call_id' => [int](../types/int.md), 'protocol' => [callProtocol](../constructors/callProtocol.md), \]) === [$Ok](../types/Ok.md)<a name="acceptCall"></a>  
+<br><br>* <a href="acceptCall.html" name="acceptCall">Accepts incoming call</a>  
 
 ***
-<br><br>$MadelineProto->[addChatMember](addChatMember.md)(\['chat_id' => [int53](../types/int53.md), 'user_id' => [int](../types/int.md), 'forward_limit' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="addChatMember"></a>  
+<br><br>* <a href="addChatMember.html" name="addChatMember">Adds new member to chat. Members can't be added to private or secret chats. Member will not be added until chat state will be synchronized with the server</a>  
 
 ***
-<br><br>$MadelineProto->[addChatMembers](addChatMembers.md)(\['chat_id' => [int53](../types/int53.md), 'user_ids' => \[[int](../types/int.md)\], \]) === [$Ok](../types/Ok.md)<a name="addChatMembers"></a>  
+<br><br>* <a href="addChatMembers.html" name="addChatMembers">Adds many new members to the chat. Currently, available only for channels. Can't be used to join the channel. Members can't be added to broadcast channel if it has more than 200 members. Members will not be added until chat state will be synchronized with the server</a>  
 
 ***
-<br><br>$MadelineProto->[addFavoriteSticker](addFavoriteSticker.md)(\['sticker' => [InputFile](../types/InputFile.md), \]) === [$Ok](../types/Ok.md)<a name="addFavoriteSticker"></a>  
+<br><br>* <a href="addFavoriteSticker.html" name="addFavoriteSticker">Adds new sticker to the list of favorite stickers. New sticker is added to the beginning of the list. If the sticker is already in the list, at first it is removed from the list. Only stickers belonging to a sticker set can be added to the list</a>  
 
 ***
-<br><br>$MadelineProto->[addNetworkStatistics](addNetworkStatistics.md)(\['entry' => [NetworkStatisticsEntry](../types/NetworkStatisticsEntry.md), \]) === [$Ok](../types/Ok.md)<a name="addNetworkStatistics"></a>  
+<br><br>* <a href="addNetworkStatistics.html" name="addNetworkStatistics">Adds specified data to data usage statistics. Can be called before authorization</a>  
 
 ***
-<br><br>$MadelineProto->[addRecentSticker](addRecentSticker.md)(\['is_attached' => [Bool](../types/Bool.md), 'sticker' => [InputFile](../types/InputFile.md), \]) === [$Stickers](../types/Stickers.md)<a name="addRecentSticker"></a>  
+<br><br>* <a href="addRecentSticker.html" name="addRecentSticker">Manually adds new sticker to the list of recently used stickers. New sticker is added to the beginning of the list. If the sticker is already in the list, at first it is removed from the list. Only stickers belonging to a sticker set can be added to the list</a>  
 
 ***
-<br><br>$MadelineProto->[addRecentlyFoundChat](addRecentlyFoundChat.md)(\['chat_id' => [int53](../types/int53.md), \]) === [$Ok](../types/Ok.md)<a name="addRecentlyFoundChat"></a>  
+<br><br>* <a href="addRecentlyFoundChat.html" name="addRecentlyFoundChat">Adds chat to the list of recently found chats. The chat is added to the beginning of the list. If the chat is already in the list, at first it is removed from the list</a>  
 
 ***
-<br><br>$MadelineProto->[addSavedAnimation](addSavedAnimation.md)(\['animation' => [InputFile](../types/InputFile.md), \]) === [$Ok](../types/Ok.md)<a name="addSavedAnimation"></a>  
+<br><br>* <a href="addSavedAnimation.html" name="addSavedAnimation">Manually adds new animation to the list of saved animations. New animation is added to the beginning of the list. If the animation is already in the list, at first it is removed from the list. Only non-secret video animations with MIME type "video/mp4" can be added to the list</a>  
 
 ***
-<br><br>$MadelineProto->[addStickerToSet](addStickerToSet.md)(\['user_id' => [int](../types/int.md), 'name' => [string](../types/string.md), 'sticker' => [inputSticker](../constructors/inputSticker.md), \]) === [$StickerSet](../types/StickerSet.md)<a name="addStickerToSet"></a>  
+<br><br>* <a href="addStickerToSet.html" name="addStickerToSet">Bots only. Adds new sticker to a set. Returns the sticker set</a>  
 
 ***
-<br><br>$MadelineProto->[answerCallbackQuery](answerCallbackQuery.md)(\['callback_query_id' => [int64](../constructors/int64.md), 'text' => [string](../types/string.md), 'show_alert' => [Bool](../types/Bool.md), 'url' => [string](../types/string.md), 'cache_time' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="answerCallbackQuery"></a>  
+<br><br>* <a href="answerCallbackQuery.html" name="answerCallbackQuery">Bots only. Sets result of a callback query</a>  
 
 ***
-<br><br>$MadelineProto->[answerCustomQuery](answerCustomQuery.md)(\['custom_query_id' => [int64](../constructors/int64.md), 'data' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerCustomQuery"></a>  
+<br><br>* <a href="answerCustomQuery.html" name="answerCustomQuery">Bots only. Answers a custom query</a>  
 
 ***
-<br><br>$MadelineProto->[answerInlineQuery](answerInlineQuery.md)(\['inline_query_id' => [int64](../constructors/int64.md), 'is_personal' => [Bool](../types/Bool.md), 'results' => \[[InputInlineQueryResult](../types/InputInlineQueryResult.md)\], 'cache_time' => [int](../types/int.md), 'next_offset' => [string](../types/string.md), 'switch_pm_text' => [string](../types/string.md), 'switch_pm_parameter' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerInlineQuery"></a>  
+<br><br>* <a href="answerInlineQuery.html" name="answerInlineQuery">Bots only. Sets result of an inline query</a>  
 
 ***
-<br><br>$MadelineProto->[answerPreCheckoutQuery](answerPreCheckoutQuery.md)(\['pre_checkout_query_id' => [int64](../constructors/int64.md), 'error_message' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerPreCheckoutQuery"></a>  
+<br><br>* <a href="answerPreCheckoutQuery.html" name="answerPreCheckoutQuery">Bots only. Sets result of a pre checkout query</a>  
 
 ***
-<br><br>$MadelineProto->[answerShippingQuery](answerShippingQuery.md)(\['shipping_query_id' => [int64](../constructors/int64.md), 'shipping_options' => \[[shippingOption](../constructors/shippingOption.md)\], 'error_message' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="answerShippingQuery"></a>  
+<br><br>* <a href="answerShippingQuery.html" name="answerShippingQuery">Bots only. Sets result of a shipping query</a>  
 
 ***
-<br><br>$MadelineProto->[blockUser](blockUser.md)(\['user_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="blockUser"></a>  
+<br><br>* <a href="blockUser.html" name="blockUser">Adds user to black list</a>  
 
 ***
-<br><br>$MadelineProto->[cancelDownloadFile](cancelDownloadFile.md)(\['file_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="cancelDownloadFile"></a>  
+<br><br>* <a href="cancelDownloadFile.html" name="cancelDownloadFile">Stops file downloading. If file is already downloaded, does nothing</a>  
 
 ***
-<br><br>$MadelineProto->[cancelUploadFile](cancelUploadFile.md)(\['file_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="cancelUploadFile"></a>  
+<br><br>* <a href="cancelUploadFile.html" name="cancelUploadFile">Stops file uploading. Works only for files uploaded using uploadFile. For other files the behavior is undefined</a>  
 
 ***
-<br><br>$MadelineProto->[changeAbout](changeAbout.md)(\['about' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="changeAbout"></a>  
+<br><br>* <a href="changeAbout.html" name="changeAbout">Changes about information of logged in user</a>  
 
 ***
-<br><br>$MadelineProto->[changeAccountTtl](changeAccountTtl.md)(\['ttl' => [accountTtl](../constructors/accountTtl.md), \]) === [$Ok](../types/Ok.md)<a name="changeAccountTtl"></a>  
+<br><br>* <a href="changeAccountTtl.html" name="changeAccountTtl">Changes period of inactivity, after which the account of currently logged in user will be automatically deleted</a>  
 
 ***
-<br><br>$MadelineProto->[changeChannelDescription](changeChannelDescription.md)(\['channel_id' => [int](../types/int.md), 'description' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="changeChannelDescription"></a>  
+<br><br>* <a href="changeChannelDescription.html" name="changeChannelDescription">Changes information about the channel. Needs appropriate rights in the channel</a>  
 
 ***
-<br><br>$MadelineProto->[changeChannelUsername](changeChannelUsername.md)(\['channel_id' => [int](../types/int.md), 'username' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="changeChannelUsername"></a>  
+<br><br>* <a href="changeChannelUsername.html" name="changeChannelUsername">Changes username of the channel. Needs creator privileges in the channel</a>  
 
 ***
-<br><br>$MadelineProto->[changeChatDraftMessage](changeChatDraftMessage.md)(\['chat_id' => [int53](../types/int53.md), 'draft_message' => [draftMessage](../constructors/draftMessage.md), \]) === [$Ok](../types/Ok.md)<a name="changeChatDraftMessage"></a>  
+<br><br>* <a href="changeChatDraftMessage.html" name="changeChatDraftMessage">Changes chat draft message</a>  
 
 ***
-<br><br>$MadelineProto->[changeChatMemberStatus](changeChatMemberStatus.md)(\['chat_id' => [int53](../types/int53.md), 'user_id' => [int](../types/int.md), 'status' => [ChatMemberStatus](../types/ChatMemberStatus.md), \]) === [$Ok](../types/Ok.md)<a name="changeChatMemberStatus"></a>  
+<br><br>* <a href="changeChatMemberStatus.html" name="changeChatMemberStatus">Changes status of the chat member, need appropriate privileges. This function is currently not suitable for adding new members to the chat, use addChatMember instead. Status will not be changed until chat state will be synchronized with the server</a>  
 
 ***
-<br><br>$MadelineProto->[changeChatPhoto](changeChatPhoto.md)(\['chat_id' => [int53](../types/int53.md), 'photo' => [InputFile](../types/InputFile.md), \]) === [$Ok](../types/Ok.md)<a name="changeChatPhoto"></a>  
+<br><br>* <a href="changeChatPhoto.html" name="changeChatPhoto">Changes chat photo. Works only for group and channel chats. Requires administrator rights in groups and appropriate administrator right in channels. Photo will not change before request to the server completes</a>  
 
 ***
-<br><br>$MadelineProto->[changeChatReportSpamState](changeChatReportSpamState.md)(\['chat_id' => [int53](../types/int53.md), 'is_spam_chat' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="changeChatReportSpamState"></a>  
+<br><br>* <a href="changeChatReportSpamState.html" name="changeChatReportSpamState">Reports chat as a spam chat or as not a spam chat. Can be used only if ChatReportSpamState.can_report_spam is true. After this request ChatReportSpamState.can_report_spam became false forever</a>  
 
 ***
-<br><br>$MadelineProto->[changeChatTitle](changeChatTitle.md)(\['chat_id' => [int53](../types/int53.md), 'title' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="changeChatTitle"></a>  
+<br><br>* <a href="changeChatTitle.html" name="changeChatTitle">Changes chat title. Works only for group and channel chats. Requires administrator rights in groups and appropriate administrator right in channels. Title will not change before request to the server completes</a>  
 
 ***
-<br><br>$MadelineProto->[changeName](changeName.md)(\['first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="changeName"></a>  
+<br><br>* <a href="changeName.html" name="changeName">Changes first and last names of logged in user. If something changes, updateUser will be sent</a>  
 
 ***
-<br><br>$MadelineProto->[changePhoneNumber](changePhoneNumber.md)(\['phone_number' => [string](../types/string.md), 'allow_flash_call' => [Bool](../types/Bool.md), 'is_current_phone_number' => [Bool](../types/Bool.md), \]) === [$AuthState](../types/AuthState.md)<a name="changePhoneNumber"></a>  
+<br><br>* <a href="changePhoneNumber.html" name="changePhoneNumber">Changes user's phone number and sends authentication code to the new user's phone number. Returns authStateWaitCode with information about sent code on success</a>  
 
 ***
-<br><br>$MadelineProto->[changeStickerSet](changeStickerSet.md)(\['set_id' => [int64](../constructors/int64.md), 'is_installed' => [Bool](../types/Bool.md), 'is_archived' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="changeStickerSet"></a>  
+<br><br>* <a href="changeStickerSet.html" name="changeStickerSet">Installs/uninstalls or enables/archives sticker set</a>  
 
 ***
-<br><br>$MadelineProto->[changeUsername](changeUsername.md)(\['username' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="changeUsername"></a>  
+<br><br>* <a href="changeUsername.html" name="changeUsername">Changes username of logged in user. If something changes, updateUser will be sent</a>  
 
 ***
-<br><br>$MadelineProto->[checkAuthBotToken](checkAuthBotToken.md)(\['token' => [string](../types/string.md), \]) === [$AuthState](../types/AuthState.md)<a name="checkAuthBotToken"></a>  
+<br><br>* <a href="checkAuthBotToken.html" name="checkAuthBotToken">Check bot's authentication token to log in as a bot. Works only when getAuthState returns authStateWaitPhoneNumber. Can be used instead of setAuthPhoneNumber and checkAuthCode to log in. Returns authStateOk on success</a>  
 
 ***
-<br><br>$MadelineProto->[checkAuthCode](checkAuthCode.md)(\['code' => [string](../types/string.md), 'first_name' => [string](../types/string.md), 'last_name' => [string](../types/string.md), \]) === [$AuthState](../types/AuthState.md)<a name="checkAuthCode"></a>  
+<br><br>* <a href="checkAuthCode.html" name="checkAuthCode">Checks authentication code. Works only when getAuthState returns authStateWaitCode. Returns authStateWaitPassword or authStateOk on success</a>  
 
 ***
-<br><br>$MadelineProto->[checkAuthPassword](checkAuthPassword.md)(\['password' => [string](../types/string.md), \]) === [$AuthState](../types/AuthState.md)<a name="checkAuthPassword"></a>  
+<br><br>* <a href="checkAuthPassword.html" name="checkAuthPassword">Checks password for correctness. Works only when getAuthState returns authStateWaitPassword. Returns authStateOk on success</a>  
 
 ***
-<br><br>$MadelineProto->[checkChangePhoneNumberCode](checkChangePhoneNumberCode.md)(\['code' => [string](../types/string.md), \]) === [$AuthState](../types/AuthState.md)<a name="checkChangePhoneNumberCode"></a>  
+<br><br>* <a href="checkChangePhoneNumberCode.html" name="checkChangePhoneNumberCode">Checks authentication code sent to change user's phone number. Returns authStateOk on success</a>  
 
 ***
-<br><br>$MadelineProto->[checkChatInviteLink](checkChatInviteLink.md)(\['invite_link' => [string](../types/string.md), \]) === [$ChatInviteLinkInfo](../types/ChatInviteLinkInfo.md)<a name="checkChatInviteLink"></a>  
+<br><br>* <a href="checkChatInviteLink.html" name="checkChatInviteLink">Checks chat invite link for validness and returns information about the corresponding chat</a>  
 
 ***
-<br><br>$MadelineProto->[clearRecentStickers](clearRecentStickers.md)(\['is_attached' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="clearRecentStickers"></a>  
+<br><br>* <a href="clearRecentStickers.html" name="clearRecentStickers">Clears list of recently used stickers</a>  
 
 ***
-<br><br>$MadelineProto->[closeChat](closeChat.md)(\['chat_id' => [int53](../types/int53.md), \]) === [$Ok](../types/Ok.md)<a name="closeChat"></a>  
+<br><br>* <a href="closeChat.html" name="closeChat">Chat is closed by the user. Many useful activities depends on chat being opened or closed.</a>  
 
 ***
-<br><br>$MadelineProto->[closeSecretChat](closeSecretChat.md)(\['secret_chat_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="closeSecretChat"></a>  
+<br><br>* <a href="closeSecretChat.html" name="closeSecretChat">Closes secret chat, effectively transfering its state to "Closed"</a>  
 
 ***
-<br><br>$MadelineProto->[createCall](createCall.md)(\['user_id' => [int](../types/int.md), 'protocol' => [callProtocol](../constructors/callProtocol.md), \]) === [$CallId](../types/CallId.md)<a name="createCall"></a>  
+<br><br>* <a href="createCall.html" name="createCall">Creates new call</a>  
 
 ***
-<br><br>$MadelineProto->[createChannelChat](createChannelChat.md)(\['channel_id' => [int](../types/int.md), \]) === [$Chat](../types/Chat.md)<a name="createChannelChat"></a>  
+<br><br>* <a href="createChannelChat.html" name="createChannelChat">Returns existing chat corresponding to the known channel</a>  
 
 ***
-<br><br>$MadelineProto->[createGroupChat](createGroupChat.md)(\['group_id' => [int](../types/int.md), \]) === [$Chat](../types/Chat.md)<a name="createGroupChat"></a>  
+<br><br>* <a href="createGroupChat.html" name="createGroupChat">Returns existing chat corresponding to the known group</a>  
 
 ***
-<br><br>$MadelineProto->[createNewChannelChat](createNewChannelChat.md)(\['title' => [string](../types/string.md), 'is_supergroup' => [Bool](../types/Bool.md), 'description' => [string](../types/string.md), \]) === [$Chat](../types/Chat.md)<a name="createNewChannelChat"></a>  
+<br><br>* <a href="createNewChannelChat.html" name="createNewChannelChat">Creates new channel chat and send corresponding messageChannelChatCreate, returns created chat</a>  
 
 ***
-<br><br>$MadelineProto->[createNewGroupChat](createNewGroupChat.md)(\['user_ids' => \[[int](../types/int.md)\], 'title' => [string](../types/string.md), \]) === [$Chat](../types/Chat.md)<a name="createNewGroupChat"></a>  
+<br><br>* <a href="createNewGroupChat.html" name="createNewGroupChat">Creates new group chat and send corresponding messageGroupChatCreate, returns created chat</a>  
 
 ***
-<br><br>$MadelineProto->[createNewSecretChat](createNewSecretChat.md)(\['user_id' => [int](../types/int.md), \]) === [$Chat](../types/Chat.md)<a name="createNewSecretChat"></a>  
+<br><br>* <a href="createNewSecretChat.html" name="createNewSecretChat">Creates new secret chat, returns created chat</a>  
 
 ***
-<br><br>$MadelineProto->[createNewStickerSet](createNewStickerSet.md)(\['user_id' => [int](../types/int.md), 'title' => [string](../types/string.md), 'name' => [string](../types/string.md), 'is_masks' => [Bool](../types/Bool.md), 'stickers' => \[[inputSticker](../constructors/inputSticker.md)\], \]) === [$StickerSet](../types/StickerSet.md)<a name="createNewStickerSet"></a>  
+<br><br>* <a href="createNewStickerSet.html" name="createNewStickerSet">Bots only. Creates new sticker set. Returns created sticker set</a>  
 
 ***
-<br><br>$MadelineProto->[createPrivateChat](createPrivateChat.md)(\['user_id' => [int](../types/int.md), \]) === [$Chat](../types/Chat.md)<a name="createPrivateChat"></a>  
+<br><br>* <a href="createPrivateChat.html" name="createPrivateChat">Returns existing chat corresponding to the given user</a>  
 
 ***
-<br><br>$MadelineProto->[createSecretChat](createSecretChat.md)(\['secret_chat_id' => [int](../types/int.md), \]) === [$Chat](../types/Chat.md)<a name="createSecretChat"></a>  
+<br><br>* <a href="createSecretChat.html" name="createSecretChat">Returns existing chat corresponding to the known secret chat</a>  
 
 ***
-<br><br>$MadelineProto->[createTemporaryPassword](createTemporaryPassword.md)(\['password' => [string](../types/string.md), 'valid_for' => [int](../types/int.md), \]) === [$TemporaryPasswordState](../types/TemporaryPasswordState.md)<a name="createTemporaryPassword"></a>  
+<br><br>* <a href="createTemporaryPassword.html" name="createTemporaryPassword">Creates new temporary password for payments processing</a>  
 
 ***
-<br><br>$MadelineProto->[debugCall](debugCall.md)(\['call_id' => [int](../types/int.md), 'debug' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="debugCall"></a>  
+<br><br>* <a href="debugCall.html" name="debugCall">Sends call debug information</a>  
 
 ***
-<br><br>$MadelineProto->[deleteAccount](deleteAccount.md)(\['reason' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="deleteAccount"></a>  
+<br><br>* <a href="deleteAccount.html" name="deleteAccount">Deletes the account of currently logged in user, deleting from the server all information associated with it. Account's phone number can be used to create new account, but only once in two weeks</a>  
 
 ***
-<br><br>$MadelineProto->[deleteChannel](deleteChannel.md)(\['channel_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="deleteChannel"></a>  
+<br><br>* <a href="deleteChannel.html" name="deleteChannel">Deletes channel along with all messages in corresponding chat. Releases channel username and removes all members. Needs creator privileges in the channel. Channels with more than 1000 members can't be deleted</a>  
 
 ***
-<br><br>$MadelineProto->[deleteChatHistory](deleteChatHistory.md)(\['chat_id' => [int53](../types/int53.md), 'remove_from_chat_list' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="deleteChatHistory"></a>  
+<br><br>* <a href="deleteChatHistory.html" name="deleteChatHistory">Deletes all messages in the chat. Can't be used for channel chats</a>  
 
 ***
-<br><br>$MadelineProto->[deleteChatReplyMarkup](deleteChatReplyMarkup.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), \]) === [$Ok](../types/Ok.md)<a name="deleteChatReplyMarkup"></a>  
+<br><br>* <a href="deleteChatReplyMarkup.html" name="deleteChatReplyMarkup">Deletes default reply markup from chat. This method needs to be called after one-time keyboard or ForceReply reply markup has been used. UpdateChatReplyMarkup will be send if reply markup will be changed</a>  
 
 ***
-<br><br>$MadelineProto->[deleteContacts](deleteContacts.md)(\['user_ids' => \[[int](../types/int.md)\], \]) === [$Ok](../types/Ok.md)<a name="deleteContacts"></a>  
+<br><br>* <a href="deleteContacts.html" name="deleteContacts">Deletes users from contacts list</a>  
 
 ***
-<br><br>$MadelineProto->[deleteFavoriteSticker](deleteFavoriteSticker.md)(\['sticker' => [InputFile](../types/InputFile.md), \]) === [$Ok](../types/Ok.md)<a name="deleteFavoriteSticker"></a>  
+<br><br>* <a href="deleteFavoriteSticker.html" name="deleteFavoriteSticker">Removes a sticker from the list of favorite stickers</a>  
 
 ***
-<br><br>$MadelineProto->[deleteFile](deleteFile.md)(\['file_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="deleteFile"></a>  
+<br><br>* <a href="deleteFile.html" name="deleteFile">Deletes a file from TDLib file cache</a>  
 
 ***
-<br><br>$MadelineProto->[deleteImportedContacts](deleteImportedContacts.md)(\[\]) === [$Ok](../types/Ok.md)<a name="deleteImportedContacts"></a>  
+<br><br>* <a href="deleteImportedContacts.html" name="deleteImportedContacts">Deletes all imported contacts</a>  
 
 ***
-<br><br>$MadelineProto->[deleteMessages](deleteMessages.md)(\['chat_id' => [int53](../types/int53.md), 'message_ids' => \[[int53](../types/int53.md)\], 'revoke' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="deleteMessages"></a>  
+<br><br>* <a href="deleteMessages.html" name="deleteMessages">Deletes messages</a>  
 
 ***
-<br><br>$MadelineProto->[deleteMessagesFromUser](deleteMessagesFromUser.md)(\['chat_id' => [int53](../types/int53.md), 'user_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="deleteMessagesFromUser"></a>  
+<br><br>* <a href="deleteMessagesFromUser.html" name="deleteMessagesFromUser">Deletes all messages in the chat sent by the specified user. Works only in supergroup channel chats, needs can_delete_messages administrator privileges</a>  
 
 ***
-<br><br>$MadelineProto->[deleteProfilePhoto](deleteProfilePhoto.md)(\['profile_photo_id' => [int64](../constructors/int64.md), \]) === [$Ok](../types/Ok.md)<a name="deleteProfilePhoto"></a>  
+<br><br>* <a href="deleteProfilePhoto.html" name="deleteProfilePhoto">Deletes profile photo. If something changes, updateUser will be sent</a>  
 
 ***
-<br><br>$MadelineProto->[deleteRecentHashtag](deleteRecentHashtag.md)(\['hashtag' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="deleteRecentHashtag"></a>  
+<br><br>* <a href="deleteRecentHashtag.html" name="deleteRecentHashtag">Deletes a hashtag from the list of recently used hashtags</a>  
 
 ***
-<br><br>$MadelineProto->[deleteRecentSticker](deleteRecentSticker.md)(\['is_attached' => [Bool](../types/Bool.md), 'sticker' => [InputFile](../types/InputFile.md), \]) === [$Ok](../types/Ok.md)<a name="deleteRecentSticker"></a>  
+<br><br>* <a href="deleteRecentSticker.html" name="deleteRecentSticker">Removes a sticker from the list of recently used stickers</a>  
 
 ***
-<br><br>$MadelineProto->[deleteRecentlyFoundChat](deleteRecentlyFoundChat.md)(\['chat_id' => [int53](../types/int53.md), \]) === [$Ok](../types/Ok.md)<a name="deleteRecentlyFoundChat"></a>  
+<br><br>* <a href="deleteRecentlyFoundChat.html" name="deleteRecentlyFoundChat">Deletes chat from the list of recently found chats</a>  
 
 ***
-<br><br>$MadelineProto->[deleteRecentlyFoundChats](deleteRecentlyFoundChats.md)(\[\]) === [$Ok](../types/Ok.md)<a name="deleteRecentlyFoundChats"></a>  
+<br><br>* <a href="deleteRecentlyFoundChats.html" name="deleteRecentlyFoundChats">Clears list of recently found chats</a>  
 
 ***
-<br><br>$MadelineProto->[deleteSavedAnimation](deleteSavedAnimation.md)(\['animation' => [InputFile](../types/InputFile.md), \]) === [$Ok](../types/Ok.md)<a name="deleteSavedAnimation"></a>  
+<br><br>* <a href="deleteSavedAnimation.html" name="deleteSavedAnimation">Removes an animation from the list of saved animations</a>  
 
 ***
-<br><br>$MadelineProto->[deleteSavedCredentials](deleteSavedCredentials.md)(\[\]) === [$Ok](../types/Ok.md)<a name="deleteSavedCredentials"></a>  
+<br><br>* <a href="deleteSavedCredentials.html" name="deleteSavedCredentials">Deletes saved credentials for all payments provider bots</a>  
 
 ***
-<br><br>$MadelineProto->[deleteSavedOrderInfo](deleteSavedOrderInfo.md)(\[\]) === [$Ok](../types/Ok.md)<a name="deleteSavedOrderInfo"></a>  
+<br><br>* <a href="deleteSavedOrderInfo.html" name="deleteSavedOrderInfo">Deletes saved order info</a>  
 
 ***
-<br><br>$MadelineProto->[deleteStickerFromSet](deleteStickerFromSet.md)(\['sticker' => [InputFile](../types/InputFile.md), \]) === [$Ok](../types/Ok.md)<a name="deleteStickerFromSet"></a>  
+<br><br>* <a href="deleteStickerFromSet.html" name="deleteStickerFromSet">Bots only. Deletes a sticker from the set it belongs to. Sticker set should be created by the bot</a>  
 
 ***
-<br><br>$MadelineProto->[deleteTopChat](deleteTopChat.md)(\['category' => [TopChatCategory](../types/TopChatCategory.md), 'chat_id' => [int53](../types/int53.md), \]) === [$Ok](../types/Ok.md)<a name="deleteTopChat"></a>  
+<br><br>* <a href="deleteTopChat.html" name="deleteTopChat">Delete a chat from a list of frequently used chats. Supported only if chat info database is enabled</a>  
 
 ***
-<br><br>$MadelineProto->[discardCall](discardCall.md)(\['call_id' => [int](../types/int.md), 'is_disconnected' => [Bool](../types/Bool.md), 'duration' => [int](../types/int.md), 'connection_id' => [int64](../constructors/int64.md), \]) === [$Ok](../types/Ok.md)<a name="discardCall"></a>  
+<br><br>* <a href="discardCall.html" name="discardCall">Discards a call</a>  
 
 ***
-<br><br>$MadelineProto->[downloadFile](downloadFile.md)(\['file_id' => [int](../types/int.md), 'priority' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="downloadFile"></a>  
+<br><br>* <a href="downloadFile.html" name="downloadFile">Asynchronously downloads file from cloud. Updates updateFile will notify about download progress and successful download</a>  
 
 ***
-<br><br>$MadelineProto->[editInlineMessageCaption](editInlineMessageCaption.md)(\['inline_message_id' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'caption' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="editInlineMessageCaption"></a>  
+<br><br>* <a href="editInlineMessageCaption.html" name="editInlineMessageCaption">Bots only. Edits caption of an inline message content sent via bot</a>  
 
 ***
-<br><br>$MadelineProto->[editInlineMessageReplyMarkup](editInlineMessageReplyMarkup.md)(\['inline_message_id' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \]) === [$Ok](../types/Ok.md)<a name="editInlineMessageReplyMarkup"></a>  
+<br><br>* <a href="editInlineMessageReplyMarkup.html" name="editInlineMessageReplyMarkup">Bots only. Edits reply markup of an inline message sent via bot</a>  
 
 ***
-<br><br>$MadelineProto->[editInlineMessageText](editInlineMessageText.md)(\['inline_message_id' => [string](../types/string.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'input_message_content' => [InputMessageContent](../types/InputMessageContent.md), \]) === [$Ok](../types/Ok.md)<a name="editInlineMessageText"></a>  
+<br><br>* <a href="editInlineMessageText.html" name="editInlineMessageText">Bots only. Edits text of an inline text or game message sent via bot</a>  
 
 ***
-<br><br>$MadelineProto->[editMessageCaption](editMessageCaption.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'caption' => [string](../types/string.md), \]) === [$Message](../types/Message.md)<a name="editMessageCaption"></a>  
+<br><br>* <a href="editMessageCaption.html" name="editMessageCaption">Edits message content caption. Non-bots can edit message in a limited period of time. Returns edited message after edit is complete server side</a>  
 
 ***
-<br><br>$MadelineProto->[editMessageReplyMarkup](editMessageReplyMarkup.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), \]) === [$Message](../types/Message.md)<a name="editMessageReplyMarkup"></a>  
+<br><br>* <a href="editMessageReplyMarkup.html" name="editMessageReplyMarkup">Bots only. Edits message reply markup. Returns edited message after edit is complete server side</a>  
 
 ***
-<br><br>$MadelineProto->[editMessageText](editMessageText.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'input_message_content' => [InputMessageContent](../types/InputMessageContent.md), \]) === [$Message](../types/Message.md)<a name="editMessageText"></a>  
+<br><br>* <a href="editMessageText.html" name="editMessageText">Edits text of text or game message. Non-bots can edit message in a limited period of time. Returns edited message after edit is complete server side</a>  
 
 ***
-<br><br>$MadelineProto->[exportChatInviteLink](exportChatInviteLink.md)(\['chat_id' => [int53](../types/int53.md), \]) === [$ChatInviteLink](../types/ChatInviteLink.md)<a name="exportChatInviteLink"></a>  
+<br><br>* <a href="exportChatInviteLink.html" name="exportChatInviteLink">Generates new chat invite link, previously generated link is revoked. Available for group and channel chats. In groups can be called only by creator, in channels requires appropriate rights</a>  
 
 ***
-<br><br>$MadelineProto->[finishFileGeneration](finishFileGeneration.md)(\['generation_id' => [int64](../constructors/int64.md), \]) === [$Ok](../types/Ok.md)<a name="finishFileGeneration"></a>  
+<br><br>* <a href="finishFileGeneration.html" name="finishFileGeneration">Finishes file generation</a>  
 
 ***
-<br><br>$MadelineProto->[forwardMessages](forwardMessages.md)(\['chat_id' => [int53](../types/int53.md), 'from_chat_id' => [int53](../types/int53.md), 'message_ids' => \[[int53](../types/int53.md)\], 'disable_notification' => [Bool](../types/Bool.md), 'from_background' => [Bool](../types/Bool.md), \]) === [$Messages](../types/Messages.md)<a name="forwardMessages"></a>  
+<br><br>* <a href="forwardMessages.html" name="forwardMessages">Forwards previously sent messages. Returns forwarded messages in the same order as message identifiers passed in message_ids. If message can't be forwarded, null will be returned instead of the message</a>  
 
 ***
-<br><br>$MadelineProto->[getAccountTtl](getAccountTtl.md)(\[\]) === [$AccountTtl](../types/AccountTtl.md)<a name="getAccountTtl"></a>  
+<br><br>* <a href="getAccountTtl.html" name="getAccountTtl">Returns period of inactivity, after which the account of currently logged in user will be automatically deleted</a>  
 
 ***
-<br><br>$MadelineProto->[getActiveSessions](getActiveSessions.md)(\[\]) === [$Sessions](../types/Sessions.md)<a name="getActiveSessions"></a>  
+<br><br>* <a href="getActiveSessions.html" name="getActiveSessions">Returns all active sessions of logged in user</a>  
 
 ***
-<br><br>$MadelineProto->[getArchivedStickerSets](getArchivedStickerSets.md)(\['is_masks' => [Bool](../types/Bool.md), 'offset_sticker_set_id' => [int64](../constructors/int64.md), 'limit' => [int](../types/int.md), \]) === [$StickerSets](../types/StickerSets.md)<a name="getArchivedStickerSets"></a>  
+<br><br>* <a href="getArchivedStickerSets.html" name="getArchivedStickerSets">Returns list of archived sticker sets</a>  
 
 ***
-<br><br>$MadelineProto->[getAttachedStickerSets](getAttachedStickerSets.md)(\['file_id' => [int](../types/int.md), \]) === [$StickerSets](../types/StickerSets.md)<a name="getAttachedStickerSets"></a>  
+<br><br>* <a href="getAttachedStickerSets.html" name="getAttachedStickerSets">Returns list of sticker sets attached to a file, currently only photos and videos can have attached sticker sets</a>  
 
 ***
-<br><br>$MadelineProto->[getAuthState](getAuthState.md)(\[\]) === [$AuthState](../types/AuthState.md)<a name="getAuthState"></a>  
+<br><br>* <a href="getAuthState.html" name="getAuthState">Returns current authorization state, offline request</a>  
 
 ***
-<br><br>$MadelineProto->[getBlockedUsers](getBlockedUsers.md)(\['offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$Users](../types/Users.md)<a name="getBlockedUsers"></a>  
+<br><br>* <a href="getBlockedUsers.html" name="getBlockedUsers">Returns users blocked by the current user</a>  
 
 ***
-<br><br>$MadelineProto->[getCallbackQueryAnswer](getCallbackQueryAnswer.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'payload' => [CallbackQueryPayload](../types/CallbackQueryPayload.md), \]) === [$CallbackQueryAnswer](../types/CallbackQueryAnswer.md)<a name="getCallbackQueryAnswer"></a>  
+<br><br>* <a href="getCallbackQueryAnswer.html" name="getCallbackQueryAnswer">Sends callback query to a bot and returns answer to it. Returns error with code 502 if bot fails to answer the query before query timeout expires. Unavailable for bots</a>  
 
 ***
-<br><br>$MadelineProto->[getChannel](getChannel.md)(\['channel_id' => [int](../types/int.md), \]) === [$Channel](../types/Channel.md)<a name="getChannel"></a>  
+<br><br>* <a href="getChannel.html" name="getChannel">Returns information about a channel by its identifier, offline request if current user is not a bot</a>  
 
 ***
-<br><br>$MadelineProto->[getChannelFull](getChannelFull.md)(\['channel_id' => [int](../types/int.md), \]) === [$ChannelFull](../types/ChannelFull.md)<a name="getChannelFull"></a>  
+<br><br>* <a href="getChannelFull.html" name="getChannelFull">Returns full information about a channel by its identifier, cached for at most 1 minute</a>  
 
 ***
-<br><br>$MadelineProto->[getChannelMembers](getChannelMembers.md)(\['channel_id' => [int](../types/int.md), 'filter' => [ChannelMembersFilter](../types/ChannelMembersFilter.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$ChatMembers](../types/ChatMembers.md)<a name="getChannelMembers"></a>  
+<br><br>* <a href="getChannelMembers.html" name="getChannelMembers">Returns information about channel members or banned users. Can be used only if channel_full->can_get_members == true. Administrator privileges may be additionally needed for some filters</a>  
 
 ***
-<br><br>$MadelineProto->[getChat](getChat.md)(\['chat_id' => [int53](../types/int53.md), \]) === [$Chat](../types/Chat.md)<a name="getChat"></a>  
+<br><br>* <a href="getChat.html" name="getChat">Returns information about a chat by its identifier, offline request if current user is not a bot</a>  
 
 ***
-<br><br>$MadelineProto->[getChatEventLog](getChatEventLog.md)(\['chat_id' => [int53](../types/int53.md), 'query' => [string](../types/string.md), 'from_event_id' => [int64](../constructors/int64.md), 'limit' => [int](../types/int.md), 'filters' => [chatEventLogFilters](../constructors/chatEventLogFilters.md), 'user_ids' => \[[int](../types/int.md)\], \]) === [$ChatEvents](../types/ChatEvents.md)<a name="getChatEventLog"></a>  
+<br><br>* <a href="getChatEventLog.html" name="getChatEventLog">Returns list of service actions taken by chat members and administrators in the last 48 hours, available only in channels. Requires administrator rights. Returns result in reverse chronological order, i. e. in order of decreasing event_id</a>  
 
 ***
-<br><br>$MadelineProto->[getChatHistory](getChatHistory.md)(\['chat_id' => [int53](../types/int53.md), 'from_message_id' => [int53](../types/int53.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), 'only_local' => [Bool](../types/Bool.md), \]) === [$Messages](../types/Messages.md)<a name="getChatHistory"></a>  
+<br><br>* <a href="getChatHistory.html" name="getChatHistory">Returns messages in a chat. Returns result in reverse chronological order, i.e. in order of decreasing message.message_id. Offline request if only_local is true</a>  
 
 ***
-<br><br>$MadelineProto->[getChatMember](getChatMember.md)(\['chat_id' => [int53](../types/int53.md), 'user_id' => [int](../types/int.md), \]) === [$ChatMember](../types/ChatMember.md)<a name="getChatMember"></a>  
+<br><br>* <a href="getChatMember.html" name="getChatMember">Returns information about one participant of the chat</a>  
 
 ***
-<br><br>$MadelineProto->[getChatReportSpamState](getChatReportSpamState.md)(\['chat_id' => [int53](../types/int53.md), \]) === [$ChatReportSpamState](../types/ChatReportSpamState.md)<a name="getChatReportSpamState"></a>  
+<br><br>* <a href="getChatReportSpamState.html" name="getChatReportSpamState">Returns current chat report spam state</a>  
 
 ***
-<br><br>$MadelineProto->[getChats](getChats.md)(\['offset_order' => [int64](../constructors/int64.md), 'offset_chat_id' => [int53](../types/int53.md), 'limit' => [int](../types/int.md), \]) === [$Chats](../types/Chats.md)<a name="getChats"></a>  
+<br><br>* <a href="getChats.html" name="getChats">Returns list of chats in the right order, chats are sorted by (order, chat_id) in decreasing order. For example, to get list of chats from the beginning, the offset_order should be equal 2^63 - 1</a>  
 
 ***
-<br><br>$MadelineProto->[getCommonChats](getCommonChats.md)(\['user_id' => [int](../types/int.md), 'offset_chat_id' => [int53](../types/int53.md), 'limit' => [int](../types/int.md), \]) === [$Chats](../types/Chats.md)<a name="getCommonChats"></a>  
+<br><br>* <a href="getCommonChats.html" name="getCommonChats">Returns list of common chats with an other given user. Chats are sorted by their type and creation date</a>  
 
 ***
-<br><br>$MadelineProto->[getCreatedPublicChats](getCreatedPublicChats.md)(\[\]) === [$Chats](../types/Chats.md)<a name="getCreatedPublicChats"></a>  
+<br><br>* <a href="getCreatedPublicChats.html" name="getCreatedPublicChats">Returns list of created public chats</a>  
 
 ***
-<br><br>$MadelineProto->[getFavoriteStickers](getFavoriteStickers.md)(\[\]) === [$Stickers](../types/Stickers.md)<a name="getFavoriteStickers"></a>  
+<br><br>* <a href="getFavoriteStickers.html" name="getFavoriteStickers">Returns favorite stickers</a>  
 
 ***
-<br><br>$MadelineProto->[getFile](getFile.md)(\['file_id' => [int](../types/int.md), \]) === [$File](../types/File.md)<a name="getFile"></a>  
+<br><br>* <a href="getFile.html" name="getFile">Returns information about a file, offline request</a>  
 
 ***
-<br><br>$MadelineProto->[getFileExtension](getFileExtension.md)(\['mime_type' => [string](../types/string.md), \]) === [$Text](../types/Text.md)<a name="getFileExtension"></a>  
+<br><br>* <a href="getFileExtension.html" name="getFileExtension">Returns file's extension guessing only by its mime type. Returns empty string on failure. Offline method. Can be called before authorization. Can be called synchronously</a>  
 
 ***
-<br><br>$MadelineProto->[getFileMimeType](getFileMimeType.md)(\['file_name' => [string](../types/string.md), \]) === [$Text](../types/Text.md)<a name="getFileMimeType"></a>  
+<br><br>* <a href="getFileMimeType.html" name="getFileMimeType">Returns file's mime type guessing only by its extension. Returns empty string on failure. Offline method. Can be called before authorization. Can be called synchronously</a>  
 
 ***
-<br><br>$MadelineProto->[getFilePersistent](getFilePersistent.md)(\['persistent_file_id' => [string](../types/string.md), 'file_type' => [FileType](../types/FileType.md), \]) === [$File](../types/File.md)<a name="getFilePersistent"></a>  
+<br><br>* <a href="getFilePersistent.html" name="getFilePersistent">Returns information about a file by its persistent id, offline request. May be used to register a URL as a file for further uploading or sending as message</a>  
 
 ***
-<br><br>$MadelineProto->[getGameHighScores](getGameHighScores.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'user_id' => [int](../types/int.md), \]) === [$GameHighScores](../types/GameHighScores.md)<a name="getGameHighScores"></a>  
+<br><br>* <a href="getGameHighScores.html" name="getGameHighScores">Bots only. Returns game high scores and some part of the score table around of the specified user in the game</a>  
 
 ***
-<br><br>$MadelineProto->[getGroup](getGroup.md)(\['group_id' => [int](../types/int.md), \]) === [$Group](../types/Group.md)<a name="getGroup"></a>  
+<br><br>* <a href="getGroup.html" name="getGroup">Returns information about a group by its identifier, offline request if current user is not a bot</a>  
 
 ***
-<br><br>$MadelineProto->[getGroupFull](getGroupFull.md)(\['group_id' => [int](../types/int.md), \]) === [$GroupFull](../types/GroupFull.md)<a name="getGroupFull"></a>  
+<br><br>* <a href="getGroupFull.html" name="getGroupFull">Returns full information about a group by its identifier</a>  
 
 ***
-<br><br>$MadelineProto->[getImportedContactCount](getImportedContactCount.md)(\[\]) === [$Count](../types/Count.md)<a name="getImportedContactCount"></a>  
+<br><br>* <a href="getImportedContactCount.html" name="getImportedContactCount">Returns total number of imported contacts</a>  
 
 ***
-<br><br>$MadelineProto->[getInlineGameHighScores](getInlineGameHighScores.md)(\['inline_message_id' => [string](../types/string.md), 'user_id' => [int](../types/int.md), \]) === [$GameHighScores](../types/GameHighScores.md)<a name="getInlineGameHighScores"></a>  
+<br><br>* <a href="getInlineGameHighScores.html" name="getInlineGameHighScores">Bots only. Returns game high scores and some part of the score table around of the specified user in the game</a>  
 
 ***
-<br><br>$MadelineProto->[getInlineQueryResults](getInlineQueryResults.md)(\['bot_user_id' => [int](../types/int.md), 'chat_id' => [int53](../types/int53.md), 'user_location' => [location](../constructors/location.md), 'query' => [string](../types/string.md), 'offset' => [string](../types/string.md), \]) === [$InlineQueryResults](../types/InlineQueryResults.md)<a name="getInlineQueryResults"></a>  
+<br><br>* <a href="getInlineQueryResults.html" name="getInlineQueryResults">Sends inline query to a bot and returns its results. Returns error with code 502 if bot fails to answer the query before query timeout expires. Unavailable for bots</a>  
 
 ***
-<br><br>$MadelineProto->[getInstalledStickerSets](getInstalledStickerSets.md)(\['is_masks' => [Bool](../types/Bool.md), \]) === [$StickerSets](../types/StickerSets.md)<a name="getInstalledStickerSets"></a>  
+<br><br>* <a href="getInstalledStickerSets.html" name="getInstalledStickerSets">Returns list of installed sticker sets</a>  
 
 ***
-<br><br>$MadelineProto->[getInviteText](getInviteText.md)(\[\]) === [$Text](../types/Text.md)<a name="getInviteText"></a>  
+<br><br>* <a href="getInviteText.html" name="getInviteText">Returns invite text for invitation of new users</a>  
 
 ***
-<br><br>$MadelineProto->[getMe](getMe.md)(\[\]) === [$User](../types/User.md)<a name="getMe"></a>  
+<br><br>* <a href="getMe.html" name="getMe">Returns current logged in user</a>  
 
 ***
-<br><br>$MadelineProto->[getMessage](getMessage.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), \]) === [$Message](../types/Message.md)<a name="getMessage"></a>  
+<br><br>* <a href="getMessage.html" name="getMessage">Returns information about a message</a>  
 
 ***
-<br><br>$MadelineProto->[getMessages](getMessages.md)(\['chat_id' => [int53](../types/int53.md), 'message_ids' => \[[int53](../types/int53.md)\], \]) === [$Messages](../types/Messages.md)<a name="getMessages"></a>  
+<br><br>* <a href="getMessages.html" name="getMessages">Returns information about messages. If message is not found, returns null on the corresponding position of the result</a>  
 
 ***
-<br><br>$MadelineProto->[getNetworkStatistics](getNetworkStatistics.md)(\['only_current' => [Bool](../types/Bool.md), \]) === [$NetworkStatistics](../types/NetworkStatistics.md)<a name="getNetworkStatistics"></a>  
+<br><br>* <a href="getNetworkStatistics.html" name="getNetworkStatistics">Returns network data usage statistics. Can be called before authorization</a>  
 
 ***
-<br><br>$MadelineProto->[getNotificationSettings](getNotificationSettings.md)(\['scope' => [NotificationSettingsScope](../types/NotificationSettingsScope.md), \]) === [$NotificationSettings](../types/NotificationSettings.md)<a name="getNotificationSettings"></a>  
+<br><br>* <a href="getNotificationSettings.html" name="getNotificationSettings">Returns notification settings for a given scope</a>  
 
 ***
-<br><br>$MadelineProto->[getOption](getOption.md)(\['name' => [string](../types/string.md), \]) === [$OptionValue](../types/OptionValue.md)<a name="getOption"></a>  
+<br><br>* <a href="getOption.html" name="getOption">Returns value of an option by its name. See list of available options on https: core.telegram.org/tdlib/options. Can be called before authorization</a>  
 
 ***
-<br><br>$MadelineProto->[getPasswordState](getPasswordState.md)(\[\]) === [$PasswordState](../types/PasswordState.md)<a name="getPasswordState"></a>  
+<br><br>* <a href="getPasswordState.html" name="getPasswordState">Returns current state of two-step verification</a>  
 
 ***
-<br><br>$MadelineProto->[getPaymentForm](getPaymentForm.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), \]) === [$PaymentForm](../types/PaymentForm.md)<a name="getPaymentForm"></a>  
+<br><br>* <a href="getPaymentForm.html" name="getPaymentForm">Returns invoice payment form. The method should be called when user presses inlineKeyboardButtonBuy</a>  
 
 ***
-<br><br>$MadelineProto->[getPaymentReceipt](getPaymentReceipt.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), \]) === [$PaymentReceipt](../types/PaymentReceipt.md)<a name="getPaymentReceipt"></a>  
+<br><br>* <a href="getPaymentReceipt.html" name="getPaymentReceipt">Returns information about successful payment</a>  
 
 ***
-<br><br>$MadelineProto->[getPrivacy](getPrivacy.md)(\['key' => [PrivacyKey](../types/PrivacyKey.md), \]) === [$PrivacyRules](../types/PrivacyRules.md)<a name="getPrivacy"></a>  
+<br><br>* <a href="getPrivacy.html" name="getPrivacy">Returns current privacy settings</a>  
 
 ***
-<br><br>$MadelineProto->[getProxy](getProxy.md)(\[\]) === [$Proxy](../types/Proxy.md)<a name="getProxy"></a>  
+<br><br>* <a href="getProxy.html" name="getProxy">Returns current set up proxy. Can be called before authorization</a>  
 
 ***
-<br><br>$MadelineProto->[getPublicMessageLink](getPublicMessageLink.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), \]) === [$PublicMessageLink](../types/PublicMessageLink.md)<a name="getPublicMessageLink"></a>  
+<br><br>* <a href="getPublicMessageLink.html" name="getPublicMessageLink">Returns public HTTPS link to a message. Available only for messages in public channels</a>  
 
 ***
-<br><br>$MadelineProto->[getRecentInlineBots](getRecentInlineBots.md)(\[\]) === [$Users](../types/Users.md)<a name="getRecentInlineBots"></a>  
+<br><br>* <a href="getRecentInlineBots.html" name="getRecentInlineBots">Returns up to 20 recently used inline bots in the order of the last usage</a>  
 
 ***
-<br><br>$MadelineProto->[getRecentStickers](getRecentStickers.md)(\['is_attached' => [Bool](../types/Bool.md), \]) === [$Stickers](../types/Stickers.md)<a name="getRecentStickers"></a>  
+<br><br>* <a href="getRecentStickers.html" name="getRecentStickers">Returns list of recently used stickers</a>  
 
 ***
-<br><br>$MadelineProto->[getRecoveryEmail](getRecoveryEmail.md)(\['password' => [string](../types/string.md), \]) === [$RecoveryEmail](../types/RecoveryEmail.md)<a name="getRecoveryEmail"></a>  
+<br><br>* <a href="getRecoveryEmail.html" name="getRecoveryEmail">Returns set up recovery email. This method can be used to verify a password provided by the user</a>  
 
 ***
-<br><br>$MadelineProto->[getSavedAnimations](getSavedAnimations.md)(\[\]) === [$Animations](../types/Animations.md)<a name="getSavedAnimations"></a>  
+<br><br>* <a href="getSavedAnimations.html" name="getSavedAnimations">Returns saved animations</a>  
 
 ***
-<br><br>$MadelineProto->[getSavedOrderInfo](getSavedOrderInfo.md)(\[\]) === [$OrderInfo](../types/OrderInfo.md)<a name="getSavedOrderInfo"></a>  
+<br><br>* <a href="getSavedOrderInfo.html" name="getSavedOrderInfo">Returns saved order info if any</a>  
 
 ***
-<br><br>$MadelineProto->[getSecretChat](getSecretChat.md)(\['secret_chat_id' => [int](../types/int.md), \]) === [$SecretChat](../types/SecretChat.md)<a name="getSecretChat"></a>  
+<br><br>* <a href="getSecretChat.html" name="getSecretChat">Returns information about a secret chat by its identifier, offline request</a>  
 
 ***
-<br><br>$MadelineProto->[getStickerEmojis](getStickerEmojis.md)(\['sticker' => [InputFile](../types/InputFile.md), \]) === [$StickerEmojis](../types/StickerEmojis.md)<a name="getStickerEmojis"></a>  
+<br><br>* <a href="getStickerEmojis.html" name="getStickerEmojis">Returns emojis corresponding to a sticker</a>  
 
 ***
-<br><br>$MadelineProto->[getStickerSet](getStickerSet.md)(\['set_id' => [int64](../constructors/int64.md), \]) === [$StickerSet](../types/StickerSet.md)<a name="getStickerSet"></a>  
+<br><br>* <a href="getStickerSet.html" name="getStickerSet">Returns information about sticker set by its identifier</a>  
 
 ***
-<br><br>$MadelineProto->[getStickers](getStickers.md)(\['emoji' => [string](../types/string.md), 'limit' => [int](../types/int.md), \]) === [$Stickers](../types/Stickers.md)<a name="getStickers"></a>  
+<br><br>* <a href="getStickers.html" name="getStickers">Returns stickers from installed ordinary sticker sets corresponding to the given emoji. If emoji is not empty, elso favorite and recently used stickers may be returned</a>  
 
 ***
-<br><br>$MadelineProto->[getStorageStatistics](getStorageStatistics.md)(\['chat_limit' => [int](../types/int.md), \]) === [$StorageStatistics](../types/StorageStatistics.md)<a name="getStorageStatistics"></a>  
+<br><br>* <a href="getStorageStatistics.html" name="getStorageStatistics">Returns storage usage statistics</a>  
 
 ***
-<br><br>$MadelineProto->[getStorageStatisticsFast](getStorageStatisticsFast.md)(\[\]) === [$StorageStatisticsFast](../types/StorageStatisticsFast.md)<a name="getStorageStatisticsFast"></a>  
+<br><br>* <a href="getStorageStatisticsFast.html" name="getStorageStatisticsFast">Quickly returns approximate storage usage statistics</a>  
 
 ***
-<br><br>$MadelineProto->[getSupportUser](getSupportUser.md)(\[\]) === [$User](../types/User.md)<a name="getSupportUser"></a>  
+<br><br>* <a href="getSupportUser.html" name="getSupportUser">Returns user that can be contacted to get support</a>  
 
 ***
-<br><br>$MadelineProto->[getTemporaryPasswordState](getTemporaryPasswordState.md)(\[\]) === [$TemporaryPasswordState](../types/TemporaryPasswordState.md)<a name="getTemporaryPasswordState"></a>  
+<br><br>* <a href="getTemporaryPasswordState.html" name="getTemporaryPasswordState">Returns information about current temporary password</a>  
 
 ***
-<br><br>$MadelineProto->[getTermsOfService](getTermsOfService.md)(\[\]) === [$Text](../types/Text.md)<a name="getTermsOfService"></a>  
+<br><br>* <a href="getTermsOfService.html" name="getTermsOfService">Returns terms of service. Can be called before authorization</a>  
 
 ***
-<br><br>$MadelineProto->[getTextEntities](getTextEntities.md)(\['text' => [string](../types/string.md), \]) === [$TextEntities](../types/TextEntities.md)<a name="getTextEntities"></a>  
+<br><br>* <a href="getTextEntities.html" name="getTextEntities">Returns all mentions, hashtags, bot commands, URLs and emails contained in the text. Offline method. Can be called before authorization. Can be called synchronously</a>  
 
 ***
-<br><br>$MadelineProto->[getTopChats](getTopChats.md)(\['category' => [TopChatCategory](../types/TopChatCategory.md), 'limit' => [int](../types/int.md), \]) === [$Chats](../types/Chats.md)<a name="getTopChats"></a>  
+<br><br>* <a href="getTopChats.html" name="getTopChats">Returns a list of frequently used chats. Supported only if chat info database is enabled</a>  
 
 ***
-<br><br>$MadelineProto->[getTrendingStickerSets](getTrendingStickerSets.md)(\[\]) === [$StickerSets](../types/StickerSets.md)<a name="getTrendingStickerSets"></a>  
+<br><br>* <a href="getTrendingStickerSets.html" name="getTrendingStickerSets">Returns list of trending sticker sets</a>  
 
 ***
-<br><br>$MadelineProto->[getUser](getUser.md)(\['user_id' => [int](../types/int.md), \]) === [$User](../types/User.md)<a name="getUser"></a>  
+<br><br>* <a href="getUser.html" name="getUser">Returns information about a user by its identifier, offline request if current user is not a bot</a>  
 
 ***
-<br><br>$MadelineProto->[getUserFull](getUserFull.md)(\['user_id' => [int](../types/int.md), \]) === [$UserFull](../types/UserFull.md)<a name="getUserFull"></a>  
+<br><br>* <a href="getUserFull.html" name="getUserFull">Returns full information about a user by its identifier</a>  
 
 ***
-<br><br>$MadelineProto->[getUserProfilePhotos](getUserProfilePhotos.md)(\['user_id' => [int](../types/int.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), \]) === [$UserProfilePhotos](../types/UserProfilePhotos.md)<a name="getUserProfilePhotos"></a>  
+<br><br>* <a href="getUserProfilePhotos.html" name="getUserProfilePhotos">Returns profile photos of the user. Result of this query may be outdated: some photos may be already deleted</a>  
 
 ***
-<br><br>$MadelineProto->[getWallpapers](getWallpapers.md)(\[\]) === [$Wallpapers](../types/Wallpapers.md)<a name="getWallpapers"></a>  
+<br><br>* <a href="getWallpapers.html" name="getWallpapers">Returns background wallpapers</a>  
 
 ***
-<br><br>$MadelineProto->[getWebPageInstantView](getWebPageInstantView.md)(\['url' => [string](../types/string.md), 'force_full' => [Bool](../types/Bool.md), \]) === [$WebPageInstantView](../types/WebPageInstantView.md)<a name="getWebPageInstantView"></a>  
+<br><br>* <a href="getWebPageInstantView.html" name="getWebPageInstantView">Returns web page instant view if available. Returns error 404 if web page has no instant view</a>  
 
 ***
-<br><br>$MadelineProto->[getWebPagePreview](getWebPagePreview.md)(\['message_text' => [string](../types/string.md), \]) === [$WebPage](../types/WebPage.md)<a name="getWebPagePreview"></a>  
+<br><br>* <a href="getWebPagePreview.html" name="getWebPagePreview">Returns web page preview by text of the message. Do not call this function to often. Returns error 404 if web page has no preview</a>  
 
 ***
-<br><br>$MadelineProto->[importChatInviteLink](importChatInviteLink.md)(\['invite_link' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="importChatInviteLink"></a>  
+<br><br>* <a href="importChatInviteLink.html" name="importChatInviteLink">Imports chat invite link, adds current user to a chat if possible. Member will not be added until chat state will be synchronized with the server</a>  
 
 ***
-<br><br>$MadelineProto->[importContacts](importContacts.md)(\['contacts' => \[[contact](../constructors/contact.md)\], \]) === [$ImportedContacts](../types/ImportedContacts.md)<a name="importContacts"></a>  
+<br><br>* <a href="importContacts.html" name="importContacts">Adds new contacts/edits existing contacts, contacts user identifiers are ignored</a>  
 
 ***
-<br><br>$MadelineProto->[migrateGroupChatToChannelChat](migrateGroupChatToChannelChat.md)(\['chat_id' => [int53](../types/int53.md), \]) === [$Chat](../types/Chat.md)<a name="migrateGroupChatToChannelChat"></a>  
+<br><br>* <a href="migrateGroupChatToChannelChat.html" name="migrateGroupChatToChannelChat">Creates new channel supergroup chat from existing group chat and send corresponding messageChatMigrateTo and messageChatMigrateFrom. Deactivates group</a>  
 
 ***
-<br><br>$MadelineProto->[openChat](openChat.md)(\['chat_id' => [int53](../types/int53.md), \]) === [$Ok](../types/Ok.md)<a name="openChat"></a>  
+<br><br>* <a href="openChat.html" name="openChat">Chat is opened by the user. Many useful activities depends on chat being opened or closed. For example, in channels all updates are received only for opened chats</a>  
 
 ***
-<br><br>$MadelineProto->[openMessageContent](openMessageContent.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), \]) === [$Ok](../types/Ok.md)<a name="openMessageContent"></a>  
+<br><br>* <a href="openMessageContent.html" name="openMessageContent">Message content is opened, for example the user has opened a photo, a video, a document, a location or a venue or have listened to an audio or a voice message. You will receive updateOpenMessageContent if something has changed</a>  
 
 ***
-<br><br>$MadelineProto->[optimizeStorage](optimizeStorage.md)(\['size' => [int53](../types/int53.md), 'ttl' => [int](../types/int.md), 'count' => [int](../types/int.md), 'immunity_delay' => [int](../types/int.md), 'file_types' => \[[FileType](../types/FileType.md)\], 'chat_ids' => \[[int53](../types/int53.md)\], 'exclude_chat_ids' => \[[int53](../types/int53.md)\], 'chat_limit' => [int](../types/int.md), \]) === [$StorageStatistics](../types/StorageStatistics.md)<a name="optimizeStorage"></a>  
+<br><br>* <a href="optimizeStorage.html" name="optimizeStorage">Optimizes storage usage, i.e. deletes some files and return new storage usage statistics. Secret thumbnails can't be deleted</a>  
 
 ***
-<br><br>$MadelineProto->[pinChannelMessage](pinChannelMessage.md)(\['channel_id' => [int](../types/int.md), 'message_id' => [int53](../types/int53.md), 'disable_notification' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="pinChannelMessage"></a>  
+<br><br>* <a href="pinChannelMessage.html" name="pinChannelMessage">Pins a message in a supergroup channel chat. Needs appropriate rights in the channel</a>  
 
 ***
-<br><br>$MadelineProto->[processDcUpdate](processDcUpdate.md)(\['dc' => [string](../types/string.md), 'addr' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="processDcUpdate"></a>  
+<br><br>* <a href="processDcUpdate.html" name="processDcUpdate">Handles DC_UPDATE push service notification. Can be called before authorization</a>  
 
 ***
-<br><br>$MadelineProto->[rateCall](rateCall.md)(\['call_id' => [int](../types/int.md), 'rating' => [int](../types/int.md), 'comment' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="rateCall"></a>  
+<br><br>* <a href="rateCall.html" name="rateCall">Sends call rating</a>  
 
 ***
-<br><br>$MadelineProto->[recoverAuthPassword](recoverAuthPassword.md)(\['recovery_code' => [string](../types/string.md), \]) === [$AuthState](../types/AuthState.md)<a name="recoverAuthPassword"></a>  
+<br><br>* <a href="recoverAuthPassword.html" name="recoverAuthPassword">Recovers password with recovery code sent to email. Works only when getAuthState returns authStateWaitPassword. Returns authStateOk on success</a>  
 
 ***
-<br><br>$MadelineProto->[recoverPassword](recoverPassword.md)(\['recovery_code' => [string](../types/string.md), \]) === [$PasswordState](../types/PasswordState.md)<a name="recoverPassword"></a>  
+<br><br>* <a href="recoverPassword.html" name="recoverPassword">Recovers password with recovery code sent to email</a>  
 
 ***
-<br><br>$MadelineProto->[registerDevice](registerDevice.md)(\['device_token' => [DeviceToken](../types/DeviceToken.md), \]) === [$Ok](../types/Ok.md)<a name="registerDevice"></a>  
+<br><br>* <a href="registerDevice.html" name="registerDevice">Registers current used device for receiving push notifications</a>  
 
 ***
-<br><br>$MadelineProto->[reorderInstalledStickerSets](reorderInstalledStickerSets.md)(\['is_masks' => [Bool](../types/Bool.md), 'sticker_set_ids' => \[[int64](../constructors/int64.md)\], \]) === [$Ok](../types/Ok.md)<a name="reorderInstalledStickerSets"></a>  
+<br><br>* <a href="reorderInstalledStickerSets.html" name="reorderInstalledStickerSets">Changes the order of installed sticker sets</a>  
 
 ***
-<br><br>$MadelineProto->[reportChannelSpam](reportChannelSpam.md)(\['channel_id' => [int](../types/int.md), 'user_id' => [int](../types/int.md), 'message_ids' => \[[int53](../types/int53.md)\], \]) === [$Ok](../types/Ok.md)<a name="reportChannelSpam"></a>  
+<br><br>* <a href="reportChannelSpam.html" name="reportChannelSpam">Reports some supergroup channel messages from a user as spam messages</a>  
 
 ***
-<br><br>$MadelineProto->[reportChat](reportChat.md)(\['chat_id' => [int53](../types/int53.md), 'reason' => [ChatReportReason](../types/ChatReportReason.md), \]) === [$Ok](../types/Ok.md)<a name="reportChat"></a>  
+<br><br>* <a href="reportChat.html" name="reportChat">Reports chat to Telegram moderators. Can be used only for a channel chat or a private chat with a bot, because all other chats can't be checked by moderators</a>  
 
 ***
-<br><br>$MadelineProto->[requestAuthPasswordRecovery](requestAuthPasswordRecovery.md)(\[\]) === [$AuthState](../types/AuthState.md)<a name="requestAuthPasswordRecovery"></a>  
+<br><br>* <a href="requestAuthPasswordRecovery.html" name="requestAuthPasswordRecovery">Requests to send password recovery code to email. Works only when getAuthState returns authStateWaitPassword. Returns authStateWaitPassword on success</a>  
 
 ***
-<br><br>$MadelineProto->[requestPasswordRecovery](requestPasswordRecovery.md)(\[\]) === [$PasswordRecoveryInfo](../types/PasswordRecoveryInfo.md)<a name="requestPasswordRecovery"></a>  
+<br><br>* <a href="requestPasswordRecovery.html" name="requestPasswordRecovery">Requests to send password recovery code to email</a>  
 
 ***
-<br><br>$MadelineProto->[resendAuthCode](resendAuthCode.md)(\[\]) === [$AuthState](../types/AuthState.md)<a name="resendAuthCode"></a>  
+<br><br>* <a href="resendAuthCode.html" name="resendAuthCode">Resends authentication code to the user. Works only when getAuthState returns authStateWaitCode and next_code_type of result is not null. Returns authStateWaitCode on success</a>  
 
 ***
-<br><br>$MadelineProto->[resendChangePhoneNumberCode](resendChangePhoneNumberCode.md)(\[\]) === [$AuthState](../types/AuthState.md)<a name="resendChangePhoneNumberCode"></a>  
+<br><br>* <a href="resendChangePhoneNumberCode.html" name="resendChangePhoneNumberCode">Resends authentication code sent to change user's phone number. Wotks only if in previously received authStateWaitCode next_code_type was not null. Returns authStateWaitCode on success</a>  
 
 ***
-<br><br>$MadelineProto->[resetAllNotificationSettings](resetAllNotificationSettings.md)(\[\]) === [$Ok](../types/Ok.md)<a name="resetAllNotificationSettings"></a>  
+<br><br>* <a href="resetAllNotificationSettings.html" name="resetAllNotificationSettings">Resets all notification settings to the default value. By default the only muted chats are supergroups, sound is set to 'default' and message previews are showed</a>  
 
 ***
-<br><br>$MadelineProto->[resetAuth](resetAuth.md)(\['force' => [Bool](../types/Bool.md), \]) === [$AuthState](../types/AuthState.md)<a name="resetAuth"></a>  
+<br><br>* <a href="resetAuth.html" name="resetAuth">Logs out user. If force == false, begins to perform soft log out, returns authStateLoggingOut after completion. If force == true then succeeds almost immediately without cleaning anything at the server, but returns error with code 401 and description "Unauthorized"</a>  
 
 ***
-<br><br>$MadelineProto->[resetNetworkStatistics](resetNetworkStatistics.md)(\[\]) === [$Ok](../types/Ok.md)<a name="resetNetworkStatistics"></a>  
+<br><br>* <a href="resetNetworkStatistics.html" name="resetNetworkStatistics">Resets all network data usage statistics to zero. Can be called before authorization</a>  
 
 ***
-<br><br>$MadelineProto->[searchCallMessages](searchCallMessages.md)(\['from_message_id' => [int53](../types/int53.md), 'limit' => [int](../types/int.md), 'only_missed' => [Bool](../types/Bool.md), \]) === [$Messages](../types/Messages.md)<a name="searchCallMessages"></a>  
+<br><br>* <a href="searchCallMessages.html" name="searchCallMessages">Searches for call messages. Returns result in reverse chronological order, i. e. in order of decreasing message_id</a>  
 
 ***
-<br><br>$MadelineProto->[searchChatMembers](searchChatMembers.md)(\['chat_id' => [int53](../types/int53.md), 'query' => [string](../types/string.md), 'limit' => [int](../types/int.md), \]) === [$ChatMembers](../types/ChatMembers.md)<a name="searchChatMembers"></a>  
+<br><br>* <a href="searchChatMembers.html" name="searchChatMembers">Searches for the specified query in the first name, last name and username among members of the specified chat. Requires administrator rights in broadcast channels</a>  
 
 ***
-<br><br>$MadelineProto->[searchChatMessages](searchChatMessages.md)(\['chat_id' => [int53](../types/int53.md), 'query' => [string](../types/string.md), 'sender_user_id' => [int](../types/int.md), 'from_message_id' => [int53](../types/int53.md), 'offset' => [int](../types/int.md), 'limit' => [int](../types/int.md), 'filter' => [SearchMessagesFilter](../types/SearchMessagesFilter.md), \]) === [$Messages](../types/Messages.md)<a name="searchChatMessages"></a>  
+<br><br>* <a href="searchChatMessages.html" name="searchChatMessages">Searches for messages with given words in the chat. Returns result in reverse chronological order, i. e. in order of decreasing message_id. Doesn't work in secret chats with non-empty query (searchSecretMessages should be used instead) or without enabled message database</a>  
 
 ***
-<br><br>$MadelineProto->[searchChats](searchChats.md)(\['query' => [string](../types/string.md), 'limit' => [int](../types/int.md), \]) === [$Chats](../types/Chats.md)<a name="searchChats"></a>  
+<br><br>* <a href="searchChats.html" name="searchChats">Searches for specified query in the title and username of known chats, offline request. Returns chats in the order of them in the chat list</a>  
 
 ***
-<br><br>$MadelineProto->[searchContacts](searchContacts.md)(\['query' => [string](../types/string.md), 'limit' => [int](../types/int.md), \]) === [$Users](../types/Users.md)<a name="searchContacts"></a>  
+<br><br>* <a href="searchContacts.html" name="searchContacts">Searches for specified query in the first name, last name and username of the known user contacts</a>  
 
 ***
-<br><br>$MadelineProto->[searchHashtags](searchHashtags.md)(\['prefix' => [string](../types/string.md), 'limit' => [int](../types/int.md), \]) === [$Hashtags](../types/Hashtags.md)<a name="searchHashtags"></a>  
+<br><br>* <a href="searchHashtags.html" name="searchHashtags">Searches for recently used hashtags by their prefix</a>  
 
 ***
-<br><br>$MadelineProto->[searchMessages](searchMessages.md)(\['query' => [string](../types/string.md), 'offset_date' => [int](../types/int.md), 'offset_chat_id' => [int53](../types/int53.md), 'offset_message_id' => [int53](../types/int53.md), 'limit' => [int](../types/int.md), \]) === [$Messages](../types/Messages.md)<a name="searchMessages"></a>  
+<br><br>* <a href="searchMessages.html" name="searchMessages">Searches for messages in all chats except secret chats. Returns result in reverse chronological order, i. e. in order of decreasing (date, chat_id, message_id)</a>  
 
 ***
-<br><br>$MadelineProto->[searchPublicChat](searchPublicChat.md)(\['username' => [string](../types/string.md), \]) === [$Chat](../types/Chat.md)<a name="searchPublicChat"></a>  
+<br><br>* <a href="searchPublicChat.html" name="searchPublicChat">Searches public chat by its username. Currently only private and channel chats can be public. Returns chat if found, otherwise some error is returned</a>  
 
 ***
-<br><br>$MadelineProto->[searchPublicChats](searchPublicChats.md)(\['username_prefix' => [string](../types/string.md), \]) === [$Chats](../types/Chats.md)<a name="searchPublicChats"></a>  
+<br><br>* <a href="searchPublicChats.html" name="searchPublicChats">Searches public chats by prefix of their username. Currently only private and channel (including supergroup) chats can be public. Returns meaningful number of results. Returns nothing if length of the searched username prefix is less than 5. Excludes private chats with contacts from the results</a>  
 
 ***
-<br><br>$MadelineProto->[searchSecretMessages](searchSecretMessages.md)(\['chat_id' => [int53](../types/int53.md), 'query' => [string](../types/string.md), 'from_search_id' => [int64](../constructors/int64.md), 'limit' => [int](../types/int.md), 'filter' => [SearchMessagesFilter](../types/SearchMessagesFilter.md), \]) === [$FoundMessages](../types/FoundMessages.md)<a name="searchSecretMessages"></a>  
+<br><br>* <a href="searchSecretMessages.html" name="searchSecretMessages">Searches for messages in secret chats. Returns result in reverse chronological order</a>  
 
 ***
-<br><br>$MadelineProto->[searchStickerSet](searchStickerSet.md)(\['name' => [string](../types/string.md), \]) === [$StickerSet](../types/StickerSet.md)<a name="searchStickerSet"></a>  
+<br><br>* <a href="searchStickerSet.html" name="searchStickerSet">Searches sticker set by its short name</a>  
 
 ***
-<br><br>$MadelineProto->[sendBotStartMessage](sendBotStartMessage.md)(\['bot_user_id' => [int](../types/int.md), 'chat_id' => [int53](../types/int53.md), 'parameter' => [string](../types/string.md), \]) === [$Message](../types/Message.md)<a name="sendBotStartMessage"></a>  
+<br><br>* <a href="sendBotStartMessage.html" name="sendBotStartMessage">Invites bot to a chat (if it is not in the chat) and send /start to it. Bot can't be invited to a private chat other than chat with the bot. Bots can't be invited to broadcast channel chats and secret chats. Returns sent message</a>  
 
 ***
-<br><br>$MadelineProto->[sendChatAction](sendChatAction.md)(\['chat_id' => [int53](../types/int53.md), 'action' => [ChatAction](../types/ChatAction.md), \]) === [$Ok](../types/Ok.md)<a name="sendChatAction"></a>  
+<br><br>* <a href="sendChatAction.html" name="sendChatAction">Sends notification about user activity in a chat</a>  
 
 ***
-<br><br>$MadelineProto->[sendChatScreenshotTakenNotification](sendChatScreenshotTakenNotification.md)(\['chat_id' => [int53](../types/int53.md), \]) === [$Ok](../types/Ok.md)<a name="sendChatScreenshotTakenNotification"></a>  
+<br><br>* <a href="sendChatScreenshotTakenNotification.html" name="sendChatScreenshotTakenNotification">Sends notification about screenshot taken in a chat. Works only in private and secret chats</a>  
 
 ***
-<br><br>$MadelineProto->[sendChatSetTtlMessage](sendChatSetTtlMessage.md)(\['chat_id' => [int53](../types/int53.md), 'ttl' => [int](../types/int.md), \]) === [$Message](../types/Message.md)<a name="sendChatSetTtlMessage"></a>  
+<br><br>* <a href="sendChatSetTtlMessage.html" name="sendChatSetTtlMessage">Changes current ttl setting in a secret chat and sends corresponding message</a>  
 
 ***
-<br><br>$MadelineProto->[sendCustomRequest](sendCustomRequest.md)(\['method' => [string](../types/string.md), 'parameters' => [string](../types/string.md), \]) === [$CustomRequestResult](../types/CustomRequestResult.md)<a name="sendCustomRequest"></a>  
+<br><br>* <a href="sendCustomRequest.html" name="sendCustomRequest">Bots only. Sends custom request</a>  
 
 ***
-<br><br>$MadelineProto->[sendInlineQueryResultMessage](sendInlineQueryResultMessage.md)(\['chat_id' => [int53](../types/int53.md), 'reply_to_message_id' => [int53](../types/int53.md), 'disable_notification' => [Bool](../types/Bool.md), 'from_background' => [Bool](../types/Bool.md), 'query_id' => [int64](../constructors/int64.md), 'result_id' => [string](../types/string.md), \]) === [$Message](../types/Message.md)<a name="sendInlineQueryResultMessage"></a>  
+<br><br>* <a href="sendInlineQueryResultMessage.html" name="sendInlineQueryResultMessage">Sends result of the inline query as a message. Returns sent message. Always clears chat draft message</a>  
 
 ***
-<br><br>$MadelineProto->[sendMessage](sendMessage.md)(\['chat_id' => [int53](../types/int53.md), 'reply_to_message_id' => [int53](../types/int53.md), 'disable_notification' => [Bool](../types/Bool.md), 'from_background' => [Bool](../types/Bool.md), 'reply_markup' => [ReplyMarkup](../types/ReplyMarkup.md), 'input_message_content' => [InputMessageContent](../types/InputMessageContent.md), \]) === [$Message](../types/Message.md)<a name="sendMessage"></a>  
+<br><br>* <a href="sendMessage.html" name="sendMessage">Sends a message. Returns sent message</a>  
 
 ***
-<br><br>$MadelineProto->[sendPaymentForm](sendPaymentForm.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'order_info_id' => [string](../types/string.md), 'shipping_option_id' => [string](../types/string.md), 'credentials' => [InputCredentials](../types/InputCredentials.md), \]) === [$PaymentResult](../types/PaymentResult.md)<a name="sendPaymentForm"></a>  
+<br><br>* <a href="sendPaymentForm.html" name="sendPaymentForm">Sends filled payment form to the bot for the final verification</a>  
 
 ***
-<br><br>$MadelineProto->[setAlarm](setAlarm.md)(\['seconds' => [double](../types/double.md), \]) === [$Ok](../types/Ok.md)<a name="setAlarm"></a>  
+<br><br>* <a href="setAlarm.html" name="setAlarm">Returns Ok after specified amount of the time passed. Can be called before authorization</a>  
 
 ***
-<br><br>$MadelineProto->[setAuthPhoneNumber](setAuthPhoneNumber.md)(\['phone_number' => [string](../types/string.md), 'allow_flash_call' => [Bool](../types/Bool.md), 'is_current_phone_number' => [Bool](../types/Bool.md), \]) === [$AuthState](../types/AuthState.md)<a name="setAuthPhoneNumber"></a>  
+<br><br>* <a href="setAuthPhoneNumber.html" name="setAuthPhoneNumber">Sets user's phone number and sends authentication code to the user. Works only when getAuthState returns authStateWaitPhoneNumber. If phone number is not recognized or another error has happened, returns an error. Otherwise returns authStateWaitCode</a>  
 
 ***
-<br><br>$MadelineProto->[setBotUpdatesStatus](setBotUpdatesStatus.md)(\['pending_update_count' => [int](../types/int.md), 'error_message' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="setBotUpdatesStatus"></a>  
+<br><br>* <a href="setBotUpdatesStatus.html" name="setBotUpdatesStatus">Bots only. Informs server about number of pending bot updates if they aren't processed for a long time</a>  
 
 ***
-<br><br>$MadelineProto->[setChannelStickerSet](setChannelStickerSet.md)(\['channel_id' => [int](../types/int.md), 'sticker_set_id' => [int64](../constructors/int64.md), \]) === [$Ok](../types/Ok.md)<a name="setChannelStickerSet"></a>  
+<br><br>* <a href="setChannelStickerSet.html" name="setChannelStickerSet">Changes sticker set of the channel. Needs appropriate rights in the channel</a>  
 
 ***
-<br><br>$MadelineProto->[setChatClientData](setChatClientData.md)(\['chat_id' => [int53](../types/int53.md), 'client_data' => [string](../types/string.md), \]) === [$Ok](../types/Ok.md)<a name="setChatClientData"></a>  
+<br><br>* <a href="setChatClientData.html" name="setChatClientData">Changes client data associated with a chat</a>  
 
 ***
-<br><br>$MadelineProto->[setFileGenerationProgress](setFileGenerationProgress.md)(\['generation_id' => [int64](../constructors/int64.md), 'size' => [int](../types/int.md), 'local_size' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="setFileGenerationProgress"></a>  
+<br><br>* <a href="setFileGenerationProgress.html" name="setFileGenerationProgress">Next part of a file was generated</a>  
 
 ***
-<br><br>$MadelineProto->[setGameScore](setGameScore.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'edit_message' => [Bool](../types/Bool.md), 'user_id' => [int](../types/int.md), 'score' => [int](../types/int.md), 'force' => [Bool](../types/Bool.md), \]) === [$Message](../types/Message.md)<a name="setGameScore"></a>  
+<br><br>* <a href="setGameScore.html" name="setGameScore">Bots only. Updates game score of the specified user in the game</a>  
 
 ***
-<br><br>$MadelineProto->[setInlineGameScore](setInlineGameScore.md)(\['inline_message_id' => [string](../types/string.md), 'edit_message' => [Bool](../types/Bool.md), 'user_id' => [int](../types/int.md), 'score' => [int](../types/int.md), 'force' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="setInlineGameScore"></a>  
+<br><br>* <a href="setInlineGameScore.html" name="setInlineGameScore">Bots only. Updates game score of the specified user in the game</a>  
 
 ***
-<br><br>$MadelineProto->[setNetworkType](setNetworkType.md)(\['type' => [NetworkType](../types/NetworkType.md), \]) === [$Ok](../types/Ok.md)<a name="setNetworkType"></a>  
+<br><br>* <a href="setNetworkType.html" name="setNetworkType">Sets current network type. Can be called before authorization. Call to this method forces reopening of all network connections mitigating delay in switching between different networks, so it should be called whenever network is changed even network type remains the same. -Network type is used to check if library can use network at all and for collecting detailed network data usage statistics</a>  
 
 ***
-<br><br>$MadelineProto->[setNotificationSettings](setNotificationSettings.md)(\['scope' => [NotificationSettingsScope](../types/NotificationSettingsScope.md), 'notification_settings' => [notificationSettings](../constructors/notificationSettings.md), \]) === [$Ok](../types/Ok.md)<a name="setNotificationSettings"></a>  
+<br><br>* <a href="setNotificationSettings.html" name="setNotificationSettings">Changes notification settings for a given scope</a>  
 
 ***
-<br><br>$MadelineProto->[setOption](setOption.md)(\['name' => [string](../types/string.md), 'value' => [OptionValue](../types/OptionValue.md), \]) === [$Ok](../types/Ok.md)<a name="setOption"></a>  
+<br><br>* <a href="setOption.html" name="setOption">Sets value of an option. See list of available options on https: core.telegram.org/tdlib/options. Only writable options can be set. Can be called before authorization</a>  
 
 ***
-<br><br>$MadelineProto->[setPassword](setPassword.md)(\['old_password' => [string](../types/string.md), 'new_password' => [string](../types/string.md), 'new_hint' => [string](../types/string.md), 'set_recovery_email' => [Bool](../types/Bool.md), 'new_recovery_email' => [string](../types/string.md), \]) === [$PasswordState](../types/PasswordState.md)<a name="setPassword"></a>  
+<br><br>* <a href="setPassword.html" name="setPassword">Changes user password. If new recovery email is specified, then error EMAIL_UNCONFIRMED is returned and password change will not be applied until email confirmation. Application should call getPasswordState from time to time to check if email is already confirmed</a>  
 
 ***
-<br><br>$MadelineProto->[setPinnedChats](setPinnedChats.md)(\['chat_ids' => \[[int53](../types/int53.md)\], \]) === [$Ok](../types/Ok.md)<a name="setPinnedChats"></a>  
+<br><br>* <a href="setPinnedChats.html" name="setPinnedChats">Changes list or order of pinned chats</a>  
 
 ***
-<br><br>$MadelineProto->[setPrivacy](setPrivacy.md)(\['key' => [PrivacyKey](../types/PrivacyKey.md), 'rules' => [privacyRules](../constructors/privacyRules.md), \]) === [$Ok](../types/Ok.md)<a name="setPrivacy"></a>  
+<br><br>* <a href="setPrivacy.html" name="setPrivacy">Changes privacy settings</a>  
 
 ***
-<br><br>$MadelineProto->[setProfilePhoto](setProfilePhoto.md)(\['photo' => [InputFile](../types/InputFile.md), \]) === [$Ok](../types/Ok.md)<a name="setProfilePhoto"></a>  
+<br><br>* <a href="setProfilePhoto.html" name="setProfilePhoto">Uploads new profile photo for logged in user. If something changes, updateUser will be sent</a>  
 
 ***
-<br><br>$MadelineProto->[setProxy](setProxy.md)(\['proxy' => [Proxy](../types/Proxy.md), \]) === [$Ok](../types/Ok.md)<a name="setProxy"></a>  
+<br><br>* <a href="setProxy.html" name="setProxy">Sets proxy server for network requests. Can be called before authorization</a>  
 
 ***
-<br><br>$MadelineProto->[setRecoveryEmail](setRecoveryEmail.md)(\['password' => [string](../types/string.md), 'new_recovery_email' => [string](../types/string.md), \]) === [$PasswordState](../types/PasswordState.md)<a name="setRecoveryEmail"></a>  
+<br><br>* <a href="setRecoveryEmail.html" name="setRecoveryEmail">Changes user recovery email. If new recovery email is specified, then error EMAIL_UNCONFIRMED is returned and email will not be changed until email confirmation. Application should call getPasswordState from time to time to check if email is already confirmed. -If new_recovery_email coincides with the current set up email succeeds immediately and aborts all other requests waiting for email confirmation</a>  
 
 ***
-<br><br>$MadelineProto->[setStickerPositionInSet](setStickerPositionInSet.md)(\['sticker' => [InputFile](../types/InputFile.md), 'position' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="setStickerPositionInSet"></a>  
+<br><br>* <a href="setStickerPositionInSet.html" name="setStickerPositionInSet">Bots only. Changes position of a sticker in the set it belongs to. Sticker set should be created by the bot</a>  
 
 ***
-<br><br>$MadelineProto->[terminateAllOtherSessions](terminateAllOtherSessions.md)(\[\]) === [$Ok](../types/Ok.md)<a name="terminateAllOtherSessions"></a>  
+<br><br>* <a href="terminateAllOtherSessions.html" name="terminateAllOtherSessions">Terminates all other sessions of logged in user</a>  
 
 ***
-<br><br>$MadelineProto->[terminateSession](terminateSession.md)(\['session_id' => [int64](../constructors/int64.md), \]) === [$Ok](../types/Ok.md)<a name="terminateSession"></a>  
+<br><br>* <a href="terminateSession.html" name="terminateSession">Terminates another session of logged in user</a>  
 
 ***
-<br><br>$MadelineProto->[testCallBytes](testCallBytes.md)(\['x' => [bytes](../types/bytes.md), \]) === [$TestBytes](../types/TestBytes.md)<a name="testCallBytes"></a>  
+<br><br>* <a href="testCallBytes.html" name="testCallBytes">Test request. Returns back received bytes</a>  
 
 ***
-<br><br>$MadelineProto->[testCallEmpty](testCallEmpty.md)(\[\]) === [$Ok](../types/Ok.md)<a name="testCallEmpty"></a>  
+<br><br>* <a href="testCallEmpty.html" name="testCallEmpty">Test request. Does nothing</a>  
 
 ***
-<br><br>$MadelineProto->[testCallString](testCallString.md)(\['x' => [string](../types/string.md), \]) === [$TestString](../types/TestString.md)<a name="testCallString"></a>  
+<br><br>* <a href="testCallString.html" name="testCallString">Test request. Returns back received string</a>  
 
 ***
-<br><br>$MadelineProto->[testCallVectorInt](testCallVectorInt.md)(\['x' => \[[int](../types/int.md)\], \]) === [$TestVectorInt](../types/TestVectorInt.md)<a name="testCallVectorInt"></a>  
+<br><br>* <a href="testCallVectorInt.html" name="testCallVectorInt">Test request. Returns back received vector of numbers</a>  
 
 ***
-<br><br>$MadelineProto->[testCallVectorIntObject](testCallVectorIntObject.md)(\['x' => \[[testInt](../constructors/testInt.md)\], \]) === [$TestVectorIntObject](../types/TestVectorIntObject.md)<a name="testCallVectorIntObject"></a>  
+<br><br>* <a href="testCallVectorIntObject.html" name="testCallVectorIntObject">Test request. Returns back received vector of objects containing a number</a>  
 
 ***
-<br><br>$MadelineProto->[testCallVectorString](testCallVectorString.md)(\['x' => \[[string](../types/string.md)\], \]) === [$TestVectorString](../types/TestVectorString.md)<a name="testCallVectorString"></a>  
+<br><br>* <a href="testCallVectorString.html" name="testCallVectorString">Test request. Returns back received vector of strings</a>  
 
 ***
-<br><br>$MadelineProto->[testCallVectorStringObject](testCallVectorStringObject.md)(\['x' => \[[testString](../constructors/testString.md)\], \]) === [$TestVectorStringObject](../types/TestVectorStringObject.md)<a name="testCallVectorStringObject"></a>  
+<br><br>* <a href="testCallVectorStringObject.html" name="testCallVectorStringObject">Test request. Returns back received vector of objects containing a string</a>  
 
 ***
-<br><br>$MadelineProto->[testGetDifference](testGetDifference.md)(\[\]) === [$Ok](../types/Ok.md)<a name="testGetDifference"></a>  
+<br><br>* <a href="testGetDifference.html" name="testGetDifference">Test request. Forces updates.getDifference call to telegram servers</a>  
 
 ***
-<br><br>$MadelineProto->[testNetwork](testNetwork.md)(\[\]) === [$Ok](../types/Ok.md)<a name="testNetwork"></a>  
+<br><br>* <a href="testNetwork.html" name="testNetwork">Test request. Sends simple network request to telegram servers</a>  
 
 ***
-<br><br>$MadelineProto->[testSquareInt](testSquareInt.md)(\['x' => [int](../types/int.md), \]) === [$TestInt](../types/TestInt.md)<a name="testSquareInt"></a>  
+<br><br>* <a href="testSquareInt.html" name="testSquareInt">Test request. Returns squared received number</a>  
 
 ***
-<br><br>$MadelineProto->[testUseError](testUseError.md)(\[\]) === [$Error](../types/Error.md)<a name="testUseError"></a>  
+<br><br>* <a href="testUseError.html" name="testUseError">Test request. Does nothing, ensures that the Error object is used</a>  
 
 ***
-<br><br>$MadelineProto->[testUseUpdate](testUseUpdate.md)(\[\]) === [$Update](../types/Update.md)<a name="testUseUpdate"></a>  
+<br><br>* <a href="testUseUpdate.html" name="testUseUpdate">Test request. Does nothing, ensures that the Update object is used</a>  
 
 ***
-<br><br>$MadelineProto->[toggleChannelInvites](toggleChannelInvites.md)(\['channel_id' => [int](../types/int.md), 'anyone_can_invite' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="toggleChannelInvites"></a>  
+<br><br>* <a href="toggleChannelInvites.html" name="toggleChannelInvites">Gives or revokes right to invite new members to all current members of the channel. Needs appropriate rights in the channel. Available only for supergroups</a>  
 
 ***
-<br><br>$MadelineProto->[toggleChannelSignMessages](toggleChannelSignMessages.md)(\['channel_id' => [int](../types/int.md), 'sign_messages' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="toggleChannelSignMessages"></a>  
+<br><br>* <a href="toggleChannelSignMessages.html" name="toggleChannelSignMessages">Enables or disables sender signature on sent messages in the channel. Needs appropriate rights in the channel. Not available for supergroups</a>  
 
 ***
-<br><br>$MadelineProto->[toggleChatIsPinned](toggleChatIsPinned.md)(\['chat_id' => [int53](../types/int53.md), 'is_pinned' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="toggleChatIsPinned"></a>  
+<br><br>* <a href="toggleChatIsPinned.html" name="toggleChatIsPinned">Changes chat pinned state. You can pin up to getOption("pinned_chat_count_max") non-secret chats and the same number of secret chats</a>  
 
 ***
-<br><br>$MadelineProto->[toggleGroupAdministrators](toggleGroupAdministrators.md)(\['group_id' => [int](../types/int.md), 'everyone_is_administrator' => [Bool](../types/Bool.md), \]) === [$Ok](../types/Ok.md)<a name="toggleGroupAdministrators"></a>  
+<br><br>* <a href="toggleGroupAdministrators.html" name="toggleGroupAdministrators">Gives or revokes all members of the group administrator rights. Needs creator privileges in the group</a>  
 
 ***
-<br><br>$MadelineProto->[unblockUser](unblockUser.md)(\['user_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="unblockUser"></a>  
+<br><br>* <a href="unblockUser.html" name="unblockUser">Removes user from black list</a>  
 
 ***
-<br><br>$MadelineProto->[unpinChannelMessage](unpinChannelMessage.md)(\['channel_id' => [int](../types/int.md), \]) === [$Ok](../types/Ok.md)<a name="unpinChannelMessage"></a>  
+<br><br>* <a href="unpinChannelMessage.html" name="unpinChannelMessage">Removes pinned message in the supergroup channel. Needs appropriate rights in the channel</a>  
 
 ***
-<br><br>$MadelineProto->[uploadFile](uploadFile.md)(\['file' => [InputFile](../types/InputFile.md), 'file_type' => [FileType](../types/FileType.md), 'priority' => [int](../types/int.md), \]) === [$File](../types/File.md)<a name="uploadFile"></a>  
+<br><br>* <a href="uploadFile.html" name="uploadFile">Asynchronously uploads file to the cloud without sending it in a message. Updates updateFile will notify about upload progress and successful upload. The file will not have persistent identifier until it will be sent in a message</a>  
 
 ***
-<br><br>$MadelineProto->[uploadStickerFile](uploadStickerFile.md)(\['user_id' => [int](../types/int.md), 'png_sticker' => [InputFile](../types/InputFile.md), \]) === [$File](../types/File.md)<a name="uploadStickerFile"></a>  
+<br><br>* <a href="uploadStickerFile.html" name="uploadStickerFile">Bots only. Uploads a png image with a sticker. Returns uploaded file</a>  
 
 ***
-<br><br>$MadelineProto->[validateOrderInfo](validateOrderInfo.md)(\['chat_id' => [int53](../types/int53.md), 'message_id' => [int53](../types/int53.md), 'order_info' => [orderInfo](../constructors/orderInfo.md), 'allow_save' => [Bool](../types/Bool.md), \]) === [$ValidatedOrderInfo](../types/ValidatedOrderInfo.md)<a name="validateOrderInfo"></a>  
+<br><br>* <a href="validateOrderInfo.html" name="validateOrderInfo">Validates order information provided by the user and returns available shipping options for flexible invoice</a>  
 
 ***
-<br><br>$MadelineProto->[viewMessages](viewMessages.md)(\['chat_id' => [int53](../types/int53.md), 'message_ids' => \[[int53](../types/int53.md)\], \]) === [$Ok](../types/Ok.md)<a name="viewMessages"></a>  
+<br><br>* <a href="viewMessages.html" name="viewMessages">Messages are viewed by the user. Many useful activities depends on message being viewed. For example, marking messages as read, incrementing of view counter, updating of view counter, removing of deleted messages in channels</a>  
 
 ***
-<br><br>$MadelineProto->[viewTrendingStickerSets](viewTrendingStickerSets.md)(\['sticker_set_ids' => \[[int64](../constructors/int64.md)\], \]) === [$Ok](../types/Ok.md)<a name="viewTrendingStickerSets"></a>  
+<br><br>* <a href="viewTrendingStickerSets.html" name="viewTrendingStickerSets">Informs that some trending sticker sets are viewed by the user</a>  
 

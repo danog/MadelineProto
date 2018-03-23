@@ -44,12 +44,7 @@ if (!file_exists('madeline.php')) {
 }
 include 'madeline.php';
 
-// !!! This API id/API hash combination will not work !!!
-// !!! You must get your own @ my.telegram.org !!!
-$api_id = 0;
-$api_hash = '';
-
-$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['app_info' => ['api_id' => $api_id, 'api_hash' => $api_hash]]);
+$MadelineProto = new \danog\MadelineProto\API('session.madeline');
 $MadelineProto->start();
 
 $X = $MadelineProto->initConnection(['api_id' => int, 'device_model' => 'string', 'system_version' => 'string', 'app_version' => 'string', 'system_lang_code' => 'string', 'lang_pack' => 'string', 'lang_code' => 'string', 'query' => !X, ]);

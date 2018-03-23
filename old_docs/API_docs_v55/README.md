@@ -4,11 +4,11 @@ description: MadelineProto API documentation (layer v55)
 ---
 # MadelineProto API documentation (layer v55)  
 
+[Back to main documentation](..)  
+
+
 [Methods](methods/)
 
 [Constructors](constructors/)
 
 [Types](types/)
-
-
-[Back to main documentation](..)
