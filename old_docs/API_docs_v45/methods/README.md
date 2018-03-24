@@ -229,9 +229,9 @@ description: What do you want to do?
 
 * <a href="messages_reorderStickerSets.html" name="messages_reorderStickerSets">Reorder sticker sets: messages.reorderStickerSets</a>  
 
-* <a href="messages_reportSpam.html" name="messages_reportSpam">Report a peer for spam: messages.reportSpam</a>  
+* <a href="channels_reportSpam.html" name="channels_reportSpam">Report a message in a supergroup/channel for spam: channels.reportSpam</a>  
 
-* <a href="channels_reportSpam.html" name="channels_reportSpam">Report a supergroup/channel for spam: channels.reportSpam</a>  
+* <a href="messages_reportSpam.html" name="messages_reportSpam">Report a peer for spam: messages.reportSpam</a>  
 
 * <a href="account_reportPeer.html" name="account_reportPeer">Report for spam: account.reportPeer</a>  
 

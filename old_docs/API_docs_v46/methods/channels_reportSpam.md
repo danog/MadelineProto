@@ -1,19 +1,19 @@
 ---
 title: channels.reportSpam
-description: Report a supergroup/channel for spam
+description: Report a message in a supergroup/channel for spam
 ---
 ## Method: channels.reportSpam  
 [Back to methods index](index.md)
 
 
-Report a supergroup/channel for spam
+Report a message in a supergroup/channel for spam
 
 ### Parameters:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
-|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user that added you to this channel|
+|user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user that sent the messages|
 |id|Array of [CLICK ME int](../types/int.md) | Yes|The IDs of messages to report|
 
 

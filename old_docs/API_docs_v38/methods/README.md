@@ -209,9 +209,9 @@ description: What do you want to do?
 
 * <a href="messages_uninstallStickerSet.html" name="messages_uninstallStickerSet">Remove a sticker set: messages.uninstallStickerSet</a>  
 
-* <a href="messages_reportSpam.html" name="messages_reportSpam">Report a peer for spam: messages.reportSpam</a>  
+* <a href="channels_reportSpam.html" name="channels_reportSpam">Report a message in a supergroup/channel for spam: channels.reportSpam</a>  
 
-* <a href="channels_reportSpam.html" name="channels_reportSpam">Report a supergroup/channel for spam: channels.reportSpam</a>  
+* <a href="messages_reportSpam.html" name="messages_reportSpam">Report a peer for spam: messages.reportSpam</a>  
 
 * <a href="account_resetNotifySettings.html" name="account_resetNotifySettings">Reset all notification settings: account.resetNotifySettings</a>  
 
