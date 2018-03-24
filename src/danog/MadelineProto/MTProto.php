@@ -111,6 +111,7 @@ class MTProto
 
     public function __magic_construct($settings = [])
     {
+        \danog\MadelineProto\Logger::class_exists();
         // Parse settings
         $this->parse_settings($settings);
         if (!defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 6) {
@@ -120,7 +121,6 @@ class MTProto
             throw new Exception(['extension', 'xml']);
         }
         $this->emojis = json_decode(self::JSON_EMOJIS);
-        \danog\MadelineProto\Logger::class_exists();
         // Connect to servers
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
         if (!isset($this->datacenter)) {
@@ -195,13 +195,11 @@ class MTProto
         }
         $this->altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
 
-        $this->settings['connection_settings']['all']['ipv6'] = (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
+        $this->settings['connection_settings']['all']['ipv6'] = \danog\MadelineProto\Logger::$ipv6;
         /*if (isset($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'] === $this->settings['updates']['callback']) {
             unset($this->settings['pwr']['update_handler']);
             $this->updates = [];
         }*/
-        // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
-        preg_match('/const V = (\\d+);/', @file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
         $keys = array_keys((array) get_object_vars($this));
         if (count($keys) !== count(array_unique($keys))) {
             throw new Bug74586Exception();
@@ -451,7 +449,7 @@ class MTProto
                 // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, obfuscated2, udp (unsupported)
                 'test_mode' => false,
                 // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
-                'ipv6' => (bool) strlen(@file_get_contents('http://ipv6.test-ipv6.com/', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0,
+                'ipv6' => \danog\MadelineProto\Logger::$ipv6,
                 // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
                 'timeout' => 2,
                 // timeout for sockets

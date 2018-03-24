@@ -51,7 +51,7 @@ function configureCall($call) {
     $call->configuration['enable_AGC'] = false;
     $call->configuration['enable_AEC'] = false;
     $call->configuration['shared_config'] = [
-            'audio_init_bitrate' => 500 * 1000,
+            'audio_init_bitrate' => 100 * 1000,
             'audio_max_bitrate'  => 500 * 1000,
             'audio_min_bitrate'  => 100 * 1000,
             'audio_congestion_window' => 4*1024

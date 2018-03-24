@@ -47,18 +47,19 @@ class API extends APIFactory
                     flock($realpaths['lockfile'], LOCK_UN);
                     fclose($realpaths['lockfile']);
                 }
-                class_exists('\\Volatile');
                 \danog\MadelineProto\Logger::class_exists();
 
                 try {
                     $unserialized = unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Bug74586Exception $e) {
+                    class_exists('\\Volatile');
                     $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                     foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
                         class_exists('\\danog\\MadelineProto\\'.$class);
                     }
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Exception $e) {
+                    class_exists('\\Volatile');
                     $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                     foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
                         class_exists('\\danog\\MadelineProto\\'.$class);

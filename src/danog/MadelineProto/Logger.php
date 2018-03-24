@@ -35,7 +35,10 @@ class Logger
     public static $is_fork = false;
     public static $can_getmypid = true;
     public static $processed_fork = false;
+    public static $ipv6;
     private static $pid;
+
+    public static $inited = false;
 
     const ULTRA_VERBOSE = 5;
     const VERBOSE = 4;
@@ -46,28 +49,32 @@ class Logger
 
     public static function class_exists()
     {
-        self::$has_thread = class_exists('\\Thread') && method_exists('\\Thread', 'getCurrentThread');
-        self::$BIG_ENDIAN = pack('L', 1) === pack('N', 1);
-        self::$bigint = PHP_INT_SIZE < 8;
-        preg_match('/const V = (\\d+);/', @file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
-        if (isset($matches[1]) && \danog\MadelineProto\MTProto::V < (int) $matches[1]) {
-            throw new \danog\MadelineProto\Exception(hex2bin(\danog\MadelineProto\Lang::$current_lang['v_error']), 0, null, 'MadelineProto', 1);
-        }
-        if (class_exists('\\danog\\MadelineProto\\VoIP')) {
-            if (!defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || \danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION !== '1.1.2') {
-                throw new \danog\MadelineProto\Exception(hex2bin(\danog\MadelineProto\Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);
+        if (!self::$inited) {
+            self::$has_thread = class_exists('\\Thread') && method_exists('\\Thread', 'getCurrentThread');
+            self::$BIG_ENDIAN = pack('L', 1) === pack('N', 1);
+            self::$bigint = PHP_INT_SIZE < 8;
+            self::$ipv6 = (bool) strlen(@file_get_contents('http://v6.ipv6-test.com/api/myip.php', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
+            preg_match('/const V = (\\d+);/', @file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
+            if (isset($matches[1]) && \danog\MadelineProto\MTProto::V < (int) $matches[1]) {
+                throw new \danog\MadelineProto\Exception(hex2bin(\danog\MadelineProto\Lang::$current_lang['v_error']), 0, null, 'MadelineProto', 1);
             }
-        }
-        self::$colors[self::ULTRA_VERBOSE] = implode(';', [self::foreground['light_gray'], self::set['dim']]);
-        self::$colors[self::VERBOSE] = implode(';', [self::foreground['green'], self::set['bold']]);
-        self::$colors[self::NOTICE] = implode(';', [self::foreground['yellow'], self::set['bold']]);
-        self::$colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
-        self::$colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
-        self::$colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
+            if (class_exists('\\danog\\MadelineProto\\VoIP')) {
+                if (!defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || \danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION !== '1.1.2') {
+                    throw new \danog\MadelineProto\Exception(hex2bin(\danog\MadelineProto\Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);
+                }
+            }
+            self::$colors[self::ULTRA_VERBOSE] = implode(';', [self::foreground['light_gray'], self::set['dim']]);
+            self::$colors[self::VERBOSE] = implode(';', [self::foreground['green'], self::set['bold']]);
+            self::$colors[self::NOTICE] = implode(';', [self::foreground['yellow'], self::set['bold']]);
+            self::$colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
+            self::$colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
+            self::$colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
 
-        try {
-            self::$isatty = defined('STDOUT') && function_exists('posix_isatty') && posix_isatty(STDOUT);
-        } catch (\danog\MadelineProto\Exception $e) {
+            try {
+                self::$isatty = defined('STDOUT') && function_exists('posix_isatty') && posix_isatty(STDOUT);
+            } catch (\danog\MadelineProto\Exception $e) {
+            }
+            self::$inited = true;
         }
     }
 
