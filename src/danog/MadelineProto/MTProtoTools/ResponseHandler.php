@@ -101,7 +101,7 @@ trait ResponseHandler
                             case 16:
                             case 17:
                                 \danog\MadelineProto\Logger::log('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['error_code']], \danog\MadelineProto\Logger::WARNING);
-                                $this->datacenter->sockets[$datacenter]->time_delta = (int) (new \phpseclib\Math\BigInteger(strrev($current_message_id), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(time()))->toString();
+                                $this->datacenter->sockets[$datacenter]->time_delta = (int) (new \phpseclib\Math\BigInteger(strrev($current_msg_id), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(time()))->toString();
                                 \danog\MadelineProto\Logger::log('Set time delta to '.$this->datacenter->sockets[$datacenter]->time_delta, \danog\MadelineProto\Logger::WARNING);
                                 $this->reset_session();
                                 $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
