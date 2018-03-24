@@ -184,7 +184,7 @@ Description: Connection, read and write timeout for sockets
 
 ### `$settings['connection_settings']['all']['proxy']`
 Default: `\Socket`  
-Description: The [proxy class](PROXY.md) to use.
+Description: The [proxy class](PROXY.html) to use.
 
 ### `$settings['connection_settings']['all']['proxy_extra']`
 Default: `[]`  
@@ -316,7 +316,7 @@ Upload settings
 
 ### `$settings['upload']['allow_automatic_uploads']`
 Default: `true`  
-Description: If false, [disables automatic upload from file path in constructors](FILES.md)
+Description: If false, [disables automatic upload from file path in constructors](FILES.html)
 
 <hr>
 ## `$settings['msg_array_limit']`
@@ -333,7 +333,7 @@ Description: maximum number of allowed MTProto messages in the outgoing message 
 
 ### `$settings['msg_array_limit']['call_queue']`
 Default: 200  
-Description: maximum number of allowed MTProto messages in any [call queue](USING_METHOD.md#call-queues)
+Description: maximum number of allowed MTProto messages in any [call queue](USING_METHOD.html#call-queues)
 
 
 <hr>
@@ -343,7 +343,7 @@ Peer caching settings
 
 ### `$settings['peer']['full_info_cache_time']`
 Default: 3600  
-Description: Cache validity of full peer info (obtained with [get_full_info](CHAT_INFO.md#get_full_info)) 
+Description: Cache validity of full peer info (obtained with [get_full_info](CHAT_INFO.html#get_full_info)) 
 
 ### `$settings['peer']['full_fetch']`
 Default: false  

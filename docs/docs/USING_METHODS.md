@@ -5,7 +5,7 @@ A list of all of the methods that can be called with MadelineProto can be found 
 There are simplifications for many, if not all of, these methods.
 
 * [Peers](#peers)
-* [Files](FILES.md)
+* [Files](FILES.html)
 * [Secret chats](#secret-chats)
 * [Entities (Markdown & HTML)](#entities)
 * [reply_markup (keyboards & inline keyboards)](#reply_markup)
@@ -78,7 +78,7 @@ To convert the results of methods to bot API objects you must provide a second p
 $bot_API_object = $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'lel'], ['botAPI' => true]);
 ```
 
-MadelineProto also [supports bot API file IDs when working with files](FILES.md)
+MadelineProto also [supports bot API file IDs when working with files](FILES.html)
 
 
 ## No result

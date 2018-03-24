@@ -1,6 +1,6 @@
 # Logging
 
-MadelineProto provides a unified class for logging messages to the logging destination defined in [settings](SETTINGS.md#settingslogger).  
+MadelineProto provides a unified class for logging messages to the logging destination defined in [settings](SETTINGS.html#settingslogger).  
 
 ```php
 \danog\MadelineProto\Logger::log($message, $level);

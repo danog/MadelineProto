@@ -67,7 +67,7 @@ src/danog/MadelineProto/
     Tools - Various tools (positive modulus, string2bin, python-like range)
 ```
 
-Check out the [Contribution guide](https://github.com/danog/MadelineProto/blob/master/CONTRIBUTING.md) before contributing.
+Check out the [Contribution guide](https://github.com/danog/MadelineProto/blob/master/CONTRIBUTING.html) before contributing.
 Kiao by grizzly
 
 
