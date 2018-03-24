@@ -62,9 +62,12 @@ $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => '<
 reply_markup accepts bot API reply markup objects as well as MTProto ones.
 
 ```php
-$bot_API_markup = ['inline_keyboard' => [
-        ['text' => 'MadelineProto docs', 'url' => 'https://docs.madelineproto.xyz'],
-        ['text' => 'MadelineProto channel', 'url' => 'https://t.me/MadelineProto']
+$bot_API_markup = ['inline_keyboard' => 
+    [
+        [
+            ['text' => 'MadelineProto docs', 'url' => 'https://docs.madelineproto.xyz'],
+            ['text' => 'MadelineProto channel', 'url' => 'https://t.me/MadelineProto']
+        ]
     ]
 ];
 $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'lel', 'reply_markup' => $bot_API_markup]);
