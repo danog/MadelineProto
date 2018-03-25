@@ -192,7 +192,7 @@ trait UpdateHandler
             \danog\MadelineProto\Logger::log($e->getMessage());
             unset($this->channels_state[$channel]);
 
-            return; //$this->get_channel_difference($channel);
+            return false; //$this->get_channel_difference($channel);
         } finally {
             $this->postpone_updates = false;
             $this->load_channel_state($channel)['sync_loading'] = false;
