@@ -27,26 +27,6 @@ trait UpdateHandler
 
     public function pwr_update_handler($update)
     {
-        /*
-        if (isset($update['message']['to_id'])) {
-            try {
-                $full_chat = $this->get_pwr_chat($update['message']['to_id']);
-            } catch (\danog\MadelineProto\Exception $e) {
-                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
-            } catch (\danog\MadelineProto\RPCErrorException $e) {
-                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
-            }
-        }
-        if (isset($update['message']['from_id'])) {
-            try {
-                $full_chat = $this->get_pwr_chat($update['message']['from_id']);
-            } catch (\danog\MadelineProto\Exception $e) {
-                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
-            } catch (\danog\MadelineProto\RPCErrorException $e) {
-                \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
-            }
-        }
-        */
         if (isset($this->settings['pwr']['update_handler'])) {
             if (is_array($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'][0] === false) {
                 $this->settings['pwr']['update_handler'] = $this->settings['pwr']['update_handler'][1];
@@ -209,10 +189,10 @@ trait UpdateHandler
 
             throw $e;
         } catch (\danog\MadelineProto\PTSException $e) {
+            \danog\MadelineProto\Logger::log($e->getMessage());
             unset($this->channels_state[$channel]);
             $this->load_channel_state($channel)['sync_loading'] = false;
-
-            return $this->get_channel_difference($channel);
+            return false;//$this->get_channel_difference($channel);
         } finally {
             $this->postpone_updates = false;
             $this->load_channel_state($channel)['sync_loading'] = false;
