@@ -50,7 +50,7 @@ trait ApiStart
                 $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper(readline('Enter a phone number that is already registered on Telegram: '));
                 $this->my_telegram_org_wrapper->complete_login(readline('Enter the verification code you received in telegram: '));
                 if (!$this->my_telegram_org_wrapper->has_app()) {
-                    $app = $this->my_telegram_org_wrapper->create_app(['app_name' => 'MadelineProto app', 'app_shortname' => 'MadelineProtoApp', 'app_url' => 'https://madelineproto.xyz', 'app_platform' => 'web', 'app_desc' => 'MadelineProto application']);
+                    $app = $this->my_telegram_org_wrapper->create_app(['app_title' => 'MadelineProto app', 'app_shortname' => 'MadelineProtoApp', 'app_url' => 'https://madelineproto.xyz', 'app_platform' => 'web', 'app_desc' => 'MadelineProto application']);
                 } else {
                     $app = $this->my_telegram_org_wrapper->get_app();
                 }
@@ -102,7 +102,7 @@ trait ApiStart
         try {
             $this->my_telegram_org_wrapper->complete_login($_POST['code']);
             if (!$this->my_telegram_org_wrapper->has_app()) {
-                $app = $this->my_telegram_org_wrapper->create_app(['app_name' => 'MadelineProto app', 'app_shortname' => 'MadelineProtoApp', 'app_url' => 'https://madelineproto.xyz', 'app_platform' => 'web', 'app_desc' => 'MadelineProto application']);
+                $app = $this->my_telegram_org_wrapper->create_app(['app_title' => 'MadelineProto app', 'app_shortname' => 'MadelineProtoApp', 'app_url' => 'https://madelineproto.xyz', 'app_platform' => 'web', 'app_desc' => 'MadelineProto application']);
             } else {
                 $app = $this->my_telegram_org_wrapper->get_app();
             }
