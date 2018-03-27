@@ -9,6 +9,7 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
+
 namespace danog\MadelineProto;
 
 if (!extension_loaded('php-libtgvoip')) {
@@ -70,7 +71,8 @@ if (!extension_loaded('php-libtgvoip')) {
         private $callID;
         private $visualization;
 
-        public function __construct($creator, $otherID, $callID, $MadelineProto, $callState, $protocol) {
+        public function __construct($creator, $otherID, $callID, $MadelineProto, $callState, $protocol)
+        {
             $this->creator = $creator;
             $this->otherID = $otherID;
             $this->callID = $callID;
@@ -78,15 +80,23 @@ if (!extension_loaded('php-libtgvoip')) {
             $this->callState = $callState;
             $this->configuration['protocol'] = $protocol;
         }
-        public function setVisualization($visualization) {
+
+        public function setVisualization($visualization)
+        {
             $this->visualization = $visualization;
         }
-        public function parseConfig() {
+
+        public function parseConfig()
+        {
         }
-        public function startTheMagic() {
+
+        public function startTheMagic()
+        {
             var_dump($this->configuration);
         }
-        public function getCallState() {
+
+        public function getCallState()
+        {
             return $this->callState;
         }
     }
