@@ -264,5 +264,6 @@ return false;
         <span class="form-control input-xlarge uneditable-input" onclick="this.select();">', $result);
         $asd = explode('</span>', $cose['1']);
         $api_hash = $asd['0'];
+        return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
     }
 }
