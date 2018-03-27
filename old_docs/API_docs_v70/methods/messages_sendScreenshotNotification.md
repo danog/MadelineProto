@@ -13,19 +13,12 @@ Send screenshot notification
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to send the notification|
-|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Yes|Reply to message by ID|
+|reply\_to\_msg\_id|[int](../types/int.md) | Yes|Reply to message by ID|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
 
 
 ### MadelineProto Example:
@@ -65,4 +58,11 @@ Or, if you're into Lua:
 ```
 Updates = messages.sendScreenshotNotification({peer=InputPeer, reply_to_msg_id=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 

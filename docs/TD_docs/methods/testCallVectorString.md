@@ -15,7 +15,7 @@ Test request. Returns back received vector of strings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|x|Array of [CLICK ME string](../types/string.md) | Yes|Vector of strings to return|
+|x|Array of [string](../types/string.md) | Yes|Vector of strings to return|
 
 
 ### Return type: [TestVectorString](../types/TestVectorString.md)

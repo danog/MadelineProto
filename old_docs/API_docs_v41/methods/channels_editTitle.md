@@ -13,21 +13,12 @@ Edit the title of a supergroup/channel
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
-|title|[CLICK ME string](../types/string.md) | Yes|The new channel/supergroup title|
+|title|[string](../types/string.md) | Yes|The new channel/supergroup title|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
-|CHAT_NOT_MODIFIED|The pinned message wasn't modified|
 
 
 ### MadelineProto Example:
@@ -76,4 +67,13 @@ Or, if you're into Lua:
 ```
 Updates = channels.editTitle({channel=InputChannel, title='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|CHAT_NOT_MODIFIED|The pinned message wasn't modified|
+
 

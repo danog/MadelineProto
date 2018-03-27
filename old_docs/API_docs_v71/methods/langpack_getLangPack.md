@@ -12,19 +12,12 @@ Get language pack
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|lang\_code|[CLICK ME string](../types/string.md) | Yes|Language code|
+|lang\_code|[string](../types/string.md) | Yes|Language code|
 
 
 ### Return type: [LangPackDifference](../types/LangPackDifference.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|LANG_PACK_INVALID|The provided language pack is invalid|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 LangPackDifference = langpack.getLangPack({lang_code='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|LANG_PACK_INVALID|The provided language pack is invalid|
+
 

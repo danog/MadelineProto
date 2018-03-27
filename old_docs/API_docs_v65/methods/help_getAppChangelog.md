@@ -12,7 +12,7 @@ Get the changelog of this app
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|prev\_app\_version|[CLICK ME string](../types/string.md) | Yes|Previous app version|
+|prev\_app\_version|[string](../types/string.md) | Yes|Previous app version|
 
 
 ### Return type: [Updates](../types/Updates.md)

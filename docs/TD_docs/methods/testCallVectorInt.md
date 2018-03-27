@@ -15,7 +15,7 @@ Test request. Returns back received vector of numbers
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|x|Array of [CLICK ME int](../types/int.md) | Yes|Vector of numbers to return|
+|x|Array of [int](../types/int.md) | Yes|Vector of numbers to return|
 
 
 ### Return type: [TestVectorInt](../types/TestVectorInt.md)

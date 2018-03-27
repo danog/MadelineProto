@@ -15,8 +15,8 @@ Changes first and last names of logged in user. If something changes, updateUser
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|first\_name|[CLICK ME string](../types/string.md) | Yes|New value of user first name, 1-255 characters|
-|last\_name|[CLICK ME string](../types/string.md) | Yes|New value of optional user last name, 0-255 characters|
+|first\_name|[string](../types/string.md) | Yes|New value of user first name, 1-255 characters|
+|last\_name|[string](../types/string.md) | Yes|New value of optional user last name, 0-255 characters|
 
 
 ### Return type: [Ok](../types/Ok.md)

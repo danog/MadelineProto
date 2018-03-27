@@ -13,20 +13,13 @@ Send a file to a secret chat
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|The chat where to send the file|
-|message|[CLICK ME DecryptedMessage](../types/DecryptedMessage.md) | Yes|The message with the file|
+|message|[DecryptedMessage](../types/DecryptedMessage.md) | Yes|The message with the file|
 |file|[File path or InputEncryptedFile](../types/InputEncryptedFile.md) | Optional|The file (optional)|
 
 
 ### Return type: [messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MSG_WAIT_FAILED|A waiting call returned an error|
 
 
 ### MadelineProto Example:
@@ -82,5 +75,12 @@ messages_SentEncryptedMessage = messages.sendEncryptedFile({peer=InputEncryptedC
 ## Return value 
 
 If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of [messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md) will be returned instead.
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MSG_WAIT_FAILED|A waiting call returned an error|
 
 

@@ -13,22 +13,14 @@ Mark messages as read
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to mark messages as read|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID to mark as read|
-|offset|[CLICK ME int](../types/int.md) | Yes|Offset|
-|read\_contents|[CLICK ME Bool](../types/Bool.md) | Yes|Mark messages as read?|
+|max\_id|[int](../types/int.md) | Yes|Maximum message ID to mark as read|
+|offset|[int](../types/int.md) | Yes|Offset|
+|read\_contents|[Bool](../types/Bool.md) | Yes|Mark messages as read?|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|Timeout|A timeout occurred while fetching data from the bot|
 
 
 ### MadelineProto Example:
@@ -72,4 +64,12 @@ Or, if you're into Lua:
 ```
 messages_AffectedHistory = messages.readHistory({peer=InputPeer, max_id=int, offset=int, read_contents=Bool, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|Timeout|A timeout occurred while fetching data from the bot|
+
 

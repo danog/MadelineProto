@@ -20,13 +20,6 @@ Delete a contact
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CONTACT_ID_INVALID|The provided contact ID is invalid|
-
-
 ### MadelineProto Example:
 
 
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 contacts_Link = contacts.deleteContact({id=InputUser, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CONTACT_ID_INVALID|The provided contact ID is invalid|
+
 

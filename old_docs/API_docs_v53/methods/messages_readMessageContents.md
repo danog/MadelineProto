@@ -12,7 +12,7 @@ Mark message as read
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|The messages to mark as read (only users and normal chats, not supergroups)|
+|id|Array of [int](../types/int.md) | Yes|The messages to mark as read (only users and normal chats, not supergroups)|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)

@@ -12,34 +12,18 @@ Edit a message
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|Disable webpage preview|
+|no\_webpage|[Bool](../types/Bool.md) | Optional|Disable webpage preview|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat|
-|id|[CLICK ME int](../types/int.md) | Yes|The message ID|
-|message|[CLICK ME string](../types/string.md) | Optional|The new message|
-|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|The new keyboard|
-|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|The new entities (for styled text)|
+|id|[int](../types/int.md) | Yes|The message ID|
+|message|[string](../types/string.md) | Optional|The new message|
+|reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|The new keyboard|
+|entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|The new entities (for styled text)|
 |parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
-|INPUT_USER_DEACTIVATED|The specified user was deleted|
-|MESSAGE_EDIT_TIME_EXPIRED|You can't edit this message anymore, too much time has passed since its creation.|
-|MESSAGE_EMPTY|The provided message is empty|
-|MESSAGE_ID_INVALID|The provided message id is invalid|
-|MESSAGE_NOT_MODIFIED|The message text has not changed|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|CHAT_WRITE_FORBIDDEN|You can't write in this chat|
-|MESSAGE_AUTHOR_REQUIRED|Message author required|
 
 
 ### MadelineProto Example:
@@ -129,3 +113,19 @@ You can also use normal markdown, note that to create mentions you must use the 
 ```
 
 MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|INPUT_USER_DEACTIVATED|The specified user was deleted|
+|MESSAGE_EDIT_TIME_EXPIRED|You can't edit this message anymore, too much time has passed since its creation.|
+|MESSAGE_EMPTY|The provided message is empty|
+|MESSAGE_ID_INVALID|The provided message id is invalid|
+|MESSAGE_NOT_MODIFIED|The message text has not changed|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|CHAT_WRITE_FORBIDDEN|You can't write in this chat|
+|MESSAGE_AUTHOR_REQUIRED|Message author required|
+
+

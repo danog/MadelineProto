@@ -12,20 +12,13 @@ Search gifs
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|q|[CLICK ME string](../types/string.md) | Yes|The search query|
-|offset|[CLICK ME int](../types/int.md) | Yes|The offset |
+|q|[string](../types/string.md) | Yes|The search query|
+|offset|[int](../types/int.md) | Yes|The offset |
 
 
 ### Return type: [messages\_FoundGifs](../types/messages_FoundGifs.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|SEARCH_QUERY_EMPTY|The search query is empty|
 
 
 ### MadelineProto Example:
@@ -65,4 +58,11 @@ Or, if you're into Lua:
 ```
 messages_FoundGifs = messages.searchGifs({q='string', offset=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|SEARCH_QUERY_EMPTY|The search query is empty|
+
 

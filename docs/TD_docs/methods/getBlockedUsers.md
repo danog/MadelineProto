@@ -15,8 +15,8 @@ Returns users blocked by the current user
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|offset|[CLICK ME int](../types/int.md) | Yes|Number of users to skip in result, must be non-negative|
-|limit|[CLICK ME int](../types/int.md) | Yes|Maximum number of users to return, can't be greater than 100|
+|offset|[int](../types/int.md) | Yes|Number of users to skip in result, must be non-negative|
+|limit|[int](../types/int.md) | Yes|Maximum number of users to return, can't be greater than 100|
 
 
 ### Return type: [Users](../types/Users.md)

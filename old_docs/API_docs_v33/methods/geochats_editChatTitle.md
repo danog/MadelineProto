@@ -12,9 +12,9 @@ Edit geochat title
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
-|title|[CLICK ME string](../types/string.md) | Yes|The new title|
-|address|[CLICK ME string](../types/string.md) | Yes|The new address|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|title|[string](../types/string.md) | Yes|The new title|
+|address|[string](../types/string.md) | Yes|The new address|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

@@ -21,15 +21,6 @@ Delete a user from a chat (not supergroup)
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|USER_NOT_PARTICIPANT|You're not a member of this supergroup/channel|
-
-
 ### MadelineProto Example:
 
 
@@ -76,4 +67,13 @@ Or, if you're into Lua:
 ```
 messages_StatedMessage = messages.deleteChatUser({chat_id=InputPeer, user_id=InputUser, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|USER_NOT_PARTICIPANT|You're not a member of this supergroup/channel|
+
 

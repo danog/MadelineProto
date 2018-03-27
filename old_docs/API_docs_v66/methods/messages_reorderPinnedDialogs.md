@@ -12,20 +12,13 @@ Reorder pinned dialogs
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|force|[CLICK ME Bool](../types/Bool.md) | Optional|Force reordering|
+|force|[Bool](../types/Bool.md) | Optional|Force reordering|
 |order|Array of [Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Yes|New order|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
 
 
 ### MadelineProto Example:
@@ -65,4 +58,11 @@ Or, if you're into Lua:
 ```
 Bool = messages.reorderPinnedDialogs({force=Bool, order={InputPeer}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 

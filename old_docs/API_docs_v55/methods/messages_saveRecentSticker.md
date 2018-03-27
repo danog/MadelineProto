@@ -13,19 +13,12 @@ Add a sticker to recent stickers
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|The sticker|
-|unsave|[CLICK ME Bool](../types/Bool.md) | Yes|Remove the sticker from recent stickers?|
+|unsave|[Bool](../types/Bool.md) | Yes|Remove the sticker from recent stickers?|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|STICKER_ID_INVALID|The provided sticker ID is invalid|
 
 
 ### MadelineProto Example:
@@ -65,4 +58,11 @@ Or, if you're into Lua:
 ```
 Bool = messages.saveRecentSticker({id=InputDocument, unsave=Bool, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|STICKER_ID_INVALID|The provided sticker ID is invalid|
+
 

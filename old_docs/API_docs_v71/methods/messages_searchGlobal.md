@@ -12,23 +12,16 @@ Global message search
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|q|[CLICK ME string](../types/string.md) | Yes|The query|
-|offset\_date|[CLICK ME int](../types/int.md) | Yes|0 or the date offset|
+|q|[string](../types/string.md) | Yes|The query|
+|offset\_date|[int](../types/int.md) | Yes|0 or the date offset|
 |offset\_peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|0 or the peer offset|
-|offset\_id|[CLICK ME int](../types/int.md) | Yes|0 or the message ID offset|
-|limit|[CLICK ME int](../types/int.md) | Yes|The number of results to return|
+|offset\_id|[int](../types/int.md) | Yes|0 or the message ID offset|
+|limit|[int](../types/int.md) | Yes|The number of results to return|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|SEARCH_QUERY_EMPTY|The search query is empty|
 
 
 ### MadelineProto Example:
@@ -74,4 +67,11 @@ Or, if you're into Lua:
 ```
 messages_Messages = messages.searchGlobal({q='string', offset_date=int, offset_peer=InputPeer, offset_id=int, limit=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|SEARCH_QUERY_EMPTY|The search query is empty|
+
 

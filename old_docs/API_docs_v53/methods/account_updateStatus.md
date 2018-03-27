@@ -12,19 +12,12 @@ Update online status
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|offline|[CLICK ME Bool](../types/Bool.md) | Yes|offline to set the status to offline|
+|offline|[Bool](../types/Bool.md) | Yes|offline to set the status to offline|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|SESSION_PASSWORD_NEEDED|2FA is enabled, use a password to login|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 Bool = account.updateStatus({offline=Bool, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|SESSION_PASSWORD_NEEDED|2FA is enabled, use a password to login|
+
 

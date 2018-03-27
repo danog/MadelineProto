@@ -15,8 +15,8 @@ Bots only. Informs server about number of pending bot updates if they aren't pro
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|pending\_update\_count|[CLICK ME int](../types/int.md) | Yes|Number of pending updates|
-|error\_message|[CLICK ME string](../types/string.md) | Yes|Last error's message|
+|pending\_update\_count|[int](../types/int.md) | Yes|Number of pending updates|
+|error\_message|[string](../types/string.md) | Yes|Last error's message|
 
 
 ### Return type: [Ok](../types/Ok.md)

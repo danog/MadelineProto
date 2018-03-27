@@ -15,8 +15,8 @@ Returns information about one participant of the chat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
-|user\_id|[CLICK ME int](../types/int.md) | Yes|User identifier|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
+|user\_id|[int](../types/int.md) | Yes|User identifier|
 
 
 ### Return type: [ChatMember](../types/ChatMember.md)

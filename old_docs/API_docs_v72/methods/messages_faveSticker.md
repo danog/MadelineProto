@@ -13,19 +13,12 @@ Add a sticker to favorites
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|The sticker to add to favorites|
-|unfave|[CLICK ME Bool](../types/Bool.md) | Yes|Remove it from favorites?|
+|unfave|[Bool](../types/Bool.md) | Yes|Remove it from favorites?|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|STICKER_ID_INVALID|The provided sticker ID is invalid|
 
 
 ### MadelineProto Example:
@@ -74,4 +67,11 @@ Or, if you're into Lua:
 ```
 Bool = messages.faveSticker({id=InputDocument, unfave=Bool, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|STICKER_ID_INVALID|The provided sticker ID is invalid|
+
 

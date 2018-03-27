@@ -12,21 +12,14 @@ Bots only: set shipping results
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|query\_id|[CLICK ME long](../types/long.md) | Yes|Query ID|
-|error|[CLICK ME string](../types/string.md) | Optional|Error|
-|shipping\_options|Array of [CLICK ME ShippingOption](../types/ShippingOption.md) | Optional|Shipping options|
+|query\_id|[long](../types/long.md) | Yes|Query ID|
+|error|[string](../types/string.md) | Optional|Error|
+|shipping\_options|Array of [ShippingOption](../types/ShippingOption.md) | Optional|Shipping options|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|QUERY_ID_INVALID|The query ID is invalid|
 
 
 ### MadelineProto Example:
@@ -77,4 +70,11 @@ Or, if you're into Lua:
 ```
 Bool = messages.setBotShippingResults({query_id=long, error='string', shipping_options={ShippingOption}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|QUERY_ID_INVALID|The query ID is invalid|
+
 

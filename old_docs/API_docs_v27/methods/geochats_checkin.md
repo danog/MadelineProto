@@ -12,7 +12,7 @@ Join a geochat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

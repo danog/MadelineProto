@@ -12,20 +12,13 @@ Delete messages
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|revoke|[CLICK ME Bool](../types/Bool.md) | Optional|Delete the messages for everyone?|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|IDs of messages to delete, use channels->deleteMessages for supergroups|
+|revoke|[Bool](../types/Bool.md) | Optional|Delete the messages for everyone?|
+|id|Array of [int](../types/int.md) | Yes|IDs of messages to delete, use channels->deleteMessages for supergroups|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MESSAGE_DELETE_FORBIDDEN|You can't delete one of the messages you tried to delete, most likely because it is a service message.|
 
 
 ### MadelineProto Example:
@@ -74,4 +67,11 @@ Or, if you're into Lua:
 ```
 messages_AffectedMessages = messages.deleteMessages({revoke=Bool, id={int}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MESSAGE_DELETE_FORBIDDEN|You can't delete one of the messages you tried to delete, most likely because it is a service message.|
+
 

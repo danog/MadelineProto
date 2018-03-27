@@ -12,20 +12,12 @@ Notify server that you received a call (server will refuse all incoming calls un
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[CLICK ME InputPhoneCall](../types/InputPhoneCall.md) | Yes|The phone call you received|
+|peer|[InputPhoneCall](../types/InputPhoneCall.md) | Yes|The phone call you received|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CALL_ALREADY_DECLINED|The call was already declined|
-|CALL_PEER_INVALID|The provided call peer object is invalid|
 
 
 ### MadelineProto Example:
@@ -63,4 +55,12 @@ Or, if you're into Lua:
 ```
 Bool = phone.receivedCall({peer=InputPhoneCall, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CALL_ALREADY_DECLINED|The call was already declined|
+|CALL_PEER_INVALID|The provided call peer object is invalid|
+
 

@@ -15,7 +15,7 @@ Clears list of recently used stickers
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|is\_attached|[CLICK ME Bool](../types/Bool.md) | Yes|Pass true to clear list of stickers recently attached to photo or video files, pass false to clear the list of recently sent stickers|
+|is\_attached|[Bool](../types/Bool.md) | Yes|Pass true to clear list of stickers recently attached to photo or video files, pass false to clear the list of recently sent stickers|
 
 
 ### Return type: [Ok](../types/Ok.md)

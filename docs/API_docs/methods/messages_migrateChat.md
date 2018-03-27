@@ -20,15 +20,6 @@ Convert chat to supergroup
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
-
-
 ### MadelineProto Example:
 
 
@@ -64,4 +55,13 @@ Or, if you're into Lua:
 ```
 Updates = messages.migrateChat({chat_id=InputPeer, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+
 

@@ -20,14 +20,6 @@ Get the settings of  apeer
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|PEER_ID_INVALID|The provided peer id is invalid|
-
-
 ### MadelineProto Example:
 
 
@@ -63,4 +55,12 @@ Or, if you're into Lua:
 ```
 PeerSettings = messages.getPeerSettings({peer=InputPeer, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 

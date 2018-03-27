@@ -12,7 +12,7 @@ Invoke this method with layer 18
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|query|[CLICK ME !X](../types/!X.md) | Yes|The method call|
+|query|[!X](../types/!X.md) | Yes|The method call|
 
 
 ### Return type: [X](../types/X.md)

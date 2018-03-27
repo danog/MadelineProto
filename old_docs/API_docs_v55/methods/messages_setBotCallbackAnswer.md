@@ -12,22 +12,15 @@ Bots only: set the callback answer (after a button was clicked)
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|alert|[CLICK ME Bool](../types/Bool.md) | Optional|Is this an alert?|
-|query\_id|[CLICK ME long](../types/long.md) | Yes|The query ID|
-|message|[CLICK ME string](../types/string.md) | Optional|The message|
-|url|[CLICK ME string](../types/string.md) | Optional|The URL|
+|alert|[Bool](../types/Bool.md) | Optional|Is this an alert?|
+|query\_id|[long](../types/long.md) | Yes|The query ID|
+|message|[string](../types/string.md) | Optional|The message|
+|url|[string](../types/string.md) | Optional|The URL|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|QUERY_ID_INVALID|The query ID is invalid|
 
 
 ### MadelineProto Example:
@@ -85,5 +78,12 @@ Bool = messages.setBotCallbackAnswer({alert=Bool, query_id=long, message='string
 ## Return value 
 
 If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of [Bool](../types/Bool.md) will be returned instead.
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|QUERY_ID_INVALID|The query ID is invalid|
 
 

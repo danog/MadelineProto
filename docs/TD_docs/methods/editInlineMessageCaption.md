@@ -15,9 +15,9 @@ Bots only. Edits caption of an inline message content sent via bot
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|inline\_message\_id|[CLICK ME string](../types/string.md) | Yes|Inline message identifier|
-|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Yes|New message reply markup|
-|caption|[CLICK ME string](../types/string.md) | Yes|New message content caption, 0-200 characters|
+|inline\_message\_id|[string](../types/string.md) | Yes|Inline message identifier|
+|reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Yes|New message reply markup|
+|caption|[string](../types/string.md) | Yes|New message content caption, 0-200 characters|
 
 
 ### Return type: [Ok](../types/Ok.md)

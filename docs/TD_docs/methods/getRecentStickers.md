@@ -15,7 +15,7 @@ Returns list of recently used stickers
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|is\_attached|[CLICK ME Bool](../types/Bool.md) | Yes|Pass true to return stickers and masks recently attached to photo or video files, pass false to return recently sent stickers|
+|is\_attached|[Bool](../types/Bool.md) | Yes|Pass true to return stickers and masks recently attached to photo or video files, pass false to return recently sent stickers|
 
 
 ### Return type: [Stickers](../types/Stickers.md)

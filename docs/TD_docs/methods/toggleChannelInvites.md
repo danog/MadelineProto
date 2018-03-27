@@ -15,8 +15,8 @@ Gives or revokes right to invite new members to all current members of the chann
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|channel\_id|[CLICK ME int](../types/int.md) | Yes|Identifier of the channel|
-|anyone\_can\_invite|[CLICK ME Bool](../types/Bool.md) | Yes|New value of anyone_can_invite|
+|channel\_id|[int](../types/int.md) | Yes|Identifier of the channel|
+|anyone\_can\_invite|[Bool](../types/Bool.md) | Yes|New value of anyone_can_invite|
 
 
 ### Return type: [Ok](../types/Ok.md)

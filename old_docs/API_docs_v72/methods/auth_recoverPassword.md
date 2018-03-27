@@ -12,19 +12,12 @@ Use the code that was emailed to you after running $MadelineProto->auth->request
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|code|[CLICK ME string](../types/string.md) | Yes|The code that was emailed to you|
+|code|[string](../types/string.md) | Yes|The code that was emailed to you|
 
 
 ### Return type: [auth\_Authorization](../types/auth_Authorization.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CODE_EMPTY|The provided code is empty|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 auth_Authorization = auth.recoverPassword({code='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CODE_EMPTY|The provided code is empty|
+
 

@@ -12,27 +12,19 @@ Edit a sent inline message
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|Disable webpage preview|
-|stop\_geo\_live|[CLICK ME Bool](../types/Bool.md) | Optional|Stop live location|
-|id|[CLICK ME InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|The message ID|
-|message|[CLICK ME string](../types/string.md) | Optional|The new message|
-|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|The new keyboard|
-|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|The new entities (for styled text)|
+|no\_webpage|[Bool](../types/Bool.md) | Optional|Disable webpage preview|
+|stop\_geo\_live|[Bool](../types/Bool.md) | Optional|Stop live location|
+|id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|The message ID|
+|message|[string](../types/string.md) | Optional|The new message|
+|reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|The new keyboard|
+|entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|The new entities (for styled text)|
 |parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
-|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|The new location|
+|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|The new location|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MESSAGE_ID_INVALID|The provided message id is invalid|
-|MESSAGE_NOT_MODIFIED|The message text has not changed|
 
 
 ### MadelineProto Example:
@@ -124,3 +116,11 @@ You can also use normal markdown, note that to create mentions you must use the 
 ```
 
 MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MESSAGE_ID_INVALID|The provided message id is invalid|
+|MESSAGE_NOT_MODIFIED|The message text has not changed|
+
+

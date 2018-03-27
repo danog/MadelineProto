@@ -12,7 +12,7 @@ Get all stickerpacks
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|hash|[CLICK ME string](../types/string.md) | Yes|Previously fetched stickers|
+|hash|[string](../types/string.md) | Yes|Previously fetched stickers|
 
 
 ### Return type: [messages\_AllStickers](../types/messages_AllStickers.md)

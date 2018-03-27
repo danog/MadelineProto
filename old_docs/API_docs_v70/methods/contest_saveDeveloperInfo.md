@@ -12,11 +12,11 @@ Save developer info for telegram contest
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|vk\_id|[CLICK ME int](../types/int.md) | Yes|VK user ID|
-|name|[CLICK ME string](../types/string.md) | Yes|Name|
-|phone\_number|[CLICK ME string](../types/string.md) | Yes|Phone number|
-|age|[CLICK ME int](../types/int.md) | Yes|Age|
-|city|[CLICK ME string](../types/string.md) | Yes|City|
+|vk\_id|[int](../types/int.md) | Yes|VK user ID|
+|name|[string](../types/string.md) | Yes|Name|
+|phone\_number|[string](../types/string.md) | Yes|Phone number|
+|age|[int](../types/int.md) | Yes|Age|
+|city|[string](../types/string.md) | Yes|City|
 
 
 ### Return type: [Bool](../types/Bool.md)

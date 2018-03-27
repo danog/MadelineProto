@@ -15,8 +15,8 @@ Searches for specified query in the first name, last name and username of the kn
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|query|[CLICK ME string](../types/string.md) | Yes|Query to search for, can be empty to return all contacts|
-|limit|[CLICK ME int](../types/int.md) | Yes|Maximum number of users to be returned|
+|query|[string](../types/string.md) | Yes|Query to search for, can be empty to return all contacts|
+|limit|[int](../types/int.md) | Yes|Maximum number of users to be returned|
 
 
 ### Return type: [Users](../types/Users.md)

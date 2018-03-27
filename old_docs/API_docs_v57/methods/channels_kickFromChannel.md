@@ -14,7 +14,7 @@ Kick user from channel
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user to kick|
-|kicked|[CLICK ME Bool](../types/Bool.md) | Yes|Kick or unkick?|
+|kicked|[Bool](../types/Bool.md) | Yes|Kick or unkick?|
 
 
 ### Return type: [Updates](../types/Updates.md)

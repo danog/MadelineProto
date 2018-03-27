@@ -15,9 +15,9 @@ Checks authentication code. Works only when getAuthState returns authStateWaitCo
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|code|[CLICK ME string](../types/string.md) | Yes|Verification code from SMS, Telegram message, phone call or flash call|
-|first\_name|[CLICK ME string](../types/string.md) | Yes|User first name, if user is yet not registered, 1-255 characters|
-|last\_name|[CLICK ME string](../types/string.md) | Yes|Optional user last name, if user is yet not registered, 0-255 characters|
+|code|[string](../types/string.md) | Yes|Verification code from SMS, Telegram message, phone call or flash call|
+|first\_name|[string](../types/string.md) | Yes|User first name, if user is yet not registered, 1-255 characters|
+|last\_name|[string](../types/string.md) | Yes|Optional user last name, if user is yet not registered, 0-255 characters|
 
 
 ### Return type: [AuthState](../types/AuthState.md)

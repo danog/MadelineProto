@@ -12,27 +12,20 @@ Get most used chats
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|correspondents|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch users?|
-|bots\_pm|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch bots?|
-|bots\_inline|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch inline bots?|
-|phone\_calls|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch phone calls?|
-|groups|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch groups?|
-|channels|[CLICK ME Bool](../types/Bool.md) | Optional|Fetch channels and supergroups?|
-|offset|[CLICK ME int](../types/int.md) | Yes|Initially 0, then `$offset += $contacts_TopPeers['categories']['count'];`|
-|limit|[CLICK ME int](../types/int.md) | Yes|How many results to fetch|
-|hash|[CLICK ME int](../types/int.md) | Yes|$MadelineProto->gen_vector_hash(previously fetched peer ids);|
+|correspondents|[Bool](../types/Bool.md) | Optional|Fetch users?|
+|bots\_pm|[Bool](../types/Bool.md) | Optional|Fetch bots?|
+|bots\_inline|[Bool](../types/Bool.md) | Optional|Fetch inline bots?|
+|phone\_calls|[Bool](../types/Bool.md) | Optional|Fetch phone calls?|
+|groups|[Bool](../types/Bool.md) | Optional|Fetch groups?|
+|channels|[Bool](../types/Bool.md) | Optional|Fetch channels and supergroups?|
+|offset|[int](../types/int.md) | Yes|Initially 0, then `$offset += $contacts_TopPeers['categories']['count'];`|
+|limit|[int](../types/int.md) | Yes|How many results to fetch|
+|hash|[int](../types/int.md) | Yes|$MadelineProto->gen_vector_hash(previously fetched peer ids);|
 
 
 ### Return type: [contacts\_TopPeers](../types/contacts_TopPeers.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|TYPES_EMPTY|The types field is empty|
 
 
 ### MadelineProto Example:
@@ -86,4 +79,11 @@ Or, if you're into Lua:
 ```
 contacts_TopPeers = contacts.getTopPeers({correspondents=Bool, bots_pm=Bool, bots_inline=Bool, phone_calls=Bool, groups=Bool, channels=Bool, offset=int, limit=int, hash=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|TYPES_EMPTY|The types field is empty|
+
 

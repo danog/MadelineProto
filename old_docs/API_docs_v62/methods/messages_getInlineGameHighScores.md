@@ -12,21 +12,13 @@ Get high scores of a game sent in an inline message
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|[CLICK ME InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|The inline message|
+|id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|The inline message|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user that set the high scores|
 
 
 ### Return type: [messages\_HighScores](../types/messages_HighScores.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MESSAGE_ID_INVALID|The provided message id is invalid|
-|USER_BOT_REQUIRED|This method can only be called by a bot|
 
 
 ### MadelineProto Example:
@@ -75,4 +67,12 @@ Or, if you're into Lua:
 ```
 messages_HighScores = messages.getInlineGameHighScores({id=InputBotInlineMessageID, user_id=InputUser, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MESSAGE_ID_INVALID|The provided message id is invalid|
+|USER_BOT_REQUIRED|This method can only be called by a bot|
+
 

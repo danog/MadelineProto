@@ -15,7 +15,7 @@ Test request. Returns back received string
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|x|[CLICK ME string](../types/string.md) | Yes|String to return|
+|x|[string](../types/string.md) | Yes|String to return|
 
 
 ### Return type: [TestString](../types/TestString.md)

@@ -12,7 +12,7 @@ Get terms of service
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|lang\_code|[CLICK ME string](../types/string.md) | Yes|Language code|
+|lang\_code|[string](../types/string.md) | Yes|Language code|
 
 
 ### Return type: [help\_TermsOfService](../types/help_TermsOfService.md)

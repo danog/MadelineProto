@@ -12,7 +12,7 @@ Log data for developer of this app
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|events|Array of [CLICK ME InputAppEvent](../types/InputAppEvent.md) | Yes|Event list|
+|events|Array of [InputAppEvent](../types/InputAppEvent.md) | Yes|Event list|
 
 
 ### Return type: [Bool](../types/Bool.md)

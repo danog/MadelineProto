@@ -12,8 +12,8 @@ Get recent stickers
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|attached|[CLICK ME Bool](../types/Bool.md) | Optional|Get stickers attached to image?|
-|hash|[CLICK ME int](../types/int.md) | Yes|0 or $result['hash']|
+|attached|[Bool](../types/Bool.md) | Optional|Get stickers attached to image?|
+|hash|[int](../types/int.md) | Yes|0 or $result['hash']|
 
 
 ### Return type: [messages\_RecentStickers](../types/messages_RecentStickers.md)

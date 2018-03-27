@@ -21,17 +21,6 @@ Get info about a certain channel/supergroup participant
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
-|USER_ID_INVALID|The provided user ID is invalid|
-|USER_NOT_PARTICIPANT|You're not a member of this supergroup/channel|
-
-
 ### MadelineProto Example:
 
 
@@ -78,4 +67,15 @@ Or, if you're into Lua:
 ```
 channels_ChannelParticipant = channels.getParticipant({channel=InputChannel, user_id=InputUser, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|USER_ID_INVALID|The provided user ID is invalid|
+|USER_NOT_PARTICIPANT|You're not a member of this supergroup/channel|
+
 

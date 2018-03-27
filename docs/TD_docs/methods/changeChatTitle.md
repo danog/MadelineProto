@@ -15,8 +15,8 @@ Changes chat title. Works only for group and channel chats. Requires administrat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
-|title|[CLICK ME string](../types/string.md) | Yes|New title of the chat, 1-255 characters|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
+|title|[string](../types/string.md) | Yes|New title of the chat, 1-255 characters|
 
 
 ### Return type: [Ok](../types/Ok.md)

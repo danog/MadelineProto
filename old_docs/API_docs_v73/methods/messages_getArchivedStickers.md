@@ -12,9 +12,9 @@ Get all archived stickers
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|masks|[CLICK ME Bool](../types/Bool.md) | Optional|Get masks?|
-|offset\_id|[CLICK ME long](../types/long.md) | Yes|Sticker ID offset|
-|limit|[CLICK ME int](../types/int.md) | Yes|Number of stickers to fetch|
+|masks|[Bool](../types/Bool.md) | Optional|Get masks?|
+|offset\_id|[long](../types/long.md) | Yes|Sticker ID offset|
+|limit|[int](../types/int.md) | Yes|Number of stickers to fetch|
 
 
 ### Return type: [messages\_ArchivedStickers](../types/messages_ArchivedStickers.md)

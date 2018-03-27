@@ -12,21 +12,14 @@ Get document by SHA256 hash
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|sha256|[CLICK ME bytes](../types/bytes.md) | Yes|`hash('sha256', $filename, true);`|
-|size|[CLICK ME int](../types/int.md) | Yes|The file size|
-|mime\_type|[CLICK ME string](../types/string.md) | Yes|The mime type of the file|
+|sha256|[bytes](../types/bytes.md) | Yes|`hash('sha256', $filename, true);`|
+|size|[int](../types/int.md) | Yes|The file size|
+|mime\_type|[string](../types/string.md) | Yes|The mime type of the file|
 
 
 ### Return type: [Document](../types/Document.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|SHA256_HASH_INVALID|The provided SHA256 hash is invalid|
 
 
 ### MadelineProto Example:
@@ -77,4 +70,11 @@ Or, if you're into Lua:
 ```
 Document = messages.getDocumentByHash({sha256='bytes', size=int, mime_type='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|SHA256_HASH_INVALID|The provided SHA256 hash is invalid|
+
 

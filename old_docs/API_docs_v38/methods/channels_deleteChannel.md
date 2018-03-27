@@ -20,14 +20,6 @@ Delete a channel/supergroup
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
-
-
 ### MadelineProto Example:
 
 
@@ -63,4 +55,12 @@ Or, if you're into Lua:
 ```
 Updates = channels.deleteChannel({channel=InputChannel, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+
 

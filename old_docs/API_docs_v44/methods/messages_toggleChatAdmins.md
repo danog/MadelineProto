@@ -13,20 +13,12 @@ Enable all users are admins in normal groups (not supergroups)
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Group ID|
-|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|Enable all users are admins|
+|enabled|[Bool](../types/Bool.md) | Yes|Enable all users are admins|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-|CHAT_NOT_MODIFIED|The pinned message wasn't modified|
 
 
 ### MadelineProto Example:
@@ -66,4 +58,12 @@ Or, if you're into Lua:
 ```
 Updates = messages.toggleChatAdmins({chat_id=InputPeer, enabled=Bool, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|CHAT_NOT_MODIFIED|The pinned message wasn't modified|
+
 

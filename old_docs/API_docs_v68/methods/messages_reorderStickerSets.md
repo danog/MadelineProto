@@ -12,8 +12,8 @@ Reorder sticker sets
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|masks|[CLICK ME Bool](../types/Bool.md) | Optional|Reorder masks?|
-|order|Array of [CLICK ME long](../types/long.md) | Yes|The order|
+|masks|[Bool](../types/Bool.md) | Optional|Reorder masks?|
+|order|Array of [long](../types/long.md) | Yes|The order|
 
 
 ### Return type: [Bool](../types/Bool.md)

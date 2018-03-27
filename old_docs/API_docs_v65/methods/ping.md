@@ -12,7 +12,7 @@ pings the server
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|ping\_id|[CLICK ME long](../types/long.md) | Yes|Ping ID|
+|ping\_id|[long](../types/long.md) | Yes|Ping ID|
 
 
 ### Return type: [Pong](../types/Pong.md)

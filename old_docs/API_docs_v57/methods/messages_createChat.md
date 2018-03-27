@@ -13,20 +13,12 @@ Create a chat (not supergroup)
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|The users to add to the chat|
-|title|[CLICK ME string](../types/string.md) | Yes|The new chat's title|
+|title|[string](../types/string.md) | Yes|The new chat's title|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|USERS_TOO_FEW|Not enough users (to create a chat, for example)|
-|USER_RESTRICTED|You're spamreported, you can't create channels or chats.|
 
 
 ### MadelineProto Example:
@@ -66,4 +58,12 @@ Or, if you're into Lua:
 ```
 Updates = messages.createChat({users={InputUser}, title='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|USERS_TOO_FEW|Not enough users (to create a chat, for example)|
+|USER_RESTRICTED|You're spamreported, you can't create channels or chats.|
+
 

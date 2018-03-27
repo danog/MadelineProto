@@ -12,7 +12,7 @@ Get info about a certain contact
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|hash|[CLICK ME int](../types/int.md) | Yes|$ids is the list ids of previously fetched contacts, `$hash = $MadelineProto->gen_vector_hash($ids);`|
+|hash|[int](../types/int.md) | Yes|$ids is the list ids of previously fetched contacts, `$hash = $MadelineProto->gen_vector_hash($ids);`|
 
 
 ### Return type: [contacts\_Contacts](../types/contacts_Contacts.md)

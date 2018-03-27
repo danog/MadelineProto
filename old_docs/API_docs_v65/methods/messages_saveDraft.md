@@ -12,24 +12,17 @@ Save a message draft
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|no\_webpage|[CLICK ME Bool](../types/Bool.md) | Optional|Disable webpage preview|
-|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|Reply to message by ID|
+|no\_webpage|[Bool](../types/Bool.md) | Optional|Disable webpage preview|
+|reply\_to\_msg\_id|[int](../types/int.md) | Optional|Reply to message by ID|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat|
-|message|[CLICK ME string](../types/string.md) | Yes|The message|
-|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|The entities (for styled text)|
+|message|[string](../types/string.md) | Yes|The message|
+|entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|The entities (for styled text)|
 |parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
 
 
 ### MadelineProto Example:
@@ -104,3 +97,10 @@ You can also use normal markdown, note that to create mentions you must use the 
 ```
 
 MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
+

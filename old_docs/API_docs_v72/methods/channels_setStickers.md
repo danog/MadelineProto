@@ -13,20 +13,12 @@ Set the supergroup/channel stickerpack
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergoup|
-|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|The stickerset|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|The stickerset|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|PARTICIPANTS_TOO_FEW|Not enough participants|
 
 
 ### MadelineProto Example:
@@ -75,4 +67,12 @@ Or, if you're into Lua:
 ```
 Bool = channels.setStickers({channel=InputChannel, stickerset=InputStickerSet, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|PARTICIPANTS_TOO_FEW|Not enough participants|
+
 

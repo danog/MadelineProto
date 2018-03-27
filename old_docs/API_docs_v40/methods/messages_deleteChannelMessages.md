@@ -13,7 +13,7 @@ Delete channel messages
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The channel/supergroup|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|The IDs of messages to delete|
+|id|Array of [int](../types/int.md) | Yes|The IDs of messages to delete|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)

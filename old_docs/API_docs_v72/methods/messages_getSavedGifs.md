@@ -12,7 +12,7 @@ Get saved gifs
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|hash|[CLICK ME int](../types/int.md) | Yes|0 or $result['hash']|
+|hash|[int](../types/int.md) | Yes|0 or $result['hash']|
 
 
 ### Return type: [messages\_SavedGifs](../types/messages_SavedGifs.md)

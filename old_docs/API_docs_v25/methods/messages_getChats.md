@@ -12,20 +12,12 @@ Get info about chats
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|The MTProto IDs of chats to fetch info about|
+|id|Array of [int](../types/int.md) | Yes|The MTProto IDs of chats to fetch info about|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-|PEER_ID_INVALID|The provided peer id is invalid|
 
 
 ### MadelineProto Example:
@@ -72,4 +64,12 @@ Or, if you're into Lua:
 ```
 messages_Chats = messages.getChats({id={int}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 

@@ -12,8 +12,8 @@ Edit geochat photo
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
-|photo|[CLICK ME InputChatPhoto](../types/InputChatPhoto.md) | Optional|The new photo|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|photo|[InputChatPhoto](../types/InputChatPhoto.md) | Optional|The new photo|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

@@ -13,19 +13,12 @@ Get the link of a message in a channel
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
-|id|[CLICK ME int](../types/int.md) | Yes|The ID of the message|
+|id|[int](../types/int.md) | Yes|The ID of the message|
 
 
 ### Return type: [ExportedMessageLink](../types/ExportedMessageLink.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
 
 
 ### MadelineProto Example:
@@ -65,4 +58,11 @@ Or, if you're into Lua:
 ```
 ExportedMessageLink = channels.exportMessageLink({channel=InputChannel, id=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+
 

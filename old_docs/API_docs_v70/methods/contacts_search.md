@@ -12,22 +12,13 @@ Search contacts
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|q|[CLICK ME string](../types/string.md) | Yes|The search query|
-|limit|[CLICK ME int](../types/int.md) | Yes|How many results should be returned|
+|q|[string](../types/string.md) | Yes|The search query|
+|limit|[int](../types/int.md) | Yes|How many results should be returned|
 
 
 ### Return type: [contacts\_Found](../types/contacts_Found.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|QUERY_TOO_SHORT|The query string is too short|
-|SEARCH_QUERY_EMPTY|The search query is empty|
-|Timeout|A timeout occurred while fetching data from the bot|
 
 
 ### MadelineProto Example:
@@ -67,4 +58,13 @@ Or, if you're into Lua:
 ```
 contacts_Found = contacts.search({q='string', limit=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|QUERY_TOO_SHORT|The query string is too short|
+|SEARCH_QUERY_EMPTY|The search query is empty|
+|Timeout|A timeout occurred while fetching data from the bot|
+
 

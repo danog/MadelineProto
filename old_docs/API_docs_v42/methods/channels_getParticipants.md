@@ -13,25 +13,14 @@ Get channel/supergroup participants (you should use `$MadelineProto->get_pwr_cha
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
-|filter|[CLICK ME ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) | Yes|Member filter|
-|offset|[CLICK ME int](../types/int.md) | Yes|Offset|
-|limit|[CLICK ME int](../types/int.md) | Yes|Limit|
+|filter|[ChannelParticipantsFilter](../types/ChannelParticipantsFilter.md) | Yes|Member filter|
+|offset|[int](../types/int.md) | Yes|Offset|
+|limit|[int](../types/int.md) | Yes|Limit|
 
 
 ### Return type: [channels\_ChannelParticipants](../types/channels_ChannelParticipants.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
-|INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid|
-|Timeout|A timeout occurred while fetching data from the bot|
 
 
 ### MadelineProto Example:
@@ -84,4 +73,15 @@ Or, if you're into Lua:
 ```
 channels_ChannelParticipants = channels.getParticipants({channel=InputChannel, filter=ChannelParticipantsFilter, offset=int, limit=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid|
+|Timeout|A timeout occurred while fetching data from the bot|
+
 

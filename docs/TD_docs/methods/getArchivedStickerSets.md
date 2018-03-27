@@ -15,9 +15,9 @@ Returns list of archived sticker sets
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|is\_masks|[CLICK ME Bool](../types/Bool.md) | Yes|Pass true to return mask stickers sets, pass false to return ordinary sticker sets|
-|offset\_sticker\_set\_id|[CLICK ME int64](../constructors/int64.md) | Yes|Identifier of the sticker set from which return the result|
-|limit|[CLICK ME int](../types/int.md) | Yes|Maximum number of sticker sets to return|
+|is\_masks|[Bool](../types/Bool.md) | Yes|Pass true to return mask stickers sets, pass false to return ordinary sticker sets|
+|offset\_sticker\_set\_id|[int64](../constructors/int64.md) | Yes|Identifier of the sticker set from which return the result|
+|limit|[int](../types/int.md) | Yes|Maximum number of sticker sets to return|
 
 
 ### Return type: [StickerSets](../types/StickerSets.md)

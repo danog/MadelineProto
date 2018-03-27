@@ -12,19 +12,12 @@ Get a stickerset
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|The stickerset to get|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|The stickerset to get|
 
 
 ### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|STICKERSET_INVALID|The provided sticker set is invalid|
 
 
 ### MadelineProto Example:
@@ -71,4 +64,11 @@ Or, if you're into Lua:
 ```
 messages_StickerSet = messages.getStickerSet({stickerset=InputStickerSet, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|STICKERSET_INVALID|The provided sticker set is invalid|
+
 

@@ -13,22 +13,12 @@ Edit the about text of a channel/supergroup
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
-|about|[CLICK ME string](../types/string.md) | Yes|The new about text|
+|about|[string](../types/string.md) | Yes|The new about text|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHAT_ABOUT_NOT_MODIFIED|About text has not changed|
-|CHAT_ABOUT_TOO_LONG|Chat about too long|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 
 
 ### MadelineProto Example:
@@ -77,4 +67,14 @@ Or, if you're into Lua:
 ```
 Bool = channels.editAbout({channel=InputChannel, about='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHAT_ABOUT_NOT_MODIFIED|About text has not changed|
+|CHAT_ABOUT_TOO_LONG|Chat about too long|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+
 

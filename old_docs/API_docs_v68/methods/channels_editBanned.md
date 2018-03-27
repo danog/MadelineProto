@@ -14,23 +14,12 @@ Kick or ban a user from a channel/supergroup
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user to kick/ban|
-|banned\_rights|[CLICK ME ChannelBannedRights](../types/ChannelBannedRights.md) | Yes|Banned/kicked permissions|
+|banned\_rights|[ChannelBannedRights](../types/ChannelBannedRights.md) | Yes|Banned/kicked permissions|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
-|USER_ADMIN_INVALID|You're not an admin|
-|USER_ID_INVALID|The provided user ID is invalid|
 
 
 ### MadelineProto Example:
@@ -81,4 +70,15 @@ Or, if you're into Lua:
 ```
 Updates = channels.editBanned({channel=InputChannel, user_id=InputUser, banned_rights=ChannelBannedRights, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|USER_ADMIN_INVALID|You're not an admin|
+|USER_ID_INVALID|The provided user ID is invalid|
+
 

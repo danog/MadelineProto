@@ -12,21 +12,14 @@ Delete chat history
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|just\_clear|[CLICK ME Bool](../types/Bool.md) | Optional|Only clear it from your side|
+|just\_clear|[Bool](../types/Bool.md) | Optional|Only clear it from your side|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to clear it|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message id of messages to delete|
+|max\_id|[int](../types/int.md) | Yes|Maximum message id of messages to delete|
 
 
 ### Return type: [messages\_AffectedHistory](../types/messages_AffectedHistory.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
 
 
 ### MadelineProto Example:
@@ -68,4 +61,11 @@ Or, if you're into Lua:
 ```
 messages_AffectedHistory = messages.deleteHistory({just_clear=Bool, peer=InputPeer, max_id=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 

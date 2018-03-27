@@ -12,20 +12,13 @@ Send a custom request to the bot API
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|custom\_method|[CLICK ME string](../types/string.md) | Yes|The method to call|
-|params|[CLICK ME DataJSON](../types/DataJSON.md) | Yes|Method parameters|
+|custom\_method|[string](../types/string.md) | Yes|The method to call|
+|params|[DataJSON](../types/DataJSON.md) | Yes|Method parameters|
 
 
 ### Return type: [DataJSON](../types/DataJSON.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|USER_BOT_INVALID|This method can only be called by a bot|
 
 
 ### MadelineProto Example:
@@ -74,4 +67,11 @@ Or, if you're into Lua:
 ```
 DataJSON = bots.sendCustomRequest({custom_method='string', params=DataJSON, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|USER_BOT_INVALID|This method can only be called by a bot|
+
 

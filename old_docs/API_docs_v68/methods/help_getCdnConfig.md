@@ -15,13 +15,6 @@ Get CDN configuration
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|Timeout|A timeout occurred while fetching data from the bot|
-
-
 ### MadelineProto Example:
 
 
@@ -64,4 +57,11 @@ Or, if you're into Lua:
 ```
 CdnConfig = help.getCdnConfig({})
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|Timeout|A timeout occurred while fetching data from the bot|
+
 

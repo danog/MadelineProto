@@ -12,21 +12,14 @@ Set phone call rating
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[CLICK ME InputPhoneCall](../types/InputPhoneCall.md) | Yes|The phone call|
-|rating|[CLICK ME int](../types/int.md) | Yes|Rating (1-5 stars)|
-|comment|[CLICK ME string](../types/string.md) | Yes|An optional comment|
+|peer|[InputPhoneCall](../types/InputPhoneCall.md) | Yes|The phone call|
+|rating|[int](../types/int.md) | Yes|Rating (1-5 stars)|
+|comment|[string](../types/string.md) | Yes|An optional comment|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CALL_PEER_INVALID|The provided call peer object is invalid|
 
 
 ### MadelineProto Example:
@@ -68,4 +61,11 @@ Or, if you're into Lua:
 ```
 Updates = phone.setCallRating({peer=InputPhoneCall, rating=int, comment='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CALL_PEER_INVALID|The provided call peer object is invalid|
+
 

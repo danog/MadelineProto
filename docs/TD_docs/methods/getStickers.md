@@ -15,8 +15,8 @@ Returns stickers from installed ordinary sticker sets corresponding to the given
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|emoji|[CLICK ME string](../types/string.md) | Yes|String representation of emoji. If empty, returns all known stickers|
-|limit|[CLICK ME int](../types/int.md) | Yes|Maximum number of stickers to return|
+|emoji|[string](../types/string.md) | Yes|String representation of emoji. If empty, returns all known stickers|
+|limit|[int](../types/int.md) | Yes|Maximum number of stickers to return|
 
 
 ### Return type: [Stickers](../types/Stickers.md)

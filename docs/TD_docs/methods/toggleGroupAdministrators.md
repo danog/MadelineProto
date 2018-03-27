@@ -15,8 +15,8 @@ Gives or revokes all members of the group administrator rights. Needs creator pr
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|group\_id|[CLICK ME int](../types/int.md) | Yes|Identifier of the group|
-|everyone\_is\_administrator|[CLICK ME Bool](../types/Bool.md) | Yes|New value of everyone_is_administrator|
+|group\_id|[int](../types/int.md) | Yes|Identifier of the group|
+|everyone\_is\_administrator|[Bool](../types/Bool.md) | Yes|New value of everyone_is_administrator|
 
 
 ### Return type: [Ok](../types/Ok.md)

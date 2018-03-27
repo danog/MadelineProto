@@ -15,7 +15,7 @@ Returns existing chat corresponding to the known group
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|group\_id|[CLICK ME int](../types/int.md) | Yes|Group identifier|
+|group\_id|[int](../types/int.md) | Yes|Group identifier|
 
 
 ### Return type: [Chat](../types/Chat.md)

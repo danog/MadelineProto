@@ -12,7 +12,7 @@ Send media to geochat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
 |media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|The media|
 
 

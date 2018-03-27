@@ -12,20 +12,13 @@ Get webpage preview
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|url|[CLICK ME string](../types/string.md) | Yes|URL|
-|hash|[CLICK ME int](../types/int.md) | Yes|0 or $result['hash']|
+|url|[string](../types/string.md) | Yes|URL|
+|hash|[int](../types/int.md) | Yes|0 or $result['hash']|
 
 
 ### Return type: [WebPage](../types/WebPage.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|WC_CONVERT_URL_INVALID|WC convert URL invalid|
 
 
 ### MadelineProto Example:
@@ -65,4 +58,11 @@ Or, if you're into Lua:
 ```
 WebPage = messages.getWebPage({url='string', hash=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|WC_CONVERT_URL_INVALID|WC convert URL invalid|
+
 

@@ -12,7 +12,7 @@ Get featured stickers
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|hash|[CLICK ME int](../types/int.md) | Yes|0 or $result['hash']|
+|hash|[int](../types/int.md) | Yes|0 or $result['hash']|
 
 
 ### Return type: [messages\_FeaturedStickers](../types/messages_FeaturedStickers.md)

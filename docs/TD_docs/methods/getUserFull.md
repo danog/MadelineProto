@@ -15,7 +15,7 @@ Returns full information about a user by its identifier
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|user\_id|[CLICK ME int](../types/int.md) | Yes|User identifier|
+|user\_id|[int](../types/int.md) | Yes|User identifier|
 
 
 ### Return type: [UserFull](../types/UserFull.md)

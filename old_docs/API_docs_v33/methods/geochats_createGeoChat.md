@@ -12,10 +12,10 @@ Create geochat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|title|[CLICK ME string](../types/string.md) | Yes|Geochat title|
-|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|Geochat location|
-|address|[CLICK ME string](../types/string.md) | Yes|Geochat address|
-|venue|[CLICK ME string](../types/string.md) | Yes|Geochat venue |
+|title|[string](../types/string.md) | Yes|Geochat title|
+|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|Geochat location|
+|address|[string](../types/string.md) | Yes|Geochat address|
+|venue|[string](../types/string.md) | Yes|Geochat venue |
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

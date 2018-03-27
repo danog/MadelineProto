@@ -15,7 +15,7 @@ Uploads new profile photo for logged in user. If something changes, updateUser w
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|photo|[CLICK ME InputFile](../types/InputFile.md) | Yes|Profile photo to set. inputFileId and inputFilePersistentId may be unsupported|
+|photo|[InputFile](../types/InputFile.md) | Yes|Profile photo to set. inputFileId and inputFilePersistentId may be unsupported|
 
 
 ### Return type: [Ok](../types/Ok.md)

@@ -12,7 +12,7 @@ Get full info about a geochat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
 
 
 ### Return type: [messages\_ChatFull](../types/messages_ChatFull.md)

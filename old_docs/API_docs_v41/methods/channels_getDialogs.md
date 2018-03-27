@@ -12,8 +12,8 @@ Get channel dialogs
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|offset|[CLICK ME int](../types/int.md) | Yes|Offset|
-|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
+|offset|[int](../types/int.md) | Yes|Offset|
+|limit|[int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [messages\_Dialogs](../types/messages_Dialogs.md)

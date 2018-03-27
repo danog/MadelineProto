@@ -12,24 +12,16 @@ Set the game score
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|edit\_message|[CLICK ME Bool](../types/Bool.md) | Optional|Should the message with the game be edited?|
+|edit\_message|[Bool](../types/Bool.md) | Optional|Should the message with the game be edited?|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat where the game was sent|
-|id|[CLICK ME int](../types/int.md) | Yes|The message ID|
+|id|[int](../types/int.md) | Yes|The message ID|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user that set the score|
-|score|[CLICK ME int](../types/int.md) | Yes|The score|
+|score|[int](../types/int.md) | Yes|The score|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|USER_BOT_REQUIRED|This method can only be called by a bot|
 
 
 ### MadelineProto Example:
@@ -84,4 +76,12 @@ Or, if you're into Lua:
 ```
 Updates = messages.setGameScore({edit_message=Bool, peer=InputPeer, id=int, user_id=InputUser, score=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|USER_BOT_REQUIRED|This method can only be called by a bot|
+
 

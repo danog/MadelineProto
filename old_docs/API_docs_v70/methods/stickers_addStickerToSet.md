@@ -12,21 +12,13 @@ Add sticker to stickerset
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|The stickerset|
-|sticker|[CLICK ME InputStickerSetItem](../types/InputStickerSetItem.md) | Yes|The sticker|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|The stickerset|
+|sticker|[InputStickerSetItem](../types/InputStickerSetItem.md) | Yes|The sticker|
 
 
 ### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|BOT_MISSING|This method can only be run by a bot|
-|STICKERSET_INVALID|The provided sticker set is invalid|
 
 
 ### MadelineProto Example:
@@ -75,4 +67,12 @@ Or, if you're into Lua:
 ```
 messages_StickerSet = stickers.addStickerToSet({stickerset=InputStickerSet, sticker=InputStickerSetItem, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|BOT_MISSING|This method can only be run by a bot|
+|STICKERSET_INVALID|The provided sticker set is invalid|
+
 

@@ -12,21 +12,13 @@ Send webhook request via bot API
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|query\_id|[CLICK ME long](../types/long.md) | Yes|The query ID|
-|data|[CLICK ME DataJSON](../types/DataJSON.md) | Yes|The parameters|
+|query\_id|[long](../types/long.md) | Yes|The query ID|
+|data|[DataJSON](../types/DataJSON.md) | Yes|The parameters|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|QUERY_ID_INVALID|The query ID is invalid|
-|USER_BOT_INVALID|This method can only be called by a bot|
 
 
 ### MadelineProto Example:
@@ -75,4 +67,12 @@ Or, if you're into Lua:
 ```
 Bool = bots.answerWebhookJSONQuery({query_id=long, data=DataJSON, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|QUERY_ID_INVALID|The query ID is invalid|
+|USER_BOT_INVALID|This method can only be called by a bot|
+
 

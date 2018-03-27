@@ -12,8 +12,8 @@ Get recent geochats
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|offset|[CLICK ME int](../types/int.md) | Yes|offset|
-|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
+|offset|[int](../types/int.md) | Yes|offset|
+|limit|[int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [geochats\_Messages](../types/geochats_Messages.md)

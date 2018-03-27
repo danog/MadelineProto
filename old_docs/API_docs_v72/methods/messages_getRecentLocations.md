@@ -13,7 +13,7 @@ Get recent locations
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat where to search locations|
-|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
+|limit|[int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

@@ -12,21 +12,14 @@ Send confirmation phone code
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|allow\_flashcall|[CLICK ME Bool](../types/Bool.md) | Optional|Can telegram call you instead of sending an SMS?|
-|hash|[CLICK ME string](../types/string.md) | Yes|The hash|
-|current\_number|[CLICK ME Bool](../types/Bool.md) | Optional|The current phone number|
+|allow\_flashcall|[Bool](../types/Bool.md) | Optional|Can telegram call you instead of sending an SMS?|
+|hash|[string](../types/string.md) | Yes|The hash|
+|current\_number|[Bool](../types/Bool.md) | Optional|The current phone number|
 
 
 ### Return type: [auth\_SentCode](../types/auth_SentCode.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|HASH_INVALID|The provided hash is invalid|
 
 
 ### MadelineProto Example:
@@ -68,4 +61,11 @@ Or, if you're into Lua:
 ```
 auth_SentCode = account.sendConfirmPhoneCode({allow_flashcall=Bool, hash='string', current_number=Bool, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|HASH_INVALID|The provided hash is invalid|
+
 

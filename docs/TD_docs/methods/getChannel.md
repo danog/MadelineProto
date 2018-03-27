@@ -15,7 +15,7 @@ Returns information about a channel by its identifier, offline request if curren
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|channel\_id|[CLICK ME int](../types/int.md) | Yes|Channel identifier|
+|channel\_id|[int](../types/int.md) | Yes|Channel identifier|
 
 
 ### Return type: [Channel](../types/Channel.md)

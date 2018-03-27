@@ -12,7 +12,7 @@ Delete all temporary authorization keys except the ones provided
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|except\_auth\_keys|Array of [CLICK ME long](../types/long.md) | Yes|The temporary authorization keys to keep|
+|except\_auth\_keys|Array of [long](../types/long.md) | Yes|The temporary authorization keys to keep|
 
 
 ### Return type: [Bool](../types/Bool.md)

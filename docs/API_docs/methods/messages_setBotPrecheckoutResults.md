@@ -12,21 +12,14 @@ Bots only: set precheckout results
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|success|[CLICK ME Bool](../types/Bool.md) | Optional|Success?|
-|query\_id|[CLICK ME long](../types/long.md) | Yes|Query ID|
-|error|[CLICK ME string](../types/string.md) | Optional|Error|
+|success|[Bool](../types/Bool.md) | Optional|Success?|
+|query\_id|[long](../types/long.md) | Yes|Query ID|
+|error|[string](../types/string.md) | Optional|Error|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|ERROR_TEXT_EMPTY|The provided error message is empty|
 
 
 ### MadelineProto Example:
@@ -77,4 +70,11 @@ Or, if you're into Lua:
 ```
 Bool = messages.setBotPrecheckoutResults({success=Bool, query_id=long, error='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|ERROR_TEXT_EMPTY|The provided error message is empty|
+
 

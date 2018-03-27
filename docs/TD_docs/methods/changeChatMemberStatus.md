@@ -15,9 +15,9 @@ Changes status of the chat member, need appropriate privileges. This function is
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
-|user\_id|[CLICK ME int](../types/int.md) | Yes|Identifier of the user to edit status|
-|status|[CLICK ME ChatMemberStatus](../types/ChatMemberStatus.md) | Yes|New status of the member in the chat|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
+|user\_id|[int](../types/int.md) | Yes|Identifier of the user to edit status|
+|status|[ChatMemberStatus](../types/ChatMemberStatus.md) | Yes|New status of the member in the chat|
 
 
 ### Return type: [Ok](../types/Ok.md)

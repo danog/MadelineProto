@@ -12,12 +12,12 @@ Requests Diffie-hellman parameters for key exchange
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|nonce|[CLICK ME int128](../types/int128.md) | Yes|Random number for cryptographic security|
-|server\_nonce|[CLICK ME int128](../types/int128.md) | Yes|Random number for cryptographic security, given by server|
-|p|[CLICK ME bytes](../types/bytes.md) | Yes|Factorized p from pq|
-|q|[CLICK ME bytes](../types/bytes.md) | Yes|Factorized q from pq|
-|public\_key\_fingerprint|[CLICK ME long](../types/long.md) | Yes|Server RSA fingerprint|
-|encrypted\_data|[CLICK ME bytes](../types/bytes.md) | Yes|Encrypted key exchange message|
+|nonce|[int128](../types/int128.md) | Yes|Random number for cryptographic security|
+|server\_nonce|[int128](../types/int128.md) | Yes|Random number for cryptographic security, given by server|
+|p|[bytes](../types/bytes.md) | Yes|Factorized p from pq|
+|q|[bytes](../types/bytes.md) | Yes|Factorized q from pq|
+|public\_key\_fingerprint|[long](../types/long.md) | Yes|Server RSA fingerprint|
+|encrypted\_data|[bytes](../types/bytes.md) | Yes|Encrypted key exchange message|
 
 
 ### Return type: [Server\_DH\_Params](../types/Server_DH_Params.md)

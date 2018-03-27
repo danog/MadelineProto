@@ -12,9 +12,9 @@ Get nearby geochats
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|geo\_point|[CLICK ME InputGeoPoint](../types/InputGeoPoint.md) | Optional|Current location|
-|radius|[CLICK ME int](../types/int.md) | Yes|Radius|
-|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
+|geo\_point|[InputGeoPoint](../types/InputGeoPoint.md) | Optional|Current location|
+|radius|[int](../types/int.md) | Yes|Radius|
+|limit|[int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [geochats\_Located](../types/geochats_Located.md)

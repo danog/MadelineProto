@@ -12,8 +12,8 @@ Get stickers
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|emoticon|[CLICK ME string](../types/string.md) | Yes|Search by emoji|
-|hash|[CLICK ME string](../types/string.md) | Yes|0 or $MadelineProto->gen_vector_hash(previously fetched sticker IDs)|
+|emoticon|[string](../types/string.md) | Yes|Search by emoji|
+|hash|[string](../types/string.md) | Yes|0 or $MadelineProto->gen_vector_hash(previously fetched sticker IDs)|
 
 
 ### Return type: [messages\_Stickers](../types/messages_Stickers.md)

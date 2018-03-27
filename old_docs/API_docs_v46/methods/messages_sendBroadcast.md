@@ -13,7 +13,7 @@ Send a message to all users in the chat list
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |contacts|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|The users to which send the message|
-|message|[CLICK ME string](../types/string.md) | Yes|The message|
+|message|[string](../types/string.md) | Yes|The message|
 |media|[MessageMedia, Update, Message or InputMedia](../types/InputMedia.md) | Optional|The media|
 
 

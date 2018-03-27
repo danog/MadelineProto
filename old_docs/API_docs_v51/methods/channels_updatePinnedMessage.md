@@ -12,24 +12,14 @@ Set the pinned message of a channel/supergroup
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|silent|[CLICK ME Bool](../types/Bool.md) | Optional|Pin silently|
+|silent|[Bool](../types/Bool.md) | Optional|Pin silently|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
-|id|[CLICK ME int](../types/int.md) | Yes|The ID of the message to pin|
+|id|[int](../types/int.md) | Yes|The ID of the message to pin|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-|CHAT_NOT_MODIFIED|The pinned message wasn't modified|
 
 
 ### MadelineProto Example:
@@ -80,4 +70,14 @@ Or, if you're into Lua:
 ```
 Updates = channels.updatePinnedMessage({silent=Bool, channel=InputChannel, id=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|CHAT_NOT_MODIFIED|The pinned message wasn't modified|
+
 

@@ -15,7 +15,7 @@ Test request. Returns back received bytes
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|x|[CLICK ME bytes](../types/bytes.md) | Yes|Bytes to return|
+|x|[bytes](../types/bytes.md) | Yes|Bytes to return|
 
 
 ### Return type: [TestBytes](../types/TestBytes.md)

@@ -15,8 +15,8 @@ Changes privacy settings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|key|[CLICK ME PrivacyKey](../types/PrivacyKey.md) | Yes|Privacy key|
-|rules|[CLICK ME privacyRules](../constructors/privacyRules.md) | Yes|New privacy rules|
+|key|[PrivacyKey](../types/PrivacyKey.md) | Yes|Privacy key|
+|rules|[privacyRules](../constructors/privacyRules.md) | Yes|New privacy rules|
 
 
 ### Return type: [Ok](../types/Ok.md)

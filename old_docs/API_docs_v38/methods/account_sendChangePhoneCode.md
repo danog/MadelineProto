@@ -12,19 +12,12 @@ Change the phone number
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|phone\_number|[CLICK ME string](../types/string.md) | Yes|New phone number|
+|phone\_number|[string](../types/string.md) | Yes|New phone number|
 
 
 ### Return type: [account\_SentChangePhoneCode](../types/account_SentChangePhoneCode.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PHONE_NUMBER_INVALID|The phone number is invalid|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 account_SentChangePhoneCode = account.sendChangePhoneCode({phone_number='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PHONE_NUMBER_INVALID|The phone number is invalid|
+
 

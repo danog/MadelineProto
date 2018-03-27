@@ -12,7 +12,7 @@ Create channel
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|title|[CLICK ME string](../types/string.md) | Yes|Channel/supergroup title|
+|title|[string](../types/string.md) | Yes|Channel/supergroup title|
 
 
 ### Return type: [Updates](../types/Updates.md)

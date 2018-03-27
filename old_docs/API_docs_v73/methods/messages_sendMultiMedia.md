@@ -12,12 +12,12 @@ Send an album
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|silent|[CLICK ME Bool](../types/Bool.md) | Optional|Disable notifications?|
-|background|[CLICK ME Bool](../types/Bool.md) | Optional|Disable background notification?|
-|clear\_draft|[CLICK ME Bool](../types/Bool.md) | Optional|Clear draft?|
+|silent|[Bool](../types/Bool.md) | Optional|Disable notifications?|
+|background|[Bool](../types/Bool.md) | Optional|Disable background notification?|
+|clear\_draft|[Bool](../types/Bool.md) | Optional|Clear draft?|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to send the album|
-|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|Reply to message by ID|
-|multi\_media|Array of [CLICK ME InputSingleMedia](../types/InputSingleMedia.md) | Yes|The album|
+|reply\_to\_msg\_id|[int](../types/int.md) | Optional|Reply to message by ID|
+|multi\_media|Array of [InputSingleMedia](../types/InputSingleMedia.md) | Yes|The album|
 
 
 ### Return type: [Updates](../types/Updates.md)

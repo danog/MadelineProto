@@ -13,20 +13,13 @@ Get chats in common with a user
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|The maximum chat ID to fetch|
-|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to fetch|
+|max\_id|[int](../types/int.md) | Yes|The maximum chat ID to fetch|
+|limit|[int](../types/int.md) | Yes|Number of results to fetch|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|USER_ID_INVALID|The provided user ID is invalid|
 
 
 ### MadelineProto Example:
@@ -68,4 +61,11 @@ Or, if you're into Lua:
 ```
 messages_Chats = messages.getCommonChats({user_id=InputUser, max_id=int, limit=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|USER_ID_INVALID|The provided user ID is invalid|
+
 

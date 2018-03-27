@@ -21,15 +21,6 @@ Upload a file without sending it to anyone
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|BOT_MISSING|This method can only be run by a bot|
-|MEDIA_INVALID|Media invalid|
-|PEER_ID_INVALID|The provided peer id is invalid|
-
-
 ### MadelineProto Example:
 
 
@@ -76,4 +67,13 @@ Or, if you're into Lua:
 ```
 MessageMedia = messages.uploadMedia({peer=InputPeer, media=InputMedia, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|BOT_MISSING|This method can only be run by a bot|
+|MEDIA_INVALID|Media invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 

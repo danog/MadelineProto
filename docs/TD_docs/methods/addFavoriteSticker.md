@@ -15,7 +15,7 @@ Adds new sticker to the list of favorite stickers. New sticker is added to the b
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|sticker|[CLICK ME InputFile](../types/InputFile.md) | Yes|Sticker file to add|
+|sticker|[InputFile](../types/InputFile.md) | Yes|Sticker file to add|
 
 
 ### Return type: [Ok](../types/Ok.md)

@@ -13,20 +13,12 @@ Edit the title of a normal chat (not supergroup)
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The ID of the chat|
-|title|[CLICK ME string](../types/string.md) | Yes|The new title|
+|title|[string](../types/string.md) | Yes|The new title|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-|NEED_CHAT_INVALID|The provided chat is invalid|
 
 
 ### MadelineProto Example:
@@ -75,4 +67,12 @@ Or, if you're into Lua:
 ```
 Updates = messages.editChatTitle({chat_id=InputPeer, title='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|NEED_CHAT_INVALID|The provided chat is invalid|
+
 

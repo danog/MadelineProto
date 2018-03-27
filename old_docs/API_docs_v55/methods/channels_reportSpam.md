@@ -14,20 +14,12 @@ Report a message in a supergroup/channel for spam
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user that sent the messages|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|The IDs of messages to report|
+|id|Array of [int](../types/int.md) | Yes|The IDs of messages to report|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|INPUT_USER_DEACTIVATED|The specified user was deleted|
 
 
 ### MadelineProto Example:
@@ -69,4 +61,12 @@ Or, if you're into Lua:
 ```
 Bool = channels.reportSpam({channel=InputChannel, user_id=InputUser, id={int}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|INPUT_USER_DEACTIVATED|The specified user was deleted|
+
 

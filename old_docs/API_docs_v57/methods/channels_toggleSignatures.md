@@ -13,19 +13,12 @@ Toggle channel signatures
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
-|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|Enable or disable channel signatures?|
+|enabled|[Bool](../types/Bool.md) | Yes|Enable or disable channel signatures?|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
 
 
 ### MadelineProto Example:
@@ -65,4 +58,11 @@ Or, if you're into Lua:
 ```
 Updates = channels.toggleSignatures({channel=InputChannel, enabled=Bool, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+
 

@@ -15,8 +15,8 @@ Changes current ttl setting in a secret chat and sends corresponding message
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
-|ttl|[CLICK ME int](../types/int.md) | Yes|New value of ttl in seconds|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
+|ttl|[int](../types/int.md) | Yes|New value of ttl in seconds|
 
 
 ### Return type: [Message](../types/Message.md)

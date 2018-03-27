@@ -13,22 +13,13 @@ Get and increase message views
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat where the message is located|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|The IDs messages to get|
-|increment|[CLICK ME Bool](../types/Bool.md) | Yes|Increase message views?|
+|id|Array of [int](../types/int.md) | Yes|The IDs messages to get|
+|increment|[Bool](../types/Bool.md) | Yes|Increase message views?|
 
 
 ### Return type: [Vector\_of\_int](../types/int.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-|PEER_ID_INVALID|The provided peer id is invalid|
 
 
 ### MadelineProto Example:
@@ -70,4 +61,13 @@ Or, if you're into Lua:
 ```
 Vector_of_int = messages.getMessagesViews({peer=InputPeer, id={int}, increment=Bool, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 

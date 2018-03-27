@@ -12,19 +12,12 @@ Get notification settings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[CLICK ME InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|Notification source |
+|peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|Notification source |
 
 
 ### Return type: [PeerNotifySettings](../types/PeerNotifySettings.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 PeerNotifySettings = account.getNotifySettings({peer=InputNotifyPeer, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 

@@ -13,26 +13,17 @@ Get admin log of a channel/supergroup
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
-|q|[CLICK ME string](../types/string.md) | Yes|Search query|
-|events\_filter|[CLICK ME ChannelAdminLogEventsFilter](../types/ChannelAdminLogEventsFilter.md) | Optional|Event filter|
+|q|[string](../types/string.md) | Yes|Search query|
+|events\_filter|[ChannelAdminLogEventsFilter](../types/ChannelAdminLogEventsFilter.md) | Optional|Event filter|
 |admins|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|Fetch only actions from these admins|
-|max\_id|[CLICK ME long](../types/long.md) | Yes|Maximum message ID to fetch|
-|min\_id|[CLICK ME long](../types/long.md) | Yes|Minimum message ID to fetch|
-|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to fetch|
+|max\_id|[long](../types/long.md) | Yes|Maximum message ID to fetch|
+|min\_id|[long](../types/long.md) | Yes|Minimum message ID to fetch|
+|limit|[int](../types/int.md) | Yes|Number of results to fetch|
 
 
 ### Return type: [channels\_AdminLogResults](../types/channels_AdminLogResults.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
 
 
 ### MadelineProto Example:
@@ -82,4 +73,13 @@ Or, if you're into Lua:
 ```
 channels_AdminLogResults = channels.getAdminLog({channel=InputChannel, q='string', events_filter=ChannelAdminLogEventsFilter, admins={InputUser}, max_id=long, min_id=long, limit=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+
 

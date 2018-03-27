@@ -12,7 +12,7 @@ Mark new featured stickers as read
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|Array of [CLICK ME long](../types/long.md) | Yes|The stickers to mark as read|
+|id|Array of [long](../types/long.md) | Yes|The stickers to mark as read|
 
 
 ### Return type: [Bool](../types/Bool.md)

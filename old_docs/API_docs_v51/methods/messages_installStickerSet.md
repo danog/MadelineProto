@@ -12,20 +12,13 @@ Add a sticker set
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|The sticker set to add|
-|disabled|[CLICK ME Bool](../types/Bool.md) | Yes|Disable stickerset?|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|The sticker set to add|
+|disabled|[Bool](../types/Bool.md) | Yes|Disable stickerset?|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|STICKERSET_INVALID|The provided sticker set is invalid|
 
 
 ### MadelineProto Example:
@@ -65,4 +58,11 @@ Or, if you're into Lua:
 ```
 Bool = messages.installStickerSet({stickerset=InputStickerSet, disabled=Bool, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|STICKERSET_INVALID|The provided sticker set is invalid|
+
 

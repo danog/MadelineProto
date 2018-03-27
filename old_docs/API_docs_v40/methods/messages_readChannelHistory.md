@@ -13,7 +13,7 @@ Mark channel/supergroup history as read
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The channel/supergruop|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID to mark as read|
+|max\_id|[int](../types/int.md) | Yes|Maximum message ID to mark as read|
 
 
 ### Return type: [Bool](../types/Bool.md)

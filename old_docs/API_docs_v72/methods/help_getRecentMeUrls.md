@@ -12,7 +12,7 @@ Get recent t.me URLs
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|referer|[CLICK ME string](../types/string.md) | Yes|Referrer|
+|referer|[string](../types/string.md) | Yes|Referrer|
 
 
 ### Return type: [help\_RecentMeUrls](../types/help_RecentMeUrls.md)

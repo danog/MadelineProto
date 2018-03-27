@@ -12,21 +12,13 @@ Save call debugging info
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[CLICK ME InputPhoneCall](../types/InputPhoneCall.md) | Yes|The call|
-|debug|[CLICK ME DataJSON](../types/DataJSON.md) | Yes|Debugging info|
+|peer|[InputPhoneCall](../types/InputPhoneCall.md) | Yes|The call|
+|debug|[DataJSON](../types/DataJSON.md) | Yes|Debugging info|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CALL_PEER_INVALID|The provided call peer object is invalid|
-|DATA_JSON_INVALID|The provided JSON data is invalid|
 
 
 ### MadelineProto Example:
@@ -66,4 +58,12 @@ Or, if you're into Lua:
 ```
 Bool = phone.saveCallDebug({peer=InputPhoneCall, debug=DataJSON, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CALL_PEER_INVALID|The provided call peer object is invalid|
+|DATA_JSON_INVALID|The provided JSON data is invalid|
+
 

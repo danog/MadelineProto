@@ -13,21 +13,12 @@ Check if this username is free and can be assigned to a channel/supergroup
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
-|username|[CLICK ME string](../types/string.md) | Yes|The new username for this channel/supergroup|
+|username|[string](../types/string.md) | Yes|The new username for this channel/supergroup|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-|USERNAME_INVALID|The provided username is not valid|
 
 
 ### MadelineProto Example:
@@ -67,4 +58,13 @@ Or, if you're into Lua:
 ```
 Bool = channels.checkUsername({channel=InputChannel, username='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|USERNAME_INVALID|The provided username is not valid|
+
 

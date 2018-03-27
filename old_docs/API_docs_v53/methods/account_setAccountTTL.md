@@ -12,19 +12,12 @@ Set account TTL
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|ttl|[CLICK ME AccountDaysTTL](../types/AccountDaysTTL.md) | Yes|Time To Live of account|
+|ttl|[AccountDaysTTL](../types/AccountDaysTTL.md) | Yes|Time To Live of account|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|TTL_DAYS_INVALID|The provided TTL is invalid|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 Bool = account.setAccountTTL({ttl=AccountDaysTTL, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|TTL_DAYS_INVALID|The provided TTL is invalid|
+
 

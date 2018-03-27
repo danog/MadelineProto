@@ -12,10 +12,10 @@ Get info about app updates
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|device\_model|[CLICK ME string](../types/string.md) | Yes|Device model|
-|system\_version|[CLICK ME string](../types/string.md) | Yes|System version|
-|app\_version|[CLICK ME string](../types/string.md) | Yes|App version|
-|lang\_code|[CLICK ME string](../types/string.md) | Yes|Langauge code|
+|device\_model|[string](../types/string.md) | Yes|Device model|
+|system\_version|[string](../types/string.md) | Yes|System version|
+|app\_version|[string](../types/string.md) | Yes|App version|
+|lang\_code|[string](../types/string.md) | Yes|Langauge code|
 
 
 ### Return type: [help\_AppUpdate](../types/help_AppUpdate.md)

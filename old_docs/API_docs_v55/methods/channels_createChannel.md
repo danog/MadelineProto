@@ -12,23 +12,15 @@ Create channel/supergroup
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|broadcast|[CLICK ME Bool](../types/Bool.md) | Optional|Set this to true to create a channel|
-|megagroup|[CLICK ME Bool](../types/Bool.md) | Optional|Set this to true to create a supergroup|
-|title|[CLICK ME string](../types/string.md) | Yes|Supergroup/channel title|
-|about|[CLICK ME string](../types/string.md) | Yes|About text|
+|broadcast|[Bool](../types/Bool.md) | Optional|Set this to true to create a channel|
+|megagroup|[Bool](../types/Bool.md) | Optional|Set this to true to create a supergroup|
+|title|[string](../types/string.md) | Yes|Supergroup/channel title|
+|about|[string](../types/string.md) | Yes|About text|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_TITLE_EMPTY|No chat title provided|
-|USER_RESTRICTED|You're spamreported, you can't create channels or chats.|
 
 
 ### MadelineProto Example:
@@ -72,4 +64,12 @@ Or, if you're into Lua:
 ```
 Updates = channels.createChannel({broadcast=Bool, megagroup=Bool, title='string', about='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHAT_TITLE_EMPTY|No chat title provided|
+|USER_RESTRICTED|You're spamreported, you can't create channels or chats.|
+
 

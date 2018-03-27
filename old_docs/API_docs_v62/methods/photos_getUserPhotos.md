@@ -13,22 +13,14 @@ Get the profile photos of a user
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user|
-|offset|[CLICK ME int](../types/int.md) | Yes|Offset|
-|max\_id|[CLICK ME long](../types/long.md) | Yes|Maximum ID of photo to return|
-|limit|[CLICK ME int](../types/int.md) | Yes|Number of photos to return|
+|offset|[int](../types/int.md) | Yes|Offset|
+|max\_id|[long](../types/long.md) | Yes|Maximum ID of photo to return|
+|limit|[int](../types/int.md) | Yes|Number of photos to return|
 
 
 ### Return type: [photos\_Photos](../types/photos_Photos.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MAX_ID_INVALID|The provided max ID is invalid|
-|USER_ID_INVALID|The provided user ID is invalid|
 
 
 ### MadelineProto Example:
@@ -81,4 +73,12 @@ Or, if you're into Lua:
 ```
 photos_Photos = photos.getUserPhotos({user_id=InputUser, offset=int, max_id=long, limit=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MAX_ID_INVALID|The provided max ID is invalid|
+|USER_ID_INVALID|The provided user ID is invalid|
+
 

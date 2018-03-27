@@ -12,19 +12,12 @@ Get the current 2FA settings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|current\_password\_hash|[CLICK ME bytes](../types/bytes.md) | Yes|Use only if you have set a 2FA password: `$current_salt = $MadelineProto->account->getPassword()['current_salt']; $current_password_hash = hash('sha256', $current_salt.$password.$current_salt, true);`|
+|current\_password\_hash|[bytes](../types/bytes.md) | Yes|Use only if you have set a 2FA password: `$current_salt = $MadelineProto->account->getPassword()['current_salt']; $current_password_hash = hash('sha256', $current_salt.$password.$current_salt, true);`|
 
 
 ### Return type: [account\_PasswordSettings](../types/account_PasswordSettings.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PASSWORD_HASH_INVALID|The provided password hash is invalid|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 account_PasswordSettings = account.getPasswordSettings({current_password_hash='bytes', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PASSWORD_HASH_INVALID|The provided password hash is invalid|
+
 

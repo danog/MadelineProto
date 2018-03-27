@@ -20,14 +20,6 @@ Remove sticker from stickerset
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|BOT_MISSING|This method can only be run by a bot|
-|STICKER_INVALID|The provided sticker is invalid|
-
-
 ### MadelineProto Example:
 
 
@@ -72,4 +64,12 @@ Or, if you're into Lua:
 ```
 messages_StickerSet = stickers.removeStickerFromSet({sticker=InputDocument, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|BOT_MISSING|This method can only be run by a bot|
+|STICKER_INVALID|The provided sticker is invalid|
+
 

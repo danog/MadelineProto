@@ -15,8 +15,8 @@ Bots only. Sets result of a pre checkout query
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|pre\_checkout\_query\_id|[CLICK ME int64](../constructors/int64.md) | Yes|Identifier of the pre-checkout query|
-|error\_message|[CLICK ME string](../types/string.md) | Yes|Error message, empty on success|
+|pre\_checkout\_query\_id|[int64](../constructors/int64.md) | Yes|Identifier of the pre-checkout query|
+|error\_message|[string](../types/string.md) | Yes|Error message, empty on success|
 
 
 ### Return type: [Ok](../types/Ok.md)

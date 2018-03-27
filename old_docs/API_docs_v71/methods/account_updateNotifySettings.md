@@ -12,20 +12,13 @@ Change notification settings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[CLICK ME InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|The peers to which the notification settings should be applied|
-|settings|[CLICK ME InputPeerNotifySettings](../types/InputPeerNotifySettings.md) | Yes|Notification settings|
+|peer|[InputNotifyPeer](../types/InputNotifyPeer.md) | Yes|The peers to which the notification settings should be applied|
+|settings|[InputPeerNotifySettings](../types/InputPeerNotifySettings.md) | Yes|Notification settings|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
 
 
 ### MadelineProto Example:
@@ -65,4 +58,11 @@ Or, if you're into Lua:
 ```
 Bool = account.updateNotifySettings({peer=InputNotifyPeer, settings=InputPeerNotifySettings, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 

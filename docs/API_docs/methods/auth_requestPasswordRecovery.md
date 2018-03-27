@@ -15,13 +15,6 @@ Send an email to recover the 2FA password
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PASSWORD_EMPTY|The provided password is empty|
-
-
 ### MadelineProto Example:
 
 
@@ -55,4 +48,11 @@ Or, if you're into Lua:
 ```
 auth_PasswordRecovery = auth.requestPasswordRecovery({})
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PASSWORD_EMPTY|The provided password is empty|
+
 

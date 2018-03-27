@@ -12,31 +12,16 @@ Create stickerset
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|masks|[CLICK ME Bool](../types/Bool.md) | Optional|Masks?|
+|masks|[Bool](../types/Bool.md) | Optional|Masks?|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user ID associated to this stickerset|
-|title|[CLICK ME string](../types/string.md) | Yes|The stickerset title|
-|short\_name|[CLICK ME string](../types/string.md) | Yes|The stickerset short name|
-|stickers|Array of [CLICK ME InputStickerSetItem](../types/InputStickerSetItem.md) | Yes|The stickers to add|
+|title|[string](../types/string.md) | Yes|The stickerset title|
+|short\_name|[string](../types/string.md) | Yes|The stickerset short name|
+|stickers|Array of [InputStickerSetItem](../types/InputStickerSetItem.md) | Yes|The stickers to add|
 
 
 ### Return type: [messages\_StickerSet](../types/messages_StickerSet.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|BOT_MISSING|This method can only be run by a bot|
-|PACK_SHORT_NAME_INVALID|Short pack name invalid|
-|PACK_SHORT_NAME_OCCUPIED|A stickerpack with this name already exists|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|STICKER_EMOJI_INVALID|Sticker emoji invalid|
-|STICKER_FILE_INVALID|Sticker file invalid|
-|STICKER_PNG_DIMENSIONS|Sticker png dimensions invalid|
-|STICKERS_EMPTY|No sticker provided|
-|USER_ID_INVALID|The provided user ID is invalid|
 
 
 ### MadelineProto Example:
@@ -91,4 +76,19 @@ Or, if you're into Lua:
 ```
 messages_StickerSet = stickers.createStickerSet({masks=Bool, user_id=InputUser, title='string', short_name='string', stickers={InputStickerSetItem}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|BOT_MISSING|This method can only be run by a bot|
+|PACK_SHORT_NAME_INVALID|Short pack name invalid|
+|PACK_SHORT_NAME_OCCUPIED|A stickerpack with this name already exists|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|STICKER_EMOJI_INVALID|Sticker emoji invalid|
+|STICKER_FILE_INVALID|Sticker file invalid|
+|STICKER_PNG_DIMENSIONS|Sticker png dimensions invalid|
+|STICKERS_EMPTY|No sticker provided|
+|USER_ID_INVALID|The provided user ID is invalid|
+
 

@@ -12,8 +12,8 @@ Get blocked users
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|offset|[CLICK ME int](../types/int.md) | Yes|Initially 0, then set to the number of blocked contacts previously fetched|
-|limit|[CLICK ME int](../types/int.md) | Yes|How many blocked contacts to fetch|
+|offset|[int](../types/int.md) | Yes|Initially 0, then set to the number of blocked contacts previously fetched|
+|limit|[int](../types/int.md) | Yes|How many blocked contacts to fetch|
 
 
 ### Return type: [contacts\_Blocked](../types/contacts_Blocked.md)

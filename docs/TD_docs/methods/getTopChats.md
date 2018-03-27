@@ -15,8 +15,8 @@ Returns a list of frequently used chats. Supported only if chat info database is
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|category|[CLICK ME TopChatCategory](../types/TopChatCategory.md) | Yes|Category of chats to return|
-|limit|[CLICK ME int](../types/int.md) | Yes|Maximum number of chats to be returned, at most 30|
+|category|[TopChatCategory](../types/TopChatCategory.md) | Yes|Category of chats to return|
+|limit|[int](../types/int.md) | Yes|Maximum number of chats to be returned, at most 30|
 
 
 ### Return type: [Chats](../types/Chats.md)

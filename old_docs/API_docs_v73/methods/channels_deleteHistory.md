@@ -13,7 +13,7 @@ Delete the history of a supergroup/channel
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message ID to delete|
+|max\_id|[int](../types/int.md) | Yes|Maximum message ID to delete|
 
 
 ### Return type: [Bool](../types/Bool.md)

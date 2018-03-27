@@ -15,13 +15,6 @@ Get available languages
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|LANG_PACK_INVALID|The provided language pack is invalid|
-
-
 ### MadelineProto Example:
 
 
@@ -55,4 +48,11 @@ Or, if you're into Lua:
 ```
 Vector_of_LangPackLanguage = langpack.getLanguages({})
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|LANG_PACK_INVALID|The provided language pack is invalid|
+
 

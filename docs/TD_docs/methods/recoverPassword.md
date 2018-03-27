@@ -15,7 +15,7 @@ Recovers password with recovery code sent to email
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|recovery\_code|[CLICK ME string](../types/string.md) | Yes|Recovery code to check|
+|recovery\_code|[string](../types/string.md) | Yes|Recovery code to check|
 
 
 ### Return type: [PasswordState](../types/PasswordState.md)

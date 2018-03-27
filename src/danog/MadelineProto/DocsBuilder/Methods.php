@@ -111,7 +111,7 @@ trait Methods
                     case 'false':
                         $ptype = 'Bool';
                 }
-                $human_ptype = 'CLICK ME '.$ptype;
+                $human_ptype = $ptype;
                 if (in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
                 }
@@ -199,17 +199,6 @@ description: '.$description.'
             $example = '';
             if (!isset($this->settings['td'])) {
                 $example .= '### Can bots use this method: **'.($bot ? 'YES' : 'NO')."**\n\n\n";
-                if (isset($errors['result'][$data['method']])) {
-                    $example .= '### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-';
-                    foreach ($errors['result'][$data['method']] as $error) {
-                        $example .= '|'.$error.'|'.$errors['human_result'][$error][0].'|'."\n";
-                    }
-                    $example .= "\n\n";
-                }
                 $example .= str_replace('[]', '', '### MadelineProto Example:
 
 
@@ -305,6 +294,17 @@ You can also use normal markdown, note that to create mentions you must use the 
 
 MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
 ';
+                }
+                if (isset($errors['result'][$data['method']])) {
+                    $example .= '### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+';
+                    foreach ($errors['result'][$data['method']] as $error) {
+                        $example .= '|'.$error.'|'.$errors['human_result'][$error][0].'|'."\n";
+                    }
+                    $example .= "\n\n";
                 }
             }
             file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);

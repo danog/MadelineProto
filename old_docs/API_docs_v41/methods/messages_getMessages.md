@@ -12,7 +12,7 @@ Get messages
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|The IDs of messages to fetch (only for users and normal groups)|
+|id|Array of [int](../types/int.md) | Yes|The IDs of messages to fetch (only for users and normal groups)|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)

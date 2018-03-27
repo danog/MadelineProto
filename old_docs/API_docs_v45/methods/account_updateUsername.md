@@ -12,21 +12,12 @@ Update this user's username
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|username|[CLICK ME string](../types/string.md) | Yes|The new username|
+|username|[string](../types/string.md) | Yes|The new username|
 
 
 ### Return type: [User](../types/User.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|USERNAME_INVALID|The provided username is not valid|
-|USERNAME_NOT_MODIFIED|The username was not modified|
-|USERNAME_OCCUPIED|The provided username is already occupied|
 
 
 ### MadelineProto Example:
@@ -64,4 +55,13 @@ Or, if you're into Lua:
 ```
 User = account.updateUsername({username='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|USERNAME_INVALID|The provided username is not valid|
+|USERNAME_NOT_MODIFIED|The username was not modified|
+|USERNAME_OCCUPIED|The provided username is already occupied|
+
 

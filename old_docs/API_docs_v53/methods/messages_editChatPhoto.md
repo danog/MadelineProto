@@ -13,23 +13,12 @@ Edit the photo of a normal chat (not supergroup)
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The ID of the chat|
-|photo|[CLICK ME InputChatPhoto](../types/InputChatPhoto.md) | Optional|The new phto|
+|photo|[InputChatPhoto](../types/InputChatPhoto.md) | Optional|The new phto|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-|INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid|
-|INPUT_FETCH_FAIL|Failed deserializing TL payload|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|PHOTO_EXT_INVALID|The extension of the photo is invalid|
 
 
 ### MadelineProto Example:
@@ -78,4 +67,15 @@ Or, if you're into Lua:
 ```
 Updates = messages.editChatPhoto({chat_id=InputPeer, photo=InputChatPhoto, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid|
+|INPUT_FETCH_FAIL|Failed deserializing TL payload|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|PHOTO_EXT_INVALID|The extension of the photo is invalid|
+
 

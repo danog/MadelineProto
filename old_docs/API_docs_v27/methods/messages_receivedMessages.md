@@ -12,7 +12,7 @@ Mark messages as read
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|max\_id|[CLICK ME int](../types/int.md) | Yes|Maximum message id of messages to mark as read|
+|max\_id|[int](../types/int.md) | Yes|Maximum message id of messages to mark as read|
 
 
 ### Return type: [Vector\_of\_int](../types/int.md)

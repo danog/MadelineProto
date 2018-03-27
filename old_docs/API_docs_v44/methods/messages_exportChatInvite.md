@@ -20,13 +20,6 @@ Export chat invite
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-
-
 ### MadelineProto Example:
 
 
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 ExportedChatInvite = messages.exportChatInvite({chat_id=InputPeer, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+
 

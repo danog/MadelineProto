@@ -12,7 +12,7 @@ Get webpage preview
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|message|[CLICK ME string](../types/string.md) | Yes|Extract preview from this message|
+|message|[string](../types/string.md) | Yes|Extract preview from this message|
 
 
 ### Return type: [MessageMedia](../types/MessageMedia.md)

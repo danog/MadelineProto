@@ -12,21 +12,12 @@ Check if this phone number is registered on telegram
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|phone\_number|[CLICK ME string](../types/string.md) | Yes|The phone number to check|
+|phone\_number|[string](../types/string.md) | Yes|The phone number to check|
 
 
 ### Return type: [auth\_CheckedPhone](../types/auth_CheckedPhone.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PHONE_NUMBER_BANNED|The provided phone number is banned from telegram|
-|PHONE_NUMBER_INVALID|The phone number is invalid|
-|PHONE_NUMBER_INVALID|The phone number is invalid|
 
 
 ### MadelineProto Example:
@@ -64,4 +55,13 @@ Or, if you're into Lua:
 ```
 auth_CheckedPhone = auth.checkPhone({phone_number='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PHONE_NUMBER_BANNED|The provided phone number is banned from telegram|
+|PHONE_NUMBER_INVALID|The phone number is invalid|
+|PHONE_NUMBER_INVALID|The phone number is invalid|
+
 

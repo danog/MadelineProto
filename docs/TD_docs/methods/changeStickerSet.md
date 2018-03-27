@@ -15,9 +15,9 @@ Installs/uninstalls or enables/archives sticker set
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|set\_id|[CLICK ME int64](../constructors/int64.md) | Yes|Identifier of the sticker set|
-|is\_installed|[CLICK ME Bool](../types/Bool.md) | Yes|New value of is_installed|
-|is\_archived|[CLICK ME Bool](../types/Bool.md) | Yes|New value of is_archived. A sticker set can't be installed and archived simultaneously|
+|set\_id|[int64](../constructors/int64.md) | Yes|Identifier of the sticker set|
+|is\_installed|[Bool](../types/Bool.md) | Yes|New value of is_installed|
+|is\_archived|[Bool](../types/Bool.md) | Yes|New value of is_archived. A sticker set can't be installed and archived simultaneously|
 
 
 ### Return type: [Ok](../types/Ok.md)

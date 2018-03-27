@@ -15,8 +15,8 @@ Sends call debug information
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|call\_id|[CLICK ME int](../types/int.md) | Yes|Call identifier|
-|debug|[CLICK ME string](../types/string.md) | Yes|Debug information in application specific format|
+|call\_id|[int](../types/int.md) | Yes|Call identifier|
+|debug|[string](../types/string.md) | Yes|Debug information in application specific format|
 
 
 ### Return type: [Ok](../types/Ok.md)

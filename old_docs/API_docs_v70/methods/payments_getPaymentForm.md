@@ -12,19 +12,12 @@ Get payment form
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|msg\_id|[CLICK ME int](../types/int.md) | Yes|Message ID|
+|msg\_id|[int](../types/int.md) | Yes|Message ID|
 
 
 ### Return type: [payments\_PaymentForm](../types/payments_PaymentForm.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MESSAGE_ID_INVALID|The provided message id is invalid|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 payments_PaymentForm = payments.getPaymentForm({msg_id=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MESSAGE_ID_INVALID|The provided message id is invalid|
+
 

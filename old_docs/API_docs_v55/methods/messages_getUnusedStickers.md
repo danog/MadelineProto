@@ -12,7 +12,7 @@ Get unused stickers
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|limit|[CLICK ME int](../types/int.md) | Yes|Number of results to return|
+|limit|[int](../types/int.md) | Yes|Number of results to return|
 
 
 ### Return type: [Vector\_of\_StickerSetCovered](../types/StickerSetCovered.md)

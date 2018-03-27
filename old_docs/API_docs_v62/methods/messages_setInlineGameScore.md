@@ -12,24 +12,16 @@ Set the game score of an inline message
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|edit\_message|[CLICK ME Bool](../types/Bool.md) | Optional|Should the message with the game be edited?|
-|force|[CLICK ME Bool](../types/Bool.md) | Optional|Force setting the game score|
-|id|[CLICK ME InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|The ID of the inline message|
+|edit\_message|[Bool](../types/Bool.md) | Optional|Should the message with the game be edited?|
+|force|[Bool](../types/Bool.md) | Optional|Force setting the game score|
+|id|[InputBotInlineMessageID](../types/InputBotInlineMessageID.md) | Yes|The ID of the inline message|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user that set the score|
-|score|[CLICK ME int](../types/int.md) | Yes|The score|
+|score|[int](../types/int.md) | Yes|The score|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MESSAGE_ID_INVALID|The provided message id is invalid|
-|USER_BOT_REQUIRED|This method can only be called by a bot|
 
 
 ### MadelineProto Example:
@@ -84,4 +76,12 @@ Or, if you're into Lua:
 ```
 Bool = messages.setInlineGameScore({edit_message=Bool, force=Bool, id=InputBotInlineMessageID, user_id=InputUser, score=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MESSAGE_ID_INVALID|The provided message id is invalid|
+|USER_BOT_REQUIRED|This method can only be called by a bot|
+
 

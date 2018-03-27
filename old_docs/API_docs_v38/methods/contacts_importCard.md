@@ -12,20 +12,12 @@ Import card as contact
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|export\_card|Array of [CLICK ME int](../types/int.md) | Yes|The card|
+|export\_card|Array of [int](../types/int.md) | Yes|The card|
 
 
 ### Return type: [User](../types/User.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|EXPORT_CARD_INVALID|Provided card is invalid|
-|NEED_MEMBER_INVALID|The provided member is invalid|
 
 
 ### MadelineProto Example:
@@ -63,4 +55,12 @@ Or, if you're into Lua:
 ```
 User = contacts.importCard({export_card={int}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|EXPORT_CARD_INVALID|Provided card is invalid|
+|NEED_MEMBER_INVALID|The provided member is invalid|
+
 

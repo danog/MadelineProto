@@ -15,7 +15,7 @@ Deletes the account of currently logged in user, deleting from the server all in
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|reason|[CLICK ME string](../types/string.md) | Yes|Optional reason of account deletion|
+|reason|[string](../types/string.md) | Yes|Optional reason of account deletion|
 
 
 ### Return type: [Ok](../types/Ok.md)

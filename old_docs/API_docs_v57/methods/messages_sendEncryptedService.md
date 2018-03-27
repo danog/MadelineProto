@@ -13,22 +13,12 @@ Send a service message to a secret chat
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|The chat where to send the service message|
-|message|[CLICK ME DecryptedMessage](../types/DecryptedMessage.md) | Yes|The service message|
+|message|[DecryptedMessage](../types/DecryptedMessage.md) | Yes|The service message|
 
 
 ### Return type: [messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|DATA_INVALID|Encrypted data invalid|
-|ENCRYPTION_DECLINED|The secret chat was declined|
-|MSG_WAIT_FAILED|A waiting call returned an error|
-|USER_IS_BLOCKED|User is blocked|
 
 
 ### MadelineProto Example:
@@ -82,5 +72,15 @@ messages_SentEncryptedMessage = messages.sendEncryptedService({peer=InputEncrypt
 ## Return value 
 
 If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of [messages\_SentEncryptedMessage](../types/messages_SentEncryptedMessage.md) will be returned instead.
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|DATA_INVALID|Encrypted data invalid|
+|ENCRYPTION_DECLINED|The secret chat was declined|
+|MSG_WAIT_FAILED|A waiting call returned an error|
+|USER_IS_BLOCKED|User is blocked|
 
 

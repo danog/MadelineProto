@@ -15,8 +15,8 @@ Bots only. Changes position of a sticker in the set it belongs to. Sticker set s
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|sticker|[CLICK ME InputFile](../types/InputFile.md) | Yes|The sticker|
-|position|[CLICK ME int](../types/int.md) | Yes|New sticker position in the set, zero-based|
+|sticker|[InputFile](../types/InputFile.md) | Yes|The sticker|
+|position|[int](../types/int.md) | Yes|New sticker position in the set, zero-based|
 
 
 ### Return type: [Ok](../types/Ok.md)

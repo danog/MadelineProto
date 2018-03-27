@@ -12,7 +12,7 @@ Get all chats (not supergroups or channels)
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|except\_ids|Array of [CLICK ME int](../types/int.md) | Yes|Do not fetch these chats (MTProto id)|
+|except\_ids|Array of [int](../types/int.md) | Yes|Do not fetch these chats (MTProto id)|
 
 
 ### Return type: [messages\_Chats](../types/messages_Chats.md)

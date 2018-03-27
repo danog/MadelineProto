@@ -15,10 +15,10 @@ Edits message content caption. Non-bots can edit message in a limited period of 
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat the message belongs to|
-|message\_id|[CLICK ME int53](../types/int53.md) | Yes|Identifier of the message|
-|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Yes|Bots only. New message reply markup|
-|caption|[CLICK ME string](../types/string.md) | Yes|New message content caption, 0-200 characters|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat the message belongs to|
+|message\_id|[int53](../types/int53.md) | Yes|Identifier of the message|
+|reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Yes|Bots only. New message reply markup|
+|caption|[string](../types/string.md) | Yes|New message content caption, 0-200 characters|
 
 
 ### Return type: [Message](../types/Message.md)

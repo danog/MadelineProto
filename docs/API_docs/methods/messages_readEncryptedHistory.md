@@ -13,19 +13,12 @@ Mark messages as read in secret chats
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Secret chat ID, Update, EncryptedMessage or InputEncryptedChat](../types/InputEncryptedChat.md) | Yes|The secret chat where to mark messages as read|
-|max\_date|[CLICK ME int](../types/int.md) | Yes|Maximum date of messages to mark|
+|max\_date|[int](../types/int.md) | Yes|Maximum date of messages to mark|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MSG_WAIT_FAILED|A waiting call returned an error|
 
 
 ### MadelineProto Example:
@@ -74,4 +67,11 @@ Or, if you're into Lua:
 ```
 Bool = messages.readEncryptedHistory({peer=InputEncryptedChat, max_date=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MSG_WAIT_FAILED|A waiting call returned an error|
+
 

@@ -13,19 +13,12 @@ Save a GIF
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |id|[MessageMedia, Update, Message or InputDocument](../types/InputDocument.md) | Optional|The GIF to save|
-|unsave|[CLICK ME Bool](../types/Bool.md) | Yes|Remove the gif?|
+|unsave|[Bool](../types/Bool.md) | Yes|Remove the gif?|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|GIF_ID_INVALID|The provided GIF ID is invalid|
 
 
 ### MadelineProto Example:
@@ -65,4 +58,11 @@ Or, if you're into Lua:
 ```
 Bool = messages.saveGif({id=InputDocument, unsave=Bool, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|GIF_ID_INVALID|The provided GIF ID is invalid|
+
 

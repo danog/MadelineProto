@@ -15,8 +15,8 @@ Searches for specified query in the title and username of known chats, offline r
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|query|[CLICK ME string](../types/string.md) | Yes|Query to search for, if query is empty, returns up to 20 recently found chats|
-|limit|[CLICK ME int](../types/int.md) | Yes|Maximum number of chats to be returned|
+|query|[string](../types/string.md) | Yes|Query to search for, if query is empty, returns up to 20 recently found chats|
+|limit|[int](../types/int.md) | Yes|Maximum number of chats to be returned|
 
 
 ### Return type: [Chats](../types/Chats.md)

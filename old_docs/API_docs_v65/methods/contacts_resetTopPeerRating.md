@@ -12,20 +12,13 @@ Reset top peer rating for a certain category/peer
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|category|[CLICK ME TopPeerCategory](../types/TopPeerCategory.md) | Yes|The category |
+|category|[TopPeerCategory](../types/TopPeerCategory.md) | Yes|The category |
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The peer|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
 
 
 ### MadelineProto Example:
@@ -65,4 +58,11 @@ Or, if you're into Lua:
 ```
 Bool = contacts.resetTopPeerRating({category=TopPeerCategory, peer=InputPeer, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 

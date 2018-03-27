@@ -15,7 +15,7 @@ Returns file's extension guessing only by its mime type. Returns empty string on
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|mime\_type|[CLICK ME string](../types/string.md) | Yes|Mime type of the file|
+|mime\_type|[string](../types/string.md) | Yes|Mime type of the file|
 
 
 ### Return type: [Text](../types/Text.md)

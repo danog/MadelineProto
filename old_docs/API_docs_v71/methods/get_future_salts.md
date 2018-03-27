@@ -12,7 +12,7 @@ Get future salts
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|num|[CLICK ME int](../types/int.md) | Yes|How many salts should be fetched|
+|num|[int](../types/int.md) | Yes|How many salts should be fetched|
 
 
 ### Return type: [FutureSalts](../types/FutureSalts.md)

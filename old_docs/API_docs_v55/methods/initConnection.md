@@ -12,25 +12,17 @@ Initializes connection and save information on the user's device and application
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|api\_id|[CLICK ME int](../types/int.md) | Yes|Application identifier|
-|device\_model|[CLICK ME string](../types/string.md) | Yes|Device model|
-|system\_version|[CLICK ME string](../types/string.md) | Yes|System version|
-|app\_version|[CLICK ME string](../types/string.md) | Yes|App version|
-|lang\_code|[CLICK ME string](../types/string.md) | Yes|Language code to set|
-|query|[CLICK ME !X](../types/!X.md) | Yes|Nested query|
+|api\_id|[int](../types/int.md) | Yes|Application identifier|
+|device\_model|[string](../types/string.md) | Yes|Device model|
+|system\_version|[string](../types/string.md) | Yes|System version|
+|app\_version|[string](../types/string.md) | Yes|App version|
+|lang\_code|[string](../types/string.md) | Yes|Language code to set|
+|query|[!X](../types/!X.md) | Yes|Nested query|
 
 
 ### Return type: [X](../types/X.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CONNECTION_LAYER_INVALID|Layer invalid|
-|INPUT_FETCH_FAIL|Failed deserializing TL payload|
 
 
 ### MadelineProto Example:
@@ -87,4 +79,12 @@ Or, if you're into Lua:
 ```
 X = initConnection({api_id=int, device_model='string', system_version='string', app_version='string', lang_code='string', query=!X, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CONNECTION_LAYER_INVALID|Layer invalid|
+|INPUT_FETCH_FAIL|Failed deserializing TL payload|
+
 

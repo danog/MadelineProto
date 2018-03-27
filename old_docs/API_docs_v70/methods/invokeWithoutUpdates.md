@@ -12,7 +12,7 @@ Invoke with method without returning updates in the socket
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|query|[CLICK ME !X](../types/!X.md) | Yes|The query|
+|query|[!X](../types/!X.md) | Yes|The query|
 
 
 ### Return type: [X](../types/X.md)

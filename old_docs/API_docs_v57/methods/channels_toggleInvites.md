@@ -13,21 +13,12 @@ Allow or disallow any user to invite users to this channel/supergroup
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
-|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|Allow or disallow|
+|enabled|[Bool](../types/Bool.md) | Yes|Allow or disallow|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
-|CHAT_NOT_MODIFIED|The pinned message wasn't modified|
 
 
 ### MadelineProto Example:
@@ -67,4 +58,13 @@ Or, if you're into Lua:
 ```
 Updates = channels.toggleInvites({channel=InputChannel, enabled=Bool, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|CHAT_NOT_MODIFIED|The pinned message wasn't modified|
+
 

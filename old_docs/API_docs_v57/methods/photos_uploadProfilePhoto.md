@@ -20,16 +20,6 @@ Upload profile photo
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|FILE_PARTS_INVALID|The number of file parts is invalid|
-|IMAGE_PROCESS_FAILED|Failure while processing image|
-|PHOTO_CROP_SIZE_SMALL|Photo is too small|
-|PHOTO_EXT_INVALID|The extension of the photo is invalid|
-
-
 ### MadelineProto Example:
 
 
@@ -65,4 +55,14 @@ Or, if you're into Lua:
 ```
 photos_Photo = photos.uploadProfilePhoto({file=InputFile, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|FILE_PARTS_INVALID|The number of file parts is invalid|
+|IMAGE_PROCESS_FAILED|Failure while processing image|
+|PHOTO_CROP_SIZE_SMALL|Photo is too small|
+|PHOTO_EXT_INVALID|The extension of the photo is invalid|
+
 

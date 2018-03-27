@@ -15,7 +15,7 @@ Searches public chat by its username. Currently only private and channel chats c
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|username|[CLICK ME string](../types/string.md) | Yes|Username to be resolved|
+|username|[string](../types/string.md) | Yes|Username to be resolved|
 
 
 ### Return type: [Chat](../types/Chat.md)

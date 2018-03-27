@@ -12,8 +12,8 @@ Get all archived stickers
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|offset\_id|[CLICK ME long](../types/long.md) | Yes|Sticker ID offset|
-|limit|[CLICK ME int](../types/int.md) | Yes|Number of stickers to fetch|
+|offset\_id|[long](../types/long.md) | Yes|Sticker ID offset|
+|limit|[int](../types/int.md) | Yes|Number of stickers to fetch|
 
 
 ### Return type: [messages\_ArchivedStickers](../types/messages_ArchivedStickers.md)

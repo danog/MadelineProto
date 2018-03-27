@@ -15,8 +15,8 @@ Reports chat to Telegram moderators. Can be used only for a channel chat or a pr
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
-|reason|[CLICK ME ChatReportReason](../types/ChatReportReason.md) | Yes|Reason, the chat is reported|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
+|reason|[ChatReportReason](../types/ChatReportReason.md) | Yes|Reason, the chat is reported|
 
 
 ### Return type: [Ok](../types/Ok.md)

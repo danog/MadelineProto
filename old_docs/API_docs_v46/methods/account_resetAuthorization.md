@@ -12,19 +12,12 @@ Delete a certain session
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|hash|[CLICK ME long](../types/long.md) | Yes|The session hash, obtained from $MadelineProto->account->getAuthorizations|
+|hash|[long](../types/long.md) | Yes|The session hash, obtained from $MadelineProto->account->getAuthorizations|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|HASH_INVALID|The provided hash is invalid|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 Bool = account.resetAuthorization({hash=long, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|HASH_INVALID|The provided hash is invalid|
+
 

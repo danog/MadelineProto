@@ -13,7 +13,7 @@ Enable or disable hidden history for new channel/supergroup users
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
-|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|Enable or disable hidden history for new channel/supergroup users|
+|enabled|[Bool](../types/Bool.md) | Yes|Enable or disable hidden history for new channel/supergroup users|
 
 
 ### Return type: [Updates](../types/Updates.md)

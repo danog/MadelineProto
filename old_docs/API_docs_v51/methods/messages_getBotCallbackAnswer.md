@@ -13,24 +13,13 @@ Get the callback answer of a bot (after clicking a button)
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat|
-|msg\_id|[CLICK ME int](../types/int.md) | Yes|The message ID|
-|data|[CLICK ME bytes](../types/bytes.md) | Yes|The data to send to the bot|
+|msg\_id|[int](../types/int.md) | Yes|The message ID|
+|data|[bytes](../types/bytes.md) | Yes|The data to send to the bot|
 
 
 ### Return type: [messages\_BotCallbackAnswer](../types/messages_BotCallbackAnswer.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|DATA_INVALID|Encrypted data invalid|
-|MESSAGE_ID_INVALID|The provided message id is invalid|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|Timeout|A timeout occurred while fetching data from the bot|
 
 
 ### MadelineProto Example:
@@ -72,4 +61,15 @@ Or, if you're into Lua:
 ```
 messages_BotCallbackAnswer = messages.getBotCallbackAnswer({peer=InputPeer, msg_id=int, data='bytes', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|DATA_INVALID|Encrypted data invalid|
+|MESSAGE_ID_INVALID|The provided message id is invalid|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|Timeout|A timeout occurred while fetching data from the bot|
+
 

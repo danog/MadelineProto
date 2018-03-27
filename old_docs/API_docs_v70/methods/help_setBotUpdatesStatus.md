@@ -12,8 +12,8 @@ Set the update status of webhook
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|pending\_updates\_count|[CLICK ME int](../types/int.md) | Yes|Pending update count|
-|message|[CLICK ME string](../types/string.md) | Yes|Message|
+|pending\_updates\_count|[int](../types/int.md) | Yes|Pending update count|
+|message|[string](../types/string.md) | Yes|Message|
 
 
 ### Return type: [Bool](../types/Bool.md)

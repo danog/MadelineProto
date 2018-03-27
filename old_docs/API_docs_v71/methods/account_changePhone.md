@@ -12,21 +12,14 @@ Change the phone number associated to this account
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|phone\_number|[CLICK ME string](../types/string.md) | Yes|Phone number|
-|phone\_code\_hash|[CLICK ME string](../types/string.md) | Yes|Phone code hash returned by account.sendChangePhoneCode|
-|phone\_code|[CLICK ME string](../types/string.md) | Yes|The phone code sent by account.sendChangePhoneCode|
+|phone\_number|[string](../types/string.md) | Yes|Phone number|
+|phone\_code\_hash|[string](../types/string.md) | Yes|Phone code hash returned by account.sendChangePhoneCode|
+|phone\_code|[string](../types/string.md) | Yes|The phone code sent by account.sendChangePhoneCode|
 
 
 ### Return type: [User](../types/User.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PHONE_NUMBER_INVALID|The phone number is invalid|
 
 
 ### MadelineProto Example:
@@ -68,4 +61,11 @@ Or, if you're into Lua:
 ```
 User = account.changePhone({phone_number='string', phone_code_hash='string', phone_code='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PHONE_NUMBER_INVALID|The phone number is invalid|
+
 

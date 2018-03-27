@@ -15,7 +15,7 @@ Returns current privacy settings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|key|[CLICK ME PrivacyKey](../types/PrivacyKey.md) | Yes|Privacy key|
+|key|[PrivacyKey](../types/PrivacyKey.md) | Yes|Privacy key|
 
 
 ### Return type: [PrivacyRules](../types/PrivacyRules.md)

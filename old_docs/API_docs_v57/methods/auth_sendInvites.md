@@ -12,20 +12,13 @@ Invite friends to telegram!
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|phone\_numbers|Array of [CLICK ME string](../types/string.md) | Yes|Phone numbers to invite|
-|message|[CLICK ME string](../types/string.md) | Yes|The message to send|
+|phone\_numbers|Array of [string](../types/string.md) | Yes|Phone numbers to invite|
+|message|[string](../types/string.md) | Yes|The message to send|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MESSAGE_EMPTY|The provided message is empty|
 
 
 ### MadelineProto Example:
@@ -70,5 +63,12 @@ Bool = auth.sendInvites({phone_numbers={'string'}, message='string', })
 ## Return value 
 
 If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of [Bool](../types/Bool.md) will be returned instead.
+
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MESSAGE_EMPTY|The provided message is empty|
 
 

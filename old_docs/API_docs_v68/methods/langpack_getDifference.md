@@ -12,19 +12,12 @@ Get language pack updates
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|from\_version|[CLICK ME int](../types/int.md) | Yes|Previous version|
+|from\_version|[int](../types/int.md) | Yes|Previous version|
 
 
 ### Return type: [LangPackDifference](../types/LangPackDifference.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|LANG_PACK_INVALID|The provided language pack is invalid|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 LangPackDifference = langpack.getDifference({from_version=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|LANG_PACK_INVALID|The provided language pack is invalid|
+
 

@@ -13,43 +13,16 @@ Send a message
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat where to send this message|
-|reply\_to\_msg\_id|[CLICK ME int](../types/int.md) | Optional|Reply to message by ID|
-|message|[CLICK ME string](../types/string.md) | Yes|The message to send|
-|reply\_markup|[CLICK ME ReplyMarkup](../types/ReplyMarkup.md) | Optional|Keyboards to send|
-|entities|Array of [CLICK ME MessageEntity](../types/MessageEntity.md) | Optional|Entities to send (for styled text)|
+|reply\_to\_msg\_id|[int](../types/int.md) | Optional|Reply to message by ID|
+|message|[string](../types/string.md) | Yes|The message to send|
+|reply\_markup|[ReplyMarkup](../types/ReplyMarkup.md) | Optional|Keyboards to send|
+|entities|Array of [MessageEntity](../types/MessageEntity.md) | Optional|Entities to send (for styled text)|
 |parse\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|BUTTON_DATA_INVALID|The provided button data is invalid|
-|BUTTON_TYPE_INVALID|The type of one of the buttons you provided is invalid|
-|BUTTON_URL_INVALID|Button URL invalid|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
-|CHAT_ID_INVALID|The provided chat id is invalid|
-|ENTITY_MENTION_USER_INVALID|You can't use this entity|
-|INPUT_USER_DEACTIVATED|The specified user was deleted|
-|MESSAGE_EMPTY|The provided message is empty|
-|MESSAGE_TOO_LONG|The provided message is too long|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|REPLY_MARKUP_INVALID|The provided reply markup is invalid|
-|USER_BANNED_IN_CHANNEL|You're banned from sending messages in supergroups/channels|
-|USER_IS_BLOCKED|User is blocked|
-|USER_IS_BOT|Bots can't send messages to other bots|
-|YOU_BLOCKED_USER|You blocked this user|
-|RANDOM_ID_DUPLICATE|You provided a random ID that was already used|
-|CHAT_WRITE_FORBIDDEN|You can't write in this chat|
-|tanti SALUTI da peppe lg .|Ciao da un pony|
-|Timeout|A timeout occurred while fetching data from the bot|
 
 
 ### MadelineProto Example:
@@ -139,3 +112,30 @@ You can also use normal markdown, note that to create mentions you must use the 
 ```
 
 MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|BUTTON_DATA_INVALID|The provided button data is invalid|
+|BUTTON_TYPE_INVALID|The type of one of the buttons you provided is invalid|
+|BUTTON_URL_INVALID|Button URL invalid|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|CHAT_ID_INVALID|The provided chat id is invalid|
+|ENTITY_MENTION_USER_INVALID|You can't use this entity|
+|INPUT_USER_DEACTIVATED|The specified user was deleted|
+|MESSAGE_EMPTY|The provided message is empty|
+|MESSAGE_TOO_LONG|The provided message is too long|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|REPLY_MARKUP_INVALID|The provided reply markup is invalid|
+|USER_BANNED_IN_CHANNEL|You're banned from sending messages in supergroups/channels|
+|USER_IS_BLOCKED|User is blocked|
+|USER_IS_BOT|Bots can't send messages to other bots|
+|YOU_BLOCKED_USER|You blocked this user|
+|RANDOM_ID_DUPLICATE|You provided a random ID that was already used|
+|CHAT_WRITE_FORBIDDEN|You can't write in this chat|
+|tanti SALUTI da peppe lg .|Ciao da un pony|
+|Timeout|A timeout occurred while fetching data from the bot|
+
+

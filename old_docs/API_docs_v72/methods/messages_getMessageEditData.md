@@ -13,20 +13,12 @@ Check if about to edit a message or a media caption
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat|
-|id|[CLICK ME int](../types/int.md) | Yes|The message ID|
+|id|[int](../types/int.md) | Yes|The message ID|
 
 
 ### Return type: [messages\_MessageEditData](../types/messages_MessageEditData.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|MESSAGE_AUTHOR_REQUIRED|Message author required|
 
 
 ### MadelineProto Example:
@@ -66,4 +58,12 @@ Or, if you're into Lua:
 ```
 messages_MessageEditData = messages.getMessageEditData({peer=InputPeer, id=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|MESSAGE_AUTHOR_REQUIRED|Message author required|
+
 

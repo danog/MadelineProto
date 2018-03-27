@@ -15,8 +15,8 @@ Deletes all messages in the chat. Can't be used for channel chats
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|chat\_id|[CLICK ME int53](../types/int53.md) | Yes|Chat identifier|
-|remove\_from\_chat\_list|[CLICK ME Bool](../types/Bool.md) | Yes|Pass true, if chat should be removed from the chat list|
+|chat\_id|[int53](../types/int53.md) | Yes|Chat identifier|
+|remove\_from\_chat\_list|[Bool](../types/Bool.md) | Yes|Pass true, if chat should be removed from the chat list|
 
 
 ### Return type: [Ok](../types/Ok.md)

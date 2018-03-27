@@ -12,7 +12,7 @@ Get stickers attachable to images
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|media|[CLICK ME InputStickeredMedia](../types/InputStickeredMedia.md) | Yes|The stickered media|
+|media|[InputStickeredMedia](../types/InputStickeredMedia.md) | Yes|The stickered media|
 
 
 ### Return type: [Vector\_of\_StickerSetCovered](../types/StickerSetCovered.md)

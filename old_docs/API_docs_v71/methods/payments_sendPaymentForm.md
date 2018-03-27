@@ -12,22 +12,15 @@ Bots only: send payment form
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|msg\_id|[CLICK ME int](../types/int.md) | Yes|Message ID|
-|requested\_info\_id|[CLICK ME string](../types/string.md) | Optional|ID of requested info|
-|shipping\_option\_id|[CLICK ME string](../types/string.md) | Optional|Shipping option ID|
-|credentials|[CLICK ME InputPaymentCredentials](../types/InputPaymentCredentials.md) | Yes|Payment credentials|
+|msg\_id|[int](../types/int.md) | Yes|Message ID|
+|requested\_info\_id|[string](../types/string.md) | Optional|ID of requested info|
+|shipping\_option\_id|[string](../types/string.md) | Optional|Shipping option ID|
+|credentials|[InputPaymentCredentials](../types/InputPaymentCredentials.md) | Yes|Payment credentials|
 
 
 ### Return type: [payments\_PaymentResult](../types/payments_PaymentResult.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MESSAGE_ID_INVALID|The provided message id is invalid|
 
 
 ### MadelineProto Example:
@@ -71,4 +64,11 @@ Or, if you're into Lua:
 ```
 payments_PaymentResult = payments.sendPaymentForm({msg_id=int, requested_info_id='string', shipping_option_id='string', credentials=InputPaymentCredentials, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MESSAGE_ID_INVALID|The provided message id is invalid|
+
 

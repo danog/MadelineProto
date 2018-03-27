@@ -15,7 +15,7 @@ Deletes a file from TDLib file cache
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|file\_id|[CLICK ME int](../types/int.md) | Yes|Identifier of the file to delete|
+|file\_id|[int](../types/int.md) | Yes|Identifier of the file to delete|
 
 
 ### Return type: [Ok](../types/Ok.md)

@@ -12,19 +12,12 @@ Get privacy settings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|key|[CLICK ME InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|Privacy setting key|
+|key|[InputPrivacyKey](../types/InputPrivacyKey.md) | Yes|Privacy setting key|
 
 
 ### Return type: [account\_PrivacyRules](../types/account_PrivacyRules.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PRIVACY_KEY_INVALID|The privacy key is invalid|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 account_PrivacyRules = account.getPrivacy({key=InputPrivacyKey, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PRIVACY_KEY_INVALID|The privacy key is invalid|
+
 

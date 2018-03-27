@@ -12,7 +12,7 @@ Delete this account
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|reason|[CLICK ME string](../types/string.md) | Yes|Why are you going away? :(|
+|reason|[string](../types/string.md) | Yes|Why are you going away? :(|
 
 
 ### Return type: [Bool](../types/Bool.md)

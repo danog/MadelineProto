@@ -12,7 +12,7 @@ Reorder sticker sets
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|order|Array of [CLICK ME long](../types/long.md) | Yes|The order|
+|order|Array of [long](../types/long.md) | Yes|The order|
 
 
 ### Return type: [Bool](../types/Bool.md)

@@ -12,21 +12,13 @@ Update profile info
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|first\_name|[CLICK ME string](../types/string.md) | Yes|The first name|
-|last\_name|[CLICK ME string](../types/string.md) | Yes|The last name|
+|first\_name|[string](../types/string.md) | Yes|The first name|
+|last\_name|[string](../types/string.md) | Yes|The last name|
 
 
 ### Return type: [User](../types/User.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|ABOUT_TOO_LONG|The provided bio is too long|
-|FIRSTNAME_INVALID|The first name is invalid|
 
 
 ### MadelineProto Example:
@@ -66,4 +58,12 @@ Or, if you're into Lua:
 ```
 User = account.updateProfile({first_name='string', last_name='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|ABOUT_TOO_LONG|The provided bio is too long|
+|FIRSTNAME_INVALID|The first name is invalid|
+
 

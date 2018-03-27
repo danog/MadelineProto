@@ -12,23 +12,13 @@ Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https:
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|offset|[CLICK ME int](../types/int.md) | Yes|Offset|
-|limit|[CLICK ME int](../types/int.md) | Yes|Number of dialogs to fetch|
+|offset|[int](../types/int.md) | Yes|Offset|
+|limit|[int](../types/int.md) | Yes|Number of dialogs to fetch|
 
 
 ### Return type: [messages\_Dialogs](../types/messages_Dialogs.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid|
-|OFFSET_PEER_ID_INVALID|The provided offset peer is invalid|
-|SESSION_PASSWORD_NEEDED|2FA is enabled, use a password to login|
-|Timeout|A timeout occurred while fetching data from the bot|
 
 
 ### MadelineProto Example:
@@ -68,4 +58,14 @@ Or, if you're into Lua:
 ```
 messages_Dialogs = messages.getDialogs({offset=int, limit=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|INPUT_CONSTRUCTOR_INVALID|The provided constructor is invalid|
+|OFFSET_PEER_ID_INVALID|The provided offset peer is invalid|
+|SESSION_PASSWORD_NEEDED|2FA is enabled, use a password to login|
+|Timeout|A timeout occurred while fetching data from the bot|
+
 

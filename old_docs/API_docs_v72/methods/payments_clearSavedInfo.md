@@ -12,8 +12,8 @@ Clear saved payments info
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|credentials|[CLICK ME Bool](../types/Bool.md) | Optional|Clear credentials?|
-|info|[CLICK ME Bool](../types/Bool.md) | Optional|Clear payment info?|
+|credentials|[Bool](../types/Bool.md) | Optional|Clear credentials?|
+|info|[Bool](../types/Bool.md) | Optional|Clear payment info?|
 
 
 ### Return type: [Bool](../types/Bool.md)

@@ -21,15 +21,6 @@ Get channel/supergroup messages
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
-|MESSAGE_IDS_EMPTY|No message ids were provided|
-
-
 ### MadelineProto Example:
 
 
@@ -76,4 +67,13 @@ Or, if you're into Lua:
 ```
 messages_Messages = channels.getMessages({channel=InputChannel, id={InputMessage}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|MESSAGE_IDS_EMPTY|No message ids were provided|
+
 

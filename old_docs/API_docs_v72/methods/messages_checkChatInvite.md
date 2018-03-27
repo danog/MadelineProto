@@ -12,21 +12,12 @@ Check if an invitation link is valid
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|hash|[CLICK ME string](../types/string.md) | Yes|The invite link in t.me/joinchat/aflakf format|
+|hash|[string](../types/string.md) | Yes|The invite link in t.me/joinchat/aflakf format|
 
 
 ### Return type: [ChatInvite](../types/ChatInvite.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|INVITE_HASH_EMPTY|The invite hash is empty|
-|INVITE_HASH_EXPIRED|The invite link has expired|
-|INVITE_HASH_INVALID|The invite hash is invalid|
 
 
 ### MadelineProto Example:
@@ -64,4 +55,13 @@ Or, if you're into Lua:
 ```
 ChatInvite = messages.checkChatInvite({hash='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|INVITE_HASH_EMPTY|The invite hash is empty|
+|INVITE_HASH_EXPIRED|The invite link has expired|
+|INVITE_HASH_INVALID|The invite hash is invalid|
+
 

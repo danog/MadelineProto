@@ -15,8 +15,8 @@ Searches for recently used hashtags by their prefix
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|prefix|[CLICK ME string](../types/string.md) | Yes|Hashtag prefix to search for|
-|limit|[CLICK ME int](../types/int.md) | Yes|Maximum number of hashtags to return|
+|prefix|[string](../types/string.md) | Yes|Hashtag prefix to search for|
+|limit|[int](../types/int.md) | Yes|Maximum number of hashtags to return|
 
 
 ### Return type: [Hashtags](../types/Hashtags.md)

@@ -12,19 +12,12 @@ Remove a sticker set
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|stickerset|[CLICK ME InputStickerSet](../types/InputStickerSet.md) | Optional|The sticker set to remove|
+|stickerset|[InputStickerSet](../types/InputStickerSet.md) | Optional|The sticker set to remove|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|STICKERSET_INVALID|The provided sticker set is invalid|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 Bool = messages.uninstallStickerSet({stickerset=InputStickerSet, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|STICKERSET_INVALID|The provided sticker set is invalid|
+
 

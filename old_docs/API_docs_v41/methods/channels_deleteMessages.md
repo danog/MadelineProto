@@ -13,21 +13,12 @@ Delete channel/supergroup messages
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|The IDs of messages to delete|
+|id|Array of [int](../types/int.md) | Yes|The IDs of messages to delete|
 
 
 ### Return type: [messages\_AffectedMessages](../types/messages_AffectedMessages.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
-|MESSAGE_DELETE_FORBIDDEN|You can't delete one of the messages you tried to delete, most likely because it is a service message.|
 
 
 ### MadelineProto Example:
@@ -76,4 +67,13 @@ Or, if you're into Lua:
 ```
 messages_AffectedMessages = channels.deleteMessages({channel=InputChannel, id={int}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|MESSAGE_DELETE_FORBIDDEN|You can't delete one of the messages you tried to delete, most likely because it is a service message.|
+
 

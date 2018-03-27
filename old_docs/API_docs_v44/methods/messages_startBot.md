@@ -14,22 +14,12 @@ Start a bot
 |----------|---------------|----------|-------------|
 |bot|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The bot's ID or username|
 |peer|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|Where to start the bot (@me or group ID/username)|
-|start\_param|[CLICK ME string](../types/string.md) | Yes|The bot's start parameter|
+|start\_param|[string](../types/string.md) | Yes|The bot's start parameter|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|BOT_INVALID|This is not a valid bot|
-|PEER_ID_INVALID|The provided peer id is invalid|
-|START_PARAM_EMPTY|The start parameter is empty|
-|START_PARAM_INVALID|Start parameter invalid|
 
 
 ### MadelineProto Example:
@@ -71,4 +61,14 @@ Or, if you're into Lua:
 ```
 Updates = messages.startBot({bot=InputUser, peer=InputPeer, start_param='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|BOT_INVALID|This is not a valid bot|
+|PEER_ID_INVALID|The provided peer id is invalid|
+|START_PARAM_EMPTY|The start parameter is empty|
+|START_PARAM_INVALID|Start parameter invalid|
+
 

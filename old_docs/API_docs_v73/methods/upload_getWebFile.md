@@ -12,21 +12,14 @@ Download a file through telegram
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|location|[CLICK ME InputWebFileLocation](../types/InputWebFileLocation.md) | Yes|The file|
-|offset|[CLICK ME int](../types/int.md) | Yes|The offset in bytes|
-|limit|[CLICK ME int](../types/int.md) | Yes|The number of bytes to fetch|
+|location|[InputWebFileLocation](../types/InputWebFileLocation.md) | Yes|The file|
+|offset|[int](../types/int.md) | Yes|The offset in bytes|
+|limit|[int](../types/int.md) | Yes|The number of bytes to fetch|
 
 
 ### Return type: [upload\_WebFile](../types/upload_WebFile.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|LOCATION_INVALID|The provided location is invalid|
 
 
 ### MadelineProto Example:
@@ -68,4 +61,11 @@ Or, if you're into Lua:
 ```
 upload_WebFile = upload.getWebFile({location=InputWebFileLocation, offset=int, limit=int, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|LOCATION_INVALID|The provided location is invalid|
+
 

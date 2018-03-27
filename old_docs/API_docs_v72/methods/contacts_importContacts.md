@@ -12,7 +12,7 @@ Add phone number as contact
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|contacts|Array of [CLICK ME InputContact](../types/InputContact.md) | Yes|The numbers to import|
+|contacts|Array of [InputContact](../types/InputContact.md) | Yes|The numbers to import|
 
 
 ### Return type: [contacts\_ImportedContacts](../types/contacts_ImportedContacts.md)

@@ -15,13 +15,6 @@ Delete all logged-in sessions.
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|Timeout|A timeout occurred while fetching data from the bot|
-
-
 ### MadelineProto Example:
 
 
@@ -55,4 +48,11 @@ Or, if you're into Lua:
 ```
 Bool = auth.resetAuthorizations({})
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|Timeout|A timeout occurred while fetching data from the bot|
+
 

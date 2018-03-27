@@ -14,28 +14,12 @@ Edit admin permissions of a user in a channel/supergroup
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel|
 |user\_id|[Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Optional|The user|
-|role|[CLICK ME ChannelParticipantRole](../types/ChannelParticipantRole.md) | Yes|User role|
+|role|[ChannelParticipantRole](../types/ChannelParticipantRole.md) | Yes|User role|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|ADMINS_TOO_MUCH|Too many admins|
-|BOT_CHANNELS_NA|Bots can't edit admin privileges|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
-|USER_CREATOR|You can't leave this channel, because you're its creator|
-|USER_ID_INVALID|The provided user ID is invalid|
-|USER_NOT_MUTUAL_CONTACT|The provided user is not a mutual contact|
-|CHAT_ADMIN_INVITE_REQUIRED|You do not have the rights to do this|
-|RIGHT_FORBIDDEN|Your admin rights do not allow you to do this|
-|USER_PRIVACY_RESTRICTED|The user's privacy settings do not allow you to do this|
 
 
 ### MadelineProto Example:
@@ -86,4 +70,20 @@ Or, if you're into Lua:
 ```
 Updates = channels.editAdmin({channel=InputChannel, user_id=InputUser, role=ChannelParticipantRole, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|ADMINS_TOO_MUCH|Too many admins|
+|BOT_CHANNELS_NA|Bots can't edit admin privileges|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHAT_ADMIN_REQUIRED|You must be an admin in this chat to do this|
+|USER_CREATOR|You can't leave this channel, because you're its creator|
+|USER_ID_INVALID|The provided user ID is invalid|
+|USER_NOT_MUTUAL_CONTACT|The provided user is not a mutual contact|
+|CHAT_ADMIN_INVITE_REQUIRED|You do not have the rights to do this|
+|RIGHT_FORBIDDEN|Your admin rights do not allow you to do this|
+|USER_PRIVACY_RESTRICTED|The user's privacy settings do not allow you to do this|
+
 

@@ -15,8 +15,8 @@ Sets value of an option. See list of available options on https: core.telegram.o
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|name|[CLICK ME string](../types/string.md) | Yes|Name of the option|
-|value|[CLICK ME OptionValue](../types/OptionValue.md) | Optional|New value of the option|
+|name|[string](../types/string.md) | Yes|Name of the option|
+|value|[OptionValue](../types/OptionValue.md) | Optional|New value of the option|
 
 
 ### Return type: [Ok](../types/Ok.md)

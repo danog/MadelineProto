@@ -13,21 +13,12 @@ Get channel/supergroup messages
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel/supergroup|
-|id|Array of [CLICK ME int](../types/int.md) | Yes|The message IDs|
+|id|Array of [int](../types/int.md) | Yes|The message IDs|
 
 
 ### Return type: [messages\_Messages](../types/messages_Messages.md)
 
 ### Can bots use this method: **YES**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHANNEL_INVALID|The provided channel is invalid|
-|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
-|MESSAGE_IDS_EMPTY|No message ids were provided|
 
 
 ### MadelineProto Example:
@@ -76,4 +67,13 @@ Or, if you're into Lua:
 ```
 messages_Messages = channels.getMessages({channel=InputChannel, id={int}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHANNEL_INVALID|The provided channel is invalid|
+|CHANNEL_PRIVATE|You haven't joined this channel/supergroup|
+|MESSAGE_IDS_EMPTY|No message ids were provided|
+
 

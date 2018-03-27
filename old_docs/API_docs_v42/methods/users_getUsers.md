@@ -20,16 +20,6 @@ Get info about users
 ### Can bots use this method: **YES**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|SESSION_PASSWORD_NEEDED|2FA is enabled, use a password to login|
-|MEMBER_NO_LOCATION|An internal failure occurred while fetching user info (couldn't find location)|
-|NEED_MEMBER_INVALID|The provided member is invalid|
-|Timeout|A timeout occurred while fetching data from the bot|
-
-
 ### MadelineProto Example:
 
 
@@ -74,4 +64,14 @@ Or, if you're into Lua:
 ```
 Vector_of_User = users.getUsers({id={InputUser}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|SESSION_PASSWORD_NEEDED|2FA is enabled, use a password to login|
+|MEMBER_NO_LOCATION|An internal failure occurred while fetching user info (couldn't find location)|
+|NEED_MEMBER_INVALID|The provided member is invalid|
+|Timeout|A timeout occurred while fetching data from the bot|
+
 

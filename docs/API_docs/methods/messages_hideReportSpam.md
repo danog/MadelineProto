@@ -20,13 +20,6 @@ Hide report spam popup
 ### Can bots use this method: **NO**
 
 
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|PEER_ID_INVALID|The provided peer id is invalid|
-
-
 ### MadelineProto Example:
 
 
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 Bool = messages.hideReportSpam({peer=InputPeer, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|PEER_ID_INVALID|The provided peer id is invalid|
+
 

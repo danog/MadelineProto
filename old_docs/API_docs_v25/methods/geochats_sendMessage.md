@@ -12,8 +12,8 @@ Send message to geochat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
-|message|[CLICK ME string](../types/string.md) | Yes|The message|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|message|[string](../types/string.md) | Yes|The message|
 
 
 ### Return type: [geochats\_StatedMessage](../types/geochats_StatedMessage.md)

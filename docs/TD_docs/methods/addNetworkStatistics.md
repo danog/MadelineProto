@@ -15,7 +15,7 @@ Adds specified data to data usage statistics. Can be called before authorization
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|entry|[CLICK ME NetworkStatisticsEntry](../types/NetworkStatisticsEntry.md) | Yes|Network statistics entry with a data to add to statistics|
+|entry|[NetworkStatisticsEntry](../types/NetworkStatisticsEntry.md) | Yes|Network statistics entry with a data to add to statistics|
 
 
 ### Return type: [Ok](../types/Ok.md)

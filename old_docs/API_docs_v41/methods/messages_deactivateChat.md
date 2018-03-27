@@ -13,7 +13,7 @@ Deactivate chat
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |chat\_id|[Username, chat ID, Update, Message or InputPeer](../types/InputPeer.md) | Optional|The chat to deactivate|
-|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|Activate or deactivate?|
+|enabled|[Bool](../types/Bool.md) | Yes|Activate or deactivate?|
 
 
 ### Return type: [Updates](../types/Updates.md)

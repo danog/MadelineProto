@@ -15,7 +15,7 @@ Finishes file generation
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|generation\_id|[CLICK ME int64](../constructors/int64.md) | Yes|Identifier of the generation process|
+|generation\_id|[int64](../constructors/int64.md) | Yes|Identifier of the generation process|
 
 
 ### Return type: [Ok](../types/Ok.md)

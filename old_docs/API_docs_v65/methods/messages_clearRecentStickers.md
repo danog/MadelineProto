@@ -12,7 +12,7 @@ Clear all recent stickers
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|attached|[CLICK ME Bool](../types/Bool.md) | Optional|Clear recent stickers attached to images?|
+|attached|[Bool](../types/Bool.md) | Optional|Clear recent stickers attached to images?|
 
 
 ### Return type: [Bool](../types/Bool.md)

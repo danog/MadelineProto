@@ -15,7 +15,7 @@ Returns existing chat corresponding to the given user
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|user\_id|[CLICK ME int](../types/int.md) | Yes|User identifier|
+|user\_id|[int](../types/int.md) | Yes|User identifier|
 
 
 ### Return type: [Chat](../types/Chat.md)

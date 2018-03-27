@@ -12,22 +12,14 @@ Create channel/supergroup
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|title|[CLICK ME string](../types/string.md) | Yes|Supergroup/channel title|
-|about|[CLICK ME string](../types/string.md) | Yes|About text|
+|title|[string](../types/string.md) | Yes|Supergroup/channel title|
+|about|[string](../types/string.md) | Yes|About text|
 |users|Array of [Username, chat ID, Update, Message or InputUser](../types/InputUser.md) | Yes|Users to add to channel|
 
 
 ### Return type: [Updates](../types/Updates.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|CHAT_TITLE_EMPTY|No chat title provided|
-|USER_RESTRICTED|You're spamreported, you can't create channels or chats.|
 
 
 ### MadelineProto Example:
@@ -69,4 +61,12 @@ Or, if you're into Lua:
 ```
 Updates = channels.createChannel({title='string', about='string', users={InputUser}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|CHAT_TITLE_EMPTY|No chat title provided|
+|USER_RESTRICTED|You're spamreported, you can't create channels or chats.|
+
 

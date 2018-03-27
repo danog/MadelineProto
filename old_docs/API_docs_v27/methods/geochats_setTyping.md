@@ -12,8 +12,8 @@ Send typing notification to geochat
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|peer|[CLICK ME InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
-|typing|[CLICK ME Bool](../types/Bool.md) | Yes|Typing or not typing|
+|peer|[InputGeoChat](../types/InputGeoChat.md) | Yes|The geochat|
+|typing|[Bool](../types/Bool.md) | Yes|Typing or not typing|
 
 
 ### Return type: [Bool](../types/Bool.md)

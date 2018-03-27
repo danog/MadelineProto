@@ -12,20 +12,13 @@ Get language pack strings
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|lang\_code|[CLICK ME string](../types/string.md) | Yes|Language code|
-|keys|Array of [CLICK ME string](../types/string.md) | Yes|Keys|
+|lang\_code|[string](../types/string.md) | Yes|Language code|
+|keys|Array of [string](../types/string.md) | Yes|Keys|
 
 
 ### Return type: [Vector\_of\_LangPackString](../types/LangPackString.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|LANG_PACK_INVALID|The provided language pack is invalid|
 
 
 ### MadelineProto Example:
@@ -65,4 +58,11 @@ Or, if you're into Lua:
 ```
 Vector_of_LangPackString = langpack.getStrings({lang_code='string', keys={'string'}, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|LANG_PACK_INVALID|The provided language pack is invalid|
+
 

@@ -12,19 +12,12 @@ Check if this username is available
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|username|[CLICK ME string](../types/string.md) | Yes|The username to check|
+|username|[string](../types/string.md) | Yes|The username to check|
 
 
 ### Return type: [Bool](../types/Bool.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|USERNAME_INVALID|The provided username is not valid|
 
 
 ### MadelineProto Example:
@@ -62,4 +55,11 @@ Or, if you're into Lua:
 ```
 Bool = account.checkUsername({username='string', })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|USERNAME_INVALID|The provided username is not valid|
+
 

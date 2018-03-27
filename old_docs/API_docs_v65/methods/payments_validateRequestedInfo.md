@@ -12,21 +12,14 @@ Validate requested payment info
 
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
-|save|[CLICK ME Bool](../types/Bool.md) | Optional|Save payment info?|
-|msg\_id|[CLICK ME int](../types/int.md) | Yes|The message ID|
-|info|[CLICK ME PaymentRequestedInfo](../types/PaymentRequestedInfo.md) | Yes|The requested payment info|
+|save|[Bool](../types/Bool.md) | Optional|Save payment info?|
+|msg\_id|[int](../types/int.md) | Yes|The message ID|
+|info|[PaymentRequestedInfo](../types/PaymentRequestedInfo.md) | Yes|The requested payment info|
 
 
 ### Return type: [payments\_ValidatedRequestedInfo](../types/payments_ValidatedRequestedInfo.md)
 
 ### Can bots use this method: **NO**
-
-
-### Errors this method can return:
-
-| Error    | Description   |
-|----------|---------------|
-|MESSAGE_ID_INVALID|The provided message id is invalid|
 
 
 ### MadelineProto Example:
@@ -68,4 +61,11 @@ Or, if you're into Lua:
 ```
 payments_ValidatedRequestedInfo = payments.validateRequestedInfo({save=Bool, msg_id=int, info=PaymentRequestedInfo, })
 ```
+
+### Errors this method can return:
+
+| Error    | Description   |
+|----------|---------------|
+|MESSAGE_ID_INVALID|The provided message id is invalid|
+
 

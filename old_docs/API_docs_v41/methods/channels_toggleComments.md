@@ -13,7 +13,7 @@ Enable channel comments
 | Name     |    Type       | Required | Description |
 |----------|---------------|----------|-------------|
 |channel|[Username, chat ID, Update, Message or InputChannel](../types/InputChannel.md) | Optional|The channel |
-|enabled|[CLICK ME Bool](../types/Bool.md) | Yes|Enable or disable comments|
+|enabled|[Bool](../types/Bool.md) | Yes|Enable or disable comments|
 
 
 ### Return type: [Updates](../types/Updates.md)
