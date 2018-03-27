@@ -208,7 +208,7 @@ return false;
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
 
         $headers = [];
-        $headers[] = "Cookie: stel_token=$token";
+        $headers[] = "Cookie: stel_token=".$this->token;
         $headers[] = 'Origin: https://my.telegram.org';
         $headers[] = 'Accept-Encoding: gzip, deflate, br';
         $headers[] = 'Accept-Language: it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4';
@@ -243,7 +243,7 @@ return false;
         $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
         $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
         $headers[] = 'Referer: https://my.telegram.org/';
-        $headers[] = "Cookie: stel_token=$token";
+        $headers[] = "Cookie: stel_token=".$this->token;
         $headers[] = 'Connection: keep-alive';
         $headers[] = 'Cache-Control: max-age=0';
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);

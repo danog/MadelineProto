@@ -22,6 +22,7 @@ echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 try {
     $MadelineProto = new \danog\MadelineProto\API('session.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
+    echo $e.PHP_EOL;
     unlink('session.madeline');
     $MadelineProto = new \danog\MadelineProto\API('session.madeline');
 }
@@ -62,6 +63,8 @@ function configureCall($call)
     $call->parseConfig();
     $call->playOnHold($songs);
 }
+//$c = $MadelineProto->request_call('@danogentili');
+//configureCall($c);
 
 $MadelineProto->get_updates(['offset' => -1]);
 $offset = 0;
