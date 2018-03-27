@@ -74,6 +74,7 @@ class Logger
                 self::$isatty = defined('STDOUT') && function_exists('posix_isatty') && posix_isatty(STDOUT);
             } catch (\danog\MadelineProto\Exception $e) {
             }
+            self::$can_getmypid = !(isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org'));
             self::$inited = true;
         }
     }
