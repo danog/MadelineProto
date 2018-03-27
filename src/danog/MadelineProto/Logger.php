@@ -123,11 +123,11 @@ class Logger
 
     public static function log($param, $level = self::NOTICE)
     {
+        if ($level > self::$level || self::$mode === 0) {
+            return false;
+        }
         if (self::$mode === 4) {
             return call_user_func_array(self::$optional, [$param, $level]);
-        }
-        if ($level > self::$level) {
-            return false;
         }
         $prefix = self::$prefix;
         if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
