@@ -102,7 +102,9 @@ class DataCenter
                 } catch (\danog\MadelineProto\Exception $e) {
                 } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
                 }
-                if (isset($this->settings[$dc_config_number]['do_not_retry']) && $this->settings[$dc_config_number]['do_not_retry']) break;
+                if (isset($this->settings[$dc_config_number]['do_not_retry']) && $this->settings[$dc_config_number]['do_not_retry']) {
+                    break;
+                }
             }
             switch ($x) {
                 case 0:

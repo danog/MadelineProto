@@ -93,26 +93,32 @@ if (!extension_loaded('php-libtgvoip')) {
             $this->callState = $callState;
             $this->protocol = $protocol;
         }
+
         public function deInitVoIPController()
         {
         }
+
         public function setVisualization($visualization)
         {
             $this->visualization = $visualization;
         }
+
         public function getVisualization()
         {
             return $this->visualization;
         }
-        public function discard($reason = ["_" => "phoneCallDiscardReasonDisconnect"], $rating = [], $debug = false)
+
+        public function discard($reason = ['_' => 'phoneCallDiscardReasonDisconnect'], $rating = [], $debug = false)
         {
             if ($this->callState === self::CALL_STATE_ENDED || empty($this->configuration)) {
                 return false;
             }
             $this->MadelineProto->discard_call($this->callID, $reason, $rating, $debug);
             $this->deinitVoIPController();
+
             return $this;
         }
+
         public function accept()
         {
             if ($this->callState !== self::CALL_STATE_INCOMING) {
@@ -121,55 +127,75 @@ if (!extension_loaded('php-libtgvoip')) {
             $this->callState = self::CALL_STATE_ACCEPTED;
             if (!$this->MadelineProto->accept_call($this->callID)) {
                 $this->discard_call(['_' => 'phoneCallDiscardReasonDisconnect']);
+
                 return false;
             }
+
             return $this;
         }
+
         public function close()
         {
             $this->deinitVoIPController();
         }
+
         public function startTheMagic()
         {
             return $this;
         }
+
         public function play($file)
         {
-            $this->inputFiles []= $file;
+            $this->inputFiles[] = $file;
+
             return $this;
         }
+
         public function playOnHold($files)
         {
             $this->holdFiles = $files;
         }
+
         public function setOutputFile($file)
         {
             $this->outputFile = $file;
         }
+
         public function unsetOutputFile()
         {
             $this->outputFile = null;
         }
 
-            public function setMadeline($MadelineProto) {
-                $this->MadelineProto = $MadelineProto;
-            }
-            public function getProtocol() {
-                return $this->protocol;
-            }
-            public function getOtherID() {
-                return $this->otherID;
-            }
-            public function getCallID() {
-                return $this->callID;
-            }
-            public function isCreator() {
-                return $this->creator;
-            }
+        public function setMadeline($MadelineProto)
+        {
+            $this->MadelineProto = $MadelineProto;
+        }
+
+        public function getProtocol()
+        {
+            return $this->protocol;
+        }
+
+        public function getOtherID()
+        {
+            return $this->otherID;
+        }
+
+        public function getCallID()
+        {
+            return $this->callID;
+        }
+
+        public function isCreator()
+        {
+            return $this->creator;
+        }
+
         public function whenCreated()
         {
             return isset($this->internalStorage['created']) ? $this->internalStorage['created'] : false;
         }
+
         public function parseConfig()
         {
             if (count($this->configuration['endpoints'])) {
@@ -197,29 +223,36 @@ if (!extension_loaded('php-libtgvoip')) {
                 $this->init_all();
             }
         }
-        private function init_all() {
+
+        private function init_all()
+        {
         }
 
         public function getCallState()
         {
             return $this->callState;
         }
+
         public function getVersion()
         {
             return 'libponyvoip-1.0';
         }
+
         public function getPreferredRelayID()
         {
             return 0;
         }
+
         public function getLastError()
         {
             return '';
         }
+
         public function getDebugLog()
         {
             return '';
         }
+
         public function getSignalBarsCount()
         {
             return $this->signal;
