@@ -134,23 +134,9 @@ class SOCKSProxy extends \BaseProxy
         return true;
     }
 
-    public function connect($address, $port = 0)
-    {
-        $errno = 0;
-        $errstr = '';
-
-        if (isset($this->options['host']) && isset($this->options['port'])) {
-            $this->sock = @fsockopen($this->options['host'], $this->options['port'], $errno, $errstr, $this->timeout['sec'] + ($this->timeout['usec'] / 1000000));
-        } else {
-            $this->sock = @fsockopen($address, $port, $errno, $errstr, $this->timeout['sec'] + ($this->timeout['usec'] / 1000000));
-        }
-
-        if ($this->sock === false) {
-            return false;
-        }
-
-        stream_set_timeout($this->sock, $this->timeout['sec'], $this->timeout['usec']);
-
+//    public function connect($address, $port = 0)
+    protected function postConnect()
+    {        
         /* Use protocol 5 only if needed */
         if (isset($this->options['host']) && isset($this->options['port'])) {
             $connected = ((!isset($this->options['version']) || $this->options['version'] !== 5) &&

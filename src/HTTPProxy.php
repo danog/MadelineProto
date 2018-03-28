@@ -2,40 +2,27 @@
 
 class HTTPProxy extends \BaseProxy
 {
-    private $use_connect = true;
-
+    private $useConnect = true;
+    private $domain;
+    
     public function __construct($domain, $type, $protocol)
     {
         parent::__construct($domain, $type, $protocol);
+        $this->domain = $domain;
 
         if ($protocol === PHP_INT_MAX - 1) { /* http */
-            $this->use_connect = false;
+            $this->useConnect = false;
         }
     }
 
-    public function connect($address, $port = 0)
-    {
-        $errno = 0;
-        $errstr = '';
-
-        if (isset($this->options['host']) && isset($this->options['port'])) {
-            $this->sock = @fsockopen($this->options['host'], $this->options['port'], $errno, $errstr, $this->timeout['sec'] + ($this->timeout['usec'] / 1000000));
-        } else {
-            $this->sock = @fsockopen($address, $port, $errno, $errstr, $this->timeout['sec'] + ($this->timeout['usec'] / 1000000));
-        }
-
-        if ($this->sock === false) {
-            return false;
-        }
-
-        stream_set_timeout($this->sock, $this->timeout['sec'], $this->timeout['usec']);
-
+    protected function postConnect() 
+    {        
         if (isset($this->options['host']) && isset($this->options['port']) &&
-                true === $this->use_connect) {
+                true === $this->useConnect) {
             if ($this->domain === AF_INET6 && strpos($address, ':') !== false) {
                 $address = '['.$address.']';
             }
-            fwrite($this->sock, 'CONNECT '.$address.':'.$port." HTTP/1.1\r\n".
+            $this->write('CONNECT '.$address.':'.$port." HTTP/1.1\r\n".
                     "Accept: */*\r\n".
                     'Host: '.$address.':'.$port."\r\n".
                     $this->getProxyAuthHeader().
@@ -44,7 +31,8 @@ class HTTPProxy extends \BaseProxy
 
             $response = '';
             $status = false;
-            while ($line = @fgets($this->sock)) {
+            $socket = $this->conn->getSocket();
+            while ($line = @fgets($socket)) {
                 $status = $status || (strpos($line, 'HTTP') !== false);
                 if ($status) {
                     $response .= $line;
@@ -72,6 +60,6 @@ class HTTPProxy extends \BaseProxy
 
     public function getProxyHeaders()
     {
-        return ($this->use_connect === true) ? '' : $this->getProxyAuthHeader();
+        return ($this->useConnect === true) ? '' : $this->getProxyAuthHeader();
     }
 }

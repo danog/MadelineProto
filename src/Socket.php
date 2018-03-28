@@ -125,6 +125,11 @@ If not, see <http://www.gnu.org/licenses/>.
         {
             return '';
         }
+        
+        public function getSocket() 
+        {
+            return $this->sock;
+        }
     }
 
 if (!extension_loaded('pthreads')) {
@@ -238,6 +243,11 @@ if (!extension_loaded('pthreads')) {
             public function getProxyHeaders()
             {
                 return '';
+            }
+            
+            public function getSocket() 
+            {
+                return $this->sock;
             }
         }
         class Socket extends SocketBase
