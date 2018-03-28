@@ -15,7 +15,7 @@ class HTTPProxy extends \BaseProxy
         }
     }
 
-    protected function postConnect() 
+    protected function postConnect($address, $port) 
     {        
         if (isset($this->options['host']) && isset($this->options['port']) &&
                 true === $this->useConnect) {
@@ -31,14 +31,15 @@ class HTTPProxy extends \BaseProxy
 
             $response = '';
             $status = false;
-            $socket = $this->conn->getSocket();
-            while ($line = @fgets($socket)) {
-                $status = $status || (strpos($line, 'HTTP') !== false);
-                if ($status) {
-                    $response .= $line;
-                    if (!rtrim($line)) {
+            
+             while (true) {
+                $line = '';
+                while (($char = $this->conn->read(1)) !== "\n") {
+                    $line .= $char;
+                }
+                $response .= $line . '\n';
+                if (!rtrim($line)) {
                         break;
-                    }
                 }
             }
             if (substr($response, 0, 13) !== 'HTTP/1.1 200 ') {

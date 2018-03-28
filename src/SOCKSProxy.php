@@ -134,8 +134,7 @@ class SOCKSProxy extends \BaseProxy
         return true;
     }
 
-//    public function connect($address, $port = 0)
-    protected function postConnect()
+    protected function postConnect($address, $port) 
     {        
         /* Use protocol 5 only if needed */
         if (isset($this->options['host']) && isset($this->options['port'])) {

@@ -39,7 +39,8 @@ class BaseProxy implements \danog\MadelineProto\Proxy
     protected function changeContextSSL()
     {
         /*
-         * Change context to SSL
+         * Change context to SSL 
+         * $this->conn must be \FSocket object
          */
         if ($this->tls !== true) {
             return true;
@@ -71,7 +72,7 @@ class BaseProxy implements \danog\MadelineProto\Proxy
         return false;
     }
 
-    protected function postConnect() 
+    protected function postConnect($address, $port) 
     {
         return $this->changeContextSSL();
     }
@@ -83,16 +84,16 @@ class BaseProxy implements \danog\MadelineProto\Proxy
         
         $isConnected = false;
         if (isset($this->options['host']) && isset($this->options['port'])) {
-            $isConnected = parent::connect($this->options['host'], $this->options['port']);
+            $isConnected = $this->conn->connect($this->options['host'], $this->options['port']);
         } else {
-            $isConnected = parent::connect($address, $port);
+            $isConnected = $this->conn->connect($address, $port);
         }
 
         if ($isConnected === false) {
             return false;
         }
 
-        return $this->postConnect();
+        return $this->postConnect($address, $port);
     }
 
     public function getOption($level, $name)
