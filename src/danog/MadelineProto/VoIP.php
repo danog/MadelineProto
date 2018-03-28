@@ -12,7 +12,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
-if (!extension_loaded('php-libtgvoip')) {
+if (!extension_loaded('php-libtgvoip') && false) {
     class VoIP
     {
         use \danog\MadelineProto\MTProtoTools\MessageHandler;
