@@ -15,6 +15,8 @@ namespace danog\MadelineProto;
 if (!extension_loaded('php-libtgvoip')) {
     class VoIP
     {
+        use \danog\MadelineProto\MTProtoTools\MessageHandler;
+
         const PHP_LIBTGVOIP_VERSION = '1.1.2';
         const STATE_CREATED = 0;
         const STATE_WAIT_INIT = 1;
@@ -62,14 +64,25 @@ if (!extension_loaded('php-libtgvoip')) {
         const CALL_STATE_ENDED = 5;
 
         private $MadelineProto;
-        public $configuration = [];
+        public $configuration = ['endpoints' => [], 'shared_config' => []];
         public $storage = [];
-        private $internalStorage = [];
-        private $otherID;
-        private $creator;
+        public $internalStorage = [];
+        private $signal = 0;
         private $callState;
         private $callID;
+        private $creatorID;
+        private $otherID;
+        private $protocol;
         private $visualization;
+        private $holdFiles = [];
+        private $inputFiles;
+        private $outputFile;
+        private $isPlaying = false;
+
+        private $connection_settings = [];
+        private $dclist = [];
+
+        private $datacenter;
 
         public function __construct($creator, $otherID, $callID, $MadelineProto, $callState, $protocol)
         {
@@ -78,26 +91,138 @@ if (!extension_loaded('php-libtgvoip')) {
             $this->callID = $callID;
             $this->MadelineProto = $MadelineProto;
             $this->callState = $callState;
-            $this->configuration['protocol'] = $protocol;
+            $this->protocol = $protocol;
         }
-
+        public function deInitVoIPController()
+        {
+        }
         public function setVisualization($visualization)
         {
             $this->visualization = $visualization;
         }
-
-        public function parseConfig()
+        public function getVisualization()
         {
+            return $this->visualization;
         }
-
+        public function discard($reason = ["_" => "phoneCallDiscardReasonDisconnect"], $rating = [], $debug = false)
+        {
+            if ($this->callState === self::CALL_STATE_ENDED || empty($this->configuration)) {
+                return false;
+            }
+            $this->MadelineProto->discard_call($this->callID, $reason, $rating, $debug);
+            $this->deinitVoIPController();
+            return $this;
+        }
+        public function accept()
+        {
+            if ($this->callState !== self::CALL_STATE_INCOMING) {
+                return false;
+            }
+            $this->callState = self::CALL_STATE_ACCEPTED;
+            if (!$this->MadelineProto->accept_call($this->callID)) {
+                $this->discard_call(['_' => 'phoneCallDiscardReasonDisconnect']);
+                return false;
+            }
+            return $this;
+        }
+        public function close()
+        {
+            $this->deinitVoIPController();
+        }
         public function startTheMagic()
         {
-            var_dump($this->configuration);
+            return $this;
+        }
+        public function play($file)
+        {
+            $this->inputFiles []= $file;
+            return $this;
+        }
+        public function playOnHold($files)
+        {
+            $this->holdFiles = $files;
+        }
+        public function setOutputFile($file)
+        {
+            $this->outputFile = $file;
+        }
+        public function unsetOutputFile()
+        {
+            $this->outputFile = null;
+        }
+
+            public function setMadeline($MadelineProto) {
+                $this->MadelineProto = $MadelineProto;
+            }
+            public function getProtocol() {
+                return $this->protocol;
+            }
+            public function getOtherID() {
+                return $this->otherID;
+            }
+            public function getCallID() {
+                return $this->callID;
+            }
+            public function isCreator() {
+                return $this->creator;
+            }
+        public function whenCreated()
+        {
+            return isset($this->internalStorage['created']) ? $this->internalStorage['created'] : false;
+        }
+        public function parseConfig()
+        {
+            if (count($this->configuration['endpoints'])) {
+                $this->connection_settings['all'] = $this->MadelineProto->settings['connection_settings']['all'];
+                $this->connection_settings['all']['protocol'] = 'obfuscated2';
+                $this->connection_settings['all']['do_not_retry'] = true;
+
+                $test = $this->connection_settings['all']['test_mode'] ? 'test' : 'main';
+                foreach ($this->configuration['endpoints'] as $endpoint) {
+                    $this->dclist[$test]['ipv6'][$endpoint['id']] = ['ip_address' => $endpoint['ipv6'], 'port' => $endpoint['port'], 'peer_tag' => $endpoint['peer_tag']];
+                    $this->dclist[$test]['ipv4'][$endpoint['id']] = ['ip_address' => $endpoint['ip'], 'port' => $endpoint['port'], 'peer_tag' => $endpoint['peer_tag']];
+                }
+                if (!isset($this->datacenter)) {
+                    $this->datacenter = new DataCenter($this->dclist, $this->connection_settings);
+                } else {
+                    //$this->datacenter->__construct($this->dclist, $this->connection_settings);
+                }
+                foreach ($this->datacenter->get_dcs() as $new_dc) {
+                    $this->datacenter->dc_connect($new_dc);
+                }
+                $this->init_all();
+                foreach ($this->datacenter->get_dcs(false) as $new_dc) {
+                    $this->datacenter->dc_connect($new_dc);
+                }
+                $this->init_all();
+            }
+        }
+        private function init_all() {
         }
 
         public function getCallState()
         {
             return $this->callState;
+        }
+        public function getVersion()
+        {
+            return 'libponyvoip-1.0';
+        }
+        public function getPreferredRelayID()
+        {
+            return 0;
+        }
+        public function getLastError()
+        {
+            return '';
+        }
+        public function getDebugLog()
+        {
+            return '';
+        }
+        public function getSignalBarsCount()
+        {
+            return $this->signal;
         }
     }
 }
