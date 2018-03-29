@@ -185,4 +185,8 @@ class HttpProxy implements \danog\MadelineProto\Proxy
     public function getProxyHeaders()
     {
     }
+    public function getResource()
+    {
+        return $this->sock->getResource();
+    }
 }
