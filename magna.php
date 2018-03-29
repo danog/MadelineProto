@@ -12,7 +12,15 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelineProto/'));
 
-require_once 'vendor/autoload.php';
+if (!file_exists(__DIR__.'/vendor/autoload.php')) {
+    echo 'You did not run composer update, using madeline.php'.PHP_EOL;
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    }
+    include 'madeline.php';
+} else {
+    require_once 'vendor/autoload.php';
+}
 if (file_exists('web_data.php')) {
     require_once 'web_data.php';
 }
