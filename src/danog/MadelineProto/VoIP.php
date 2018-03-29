@@ -227,7 +227,7 @@ if (!extension_loaded('php-libtgvoip') && false) {
         private function init_all()
         {
             foreach ($this->datacenter->sockets as $dc_id => $socket) {
-                if ($socket->auth_key === NULL) {
+                if ($socket->auth_key === null) {
                     $socket->auth_key = ['id' => $this->configuration['auth_key_id'], 'auth_key' => $this->configuration['auth_key']];
                 }
             }

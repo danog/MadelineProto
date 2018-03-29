@@ -144,15 +144,17 @@ class DataCenter
 
         return $all ? array_keys((array) $this->dclist[$test][$ipv6]) : array_keys((array) $this->sockets);
     }
+
     public function select()
     {
         $read = [];
         $write = [];
         $except = [];
         foreach ($this->sockets as $dc_id => $socket) {
-            $read [$dc_id] = $socket->getSocket();
+            $read[$dc_id] = $socket->getSocket();
         }
         \Socket::select($read, $write, $except, 0);
+
         return array_keys($read);
     }
 }

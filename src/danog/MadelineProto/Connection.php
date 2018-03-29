@@ -413,6 +413,7 @@ class Connection
 
         return ['protocol' => $protocol, 'code' => $code, 'description' => $description, 'body' => $read, 'headers' => $headers];
     }
+
     public function getSocket()
     {
         return $this->sock;

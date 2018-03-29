@@ -97,14 +97,21 @@ If not, see <http://www.gnu.org/licenses/>.
             }
             $res = stream_select($actual_read, $actual_write, $actual_except, $tv_sec, $tv_usec);
             foreach ($read as $key => $resource) {
-                if (!isset($actual_read[$key])) unset($read[$key]);
+                if (!isset($actual_read[$key])) {
+                    unset($read[$key]);
+                }
             }
             foreach ($write as $key => $resource) {
-                if (!isset($actual_write[$key])) unset($write[$key]);
+                if (!isset($actual_write[$key])) {
+                    unset($write[$key]);
+                }
             }
             foreach ($except as $key => $resource) {
-                if (!isset($actual_except[$key])) unset($except[$key]);
+                if (!isset($actual_except[$key])) {
+                    unset($except[$key]);
+                }
             }
+
             return $res;
         }
 
@@ -147,6 +154,7 @@ If not, see <http://www.gnu.org/licenses/>.
         {
             return '';
         }
+
         public function getResource()
         {
             return $this->sock;
@@ -233,17 +241,23 @@ if (!extension_loaded('pthreads')) {
                 }
                 $res = socket_select($actual_read, $actual_write, $actual_except, $tv_sec, $tv_usec);
                 foreach ($read as $key => $resource) {
-                    if (!isset($actual_read[$key])) unset($read[$key]);
+                    if (!isset($actual_read[$key])) {
+                        unset($read[$key]);
+                    }
                 }
                 foreach ($write as $key => $resource) {
-                    if (!isset($actual_write[$key])) unset($write[$key]);
+                    if (!isset($actual_write[$key])) {
+                        unset($write[$key]);
+                    }
                 }
                 foreach ($except as $key => $resource) {
-                    if (!isset($actual_except[$key])) unset($except[$key]);
+                    if (!isset($actual_except[$key])) {
+                        unset($except[$key]);
+                    }
                 }
+
                 return $res;
             }
-
 
             public function read(int $length, int $flags = 0)
             {
@@ -288,6 +302,7 @@ if (!extension_loaded('pthreads')) {
             {
                 return '';
             }
+
             public function getResource()
             {
                 return $this->sock;
