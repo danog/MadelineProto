@@ -28,6 +28,10 @@ class EventHandler extends \danog\MadelineProto\EventHandler
     {
         \danog\MadelineProto\Logger::log("Received an update of type ".$update['_']);
     }
+    public function onLoop()
+    {
+        \danog\MadelineProto\Logger::log("Working...");
+    }
     public function onUpdateNewChannelMessage($update)
     {
         $this->onUpdateNewMessage($update);
@@ -79,7 +83,9 @@ This will create an event handler class `EventHandler`, create a MadelineProto s
 
 When an [Update](https://docs.madelineproto.xyz/API_docs/types/Update.html) is received, the corresponding `onUpdateType` event handler method is called. To get a list of all possible update types, [click here](https://docs.madelineproto.xyz/API_docs/types/Update.html). 
 If such a method does not exist, the `onAny` event handler method is called.  
-If the `onAny` event handler method does not exist, the update is ignored.
+If the `onAny` event handler method does not exist, the update is ignored.  
+The `onLoop` method, if it exists, will be called every time the update loop finishes one cycle, even if no update was received.  
+It is useful for scheduling actions.
 
 To access the `$MadelineProto` instance inside of the event handler, simply access `$this`:
 ```php

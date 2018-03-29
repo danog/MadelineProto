@@ -18,6 +18,11 @@ namespace danog\MadelineProto\Wrappers;
  */
 trait Loop
 {
+    private $loop_callback;
+    public function setLoopCallback($callback)
+    {
+        $this->loop_callback = $callback;
+    }
     public function loop($max_forks = 0)
     {
         if (in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler'])) {
@@ -46,6 +51,9 @@ trait Loop
                         die;
                     }
                 }
+                if ($this->loop_callback !== NULL) {
+                    ($this->loop_callback)();
+                }
             }
         } else {
             while (true) {
@@ -53,6 +61,9 @@ trait Loop
                 foreach ($updates as $update) {
                     $offset = $update['update_id'] + 1;
                     $this->settings['updates']['callback']($update['update']);
+                }
+                if ($this->loop_callback !== NULL) {
+                    ($this->loop_callback)();
                 }
             }
         }

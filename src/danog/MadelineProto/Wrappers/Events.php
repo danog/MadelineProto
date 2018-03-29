@@ -23,20 +23,26 @@ trait Events
 
     public function setEventHandler($event_handler)
     {
+        if (!class_exists($event_handler) || !is_subclass_of($event_handler, '\danog\MadelineProto\EventHandler')) {
+            throw new \danog\MadelineProto\Exception('Wrong event handler was defined');
+        }
+
         $this->event_handler = $event_handler;
+
+        if (!($this->event_handler_instance instanceof $this->event_handler)) {
+            $class_name = $this->event_handler;
+            $this->event_handler_instance = new $class_name($this);
+        }
+        if (method_exists($this->event_handler_instance, 'onLoop')) {
+            $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
+        }
+
         $this->settings['updates']['callback'] = [$this, 'event_update_handler'];
         $this->settings['updates']['handle_updates'] = true;
     }
 
     public function event_update_handler($update)
     {
-        if (!class_exists($this->event_handler) || !is_subclass_of($this->event_handler, '\danog\MadelineProto\EventHandler')) {
-            throw new \danog\MadelineProto\Exception('Wrong event handler was defined');
-        }
-        if (!($this->event_handler_instance instanceof $this->event_handler)) {
-            $class_name = $this->event_handler;
-            $this->event_handler_instance = new $class_name($this);
-        }
         $method_name = 'on'.ucfirst($update['_']);
         if (method_exists($this->event_handler_instance, $method_name)) {
             $this->event_handler_instance->$method_name($update);

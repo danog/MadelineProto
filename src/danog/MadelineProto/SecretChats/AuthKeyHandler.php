@@ -233,7 +233,7 @@ trait AuthKeyHandler
 
     public function get_secret_chat($chat)
     {
-        return $this->secret_chats[$chat];
+        return $this->secret_chats[is_array($chat) ? $chat['chat_id'] : $chat];
     }
 
     public function discard_secret_chat($chat)
