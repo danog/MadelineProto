@@ -19,14 +19,7 @@ if (file_exists('web_data.php')) {
 
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 
-try {
-    $MadelineProto = new \danog\MadelineProto\API('session.madeline');
-} catch (\danog\MadelineProto\Exception $e) {
-    echo $e.PHP_EOL;
-    unlink('session.madeline');
-    $MadelineProto = new \danog\MadelineProto\API('session.madeline');
-}
-
+$MadelineProto = new \danog\MadelineProto\API('session.madeline');
 $MadelineProto->start();
 
 if (!isset($MadelineProto->programmed_call)) {
