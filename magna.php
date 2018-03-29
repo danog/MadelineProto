@@ -36,12 +36,12 @@ $MadelineProto->session = 'session.madeline';
     $MadelineProto->inputEncryptedFileAudio = $MadelineProto->upload_encrypted('tests/mosconi.mp3');
 }*/
 
-
 class EventHandler extends \danog\MadelineProto\EventHandler
 {
     private $times = [];
     private $calls = [];
     private $my_users = [];
+
     public function configureCall($call)
     {
         include 'songs.php';
@@ -59,6 +59,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         $call->parseConfig();
         $call->playOnHold($songs);
     }
+
     public function handleMessage($chat_id, $from_id, $message)
     {
         try {
@@ -100,7 +101,7 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
                 }
             }
             if ($message === '/broadcast' && $from_id === 101374607) {
-                $time = time()+100;
+                $time = time() + 100;
                 foreach ($this->get_dialogs() as $peer) {
                     if (isset($peer['user_id'])) {
                         $this->programmed_call[] = [$peer['user_id'], $time];
@@ -135,6 +136,7 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
         $message = isset($update['message']['message']) ? $update['message']['message'] : '';
         $this->handleMessage($chat_id, $from_id, $message);
     }
+
     public function onUpdateNewEncryptedMessage($update)
     {
         return;
@@ -143,73 +145,81 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
         $message = isset($update['message']['decrypted_message']['message']) ? $update['message']['decrypted_message']['message'] : '';
         $this->handleMessage($chat_id, $from_id, $message);
     }
-    public function onUpdateEncryption($update) {
+
+    public function onUpdateEncryption($update)
+    {
         return;
-                    try {
-                        if ($update['chat']['_'] !== 'encryptedChat') return;
-                        $chat_id = $this->get_info($update)['InputEncryptedChat'];
-                        $from_id = $this->get_secret_chat($chat_id)['user_id'];
-                        $message = '';
-                    } catch (\danog\MadelineProto\Exception $e) { return; }
+
+        try {
+            if ($update['chat']['_'] !== 'encryptedChat') {
+                return;
+            }
+            $chat_id = $this->get_info($update)['InputEncryptedChat'];
+            $from_id = $this->get_secret_chat($chat_id)['user_id'];
+            $message = '';
+        } catch (\danog\MadelineProto\Exception $e) {
+            return;
+        }
         $this->handleMessage($chat_id, $from_id, $message);
     }
+
     public function onUpdatePhoneCall($update)
     {
-                if (is_object($update['phone_call']) && isset($update['phone_call']->madeline) && $update['phone_call']->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
-                    $this->configureCall($update['phone_call']);
-                    if ($update['phone_call']->accept() === false) {
-                        echo 'DID NOT ACCEPT A CALL';
-                    }
-                    $this->calls[$update['phone_call']->getOtherID()] = $update['phone_call'];
-
-                    try {
-                        $this->times[$update['phone_call']->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $update['phone_call']->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL])['id']];
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {
-                    }
-                }
-    }
-    public function onLoop()
-    {
-    foreach ($this->programmed_call as $key => $pair) {
-        list($user, $time) = $pair;
-        if ($time < time()) {
-            if (!isset($this->calls[$user])) {
-                try {
-                    $call = $this->request_call($user);
-                    $this->configureCall($call);
-                    $this->calls[$call->getOtherID()] = $call;
-                    $this->times[$call->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL.$call->getDebugString()])['id']];
-                } catch (\danog\MadelineProto\RPCErrorException $e) {
-                    try {
-                        if ($e->rpc === 'USER_PRIVACY_RESTRICTED') {
-                            $e = 'Please disable call privacy settings to make me call you';
-                        } elseif (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
-                            $t = str_replace('FLOOD_WAIT_', '', $e->rpc);
-                            $this->programmed_call[] = [$user, time() + 1 + $t];
-                            $e = "I'll call you back in $t seconds.\nYou can also call me right now.";
-                        }
-                        $this->messages->sendMessage(['peer' => $user, 'message' => (string) $e]);
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {
-                    }
-                }
+        if (is_object($update['phone_call']) && isset($update['phone_call']->madeline) && $update['phone_call']->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
+            $this->configureCall($update['phone_call']);
+            if ($update['phone_call']->accept() === false) {
+                echo 'DID NOT ACCEPT A CALL';
             }
-            unset($this->programmed_call[$key]);
-        }
-    }
-    foreach ($this->calls as $key => $call) {
-        if ($call->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-            unset($this->calls[$key]);
-        } elseif (isset($this->times[$call->getOtherID()]) && $this->times[$call->getOtherID()][0] < time()) {
-            $this->times[$call->getOtherID()][0] += 30 + count($this->calls);
+            $this->calls[$update['phone_call']->getOtherID()] = $update['phone_call'];
 
             try {
-                $this->messages->editMessage(['id' => $this->times[$call->getOtherID()][1], 'peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL.$call->getDebugString()]);
+                $this->times[$update['phone_call']->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $update['phone_call']->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL])['id']];
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                echo $e;
             }
         }
     }
 
+    public function onLoop()
+    {
+        foreach ($this->programmed_call as $key => $pair) {
+            list($user, $time) = $pair;
+            if ($time < time()) {
+                if (!isset($this->calls[$user])) {
+                    try {
+                        $call = $this->request_call($user);
+                        $this->configureCall($call);
+                        $this->calls[$call->getOtherID()] = $call;
+                        $this->times[$call->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL.$call->getDebugString()])['id']];
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        try {
+                            if ($e->rpc === 'USER_PRIVACY_RESTRICTED') {
+                                $e = 'Please disable call privacy settings to make me call you';
+                            } elseif (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
+                                $t = str_replace('FLOOD_WAIT_', '', $e->rpc);
+                                $this->programmed_call[] = [$user, time() + 1 + $t];
+                                $e = "I'll call you back in $t seconds.\nYou can also call me right now.";
+                            }
+                            $this->messages->sendMessage(['peer' => $user, 'message' => (string) $e]);
+                        } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        }
+                    }
+                }
+                unset($this->programmed_call[$key]);
+            }
+        }
+        foreach ($this->calls as $key => $call) {
+            if ($call->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                unset($this->calls[$key]);
+            } elseif (isset($this->times[$call->getOtherID()]) && $this->times[$call->getOtherID()][0] < time()) {
+                $this->times[$call->getOtherID()][0] += 30 + count($this->calls);
+
+                try {
+                    $this->messages->editMessage(['id' => $this->times[$call->getOtherID()][1], 'peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL.$call->getDebugString()]);
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    echo $e;
+                }
+            }
+        }
     }
 }
 
