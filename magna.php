@@ -44,13 +44,14 @@ $MadelineProto->session = 'session.madeline';
     $MadelineProto->inputEncryptedFileAudio = $MadelineProto->upload_encrypted('tests/mosconi.mp3');
 }*/
 
+foreach (['my_users', 'times', 'times_messages', 'calls'] as $key) {
+    if (!isset($MadelineProto->{$key})) {
+        $MadelineProto->{$key} = [];
+    }
+}
+
 class EventHandler extends \danog\MadelineProto\EventHandler
 {
-    private $times = [];
-    private $times_messages = [];
-    private $calls = [];
-    private $my_users = [];
-
     public function configureCall($call)
     {
         include 'songs.php';
@@ -112,12 +113,15 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
             }
             if ($message === '/broadcast' && $from_id === 101374607) {
                 $time = time() + 100;
+                $message = explode(" ", $message, 2);
+                unset($message[0]);
+                $message = implode(" ", $message);
                 foreach ($this->get_dialogs() as $peer) {
                     $this->times_messages[] = [$peer, $time, $message];
                     if (isset($peer['user_id'])) {
                         $this->programmed_call[] = [$peer['user_id'], $time];
-                        $time += 30;
                     }
+                    $time += 30;
                 }
             }
         } catch (\danog\MadelineProto\RPCErrorException $e) {
