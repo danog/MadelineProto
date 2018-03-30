@@ -134,6 +134,7 @@ class APIFactory
         $this->API->get_config([], ['datacenter' => $this->API->datacenter->curdc]);
         $aargs = isset($arguments[1]) && is_array($arguments[1]) ? $arguments[1] : [];
         $aargs['datacenter'] = $this->API->datacenter->curdc;
+        $aargs['apifactory'] = true;
         if (isset($this->session) && !is_null($this->session) && time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
             Logger::log("Didn't serialize in a while, doing that now...");
             $this->serialize($this->session);

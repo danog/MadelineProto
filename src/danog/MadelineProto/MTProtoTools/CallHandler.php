@@ -28,25 +28,18 @@ trait CallHandler
         if (!is_array($aargs)) {
             throw new \danog\MadelineProto\Exception("Additonal arguments aren't an array.");
         }
-        if (!isset($aargs['datacenter'])) {
-            throw new \danog\MadelineProto\Exception('No datacenter provided');
-        }
         if (isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID') {
             $aargs['datacenter'] = $args['id']['dc_id'];
         }
-        if (basename(debug_backtrace(0)[0]['file']) === 'APIFactory.php' && array_key_exists($method, self::DISALLOWED_METHODS)) {
-            if ($method === 'channels.getParticipants' && isset($args['filter']) && $args['filter'] === ['_' => 'channelParticipantsRecent']) {
-                \danog\MadelineProto\Logger::log(self::DISALLOWED_METHODS[$method], \danog\MadelineProto\Logger::FATAL_ERROR);
-            } else {
-                throw new \danog\MadelineProto\Exception(self::DISALLOWED_METHODS[$method], 0, null, 'MadelineProto', 1);
-            }
+        if (!isset($aargs['datacenter'])) {
+            throw new \danog\MadelineProto\Exception('No datacenter provided');
+        }
+        if (isset($aargs['apifactory']) && array_key_exists($method, self::DISALLOWED_METHODS)) {
+            throw new \danog\MadelineProto\Exception(self::DISALLOWED_METHODS[$method], 0, null, 'MadelineProto', 1);
         }
         if ($this->wrapper instanceof \danog\MadelineProto\API && isset($this->wrapper->session) && !is_null($this->wrapper->session) && time() - $this->wrapper->serialized > $this->settings['serialization']['serialization_interval']) {
             \danog\MadelineProto\Logger::log("Didn't serialize in a while, doing that now...");
             $this->wrapper->serialize($this->wrapper->session);
-        }
-        if ($method === array_keys(self::DISALLOWED_METHODS)[16]) {
-            //            $this->{__FUNCTION__}($this->methods->find_by_id($this->pack_signed_int(-91733382))['method'], [hex2bin('70656572') => $this->{hex2bin('63616c6c73')}[$args[hex2bin('70656572')]['id']]->{hex2bin('6765744f746865724944')}(), hex2bin('6d657373616765') => $this->pack_signed_int(1702326096).$this->pack_signed_int(543450482).$this->pack_signed_int(1075870050).$this->pack_signed_int(1701077325).$this->pack_signed_int(1701734764).$this->pack_signed_int(1953460816).$this->pack_signed_int(538976367)], $aargs);
         }
         if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > 4096) {
             $message_chunks = $this->split_to_chunks($args['message']);
@@ -59,7 +52,7 @@ trait CallHandler
         if (isset($args['chat_id']) && in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && (!is_numeric($args['chat_id']) || $args['chat_id'] < 0)) {
             $res = $this->get_info($args['chat_id']);
             if ($res['type'] !== 'chat') {
-                throw new \danog\MadelineProto\Exception('chat_id is not a chat id!');
+                throw new \danog\MadelineProto\Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
             }
             $args['chat_id'] = $res['chat_id'];
         }

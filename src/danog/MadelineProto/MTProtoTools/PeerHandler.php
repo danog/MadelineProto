@@ -274,6 +274,8 @@ trait PeerHandler
                 case 'updateNewChannelMessage':
                 case 'updateNewEncryptedMessage':
                     return $this->get_info($id['message']);
+                case 'updateEncryption':
+                    return $this->get_secret_chat($id['chat']['id']);
                 case 'chatForbidden':
                 case 'channelForbidden':
                     throw new \danog\MadelineProto\RPCErrorException('CHAT_FORBIDDEN');

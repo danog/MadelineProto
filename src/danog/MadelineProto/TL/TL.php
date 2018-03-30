@@ -400,6 +400,12 @@ trait TL
                 $arguments['hash'] = $matches[2];
             }
         }
+        if ($method === 'messages.sendMessage' && isset($arguments['peer']['_']) && $arguments['peer']['_'] === 'inputEncryptedChat') {
+            $method = 'messages.sendEncrypted';
+            $arguments = ['peer' => $arguments['peer'], 'message' => $arguments];
+            $arguments['message']['_'] = 'decryptedMessage';
+            $arguments['message']['ttl'] = 0;
+        }
         if ($method === 'messages.sendEncryptedFile') {
             if (isset($arguments['file'])) {
                 if (!is_array($arguments['file']) && $this->settings['upload']['allow_automatic_upload']) {
@@ -413,7 +419,6 @@ trait TL
                 }
             }
         }
-
         $tl = $this->methods->find_by_method($method);
         if ($tl === false) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'].$method);
