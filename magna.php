@@ -113,15 +113,7 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
             if ($message === '/broadcast' && $from_id === 101374607) {
                 $time = time() + 100;
                 foreach ($this->get_dialogs() as $peer) {
-                    try {
-                        $this->messages->sendMessage(['peer' => $peer, 'message' => $message = "Hi!\nI'm a telegram webradio!\nCall me 📞 to listen to some awesome music! 🎶"]);
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
-                            $t = str_replace('FLOOD_WAIT_', '', $e->rpc);
-                            $this->times_messages[] = [$peer, time() + 1 + $t, $message];
-                        }
-                        echo $e;
-                    }
+                    $this->times_messages[] = [$peer, $time, $message];
                     if (isset($peer['user_id'])) {
                         $this->programmed_call[] = [$peer['user_id'], $time];
                         $time += 30;
@@ -225,6 +217,7 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
                 }
                 unset($this->programmed_call[$key]);
             }
+            break;
         }
         foreach ($this->times_messages as $key => $pair) {
             list($peer, $time, $message) = $pair;
@@ -240,6 +233,7 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
                 }
                 unset($this->times_messages[$key]);
             }
+            break;
         }
         \danog\MadelineProto\Logger::log(count($this->calls).' calls running!');
         foreach ($this->calls as $key => $call) {
