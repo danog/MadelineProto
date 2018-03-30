@@ -47,6 +47,7 @@ $MadelineProto->session = 'session.madeline';
 class EventHandler extends \danog\MadelineProto\EventHandler
 {
     private $times = [];
+    private $times_messages = [];
     private $calls = [];
     private $my_users = [];
 
@@ -88,9 +89,10 @@ Send /start to see this message again.
 
 I also provide advanced stats during calls!
 
-I can also work in secret chats!
-
 I'm a userbot powered by @MadelineProto, created by @danogentili.
+
+Source code: https://github.com/danog/MadelineProto
+
 Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'parse_mode' => 'Markdown']);
             }
             if (!isset($this->calls[$from_id]) && $message === '/call') {
@@ -111,6 +113,15 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
             if ($message === '/broadcast' && $from_id === 101374607) {
                 $time = time() + 100;
                 foreach ($this->get_dialogs() as $peer) {
+                    try {
+                        $this->messages->sendMessage(['peer' => $peer, 'message' => $message = "Hi!\nI'm a telegram webradio!\nCall me 📞 to listen to some awesome music! 🎶"]);
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
+                            $t = str_replace('FLOOD_WAIT_', '', $e->rpc);
+                            $this->times_messages[] = [$peer, time() + 1 + $t, $message];
+                        }
+                        echo $e;
+                    }
                     if (isset($peer['user_id'])) {
                         $this->programmed_call[] = [$peer['user_id'], $time];
                         $time += 30;
@@ -215,6 +226,22 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
                 unset($this->programmed_call[$key]);
             }
         }
+        foreach ($this->times_messages as $key => $pair) {
+            list($peer, $time, $message) = $pair;
+            if ($time < time()) {
+                    try {
+                        $this->messages->sendMessage(['peer' => $peer, 'message' => $message ]);
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
+                            $t = str_replace('FLOOD_WAIT_', '', $e->rpc);
+                            $this->times_messages[] = [$peer, time() + 1 + $t, $message];
+                        }
+                        echo $e;
+                    }
+                unset($this->times_messages[$key]);
+            }
+        }
+        \danog\MadelineProto\Logger::log(count($this->calls)." calls running!");
         foreach ($this->calls as $key => $call) {
             if ($call->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 unset($this->calls[$key]);
