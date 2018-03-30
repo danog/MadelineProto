@@ -113,9 +113,9 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
             }
             if ($message === '/broadcast' && $from_id === 101374607) {
                 $time = time() + 100;
-                $message = explode(" ", $message, 2);
+                $message = explode(' ', $message, 2);
                 unset($message[0]);
-                $message = implode(" ", $message);
+                $message = implode(' ', $message);
                 foreach ($this->get_dialogs() as $peer) {
                     $this->times_messages[] = [$peer, $time, $message];
                     if (isset($peer['user_id'])) {
