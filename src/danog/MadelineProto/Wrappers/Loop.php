@@ -54,7 +54,8 @@ trait Loop
                     }
                 }
                 if ($this->loop_callback !== null) {
-                    ($this->loop_callback)();
+                    $callback = $this->loop_callback;
+                    $callback();
                 }
             }
         } else {
@@ -65,7 +66,8 @@ trait Loop
                     $this->settings['updates']['callback']($update['update']);
                 }
                 if ($this->loop_callback !== null) {
-                    ($this->loop_callback)();
+                    $callback = $this->loop_callback;
+                    $callback();
                 }
             }
         }
