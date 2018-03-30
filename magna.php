@@ -229,19 +229,19 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
         foreach ($this->times_messages as $key => $pair) {
             list($peer, $time, $message) = $pair;
             if ($time < time()) {
-                    try {
-                        $this->messages->sendMessage(['peer' => $peer, 'message' => $message ]);
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
-                            $t = str_replace('FLOOD_WAIT_', '', $e->rpc);
-                            $this->times_messages[] = [$peer, time() + 1 + $t, $message];
-                        }
-                        echo $e;
+                try {
+                    $this->messages->sendMessage(['peer' => $peer, 'message' => $message]);
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
+                        $t = str_replace('FLOOD_WAIT_', '', $e->rpc);
+                        $this->times_messages[] = [$peer, time() + 1 + $t, $message];
                     }
+                    echo $e;
+                }
                 unset($this->times_messages[$key]);
             }
         }
-        \danog\MadelineProto\Logger::log(count($this->calls)." calls running!");
+        \danog\MadelineProto\Logger::log(count($this->calls).' calls running!');
         foreach ($this->calls as $key => $call) {
             if ($call->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 unset($this->calls[$key]);
