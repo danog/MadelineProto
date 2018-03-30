@@ -65,15 +65,8 @@ class EventHandler extends \danog\MadelineProto\EventHandler
 }
 
 
-$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
+$MadelineProto = new \danog\MadelineProto\API('bot.madeline');
 
-try {
-    $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
-} catch (\danog\MadelineProto\Exception $e) {
-    \danog\MadelineProto\Logger::log($e->getMessage());
-    unlink('bot.madeline');
-    $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
-}
 $MadelineProto->start();
 $MadelineProto->setEventHandler('\EventHandler');
 $MadelineProto->loop();
@@ -112,15 +105,8 @@ Note that multiprocessing is not the same as multithreading, and should be avoid
 
 ## Webhook
 ```php
-$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
+$MadelineProto = new \danog\MadelineProto\API('bot.madeline');
 
-try {
-    $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
-} catch (\danog\MadelineProto\Exception $e) {
-    \danog\MadelineProto\Logger::log($e->getMessage());
-    unlink('bot.madeline');
-    $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
-}
 $MadelineProto->start();
 $MadelineProto->setWebhook('http://mybot.eu.org/madelinehook.php');
 $MadelineProto->loop();
@@ -146,6 +132,9 @@ This way, each update could be managed faster.
 
 ## Long polling
 ```php
+$MadelineProto = new \danog\MadelineProto\API('bot.madeline');
+$MadelineProto->start();
+
 while (true) {
     $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
     \danog\MadelineProto\Logger::log($updates);
@@ -163,7 +152,7 @@ while (true) {
                 }
 
                 try {
-                    $MadelineProto->messages->sendMessage(['peer' => $update['update']['_'] === 'updateNewMessage' ? $update['update']['message']['from_id'] : $update['update']['message']['to_id'], 'message' => $res, 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
+                    $MadelineProto->messages->sendMessage(['peer' => $update, 'message' => $res, 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
                 }
@@ -179,15 +168,8 @@ The get_updates function accepts an array of options as the first parameter, and
 ## Callback
 
 ```php
-$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
+$MadelineProto = new \danog\MadelineProto\API('bot.madeline');
 
-try {
-    $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
-} catch (\danog\MadelineProto\Exception $e) {
-    \danog\MadelineProto\Logger::log($e->getMessage());
-    unlink('bot.madeline');
-    $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
-}
 $MadelineProto->start();
 $MadelineProto->setCallback(function ($update) use ($MadelineProto) { \danog\MadelineProto\Logger::log("Received an update of type ".$update['_']); });
 $MadelineProto->loop();

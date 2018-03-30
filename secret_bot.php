@@ -99,13 +99,8 @@ if (file_exists('.env')) {
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
-try {
-    $MadelineProto = new \danog\MadelineProto\API('s.madeline', $settings);
-} catch (\danog\MadelineProto\Exception $e) {
-    \danog\MadelineProto\Logger::log($e->getMessage());
-    unlink('s.madeline');
-    $MadelineProto = new \danog\MadelineProto\API('s.madeline', $settings);
-}
+$MadelineProto = new \danog\MadelineProto\API('s.madeline', $settings);
+
 $MadelineProto->start();
 $MadelineProto->setEventHandler('\EventHandler');
 $MadelineProto->loop();
