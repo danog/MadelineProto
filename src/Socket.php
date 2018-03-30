@@ -81,9 +81,38 @@ If not, see <http://www.gnu.org/licenses/>.
             return true;
         }
 
-        public function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0)
+        public static function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0)
         {
-            return stream_select($read, $write, $except, $tv_sec, $tv_usec);
+            $actual_read = [];
+            foreach ($read as $key => $resource) {
+                $actual_read[$key] = $resource->getResource();
+            }
+            $actual_write = [];
+            foreach ($write as $key => $resource) {
+                $actual_write[$key] = $resource->getResource();
+            }
+            $actual_except = [];
+            foreach ($except as $key => $resource) {
+                $actual_except[$key] = $resource->getResource();
+            }
+            $res = stream_select($actual_read, $actual_write, $actual_except, $tv_sec, $tv_usec);
+            foreach ($read as $key => $resource) {
+                if (!isset($actual_read[$key])) {
+                    unset($read[$key]);
+                }
+            }
+            foreach ($write as $key => $resource) {
+                if (!isset($actual_write[$key])) {
+                    unset($write[$key]);
+                }
+            }
+            foreach ($except as $key => $resource) {
+                if (!isset($actual_except[$key])) {
+                    unset($except[$key]);
+                }
+            }
+
+            return $res;
         }
 
         public function read(int $length, int $flags = 0)
@@ -124,6 +153,11 @@ If not, see <http://www.gnu.org/licenses/>.
         public function getProxyHeaders()
         {
             return '';
+        }
+
+        public function getResource()
+        {
+            return $this->sock;
         }
     }
 
@@ -191,9 +225,38 @@ if (!extension_loaded('pthreads')) {
                 return socket_connect($this->sock, $address, $port);
             }
 
-            public function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0)
+            public static function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0)
             {
-                return socket_select($read, $write, $except, $tv_sec, $tv_usec);
+                $actual_read = [];
+                foreach ($read as $key => $resource) {
+                    $actual_read[$key] = $resource->getResource();
+                }
+                $actual_write = [];
+                foreach ($write as $key => $resource) {
+                    $actual_write[$key] = $resource->getResource();
+                }
+                $actual_except = [];
+                foreach ($except as $key => $resource) {
+                    $actual_except[$key] = $resource->getResource();
+                }
+                $res = socket_select($actual_read, $actual_write, $actual_except, $tv_sec, $tv_usec);
+                foreach ($read as $key => $resource) {
+                    if (!isset($actual_read[$key])) {
+                        unset($read[$key]);
+                    }
+                }
+                foreach ($write as $key => $resource) {
+                    if (!isset($actual_write[$key])) {
+                        unset($write[$key]);
+                    }
+                }
+                foreach ($except as $key => $resource) {
+                    if (!isset($actual_except[$key])) {
+                        unset($except[$key]);
+                    }
+                }
+
+                return $res;
             }
 
             public function read(int $length, int $flags = 0)
@@ -238,6 +301,11 @@ if (!extension_loaded('pthreads')) {
             public function getProxyHeaders()
             {
                 return '';
+            }
+
+            public function getResource()
+            {
+                return $this->sock;
             }
         }
         class Socket extends SocketBase

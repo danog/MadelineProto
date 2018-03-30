@@ -20,6 +20,12 @@ class Connection
 {
     use \danog\Serializable;
     use \danog\MadelineProto\Tools;
+    const API_ENDPOINT = 0;
+    const VOIP_UDP_REFLECTOR_ENDPOINT = 1;
+    const VOIP_TCP_REFLECTOR_ENDPOINT = 2;
+    const VOIP_UDP_P2P_ENDPOINT = 3;
+    const VOIP_UDP_LAN_ENDPOINT = 4;
+
     public $sock = null;
     public $protocol = null;
     public $ip = null;
@@ -27,6 +33,8 @@ class Connection
     public $timeout = null;
     public $parsed = [];
     public $time_delta = 0;
+    public $type = 0;
+    public $peer_tag;
     public $temp_auth_key;
     public $auth_key;
     public $session_id;
@@ -208,7 +216,7 @@ class Connection
 
     public function __sleep()
     {
-        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'object_queue', 'ack_queue'];
+        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'peer_tag', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'object_queue', 'ack_queue'];
     }
 
     public function __wakeup()
@@ -404,5 +412,10 @@ class Connection
         }
 
         return ['protocol' => $protocol, 'code' => $code, 'description' => $description, 'body' => $read, 'headers' => $headers];
+    }
+
+    public function getSocket()
+    {
+        return $this->sock;
     }
 }

@@ -192,4 +192,9 @@ class CustomHTTPProxy implements \danog\MadelineProto\Proxy
     {
         $this->options = $extra;
     }
+
+    public function getResource()
+    {
+        return $this->sock->getResource();
+    }
 }

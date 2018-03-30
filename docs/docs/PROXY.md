@@ -77,11 +77,6 @@ Works exactly like the [socket_accept](http://php.net/manual/en/function.socket-
 
 
 
-`public function select(array &$read, array &$write, array &$except, int $tv_sec, int $tv_usec = 0);`
-
-Works exactly like the [socket_select](http://php.net/manual/en/function.socket-select.php) function.
-
-
 
 `public function read(int $length, [ int $flags = 0 ]);`
 
@@ -91,7 +86,7 @@ Works exactly like the [socket_read](http://php.net/manual/en/function.socket-re
 
 `public function write(string $buffer, [ int $length ]);`
 
-Works exactly like the [socket_read](http://php.net/manual/en/function.socket-write.php) function.
+Works exactly like the [socket_write](http://php.net/manual/en/function.socket-write.php) function.
 
 
 
@@ -119,5 +114,9 @@ Works like [socket_getsockname](http://php.net/manual/en/function.socket-getsock
 `public function getProxyHeaders();`
 
 Can return additional HTTP headers to use when the HTTP protocol is being used.
+
+`public function getResource();`
+
+Returns the resource used for socket communication: should call `$socket->getResource()`.  
 
 <form action="https://docs.madelineproto.xyz/docs/LUA.html"><input type="submit" value="Previous section" /></form><form action="https://docs.madelineproto.xyz/docs/CONTRIB.html"><input type="submit" value="Next section" /></form>

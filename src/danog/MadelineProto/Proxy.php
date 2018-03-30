@@ -31,8 +31,6 @@ interface Proxy
 
     public function connect($address, $port = 0);
 
-    public function select(array &$read, array &$write, array &$except, $tv_sec, $tv_usec = 0);
-
     public function read($length, $flags = 0);
 
     public function write($buffer, $length = -1);
@@ -48,4 +46,6 @@ interface Proxy
     public function getProxyHeaders();
 
     public function setExtra(array $extra = []);
+
+    public function getResource();
 }
