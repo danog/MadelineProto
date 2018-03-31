@@ -24,6 +24,7 @@ trait UpdateHandler
     private $channels_state = [];
     public $updates = [];
     public $updates_key = 0;
+    public $last_getdifference = 0;
 
     public function pwr_update_handler($update)
     {
@@ -58,26 +59,29 @@ trait UpdateHandler
             }
         });
         $time = microtime(true);
-
         try {
             try {
-                if (($error = $this->recv_message($this->datacenter->curdc)) !== true) {
-                    if ($error === -404) {
-                        if ($this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
-                            \danog\MadelineProto\Logger::log('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
-                            $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key = null;
-                            $this->init_authorization();
+                $waiting = $this->datacenter->select();
+                $dc = count($waiting) ? $waiting[0] : $this->datacenter->curdc;
+                $last_recv = $this->datacenter->sockets[$dc]->last_recv;
+                if (count($waiting) && !$this->is_http($dc)) {
+                    if (($error = $this->recv_message($dc)) !== true) {
+                        if ($error === -404) {
+                            if ($this->datacenter->sockets[$dc]->temp_auth_key !== null) {
+                                \danog\MadelineProto\Logger::log('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
+                                $this->datacenter->sockets[$dc]->temp_auth_key = null;
+                                $this->init_authorization();
 
-                            throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                                throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                            }
                         }
+                        throw new \danog\MadelineProto\RPCErrorException($error, $error);
                     }
-
-                    throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                    $only_updates = $this->handle_messages($dc);
                 }
-                $only_updates = $this->handle_messages($this->datacenter->curdc);
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
             }
-            if (time() - $this->datacenter->sockets[$this->datacenter->curdc]->last_recv > $this->settings['updates']['getdifference_interval']) {
+            if ($this->is_http($dc) || time() - $this->last_getdifference > $this->settings['updates']['getdifference_interval']) {
                 $this->get_updates_difference();
             }
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -298,6 +302,7 @@ trait UpdateHandler
         \danog\MadelineProto\Logger::log('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->postpone_updates = true;
         $this->updates_state['sync_loading'] = true;
+        $this->last_getdifference = time();
 
         try {
             switch ($difference['_']) {

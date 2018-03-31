@@ -153,7 +153,7 @@ class DataCenter
         foreach ($this->sockets as $dc_id => $socket) {
             $read[$dc_id] = $socket->getSocket();
         }
-        \Socket::select($read, $write, $except, 0);
+        \Socket::select($read, $write, $except, $this->settings['all']['timeout']);
 
         return array_keys($read);
     }

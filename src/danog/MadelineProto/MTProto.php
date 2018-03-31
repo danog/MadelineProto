@@ -54,7 +54,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 98;
+    const V = 99;
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
@@ -241,6 +241,9 @@ class MTProto
             $settings = $this->settings;
             if (isset($settings['updates']['callback'][0]) && $settings['updates']['callback'][0] === $this) {
                 $settings['updates']['callback'] = 'get_updates_update_handler';
+            }
+            if (isset($settings['updates']['getdifference_interval']) && $settings['updates']['getdifference_interval'] === -1) {
+                unset($settings['updates']['getdifference_interval']);
             }
             unset($settings['tl_schema']);
             if (isset($settings['authorization']['rsa_key'])) {
@@ -525,7 +528,7 @@ class MTProto
             // Should I handle updates?
             'handle_old_updates' => true,
             // Should I handle old updates on startup?
-            'getdifference_interval' => -1,
+            'getdifference_interval' => 10,
             // Getdifference manual polling interval
             'callback' => 'get_updates_update_handler',
         ], 'secret_chats' => ['accept_chats' => true], 'serialization' => ['serialization_interval' => 30], 'threading' => [

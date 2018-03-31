@@ -378,7 +378,7 @@ Default: true
 Description: Should I handle old updates on startup?
 
 ### `$settings['updates']['getdifference_interval']`
-Default: -1  
+Default: 10  
 Description: If positive and bigger than zero, no requests will be sent to the socket to request updates in N seconds, passive update listening will be used instead
 
 ### `$settings['updates']['callback']`
