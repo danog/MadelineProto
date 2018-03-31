@@ -61,29 +61,30 @@ trait UpdateHandler
         $time = microtime(true);
 
         try {
-            try {
-                $waiting = $this->datacenter->select();
-                $dc = count($waiting) ? $waiting[0] : $this->datacenter->curdc;
-                $last_recv = $this->datacenter->sockets[$dc]->last_recv;
-                if (count($waiting) && !$this->is_http($dc)) {
-                    if (($error = $this->recv_message($dc)) !== true) {
-                        if ($error === -404) {
-                            if ($this->datacenter->sockets[$dc]->temp_auth_key !== null) {
-                                \danog\MadelineProto\Logger::log('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
-                                $this->datacenter->sockets[$dc]->temp_auth_key = null;
-                                $this->init_authorization();
+            if (!$this->is_http($this->datacenter->curdc) || $this->altervista) {
+                try {
+                    $waiting = $this->datacenter->select();
+                    $dc = count($waiting) ? $waiting[0] : $this->datacenter->curdc;
+                    $last_recv = $this->datacenter->sockets[$dc]->last_recv;
+                    if (count($waiting)) {
+                        if (($error = $this->recv_message($dc)) !== true) {
+                            if ($error === -404) {
+                                if ($this->datacenter->sockets[$dc]->temp_auth_key !== null) {
+                                    \danog\MadelineProto\Logger::log('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
+                                    $this->datacenter->sockets[$dc]->temp_auth_key = null;
+                                    $this->init_authorization();
 
-                                throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                                    throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                                }
                             }
+                            throw new \danog\MadelineProto\RPCErrorException($error, $error);
                         }
-
-                        throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                        $only_updates = $this->handle_messages($dc);
                     }
-                    $only_updates = $this->handle_messages($dc);
+                } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
                 }
-            } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
             }
-            if ($this->is_http($dc) || time() - $this->last_getdifference > $this->settings['updates']['getdifference_interval']) {
+            if ($this->is_http($dc) || $this->altervista && time() - $this->last_getdifference > $this->settings['updates']['getdifference_interval']) {
                 $this->get_updates_difference();
             }
         } catch (\danog\MadelineProto\RPCErrorException $e) {
