@@ -210,10 +210,6 @@ No default value, get your own API hash at my.telegram.org
 Default: auto-detected  
 Description: device model
 
-### `$settings['app_info']['device_model']`
-Default: auto-detected  
-Description: device model
-
 ### `$settings['app_info']['system_version']`
 Default: auto-detected  
 Description: system version
