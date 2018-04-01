@@ -146,7 +146,8 @@ trait MessageHandler
             }
             $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = ['seq_no' => $seq_no];
         } else {
-            throw new \danog\MadelineProto\SecurityException('Got unknown auth_key id');
+            $this->close_and_reopen($datacenter);
+            throw new \danog\MadelineProto\Exception('Got unknown auth_key id');
         }
         $deserialized = $this->deserialize($message_data, ['type' => '', 'datacenter' => $datacenter]);
         $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['content'] = $deserialized;
