@@ -247,8 +247,8 @@ trait CallHandler
             } catch (\danog\MadelineProto\Exception $e) {
                 $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
                 if (strpos($e->getMessage(), 'Received request to switch to DC ') === 0) {
-                    if ($this->authorized_dc === -1 && ($method === 'users.getUsers' && $args = ['id' => [['_' => 'inputUserSelf']]]) || $method === 'auth.exportAuthorization') {
-                        $this->authorized_dc = $this->datacenter->curdc;
+                    if (($method === 'users.getUsers' && $args = ['id' => [['_' => 'inputUserSelf']]]) || $method === 'auth.exportAuthorization' || $method === 'updates.getDifference') {
+                        $this->settings['connection_settings']['default_dc'] = $this->authorized_dc = $this->datacenter->curdc;
                     }
                     $last_recv = $this->datacenter->sockets[$aargs['datacenter']]->last_recv;
                     \danog\MadelineProto\Logger::log($e->getMessage(), \danog\MadelineProto\Logger::WARNING);

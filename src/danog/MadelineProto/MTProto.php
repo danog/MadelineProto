@@ -54,7 +54,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 99;
+    const V = 100;
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
@@ -462,6 +462,7 @@ class MTProto
                 // Extra parameters to pass to the proxy class using setExtra
                 'pfs' => extension_loaded('gmp'),
             ],
+            'default_dc' => 2
         ], 'app_info' => [
             // obtained in https://my.telegram.org
             //'api_id'          => you should put an API id in the settings array you provide
