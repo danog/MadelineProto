@@ -345,6 +345,8 @@ class Connection
 
     public function send_message($message)
     {
+        $this->must_open = $this->must_open || $this->sock === null || $this->sock->getResource() === null;
+
         if ($this->must_open) {
             $this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
             $this->must_open = false;
