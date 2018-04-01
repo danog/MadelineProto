@@ -145,7 +145,7 @@ class DataCenter
         return $all ? array_keys((array) $this->dclist[$test][$ipv6]) : array_keys((array) $this->sockets);
     }
 
-    public function select()
+    public function select($poll = false)
     {
         $read = [];
         $write = [];
@@ -153,7 +153,7 @@ class DataCenter
         foreach ($this->sockets as $dc_id => $socket) {
             $read[$dc_id] = $socket->getSocket();
         }
-        \Socket::select($read, $write, $except, $this->settings['all']['timeout']);
+        \Socket::select($read, $write, $except, $poll ? 0 : $this->settings['all']['timeout']);
 
         return array_keys($read);
     }

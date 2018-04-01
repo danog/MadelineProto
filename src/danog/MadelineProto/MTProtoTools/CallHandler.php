@@ -143,7 +143,11 @@ trait CallHandler
                 $server_answer = null;
                 $update_count = 0;
                 $only_updates = false;
-                while ($server_answer === null && $res_count++ < $this->settings['max_tries']['response'] + 1) {
+                $response_tries = $this->settings['max_tries']['response'] + 1;
+                if ($last_recv) {
+                    $response_tries += (int) floor((time() - $last_recv)/10);
+                }
+                while ($server_answer === null && $res_count++ < $response_tries) {
                     // Loop until we get a response, loop for a max of $this->settings['max_tries']['response'] times
                     try {
                         \danog\MadelineProto\Logger::log('Getting response (try number '.$res_count.' for '.$method.')...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);

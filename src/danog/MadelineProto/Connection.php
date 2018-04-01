@@ -264,10 +264,11 @@ class Connection
             case 'obfuscated2':
                 $packet = '';
                 while (strlen($packet) < $length) {
-                    $packet .= $this->sock->read($length - strlen($packet));
-                    if ($packet === false || strlen($packet) === 0) {
+                    $piece = $this->sock->read($length - strlen($packet));
+                    if ($piece === false || strlen($piece) === 0) {
                         throw new \danog\MadelineProto\NothingInTheSocketException(\danog\MadelineProto\Lang::$current_lang['nothing_in_socket']);
                     }
+                    $packet .= $piece;
                 }
 
                 return @$this->obfuscated['decryption']->encrypt($packet);
@@ -278,10 +279,11 @@ class Connection
             case 'https':
                 $packet = '';
                 while (strlen($packet) < $length) {
-                    $packet .= $this->sock->read($length - strlen($packet));
-                    if ($packet === false || strlen($packet) === 0) {
+                    $piece = $this->sock->read($length - strlen($packet));
+                    if ($piece === false || strlen($piece) === 0) {
                         throw new \danog\MadelineProto\NothingInTheSocketException(\danog\MadelineProto\Lang::$current_lang['nothing_in_socket']);
                     }
+                    $packet .= $piece;
                 }
 
                 return $packet;

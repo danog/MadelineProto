@@ -61,31 +61,39 @@ trait UpdateHandler
         $time = microtime(true);
 
         try {
-            if (!$this->is_http($this->datacenter->curdc) || $this->altervista) {
+            if (!$this->is_http($this->datacenter->curdc) && !$this->altervista) {
                 try {
                     $waiting = $this->datacenter->select();
-                    $dc = count($waiting) ? $waiting[0] : $this->datacenter->curdc;
-                    $last_recv = $this->datacenter->sockets[$dc]->last_recv;
                     if (count($waiting)) {
-                        if (($error = $this->recv_message($dc)) !== true) {
-                            if ($error === -404) {
-                                if ($this->datacenter->sockets[$dc]->temp_auth_key !== null) {
-                                    \danog\MadelineProto\Logger::log('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
-                                    $this->datacenter->sockets[$dc]->temp_auth_key = null;
-                                    $this->init_authorization();
+                        $tries = 10;
+                        while (count($waiting) && $tries--) {
+                            $dc = $waiting[0];
+                            if (($error = $this->recv_message($dc)) !== true) {
+                                if ($error === -404) {
+                                    if ($this->datacenter->sockets[$dc]->temp_auth_key !== null) {
+                                        \danog\MadelineProto\Logger::log('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
+                                        $this->datacenter->sockets[$dc]->temp_auth_key = null;
+                                        $this->init_authorization();
 
-                                    throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                                        throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                                    }
                                 }
-                            }
 
-                            throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                                throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                            }
+                            $only_updates = $this->handle_messages($dc);
+                            $waiting = $this->datacenter->select(true);
                         }
-                        $only_updates = $this->handle_messages($dc);
+                    } else {
+                        $this->get_updates_difference();
                     }
                 } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+                    $this->get_updates_difference();
                 }
+            } else {
+                $this->get_updates_difference();
             }
-            if ($this->is_http($dc) || $this->altervista && time() - $this->last_getdifference > $this->settings['updates']['getdifference_interval']) {
+            if (time() - $this->last_getdifference > $this->settings['updates']['getdifference_interval']) {
                 $this->get_updates_difference();
             }
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -294,7 +302,7 @@ trait UpdateHandler
         \danog\MadelineProto\Logger::log('Fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         while (!isset($difference)) {
             try {
-                $difference = $this->method_call('updates.getDifference', ['pts' => $this->load_update_state()['pts'], 'date' => $this->load_update_state()['date'], 'qts' => $this->load_update_state()['qts']], ['datacenter' => $this->datacenter->curdc]);
+                $difference = $this->method_call('updates.getDifference', ['pts' => $this->load_update_state()['pts'], 'date' => $this->load_update_state()['date'], 'qts' => $this->load_update_state()['qts']], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             } catch (\danog\MadelineProto\PTSException $e) {
                 $this->updates_state['sync_loading'] = false;
                 $this->got_state = false;
@@ -348,8 +356,8 @@ trait UpdateHandler
         $this->updates_state['sync_loading'] = true;
 
         try {
-            $data = $this->method_call('updates.getState', [], ['datacenter' => $this->datacenter->curdc]);
-            $this->get_cdn_config($this->datacenter->curdc);
+            $data = $this->method_call('updates.getState', [], ['datacenter' =>  $this->settings['connection_settings']['default_dc']]);
+            $this->get_cdn_config( $this->settings['connection_settings']['default_dc']);
         } finally {
             $this->updates_state['sync_loading'] = $last;
         }
@@ -565,7 +573,7 @@ trait UpdateHandler
                 return false;
             }
             \danog\MadelineProto\Logger::log('Applying qts: '.$update['qts'].' over current qts '.$cur_state['qts'].', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
-            $this->method_call('messages.receivedQueue', ['max_qts' => $cur_state['qts'] = $update['qts']], ['datacenter' => $this->datacenter->curdc]);
+            $this->method_call('messages.receivedQueue', ['max_qts' => $cur_state['qts'] = $update['qts']], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             $this->handle_encrypted_update($update);
 
             return;
