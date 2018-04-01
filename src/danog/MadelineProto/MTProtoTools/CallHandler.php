@@ -145,7 +145,7 @@ trait CallHandler
                 $only_updates = false;
                 $response_tries = $this->settings['max_tries']['response'] + 1;
                 if ($last_recv) {
-                    $response_tries += (int) floor((time() - $last_recv)/10);
+                    $response_tries += (int) floor((time() - $last_recv) / 10);
                 }
                 while ($server_answer === null && $res_count++ < $response_tries) {
                     // Loop until we get a response, loop for a max of $this->settings['max_tries']['response'] times

@@ -357,7 +357,7 @@ trait UpdateHandler
 
         try {
             $data = $this->method_call('updates.getState', [], ['datacenter' =>  $this->settings['connection_settings']['default_dc']]);
-            $this->get_cdn_config( $this->settings['connection_settings']['default_dc']);
+            $this->get_cdn_config($this->settings['connection_settings']['default_dc']);
         } finally {
             $this->updates_state['sync_loading'] = $last;
         }
