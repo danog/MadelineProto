@@ -16,4 +16,4 @@ All MadelineProto wrapper methods (for example upload, download, upload_encrypte
 
 td-cli wrappers are also present: you can use the tdcli_function in lua and pass mtproto updates to the tdcli_update_callback via PHP, they will be automatically converted to/from td objects. Please note that the object conversion is not complete, feel free to contribute to the conversion module in [`src/danog/MadelineProto/Conversion/TD.php`](https://github.com/danog/MadelineProto/raw/master/src/danog/MadelineProto/TL/Conversion/TD.php).
 
-<amp-form action="https://docs.madelineproto.xyz/docs/SECRET_CHATS.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/PROXY.html"><input type="submit" value="Next section" /></form>
+<amp-form method="GET" target="_top" action="https://docs.madelineproto.xyz/docs/SECRET_CHATS.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/PROXY.html" method="GET" target="_top"><input type="submit" value="Next section" /></form>

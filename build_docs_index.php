@@ -60,9 +60,9 @@ foreach ($orderedfiles as $key => $filename) {
     if (isset($orderedfiles[$key + 1])) {
         $nextfile = 'https://docs.madelineproto.xyz/docs/'.basename($orderedfiles[$key + 1], '.md').'.html';
         $prevfile = $key === 0 ? 'https://docs.madelineproto.xyz' : 'https://docs.madelineproto.xyz/docs/'.basename($orderedfiles[$key - 1], '.md').'.html';
-        $lines[count($lines)] = "\n<amp-form action=\"$prevfile\"><input type=\"submit\" value=\"Previous section\" /></form><amp-form action=\"$nextfile\"><input type=\"submit\" value=\"Next section\" /></form>";
+        $lines[count($lines)] = "\n<amp-form method=\"GET\" target=\"_top\" action=\"$prevfile\"><input type=\"submit\" value=\"Previous section\" /></form><amp-form action=\"$nextfile\" method=\"GET\" target=\"_top\"><input type=\"submit\" value=\"Next section\" /></form>";
     } else {
-        $lines[count($lines)] = "\n<amp-form action=\"https://docs.madelineproto.xyz/#very-complex-and-complete-examples\"><input type=\"submit\" value=\"Next section\" /></form>";
+        $lines[count($lines)] = "\n<amp-form method=\"GET\" target=\"_top\" action=\"https://docs.madelineproto.xyz/#very-complex-and-complete-examples\"><input type=\"submit\" value=\"Next section\" /></form>";
     }
     file_put_contents($filename, implode("\n", $lines));
 

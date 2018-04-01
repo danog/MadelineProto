@@ -119,4 +119,4 @@ Can return additional HTTP headers to use when the HTTP protocol is being used.
 
 Returns the resource used for socket communication: should call `$socket->getResource()`.  
 
-<amp-form action="https://docs.madelineproto.xyz/docs/LUA.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/CONTRIB.html"><input type="submit" value="Next section" /></form>
+<amp-form method="GET" target="_top" action="https://docs.madelineproto.xyz/docs/LUA.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/CONTRIB.html" method="GET" target="_top"><input type="submit" value="Next section" /></form>

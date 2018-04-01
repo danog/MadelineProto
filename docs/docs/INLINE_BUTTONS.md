@@ -48,4 +48,4 @@ And click them:
 $button->click();
 ```
 
-<amp-form action="https://docs.madelineproto.xyz/docs/DIALOGS.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/CALLS.html"><input type="submit" value="Next section" /></form>
+<amp-form method="GET" target="_top" action="https://docs.madelineproto.xyz/docs/DIALOGS.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/CALLS.html" method="GET" target="_top"><input type="submit" value="Next section" /></form>

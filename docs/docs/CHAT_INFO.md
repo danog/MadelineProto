@@ -42,4 +42,4 @@ You can also use `get_info` to get chat info, see [here for the parameters and t
 * Speed: very fast
 * Caching: full
 
-<amp-form action="https://docs.madelineproto.xyz/docs/FILES.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/DIALOGS.html"><input type="submit" value="Next section" /></form>
+<amp-form method="GET" target="_top" action="https://docs.madelineproto.xyz/docs/FILES.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/DIALOGS.html" method="GET" target="_top"><input type="submit" value="Next section" /></form>

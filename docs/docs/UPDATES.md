@@ -190,4 +190,4 @@ $MadelineProto->loop(-1);
 This way, each update will be managed in its own fork.  
 Note that multiprocessing is not the same as multithreading, and should be avoided unless lengthy operations are made in the update handler.
 
-<amp-form action="https://docs.madelineproto.xyz/docs/INSTALLATION.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/SETTINGS.html"><input type="submit" value="Next section" /></form>
+<amp-form method="GET" target="_top" action="https://docs.madelineproto.xyz/docs/INSTALLATION.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/SETTINGS.html" method="GET" target="_top"><input type="submit" value="Next section" /></form>
