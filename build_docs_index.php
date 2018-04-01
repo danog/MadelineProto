@@ -1,7 +1,7 @@
 <?php
 
 $index = '';
-$files = glob('docs/docs/*md');
+$files = glob('docs/docs/docs/*md');
 foreach ($files as $file) {
     $base = basename($file, '.md');
     if ($base === 'CREATING_A_CLIENT') {
