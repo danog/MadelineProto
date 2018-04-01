@@ -118,4 +118,4 @@ cp -a *php tests userbots .env* ..
 
 Now open `.env` and edit its values as needed.
 
-<amp-form method="GET" target="_top" action="https://docs.madelineproto.xyz/docs/REQUIREMENTS.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/UPDATES.html" method="GET" target="_top"><input type="submit" value="Next section" /></form>
+<amp-form method="GET" target="_top" action="https://docs.madelineproto.xyz/docs/REQUIREMENTS.html"><input type="submit" value="Previous section" /></amp-form><amp-form action="https://docs.madelineproto.xyz/docs/UPDATES.html" method="GET" target="_top"><input type="submit" value="Next section" /></amp-form>

@@ -88,4 +88,4 @@ While writing this client, I looked at many projects for inspiration and help. H
 
 Thanks to the devs that contributed to these projects, MadelineProto is now an easy, well-written and complete MTProto client.  
 
-<amp-form method="GET" target="_top" action="https://docs.madelineproto.xyz/docs/PROXY.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/TEMPLATES.html" method="GET" target="_top"><input type="submit" value="Next section" /></form>
+<amp-form method="GET" target="_top" action="https://docs.madelineproto.xyz/docs/PROXY.html"><input type="submit" value="Previous section" /></amp-form><amp-form action="https://docs.madelineproto.xyz/docs/TEMPLATES.html" method="GET" target="_top"><input type="submit" value="Next section" /></amp-form>

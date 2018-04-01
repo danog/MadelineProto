@@ -101,4 +101,4 @@ $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => 'l
 
 If the queue if the specified queue name does not exist, it will be created.
 
-<amp-form method="GET" target="_top" action="https://docs.madelineproto.xyz/docs/LOGGING.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/FILES.html" method="GET" target="_top"><input type="submit" value="Next section" /></form>
+<amp-form method="GET" target="_top" action="https://docs.madelineproto.xyz/docs/LOGGING.html"><input type="submit" value="Previous section" /></amp-form><amp-form action="https://docs.madelineproto.xyz/docs/FILES.html" method="GET" target="_top"><input type="submit" value="Next section" /></amp-form>
