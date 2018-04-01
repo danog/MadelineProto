@@ -462,7 +462,7 @@ class MTProto
                 // Extra parameters to pass to the proxy class using setExtra
                 'pfs' => extension_loaded('gmp'),
             ],
-            'default_dc' => 2
+            'default_dc' => 2,
         ], 'app_info' => [
             // obtained in https://my.telegram.org
             //'api_id'          => you should put an API id in the settings array you provide
