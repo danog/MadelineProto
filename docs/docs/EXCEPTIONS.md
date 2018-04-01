@@ -102,4 +102,4 @@ try {
 }
 ```
 
-<form action="https://docs.madelineproto.xyz/docs/SELF.html"><input type="submit" value="Previous section" /></form><form action="https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html"><input type="submit" value="Next section" /></form>
+<amp-form action="https://docs.madelineproto.xyz/docs/SELF.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html"><input type="submit" value="Next section" /></form>

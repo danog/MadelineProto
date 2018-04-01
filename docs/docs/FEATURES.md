@@ -40,4 +40,4 @@
 
 * [Clickable inline buttons](#inline-buttons)!
 
-<form action="https://docs.madelineproto.xyz/docs/LOGIN.html"><input type="submit" value="Previous section" /></form><form action="https://docs.madelineproto.xyz/docs/REQUIREMENTS.html"><input type="submit" value="Next section" /></form>
+<amp-form action="https://docs.madelineproto.xyz/docs/LOGIN.html"><input type="submit" value="Previous section" /></form><amp-form action="https://docs.madelineproto.xyz/docs/REQUIREMENTS.html"><input type="submit" value="Next section" /></form>
