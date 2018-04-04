@@ -57,6 +57,7 @@ class DocsBuilder
         file_put_contents($this->index, '---
 title: '.$this->settings['title'].'
 description: '.$this->settings['description'].'
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 # '.$this->settings['description'].'  
 
@@ -109,6 +110,7 @@ description: '.$this->settings['description'].'
             $header = '---
 title: '.$type.'
 description: constructors and methods of type '.$type.'
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: '.str_replace('_', '\\_', $type).'  
 [Back to types index](index.md)
@@ -418,6 +420,7 @@ After modifying it, you must always parse the new configuration with a call to `
         file_put_contents('types/'.$this->index, '---
 title: Types
 description: List of types
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 # Types  
 [Back to API documentation index](..)
@@ -428,6 +431,7 @@ description: List of types
         file_put_contents('types/string.md', '---
 title: string
 description: A UTF8 string of variable length
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: string  
 [Back to constructor index](index.md)
@@ -437,6 +441,7 @@ A UTF8 string of variable length. The total length in bytes of the string must n
         file_put_contents('types/bytes.md', '---
 title: bytes
 description: A string of variable length
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: bytes  
 [Back to constructor index](index.md)
@@ -446,6 +451,7 @@ A string of bytes of variable length, with length smaller than or equal to 16777
         file_put_contents('types/int.md', '---
 title: integer
 description: A 32 bit signed integer ranging from -2147483648 to 2147483647
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: int  
 [Back to constructor index](index.md)
@@ -455,6 +461,7 @@ A 32 bit signed integer ranging from `-2147483648` to `2147483647`.
         file_put_contents('types/int53.md', '---
 title: integer
 description: A 53 bit signed integer
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: int53  
 [Back to constructor index](index.md)
@@ -464,6 +471,7 @@ A 53 bit signed integer.
         file_put_contents('types/long.md', '---
 title: long
 description: A 32 bit signed integer ranging from -9223372036854775808 to 9223372036854775807
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: long  
 [Back to constructor index](index.md)
@@ -473,6 +481,7 @@ A 64 bit signed integer ranging from `-9223372036854775808` to `9223372036854775
         file_put_contents('types/int128.md', '---
 title: int128
 description: A 128 bit signed integer
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: int128  
 [Back to constructor index](index.md)
@@ -482,6 +491,7 @@ A 128 bit signed integer represented in little-endian base256 (`string`) format.
         file_put_contents('types/int256.md', '---
 title: int256
 description: A 256 bit signed integer
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: int256
 [Back to constructor index](index.md)
@@ -491,6 +501,7 @@ A 256 bit signed integer represented in little-endian base256 (`string`) format.
         file_put_contents('types/int512.md', '---
 title: int512
 description: A 512 bit signed integer
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: int512  
 [Back to constructor index](index.md)
@@ -500,6 +511,7 @@ A 512 bit signed integer represented in little-endian base256 (`string`) format.
         file_put_contents('types/double.md', '---
 title: double
 description: A double precision floating point number
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: double  
 [Back to constructor index](index.md)
@@ -509,6 +521,7 @@ A double precision floating point number, single precision can also be used (flo
         file_put_contents('types/!X.md', '---
 title: !X
 description: Represents a TL serialized payload
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: !X  
 [Back to constructor index](index.md)
@@ -518,6 +531,7 @@ Represents a TL serialized payload.
         file_put_contents('types/X.md', '---
 title: X
 description: Represents a TL serialized payload
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: X  
 [Back to constructor index](index.md)
@@ -527,6 +541,7 @@ Represents a TL serialized payload.
         file_put_contents('constructors/boolFalse.md', '---
 title: boolFalse
 description: Represents a boolean with value equal to false
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 # boolFalse  
 [Back to constructor index](index.md)
@@ -536,6 +551,7 @@ description: Represents a boolean with value equal to false
         file_put_contents('constructors/boolTrue.md', '---
 title: boolTrue
 description: Represents a boolean with value equal to true
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 # boolTrue  
 [Back to constructor index](index.md)
@@ -545,6 +561,7 @@ Represents a boolean with value equal to `true`.
         file_put_contents('constructors/null.md', '---
 title: null
 description: Represents a null value
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 # null  
 [Back to constructor index](index.md)
@@ -554,6 +571,7 @@ Represents a `null` value.
         file_put_contents('types/Bool.md', '---
 title: Bool
 description: Represents a boolean.
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 # Bool  
 [Back to types index](index.md)
@@ -563,6 +581,7 @@ Represents a boolean.
         file_put_contents('types/DataJSON.md', '---
 title: DataJSON
 description: Any json-encodable data
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Type: DataJSON
 [Back to constructor index](index.md)

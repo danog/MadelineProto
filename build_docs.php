@@ -19,7 +19,8 @@ set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
 file_put_contents('docs/docs/index.md', '---
 title: MadelineProto documentation
-description: PHP implementation of telegram\'s MTProto protocol
+description: PHP client/server for the telegram MTProto protocol (a better tg-cli)
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 '.str_replace('<img', '<amp-img', file_get_contents('README.md')));
 

@@ -178,6 +178,7 @@ trait Constructors
             $header = '---
 title: '.$data['predicate'].'
 description: '.$description.'
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 ## Constructor: '.str_replace('_', '\\_', $data['predicate'].$layer).'  
 [Back to constructors index](index.md)
@@ -280,6 +281,7 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
         file_put_contents('constructors/'.$this->index, '---
 title: Constructors
 description: List of constructors
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 # Constructors  
 [Back to API documentation index](..)
