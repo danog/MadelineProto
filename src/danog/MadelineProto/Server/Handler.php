@@ -39,7 +39,7 @@ class Handler extends \danog\MadelineProto\Connection
 
     public function __destruct()
     {
-        echo('Closing socket in fork '.getmypid().PHP_EOL);
+        echo 'Closing socket in fork '.getmypid().PHP_EOL;
         unset($this->sock);
         $this->destruct_madeline();
         exit();
@@ -139,6 +139,7 @@ class Handler extends \danog\MadelineProto\Connection
                 $args[1]['updates']['callback'] = [$this, 'update_handler'];
             }
             $this->madeline = new \danog\MadelineProto\API(...$args);
+
             return true;
         }
         if ($method[0] === '__destruct') {
@@ -205,7 +206,9 @@ class Handler extends \danog\MadelineProto\Connection
                 }
                 if (isset($frame['args'])) {
                     $args = json_encode($frame['args']);
-                    if ($args !== false) $tl_frame['args'] = $args;
+                    if ($args !== false) {
+                        $tl_frame['args'] = $args;
+                    }
                 }
                 $tl = false;
             }
@@ -223,7 +226,9 @@ class Handler extends \danog\MadelineProto\Connection
     {
         $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageRawData', 'stream_id' => $stream_id, 'data' => $data], 'data'));
     }
+
     public $logging = false;
+
     public function logger($message, $level)
     {
         if (!$this->logging) {
@@ -232,25 +237,31 @@ class Handler extends \danog\MadelineProto\Connection
 
                 $message = ['_' => 'socketMessageLog', 'data' => $message, 'level' => $level, 'thread' => \danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread()), 'process' => \danog\MadelineProto\Logger::is_fork(), 'file' => basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'], '.php')];
 
-
                 $this->send_message_safe($this->serialize_object(['type' => ''], $message, 'log'));
             } finally {
                 $this->logging = false;
             }
         }
     }
-    public function send_message_safe($message) {
-        if (!isset($this->sock)) return false;
+
+    public function send_message_safe($message)
+    {
+        if (!isset($this->sock)) {
+            return false;
+        }
+
         try {
             $this->send_message($message);
         } catch (\danog\MadelineProto\Exception $e) {
             $this->__destruct();
         }
     }
+
     public function update_handler($update)
     {
         $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageUpdate', 'data' => $update], 'update'));
     }
+
     public function __call($method, $args)
     {
         $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageRequest', 'request_id' => 0, 'method' => $method, 'args' => $args], 'method'));
