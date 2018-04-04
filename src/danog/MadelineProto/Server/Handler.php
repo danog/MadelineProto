@@ -19,6 +19,10 @@ namespace danog\MadelineProto\Server;
 class Handler extends \danog\MadelineProto\Connection
 {
     use \danog\MadelineProto\TL\TL;
+    use \danog\MadelineProto\TL\Conversion\BotAPI;
+    use \danog\MadelineProto\TL\Conversion\BotAPIFiles;
+    use \danog\MadelineProto\TL\Conversion\Extension;
+    use \danog\MadelineProto\TL\Conversion\TD;
     use \danog\MadelineProto\Tools;
     private $madeline;
 
@@ -26,6 +30,7 @@ class Handler extends \danog\MadelineProto\Connection
     {
         $this->sock = $socket;
         $this->sock->setBlocking(true);
+        $this->must_open = false;
         $timeout = 2;
         $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
         $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
@@ -34,7 +39,7 @@ class Handler extends \danog\MadelineProto\Connection
 
     public function __destruct()
     {
-        \danog\MadelineProto\Logger::log('Closing socket in fork '.getmypid());
+        echo('Closing socket in fork '.getmypid().PHP_EOL);
         unset($this->sock);
         $this->destruct_madeline();
         exit();
@@ -58,6 +63,7 @@ class Handler extends \danog\MadelineProto\Connection
         $buffer = '';
 
         $first_byte = $this->sock->read(1);
+
         if ($first_byte === chr(239)) {
             $this->protocol = 'tcp_abridged';
         } else {
@@ -133,11 +139,10 @@ class Handler extends \danog\MadelineProto\Connection
                 $args[1]['updates']['callback'] = [$this, 'update_handler'];
             }
             $this->madeline = new \danog\MadelineProto\API(...$args);
-
             return true;
         }
         if ($method[0] === '__destruct') {
-            return $this->destruct_madeline();
+            return $this->__destruct();
         }
         if ($this->madeline === null) {
             throw new \danog\MadelineProto\Exception('__construct was not called');
@@ -199,38 +204,55 @@ class Handler extends \danog\MadelineProto\Connection
                     $tl_frame['function'] = $frame['function'];
                 }
                 if (isset($frame['args'])) {
-                    $tl_frame['args'] = json_encode($frame['args']);
+                    $args = json_encode($frame['args']);
+                    if ($args !== false) $tl_frame['args'] = $args;
                 }
                 $tl = false;
             }
             $exception['trace']['frames'][] = $tl_frame;
         }
-        $this->send_message($this->serialize_object(['type' => 'socketMessageException'], ['request_id' => $request_id, 'exception' => $exception]));
+        $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageException', 'request_id' => $request_id, 'exception' => $exception], 'exception'));
     }
 
     public function send_response($request_id, $response)
     {
-        $this->send_message($this->serialize_object(['type' => 'socketMessageResponse'], ['request_id' => $request_id, 'data' => $response]));
+        $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageResponse', 'request_id' => $request_id, 'data' => $response], 'exception'));
     }
 
     public function send_data($stream_id, $data)
     {
-        $this->send_message($this->serialize_object(['type' => 'socketMessageRawData'], ['stream_id' => $stream_id, 'data' => $data]));
+        $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageRawData', 'stream_id' => $stream_id, 'data' => $data], 'data'));
     }
-
+    public $logging = false;
     public function logger($message, $level)
     {
-        $message = ['_' => 'socketMessageLog', 'data' => $message, 'level' => $level, 'thread' => \danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread()), 'process' => \danog\MadelineProto\Logger::is_fork(), 'file' => basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php')];
-        $this->send_message($this->serialize_object(['type' => 'socketMessageLog'], $message));
-    }
+        if (!$this->logging) {
+            try {
+                $this->logging = true;
 
+                $message = ['_' => 'socketMessageLog', 'data' => $message, 'level' => $level, 'thread' => \danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread()), 'process' => \danog\MadelineProto\Logger::is_fork(), 'file' => basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'], '.php')];
+
+
+                $this->send_message_safe($this->serialize_object(['type' => ''], $message, 'log'));
+            } finally {
+                $this->logging = false;
+            }
+        }
+    }
+    public function send_message_safe($message) {
+        if (!isset($this->sock)) return false;
+        try {
+            $this->send_message($message);
+        } catch (\danog\MadelineProto\Exception $e) {
+            $this->__destruct();
+        }
+    }
     public function update_handler($update)
     {
-        $this->send_message($this->serialize_object(['type' => 'socketMessageUpdate'], ['data' => $update]));
+        $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageUpdate', 'data' => $update], 'update'));
     }
-
     public function __call($method, $args)
     {
-        $this->send_message($this->serialize_object(['type' => 'socketMessageRequest'], ['request_id' => 0, 'method' => $method, 'args' => $args]));
+        $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageRequest', 'request_id' => 0, 'method' => $method, 'args' => $args], 'method'));
     }
 }

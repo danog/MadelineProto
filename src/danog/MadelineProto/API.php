@@ -114,7 +114,7 @@ class API extends APIFactory
             return;
         }
         $this->serialize();
-        restore_error_handler();
+        //restore_error_handler();
     }
 
     public function __sleep()

@@ -499,7 +499,8 @@ trait TL
 
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['params_missing'], $current_argument['name']);
             }
-            if ($current_argument['type'] === 'DataJSON') {
+
+            if (in_array($current_argument['type'], ['DataJSON', '%DataJSON'])) {
                 $arguments[$current_argument['name']] = ['_' => 'dataJSON', 'data' => json_encode($arguments[$current_argument['name']])];
             }
             if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputFile' && $this->settings['upload']['allow_automatic_upload']) {
