@@ -173,7 +173,7 @@ title: '.$data['method'].'
 description: '.$description.'
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
-## Method: '.str_replace('_', '\\_', $data['method']).'  
+# Method: '.str_replace('_', '\\_', $data['method']).'  
 [Back to methods index](index.md)
 
 

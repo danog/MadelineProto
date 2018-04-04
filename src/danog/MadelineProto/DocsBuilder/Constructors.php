@@ -180,7 +180,7 @@ title: '.$data['predicate'].'
 description: '.$description.'
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
-## Constructor: '.str_replace('_', '\\_', $data['predicate'].$layer).'  
+# Constructor: '.str_replace('_', '\\_', $data['predicate'].$layer).'  
 [Back to constructors index](index.md)
 
 

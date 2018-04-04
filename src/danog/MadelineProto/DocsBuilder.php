@@ -112,7 +112,7 @@ title: '.$type.'
 description: constructors and methods of type '.$type.'
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
-## Type: '.str_replace('_', '\\_', $type).'  
+# Type: '.str_replace('_', '\\_', $type).'  
 [Back to types index](index.md)
 
 
