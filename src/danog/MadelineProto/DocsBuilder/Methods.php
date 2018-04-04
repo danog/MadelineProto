@@ -171,8 +171,9 @@ trait Methods
             $header = '---
 title: '.$data['method'].'
 description: '.$description.'
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
-## Method: '.str_replace('_', '\\_', $data['method']).'  
+# Method: '.str_replace('_', '\\_', $data['method']).'  
 [Back to methods index](index.md)
 
 
@@ -324,6 +325,7 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
         file_put_contents('methods/api_'.$this->index, '---
 title: Methods
 description: List of methods
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 # Methods  
 [Back to API documentation index](..)
@@ -361,6 +363,7 @@ $MadelineProto->[request_secret_chat](https://docs.madelineproto.xyz/request_sec
         file_put_contents('methods/'.$this->index, '---
 title: Methods
 description: What do you want to do?
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 # What do you want to do?  
 [Go back to API documentation index](..)  
