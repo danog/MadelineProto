@@ -24,13 +24,13 @@ trait MessageHandler
 
         if (count($this->datacenter->sockets[$datacenter]->object_queue) > 1) {
             $messages = [];
-            \danog\MadelineProto\Logger::log("Sending msg_container as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->logger->logger("Sending msg_container as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             foreach ($this->datacenter->sockets[$datacenter]->object_queue as $message) {
                 $message['seqno'] = $this->generate_out_seq_no($datacenter, $message['content_related']);
                 $message['bytes'] = strlen($message['body']);
                 //$has_ack = $has_ack || $message['_'] === 'msgs_ack';
-                \danog\MadelineProto\Logger::log("Inside of msg_container, sending {$message['_']} as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $this->logger->logger("Inside of msg_container, sending {$message['_']} as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 $message['_'] = 'MTmessage';
                 $messages[] = $message;
                 $this->datacenter->sockets[$datacenter]->outgoing_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'response' => -1]; //, 'content' => $this->deserialize($message['body'], ['type' => '', 'datacenter' => $datacenter])];
@@ -40,7 +40,7 @@ trait MessageHandler
             $seq_no = $this->generate_out_seq_no($datacenter, false);
         } elseif (count($this->datacenter->sockets[$datacenter]->object_queue)) {
             $message = array_shift($this->datacenter->sockets[$datacenter]->object_queue);
-            \danog\MadelineProto\Logger::log("Sending {$message['_']} as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->logger->logger("Sending {$message['_']} as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             $message_data = $message['body'];
             $message_id = $message['msg_id'];
             $seq_no = $this->generate_out_seq_no($datacenter, $message['content_related']);
@@ -74,7 +74,7 @@ trait MessageHandler
     public function recv_message($datacenter)
     {
         if ($this->datacenter->sockets[$datacenter]->must_open) {
-            \danog\MadelineProto\Logger::log('Trying to read from closed socket, sending initial ping');
+            $this->logger->logger('Trying to read from closed socket, sending initial ping');
             if ($this->is_http($datacenter)) {
                 $this->method_call('http_wait', ['max_wait' => 500, 'wait_after' => 150, 'max_delay' => 500], ['datacenter' => $datacenter]);
             } elseif (isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) && $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) {
@@ -86,7 +86,7 @@ trait MessageHandler
         $payload = $this->datacenter->sockets[$datacenter]->read_message();
         if (strlen($payload) === 4) {
             $payload = $this->unpack_signed_int($payload);
-            \danog\MadelineProto\Logger::log("Received $payload from DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->logger->logger("Received $payload from DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             return $payload;
         }
@@ -105,7 +105,7 @@ trait MessageHandler
             /*
             $server_salt = substr($decrypted_data, 0, 8);
             if ($server_salt != $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt']) {
-                \danog\MadelineProto\Logger::log('WARNING: Server salt mismatch (my server salt '.$this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').', \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger('WARNING: Server salt mismatch (my server salt '.$this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').', \danog\MadelineProto\Logger::WARNING);
             }
             */
             $session_id = substr($decrypted_data, 8, 8);

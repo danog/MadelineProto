@@ -22,7 +22,7 @@ trait AckHandler
     {
         // The server acknowledges that it received my message
         if (!isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id])) {
-            \danog\MadelineProto\Logger::log("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
+            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
 
             return false;
         }
@@ -34,7 +34,7 @@ trait AckHandler
     {
         // I let the server know that I received its message
         if (!isset($this->datacenter->sockets[$datacenter]->incoming_messages[$message_id])) {
-            \danog\MadelineProto\Logger::log("WARNING: Couldn't find message id ".$message_id.' in the array of incomgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
+            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of incomgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
             //throw new \danog\MadelineProto\Exception("Couldn't find message id ".$message_id.' in the array of incoming message ids. Maybe try to increase its size?');
         }
         if ($this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === null || $this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === "\0\0\0\0\0\0\0\0") {

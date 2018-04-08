@@ -21,7 +21,7 @@ trait MessageHandler
     public function encrypt_secret_message($chat_id, $message)
     {
         if (!isset($this->secret_chats[$chat_id])) {
-            \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $chat_id));
+            $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $chat_id));
 
             return false;
         }
@@ -57,7 +57,7 @@ trait MessageHandler
     public function handle_encrypted_update($message, $test = false)
     {
         if (!isset($this->secret_chats[$message['message']['chat_id']])) {
-            \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $message['message']['chat_id']));
+            $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $message['message']['chat_id']));
 
             return false;
         }
@@ -80,27 +80,27 @@ trait MessageHandler
         $message_key = substr($message['message']['bytes'], 8, 16);
         $encrypted_data = substr($message['message']['bytes'], 24);
         if ($this->secret_chats[$message['message']['chat_id']]['mtproto'] === 2) {
-            \danog\MadelineProto\Logger::log('Trying MTProto v2 decryption for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
+            $this->logger->logger('Trying MTProto v2 decryption for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
 
             try {
                 $message_data = $this->try_mtproto_v2_decrypt($message_key, $message['message']['chat_id'], $old, $encrypted_data);
-                \danog\MadelineProto\Logger::log('MTProto v2 decryption OK for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger('MTProto v2 decryption OK for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
             } catch (\danog\MadelineProto\SecurityException $e) {
-                \danog\MadelineProto\Logger::log('MTProto v2 decryption failed with message '.$e->getMessage().', trying MTProto v1 decryption for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger('MTProto v2 decryption failed with message '.$e->getMessage().', trying MTProto v1 decryption for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
                 $message_data = $this->try_mtproto_v1_decrypt($message_key, $message['message']['chat_id'], $old, $encrypted_data);
-                \danog\MadelineProto\Logger::log('MTProto v1 decryption OK for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger('MTProto v1 decryption OK for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
                 $this->secret_chats[$message['message']['chat_id']]['mtproto'] = 1;
             }
         } else {
-            \danog\MadelineProto\Logger::log('Trying MTProto v1 decryption for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
+            $this->logger->logger('Trying MTProto v1 decryption for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
 
             try {
                 $message_data = $this->try_mtproto_v1_decrypt($message_key, $message['message']['chat_id'], $old, $encrypted_data);
-                \danog\MadelineProto\Logger::log('MTProto v1 decryption OK for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger('MTProto v1 decryption OK for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
             } catch (\danog\MadelineProto\SecurityException $e) {
-                \danog\MadelineProto\Logger::log('MTProto v1 decryption failed with message '.$e->getMessage().', trying MTProto v2 decryption for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger('MTProto v1 decryption failed with message '.$e->getMessage().', trying MTProto v2 decryption for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
                 $message_data = $this->try_mtproto_v2_decrypt($message_key, $message['message']['chat_id'], $old, $encrypted_data);
-                \danog\MadelineProto\Logger::log('MTProto v2 decryption OK for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger('MTProto v2 decryption OK for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
                 $this->secret_chats[$message['message']['chat_id']]['mtproto'] = 2;
             }
         }

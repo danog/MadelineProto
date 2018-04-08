@@ -33,7 +33,7 @@ class SocketReader extends \Threaded implements \Collectable
 
     public function __destruct()
     {
-        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['shutting_down_reader_pool'].$this->current, \danog\MadelineProto\Logger::NOTICE);
+        $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['shutting_down_reader_pool'].$this->current, \danog\MadelineProto\Logger::NOTICE);
     }
 
     /**
@@ -47,18 +47,18 @@ class SocketReader extends \Threaded implements \Collectable
         while ($this->API->run_workers) {
             try {
                 $this->API->datacenter->sockets[$this->current]->reading = true;
-                //\danog\MadelineProto\Logger::log('RECEIVING');
+                //$this->logger->logger('RECEIVING');
                 $error = $this->API->recv_message($this->current);
-                \danog\MadelineProto\Logger::log('NOW HANDLE');
+                $this->logger->logger('NOW HANDLE');
                 $handler_pool->submit(new SocketHandler($this->API, $this->current, $error));
-                \danog\MadelineProto\Logger::log('SUBMITTED');
+                $this->logger->logger('SUBMITTED');
                 $this->API->datacenter->sockets[$this->current]->reading = false;
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
-                //\danog\MadelineProto\Logger::log('Nothing in the socket for dc '.$this->current, \danog\MadelineProto\Logger::VERBOSE);
+                //$this->logger->logger('Nothing in the socket for dc '.$this->current, \danog\MadelineProto\Logger::VERBOSE);
             }
         }
         while ($number = $handler_pool->collect()) {
-            \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['shutting_down_handler_pool'], $this->current, $number), \danog\MadelineProto\Logger::NOTICE);
+            $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['shutting_down_handler_pool'], $this->current, $number), \danog\MadelineProto\Logger::NOTICE);
         }
         $this->setGarbage();
     }

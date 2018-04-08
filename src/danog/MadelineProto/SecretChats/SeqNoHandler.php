@@ -56,10 +56,10 @@ trait SeqNoHandler
                 }
             }
         }
-        //\danog\MadelineProto\Logger::log($C, $seqno);
+        //$this->logger->logger($C, $seqno);
         if ($seqno < $C) {
             // <= C
-            \danog\MadelineProto\Logger::log('WARNING: dropping repeated message with seqno '.$seqno);
+            $this->logger->logger('WARNING: dropping repeated message with seqno '.$seqno);
 
             return false;
         }
