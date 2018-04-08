@@ -111,7 +111,7 @@ class MTProto
 
     public function __magic_construct($settings = [])
     {
-        \danog\MadelineProto\Logger::class_exists();
+        \danog\MadelineProto\Magic::class_exists();
         // Parse settings
         $this->parse_settings($settings);
         if (!defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 6) {
@@ -180,7 +180,7 @@ class MTProto
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         set_exception_handler(['\\danog\\MadelineProto\\Serialization', 'serialize_all']);
         $this->setup_logger();
-        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
+        if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
         Lang::$current_lang = &Lang::$lang['en'];
@@ -195,7 +195,7 @@ class MTProto
         }
         $this->altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
 
-        $this->settings['connection_settings']['all']['ipv6'] = \danog\MadelineProto\Logger::$ipv6;
+        $this->settings['connection_settings']['all']['ipv6'] = \danog\MadelineProto\Magic::$ipv6;
         /*if (isset($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'] === $this->settings['updates']['callback']) {
             unset($this->settings['pwr']['update_handler']);
             $this->updates = [];
@@ -336,7 +336,7 @@ class MTProto
 
     public function __destruct()
     {
-        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
+        if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
         }
     }
@@ -452,7 +452,7 @@ class MTProto
                 // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, obfuscated2, udp (unsupported)
                 'test_mode' => false,
                 // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
-                'ipv6' => \danog\MadelineProto\Logger::$ipv6,
+                'ipv6' => \danog\MadelineProto\Magic::$ipv6,
                 // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
                 'timeout' => 2,
                 // timeout for sockets

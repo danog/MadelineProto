@@ -564,7 +564,7 @@ trait TL
                     return stream_get_contents($stream, 8);
                 }
 
-                return \danog\MadelineProto\Logger::$bigint || isset($type['strlong']) ? stream_get_contents($stream, 8) : $this->unpack_signed_long(stream_get_contents($stream, 8));
+                return \danog\MadelineProto\Magic::$bigint || isset($type['strlong']) ? stream_get_contents($stream, 8) : $this->unpack_signed_long(stream_get_contents($stream, 8));
             case 'double':
                 return $this->unpack_double(stream_get_contents($stream, 8));
             case 'int128':

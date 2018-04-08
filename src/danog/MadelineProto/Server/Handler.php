@@ -235,7 +235,7 @@ class Handler extends \danog\MadelineProto\Connection
             try {
                 $this->logging = true;
 
-                $message = ['_' => 'socketMessageLog', 'data' => $message, 'level' => $level, 'thread' => \danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread()), 'process' => \danog\MadelineProto\Logger::is_fork(), 'file' => basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'], '.php')];
+                $message = ['_' => 'socketMessageLog', 'data' => $message, 'level' => $level, 'thread' => \danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread()), 'process' => \danog\MadelineProto\Magic::is_fork(), 'file' => basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'], '.php')];
 
                 $this->send_message_safe($this->serialize_object(['type' => ''], $message, 'log'));
             } finally {

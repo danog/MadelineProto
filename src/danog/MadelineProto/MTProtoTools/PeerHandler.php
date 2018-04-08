@@ -297,7 +297,7 @@ trait PeerHandler
         }
         if (is_numeric($id)) {
             if (is_string($id)) {
-                $id = \danog\MadelineProto\Logger::$bigint ? (float) $id : (int) $id;
+                $id = \danog\MadelineProto\Magic::$bigint ? (float) $id : (int) $id;
             }
             if (!isset($this->chats[$id]) && $id < 0 && !$this->is_supergroup($id)) {
                 $this->method_call('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);

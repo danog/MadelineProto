@@ -22,24 +22,15 @@ class Logger
     const background = ['default' => 49, 'black' => 40, 'red' => 41, 'magenta' => 45, 'yellow' => 43, 'green' => 42, 'blue' => 44, 'cyan' => 46, 'light_gray' => 47, 'dark_gray' => 100, 'light_red' => 101, 'light_green' => 102, 'light_yellow' => 103, 'light_blue' => 104, 'light_magenta' => 105, 'light_cyan' => 106, 'white' => 107];
     const set = ['bold' => 1, 'dim' => 2, 'underlined' => 3, 'blink' => 4, 'reverse' => 5, 'hidden' => 6];
     const reset = ['all' => 0, 'bold' => 21, 'dim' => 22, 'underlined' => 24, 'blink' => 25, 'reverse' => 26, 'hidden' => 28];
-    public static $storage = [];
-    public static $mode = 0;
-    public static $optional = null;
-    public static $prefix = '';
-    public static $level = 3;
-    public static $has_thread = false;
-    public static $BIG_ENDIAN = false;
-    public static $bigint = true;
-    public static $colors = [];
-    public static $isatty = false;
-    public static $is_fork = false;
-    public static $can_getmypid = true;
-    public static $processed_fork = false;
-    public static $ipv6;
-    private static $pid;
-
-    public static $inited = false;
-
+    
+    public $mode = 0;
+    public $optional = null;
+    public $prefix = '';
+    public $level = 3;
+    public $colors = [];
+    
+    public static $default;
+    
     const ULTRA_VERBOSE = 5;
     const VERBOSE = 4;
     const NOTICE = 3;
@@ -47,58 +38,8 @@ class Logger
     const ERROR = 1;
     const FATAL_ERROR = 0;
 
-    public static function class_exists()
-    {
-        if (!self::$inited) {
-            self::$has_thread = class_exists('\\Thread') && method_exists('\\Thread', 'getCurrentThread');
-            self::$BIG_ENDIAN = pack('L', 1) === pack('N', 1);
-            self::$bigint = PHP_INT_SIZE < 8;
-            self::$ipv6 = (bool) strlen(@file_get_contents('http://v6.ipv6-test.com/api/myip.php', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
-            preg_match('/const V = (\\d+);/', @file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
-            if (isset($matches[1]) && \danog\MadelineProto\MTProto::V < (int) $matches[1]) {
-                throw new \danog\MadelineProto\Exception(hex2bin(\danog\MadelineProto\Lang::$current_lang['v_error']), 0, null, 'MadelineProto', 1);
-            }
-            if (class_exists('\\danog\\MadelineProto\\VoIP')) {
-                if (!defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || \danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION !== '1.1.2') {
-                    throw new \danog\MadelineProto\Exception(hex2bin(\danog\MadelineProto\Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);
-                }
-            }
-            self::$colors[self::ULTRA_VERBOSE] = implode(';', [self::foreground['light_gray'], self::set['dim']]);
-            self::$colors[self::VERBOSE] = implode(';', [self::foreground['green'], self::set['bold']]);
-            self::$colors[self::NOTICE] = implode(';', [self::foreground['yellow'], self::set['bold']]);
-            self::$colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
-            self::$colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
-            self::$colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
-
-            try {
-                self::$isatty = defined('STDOUT') && function_exists('posix_isatty') && posix_isatty(STDOUT);
-            } catch (\danog\MadelineProto\Exception $e) {
-            }
-            self::$can_getmypid = !(isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org'));
-            self::$inited = true;
-        }
-    }
-
-    public static function is_fork()
-    {
-        if (self::$is_fork) {
-            return true;
-        }
-        if (!self::$can_getmypid) {
-            return false;
-        }
-
-        try {
-            if (self::$pid === null) {
-                self::$pid = getmypid();
-            }
-
-            return self::$is_fork = self::$pid !== getmypid();
-        } catch (\danog\MadelineProto\Exception $e) {
-            return self::$can_getmypid = false;
-        }
-    }
-
+    
+    
     /*
      * Constructor function
      * Accepts various logger modes:
@@ -109,31 +50,45 @@ class Logger
      * 4 - Call callable provided in logger_param. logger_param must accept two parameters: array $message, int $level
      *     $message is an array containing the messages the log, $level, is the logging level
      */
-    public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE)
+    public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE) {
+        self::$default = new Logger($mode, $optional, $prefix, $level);
+    }
+    public function __construct($mode, $optional = null, $prefix = '', $level = self::NOTICE)
     {
         if ($mode === null) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['no_mode_specified']);
         }
-        self::$mode = $mode;
-        self::$optional = $mode == 2 ? Absolute::absolute($optional) : $optional;
-        self::$prefix = $prefix === '' ? '' : ', '.$prefix;
-        self::$level = $level;
-        self::class_exists();
+        $this->mode = $mode;
+        $this->optional = $mode == 2 ? Absolute::absolute($optional) : $optional;
+        $this->prefix = $prefix === '' ? '' : ', '.$prefix;
+        $this->level = $level;
+        
+        $this->colors[Logger::ULTRA_VERBOSE] = implode(';', [Logger::foreground['light_gray'], Logger::set['dim']]);
+        $this->colors[Logger::VERBOSE] = implode(';', [Logger::foreground['green'], Logger::set['bold']]);
+        $this->colors[Logger::NOTICE] = implode(';', [Logger::foreground['yellow'], Logger::set['bold']]);
+        $this->colors[Logger::WARNING] = implode(';', [Logger::foreground['white'], Logger::set['dim'], Logger::background['red']]);
+        $this->colors[Logger::ERROR] = implode(';', [Logger::foreground['white'], Logger::set['bold'], Logger::background['red']]);
+        $this->colors[Logger::FATAL_ERROR] = implode(';', [Logger::foreground['red'], Logger::set['bold'], Logger::background['light_gray']]);
     }
-
+    
     public static function log($param, $level = self::NOTICE)
     {
-        if ($level > self::$level || self::$mode === 0) {
+        if (!is_null(self::$default)) {
+            self::$default->logger($param, $level, basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php'));
+        }
+    }
+    public function logger($param, $level = self::NOTICE, $file = null) {
+        if ($level > $this->level || $this->mode === 0) {
             return false;
         }
-        if (self::$mode === 4) {
-            return call_user_func_array(self::$optional, [$param, $level]);
+        if ($this->mode === 4) {
+            return call_user_func_array($this->optional, [$param, $level]);
         }
-        $prefix = self::$prefix;
-        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread())) {
+        $prefix = $this->prefix;
+        if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread())) {
             $prefix .= ' (t)';
         }
-        if (\danog\MadelineProto\Logger::is_fork()) {
+        if (\danog\MadelineProto\Magic::is_fork()) {
             $prefix .= ' (p)';
         }
         if (!is_string($param)) {
@@ -144,19 +99,19 @@ class Logger
                 $param = $parame;
             }*/
         }
-        $param = str_pad(basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php').$prefix.': ', 16 + strlen($prefix))."\t".$param;
-        /*if (self::$isatty) {
-            self::$mode = 3;
-        }*/
-        switch (self::$mode) {
+        if ($file === null) {
+            $file = basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
+        }
+        $param = str_pad($file.$prefix.': ', 16 + strlen($prefix))."\t".$param;
+        switch ($this->mode) {
                 case 1:
                     error_log($param);
                     break;
                 case 2:
-                    error_log($param.PHP_EOL, 3, self::$optional);
+                    error_log($param.PHP_EOL, 3, $this->optional);
                     break;
                 case 3:
-                    echo self::$isatty ? "\33[".self::$colors[$level].'m'.$param."\33[0m".PHP_EOL : $param.PHP_EOL;
+                    echo Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".PHP_EOL : $param.PHP_EOL;
                     break;
             }
     }

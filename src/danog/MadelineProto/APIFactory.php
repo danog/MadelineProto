@@ -118,13 +118,13 @@ class APIFactory
 
     public function __call($name, $arguments)
     {
-        if (Logger::is_fork() && !Logger::$processed_fork) {
+        if (Magic::is_fork() && !Magic::$processed_fork) {
             \danog\MadelineProto\Logger::log('Detected fork');
             $this->API->reset_session();
             foreach ($this->API->datacenter->sockets as $datacenter) {
                 $datacenter->close_and_reopen();
             }
-            Logger::$processed_fork = true;
+            Magic::$processed_fork = true;
         }
 
         if ($this->API->setdem) {

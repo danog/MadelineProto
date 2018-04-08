@@ -19,7 +19,7 @@ trait Tools
 {
     public function gen_vector_hash($ints)
     {
-        if (\danog\MadelineProto\Logger::$bigint) {
+        if (\danog\MadelineProto\Magic::$bigint) {
             $hash = new \phpseclib\Math\BigInteger(0);
             foreach ($ints as $int) {
                 $hash = $hash->multiply($this->twozerotwosixone)->add($this->zeroeight)->add(new \phpseclib\Math\BigInteger($int))->divide($this->zeroeight)[1];
@@ -53,7 +53,7 @@ trait Tools
 
     public function array_cast_recursive($array, $force = false)
     {
-        if (!\danog\MadelineProto\Logger::$has_thread && !$force) {
+        if (!\danog\MadelineProto\Magic::$has_thread && !$force) {
             return $array;
         }
         if (is_array($array)) {
@@ -74,7 +74,7 @@ trait Tools
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_4']);
         }
 
-        return unpack('l', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
+        return unpack('l', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 
     public function unpack_signed_long($value)
@@ -83,7 +83,7 @@ trait Tools
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
 
-        return unpack('q', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
+        return unpack('q', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 
     public function pack_signed_int($value)
@@ -96,7 +96,7 @@ trait Tools
         }
         $res = pack('l', $value);
 
-        return \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($res) : $res;
+        return \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($res) : $res;
     }
 
     public function pack_signed_long($value)
@@ -107,7 +107,7 @@ trait Tools
         if ($value < -9.223372036854776E+18) {
             throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_9223372036854775808'], $value));
         }
-        $res = \danog\MadelineProto\Logger::$bigint ? $this->pack_signed_int($value)."\0\0\0\0" : (\danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value));
+        $res = \danog\MadelineProto\Magic::$bigint ? $this->pack_signed_int($value)."\0\0\0\0" : (\danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value));
 
         return $res;
     }
@@ -131,7 +131,7 @@ trait Tools
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['encode_double_error']);
         }
 
-        return \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($res) : $res;
+        return \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($res) : $res;
     }
 
     public function unpack_double($value)
@@ -140,6 +140,6 @@ trait Tools
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
 
-        return unpack('d', \danog\MadelineProto\Logger::$BIG_ENDIAN ? strrev($value) : $value)[1];
+        return unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 }

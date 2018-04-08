@@ -47,7 +47,7 @@ class API extends APIFactory
                     flock($realpaths['lockfile'], LOCK_UN);
                     fclose($realpaths['lockfile']);
                 }
-                \danog\MadelineProto\Logger::class_exists();
+                \danog\MadelineProto\Magic::class_exists();
 
                 try {
                     $unserialized = unserialize($tounserialize);
@@ -110,7 +110,7 @@ class API extends APIFactory
 
     public function __destruct()
     {
-        if (\danog\MadelineProto\Logger::$has_thread && is_object(\Thread::getCurrentThread()) || Logger::is_fork()) {
+        if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread()) || Magic::is_fork()) {
             return;
         }
         $this->serialize();
@@ -136,13 +136,13 @@ class API extends APIFactory
     public function __set($name, $value)
     {
         if ($name === 'settings') {
-            if (Logger::is_fork() && !Logger::$processed_fork) {
+            if (Magic::is_fork() && !Magic::$processed_fork) {
                 \danog\MadelineProto\Logger::log('Detected fork');
                 $this->API->reset_session();
                 foreach ($this->API->datacenter->sockets as $datacenter) {
                     $datacenter->close_and_reopen();
                 }
-                Logger::$processed_fork = true;
+                Magic::$processed_fork = true;
             }
 
             return $this->API->__construct(array_replace_recursive($this->API->settings, $value));

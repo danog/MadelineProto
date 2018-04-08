@@ -35,7 +35,7 @@ trait MsgIdHandler
             if (!$new_message_id->divide($this->four)[1]->equals($this->zero)) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4. Consider syncing your date.');
             }
-            if (!\danog\MadelineProto\Logger::$has_thread && $new_message_id->compare($key = $this->get_max_id($aargs['datacenter'], false)) <= 0) {
+            if (!\danog\MadelineProto\Magic::$has_thread && $new_message_id->compare($key = $this->get_max_id($aargs['datacenter'], false)) <= 0) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', 1);
             }
             if (count($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
