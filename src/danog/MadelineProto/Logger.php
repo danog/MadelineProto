@@ -22,15 +22,15 @@ class Logger
     const background = ['default' => 49, 'black' => 40, 'red' => 41, 'magenta' => 45, 'yellow' => 43, 'green' => 42, 'blue' => 44, 'cyan' => 46, 'light_gray' => 47, 'dark_gray' => 100, 'light_red' => 101, 'light_green' => 102, 'light_yellow' => 103, 'light_blue' => 104, 'light_magenta' => 105, 'light_cyan' => 106, 'white' => 107];
     const set = ['bold' => 1, 'dim' => 2, 'underlined' => 3, 'blink' => 4, 'reverse' => 5, 'hidden' => 6];
     const reset = ['all' => 0, 'bold' => 21, 'dim' => 22, 'underlined' => 24, 'blink' => 25, 'reverse' => 26, 'hidden' => 28];
-    
+
     public $mode = 0;
     public $optional = null;
     public $prefix = '';
     public $level = 3;
     public $colors = [];
-    
+
     public static $default;
-    
+
     const ULTRA_VERBOSE = 5;
     const VERBOSE = 4;
     const NOTICE = 3;
@@ -38,8 +38,6 @@ class Logger
     const ERROR = 1;
     const FATAL_ERROR = 0;
 
-    
-    
     /*
      * Constructor function
      * Accepts various logger modes:
@@ -50,9 +48,11 @@ class Logger
      * 4 - Call callable provided in logger_param. logger_param must accept two parameters: array $message, int $level
      *     $message is an array containing the messages the log, $level, is the logging level
      */
-    public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE) {
-        self::$default = new Logger($mode, $optional, $prefix, $level);
+    public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE)
+    {
+        self::$default = new self($mode, $optional, $prefix, $level);
     }
+
     public function __construct($mode, $optional = null, $prefix = '', $level = self::NOTICE)
     {
         if ($mode === null) {
@@ -62,22 +62,24 @@ class Logger
         $this->optional = $mode == 2 ? Absolute::absolute($optional) : $optional;
         $this->prefix = $prefix === '' ? '' : ', '.$prefix;
         $this->level = $level;
-        
-        $this->colors[Logger::ULTRA_VERBOSE] = implode(';', [Logger::foreground['light_gray'], Logger::set['dim']]);
-        $this->colors[Logger::VERBOSE] = implode(';', [Logger::foreground['green'], Logger::set['bold']]);
-        $this->colors[Logger::NOTICE] = implode(';', [Logger::foreground['yellow'], Logger::set['bold']]);
-        $this->colors[Logger::WARNING] = implode(';', [Logger::foreground['white'], Logger::set['dim'], Logger::background['red']]);
-        $this->colors[Logger::ERROR] = implode(';', [Logger::foreground['white'], Logger::set['bold'], Logger::background['red']]);
-        $this->colors[Logger::FATAL_ERROR] = implode(';', [Logger::foreground['red'], Logger::set['bold'], Logger::background['light_gray']]);
+
+        $this->colors[self::ULTRA_VERBOSE] = implode(';', [self::foreground['light_gray'], self::set['dim']]);
+        $this->colors[self::VERBOSE] = implode(';', [self::foreground['green'], self::set['bold']]);
+        $this->colors[self::NOTICE] = implode(';', [self::foreground['yellow'], self::set['bold']]);
+        $this->colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
+        $this->colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
+        $this->colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
     }
-    
+
     public static function log($param, $level = self::NOTICE)
     {
         if (!is_null(self::$default)) {
             self::$default->logger($param, $level, basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php'));
         }
     }
-    public function logger($param, $level = self::NOTICE, $file = null) {
+
+    public function logger($param, $level = self::NOTICE, $file = null)
+    {
         if ($level > $this->level || $this->mode === 0) {
             return false;
         }
