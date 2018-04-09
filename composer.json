@@ -17,6 +17,7 @@
         "erusev/parsedown": "^1.6",
         "rollbar/rollbar": "dev-master",
         "ext-curl": "*",
+        "ext-mbstring": "*",
         "ext-xml": "*"
     },
     "require-dev": {
