@@ -108,7 +108,7 @@ trait Files
                     throw new \danog\MadelineProto\Exception('No access hash');
                 }
                 $res['Document'] = $media['document'];
-                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['document']['id'], 'access_hash' => $media['photo']['access_hash']];
+                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['document']['id'], 'access_hash' => $media['document']['access_hash']];
                 $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
                 if (isset($media['ttl_seconds'])) {
                     $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
