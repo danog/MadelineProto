@@ -60,7 +60,6 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
   * [Simple (manual)](https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple-manual)
   * [Composer from scratch](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-scratch)
   * [Composer from existing project](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-existing-project)
-  * [Git](https://docs.madelineproto.xyz/docs/INSTALLATION.html#git)
 * [Handling updates](https://docs.madelineproto.xyz/docs/UPDATES.html)
   * [Event driven](https://docs.madelineproto.xyz/docs/UPDATES.html#event-driven)
     * [Event driven multithreaded](https://docs.madelineproto.xyz/docs/UPDATES.html#event-driven-multithreaded)
@@ -78,7 +77,9 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
 * [Avoiding FLOOD_WAITs](https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html)
 * [Logging](https://docs.madelineproto.xyz/docs/LOGGING.html)
 * [Using methods](https://docs.madelineproto.xyz/docs/USING_METHODS.html)
+  * [FULL API Documentation with descriptions](https://docs.madelineproto.xyz/API_docs/methods)
   * [Peers](https://docs.madelineproto.xyz/docs/USING_METHODS.html#peers)
+  * [Files](https://docs.madelineproto.xyz/docs/FILES.html)
   * [Secret chats](https://docs.madelineproto.xyz/docs/USING_METHODS.html#secret-chats)
   * [Entities (Markdown & HTML)](https://docs.madelineproto.xyz/docs/USING_METHODS.html#entities)
   * [reply_markup (keyboards & inline keyboards)](https://docs.madelineproto.xyz/docs/USING_METHODS.html#reply_markup)
@@ -131,7 +132,6 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
   * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIB.html#contribution-guide)
   * [Credits](https://docs.madelineproto.xyz/docs/CONTRIB.html#credits)
 * [Web templates for `$MadelineProto->start()`](https://docs.madelineproto.xyz/docs/TEMPLATES.html)
-
 
 ## Very complex and complete examples
 
