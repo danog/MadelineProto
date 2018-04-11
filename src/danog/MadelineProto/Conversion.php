@@ -28,11 +28,11 @@ class Conversion
         $sqlite = new \PDO("sqlite:$session");
         $sqlite->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING);
 
-        $sessions = $sqlite->query("SELECT * FROM sessions")->fetchAll();
+        $sessions = $sqlite->query('SELECT * FROM sessions')->fetchAll();
         $MadelineProto = new \danog\MadelineProto\API($new_session, $settings);
         foreach ($sessions as $dc) {
             $MadelineProto->API->datacenter->sockets[$dc['dc_id']]->auth_key = ['server_salt' => '', 'connection_inited' => true, 'id' => substr(sha1($dc['auth_key'], true), -8), 'auth_key' => $dc['auth_key']];
-            $MadelineProto->API->datacenter->sockets[$dc['dc_id']]->temp_auth_key = NULL;
+            $MadelineProto->API->datacenter->sockets[$dc['dc_id']]->temp_auth_key = null;
             $MadelineProto->API->datacenter->sockets[$dc['dc_id']]->ip = $dc['server_address'];
             $MadelineProto->API->datacenter->sockets[$dc['dc_id']]->port = $dc['port'];
             $MadelineProto->API->datacenter->sockets[$dc['dc_id']]->authorized = true;
@@ -46,6 +46,7 @@ class Conversion
         }
         $MadelineProto->API->authorized = MTProto::LOGGED_IN;
         $MadelineProto->API->init_authorization();
+
         return $MadelineProto;
     }
 
@@ -64,7 +65,7 @@ class Conversion
         $MadelineProto = new \danog\MadelineProto\API($new_session, $settings);
 
         $MadelineProto->API->datacenter->sockets[$session['dc_id']]->auth_key = ['server_salt' => '', 'connection_inited' => true, 'id' => substr(sha1($session['auth_key'], true), -8), 'auth_key' => $session['auth_key']];
-        $MadelineProto->API->datacenter->sockets[$session['dc_id']]->temp_auth_key = NULL;
+        $MadelineProto->API->datacenter->sockets[$session['dc_id']]->temp_auth_key = null;
         $MadelineProto->API->datacenter->sockets[$session['dc_id']]->authorized = true;
         $MadelineProto->API->datacenter->sockets[$session['dc_id']]->session_id = $MadelineProto->random(8);
         $MadelineProto->API->datacenter->sockets[$session['dc_id']]->session_in_seq_no = 0;
@@ -76,6 +77,7 @@ class Conversion
 
         $MadelineProto->API->authorized = MTProto::LOGGED_IN;
         $MadelineProto->API->init_authorization();
+
         return $MadelineProto;
     }
 }
