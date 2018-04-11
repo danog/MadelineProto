@@ -451,6 +451,9 @@ trait BotAPI
 
             $arguments['message'] = $this->html_fixtags($arguments['message']);
             $dom = new \DOMDocument();
+            if (!extension_loaded('mbstring')) {
+                throw new Exception(['extension', 'mbstring']);
+            }
             $dom->loadHTML(mb_convert_encoding($arguments['message'], 'HTML-ENTITIES', 'UTF-8'));
             if (!isset($arguments['entities'])) {
                 $arguments['entities'] = [];
