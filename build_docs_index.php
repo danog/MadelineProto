@@ -94,18 +94,18 @@ foreach ($orderedfiles as $key => $filename) {
     }
 }
 
-$readme = explode("## ", file_get_contents('README.md'));
+$readme = explode('## ', file_get_contents('README.md'));
 foreach ($readme as &$section) {
     if (explode("\n", $section)[0] === 'Documentation') {
         $section = "Documentation\n\n".$index."\n";
     }
 }
-$readme = implode("## ", $readme);
+$readme = implode('## ', $readme);
 
 file_put_contents('README.md', $readme);
-file_put_contents('docs/docs/index.md', "---
+file_put_contents('docs/docs/index.md', '---
 title: MadelineProto documentation
 description: PHP client/server for the telegram MTProto protocol (a better tg-cli)
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
-".$readme);
+'.$readme);
