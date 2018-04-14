@@ -176,7 +176,13 @@ class Conversion
     public static function tdesktop_fopen_encrypted($fileName, $options = 3) {
         $f = self::tdesktop_fopen($fileName, $options);
         $data = self::tdesktop_read_bytearray($f);
-        return self::tdesktop_decrypt($data, self::$tdesktop_key);
+        $res = self::tdesktop_decrypt($data, self::$tdesktop_key);
+        $length = unpack('V', stream_get_contents($res, 4))[1];
+
+        if ($length > fstat($res)['size'] || $length < 4) {
+             throw new \danog\MadelineProto\Exception('Wrong length');
+        }
+        return $res;
     }
     public static function tdesktop_read_bytearray($fp) {
         $length = self::unpack_signed_int(stream_get_contents($fp, 4));
@@ -200,14 +206,99 @@ class Conversion
         $res = fopen('php://memory', 'rw+b');
         fwrite($res, $decrypted_data);
         fseek($res, 0);
+
         return $res;
     }
+
+	const dbiKey = 0x00;
+	const dbiUser = 0x01;
+	const dbiDcOptionOldOld = 0x02;
+	const dbiChatSizeMax = 0x03;
+	const dbiMutePeer = 0x04;
+	const dbiSendKey = 0x05;
+	const dbiAutoStart = 0x06;
+	const dbiStartMinimized = 0x07;
+	const dbiSoundNotify = 0x08;
+	const dbiWorkMode = 0x09;
+	const dbiSeenTrayTooltip = 0x0a;
+	const dbiDesktopNotify = 0x0b;
+	const dbiAutoUpdate = 0x0c;
+	const dbiLastUpdateCheck = 0x0d;
+	const dbiWindowPosition = 0x0e;
+	const dbiConnectionTypeOld = 0x0f;
+	// 0x10 reserved
+	const dbiDefaultAttach = 0x11;
+	const dbiCatsAndDogs = 0x12;
+	const dbiReplaceEmojis = 0x13;
+	const dbiAskDownloadPath = 0x14;
+	const dbiDownloadPathOld = 0x15;
+	const dbiScale = 0x16;
+	const dbiEmojiTabOld = 0x17;
+	const dbiRecentEmojiOldOld = 0x18;
+	const dbiLoggedPhoneNumber = 0x19;
+	const dbiMutedPeers = 0x1a;
+	// 0x1b reserved
+	const dbiNotifyView = 0x1c;
+	const dbiSendToMenu = 0x1d;
+	const dbiCompressPastedImage = 0x1e;
+	const dbiLangOld = 0x1f;
+	const dbiLangFileOld = 0x20;
+	const dbiTileBackground = 0x21;
+	const dbiAutoLock = 0x22;
+	const dbiDialogLastPath = 0x23;
+	const dbiRecentEmojiOld = 0x24;
+	const dbiEmojiVariantsOld = 0x25;
+	const dbiRecentStickers = 0x26;
+	const dbiDcOptionOld = 0x27;
+	const dbiTryIPv6 = 0x28;
+	const dbiSongVolume = 0x29;
+	const dbiWindowsNotificationsOld = 0x30;
+	const dbiIncludeMuted = 0x31;
+	const dbiMegagroupSizeMax = 0x32;
+	const dbiDownloadPath = 0x33;
+	const dbiAutoDownload = 0x34;
+	const dbiSavedGifsLimit = 0x35;
+	const dbiShowingSavedGifsOld = 0x36;
+	const dbiAutoPlay = 0x37;
+	const dbiAdaptiveForWide = 0x38;
+	const dbiHiddenPinnedMessages = 0x39;
+	const dbiRecentEmoji = 0x3a;
+	const dbiEmojiVariants = 0x3b;
+	const dbiDialogsMode = 0x40;
+	const dbiModerateMode = 0x41;
+	const dbiVideoVolume = 0x42;
+	const dbiStickersRecentLimit = 0x43;
+	const dbiNativeNotifications = 0x44;
+	const dbiNotificationsCount  = 0x45;
+	const dbiNotificationsCorner = 0x46;
+	const dbiThemeKey = 0x47;
+	const dbiDialogsWidthRatioOld = 0x48;
+	const dbiUseExternalVideoPlayer = 0x49;
+	const dbiDcOptions = 0x4a;
+	const dbiMtpAuthorization = 0x4b;
+	const dbiLastSeenWarningSeenOld = 0x4c;
+	const dbiAuthSessionSettings = 0x4d;
+	const dbiLangPackKey = 0x4e;
+	const dbiConnectionType = 0x4f;
+	const dbiStickersFavedLimit = 0x50;
+	const dbiSuggestStickersByEmoji = 0x51;
+
+	const dbiEncryptedWithSalt = 333;
+	const dbiEncrypted = 444;
+
+	// 500-600 reserved
+
+	const dbiVersion = 666;
+
+
     public static function tdesktop($session, $new_session, $settings = []) {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         if (!isset($settings['old_session_key'])) $settings['old_session_key'] = 'data';
         if (!isset($settings['old_session_passcode'])) $settings['old_session_passcode'] = '';
-        list($part_one_md5, $part_two_md5) = str_split(self::tdesktop_md5($settings['old_session_key']), 16);
 
+        if (basename($session) !== 'tdata') $session .= '/tdata';
+
+        list($part_one_md5, $part_two_md5) = str_split(self::tdesktop_md5($settings['old_session_key']), 16);
         self::$tdesktop_base_path = $session.'/';
         self::$tdesktop_user_base_path = self::$tdesktop_base_path.$part_one_md5.'/';
 
@@ -223,21 +314,116 @@ class Conversion
         self::$tdesktop_key = stream_get_contents(self::tdesktop_read_bytearray(self::tdesktop_decrypt($encryptedKey, $passKey)));
 
         $main = self::tdesktop_fopen_encrypted($part_one_md5, self::FILEOPTION_SAFE);
+        $auth_keys = [];
 
-        $magic = self::pack_signed_int(0x4b);
-        while (($crc = stream_get_contents($main, 4)) !== $magic) {
+        while (true) {
+            $magic = self::unpack_signed_int(stream_get_contents($main, 4));
+            switch ($magic) {
+                case self::dbiDcOptionOldOld:
+                    stream_get_contents($main, 4);
+                    self::tdesktop_read_bytearray($main);
+                    self::tdesktop_read_bytearray($main);
+                    stream_get_contents($main, 4);
+                    break;
+                case self::dbiDcOptionOld:
+                    stream_get_contents($main, 8);
+                    self::tdesktop_read_bytearray($main);
+                    stream_get_contents($main, 4);
+                    break;
+                case self::dbiDcOptions:
+                    self::tdesktop_read_bytearray($main);
+                    break;
+                case self::dbiUser:
+                    stream_get_contents($main, 4);
+                    $main_dc_id = self::unpack_signed_int(stream_get_contents($main, 4));
+                    break;
+                case self::dbiKey:
+                    $auth_keys[self::unpack_signed_int(stream_get_contents($main, 4))] = stream_get_contents($main, 256);
+                    break;
+                case self::dbiMtpAuthorization:
+                    $main = self::tdesktop_read_bytearray($main);
+                    //stream_get_contents($main, 4);
+                    $user_id = self::unpack_signed_int(stream_get_contents($main, 4));
+                    $main_dc_id = self::unpack_signed_int(stream_get_contents($main, 4));
+                    $length = self::unpack_signed_int(stream_get_contents($main, 4));
+                    for ($x = 0; $x < $length; $x++) {
+                        $auth_keys[self::unpack_signed_int(stream_get_contents($main, 4))] = stream_get_contents($main, 256);
+                    }
+                    break 2;
+                case self::dbiAutoDownload:
+                    stream_get_contents($main, 12);
+                    break;
+                case self::dbiDialogsMode:
+                    stream_get_contents($main, 8);
+                    break;
+                case self::dbiAuthSessionSettings:
+                    self::tdesktop_read_bytearray($main);
+                    break;
+                case self::dbiConnectionTypeOld:
+                    switch (self::unpack_signed_int(stream_get_contents($main, 4))) {
+                        case 2:
+                        case 3:
+                        self::tdesktop_read_bytearray($main);
+                        stream_get_contents($main, 4);
+                        self::tdesktop_read_bytearray($main);
+                        self::tdesktop_read_bytearray($main);
+                        break;
+                    }
+                    break;
+                case self::dbiConnectionType:
+                    stream_get_contents($main, 8);
+                    self::tdesktop_read_bytearray($main);
+                    stream_get_contents($main, 4);
+                    self::tdesktop_read_bytearray($main);
+                    self::tdesktop_read_bytearray($main);
+                    break;
+                case self::dbiThemeKey:
+                case self::dbiLangPackKey:
+                case self::dbiMutePeer:
+                    stream_get_contents($main, 8);
+                    break;
+                case self::dbiWindowPosition:
+                    stream_get_contents($main, 24);
+                    break;
+                case self::dbiLoggedPhoneNumber:
+                    self::tdesktop_read_bytearray($main);
+                    break;
+                case self::dbiMutedPeers:
+                    $length = self::unpack_signed_int(stream_get_contents($main, 4));
+                    for ($x = 0; $x < $length; $x++) {
+                        stream_get_contents($main, 8);
+                    }
+                case self::dbiDownloadPathOld:
+                    self::tdesktop_read_bytearray($main);
+                    break;
+                case self::dbiDialogLastPath:
+                    self::tdesktop_read_bytearray($main);
+                    break;
+                case self::dbiDownloadPath:
+                    self::tdesktop_read_bytearray($main);
+                    self::tdesktop_read_bytearray($main);
+                    break;
+                default:
+                    stream_get_contents($main, 4);
+                    break;
+            }
         }
-        $main = self::tdesktop_read_bytearray($main);
-
-        $user_id = self::unpack_signed_int(stream_get_contents($main, 4));
-        $dc_id = self::unpack_signed_int(stream_get_contents($main, 4));
-        
-        $keys = [];
-        $length = self::unpack_signed_int(stream_get_contents($main, 4));
-        for ($x = 0; $x < $length; $x++) {
-            $keys[$x]['dc_id'] = self::unpack_signed_int(stream_get_contents($main, 4));
-            $keys[$x]['auth_key'] = self::tdesktop_read_bytearray($main);
+        $MadelineProto = new \danog\MadelineProto\API($new_session, $settings);
+        foreach ($auth_keys as $dc => $auth_key) {
+            $MadelineProto->API->datacenter->sockets[$dc]->auth_key = ['server_salt' => '', 'connection_inited' => true, 'id' => substr(sha1($auth_key, true), -8), 'auth_key' => $auth_key];
+            $MadelineProto->API->datacenter->sockets[$dc]->temp_auth_key = NULL;
+            $MadelineProto->API->datacenter->sockets[$dc]->authorized = true;
+            $MadelineProto->API->datacenter->sockets[$dc]->session_id = $MadelineProto->random(8);
+            $MadelineProto->API->datacenter->sockets[$dc]->session_in_seq_no = 0;
+            $MadelineProto->API->datacenter->sockets[$dc]->session_out_seq_no = 0;
+            $MadelineProto->API->datacenter->sockets[$dc]->incoming_messages = [];
+            $MadelineProto->API->datacenter->sockets[$dc]->outgoing_messages = [];
+            $MadelineProto->API->datacenter->sockets[$dc]->new_outgoing = [];
+            $MadelineProto->API->datacenter->sockets[$dc]->incoming = [];
         }
-        var_dump($keys, $length, $dc_id, $user_id);
+        $MadelineProto->API->authorized = MTProto::LOGGED_IN;
+        $MadelineProto->API->authorized_dc = $main_dc_id;
+        $MadelineProto->API->init_authorization();
+        return $MadelineProto;
     }
 }
