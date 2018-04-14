@@ -266,7 +266,7 @@ if (!extension_loaded('pthreads')) {
 
             public function write(string $buffer, int $length = -1)
             {
-                return $length === -1 ? socket_write($this->sock, $buffer) : socket_write($this->sock, $buffer, $Length);
+                return $length === -1 ? socket_write($this->sock, $buffer) : socket_write($this->sock, $buffer, $length);
             }
 
             public function send(string $data, int $length, int $flags)
