@@ -102,10 +102,10 @@ class Lua
 
     private function convert_array($array)
     {
-        if (!is_array($value)) {
+        if (!is_array($array)) {
             return $array;
         }
-        if ($this->is_seqential($value)) {
+        if ($this->is_seqential($array)) {
             return array_flip(array_map(function ($el) {
                 return $el + 1;
             }, array_flip($array)));
