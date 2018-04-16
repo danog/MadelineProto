@@ -593,8 +593,10 @@ class MTProto
             Exception::$rollbar = false;
             RPCErrorException::$rollbar = false;
         }
-        $this->logger = new \danog\MadelineProto\Logger($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
-        \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
+        $this->logger = new \danog\MadelineProto\Logger($this->settings['logger']['logger'], isset($this->settings['logger']['logger_param']) ? $this->settings['logger']['logger_param'] : '', isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
+        if (!\danog\MadelineProto\Logger::$default) {
+            \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
+        }
     }
 
     public function reset_session($de = true, $auth_key = false)

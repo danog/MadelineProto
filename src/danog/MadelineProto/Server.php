@@ -25,6 +25,7 @@ class Server
     public function __construct($settings)
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
+        \danog\MadelineProto\Logger::constructor(3);
         $this->settings = $settings;
         $this->mypid = getmypid();
     }

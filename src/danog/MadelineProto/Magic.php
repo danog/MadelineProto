@@ -24,7 +24,7 @@ class Magic
     public static $can_getmypid = true;
     public static $processed_fork = false;
     public static $ipv6;
-    private static $pid;
+    public static $pid;
 
     public static $inited = false;
 

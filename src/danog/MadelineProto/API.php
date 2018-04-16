@@ -170,6 +170,12 @@ class API extends APIFactory
             $this->API->wrapper = $this;
         }
     }
+    public function get_all_methods()
+    {
+        $methods = [];
+        foreach ($this->API->methods->by_id as $method) { $methods []= $method['method']; }
+        return array_merge($methods, get_class_methods($this->API));
+    }
 
     public function serialize($params = '')
     {

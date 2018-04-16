@@ -28,12 +28,14 @@ class Handler extends \danog\MadelineProto\Connection
 
     public function __magic_construct($socket, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
+        \danog\MadelineProto\Magic::$pid = getmypid();
         $this->sock = $socket;
         $this->sock->setBlocking(true);
         $this->must_open = false;
         $timeout = 2;
         $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
         $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+        $this->logger = new \danog\MadelineProto\Logger(3);
         $this->construct_TL(['socket' => __DIR__.'/../TL_socket.tl']);
     }
 
@@ -42,14 +44,13 @@ class Handler extends \danog\MadelineProto\Connection
         echo 'Closing socket in fork '.getmypid().PHP_EOL;
         unset($this->sock);
         $this->destruct_madeline();
-        exit();
     }
 
     public function destruct_madeline()
     {
         if ($this->madeline !== null) {
-            $this->madeline->settings['logger'] = ['logger' => 0];
-            $this->madeline->serialize();
+            $this->madeline->API->settings['logger'] = ['logger' => 0, 'logger_param' => ''];
+            $this->madeline->API->settings['updates']['callback'] = [];
             unset($this->madeline);
 
             return true;
@@ -96,12 +97,13 @@ class Handler extends \danog\MadelineProto\Connection
                     $message = $buffer;
                     $buffer = '';
                 } else {
+                    $time = time();
                     $message = $this->read_message();
                 }
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+                if (time() - $time < 2) $this->sock = null;
                 continue;
             }
-
             try {
                 $message = $this->deserialize($message, ['type' => '', 'datacenter' => '']);
                 if ($message['_'] !== 'socketMessageRequest') {
@@ -143,21 +145,32 @@ class Handler extends \danog\MadelineProto\Connection
             return true;
         }
         if ($method[0] === '__destruct') {
-            return $this->__destruct();
+            $this->__destruct();
+            exit();
         }
         if ($this->madeline === null) {
             throw new \danog\MadelineProto\Exception('__construct was not called');
         }
-        foreach ($args as &$arg) {
+        array_walk_recursive($args, function (&$arg, $zis) {
             if (is_array($arg) && isset($arg['_'])) {
-                if ($arg['_'] === 'callback' && isset($arg['callback']) && !method_exists($this, $arg['callback'])) {
-                    $arg = [$this, $arg['callback']];
+                if ($arg['_'] === 'fileCallback' && isset($arg['callback']) && isset($arg['file']) && !method_exists($zis, $arg['callback']['callback'])) {
+                    if (isset($arg['file']['_']) && $arg['file']['_'] === 'stream') {
+                        $arg['file'] = fopen('madelineSocket://', 'r+b', false, Stream::getContext($zis, $arg['file']['stream_id']));
+                    }
+                    $arg = new \danog\MadelineProto\FileCallback($arg['file'], [$zis, $arg['callback']['callback']]);
+                    return;
+                }
+                if ($arg['_'] === 'callback' && isset($arg['callback']) && !method_exists($zis, $arg['callback'])) {
+                    $arg = [$zis, $arg['callback']];
+                    return;
                 }
                 if ($arg['_'] === 'stream' && isset($arg['stream_id'])) {
-                    $arg = fopen('madelineSocket://', 'r+b', false, self::getContext($this, $arg['stream_id']));
+                    $arg = fopen('madelineSocket://', 'r+b', false, Stream::getContext($zis, $arg['stream_id']));
+                    return;
                 }
             }
-        }
+        }, $this);
+
         if (count($method) === 1) {
             return $this->madeline->{$method[0]}(...$args);
         }
@@ -254,6 +267,7 @@ class Handler extends \danog\MadelineProto\Connection
             $this->send_message($message);
         } catch (\danog\MadelineProto\Exception $e) {
             $this->__destruct();
+            die;
         }
     }
 
