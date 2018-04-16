@@ -225,7 +225,7 @@ class MTProto
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
         if (isset($backtrace[2]['function']) && isset($backtrace[2]['class']) && isset($backtrace[2]['args']) && $backtrace[2]['class'] === 'danog\\MadelineProto\\API' && $backtrace[2]['function'] === '__magic_construct') {
             if (count($backtrace[2]['args']) === 2) {
-                $this->logger->logger('Updating settings on wakeup');
+                //$this->logger->logger('Updating settings on wakeup');
                 $this->parse_settings(array_replace_recursive($this->settings, $backtrace[2]['args'][1]));
             }
             //$this->wrapper = $backtrace[2]['object'];
@@ -606,7 +606,7 @@ class MTProto
         }
         foreach ($this->datacenter->sockets as $id => $socket) {
             if ($de) {
-                $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['reset_session_seqno'], $id), Logger::VERBOSE);
+                //$this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['reset_session_seqno'], $id), Logger::VERBOSE);
                 $socket->session_id = $this->random(8);
                 $socket->session_in_seq_no = 0;
                 $socket->session_out_seq_no = 0;
