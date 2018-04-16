@@ -101,9 +101,12 @@ class Handler extends \danog\MadelineProto\Connection
                     $message = $this->read_message();
                 }
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
-                if (time() - $time < 2) $this->sock = null;
+                if (time() - $time < 2) {
+                    $this->sock = null;
+                }
                 continue;
             }
+
             try {
                 $message = $this->deserialize($message, ['type' => '', 'datacenter' => '']);
                 if ($message['_'] !== 'socketMessageRequest') {
@@ -158,14 +161,17 @@ class Handler extends \danog\MadelineProto\Connection
                         $arg['file'] = fopen('madelineSocket://', 'r+b', false, Stream::getContext($zis, $arg['file']['stream_id']));
                     }
                     $arg = new \danog\MadelineProto\FileCallback($arg['file'], [$zis, $arg['callback']['callback']]);
+
                     return;
                 }
                 if ($arg['_'] === 'callback' && isset($arg['callback']) && !method_exists($zis, $arg['callback'])) {
                     $arg = [$zis, $arg['callback']];
+
                     return;
                 }
                 if ($arg['_'] === 'stream' && isset($arg['stream_id'])) {
                     $arg = fopen('madelineSocket://', 'r+b', false, Stream::getContext($zis, $arg['stream_id']));
+
                     return;
                 }
             }
