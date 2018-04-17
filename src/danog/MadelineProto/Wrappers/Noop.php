@@ -11,27 +11,14 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-namespace danog\MadelineProto;
+namespace danog\MadelineProto\Wrappers;
 
-class FileCallback implements FileCallbackInterface
+trait Noop
 {
-    private $file;
-    private $callback;
-
-    public function __construct($file, $callback)
+    public function setNoop()
     {
-        $this->file = $file;
-        $this->callback = $callback;
+        $this->settings['updates']['callback'] = [$this, 'noop'];
+        $this->settings['updates']['handle_updates'] = true;
     }
-
-    public function getFile()
-    {
-        return $this->file;
-    }
-
-    public function __invoke($percent)
-    {
-        $callback = $this->callback;
-        $callback($percent);
-    }
+    public function noop() {}
 }

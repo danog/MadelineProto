@@ -503,6 +503,11 @@ trait TL
             if (in_array($current_argument['type'], ['DataJSON', '%DataJSON'])) {
                 $arguments[$current_argument['name']] = ['_' => 'dataJSON', 'data' => json_encode($arguments[$current_argument['name']])];
             }
+
+            if (isset($current_argument['subtype']) && in_array($current_argument['subtype'], ['DataJSON', '%DataJSON'])) {
+                array_walk($arguments[$current_argument['name']], function (&$arg) { $arg = ['_' => 'dataJSON', 'data' => json_encode($arg)]; });
+            }
+
             if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputFile' && $this->settings['upload']['allow_automatic_upload']) {
                 $arguments[$current_argument['name']] = $this->upload($arguments[$current_argument['name']]);
             }

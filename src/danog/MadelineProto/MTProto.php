@@ -48,6 +48,7 @@ class MTProto
     use \danog\MadelineProto\Wrappers\Callback;
     use \danog\MadelineProto\Wrappers\Login;
     use \danog\MadelineProto\Wrappers\Loop;
+    use \danog\MadelineProto\Wrappers\Noop;
     use \danog\MadelineProto\Wrappers\Start;
     use \danog\MadelineProto\Wrappers\Templates;
 

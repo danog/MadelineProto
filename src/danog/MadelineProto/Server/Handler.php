@@ -48,7 +48,7 @@ class Handler extends \danog\MadelineProto\Connection
 
     public function destruct_madeline()
     {
-        if ($this->madeline !== null) {
+        if (isset($this->madeline) && $this->madeline !== null) {
             $this->madeline->API->settings['logger'] = ['logger' => 0, 'logger_param' => ''];
             $this->madeline->API->settings['updates']['callback'] = [];
             unset($this->madeline);
@@ -154,28 +154,8 @@ class Handler extends \danog\MadelineProto\Connection
         if ($this->madeline === null) {
             throw new \danog\MadelineProto\Exception('__construct was not called');
         }
-        array_walk_recursive($args, function (&$arg, $zis) {
-            if (is_array($arg) && isset($arg['_'])) {
-                if ($arg['_'] === 'fileCallback' && isset($arg['callback']) && isset($arg['file']) && !method_exists($zis, $arg['callback']['callback'])) {
-                    if (isset($arg['file']['_']) && $arg['file']['_'] === 'stream') {
-                        $arg['file'] = fopen('madelineSocket://', 'r+b', false, Stream::getContext($zis, $arg['file']['stream_id']));
-                    }
-                    $arg = new \danog\MadelineProto\FileCallback($arg['file'], [$zis, $arg['callback']['callback']]);
 
-                    return;
-                }
-                if ($arg['_'] === 'callback' && isset($arg['callback']) && !method_exists($zis, $arg['callback'])) {
-                    $arg = [$zis, $arg['callback']];
-
-                    return;
-                }
-                if ($arg['_'] === 'stream' && isset($arg['stream_id'])) {
-                    $arg = fopen('madelineSocket://', 'r+b', false, Stream::getContext($zis, $arg['stream_id']));
-
-                    return;
-                }
-            }
-        }, $this);
+        array_walk($args, [$this, 'walker']);
 
         if (count($method) === 1) {
             return $this->madeline->{$method[0]}(...$args);
@@ -185,8 +165,34 @@ class Handler extends \danog\MadelineProto\Connection
         }
     }
 
+    private function walker(&$arg) {
+        if (is_array($arg)) {
+            if (isset($arg['_'])) {
+                if ($arg['_'] === 'fileCallback' && isset($arg['callback']) && isset($arg['file']) && !method_exists($this, $arg['callback']['callback'])) {
+                    if (isset($arg['file']['_']) && $arg['file']['_'] === 'stream') {
+                        $arg['file'] = fopen('madelineSocket://', 'r+b', false, Stream::getContext($this, $arg['file']['stream_id']));
+                    }
+                    $arg = new \danog\MadelineProto\FileCallback($arg['file'], [$this, $arg['callback']['callback']]);
+                    return;
+                } else if ($arg['_'] === 'callback' && isset($arg['callback']) && !method_exists($this, $arg['callback'])) {
+                    $arg = [$this, $arg['callback']];
+
+                    return;
+                } else if ($arg['_'] === 'stream' && isset($arg['stream_id'])) {
+                    $arg = fopen('madelineSocket://', 'r+b', false, Stream::getContext($this, $arg['stream_id']));
+                    return;
+                } else {
+                    array_walk($arg, [$this, 'walker']);
+                }
+            } else {
+                array_walk($arg, [$this, 'walker']);
+            }
+        }
+    }
+
     public function send_exception($request_id, $e)
     {
+        echo $e.PHP_EOL;
         if ($e instanceof \danog\MadelineProto\RPCErrorException) {
             $exception = ['_' => 'socketRPCErrorException'];
             if ($e->getMessage() === $e->rpc) {
@@ -209,7 +215,7 @@ class Handler extends \danog\MadelineProto\Connection
             $tl_frame = ['_' => 'socketTLFrame'];
             if (isset($frame['function']) && in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
                 if ($frame['args'][2] !== '') {
-                    $tl_frame['tl_param'] = $frame['args'][2];
+                    $tl_frame['tl_param'] = (string) $frame['args'][2];
                     $tl = true;
                 }
             } else {
@@ -284,6 +290,6 @@ class Handler extends \danog\MadelineProto\Connection
 
     public function __call($method, $args)
     {
-        $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageRequest', 'request_id' => 0, 'method' => $method, 'args' => $args], 'method'));
+        $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageRequest', 'request_id' => 0, 'method' => [$method], 'args' => $args], 'method'));
     }
 }

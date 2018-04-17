@@ -20,7 +20,10 @@ trait Files
 {
     public function upload($file, $file_name = '', $cb = null, $encrypted = false, $datacenter = null)
     {
-        if (is_object($file) && class_implements($file)['\danog\MadelineProto\FileCallbackInterface']) {
+        if (is_object($file)) {
+            if (!isset(class_implements($file)['danog\MadelineProto\FileCallbackInterface'])) {
+                throw new \danog\MadelineProto\Exception('Provided object does not implement FileCallbackInterface');
+            }
             $cb = $file;
             $file = $file->getFile();
         }
