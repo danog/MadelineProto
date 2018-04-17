@@ -68,7 +68,6 @@ class Magic
             self::$twozerotwosixone = new \phpseclib\Math\BigInteger(20261);
             self::$zeroeight = new \phpseclib\Math\BigInteger('2147483648');
 
-
             try {
                 self::$isatty = defined('STDOUT') && function_exists('posix_isatty') && posix_isatty(STDOUT);
             } catch (\danog\MadelineProto\Exception $e) {
