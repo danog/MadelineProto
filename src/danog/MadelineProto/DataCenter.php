@@ -112,20 +112,30 @@ class DataCenter
                     \danog\MadelineProto\Logger::log('Connection failed, retrying connection with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
                     continue;
                 case 1:
-                    $this->settings[$dc_config_number]['proxy'] = '\\Socket';
-                    \danog\MadelineProto\Logger::log('Connection failed, retrying connection without the proxy with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
+                    if (isset($this->dclist[$test][$ipv6][$dc_number.'_bk']['ip_address'])) {
+                        $dc_number .= '_bk';
+                    }
+                    \danog\MadelineProto\Logger::log('Connection failed, retrying connection on backup DCs with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
                     continue;
                 case 2:
                     $this->settings[$dc_config_number]['ipv6'] = !$this->settings[$dc_config_number]['ipv6'];
-                    \danog\MadelineProto\Logger::log('Connection failed, retrying connection without the proxy with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
+                    \danog\MadelineProto\Logger::log('Connection failed, retrying connection on backup DCs with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
                     continue;
                 case 3:
+                    $this->settings[$dc_config_number]['proxy'] = '\\Socket';
+                    \danog\MadelineProto\Logger::log('Connection failed, retrying connection without the proxy with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
+                    continue;
+                case 4:
+                    $this->settings[$dc_config_number]['ipv6'] = !$this->settings[$dc_config_number]['ipv6'];
+                    \danog\MadelineProto\Logger::log('Connection failed, retrying connection without the proxy with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
+                    continue;
+                case 5:
                     $this->settings[$dc_config_number]['proxy'] = '\\HttpProxy';
                     $this->settings[$dc_config_number]['proxy_extra'] = ['address' => 'localhost', 'port' => 80];
                     $this->settings[$dc_config_number]['ipv6'] = !$this->settings[$dc_config_number]['ipv6'];
                     \danog\MadelineProto\Logger::log('Connection failed, retrying connection with localhost HTTP proxy with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
                     continue;
-                case 4:
+                case 6:
                     $this->settings[$dc_config_number]['ipv6'] = !$this->settings[$dc_config_number]['ipv6'];
                     \danog\MadelineProto\Logger::log('Connection failed, retrying connection with localhost HTTP proxy with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
                     continue;
