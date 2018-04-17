@@ -147,6 +147,7 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
         if ($update['message']['out'] || $update['message']['to_id']['_'] !== 'peerUser' || !isset($update['message']['from_id'])) {
             return;
         }
+        \danog\MadelineProto\Logger::log($update);
         $chat_id = $from_id = $this->get_info($update)['bot_api_id'];
         $message = isset($update['message']['message']) ? $update['message']['message'] : '';
         $this->handleMessage($chat_id, $from_id, $message);
@@ -193,7 +194,10 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
             }
         }
     }
-
+    public function onAny($update)
+    {
+        \danog\MadelineProto\Logger::log($update);
+    }
     public function onLoop()
     {
         foreach ($this->programmed_call as $key => $pair) {

@@ -383,7 +383,7 @@ trait TL
 
     public function serialize_method($method, $arguments)
     {
-        if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
+        if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && is_string($arguments['hash']) && preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
             if ($matches[1] === '') {
                 $method = 'channels.joinChannel';
                 $arguments['channel'] = $matches[2];
@@ -391,10 +391,10 @@ trait TL
                 $arguments['hash'] = $matches[2];
             }
         }
-        if ($method === 'messages.checkChatInvite' && isset($arguments['hash']) && preg_match('@(?:t|telegram)\.(?:me|dog)/joinchat/([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
+        if ($method === 'messages.checkChatInvite' && isset($arguments['hash']) && is_string($arguments['hash']) && preg_match('@(?:t|telegram)\.(?:me|dog)/joinchat/([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
             $arguments['hash'] = $matches[1];
         }
-        if ($method === 'channels.joinChannel' && isset($arguments['channel']) && preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['channel'], $matches)) {
+        if ($method === 'channels.joinChannel' && isset($arguments['channel']) && is_string($arguments['channel']) && preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['channel'], $matches)) {
             if ($matches[1] !== '') {
                 $method = 'messages.importChatInvite';
                 $arguments['hash'] = $matches[2];
