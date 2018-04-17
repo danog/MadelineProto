@@ -41,7 +41,7 @@ trait AuthKeyHandler
         $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['calling_user'], $user['user_id']), \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['generating_a'], \danog\MadelineProto\Logger::VERBOSE);
-        $a = \phpseclib\Math\BigInteger::randomRange($this->two, $dh_config['p']->subtract($this->two));
+        $a = \phpseclib\Math\BigInteger::randomRange(\danog\MadelineProto\Magic::$two, $dh_config['p']->subtract(\danog\MadelineProto\Magic::$two));
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['generating_g_a'], \danog\MadelineProto\Logger::VERBOSE);
         $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
         $this->check_G($g_a, $dh_config['p']);
@@ -72,7 +72,7 @@ trait AuthKeyHandler
         $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['accepting_call'], $this->calls[$call['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = $this->get_dh_config();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['generating_b'], \danog\MadelineProto\Logger::VERBOSE);
-        $b = \phpseclib\Math\BigInteger::randomRange($this->two, $dh_config['p']->subtract($this->two));
+        $b = \phpseclib\Math\BigInteger::randomRange(\danog\MadelineProto\Magic::$two, $dh_config['p']->subtract(\danog\MadelineProto\Magic::$two));
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->check_G($g_b, $dh_config['p']);
 
@@ -122,10 +122,10 @@ trait AuthKeyHandler
         $key = str_pad($params['g_b']->powMod($this->calls[$params['id']]->storage['a'], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT);
         $res = $this->method_call('phone.confirmCall', ['key_fingerprint' => substr(sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->calls[$params['id']]->storage['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc])['phone_call'];
         $visualization = [];
-        $length = new \phpseclib\Math\BigInteger(count($this->emojis));
+        $length = new \phpseclib\Math\BigInteger(count(\danog\MadelineProto\Magic::$emojis));
         foreach (str_split(hash('sha256', $key.str_pad($this->calls[$params['id']]->storage['g_a'], 256, chr(0), \STR_PAD_LEFT), true), 8) as $number) {
             $number[0] = chr(ord($number[0]) & 0x7f);
-            $visualization[] = $this->emojis[(int) (new \phpseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
+            $visualization[] = \danog\MadelineProto\Magic::$emojis[(int) (new \phpseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
         }
         $this->calls[$params['id']]->setVisualization($visualization);
         $this->calls[$params['id']]->configuration['shared_config'] = array_merge($this->method_call('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]), $this->calls[$params['id']]->configuration['shared_config']);
@@ -165,10 +165,10 @@ trait AuthKeyHandler
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['fingerprint_invalid']);
         }
         $visualization = [];
-        $length = new \phpseclib\Math\BigInteger(count($this->emojis));
+        $length = new \phpseclib\Math\BigInteger(count(\danog\MadelineProto\Magic::$emojis));
         foreach (str_split(hash('sha256', $key.str_pad($params['g_a_or_b']->toBytes(), 256, chr(0), \STR_PAD_LEFT), true), 8) as $number) {
             $number[0] = chr(ord($number[0]) & 0x7f);
-            $visualization[] = $this->emojis[(int) (new \phpseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
+            $visualization[] = \danog\MadelineProto\Magic::$emojis[(int) (new \phpseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
         }
         $this->calls[$params['id']]->setVisualization($visualization);
         $this->calls[$params['id']]->configuration['shared_config'] = array_merge($this->method_call('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]), $this->calls[$params['id']]->configuration['shared_config']);

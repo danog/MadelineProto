@@ -74,7 +74,7 @@ trait AuthKeyHandler
                 $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
                 $q = new \phpseclib\Math\BigInteger(0);
                 $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::auto_single($pq->__toString()));
-                if (!$p->equals($this->zero)) {
+                if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                     $q = $pq->divide($p)[0];
                     if ($p->compare($q) > 0) {
                         list($p, $q) = [$q, $p];
@@ -83,7 +83,7 @@ trait AuthKeyHandler
                 if (!$pq->equals($p->multiply($q))) {
                     $this->logger->logger('Automatic factorization failed, trying native CPP module', \danog\MadelineProto\Logger::ERROR);
                     $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::native_single_cpp($pq->__toString()));
-                    if (!$p->equals($this->zero)) {
+                    if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                         $q = $pq->divide($p)[0];
                         if ($p->compare($q) > 0) {
                             list($p, $q) = [$q, $p];
@@ -93,7 +93,7 @@ trait AuthKeyHandler
                     if (!$pq->equals($p->multiply($q))) {
                         $this->logger->logger('Automatic factorization failed, trying alt py module', \danog\MadelineProto\Logger::ERROR);
                         $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::python_single_alt($pq->__toString()));
-                        if (!$p->equals($this->zero)) {
+                        if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                             $q = $pq->divide($p)[0];
                             if ($p->compare($q) > 0) {
                                 list($p, $q) = [$q, $p];
@@ -103,7 +103,7 @@ trait AuthKeyHandler
                         if (!$pq->equals($p->multiply($q))) {
                             $this->logger->logger('Automatic factorization failed, trying py module', \danog\MadelineProto\Logger::ERROR);
                             $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::python_single($pq->__toString()));
-                            if (!$p->equals($this->zero)) {
+                            if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                                 $q = $pq->divide($p)[0];
                                 if ($p->compare($q) > 0) {
                                     list($p, $q) = [$q, $p];
@@ -113,7 +113,7 @@ trait AuthKeyHandler
                             if (!$pq->equals($p->multiply($q))) {
                                 $this->logger->logger('Automatic factorization failed, trying native module', \danog\MadelineProto\Logger::ERROR);
                                 $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::native_single($pq->__toString()));
-                                if (!$p->equals($this->zero)) {
+                                if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                                     $q = $pq->divide($p)[0];
                                     if ($p->compare($q) > 0) {
                                         list($p, $q) = [$q, $p];
@@ -127,7 +127,7 @@ trait AuthKeyHandler
                                     }
 
                                     $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::wolfram_single($pq->__toString()));
-                                    if (!$p->equals($this->zero)) {
+                                    if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                                         $q = $pq->divide($p)[0];
                                         if ($p->compare($q) > 0) {
                                             list($p, $q) = [$q, $p];
@@ -270,7 +270,7 @@ trait AuthKeyHandler
                      * 1 < g_b < dh_prime - 1
                      */
                     $this->logger->logger('Executing g_b check...', \danog\MadelineProto\Logger::VERBOSE);
-                    if ($g_b->compare($this->one) <= 0 || $g_b->compare($dh_prime->subtract($this->one)) >= 0) {
+                    if ($g_b->compare(\danog\MadelineProto\Magic::$one) <= 0 || $g_b->compare($dh_prime->subtract(\danog\MadelineProto\Magic::$one)) >= 0) {
                         throw new \danog\MadelineProto\SecurityException('g_b is invalid (1 < g_b < dh_prime - 1 is false).');
                     }
                     $this->logger->logger('Preparing client_DH_inner_data...', \danog\MadelineProto\Logger::VERBOSE);
@@ -402,11 +402,11 @@ trait AuthKeyHandler
          * 1 < g_a < p - 1
          */
         $this->logger->logger('Executing g_a check (1/2)...', \danog\MadelineProto\Logger::VERBOSE);
-        if ($g_a->compare($this->one) <= 0 || $g_a->compare($p->subtract($this->one)) >= 0) {
+        if ($g_a->compare(\danog\MadelineProto\Magic::$one) <= 0 || $g_a->compare($p->subtract(\danog\MadelineProto\Magic::$one)) >= 0) {
             throw new \danog\MadelineProto\SecurityException('g_a is invalid (1 < g_a < dh_prime - 1 is false).');
         }
         $this->logger->logger('Executing g_a check (2/2)...', \danog\MadelineProto\Logger::VERBOSE);
-        if ($g_a->compare($this->twoe1984) < 0 || $g_a->compare($p->subtract($this->twoe1984)) >= 0) {
+        if ($g_a->compare(\danog\MadelineProto\Magic::$twoe1984) < 0 || $g_a->compare($p->subtract(\danog\MadelineProto\Magic::$twoe1984)) >= 0) {
             throw new \danog\MadelineProto\SecurityException('g_a is invalid (2^1984 < gA < dh_prime - 2^1984 is false).');
         }
 
@@ -433,7 +433,7 @@ trait AuthKeyHandler
          */
         /*
         $this->logger->logger('Executing p/g checks (2/3)...', \danog\MadelineProto\Logger::VERBOSE);
-        if (!$p->subtract($this->one)->divide($this->two)[0]->isPrime()) {
+        if (!$p->subtract(\danog\MadelineProto\Magic::$one)->divide(\danog\MadelineProto\Magic::$two)[0]->isPrime()) {
             throw new \danog\MadelineProto\SecurityException("p isn't a safe 2048-bit prime ((p - 1) / 2 isn't a prime).");
         }
         */
@@ -443,7 +443,7 @@ trait AuthKeyHandler
          * 2^2047 < p < 2^2048
          */
         $this->logger->logger('Executing p/g checks (2/2)...', \danog\MadelineProto\Logger::VERBOSE);
-        if ($p->compare($this->twoe2047) <= 0 || $p->compare($this->twoe2048) >= 0) {
+        if ($p->compare(\danog\MadelineProto\Magic::$twoe2047) <= 0 || $p->compare(\danog\MadelineProto\Magic::$twoe2048) >= 0) {
             throw new \danog\MadelineProto\SecurityException("g isn't a safe 2048-bit prime (2^2047 < p < 2^2048 is false).");
         }
         /*
@@ -452,7 +452,7 @@ trait AuthKeyHandler
          * 1 < g < p - 1
          */
         $this->logger->logger('Executing g check...', \danog\MadelineProto\Logger::VERBOSE);
-        if ($g->compare($this->one) <= 0 || $g->compare($p->subtract($this->one)) >= 0) {
+        if ($g->compare(\danog\MadelineProto\Magic::$one) <= 0 || $g->compare($p->subtract(\danog\MadelineProto\Magic::$one)) >= 0) {
             throw new \danog\MadelineProto\SecurityException('g is invalid (1 < g < p - 1 is false).');
         }
 

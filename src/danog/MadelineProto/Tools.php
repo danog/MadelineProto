@@ -22,7 +22,7 @@ trait Tools
         if (\danog\MadelineProto\Magic::$bigint) {
             $hash = new \phpseclib\Math\BigInteger(0);
             foreach ($ints as $int) {
-                $hash = $hash->multiply($this->twozerotwosixone)->add($this->zeroeight)->add(new \phpseclib\Math\BigInteger($int))->divide($this->zeroeight)[1];
+                $hash = $hash->multiply(\danog\MadelineProto\Magic::$twozerotwosixone)->add(\danog\MadelineProto\Magic::$zeroeight)->add(new \phpseclib\Math\BigInteger($int))->divide(\danog\MadelineProto\Magic::$zeroeight)[1];
             }
             $hash = $this->unpack_signed_int(strrev(str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
         } else {

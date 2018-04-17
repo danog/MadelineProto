@@ -32,7 +32,7 @@ trait MsgIdHandler
             throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too new compared to the max value ('.$max_message_id.'). Consider syncing your date.');
         }
         if ($aargs['outgoing']) {
-            if (!$new_message_id->divide($this->four)[1]->equals($this->zero)) {
+            if (!$new_message_id->divide(\danog\MadelineProto\Magic::$four)[1]->equals(\danog\MadelineProto\Magic::$zero)) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4. Consider syncing your date.');
             }
             if (!\danog\MadelineProto\Magic::$has_thread && $new_message_id->compare($key = $this->get_max_id($aargs['datacenter'], false)) <= 0) {
@@ -46,7 +46,7 @@ trait MsgIdHandler
             $this->datacenter->sockets[$aargs['datacenter']]->max_outgoing_id = $new_message_id;
             $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[strrev($new_message_id->toBytes())] = [];
         } else {
-            if (!$new_message_id->divide($this->four)[1]->equals($this->one) && !$new_message_id->divide($this->four)[1]->equals($this->three)) {
+            if (!$new_message_id->divide(\danog\MadelineProto\Magic::$four)[1]->equals(\danog\MadelineProto\Magic::$one) && !$new_message_id->divide(\danog\MadelineProto\Magic::$four)[1]->equals(\danog\MadelineProto\Magic::$three)) {
                 throw new \danog\MadelineProto\Exception('message id mod 4 != 1 or 3');
             }
             $key = $this->get_max_id($aargs['datacenter'], true);
@@ -76,7 +76,7 @@ trait MsgIdHandler
     {
         $message_id = (new \phpseclib\Math\BigInteger(time() + $this->datacenter->sockets[$datacenter]->time_delta))->bitwise_leftShift(32);
         if ($message_id->compare($key = $this->get_max_id($datacenter, false)) <= 0) {
-            $message_id = $key->add($this->four);
+            $message_id = $key->add(\danog\MadelineProto\Magic::$four);
         }
         $this->check_message_id($message_id, ['outgoing' => true, 'datacenter' => $datacenter, 'container' => false]);
 
@@ -90,6 +90,6 @@ trait MsgIdHandler
             return $this->datacenter->sockets[$datacenter]->{'max_'.$incoming.'_id'};
         }
 
-        return $this->zero;
+        return \danog\MadelineProto\Magic::$zero;
     }
 }
