@@ -93,7 +93,6 @@ class MTProto
     public $run_workers = false;
     public $setdem = false;
     public $storage = [];
-    private $emojis;
     private $postpone_updates = false;
     private $postpone_pwrchat = false;
     private $pending_pwrchat = [];
