@@ -194,10 +194,12 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
             }
         }
     }
+
     public function onAny($update)
     {
         \danog\MadelineProto\Logger::log($update);
     }
+
     public function onLoop()
     {
         foreach ($this->programmed_call as $key => $pair) {
