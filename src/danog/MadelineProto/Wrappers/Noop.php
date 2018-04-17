@@ -20,5 +20,8 @@ trait Noop
         $this->settings['updates']['callback'] = [$this, 'noop'];
         $this->settings['updates']['handle_updates'] = true;
     }
-    public function noop() {}
+
+    public function noop()
+    {
+    }
 }

@@ -165,7 +165,8 @@ class Handler extends \danog\MadelineProto\Connection
         }
     }
 
-    private function walker(&$arg) {
+    private function walker(&$arg)
+    {
         if (is_array($arg)) {
             if (isset($arg['_'])) {
                 if ($arg['_'] === 'fileCallback' && isset($arg['callback']) && isset($arg['file']) && !method_exists($this, $arg['callback']['callback'])) {
@@ -173,13 +174,15 @@ class Handler extends \danog\MadelineProto\Connection
                         $arg['file'] = fopen('madelineSocket://', 'r+b', false, Stream::getContext($this, $arg['file']['stream_id']));
                     }
                     $arg = new \danog\MadelineProto\FileCallback($arg['file'], [$this, $arg['callback']['callback']]);
+
                     return;
-                } else if ($arg['_'] === 'callback' && isset($arg['callback']) && !method_exists($this, $arg['callback'])) {
+                } elseif ($arg['_'] === 'callback' && isset($arg['callback']) && !method_exists($this, $arg['callback'])) {
                     $arg = [$this, $arg['callback']];
 
                     return;
-                } else if ($arg['_'] === 'stream' && isset($arg['stream_id'])) {
+                } elseif ($arg['_'] === 'stream' && isset($arg['stream_id'])) {
                     $arg = fopen('madelineSocket://', 'r+b', false, Stream::getContext($this, $arg['stream_id']));
+
                     return;
                 } else {
                     array_walk($arg, [$this, 'walker']);
