@@ -120,9 +120,12 @@ If not, see <http://www.gnu.org/licenses/>.
             $packet = '';
             while (strlen($packet) < $length) {
                 $read = stream_get_contents($this->sock, $length - strlen($packet));
-                if ($read === false || strlen($read) === 0) throw new \danog\MadelineProto\NothingInTheSocketException();
+                if ($read === false || strlen($read) === 0) {
+                    throw new \danog\MadelineProto\NothingInTheSocketException();
+                }
                 $packet .= $read;
             }
+
             return $packet;
         }
 
@@ -136,7 +139,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
             $wrote = 0;
             if (($wrote += fwrite($this->sock, $buffer, $length)) !== $length) {
-                while (($wrote += fwrite($this->sock, substr($buffer, $wrote), $length-$wrote)) !== $length) {
+                while (($wrote += fwrite($this->sock, substr($buffer, $wrote), $length - $wrote)) !== $length) {
                 }
             }
 
@@ -282,9 +285,12 @@ if (!extension_loaded('pthreads')) {
                 $packet = '';
                 while (strlen($packet) < $length) {
                     $read = socket_read($this->sock, $length - strlen($packet), $flags);
-                    if ($read === false || strlen($read) === false) throw new \danog\MadelineProto\NothingInTheSocketException();
+                    if ($read === false || strlen($read) === false) {
+                        throw new \danog\MadelineProto\NothingInTheSocketException();
+                    }
                     $packet .= $read;
                 }
+
                 return $packet;
             }
 
@@ -298,7 +304,7 @@ if (!extension_loaded('pthreads')) {
 
                 $wrote = 0;
                 if (($wrote += socket_write($this->sock, $buffer, $length)) !== $length) {
-                    while (($wrote += socket_write($this->sock, substr($buffer, $wrote), $length-$wrote)) !== $length) {
+                    while (($wrote += socket_write($this->sock, substr($buffer, $wrote), $length - $wrote)) !== $length) {
                     }
                 }
 

@@ -114,7 +114,9 @@ class HttpProxy implements \danog\MadelineProto\Proxy
     {
         list($protocol, $code, $description) = explode(' ', $this->read_http_line(), 3);
         list($protocol, $protocol_version) = explode('/', $protocol);
-        if ($protocol !== 'HTTP') throw new \danog\MadelineProto\Exception('Wrong protocol');
+        if ($protocol !== 'HTTP') {
+            throw new \danog\MadelineProto\Exception('Wrong protocol');
+        }
         $code = (int) $code;
         $headers = [];
         while (strlen($current_header = $this->read_http_line())) {
