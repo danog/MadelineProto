@@ -362,7 +362,7 @@ class Connection
     {
         $line = $lastchar = $curchar = '';
         while ($lastchar.$curchar !== "\r\n") {
-            $line .= $curchar;
+            $line .= $lastchar;
             $lastchar = $curchar;
             $curchar = $this->sock->read(1);
         }
