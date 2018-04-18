@@ -270,12 +270,56 @@ trait PeerHandler
                     }
 
                     return $this->secret_chats[$id];
+                case 'updateChannelReadMessagesContents':
+                case 'updateChannelAvailableMessages':
+                case 'updateChannel':
+                case 'updateChannelWebPage':
+                case 'updateChannelMessageViews':
+                case 'updateChannelTooLong':
+                case 'updateReadChannelInbox':
+                case 'updateReadChannelOutbox':
+                case 'updateDeleteChannelMessages':
+                case 'updateChannelPinnedMessage':
+                     return $this->get_info($this->to_supergroup($id['channel_id']));
+                case 'updateChatParticipants':
+                     $id = $id['participants'];
+                case 'updateChatUserTyping':
+                case 'updateChatParticipantAdd':
+                case 'updateChatParticipantDelete':
+                case 'updateChatParticipantAdmin':
+                case 'updateChatAdmins':
+                     return $this->get_info(-$id['chat_id']);
+                case 'updateUserTyping':
+                case 'updateUserStatus':
+                case 'updateUserName':
+                case 'updateUserPhoto':
+                case 'updateUserPhone':
+                case 'updateUserBlocked':
+                case 'updateContactRegistered':
+                case 'updateContactLink':
+                case 'updateBotInlineQuery':
+                case 'updateInlineBotCallbackQuery':
+                case 'updateBotInlineSend':
+                case 'updateBotCallbackQuery':
+                case 'updateBotPrecheckoutQuery':
+                case 'updateBotShippingQuery':
+                     return $this->get_info($id['user_id']);
+                case 'updatePhoneCall':
+                     return $this->get_info($id->getOtherID());
+                case 'updateReadHistoryInbox':
+                case 'updateReadHistoryOutbox':
+                     return $this->get_info($id['peer']);
                 case 'updateNewMessage':
                 case 'updateNewChannelMessage':
+                case 'updateEditMessage':
+                case 'updateEditChannelMessage':
                 case 'updateNewEncryptedMessage':
                     return $this->get_info($id['message']);
                 case 'updateEncryption':
                     return $this->get_secret_chat($id['chat']['id']);
+                case 'updateEncryptedChatTyping':
+                case 'updateEncryptedMessagesRead':
+                    return $this->get_secret_chat($id['chat_id']);
                 case 'chatForbidden':
                 case 'channelForbidden':
                     throw new \danog\MadelineProto\RPCErrorException('CHAT_FORBIDDEN');

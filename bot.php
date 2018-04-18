@@ -29,16 +29,6 @@ class EventHandler extends \danog\MadelineProto\EventHandler
 {
     public function onAny($update)
     {
-        \danog\MadelineProto\Logger::log('Received an update of type '.$update['_']);
-    }
-
-    public function onUpdateNewChannelMessage($update)
-    {
-        $this->onUpdateNewMessage($update);
-    }
-
-    public function onUpdateNewMessage($update)
-    {
         if (isset($update['message']['out']) && $update['message']['out']) {
             return;
         }
@@ -46,21 +36,13 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         if ($res == '') {
             $res = var_export($update, true);
         }
-
         try {
-            $this->messages->sendMessage(['peer' => $update, 'message' => $res, 'reply_to_msg_id' => $update['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
+            $this->messages->sendMessage(['peer' => $update, 'message' => $res, 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
-        }
-
-        try {
-            if (isset($update['message']['media']) && ($update['message']['media']['_'] == 'messageMediaPhoto' || $update['message']['media']['_'] == 'messageMediaDocument')) {
-                $time = microtime(true);
-                $file = $this->download_to_dir($update, '/tmp');
-                $this->messages->sendMessage(['peer' => $update, 'message' => 'Downloaded to '.$file.' in '.(microtime(true) - $time).' seconds', 'reply_to_msg_id' => $update['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
-            }
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
+            \danog\MadelineProto\Logger::log((string)$e, \danog\MadelineProto\Logger::FATAL_ERROR);
+        } catch (\danog\MadelineProto\Exception $e) {
+            \danog\MadelineProto\Logger::log((string)$e, \danog\MadelineProto\Logger::FATAL_ERROR);
+            //$this->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
         }
     }
 }
