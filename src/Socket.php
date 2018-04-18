@@ -117,12 +117,30 @@ If not, see <http://www.gnu.org/licenses/>.
 
         public function read(int $length, int $flags = 0)
         {
-            return stream_get_contents($this->sock, $length);
+            $packet = '';
+            while (strlen($packet) < $length) {
+                $read = stream_get_contents($this->sock, $length - strlen($packet));
+                if ($read === false || strlen($read) === 0) throw new \danog\MadelineProto\NothingInTheSocketException();
+                $packet .= $read;
+            }
+            return $packet;
         }
 
         public function write(string $buffer, int $length = -1)
         {
-            return $length === -1 ? fwrite($this->sock, $buffer) : fwrite($this->sock, $buffer, $length);
+            if ($length === -1) {
+                $length = strlen($buffer);
+            } else {
+                $buffer = substr($buffer, 0, $length);
+            }
+
+            $wrote = 0;
+            if (($wrote += fwrite($this->sock, $buffer, $length)) !== $length) {
+                while (($wrote += fwrite($this->sock, substr($buffer, $wrote), $length-$wrote)) !== $length) {
+                }
+            }
+
+            return $wrote;
         }
 
         public function send(string $data, int $length, int $flags)
@@ -261,12 +279,30 @@ if (!extension_loaded('pthreads')) {
 
             public function read(int $length, int $flags = 0)
             {
-                return socket_read($this->sock, $length, $flags);
+                $packet = '';
+                while (strlen($packet) < $length) {
+                    $read = socket_read($this->sock, $length - strlen($packet), $flags);
+                    if ($read === false || strlen($read) === false) throw new \danog\MadelineProto\NothingInTheSocketException();
+                    $packet .= $read;
+                }
+                return $packet;
             }
 
             public function write(string $buffer, int $length = -1)
             {
-                return $length === -1 ? socket_write($this->sock, $buffer) : socket_write($this->sock, $buffer, $length);
+                if ($length === -1) {
+                    $length = strlen($buffer);
+                } else {
+                    $buffer = substr($buffer, 0, $length);
+                }
+
+                $wrote = 0;
+                if (($wrote += socket_write($this->sock, $buffer, $length)) !== $length) {
+                    while (($wrote += socket_write($this->sock, substr($buffer, $wrote), $length-$wrote)) !== $length) {
+                    }
+                }
+
+                return $wrote;
             }
 
             public function send(string $data, int $length, int $flags)

@@ -243,13 +243,7 @@ class Connection
             case 'tcp_full':
             case 'http':
             case 'https':
-                $wrote = 0;
-                if (($wrote += $this->sock->write($what)) !== $length) {
-                    while (($wrote += $this->sock->write(substr($what, $wrote))) !== $length) {
-                    }
-                }
-
-                return $wrote;
+                return $this->sock->write($what);
             case 'udp':
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
             default:
@@ -262,31 +256,13 @@ class Connection
         //\danog\MadelineProto\Logger::log("Asked to read $length", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         switch ($this->protocol) {
             case 'obfuscated2':
-                $packet = '';
-                while (strlen($packet) < $length) {
-                    $piece = $this->sock->read($length - strlen($packet));
-                    if ($piece === false || strlen($piece) === 0) {
-                        throw new \danog\MadelineProto\NothingInTheSocketException(\danog\MadelineProto\Lang::$current_lang['nothing_in_socket']);
-                    }
-                    $packet .= $piece;
-                }
-
-                return @$this->obfuscated['decryption']->encrypt($packet);
+                return @$this->obfuscated['decryption']->encrypt($this->sock->read($length));
             case 'tcp_abridged':
             case 'tcp_intermediate':
             case 'tcp_full':
             case 'http':
             case 'https':
-                $packet = '';
-                while (strlen($packet) < $length) {
-                    $piece = $this->sock->read($length - strlen($packet));
-                    if ($piece === false || strlen($piece) === 0) {
-                        throw new \danog\MadelineProto\NothingInTheSocketException(\danog\MadelineProto\Lang::$current_lang['nothing_in_socket']);
-                    }
-                    $packet .= $piece;
-                }
-
-                return $packet;
+                return $this->sock->read($length);
             case 'udp':
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
             default:
@@ -384,20 +360,22 @@ class Connection
 
     public function read_http_line()
     {
-        $line = '';
-        while (($curchar = $this->read(1)) !== "\n") {
+        $line = $lastchar = $curchar = '';
+        while ($lastchar.$curchar !== "\r\n") {
             $line .= $curchar;
+            $lastchar = $curchar;
+            $curchar = $this->sock->read(1);
         }
 
-        return rtrim($line);
+        return $line;
     }
 
     public function read_http_payload()
     {
-        $header = explode(' ', $this->read_http_line(), 3);
-        $protocol = $header[0];
-        $code = (int) $header[1];
-        $description = $header[2];
+        list($protocol, $code, $description) = explode(' ', $this->read_http_line(), 3);
+        list($protocol, $protocol_version) = explode('/', $protocol);
+        if ($protocol !== 'HTTP') throw new \danog\MadelineProto\Exception('Wrong protocol');
+        $code = (int) $code;
         $headers = [];
         while (strlen($current_header = $this->read_http_line())) {
             $current_header = explode(':', $current_header, 2);
@@ -406,16 +384,16 @@ class Connection
 
         $read = '';
         if (isset($headers['content-length'])) {
-            $read = $this->read((int) $headers['content-length']);
-        } elseif (isset($headers['transfer-encoding']) && $headers['transfer-encoding'] === 'chunked') {
+            $read = $this->sock->read((int) $headers['content-length']);
+        }/* elseif (isset($headers['transfer-encoding']) && $headers['transfer-encoding'] === 'chunked') {
             do {
                 $length = hexdec($this->read_http_line());
-                $read .= $this->read($length);
+                $read .= $this->sock->read($length);
                 $this->read_http_line();
             } while ($length);
-        }
+        }*/
 
-        return ['protocol' => $protocol, 'code' => $code, 'description' => $description, 'body' => $read, 'headers' => $headers];
+        return ['protocol' => $protocol, 'protocol_version' => $protocol_version, 'code' => $code, 'description' => $description, 'body' => $read, 'headers' => $headers];
     }
 
     public function getSocket()

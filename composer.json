@@ -46,7 +46,8 @@
             "src/Thread.php",
             "src/Worker.php",
             "src/Pool.php",
-            "src/HttpProxy.php"
+            "src/HttpProxy.php",
+            "src/SocksProxy.php"
         ]
     }
 }

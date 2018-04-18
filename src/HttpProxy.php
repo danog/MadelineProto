@@ -18,7 +18,7 @@ class HttpProxy implements \danog\MadelineProto\Proxy
     private $extra;
     private $sock;
 
-    public function __construct($domain, $type, $protocol)
+    public function __construct(int $domain, int $type, int $protocol)
     {
         if (!in_array($domain, [AF_INET, AF_INET6])) {
             throw new \danog\MadelineProto\Exception('Wrong protocol family provided');
@@ -73,7 +73,7 @@ class HttpProxy implements \danog\MadelineProto\Proxy
 
     public function select(array &$read, array &$write, array &$except, $tv_sec, $tv_usec = 0)
     {
-        throw new \danog\MadelineProto\Exception('Not Implemented');
+        return $this->sock->select($read, $write, $except, $tv_sec, $tv_usec);
     }
 
     public function connect($address, $port = 0)
@@ -86,7 +86,7 @@ class HttpProxy implements \danog\MadelineProto\Proxy
             }
         } catch (\danog\MadelineProto\Exception $e) {
         }
-        $this->sock->write("CONNECT $address:$port HTTP/1.1\r\nHost: $address:$port\r\n\r\n");
+        $this->sock->write("CONNECT $address:$port HTTP/1.1\r\nHost: $address:$port\r\nAccept: */*\r\n".$this->getProxyAuthHeader()."Connection: keep-Alive\r\n\r\n");
         $response = $this->read_http_payload();
         if ($response['code'] !== 200) {
             \danog\MadelineProto\Logger::log(trim($response['body']));
@@ -98,35 +98,24 @@ class HttpProxy implements \danog\MadelineProto\Proxy
         return true;
     }
 
-    private function http_read($length)
-    {
-        $packet = '';
-        while (strlen($packet) < $length) {
-            $packet .= $this->sock->read($length - strlen($packet));
-            if ($packet === false || strlen($packet) === 0) {
-                throw new \danog\MadelineProto\NothingInTheSocketException(\danog\MadelineProto\Lang::$current_lang['nothing_in_socket']);
-            }
-        }
-
-        return $packet;
-    }
-
     public function read_http_line()
     {
-        $line = '';
-        while (($curchar = $this->http_read(1)) !== "\n") {
+        $line = $lastchar = $curchar = '';
+        while ($lastchar.$curchar !== "\r\n") {
             $line .= $curchar;
+            $lastchar = $curchar;
+            $curchar = $this->sock->read(1);
         }
 
-        return rtrim($line);
+        return $line;
     }
 
     public function read_http_payload()
     {
-        $header = explode(' ', $this->read_http_line(), 3);
-        $protocol = $header[0];
-        $code = (int) $header[1];
-        $description = $header[2];
+        list($protocol, $code, $description) = explode(' ', $this->read_http_line(), 3);
+        list($protocol, $protocol_version) = explode('/', $protocol);
+        if ($protocol !== 'HTTP') throw new \danog\MadelineProto\Exception('Wrong protocol');
+        $code = (int) $code;
         $headers = [];
         while (strlen($current_header = $this->read_http_line())) {
             $current_header = explode(':', $current_header, 2);
@@ -135,26 +124,21 @@ class HttpProxy implements \danog\MadelineProto\Proxy
 
         $read = '';
         if (isset($headers['content-length'])) {
-            $read = $this->http_read((int) $headers['content-length']);
+            $read = $this->sock->read((int) $headers['content-length']);
         }/* elseif (isset($headers['transfer-encoding']) && $headers['transfer-encoding'] === 'chunked') {
             do {
                 $length = hexdec($this->read_http_line());
-                $read .= $this->http_read($length);
+                $read .= $this->sock->read($length);
                 $this->read_http_line();
             } while ($length);
         }*/
 
-        return ['protocol' => $protocol, 'code' => $code, 'description' => $description, 'body' => $read, 'headers' => $headers];
+        return ['protocol' => $protocol, 'protocol_version' => $protocol_version, 'code' => $code, 'description' => $description, 'body' => $read, 'headers' => $headers];
     }
 
     public function read($length, $flags = 0)
     {
-        $read = $this->sock->read($length, $flags);
-        if ($read === 0) {
-            throw new \danog\MadelineProto\Exception('pls reconnect');
-        }
-
-        return $read;
+        return $this->sock->read($length, $flags);
     }
 
     public function write($buffer, $length = -1)
@@ -182,8 +166,18 @@ class HttpProxy implements \danog\MadelineProto\Proxy
         throw new \danog\MadelineProto\Exception('Not Implemented');
     }
 
+    private function getProxyAuthHeader()
+    {
+        if (!isset($this->extra['user']) || !isset($this->extra['password'])) {
+            return '';
+        }
+
+        return 'Proxy-Authorization: Basic '.base64_encode($this->extra['user'].':'.$this->extra['password'])."\r\n";
+    }
+
     public function getProxyHeaders()
     {
+        return '';
     }
 
     public function getResource()

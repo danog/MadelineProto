@@ -100,7 +100,9 @@ class DataCenter
 
                     return true;
                 } catch (\danog\MadelineProto\Exception $e) {
+                    \danog\MadelineProto\Logger::log("Connection failed: ".$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
                 } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+                    \danog\MadelineProto\Logger::log("Connection failed: read timeout", \danog\MadelineProto\Logger::ERROR);
                 }
                 if (isset($this->settings[$dc_config_number]['do_not_retry']) && $this->settings[$dc_config_number]['do_not_retry']) {
                     break;
