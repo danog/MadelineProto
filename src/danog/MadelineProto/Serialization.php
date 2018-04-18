@@ -71,19 +71,23 @@ class Serialization
         \danog\MadelineProto\Logger::log('Lock acquired, serializing');
 
         try {
-            $update_closure = $instance->API->settings['updates']['callback'];
-            if ($instance->API->settings['updates']['callback'] instanceof \Closure) {
-                $instance->API->settings['updates']['callback'] = [$instance->API, 'noop'];
-            }
-            $logger_closure = $instance->API->settings['logger']['logger_param'];
-            if ($instance->API->settings['logger']['logger_param'] instanceof \Closure) {
-                $instance->API->settings['logger']['logger_param'] = [$instance->API, 'noop'];
+            if (!$instance->getting_api_id) {
+                $update_closure = $instance->API->settings['updates']['callback'];
+                if ($instance->API->settings['updates']['callback'] instanceof \Closure) {
+                    $instance->API->settings['updates']['callback'] = [$instance->API, 'noop'];
+                }
+                $logger_closure = $instance->API->settings['logger']['logger_param'];
+                if ($instance->API->settings['logger']['logger_param'] instanceof \Closure) {
+                    $instance->API->settings['logger']['logger_param'] = [$instance->API, 'noop'];
+                }
             }
             $wrote = file_put_contents($realpaths['tempfile'], serialize($instance));
             rename($realpaths['tempfile'], $realpaths['file']);
         } finally {
-            $instance->API->settings['updates']['callback'] = $update_closure;
-            $instance->API->settings['logger']['logger_param'] = $logger_closure;
+            if (!$instance->getting_api_id) {
+                $instance->API->settings['updates']['callback'] = $update_closure;
+                $instance->API->settings['logger']['logger_param'] = $logger_closure;
+            }
             flock($realpaths['lockfile'], LOCK_UN);
             fclose($realpaths['lockfile']);
         }
