@@ -130,7 +130,7 @@ trait UpdateHandler
         return $updates;
     }
 
-    public function &load_channel_state($channel, $pts = 0)
+    public function &load_channel_state($channel, $pts = 1)
     {
         if (!isset($this->channels_state[$channel])) {
             $this->channels_state[$channel] = ['pts' => $pts, 'sync_loading' => false];
