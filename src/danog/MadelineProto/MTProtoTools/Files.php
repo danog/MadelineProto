@@ -353,8 +353,11 @@ trait Files
             };
         }
         $message_media = $this->get_download_info($message_media);
-        if (stream_get_meta_data($stream)['seekable']) {
-            fseek($stream, $offset);
+        try {
+            if (stream_get_meta_data($stream)['seekable']) {
+                fseek($stream, $offset);
+            }
+        } catch (\danog\MadelineProto\Exception $e) {
         }
         $downloaded_size = 0;
         if ($end === -1 && isset($message_media['size'])) {

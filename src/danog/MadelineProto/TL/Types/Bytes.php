@@ -35,6 +35,6 @@ class Bytes extends \Volatile implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        return utf8_encode($this->bytes);
+        return ['_' => 'bytes', 'bytes' => base64_encode($this->bytes)];
     }
 }

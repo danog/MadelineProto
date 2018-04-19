@@ -30,17 +30,17 @@ class Stream
             self::$_isRegistered = true;
         }
 
-        return stream_context_create([self::WRAPPER_NAME => ['handler' => $handler, $stream_id]]);
+        return stream_context_create([self::WRAPPER_NAME => ['handler' => $handler, 'stream_id' => $stream_id]]);
     }
 
     public function stream_open($path, $mode, $options, &$opened_path)
     {
         $opt = stream_context_get_options($this->context);
+
         if (!is_array($opt[self::WRAPPER_NAME]) ||
         !isset($opt[self::WRAPPER_NAME]['handler']) ||
         !($opt[self::WRAPPER_NAME]['handler'] instanceof Handler) ||
-        !isset($opt[self::WRAPPER_NAME]['stream_id']) ||
-        !is_int($opt[self::WRAPPER_NAME]['stream_id'])) {
+        !isset($opt[self::WRAPPER_NAME]['stream_id'])) {
             return false;
         }
         $this->_handler = $opt[self::WRAPPER_NAME]['handler'];
@@ -51,7 +51,7 @@ class Stream
 
     public function stream_write($data)
     {
-        $this->handler->send_data($this->_stream_id, $data);
+        $this->_handler->send_data($this->_stream_id, $data);
     }
 
     public function stream_lock($mode)

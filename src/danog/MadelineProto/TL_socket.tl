@@ -5,7 +5,7 @@ socketMessageResponse request_id:int data:%DataJSON = SocketMessage;
 socketMessageException request_id:int exception:SocketException = SocketMessage;
 socketMessageUpdate data:%DataJSON = SocketMessage;
 socketMessageLog flags:# thread:flags.0?true process:flags.1?true file:string level:int data:%DataJSON = SocketMessage;
-socketMessageRawData stream_id:int data:bytes = SocketMessage;
+socketMessageRawData stream_id:string data:bytes = SocketMessage;
 
 socketException message:string code:int trace:%SocketTLTrace = SocketException;
 socketRPCErrorException flags:# rpc_message:flags.0?string message:flags.1?string code:int trace:%SocketTLTrace = SocketException;

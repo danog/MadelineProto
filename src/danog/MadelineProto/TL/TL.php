@@ -282,6 +282,7 @@ trait TL
 
                 return $concat;
             case 'bytes':
+                if (is_array($object) && isset($object['_']) && $object['_'] === 'bytes') $object = base64_decode($object['bytes']);
                 if (!is_string($object) && !$object instanceof \danog\MadelineProto\TL\Types\Bytes) {
                     throw new Exception("You didn't provide a valid string");
                 }
