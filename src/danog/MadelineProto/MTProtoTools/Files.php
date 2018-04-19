@@ -353,6 +353,7 @@ trait Files
             };
         }
         $message_media = $this->get_download_info($message_media);
+
         try {
             if (stream_get_meta_data($stream)['seekable']) {
                 fseek($stream, $offset);
