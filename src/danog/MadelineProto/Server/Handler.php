@@ -101,6 +101,7 @@ class Handler extends \danog\MadelineProto\Connection
                     $message = $this->read_message();
                 }
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+                echo $e;
                 if (time() - $time < 2) {
                     $this->sock = null;
                 }
@@ -135,6 +136,9 @@ class Handler extends \danog\MadelineProto\Connection
         if (count($method) === 0 || count($method) > 2) {
             throw new \danog\MadelineProto\Exception('Invalid method called');
         }
+
+        array_walk($args, [$this, 'walker']);
+
         if ($method[0] === '__construct') {
             if (count($args) === 1 && is_array($args[0])) {
                 $args[0]['logger'] = ['logger' => 4, 'logger_param' => [$this, 'logger']];
@@ -154,8 +158,6 @@ class Handler extends \danog\MadelineProto\Connection
         if ($this->madeline === null) {
             throw new \danog\MadelineProto\Exception('__construct was not called');
         }
-
-        array_walk($args, [$this, 'walker']);
 
         if (count($method) === 1) {
             return $this->madeline->{$method[0]}(...$args);
@@ -182,6 +184,10 @@ class Handler extends \danog\MadelineProto\Connection
                     return;
                 } elseif ($arg['_'] === 'stream' && isset($arg['stream_id'])) {
                     $arg = fopen('madelineSocket://', 'r+b', false, Stream::getContext($this, $arg['stream_id']));
+
+                    return;
+                } elseif ($arg['_'] === 'bytes' && isset($arg['bytes'])) {
+                    $arg = base64_decode($args['bytes']);
 
                     return;
                 } else {

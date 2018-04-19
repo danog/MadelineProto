@@ -170,11 +170,11 @@ class HttpProxy implements \danog\MadelineProto\Proxy
 
     private function getProxyAuthHeader()
     {
-        if (!isset($this->extra['user']) || !isset($this->extra['password'])) {
+        if (!isset($this->extra['username']) || !isset($this->extra['password'])) {
             return '';
         }
 
-        return 'Proxy-Authorization: Basic '.base64_encode($this->extra['user'].':'.$this->extra['password'])."\r\n";
+        return 'Proxy-Authorization: Basic '.base64_encode($this->extra['username'].':'.$this->extra['password'])."\r\n";
     }
 
     public function getProxyHeaders()
