@@ -13,6 +13,8 @@ If not, see <http://www.gnu.org/licenses/>.
 require 'vendor/autoload.php';
 $param = 1;
 \danog\MadelineProto\Logger::constructor($param);
+$logger = \danog\MadelineProto\Logger::$default;
+
 set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
 \danog\MadelineProto\Logger::log('Copying readme...', \danog\MadelineProto\Logger::NOTICE);
@@ -71,10 +73,10 @@ description: Documentation of old mtproto layers
 
 '.$layer_list);
 
-$doc = new \danog\MadelineProto\AnnotationsBuilder($docs[2]);
+$doc = new \danog\MadelineProto\AnnotationsBuilder($logger, $docs[2]);
 $doc->mk_annotations();
 
 foreach ($docs as $settings) {
-    $doc = new \danog\MadelineProto\DocsBuilder($settings);
+    $doc = new \danog\MadelineProto\DocsBuilder($logger, $settings);
     $doc->mk_docs();
 }

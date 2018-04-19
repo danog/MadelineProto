@@ -21,8 +21,9 @@ class DocsBuilder
     use Tools;
     public $td = false;
 
-    public function __construct($settings)
+    public function __construct($logger, $settings)
     {
+        $this->logger = $logger;
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         $this->construct_TL($settings['tl_schema']);
         if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) {
@@ -446,7 +447,15 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ## Type: bytes  
 [Back to constructor index](index.md)
 
-A string of bytes of variable length, with length smaller than or equal to 16777215.
+An object of type `\danog\MadelineProto\TL\Types\Bytes`.  
+When casted to string, turns into a string of bytes of variable length, with length smaller than or equal to 16777215.  
+When JSON-serialized, turns into an array of the following format:  
+```
+[
+   \'_\'     => \'bytes\',
+   \'bytes\' => base64_encode($contents)
+];
+```
 ');
         file_put_contents('types/int.md', '---
 title: integer

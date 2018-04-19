@@ -20,8 +20,9 @@ class AnnotationsBuilder
     use \danog\MadelineProto\TL\TL;
     use Tools;
 
-    public function __construct($settings)
+    public function __construct($logger, $settings)
     {
+        $this->logger = $logger;
         $this->construct_TL($settings['tl_schema']);
         $this->settings = $settings;
     }

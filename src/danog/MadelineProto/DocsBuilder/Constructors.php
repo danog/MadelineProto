@@ -161,7 +161,8 @@ trait Constructors
                 }
                 $table .= PHP_EOL;
                 $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
-                $ppptype = in_array($ptype, ['string', 'bytes']) ? '"'.$ptype.'"' : $ptype;
+                $ppptype = in_array($ptype, ['string']) ? '"'.$ptype.'"' : $ptype;
+                $ppptype = in_array($ptype, ['bytes']) ? '{"_": "bytes", "bytes":"base64 encoded '.$ptype.'"}' : $ppptype;
                 $params .= ", '".$param['name']."' => ";
                 $params .= isset($param['subtype']) ? '['.$pptype.', '.$pptype.']' : $pptype;
                 $lua_params .= ', '.$param['name'].'=';
