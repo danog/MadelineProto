@@ -450,7 +450,7 @@ trait UpdateHandler
 
                 return false;
             }
-            if (isset($update['message']['id'], $update['message']['to_id'])) {
+            if (isset($update['message']['id'], $update['message']['to_id']) && !in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage'])) {
                 if (!$this->check_msg_id($update['message'])) {
                     $this->logger->logger('Duplicate update by message id, channel id: '.$channel_id, \danog\MadelineProto\Logger::ERROR);
 
