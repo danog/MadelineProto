@@ -536,7 +536,7 @@ class Lang
     'method_messages.search_param_filter_type_MessagesFilter' => 'Message filter',
     'method_messages.search_param_min_date_type_int' => 'Minumum date of results to fetch',
     'method_messages.search_param_max_date_type_int' => 'Maximum date of results to fetch',
-    'method_messages.search_param_offset_id_type_int' => 'Offset ',
+    'method_messages.search_param_offset_id_type_int' => 'Message ID offset',
     'method_messages.search_param_add_offset_type_int' => 'Additional offset, can be 0',
     'method_messages.search_param_limit_type_int' => 'Number of results to return',
     'method_messages.search_param_max_id_type_int' => 'Maximum message id to return',
