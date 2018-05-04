@@ -66,7 +66,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             //'audio_bitrate_step_decr' => 0,
             //'audio_bitrate_step_incr' => 2000,
         ];
-        $call->configuration["log_file_path"] = "/tmp/logs".$call->getCallID()['id'].".log"; // Default is /dev/null
+        $call->configuration['log_file_path'] = '/tmp/logs'.$call->getCallID()['id'].'.log'; // Default is /dev/null
         //$call->configuration["stats_dump_file_path"] = "/tmp/stats".$call->getCallID()['id'].".txt"; // Default is /dev/null
 
         $call->parseConfig();
@@ -252,35 +252,35 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
         foreach ($this->calls as $key => $call) {
             if ($call->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 try {
-                if (isset($this->times[$call->getOtherID()][1])) {
-                    /*$this->messages->sendMedia([
+                    if (isset($this->times[$call->getOtherID()][1])) {
+                        /*$this->messages->sendMedia([
+                        'reply_to_msg_id' => $this->times[$call->getOtherID()][1],
+                        'peer' => $call->getOtherID(), 'message' => 'Call statistics by @magnaluna',
+                        'media' => [
+                            '_' => 'inputMediaUploadedDocument',
+                            'file' => "/tmp/stats".$call->getCallID()['id'].".txt",
+                            'attributes' => [
+                                ['_' => 'documentAttributeFilename', 'file_name' => "stats".$call->getCallID()['id'].".txt"]
+                            ]
+                        ],
+                        ]);*/
+                        $this->messages->sendMedia([
                     'reply_to_msg_id' => $this->times[$call->getOtherID()][1],
-                    'peer' => $call->getOtherID(), 'message' => 'Call statistics by @magnaluna',
-                    'media' => [
-                        '_' => 'inputMediaUploadedDocument',
-                        'file' => "/tmp/stats".$call->getCallID()['id'].".txt",
+                    'peer'            => $call->getOtherID(), 'message' => 'Debug info by @magnaluna',
+                    'media'           => [
+                        '_'          => 'inputMediaUploadedDocument',
+                        'file'       => '/tmp/logs'.$call->getCallID()['id'].'.log',
                         'attributes' => [
-                            ['_' => 'documentAttributeFilename', 'file_name' => "stats".$call->getCallID()['id'].".txt"]
-                        ]
-                    ],
-                    ]);*/
-                    $this->messages->sendMedia([
-                    'reply_to_msg_id' => $this->times[$call->getOtherID()][1],
-                    'peer' => $call->getOtherID(), 'message' => 'Debug info by @magnaluna',
-                    'media' => [
-                        '_' => 'inputMediaUploadedDocument',
-                        'file' => "/tmp/logs".$call->getCallID()['id'].".log",
-                        'attributes' => [
-                            ['_' => 'documentAttributeFilename', 'file_name' => "logs".$call->getCallID()['id'].".log"]
-                        ]
+                            ['_' => 'documentAttributeFilename', 'file_name' => 'logs'.$call->getCallID()['id'].'.log'],
+                        ],
                     ],
                     ]);
-                }
+                    }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     echo $e;
                 }
-                @unlink("/tmp/logs".$call->getCallID()['id'].".log");
-                @unlink("/tmp/stats".$call->getCallID()['id'].".txt");
+                @unlink('/tmp/logs'.$call->getCallID()['id'].'.log');
+                @unlink('/tmp/stats'.$call->getCallID()['id'].'.txt');
                 unset($this->calls[$key]);
             } elseif (isset($this->times[$call->getOtherID()]) && $this->times[$call->getOtherID()][0] < time()) {
                 $this->times[$call->getOtherID()][0] += 30 + count($this->calls);
