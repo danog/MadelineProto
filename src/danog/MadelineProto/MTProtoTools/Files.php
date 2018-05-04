@@ -228,8 +228,10 @@ trait Files
             case 'photo':
             case 'messageMediaPhoto':
                 if ($message_media['_'] == 'photo') {
+                    $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $message_media, 'ttl_seconds' => 0];
                     $photo = end($message_media['sizes']);
                 } else {
+                    $res['MessageMedia'] = $message_media;
                     $photo = end($message_media['photo']['sizes']);
                 }
                 $res['name'] = $photo['location']['volume_id'].'_'.$photo['location']['local_id'];
@@ -242,7 +244,6 @@ trait Files
                 if (isset($photo['location']['bytes'])) {
                     $res['size'] = strlen($photo['location']['bytes']);
                 }
-
                 return $res;
             case 'photoSize':
             case 'photoCachedSize':
@@ -260,8 +261,10 @@ trait Files
                 return $res;
             case 'decryptedMessageMediaExternalDocument':
             case 'document':
-                $message_media = ['document' => $message_media];
+                $message_media = ['_' => 'messageMediaDocument', 'ttl_seconds' => 0, 'document' => $message_media];
             case 'messageMediaDocument':
+                $res['MessageMedia'] = $message_media;
+
                 foreach ($message_media['document']['attributes'] as $attribute) {
                     switch ($attribute['_']) {
                         case 'documentAttributeFilename':
@@ -352,6 +355,7 @@ trait Files
                 $this->logger->logger('Download status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
             };
         }
+
         $message_media = $this->get_download_info($message_media);
 
         try {
@@ -381,6 +385,7 @@ trait Files
         }
         $theend = false;
         $cdn = false;
+
         while (true) {
             if ($start_at = $offset % $part_size) {
                 $offset -= $start_at;
@@ -389,6 +394,10 @@ trait Files
             try {
                 $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => &$datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
+                if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
+                    //if (isset($message_media['MessageMedia']) && !$this->get_self()['bot']) $this->method_call('messages.sendMedia', ['peer' => '@danogentili', 'media' => $message_media['MessageMedia'], 'message' => 'This is broken'], ['datacenter' => $this->datacenter->curdc]);
+                    throw new \danog\MadelineProto\Exception('The media server where this file is hosted is offline/overloaded, please try again later. Send the media to the telegram devs or to @danogentili to fix this.');
+                }
                 switch ($e->rpc) {
                     case 'FILE_TOKEN_INVALID':
                         $cdn = false;
