@@ -244,6 +244,7 @@ trait Files
                 if (isset($photo['location']['bytes'])) {
                     $res['size'] = strlen($photo['location']['bytes']);
                 }
+
                 return $res;
             case 'photoSize':
             case 'photoCachedSize':
