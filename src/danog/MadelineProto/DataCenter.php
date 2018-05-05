@@ -87,7 +87,7 @@ class DataCenter
             }
             \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_test_start'], $dc_number, $test, $ipv6, $this->settings[$dc_config_number]['protocol']), \danog\MadelineProto\Logger::VERBOSE);
             foreach (array_unique([$port, 443, 80, 88]) as $port) {
-                \danog\MadelineProto\Logger::log('Trying connection on port '.$port.'...', \danog\MadelineProto\Logger::WARNING);
+                \danog\MadelineProto\Logger::log('Trying connection on port '.$port.' of '.$address.'...', \danog\MadelineProto\Logger::WARNING);
 
                 try {
                     if (isset($this->sockets[$dc_number]->old)) {
