@@ -64,7 +64,7 @@ class Server
         } elseif ($pid) {
             return $this->pids[] = $pid;
         }
-        $handler = new \danog\MadelineProto\Server\Handler($socket, null, null, null, null, null, null);
+        $handler = new $this->settings['handler']($socket, $this->settings['extra'], null, null, null, null, null);
         $handler->loop();
         die;
     }
