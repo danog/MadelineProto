@@ -26,6 +26,15 @@ class Server
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         \danog\MadelineProto\Logger::constructor(3);
+
+        if (!extension_loaded('sockets')) {
+            throw new Exception(['extension', 'sockets']);
+        }
+
+        if (!extension_loaded('pcntl')) {
+            throw new Exception(['extension', 'pcntl']);
+        }
+
         $this->settings = $settings;
         $this->mypid = getmypid();
     }
