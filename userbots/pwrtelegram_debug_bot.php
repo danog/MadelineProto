@@ -11,7 +11,7 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 require '../vendor/autoload.php';
-$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e']];
+$settings = [];
 include_once 'token.php';
 
 try {

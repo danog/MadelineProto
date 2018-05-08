@@ -48,9 +48,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
     }
 }
 
-$settings = ['app_info' => ['api_id' => 6, 'api_hash' => 'eb06d4abfb49dc3eeb1aeb98ae0f581e'], 'updates' => ['handle_updates' => true]];
-
-$MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
+$MadelineProto = new \danog\MadelineProto\API('bot.madeline');
 
 $MadelineProto->start();
 $MadelineProto->setEventHandler('\EventHandler');
