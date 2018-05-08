@@ -53,7 +53,7 @@ class Server
         $timeout = 2;
         $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
         $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
-        \danog\MadelineProto\Logger::log("Server started! Listening on ".$this->settings['address'].":".$this->settings['port']);
+        \danog\MadelineProto\Logger::log('Server started! Listening on '.$this->settings['address'].':'.$this->settings['port']);
         while (true) {
             pcntl_signal_dispatch();
 
