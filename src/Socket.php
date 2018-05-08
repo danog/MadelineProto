@@ -118,12 +118,14 @@ If not, see <http://www.gnu.org/licenses/>.
         public function read(int $length, int $flags = 0)
         {
             $packet = '';
+            $try = 0;
             while (strlen($packet) < $length) {
                 $read = stream_get_contents($this->sock, $length - strlen($packet));
-                if ($read === false || strlen($read) === 0) {
+                if ($read === false || (strlen($read) === 0 && $try > 10)) {
                     throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
                 }
                 $packet .= $read;
+                $try++;
             }
 
             return $packet;
@@ -283,12 +285,14 @@ if (!extension_loaded('pthreads')) {
             public function read(int $length, int $flags = 0)
             {
                 $packet = '';
+                $try = 0;
                 while (strlen($packet) < $length) {
                     $read = socket_read($this->sock, $length - strlen($packet), $flags);
-                    if ($read === false || strlen($read) === 0) {
+                    if ($read === false || (strlen($read) === 0 && $try > 10)) {
                         throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
                     }
                     $packet .= $read;
+                    $try++;
                 }
 
                 return $packet;

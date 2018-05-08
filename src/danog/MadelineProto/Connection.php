@@ -69,6 +69,11 @@ class Connection
         - https
         - udp
         */
+        if ($proxy === '\\MTProxySocket') {
+            $proxy = '\\Socket';
+            $protocol = 'obfuscated2';
+        }
+
         $this->protocol = $protocol;
         $this->timeout = $timeout;
         $this->ipv6 = $ipv6;
@@ -76,7 +81,7 @@ class Connection
         $this->port = $port;
         $this->proxy = $proxy;
         $this->extra = $extra;
-        if (($has_proxy = $proxy !== '\\Socket') && !isset(class_implements($proxy)['danog\\MadelineProto\\Proxy'])) {
+        if (($has_proxy = !in_array($proxy, ['\\MTProxySocket', '\\Socket'])) && !isset(class_implements($proxy)['danog\\MadelineProto\\Proxy'])) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
         }
         switch ($this->protocol) {
@@ -135,6 +140,7 @@ class Connection
                     $random = $this->random(64);
                 } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
                 $random[56] = $random[57] = $random[58] = $random[59] = chr(0xef);
+
                 $reversed = strrev(substr($random, 8, 48));
                 $this->obfuscated = ['encryption' => new \phpseclib\Crypt\AES('ctr'), 'decryption' => new \phpseclib\Crypt\AES('ctr')];
                 $this->obfuscated['encryption']->enableContinuousBuffer();

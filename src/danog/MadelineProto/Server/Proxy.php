@@ -16,20 +16,20 @@ namespace danog\MadelineProto\Server;
 /*
  * Socket handler for server
  */
-class Handler extends \danog\MadelineProto\Connection
+class Proxy extends \danog\MadelineProto\Connection
 {
     use \danog\MadelineProto\Tools;
     private $madeline;
 
     public function __magic_construct($socket, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
+        \danog\MadelineProto\Logger::log('Got connection '.getmypid().'!');
         \danog\MadelineProto\Magic::$pid = getmypid();
         $this->sock = $socket;
         $this->sock->setBlocking(true);
         $this->must_open = false;
-        $timeout = 2;
-        $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
-        $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
+        $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $extra['timeout']);
+        $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $extra['timeout']);
         $this->logger = new \danog\MadelineProto\Logger(3);
         $this->extra = $extra;
     }
@@ -46,39 +46,50 @@ class Handler extends \danog\MadelineProto\Connection
         $random = $this->sock->read(64);
 
         $reversed = strrev(substr($random, 8, 48));
+        $key = substr($random, 8, 32);
+        $keyRev = substr($reversed, 0, 32);
         if (isset($this->extra['secret'])) {
-            $random = substr_replace($random, hash('sha256', $key.$this->extra['secret'], true), 32, 8);
+            $key = hash('sha256', $key.$this->extra['secret'], true);
+            $keyRev = hash('sha256', $keyRev.$this->extra['secret'], true);
         }
 
         $this->obfuscated = ['encryption' => new \phpseclib\Crypt\AES('ctr'), 'decryption' => new \phpseclib\Crypt\AES('ctr')];
         $this->obfuscated['encryption']->enableContinuousBuffer();
         $this->obfuscated['decryption']->enableContinuousBuffer();
-        $this->obfuscated['decryption']->setKey(substr($random, 8, 32));
+        $this->obfuscated['decryption']->setKey($key);
         $this->obfuscated['decryption']->setIV(substr($random, 40, 16));
-        $this->obfuscated['encryption']->setKey(substr($reversed, 0, 32));
+        $this->obfuscated['encryption']->setKey($keyRev);
         $this->obfuscated['encryption']->setIV(substr($reversed, 32, 16));
-        $random = substr_replace($random, substr(@$this->obfuscated['encryption']->encrypt($random), 56, 8), 56, 8);
-
-        $random[56] = $random[57] = $random[58] = $random[59] = chr(0xef);
+        $random = substr_replace($random, substr(@$this->obfuscated['decryption']->encrypt($random), 56, 8), 56, 8);
 
         if (substr($random, 56, 4) !== str_repeat(chr(0xef), 4)) {
             throw new \danog\MadelineProto\Exception('Wrong protocol version');
         }
-        $socket = $this->extra['madeline']->API->datacenter->sockets[unpack('v', substr($random, 60, 2)[1]];
-        $socket->close_and_reopen();
+        $dc = abs(unpack('s', substr($random, 60, 2))[1]);
+
+        $socket = $this->extra['madeline']->API->datacenter->sockets[$dc];
+        $socket->__construct($socket->proxy, $socket->extra, $socket->ip, $socket->port, $socket->protocol, $this->extra['timeout'], $socket->ipv6);
+
+        $write = [];
+        $except = [];
 
         while (true) {
             pcntl_signal_dispatch();
 
             try {
-                $time = time();
-                $socket->send_message($this->read_message());
+                $read = [$this->getSocket(), $socket->getSocket()];
+                \Socket::select($read, $write, $except, 2);
+                if (isset($read[0])) {
+                    \danog\MadelineProto\Logger::log("Will write to DC $dc on ".\danog\MadelineProto\Magic::$pid);
+                    $socket->send_message($this->read_message());
+                }
+                if (isset($read[1])) {
+                    \danog\MadelineProto\Logger::log("Will read from DC $dc on ".\danog\MadelineProto\Magic::$pid);
+                    $this->send_message($socket->read_message());
+                }
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
                 echo $e;
-                if (time() - $time < 2) {
-                    exit();
-                }
-                continue;
+                exit();
             }
         }
     }
