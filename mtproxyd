@@ -17,7 +17,7 @@ if (!file_exists('madeline.php')) {
 }
 
 if (!$debug) {
-    $mtproxyd = file_get_contents('https://phar.madelineproto.xyz/mtproxyd');
+    $mtproxyd = file_get_contents('https://phar.madelineproto.xyz/mtproxyd?v=new');
     if ($mtproxyd) {
         file_put_contents($argv[0], $mtproxyd);
     }
