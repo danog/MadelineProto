@@ -52,7 +52,9 @@ class Exception extends \Exception
             $this->line = $line;
         }
         parent::__construct($message, $code, $previous);
-        \danog\MadelineProto\Logger::log($message.' in '.basename($this->file).':'.$this->line, \danog\MadelineProto\Logger::FATAL_ERROR);
+        if (strpos($message, 'socket_accept') === false) {
+            \danog\MadelineProto\Logger::log($message.' in '.basename($this->file).':'.$this->line, \danog\MadelineProto\Logger::FATAL_ERROR);
+        }
         if (in_array($message, ['The session is corrupted!', 'Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response", 'Chat forbidden', 'The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.', 'File does not exist', 'Please install this fork of phpseclib: https://github.com/danog/phpseclib'])) {
             return;
         }

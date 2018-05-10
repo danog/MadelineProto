@@ -34,7 +34,6 @@ class Server
         if (!extension_loaded('pcntl')) {
             throw new Exception(['extension', 'pcntl']);
         }
-
         $this->settings = $settings;
         $this->mypid = getmypid();
     }

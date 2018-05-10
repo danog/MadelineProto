@@ -18,13 +18,11 @@ namespace danog\MadelineProto\Server;
  */
 class Proxy extends \danog\MadelineProto\Connection
 {
-    use \danog\MadelineProto\Tools;
-    private $madeline;
-
     public function __magic_construct($socket, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
         \danog\MadelineProto\Logger::log('Got connection '.getmypid().'!');
         \danog\MadelineProto\Magic::$pid = getmypid();
+        \danog\MadelineProto\Lang::$current_lang = [];
         $this->sock = $socket;
         $this->sock->setBlocking(true);
         $this->must_open = false;
@@ -32,11 +30,14 @@ class Proxy extends \danog\MadelineProto\Connection
         $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $extra['timeout']);
         $this->logger = new \danog\MadelineProto\Logger(3);
         $this->extra = $extra;
+        if ($this->extra['madeline'] instanceof \danog\MadelineProto\API) {
+            $this->extra['madeline'] = $this->extra['madeline']->API->datacenter->sockets;
+        }
     }
 
     public function __destruct()
     {
-        echo 'Closing socket in fork '.getmypid().PHP_EOL;
+        \danog\MadelineProto\Logger::log('Closing fork '.getmypid().'!');
         unset($this->sock);
     }
 
@@ -67,20 +68,19 @@ class Proxy extends \danog\MadelineProto\Connection
         }
         $dc = abs(unpack('s', substr($random, 60, 2))[1]);
 
-        $socket = $this->extra['madeline']->API->datacenter->sockets[$dc];
-        $socket->__construct($socket->proxy, $socket->extra, $socket->ip, $socket->port, $socket->protocol, $this->extra['timeout'], $socket->ipv6);
+        $socket = $this->extra['madeline'][$dc];
+        $socket->__construct($socket->proxy, $socket->extra, $socket->ip, $socket->port, $socket->protocol, $timeout = $this->extra['timeout'], $socket->ipv6);
 
         unset($this->extra);
 
         $write = [];
         $except = [];
-
         while (true) {
             pcntl_signal_dispatch();
 
             try {
                 $read = [$this->getSocket(), $socket->getSocket()];
-                \Socket::select($read, $write, $except, 2);
+                \Socket::select($read, $write, $except, $timeout);
                 if (isset($read[0])) {
                     //\danog\MadelineProto\Logger::log("Will write to DC $dc on ".\danog\MadelineProto\Magic::$pid);
                     $socket->send_message($this->read_message());
@@ -89,8 +89,8 @@ class Proxy extends \danog\MadelineProto\Connection
                     //\danog\MadelineProto\Logger::log("Will read from DC $dc on ".\danog\MadelineProto\Magic::$pid);
                     $this->send_message($socket->read_message());
                 }
+                if (empty($read)) throw new \danog\MadelineProto\NothingInTheSocketException('Inactivity');
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
-                echo $e;
                 exit();
             }
         }
