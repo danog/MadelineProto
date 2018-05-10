@@ -89,7 +89,9 @@ class Proxy extends \danog\MadelineProto\Connection
                     //\danog\MadelineProto\Logger::log("Will read from DC $dc on ".\danog\MadelineProto\Magic::$pid);
                     $this->send_message($socket->read_message());
                 }
-                if (empty($read)) throw new \danog\MadelineProto\NothingInTheSocketException('Inactivity');
+                if (empty($read)) {
+                    throw new \danog\MadelineProto\NothingInTheSocketException('Inactivity');
+                }
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
                 exit();
             }
