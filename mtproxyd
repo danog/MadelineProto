@@ -17,7 +17,10 @@ if (!file_exists('madeline.php')) {
 }
 
 if (!$debug) {
-    copy('https://phar.madelineproto.xyz/mtproxyd', $argv[0]);
+    $mtproxyd = file_get_contents('https://phar.madelineproto.xyz/mtproxyd');
+    if ($mtproxyd) {
+        file_put_contents($argv[0], $mtproxyd);
+    }
 }
 
 require_once 'madeline.php';
