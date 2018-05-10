@@ -44,7 +44,7 @@ ssh-add madeline_rsa
 git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
 cp "../madeline$branch.phar" .
-cp ../phar.php .
+cp ../phar.php ../mtproxyd .
 [ "$TRAVIS_BRANCH" == "master" ] && echo -n $TRAVIS_COMMIT > release
 git add -A
 git commit -am "Release $TRAVIS_BRANCH $TRAVIS_COMMIT"
