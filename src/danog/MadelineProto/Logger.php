@@ -30,6 +30,7 @@ class Logger
     public $colors = [];
 
     public static $default;
+    public static $printed = false;
 
     const ULTRA_VERBOSE = 5;
     const VERBOSE = 4;
@@ -69,6 +70,18 @@ class Logger
         $this->colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
         $this->colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
         $this->colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
+
+        if (!self::$printed) {
+            $this->colors[self::NOTICE] = implode(';', [self::foreground['light_gray'], self::set['bold'], self::background['blue']]);
+
+            $this->logger('MadelineProto');
+            $this->logger('Copyright (C) 2016-2018 Daniil Gentili');
+            $this->logger('Licensed under AGPLv3');
+            $this->logger('https://github.com/danog/MadelineProto');
+
+            $this->colors[self::NOTICE] = implode(';', [self::foreground['yellow'], self::set['bold']]);
+            self::$printed = true;
+        }
     }
 
     public static function log($param, $level = self::NOTICE)

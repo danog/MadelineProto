@@ -6,7 +6,7 @@ $debug = false; // Set this to true to avoid automatic updates of this script
 
 
 
-echo "Powered by MadelineProto, licensed under AGPLv3\n\n";
+echo "mtproxyd - Copyright by Daniil Gentili, licensed under AGPLv3\n\n";
 if (!isset($argv[2])) {
     echo "Usage: ".$argv[0]." seed port\n\nseed is any string or word that will be used as seed to generate the proxy secret\nport is the port where to start listening for connections\n";
     exit(1);
