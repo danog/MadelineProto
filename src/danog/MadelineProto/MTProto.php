@@ -109,6 +109,9 @@ class MTProto
         if (!extension_loaded('xml')) {
             throw new Exception(['extension', 'xml']);
         }
+        if (!extension_loaded('json')) {
+            throw new Exception(['extension', 'json']);
+        }
         // Connect to servers
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
         if (!isset($this->datacenter)) {
