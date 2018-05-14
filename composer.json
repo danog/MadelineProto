@@ -18,6 +18,7 @@
         "rollbar/rollbar": "dev-master",
         "ext-curl": "*",
         "ext-mbstring": "*",
+        "ext-json": "*",
         "ext-xml": "*"
     },
     "require-dev": {
