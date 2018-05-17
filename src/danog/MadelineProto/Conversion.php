@@ -130,6 +130,34 @@ class Conversion
         return $MadelineProto;
     }
 
+    public static function zerobias($session, $new_session, $settings = [])
+    {
+        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
+        if (is_string($session)) {
+            $session = json_decode($session, true);
+        }
+        $dc = $session['dc'];
+        $session['auth_key'] = hex2bin($session["dc$dc".'_auth_key']);
+
+        $MadelineProto = new \danog\MadelineProto\API($new_session, $settings);
+
+        $MadelineProto->API->datacenter->sockets[$dc]->auth_key = ['server_salt' => '', 'connection_inited' => true, 'id' => substr(sha1($session['auth_key'], true), -8), 'auth_key' => $session['auth_key']];
+        $MadelineProto->API->datacenter->sockets[$dc]->temp_auth_key = null;
+        $MadelineProto->API->datacenter->sockets[$dc]->authorized = true;
+        $MadelineProto->API->datacenter->sockets[$dc]->session_id = $MadelineProto->random(8);
+        $MadelineProto->API->datacenter->sockets[$dc]->session_in_seq_no = 0;
+        $MadelineProto->API->datacenter->sockets[$dc]->session_out_seq_no = 0;
+        $MadelineProto->API->datacenter->sockets[$dc]->incoming_messages = [];
+        $MadelineProto->API->datacenter->sockets[$dc]->outgoing_messages = [];
+        $MadelineProto->API->datacenter->sockets[$dc]->new_outgoing = [];
+        $MadelineProto->API->datacenter->sockets[$dc]->incoming = [];
+
+        $MadelineProto->API->authorized = MTProto::LOGGED_IN;
+        $MadelineProto->API->init_authorization();
+
+        return $MadelineProto;
+    }
+
     public static function tdesktop_md5($data)
     {
         $result = '';
