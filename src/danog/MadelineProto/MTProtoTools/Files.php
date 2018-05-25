@@ -307,7 +307,7 @@ trait Files
 
     public function download_to_dir($message_media, $dir, $cb = null)
     {
-        if (is_object($dir) && class_implements($dir)['\danog\MadelineProto\FileCallbackInterface']) {
+        if (is_object($dir) && class_implements($dir)['danog\MadelineProto\FileCallbackInterface']) {
             $cb = $dir;
             $dir = $dir->getFile();
         }
@@ -319,7 +319,7 @@ trait Files
 
     public function download_to_file($message_media, $file, $cb = null)
     {
-        if (is_object($file) && class_implements($file)['\danog\MadelineProto\FileCallbackInterface']) {
+        if (is_object($file) && class_implements($file)['danog\MadelineProto\FileCallbackInterface']) {
             $cb = $file;
             $file = $file->getFile();
         }
@@ -346,7 +346,7 @@ trait Files
 
     public function download_to_stream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
     {
-        if (is_object($stream) && class_implements($stream)['\danog\MadelineProto\FileCallbackInterface']) {
+        if (is_object($stream) && class_implements($stream)['danog\MadelineProto\FileCallbackInterface']) {
             $cb = $stream;
             $stream = $stream->getFile();
         }
