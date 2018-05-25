@@ -41,7 +41,7 @@ trait CallHandler
             $this->logger->logger("Didn't serialize in a while, doing that now...");
             $this->wrapper->serialize($this->wrapper->session);
         }
-        if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > 4096) {
+        if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > 4096 && !isset($args['parse_mode'])) {
             $message_chunks = $this->split_to_chunks($args['message']);
             $args['message'] = array_shift($message_chunks);
         }
