@@ -85,6 +85,7 @@ class Logger
             return false;
         }
         if (!self::$printed) {
+            self::$printed = true;
             $this->colors[self::NOTICE] = implode(';', [self::foreground['light_gray'], self::set['bold'], self::background['blue']]);
 
             $this->logger('MadelineProto');
@@ -93,7 +94,6 @@ class Logger
             $this->logger('https://github.com/danog/MadelineProto');
 
             $this->colors[self::NOTICE] = implode(';', [self::foreground['yellow'], self::set['bold']]);
-            self::$printed = true;
         }
         if ($this->mode === 4) {
             return call_user_func_array($this->optional, [$param, $level]);
