@@ -32,6 +32,7 @@ composer update
 cd ..
 
 $php7to5 convert --copy-all phar7 phar5 >/dev/null
+find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
 
 [ "$TRAVIS_BRANCH" != "master" ] && branch="-$TRAVIS_BRANCH" || branch=""
 

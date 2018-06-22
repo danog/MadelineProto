@@ -597,7 +597,7 @@ trait TL
                         stream_get_contents($stream, $resto);
                     }
                 } else {
-                    $x = stream_get_contents($stream, $l);
+                    $x = $l ? stream_get_contents($stream, $l) : '';
                     $resto = $this->posmod(-($l + 1), 4);
                     if ($resto > 0) {
                         stream_get_contents($stream, $resto);
