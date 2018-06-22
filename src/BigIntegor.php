@@ -9,9 +9,10 @@ if (defined('HHVM_VERSION')) {
     $engines = [['PHP64', ['OpenSSL']], ['BCMath', ['OpenSSL']], ['PHP32', ['OpenSSL']]];
     foreach ($engines as $engine) {
         try {
-           \phpseclib\Math\BigInteger::setEngine($engine[0], isset($engine[1]) ? $engine[1] : []);
-           break;
-        } catch (\Exception $e) {}
+            \phpseclib\Math\BigInteger::setEngine($engine[0], isset($engine[1]) ? $engine[1] : []);
+            break;
+        } catch (\Exception $e) {
+        }
     }
 }
 
