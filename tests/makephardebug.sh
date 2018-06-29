@@ -32,6 +32,7 @@ cp -a ../src vendor/danog/madelineproto
 cd ..
 
 $php7to5 convert --copy-all phar7 phar5 >/dev/null
+find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
 
 php makephar.php phar5 madeline.phar $(cat .git/refs/heads/master)
 
