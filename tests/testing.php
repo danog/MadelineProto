@@ -45,6 +45,14 @@ echo 'Loading MadelineProto...'.PHP_EOL;
 
 $MadelineProto = new \danog\MadelineProto\API(getcwd().'/testing.madeline', $settings);
 
+try {
+    $MadelineProto->get_self();
+} catch (\danog\MadelineProto\Exception $e) {
+    if ($e->getMessage() === 'TOS action required, check the logs') {
+        $MadelineProto->accept_tos();
+    }
+}
+
 /*
  * If this session is not logged in, login
  */

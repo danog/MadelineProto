@@ -11,15 +11,6 @@ interface auth
 {
     /**
      * @param array params [
-     *               string phone_number,
-     *              ]
-     *
-     * @return auth_CheckedPhone
-     */
-    public function checkPhone(array $params);
-
-    /**
-     * @param array params [
      *               boolean allow_flashcall,
      *               string phone_number,
      *               Bool current_number,
@@ -64,16 +55,6 @@ interface auth
      * @return bool
      */
     public function resetAuthorizations();
-
-    /**
-     * @param array params [
-     *               string phone_numbers,
-     *               string message,
-     *              ]
-     *
-     * @return bool
-     */
-    public function sendInvites(array $params);
 
     /**
      * @param array params [
@@ -177,6 +158,7 @@ interface account
      *               int token_type,
      *               string token,
      *               Bool app_sandbox,
+     *               bytes secret,
      *               int other_uids,
      *              ]
      *
@@ -432,6 +414,128 @@ interface account
      * @return bool
      */
     public function resetWebAuthorizations();
+
+    /**
+     * @return Vector_of_SecureValue
+     */
+    public function getAllSecureValues();
+
+    /**
+     * @param array params [
+     *               SecureValueType types,
+     *              ]
+     *
+     * @return Vector_of_SecureValue
+     */
+    public function getSecureValue(array $params);
+
+    /**
+     * @param array params [
+     *               InputSecureValue value,
+     *               long secure_secret_id,
+     *              ]
+     *
+     * @return SecureValue
+     */
+    public function saveSecureValue(array $params);
+
+    /**
+     * @param array params [
+     *               SecureValueType types,
+     *              ]
+     *
+     * @return bool
+     */
+    public function deleteSecureValue(array $params);
+
+    /**
+     * @param array params [
+     *               int bot_id,
+     *               string scope,
+     *               string public_key,
+     *              ]
+     *
+     * @return account_AuthorizationForm
+     */
+    public function getAuthorizationForm(array $params);
+
+    /**
+     * @param array params [
+     *               int bot_id,
+     *               string scope,
+     *               string public_key,
+     *               SecureValueHash value_hashes,
+     *               SecureCredentialsEncrypted credentials,
+     *              ]
+     *
+     * @return bool
+     */
+    public function acceptAuthorization(array $params);
+
+    /**
+     * @param array params [
+     *               boolean allow_flashcall,
+     *               string phone_number,
+     *               Bool current_number,
+     *              ]
+     *
+     * @return auth_SentCode
+     */
+    public function sendVerifyPhoneCode(array $params);
+
+    /**
+     * @param array params [
+     *               string phone_number,
+     *               string phone_code_hash,
+     *               string phone_code,
+     *              ]
+     *
+     * @return bool
+     */
+    public function verifyPhone(array $params);
+
+    /**
+     * @param array params [
+     *               string email,
+     *              ]
+     *
+     * @return account_SentEmailCode
+     */
+    public function sendVerifyEmailCode(array $params);
+
+    /**
+     * @param array params [
+     *               string email,
+     *               string code,
+     *              ]
+     *
+     * @return bool
+     */
+    public function verifyEmail(array $params);
+
+    /**
+     * @param array params [
+     *               boolean contacts,
+     *               boolean message_users,
+     *               boolean message_chats,
+     *               boolean message_megagroups,
+     *               boolean message_channels,
+     *               boolean files,
+     *               int file_max_size,
+     *              ]
+     *
+     * @return account_Takeout
+     */
+    public function initTakeoutSession(array $params);
+
+    /**
+     * @param array params [
+     *               boolean success,
+     *              ]
+     *
+     * @return bool
+     */
+    public function finishTakeoutSession(array $params);
 }
 
 interface users
@@ -453,6 +557,16 @@ interface users
      * @return UserFull
      */
     public function getFullUser(array $params);
+
+    /**
+     * @param array params [
+     *               InputUser id,
+     *               SecureValueError errors,
+     *              ]
+     *
+     * @return bool
+     */
+    public function setSecureValueErrors(array $params);
 }
 
 interface contacts
@@ -590,6 +704,11 @@ interface contacts
      * @return bool
      */
     public function resetSaved();
+
+    /**
+     * @return Vector_of_SavedContact
+     */
+    public function getSaved();
 }
 
 interface messages
@@ -645,6 +764,7 @@ interface messages
      *               int limit,
      *               int max_id,
      *               int min_id,
+     *               int hash,
      *              ]
      *
      * @return messages_Messages
@@ -776,6 +896,17 @@ interface messages
      * @return PeerSettings
      */
     public function getPeerSettings(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               int id,
+     *               ReportReason reason,
+     *              ]
+     *
+     * @return bool
+     */
+    public function report(array $params);
 
     /**
      * @param array params [
@@ -967,7 +1098,7 @@ interface messages
     /**
      * @param array params [
      *               string emoticon,
-     *               string hash,
+     *               int hash,
      *              ]
      *
      * @return messages_Stickers
@@ -1223,6 +1354,7 @@ interface messages
      *               InputPeer peer,
      *               int id,
      *               string message,
+     *               InputMedia media,
      *               ReplyMarkup reply_markup,
      *               MessageEntity entities,
      *               InputGeoPoint geo_point,
@@ -1238,6 +1370,7 @@ interface messages
      *               boolean stop_geo_live,
      *               InputBotInlineMessageID id,
      *               string message,
+     *               InputMedia media,
      *               ReplyMarkup reply_markup,
      *               MessageEntity entities,
      *               InputGeoPoint geo_point,
@@ -1274,7 +1407,7 @@ interface messages
 
     /**
      * @param array params [
-     *               InputPeer peers,
+     *               InputDialogPeer peers,
      *              ]
      *
      * @return messages_PeerDialogs
@@ -1457,7 +1590,7 @@ interface messages
     /**
      * @param array params [
      *               boolean pinned,
-     *               InputPeer peer,
+     *               InputDialogPeer peer,
      *              ]
      *
      * @return bool
@@ -1467,7 +1600,7 @@ interface messages
     /**
      * @param array params [
      *               boolean force,
-     *               InputPeer order,
+     *               InputDialogPeer order,
      *              ]
      *
      * @return bool
@@ -1567,6 +1700,7 @@ interface messages
      * @param array params [
      *               InputPeer peer,
      *               int limit,
+     *               int hash,
      *              ]
      *
      * @return messages_Messages
@@ -1596,6 +1730,22 @@ interface messages
      * @return EncryptedFile
      */
     public function uploadEncryptedFile(array $params);
+
+    /**
+     * @param array params [
+     *               boolean exclude_featured,
+     *               string q,
+     *               int hash,
+     *              ]
+     *
+     * @return messages_FoundStickerSets
+     */
+    public function searchStickerSets(array $params);
+
+    /**
+     * @return Vector_of_MessageRange
+     */
+    public function getSplitRanges();
 }
 
 interface updates
@@ -1737,7 +1887,7 @@ interface upload
      *               bytes request_token,
      *              ]
      *
-     * @return Vector_of_CdnFileHash
+     * @return Vector_of_FileHash
      */
     public function reuploadCdnFile(array $params);
 
@@ -1747,9 +1897,19 @@ interface upload
      *               int offset,
      *              ]
      *
-     * @return Vector_of_CdnFileHash
+     * @return Vector_of_FileHash
      */
     public function getCdnFileHashes(array $params);
+
+    /**
+     * @param array params [
+     *               InputFileLocation location,
+     *               int offset,
+     *              ]
+     *
+     * @return Vector_of_FileHash
+     */
+    public function getFileHashes(array $params);
 }
 
 interface help
@@ -1798,11 +1958,6 @@ interface help
     public function getAppChangelog(array $params);
 
     /**
-     * @return help_TermsOfService
-     */
-    public function getTermsOfService();
-
-    /**
      * @param array params [
      *               int pending_updates_count,
      *               string message,
@@ -1825,6 +1980,34 @@ interface help
      * @return help_RecentMeUrls
      */
     public function getRecentMeUrls(array $params);
+
+    /**
+     * @return help_ProxyData
+     */
+    public function getProxyData();
+
+    /**
+     * @return help_TermsOfServiceUpdate
+     */
+    public function getTermsOfServiceUpdate();
+
+    /**
+     * @param array params [
+     *               DataJSON id,
+     *              ]
+     *
+     * @return bool
+     */
+    public function acceptTermsOfService(array $params);
+
+    /**
+     * @param array params [
+     *               string path,
+     *              ]
+     *
+     * @return help_DeepLinkInfo
+     */
+    public function getDeepLinkInfo(array $params);
 }
 
 interface channels
@@ -2152,6 +2335,15 @@ interface channels
      * @return Updates
      */
     public function togglePreHistoryHidden(array $params);
+
+    /**
+     * @param array params [
+     *               int offset,
+     *              ]
+     *
+     * @return messages_Chats
+     */
+    public function getLeftChannels(array $params);
 }
 
 interface bots

@@ -49,12 +49,12 @@ class Logger
      * 4 - Call callable provided in logger_param. logger_param must accept two parameters: array $message, int $level
      *     $message is an array containing the messages the log, $level, is the logging level
      */
-    public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE)
+    public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE, $max_size = 100*1024*1024)
     {
-        self::$default = new self($mode, $optional, $prefix, $level);
+        self::$default = new self($mode, $optional, $prefix, $level, $max_size);
     }
 
-    public function __construct($mode, $optional = null, $prefix = '', $level = self::NOTICE)
+    public function __construct($mode, $optional, $prefix, $level, $max_size)
     {
         if ($mode === null) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['no_mode_specified']);
@@ -63,6 +63,10 @@ class Logger
         $this->optional = $mode == 2 ? Absolute::absolute($optional) : $optional;
         $this->prefix = $prefix === '' ? '' : ', '.$prefix;
         $this->level = $level;
+
+        if ($mode === 2 && $max_size !== -1 && file_exists($this->optional) && filesize($this->optional) > $max_size) {
+            unlink($this->optional);
+        }
 
         $this->colors[self::ULTRA_VERBOSE] = implode(';', [self::foreground['light_gray'], self::set['dim']]);
         $this->colors[self::VERBOSE] = implode(';', [self::foreground['green'], self::set['bold']]);

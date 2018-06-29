@@ -70,7 +70,7 @@ trait Methods
             $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md)<a name="'.$method.'"></a>  
 
 ';
-            if (!isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']])) {
+            if (!isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']]) && isset($this->td_descriptions['methods'][$data['method']])) {
                 $this->human_docs_methods[$this->td_descriptions['methods'][$data['method']]['description'].': '.$data['method']] = '* <a href="'.$method.'.html" name="'.$method.'">'.$this->td_descriptions['methods'][$data['method']]['description'].': '.$data['method'].'</a>  
 
 ';

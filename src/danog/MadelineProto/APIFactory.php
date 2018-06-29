@@ -139,6 +139,10 @@ class APIFactory
             Logger::log("Didn't serialize in a while, doing that now...");
             $this->serialize($this->session);
         }
+        if ($name !== 'accept_tos' && $name !== 'decline_tos') {
+            $this->API->check_tos();
+        }
+
         if ($this->lua === false) {
             return method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [], $aargs);
         }

@@ -34,6 +34,7 @@ if (!isset(\danog\MadelineProto\Lang::$lang[$lang_code])) {
 }
 $count = count(\danog\MadelineProto\Lang::$lang[$lang_code]);
 $curcount = 0;
+ksort(\danog\MadelineProto\Lang::$current_lang);
 foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
     if (!isset(\danog\MadelineProto\Lang::$lang[$lang_code][$key])) {
         \danog\MadelineProto\Lang::$lang[$lang_code][$key] = $value;

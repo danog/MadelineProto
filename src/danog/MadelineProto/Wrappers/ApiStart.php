@@ -33,7 +33,9 @@ trait ApiStart
                     return $line;
                 }
             }
-            if (strpos($res = readline('You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a): '), 'm') !== false) {
+            echo 'You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a)
+Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id'.PHP_EOL;
+            if (strpos($res = readline('Your choice (m/a): '), 'm') !== false) {
                 echo '1) Login to my.telegram.org
 2) Go to API development tools
 3) App title: your app\'s name, can be anything

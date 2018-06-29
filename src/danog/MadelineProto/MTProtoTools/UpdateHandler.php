@@ -510,11 +510,6 @@ trait UpdateHandler
 
     public function save_update($update)
     {
-        array_walk($this->calls, function ($controller, $id) {
-            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                $controller->discard();
-            }
-        });
         if ($update['_'] === 'updateDcOptions') {
             $this->logger->logger('Got new dc options', \danog\MadelineProto\Logger::VERBOSE);
             $this->parse_dc_options($update['dc_options']);

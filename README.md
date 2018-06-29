@@ -77,7 +77,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
 * [Avoiding FLOOD_WAITs](https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html)
 * [Logging](https://docs.madelineproto.xyz/docs/LOGGING.html)
 * [Using methods](https://docs.madelineproto.xyz/docs/USING_METHODS.html)
-  * [FULL API Documentation with descriptions](https://docs.madelineproto.xyz/API_docs/methods)
+  * [FULL API Documentation with descriptions](https://docs.madelineproto.xyz/API_docs/methods/)
   * [Peers](https://docs.madelineproto.xyz/docs/USING_METHODS.html#peers)
   * [Files](https://docs.madelineproto.xyz/docs/FILES.html)
   * [Secret chats](https://docs.madelineproto.xyz/docs/USING_METHODS.html#secret-chats)

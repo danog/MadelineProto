@@ -51,11 +51,12 @@ class MTProto
     use \danog\MadelineProto\Wrappers\Noop;
     use \danog\MadelineProto\Wrappers\Start;
     use \danog\MadelineProto\Wrappers\Templates;
+    use \danog\MadelineProto\Wrappers\TOS;
 
     /*
         const V = 71;
     */
-    const V = 100;
+    const V = 102;
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
@@ -74,6 +75,7 @@ class MTProto
     public $hook_url = false;
     public $settings = [];
     private $config = ['expires' => -1];
+    private $tos = ['expires' => 0, 'accepted' => true];
     private $initing_authorization = false;
     public $authorization = null;
     public $authorized = 0;
@@ -152,7 +154,7 @@ class MTProto
 
     public function __sleep()
     {
-        return ['event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'pending_pwrchat', 'postpone_pwrchat', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc'];
+        return ['event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'pending_pwrchat', 'postpone_pwrchat', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
     }
 
     public function __wakeup()
@@ -455,12 +457,12 @@ class MTProto
             'lang_code' => $lang_code,
         ], 'tl_schema' => [
             // TL scheme files
-            'layer' => 75,
+            'layer' => 81,
             // layer version
             'src' => [
                 'mtproto' => __DIR__.'/TL_mtproto_v1.json',
                 // mtproto TL scheme
-                'telegram' => __DIR__.'/TL_telegram_v75.tl',
+                'telegram' => __DIR__.'/TL_telegram_v81.tl',
                 // telegram TL scheme
                 'secret' => __DIR__.'/TL_secret.tl',
                 // secret chats TL scheme
@@ -485,6 +487,7 @@ class MTProto
             'logger'       => php_sapi_name() === 'cli' ? 3 : 2,
             // overwrite previous setting and echo logs
             'logger_level' => Logger::VERBOSE,
+            'max_size'     => 100*1024*1024,
             // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
             'rollbar_token' => '',
         ], 'max_tries' => [
@@ -573,9 +576,9 @@ class MTProto
             Exception::$rollbar = false;
             RPCErrorException::$rollbar = false;
         }
-        $this->logger = new \danog\MadelineProto\Logger($this->settings['logger']['logger'], isset($this->settings['logger']['logger_param']) ? $this->settings['logger']['logger_param'] : '', isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
+        $this->logger = new \danog\MadelineProto\Logger($this->settings['logger']['logger'], isset($this->settings['logger']['logger_param']) ? $this->settings['logger']['logger_param'] : '', isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE, isset($this->settings['logger']['max_size']) ? $this->settings['logger']['max_size'] : 100*1024*1024);
         if (!\danog\MadelineProto\Logger::$default) {
-            \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE);
+            \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE, isset($this->settings['logger']['max_size']) ? $this->settings['logger']['max_size'] : 100*1024*1024);
         }
     }
 

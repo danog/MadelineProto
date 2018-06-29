@@ -38,10 +38,10 @@ trait AuthKeyHandler
                  * ]
                  *
                  * @return ResPQ [
-                 *               int128 		$nonce 							: The value of nonce is selected randomly by the server
-                 *               int128 		$server_nonce 					: The value of server_nonce is selected randomly by the server
-                 *               string 		$pq 							: This is a representation of a natural number (in binary big endian format). This number is the product of two different odd prime numbers
-                 *               Vector long $server_public_key_fingerprints : This is a list of public RSA key fingerprints
+                 *               	int128 		$nonce 							: The value of nonce is selected randomly by the server
+                 *               	int128 		$server_nonce 						: The value of server_nonce is selected randomly by the server
+                 *               	string 		$pq 							: This is a representation of a natural number (in binary big endian format). This number is the product of two different odd prime numbers
+                 *               	Vector long	$server_public_key_fingerprints				: This is a list of public RSA key fingerprints
                  *               ]
                  */
                 $nonce = $this->random(16);
@@ -496,7 +496,6 @@ trait AuthKeyHandler
                 $encrypted_data = $this->random(16).$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
                 $message_key = substr(sha1($encrypted_data, true), -16);
                 $padding = $this->random($this->posmod(-strlen($encrypted_data), 16));
-                //$message_key = substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->auth_key['auth_key'], 88, 32).$encrypted_data.$padding, true), 8, 16);
                 list($aes_key, $aes_iv) = $this->old_aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->auth_key['auth_key']);
                 $encrypted_message = $this->datacenter->sockets[$datacenter]->auth_key['id'].$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
                 $res = $this->method_call('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], ['message_id' => $message_id, 'datacenter' => $datacenter]);
@@ -578,6 +577,7 @@ trait AuthKeyHandler
             $this->updates_state['sync_loading'] = false;
             $this->handle_pending_updates();
         }
+
     }
 
     public function sync_authorization($id)

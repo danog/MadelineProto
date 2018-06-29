@@ -133,6 +133,7 @@ trait TL
                     $key++;
                 }
             } else {
+
                 foreach ($TL_dict['constructors'] as $key => $value) {
                     $TL_dict['constructors'][$key]['id'] = $this->pack_signed_int($TL_dict['constructors'][$key]['id']);
                 }
@@ -140,6 +141,7 @@ trait TL
                     $TL_dict['methods'][$key]['id'] = $this->pack_signed_int($TL_dict['methods'][$key]['id']);
                 }
             }
+
             if (empty($TL_dict) || empty($TL_dict['constructors']) || !isset($TL_dict['methods'])) {
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['src_file_invalid'].$file);
             }
@@ -311,6 +313,9 @@ trait TL
             case 'Vector t':
                 if (!is_array($object)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['array_invalid']);
+                }
+                if (isset($object['_'])) {
+                    throw new Exception('You must provide an array of '.$type['subtype']." objects, not a ".$type['subtype']." object. Example: [['_' => ".$type['subtype'].", ... ]]");
                 }
                 $concat = $this->constructors->find_by_predicate('vector')['id'];
                 $concat .= $this->pack_unsigned_int(count($object));
@@ -597,7 +602,7 @@ trait TL
                         stream_get_contents($stream, $resto);
                     }
                 } else {
-                    $x = stream_get_contents($stream, $l);
+                    $x = $l ? stream_get_contents($stream, $l) : '';
                     $resto = $this->posmod(-($l + 1), 4);
                     if ($resto > 0) {
                         stream_get_contents($stream, $resto);

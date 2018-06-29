@@ -31,6 +31,7 @@ trait Login
         $this->chats = [];
         $this->users = [];
         $this->state = [];
+        $this->tos = ['expires' => 0, 'accepted' => true];
         if (!$this->method_call('auth.logOut', [], ['datacenter' => $this->datacenter->curdc])) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['logout_error']);
         }

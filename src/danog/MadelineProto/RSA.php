@@ -24,7 +24,6 @@ class RSA
 
     public function __magic_construct($rsa_key)
     {
-        //if ($this->unserialized($rsa_key)) return true;
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_init'], Logger::ULTRA_VERBOSE);
         $key = new \phpseclib\Crypt\RSA();
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['loading_key'], Logger::ULTRA_VERBOSE);
