@@ -69,7 +69,7 @@ trait Files
                 $bytes = $ige->encrypt(str_pad($bytes, $part_size, chr(0)));
             }
             hash_update($ctx, $bytes);
-            if (!$this->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => $bytes], ['heavy' => true, 'file' => false, 'datacenter' => &$datacenter])) {
+            if (!$this->method_call($method, ['file_id' => $file_id, 'file_part' => $part_num++, 'file_total_parts' => $part_total_num, 'bytes' => $bytes], ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter])) {
                 throw new \danog\MadelineProto\Exception('An error occurred while uploading file part '.$part_num);
             }
             $cb(ftell($f) * 100 / $file_size);
@@ -393,7 +393,7 @@ trait Files
             }
 
             try {
-                $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'file' => false, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'file' => false, 'datacenter' => &$datacenter]);
+                $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'file' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
                     //if (isset($message_media['MessageMedia']) && !$this->get_self()['bot']) $this->method_call('messages.sendMedia', ['peer' => '@danogentili', 'media' => $message_media['MessageMedia'], 'message' => 'This is broken'], ['datacenter' => $this->datacenter->curdc]);

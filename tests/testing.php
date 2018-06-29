@@ -45,8 +45,6 @@ echo 'Loading MadelineProto...'.PHP_EOL;
 
 $MadelineProto = new \danog\MadelineProto\API(getcwd().'/testing.madeline', $settings);
 
-$MadelineProto->messages->sendMessage(['peer' => '@pwrtelegramgroupita', 'message' => '<b>'.str_repeat('a b c d', 700).'</b>', 'parse_mode' => 'markdown']);
-
 try {
     $MadelineProto->get_self();
 } catch (\danog\MadelineProto\Exception $e) {
