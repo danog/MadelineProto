@@ -18,8 +18,8 @@ namespace danog\MadelineProto\Wrappers;
  */
 trait TOS
 {
-     public function check_tos()
-     {
+    public function check_tos()
+    {
         if ($this->authorized === self::LOGGED_IN && !$this->get_self()['bot']) {
             if ($this->tos['expires'] < time()) {
                 $this->logger->logger('Fetching TOS...');

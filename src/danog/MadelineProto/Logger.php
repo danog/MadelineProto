@@ -54,7 +54,7 @@ class Logger
         self::$default = new self($mode, $optional, $prefix, $level, $max_size);
     }
 
-    public function __construct($mode, $optional = null, $prefix = '', $level = self::NOTICE, $max_size = 100*1024*1024)
+    public function __construct($mode, $optional = null, $prefix = '', $level = self::NOTICE, $max_size = 100 * 1024 * 1024)
     {
         if ($mode === null) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['no_mode_specified']);

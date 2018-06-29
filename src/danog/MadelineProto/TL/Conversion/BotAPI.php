@@ -506,15 +506,15 @@ trait BotAPI
         $offset = 0;
         foreach ($args['entities'] as $entity) {
             do {
-                while ($entity['offset'] > $offset+$this->mb_strlen($multiple_args[$i]['message'])) {
+                while ($entity['offset'] > $offset + $this->mb_strlen($multiple_args[$i]['message'])) {
                     $offset += $this->mb_strlen($multiple_args[$i]['message']);
                     $i++;
                 }
                 $entity['offset'] -= $offset;
-                if ($entity['offset']+$entity['length'] > $this->mb_strlen($multiple_args[$i]['message'])) {
+                if ($entity['offset'] + $entity['length'] > $this->mb_strlen($multiple_args[$i]['message'])) {
                     $newentity = $entity;
-                    $newentity['length'] = $entity['length']-($this->mb_strlen($multiple_args[$i]['message'])-$entity['offset']);
-                    $entity['length'] = $this->mb_strlen($multiple_args[$i]['message'])-$entity['offset'];
+                    $newentity['length'] = $entity['length'] - ($this->mb_strlen($multiple_args[$i]['message']) - $entity['offset']);
+                    $entity['length'] = $this->mb_strlen($multiple_args[$i]['message']) - $entity['offset'];
                     $multiple_args[$i]['entities'][] = $entity;
 
                     $offset += $this->mb_strlen($multiple_args[$i]['message']);
@@ -529,6 +529,7 @@ trait BotAPI
                 }
             } while (true);
         }
+
         return $multiple_args;
     }
 

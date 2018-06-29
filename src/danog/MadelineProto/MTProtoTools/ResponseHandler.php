@@ -340,7 +340,6 @@ trait ResponseHandler
                     $aargs['datacenter'] .= '_media';
                 }
 
-
                 throw new \danog\MadelineProto\Exception('Received request to switch to DC '.$this->datacenter->curdc);
             case 401:
                 switch ($server_answer['error_message']) {

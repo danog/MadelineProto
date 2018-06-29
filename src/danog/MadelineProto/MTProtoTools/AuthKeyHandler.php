@@ -542,7 +542,7 @@ trait AuthKeyHandler
                         $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
                         $socket->auth_key = $this->create_auth_key(-1, $id);
                         $socket->authorized = false;
-                    } else if ($socket->auth_key === null && $media) {
+                    } elseif ($socket->auth_key === null && $media) {
                         $socket->auth_key = $this->datacenter->sockets[intval($id)]->auth_key;
                         $socket->authorized = $this->datacenter->sockets[intval($id)]->authorized;
                     }
