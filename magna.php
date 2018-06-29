@@ -27,13 +27,6 @@ if (file_exists('web_data.php')) {
 
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 
-$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['secret_chats' => ['accept_chats' => false]]);
-$MadelineProto->start();
-
-if (!isset($MadelineProto->programmed_call)) {
-    $MadelineProto->programmed_call = [];
-}
-$MadelineProto->session = 'session.madeline';
 
 /*if (!isset($MadelineProto->inputEncryptedFilePhoto) && false) {
     $MadelineProto->inputEncryptedFilePhoto = $MadelineProto->upload_encrypted('tests/faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
@@ -43,12 +36,6 @@ $MadelineProto->session = 'session.madeline';
     $MadelineProto->inputEncryptedFileVideo = $MadelineProto->upload_encrypted('tests/swing.mp4');
     $MadelineProto->inputEncryptedFileAudio = $MadelineProto->upload_encrypted('tests/mosconi.mp3');
 }*/
-
-foreach (['my_users', 'times', 'times_messages', 'calls'] as $key) {
-    if (!isset($MadelineProto->{$key})) {
-        $MadelineProto->{$key} = [];
-    }
-}
 
 class EventHandler extends \danog\MadelineProto\EventHandler
 {
@@ -68,9 +55,9 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         ];
         $call->configuration['log_file_path'] = '/tmp/logs'.$call->getCallID()['id'].'.log'; // Default is /dev/null
         //$call->configuration["stats_dump_file_path"] = "/tmp/stats".$call->getCallID()['id'].".txt"; // Default is /dev/null
-
         $call->parseConfig();
         $call->playOnHold($songs);
+$this->messages->sendMessage(['message' => var_export($call->configuration, true), 'peer' => $call->getOtherID()]);
     }
 
     public function handleMessage($chat_id, $from_id, $message)
@@ -294,6 +281,19 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
         }
     }
 }
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['secret_chats' => ['accept_chats' => false]]);
+$MadelineProto->start();
+
+if (!isset($MadelineProto->programmed_call)) {
+    $MadelineProto->programmed_call = [];
+}
+
+foreach (['my_users', 'times', 'times_messages', 'calls'] as $key) {
+    if (!isset($MadelineProto->{$key})) {
+        $MadelineProto->{$key} = [];
+    }
+}
+
 
 $MadelineProto->setEventHandler('\EventHandler');
 $MadelineProto->loop();
