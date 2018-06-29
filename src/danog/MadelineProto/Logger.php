@@ -49,7 +49,7 @@ class Logger
      * 4 - Call callable provided in logger_param. logger_param must accept two parameters: array $message, int $level
      *     $message is an array containing the messages the log, $level, is the logging level
      */
-    public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE, $max_size = 100*1024*1024)
+    public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE, $max_size = 100 * 1024 * 1024)
     {
         self::$default = new self($mode, $optional, $prefix, $level, $max_size);
     }

@@ -34,19 +34,22 @@ trait TOS
                 $this->logger->logger('By declining the TOS, the currently logged in account will be PERMANENTLY DELETED.', \danog\MadelineProto\Logger::FATAL_ERROR);
                 $this->logger->logger('Read the following TOS very carefully: ', \danog\MadelineProto\Logger::ERROR);
                 $this->logger->logger($this->tos);
+
                 throw new \danog\MadelineProto\Exception('TOS action required, check the logs', 0, null, 'MadelineProto', 1);
             }
         }
     }
+
     public function accept_tos()
     {
-         $this->tos['accepted'] = $this->method_call('help.acceptTermsOfService', ['id' => $this->tos['terms_of_service']['id']], ['datacenter' => $this->datacenter->curdc]);
-         if ($this->tos['accepted']) {
-             $this->logger->logger('TOS accepted successfully');
-         } else {
-             throw new \danog\MadelineProto\Exception('An error occurred while accepting the TOS');
-         }
+        $this->tos['accepted'] = $this->method_call('help.acceptTermsOfService', ['id' => $this->tos['terms_of_service']['id']], ['datacenter' => $this->datacenter->curdc]);
+        if ($this->tos['accepted']) {
+            $this->logger->logger('TOS accepted successfully');
+        } else {
+            throw new \danog\MadelineProto\Exception('An error occurred while accepting the TOS');
+        }
     }
+
     public function decline_tos()
     {
         $this->method_call('account.deleteAccount', ['reason' => 'Decline ToS update'], ['datacenter' => $this->datacenter->curdc]);

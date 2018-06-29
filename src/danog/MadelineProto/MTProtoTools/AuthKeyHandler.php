@@ -38,10 +38,10 @@ trait AuthKeyHandler
                  * ]
                  *
                  * @return ResPQ [
-                 *               	int128 		$nonce 							: The value of nonce is selected randomly by the server
-                 *               	int128 		$server_nonce 						: The value of server_nonce is selected randomly by the server
-                 *               	string 		$pq 							: This is a representation of a natural number (in binary big endian format). This number is the product of two different odd prime numbers
-                 *               	Vector long	$server_public_key_fingerprints				: This is a list of public RSA key fingerprints
+                 *               int128 		$nonce 							: The value of nonce is selected randomly by the server
+                 *               int128 		$server_nonce 						: The value of server_nonce is selected randomly by the server
+                 *               string 		$pq 							: This is a representation of a natural number (in binary big endian format). This number is the product of two different odd prime numbers
+                 *               Vector long	$server_public_key_fingerprints				: This is a list of public RSA key fingerprints
                  *               ]
                  */
                 $nonce = $this->random(16);
@@ -580,7 +580,6 @@ trait AuthKeyHandler
             $this->updates_state['sync_loading'] = false;
             $this->handle_pending_updates();
         }
-
     }
 
     public function sync_authorization($id)

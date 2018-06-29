@@ -487,7 +487,7 @@ class MTProto
             'logger'       => php_sapi_name() === 'cli' ? 3 : 2,
             // overwrite previous setting and echo logs
             'logger_level' => Logger::VERBOSE,
-            'max_size'     => 100*1024*1024,
+            'max_size'     => 100 * 1024 * 1024,
             // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
             'rollbar_token' => '',
         ], 'max_tries' => [
@@ -576,9 +576,9 @@ class MTProto
             Exception::$rollbar = false;
             RPCErrorException::$rollbar = false;
         }
-        $this->logger = new \danog\MadelineProto\Logger($this->settings['logger']['logger'], isset($this->settings['logger']['logger_param']) ? $this->settings['logger']['logger_param'] : '', isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE, isset($this->settings['logger']['max_size']) ? $this->settings['logger']['max_size'] : 100*1024*1024);
+        $this->logger = new \danog\MadelineProto\Logger($this->settings['logger']['logger'], isset($this->settings['logger']['logger_param']) ? $this->settings['logger']['logger_param'] : '', isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE, isset($this->settings['logger']['max_size']) ? $this->settings['logger']['max_size'] : 100 * 1024 * 1024);
         if (!\danog\MadelineProto\Logger::$default) {
-            \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE, isset($this->settings['logger']['max_size']) ? $this->settings['logger']['max_size'] : 100*1024*1024);
+            \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE, isset($this->settings['logger']['max_size']) ? $this->settings['logger']['max_size'] : 100 * 1024 * 1024);
         }
     }
 
