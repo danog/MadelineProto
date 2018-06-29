@@ -27,7 +27,6 @@ if (file_exists('web_data.php')) {
 
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
 
-
 /*if (!isset($MadelineProto->inputEncryptedFilePhoto) && false) {
     $MadelineProto->inputEncryptedFilePhoto = $MadelineProto->upload_encrypted('tests/faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
     $MadelineProto->inputEncryptedFileGif = $MadelineProto->upload_encrypted('tests/pony.mp4');
@@ -57,7 +56,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         //$call->configuration["stats_dump_file_path"] = "/tmp/stats".$call->getCallID()['id'].".txt"; // Default is /dev/null
         $call->parseConfig();
         $call->playOnHold($songs);
-$this->messages->sendMessage(['message' => var_export($call->configuration, true), 'peer' => $call->getOtherID()]);
+        $this->messages->sendMessage(['message' => var_export($call->configuration, true), 'peer' => $call->getOtherID()]);
     }
 
     public function handleMessage($chat_id, $from_id, $message)
@@ -293,7 +292,6 @@ foreach (['my_users', 'times', 'times_messages', 'calls'] as $key) {
         $MadelineProto->{$key} = [];
     }
 }
-
 
 $MadelineProto->setEventHandler('\EventHandler');
 $MadelineProto->loop();
