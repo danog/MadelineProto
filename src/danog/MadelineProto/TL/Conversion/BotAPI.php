@@ -442,11 +442,11 @@ trait BotAPI
         if (isset($arguments['parse_mode']['_'])) {
             $arguments['parse_mode'] = str_replace('textParseMode', '', $arguments['parse_mode']['_']);
         }
-        if (preg_match('/markdown/i', $arguments['parse_mode'])) {
+        if (stripos($arguments['parse_mode'], 'markdown') !== false) {
             $arguments['message'] = \Parsedown::instance()->line($arguments['message']);
             $arguments['parse_mode'] = 'HTML';
         }
-        if (preg_match('/html/i', $arguments['parse_mode'])) {
+        if (stripos($arguments['parse_mode'], 'html') !== false) {
             $new_message = '';
 
             $arguments['message'] = $this->html_fixtags($arguments['message']);
@@ -473,12 +473,17 @@ trait BotAPI
         return $arguments;
     }
 
-    public function split_to_chunks($text)
+    public function split_to_chunks($args)
     {
+        $args = $this->parse_mode($args);
+
+        $multiple_args_base = array_merge($args, ['entities' => [], 'parse_mode' => 'text', 'message' => '']);
+        $multiple_args = [$multiple_args_base];
+
         $max_length = 4096;
         $text_arr = [];
-        foreach ($this->multipleExplodeKeepDelimiters(["\n"], $text) as $word) {
-            if (strlen($word) > $max_length) {
+        foreach ($this->multipleExplodeKeepDelimiters(["\n"], $args['message']) as $word) {
+            if ($this->mb_strlen($word) > $max_length) {
                 foreach (str_split($word, $max_length) as $vv) {
                     $text_arr[] = $vv;
                 }
@@ -487,17 +492,44 @@ trait BotAPI
             }
         }
         $i = 0;
-        $message = [''];
         foreach ($text_arr as $word) {
-            if (strlen($message[$i].$word) <= $max_length) {
-                $message[$i] .= $word;
+            if ($this->mb_strlen($multiple_args[$i]['message'].$word) <= $max_length) {
+                $multiple_args[$i]['message'] .= $word;
             } else {
                 $i++;
-                $message[$i] = $word;
+                $multiple_args[$i] = $multiple_args_base;
+                $multiple_args[$i]['message'] .= $word;
             }
         }
 
-        return $message;
+        $i = 0;
+        $offset = 0;
+        foreach ($args['entities'] as $entity) {
+            do {
+                while ($entity['offset'] > $offset+$this->mb_strlen($multiple_args[$i]['message'])) {
+                    $offset += $this->mb_strlen($multiple_args[$i]['message']);
+                    $i++;
+                }
+                $entity['offset'] -= $offset;
+                if ($entity['offset']+$entity['length'] > $this->mb_strlen($multiple_args[$i]['message'])) {
+                    $newentity = $entity;
+                    $newentity['length'] = $entity['length']-($this->mb_strlen($multiple_args[$i]['message'])-$entity['offset']);
+                    $entity['length'] = $this->mb_strlen($multiple_args[$i]['message'])-$entity['offset'];
+                    $multiple_args[$i]['entities'][] = $entity;
+
+                    $offset += $this->mb_strlen($multiple_args[$i]['message']);
+                    $newentity['offset'] = $offset;
+                    $i++;
+                    $entity = $newentity;
+
+                    continue;
+                } else {
+                    $multiple_args[$i]['entities'][] = $entity;
+                    break;
+                }
+            } while (true);
+        }
+        return $multiple_args;
     }
 
     public function multipleExplodeKeepDelimiters($delimiters, $string)
@@ -506,9 +538,9 @@ trait BotAPI
         $finalArray = [];
         $delimOffset = 0;
         foreach ($initialArray as $item) {
-            $delimOffset += strlen($item);
-            if (strlen($item) > 0) {
-                $finalArray[] = $item.($delimOffset < strlen($string) ? $string[$delimOffset] : '');
+            $delimOffset += $this->mb_strlen($item);
+            if ($this->mb_strlen($item) > 0) {
+                $finalArray[] = $item.($delimOffset < $this->mb_strlen($string) ? $string[$delimOffset] : '');
             }
             $delimOffset++;
         }

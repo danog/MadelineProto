@@ -528,25 +528,28 @@ trait AuthKeyHandler
 
         try {
             foreach ($this->datacenter->sockets as $id => $socket) {
-                $cdn = strpos($id, 'cdn');
-                if (strpos($id, 'media') !== false && !$cdn) {
-                    continue;
-                }
                 if ($socket->session_id === null) {
                     $socket->session_id = $this->random(8);
                     $socket->session_in_seq_no = 0;
                     $socket->session_out_seq_no = 0;
                 }
+                $cdn = strpos($id, 'cdn');
+                $media = strpos($id, 'media');
+
                 if ($socket->temp_auth_key === null || $socket->auth_key === null) {
                     $dc_config_number = isset($this->settings['connection_settings'][$id]) ? $id : 'all';
-                    if ($socket->auth_key === null && !$cdn) {
+                    if ($socket->auth_key === null && !$cdn && !$media) {
                         $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
                         $socket->auth_key = $this->create_auth_key(-1, $id);
                         $socket->authorized = false;
+                    } else if ($socket->auth_key === null && $media) {
+                        $socket->auth_key = $this->datacenter->sockets[intval($id)]->auth_key;
+                        $socket->authorized = $this->datacenter->sockets[intval($id)]->authorized;
                     }
                     if ($this->settings['connection_settings'][$dc_config_number]['pfs']) {
                         if (!$cdn) {
                             $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
+                            $socket->temp_auth_key = null;
                             $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
                             $this->bind_temp_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
                             $config = $this->method_call('help.getConfig', [], ['datacenter' => $id]);

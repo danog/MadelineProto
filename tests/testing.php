@@ -45,6 +45,10 @@ echo 'Loading MadelineProto...'.PHP_EOL;
 
 $MadelineProto = new \danog\MadelineProto\API(getcwd().'/testing.madeline', $settings);
 
+
+$MadelineProto->messages->sendMessage(['peer' => '@pwrtelegramgroupita', 'message' => '<b>'.str_repeat('a b c d', 700).'</b>', 'parse_mode' => 'markdown']);
+
+
 try {
     $MadelineProto->get_self();
 } catch (\danog\MadelineProto\Exception $e) {
@@ -248,6 +252,12 @@ $message = 'yay';
 $mention = $MadelineProto->get_info(getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id
 
+/*
+$t = time();
+$MadelineProto->upload('big');
+var_dump(time()-$t);
+*/
+
 foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log($sentMessage, \danog\MadelineProto\Logger::NOTICE);
@@ -262,3 +272,5 @@ foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
     \danog\MadelineProto\Logger::log($sentMessage, \danog\MadelineProto\Logger::NOTICE);
 }
+
+

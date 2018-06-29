@@ -20,7 +20,7 @@ trait TOS
 {
      public function check_tos()
      {
-        if ($this->authorized === self::LOGGED_IN) {
+        if ($this->authorized === self::LOGGED_IN && !$this->get_self()['bot']) {
             if ($this->tos['expires'] < time()) {
                 $this->logger->logger('Fetching TOS...');
                 $this->tos = $this->method_call('help.getTermsOfServiceUpdate', [], ['datacenter' => $this->datacenter->curdc]);

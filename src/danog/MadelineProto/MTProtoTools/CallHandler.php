@@ -41,9 +41,13 @@ trait CallHandler
             $this->logger->logger("Didn't serialize in a while, doing that now...");
             $this->wrapper->serialize($this->wrapper->session);
         }
-        if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > 4096 && !isset($args['parse_mode'])) {
-            $message_chunks = $this->split_to_chunks($args['message']);
-            $args['message'] = array_shift($message_chunks);
+        if (isset($aargs['file']) && $aargs['file'] && isset($this->datacenter->sockets[$aargs['datacenter'].'_media'])) {
+            \danog\MadelineProto\Logger::log('Using media DC');
+            $aargs['datacenter'] .= '_media';
+        }
+        if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > 4096) {
+            $arg_chunks = $this->split_to_chunks($args);
+            $args = array_shift($arg_chunks);
         }
         $args = $this->botAPI_to_MTProto($args);
         if (isset($args['ping_id']) && is_int($args['ping_id'])) {
@@ -302,10 +306,9 @@ trait CallHandler
                 $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['connection_inited'] = true;
             }
             $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id] = [];
-            if (isset($message_chunks) && count($message_chunks)) {
+            if (isset($arg_chunks) && count($arg_chunks)) {
                 $server_answer = [$server_answer];
-                foreach ($message_chunks as $message) {
-                    $args['message'] = $message;
+                foreach ($arg_chunks as $args) {
                     $server_answer[] = $this->method_call($method, $args, $aargs);
                 }
             }

@@ -709,6 +709,15 @@ interface contacts
      * @return Vector_of_SavedContact
      */
     public function getSaved();
+
+    /**
+     * @param array params [
+     *               Bool enabled,
+     *              ]
+     *
+     * @return bool
+     */
+    public function toggleTopPeers(array $params);
 }
 
 interface messages
@@ -729,6 +738,7 @@ interface messages
      *               int offset_id,
      *               InputPeer offset_peer,
      *               int limit,
+     *               int hash,
      *              ]
      *
      * @return messages_Dialogs
@@ -1746,6 +1756,21 @@ interface messages
      * @return Vector_of_MessageRange
      */
     public function getSplitRanges();
+
+    /**
+     * @param array params [
+     *               boolean unread,
+     *               InputDialogPeer peer,
+     *              ]
+     *
+     * @return bool
+     */
+    public function markDialogUnread(array $params);
+
+    /**
+     * @return Vector_of_DialogPeer
+     */
+    public function getDialogUnreadMarks();
 }
 
 interface updates

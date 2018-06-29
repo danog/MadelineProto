@@ -49,7 +49,9 @@ trait ResponseHandler
         foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
             $unset = false;
             $this->logger->logger((isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['from_container']) ? 'Inside of container, received ' : 'Received ').$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].' from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            //$this->logger->logger($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
+            //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
             switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']) {
                 case 'msgs_ack':
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
@@ -332,6 +334,12 @@ trait ResponseHandler
                 throw new \danog\MadelineProto\Exception('Re-executing query after server error...');
             case 303:
                 $this->datacenter->curdc = $aargs['datacenter'] = (int) preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
+
+                if (isset($aargs['file']) && $aargs['file'] && isset($this->datacenter->sockets[$aargs['datacenter'].'_media'])) {
+                    \danog\MadelineProto\Logger::log('Using media DC');
+                    $aargs['datacenter'] .= '_media';
+                }
+
 
                 throw new \danog\MadelineProto\Exception('Received request to switch to DC '.$this->datacenter->curdc);
             case 401:
