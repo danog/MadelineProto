@@ -133,7 +133,6 @@ trait TL
                     $key++;
                 }
             } else {
-
                 foreach ($TL_dict['constructors'] as $key => $value) {
                     $TL_dict['constructors'][$key]['id'] = $this->pack_signed_int($TL_dict['constructors'][$key]['id']);
                 }
@@ -315,7 +314,7 @@ trait TL
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['array_invalid']);
                 }
                 if (isset($object['_'])) {
-                    throw new Exception('You must provide an array of '.$type['subtype']." objects, not a ".$type['subtype']." object. Example: [['_' => ".$type['subtype'].", ... ]]");
+                    throw new Exception('You must provide an array of '.$type['subtype'].' objects, not a '.$type['subtype']." object. Example: [['_' => ".$type['subtype'].', ... ]]');
                 }
                 $concat = $this->constructors->find_by_predicate('vector')['id'];
                 $concat .= $this->pack_unsigned_int(count($object));
