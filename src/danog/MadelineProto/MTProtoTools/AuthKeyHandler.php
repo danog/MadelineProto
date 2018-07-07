@@ -544,7 +544,10 @@ trait AuthKeyHandler
                         $socket->authorized = false;
                     } elseif ($socket->auth_key === null && $media) {
                         $socket->auth_key = $this->datacenter->sockets[intval($id)]->auth_key;
-                        $socket->authorized = $this->datacenter->sockets[intval($id)]->authorized;
+                        $socket->authorized = &$this->datacenter->sockets[intval($id)]->authorized;
+                    }
+                    if ($media) {
+                        $socket->authorized = &$this->datacenter->sockets[intval($id)]->authorized;
                     }
                     if ($this->settings['connection_settings'][$dc_config_number]['pfs']) {
                         if (!$cdn) {

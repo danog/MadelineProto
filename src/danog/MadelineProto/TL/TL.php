@@ -499,11 +499,14 @@ trait TL
                     $serialized .= pack('@4');
                     continue;
                 }
+                if (in_array($current_argument['type'], ['bytes', 'string', 'Vector t'])) {
+                    $serialized .= pack('@4');
+                    continue;
+                }
                 if ($id = $this->constructors->find_by_predicate(lcfirst($current_argument['type']).'Empty')) {
                     $serialized .= $id['id'];
                     continue;
                 }
-
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['params_missing'], $current_argument['name']);
             }
 

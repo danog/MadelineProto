@@ -395,6 +395,7 @@ trait UpdateHandler
                 }
                 break;
         }
+
         if ($channel_id === false) {
             $cur_state = &$this->load_update_state();
         } else {
