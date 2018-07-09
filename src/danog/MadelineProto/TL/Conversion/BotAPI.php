@@ -439,6 +439,9 @@ trait BotAPI
 
     public function parse_mode($arguments)
     {
+        if ($arguments['message'] === '' || !isset($arguments['message'])) {
+            return $arguments;
+        }
         if (isset($arguments['parse_mode']['_'])) {
             $arguments['parse_mode'] = str_replace('textParseMode', '', $arguments['parse_mode']['_']);
         }
