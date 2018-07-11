@@ -63,6 +63,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
 * [Handling updates](https://docs.madelineproto.xyz/docs/UPDATES.html)
   * [Event driven](https://docs.madelineproto.xyz/docs/UPDATES.html#event-driven)
     * [Event driven multithreaded](https://docs.madelineproto.xyz/docs/UPDATES.html#event-driven-multithreaded)
+  * [Multi-account: Combined Event driven update handling](https://docs.madelineproto.xyz/docs/UPDATES.html#combined-event-driven)
   * [Webhook](https://docs.madelineproto.xyz/docs/UPDATES.html#webhook)
     * [Webhook multithreaded](https://docs.madelineproto.xyz/docs/UPDATES.html#webhook-multithreaded)
   * [Long polling (getupdates)](https://docs.madelineproto.xyz/docs/UPDATES.html#long-polling)
