@@ -16,6 +16,7 @@ namespace danog\MadelineProto;
 abstract class CombinedEventHandler
 {
     private $CombinedAPI;
+
     public function __construct($CombinedAPI)
     {
         $this->CombinedAPI = $CombinedAPI;
@@ -23,6 +24,7 @@ abstract class CombinedEventHandler
             $this->referenceInstance($path);
         }
     }
+
     final public function __sleep()
     {
         $keys = get_object_vars($this);
@@ -30,12 +32,15 @@ abstract class CombinedEventHandler
         foreach ($this->CombinedAPI->instance_paths as $path) {
             unset($keys[$path]);
         }
+
         return array_keys($keys);
     }
+
     final public function referenceInstance($path)
     {
         $this->{$path} = $this->CombinedAPI->instances[$path];
     }
+
     final public function removeInstance($path)
     {
         if (isset($this->{$path})) {

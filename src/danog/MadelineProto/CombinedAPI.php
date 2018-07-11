@@ -56,17 +56,17 @@ class CombinedAPI
 
             $this->event_handler = $deserialized['event_handler'];
             $this->event_handler_instance = $deserialized['event_handler_instance'];
-
         }
         foreach ($paths as $path => $settings) {
             $this->addInstance($path, $settings);
         }
-
-
     }
+
     public function addInstance($path, $settings = [])
     {
-        if (isset($this->instances[$path]) && isset($this->instance_paths[$path])) return;
+        if (isset($this->instances[$path]) && isset($this->instance_paths[$path])) {
+            return;
+        }
 
         \danog\MadelineProto\Logger::constructor(3);
         \danog\MadelineProto\Logger::log("INSTANTIATING $path...");
@@ -79,6 +79,7 @@ class CombinedAPI
             $this->event_handler_instance->referenceInstance($path);
         }
     }
+
     public function removeInstance($path)
     {
         if (isset($this->instance_paths[$path])) {
@@ -91,8 +92,8 @@ class CombinedAPI
         if (isset($this->event_handler_instance)) {
             $this->event_handler_instance->removeInstance($path);
         }
-
     }
+
     public function __destruct()
     {
         if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread()) || Magic::is_fork()) {
@@ -134,6 +135,7 @@ class CombinedAPI
         }
 
         $this->serialized = time();
+
         return $wrote;
     }
 
@@ -151,7 +153,9 @@ class CombinedAPI
         if (!($this->event_handler_instance instanceof $this->event_handler)) {
             $class_name = $this->event_handler;
             $this->event_handler_instance = new $class_name($this);
-        } else if ($this->event_handler_instance) $this->event_handler_instance->__construct($this);
+        } elseif ($this->event_handler_instance) {
+            $this->event_handler_instance->__construct($this);
+        }
         if (method_exists($this->event_handler_instance, 'onLoop')) {
             $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
         }
@@ -178,7 +182,6 @@ class CombinedAPI
     {
     }
 
-
     public function loop($max_forks = 0)
     {
         if (php_sapi_name() !== 'cli') {
@@ -193,7 +196,9 @@ class CombinedAPI
             }
         }
         foreach ($this->instances as $path => $instance) {
-            if ($instance->API->authorized !== MTProto::LOGGED_IN) continue;
+            if ($instance->API->authorized !== MTProto::LOGGED_IN) {
+                continue;
+            }
             if (!$instance->API->settings['updates']['handle_updates']) {
                 $instance->API->settings['updates']['handle_updates'] = true;
             }
@@ -210,7 +215,9 @@ class CombinedAPI
             $write = [];
             $except = [];
             foreach ($this->instances as $path => $instance) {
-                if ($instance->API->authorized !== MTProto::LOGGED_IN) continue;
+                if ($instance->API->authorized !== MTProto::LOGGED_IN) {
+                    continue;
+                }
                 if (time() - $instance->API->last_getdifference > $instance->API->settings['updates']['getdifference_interval']) {
                     $instance->API->get_updates_difference();
                 }
@@ -227,6 +234,7 @@ class CombinedAPI
                 \danog\MadelineProto\Logger::log('Serializing combined event handler');
                 $this->serialize();
             }
+
             try {
                 \Socket::select($read, $write, $except, $this->timeout);
                 if (count($read)) {
@@ -238,9 +246,11 @@ class CombinedAPI
                                     $this->instances[$path]->API->logger->logger('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
                                     $this->instances[$path]->API->datacenter->sockets[$dc]->temp_auth_key = null;
                                     $this->instances[$path]->API->init_authorization();
+
                                     throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
                                 }
                             }
+
                             throw new \danog\MadelineProto\RPCErrorException($error, $error);
                         }
                         $only_updates = $this->instances[$path]->API->handle_messages($dc);
