@@ -479,7 +479,9 @@ trait BotAPI
     public function split_to_chunks($args)
     {
         $args = $this->parse_mode($args);
-        if (!isset($args['entities'])) $args['entities'] = [];
+        if (!isset($args['entities'])) {
+            $args['entities'] = [];
+        }
 
         $multiple_args_base = array_merge($args, ['entities' => [], 'parse_mode' => 'text', 'message' => '']);
         $multiple_args = [$multiple_args_base];
@@ -545,7 +547,7 @@ trait BotAPI
         foreach ($initialArray as $item) {
             $delimOffset += $this->mb_strlen($item);
             //if ($this->mb_strlen($item) > 0) {
-                $finalArray[] = $item.($delimOffset < $this->mb_strlen($string) ? $string[$delimOffset] : '');
+            $finalArray[] = $item.($delimOffset < $this->mb_strlen($string) ? $string[$delimOffset] : '');
             //}
             $delimOffset++;
         }
