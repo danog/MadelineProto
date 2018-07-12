@@ -213,7 +213,6 @@ class MTProto
             //$this->wrapper = $backtrace[2]['object'];
         }
 
-        
         if (isset($this->settings['tl_schema']['src']['botAPI']) && $this->settings['tl_schema']['src']['botAPI'] !== __DIR__.'/TL_botAPI.tl') {
             $settings = $this->settings;
             unset($settings['tl_schema']);
