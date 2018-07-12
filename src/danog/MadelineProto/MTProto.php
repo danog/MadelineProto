@@ -212,6 +212,13 @@ class MTProto
             }
             //$this->wrapper = $backtrace[2]['object'];
         }
+
+        
+        if (isset($this->settings['tl_schema']['src']['botAPI']) && $this->settings['tl_schema']['src']['botAPI'] !== __DIR__.'/TL_botAPI.tl') {
+            $settings = $this->settings;
+            unset($settings['tl_schema']);
+            $this->__construct($settings);
+        }
         if (!isset($this->v) || $this->v !== self::V) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['serialization_ofd'], Logger::WARNING);
             foreach ($this->datacenter->sockets as $dc_id => $socket) {
@@ -219,7 +226,6 @@ class MTProto
                     $socket->authorized = true;
                 }
             }
-            //$this->authorized === self::LOGGED_IN; }
             $settings = $this->settings;
             if (isset($settings['updates']['callback'][0]) && $settings['updates']['callback'][0] === $this) {
                 $settings['updates']['callback'] = 'get_updates_update_handler';
