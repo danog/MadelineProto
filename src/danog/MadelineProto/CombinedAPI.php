@@ -65,7 +65,6 @@ class CombinedAPI
         foreach ($paths as $path => $settings) {
             $this->addInstance($path, $settings);
         }
-
     }
 
     public function addInstance($path, $settings = [])
@@ -74,6 +73,7 @@ class CombinedAPI
             if (isset($this->event_handler_instance)) {
                 $this->event_handler_instance->referenceInstance($path);
             }
+
             return;
         }
 
@@ -172,7 +172,7 @@ class CombinedAPI
 
     public function event_update_handler($update, $instance)
     {
-        $method_name = 'on' . ucfirst($update['_']);
+        $method_name = 'on'.ucfirst($update['_']);
         if (method_exists($this->event_handler_instance, $method_name)) {
             $this->event_handler_instance->$method_name($update, $instance);
         } elseif (method_exists($this->event_handler_instance, 'onAny')) {
@@ -199,8 +199,8 @@ class CombinedAPI
             } catch (\danog\MadelineProto\Exception $e) {
                 register_shutdown_function(function () {
                     \danog\MadelineProto\Logger::log(['Restarting script...']);
-                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp') . '://' . $_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
-                    fwrite($a, $_SERVER['REQUEST_METHOD'] . ' ' . $_SERVER['REQUEST_URI'] . ' ' . $_SERVER['SERVER_PROTOCOL'] . "\r\n" . 'Host: ' . $_SERVER['SERVER_NAME'] . "\r\n\r\n");
+                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
+                    fwrite($a, $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n");
                 });
             }
         }
@@ -236,7 +236,7 @@ class CombinedAPI
                 }
 
                 foreach ($instance->API->datacenter->sockets as $id => $connection) {
-                    $read[$id . '-' . $path] = $connection->getSocket();
+                    $read[$id.'-'.$path] = $connection->getSocket();
                 }
             }
             if (time() - $this->serialized > $this->serialization_interval) {

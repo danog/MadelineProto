@@ -478,6 +478,7 @@ trait PeerHandler
         $this->full_chats[$partial['bot_api_id']] = $res;
 
         $partial = $this->get_info($id);
+
         return array_merge($partial, $res);
     }
 

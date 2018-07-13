@@ -315,7 +315,7 @@ trait ResponseHandler
             if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['chat'])) {
                 $this->add_chats([$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['chat']]);
             }
-            
+
             if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result']['users'])) {
                 $this->add_users($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result']['users']);
             }
