@@ -214,9 +214,7 @@ class MTProto
         }
 
         if (isset($this->settings['tl_schema']['src']['botAPI']) && $this->settings['tl_schema']['src']['botAPI'] !== __DIR__.'/TL_botAPI.tl') {
-            $settings = $this->settings;
-            unset($settings['tl_schema']);
-            $this->__construct($settings);
+            unset($this->v);
         }
         if (!isset($this->v) || $this->v !== self::V) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['serialization_ofd'], Logger::WARNING);

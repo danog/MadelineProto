@@ -64,6 +64,11 @@ class Logger
         $this->prefix = $prefix === '' ? '' : ', '.$prefix;
         $this->level = $level;
 
+        if ($this->mode === 2 && !file_exists(pathinfo($this->optional, PATHINFO_DIRNAME))) {
+            $this->optional = Absolute::absolute(getcwd().'/MadelineProto.log');
+        }
+
+
         if ($mode === 2 && $max_size !== -1 && file_exists($this->optional) && filesize($this->optional) > $max_size) {
             unlink($this->optional);
         }

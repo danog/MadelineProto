@@ -280,7 +280,7 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
         }
     }
 }
-$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['secret_chats' => ['accept_chats' => false]]);
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['secret_chats' => ['accept_chats' => false], 'logger' => ['logger' => 2, 'logger_param' => getcwd().'/MadelineProto.log']]);
 $MadelineProto->start();
 
 if (!isset($MadelineProto->programmed_call)) {
