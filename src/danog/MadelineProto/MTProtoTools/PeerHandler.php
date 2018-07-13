@@ -471,11 +471,13 @@ trait PeerHandler
                 $full = $this->method_call('channels.getFullChannel', ['channel' => $partial['InputChannel']], ['datacenter' => $this->datacenter->curdc])['full_chat'];
                 break;
         }
+
         $res = [];
         $res['full'] = $full;
         $res['last_update'] = time();
         $this->full_chats[$partial['bot_api_id']] = $res;
 
+        $partial = $this->get_info($id);
         return array_merge($partial, $res);
     }
 

@@ -272,6 +272,14 @@ trait ResponseHandler
                             if (strpos($datacenter, 'cdn') === false) {
                                 $this->handle_updates($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
                             }
+
+                            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['users'])) {
+                                unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['users']);
+                            }
+                            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['chats'])) {
+                                unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['chats']);
+                            }
+
                             $only_updates = true && $only_updates;
                             break;
                         default:
@@ -294,15 +302,20 @@ trait ResponseHandler
                     }
                     break;
             }
+
             if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['users'])) {
                 $this->add_users($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['users']);
             }
             if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['chats'])) {
                 $this->add_chats($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['chats']);
             }
+            if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['user'])) {
+                $this->add_users([$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['user']]);
+            }
             if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['chat'])) {
                 $this->add_chats([$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['chat']]);
             }
+            
             if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result']['users'])) {
                 $this->add_users($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result']['users']);
             }

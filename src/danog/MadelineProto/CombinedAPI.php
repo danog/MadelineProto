@@ -9,7 +9,7 @@ MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY
 See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 namespace danog\MadelineProto;
 
@@ -32,6 +32,10 @@ class CombinedAPI
 
         \danog\MadelineProto\Magic::class_exists();
 
+        foreach ($paths as $path => $settings) {
+            $this->addInstance($path, $settings);
+        }
+
         if (file_exists($realpaths['file'])) {
             if (!file_exists($realpaths['lockfile'])) {
                 touch($realpaths['lockfile']);
@@ -50,21 +54,26 @@ class CombinedAPI
             }
             $deserialized = unserialize($tounserialize);
 
-            foreach ($deserialized['instance_paths'] as $path) {
-                $this->addInstance($path, isset($paths[$path]) ? $paths[$path] : []);
-            }
+            /*foreach ($deserialized['instance_paths'] as $path) {
+            $this->addInstance($path, isset($paths[$path]) ? $paths[$path] : []);
+            }*/
 
             $this->event_handler = $deserialized['event_handler'];
             $this->event_handler_instance = $deserialized['event_handler_instance'];
+            $this->setEventHandler($this->event_handler);
         }
         foreach ($paths as $path => $settings) {
             $this->addInstance($path, $settings);
         }
+
     }
 
     public function addInstance($path, $settings = [])
     {
         if (isset($this->instances[$path]) && isset($this->instance_paths[$path])) {
+            if (isset($this->event_handler_instance)) {
+                $this->event_handler_instance->referenceInstance($path);
+            }
             return;
         }
 
@@ -105,7 +114,7 @@ class CombinedAPI
     public function serialize($filename = '')
     {
         /*foreach ($this->instances as $instance) {
-            $instance->serialize();
+        $instance->serialize();
         }*/
 
         if (is_null($this->session)) {
@@ -163,7 +172,7 @@ class CombinedAPI
 
     public function event_update_handler($update, $instance)
     {
-        $method_name = 'on'.ucfirst($update['_']);
+        $method_name = 'on' . ucfirst($update['_']);
         if (method_exists($this->event_handler_instance, $method_name)) {
             $this->event_handler_instance->$method_name($update, $instance);
         } elseif (method_exists($this->event_handler_instance, 'onAny')) {
@@ -190,8 +199,8 @@ class CombinedAPI
             } catch (\danog\MadelineProto\Exception $e) {
                 register_shutdown_function(function () {
                     \danog\MadelineProto\Logger::log(['Restarting script...']);
-                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
-                    fwrite($a, $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n");
+                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp') . '://' . $_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
+                    fwrite($a, $_SERVER['REQUEST_METHOD'] . ' ' . $_SERVER['REQUEST_URI'] . ' ' . $_SERVER['SERVER_PROTOCOL'] . "\r\n" . 'Host: ' . $_SERVER['SERVER_NAME'] . "\r\n\r\n");
                 });
             }
         }
@@ -227,7 +236,7 @@ class CombinedAPI
                 }
 
                 foreach ($instance->API->datacenter->sockets as $id => $connection) {
-                    $read[$id.'-'.$path] = $connection->getSocket();
+                    $read[$id . '-' . $path] = $connection->getSocket();
                 }
             }
             if (time() - $this->serialized > $this->serialization_interval) {
