@@ -412,6 +412,9 @@ trait TL
             $arguments = ['peer' => $arguments['peer'], 'message' => $arguments];
             $arguments['message']['_'] = 'decryptedMessage';
             $arguments['message']['ttl'] = 0;
+            if (isset($arguments['message']['reply_to_msg_id'])) {
+                $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to_msg_id'];
+            }
         }
         if ($method === 'messages.sendEncryptedFile') {
             if (isset($arguments['file'])) {
@@ -503,7 +506,7 @@ trait TL
                     $serialized .= pack('@4');
                     continue;
                 }
-                if ($id = $this->constructors->find_by_predicate(lcfirst($current_argument['type']).'Empty')) {
+                if ($id = $this->constructors->find_by_predicate(lcfirst($current_argument['type']).'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) {
                     $serialized .= $id['id'];
                     continue;
                 }
