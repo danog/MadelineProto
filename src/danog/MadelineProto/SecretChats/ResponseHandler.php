@@ -52,6 +52,7 @@ trait ResponseHandler
                     case 'decryptedMessageActionSetMessageTTL':
                         $this->secret_chats[$update['message']['chat_id']]['ttl'] = $update['message']['decrypted_message']['action']['ttl_seconds'];
 
+                        $this->save_update($update);
                         return;
                     case 'decryptedMessageActionNoop':
                         return;
