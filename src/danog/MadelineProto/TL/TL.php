@@ -410,8 +410,12 @@ trait TL
         if ($method === 'messages.sendMessage' && isset($arguments['peer']['_']) && $arguments['peer']['_'] === 'inputEncryptedChat') {
             $method = 'messages.sendEncrypted';
             $arguments = ['peer' => $arguments['peer'], 'message' => $arguments];
-            $arguments['message']['_'] = 'decryptedMessage';
-            $arguments['message']['ttl'] = 0;
+            if (!isset($arguments['message']['_'])) {
+                $arguments['message']['_'] = 'decryptedMessage';
+            }
+            if (!isset($arguments['message']['ttl'])) {
+                $arguments['message']['ttl'] = 0;
+            }
             if (isset($arguments['message']['reply_to_msg_id'])) {
                 $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to_msg_id'];
             }
