@@ -486,7 +486,7 @@ trait BotAPI
         $multiple_args_base = array_merge($args, ['entities' => [], 'parse_mode' => 'text', 'message' => '']);
         $multiple_args = [$multiple_args_base];
 
-        $max_length = 4096;
+        $max_length = $this->config['message_length_max'];
         $text_arr = [];
         foreach ($this->multipleExplodeKeepDelimiters(["\n"], $args['message']) as $word) {
             if ($this->mb_strlen($word) > $max_length) {

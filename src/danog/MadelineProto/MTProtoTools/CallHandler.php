@@ -45,7 +45,7 @@ trait CallHandler
             \danog\MadelineProto\Logger::log('Using media DC');
             $aargs['datacenter'] .= '_media';
         }
-        if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > 4096) {
+        if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > $this->config['message_length_max']) {
             $arg_chunks = $this->split_to_chunks($args);
             $args = array_shift($arg_chunks);
         }
