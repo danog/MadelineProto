@@ -27,12 +27,11 @@ abstract class CombinedEventHandler
 
     final public function __sleep()
     {
-        $keys = get_object_vars($this);
+        $keys = method_exists($this, '__magic_sleep') ? $this->__magic_sleep() : get_object_vars($this);
         unset($keys['CombinedAPI']);
         foreach ($this->CombinedAPI->instance_paths as $path) {
             unset($keys[$path]);
         }
-
         return array_keys($keys);
     }
 

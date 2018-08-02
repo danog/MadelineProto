@@ -119,8 +119,8 @@ If not, see <http://www.gnu.org/licenses/>.
         {
             $packet = '';
             $try = 0;
-            while (strlen($packet) < $length) {
-                $read = stream_get_contents($this->sock, $length - strlen($packet));
+            while (($current_length = strlen($packet)) < $length) {
+                $read = stream_get_contents($this->sock, $length - $current_length);
                 if ($read === false || (strlen($read) === 0 && $try > 10)) {
                     throw new \danog\MadelineProto\NothingInTheSocketException('Nothing in the socket!');
                 }
@@ -139,10 +139,15 @@ If not, see <http://www.gnu.org/licenses/>.
                 $buffer = substr($buffer, 0, $length);
             }
 
-            $wrote = 0;
-            if (($wrote += fwrite($this->sock, $buffer, $length)) !== $length) {
-                while (($wrote += fwrite($this->sock, substr($buffer, $wrote), $length - $wrote)) !== $length) {
+            $try = 0;
+            $wrote = fwrite($this->sock, $buffer, $length);
+            while ($wrote < $length) {
+                $wrote_now = fwrite($this->sock, substr($buffer, $wrote), $length - $wrote);
+                if ($wrote_now === false || ($wrote_now === 0 && $try > 10)) {
+                    throw new \danog\MadelineProto\NothingInTheSocketException('Nothing could be written in the socket!');
                 }
+                $wrote += $wrote_now;
+                $try++;
             }
 
             return $wrote;
@@ -306,10 +311,16 @@ if (!extension_loaded('pthreads')) {
                     $buffer = substr($buffer, 0, $length);
                 }
 
-                $wrote = 0;
-                if (($wrote += socket_write($this->sock, $buffer, $length)) !== $length) {
-                    while (($wrote += socket_write($this->sock, substr($buffer, $wrote), $length - $wrote)) !== $length) {
+
+                $try = 0;
+                $wrote = socket_write($this->sock, $buffer, $length);
+                while ($wrote < $length) {
+                    $wrote_now = socket_write($this->sock, substr($buffer, $wrote), $length - $wrote);
+                    if ($wrote_now === false || ($wrote_now === 0 && $try > 10)) {
+                        throw new \danog\MadelineProto\NothingInTheSocketException('Nothing could be written in the socket!');
                     }
+                    $wrote += $wrote_now;
+                    $try++;
                 }
 
                 return $wrote;

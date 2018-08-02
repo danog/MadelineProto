@@ -605,6 +605,10 @@ trait UpdateHandler
                     if (isset($this->temp_requested_secret_chats[$update['chat']['id']])) {
                         unset($this->temp_requested_secret_chats[$update['chat']['id']]);
                     }
+                    if (isset($this->temp_rekeyed_secret_chats[$update['chat']['id']])) {
+                        unset($this->temp_rekeyed_secret_chats[$update['chat']['id']]);
+                    }
+
                     break;
                 case 'encryptedChat':
                     $this->logger->logger('Completing creation of secret chat '.$update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);

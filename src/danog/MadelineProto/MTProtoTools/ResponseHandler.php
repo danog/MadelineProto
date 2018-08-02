@@ -344,6 +344,9 @@ trait ResponseHandler
         }
         switch ($server_answer['error_code']) {
             case 500:
+                if ($server_answer['error_message'] === 'MSG_WAIT_FAILED') {
+                    throw new \danog\MadelineProto\RPCErrorException($server_answer['error_message'], $server_answer['error_code']);
+                }
                 throw new \danog\MadelineProto\Exception('Re-executing query after server error...');
             case 303:
                 $this->datacenter->curdc = $aargs['datacenter'] = (int) preg_replace('/[^0-9]+/', '', $server_answer['error_message']);
