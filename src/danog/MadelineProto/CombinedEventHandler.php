@@ -32,6 +32,7 @@ abstract class CombinedEventHandler
         foreach ($this->CombinedAPI->instance_paths as $path) {
             unset($keys[$path]);
         }
+
         return array_keys($keys);
     }
 

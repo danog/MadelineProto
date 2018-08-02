@@ -311,7 +311,6 @@ if (!extension_loaded('pthreads')) {
                     $buffer = substr($buffer, 0, $length);
                 }
 
-
                 $try = 0;
                 $wrote = socket_write($this->sock, $buffer, $length);
                 while ($wrote < $length) {
