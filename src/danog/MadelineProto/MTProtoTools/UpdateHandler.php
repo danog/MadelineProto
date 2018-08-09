@@ -637,7 +637,7 @@ trait UpdateHandler
     public function pwr_webhook($update)
     {
         $payload = json_encode($update);
-        $this->logger->logger($update, $payload, json_last_error());
+        //$this->logger->logger($update, $payload, json_last_error());
         if ($payload === '') {
             $this->logger->logger('EMPTY UPDATE');
 
