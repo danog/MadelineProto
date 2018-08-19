@@ -187,7 +187,7 @@ class API extends APIFactory
             $params = $this->session;
         }
         Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
-        if (is_null($this->session)) {
+        if (is_null($params)) {
             return;
         }
 
