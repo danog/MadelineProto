@@ -181,13 +181,13 @@ class API extends APIFactory
         return array_merge($methods, get_class_methods($this->API));
     }
 
-    public function serialize($params = '')
+    public function serialize($params = null)
     {
-        if ($params === '') {
+        if ($params === null) {
             $params = $this->session;
         }
         Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
-        if (is_null($params)) {
+        if (empty($params)) {
             return;
         }
 
