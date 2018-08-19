@@ -60,7 +60,10 @@ class CombinedAPI
 
             $this->event_handler = $deserialized['event_handler'];
             $this->event_handler_instance = $deserialized['event_handler_instance'];
-            $this->setEventHandler($this->event_handler);
+
+            if ($this->event_handler !== null) {
+                $this->setEventHandler($this->event_handler);
+            }
         }
         foreach ($paths as $path => $settings) {
             $this->addInstance($path, $settings);
