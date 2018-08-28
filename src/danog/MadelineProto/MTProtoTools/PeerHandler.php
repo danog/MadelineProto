@@ -652,6 +652,7 @@ trait PeerHandler
         $limit = 200;
         $has_more = false;
         $cached = false;
+        $last_count = -1;
 
         do {
             try {
@@ -670,7 +671,11 @@ trait PeerHandler
                 $this->store_participants_cache($gres, $channel, $filter, $q, $offset, $limit);
             }
 
-            $has_more = $gres['count'] === 10000;
+            if ($last_count !== -1 && $last_count !== $gres['count']) {
+                $has_more = true;
+            } else {
+                $last_count = $gres['count'];
+            }
 
             foreach ($gres['participants'] as $participant) {
                 $newres = [];
@@ -712,7 +717,7 @@ trait PeerHandler
                         }
                 $res['participants'][$participant['user_id']] = $newres;
             }
-            $this->logger->logger("Fetched channel participants with filter $filter, query $q, offset $offset, limit $limit, hash $hash: ".($cached ? 'cached' : 'not cached').', '.count($gres['participants']).' participants out of '.$gres['count'].', in total fetched '.count($res['participants']).' out of '.$total_count);
+            $this->logger->logger("Fetched ".count($gres['participants'])." channel participants with filter $filter, query $q, offset $offset, limit $limit, hash $hash: ".($cached ? 'cached' : 'not cached').', '.($offset + count($gres['participants'])).' participants out of '.$gres['count'].', in total fetched '.count($res['participants']).' out of '.$total_count);
             $offset += count($gres['participants']);
         } while (count($gres['participants']));
 
@@ -726,7 +731,7 @@ trait PeerHandler
 
     public function store_participants_cache($gres, $channel, $filter, $q, $offset, $limit)
     {
-        return;
+        //return;
         unset($gres['users']);
         $ids = [];
         foreach ($gres['participants'] as $participant) {
