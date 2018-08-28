@@ -150,8 +150,8 @@ trait CallHandler
                 $response_tries = $this->settings['max_tries']['response'] + 1;
                 if ($last_recv) {
                     $additional = (int) floor((time() - $last_recv) / 10);
-                    if ($additional > $this->settings['max_tries']['response']*2) {
-                        $additional = $this->settings['max_tries']['response']*2;
+                    if ($additional > $this->settings['max_tries']['response'] * 2) {
+                        $additional = $this->settings['max_tries']['response'] * 2;
                     }
                     $response_tries += $additional;
                 }

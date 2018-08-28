@@ -77,7 +77,6 @@ if ($MadelineProto->get_self() === false) {
 \danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::ERROR);
 \danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::FATAL_ERROR);
 
-
 /**
  * A small example message to use for tests.
  */
