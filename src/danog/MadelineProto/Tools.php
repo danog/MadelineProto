@@ -19,7 +19,7 @@ trait Tools
 {
     public function gen_vector_hash($ints)
     {
-        sort($ints, SORT_NUMERIC);
+        //sort($ints, SORT_NUMERIC);
         if (\danog\MadelineProto\Magic::$bigint) {
             $hash = new \phpseclib\Math\BigInteger(0);
             foreach ($ints as $int) {
@@ -29,7 +29,7 @@ trait Tools
         } else {
             $hash = 0;
             foreach ($ints as $int) {
-                $hash = (($hash * 20261) + 0x80000000 + $int) % 0x80000000;
+                $hash = ((($hash * 20261) & 0x7FFFFFFF) + $int) & 0x7FFFFFFF;
             }
         }
 

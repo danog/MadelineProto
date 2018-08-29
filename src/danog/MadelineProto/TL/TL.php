@@ -218,7 +218,11 @@ trait TL
         switch ($type['type']) {
             case 'int':
                 if (!is_numeric($object)) {
-                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
+                    if (is_array($object) && $type['name'] === 'hash') {
+                        $object = $this->gen_vector_hash($object);
+                    } else {
+                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
+                    }
                 }
 
                 return $this->pack_signed_int($object);
@@ -497,6 +501,10 @@ trait TL
                                 continue 2;
                             }
                     }
+                }
+                if ($current_argument['name'] === 'hash' && $current_argument['type'] === 'int') {
+                    $serialized .= pack('@4');
+                    continue;
                 }
                 if ($tl['type'] === 'InputMedia' && $current_argument['name'] === 'mime_type') {
                     $serialized .= $this->serialize_object($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer);

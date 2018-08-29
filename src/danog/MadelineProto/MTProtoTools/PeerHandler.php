@@ -737,6 +737,7 @@ trait PeerHandler
         foreach ($gres['participants'] as $participant) {
             $ids[] = $participant['user_id'];
         }
+        sort($ids, SORT_NUMERIC);
         $gres['hash'] = $this->gen_vector_hash($ids);
         $this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit] = $gres;
     }

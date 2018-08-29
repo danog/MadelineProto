@@ -105,6 +105,11 @@ trait Methods
                 if ($param['name'] === 'chat_id' && $data['method'] !== 'messages.discardEncryption' && !isset($this->settings['td'])) {
                     $param['type'] = 'InputPeer';
                 }
+                if ($param['name'] === 'hash' && $param['type'] === 'int') {
+                    $param['pow'] = 'hi';
+                    $param['type'] = 'Vector t';
+                    $param['subtype'] = 'int';
+                }
                 $ptype = str_replace('.', '_', $param[$type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type']);
                 switch ($ptype) {
                     case 'true':
