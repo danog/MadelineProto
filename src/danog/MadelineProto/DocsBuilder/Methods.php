@@ -87,8 +87,8 @@ trait Methods
             if (isset($this->td_descriptions['methods'][$data['method']]) && !empty($data['params'])) {
                 $table = '### Parameters:
 
-| Name     |    Type       | Required | Description |
-|----------|---------------|----------|-------------|
+| Name     |    Type       | Description | Required |
+|----------|---------------|-------------|----------|
 ';
             }
             $hasentities = false;
@@ -131,7 +131,6 @@ trait Methods
                     $human_ptype = 'File path or '.$ptype;
                 }
                 $type_or_bare_type = ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
-                $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
                 if (!isset($this->td_descriptions['methods'][$data['method']]['params'][$param['name']])) {
                     $this->add_to_lang('method_'.$data['method'].'_param_'.$param['name'].'_type_'.$param['type']);
                     if (isset($this->td_descriptions['methods'][$data['method']]['description'])) {
@@ -140,7 +139,9 @@ trait Methods
                 }
 
                 if (isset($this->td_descriptions['methods'][$data['method']])) {
-                    $table .= $this->td_descriptions['methods'][$data['method']]['params'][$param['name']].'|';
+                    $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->td_descriptions['methods'][$data['method']]['params'][$param['name']].' | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
+                } else {
+                    $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') ? 'Optional' : 'Yes').'|';
                 }
                 $table .= PHP_EOL;
                 $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
@@ -161,7 +162,7 @@ trait Methods
                 }
                 if ($param['name'] === 'entities') {
                     $hasentities = true;
-                    $table .= '|parse\\_mode| [string](../types/string.md) | Optional |Whether to parse HTML or Markdown markup in the message|
+                    $table .= '|parse\\_mode| [string](../types/string.md) | Whether to parse HTML or Markdown markup in the message| Optional |
 ';
                     $params .= "'parse_mode' => 'string', ";
                     $lua_params .= "parse_mode='string', ";
