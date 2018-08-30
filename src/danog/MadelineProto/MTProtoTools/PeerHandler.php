@@ -436,12 +436,11 @@ trait PeerHandler
             case 'chat':
             case 'chatForbidden':
                 $res['InputPeer'] = ['_' => 'inputPeerChat', 'chat_id' => $constructor['id']];
-
+                $res['Peer'] = ['_' => 'peerChat', 'chat_id' => $constructor['id']];
                 $res['DialogPeer'] = ['_' => 'dialogPeer', 'peer' => $res['Peer']];
                 $res['NotifyPeer'] = ['_' => 'notifyPeer', 'peer' => $res['Peer']];
                 $res['InputDialogPeer'] = ['_' => 'inputDialogPeer', 'peer' => $res['InputPeer']];
                 $res['InputNotifyPeer'] = ['_' => 'inputNotifyPeer', 'peer' => $res['InputPeer']];
-                $res['Peer'] = ['_' => 'peerChat', 'chat_id' => $constructor['id']];
                 $res['chat_id'] = $constructor['id'];
                 $res['bot_api_id'] = -$constructor['id'];
                 $res['type'] = 'chat';
@@ -451,13 +450,12 @@ trait PeerHandler
                     throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
                 }
                 $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
-
+                $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
                 $res['DialogPeer'] = ['_' => 'dialogPeer', 'peer' => $res['Peer']];
                 $res['NotifyPeer'] = ['_' => 'notifyPeer', 'peer' => $res['Peer']];
                 $res['InputDialogPeer'] = ['_' => 'inputDialogPeer', 'peer' => $res['InputPeer']];
                 $res['InputNotifyPeer'] = ['_' => 'inputNotifyPeer', 'peer' => $res['InputPeer']];
                 $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
-                $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
                 $res['channel_id'] = $constructor['id'];
                 $res['bot_api_id'] = $this->to_supergroup($constructor['id']);
                 $res['type'] = $constructor['megagroup'] ? 'supergroup' : 'channel';
