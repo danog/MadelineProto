@@ -69,6 +69,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
   * [Long polling (getupdates)](https://docs.madelineproto.xyz/docs/UPDATES.html#long-polling)
   * [Callback](https://docs.madelineproto.xyz/docs/UPDATES.html#callback)
     * [Callback multithreaded](https://docs.madelineproto.xyz/docs/UPDATES.html#callback-multithreaded)
+  * [Noop](https://docs.madelineproto.xyz/docs/UPDATES.html#noop)
 * [Settings](https://docs.madelineproto.xyz/docs/SETTINGS.html)
 * [Getting info about the current user](https://docs.madelineproto.xyz/docs/SELF.html)
 * [Exceptions](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html)
