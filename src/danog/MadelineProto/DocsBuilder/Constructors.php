@@ -130,7 +130,7 @@ trait Constructors
                         $ptype = 'Bool';
                 }
                 $human_ptype = $ptype;
-                if (strpos($type, 'Input') === 0 && in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer']) && !isset($this->settings['td'])) {
+                if (strpos($type, 'Input') === 0 && in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'InputPeer']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
                 }
                 if (strpos($type, 'Input') === 0 && in_array($ptype, ['InputMedia', 'InputDocument', 'InputPhoto']) && !isset($this->settings['td'])) {

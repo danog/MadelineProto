@@ -9,7 +9,7 @@ MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY
 See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 namespace danog\MadelineProto\MTProtoTools;
 
@@ -94,7 +94,7 @@ trait PeerHandler
                 case 'userEmpty':
                     break;
                 default:
-                    throw new \danog\MadelineProto\Exception('Invalid user provided at key '.$key.': '.var_export($user, true));
+                    throw new \danog\MadelineProto\Exception('Invalid user provided at key ' . $key . ': ' . var_export($user, true));
                     break;
             }
         }
@@ -162,7 +162,7 @@ trait PeerHandler
                     }
                     break;
                 default:
-                    throw new \danog\MadelineProto\Exception('Invalid chat provided at key '.$key.': '.var_export($chat, true));
+                    throw new \danog\MadelineProto\Exception('Invalid chat provided at key ' . $key . ': ' . var_export($chat, true));
                     break;
             }
         }
@@ -223,6 +223,18 @@ trait PeerHandler
     {
         if (is_array($id)) {
             switch ($id['_']) {
+                case 'updateDialogPinned':
+                case 'updateDialogUnreadMark':
+                case 'updateNotifySettings':
+                    $id = $id['peer'];
+                case 'updateDraftMessage':
+                case 'inputDialogPeer':
+                case 'dialogPeer':
+                case 'inputNotifyPeer':
+                case 'notifyPeer':
+                case 'dialog':
+                case 'help.proxyDataPromo':
+                    return $this->get_info($id['peer']);
                 case 'inputUserSelf':
                 case 'inputPeerSelf':
                     $id = $this->authorization['user']['id'];
@@ -280,15 +292,15 @@ trait PeerHandler
                 case 'updateReadChannelOutbox':
                 case 'updateDeleteChannelMessages':
                 case 'updateChannelPinnedMessage':
-                     return $this->get_info($this->to_supergroup($id['channel_id']));
+                    return $this->get_info($this->to_supergroup($id['channel_id']));
                 case 'updateChatParticipants':
-                     $id = $id['participants'];
+                    $id = $id['participants'];
                 case 'updateChatUserTyping':
                 case 'updateChatParticipantAdd':
                 case 'updateChatParticipantDelete':
                 case 'updateChatParticipantAdmin':
                 case 'updateChatAdmins':
-                     return $this->get_info(-$id['chat_id']);
+                    return $this->get_info(-$id['chat_id']);
                 case 'updateUserTyping':
                 case 'updateUserStatus':
                 case 'updateUserName':
@@ -303,12 +315,12 @@ trait PeerHandler
                 case 'updateBotCallbackQuery':
                 case 'updateBotPrecheckoutQuery':
                 case 'updateBotShippingQuery':
-                     return $this->get_info($id['user_id']);
+                    return $this->get_info($id['user_id']);
                 case 'updatePhoneCall':
-                     return $this->get_info($id->getOtherID());
+                    return $this->get_info($id->getOtherID());
                 case 'updateReadHistoryInbox':
                 case 'updateReadHistoryOutbox':
-                     return $this->get_info($id['peer']);
+                    return $this->get_info($id['peer']);
                 case 'updateNewMessage':
                 case 'updateNewChannelMessage':
                 case 'updateEditMessage':
@@ -324,7 +336,7 @@ trait PeerHandler
                 case 'channelForbidden':
                     throw new \danog\MadelineProto\RPCErrorException('CHAT_FORBIDDEN');
                 default:
-                    throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($id, true));
+                    throw new \danog\MadelineProto\Exception('Invalid constructor given ' . var_export($id, true));
                     break;
             }
         }
@@ -333,7 +345,7 @@ trait PeerHandler
                 $id = $this->to_supergroup($matches[1]);
             }
             if (preg_match('/^chat#(\d*)/', $id, $matches)) {
-                $id = '-'.$matches[1];
+                $id = '-' . $matches[1];
             }
             if (preg_match('/^user#(\d*)/', $id, $matches)) {
                 $id = $matches[1];
@@ -358,9 +370,9 @@ trait PeerHandler
                 }
             }
             if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true && $recursive) {
-                $dbres = json_decode(@file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http' => ['timeout' => 2]])), true);
+                $dbres = json_decode(@file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id=' . $id, false, stream_context_create(['http' => ['timeout' => 2]])), true);
                 if (isset($dbres['ok']) && $dbres['ok']) {
-                    $this->resolve_username('@'.$dbres['result']);
+                    $this->resolve_username('@' . $dbres['result']);
 
                     return $this->get_info($id, false);
                 }
@@ -413,6 +425,10 @@ trait PeerHandler
                     throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
                 }
                 $res['Peer'] = ['_' => 'peerUser', 'user_id' => $constructor['id']];
+                $res['DialogPeer'] = ['_' => 'dialogPeer', 'peer' => $res['Peer']];
+                $res['NotifyPeer'] = ['_' => 'notifyPeer', 'peer' => $res['Peer']];
+                $res['InputDialogPeer'] = ['_' => 'inputDialogPeer', 'peer' => $res['InputPeer']];
+                $res['InputNotifyPeer'] = ['_' => 'inputNotifyPeer', 'peer' => $res['InputPeer']];
                 $res['user_id'] = $constructor['id'];
                 $res['bot_api_id'] = $constructor['id'];
                 $res['type'] = $constructor['bot'] ? 'bot' : 'user';
@@ -420,6 +436,11 @@ trait PeerHandler
             case 'chat':
             case 'chatForbidden':
                 $res['InputPeer'] = ['_' => 'inputPeerChat', 'chat_id' => $constructor['id']];
+
+                $res['DialogPeer'] = ['_' => 'dialogPeer', 'peer' => $res['Peer']];
+                $res['NotifyPeer'] = ['_' => 'notifyPeer', 'peer' => $res['Peer']];
+                $res['InputDialogPeer'] = ['_' => 'inputDialogPeer', 'peer' => $res['InputPeer']];
+                $res['InputNotifyPeer'] = ['_' => 'inputNotifyPeer', 'peer' => $res['InputPeer']];
                 $res['Peer'] = ['_' => 'peerChat', 'chat_id' => $constructor['id']];
                 $res['chat_id'] = $constructor['id'];
                 $res['bot_api_id'] = -$constructor['id'];
@@ -430,6 +451,11 @@ trait PeerHandler
                     throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
                 }
                 $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+
+                $res['DialogPeer'] = ['_' => 'dialogPeer', 'peer' => $res['Peer']];
+                $res['NotifyPeer'] = ['_' => 'notifyPeer', 'peer' => $res['Peer']];
+                $res['InputDialogPeer'] = ['_' => 'inputDialogPeer', 'peer' => $res['InputPeer']];
+                $res['InputNotifyPeer'] = ['_' => 'inputNotifyPeer', 'peer' => $res['InputPeer']];
                 $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
                 $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
                 $res['channel_id'] = $constructor['id'];
@@ -440,7 +466,7 @@ trait PeerHandler
                 throw new \danog\MadelineProto\RPCErrorException('CHAT_FORBIDDEN');
                 break;
             default:
-                throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($constructor, true));
+                throw new \danog\MadelineProto\Exception('Invalid constructor given ' . var_export($constructor, true));
                 break;
         }
 
@@ -513,16 +539,16 @@ trait PeerHandler
                     $res['photo'] = $this->photosize_to_botapi(end($full['full']['profile_photo']['sizes']), []);
                 }
                 /*$bio = '';
-                  if ($full['type'] === 'user' && isset($res['username']) && !isset($res['about']) && $fullfetch) {
-                      if (preg_match('/meta property="og:description" content=".+/', file_get_contents('https://telegram.me/'.$res['username']), $biores)) {
-                          $bio = html_entity_decode(preg_replace_callback('/(&#[0-9]+;)/', function ($m) {
-                              return mb_convert_encoding($m[1], 'UTF-8', 'HTML-ENTITIES');
-                          }, str_replace(['meta property="og:description" content="', '">'], '', $biores[0])));
-                      }
-                      if ($bio != '' && $bio != 'You can contact @'.$res['username'].' right away.') {
-                          $res['about'] = $bio;
-                      }
-                  }*/
+                if ($full['type'] === 'user' && isset($res['username']) && !isset($res['about']) && $fullfetch) {
+                if (preg_match('/meta property="og:description" content=".+/', file_get_contents('https://telegram.me/'.$res['username']), $biores)) {
+                $bio = html_entity_decode(preg_replace_callback('/(&#[0-9]+;)/', function ($m) {
+                return mb_convert_encoding($m[1], 'UTF-8', 'HTML-ENTITIES');
+                }, str_replace(['meta property="og:description" content="', '">'], '', $biores[0])));
+                }
+                if ($bio != '' && $bio != 'You can contact @'.$res['username'].' right away.') {
+                $res['about'] = $bio;
+                }
+                }*/
                 break;
             case 'chat':
                 foreach (['title', 'participants_count', 'admin', 'admins_enabled'] as $key) {
@@ -622,7 +648,7 @@ trait PeerHandler
             foreach ($filters as $filter) {
                 $this->recurse_alphabet_search_participants($full['InputChannel'], $filter, $q, $total_count, $res);
             }
-            $this->logger->logger('Fetched '.count($res['participants'])." out of $total_count");
+            $this->logger->logger('Fetched ' . count($res['participants']) . " out of $total_count");
             $res['participants'] = array_values($res['participants']);
         }
         if (!$fullfetch) {
@@ -642,7 +668,7 @@ trait PeerHandler
         }
 
         for ($x = 'a'; $x !== 'aa' && $total_count > count($res['participants']); $x++) {
-            $this->recurse_alphabet_search_participants($channel, $filter, $q.$x, $total_count, $res);
+            $this->recurse_alphabet_search_participants($channel, $filter, $q . $x, $total_count, $res);
         }
     }
 
@@ -693,31 +719,31 @@ trait PeerHandler
                     $newres['date'] = $participant['date'];
                 }
                 switch ($participant['_']) {
-                            case 'channelParticipantSelf':
-                                $newres['role'] = 'user';
-                                if (isset($newres['admin_rights'])) {
-                                    $newres['admin_rights'] = $full['Chat']['admin_rights'];
-                                }
-                                if (isset($newres['banned_rights'])) {
-                                    $newres['banned_rights'] = $full['Chat']['banned_rights'];
-                                }
-                                break;
-                            case 'channelParticipant':
-                                $newres['role'] = 'user';
-                                break;
-                            case 'channelParticipantCreator':
-                                $newres['role'] = 'creator';
-                                break;
-                            case 'channelParticipantAdmin':
-                                $newres['role'] = 'admin';
-                                break;
-                            case 'channelParticipantBanned':
-                                $newres['role'] = 'banned';
-                                break;
+                    case 'channelParticipantSelf':
+                        $newres['role'] = 'user';
+                        if (isset($newres['admin_rights'])) {
+                            $newres['admin_rights'] = $full['Chat']['admin_rights'];
                         }
+                        if (isset($newres['banned_rights'])) {
+                            $newres['banned_rights'] = $full['Chat']['banned_rights'];
+                        }
+                        break;
+                    case 'channelParticipant':
+                        $newres['role'] = 'user';
+                        break;
+                    case 'channelParticipantCreator':
+                        $newres['role'] = 'creator';
+                        break;
+                    case 'channelParticipantAdmin':
+                        $newres['role'] = 'admin';
+                        break;
+                    case 'channelParticipantBanned':
+                        $newres['role'] = 'banned';
+                        break;
+                }
                 $res['participants'][$participant['user_id']] = $newres;
             }
-            $this->logger->logger('Fetched '.count($gres['participants'])." channel participants with filter $filter, query $q, offset $offset, limit $limit, hash $hash: ".($cached ? 'cached' : 'not cached').', '.($offset + count($gres['participants'])).' participants out of '.$gres['count'].', in total fetched '.count($res['participants']).' out of '.$total_count);
+            $this->logger->logger('Fetched ' . count($gres['participants']) . " channel participants with filter $filter, query $q, offset $offset, limit $limit, hash $hash: " . ($cached ? 'cached' : 'not cached') . ', ' . ($offset + count($gres['participants'])) . ' participants out of ' . $gres['count'] . ', in total fetched ' . count($res['participants']) . ' out of ' . $total_count);
             $offset += count($gres['participants']);
         } while (count($gres['participants']));
 
@@ -753,13 +779,13 @@ trait PeerHandler
         if (!isset($this->settings['pwr']) || $this->settings['pwr']['pwr'] === false || $settings['test_mode']) {
             /*
             try {
-                if (isset($res['username'])) {
-                    shell_exec('curl '.escapeshellarg('https://api.pwrtelegram.xyz/getchat?chat_id=@'.$res['username']).' -s -o /dev/null >/dev/null 2>/dev/null & ');
-                }
-            } catch (\danog\MadelineProto\Exception $e) {
-                $this->logger->logger([$e->getMessage());
+            if (isset($res['username'])) {
+            shell_exec('curl '.escapeshellarg('https://api.pwrtelegram.xyz/getchat?chat_id=@'.$res['username']).' -s -o /dev/null >/dev/null 2>/dev/null & ');
             }
-            */
+            } catch (\danog\MadelineProto\Exception $e) {
+            $this->logger->logger([$e->getMessage());
+            }
+             */
             return;
         }
         if (!empty($res)) {
@@ -783,7 +809,7 @@ trait PeerHandler
             $id = isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'];
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_URL, 'https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id);
+            curl_setopt($ch, CURLOPT_URL, 'https://id.pwrtelegram.xyz/db' . $this->settings['pwr']['db_token'] . '/addnewmadeline?d=pls&from=' . $id);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
             curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
@@ -797,7 +823,7 @@ trait PeerHandler
             if (file_exists($path)) {
                 unlink($path);
             }
-            $this->logger->logger('======= COULD NOT STORE IN DB DUE TO '.$e->getMessage().' =============', \danog\MadelineProto\Logger::VERBOSE);
+            $this->logger->logger('======= COULD NOT STORE IN DB DUE TO ' . $e->getMessage() . ' =============', \danog\MadelineProto\Logger::VERBOSE);
         }
     }
 
@@ -806,7 +832,7 @@ trait PeerHandler
         try {
             $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->logger->logger('Username resolution failed with error '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+            $this->logger->logger('Username resolution failed with error ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             if (strpos($e->rpc, 'FLOOD_WAIT_') === 0 || $e->rpc === 'AUTH_KEY_UNREGISTERED' || $e->rpc === 'USERNAME_INVALID') {
                 throw $e;
             }

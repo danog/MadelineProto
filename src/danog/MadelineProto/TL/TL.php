@@ -346,7 +346,7 @@ trait TL
         if ($type['type'] === 'InputMessage' && !is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];
         }
-        if (in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer']) && (!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
+        if (in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer', 'InputDialogPeer', 'InputNotifyPeer']) && (!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
             $object = $this->get_info($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);

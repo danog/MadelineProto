@@ -121,7 +121,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ';
             $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype].PHP_EOL.PHP_EOL : '';
             if (!isset($this->settings['td'])) {
-                if (in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'])) {
+                if (in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'InputPeer', 'NotifyPeer', 'InputNotifyPeer'])) {
                     $header .= 'You can directly provide the [Update](Update.md) or [Message](Message.md) object here, MadelineProto will automatically extract the destination chat id.
 
 The following syntaxes can also be used:
@@ -143,7 +143,7 @@ $'.$type." = 'https://t.me/danogentili'; // t.me URLs
 \$".$type." = 'channel#38575794'; // tg-cli style id (channels)
 ```
 
-A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), or a [Chat](Chat.md) object can also be used.\n\n\n";
+A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputDialogPeer](InputDialogPeer.md), an [InputNotifyPeer](InputNotifyPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), an [DialogPeer](DialogPeer.md), [NotifyPeer](NotifyPeer.md), or a [Chat](Chat.md) object can also be used.\n\n\n";
                 }
                 if (in_array($type, ['InputEncryptedChat'])) {
                     $header .= 'You can directly provide the [Update](Update.md) or [EncryptedMessage](EncryptedMessage.md) object here, MadelineProto will automatically extract the destination chat id.
