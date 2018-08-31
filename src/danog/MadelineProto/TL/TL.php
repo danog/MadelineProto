@@ -518,7 +518,11 @@ trait TL
                     $serialized .= pack('@4');
                     continue;
                 }
-                if ($id = $this->constructors->find_by_predicate(lcfirst($current_argument['type']).'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) {
+                if (($id = $this->constructors->find_by_predicate(lcfirst($current_argument['type']).'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
+                    $serialized .= $id['id'];
+                    continue;
+                }
+                if (($id = $this->constructors->find_by_predicate('input'.$current_argument['type'].'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
                     $serialized .= $id['id'];
                     continue;
                 }
