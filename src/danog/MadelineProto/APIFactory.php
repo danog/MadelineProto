@@ -9,7 +9,7 @@ MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY
 See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 namespace danog\MadelineProto;
 
@@ -112,7 +112,7 @@ class APIFactory
 
     public function __construct($namespace, $API)
     {
-        $this->namespace = $namespace.'.';
+        $this->namespace = $namespace . '.';
         $this->API = $API;
     }
 
@@ -144,11 +144,17 @@ class APIFactory
         }
 
         if ($this->lua === false) {
-            return method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [], $aargs);
+            if (method_exists($this->API, $this->namespace . $name)) {
+                return $this->API->{$this->namespace . $name}(...$arguments);
+            } else if (array_key_exists($this->namespace . $name, \danog\MadelineProto\MTProto::DISALLOWED_METHODS)) {
+                throw new \danog\MadelineProto\Exception(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$this->namespace . $name], 0, null, 'MadelineProto', 1);
+            } else {
+                return $this->API->method_call($this->namespace . $name, isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [], $aargs);
+            }
         }
 
         try {
-            $deserialized = method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [], $aargs);
+            $deserialized = method_exists($this->API, $this->namespace . $name) ? $this->API->{$this->namespace . $name}(...$arguments) : $this->API->method_call($this->namespace . $name, isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [], $aargs);
             Lua::convert_objects($deserialized);
 
             return $deserialized;

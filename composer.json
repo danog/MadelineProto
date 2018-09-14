@@ -19,7 +19,8 @@
         "ext-curl": "*",
         "ext-mbstring": "*",
         "ext-json": "*",
-        "ext-xml": "*"
+        "ext-xml": "*",
+        "guzzlehttp/promises": "^1.3"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1"

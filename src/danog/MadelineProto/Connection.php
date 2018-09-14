@@ -45,6 +45,8 @@ class Connection
     public $outgoing_messages = [];
     public $new_incoming = [];
     public $new_outgoing = [];
+    public $pending_outgoing = [];
+    public $pending_outgoing_key = 0;
     public $max_incoming_id;
     public $max_outgoing_id;
     public $proxy = '\\Socket';
@@ -52,7 +54,6 @@ class Connection
     public $obfuscated = [];
     public $authorized = false;
     public $call_queue = [];
-    public $object_queue = [];
     public $ack_queue = [];
     public $i = [];
     public $must_open = true;
@@ -222,7 +223,7 @@ class Connection
 
     public function __sleep()
     {
-        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'peer_tag', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'object_queue', 'ack_queue'];
+        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'peer_tag', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'pending_outgoing', 'pending_outgoing_key', 'ack_queue'];
     }
 
     public function __wakeup()

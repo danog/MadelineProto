@@ -53,6 +53,9 @@ trait UpdateHandler
         if (!$this->settings['updates']['handle_updates']) {
             $this->settings['updates']['handle_updates'] = true;
         }
+        if (!$this->settings['updates']['run_callback']) {
+            $this->settings['updates']['run_callback'] = true;
+        }
         array_walk($this->calls, function ($controller, $id) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 $controller->discard();
@@ -97,9 +100,7 @@ trait UpdateHandler
                 $this->get_updates_difference();
             }
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            if ($e->rpc !== 'RPC_CALL_FAIL') {
-                throw $e;
-            }
+            throw $e;
         } catch (\danog\MadelineProto\Exception $e) {
             $this->connect_to_all_dcs();
         }
@@ -125,6 +126,10 @@ trait UpdateHandler
             } elseif ($params['limit'] === null || count($updates) < $params['limit']) {
                 $updates[] = ['update_id' => $key, 'update' => $value];
             }
+        }
+
+        if (empty($this->updates)) {
+            $this->updates_key = 0;
         }
 
         return $updates;
@@ -558,7 +563,7 @@ trait UpdateHandler
                         return;
                     }
 
-                    return $this->calls[$update['phone_call']['id']]->discard(['_' => 'phoneCallDiscardReasonHangup'], [], $update['phone_call']['need_debug']);
+                    return $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'], [], $update['phone_call']['need_debug']);
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
@@ -629,7 +634,7 @@ trait UpdateHandler
         $this->logger->logger('Saving an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
         if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict'] && isset($this->settings['pwr']['update_handler'])) {
             $this->pwr_update_handler($update);
-        } else {
+        } else if ($this->settings['updates']['run_callback']) {
             $this->get_updates_update_handler($update);
         }
     }

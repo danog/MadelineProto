@@ -328,11 +328,10 @@ trait BotAPI
         }
     }
 
-    public $botapi_params = ['disable_web_page_preview' => 'no_webpage', 'disable_notification' => 'silent', 'reply_to_message_id' => 'reply_to_msg_id', 'chat_id' => 'peer', 'text' => 'message'];
 
     public function botAPI_to_MTProto($arguments)
     {
-        foreach ($this->botapi_params as $bot => $mtproto) {
+        foreach (self::BOTAPI_PARAMS_CONVERSION as $bot => $mtproto) {
             if (isset($arguments[$bot]) && !isset($arguments[$mtproto])) {
                 $arguments[$mtproto] = $arguments[$bot];
                 //unset($arguments[$bot]);

@@ -88,8 +88,10 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
             if (!isset($this->calls[$from_id]) && $message === '/call') {
                 $call = $this->request_call($from_id);
                 $this->configureCall($call);
-                $this->calls[$call->getOtherID()] = $call;
-                $this->times[$call->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL.$call->getDebugString()])['id']];
+                if ($call->getCallState() !== \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                    $this->calls[$call->getOtherID()] = $call;
+                    $this->times[$call->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL.$call->getDebugString()])['id']];
+                }
             }
             if (strpos($message, '/program') === 0) {
                 $time = strtotime(str_replace('/program ', '', $message));
@@ -198,8 +200,10 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
                     try {
                         $call = $this->request_call($user);
                         $this->configureCall($call);
-                        $this->calls[$call->getOtherID()] = $call;
-                        $this->times[$call->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL.$call->getDebugString()])['id']];
+                        if ($call->getCallState() !== \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                            $this->calls[$call->getOtherID()] = $call;
+                            $this->times[$call->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL.$call->getDebugString()])['id']];
+                        }
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                         try {
                             if ($e->rpc === 'USER_PRIVACY_RESTRICTED') {
@@ -262,6 +266,8 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
                     ],
                     ]);
                     }
+                } catch (\danog\MadelineProto\Exception $e) {
+                    echo $e;
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     echo $e;
                 }
@@ -280,7 +286,7 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
         }
     }
 }
-$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['secret_chats' => ['accept_chats' => false], 'logger' => ['logger' => 2, 'logger_param' => getcwd().'/MadelineProto.log']]);
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['secret_chats' => ['accept_chats' => false], 'logger' => ['logger' => 3, 'logger_param' => getcwd().'/MadelineProto.log']]);
 $MadelineProto->start();
 
 if (!isset($MadelineProto->programmed_call)) {

@@ -56,7 +56,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 104;
+    const V = 105;
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
@@ -72,6 +72,39 @@ class MTProto
     const TD_PARAMS_CONVERSION = ['updateNewMessage' => ['_' => 'updateNewMessage', 'disable_notification' => ['message', 'silent'], 'message' => ['message']], 'message' => ['_' => 'message', 'id' => ['id'], 'sender_user_id' => ['from_id'], 'chat_id' => ['to_id', 'choose_chat_id_from_botapi'], 'send_state' => ['choose_incoming_or_sent'], 'can_be_edited' => ['choose_can_edit'], 'can_be_deleted' => ['choose_can_delete'], 'is_post' => ['post'], 'date' => ['date'], 'edit_date' => ['edit_date'], 'forward_info' => ['fwd_info', 'choose_forward_info'], 'reply_to_message_id' => ['reply_to_msg_id'], 'ttl' => ['choose_ttl'], 'ttl_expires_in' => ['choose_ttl_expires_in'], 'via_bot_user_id' => ['via_bot_id'], 'views' => ['views'], 'content' => ['choose_message_content'], 'reply_markup' => ['reply_markup']], 'messages.sendMessage' => ['chat_id' => ['peer'], 'reply_to_message_id' => ['reply_to_msg_id'], 'disable_notification' => ['silent'], 'from_background' => ['background'], 'input_message_content' => ['choose_message_content'], 'reply_markup' => ['reply_markup']]];
     const TD_REVERSE = ['sendMessage' => 'messages.sendMessage'];
     const TD_IGNORE = ['updateMessageID'];
+    const BOTAPI_PARAMS_CONVERSION = ['disable_web_page_preview' => 'no_webpage', 'disable_notification' => 'silent', 'reply_to_message_id' => 'reply_to_msg_id', 'chat_id' => 'peer', 'text' => 'message'];
+    const NOT_CONTENT_RELATED = [
+        'rpc_result',
+        //'rpc_error',
+        'rpc_drop_answer',
+        'rpc_answer_unknown',
+        'rpc_answer_dropped_running',
+        'rpc_answer_dropped',
+        'get_future_salts',
+        'future_salt',
+        'future_salts',
+        'ping',
+        'pong',
+        'ping_delay_disconnect',
+        'destroy_session',
+        'destroy_session_ok',
+        'destroy_session_none',
+        //'new_session_created',
+        'msg_container',
+        'msg_copy',
+        'gzip_packed',
+        'http_wait',
+        'msgs_ack',
+        'bad_msg_notification',
+        'bad_server_salt',
+        'msgs_state_req',
+        'msgs_state_info',
+        'msgs_all_info',
+        'msg_detailed_info',
+        'msg_new_detailed_info',
+        'msg_resend_req',
+        'msg_resend_ans_req',
+    ];
     public $hook_url = false;
     public $settings = [];
     private $config = ['expires' => -1];
@@ -518,6 +551,8 @@ class MTProto
             'getdifference_interval' => 10,
             // Getdifference manual polling interval
             'callback' => 'get_updates_update_handler',
+            // Update callback
+            'run_callback' => true
         ], 'secret_chats' => ['accept_chats' => true], 'serialization' => ['serialization_interval' => 30], 'threading' => [
             'allow_threading' => false,
             // Should I use threading, if it is enabled?

@@ -9,7 +9,7 @@ MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY
 See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 namespace danog\MadelineProto\MTProtoTools;
 
@@ -22,28 +22,28 @@ trait AckHandler
     {
         // The server acknowledges that it received my message
         if (!isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id])) {
-            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
+            $this->logger->logger("WARNING: Couldn't find message id " . $message_id . ' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
 
             return false;
         }
-
-        return $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['ack'] = true;
+        unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['body']);
+        if (isset($this->datacenter->sockets[$datacenter]->new_outgoing[$message_id])) {
+            unset($this->datacenter->sockets[$datacenter]->new_outgoing[$message_id]);
+        }
+        return true;
     }
 
     public function ack_incoming_message_id($message_id, $datacenter)
     {
         // I let the server know that I received its message
         if (!isset($this->datacenter->sockets[$datacenter]->incoming_messages[$message_id])) {
-            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of incomgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
-            //throw new \danog\MadelineProto\Exception("Couldn't find message id ".$message_id.' in the array of incoming message ids. Maybe try to increase its size?');
+            $this->logger->logger("WARNING: Couldn't find message id " . $message_id . ' in the array of incoming messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
         }
-        if ($this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === null || $this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === "\0\0\0\0\0\0\0\0") {
-            // || (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack']) && $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack'])) {
-            return;
-        }
+        /*if ($this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === null || $this->datacenter->sockets[$datacenter]->temp_auth_key['id'] === "\0\0\0\0\0\0\0\0") {
+        // || (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack']) && $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack'])) {
+        return;
+        }*/
         $this->datacenter->sockets[$datacenter]->ack_queue[$message_id] = $message_id;
-        //$this->object_call('msgs_ack', ['msg_ids' => [$message_id]], ['datacenter' => $datacenter]);
         return true;
-        //$this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['ack'] = true;
     }
 }
