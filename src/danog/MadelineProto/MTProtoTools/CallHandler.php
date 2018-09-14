@@ -5,7 +5,9 @@ Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
 This file is part of MadelineProto.
 MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+MadelineProto is distributed i                            $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->reject(new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                            $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->reject(new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+n the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
@@ -20,11 +22,144 @@ trait CallHandler
 {
     public $wrapper;
 
-    public function method_call_async($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
+    public function iorun()
     {
+        try {
+            if (!$this->is_http($this->datacenter->curdc) && !$this->altervista) {
+                try {
+                    $waiting = $this->datacenter->select();
+                    if (count($waiting)) {
+                        $tries = 10;
+                        while (count($waiting) && $tries--) {
+                            $dc = $waiting[0];
+                            if (($error = $this->recv_message($dc)) !== true) {
+                                if ($error === -404) {
+                                    if ($this->datacenter->sockets[$dc]->temp_auth_key !== null) {
+                                        $this->logger->logger('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
+                                        $this->datacenter->sockets[$dc]->temp_auth_key = null;
+                                        $this->init_authorization();
 
+                                        throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                                    }
+                                }
+
+                                throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                            }
+                            $only_updates = $this->handle_messages($dc);
+                            $waiting = $this->datacenter->select(true);
+                        }
+                    } else {
+                        $this->poll();
+                    }
+                } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+                    $this->poll();
+                }
+            } else {
+                $this->poll();
+            }
+            if (time() - $this->last_getdifference > $this->settings['updates']['getdifference_interval']) {
+                $this->poll();
+            }
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            throw $e;
+        } catch (\danog\MadelineProto\Exception $e) {
+            $this->connect_to_all_dcs();
+        }
     }
+
+    public function poll()
+    {
+        if ($this->settings['updates']['handle_updates']) {
+            $this->get_updates_difference();
+        } else {
+            foreach ($this->datacenter->sockets as $datacenter => $socket) {
+
+                $this->send_messages($datacenter);
+                if (($error = $this->recv_message($datacenter)) !== true) {
+                    var_dump($error);
+                    if ($error === -404) {
+                        if ($this->datacenter->sockets[$datacenter]->temp_auth_key !== null) {
+                            $this->logger->logger('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
+                            $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
+                            $this->init_authorization();
+    
+                            throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+                        }
+                        $this->check_pending_calls_dc($datacenter);
+                        return;
+                    }
+    
+                    throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                }
+    
+                }
+            $this->last_getdifference = time();
+        }
+    }
+
+    public function check_pending_calls()
+    {
+        foreach ($this->datacenter->sockets as $datacenter => $socket) {
+            $this->check_pending_calls_dc($datacenter);
+        }
+    }
+
+    public function check_pending_calls_dc($datacenter) {
+        $zis = $this;
+        if (!empty($this->datacenter->sockets[$datacenter]->new_outgoing)) {
+            $promise = new \GuzzleHttp\Promise\Promise();
+            $promise->then(
+                function ($result) use ($datacenter, $zis) {
+                    $zis->logger->logger($result, \danog\MadelineProto\Logger::NOTICE);
+                }, 
+                function ($error) use ($datacenter, $zis) {
+                    $zis->logger->logger($error, \danog\MadelineProto\Logger::FATAL_ERROR);
+                }
+            );
+            $this->object_call('msgs_state_req', ['msg_ids' => $this->datacenter->sockets[$datacenter]->new_outgoing], ['promise' => $promise]);
+        }
+    }
+
+    public function method_recall($message_id, $new_datacenter, $old_datacenter = false)
+    {
+        if ($old_datacenter === false) {
+            $old_datacenter = $new_datacenter;
+        }
+
+        if (isset($this->datacenter->sockets[$old_datacenter][$message_id]['container'])) {
+            $message_ids = $this->datacenter->sockets[$old_datacenter][$message_id]['container'];
+        } else {
+            $message_ids = [$message_id];
+        }
+
+        foreach ($message_ids as $message_id) {
+            $this->append_message($this->datacenter->sockets[$old_datacenter][$message_id], ['datacenter' => $new_datacenter]);
+            $this->ack_outgoing_message_id($message_id, $datacenter);
+        }
+        
+        $this->send_messages($new_datacenter);
+    }
+
     public function method_call($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
+    {
+        $promise = $this->method_call_async($method, $args, $aargs);
+        do {
+            $this->iorun();
+        } while ($promise->getState() === 'pending');
+
+        $promise->then(
+            function ($result) use (&$out) {
+                $out = $result;
+            },
+            function ($error) {
+                throw $error;
+            }
+        );
+        var_dump($out);
+        return $out;
+    }
+
+    public function method_call_async($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
         if (isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID') {
             $aargs['datacenter'] = $args['id']['dc_id'];
@@ -49,14 +184,24 @@ trait CallHandler
         if (isset($args['ping_id']) && is_int($args['ping_id'])) {
             $args['ping_id'] = $this->pack_signed_long($args['ping_id']);
         }
+
+        $promise = new \GuzzleHttp\Promise\Promise();
+        $message = ['_' => $method, 'type' => $this->methods->find_by_method($method)['type'], 'content_related' => $this->content_related($method), 'promise' => $promise];
+
         if (isset($aargs['serialized'])) {
-            $serialized = $aargs['serialized'];
+            $message['body'] = $aargs['serialized'];
         } else {
-            $serialized = $this->serialize_method($method, $args);
+            $message['body'] = $this->serialize_method($method, $args);
         }
-        $content_related = $this->content_related($method);
-        $type = $this->methods->find_by_method($method)['type'];
-        $this->append_message(['_' => $method, 'body' => $serialized, 'content_related' => $content_related, 'method' => true], $aargs);
+        if (isset($aargs['msg_id'])) {
+            $message['msg_id'] = $aargs['msg_id'];
+        }
+        if (isset($aargs['file'])) {
+            $message['file'] = $aargs['file'];
+        }
+        $this->append_message($message, $aargs['datacenter']);
+
+        return $promise;
 
         $last_recv = $this->datacenter->sockets[$aargs['datacenter']]->last_recv;
         for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
@@ -248,14 +393,11 @@ trait CallHandler
 
     public function object_call($object, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
-        if (!is_array($args)) {
-            throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
+        $message = ['_' => $object, 'body' => $this->serialize_object(['type' => $object], $args, $object), 'content_related' => $this->content_related($object)];
+        if (isset($aargs['promise'])) {
+            $message['promise'] = $aargs['promise'];
         }
-        if (!isset($aargs['datacenter'])) {
-            throw new \danog\MadelineProto\Exception('No datacenter provided');
-        }
-        $serialized = $this->serialize_object(['type' => $object], $args, $object);
-        $this->append_message(['_' => $object, 'body' => $serialized, 'method' => false, 'content_related' => $this->content_related($object)], $aargs);
+        $this->append_message($message, $aargs['datacenter']);
     }
 
     /*
@@ -264,7 +406,7 @@ trait CallHandler
         'body' => 'serialized body', (optional if container)
         'content_related' => bool,
         '_' => 'predicate',
-        'method' => bool,
+        'promise' => promise object (optional),
         'file' => bool (optional),
         'type' => 'type' (optional),
         'queue' => queue ID (optional),
@@ -272,22 +414,22 @@ trait CallHandler
 
         // only in incoming messages
         'content' => deserialized body,
-        'seqno' => number (optional),
+        'seq_no' => number (optional),
+        'from_container' => bool (optional),
 
         // can be present in both
         'response' => message id (optional),
+        'msg_id' => message id (optional),
+        'sent' => timestamp,
+        'tries' => number
     ];
     */
-    public function append_message($message, $aargs)
+    public function append_message(&$message, $datacenter)
     {
-        if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
-            if (isset($aargs['msg_id'])) {
-                $message['msg_id'] = $aargs['msg_id'];
-            }
-            $this->datacenter->sockets[$aargs['datacenter']]->pending_outgoing[$this->datacenter->sockets[$aargs['datacenter']]->pending_outgoing_key++] = $message;
+        if ($this->datacenter->sockets[$datacenter]->temp_auth_key !== null) {
+            $this->datacenter->sockets[$datacenter]->pending_outgoing[$this->datacenter->sockets[$datacenter]->pending_outgoing_key++] = $message;
         } else {
-            $this->send_unencrypted_message($message, $aargs);
+            $this->send_unencrypted_message($message, $datacenter);
         }
-
     }
 }

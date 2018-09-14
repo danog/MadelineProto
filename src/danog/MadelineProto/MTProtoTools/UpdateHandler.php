@@ -63,49 +63,9 @@ trait UpdateHandler
         });
         $time = microtime(true);
 
-        try {
-            if (!$this->is_http($this->datacenter->curdc) && !$this->altervista) {
-                try {
-                    $waiting = $this->datacenter->select();
-                    if (count($waiting)) {
-                        $tries = 10;
-                        while (count($waiting) && $tries--) {
-                            $dc = $waiting[0];
-                            if (($error = $this->recv_message($dc)) !== true) {
-                                if ($error === -404) {
-                                    if ($this->datacenter->sockets[$dc]->temp_auth_key !== null) {
-                                        $this->logger->logger('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
-                                        $this->datacenter->sockets[$dc]->temp_auth_key = null;
-                                        $this->init_authorization();
+        $this->iorun();
 
-                                        throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
-                                    }
-                                }
-
-                                throw new \danog\MadelineProto\RPCErrorException($error, $error);
-                            }
-                            $only_updates = $this->handle_messages($dc);
-                            $waiting = $this->datacenter->select(true);
-                        }
-                    } else {
-                        $this->get_updates_difference();
-                    }
-                } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
-                    $this->get_updates_difference();
-                }
-            } else {
-                $this->get_updates_difference();
-            }
-            if (time() - $this->last_getdifference > $this->settings['updates']['getdifference_interval']) {
-                $this->get_updates_difference();
-            }
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
-            throw $e;
-        } catch (\danog\MadelineProto\Exception $e) {
-            $this->connect_to_all_dcs();
-        }
-        $default_params = ['offset' => 0, 'limit' => null, 'timeout' => 0];
-        $params = array_merge($default_params, $params);
+        $params = array_merge(self::DEFAULT_GETUPDATES_PARAMS, $params);
         $params['timeout'] = (int) ($params['timeout'] * 1000000 - (microtime(true) - $time));
         usleep($params['timeout'] > 0 ? $params['timeout'] : 0);
         if (empty($this->updates)) {

@@ -105,6 +105,8 @@ class MTProto
         'msg_resend_req',
         'msg_resend_ans_req',
     ];
+    const DEFAULT_GETUPDATES_PARAMS = ['offset' => 0, 'limit' => null, 'timeout' => 0];
+
     public $hook_url = false;
     public $settings = [];
     private $config = ['expires' => -1];

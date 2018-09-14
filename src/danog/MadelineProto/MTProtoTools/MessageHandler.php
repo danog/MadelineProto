@@ -18,12 +18,14 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait MessageHandler
 {
-    public function send_unencrypted_message(&$message, $aargs)
+    public function send_unencrypted_message(&$message, $datacenter)
     {
-        $this->logger->logger("Sending {$message['type']} as unencrypted message to DC {$aargs['datacenter']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->logger->logger("Sending {$message['_']} as unencrypted message to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
-        $this->datacenter->sockets[$aargs['datacenter']]->send_message("\0\0\0\0\0\0\0\0" . $aargs['msg_id'] . $this->pack_unsigned_int(strlen($message['body'])) . $message['body']);
-        $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$aargs['msg_id']] = $message;
+        $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id($datacenter);
+
+        $this->datacenter->sockets[$datacenter]->send_message("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int(strlen($message['body'])) . $message['body']);
+        $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = $message;
     }
 
     public function send_messages($datacenter)
@@ -32,11 +34,14 @@ trait MessageHandler
             $this->datacenter->sockets[$datacenter]->pending_outgoing[$this->generate_message_id($datacenter)] = ['_' => 'msgs_ack', 'body' => $this->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->datacenter->sockets[$datacenter]->ack_queue], 'msgs_ack'), 'content_related' => false];
         }
 
+        $has_method = false;
         if (empty($this->datacenter->sockets[$datacenter]->pending_outgoing)) {
-            return;
+            if (!$this->is_http($datacenter)) {
+                return;
+            }
+            $has_method = true;
         }
 
-        $has_method = false;
         $has_http_wait = false;
         $total_length = 0;
         $messages = [];
@@ -56,7 +61,7 @@ trait MessageHandler
             if ($message['_'] === 'http_wait') {
                 $has_http_wait = true;
             }
-            if ($message['method']) {
+            if (isset($message['promise'])) {
                 $has_method = true;
                 if (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === false) {
                     $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $message['_']), \danog\MadelineProto\Logger::NOTICE);
@@ -101,10 +106,10 @@ trait MessageHandler
         if ($this->is_http($datacenter) && $has_method && !$has_http_wait) {
             $this->logger->logger("Adding http_wait as encrypted message for DC $datacenter", \danog\Madelineproto\Logger::ULTRA_VERBOSE);
             $message_id = $this->generate_message_id($datacenter);
-            $message = ['_' => 'http_wait', 'method' => false, 'body' => $this->serialize_method('http_wait', ['max_wait' => 500, 'wait_after' => 150, 'max_delay' => 500]), 'content_related' => false];
+            $message = ['_' => 'http_wait', 'body' => $this->serialize_method('http_wait', ['max_wait' => 500, 'wait_after' => 150, 'max_delay' => 500]), 'content_related' => false];
 
-            $keys[$this->datacenter->sockets[$aargs['datacenter']]->pending_outgoing_key] = $message_id;
-            $this->datacenter->sockets[$aargs['datacenter']]->pending_outgoing[$this->datacenter->sockets[$aargs['datacenter']]->pending_outgoing_key++] = $message;
+            $keys[$this->datacenter->sockets[$datacenter]->pending_outgoing_key] = $message_id;
+            $this->datacenter->sockets[$datacenter]->pending_outgoing[$this->datacenter->sockets[$datacenter]->pending_outgoing_key++] = $message;
 
             $messages[] = ['_' => 'MTmessage', 'msg_id' => $message_id, 'bytes' => strlen($message['body']), 'body' => $message['body'], 'seqno' => $this->generate_out_seq_no($datacenter, $message['content_related'])];
             $message_ids[] = $message_id;
@@ -114,8 +119,8 @@ trait MessageHandler
             $this->logger->logger("Wrapping in msg_container as encrypted message for DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             $message_id = $this->generate_message_id($datacenter);
-            $keys[$this->datacenter->sockets[$aargs['datacenter']]->pending_outgoing_key] = $message_id;
-            $this->datacenter->sockets[$aargs['datacenter']]->pending_outgoing[$this->datacenter->sockets[$aargs['datacenter']]->pending_outgoing_key++] = ['_' => 'msg_container', 'method' => false, 'container' => array_values($message_ids), 'content_related' => false];
+            $keys[$this->datacenter->sockets[$datacenter]->pending_outgoing_key] = $message_id;
+            $this->datacenter->sockets[$datacenter]->pending_outgoing[$this->datacenter->sockets[$datacenter]->pending_outgoing_key++] = ['_' => 'msg_container', 'container' => array_values($message_ids), 'content_related' => false];
 
             $message_data = $this->serialize_object(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'container');
             $message_data_length = strlen($message_data);
@@ -144,11 +149,14 @@ trait MessageHandler
         $message = $this->datacenter->sockets[$datacenter]->temp_auth_key['id'] . $message_key . $this->ige_encrypt($plaintext . $padding, $aes_key, $aes_iv);
 
         $this->datacenter->sockets[$datacenter]->send_message($message);
+        $sent = time();
 
         foreach ($keys as $key => $message_id) {
             $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = &$this->datacenter->sockets[$datacenter]->pending_outgoing[$key];
-            if ($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['method']) {
+            if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['promise'])) {
                 $this->datacenter->sockets[$datacenter]->new_outgoing[$message_id] = $message_id;
+                $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent'] = $sent;
+                $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['tries'] = 0;
             }
             unset($this->datacenter->sockets[$datacenter]->pending_outgoing[$key]);
         }
