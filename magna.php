@@ -56,7 +56,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         //$call->configuration["stats_dump_file_path"] = "/tmp/stats".$call->getCallID()['id'].".txt"; // Default is /dev/null
         $call->parseConfig();
         $call->playOnHold($songs);
-        $this->messages->sendMessage(['message' => var_export($call->configuration, true), 'peer' => $call->getOtherID()]);
+        //$this->messages->sendMessage(['message' => var_export($call->configuration, true), 'peer' => $call->getOtherID()]);
     }
 
     public function handleMessage($chat_id, $from_id, $message)
@@ -263,6 +263,8 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
                     ]);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    echo $e;
+                } catch (\danog\MadelineProto\Exception $e) {
                     echo $e;
                 }
                 @unlink('/tmp/logs'.$call->getCallID()['id'].'.log');

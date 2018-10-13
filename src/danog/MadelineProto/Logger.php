@@ -61,7 +61,7 @@ class Logger
         }
         $this->mode = $mode;
         $this->optional = $mode == 2 ? Absolute::absolute($optional) : $optional;
-        $this->prefix = $prefix === '' ? '' : ', '.$prefix;
+        $this->prefix = $prefix === '' ? '' : ', '.preg_replace('/[^A-Za-z0-9_]/', '', $prefix);
         $this->level = $level;
 
         if ($this->mode === 2 && !file_exists(pathinfo($this->optional, PATHINFO_DIRNAME))) {
