@@ -119,7 +119,7 @@ class Logger
         if ($file === null) {
             $file = basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
-        $param = str_pad($file.$prefix.': ', 16 + strlen($prefix))."\t".$param;
+        $param = str_pad($file.$prefix.': ', 16 + strlen($prefix))."\t".str_replace('<', '', $param);
         switch ($this->mode) {
                 case 1:
                     error_log($param);
