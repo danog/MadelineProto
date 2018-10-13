@@ -61,7 +61,7 @@ class Logger
         }
         $this->mode = $mode;
         $this->optional = $mode == 2 ? Absolute::absolute($optional) : $optional;
-        $this->prefix = $prefix === '' ? '' : ', '.preg_replace('/[^A-Za-z0-9_]/', '', $prefix);
+        $this->prefix = $prefix === '' ? '' : ', '.$prefix;
         $this->level = $level;
 
         if ($this->mode === 2 && !file_exists(pathinfo($this->optional, PATHINFO_DIRNAME))) {
@@ -123,7 +123,7 @@ class Logger
         if ($file === null) {
             $file = basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
-        $param = str_pad($file.$prefix.': ', 16 + strlen($prefix))."\t".str_replace('<', '', $param);
+        $param = str_pad($file.$prefix.': ', 16 + strlen($prefix))."\t".$param;
         switch ($this->mode) {
                 case 1:
                     error_log($param);
