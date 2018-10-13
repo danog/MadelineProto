@@ -56,7 +56,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 104;
+    const V = 105;
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
@@ -524,6 +524,9 @@ class MTProto
             'handler_workers' => 10,
         ], 'upload' => [
             'allow_automatic_upload' => true,
+            'part_size' => 512*1024,
+        ], 'download' => [
+            'part_size' => 1024*1024,
         ], 'pwr' => [
             'pwr' => false,
             // Need info ?
