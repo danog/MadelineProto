@@ -36,6 +36,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         if ($res == '') {
             $res = var_export($update, true);
         }
+
         try {
             $this->messages->sendMessage(['peer' => $update, 'message' => $res, 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
