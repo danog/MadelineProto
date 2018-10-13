@@ -72,7 +72,6 @@ class Logger
             $this->optional .= '.log';
         }
 
-
         if ($mode === 2 && $max_size !== -1 && file_exists($this->optional) && filesize($this->optional) > $max_size) {
             unlink($this->optional);
         }
