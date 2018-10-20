@@ -594,7 +594,7 @@ trait UpdateHandler
         $this->logger->logger('Saving an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
         if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict'] && isset($this->settings['pwr']['update_handler'])) {
             $this->pwr_update_handler($update);
-        } else if ($this->settings['updates']['run_callback']) {
+        } elseif ($this->settings['updates']['run_callback']) {
             $this->get_updates_update_handler($update);
         }
     }

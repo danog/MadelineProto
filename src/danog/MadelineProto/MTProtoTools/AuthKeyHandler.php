@@ -151,7 +151,7 @@ trait AuthKeyHandler
                 $p_bytes = $p->toBytes();
                 $q_bytes = $q->toBytes();
                 $new_nonce = $this->random(32);
-                $data_unserialized = ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in];
+                $data_unserialized = ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => preg_replace('|_.*|', '', $datacenter)];
                 $p_q_inner_data = $this->serialize_object(['type' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp')], $data_unserialized, 'p_q_inner_data');
                 /*
                  * ***********************************************************************
@@ -384,9 +384,6 @@ trait AuthKeyHandler
                     throw $e;
                 }
                 $this->logger->logger('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
-            } finally {
-                $this->datacenter->sockets[$datacenter]->new_outgoing = [];
-                $this->datacenter->sockets[$datacenter]->new_incoming = [];
             }
         }
         if (strpos($datacenter, 'cdn') === false) {
@@ -510,9 +507,6 @@ trait AuthKeyHandler
                 $this->logger->logger('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 $this->logger->logger('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
-            } finally {
-                $this->datacenter->sockets[$datacenter]->new_outgoing = [];
-                $this->datacenter->sockets[$datacenter]->new_incoming = [];
             }
         }
 
@@ -558,6 +552,9 @@ trait AuthKeyHandler
                             $config = $this->method_call('help.getConfig', [], ['datacenter' => $id]);
                             $this->sync_authorization($id);
                             $this->get_config($config);
+                            
+                            //$this->method_call('auth.dropTempAuthKeys', ['except_auth_keys' => [$socket->temp_auth_key['id']]], ['datacenter' => $id]);
+
                         } elseif ($socket->temp_auth_key === null) {
                             $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
                             $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);

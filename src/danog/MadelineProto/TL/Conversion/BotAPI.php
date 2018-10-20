@@ -33,6 +33,39 @@ trait BotAPI
 
         return $length;
     }
+    
+    public function mb_substr($text, $offset, $length = null)
+    {
+        $mb_text_length = $this->mb_strlen($text);
+        if ($offset < 0) {
+            $offset = $mb_text_length + $offset;
+        }
+        if ($length < 0) {
+            $length = ($mb_text_length - $offset) + $length;
+        } else if ($length === null) {
+            $length = $mb_text_length - $offset;
+        }
+        $new_text = '';
+        $current_offset = 0;
+        $current_length = 0;
+        $text_length = strlen($text);
+        for ($x = 0; $x < $text_length; $x++) {
+            $char = ord($text[$x]);
+            if (($char & 0xC0) != 0x80) {
+                $current_offset += 1 + ($char >= 0xf0);
+                if ($current_offset > $offset) {
+                    $current_length += 1 + ($char >= 0xf0);
+                }
+            }
+            if ($current_offset > $offset) {
+                if ($current_length <= $length) {
+                    $new_text .= $text[$x];
+                }
+            }
+        }
+
+        return $new_text;
+    }
 
     public function parse_buttons($rows)
     {
@@ -327,7 +360,6 @@ trait BotAPI
                 throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['botapi_conversion_error'], $data['_']));
         }
     }
-
 
     public function botAPI_to_MTProto($arguments)
     {

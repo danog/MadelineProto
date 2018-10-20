@@ -75,6 +75,9 @@ class DataCenter
             }
             if (strpos($this->settings[$dc_config_number]['protocol'], 'https') === 0) {
                 $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
+                if (strpos($dc_number, '_media') !== false) {
+                    $subdomain .= '-1';
+                }
                 $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
                 $address = 'https://'.$subdomain.'.web.telegram.org/'.$path;
                 $port = 443;
@@ -164,8 +167,16 @@ class DataCenter
         $except = [];
         foreach ($this->sockets as $dc_id => $socket) {
             $read[$dc_id] = $socket->getSocket();
+            $proxy = $socket->proxy;
         }
-        \Socket::select($read, $write, $except, $poll ? 0 : $this->settings['all']['timeout']);
+        if ($poll === true) {
+            $poll = 0;
+        } else if ($poll === false) {
+            $poll = $this->settings['all']['timeout'];
+        }
+        $poll_sec = floor($poll);
+        $poll_usec = ($poll - $poll_sec)*1000000;
+        $proxy::select($read, $write, $except, $poll_sec, $poll_usec);
 
         return array_keys($read);
     }

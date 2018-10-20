@@ -58,6 +58,7 @@ class Connection
     public $i = [];
     public $must_open = true;
     public $last_recv = 0;
+    public $last_http_wait = 0;
 
     public function __magic_construct($proxy, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
@@ -70,9 +71,14 @@ class Connection
         - https
         - udp
         */
+        \danog\MadelineProto\Logger::log('Opening...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
         if ($proxy === '\\MTProxySocket') {
             $proxy = '\\Socket';
             $protocol = 'obfuscated2';
+        }
+        if (strpos($protocol, 'https') === 0 && $proxy === '\\Socket') {
+            $proxy = '\\FSocket';
         }
 
         $this->protocol = $protocol;
@@ -82,7 +88,7 @@ class Connection
         $this->port = $port;
         $this->proxy = $proxy;
         $this->extra = $extra;
-        if (($has_proxy = !in_array($proxy, ['\\MTProxySocket', '\\Socket'])) && !isset(class_implements($proxy)['danog\\MadelineProto\\Proxy'])) {
+        if (($has_proxy = !in_array($proxy, ['\\MTProxySocket', '\\Socket', '\\FSocket'])) && !isset(class_implements($proxy)['danog\\MadelineProto\\Proxy'])) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
         }
         switch ($this->protocol) {
@@ -163,9 +169,6 @@ class Connection
                 if ($this->parsed['host'][0] === '[') {
                     $this->parsed['host'] = substr($this->parsed['host'], 1, -1);
                 }
-                if (strpos($this->protocol, 'https') === 0 && $proxy === '\\Socket') {
-                    $proxy = '\\FSocket';
-                }
                 $this->sock = new $proxy($ipv6 ? \AF_INET6 : \AF_INET, \SOCK_STREAM, strpos($this->protocol, 'https') === 0 ? PHP_INT_MAX : getprotobyname('tcp'));
                 if ($has_proxy) {
                     if ($this->extra !== []) {
@@ -191,6 +194,7 @@ class Connection
             default:
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
         }
+        $this->must_open = false;
     }
 
     public function __destruct()
@@ -223,7 +227,7 @@ class Connection
 
     public function __sleep()
     {
-        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'peer_tag', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'incoming_messages', 'outgoing_messages', 'new_incoming', 'new_outgoing', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'pending_outgoing', 'pending_outgoing_key', 'ack_queue'];
+        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'peer_tag', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'ack_queue'];
     }
 
     public function __wakeup()
@@ -332,7 +336,6 @@ class Connection
 
         if ($this->must_open) {
             $this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
-            $this->must_open = false;
         }
         switch ($this->protocol) {
             case 'tcp_full':
@@ -407,6 +410,11 @@ class Connection
 
     public function getSocket()
     {
+        $this->must_open = $this->must_open || $this->sock === null || $this->sock->getResource() === null;
+
+        if ($this->must_open) {
+            $this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
+        }
         return $this->sock;
     }
 }
