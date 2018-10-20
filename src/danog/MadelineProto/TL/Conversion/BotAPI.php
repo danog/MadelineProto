@@ -33,7 +33,7 @@ trait BotAPI
 
         return $length;
     }
-    
+
     public function mb_substr($text, $offset, $length = null)
     {
         $mb_text_length = $this->mb_strlen($text);
@@ -42,7 +42,7 @@ trait BotAPI
         }
         if ($length < 0) {
             $length = ($mb_text_length - $offset) + $length;
-        } else if ($length === null) {
+        } elseif ($length === null) {
             $length = $mb_text_length - $offset;
         }
         $new_text = '';

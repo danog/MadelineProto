@@ -22,29 +22,39 @@ class ImmediatePromise
     const PENDING = 'pending';
     const FULFILLED = 'fulfilled';
     const REJECTED = 'rejected';
-    public function __construct($waitFn = null) {
+
+    public function __construct($waitFn = null)
+    {
         $this->waitFn = $waitFn;
         $this->state = self::PENDING;
     }
-    public function then($resolveCallback = null, $rejectCallback = null) {
+
+    public function then($resolveCallback = null, $rejectCallback = null)
+    {
         $this->resolveCallback = $resolveCallback;
         $this->rejectCallback = $rejectCallback;
     }
-    public function resolve($data) {
+
+    public function resolve($data)
+    {
         $this->state = self::FULFILLED;
         if ($this->resolveCallback) {
             $func = $this->resolveCallback;
             $func($data);
         }
     }
-    public function reject($data) {
+
+    public function reject($data)
+    {
         $this->state = self::REJECTED;
         if ($this->rejectCallback) {
             $func = $this->rejectCallback;
             $func($data);
         }
     }
-    public function wait() {
+
+    public function wait()
+    {
         if ($this->waitFn) {
             $func = $this->waitFn;
             $func();
@@ -53,7 +63,9 @@ class ImmediatePromise
             }
         }
     }
-    public function getState() {
+
+    public function getState()
+    {
         return $this->state;
     }
 }

@@ -171,11 +171,11 @@ class DataCenter
         }
         if ($poll === true) {
             $poll = 0;
-        } else if ($poll === false) {
+        } elseif ($poll === false) {
             $poll = $this->settings['all']['timeout'];
         }
         $poll_sec = floor($poll);
-        $poll_usec = ($poll - $poll_sec)*1000000;
+        $poll_usec = ($poll - $poll_sec) * 1000000;
         $proxy::select($read, $write, $except, $poll_sec, $poll_usec);
 
         return array_keys($read);

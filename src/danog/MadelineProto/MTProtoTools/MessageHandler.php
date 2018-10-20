@@ -48,7 +48,7 @@ trait MessageHandler
                     return;
                 }
                 $this->method_call_async('ping', ['ping_id' => $this->random(8)]);
-            } else if ($this->datacenter->sockets[$datacenter]->last_http_wait + $this->settings['connection_settings'][$dc_config_number]['timeout'] > time()) {
+            } elseif ($this->datacenter->sockets[$datacenter]->last_http_wait + $this->settings['connection_settings'][$dc_config_number]['timeout'] > time()) {
                 return;
             }
         }
@@ -62,7 +62,7 @@ trait MessageHandler
             $has_http_wait = false;
             $messages = [];
             $keys = [];
-    
+
             $total_length = 0;
             $count = 0;
             foreach ($this->datacenter->sockets[$datacenter]->pending_outgoing as $message) {
@@ -82,7 +82,7 @@ trait MessageHandler
             if ($this->is_http($datacenter) && !$has_http_wait) {
                 $dc_config_number = isset($this->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
 
-                $this->datacenter->sockets[$datacenter]->pending_outgoing[$this->datacenter->sockets[$datacenter]->pending_outgoing_key++] =  ['_' => 'http_wait', 'body' => $this->serialize_method('http_wait', ['max_wait' => $this->settings['connection_settings'][$dc_config_number]['timeout']*1000-100, 'wait_after' => 0, 'max_delay' => 0]), 'content_related' => false];
+                $this->datacenter->sockets[$datacenter]->pending_outgoing[$this->datacenter->sockets[$datacenter]->pending_outgoing_key++] = ['_' => 'http_wait', 'body' => $this->serialize_method('http_wait', ['max_wait' => $this->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0]), 'content_related' => false];
                 $has_http_wait = true;
             }
 
@@ -94,10 +94,10 @@ trait MessageHandler
                     continue;
                 }
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id($datacenter);
-    
+
                 $this->logger->logger("Sending {$message['_']} as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $message['body'], 'seqno' => $this->generate_out_seq_no($datacenter, $message['content_related'])];
-    
+
                 if (isset($message['method']) && $message['method']) {
                     if (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === false) {
                         $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $message['_']), \danog\MadelineProto\Logger::NOTICE);
@@ -108,7 +108,7 @@ trait MessageHandler
                                 $this->datacenter->sockets[$datacenter]->call_queue[$message['queue']] = [];
                             }
                             $MTmessage['body'] = $this->serialize_method('invokeAfterMsgs', ['msg_ids' => $this->datacenter->sockets[$datacenter]->call_queue[$message['queue']], 'query' => $MTmessage['body']]);
-    
+
                             $this->datacenter->sockets[$datacenter]->call_queue[$message['queue']][$message_id] = $message_id;
                             if (count($this->datacenter->sockets[$datacenter]->call_queue[$message['queue']]) > $this->settings['msg_array_limit']['call_queue']) {
                                 reset($this->datacenter->sockets[$datacenter]->call_queue[$message['queue']]);
@@ -116,7 +116,7 @@ trait MessageHandler
                                 unset($this->datacenter->sockets[$datacenter]->call_queue[$message['queue']][$key]);
                             }
                         }
-    
+
                         /*
                         if ($this->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $this->settings['requests']['gzip_encode_if_gt']) {
                             if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
@@ -134,7 +134,7 @@ trait MessageHandler
                 }
                 $count++;
                 $total_length += $body_length + 32;
-    
+
                 $MTmessage['bytes'] = $body_length;
                 $messages[] = $MTmessage;
                 $keys[$k] = $message_id;
@@ -142,10 +142,10 @@ trait MessageHandler
 
             if (count($messages) > 1) {
                 $this->logger->logger("Wrapping in msg_container as encrypted message for DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-    
+
                 $message_id = $this->generate_message_id($datacenter);
                 $this->datacenter->sockets[$datacenter]->pending_outgoing[$this->datacenter->sockets[$datacenter]->pending_outgoing_key] = ['_' => 'msg_container', 'container' => array_values($keys), 'content_related' => false];
-    
+
                 $keys[$this->datacenter->sockets[$datacenter]->pending_outgoing_key++] = $message_id;
 
                 $message_data = $this->serialize_object(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'container');
@@ -159,25 +159,26 @@ trait MessageHandler
                 $message_id = $message['msg_id'];
                 $seq_no = $message['seqno'];
             } else {
-                $this->logger->logger("NO MESSAGE SENT", \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger('NO MESSAGE SENT', \danog\MadelineProto\Logger::WARNING);
+
                 return;
             }
-    
+
             unset($messages);
-    
-            $plaintext = $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'] . $this->datacenter->sockets[$datacenter]->session_id . $message_id . pack('VV', $seq_no, $message_data_length) . $message_data;
+
+            $plaintext = $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'].$this->datacenter->sockets[$datacenter]->session_id.$message_id.pack('VV', $seq_no, $message_data_length).$message_data;
             $padding = $this->posmod(-strlen($plaintext), 16);
             if ($padding < 12) {
                 $padding += 16;
             }
             $padding = $this->random($padding);
-            $message_key = substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 88, 32) . $plaintext . $padding, true), 8, 16);
+            $message_key = substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 88, 32).$plaintext.$padding, true), 8, 16);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key']);
-            $message = $this->datacenter->sockets[$datacenter]->temp_auth_key['id'] . $message_key . $this->ige_encrypt($plaintext . $padding, $aes_key, $aes_iv);
-    
+            $message = $this->datacenter->sockets[$datacenter]->temp_auth_key['id'].$message_key.$this->ige_encrypt($plaintext.$padding, $aes_key, $aes_iv);
+
             $this->datacenter->sockets[$datacenter]->send_message($message);
             $sent = time();
-    
+
             foreach ($keys as $key => $message_id) {
                 $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = &$this->datacenter->sockets[$datacenter]->pending_outgoing[$key];
                 if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['promise'])) {
@@ -187,14 +188,14 @@ trait MessageHandler
                 }
                 unset($this->datacenter->sockets[$datacenter]->pending_outgoing[$key]);
             }
-    
+
             if ($to_ack) {
                 $this->datacenter->sockets[$datacenter]->ack_queue = [];
             }
 
             if ($has_http_wait) {
                 $this->datacenter->sockets[$datacenter]->last_http_wait = $sent;
-            } else if ($this->altervista) {
+            } elseif ($this->altervista) {
                 $this->datacenter->sockets[$datacenter]->last_http_wait = PHP_INT_MAX;
             }
         } while (!empty($this->datacenter->sockets[$datacenter]->pending_outgoing));
@@ -284,7 +285,7 @@ trait MessageHandler
         $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;
         $this->datacenter->sockets[$datacenter]->last_recv = time();
         $this->datacenter->sockets[$datacenter]->last_http_wait = 0;
-        
+
         return true;
     }
 }

@@ -44,7 +44,6 @@ trait MsgIdHandler
                 if (!isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$key]['promise']) || $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$key]['promise']->getState() !== 'pending') {
                     unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$key]);
                 }
-
             }
             $this->datacenter->sockets[$aargs['datacenter']]->max_outgoing_id = $new_message_id;
             $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[strrev($new_message_id->toBytes())] = [];

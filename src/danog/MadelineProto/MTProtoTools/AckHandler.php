@@ -36,11 +36,12 @@ trait AckHandler
         }*/
         return true;
     }
+
     public function got_response_for_outgoing_message_id($message_id, $datacenter)
     {
         // The server acknowledges that it received my message
         if (!isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id])) {
-            $this->logger->logger("WARNING: Couldn't find message id " . $message_id . ' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
+            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
 
             return false;
         }

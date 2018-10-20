@@ -147,7 +147,7 @@ trait TL
             }
 
             if (empty($TL_dict) || empty($TL_dict['constructors']) || !isset($TL_dict['methods'])) {
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['src_file_invalid'] . $file);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['src_file_invalid'].$file);
             }
             $orig = $this->encrypted_layer;
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_obj'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
@@ -155,11 +155,11 @@ trait TL
                 if ($scheme_type === 'secret') {
                     $this->encrypted_layer = max($this->encrypted_layer, $elem['layer']);
                 }
-                $this->{($scheme_type === 'td' ? 'td_' : '') . 'constructors'}->add($elem, $scheme_type);
+                $this->{($scheme_type === 'td' ? 'td_' : '').'constructors'}->add($elem, $scheme_type);
             }
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_methods'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
-                $this->{($scheme_type === 'td' ? 'td_' : '') . 'methods'}->add($elem);
+                $this->{($scheme_type === 'td' ? 'td_' : '').'methods'}->add($elem);
                 if ($scheme_type === 'secret') {
                     $this->encrypted_layer = max($this->encrypted_layer, $elem['layer']);
                 }
@@ -282,12 +282,12 @@ trait TL
                 if ($l <= 253) {
                     $concat .= chr($l);
                     $concat .= $object;
-                    $concat .= pack('@' . $this->posmod(-$l - 1, 4));
+                    $concat .= pack('@'.$this->posmod(-$l - 1, 4));
                 } else {
                     $concat .= chr(254);
                     $concat .= substr($this->pack_signed_int($l), 0, 3);
                     $concat .= $object;
-                    $concat .= pack('@' . $this->posmod(-$l, 4));
+                    $concat .= pack('@'.$this->posmod(-$l, 4));
                 }
 
                 return $concat;
@@ -303,12 +303,12 @@ trait TL
                 if ($l <= 253) {
                     $concat .= chr($l);
                     $concat .= $object;
-                    $concat .= pack('@' . $this->posmod(-$l - 1, 4));
+                    $concat .= pack('@'.$this->posmod(-$l - 1, 4));
                 } else {
                     $concat .= chr(254);
                     $concat .= substr($this->pack_signed_int($l), 0, 3);
                     $concat .= $object;
-                    $concat .= pack('@' . $this->posmod(-$l, 4));
+                    $concat .= pack('@'.$this->posmod(-$l, 4));
                 }
 
                 return $concat;
@@ -323,7 +323,7 @@ trait TL
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['array_invalid']);
                 }
                 if (isset($object['_'])) {
-                    throw new Exception('You must provide an array of ' . $type['subtype'] . ' objects, not a ' . $type['subtype'] . " object. Example: [['_' => " . $type['subtype'] . ', ... ]]');
+                    throw new Exception('You must provide an array of '.$type['subtype'].' objects, not a '.$type['subtype']." object. Example: [['_' => ".$type['subtype'].', ... ]]');
                 }
                 $concat = $this->constructors->find_by_predicate('vector')['id'];
                 $concat .= $this->pack_unsigned_int(count($object));
@@ -394,7 +394,7 @@ trait TL
             $concat = $constructorData['id'];
         }
 
-        return $concat . $this->serialize_params($constructorData, $object, '', $layer);
+        return $concat.$this->serialize_params($constructorData, $object, '', $layer);
     }
 
     public function serialize_method($method, $arguments)
@@ -453,10 +453,10 @@ trait TL
 
         $tl = $this->methods->find_by_method($method);
         if ($tl === false) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'] . $method);
+            throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'].$method);
         }
 
-        return $tl['id'] . $this->serialize_params($tl, $arguments, $method);
+        return $tl['id'].$this->serialize_params($tl, $arguments, $method);
     }
 
     public function serialize_params($tl, $arguments, $ctx, $layer = -1)
@@ -532,11 +532,11 @@ trait TL
                     $serialized .= pack('@4');
                     continue;
                 }
-                if (($id = $this->constructors->find_by_predicate(lcfirst($current_argument['type']) . 'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
+                if (($id = $this->constructors->find_by_predicate(lcfirst($current_argument['type']).'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
                     $serialized .= $id['id'];
                     continue;
                 }
-                if (($id = $this->constructors->find_by_predicate('input' . $current_argument['type'] . 'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
+                if (($id = $this->constructors->find_by_predicate('input'.$current_argument['type'].'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
                     $serialized .= $id['id'];
                     continue;
                 }
@@ -631,7 +631,7 @@ trait TL
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['length_too_big']);
                 }
                 if ($l === 254) {
-                    $long_len = unpack('V', stream_get_contents($stream, 3) . chr(0))[1];
+                    $long_len = unpack('V', stream_get_contents($stream, 3).chr(0))[1];
                     $x = stream_get_contents($stream, $long_len);
                     $resto = $this->posmod(-$long_len, 4);
                     if ($resto > 0) {
@@ -654,7 +654,7 @@ trait TL
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
                     $constructorData = $this->methods->find_by_id($id);
-                    $constructorData['predicate'] = 'method_' . $constructorData['method'];
+                    $constructorData['predicate'] = 'method_'.$constructorData['method'];
                 }
                 if ($constructorData === false) {
                     throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
@@ -666,7 +666,7 @@ trait TL
                     case 'vector':
                         break;
                     default:
-                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['vector_invalid'] . $constructorData['predicate']);
+                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['vector_invalid'].$constructorData['predicate']);
                 }
             case 'vector':
                 $count = unpack('V', stream_get_contents($stream, 4))[1];
@@ -682,7 +682,7 @@ trait TL
             $checkType = substr($type['type'], 1);
             $constructorData = $this->constructors->find_by_type($checkType);
             if ($constructorData === false) {
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['constructor_not_found'] . $checkType);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['constructor_not_found'].$checkType);
             }
         } else {
             $constructorData = $this->constructors->find_by_predicate($type['type']);
@@ -694,7 +694,7 @@ trait TL
                     if ($constructorData === false) {
                         throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
                     }
-                    $constructorData['predicate'] = 'method_' . $constructorData['method'];
+                    $constructorData['predicate'] = 'method_'.$constructorData['method'];
                 }
             }
         }

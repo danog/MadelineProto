@@ -415,6 +415,7 @@ class Connection
         if ($this->must_open) {
             $this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
         }
+
         return $this->sock;
     }
 }
