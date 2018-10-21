@@ -20,11 +20,15 @@ trait MessageHandler
 {
     public function send_unencrypted_message($message, $datacenter)
     {
+        $body = is_callable($message['body']) ? $message['body']() : $message['body'];
+        if ($body === null) {
+            $this->logger->logger("Postponing {$message['_']} as unencrypted message to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            return;
+        }
+
         $this->logger->logger("Sending {$message['_']} as unencrypted message to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
         $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id($datacenter);
-
-        $body = is_callable($message['body']) ? $message['body']() : $message['body'];
 
         $this->datacenter->sockets[$datacenter]->send_message("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int(strlen($body)) . $body);
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = $message;
@@ -91,10 +95,17 @@ trait MessageHandler
                     break;
                 }
 
+
+                $body = is_callable($message['body']) ? $message['body']() : $message['body'];
+                if ($body === null) {
+                    $this->logger->logger("Postponing {$message['_']} as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    continue;
+                }
+
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id($datacenter);
 
                 $this->logger->logger("Sending {$message['_']} as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => is_callable($message['body']) ? $message['body']() : $message['body'], 'seqno' => $this->generate_out_seq_no($datacenter, $message['content_related'])];
+                $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $body, 'seqno' => $this->generate_out_seq_no($datacenter, $message['content_related'])];
 
                 if (isset($message['method']) && $message['method']) {
                     if (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === false) {
