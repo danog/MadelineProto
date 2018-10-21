@@ -546,7 +546,7 @@ class MTProto
             'full_fetch' => false,
             // Should madeline fetch the full member list of every group it meets?
             'cache_all_peers_on_startup' => false,
-        ], 'requests' => ['gzip_encode_if_gt' => 500], 'updates' => [
+        ], 'requests' => ['gzip_encode_if_gt' => 1024*1024], 'updates' => [
             'handle_updates' => false,
             // Should I handle updates?
             'handle_old_updates' => true,

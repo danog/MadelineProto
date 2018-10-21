@@ -25,9 +25,9 @@ trait CallHandler
         try {
             /*
             if ($this->is_http($this->settings['connection_settings']['default_dc']) || $this->altervista) {
-                $this->logger->logger("Initial HTTP short poll");
-                $waiting = $this->datacenter->select(0.1);
-                $result = $this->handle_select($waiting, $result);
+            $this->logger->logger("Initial HTTP short poll");
+            $waiting = $this->datacenter->select(0.1);
+            $result = $this->handle_select($waiting, $result);
             }*/
             $tries = 10; // TODO add setting
             $this->logger->logger('Long poll');
@@ -106,11 +106,11 @@ trait CallHandler
                 $this->send_messages($this->settings['connection_settings']['default_dc']);
             }
 
-            $this->logger->logger('Polling for '.($updates ? 'updates' : 'replies').': selecting', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->logger->logger('Polling for ' . ($updates ? 'updates' : 'replies') . ': selecting', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             $t = microtime(true);
             $only_updates = $this->select();
             $t = microtime(true) - $t;
-            $this->logger->logger('Polling for '.($updates ? 'updates' : 'replies').': selecting took '.$t, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->logger->logger('Polling for ' . ($updates ? 'updates' : 'replies') . ': selecting took ' . $t, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             $response_result = $this->has_pending_calls();
 
             $repeat = 0;
@@ -232,44 +232,43 @@ trait CallHandler
         if (!empty($this->datacenter->sockets[$datacenter]->new_outgoing)) {
             if ($this->has_pending_calls_dc($datacenter)) {
                 if ($this->datacenter->sockets[$datacenter]->temp_auth_key !== null) {
-                    $thiz = $this;
                     $message_ids = array_values($this->datacenter->sockets[$datacenter]->new_outgoing);
                     $promise = new \danog\MadelineProto\ImmediatePromise();
                     $promise->then(
-                        function ($result) use ($datacenter, $thiz, $message_ids) {
+                        function ($result) use ($datacenter, $message_ids) {
                             $reply = [];
                             foreach (str_split($result['info']) as $key => $chr) {
                                 $message_id = $message_ids[$key];
                                 if (!isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id])) {
-                                    $thiz->logger->logger('Already got response for and forgot about message ID '.$this->unpack_signed_long($message_id));
+                                    $this->logger->logger('Already got response for and forgot about message ID ' . $this->unpack_signed_long($message_id));
                                     continue;
                                 }
                                 if (!isset($this->datacenter->sockets[$datacenter]->new_outgoing[$message_id])) {
-                                    $thiz->logger->logger('Already got response for '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id));
+                                    $this->logger->logger('Already got response for ' . $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'] . ' with message ID ' . $this->unpack_signed_long($message_id));
                                     continue;
                                 }
                                 $chr = ord($chr);
                                 switch ($chr & 7) {
                                     case 0:
-                                        $thiz->logger->logger('Wrong message status 0 for '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'], \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $this->logger->logger('Wrong message status 0 for ' . $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'], \danog\MadelineProto\Logger::FATAL_ERROR);
                                         break;
                                     case 1:
                                     case 2:
                                     case 3:
-                                        $thiz->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' not received by server, resending...', \danog\MadelineProto\Logger::ERROR);
+                                        $this->logger->logger('Message ' . $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'] . ' with message ID ' . $this->unpack_signed_long($message_id) . ' not received by server, resending...', \danog\MadelineProto\Logger::ERROR);
                                         $this->method_recall($message_id, $datacenter, false, true);
                                         break;
                                     case 4:
                                         if ($chr & 32) {
-                                            $thiz->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' received by server and is being processed, waiting...', \danog\MadelineProto\Logger::ERROR);
+                                            $this->logger->logger('Message ' . $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'] . ' with message ID ' . $this->unpack_signed_long($message_id) . ' received by server and is being processed, waiting...', \danog\MadelineProto\Logger::ERROR);
                                         } elseif ($chr & 64) {
-                                            $thiz->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' received by server and was already processed, requesting reply...', \danog\MadelineProto\Logger::ERROR);
+                                            $this->logger->logger('Message ' . $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'] . ' with message ID ' . $this->unpack_signed_long($message_id) . ' received by server and was already processed, requesting reply...', \danog\MadelineProto\Logger::ERROR);
                                             $reply[] = $message_id;
                                         } elseif ($chr & 128) {
-                                            $thiz->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' received by server and was already sent, requesting reply...', \danog\MadelineProto\Logger::ERROR);
+                                            $this->logger->logger('Message ' . $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'] . ' with message ID ' . $this->unpack_signed_long($message_id) . ' received by server and was already sent, requesting reply...', \danog\MadelineProto\Logger::ERROR);
                                             $reply[] = $message_id;
                                         } else {
-                                            $thiz->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' received by server, requesting reply...', \danog\MadelineProto\Logger::ERROR);
+                                            $this->logger->logger('Message ' . $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'] . ' with message ID ' . $this->unpack_signed_long($message_id) . ' received by server, requesting reply...', \danog\MadelineProto\Logger::ERROR);
                                             $reply[] = $message_id;
                                         }
                                 }
@@ -279,7 +278,7 @@ trait CallHandler
                             }
                             $this->send_messages($datacenter);
                         },
-                        function ($error) use ($datacenter, $thiz) {
+                        function ($error) use ($datacenter) {
                             throw $error;
                         }
                     );
@@ -289,7 +288,7 @@ trait CallHandler
                     $dc_config_number = isset($this->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
                     foreach ($this->datacenter->sockets[$datacenter]->new_outgoing as $message_id) {
                         if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent']) && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent'] + $this->settings['connection_settings'][$dc_config_number]['timeout'] < time() && isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['unencrypted']) && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['unencrypted']) {
-                            $this->logger->logger('Still missing '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message id '.$this->unpack_signed_long($message_id)." on DC $datacenter, resending", \danog\MadelineProto\Logger::ERROR);
+                            $this->logger->logger('Still missing ' . $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'] . ' with message id ' . $this->unpack_signed_long($message_id) . " on DC $datacenter, resending", \danog\MadelineProto\Logger::ERROR);
                             $this->method_recall($message_id, $datacenter, false, true);
                         }
                     }
@@ -350,7 +349,7 @@ trait CallHandler
             $this->logger->logger("Didn't serialize in a while, doing that now...");
             $this->wrapper->serialize($this->wrapper->session);
         }
-        if (isset($aargs['file']) && $aargs['file'] && isset($this->datacenter->sockets[$aargs['datacenter'].'_media'])) {
+        if (isset($aargs['file']) && $aargs['file'] && isset($this->datacenter->sockets[$aargs['datacenter'] . '_media'])) {
             \danog\MadelineProto\Logger::log('Using media DC');
             $aargs['datacenter'] .= '_media';
         }
@@ -359,28 +358,36 @@ trait CallHandler
         }
 
         if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > $this->config['message_length_max']) {
-            // TODO multiple promise resolution
             $arg_chunks = $this->split_to_chunks($args);
-            /*$promise = new \GuzzleHttp\Promise\Promise();
-            foreach ($args_chunks as $args) {
-            $this->method_call_async($method, $args, $aargs)->then(function );
+            $promises = [];
+            $new_aargs = $aargs;
+            $new_aargs['postpone'] = true;
+            $new_aargs['queue'] = $method;
+            foreach ($arg_chunks as $args) {
+                $promises[] = $this->method_call_async($method, $args, $new_aargs);
             }
-            if ($promises)
-             */
-            return $promise;
+
+            if (!isset($aargs['postpone'])) {
+                $this->send_messages($aargs['datacenter']);
+            }
+
+            return new \danog\MadelineProto\CombinedPromise($promises);
         }
         $args = $this->botAPI_to_MTProto($args);
         if (isset($args['ping_id']) && is_int($args['ping_id'])) {
             $args['ping_id'] = $this->pack_signed_long($args['ping_id']);
         }
 
-        $zis = $this;
-        $promise = new \GuzzleHttp\Promise\Promise(function () use (&$zis, $method, $aargs, &$promise) {
+        $promise = new \GuzzleHttp\Promise\Promise(function () use (&$promise, $method, $aargs) {
             do {
-                $zis->logger->logger('Waiting reply for '.$method.' from DC '.$aargs['datacenter'].', current status '.$promise->getState());
-                $zis->iorun(false);
+                if (!$this->datacenter->sockets[$aargs['datacenter']]->new_outgoing) {
+                    $promise->reject(new \danog\MadelineProto\Exception('Empty outgoing queue'));
+                    return;
+                }
+                $this->logger->logger('Waiting reply for ' . $method . ' from DC ' . $aargs['datacenter'] . ', current status ' . $promise->getState());
+                $this->iorun(false);
             } while ($promise->getState() === 'pending');
-            $zis->logger->logger('Got reply for '.$method.' from DC '.$aargs['datacenter'].', current status '.$promise->getState());
+            $this->logger->logger('Got reply for ' . $method . ' from DC ' . $aargs['datacenter'] . ', current status ' . $promise->getState());
         });
         $message = ['_' => $method, 'type' => $this->methods->find_by_method($method)['type'], 'content_related' => $this->content_related($method), 'promise' => $promise, 'method' => true];
 
