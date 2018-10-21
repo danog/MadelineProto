@@ -24,7 +24,9 @@ trait MessageHandler
 
         $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id($datacenter);
 
-        $this->datacenter->sockets[$datacenter]->send_message("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int(strlen($message['body'])) . $message['body']);
+        $body = is_callable($message['body']) ? $message['body']() : $message['body'];
+
+        $this->datacenter->sockets[$datacenter]->send_message("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int(strlen($body)) . $body);
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = $message;
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent'] = time();
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['tries'] = 0;
@@ -62,16 +64,7 @@ trait MessageHandler
             $messages = [];
             $keys = [];
 
-            $total_length = 0;
-            $count = 0;
             foreach ($this->datacenter->sockets[$datacenter]->pending_outgoing as $message) {
-                $body_length = strlen($message['body']);
-                if (($total_length && $total_length + $body_length + 32 > 655360) || $count > 1020) {
-                    break;
-                }
-                $count++;
-                $total_length += $body_length + 32;
-
                 if ($message['_'] === 'http_wait') {
                     $has_http_wait = true;
                     break;
@@ -92,10 +85,16 @@ trait MessageHandler
                     unset($this->datacenter->sockets[$datacenter]->pending_outgoing[$k]);
                     continue;
                 }
+
+                if ($count > 1020 || $total_length + 32 > 655360) {
+                    $this->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::NOTICE);
+                    break;
+                }
+
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id($datacenter);
 
                 $this->logger->logger("Sending {$message['_']} as encrypted message to DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $message['body'], 'seqno' => $this->generate_out_seq_no($datacenter, $message['content_related'])];
+                $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => is_callable($message['body']) ? $message['body']() : $message['body'], 'seqno' => $this->generate_out_seq_no($datacenter, $message['content_related'])];
 
                 if (isset($message['method']) && $message['method']) {
                     if (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === false) {
@@ -126,7 +125,7 @@ trait MessageHandler
                     }
                 }
                 $body_length = strlen($MTmessage['body']);
-                if (($total_length && $total_length + $body_length + 32 > 655360) || $count > 1020) {
+                if ($total_length && $total_length + $body_length + 32 > 655360) {
                     $this->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::NOTICE);
                     break;
                 }
