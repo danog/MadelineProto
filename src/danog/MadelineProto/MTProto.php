@@ -562,6 +562,9 @@ class MTProto
             'handler_workers' => 10,
         ], 'upload' => [
             'allow_automatic_upload' => true,
+            'part_size'              => 512 * 1024,
+        ], 'download' => [
+            'part_size' => 1024 * 1024,
         ], 'pwr' => [
             'pwr' => false,
             // Need info ?

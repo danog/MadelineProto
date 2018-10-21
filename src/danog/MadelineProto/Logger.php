@@ -68,6 +68,10 @@ class Logger
             $this->optional = Absolute::absolute(getcwd().'/MadelineProto.log');
         }
 
+        if ($this->mode === 2 && !preg_match('/\.log$/', $this->optional)) {
+            $this->optional .= '.log';
+        }
+
         if ($mode === 2 && $max_size !== -1 && file_exists($this->optional) && filesize($this->optional) > $max_size) {
             unlink($this->optional);
         }

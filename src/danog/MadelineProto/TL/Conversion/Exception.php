@@ -15,4 +15,16 @@ namespace danog\MadelineProto\TL\Conversion;
 
 class Exception extends \Exception
 {
+    use \danog\MadelineProto\TL\PrettyException;
+
+    public function __toString()
+    {
+        return get_class($this).($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.@file_get_contents(__DIR__.'/../../../.git/refs/heads/master').PHP_EOL.'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
+    }
+
+    public function __construct($message, $file = '')
+    {
+        parent::__construct($message);
+        $this->prettify_tl($file);
+    }
 }

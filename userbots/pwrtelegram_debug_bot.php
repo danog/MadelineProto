@@ -10,7 +10,17 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-require '../vendor/autoload.php';
+
+if (!file_exists(__DIR__.'/../vendor/autoload.php')) {
+    echo 'You did not run composer update, using madeline.php'.PHP_EOL;
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    }
+    include 'madeline.php';
+} else {
+    require_once 'vendor/autoload.php';
+}
+
 $settings = [];
 include_once 'token.php';
 
