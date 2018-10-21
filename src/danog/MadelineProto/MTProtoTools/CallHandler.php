@@ -24,7 +24,7 @@ trait CallHandler
 
         try {
             /*
-            if ($this->is_http($this->datacenter->curdc) || $this->altervista) {
+            if ($this->is_http($this->settings['connection_settings']['default_dc']) || $this->altervista) {
                 $this->logger->logger("Initial HTTP short poll");
                 $waiting = $this->datacenter->select(0.1);
                 $result = $this->handle_select($waiting, $result);
@@ -40,7 +40,7 @@ trait CallHandler
 
             do {
                 $this->logger->logger('Short poll');
-                $waiting = $this->datacenter->select($this->is_http($this->datacenter->curdc) || $this->altervista ? $this->settings['connection_settings']['all']['timeout'] / 10 : true);
+                $waiting = $this->datacenter->select($this->is_http($this->settings['connection_settings']['default_dc']) || $this->altervista ? $this->settings['connection_settings']['all']['timeout'] / 10 : true);
                 $result = $this->handle_select($waiting, $result);
             } while ($tries-- && $waiting);
         } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
@@ -102,8 +102,8 @@ trait CallHandler
                 $this->postpone_pwrchat = true;
             }
 
-            if (($this->is_http($this->datacenter->curdc) || $this->altervista) && $updates) {
-                $this->send_messages($this->datacenter->curdc);
+            if (($this->is_http($this->settings['connection_settings']['default_dc']) || $this->altervista) && $updates) {
+                $this->send_messages($this->settings['connection_settings']['default_dc']);
             }
 
             $this->logger->logger('Polling for '.($updates ? 'updates' : 'replies').': selecting', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
@@ -127,7 +127,7 @@ trait CallHandler
                             $this->send_messages($id);
                         }
                     } else {
-                        if ($response_result[$id] || $id === $this->datacenter->curdc) {
+                        if ($response_result[$id] || $id === $this->settings['connection_settings']['default_dc']) {
                             $this->logger->logger("Polling for updates: got nothing for DC $id", \danog\MadelineProto\Logger::ERROR);
 
                             if ($this->is_http($id) || $this->altervista) {

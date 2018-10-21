@@ -312,7 +312,7 @@ trait ResponseHandler
                             $old_datacenter = $datacenter;
                             $this->datacenter->curdc = $datacenter = (int) preg_replace('/[^0-9]+/', '', $response['error_message']);
 
-                            if ($request['file'] && isset($this->datacenter->sockets[$datacenter.'_media'])) {
+                            if (isset($request['file']) && $request['file'] && isset($this->datacenter->sockets[$datacenter.'_media'])) {
                                 \danog\MadelineProto\Logger::log('Using media DC');
                                 $datacenter .= '_media';
                             }
