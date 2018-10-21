@@ -34,8 +34,10 @@ class ImmediatePromise
     {
         $this->resolveCallback = $resolveCallback;
         $this->rejectCallback = $rejectCallback;
-        
-        return $this->chained = new self(function () { $this->wait(); });
+
+        return $this->chained = new self(function () {
+            $this->wait();
+        });
     }
 
     public function resolve($data)

@@ -394,7 +394,7 @@ trait CallHandler
 
         if (isset($aargs['serialized'])) {
             $message['body'] = $aargs['serialized'];
-        } else if (is_callable($aargs)) {
+        } elseif (is_callable($aargs)) {
             $message['body'] = $aargs;
         } else {
             $message['body'] = $this->serialize_method($method, $args);

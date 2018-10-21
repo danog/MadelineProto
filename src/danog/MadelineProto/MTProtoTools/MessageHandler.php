@@ -23,6 +23,7 @@ trait MessageHandler
         $body = is_callable($message['body']) ? $message['body']() : $message['body'];
         if ($body === null) {
             $this->logger->logger("Postponing {$message['_']} as unencrypted message to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
             return;
         }
 
@@ -30,7 +31,7 @@ trait MessageHandler
 
         $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id($datacenter);
 
-        $this->datacenter->sockets[$datacenter]->send_message("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int(strlen($body)) . $body);
+        $this->datacenter->sockets[$datacenter]->send_message("\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int(strlen($body)).$body);
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = $message;
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent'] = time();
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['tries'] = 0;
@@ -94,7 +95,6 @@ trait MessageHandler
                     $this->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::NOTICE);
                     break;
                 }
-
 
                 $body = is_callable($message['body']) ? $message['body']() : $message['body'];
                 if ($body === null) {

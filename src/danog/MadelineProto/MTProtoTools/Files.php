@@ -41,14 +41,14 @@ trait Files
         }
         if ($cb === null) {
             $cb = function ($percent) {
-                $this->logger->logger('Upload status: ' . $percent . '%', \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger('Upload status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
             };
         }
         $part_size = $this->settings['upload']['part_size'];
         $part_total_num = (int) ceil($file_size / $part_size);
         $part_num = 0;
         $method = $file_size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
-        $constructor = 'input' . ($encrypted === true ? 'Encrypted' : '') . ($file_size > 10 * 1024 * 1024 ? 'FileBig' : 'File') . ($encrypted === true ? 'Uploaded' : '');
+        $constructor = 'input'.($encrypted === true ? 'Encrypted' : '').($file_size > 10 * 1024 * 1024 ? 'FileBig' : 'File').($encrypted === true ? 'Uploaded' : '');
         $file_id = $this->random(8);
         $f = fopen($file, 'r');
         fseek($f, 0);
@@ -56,7 +56,7 @@ trait Files
         if ($encrypted === true) {
             $key = $this->random(32);
             $iv = $this->random(32);
-            $digest = hash('md5', $key . $iv, true);
+            $digest = hash('md5', $key.$iv, true);
             $fingerprint = $this->unpack_signed_int(substr($digest, 0, 4) ^ substr($digest, 4, 4));
             $ige = new \phpseclib\Crypt\AES('ige');
             $ige->setIV($iv);
@@ -71,8 +71,9 @@ trait Files
                 $method,
                 function () use ($file_id, $part_num, $part_total_num, &$last_part_num, $part_size, $f, $ctx, $ige, $datacenter) {
                     if ($last_part_num !== $part_num - 1) {
-                        $this->logger->logger("Trying to upload part number $part_num out of order, should be uploading " . ($last_part_num + 1));
-                        return null;
+                        $this->logger->logger("Trying to upload part number $part_num out of order, should be uploading ".($last_part_num + 1));
+
+                        return;
                     }
 
                     $bytes = stream_get_contents($f, $part_size);
@@ -82,13 +83,14 @@ trait Files
                     hash_update($ctx, $bytes);
 
                     $last_part_num++;
+
                     return ['file_id' => $file_id, 'file_part' => $part_num, 'file_total_parts' => $part_total_num, 'bytes' => $bytes];
                 },
                 ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]
             );
             $promise->then(function ($result) use ($cb, $f, $file_size) {
                 if (!$result) {
-                    throw new \danog\MadelineProto\Exception('An error occurred while uploading file part ' . $part_num);
+                    throw new \danog\MadelineProto\Exception('An error occurred while uploading file part '.$part_num);
                 }
                 $cb(ftell($f) * 100 / $file_size);
                 if (ftell($f) === $part_size) {
@@ -109,10 +111,13 @@ trait Files
 
         $promise = $promise->then(function ($result) use ($constructor, $ctx) {
             $constructor['md5_checksum'] = hash_final($ctx);
+
             return $constructor;
         });
+
         return $promise;
     }
+
     public function upload($file, $file_name = '', $cb = null, $encrypted = false, $datacenter = null)
     {
         $promise = $this->upload_async($file, $file_name, $cb, $encrypted, $datacenter);
@@ -232,7 +237,7 @@ trait Files
                 if (isset($message_media['decrypted_message']['media']['file_name'])) {
                     $pathinfo = pathinfo($message_media['decrypted_message']['media']['file_name']);
                     if (isset($pathinfo['extension'])) {
-                        $res['ext'] = '.' . $pathinfo['extension'];
+                        $res['ext'] = '.'.$pathinfo['extension'];
                     }
                     $res['name'] = $pathinfo['filename'];
                 }
@@ -247,7 +252,7 @@ trait Files
                             case 'documentAttributeFilename':
                                 $pathinfo = pathinfo($attribute['file_name']);
                                 if (isset($pathinfo['extension'])) {
-                                    $res['ext'] = '.' . $pathinfo['extension'];
+                                    $res['ext'] = '.'.$pathinfo['extension'];
                                 }
                                 $res['name'] = $pathinfo['filename'];
                                 break;
@@ -260,7 +265,7 @@ trait Files
                 if (isset($audio) && isset($audio['title']) && !isset($res['name'])) {
                     $res['name'] = $audio['title'];
                     if (isset($audio['performer'])) {
-                        $res['name'] .= ' - ' . $audio['performer'];
+                        $res['name'] .= ' - '.$audio['performer'];
                     }
                 }
                 if (!isset($res['ext'])) {
@@ -280,7 +285,7 @@ trait Files
                     $res['MessageMedia'] = $message_media;
                     $photo = end($message_media['photo']['sizes']);
                 }
-                $res['name'] = $photo['location']['volume_id'] . '_' . $photo['location']['local_id'];
+                $res['name'] = $photo['location']['volume_id'].'_'.$photo['location']['local_id'];
                 $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret'], 'dc_id' => $photo['location']['dc_id']];
                 $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], '.jpg');
                 $res['mime'] = 'image/jpeg';
@@ -294,7 +299,7 @@ trait Files
                 return $res;
             case 'photoSize':
             case 'photoCachedSize':
-                $res['name'] = $message_media['location']['volume_id'] . '_' . $message_media['location']['local_id'];
+                $res['name'] = $message_media['location']['volume_id'].'_'.$message_media['location']['local_id'];
                 $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['location']['volume_id'], 'local_id' => $message_media['location']['local_id'], 'secret' => $message_media['location']['secret'], 'dc_id' => $message_media['location']['dc_id']];
                 $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], '.jpg');
                 $res['mime'] = 'image/jpeg';
@@ -317,7 +322,7 @@ trait Files
                         case 'documentAttributeFilename':
                             $pathinfo = pathinfo($attribute['file_name']);
                             if (isset($pathinfo['extension'])) {
-                                $res['ext'] = '.' . $pathinfo['extension'];
+                                $res['ext'] = '.'.$pathinfo['extension'];
                             }
                             $res['name'] = $pathinfo['filename'];
                             break;
@@ -329,7 +334,7 @@ trait Files
                 if (isset($audio) && isset($audio['title']) && !isset($res['name'])) {
                     $res['name'] = $audio['title'];
                     if (isset($audio['performer'])) {
-                        $res['name'] .= ' - ' . $audio['performer'];
+                        $res['name'] .= ' - '.$audio['performer'];
                     }
                 }
                 $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => isset($message_media['document']['version']) ? $message_media['document']['version'] : 0, 'dc_id' => $message_media['document']['dc_id']];
@@ -342,12 +347,12 @@ trait Files
                 if (isset($message_media['document']['size'])) {
                     $res['size'] = $message_media['document']['size'];
                 }
-                $res['name'] .= '_' . $message_media['document']['id'];
+                $res['name'] .= '_'.$message_media['document']['id'];
                 $res['mime'] = $message_media['document']['mime_type'];
 
                 return $res;
             default:
-                throw new \danog\MadelineProto\Exception('Invalid constructor provided: ' . $message_media['_']);
+                throw new \danog\MadelineProto\Exception('Invalid constructor provided: '.$message_media['_']);
         }
     }
 
@@ -360,7 +365,7 @@ trait Files
 
         $message_media = $this->get_download_info($message_media);
 
-        return $this->download_to_file($message_media, $dir . '/' . $message_media['name'] . $message_media['ext'], $cb);
+        return $this->download_to_file($message_media, $dir.'/'.$message_media['name'].$message_media['ext'], $cb);
     }
 
     public function download_to_file($message_media, $file, $cb = null)
@@ -399,7 +404,7 @@ trait Files
 
         if ($cb === null) {
             $cb = function ($percent) {
-                $this->logger->logger('Download status: ' . $percent . '%', \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger('Download status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
             };
         }
 
@@ -420,7 +425,7 @@ trait Files
         $percent = 0;
         $datacenter = isset($message_media['InputFileLocation']['dc_id']) ? $message_media['InputFileLocation']['dc_id'] : $this->datacenter->curdc;
         if (isset($message_media['key'])) {
-            $digest = hash('md5', $message_media['key'] . $message_media['iv'], true);
+            $digest = hash('md5', $message_media['key'].$message_media['iv'], true);
             $fingerprint = $this->unpack_signed_int(substr($digest, 0, 4) ^ substr($digest, 4, 4));
             if ($fingerprint !== $message_media['key_fingerprint']) {
                 throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
@@ -459,7 +464,7 @@ trait Files
                 $message_media['cdn_key'] = $res['encryption_key'];
                 $message_media['cdn_iv'] = $res['encryption_iv'];
                 $old_dc = $datacenter;
-                $datacenter = $res['dc_id'] . '_cdn';
+                $datacenter = $res['dc_id'].'_cdn';
                 if (!isset($this->datacenter->sockets[$datacenter])) {
                     $this->config['expires'] = -1;
                     $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
@@ -496,7 +501,7 @@ trait Files
                 }
             }
             if (isset($message_media['cdn_key'])) {
-                $ivec = substr($message_media['cdn_iv'], 0, 12) . pack('N', $offset >> 4);
+                $ivec = substr($message_media['cdn_iv'], 0, 12).pack('N', $offset >> 4);
                 $res['bytes'] = $this->ctr_encrypt($res['bytes'], $message_media['cdn_key'], $ivec);
                 $this->check_cdn_hash($message_media['file_token'], $offset, $res['bytes'], $old_dc);
             }
@@ -552,10 +557,10 @@ trait Files
                 $this->add_cdn_hashes($file, $this->method_call('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => $datacenter]));
             }
             if (!isset($this->cdn_hashes[$file][$offset])) {
-                throw new \danog\MadelineProto\Exception('Could not fetch CDN hashes for offset ' . $offset);
+                throw new \danog\MadelineProto\Exception('Could not fetch CDN hashes for offset '.$offset);
             }
             if (hash('sha256', substr($data, 0, $this->cdn_hashes[$file][$offset]['limit']), true) !== $this->cdn_hashes[$file][$offset]['hash']) {
-                throw new \danog\MadelineProto\SecurityException('CDN hash mismatch for offset ' . $offset);
+                throw new \danog\MadelineProto\SecurityException('CDN hash mismatch for offset '.$offset);
             }
             $data = substr($data, $this->cdn_hashes[$file][$offset]['limit']);
             $offset += $this->cdn_hashes[$file][$offset]['limit'];
