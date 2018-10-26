@@ -376,6 +376,7 @@ class Connection
                 $this->must_open = true;
                 continue;
             }
+
             return;
         } while (true);
     }
