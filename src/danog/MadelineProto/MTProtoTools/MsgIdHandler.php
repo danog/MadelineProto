@@ -41,7 +41,7 @@ trait MsgIdHandler
             if (count($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages) > $this->settings['msg_array_limit']['outgoing']) {
                 reset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
                 $key = key($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages);
-                if (!isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$key]['promise']) || $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$key]['promise']->getState() !== 'pending') {
+                if (!isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$key]['promise']) || !is_object($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$key]['promise']) || $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$key]['promise']->getState() !== 'pending') {
                     unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$key]);
                 }
             }
@@ -64,7 +64,7 @@ trait MsgIdHandler
             if (count($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages) > $this->settings['msg_array_limit']['incoming']) {
                 reset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
                 $key = key($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages);
-                if (!isset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$key]['promise']) || $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$key]['promise']->getState() !== 'pending') {
+                if (!isset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$key]['promise']) || !is_object($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$key]['promise']) || $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$key]['promise']->getState() !== 'pending') {
                     unset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$key]);
                 }
             }

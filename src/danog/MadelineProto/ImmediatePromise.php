@@ -19,6 +19,7 @@ class ImmediatePromise
     private $waitFn;
     private $state;
     private $chained;
+    private $value;
 
     const PENDING = 'pending';
     const FULFILLED = 'fulfilled';
@@ -34,7 +35,6 @@ class ImmediatePromise
     {
         $this->resolveCallback = $resolveCallback;
         $this->rejectCallback = $rejectCallback;
-
         return $this->chained = new self(function () {
             $this->wait();
         });
@@ -43,6 +43,8 @@ class ImmediatePromise
     public function resolve($data)
     {
         $this->state = self::FULFILLED;
+        $this->value = $data;
+
         if ($this->resolveCallback) {
             $func = $this->resolveCallback;
             $result = $func($data);
@@ -54,6 +56,8 @@ class ImmediatePromise
     public function reject($data)
     {
         $this->state = self::REJECTED;
+        $this->value = $data;
+
         if ($this->rejectCallback) {
             $func = $this->rejectCallback;
             $result = $func($data);
@@ -62,14 +66,20 @@ class ImmediatePromise
         }
     }
 
-    public function wait()
+    public function wait($unwrap = true)
     {
-        if ($this->waitFn) {
+        if ($this->state === self::PENDING && $this->waitFn) {
             $func = $this->waitFn;
             $func();
             if ($this->state === self::PENDING) {
                 throw new Exception('Waiting function did not resolve or reject.');
             }
+        }
+        if ($unwrap) {
+            if ($this->getState() === self::REJECTED) {
+                throw ($this->value instanceof \Exception || $this->value instanceof \Throwable ? $this->value : new Exception($this->value));
+            }
+            return $this->value;
         }
     }
 

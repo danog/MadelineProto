@@ -42,6 +42,7 @@ trait MessageHandler
     public function send_messages($datacenter)
     {
         if ($this->datacenter->sockets[$datacenter]->temp_auth_key === null) {
+            $this->check_pending_calls_dc($datacenter);
             return;
         }
         if (empty($this->datacenter->sockets[$datacenter]->pending_outgoing)) {
@@ -59,12 +60,12 @@ trait MessageHandler
             }
         }
 
-        if (count($to_ack = $this->datacenter->sockets[$datacenter]->ack_queue)) {
-            $this->datacenter->sockets[$datacenter]->pending_outgoing[$this->datacenter->sockets[$datacenter]->pending_outgoing_key++] = ['_' => 'msgs_ack', 'body' => $this->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->datacenter->sockets[$datacenter]->ack_queue], 'msgs_ack'), 'content_related' => false];
-        }
-
         $this->check_pending_calls_dc($datacenter);
         do {
+            if (count($to_ack = $this->datacenter->sockets[$datacenter]->ack_queue)) {
+                $this->datacenter->sockets[$datacenter]->pending_outgoing[] = ['_' => 'msgs_ack', 'body' => $this->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->datacenter->sockets[$datacenter]->ack_queue], 'msgs_ack'), 'content_related' => false];
+            }
+
             $has_http_wait = false;
             $messages = [];
             $keys = [];
@@ -85,13 +86,14 @@ trait MessageHandler
 
             $total_length = 0;
             $count = 0;
+            ksort($this->datacenter->sockets[$datacenter]->pending_outgoing);
             foreach ($this->datacenter->sockets[$datacenter]->pending_outgoing as $k => $message) {
                 if (isset($message['container'])) {
                     unset($this->datacenter->sockets[$datacenter]->pending_outgoing[$k]);
                     continue;
                 }
 
-                if ($count > 1020 || $total_length + 32 > 655360) {
+                if ($count > 1020 || $total_length + 32 > 512*1024) {
                     $this->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::NOTICE);
                     break;
                 }
@@ -206,6 +208,7 @@ trait MessageHandler
             } elseif ($this->altervista) {
                 $this->datacenter->sockets[$datacenter]->last_http_wait = PHP_INT_MAX;
             }
+            //if (!empty($this->datacenter->sockets[$datacenter]->pending_outgoing)) $this->select();
         } while (!empty($this->datacenter->sockets[$datacenter]->pending_outgoing));
 
         $this->datacenter->sockets[$datacenter]->pending_outgoing_key = 0;

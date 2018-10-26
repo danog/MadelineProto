@@ -9,7 +9,7 @@ The PWRTelegram API is distributed in the hope that it will be useful, but WITHO
 See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 namespace danog\MadelineProto;
 
@@ -70,7 +70,7 @@ class Connection
         - http
         - https
         - udp
-        */
+         */
         \danog\MadelineProto\Logger::log('Opening...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
         if ($proxy === '\\MTProxySocket') {
@@ -173,14 +173,14 @@ class Connection
                 if ($has_proxy) {
                     if ($this->extra !== []) {
                         $this->sock->setExtra($this->extra);
-                    }/*
-                    if ($this->protocol === 'http') {
-                        $this->parsed['path'] = $this->parsed['scheme'].'://'.$this->parsed['host'].
-                        $this->parsed['path'];
-                        $port = 80;
-                    } elseif ($this->protocol === 'https') {
-                        $port = 443;
-                    }*/
+                    } /*
+                if ($this->protocol === 'http') {
+                $this->parsed['path'] = $this->parsed['scheme'].'://'.$this->parsed['host'].
+                $this->parsed['path'];
+                $port = 80;
+                } elseif ($this->protocol === 'https') {
+                $port = 443;
+                }*/
                 }
                 $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
                 $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
@@ -288,7 +288,7 @@ class Connection
                 $packet_length_data = $this->read(4);
                 $packet_length = unpack('V', $packet_length_data)[1];
                 $packet = $this->read($packet_length - 4);
-                if (strrev(hash('crc32b', $packet_length_data.substr($packet, 0, -4), true)) !== substr($packet, -4)) {
+                if (strrev(hash('crc32b', $packet_length_data . substr($packet, 0, -4), true)) !== substr($packet, -4)) {
                     throw new Exception('CRC32 was not correct!');
                 }
                 $this->in_seq_no++;
@@ -304,7 +304,7 @@ class Connection
             case 'tcp_abridged':
                 $packet_length = ord($this->read(1));
 
-                return $this->read($packet_length < 127 ? $packet_length << 2 : unpack('V', $this->read(3)."\0")[1] << 2);
+                return $this->read($packet_length < 127 ? $packet_length << 2 : unpack('V', $this->read(3) . "\0")[1] << 2);
             case 'http':
             case 'https':
                 $response = $this->read_http_payload();
@@ -332,46 +332,56 @@ class Connection
 
     public function send_message($message)
     {
-        $this->must_open = $this->must_open || $this->sock === null || $this->sock->getResource() === null;
+        $tries = 3;
+        do {
+            try {
+                $this->must_open = $this->must_open || $this->sock === null || $this->sock->getResource() === null;
 
-        if ($this->must_open) {
-            $this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
-        }
-        switch ($this->protocol) {
-            case 'tcp_full':
-                $this->out_seq_no++;
-                $step1 = pack('VV', strlen($message) + 12, $this->out_seq_no).$message;
-                $step2 = $step1.strrev(hash('crc32b', $step1, true));
-                $this->write($step2);
-                break;
-            case 'tcp_intermediate':
-                $this->write(pack('V', strlen($message)).$message);
-                break;
-            case 'obfuscated2':
-            case 'tcp_abridged':
-                $len = strlen($message) / 4;
-                if ($len < 127) {
-                    $message = chr($len).$message;
-                } else {
-                    $message = chr(127).substr(pack('V', $len), 0, 3).$message;
+                if ($this->must_open) {
+                    $this->__construct($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol, $this->timeout, $this->ipv6);
                 }
-                $this->write($message);
-                break;
-            case 'http':
-            case 'https':
-                $this->write('POST '.$this->parsed['path']." HTTP/1.1\r\nHost: ".$this->parsed['host'].':'.$this->port."\r\n".$this->sock->getProxyHeaders()."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".strlen($message)."\r\n\r\n".$message);
-                break;
-            case 'udp':
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
-            default:
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
-        }
+                switch ($this->protocol) {
+                    case 'tcp_full':
+                        $this->out_seq_no++;
+                        $step1 = pack('VV', strlen($message) + 12, $this->out_seq_no) . $message;
+                        $step2 = $step1 . strrev(hash('crc32b', $step1, true));
+                        $this->write($step2);
+                        break;
+                    case 'tcp_intermediate':
+                        $this->write(pack('V', strlen($message)) . $message);
+                        break;
+                    case 'obfuscated2':
+                    case 'tcp_abridged':
+                        $len = strlen($message) / 4;
+                        if ($len < 127) {
+                            $message = chr($len) . $message;
+                        } else {
+                            $message = chr(127) . substr(pack('V', $len), 0, 3) . $message;
+                        }
+                        $this->write($message);
+                        break;
+                    case 'http':
+                    case 'https':
+                        $this->write('POST ' . $this->parsed['path'] . " HTTP/1.1\r\nHost: " . $this->parsed['host'] . ':' . $this->port . "\r\n" . $this->sock->getProxyHeaders() . "Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: " . strlen($message) . "\r\n\r\n" . $message);
+                        break;
+                    case 'udp':
+                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
+                    default:
+                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
+                }
+            } catch (\danog\MadelineProto\Exception $e) {
+                if (strpos($e->getMessage(), 'broken pipe') === false) {
+                    throw $e;
+                }
+                $this->must_open = true;
+            }
+        } while ($tries--);
     }
 
     public function read_http_line()
     {
         $line = $lastchar = $curchar = '';
-        while ($lastchar.$curchar !== "\r\n") {
+        while ($lastchar . $curchar !== "\r\n") {
             $line .= $lastchar;
             $lastchar = $curchar;
             $curchar = $this->sock->read(1);
@@ -397,12 +407,12 @@ class Connection
         $read = '';
         if (isset($headers['content-length'])) {
             $read = $this->sock->read((int) $headers['content-length']);
-        }/* elseif (isset($headers['transfer-encoding']) && $headers['transfer-encoding'] === 'chunked') {
-            do {
-                $length = hexdec($this->read_http_line());
-                $read .= $this->sock->read($length);
-                $this->read_http_line();
-            } while ($length);
+        } /* elseif (isset($headers['transfer-encoding']) && $headers['transfer-encoding'] === 'chunked') {
+        do {
+        $length = hexdec($this->read_http_line());
+        $read .= $this->sock->read($length);
+        $this->read_http_line();
+        } while ($length);
         }*/
 
         return ['protocol' => $protocol, 'protocol_version' => $protocol_version, 'code' => $code, 'description' => $description, 'body' => $read, 'headers' => $headers];

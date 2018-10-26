@@ -27,18 +27,11 @@ class CombinedPromise extends ImmediatePromise
         foreach ($this->promises as $id => $promise) {
             $promise->then(function ($result) use ($id) {
                 $this->resolved[$id] = $result;
-
-                if (count($this->resolved) + count($this->rejected) === $this->count) {
-                    $this->resolve(['resolved' => $this->resolved, 'rejected' => $this->rejected]);
-                }
             }, function ($result) use ($id) {
-                $this->resolved[$id] = $result;
-
-                if (count($this->resolved) + count($this->rejected) === $this->count) {
-                    $this->resolve(['resolved' => $this->resolved, 'rejected' => $this->rejected]);
-                }
+                $this->rejected[$id] = $result;
             });
         }
+
         parent::__construct([$this, 'waitPromises']);
     }
 
@@ -49,5 +42,7 @@ class CombinedPromise extends ImmediatePromise
                 $promise->wait();
             }
         }
+
+        $this->resolve(['resolved' => $this->resolved, 'rejected' => $this->rejected]);
     }
 }

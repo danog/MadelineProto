@@ -267,12 +267,15 @@ trait ResponseHandler
 
     public function handle_reject($datacenter, $request, $data)
     {
-        if (isset($request['promise'])) {
-            $request['promise']->reject($request, $data);
+        if (isset($request['promise']) && is_object($request['promise']) && $request['promise']->getState() === 'pending') {
+            $request['promise']->reject($data);
+            $request['promise'] = $request['promise']->getState();
         } elseif (isset($request['container'])) {
             foreach ($request['container'] as $message_id) {
                 $this->handle_reject($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]);
             }
+        } else {
+            $this->logger->logger('Rejecting: already got response for '.(isset($request['_']) ? $request['_'] : '-'));
         }
     }
 
@@ -282,11 +285,6 @@ trait ResponseHandler
         unset($this->datacenter->sockets[$datacenter]->incoming_messages[$response_id]['content']);
         $request = &$this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id];
 
-        if (isset($request['promise']) && $request['promise']->getState() !== 'pending') {
-            $this->logger->logger('Already got response for '.$request['_'].' with message ID '.$this->unpack_signed_long($request_id));
-
-            return;
-        }
         if (isset($request['method']) && $request['method'] && $this->datacenter->sockets[$datacenter]->temp_auth_key !== null && (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === false)) {
             $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] = true;
         }
@@ -448,6 +446,12 @@ trait ResponseHandler
             }
         }
 
+        if (!isset($request['promise']) || (is_object($request['promise']) ? $request['promise']->getState() : $request['promise']) !== 'pending') {
+            $this->logger->logger('Response: already got response for '.(isset($request['_']) ? $request['_'] : '-').' with message ID '.$this->unpack_signed_long($request_id));
+
+            return;
+        }
+
         if (isset($request['botAPI']) && $request['botAPI']) {
             $response = $this->MTProto_to_botAPI($response);
         }
@@ -455,6 +459,8 @@ trait ResponseHandler
         unset($request);
         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
+        $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise'] = $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->getState();
+
     }
 
     public function handle_pending_updates()

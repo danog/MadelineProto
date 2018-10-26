@@ -105,6 +105,9 @@ trait CallHandler
             if (($this->is_http($this->settings['connection_settings']['default_dc']) || $this->altervista) && $updates) {
                 $this->send_messages($this->settings['connection_settings']['default_dc']);
             }
+            foreach ($this->datacenter->sockets as $id => $datacenter) {
+                if ($datacenter->pending_outgoing) $this->send_messages($id);
+            }
 
             $this->logger->logger('Polling for '.($updates ? 'updates' : 'replies').': selecting', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             $t = microtime(true);
@@ -324,20 +327,7 @@ trait CallHandler
     public function method_call($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
         $promise = $this->method_call_async($method, $args, $aargs);
-        $promise->then(
-            function ($result) use (&$out) {
-                $out = $result;
-            },
-            function ($result) use (&$error) {
-                $error = $result;
-            }
-        );
-        $promise->wait();
-        if (isset($error)) {
-            throw $error;
-        }
-
-        return $out;
+        return $promise->wait();
     }
 
     public function method_call_async($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
@@ -357,31 +347,33 @@ trait CallHandler
             $aargs['queue'] = 'secret';
         }
 
-        if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > $this->config['message_length_max']) {
-            $arg_chunks = $this->split_to_chunks($args);
-            $promises = [];
-            $new_aargs = $aargs;
-            $new_aargs['postpone'] = true;
-            $new_aargs['queue'] = $method;
-            foreach ($arg_chunks as $args) {
-                $promises[] = $this->method_call_async($method, $args, $new_aargs);
-            }
+        if (is_array($args)) {
+            if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > $this->config['message_length_max']) {
+                $arg_chunks = $this->split_to_chunks($args);
+                $promises = [];
+                $new_aargs = $aargs;
+                $new_aargs['postpone'] = true;
+                $new_aargs['queue'] = $method;
+                foreach ($arg_chunks as $args) {
+                    $promises[] = $this->method_call_async($method, $args, $new_aargs);
+                }
 
-            if (!isset($aargs['postpone'])) {
-                $this->send_messages($aargs['datacenter']);
-            }
+                if (!isset($aargs['postpone'])) {
+                    $this->send_messages($aargs['datacenter']);
+                }
 
-            return new \danog\MadelineProto\CombinedPromise($promises);
-        }
-        $args = $this->botAPI_to_MTProto($args);
-        if (isset($args['ping_id']) && is_int($args['ping_id'])) {
-            $args['ping_id'] = $this->pack_signed_long($args['ping_id']);
+                return new \danog\MadelineProto\CombinedPromise($promises);
+            }
+            $args = $this->botAPI_to_MTProto($args);
+            if (isset($args['ping_id']) && is_int($args['ping_id'])) {
+                $args['ping_id'] = $this->pack_signed_long($args['ping_id']);
+            }
         }
 
         $promise = new \GuzzleHttp\Promise\Promise(function () use (&$promise, $method, $aargs) {
             do {
                 if (!$this->datacenter->sockets[$aargs['datacenter']]->new_outgoing) {
-                    $promise->reject(new \danog\MadelineProto\Exception('Empty outgoing queue'));
+                    $promise->reject(new \danog\MadelineProto\Exception('Empty outgoing queue'.$promise->getState()));
 
                     return;
                 }
@@ -394,8 +386,8 @@ trait CallHandler
 
         if (isset($aargs['serialized'])) {
             $message['body'] = $aargs['serialized'];
-        } elseif (is_callable($aargs)) {
-            $message['body'] = $aargs;
+        } elseif (is_callable($args)) {
+            $message['body'] = function () use ($method, $args) { $args = $args(); return $args ? $this->serialize_method($method, $this->botAPI_to_MTProto($args)) : $args; };
         } else {
             $message['body'] = $this->serialize_method($method, $args);
         }

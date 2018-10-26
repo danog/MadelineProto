@@ -34,7 +34,7 @@ trait Files
         if (empty($file_name)) {
             $file_name = basename($file);
         }
-        $datacenter = is_null($datacenter) ? $this->datacenter->curdc : $datacenter;
+        $datacenter = is_null($datacenter) ? $this->settings['connection_settings']['default_dc'] : $datacenter;
         $file_size = filesize($file);
         if ($file_size > 512 * 1024 * 3000) {
             throw new \danog\MadelineProto\Exception('Given file is too big!');
@@ -65,36 +65,32 @@ trait Files
         }
         $ctx = hash_init('md5');
         $promises = [];
-        $last_part_num = -1;
-        while (ftell($f) !== $file_size) {
+        $cur_part_num = 0;
+        $uploaded = [];
+        while ($part_num < $part_total_num) {
             $promise = $this->method_call_async(
                 $method,
-                function () use ($file_id, $part_num, $part_total_num, &$last_part_num, $part_size, $f, $ctx, $ige, $datacenter) {
-                    if ($last_part_num !== $part_num - 1) {
-                        $this->logger->logger("Trying to upload part number $part_num out of order, should be uploading ".($last_part_num + 1));
-
-                        return;
+                static function () use ($file_id, $part_num, $part_total_num, $part_size, $f, $ctx, $ige, $datacenter, &$cur_part_num, &$uploaded) {
+                    if (!isset($uploaded[$part_num]) && $cur_part_num !== $part_num) {
+                        return null;
+                    } else if (!isset($uploaded[$part_num])) {
+                        $cur_part_num++;
+                        $uploaded[$part_num] = true;
                     }
 
+                    fseek($f, $part_num*$part_size);
                     $bytes = stream_get_contents($f, $part_size);
-                    if ($encrypted === true) {
+                    if ($ige) {
                         $bytes = $ige->encrypt(str_pad($bytes, $part_size, chr(0)));
                     }
                     hash_update($ctx, $bytes);
-
-                    $last_part_num++;
-
                     return ['file_id' => $file_id, 'file_part' => $part_num, 'file_total_parts' => $part_total_num, 'bytes' => $bytes];
                 },
-                ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]
+                ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter, 'postpone' => true]
             );
-            $promise->then(function ($result) use ($cb, $f, $file_size) {
+            $promise->then(static function ($result) use ($cb, $f, $file_size) {
                 if (!$result) {
                     throw new \danog\MadelineProto\Exception('An error occurred while uploading file part '.$part_num);
-                }
-                $cb(ftell($f) * 100 / $file_size);
-                if (ftell($f) === $part_size) {
-                    fclose($f);
                 }
             });
             $part_num = $part_num + 1;
@@ -109,32 +105,25 @@ trait Files
             $constructor['iv'] = $iv;
         }
 
-        $promise = $promise->then(function ($result) use ($constructor, $ctx) {
-            $constructor['md5_checksum'] = hash_final($ctx);
+        $promise = $promise->then(static function ($result) use ($constructor, $ctx, $f) {
+//            $constructor['md5_checksum'] = hash_final($ctx);
+            fclose($f);
 
             return $constructor;
         });
+
+        $this->send_messages($datacenter);
 
         return $promise;
     }
 
     public function upload($file, $file_name = '', $cb = null, $encrypted = false, $datacenter = null)
     {
+$t = microtime(true);
         $promise = $this->upload_async($file, $file_name, $cb, $encrypted, $datacenter);
-        $promise->then(
-            function ($result) use (&$out) {
-                $out = $result;
-            },
-            function ($result) use (&$error) {
-                $error = $result;
-            }
-        );
-        $promise->wait();
-        if (isset($error)) {
-            throw $error;
-        }
-
-        return $out;
+        $res = $promise->wait();
+$this->logger->logger('Speed: '.((filesize($file)*8)/(microtime(true)-$t)/1000000));
+return $res;
     }
 
     public function upload_encrypted($file, $file_name = '', $cb = null)
