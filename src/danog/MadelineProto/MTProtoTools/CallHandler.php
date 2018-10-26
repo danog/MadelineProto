@@ -106,7 +106,9 @@ trait CallHandler
                 $this->send_messages($this->settings['connection_settings']['default_dc']);
             }
             foreach ($this->datacenter->sockets as $id => $datacenter) {
-                if ($datacenter->pending_outgoing) $this->send_messages($id);
+                if ($datacenter->pending_outgoing) {
+                    $this->send_messages($id);
+                }
             }
 
             $this->logger->logger('Polling for '.($updates ? 'updates' : 'replies').': selecting', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
@@ -327,6 +329,7 @@ trait CallHandler
     public function method_call($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
         $promise = $this->method_call_async($method, $args, $aargs);
+
         return $promise->wait();
     }
 
@@ -387,7 +390,11 @@ trait CallHandler
         if (isset($aargs['serialized'])) {
             $message['body'] = $aargs['serialized'];
         } elseif (is_callable($args)) {
-            $message['body'] = function () use ($method, $args) { $args = $args(); return $args ? $this->serialize_method($method, $this->botAPI_to_MTProto($args)) : $args; };
+            $message['body'] = function () use ($method, $args) {
+                $args = $args();
+
+                return $args ? $this->serialize_method($method, $this->botAPI_to_MTProto($args)) : $args;
+            };
         } else {
             $message['body'] = $this->serialize_method($method, $args);
         }

@@ -460,7 +460,6 @@ trait ResponseHandler
         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise'] = $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->getState();
-
     }
 
     public function handle_pending_updates()

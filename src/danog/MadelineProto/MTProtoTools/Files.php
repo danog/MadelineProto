@@ -72,18 +72,19 @@ trait Files
                 $method,
                 static function () use ($file_id, $part_num, $part_total_num, $part_size, $f, $ctx, $ige, $datacenter, &$cur_part_num, &$uploaded) {
                     if (!isset($uploaded[$part_num]) && $cur_part_num !== $part_num) {
-                        return null;
-                    } else if (!isset($uploaded[$part_num])) {
+                        return;
+                    } elseif (!isset($uploaded[$part_num])) {
                         $cur_part_num++;
                         $uploaded[$part_num] = true;
                     }
 
-                    fseek($f, $part_num*$part_size);
+                    fseek($f, $part_num * $part_size);
                     $bytes = stream_get_contents($f, $part_size);
                     if ($ige) {
                         $bytes = $ige->encrypt(str_pad($bytes, $part_size, chr(0)));
                     }
                     hash_update($ctx, $bytes);
+
                     return ['file_id' => $file_id, 'file_part' => $part_num, 'file_total_parts' => $part_total_num, 'bytes' => $bytes];
                 },
                 ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter, 'postpone' => true]
@@ -119,11 +120,12 @@ trait Files
 
     public function upload($file, $file_name = '', $cb = null, $encrypted = false, $datacenter = null)
     {
-$t = microtime(true);
+        $t = microtime(true);
         $promise = $this->upload_async($file, $file_name, $cb, $encrypted, $datacenter);
         $res = $promise->wait();
-$this->logger->logger('Speed: '.((filesize($file)*8)/(microtime(true)-$t)/1000000));
-return $res;
+        $this->logger->logger('Speed: '.((filesize($file) * 8) / (microtime(true) - $t) / 1000000));
+
+        return $res;
     }
 
     public function upload_encrypted($file, $file_name = '', $cb = null)

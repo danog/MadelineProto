@@ -43,6 +43,7 @@ trait MessageHandler
     {
         if ($this->datacenter->sockets[$datacenter]->temp_auth_key === null) {
             $this->check_pending_calls_dc($datacenter);
+
             return;
         }
         if (empty($this->datacenter->sockets[$datacenter]->pending_outgoing)) {
@@ -93,7 +94,7 @@ trait MessageHandler
                     continue;
                 }
 
-                if ($count > 1020 || $total_length + 32 > 512*1024) {
+                if ($count > 1020 || $total_length + 32 > 512 * 1024) {
                     $this->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::NOTICE);
                     break;
                 }

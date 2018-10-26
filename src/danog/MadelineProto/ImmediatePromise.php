@@ -35,6 +35,7 @@ class ImmediatePromise
     {
         $this->resolveCallback = $resolveCallback;
         $this->rejectCallback = $rejectCallback;
+
         return $this->chained = new self(function () {
             $this->wait();
         });
@@ -79,6 +80,7 @@ class ImmediatePromise
             if ($this->getState() === self::REJECTED) {
                 throw ($this->value instanceof \Exception || $this->value instanceof \Throwable ? $this->value : new Exception($this->value));
             }
+
             return $this->value;
         }
     }
