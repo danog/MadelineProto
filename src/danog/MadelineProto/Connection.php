@@ -370,12 +370,14 @@ class Connection
                         throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
                 }
             } catch (\danog\MadelineProto\Exception $e) {
-                if (strpos($e->getMessage(), 'broken pipe') === false) {
+                if (strpos($e->getMessage(), 'broken pipe') === false || !$tries--) {
                     throw $e;
                 }
                 $this->must_open = true;
+                continue;
             }
-        } while ($tries--);
+            return;
+        } while (true);
     }
 
     public function read_http_line()
