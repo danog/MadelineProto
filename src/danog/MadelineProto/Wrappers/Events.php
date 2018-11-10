@@ -40,6 +40,7 @@ trait Events
         $this->settings['updates']['callback'] = [$this, 'event_update_handler'];
         $this->settings['updates']['handle_updates'] = true;
     }
+
     public function getEventHandler()
     {
         return $this->event_handler_instance;
