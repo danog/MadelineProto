@@ -1,15 +1,14 @@
 <?php
-
 /**
  * MessageHandler module
- * 
+ *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details.
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
@@ -18,6 +17,8 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use function \Amp\call;
+use function \Amp\Socket\connect;
 /**
  * Manages packing and unpacking of messages, and the list of sent and received messages.
  */
@@ -36,7 +37,7 @@ trait MessageHandler
 
         $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id($datacenter);
 
-        $this->datacenter->sockets[$datacenter]->send_message("\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int(strlen($body)).$body);
+        $this->datacenter->sockets[$datacenter]->send_message("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int(strlen($body)) . $body);
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id] = $message;
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent'] = time();
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['tries'] = 0;
@@ -137,7 +138,7 @@ trait MessageHandler
                         if ($this->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $this->settings['requests']['gzip_encode_if_gt']) {
                             if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
                                 $MTmessage['body'] = $this->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
-                                $this->logger->logger('Using GZIP compression for '.$message['_'].', saved '.($l - $g).' bytes of data, reduced call size by '.$g * 100 / $l.'%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                                $this->logger->logger('Using GZIP compression for ' . $message['_'] . ', saved ' . ($l - $g) . ' bytes of data, reduced call size by ' . $g * 100 / $l . '%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                             }
                             unset($gzipped);
                         }
@@ -182,15 +183,15 @@ trait MessageHandler
 
             unset($messages);
 
-            $plaintext = $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'].$this->datacenter->sockets[$datacenter]->session_id.$message_id.pack('VV', $seq_no, $message_data_length).$message_data;
+            $plaintext = $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'] . $this->datacenter->sockets[$datacenter]->session_id . $message_id . pack('VV', $seq_no, $message_data_length) . $message_data;
             $padding = $this->posmod(-strlen($plaintext), 16);
             if ($padding < 12) {
                 $padding += 16;
             }
             $padding = $this->random($padding);
-            $message_key = substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 88, 32).$plaintext.$padding, true), 8, 16);
+            $message_key = substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 88, 32) . $plaintext . $padding, true), 8, 16);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key']);
-            $message = $this->datacenter->sockets[$datacenter]->temp_auth_key['id'].$message_key.$this->ige_encrypt($plaintext.$padding, $aes_key, $aes_iv);
+            $message = $this->datacenter->sockets[$datacenter]->temp_auth_key['id'] . $message_key . $this->ige_encrypt($plaintext . $padding, $aes_key, $aes_iv);
 
             $this->datacenter->sockets[$datacenter]->send_message($message);
             $sent = time();
@@ -225,84 +226,77 @@ trait MessageHandler
      */
     public function recv_message($datacenter)
     {
-        if ($this->datacenter->sockets[$datacenter]->must_open) {
-            $this->logger->logger('Trying to read from closed socket, sending initial ping');
-            if ($this->is_http($datacenter)) {
-                $this->send_messages($datacenter);
-            } elseif (isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) && $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) {
-                $this->method_call('ping', ['ping_id' => 0], ['datacenter' => $datacenter]);
-            } else {
-                $this->close_and_reopen($datacenter);
+        return call(
+            function () use ($datacenter) {
 
-                throw new \danog\MadelineProto\NothingInTheSocketException();
-            }
-        }
-        $payload = $this->datacenter->sockets[$datacenter]->read_message();
-        if (strlen($payload) === 4) {
-            $payload = $this->unpack_signed_int($payload);
-            $this->logger->logger("Received $payload from DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $payload = $this->datacenter->sockets[$datacenter]->read_message();
+                if (strlen($payload) === 4) {
+                    $payload = $this->unpack_signed_int($payload);
+                    $this->logger->logger("Received $payload from DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
-            return $payload;
-        }
-        $auth_key_id = substr($payload, 0, 8);
-        if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
-            $message_id = substr($payload, 8, 8);
-            $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
-            $message_length = unpack('V', substr($payload, 16, 4))[1];
-            $message_data = substr($payload, 20, $message_length);
-            $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = [];
-        } elseif ($auth_key_id === $this->datacenter->sockets[$datacenter]->temp_auth_key['id']) {
-            $message_key = substr($payload, 8, 16);
-            $encrypted_data = substr($payload, 24);
-            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], false);
-            $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
-            /*
-            $server_salt = substr($decrypted_data, 0, 8);
-            if ($server_salt != $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt']) {
-            $this->logger->logger('WARNING: Server salt mismatch (my server salt '.$this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').', \danog\MadelineProto\Logger::WARNING);
-            }
-             */
-            $session_id = substr($decrypted_data, 8, 8);
-            if ($session_id != $this->datacenter->sockets[$datacenter]->session_id) {
-                throw new \danog\MadelineProto\Exception('Session id mismatch.');
-            }
-            $message_id = substr($decrypted_data, 16, 8);
-            $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
-            $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
-            // Dunno how to handle any incorrect sequence numbers
-            $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
-            if ($message_data_length > strlen($decrypted_data)) {
-                throw new \danog\MadelineProto\SecurityException('message_data_length is too big');
-            }
-            if (strlen($decrypted_data) - 32 - $message_data_length < 12) {
-                throw new \danog\MadelineProto\SecurityException('padding is too small');
-            }
-            if (strlen($decrypted_data) - 32 - $message_data_length > 1024) {
-                throw new \danog\MadelineProto\SecurityException('padding is too big');
-            }
-            if ($message_data_length < 0) {
-                throw new \danog\MadelineProto\SecurityException('message_data_length not positive');
-            }
-            if ($message_data_length % 4 != 0) {
-                throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
-            }
-            $message_data = substr($decrypted_data, 32, $message_data_length);
-            if ($message_key != substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 96, 32).$decrypted_data, true), 8, 16)) {
-                throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
-            }
-            $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = ['seq_no' => $seq_no];
-        } else {
-            $this->close_and_reopen($datacenter);
+                    return $payload;
+                }
+                $auth_key_id = substr($payload, 0, 8);
+                if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
+                    $message_id = substr($payload, 8, 8);
+                    $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
+                    $message_length = unpack('V', substr($payload, 16, 4))[1];
+                    $message_data = substr($payload, 20, $message_length);
+                    $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = [];
+                } elseif ($auth_key_id === $this->datacenter->sockets[$datacenter]->temp_auth_key['id']) {
+                    $message_key = substr($payload, 8, 16);
+                    $encrypted_data = substr($payload, 24);
+                    list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], false);
+                    $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
+                    /*
+                    $server_salt = substr($decrypted_data, 0, 8);
+                    if ($server_salt != $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt']) {
+                    $this->logger->logger('WARNING: Server salt mismatch (my server salt '.$this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').', \danog\MadelineProto\Logger::WARNING);
+                    }
+                     */
+                    $session_id = substr($decrypted_data, 8, 8);
+                    if ($session_id != $this->datacenter->sockets[$datacenter]->session_id) {
+                        throw new \danog\MadelineProto\Exception('Session id mismatch.');
+                    }
+                    $message_id = substr($decrypted_data, 16, 8);
+                    $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
+                    $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
+                    // Dunno how to handle any incorrect sequence numbers
+                    $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
+                    if ($message_data_length > strlen($decrypted_data)) {
+                        throw new \danog\MadelineProto\SecurityException('message_data_length is too big');
+                    }
+                    if (strlen($decrypted_data) - 32 - $message_data_length < 12) {
+                        throw new \danog\MadelineProto\SecurityException('padding is too small');
+                    }
+                    if (strlen($decrypted_data) - 32 - $message_data_length > 1024) {
+                        throw new \danog\MadelineProto\SecurityException('padding is too big');
+                    }
+                    if ($message_data_length < 0) {
+                        throw new \danog\MadelineProto\SecurityException('message_data_length not positive');
+                    }
+                    if ($message_data_length % 4 != 0) {
+                        throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
+                    }
+                    $message_data = substr($decrypted_data, 32, $message_data_length);
+                    if ($message_key != substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 96, 32) . $decrypted_data, true), 8, 16)) {
+                        throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
+                    }
+                    $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = ['seq_no' => $seq_no];
+                } else {
+                    $this->close_and_reopen($datacenter);
 
-            throw new \danog\MadelineProto\Exception('Got unknown auth_key id');
-        }
-        $deserialized = $this->deserialize($message_data, ['type' => '', 'datacenter' => $datacenter]);
-        $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['content'] = $deserialized;
-        $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
-        $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;
-        $this->datacenter->sockets[$datacenter]->last_recv = time();
-        $this->datacenter->sockets[$datacenter]->last_http_wait = 0;
+                    throw new \danog\MadelineProto\Exception('Got unknown auth_key id');
+                }
+                $deserialized = $this->deserialize($message_data, ['type' => '', 'datacenter' => $datacenter]);
+                $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['content'] = $deserialized;
+                $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
+                $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;
+                $this->datacenter->sockets[$datacenter]->last_recv = time();
+                $this->datacenter->sockets[$datacenter]->last_http_wait = 0;
 
-        return true;
+                return true;
+            }
+        );
     }
 }
