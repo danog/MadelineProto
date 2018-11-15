@@ -1,6 +1,6 @@
 <?php
 /**
- * Connection module
+ * Connection module.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -12,27 +12,28 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
 
-use function \Amp\call;
-use function \Amp\Promise\wait;
-use function \Amp\Socket\connect;
-use \Amp\Promise;
-use \Amp\Socket\ClientConnectContext;
-use danog\MadelineProto\Stream\Transport\DefaultStream;
-use danog\MadelineProto\Stream\Transport\ObfuscatedTransportStream;
+use Amp\Promise;
+use Amp\Socket\ClientConnectContext;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
-use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
 use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
+use danog\MadelineProto\Stream\Transport\DefaultStream;
+use danog\MadelineProto\Stream\Transport\ObfuscatedTransportStream;
+use function Amp\call;
+use function Amp\Promise\wait;
+use function Amp\Socket\connect;
 
 /**
- * Connection class
+ * Connection class.
  *
  * Manages connection to Telegram datacenters
  *
@@ -84,7 +85,7 @@ class Connection
     public $ctx;
 
     /**
-     * Connect function
+     * Connect function.
      *
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters
      *
@@ -109,7 +110,7 @@ class Connection
         if ($proxy === '\\Socket') {
             $proxy = DefaultStream::getName();
         }
-        
+
         if ($protocol === 'obfuscated2' && $proxy === '\\danog\\MadelineProto\\Stream\\Transport\\DefaultStream') {
             $proxy = ObfuscatedTransportStream::getName();
         }
@@ -117,7 +118,6 @@ class Connection
         if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\StreamInterface'])) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
         }
-
 
         /** @var $context \Amp\ClientConnectContext */
         $context = new ClientConnectContext();
@@ -127,7 +127,7 @@ class Connection
         /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
         $ctx = new ConnectionContext();
         $ctx->setDc($dc)->setUri($uri)->setSocketContext($context)->secure($protocol === 'https');
-        
+
         if ($proxy !== ObfuscatedTransportStream::getName() && $proxy !== DefaultStream::getName()) {
             $ctx->addStream(DefaultStream::getName(), $extra);
         }
@@ -154,7 +154,6 @@ class Connection
                 break;
             default:
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
-
         }
 
         $this->dc = $dc;
@@ -169,7 +168,7 @@ class Connection
     }
 
     /**
-     * Disconnect function
+     * Disconnect function.
      *
      * Disconnects from a telegram DC
      *
@@ -185,15 +184,15 @@ class Connection
                     yield $this->sock->end();
                     unset($this->sock);
                 } catch (\danog\MadelineProto\Exception $e) {
-                    \danog\MadelineProto\Logger::log("Exception while closing socket: " . $e);
+                    \danog\MadelineProto\Logger::log('Exception while closing socket: '.$e);
                 }
-                \danog\MadelineProto\Logger::log("Closed!");
+                \danog\MadelineProto\Logger::log('Closed!');
             }
         );
     }
 
     /**
-     * Disconnect function
+     * Disconnect function.
      *
      * Disconnects from a telegram DC
      *
@@ -210,11 +209,13 @@ class Connection
             }
         );
     }
+
     public function close()
-    {}
+    {
+    }
 
     /**
-     * Destruct function
+     * Destruct function.
      *
      * @internal
      *
@@ -224,8 +225,9 @@ class Connection
     {
         $this->disconnect();
     }
+
     /**
-     * Sleep function
+     * Sleep function.
      *
      * @internal
      *
@@ -237,7 +239,7 @@ class Connection
     }
 
     /**
-     * Wakeup function
+     * Wakeup function.
      *
      * @internal
      *
@@ -254,5 +256,4 @@ class Connection
             wait($this->connect($this->dc, $this->proxy, $this->extra, $this->uri, $this->protocol, $this->timeout, $this->ipv6));
         }
     }
-
 }

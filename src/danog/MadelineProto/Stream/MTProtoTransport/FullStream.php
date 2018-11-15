@@ -1,6 +1,6 @@
 <?php
 /**
- * Obfuscated2 stream wrapper
+ * Obfuscated2 stream wrapper.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -12,24 +12,19 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use \Amp\Deferred;
-use \Amp\Promise;
-use \danog\MadelineProto\Stream\Common\BufferedRawStream;
-use \danog\MadelineProto\Stream\BufferInterface;
-use \danog\MadelineProto\Stream\BufferedProxyStreamInterface;
-use \danog\MadelineProto\Stream\RawProxyStreamInterface;
-use function \Amp\call;
-use danog\MadelineProto\Stream\BufferedStreamInterface;
+use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
+use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 
 /**
- * Obfuscated2 AMP stream wrapper
+ * Obfuscated2 AMP stream wrapper.
  *
  * Manages obfuscated2 encryption/decryption
  *
@@ -43,10 +38,10 @@ class FullStream implements BufferedStreamInterface
     private $out_seq_no = -1;
 
     /**
-     * Stream to use as data source
+     * Stream to use as data source.
      *
      * @param mixed $stream The stream
-     * 
+     *
      * @return Promise
      */
     public function connect(ConnectionContext $ctx): Promise
@@ -55,28 +50,30 @@ class FullStream implements BufferedStreamInterface
         $this->out_seq_no = -1;
         $this->stream = new HashedBufferedStream();
         $this->stream->setExtra('crc32b');
+
         return $this->stream->connect($ctx);
     }
-    
+
     /**
-     * Get write buffer asynchronously
-     * 
-     * @param integer $length Length of data that is going to be written to the write buffer
+     * Get write buffer asynchronously.
+     *
+     * @param int $length Length of data that is going to be written to the write buffer
      *
      * @return Generator
      */
     public function getWriteBufferAsync($length): \Generator
     {
         $this->stream->startWriteHash();
-        $this->stream->checkWriteHash($length+8);
-        $buffer = yield $this->stream->getWriteBuffer($length+12);
+        $this->stream->checkWriteHash($length + 8);
+        $buffer = yield $this->stream->getWriteBuffer($length + 12);
         $this->out_seq_no++;
         $buffer->bufferWrite(pack('VV', $length + 12, $this->out_seq_no));
+
         return $buffer;
     }
 
     /**
-     * Get read buffer asynchronously
+     * Get read buffer asynchronously.
      *
      * @return Generator
      */
@@ -93,6 +90,7 @@ class FullStream implements BufferedStreamInterface
 
         return $buffer;
     }
+
     public static function getName(): string
     {
         return __CLASS__;

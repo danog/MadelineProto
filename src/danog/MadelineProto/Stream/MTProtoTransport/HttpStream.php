@@ -1,6 +1,6 @@
 <?php
 /**
- * Obfuscated2 stream wrapper
+ * Obfuscated2 stream wrapper.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -12,24 +12,19 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use \Amp\Deferred;
-use \Amp\Promise;
-use \danog\MadelineProto\Stream\Common\BufferedRawStream;
-use \danog\MadelineProto\Stream\BufferInterface;
-use \danog\MadelineProto\Stream\BufferedProxyStreamInterface;
-use \danog\MadelineProto\Stream\RawProxyStreamInterface;
-use function \Amp\call;
+use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
-use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
+use danog\MadelineProto\Stream\ConnectionContext;
 
 /**
- * Obfuscated2 AMP stream wrapper
+ * Obfuscated2 AMP stream wrapper.
  *
  * Manages obfuscated2 encryption/decryption
  *
@@ -42,17 +37,17 @@ class HttpStream implements BufferedStreamInterface
     private $code;
     private $ctx;
     /**
-     * URI of the HTTP API
+     * URI of the HTTP API.
      *
      * @var \Amp\Uri\Uri
      */
     private $uri;
 
     /**
-     * Stream to use as data source
+     * Stream to use as data source.
      *
      * @param BufferedStreamInterface $stream The stream
-     * 
+     *
      * @return Promise
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
@@ -63,22 +58,23 @@ class HttpStream implements BufferedStreamInterface
     }
 
     /**
-     * Get write buffer asynchronously
-     * 
-     * @param integer $length Length of data that is going to be written to the write buffer
+     * Get write buffer asynchronously.
+     *
+     * @param int $length Length of data that is going to be written to the write buffer
      *
      * @return Generator
      */
     public function getWriteBufferAsync($length): \Generator
     {
-        $header_data = 'POST ' . $this->uri->getAbsoluteUri() . " HTTP/1.1\r\nHost: " . $this->uri->getHost() . ':' . $this->uri->getPort() . "\r\n" . "Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: " . $length . "\r\n\r\n";
-        $buffer = yield $this->stream->getWriteBuffer(strlen($header_data)+$length);
+        $header_data = 'POST '.$this->uri->getAbsoluteUri()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length."\r\n\r\n";
+        $buffer = yield $this->stream->getWriteBuffer(strlen($header_data) + $length);
         yield $buffer->bufferWrite($header_data);
+
         return $buffer;
     }
 
     /**
-     * Get read buffer asynchronously
+     * Get read buffer asynchronously.
      *
      * @return Generator
      */
@@ -138,11 +134,12 @@ class HttpStream implements BufferedStreamInterface
 
         return $buffer;
     }
- 
+
     public function bufferRead(int $length): Promise
     {
         return new Success($this->code);
     }
+
     public static function getName(): string
     {
         return __CLASS__;

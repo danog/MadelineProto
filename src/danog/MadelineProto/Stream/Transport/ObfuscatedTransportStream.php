@@ -1,6 +1,6 @@
 <?php
 /**
- * Obfuscated2 stream wrapper
+ * Obfuscated2 stream wrapper.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -12,23 +12,19 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\Transport;
 
-use \Amp\Deferred;
-use \Amp\Promise;
-use \danog\MadelineProto\Stream\Common\BufferedRawStream;
-use \danog\MadelineProto\Stream\BufferInterface;
-use \danog\MadelineProto\Stream\BufferedProxyStreamInterface;
-use \danog\MadelineProto\Stream\RawProxyStreamInterface;
-use function \Amp\call;
-use danog\MadelineProto\Stream\ConnectionContext;
+use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
+use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\RawProxyStreamInterface;
 
 /**
- * Obfuscated2 AMP stream wrapper
+ * Obfuscated2 AMP stream wrapper.
  *
  * Manages obfuscated2 encryption/decryption
  *
@@ -42,13 +38,13 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
     private $stream;
 
     /**
-     * Connect to a server
+     * Connect to a server.
      *
      * @param string                           $uri           URI
      * @param bool                             $secure        Whether to use TLS while connecting
      * @param \Amp\Socket\ClientConnectContext $socketContext Socket context
      * @param \Amp\CancellationToken           $token         Cancellation token
-     * 
+     *
      * @return Promise
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
@@ -59,7 +55,7 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
             $random = $this->random(64);
         } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
         $random[56] = $random[57] = $random[58] = $random[59] = chr(0xef);
-        
+
         $random = substr_replace(pack('s', $ctx->getDc()), 60, 2);
 
         $reversed = strrev(substr($random, 8, 48));
@@ -87,13 +83,13 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
     }
 
     /**
-     * Decrypts read data asynchronously
+     * Decrypts read data asynchronously.
      *
      * @param Promise $promise Promise that resolves with a string when new data is available or `null` if the stream has closed.
-     * 
-     * @return Generator That resolves with a string when the provided promise is resolved and the data is decrypted
      *
      * @throws PendingReadError Thrown if another read operation is still pending.
+     *
+     * @return Generator That resolves with a string when the provided promise is resolved and the data is decrypted
      */
     public function readAsync(): \Generator
     {
@@ -105,9 +101,9 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
      *
      * @param string $data Bytes to write.
      *
-     * @return Promise Succeeds once the data has been successfully written to the stream.
-     *
      * @throws ClosedException If the stream has already been closed.
+     *
+     * @return Promise Succeeds once the data has been successfully written to the stream.
      */
     public function write(string $data): Promise
     {
@@ -119,17 +115,17 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
      *
      * @param string $data Bytes to write.
      *
-     * @return Promise Succeeds once the data has been successfully written to the stream.
-     *
      * @throws ClosedException If the stream has already been closed.
+     *
+     * @return Promise Succeeds once the data has been successfully written to the stream.
      */
-    public function end(string $finalData = ""): Promise
+    public function end(string $finalData = ''): Promise
     {
         return parent::end(@$this->encrypt->encrypt($finalData));
     }
 
     /**
-     * Get read buffer asynchronously
+     * Get read buffer asynchronously.
      *
      * @return Generator
      */
@@ -141,10 +137,11 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
 
         return $this;
     }
+
     /**
-     * Get write buffer asynchronously
-     * 
-     * @param integer $length Length of data that is going to be written to the write buffer
+     * Get write buffer asynchronously.
+     *
+     * @param int $length Length of data that is going to be written to the write buffer
      *
      * @return Generator
      */
@@ -153,21 +150,23 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
         if ($length < 127) {
             $message = chr($length);
         } else {
-            $message = chr(127) . substr(pack('V', $length), 0, 3);
+            $message = chr(127).substr(pack('V', $length), 0, 3);
         }
         yield $this->bufferWrite($message);
+
         return $this;
     }
+
     public static function getName(): string
     {
         return __CLASS__;
     }
 
     /**
-     * Does nothing
-     * 
+     * Does nothing.
+     *
      * @param void $data Nothing
-     * 
+     *
      * @return void
      */
     public function setExtra($extra)

@@ -1,6 +1,6 @@
 <?php
 /**
- * Buffer interface
+ * Buffer interface.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -12,14 +12,14 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream;
 
-
 /**
- * Buffer interface
+ * Buffer interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */

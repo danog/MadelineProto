@@ -1,6 +1,6 @@
 <?php
 /**
- * Buffer interface
+ * Buffer interface.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -12,22 +12,23 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\Async;
 
-use \Amp\Promise;
+use Amp\Promise;
 
 /**
- * Buffer interface
+ * Buffer interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 trait Buffer
 {
     /**
-     * Read data asynchronously
+     * Read data asynchronously.
      *
      * @return Promise
      */
@@ -35,27 +36,28 @@ trait Buffer
     {
         return call([$this, 'bufferReadAsync'], $length);
     }
+
     /**
-     * Write data asynchronously
+     * Write data asynchronously.
      *
      * @param string $data Data to write
-     * 
+     *
      * @return Promise
      */
     public function bufferWrite(string $data): Promise
     {
         return call([$this, 'bufferWriteAsync'], $data);
     }
+
     /**
-     * Write data and close buffer asynchronously
-     * 
+     * Write data and close buffer asynchronously.
+     *
      * @param string $data Data to write
      *
      * @return Promise
      */
     public function bufferEnd(string $finalData = ''): Promise
     {
-        return call([$this, 'bufferEndAsync']. $finalData);
+        return call([$this, 'bufferEndAsync'].$finalData);
     }
-
 }
