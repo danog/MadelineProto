@@ -31,7 +31,7 @@ interface BufferInterface
      *
      * @return Promise
      */
-    public function bufferRead($length): Promise;
+    public function bufferRead(int $length): Promise;
     /**
      * Write data asynchronously
      *

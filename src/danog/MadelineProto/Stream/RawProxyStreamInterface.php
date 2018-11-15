@@ -26,12 +26,4 @@ use \Amp\Promise;
  */
 interface RawProxyStreamInterface extends RawStreamInterface, ProxyStreamInterface
 {
-    /**
-     * Set extra proxy data
-     *
-     * @param mixed $extra Proxy data
-     *
-     * @return void
-     */
-    public function setExtra(mixed $extra);
 }

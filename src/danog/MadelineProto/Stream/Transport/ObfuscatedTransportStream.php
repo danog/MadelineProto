@@ -15,7 +15,7 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Streams\Transport;
+namespace danog\MadelineProto\Stream\Transport;
 
 use \Amp\Deferred;
 use \Amp\Promise;
@@ -34,7 +34,7 @@ use danog\MadelineProto\Stream\Async\BufferedStream;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class ObfuscatedStream extends DefaultStream implements RawProxyStreamInterface
+class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamInterface
 {
     use BufferedStream;
     private $encrypt;
@@ -157,5 +157,21 @@ class ObfuscatedStream extends DefaultStream implements RawProxyStreamInterface
         }
         yield $this->bufferWrite($message);
         return $this;
+    }
+    public static function getName(): string
+    {
+        return __CLASS__;
+    }
+
+    /**
+     * Does nothing
+     * 
+     * @param void $data Nothing
+     * 
+     * @return void
+     */
+    public function setExtra($extra)
+    {
+        $this->extra = $extra;
     }
 }

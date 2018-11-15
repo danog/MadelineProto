@@ -15,7 +15,7 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Streams\Transport;
+namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use \Amp\Deferred;
 use \Amp\Promise;
@@ -79,5 +79,9 @@ class IntermediateStream implements BufferedStreamInterface
         yield $buffer->bufferRead(4);
 
         return $buffer;
+    }
+    public static function getName(): string
+    {
+        return __CLASS__;
     }
 }

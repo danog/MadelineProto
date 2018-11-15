@@ -18,6 +18,7 @@
 namespace danog\MadelineProto\Stream\Async;
 
 use \Amp\Promise;
+use danog\MadelineProto\Stream\ConnectionContext;
 
 /**
  * Raw stream interface

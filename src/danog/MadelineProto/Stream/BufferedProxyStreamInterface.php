@@ -17,7 +17,6 @@
 
 namespace danog\MadelineProto\Stream;
 
-use \Amp\Promise;
 
 /**
  * Buffer interface

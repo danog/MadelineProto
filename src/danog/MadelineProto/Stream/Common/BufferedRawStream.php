@@ -80,7 +80,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      * 
      * @return Promise
      */
-    public function write($data): Promise
+    public function write(string $data): Promise
     {
         return $this->sock->write($data);
     }
@@ -92,7 +92,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      * 
      * @return Generator
      */
-    public function endAsync($finalData = ''): \Generator
+    public function endAsync(string $finalData = ''): \Generator
     {
         try {
             yield $this->sock->end($finalData);
@@ -143,7 +143,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      * 
      * @return Promise
      */
-    public function bufferRead($length): Promise
+    public function bufferRead(int $length): Promise
     {
         $size = fstat($this->memory_stream)['size'];
         $offset = fstat($this->memory_stream);
@@ -185,7 +185,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      * 
      * @return Promise
      */
-    public function bufferWrite($data): Promise
+    public function bufferWrite(string $data): Promise
     {
         return $this->sock->write($data);
     }
@@ -197,8 +197,12 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      * 
      * @return Promise
      */
-    public function bufferEnd($finalData = ''): Promise
+    public function bufferEnd(string $finalData = ''): Promise
     {
         return call([$this, 'endAsync'], $finalData);
+    }
+    public static function getName(): string
+    {
+        return __CLASS__;
     }
 }

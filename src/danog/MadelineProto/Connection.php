@@ -20,9 +20,16 @@ namespace danog\MadelineProto;
 use function \Amp\call;
 use function \Amp\Promise\wait;
 use function \Amp\Socket\connect;
-use \Amp\Socket\ClientConnectContext;
-use \Amp\Deferred;
 use \Amp\Promise;
+use \Amp\Socket\ClientConnectContext;
+use danog\MadelineProto\Stream\Transport\DefaultStream;
+use danog\MadelineProto\Stream\Transport\ObfuscatedTransportStream;
+use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
+use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
+use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 
 /**
  * Connection class
@@ -41,12 +48,15 @@ class Connection
     const VOIP_UDP_P2P_ENDPOINT = 3;
     const VOIP_UDP_LAN_ENDPOINT = 4;
 
-    public $sock = null;
-    public $protocol = null;
-    public $ip = null;
-    public $port = null;
-    public $timeout = null;
-    public $parsed = [];
+    public $dc;
+    public $proxy;
+    public $extra = [];
+    public $uri;
+    public $protocol;
+    public $timeout;
+    public $sock;
+    public $ipv6 = false;
+
     public $time_delta = 0;
     public $type = 0;
     public $peer_tag;
@@ -55,7 +65,6 @@ class Connection
     public $session_id;
     public $session_out_seq_no = 0;
     public $session_in_seq_no = 0;
-    public $ipv6 = false;
     public $incoming_messages = [];
     public $outgoing_messages = [];
     public $new_incoming = [];
@@ -64,8 +73,6 @@ class Connection
     public $pending_outgoing_key = 0;
     public $max_incoming_id;
     public $max_outgoing_id;
-    public $proxy = '\\Socket';
-    public $extra = [];
     public $obfuscated = [];
     public $authorized = false;
     public $call_queue = [];
@@ -74,7 +81,7 @@ class Connection
     public $last_recv = 0;
     public $last_http_wait = 0;
 
-    public $packet_left = 0;
+    public $ctx;
 
     /**
      * Connect function
@@ -91,90 +98,74 @@ class Connection
      *
      * @return \Amp\Promise
      */
-    public function connect($proxy, $extra, $ip, $port, $protocol): Promise
+    public function connect($dc, $proxy, $extra, $uri, $protocol, $timeout, $ipv6): Promise
     {
-        return call(
-            function () use ($proxy, $extra, $ip, $port, $protocol) {
-                \danog\MadelineProto\Logger::log('Opening...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log('Opening...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
-                if ($proxy === '\\MTProxySocket') {
-                    $proxy = '\\Socket';
-                    $protocol = 'obfuscated2';
+        if ($proxy === '\\MTProxySocket') {
+            $proxy = '\\Socket';
+            $protocol = 'obfuscated2';
+        }
+        if ($proxy === '\\Socket') {
+            $proxy = DefaultStream::getName();
+        }
+        
+        if ($protocol === 'obfuscated2' && $proxy === '\\danog\\MadelineProto\\Stream\\Transport\\DefaultStream') {
+            $proxy = ObfuscatedTransportStream::getName();
+        }
+
+        if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\StreamInterface'])) {
+            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
+        }
+
+
+        /** @var $context \Amp\ClientConnectContext */
+        $context = new ClientConnectContext();
+        $context = $context->withConnectTimeout($timeout);
+        $context = $context->withMaxAttempts(1);
+
+        /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
+        $ctx = new ConnectionContext();
+        $ctx->setDc($dc)->setUri($uri)->setSocketContext($context)->secure($protocol === 'https');
+        
+        if ($proxy !== ObfuscatedTransportStream::getName() && $proxy !== DefaultStream::getName()) {
+            $ctx->addStream(DefaultStream::getName(), $extra);
+        }
+        $ctx->addStream($proxy, $extra);
+
+        switch ($protocol) {
+            case 'tcp_abridged':
+                $ctx->addStream(AbridgedStream::getName());
+                break;
+            case 'tcp_intermediate':
+                $ctx->addStream(IntermediateStream::getName());
+                break;
+            case 'tcp_full':
+                $ctx->addStream(FullStream::getName());
+                break;
+            case 'http':
+            case 'https':
+                $ctx->addStream(HttpStream::getName());
+                break;
+            case 'obfuscated2':
+                if ($proxy !== ObfuscatedTransportStream::getName()) {
+                    $ctx->addStream(ObfuscatedStream::getName(), $extra);
                 }
-                if (strpos($protocol, 'https') === 0 && $proxy === '\\Socket') {
-                    $proxy = '\\FSocket';
-                }
+                break;
+            default:
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
 
-                $this->protocol = $protocol;
-                $this->timeout = $timeout;
-                $this->ipv6 = $ipv6;
-                $this->ip = $ip;
-                $this->port = $port;
-                $this->proxy = $proxy;
-                $this->extra = $extra;
-                /** @var $context \Amp\ClientConnectContext */
-                $context = new ClientConnectContext();
-                $context = $context->withConnectTimeout($timeout);
-                $context = $context->withMaxAttempts(1);
-                if (($has_proxy = !in_array($proxy, ['\\MTProxySocket', '\\Socket', '\\FSocket'])) && !isset(class_implements($proxy)['danog\\MadelineProto\\Proxy'])) {
-                    throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
-                }
-                switch ($protocol) {
-                    case 'tcp_abridged':
-                        $this->sock = yield connect("tcp://" . $ip . ":" . $port, $context);
-                        yield $this->write(chr(239));
-                        break;
-                    case 'tcp_intermediate':
-                        $this->sock = yield connect("tcp://" . $ip . ":" . $port, $context);
-                        yield $this->write(str_repeat(chr(238), 4));
-                        break;
-                    case 'tcp_full':
-                        $this->sock = yield connect("tcp://" . $ip . ":" . $port, $context);
-                        $this->out_seq_no = -1;
-                        $this->in_seq_no = -1;
-                        break;
-                    case 'obfuscated2':
-                        $this->sock = yield connect("tcp://" . $ip . ":" . $port, $context);
-                        do {
-                            $random = $this->random(64);
-                        } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
-                        $random[56] = $random[57] = $random[58] = $random[59] = chr(0xef);
+        }
 
-                        $reversed = strrev(substr($random, 8, 48));
+        $this->dc = $dc;
+        $this->protocol = $protocol;
+        $this->timeout = $timeout;
+        $this->ipv6 = $ipv6;
+        $this->uri = $uri;
+        $this->proxy = $proxy;
+        $this->extra = $extra;
 
-                        $encrypt = new \phpseclib\Crypt\AES('ctr');
-                        $encrypt->enableContinuousBuffer();
-                        $encrypt->setKey(substr($random, 8, 32));
-                        $encrypt->setIV(substr($random, 40, 16));
-
-                        $decrypt = new \phpseclib\Crypt\AES('ctr');
-                        $decrypt->enableContinuousBuffer();
-                        $decrypt->setKey(substr($reversed, 0, 32));
-                        $decrypt->setIV(substr($reversed, 32, 16));
-
-                        $random = substr_replace($random, substr(@$encrypt->encrypt($random), 56, 8), 56, 8);
-
-                        yield $this->sock->write($random);
-
-                        $this->sock = new \danog\MadelineProto\Streams\ObfuscatedStream($encrypt, $decrypt, $this->sock)
-
-                        break;
-                    case 'http':
-                    case 'https':
-                        $this->parsed = parse_url($ip);
-                        if ($this->parsed['host'][0] === '[') {
-                            $this->parsed['host'] = substr($this->parsed['host'], 1, -1);
-                        }
-                        $method = $protocol === 'https' ? 'cryptoConnect' : 'connect';
-                        $this->sock = yield $method("tcp://" . $ip . ":" . $port, $context);
-                        break;
-                    case 'udp':
-                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
-                    default:
-                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
-                }
-            }
-        );
+        return $ctx->getStream();
     }
 
     /**
@@ -219,6 +210,8 @@ class Connection
             }
         );
     }
+    public function close()
+    {}
 
     /**
      * Destruct function
@@ -257,152 +250,9 @@ class Connection
             throw new Bug74586Exception();
         }
         $this->time_delta = 0;
-        wait($this->connect());
-    }
-
-    /**
-     * Read payload chunk
-     *
-     * @param integer $length Size of chunk to read
-     *
-     * @return Amp\Promise
-     */
-    public function read_message_chunk($length): Promise
-    {
-        if ($this->packet_left) {
-            $deferred = new Deferred();
-            $promise = $this->read($length);
-            $promise->onResolve(
-                function ($error, $result) use ($deferred, $length) {
-                    if ($error) {
-                        return $deferred->fail($error);
-                    }
-                    $this->packet_left -= $length;
-                    $deferred->resolve($result);
-                }
-            );
-            return $deferred->promise();
-        }
-        return call(
-            function () use ($length) {
-                switch ($this->protocol) {
-                    case 'tcp_full':
-                        $packet_length_data = yield $this->read(4);
-                        $packet_length = unpack('V', $packet_length_data)[1];
-                        $packet = yield $this->read($packet_length - 4);
-                        if (strrev(hash('crc32b', $packet_length_data . substr($packet, 0, -4), true)) !== substr($packet, -4)) {
-                            throw new Exception('CRC32 was not correct!');
-                        }
-                        $this->in_seq_no++;
-                        $in_seq_no = unpack('V', substr($packet, 0, 4))[1];
-                        if ($in_seq_no != $this->in_seq_no) {
-                            throw new Exception('Incoming seq_no mismatch');
-                        }
-
-                        return substr($packet, 4, $packet_length - 12);
-                    case 'tcp_intermediate':
-                        return yield $this->read(unpack('V', yield $this->read(4))[1]);
-                    case 'obfuscated2':
-                    case 'tcp_abridged':
-                        $packet_length = ord(yield $this->read(1));
-
-                        return yield $this->read($packet_length < 127 ? $packet_length << 2 : unpack('V', yield $this->read(3) . "\0")[1] << 2);
-                    case 'http':
-                    case 'https':
-                        $response = yield $this->read_http_payload();
-                        $close = $response['protocol'] === 'HTTP/1.0' || $response['code'] !== 200;
-                        if (isset($response['headers']['connection'])) {
-                            $close = strtolower($response['headers']['connection']) === 'close';
-                        }
-                        if ($close) {
-                            $this->close_and_reopen();
-                        }
-
-                        if ($response['code'] !== 200) {
-                            Logger::log($response['body']);
-
-                            return $this->pack_signed_int(-$response['code']);
-                        }
-
-                        return $response['body'];
-                    case 'udp':
-                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
-                    default:
-                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
-                }
-            }
-        );
-    }
-
-    public function send_message($message): Promise
-    {
-        switch ($this->protocol) {
-            case 'tcp_full':
-                $this->out_seq_no++;
-                $step1 = pack('VV', strlen($message) + 12, $this->out_seq_no) . $message;
-                $step2 = $step1 . strrev(hash('crc32b', $step1, true));
-                return $this->write($step2);
-            case 'tcp_intermediate':
-                return $this->write(pack('V', strlen($message)) . $message);
-            case 'obfuscated2':
-            case 'tcp_abridged':
-                $len = strlen($message) / 4;
-                if ($len < 127) {
-                    $message = chr($len) . $message;
-                } else {
-                    $message = chr(127) . substr(pack('V', $len), 0, 3) . $message;
-                }
-                return $this->write($message);
-            case 'http':
-            case 'https':
-                return $this->write('POST ' . $this->parsed['path'] . " HTTP/1.1\r\nHost: " . $this->parsed['host'] . ':' . $this->port . "\r\n" . $this->sock->getProxyHeaders() . "Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: " . strlen($message) . "\r\n\r\n" . $message);
-                break;
-            case 'udp':
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_not_implemented']);
-            default:
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
+        if ($this->uri) {
+            wait($this->connect($this->dc, $this->proxy, $this->extra, $this->uri, $this->protocol, $this->timeout, $this->ipv6));
         }
     }
 
-    public function read_http_line(): Promise
-    {
-        return call(
-            function () {
-                $line = $lastchar = $curchar = '';
-                while ($lastchar . $curchar !== "\r\n") {
-                    $line .= $lastchar;
-                    $lastchar = $curchar;
-                    $curchar = yield $this->sock->read(1);
-                }
-
-                return $line;
-            }
-        );
-    }
-
-    public function read_http_payload(): Promise
-    {
-        return call(
-            function () {
-                list($protocol, $code, $description) = explode(' ', yield $this->read_http_line(), 3);
-                list($protocol, $protocol_version) = explode('/', $protocol);
-                if ($protocol !== 'HTTP') {
-                    throw new \danog\MadelineProto\Exception('Wrong protocol');
-                }
-                $code = (int) $code;
-                $headers = [];
-                while (strlen($current_header = yield $this->read_http_line())) {
-                    $current_header = explode(':', $current_header, 2);
-                    $headers[strtolower($current_header[0])] = trim($current_header[1]);
-                }
-
-                $read = '';
-                if (isset($headers['content-length'])) {
-                    $read = yield $this->sock->read((int) $headers['content-length']);
-                }
-
-                return ['protocol' => $protocol, 'protocol_version' => $protocol_version, 'code' => $code, 'description' => $description, 'body' => $read, 'headers' => $headers];
-            }
-        );
-    }
 }

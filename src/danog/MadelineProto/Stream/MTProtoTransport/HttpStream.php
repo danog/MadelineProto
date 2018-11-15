@@ -15,7 +15,7 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Streams\Transport;
+namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use \Amp\Deferred;
 use \Amp\Promise;
@@ -39,8 +39,8 @@ class HttpStream implements BufferedStreamInterface
 {
     use BufferedStream;
     private $stream;
-    private $close = false;
     private $code;
+    private $ctx;
     /**
      * URI of the HTTP API
      *
@@ -57,6 +57,7 @@ class HttpStream implements BufferedStreamInterface
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
+        $this->ctx = $ctx->getCtx();
         $this->stream = yield $ctx->getStream();
         $this->uri = $ctx->getUri();
     }
@@ -113,9 +114,13 @@ class HttpStream implements BufferedStreamInterface
             $headers[strtolower($current_header[0])] = trim($current_header[1]);
         }
 
-        $this->close = $protocol === 'HTTP/1.0' || $code !== 200;
+        $close = $protocol === 'HTTP/1.0' || $code !== 200;
         if (isset($headers['connection'])) {
-            $this->close = strtolower($headers['connection']) === 'close';
+            $close = strtolower($headers['connection']) === 'close';
+        }
+        if ($close) {
+            yield $this->stream->bufferEnd();
+            yield $this->connect($this->ctx);
         }
 
         if ($response['code'] !== 200) {
@@ -134,42 +139,12 @@ class HttpStream implements BufferedStreamInterface
         return $buffer;
     }
  
-
-    /**
-     * Stream to use as data source
-     *
-     * @param mixed $stream The stream
-     * 
-     * @return Promise
-     */
-    public function pipe(mixed $stream): Promise
-    {
-        return call([$this, 'pipeAsync'], $stream);
-    }
-
-    /**
-     * Get read buffer asynchronously
-     *
-     * @return Promise
-     */
-    public function getReadBuffer(): Promise
-    {
-        return call([$this, 'getReadBufferAsync']);
-    }
-    /**
-     * Get write buffer asynchronously
-     *
-     * @param int $length Length of data that is going to be written to the write buffer
-     * 
-     * @return Promise
-     */
-    public function getWriteBuffer(int $length): Promise
-    {
-        return call([$this, 'getWriteBufferAsync'], $length);
-    }
-
     public function bufferRead(int $length): Promise
     {
         return new Success($this->code);
+    }
+    public static function getName(): string
+    {
+        return __CLASS__;
     }
 }

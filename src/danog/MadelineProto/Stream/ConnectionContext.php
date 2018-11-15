@@ -20,7 +20,8 @@ namespace danog\MadelineProto\Stream;
 use Amp\Socket\ClientConnectContext;
 use Amp\CancellationToken;
 use Amp\Uri\Uri;
-
+use function Amp\call;
+use function Amp\coroutine;
 
 class ConnectionContext
 {
@@ -74,25 +75,29 @@ class ConnectionContext
     {
         return $this->secure;
     }
-    public function setDc(string $dc)
+    public function setDc($dc): self
     {
         $this->dc = $dc;
         return $this;
     }
-    public function getDc(): string
+    public function getDc()
     {
         return $this->dc;
     }
-    public function addStream(string $streamName, mixed $extra = null): self
+    public function getCtx(): self
+    {
+        return clone $this;
+    }
+    public function addStream(string $streamName, $extra = null): self
     {
         $this->nextStreams[] = [$streamName, $extra];
         return $this;
     }
     public function getStream(): Promise
     {
-        return call([$this, 'getStreamAsync']);
+        return coroutine([$this, 'getStreamAsync'])();
     }
-    private function getStreamAsync(): \Generator
+    public function getStreamAsync(): \Generator
     {
         list($clazz, $extra) = $this->nextStreams[$this->key++];
         $obj = new $clazz();

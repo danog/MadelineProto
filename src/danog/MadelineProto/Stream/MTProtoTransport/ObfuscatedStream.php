@@ -15,7 +15,7 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Streams\Transport;
+namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use \Amp\Deferred;
 use \Amp\Promise;
@@ -174,8 +174,12 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, BufferInterface
      * 
      * @return void
      */
-    public function setExtra(mixed $extra)
+    public function setExtra(public static function getName(): string$extra)
     {
         $this->extra = $extra;
+    }
+    public static function getName(): string
+    {
+        return __CLASS__;
     }
 }

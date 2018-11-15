@@ -15,7 +15,7 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Streams\Transport;
+namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use \Amp\Deferred;
 use \Amp\Promise;
@@ -88,5 +88,9 @@ class AbridgedStream implements BufferedStreamInterface
         }
 
         return $buffer;
+    }
+    public static function getName(): string
+    {
+        return __CLASS__;
     }
 }

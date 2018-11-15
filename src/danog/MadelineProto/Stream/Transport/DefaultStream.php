@@ -15,7 +15,7 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Streams\Transport;
+namespace danog\MadelineProto\Stream\Transport;
 
 use \danog\MadelineProto\Stream\Common\BufferedRawStream;
 
@@ -28,4 +28,8 @@ use \danog\MadelineProto\Stream\Common\BufferedRawStream;
  */
 class DefaultStream extends BufferedRawStream
 {
+    public static function getName(): string
+    {
+        return __CLASS__;
+    }
 }

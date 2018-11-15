@@ -307,4 +307,8 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         return call([$this, 'bufferWriteAsync'], $data);
     }
 
+    public static function getName(): string
+    {
+        return __CLASS__;
+    }
 }
