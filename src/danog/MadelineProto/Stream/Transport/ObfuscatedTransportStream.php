@@ -24,6 +24,8 @@ use \danog\MadelineProto\Stream\BufferInterface;
 use \danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use \danog\MadelineProto\Stream\RawProxyStreamInterface;
 use function \Amp\call;
+use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\Async\BufferedStream;
 
 /**
  * Obfuscated2 AMP stream wrapper
@@ -34,22 +36,12 @@ use function \Amp\call;
  */
 class ObfuscatedStream extends DefaultStream implements RawProxyStreamInterface
 {
+    use BufferedStream;
     private $encrypt;
     private $decrypt;
     private $stream;
 
     /**
-     * Does nothing
-     * 
-     * @param void $data Nothing
-     * 
-     * @return void
-     */
-    public function setExtra($data)
-    {
-    }
-
-    /**
      * Connect to a server
      *
      * @param string                           $uri           URI
@@ -59,58 +51,40 @@ class ObfuscatedStream extends DefaultStream implements RawProxyStreamInterface
      * 
      * @return Promise
      */
-    public function connect(string $uri, bool $secure, ClientConnectContext $socketContext = null, CancellationToken $token = null): Promise
+    public function connectAsync(ConnectionContext $ctx): \Generator
     {
-        return call([$this, 'connectAsync'], $uri, $secure, $socketContext, $token);
-    }
-    
-    /**
-     * Connect to a server
-     *
-     * @param string                           $uri           URI
-     * @param bool                             $secure        Whether to use TLS while connecting
-     * @param \Amp\Socket\ClientConnectContext $socketContext Socket context
-     * @param \Amp\CancellationToken           $token         Cancellation token
-     * 
-     * @return Promise
-     */
-    public function connectAsync(string $uri, bool $secure, ClientConnectContext $socketContext = null, CancellationToken $token = null): \Generator
-    {
-        yield parent::connect($uri, $secure, $socketContext, $token);
+        yield parent::connect($ctx);
 
         do {
             $random = $this->random(64);
         } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
         $random[56] = $random[57] = $random[58] = $random[59] = chr(0xef);
+        
+        $random = substr_replace(pack('s', $ctx->getDc()), 60, 2);
 
         $reversed = strrev(substr($random, 8, 48));
 
+        $key = substr($random, 8, 32);
+        $keyRev = substr($reversed, 0, 32);
+        if (isset($this->extra['secret'])) {
+            $key = hash('sha256', $key.$this->extra['secret'], true);
+            $keyRev = hash('sha256', $keyRev.$this->extra['secret'], true);
+        }
+
         $this->encrypt = new \phpseclib\Crypt\AES('ctr');
         $this->encrypt->enableContinuousBuffer();
-        $this->encrypt->setKey(substr($random, 8, 32));
+        $this->encrypt->setKey($key);
         $this->encrypt->setIV(substr($random, 40, 16));
 
         $this->decrypt = new \phpseclib\Crypt\AES('ctr');
         $this->decrypt->enableContinuousBuffer();
-        $this->decrypt->setKey(substr($reversed, 0, 32));
+        $this->decrypt->setKey($keyRev);
         $this->decrypt->setIV(substr($reversed, 32, 16));
 
         $random = substr_replace($random, substr(@$this->encrypt->encrypt($random), 56, 8), 56, 8);
 
         yield parent::write($random);
     }
-    /**
-     * Reads data from the stream.
-     *
-     * @return Promise Resolves with a string when new data is available or `null` if the stream has closed.
-     *
-     * @throws PendingReadError Thrown if another read operation is still pending.
-     */
-    public function read(): Promise
-    {
-        return call([$this, 'onRead'], parent::read());
-    }
-
 
     /**
      * Decrypts read data asynchronously
@@ -121,9 +95,9 @@ class ObfuscatedStream extends DefaultStream implements RawProxyStreamInterface
      *
      * @throws PendingReadError Thrown if another read operation is still pending.
      */
-    public function onRead(Promise $promise): \Generator
+    public function readAsync(): \Generator
     {
-        return @$this->decrypt->encrypt(yield $promise);
+        return @$this->decrypt->encrypt(yield parent::read());
     }
 
     /**
@@ -154,16 +128,6 @@ class ObfuscatedStream extends DefaultStream implements RawProxyStreamInterface
         return parent::end(@$this->encrypt->encrypt($finalData));
     }
 
-
-    /**
-     * Get read buffer asynchronously
-     *
-     * @return Promise
-     */
-    public function getReadBuffer(): Promise
-    {
-        return call([$this, 'getReadBufferAsync']);
-    }
     /**
      * Get read buffer asynchronously
      *
@@ -176,17 +140,6 @@ class ObfuscatedStream extends DefaultStream implements RawProxyStreamInterface
         }
 
         return $this;
-    }
-    /**
-     * Get write buffer asynchronously
-     *
-     * @param int $length Length of data that is going to be written to the write buffer
-     * 
-     * @return Promise
-     */
-    public function getWriteBuffer(int $length): Promise
-    {
-        return call([$this, 'getWriteBufferAsync'], $length);
     }
     /**
      * Get write buffer asynchronously
@@ -205,5 +158,4 @@ class ObfuscatedStream extends DefaultStream implements RawProxyStreamInterface
         yield $this->bufferWrite($message);
         return $this;
     }
-
 }

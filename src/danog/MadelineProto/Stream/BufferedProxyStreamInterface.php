@@ -24,22 +24,6 @@ use \Amp\Promise;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-interface BufferedProxyStreamInterface extends BufferedStreamInterface
+interface BufferedProxyStreamInterface extends BufferedStreamInterface, ProxyStreamInterface
 {
-    /**
-     * Set extra proxy data
-     *
-     * @param mixed $extra Proxy data
-     *
-     * @return void
-     */
-    public function setExtra(mixed $extra);
-    /**
-     * Stream to use as data source
-     *
-     * @param BufferedStreamInterface $stream
-     * 
-     * @return Promise
-     */
-    public function pipe(BufferedStreamInterface $stream): Promise;
 }

@@ -19,26 +19,12 @@ namespace danog\MadelineProto\Stream;
 
 use \Amp\ByteStream\OutputStream;
 use \Amp\ByteStream\InputStream;
-use \Amp\Socket\ClientConnectContext;
-use \Amp\CancellationToken;
-use \Amp\Promise;
 
 /**
  * Raw stream interface
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-interface RawStreamInterface extends InputStream, OutputStream
+interface RawStreamInterface extends InputStream, OutputStream, StreamInterface
 {
-    /**
-     * Connect to a server
-     *
-     * @param string                           $uri           URI
-     * @param bool                             $secure        Whether to use TLS while connecting
-     * @param \Amp\Socket\ClientConnectContext $socketContext Socket context
-     * @param \Amp\CancellationToken           $token         Cancellation token
-     * 
-     * @return Promise
-     */
-    public function connect(string $uri, bool $secure, ClientConnectContext $socketContext = null, CancellationToken $token = null): Promise;
 }

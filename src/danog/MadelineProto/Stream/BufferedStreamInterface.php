@@ -24,7 +24,7 @@ use \Amp\Promise;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-interface BufferedStreamInterface
+interface BufferedStreamInterface extends StreamInterface
 {
     /**
      * Get read buffer asynchronously

@@ -24,7 +24,7 @@ use \Amp\Promise;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-interface RawProxyStreamInterface extends RawStreamInterface, ProxyStreamInterface
+interface ProxyStreamInterface
 {
     /**
      * Set extra proxy data

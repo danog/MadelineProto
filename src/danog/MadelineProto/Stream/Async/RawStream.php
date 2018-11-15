@@ -1,6 +1,6 @@
 <?php
 /**
- * Buffer interface
+ * Raw stream interface
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -15,23 +15,28 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream;
+namespace danog\MadelineProto\Stream\Async;
 
-use \Amp\Promise;
+use Amp\Promise;
 
 /**
- * Buffer interface
+ * Raw stream interface
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-interface RawProxyStreamInterface extends RawStreamInterface, ProxyStreamInterface
+trait RawStream
 {
-    /**
-     * Set extra proxy data
-     *
-     * @param mixed $extra Proxy data
-     *
-     * @return void
-     */
-    public function setExtra(mixed $extra);
+    use Stream;
+    public function read(): Promise
+    {
+        return call([$this, 'readAsync']);
+    }
+    public function write(string $data): Promise
+    {
+        return call([$this, 'writeAsync'], $data);
+    }
+    public function end(string $finalData = ''): Promise
+    {
+        return call([$this, 'endAsync'], $finalData);
+    }
 }

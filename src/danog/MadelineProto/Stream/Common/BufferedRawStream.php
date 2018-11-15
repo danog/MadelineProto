@@ -22,6 +22,9 @@ use function \Amp\asyncCall;
 use function \Amp\Socket\connect;
 use function \Amp\Socket\cryptoConnect;
 use \Amp\Promise;
+use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\Async\Buffer;
+use danog\MadelineProto\Stream\Async\RawStream;
 
 /**
  * Raw proxy stream wrapper
@@ -32,6 +35,8 @@ use \Amp\Promise;
  */
 class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInterface, \danog\MadelineProto\Stream\BufferInterface, \danog\MadelineProto\Stream\RawStreamInterface
 {
+    use RawStream;
+
     const MAX_SIZE = 10*1024*1024;
 
     private $sock;
@@ -47,28 +52,14 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      * @param \Amp\Socket\ClientConnectContext $socketContext Socket context
      * @param \Amp\CancellationToken           $token         Cancellation token
      *
-     * @return Promise
-     */
-    public function connect(string $uri, bool $secure, ClientConnectContext $socketContext = null, CancellationToken $token = null): Promise
-    {
-        return call([$this, 'connectAsync'], $uri, $secure, $socketContext, $token);
-    }
-    /**
-     * Connect to a server
-     *
-     * @param string                           $uri           URI
-     * @param bool                             $secure        Use TLS?
-     * @param \Amp\Socket\ClientConnectContext $socketContext Socket context
-     * @param \Amp\CancellationToken           $token         Cancellation token
-     *
      * @internal Used by connect
      * 
      * @return Promise
      */
-    public function connectAsync(string $uri, bool $secure, ClientConnectContext $socketContext = null, CancellationToken $token = null): \Generator
+    public function connectAsync(ConnectionContext $ctx): \Generator
     {
-        $fn = $secure ? 'cryptoConnect' : 'connect';
-        $this->sock = yield $fn($uri, $socketContext, $token);
+        $fn = $ctx->isSecure() ? 'cryptoConnect' : 'connect';
+        $this->sock = yield $fn($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
         $this->memory_stream = fopen('php://memory', 'r+');
         return true;
     }
@@ -94,17 +85,6 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
         return $this->sock->write($data);
     }
 
-    /**
-     * Async write and close
-     *
-     * @param string $finalData Final chunk of data to write
-     * 
-     * @return Promise
-     */
-    public function end($finalData = ''): Promise
-    {
-        return call([$this, 'endAsync'], $finalData);
-    }
     /**
      * Async write and close
      *

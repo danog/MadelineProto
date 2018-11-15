@@ -24,6 +24,10 @@ use \danog\MadelineProto\Stream\BufferInterface;
 use \danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use \danog\MadelineProto\Stream\RawProxyStreamInterface;
 use function \Amp\call;
+use Amp\Socket\ClientConnectContext;
+use danog\MadelineProto\Stream\Async\BufferedStream;
+use danog\MadelineProto\Stream\BufferedStreamInterface;
+use danog\MadelineProto\Stream\ConnectionContext;
 
 /**
  * Obfuscated2 AMP stream wrapper
@@ -32,8 +36,10 @@ use function \Amp\call;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class AbridgedStream implements BufferedProxyStreamInterface
+class AbridgedStream implements BufferedStreamInterface
 {
+    use BufferedStream;
+
     private $stream;
 
     /**
@@ -43,10 +49,10 @@ class AbridgedStream implements BufferedProxyStreamInterface
      * 
      * @return Promise
      */
-    public function pipeAsync(BufferedStreamInterface $stream): \Generator
+    public function connectAsync(ConnectionContext $ctx): \Generator
     {
-        $this->stream = $stream;
-        $buffer = $this->stream->getWriteBuffer(1);
+        $this->stream = yield $ctx->getStream();
+        $buffer = yield $this->stream->getWriteBuffer(1);
         yield $buffer->bufferWrite(chr(239));
     }
 
@@ -82,50 +88,5 @@ class AbridgedStream implements BufferedProxyStreamInterface
         }
 
         return $buffer;
-    }
-    /**
-     * Does nothing
-     * 
-     * @param void $data Nothing
-     * 
-     * @return void
-     */
-    public function setExtra($data)
-    {
-    }
-
- 
-
-    /**
-     * Stream to use as data source
-     *
-     * @param mixed $stream The stream
-     * 
-     * @return Promise
-     */
-    public function pipe(mixed $stream): Promise
-    {
-        return call([$this, 'pipeAsync'], $stream);
-    }
-
-    /**
-     * Get read buffer asynchronously
-     *
-     * @return Promise
-     */
-    public function getReadBuffer(): Promise
-    {
-        return call([$this, 'getReadBufferAsync']);
-    }
-    /**
-     * Get write buffer asynchronously
-     *
-     * @param int $length Length of data that is going to be written to the write buffer
-     * 
-     * @return Promise
-     */
-    public function getWriteBuffer(int $length): Promise
-    {
-        return call([$this, 'getWriteBufferAsync'], $length);
     }
 }

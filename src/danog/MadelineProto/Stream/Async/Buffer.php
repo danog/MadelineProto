@@ -15,7 +15,7 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream;
+namespace danog\MadelineProto\Stream\Async;
 
 use \Amp\Promise;
 
@@ -24,14 +24,38 @@ use \Amp\Promise;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-interface RawProxyStreamInterface extends RawStreamInterface, ProxyStreamInterface
+trait Buffer
 {
     /**
-     * Set extra proxy data
+     * Read data asynchronously
      *
-     * @param mixed $extra Proxy data
-     *
-     * @return void
+     * @return Promise
      */
-    public function setExtra(mixed $extra);
+    public function bufferRead(int $length): Promise
+    {
+        return call([$this, 'bufferReadAsync'], $length);
+    }
+    /**
+     * Write data asynchronously
+     *
+     * @param string $data Data to write
+     * 
+     * @return Promise
+     */
+    public function bufferWrite(string $data): Promise
+    {
+        return call([$this, 'bufferWriteAsync'], $data);
+    }
+    /**
+     * Write data and close buffer asynchronously
+     * 
+     * @param string $data Data to write
+     *
+     * @return Promise
+     */
+    public function bufferEnd(string $finalData = ''): Promise
+    {
+        return call([$this, 'bufferEndAsync']. $finalData);
+    }
+
 }

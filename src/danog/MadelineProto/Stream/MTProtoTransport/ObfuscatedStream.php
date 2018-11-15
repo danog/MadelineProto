@@ -24,6 +24,9 @@ use \danog\MadelineProto\Stream\BufferInterface;
 use \danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use \danog\MadelineProto\Stream\RawProxyStreamInterface;
 use function \Amp\call;
+use danog\MadelineProto\Stream\Async\Buffer;
+use danog\MadelineProto\Stream\Async\BufferedStream;
+use danog\MadelineProto\Stream\ConnectionContext;
 
 /**
  * Obfuscated2 AMP stream wrapper
@@ -32,13 +35,16 @@ use function \Amp\call;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class ObfuscatedStream extends AbridgedStream implements BufferedProxyStreamInterface, BufferInterface
+class ObfuscatedStream implements BufferedProxyStreamInterface, BufferInterface
 {
+    use Buffer;
+    use BufferedStream;
     private $encrypt;
     private $decrypt;
     private $stream;
     private $write_buffer;
     private $read_buffer;
+    private $extra;
 
     /**
      * Stream to use as data source
@@ -47,25 +53,34 @@ class ObfuscatedStream extends AbridgedStream implements BufferedProxyStreamInte
      * 
      * @return Promise
      */
-    public function pipeAsync(BufferedStreamInterface $stream): \Generator
+    public function connectAsync(ConnectionContext $ctx): \Generator
     {
-        $this->stream = $stream;
+        $this->stream = yield $ctx->getStream();
 
         do {
             $random = $this->random(64);
         } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
         $random[56] = $random[57] = $random[58] = $random[59] = chr(0xef);
+        
+        $random = substr_replace(pack('s', $ctx->getDc()), 60, 2);
 
         $reversed = strrev(substr($random, 8, 48));
 
+        $key = substr($random, 8, 32);
+        $keyRev = substr($reversed, 0, 32);
+        if (isset($this->extra['secret'])) {
+            $key = hash('sha256', $key.$this->extra['secret'], true);
+            $keyRev = hash('sha256', $keyRev.$this->extra['secret'], true);
+        }
+
         $this->encrypt = new \phpseclib\Crypt\AES('ctr');
         $this->encrypt->enableContinuousBuffer();
-        $this->encrypt->setKey(substr($random, 8, 32));
+        $this->encrypt->setKey($key);
         $this->encrypt->setIV(substr($random, 40, 16));
 
         $this->decrypt = new \phpseclib\Crypt\AES('ctr');
         $this->decrypt->enableContinuousBuffer();
-        $this->decrypt->setKey(substr($reversed, 0, 32));
+        $this->decrypt->setKey($keyRev);
         $this->decrypt->setIV(substr($reversed, 32, 16));
 
         $random = substr_replace($random, substr(@$this->encrypt->encrypt($random), 56, 8), 56, 8);
@@ -159,55 +174,8 @@ class ObfuscatedStream extends AbridgedStream implements BufferedProxyStreamInte
      * 
      * @return void
      */
-    public function setExtra($data)
+    public function setExtra(mixed $extra)
     {
+        $this->extra = $extra;
     }
-
- 
-
-    /**
-     * Stream to use as data source
-     *
-     * @param mixed $stream The stream
-     * 
-     * @return Promise
-     */
-    public function pipe(mixed $stream): Promise
-    {
-        return call([$this, 'pipeAsync'], $stream);
-    }
-
-    /**
-     * Get read buffer asynchronously
-     *
-     * @return Promise
-     */
-    public function getReadBuffer(): Promise
-    {
-        return call([$this, 'getReadBufferAsync']);
-    }
-    /**
-     * Get write buffer asynchronously
-     *
-     * @param int $length Length of data that is going to be written to the write buffer
-     * 
-     * @return Promise
-     */
-    public function getWriteBuffer(int $length): Promise
-    {
-        return call([$this, 'getWriteBufferAsync'], $length);
-    }
-
-    /**
-     * Reads data from the stream.
-     *
-     * @return Promise Resolves with a string when new data is available or `null` if the stream has closed.
-     *
-     * @throws PendingReadError Thrown if another read operation is still pending.
-     */
-    public function bufferRead(int $length): Promise
-    {
-        return call([$this, 'bufferReadAsync'], $length);
-    }
-
 }
