@@ -20,6 +20,7 @@ namespace danog\MadelineProto\Stream\Async;
 
 use Amp\Promise;
 use danog\MadelineProto\Stream\ConnectionContext;
+use function Amp\call;
 
 /**
  * Generic stream helper trait

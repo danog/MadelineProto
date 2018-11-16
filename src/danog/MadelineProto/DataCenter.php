@@ -29,6 +29,8 @@ use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\ObfuscatedTransportStream;
 use function Amp\call;
 use function Amp\Socket\connect;
+use Amp\Socket\ClientConnectContext;
+use danog\MadelineProto\Stream\ConnectionContext;
 use function Amp\Promise\wait;
 
 /**
@@ -56,7 +58,7 @@ class DataCenter
             if ($socket instanceof Connection) {
                 \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
                 $socket->old = true;
-                wait($socket->end());
+                //wait($socket->end());
             } else {
                 unset($this->sockets[$key]);
             }
@@ -65,7 +67,7 @@ class DataCenter
 
     public function dc_connect($dc_number)
     {
-        return call([$this, 'dc_connect_async'], $dc_number);
+        return wait(call([$this, 'dc_connect_async'], $dc_number));
     }
     public function dc_connect_async($dc_number)
     {
@@ -73,18 +75,15 @@ class DataCenter
             return false;
         }
         $ctxs = $this->generate_contexts($dc_number);
-
-        \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_test_start'], $dc_number, $test, $ipv6, $this->settings[$dc_config_number]['protocol']), \danog\MadelineProto\Logger::VERBOSE);
         foreach ($ctxs as $ctx) {
             \danog\MadelineProto\Logger::log("Trying connection via $ctx", \danog\MadelineProto\Logger::WARNING);
-
             try {
                 if (isset($this->sockets[$dc_number]->old)) {
-                    yield $this->sockets[$dc_number]->connect($dc_number, $this->settings[$dc_config_number]['proxy'], $this->settings[$dc_config_number]['proxy_extra'], $address, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout'], $this->settings[$dc_config_number]['ipv6']);
+                    yield $this->sockets[$dc_number]->connect($ctx);
                     unset($this->sockets[$dc_number]->old);
                 } else {
                     $this->sockets[$dc_number] = new Connection();
-                    yield $this->sockets[$dc_number]->connect($dc_number, $this->settings[$dc_config_number]['proxy'], $this->settings[$dc_config_number]['proxy_extra'], $address, $port, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout'], $this->settings[$dc_config_number]['ipv6']);
+                    yield $this->sockets[$dc_number]->connect($ctx);
                 }
                 \danog\MadelineProto\Logger::log('OK!', \danog\MadelineProto\Logger::WARNING);
 
@@ -107,19 +106,19 @@ class DataCenter
 
         switch ($this->settings[$dc_config_number]['protocol']) {
             case 'tcp_abridged':
-                $default = [[DefaultStream::getName()], [AbridgedStream::getName()]];
+                $default = [[DefaultStream::getName(), []], [AbridgedStream::getName(), []]];
                 break;
             case 'tcp_intermediate':
-                $default = [[DefaultStream::getName()], [IntermediateStream::getName()]];
+                $default = [[DefaultStream::getName(), []], [IntermediateStream::getName(), []]];
                 break;
             case 'tcp_full':
-                $default = [[DefaultStream::getName()], [FullStream::getName()]];
+                $default = [[DefaultStream::getName(), []], [FullStream::getName(), []]];
                 break;
             case 'http':
-                $default = [[DefaultStream::getName()], [HttpStream::getName()]];
+                $default = [[DefaultStream::getName(), []], [HttpStream::getName(), []]];
                 break;
             case 'https':
-                $default = [[DefaultStream::getName()], [HttpsStream::getName()]];
+                $default = [[DefaultStream::getName(), []], [HttpsStream::getName(), []]];
                 break;
             case 'obfuscated2':
                 $default = [[ObfuscatedTransportStream::getName()]];
@@ -129,64 +128,62 @@ class DataCenter
         }
         $combos[] = $default;
 
-        if (isset($this->settings[$dc_config_number]['do_not_retry']) && $this->settings[$dc_config_number]['do_not_retry']) {
-            return $combos;
-        }
+        if (!isset($this->settings[$dc_config_number]['do_not_retry'])) {
 
-        if ((isset($this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) && $this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
-            $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];
-            $combos[] = [[ObfuscatedTransportStream::getName(), $extra]];
-        }
-
-        // Convert old settings
-        if ($this->settings[$dc_config_number]['proxy'] === '\\Socket') {
-            $this->settings[$dc_config_number]['proxy'] = DefaultStream::getName();
-        }
-        if ($this->settings[$dc_config_number]['proxy'] === '\\MTProxySocket') {
-            $this->settings[$dc_config_number]['proxy'] = ObfuscatedTransportStream::getName();
-        }
-        if (is_array($this->settings[$dc_config_number]['proxy'])) {
-            $proxies = $this->settings[$dc_config_number]['proxy'];
-            $proxy_extras = $this->settings[$dc_config_number]['extra'];
-        } else {
-            $proxies = [$this->settings[$dc_config_number]['proxy']];
-            $proxy_extras = [$this->settings[$dc_config_number]['extra']];
-        }
-        foreach ($proxies as $key => $proxy) {
-            $extra = $proxy_extras[$key];
-            if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\StreamInterface'])) {
-                throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
+            if ((isset($this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) && $this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
+                $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];
+                $combos[] = [[ObfuscatedTransportStream::getName(), $extra]];
             }
-            foreach ($combos as $orig) {
-                $combo = [];
-                if (isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\MTProtoBufferInterface'])) {
-                    $combo[] = [$proxy, $extra];
-                } else {
-                    if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\RawStreamInterface'])) {
-                        $combo[] = [DefaultStream::getName()];
-                    }
-                    if (isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\BufferedStreamInterface'])) {
-                        $combo[] = [$proxy, $extra];
-                    }
-                    $default_protocol = end($orig)[0];
-                    if ($default_protocol === ObfuscatedTransportStream::getName()) {
-                        $default_protocol = ObfuscatedStream::getName();
-                    }
-                    $combo[] = [$default_protocol];
+
+            // Convert old settings
+            if ($this->settings[$dc_config_number]['proxy'] === '\\Socket') {
+                $this->settings[$dc_config_number]['proxy'] = DefaultStream::getName();
+            }
+            if ($this->settings[$dc_config_number]['proxy'] === '\\MTProxySocket') {
+                $this->settings[$dc_config_number]['proxy'] = ObfuscatedTransportStream::getName();
+            }
+            if (is_array($this->settings[$dc_config_number]['proxy'])) {
+                $proxies = $this->settings[$dc_config_number]['proxy'];
+                $proxy_extras = $this->settings[$dc_config_number]['proxy_extra'];
+            } else {
+                $proxies = [$this->settings[$dc_config_number]['proxy']];
+                $proxy_extras = [$this->settings[$dc_config_number]['proxy_extra']];
+            }
+            foreach ($proxies as $key => $proxy) {
+                $extra = $proxy_extras[$key];
+                if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\StreamInterface'])) {
+                    throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
                 }
-                $combos[] = $combo;
+                foreach ($combos as $orig) {
+                    $combo = [];
+                    if (isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\MTProtoBufferInterface'])) {
+                        $combo[] = [$proxy, $extra];
+                    } else {
+                        if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\RawStreamInterface'])) {
+                            $combo[] = [DefaultStream::getName()];
+                        }
+                        if (isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\BufferedStreamInterface'])) {
+                            $combo[] = [$proxy, $extra];
+                        }
+                        $default_protocol = end($orig);
+                        if ($default_protocol[0] === ObfuscatedTransportStream::getName()) {
+                            $default_protocol[0] = ObfuscatedStream::getName();
+                        }
+                        $combo[] = $default_protocol;
+                    }
+                    $combos[] = $combo;
+                }
             }
+
+            $combos[] = [[DefaultStream::getName(), []], [HttpsStream::getName(), []]];
+            $combos = array_unique($combos, SORT_REGULAR);
         }
-
-        $combos[] = [[DefaultStream::getName()], [HttpsStream::getName()]];
-
-        $combos = array_unique($combos);
-
-        /** @var $context \Amp\ClientConnectContext */
-        $context = (new ClientConnectContext())->withMaxAttempts(1)->withTimeout($this->settings[$dc_config_number]['timeout']);
+        /* @var $context \Amp\ClientConnectContext */
+        $context = (new ClientConnectContext())->withMaxAttempts(1)->withConnectTimeout(1000*$this->settings[$dc_config_number]['timeout']);
 
         foreach ($combos as $combo) {
             $ipv6 = [$this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4', $this->settings[$dc_config_number]['ipv6'] ? 'ipv4' : 'ipv6'];
+
             foreach ($ipv6 as $ipv6) {
                 if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
                     unset($this->sockets[$dc_number]);
@@ -202,7 +199,9 @@ class DataCenter
                 }
 
                 foreach (array_unique([$port, 443, 80, 88]) as $port) {
-                    if (strpos($this->settings[$dc_config_number]['protocol'], 'https') === 0) {
+                    $stream = end($combo)[0];
+
+                    if ($stream === HttpsStream::getName()) {
                         $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
                         if (strpos($dc_number, '_media') !== false) {
                             $subdomain .= '-1';
@@ -210,23 +209,22 @@ class DataCenter
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
 
                         $uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
-                    } elseif ($this->settings[$dc_config_number]['protocol'] === 'http') {
+                    } elseif ($stream === HttpStream::getName()) {
                         $uri = 'tcp://' . $address . ':' . $port . '/api';
                     } else {
                         $uri = 'tcp://' . $address . ':' . $port;
                     }
+
                     /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
                     $ctx = (new ConnectionContext())
                         ->setDc($dc_number)
                         ->setSocketContext($context)
                         ->setUri($uri)
-                        ->setIpv6($ipv6 === 'ipv6')
-                        ->secure($protocol === 'https');
+                        ->setIpv6($ipv6 === 'ipv6');
 
                     foreach ($combo as $stream) {
                         $ctx->addStream(...$stream);
                     }
-                    $ctx->addStream(Connection::getName());
                     $ctxs[] = $ctx;
                 }
             }
@@ -235,6 +233,7 @@ class DataCenter
         if (isset($this->dclist[$test][$ipv6][$dc_number . '_bk']['ip_address'])) {
             $ctxs = array_merge($ctxs, $this->generate_contexts($dc_number . '_bk'));
         }
+
         return $ctxs;
     }
 

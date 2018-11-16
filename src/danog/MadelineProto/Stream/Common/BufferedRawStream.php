@@ -50,10 +50,12 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
-        $fn = $ctx->isSecure() ? 'cryptoConnect' : 'connect';
-        $this->sock = yield $fn($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
+        if ($ctx->isSecure()) {
+            $this->sock = yield cryptoConnect($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
+        } else {
+            $this->sock = yield connect($ctx->getStringUri(), $ctx->getSocketContext());
+        }
         $this->memory_stream = fopen('php://memory', 'r+');
-
         return true;
     }
 

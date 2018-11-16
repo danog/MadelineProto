@@ -19,6 +19,7 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use function Amp\call;
+use function Amp\Promise\wait;
 
 /**
  * Manages packing and unpacking of messages, and the list of sent and received messages.
@@ -194,7 +195,8 @@ trait MessageHandler
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key']);
             $message = $this->datacenter->sockets[$datacenter]->temp_auth_key['id'].$message_key.$this->ige_encrypt($plaintext.$padding, $aes_key, $aes_iv);
 
-            $this->datacenter->sockets[$datacenter]->send_message($message);
+            $buffer = wait($this->datacenter->sockets[$datacenter]->stream->getWriteBuffer(strlen($message)));
+            wait($buffer->bufferWrite($message));
             $sent = time();
 
             foreach ($keys as $key => $message_id) {

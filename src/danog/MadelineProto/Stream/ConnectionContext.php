@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Stream;
 use Amp\CancellationToken;
 use Amp\Socket\ClientConnectContext;
 use Amp\Uri\Uri;
+use Amp\Promise;
 use function Amp\coroutine;
 use function Amp\call;
 
@@ -145,7 +146,7 @@ class ConnectionContext
      * @param CancellationToken $cancellationToken
      * @return self
      */
-    public function setCancellationToken(CancellationToken $cancellationToken): self
+    public function setCancellationToken($cancellationToken): self
     {
         $this->cancellationToken = $cancellationToken;
 
@@ -157,7 +158,7 @@ class ConnectionContext
      *
      * @return CancellationToken
      */
-    public function getCancellationToken(): CancellationToken
+    public function getCancellationToken()
     {
         return $this->cancellationToken;
     }
@@ -301,9 +302,9 @@ class ConnectionContext
         $string .= ' using ';
         foreach ($this->nextStreams as $k => $stream) {
             if ($k) $string .= ' => ';
-            $stream .= preg_replace('/.*\\\\/', '', $stream[0]);
+            $string .= preg_replace('/.*\\\\/', '', $stream[0]);
             if ($stream[1]) {
-                $stream .= ' ('.json_encode($stream[1]).')';
+                $string .= ' ('.json_encode($stream[1]).')';
             }
         }
         return $string;

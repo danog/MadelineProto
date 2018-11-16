@@ -93,7 +93,7 @@ class Connection implements RawStreamInterface
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
-        $this->stream = $ctx->getStream();
+        $this->stream = yield $ctx->getStream();
     }
 
     public function readAsync(): \Generator
