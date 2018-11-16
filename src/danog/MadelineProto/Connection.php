@@ -18,22 +18,10 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Promise;
-use Amp\Socket\ClientConnectContext;
-use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
-use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
-use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
-use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
-use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
-use danog\MadelineProto\Stream\Transport\DefaultStream;
-use danog\MadelineProto\Stream\Transport\ObfuscatedTransportStream;
-use function Amp\call;
-use function Amp\Promise\wait;
-use function Amp\Socket\connect;
-use danog\MadelineProto\Stream\RawStreamInterface;
-use danog\MadelineProto\Stream\RawProxyStreamInterface;
 use danog\MadelineProto\Stream\Async\RawStream;
+use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\RawStreamInterface;
+use function Amp\Socket\connect;
 
 /**
  * Connection class.
@@ -79,13 +67,12 @@ class Connection implements RawStreamInterface
     public $last_recv = 0;
     public $last_http_wait = 0;
 
-
     /**
      * Connect function.
      *
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters
      *
-     * @param string $proxy    Proxy class name
+     * @param string $proxy Proxy class name
      *
      * @internal
      *
@@ -169,6 +156,7 @@ class Connection implements RawStreamInterface
 
         return true;
     }
+
     public function getName(): string
     {
         return __CLASS__;
@@ -185,5 +173,4 @@ class Connection implements RawStreamInterface
     {
         return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'peer_tag', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'ack_queue'];
     }
-
 }

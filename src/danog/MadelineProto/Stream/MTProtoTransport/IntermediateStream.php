@@ -18,7 +18,6 @@
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -37,9 +36,8 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     private $stream;
     private $length = 0;
 
-
     /**
-     * Connect to stream
+     * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
      *
@@ -80,11 +78,11 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
         return $buffer;
     }
 
-
     public function getLength(): int
     {
         return $this->length;
     }
+
     public static function getName(): string
     {
         return __CLASS__;

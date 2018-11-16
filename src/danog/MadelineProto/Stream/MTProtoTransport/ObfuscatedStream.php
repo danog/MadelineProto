@@ -1,6 +1,6 @@
 <?php
 /**
- * Obfuscated2 stream wrapper
+ * Obfuscated2 stream wrapper.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -12,25 +12,21 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use \Amp\Deferred;
-use \Amp\Promise;
-use \danog\MadelineProto\Stream\Common\BufferedRawStream;
-use \danog\MadelineProto\Stream\BufferInterface;
-use \danog\MadelineProto\Stream\BufferedProxyStreamInterface;
-use \danog\MadelineProto\Stream\RawProxyStreamInterface;
-use function \Amp\call;
+use Amp\Promise;
 use danog\MadelineProto\Stream\Async\Buffer;
 use danog\MadelineProto\Stream\Async\BufferedStream;
+use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
- * Obfuscated2 stream wrapper
+ * Obfuscated2 stream wrapper.
  *
  * Manages obfuscated2 encryption/decryption
  *
@@ -49,7 +45,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
     private $length = 0;
 
     /**
-     * Connect to stream
+     * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
      *
@@ -59,7 +55,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
     {
         if (isset($this->extra['address'])) {
             $ctx = $ctx->getCtx();
-            $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port']);
+            $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port']);
         }
         $this->stream = yield $ctx->getStream();
 
@@ -67,7 +63,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
             $random = $this->random(64);
         } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
         $random[56] = $random[57] = $random[58] = $random[59] = chr(0xef);
-        
+
         $random = substr_replace(pack('s', $ctx->getDc()), 60, 2);
 
         $reversed = strrev(substr($random, 8, 48));
@@ -96,8 +92,8 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
     }
 
     /**
-     * Get write buffer asynchronously
-     * 
+     * Get write buffer asynchronously.
+     *
      * @param int $length Length of data that is going to be written to the write buffer
      *
      * @return Generator
@@ -107,16 +103,17 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
         if ($length < 127) {
             $message = chr($length);
         } else {
-            $message = chr(127) . substr(pack('V', $length), 0, 3);
+            $message = chr(127).substr(pack('V', $length), 0, 3);
         }
-        $buffer = yield $this->stream->getWriteBuffer(strlen($message)+$length);
+        $buffer = yield $this->stream->getWriteBuffer(strlen($message) + $length);
         yield $buffer->bufferWrite($message);
         $this->write_buffer = $buffer;
+
         return $this;
     }
 
     /**
-     * Get read buffer asynchronously
+     * Get read buffer asynchronously.
      *
      * @return Generator
      */
@@ -134,32 +131,33 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
         return $this;
     }
 
-
     public function getLength(): int
     {
         return $this->length;
     }
+
     /**
-     * Decrypts read data asynchronously
+     * Decrypts read data asynchronously.
      *
      * @param Promise $promise Promise that resolves with a string when new data is available or `null` if the stream has closed.
-     * 
-     * @return Generator That resolves with a string when the provided promise is resolved and the data is decrypted
      *
      * @throws PendingReadError Thrown if another read operation is still pending.
+     *
+     * @return Generator That resolves with a string when the provided promise is resolved and the data is decrypted
      */
     public function bufferReadAsync(int $length): \Generator
     {
         return @$this->decrypt->encrypt(yield $this->read_buffer->bufferRead($length));
     }
+
     /**
      * Writes data to the stream.
      *
      * @param string $data Bytes to write.
      *
-     * @return Promise Succeeds once the data has been successfully written to the stream.
-     *
      * @throws ClosedException If the stream has already been closed.
+     *
+     * @return Promise Succeeds once the data has been successfully written to the stream.
      */
     public function bufferWrite(string $data): Promise
     {
@@ -171,26 +169,27 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
      *
      * @param string $data Bytes to write.
      *
-     * @return Promise Succeeds once the data has been successfully written to the stream.
-     *
      * @throws ClosedException If the stream has already been closed.
+     *
+     * @return Promise Succeeds once the data has been successfully written to the stream.
      */
-    public function bufferEnd(string $finalData = ""): Promise
+    public function bufferEnd(string $finalData = ''): Promise
     {
         return $this->buffer_write->bufferEnd(@$this->encrypt->encrypt($finalData));
     }
 
     /**
-     * Does nothing
-     * 
+     * Does nothing.
+     *
      * @param void $data Nothing
-     * 
+     *
      * @return void
      */
     public function setExtra($extra)
     {
         $this->extra = $extra;
     }
+
     public static function getName(): string
     {
         return __CLASS__;

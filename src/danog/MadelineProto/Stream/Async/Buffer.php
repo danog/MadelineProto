@@ -1,6 +1,6 @@
 <?php
 /**
- * Buffer helper trait
+ * Buffer helper trait.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -22,8 +22,8 @@ use Amp\Promise;
 use function Amp\call;
 
 /**
- * Buffer helper trait
- * 
+ * Buffer helper trait.
+ *
  * Wraps the asynchronous generator methods with asynchronous promise-based methods
  *
  * @author Daniil Gentili <daniil@daniil.it>

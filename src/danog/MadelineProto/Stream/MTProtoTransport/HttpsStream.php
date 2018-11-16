@@ -18,9 +18,6 @@
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use Amp\Promise;
-use danog\MadelineProto\Stream\Async\BufferedStream;
-use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
@@ -32,7 +29,7 @@ use danog\MadelineProto\Stream\MTProtoBufferInterface;
 class HttpsStream extends HttpStream implements MTProtoBufferInterface
 {
     /**
-     * Connect to stream
+     * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
      *
@@ -42,6 +39,7 @@ class HttpsStream extends HttpStream implements MTProtoBufferInterface
     {
         return parent::connectAsync($ctx->getCtx()->secure(true));
     }
+
     public static function getName(): string
     {
         return __CLASS__;

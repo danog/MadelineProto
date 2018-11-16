@@ -31,7 +31,7 @@ interface BufferInterface
      * Read data asynchronously.
      *
      * @param int $length How much data to read
-     * 
+     *
      * @return Promise
      */
     public function bufferRead(int $length): Promise;

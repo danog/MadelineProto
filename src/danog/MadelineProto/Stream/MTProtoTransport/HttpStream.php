@@ -43,9 +43,8 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
      */
     private $uri;
 
-
     /**
-     * Connect to stream
+     * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
      *
@@ -145,11 +144,11 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
         return new Success($this->code);
     }
 
-
     public function getLength(): int
     {
         return $this->length;
     }
+
     public static function getName(): string
     {
         return __CLASS__;

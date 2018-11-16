@@ -21,8 +21,8 @@ namespace danog\MadelineProto\Stream\Transport;
 use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\RawProxyStreamInterface;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
+use danog\MadelineProto\Stream\RawProxyStreamInterface;
 
 /**
  * Obfuscated2 AMP stream wrapper.
@@ -40,7 +40,7 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
     private $length = 0;
 
     /**
-     * Connect to stream
+     * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
      *
@@ -50,7 +50,7 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
     {
         if (isset($this->extra['address'])) {
             $ctx = $ctx->getCtx();
-            $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port']);
+            $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port']);
         }
         yield parent::connect($ctx);
 
@@ -147,6 +147,7 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
     {
         return $this->length;
     }
+
     /**
      * Get write buffer asynchronously.
      *

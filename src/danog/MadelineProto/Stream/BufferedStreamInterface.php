@@ -44,8 +44,8 @@ interface BufferedStreamInterface extends StreamInterface
     public function getWriteBuffer(int $length): Promise;
 
     /**
-     * Get stream name
-     * 
+     * Get stream name.
+     *
      * Is supposed to return __CLASS__
      *
      * @return string

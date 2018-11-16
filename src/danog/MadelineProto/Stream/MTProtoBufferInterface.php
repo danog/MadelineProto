@@ -18,19 +18,17 @@
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\Promise;
-
 /**
- * MTProto buffer interface, for reading transport MTProto header info
+ * MTProto buffer interface, for reading transport MTProto header info.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 interface MTProtoBufferInterface
 {
     /**
-     * Get the length of the last buffer
+     * Get the length of the last buffer.
      *
-     * @return integer
+     * @return int
      */
     public function getLength(): int;
 }

@@ -18,7 +18,6 @@
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -37,7 +36,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
     private $length = 0;
 
     /**
-     * Connect to stream
+     * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
      *
@@ -86,7 +85,6 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
 
         return $buffer;
     }
-
 
     public function getLength(): int
     {

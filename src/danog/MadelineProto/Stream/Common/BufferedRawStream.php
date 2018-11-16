@@ -26,7 +26,7 @@ use function Amp\Socket\connect;
 use function Amp\Socket\cryptoConnect;
 
 /**
- * Buffered raw stream
+ * Buffered raw stream.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
@@ -56,6 +56,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
             $this->sock = yield connect($ctx->getStringUri(), $ctx->getSocketContext());
         }
         $this->memory_stream = fopen('php://memory', 'r+');
+
         return true;
     }
 
@@ -204,7 +205,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     }
 
     /**
-     * Get class name
+     * Get class name.
      *
      * @return string
      */

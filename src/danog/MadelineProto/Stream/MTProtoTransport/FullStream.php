@@ -95,11 +95,11 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
         return $buffer;
     }
 
-
     public function getLength(): int
     {
         return $this->length;
     }
+
     public static function getName(): string
     {
         return __CLASS__;

@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Socket\ClientConnectContext;
+use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
 use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
@@ -28,10 +30,8 @@ use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\ObfuscatedTransportStream;
 use function Amp\call;
-use function Amp\Socket\connect;
-use Amp\Socket\ClientConnectContext;
-use danog\MadelineProto\Stream\ConnectionContext;
 use function Amp\Promise\wait;
+use function Amp\Socket\connect;
 
 /**
  * Manages datacenters.
@@ -58,7 +58,7 @@ class DataCenter
             if ($socket instanceof Connection) {
                 \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
                 $socket->old = true;
-                //wait($socket->end());
+            //wait($socket->end());
             } else {
                 unset($this->sockets[$key]);
             }
@@ -69,6 +69,7 @@ class DataCenter
     {
         return wait(call([$this, 'dc_connect_async'], $dc_number));
     }
+
     public function dc_connect_async($dc_number)
     {
         if (isset($this->sockets[$dc_number]) && !isset($this->sockets[$dc_number]->old)) {
@@ -77,6 +78,7 @@ class DataCenter
         $ctxs = $this->generate_contexts($dc_number);
         foreach ($ctxs as $ctx) {
             \danog\MadelineProto\Logger::log("Trying connection via $ctx", \danog\MadelineProto\Logger::WARNING);
+
             try {
                 if (isset($this->sockets[$dc_number]->old)) {
                     yield $this->sockets[$dc_number]->connect($ctx);
@@ -89,12 +91,13 @@ class DataCenter
 
                 return true;
             } catch (\Throwable $e) {
-                \danog\MadelineProto\Logger::log('Connection failed: ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                \danog\MadelineProto\Logger::log('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             }
         }
-        throw new \danog\MadelineProto\Exception("Could not connect to DC $dc_number");
 
+        throw new \danog\MadelineProto\Exception("Could not connect to DC $dc_number");
     }
+
     public function generate_contexts($dc_number)
     {
         $ctxs = [];
@@ -129,7 +132,6 @@ class DataCenter
         $combos[] = $default;
 
         if (!isset($this->settings[$dc_config_number]['do_not_retry'])) {
-
             if ((isset($this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) && $this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
                 $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];
                 $combos[] = [[ObfuscatedTransportStream::getName(), $extra]];
@@ -179,7 +181,7 @@ class DataCenter
             $combos = array_unique($combos, SORT_REGULAR);
         }
         /* @var $context \Amp\ClientConnectContext */
-        $context = (new ClientConnectContext())->withMaxAttempts(1)->withConnectTimeout(1000*$this->settings[$dc_config_number]['timeout']);
+        $context = (new ClientConnectContext())->withMaxAttempts(1)->withConnectTimeout(1000 * $this->settings[$dc_config_number]['timeout']);
 
         foreach ($combos as $combo) {
             $ipv6 = [$this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4', $this->settings[$dc_config_number]['ipv6'] ? 'ipv4' : 'ipv6'];
@@ -195,7 +197,7 @@ class DataCenter
                 $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
                 $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
                 if ($ipv6 === 'ipv6') {
-                    $address = '[' . $address . ']';
+                    $address = '['.$address.']';
                 }
 
                 foreach (array_unique([$port, 443, 80, 88]) as $port) {
@@ -208,11 +210,11 @@ class DataCenter
                         }
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
 
-                        $uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
+                        $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
                     } elseif ($stream === HttpStream::getName()) {
-                        $uri = 'tcp://' . $address . ':' . $port . '/api';
+                        $uri = 'tcp://'.$address.':'.$port.'/api';
                     } else {
-                        $uri = 'tcp://' . $address . ':' . $port;
+                        $uri = 'tcp://'.$address.':'.$port;
                     }
 
                     /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
@@ -230,8 +232,8 @@ class DataCenter
             }
         }
 
-        if (isset($this->dclist[$test][$ipv6][$dc_number . '_bk']['ip_address'])) {
-            $ctxs = array_merge($ctxs, $this->generate_contexts($dc_number . '_bk'));
+        if (isset($this->dclist[$test][$ipv6][$dc_number.'_bk']['ip_address'])) {
+            $ctxs = array_merge($ctxs, $this->generate_contexts($dc_number.'_bk'));
         }
 
         return $ctxs;

@@ -1,6 +1,6 @@
 <?php
 /**
- * Connection context
+ * Connection context.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,15 +19,14 @@
 namespace danog\MadelineProto\Stream;
 
 use Amp\CancellationToken;
+use Amp\Promise;
 use Amp\Socket\ClientConnectContext;
 use Amp\Uri\Uri;
-use Amp\Promise;
-use function Amp\coroutine;
 use function Amp\call;
 
 /**
- * Connection context class
- * 
+ * Connection context class.
+ *
  * Is responsible for maintaining state about a certain connection to a DC.
  * That includes the Stream chain that is required to use the connection, the connection URI, and other connection-related data.
  *
@@ -36,58 +35,59 @@ use function Amp\call;
 class ConnectionContext
 {
     /**
-     * Whether to use a secure socket
+     * Whether to use a secure socket.
      *
-     * @var boolean
+     * @var bool
      */
     private $secure = false;
     /**
-     * The connection URI
+     * The connection URI.
      *
      * @var \Amp\Uri\Uri
      */
     private $uri;
     /**
-     * Socket context
+     * Socket context.
      *
      * @var \Amp\Socket\ClientConnectionContext
      */
     private $socketContext;
     /**
-     * Cancellation token
+     * Cancellation token.
      *
      * @var \Amp\CancellationToken
      */
     private $cancellationToken;
     /**
-     * The telegram DC ID
+     * The telegram DC ID.
      *
-     * @var integer
+     * @var int
      */
     private $dc = 0;
     /**
-     * Whether to use IPv6
+     * Whether to use IPv6.
      *
-     * @var boolean
+     * @var bool
      */
     private $ipv6 = false;
     /**
-     * An array of arrays containing an array with the stream name and the extra parameter to pass to it
+     * An array of arrays containing an array with the stream name and the extra parameter to pass to it.
      *
      * @var array<array<string, any>>
      */
     private $nextStreams = [];
     /**
-     * The current stream key
+     * The current stream key.
      *
-     * @var integer
+     * @var int
      */
     private $key = 0;
 
     /**
-     * Set the socket context
+     * Set the socket context.
      *
      * @param ClientConnectContext $socketContext
+     *
      * @return self
      */
     public function setSocketContext(ClientConnectContext $socketContext): self
@@ -98,7 +98,7 @@ class ConnectionContext
     }
 
     /**
-     * Get the socket context
+     * Get the socket context.
      *
      * @return ClientConnectContext
      */
@@ -108,9 +108,10 @@ class ConnectionContext
     }
 
     /**
-     * Set the connection URI
+     * Set the connection URI.
      *
      * @param string|\Amp\Uri\Uri $uri
+     *
      * @return self
      */
     public function setUri($uri): self
@@ -121,7 +122,7 @@ class ConnectionContext
     }
 
     /**
-     * Get the URI as a string
+     * Get the URI as a string.
      *
      * @return string
      */
@@ -131,7 +132,7 @@ class ConnectionContext
     }
 
     /**
-     * Get the URI
+     * Get the URI.
      *
      * @return \Amp\Uri\Uri
      */
@@ -141,9 +142,10 @@ class ConnectionContext
     }
 
     /**
-     * Set the cancellation token
+     * Set the cancellation token.
      *
      * @param CancellationToken $cancellationToken
+     *
      * @return self
      */
     public function setCancellationToken($cancellationToken): self
@@ -154,7 +156,7 @@ class ConnectionContext
     }
 
     /**
-     * Get the cancellation token
+     * Get the cancellation token.
      *
      * @return CancellationToken
      */
@@ -164,9 +166,10 @@ class ConnectionContext
     }
 
     /**
-     * Set the secure boolean
+     * Set the secure boolean.
      *
-     * @param boolean $secure
+     * @param bool $secure
+     *
      * @return self
      */
     public function secure(bool $secure): self
@@ -177,9 +180,9 @@ class ConnectionContext
     }
 
     /**
-     * Whether to use TLS with socket connections
+     * Whether to use TLS with socket connections.
      *
-     * @return boolean
+     * @return bool
      */
     public function isSecure(): bool
     {
@@ -187,9 +190,10 @@ class ConnectionContext
     }
 
     /**
-     * Set the DC ID
+     * Set the DC ID.
      *
      * @param string|int $dc
+     *
      * @return self
      */
     public function setDc($dc): self
@@ -200,7 +204,7 @@ class ConnectionContext
     }
 
     /**
-     * Get the DC ID
+     * Get the DC ID.
      *
      * @return string|int
      */
@@ -208,10 +212,12 @@ class ConnectionContext
     {
         return $this->dc;
     }
+
     /**
-     * Whether to use ipv6
+     * Whether to use ipv6.
      *
-     * @param boolean $ipv6
+     * @param bool $ipv6
+     *
      * @return self
      */
     public function setIpv6(bool $ipv6): self
@@ -222,9 +228,9 @@ class ConnectionContext
     }
 
     /**
-     * Whether to use ipv6
+     * Whether to use ipv6.
      *
-     * @return boolean
+     * @return bool
      */
     public function getIpv6(): bool
     {
@@ -232,7 +238,7 @@ class ConnectionContext
     }
 
     /**
-     * Set the ipv6 boolean
+     * Set the ipv6 boolean.
      *
      * @return self
      */
@@ -242,10 +248,11 @@ class ConnectionContext
     }
 
     /**
-     * Add a stream to the stream chain
+     * Add a stream to the stream chain.
      *
      * @param string $streamName
-     * @param any $extra
+     * @param any    $extra
+     *
      * @return self
      */
     public function addStream(string $streamName, $extra = null): self
@@ -256,7 +263,7 @@ class ConnectionContext
     }
 
     /**
-     * Get a stream from the stream chain
+     * Get a stream from the stream chain.
      *
      * @return Promise
      */
@@ -266,8 +273,8 @@ class ConnectionContext
     }
 
     /**
-     * Get a stream from the stream chain
-     * 
+     * Get a stream from the stream chain.
+     *
      * @internal Generator func
      *
      * @return \Generator
@@ -285,7 +292,7 @@ class ConnectionContext
     }
 
     /**
-     * Get a description "name" of the context
+     * Get a description "name" of the context.
      *
      * @return string
      */
@@ -301,17 +308,20 @@ class ConnectionContext
         $string .= $this->getIpv6() ? 'ipv6' : 'ipv4';
         $string .= ' using ';
         foreach ($this->nextStreams as $k => $stream) {
-            if ($k) $string .= ' => ';
+            if ($k) {
+                $string .= ' => ';
+            }
             $string .= preg_replace('/.*\\\\/', '', $stream[0]);
             if ($stream[1]) {
                 $string .= ' ('.json_encode($stream[1]).')';
             }
         }
+
         return $string;
     }
 
     /**
-     * Returns a representation of the context
+     * Returns a representation of the context.
      *
      * @return string
      */

@@ -19,12 +19,12 @@
 namespace danog\MadelineProto\Stream\Common;
 
 use Amp\Promise;
+use danog\MadelineProto\Stream\Async\BufferedStream;
+use danog\MadelineProto\Stream\Async\Stream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use function Amp\call;
-use danog\MadelineProto\Stream\Async\BufferedStream;
-use danog\MadelineProto\Stream\Async\Stream;
 
 /**
  * Hash stream wrapper.
@@ -238,7 +238,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
             hash_update($this->write_hash, $finalData);
         }
 
-
         return $this->buffer_write->bufferEnd($finalData);
     }
 
@@ -253,8 +252,9 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     {
         $this->hash_name = $hash;
     }
+
     /**
-     * Connect to stream
+     * Connect to stream.
      *
      * @param ConnectionContext $ctx The connection context
      *
@@ -332,8 +332,9 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
 
         return call([$this, 'bufferWriteAsync'], $data);
     }
+
     /**
-     * Writes data to the stream and closes it
+     * Writes data to the stream and closes it.
      *
      * @param string $data Bytes to write.
      *

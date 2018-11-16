@@ -23,7 +23,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use function Amp\call;
 
 /**
- * Generic stream helper trait
+ * Generic stream helper trait.
  *
  * Wraps the asynchronous generator methods with asynchronous promise-based methods
  *
