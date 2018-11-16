@@ -22,6 +22,7 @@ use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
+use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
  * Obfuscated2 AMP stream wrapper.
@@ -30,12 +31,13 @@ use danog\MadelineProto\Stream\RawProxyStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamInterface
+class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamInterface, MTProtoBufferInterface
 {
     use BufferedStream;
     private $encrypt;
     private $decrypt;
     private $stream;
+    private $length = 0;
 
     /**
      * Connect to a server.
@@ -49,6 +51,10 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
+        if (isset($this->extra['address'])) {
+            $ctx = $ctx->getCtx();
+            $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port']);
+        }
         yield parent::connect($ctx);
 
         do {
@@ -131,13 +137,19 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
      */
     public function getReadBufferAsync(): \Generator
     {
-        if (ord(yield $this->bufferRead(1)) >= 127) {
-            yield $this->bufferRead(3);
+        $length = ord(yield $this->bufferRead(1));
+        if ($length >= 127) {
+            $length = unpack('V', (yield $this->bufferRead(3))."\0")[1];
         }
+        $this->length = $length;
 
         return $this;
     }
 
+    public function getLength(): int
+    {
+        return $this->length;
+    }
     /**
      * Get write buffer asynchronously.
      *

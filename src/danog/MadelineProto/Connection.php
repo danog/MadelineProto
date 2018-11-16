@@ -31,6 +31,9 @@ use danog\MadelineProto\Stream\Transport\ObfuscatedTransportStream;
 use function Amp\call;
 use function Amp\Promise\wait;
 use function Amp\Socket\connect;
+use danog\MadelineProto\Stream\RawStreamInterface;
+use danog\MadelineProto\Stream\RawProxyStreamInterface;
+use danog\MadelineProto\Stream\Async\RawStream;
 
 /**
  * Connection class.
@@ -39,8 +42,9 @@ use function Amp\Socket\connect;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class Connection
+class Connection implements RawStreamInterface
 {
+    use RawStream;
     use \danog\Serializable;
     use \danog\MadelineProto\Tools;
     const API_ENDPOINT = 0;
@@ -49,14 +53,7 @@ class Connection
     const VOIP_UDP_P2P_ENDPOINT = 3;
     const VOIP_UDP_LAN_ENDPOINT = 4;
 
-    public $dc;
-    public $proxy;
-    public $extra = [];
-    public $uri;
-    public $protocol;
-    public $timeout;
-    public $sock;
-    public $ipv6 = false;
+    public $stream;
 
     public $time_delta = 0;
     public $type = 0;
@@ -82,7 +79,6 @@ class Connection
     public $last_recv = 0;
     public $last_http_wait = 0;
 
-    public $ctx;
 
     /**
      * Connect function.
@@ -90,140 +86,92 @@ class Connection
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters
      *
      * @param string $proxy    Proxy class name
-     * @param all    $extra    Proxy parameters
-     * @param string $ip       IP address/URI of DC
-     * @param int    $port     Port to connect to
-     * @param string $protocol Protocol name
      *
      * @internal
      *
      * @return \Amp\Promise
      */
-    public function connect($dc, $proxy, $extra, $uri, $protocol, $timeout, $ipv6): Promise
+    public function connectAsync(ConnectionContext $ctx): \Generator
     {
-        \danog\MadelineProto\Logger::log('Opening...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-
-        if ($proxy === '\\MTProxySocket') {
-            $proxy = '\\Socket';
-            $protocol = 'obfuscated2';
-        }
-        if ($proxy === '\\Socket') {
-            $proxy = DefaultStream::getName();
-        }
-
-        if ($protocol === 'obfuscated2' && $proxy === '\\danog\\MadelineProto\\Stream\\Transport\\DefaultStream') {
-            $proxy = ObfuscatedTransportStream::getName();
-        }
-
-        if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\StreamInterface'])) {
-            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
-        }
-
-        /** @var $context \Amp\ClientConnectContext */
-        $context = new ClientConnectContext();
-        $context = $context->withConnectTimeout($timeout);
-        $context = $context->withMaxAttempts(1);
-
-        /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
-        $ctx = new ConnectionContext();
-        $ctx->setDc($dc)->setUri($uri)->setSocketContext($context)->secure($protocol === 'https');
-
-        if ($proxy !== ObfuscatedTransportStream::getName() && $proxy !== DefaultStream::getName()) {
-            $ctx->addStream(DefaultStream::getName(), $extra);
-        }
-        $ctx->addStream($proxy, $extra);
-
-        switch ($protocol) {
-            case 'tcp_abridged':
-                $ctx->addStream(AbridgedStream::getName());
-                break;
-            case 'tcp_intermediate':
-                $ctx->addStream(IntermediateStream::getName());
-                break;
-            case 'tcp_full':
-                $ctx->addStream(FullStream::getName());
-                break;
-            case 'http':
-            case 'https':
-                $ctx->addStream(HttpStream::getName());
-                break;
-            case 'obfuscated2':
-                if ($proxy !== ObfuscatedTransportStream::getName()) {
-                    $ctx->addStream(ObfuscatedStream::getName(), $extra);
-                }
-                break;
-            default:
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
-        }
-
-        $this->dc = $dc;
-        $this->protocol = $protocol;
-        $this->timeout = $timeout;
-        $this->ipv6 = $ipv6;
-        $this->uri = $uri;
-        $this->proxy = $proxy;
-        $this->extra = $extra;
-
-        return $ctx->getStream();
+        $this->stream = $ctx->getStream();
     }
 
-    /**
-     * Disconnect function.
-     *
-     * Disconnects from a telegram DC
-     *
-     * @internal
-     *
-     * @return \Amp\Promise
-     */
-    public function disconnect(): Promise
+    public function readAsync(): \Generator
     {
-        return call(
-            function () {
-                try {
-                    yield $this->sock->end();
-                    unset($this->sock);
-                } catch (\danog\MadelineProto\Exception $e) {
-                    \danog\MadelineProto\Logger::log('Exception while closing socket: '.$e);
-                }
-                \danog\MadelineProto\Logger::log('Closed!');
+        $buffer = yield $this->stream->getReadBuffer();
+        $payload_length = $buffer->getLength();
+        if ($payload_length === 4) {
+            $payload = $this->unpack_signed_int(yield $buffer->bufferRead(4));
+            $this->logger->logger("Received $payload from DC $datacenter", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
+            return $payload;
+        }
+
+        $auth_key_id = yield $buffer->bufferRead(8);
+        if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
+            $message_id = yield $buffer->bufferRead(8);
+            $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
+            $message_length = unpack('V', $buffer->bufferRead(4))[1];
+            $message_data = yield $buffer->bufferRead($message_length);
+            $buffer->bufferRead($payload_length - $message_length - 4 - 8);
+            $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = [];
+        } elseif ($auth_key_id === $this->datacenter->sockets[$datacenter]->temp_auth_key['id']) {
+            $message_key = yield $buffer->bufferRead(8);
+            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], false);
+            $encrypted_data = substr($payload, 24);
+            $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
+            /*
+            $server_salt = substr($decrypted_data, 0, 8);
+            if ($server_salt != $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt']) {
+            $this->logger->logger('WARNING: Server salt mismatch (my server salt '.$this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').', \danog\MadelineProto\Logger::WARNING);
             }
-        );
-    }
-
-    /**
-     * Disconnect function.
-     *
-     * Disconnects from a telegram DC
-     *
-     * @internal
-     *
-     * @return \Amp\Promise
-     */
-    public function close_and_reopen()
-    {
-        return call(
-            function () {
-                yield $this->disconnect();
-                yield $this->connect($this->proxy, $this->extra, $this->ip, $this->port, $this->protocol);
+             */
+            $session_id = substr($decrypted_data, 8, 8);
+            if ($session_id != $this->datacenter->sockets[$datacenter]->session_id) {
+                throw new \danog\MadelineProto\Exception('Session id mismatch.');
             }
-        );
-    }
+            $message_id = substr($decrypted_data, 16, 8);
+            $this->check_message_id($message_id, ['outgoing' => false, 'datacenter' => $datacenter, 'container' => false]);
+            $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
+            // Dunno how to handle any incorrect sequence numbers
+            $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
+            if ($message_data_length > strlen($decrypted_data)) {
+                throw new \danog\MadelineProto\SecurityException('message_data_length is too big');
+            }
+            if (strlen($decrypted_data) - 32 - $message_data_length < 12) {
+                throw new \danog\MadelineProto\SecurityException('padding is too small');
+            }
+            if (strlen($decrypted_data) - 32 - $message_data_length > 1024) {
+                throw new \danog\MadelineProto\SecurityException('padding is too big');
+            }
+            if ($message_data_length < 0) {
+                throw new \danog\MadelineProto\SecurityException('message_data_length not positive');
+            }
+            if ($message_data_length % 4 != 0) {
+                throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
+            }
+            $message_data = substr($decrypted_data, 32, $message_data_length);
+            if ($message_key != substr(hash('sha256', substr($this->datacenter->sockets[$datacenter]->temp_auth_key['auth_key'], 96, 32).$decrypted_data, true), 8, 16)) {
+                throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
+            }
+            $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id] = ['seq_no' => $seq_no];
+        } else {
+            $this->close_and_reopen($datacenter);
 
-    public function close()
-    {
-    }
+            throw new \danog\MadelineProto\Exception('Got unknown auth_key id');
+        }
+        $deserialized = $this->deserialize($message_data, ['type' => '', 'datacenter' => $datacenter]);
+        $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['content'] = $deserialized;
+        $this->datacenter->sockets[$datacenter]->incoming_messages[$message_id]['response'] = -1;
+        $this->datacenter->sockets[$datacenter]->new_incoming[$message_id] = $message_id;
+        $this->datacenter->sockets[$datacenter]->last_recv = time();
+        $this->datacenter->sockets[$datacenter]->last_http_wait = 0;
 
-    /**
-     * Destruct function.
-     *
-     * @internal
-     *
-     * @return void
-     */
-    public function __destruct()
+        return true;
+    }
+    public function getName(): string
     {
-        $this->disconnect();
+        return __CLASS__;
     }
 
     /**
@@ -235,25 +183,7 @@ class Connection
      */
     public function __sleep()
     {
-        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'time_delta', 'peer_tag', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'ack_queue'];
+        return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'peer_tag', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'ack_queue'];
     }
 
-    /**
-     * Wakeup function.
-     *
-     * @internal
-     *
-     * @return void
-     */
-    public function __wakeup()
-    {
-        $keys = array_keys((array) get_object_vars($this));
-        if (count($keys) !== count(array_unique($keys))) {
-            throw new Bug74586Exception();
-        }
-        $this->time_delta = 0;
-        if ($this->uri) {
-            wait($this->connect($this->dc, $this->proxy, $this->extra, $this->uri, $this->protocol, $this->timeout, $this->ipv6));
-        }
-    }
 }

@@ -22,6 +22,7 @@ use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
  * Obfuscated2 AMP stream wrapper.
@@ -30,11 +31,12 @@ use danog\MadelineProto\Stream\ConnectionContext;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class AbridgedStream implements BufferedStreamInterface
+class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     use BufferedStream;
 
     private $stream;
+    private $length = 0;
 
     /**
      * Stream to use as data source.
@@ -78,11 +80,19 @@ class AbridgedStream implements BufferedStreamInterface
     public function getReadBufferAsync(): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer();
-        if (ord(yield $buffer->bufferRead(1)) >= 127) {
-            yield $buffer->bufferRead(3);
+        $length = ord(yield $buffer->bufferRead(1));
+        if ($length >= 127) {
+            $length = unpack('V', (yield $buffer->bufferRead(3))."\0")[1];
         }
+        $this->length = $length;
 
         return $buffer;
+    }
+
+
+    public function getLength(): int
+    {
+        return $this->length;
     }
 
     public static function getName(): string

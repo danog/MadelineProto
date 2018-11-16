@@ -22,6 +22,7 @@ use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
  * Obfuscated2 AMP stream wrapper.
@@ -30,10 +31,11 @@ use danog\MadelineProto\Stream\ConnectionContext;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class IntermediateStream implements BufferedStreamInterface
+class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     use BufferedStream;
     private $stream;
+    private $length = 0;
 
     /**
      * Stream to use as data source.
@@ -72,11 +74,16 @@ class IntermediateStream implements BufferedStreamInterface
     public function getReadBufferAsync(): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer();
-        yield $buffer->bufferRead(4);
+        $this->length = unpack('V', yield $buffer->bufferRead(4))[1];
 
         return $buffer;
     }
 
+
+    public function getLength(): int
+    {
+        return $this->length;
+    }
     public static function getName(): string
     {
         return __CLASS__;

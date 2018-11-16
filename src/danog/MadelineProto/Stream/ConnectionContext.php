@@ -30,6 +30,7 @@ class ConnectionContext
     private $socketContext;
     private $cancellationToken;
     private $dc = 0;
+    private $ipv6 = false;
     private $nextStreams = [];
     private $key = 0;
 
@@ -97,6 +98,17 @@ class ConnectionContext
     {
         return $this->dc;
     }
+    public function setIpv6(bool $ipv6): self
+    {
+        $this->ipv6 = $ipv6;
+
+        return $this;
+    }
+
+    public function getIpv6(): bool
+    {
+        return $this->ipv6;
+    }
 
     public function getCtx(): self
     {
@@ -125,5 +137,31 @@ class ConnectionContext
         yield $obj->connect($this);
 
         return $obj;
+    }
+
+    public function getName(): string
+    {
+        $string = $this->getStringUri();
+        if ($this->isSecure()) {
+            $string .= ' (TLS)';
+        }
+        $string .= ' DC ';
+        $string .= $this->getDc();
+        $string .= ', via ';
+        $string .= $this->getIpv6() ? 'ipv6' : 'ipv4';
+        $string .= ' using ';
+        foreach ($this->nextStreams as $k => $stream) {
+            if ($k) $string .= ' => ';
+            $stream .= preg_replace('/.*\\\\/', '', $stream[0]);
+            if ($stream[1]) {
+                $stream .= ' ('.json_encode($stream[1]).')';
+            }
+        }
+        return $string;
+    }
+
+    public function __toString()
+    {
+        return $this->getName();
     }
 }

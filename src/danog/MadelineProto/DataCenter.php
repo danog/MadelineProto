@@ -19,9 +19,17 @@
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
+use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
+use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
+use danog\MadelineProto\Stream\Transport\DefaultStream;
+use danog\MadelineProto\Stream\Transport\ObfuscatedTransportStream;
 use function Amp\call;
-use function Amp\Promise\wait;
 use function Amp\Socket\connect;
+use function Amp\Promise\wait;
 
 /**
  * Manages datacenters.
@@ -48,7 +56,7 @@ class DataCenter
             if ($socket instanceof Connection) {
                 \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
                 $socket->old = true;
-            //wait($socket->close());
+                wait($socket->end());
             } else {
                 unset($this->sockets[$key]);
             }
@@ -57,131 +65,177 @@ class DataCenter
 
     public function dc_connect($dc_number)
     {
-        return call(
-            function () use ($dc_number) {
-                if (isset($this->sockets[$dc_number]) && !isset($this->sockets[$dc_number]->old)) {
-                    return false;
+        return call([$this, 'dc_connect_async'], $dc_number);
+    }
+    public function dc_connect_async($dc_number)
+    {
+        if (isset($this->sockets[$dc_number]) && !isset($this->sockets[$dc_number]->old)) {
+            return false;
+        }
+        $ctxs = $this->generate_contexts($dc_number);
+
+        \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_test_start'], $dc_number, $test, $ipv6, $this->settings[$dc_config_number]['protocol']), \danog\MadelineProto\Logger::VERBOSE);
+        foreach ($ctxs as $ctx) {
+            \danog\MadelineProto\Logger::log("Trying connection via $ctx", \danog\MadelineProto\Logger::WARNING);
+
+            try {
+                if (isset($this->sockets[$dc_number]->old)) {
+                    yield $this->sockets[$dc_number]->connect($dc_number, $this->settings[$dc_config_number]['proxy'], $this->settings[$dc_config_number]['proxy_extra'], $address, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout'], $this->settings[$dc_config_number]['ipv6']);
+                    unset($this->sockets[$dc_number]->old);
+                } else {
+                    $this->sockets[$dc_number] = new Connection();
+                    yield $this->sockets[$dc_number]->connect($dc_number, $this->settings[$dc_config_number]['proxy'], $this->settings[$dc_config_number]['proxy_extra'], $address, $port, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout'], $this->settings[$dc_config_number]['ipv6']);
                 }
-                $dc_config_number = isset($this->settings[$dc_number]) ? $dc_number : 'all';
-                $test = $this->settings[$dc_config_number]['test_mode'] ? 'test' : 'main';
-                $x = 0;
-                do {
-                    $ipv6 = $this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4';
-                    if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
-                        unset($this->sockets[$dc_number]);
+                \danog\MadelineProto\Logger::log('OK!', \danog\MadelineProto\Logger::WARNING);
 
-                        \danog\MadelineProto\Logger::log("No info for DC $dc_number", \danog\MadelineProto\Logger::ERROR);
+                return true;
+            } catch (\Throwable $e) {
+                \danog\MadelineProto\Logger::log('Connection failed: ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+            }
+        }
+        throw new \danog\MadelineProto\Exception("Could not connect to DC $dc_number");
 
-                        return false;
-                    }
-                    $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
-                    $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
-                    if (isset($this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) && $this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) {
-                        if ($dc_config_number === 'all') {
-                            $dc_config_number = $dc_number;
-                        }
-                        if (!isset($this->settings[$dc_config_number])) {
-                            $this->settings[$dc_config_number] = $this->settings['all'];
-                        }
-                        $this->settings[$dc_config_number]['protocol'] = 'obfuscated2';
-                    }
-                    if (isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
-                        if ($dc_config_number === 'all') {
-                            $dc_config_number = $dc_number;
-                        }
-                        if (!isset($this->settings[$dc_config_number])) {
-                            $this->settings[$dc_config_number] = $this->settings['all'];
-                        }
-                        $this->settings[$dc_config_number]['protocol'] = 'obfuscated2';
-                        if ($this->settings[$dc_config_number]['proxy_extra'] === null) {
-                            $this->settings[$dc_config_number]['proxy_extra'] = [];
-                        }
-                        $this->settings[$dc_config_number]['proxy_extra']['secret'] = $this->dclist[$test][$ipv6][$dc_number]['secret'];
-                    }
-                    if ($ipv6) {
-                        $address = '['.$address.']';
-                    }
+    }
+    public function generate_contexts($dc_number)
+    {
+        $ctxs = [];
+        $combos = [];
 
+        $dc_config_number = isset($this->settings[$dc_number]) ? $dc_number : 'all';
+        $test = $this->settings[$dc_config_number]['test_mode'] ? 'test' : 'main';
+        $ipv6 = $this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4';
+
+        switch ($this->settings[$dc_config_number]['protocol']) {
+            case 'tcp_abridged':
+                $default = [[DefaultStream::getName()], [AbridgedStream::getName()]];
+                break;
+            case 'tcp_intermediate':
+                $default = [[DefaultStream::getName()], [IntermediateStream::getName()]];
+                break;
+            case 'tcp_full':
+                $default = [[DefaultStream::getName()], [FullStream::getName()]];
+                break;
+            case 'http':
+                $default = [[DefaultStream::getName()], [HttpStream::getName()]];
+                break;
+            case 'https':
+                $default = [[DefaultStream::getName()], [HttpsStream::getName()]];
+                break;
+            case 'obfuscated2':
+                $default = [[ObfuscatedTransportStream::getName()]];
+                break;
+            default:
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
+        }
+        $combos[] = $default;
+
+        if (isset($this->settings[$dc_config_number]['do_not_retry']) && $this->settings[$dc_config_number]['do_not_retry']) {
+            return $combos;
+        }
+
+        if ((isset($this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) && $this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
+            $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];
+            $combos[] = [[ObfuscatedTransportStream::getName(), $extra]];
+        }
+
+        // Convert old settings
+        if ($this->settings[$dc_config_number]['proxy'] === '\\Socket') {
+            $this->settings[$dc_config_number]['proxy'] = DefaultStream::getName();
+        }
+        if ($this->settings[$dc_config_number]['proxy'] === '\\MTProxySocket') {
+            $this->settings[$dc_config_number]['proxy'] = ObfuscatedTransportStream::getName();
+        }
+        if (is_array($this->settings[$dc_config_number]['proxy'])) {
+            $proxies = $this->settings[$dc_config_number]['proxy'];
+            $proxy_extras = $this->settings[$dc_config_number]['extra'];
+        } else {
+            $proxies = [$this->settings[$dc_config_number]['proxy']];
+            $proxy_extras = [$this->settings[$dc_config_number]['extra']];
+        }
+        foreach ($proxies as $key => $proxy) {
+            $extra = $proxy_extras[$key];
+            if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\StreamInterface'])) {
+                throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
+            }
+            foreach ($combos as $orig) {
+                $combo = [];
+                if (isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\MTProtoBufferInterface'])) {
+                    $combo[] = [$proxy, $extra];
+                } else {
+                    if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\RawStreamInterface'])) {
+                        $combo[] = [DefaultStream::getName()];
+                    }
+                    if (isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\BufferedStreamInterface'])) {
+                        $combo[] = [$proxy, $extra];
+                    }
+                    $default_protocol = end($orig)[0];
+                    if ($default_protocol === ObfuscatedTransportStream::getName()) {
+                        $default_protocol = ObfuscatedStream::getName();
+                    }
+                    $combo[] = [$default_protocol];
+                }
+                $combos[] = $combo;
+            }
+        }
+
+        $combos[] = [[DefaultStream::getName()], [HttpsStream::getName()]];
+
+        $combos = array_unique($combos);
+
+        /** @var $context \Amp\ClientConnectContext */
+        $context = (new ClientConnectContext())->withMaxAttempts(1)->withTimeout($this->settings[$dc_config_number]['timeout']);
+
+        foreach ($combos as $combo) {
+            $ipv6 = [$this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4', $this->settings[$dc_config_number]['ipv6'] ? 'ipv4' : 'ipv6'];
+            foreach ($ipv6 as $ipv6) {
+                if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
+                    unset($this->sockets[$dc_number]);
+
+                    \danog\MadelineProto\Logger::log("No info for DC $dc_number", \danog\MadelineProto\Logger::ERROR);
+
+                    continue;
+                }
+                $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
+                $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
+                if ($ipv6 === 'ipv6') {
+                    $address = '[' . $address . ']';
+                }
+
+                foreach (array_unique([$port, 443, 80, 88]) as $port) {
                     if (strpos($this->settings[$dc_config_number]['protocol'], 'https') === 0) {
-                        $port = 443;
                         $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
                         if (strpos($dc_number, '_media') !== false) {
                             $subdomain .= '-1';
                         }
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
+
+                        $uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
+                    } elseif ($this->settings[$dc_config_number]['protocol'] === 'http') {
+                        $uri = 'tcp://' . $address . ':' . $port . '/api';
+                    } else {
+                        $uri = 'tcp://' . $address . ':' . $port;
                     }
+                    /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
+                    $ctx = (new ConnectionContext())
+                        ->setDc($dc_number)
+                        ->setSocketContext($context)
+                        ->setUri($uri)
+                        ->setIpv6($ipv6 === 'ipv6')
+                        ->secure($protocol === 'https');
 
-                    \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_test_start'], $dc_number, $test, $ipv6, $this->settings[$dc_config_number]['protocol']), \danog\MadelineProto\Logger::VERBOSE);
-                    foreach (array_unique([$port, 443, 80, 88]) as $port) {
-                        \danog\MadelineProto\Logger::log('Trying connection on port '.$port.' of '.$address.'...', \danog\MadelineProto\Logger::WARNING);
-
-                        if (strpos($this->settings[$dc_config_number]['protocol'], 'https') === 0) {
-                            $address = 'https://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
-                        } elseif ($this->settings[$dc_config_number]['protocol'] === 'http') {
-                            $address = $this->settings[$dc_config_number]['protocol'].'://'.$address.':'.$port.'/api';
-                        } else {
-                            $address = 'tcp://'.$address.':'.$port;
-                        }
-
-                        try {
-                            if (isset($this->sockets[$dc_number]->old)) {
-                                yield $this->sockets[$dc_number]->connect($dc_number, $this->settings[$dc_config_number]['proxy'], $this->settings[$dc_config_number]['proxy_extra'], $address, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout'], $this->settings[$dc_config_number]['ipv6']);
-                                unset($this->sockets[$dc_number]->old);
-                            } else {
-                                $this->sockets[$dc_number] = new Connection();
-                                yield $this->sockets[$dc_number]->connect($dc_number, $this->settings[$dc_config_number]['proxy'], $this->settings[$dc_config_number]['proxy_extra'], $address, $port, $this->settings[$dc_config_number]['protocol'], $this->settings[$dc_config_number]['timeout'], $this->settings[$dc_config_number]['ipv6']);
-                            }
-                            \danog\MadelineProto\Logger::log('OK!', \danog\MadelineProto\Logger::WARNING);
-
-                            return true;
-                        } catch (\Throwable $e) {
-                            \danog\MadelineProto\Logger::log('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
-                        }
-                        if (isset($this->settings[$dc_config_number]['do_not_retry']) && $this->settings[$dc_config_number]['do_not_retry']) {
-                            break;
-                        }
+                    foreach ($combo as $stream) {
+                        $ctx->addStream(...$stream);
                     }
-                    switch ($x) {
-                        case 0:
-                            $this->settings[$dc_config_number]['ipv6'] = !$this->settings[$dc_config_number]['ipv6'];
-                            \danog\MadelineProto\Logger::log('Connection failed, retrying connection with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
-                            continue;
-                        case 1:
-                            if (isset($this->dclist[$test][$ipv6][$dc_number.'_bk']['ip_address'])) {
-                                $dc_number .= '_bk';
-                            }
-                            \danog\MadelineProto\Logger::log('Connection failed, retrying connection on backup DCs with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
-                            continue;
-                        case 2:
-                            $this->settings[$dc_config_number]['ipv6'] = !$this->settings[$dc_config_number]['ipv6'];
-                            \danog\MadelineProto\Logger::log('Connection failed, retrying connection on backup DCs with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
-                            continue;
-                        case 3:
-                            $this->settings[$dc_config_number]['proxy'] = '\\Socket';
-                            \danog\MadelineProto\Logger::log('Connection failed, retrying connection without the proxy with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
-                            continue;
-                        case 4:
-                            $this->settings[$dc_config_number]['ipv6'] = !$this->settings[$dc_config_number]['ipv6'];
-                            \danog\MadelineProto\Logger::log('Connection failed, retrying connection without the proxy with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
-                            continue;
-                        case 5:
-                            $this->settings[$dc_config_number]['proxy'] = '\\HttpProxy';
-                            $this->settings[$dc_config_number]['proxy_extra'] = ['address' => 'localhost', 'port' => 80];
-                            $this->settings[$dc_config_number]['ipv6'] = !$this->settings[$dc_config_number]['ipv6'];
-                            \danog\MadelineProto\Logger::log('Connection failed, retrying connection with localhost HTTP proxy with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
-                            continue;
-                        case 6:
-                            $this->settings[$dc_config_number]['ipv6'] = !$this->settings[$dc_config_number]['ipv6'];
-                            \danog\MadelineProto\Logger::log('Connection failed, retrying connection with localhost HTTP proxy with '.($this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4').'...', \danog\MadelineProto\Logger::WARNING);
-                            continue;
-                        default:
-                            throw new \danog\MadelineProto\Exception("Could not connect to DC $dc_number");
-                    }
-                } while (++$x);
-
-                throw new \danog\MadelineProto\Exception("Could not connect to DC $dc_number");
+                    $ctx->addStream(Connection::getName());
+                    $ctxs[] = $ctx;
+                }
             }
-        );
+        }
+
+        if (isset($this->dclist[$test][$ipv6][$dc_number . '_bk']['ip_address'])) {
+            $ctxs = array_merge($ctxs, $this->generate_contexts($dc_number . '_bk'));
+        }
+        return $ctxs;
     }
 
     public function get_dcs($all = true)

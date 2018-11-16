@@ -1,6 +1,6 @@
 <?php
 /**
- * Buffered stream interface.
+ * Obfuscated2 stream wrapper.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -16,39 +16,29 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\Async;
+namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Promise;
-use function Amp\call;
+use danog\MadelineProto\Stream\Async\BufferedStream;
+use danog\MadelineProto\Stream\BufferedStreamInterface;
+use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
- * Buffered stream interface.
+ * Obfuscated2 AMP stream wrapper.
+ *
+ * Manages obfuscated2 encryption/decryption
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-trait BufferedStream
+class HttpsStream extends HttpStream implements MTProtoBufferInterface
 {
-    use Stream;
-
-    /**
-     * Get read buffer asynchronously.
-     *
-     * @return Promise
-     */
-    public function getReadBuffer(): Promise
+    public function connectAsync(ConnectionContext $ctx): \Generator
     {
-        return call([$this, 'getReadBufferAsync']);
+        return parent::connectAsync($ctx->getCtx()->secure(true));
     }
-
-    /**
-     * Get write buffer asynchronously.
-     *
-     * @param int $length Total length of data that is going to be piped in the buffer
-     *
-     * @return Promise
-     */
-    public function getWriteBuffer(int $length): Promise
+    public static function getName(): string
     {
-        return call([$this, 'getWriteBufferAsync'], $length);
+        return __CLASS__;
     }
 }

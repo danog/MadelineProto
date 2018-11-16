@@ -19,6 +19,7 @@
 namespace danog\MadelineProto\Stream\Async;
 
 use Amp\Promise;
+use function Amp\call;
 
 /**
  * Buffer interface.

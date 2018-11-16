@@ -22,6 +22,7 @@ use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
  * Obfuscated2 AMP stream wrapper.
@@ -30,12 +31,13 @@ use danog\MadelineProto\Stream\ConnectionContext;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class FullStream implements BufferedStreamInterface
+class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     use BufferedStream;
     private $stream;
     private $in_seq_no = -1;
     private $out_seq_no = -1;
+    private $length = 0;
 
     /**
      * Stream to use as data source.
@@ -81,7 +83,9 @@ class FullStream implements BufferedStreamInterface
     {
         $this->stream->startReadHash();
         $buffer = yield $this->stream->getReadBuffer();
-        $this->stream->checkReadHash(unpack('V', yield $buffer->bufferRead(4))[1] - 8);
+        $length = unpack('V', yield $buffer->bufferRead(4))[1];
+        $this->length = $length - 12;
+        $this->stream->checkReadHash($length - 8);
         $this->in_seq_no++;
         $in_seq_no = unpack('V', $buffer->bufferRead(4))[1];
         if ($in_seq_no != $this->in_seq_no) {
@@ -91,6 +95,11 @@ class FullStream implements BufferedStreamInterface
         return $buffer;
     }
 
+
+    public function getLength(): int
+    {
+        return $this->length;
+    }
     public static function getName(): string
     {
         return __CLASS__;

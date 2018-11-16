@@ -27,6 +27,7 @@ use function \Amp\call;
 use danog\MadelineProto\Stream\Async\Buffer;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
  * Obfuscated2 AMP stream wrapper
@@ -35,7 +36,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class ObfuscatedStream implements BufferedProxyStreamInterface, BufferInterface
+class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInterface
 {
     use Buffer;
     use BufferedStream;
@@ -45,6 +46,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, BufferInterface
     private $write_buffer;
     private $read_buffer;
     private $extra;
+    private $length = 0;
 
     /**
      * Stream to use as data source
@@ -55,6 +57,10 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, BufferInterface
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
+        if (isset($this->extra['address'])) {
+            $ctx = $ctx->getCtx();
+            $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port']);
+        }
         $this->stream = yield $ctx->getStream();
 
         do {
@@ -117,15 +123,22 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, BufferInterface
     public function getReadBufferAsync(): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer();
-        if (ord(yield $buffer->bufferRead(1)) >= 127) {
-            yield $buffer->bufferRead(3);
+        $length = ord(yield $buffer->bufferRead(1));
+        if ($length >= 127) {
+            $length = unpack('V', (yield $buffer->bufferRead(3))."\0")[1];
         }
+        $this->length = $length;
 
         $this->read_buffer = $buffer;
 
         return $this;
     }
 
+
+    public function getLength(): int
+    {
+        return $this->length;
+    }
     /**
      * Decrypts read data asynchronously
      *

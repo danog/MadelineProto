@@ -22,6 +22,7 @@ use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
  * Obfuscated2 AMP stream wrapper.
@@ -30,12 +31,13 @@ use danog\MadelineProto\Stream\ConnectionContext;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class HttpStream implements BufferedStreamInterface
+class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     use BufferedStream;
     private $stream;
     private $code;
     private $ctx;
+    private $length = 0;
     /**
      * URI of the HTTP API.
      *
@@ -128,8 +130,12 @@ class HttpStream implements BufferedStreamInterface
             \danog\MadelineProto\Logger::log($read);
 
             $this->code = $this->pack_signed_int(-$code);
+            $this->length = 4;
 
             return $this;
+        }
+        if (isset($headers['content-length'])) {
+            $this->length = (int) $headers['content-length'];
         }
 
         return $buffer;
@@ -140,6 +146,11 @@ class HttpStream implements BufferedStreamInterface
         return new Success($this->code);
     }
 
+
+    public function getLength(): int
+    {
+        return $this->length;
+    }
     public static function getName(): string
     {
         return __CLASS__;
