@@ -1,6 +1,6 @@
 <?php
 /**
- * Raw stream interface.
+ * Generic stream interface.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -21,7 +21,7 @@ namespace danog\MadelineProto\Stream;
 use Amp\Promise;
 
 /**
- * Raw stream interface.
+ * Generic stream interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
@@ -30,7 +30,7 @@ interface StreamInterface
     /**
      * Connect to a server.
      *
-     * @param ConnectionContext $ctx URI
+     * @param ConnectionContext $ctx The connection context
      *
      * @return Promise
      */

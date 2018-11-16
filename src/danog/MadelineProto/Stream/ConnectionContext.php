@@ -1,6 +1,6 @@
 <?php
 /**
- * Buffer interface.
+ * Connection context
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -22,18 +22,73 @@ use Amp\CancellationToken;
 use Amp\Socket\ClientConnectContext;
 use Amp\Uri\Uri;
 use function Amp\coroutine;
+use function Amp\call;
 
+/**
+ * Connection context class
+ * 
+ * Is responsible for maintaining state about a certain connection to a DC.
+ * That includes the Stream chain that is required to use the connection, the connection URI, and other connection-related data.
+ *
+ * @author Daniil Gentili <daniil@daniil.it>
+ */
 class ConnectionContext
 {
+    /**
+     * Whether to use a secure socket
+     *
+     * @var boolean
+     */
     private $secure = false;
-    private $uri = '';
+    /**
+     * The connection URI
+     *
+     * @var \Amp\Uri\Uri
+     */
+    private $uri;
+    /**
+     * Socket context
+     *
+     * @var \Amp\Socket\ClientConnectionContext
+     */
     private $socketContext;
+    /**
+     * Cancellation token
+     *
+     * @var \Amp\CancellationToken
+     */
     private $cancellationToken;
+    /**
+     * The telegram DC ID
+     *
+     * @var integer
+     */
     private $dc = 0;
+    /**
+     * Whether to use IPv6
+     *
+     * @var boolean
+     */
     private $ipv6 = false;
+    /**
+     * An array of arrays containing an array with the stream name and the extra parameter to pass to it
+     *
+     * @var array<array<string, any>>
+     */
     private $nextStreams = [];
+    /**
+     * The current stream key
+     *
+     * @var integer
+     */
     private $key = 0;
 
+    /**
+     * Set the socket context
+     *
+     * @param ClientConnectContext $socketContext
+     * @return self
+     */
     public function setSocketContext(ClientConnectContext $socketContext): self
     {
         $this->socketContext = $socketContext;
@@ -41,11 +96,22 @@ class ConnectionContext
         return $this;
     }
 
+    /**
+     * Get the socket context
+     *
+     * @return ClientConnectContext
+     */
     public function getSocketContext(): ClientConnectContext
     {
         return $this->socketContext;
     }
 
+    /**
+     * Set the connection URI
+     *
+     * @param string|\Amp\Uri\Uri $uri
+     * @return self
+     */
     public function setUri($uri): self
     {
         $this->uri = $uri instanceof Uri ? $uri : new Uri($uri);
@@ -53,16 +119,32 @@ class ConnectionContext
         return $this;
     }
 
+    /**
+     * Get the URI as a string
+     *
+     * @return string
+     */
     public function getStringUri(): string
     {
         return (string) $this->uri;
     }
 
+    /**
+     * Get the URI
+     *
+     * @return \Amp\Uri\Uri
+     */
     public function getUri(): Uri
     {
         return $this->uri;
     }
 
+    /**
+     * Set the cancellation token
+     *
+     * @param CancellationToken $cancellationToken
+     * @return self
+     */
     public function setCancellationToken(CancellationToken $cancellationToken): self
     {
         $this->cancellationToken = $cancellationToken;
@@ -70,11 +152,22 @@ class ConnectionContext
         return $this;
     }
 
+    /**
+     * Get the cancellation token
+     *
+     * @return CancellationToken
+     */
     public function getCancellationToken(): CancellationToken
     {
         return $this->cancellationToken;
     }
 
+    /**
+     * Set the secure boolean
+     *
+     * @param boolean $secure
+     * @return self
+     */
     public function secure(bool $secure): self
     {
         $this->secure = $secure;
@@ -82,11 +175,22 @@ class ConnectionContext
         return $this;
     }
 
+    /**
+     * Whether to use TLS with socket connections
+     *
+     * @return boolean
+     */
     public function isSecure(): bool
     {
         return $this->secure;
     }
 
+    /**
+     * Set the DC ID
+     *
+     * @param string|int $dc
+     * @return self
+     */
     public function setDc($dc): self
     {
         $this->dc = $dc;
@@ -94,10 +198,21 @@ class ConnectionContext
         return $this;
     }
 
+    /**
+     * Get the DC ID
+     *
+     * @return string|int
+     */
     public function getDc()
     {
         return $this->dc;
     }
+    /**
+     * Whether to use ipv6
+     *
+     * @param boolean $ipv6
+     * @return self
+     */
     public function setIpv6(bool $ipv6): self
     {
         $this->ipv6 = $ipv6;
@@ -105,16 +220,33 @@ class ConnectionContext
         return $this;
     }
 
+    /**
+     * Whether to use ipv6
+     *
+     * @return boolean
+     */
     public function getIpv6(): bool
     {
         return $this->ipv6;
     }
 
+    /**
+     * Set the ipv6 boolean
+     *
+     * @return self
+     */
     public function getCtx(): self
     {
         return clone $this;
     }
 
+    /**
+     * Add a stream to the stream chain
+     *
+     * @param string $streamName
+     * @param any $extra
+     * @return self
+     */
     public function addStream(string $streamName, $extra = null): self
     {
         $this->nextStreams[] = [$streamName, $extra];
@@ -122,11 +254,23 @@ class ConnectionContext
         return $this;
     }
 
+    /**
+     * Get a stream from the stream chain
+     *
+     * @return Promise
+     */
     public function getStream(): Promise
     {
-        return coroutine([$this, 'getStreamAsync'])();
+        return call([$this, 'getStreamAsync']);
     }
 
+    /**
+     * Get a stream from the stream chain
+     * 
+     * @internal Generator func
+     *
+     * @return \Generator
+     */
     public function getStreamAsync(): \Generator
     {
         list($clazz, $extra) = $this->nextStreams[$this->key++];
@@ -139,6 +283,11 @@ class ConnectionContext
         return $obj;
     }
 
+    /**
+     * Get a description "name" of the context
+     *
+     * @return string
+     */
     public function getName(): string
     {
         $string = $this->getStringUri();
@@ -160,6 +309,11 @@ class ConnectionContext
         return $string;
     }
 
+    /**
+     * Returns a representation of the context
+     *
+     * @return string
+     */
     public function __toString()
     {
         return $this->getName();

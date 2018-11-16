@@ -1,6 +1,6 @@
 <?php
 /**
- * Obfuscated2 stream wrapper.
+ * HTTP stream wrapper.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -25,9 +25,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
- * Obfuscated2 AMP stream wrapper.
- *
- * Manages obfuscated2 encryption/decryption
+ * HTTP stream wrapper.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
@@ -45,12 +43,13 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
      */
     private $uri;
 
+
     /**
-     * Stream to use as data source.
+     * Connect to stream
      *
-     * @param BufferedStreamInterface $stream The stream
+     * @param ConnectionContext $ctx The connection context
      *
-     * @return Promise
+     * @return \Generator
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
@@ -66,7 +65,7 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return Generator
      */
-    public function getWriteBufferAsync($length): \Generator
+    public function getWriteBufferAsync(int $length): \Generator
     {
         $header_data = 'POST '.$this->uri->getAbsoluteUri()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length."\r\n\r\n";
         $buffer = yield $this->stream->getWriteBuffer(strlen($header_data) + $length);

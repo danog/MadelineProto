@@ -1,6 +1,6 @@
 <?php
 /**
- * Buffer interface.
+ * Buffer helper trait
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -22,41 +22,24 @@ use Amp\Promise;
 use function Amp\call;
 
 /**
- * Buffer interface.
+ * Buffer helper trait
+ * 
+ * Wraps the asynchronous generator methods with asynchronous promise-based methods
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 trait Buffer
 {
-    /**
-     * Read data asynchronously.
-     *
-     * @return Promise
-     */
     public function bufferRead(int $length): Promise
     {
         return call([$this, 'bufferReadAsync'], $length);
     }
 
-    /**
-     * Write data asynchronously.
-     *
-     * @param string $data Data to write
-     *
-     * @return Promise
-     */
     public function bufferWrite(string $data): Promise
     {
         return call([$this, 'bufferWriteAsync'], $data);
     }
 
-    /**
-     * Write data and close buffer asynchronously.
-     *
-     * @param string $data Data to write
-     *
-     * @return Promise
-     */
     public function bufferEnd(string $finalData = ''): Promise
     {
         return call([$this, 'bufferEndAsync'].$finalData);

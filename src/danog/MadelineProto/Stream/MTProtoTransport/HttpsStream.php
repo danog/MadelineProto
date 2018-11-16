@@ -1,6 +1,6 @@
 <?php
 /**
- * Obfuscated2 stream wrapper.
+ * HTTPS stream wrapper.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -25,14 +25,19 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
- * Obfuscated2 AMP stream wrapper.
- *
- * Manages obfuscated2 encryption/decryption
+ * HTTPS stream wrapper.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 class HttpsStream extends HttpStream implements MTProtoBufferInterface
 {
+    /**
+     * Connect to stream
+     *
+     * @param ConnectionContext $ctx The connection context
+     *
+     * @return \Generator
+     */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
         return parent::connectAsync($ctx->getCtx()->secure(true));

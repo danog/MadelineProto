@@ -1,6 +1,6 @@
 <?php
 /**
- * Obfuscated2 stream wrapper.
+ * TCP full stream wrapper.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -25,7 +25,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
- * Obfuscated2 AMP stream wrapper.
+ * TCP full stream wrapper.
  *
  * Manages obfuscated2 encryption/decryption
  *
@@ -63,7 +63,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return Generator
      */
-    public function getWriteBufferAsync($length): \Generator
+    public function getWriteBufferAsync(int $length): \Generator
     {
         $this->stream->startWriteHash();
         $this->stream->checkWriteHash($length + 8);

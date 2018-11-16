@@ -30,7 +30,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
- * Obfuscated2 AMP stream wrapper
+ * Obfuscated2 stream wrapper
  *
  * Manages obfuscated2 encryption/decryption
  *
@@ -49,11 +49,11 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
     private $length = 0;
 
     /**
-     * Stream to use as data source
+     * Connect to stream
      *
-     * @param BufferedStreamInterface $stream The stream
-     * 
-     * @return Promise
+     * @param ConnectionContext $ctx The connection context
+     *
+     * @return \Generator
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
@@ -98,11 +98,11 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
     /**
      * Get write buffer asynchronously
      * 
-     * @param integer $length Length of data that is going to be written to the write buffer
+     * @param int $length Length of data that is going to be written to the write buffer
      *
      * @return Generator
      */
-    public function getWriteBufferAsync($length): \Generator
+    public function getWriteBufferAsync(int $length): \Generator
     {
         if ($length < 127) {
             $message = chr($length);
@@ -187,7 +187,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
      * 
      * @return void
      */
-    public function setExtra(public static function getName(): string$extra)
+    public function setExtra($extra)
     {
         $this->extra = $extra;
     }

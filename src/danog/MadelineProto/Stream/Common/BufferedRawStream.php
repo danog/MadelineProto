@@ -1,6 +1,6 @@
 <?php
 /**
- * Buffered wrapper for RawStream.
+ * Buffered raw stream.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,7 +19,6 @@
 namespace danog\MadelineProto\Stream\Common;
 
 use Amp\Promise;
-use danog\MadelineProto\Stream\Async\Buffer;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use function Amp\call;
@@ -27,9 +26,7 @@ use function Amp\Socket\connect;
 use function Amp\Socket\cryptoConnect;
 
 /**
- * Raw proxy stream wrapper.
- *
- * Proxy interface
+ * Buffered raw stream
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
@@ -45,16 +42,11 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     private $need = 0;
 
     /**
-     * Connect to a server.
+     * Asynchronously connect to a TCP/TLS server.
      *
-     * @param string                           $uri           URI
-     * @param bool                             $secure        Use TLS?
-     * @param \Amp\Socket\ClientConnectContext $socketContext Socket context
-     * @param \Amp\CancellationToken           $token         Cancellation token
+     * @param ConnectionContext $ctx Connection context
      *
-     * @internal Used by connect
-     *
-     * @return Promise
+     * @return \Generator
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
@@ -164,9 +156,9 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      *
      * @param int $length Amount of data to read
      *
-     * @return Promise
+     * @return \Generator
      */
-    public function bufferReadAsync($length): \Generator
+    public function bufferReadAsync(int $length): \Generator
     {
         $size = fstat($this->memory_stream)['size'];
         $offset = fstat($this->memory_stream);
@@ -209,6 +201,11 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
         return call([$this, 'endAsync'], $finalData);
     }
 
+    /**
+     * Get class name
+     *
+     * @return string
+     */
     public static function getName(): string
     {
         return __CLASS__;

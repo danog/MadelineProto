@@ -30,6 +30,8 @@ interface BufferInterface
     /**
      * Read data asynchronously.
      *
+     * @param int $length How much data to read
+     * 
      * @return Promise
      */
     public function bufferRead(int $length): Promise;
@@ -46,7 +48,7 @@ interface BufferInterface
     /**
      * Write data and close buffer asynchronously.
      *
-     * @param string $data Data to write
+     * @param string $finalData Data to write before closing buffer
      *
      * @return Promise
      */

@@ -40,14 +40,11 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
     private $length = 0;
 
     /**
-     * Connect to a server.
+     * Connect to stream
      *
-     * @param string                           $uri           URI
-     * @param bool                             $secure        Whether to use TLS while connecting
-     * @param \Amp\Socket\ClientConnectContext $socketContext Socket context
-     * @param \Amp\CancellationToken           $token         Cancellation token
+     * @param ConnectionContext $ctx The connection context
      *
-     * @return Promise
+     * @return \Generator
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
@@ -157,7 +154,7 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
      *
      * @return Generator
      */
-    public function getWriteBufferAsync($length): \Generator
+    public function getWriteBufferAsync(int $length): \Generator
     {
         if ($length < 127) {
             $message = chr($length);
