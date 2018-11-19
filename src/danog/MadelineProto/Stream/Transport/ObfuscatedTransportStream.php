@@ -37,7 +37,6 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
     private $encrypt;
     private $decrypt;
     private $stream;
-    private $length = 0;
 
     /**
      * Connect to stream.
@@ -130,23 +129,20 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
     /**
      * Get read buffer asynchronously.
      *
+     * @param int $length Length of payload, as detected by this layer
+     *
      * @return Generator
      */
-    public function getReadBufferAsync(): \Generator
+    public function getReadBufferAsync(int &$length): \Generator
     {
         $length = ord(yield $this->bufferRead(1));
         if ($length >= 127) {
             $length = unpack('V', (yield $this->bufferRead(3))."\0")[1];
         }
-        $this->length = $length;
 
         return $this;
     }
 
-    public function getLength(): int
-    {
-        return $this->length;
-    }
 
     /**
      * Get write buffer asynchronously.

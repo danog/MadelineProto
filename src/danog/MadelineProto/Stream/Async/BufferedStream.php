@@ -35,11 +35,27 @@ trait BufferedStream
     /**
      * Get read buffer asynchronously.
      *
+     * @param int $length Length of payload, as detected by this layer
+     *
      * @return Promise
      */
-    public function getReadBuffer(): Promise
+    public function getReadBuffer(int &$length): Promise
     {
-        return call([$this, 'getReadBufferAsync']);
+        try {
+            $result = $this->getReadBufferAsync($length);
+        } catch (\Throwable $exception) {
+            return new Failure($exception);
+        }
+        if ($result instanceof \Generator) {
+            return new Coroutine($result);
+        }
+        if ($result instanceof Promise) {
+            return $result;
+        }
+        if ($result instanceof ReactPromise) {
+            return Promise\adapt($result);
+        }
+        return new Success($result);
     }
 
     /**

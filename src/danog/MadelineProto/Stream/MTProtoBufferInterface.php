@@ -25,10 +25,4 @@ namespace danog\MadelineProto\Stream;
  */
 interface MTProtoBufferInterface
 {
-    /**
-     * Get the length of the last buffer.
-     *
-     * @return int
-     */
-    public function getLength(): int;
 }

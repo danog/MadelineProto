@@ -42,6 +42,6 @@ trait Buffer
 
     public function bufferEnd(string $finalData = ''): Promise
     {
-        return call([$this, 'bufferEndAsync'].$finalData);
+        return call([$this, 'bufferEndAsync'], $finalData);
     }
 }

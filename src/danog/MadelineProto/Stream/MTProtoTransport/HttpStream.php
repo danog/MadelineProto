@@ -23,6 +23,7 @@ use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
+use danog\MadelineProto\Tools;
 
 /**
  * HTTP stream wrapper.
@@ -32,10 +33,10 @@ use danog\MadelineProto\Stream\MTProtoBufferInterface;
 class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     use BufferedStream;
+    use Tools;
     private $stream;
     private $code;
     private $ctx;
-    private $length = 0;
     /**
      * URI of the HTTP API.
      *
@@ -76,11 +77,13 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
     /**
      * Get read buffer asynchronously.
      *
+     * @param int $length Length of payload, as detected by this layer
+     *
      * @return Generator
      */
-    public function getReadBufferAsync(): \Generator
+    public function getReadBufferAsync(int &$length): \Generator
     {
-        $buffer = yield $this->stream->getReadBuffer();
+        $buffer = yield $this->stream->getReadBuffer($l);
         $header_data = '';
         $was_crlf = false;
         while (true) {
@@ -128,12 +131,12 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
             \danog\MadelineProto\Logger::log($read);
 
             $this->code = $this->pack_signed_int(-$code);
-            $this->length = 4;
+            $length = 4;
 
             return $this;
         }
         if (isset($headers['content-length'])) {
-            $this->length = (int) $headers['content-length'];
+            $length = (int) $headers['content-length'];
         }
 
         return $buffer;
@@ -144,10 +147,6 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
         return new Success($this->code);
     }
 
-    public function getLength(): int
-    {
-        return $this->length;
-    }
 
     public static function getName(): string
     {

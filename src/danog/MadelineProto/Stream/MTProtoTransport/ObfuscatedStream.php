@@ -42,7 +42,6 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
     private $write_buffer;
     private $read_buffer;
     private $extra;
-    private $length = 0;
 
     /**
      * Connect to stream.
@@ -115,26 +114,23 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
     /**
      * Get read buffer asynchronously.
      *
+     * @param int $length Length of payload, as detected by this layer
+     *
      * @return Generator
      */
-    public function getReadBufferAsync(): \Generator
+    public function getReadBufferAsync(int &$length): \Generator
     {
-        $buffer = yield $this->stream->getReadBuffer();
+        $buffer = yield $this->stream->getReadBuffer($l);
         $length = ord(yield $buffer->bufferRead(1));
         if ($length >= 127) {
             $length = unpack('V', (yield $buffer->bufferRead(3))."\0")[1];
         }
-        $this->length = $length;
 
         $this->read_buffer = $buffer;
 
         return $this;
     }
 
-    public function getLength(): int
-    {
-        return $this->length;
-    }
 
     /**
      * Decrypts read data asynchronously.

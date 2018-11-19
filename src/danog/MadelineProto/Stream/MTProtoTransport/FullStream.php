@@ -37,7 +37,6 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
     private $stream;
     private $in_seq_no = -1;
     private $out_seq_no = -1;
-    private $length = 0;
 
     /**
      * Stream to use as data source.
@@ -77,15 +76,17 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
     /**
      * Get read buffer asynchronously.
      *
+     * @param int $length Length of payload, as detected by this layer
+     *
      * @return Generator
      */
-    public function getReadBufferAsync(): \Generator
+    public function getReadBufferAsync(int &$length): \Generator
     {
         $this->stream->startReadHash();
-        $buffer = yield $this->stream->getReadBuffer();
-        $length = unpack('V', yield $buffer->bufferRead(4))[1];
-        $this->length = $length - 12;
-        $this->stream->checkReadHash($length - 8);
+        $buffer = yield $this->stream->getReadBuffer($l);
+        $read_length = unpack('V', yield $buffer->bufferRead(4))[1];
+        $length = $read_length - 12;
+        $this->stream->checkReadHash($read_length - 8);
         $this->in_seq_no++;
         $in_seq_no = unpack('V', $buffer->bufferRead(4))[1];
         if ($in_seq_no != $this->in_seq_no) {
@@ -93,11 +94,6 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
         }
 
         return $buffer;
-    }
-
-    public function getLength(): int
-    {
-        return $this->length;
     }
 
     public static function getName(): string

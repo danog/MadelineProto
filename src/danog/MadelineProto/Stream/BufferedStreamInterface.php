@@ -30,9 +30,11 @@ interface BufferedStreamInterface extends StreamInterface
     /**
      * Get read buffer asynchronously.
      *
+     * @param int $length Length of payload, as detected by this layer
+     * 
      * @return Promise
      */
-    public function getReadBuffer(): Promise;
+    public function getReadBuffer(int &$length): Promise;
 
     /**
      * Get write buffer asynchronously.

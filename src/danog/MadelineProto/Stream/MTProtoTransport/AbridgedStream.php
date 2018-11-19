@@ -33,7 +33,6 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
     use BufferedStream;
 
     private $stream;
-    private $length = 0;
 
     /**
      * Connect to stream.
@@ -72,24 +71,21 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
     /**
      * Get read buffer asynchronously.
      *
+     * @param int $length Length of payload, as detected by this layer
+     *
      * @return Generator
      */
-    public function getReadBufferAsync(): \Generator
+    public function getReadBufferAsync(int &$length): \Generator
     {
-        $buffer = yield $this->stream->getReadBuffer();
+        $buffer = yield $this->stream->getReadBuffer($l);
         $length = ord(yield $buffer->bufferRead(1));
         if ($length >= 127) {
             $length = unpack('V', (yield $buffer->bufferRead(3))."\0")[1];
         }
-        $this->length = $length;
 
         return $buffer;
     }
 
-    public function getLength(): int
-    {
-        return $this->length;
-    }
 
     public static function getName(): string
     {

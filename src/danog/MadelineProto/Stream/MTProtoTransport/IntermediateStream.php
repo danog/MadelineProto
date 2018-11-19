@@ -34,7 +34,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
 {
     use BufferedStream;
     private $stream;
-    private $length = 0;
 
     /**
      * Connect to stream.
@@ -68,20 +67,18 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     /**
      * Get read buffer asynchronously.
      *
+     * @param int $length Length of payload, as detected by this layer
+     *
      * @return Generator
      */
-    public function getReadBufferAsync(): \Generator
+    public function getReadBufferAsync(int $length): \Generator
     {
-        $buffer = yield $this->stream->getReadBuffer();
-        $this->length = unpack('V', yield $buffer->bufferRead(4))[1];
+        $buffer = yield $this->stream->getReadBuffer($l);
+        $length = unpack('V', yield $buffer->bufferRead(4))[1];
 
         return $buffer;
     }
 
-    public function getLength(): int
-    {
-        return $this->length;
-    }
 
     public static function getName(): string
     {

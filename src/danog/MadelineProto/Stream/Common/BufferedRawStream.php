@@ -104,9 +104,11 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     /**
      * Get read buffer asynchronously.
      *
+     * @param int $length Length of payload, as detected by this layer
+     *
      * @return Promise
      */
-    public function getReadBuffer(): Promise
+    public function getReadBuffer(int &$length): Promise
     {
         $size = fstat($this->memory_stream)['size'];
         $offset = fstat($this->memory_stream);
