@@ -1,7 +1,6 @@
 <?php
-
 /**
- * BigInteger placeholder for deserialization.
+ * Async parameters class.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -17,22 +16,44 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace phpseclib\Math;
+namespace danog\MadelineProto\Async;
 
-if (PHP_MAJOR_VERSION < 7 && !(class_exists('\\Phar') && \Phar::running())) {
-    throw new \Exception('MadelineProto requires php 7 to run natively, use phar.madelineproto.xyz to run on PHP 5.6');
-}
-if (defined('HHVM_VERSION')) {
-    $engines = [['PHP64', ['OpenSSL']], ['BCMath', ['OpenSSL']], ['PHP32', ['OpenSSL']]];
-    foreach ($engines as $engine) {
-        try {
-            \phpseclib\Math\BigInteger::setEngine($engine[0], isset($engine[1]) ? $engine[1] : []);
-            break;
-        } catch (\Exception $e) {
-        }
-    }
-}
+use \Amp\Promise;
+use function Amp\call;
 
-class BigIntegor
+/**
+ * Async parameters class
+ *
+ * Manages asynchronous generation of method parameters
+ *
+ * @author Daniil Gentili <daniil@daniil.it>
+ */
+class AsyncParameters extends Parameters
 {
+    private $callable;
+    private $refetchable = true;
+    
+    public function __construct(callable $callable, bool $refetchable = true)
+    {
+        $this->callable = $callable;
+        $this->refetchable = $refetchable;
+    }
+
+    public function setRefetchable(bool $refetchable)
+    {
+        $this->refetchable = $refetchable;
+    }
+    public function setCallable(callable $callable)
+    {
+        $this->callable = $callable;
+    }
+    public function isRefetchable(): bool
+    {
+        return $this->refetchable;
+    }
+    public function getParameters(): \Generator
+    {
+        $callable = $this->callable;
+        return $callable();
+    }
 }

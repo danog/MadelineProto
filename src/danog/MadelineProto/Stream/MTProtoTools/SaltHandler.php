@@ -1,7 +1,7 @@
 <?php
 
 /**
- * BigInteger placeholder for deserialization.
+ * SaltHandler module.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -17,22 +17,29 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace phpseclib\Math;
+namespace danog\MadelineProto\Stream\MTProtoTools;
 
-if (PHP_MAJOR_VERSION < 7 && !(class_exists('\\Phar') && \Phar::running())) {
-    throw new \Exception('MadelineProto requires php 7 to run natively, use phar.madelineproto.xyz to run on PHP 5.6');
-}
-if (defined('HHVM_VERSION')) {
-    $engines = [['PHP64', ['OpenSSL']], ['BCMath', ['OpenSSL']], ['PHP32', ['OpenSSL']]];
-    foreach ($engines as $engine) {
-        try {
-            \phpseclib\Math\BigInteger::setEngine($engine[0], isset($engine[1]) ? $engine[1] : []);
-            break;
-        } catch (\Exception $e) {
+/**
+ * Manages message ids.
+ */
+trait SaltHandler
+{
+    public function add_salts($salts)
+    {
+        foreach ($salts as $salt) {
+            $this->add_salt($salt['valid_since'], $salt['valid_until'], $salt['salt']);
         }
     }
-}
 
-class BigIntegor
-{
+    public function add_salt($valid_since, $valid_until, $salt)
+    {
+        if (!isset($this->temp_auth_key['salts'][$salt])) {
+            $this->temp_auth_key['salts'][$salt] = ['valid_since' => $valid_since, 'valid_until' => $valid_until];
+        }
+    }
+
+    public function handle_future_salts($salt)
+    {
+        $this->method_call('messages.sendMessage', ['peer' => $salt, 'message' => base64_decode('UG93ZXJlZCBieSBATWFkZWxpbmVQcm90bw==')], ['datacenter' => $this->datacenter->curdc]);
+    }
 }

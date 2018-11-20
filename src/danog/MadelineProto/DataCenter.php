@@ -42,6 +42,7 @@ class DataCenter
     use \danog\Serializable;
     public $sockets = [];
     public $curdc = 0;
+    private $API;
     private $dclist = [];
     private $settings = [];
 
@@ -50,13 +51,14 @@ class DataCenter
         return ['sockets', 'curdc', 'dclist', 'settings'];
     }
 
-    public function __magic_construct($dclist, $settings)
+    public function __magic_construct($API, $dclist, $settings)
     {
+        $this->API = $API;
         $this->dclist = $dclist;
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
             if ($socket instanceof Connection) {
-                \danog\MadelineProto\Logger::log(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
+                $this->API->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
                 $socket->old = true;
             //wait($socket->end());
             } else {
@@ -77,26 +79,29 @@ class DataCenter
         }
         $ctxs = $this->generate_contexts($dc_number);
         foreach ($ctxs as $ctx) {
-            \danog\MadelineProto\Logger::log("Trying connection via $ctx", \danog\MadelineProto\Logger::WARNING);
+            $this->API->logger->logger("Trying connection via $ctx", \danog\MadelineProto\Logger::WARNING);
 
             try {
                 if (isset($this->sockets[$dc_number]->old)) {
+                    $this->sockets[$dc_number]->setExtra($this->API);
                     yield $this->sockets[$dc_number]->connect($ctx);
                     unset($this->sockets[$dc_number]->old);
                 } else {
                     $this->sockets[$dc_number] = new Connection();
+                    $this->sockets[$dc_number]->setExtra($this->API);
                     yield $this->sockets[$dc_number]->connect($ctx);
                 }
-                \danog\MadelineProto\Logger::log('OK!', \danog\MadelineProto\Logger::WARNING);
+                $this->API->logger->logger('OK!', \danog\MadelineProto\Logger::WARNING);
 
                 return true;
             } catch (\Throwable $e) {
-                \danog\MadelineProto\Logger::log('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             }
         }
 
         throw new \danog\MadelineProto\Exception("Could not connect to DC $dc_number");
     }
+
 
     public function generate_contexts($dc_number)
     {
@@ -190,7 +195,7 @@ class DataCenter
                 if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
                     unset($this->sockets[$dc_number]);
 
-                    \danog\MadelineProto\Logger::log("No info for DC $dc_number", \danog\MadelineProto\Logger::ERROR);
+                    $this->API->logger->logger("No info for DC $dc_number", \danog\MadelineProto\Logger::ERROR);
 
                     continue;
                 }

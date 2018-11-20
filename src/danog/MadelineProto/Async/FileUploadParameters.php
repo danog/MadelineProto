@@ -1,7 +1,6 @@
 <?php
-
 /**
- * SaltHandler module.
+ * File upload parameters class.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -17,29 +16,22 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\MTProtoTools;
+namespace danog\MadelineProto\Async;
+
+use \Amp\Promise;
+use function Amp\call;
 
 /**
- * Manages message ids.
+ * Async parameters class
+ *
+ * Manages asynchronous generation of method parameters
+ *
+ * @author Daniil Gentili <daniil@daniil.it>
  */
-trait SaltHandler
+class FileUploadParameters extends Parameters
 {
-    public function add_salts($salts)
+    public function __construct(resource $file)
     {
-        foreach ($salts as $salt) {
-            $this->add_salt($salt['valid_since'], $salt['valid_until'], $salt['salt']);
-        }
-    }
-
-    public function add_salt($valid_since, $valid_until, $salt)
-    {
-        if (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['salts'][$salt])) {
-            $this->datacenter->sockets[$datacenter]->temp_auth_key['salts'][$salt] = ['valid_since' => $valid_since, 'valid_until' => $valid_until];
-        }
-    }
-
-    public function handle_future_salts($salt)
-    {
-        $this->method_call('messages.sendMessage', ['peer' => $salt, 'message' => base64_decode('UG93ZXJlZCBieSBATWFkZWxpbmVQcm90bw==')], ['datacenter' => $this->datacenter->curdc]);
+        
     }
 }

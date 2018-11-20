@@ -24,31 +24,6 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 trait SeqNoHandler
 {
-    public function generate_out_seq_no($datacenter, $content_related)
-    {
-        $in = $content_related ? 1 : 0;
-        $value = $this->datacenter->sockets[$datacenter]->session_out_seq_no;
-        $this->datacenter->sockets[$datacenter]->session_out_seq_no += $in;
-        //$this->logger->logger("OUT $datacenter: $value + $in = ".$this->datacenter->sockets[$datacenter]->session_out_seq_no);
-        return $value * 2 + $in;
-    }
-
-    public function check_in_seq_no($datacenter, $current_msg_id)
-    {
-        if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generate_in_seq_no($datacenter, $this->content_related($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']))) !== $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) {
-            //$this->logger->logger('SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no'].', '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].')', \danog\MadelineProto\Logger::ERROR);
-        }
-    }
-
-    public function generate_in_seq_no($datacenter, $content_related)
-    {
-        $in = $content_related ? 1 : 0;
-        $value = $this->datacenter->sockets[$datacenter]->session_in_seq_no;
-        $this->datacenter->sockets[$datacenter]->session_in_seq_no += $in;
-        //$this->logger->logger("IN $datacenter: $value + $in = ".$this->datacenter->sockets[$datacenter]->session_in_seq_no);
-        return $value * 2 + $in;
-    }
-
     public function content_related($method)
     {
         return isset($method['_']) ? !in_array($method['_'], self::NOT_CONTENT_RELATED) : true;

@@ -29,11 +29,8 @@ class MTProto
     use \danog\MadelineProto\MTProtoTools\AuthKeyHandler;
     use \danog\MadelineProto\MTProtoTools\CallHandler;
     use \danog\MadelineProto\MTProtoTools\Crypt;
-    use \danog\MadelineProto\MTProtoTools\MessageHandler;
-    use \danog\MadelineProto\MTProtoTools\MsgIdHandler;
     use \danog\MadelineProto\MTProtoTools\PeerHandler;
     use \danog\MadelineProto\MTProtoTools\ResponseHandler;
-    use \danog\MadelineProto\MTProtoTools\SaltHandler;
     use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
     use \danog\MadelineProto\MTProtoTools\UpdateHandler;
     use \danog\MadelineProto\MTProtoTools\Files;
@@ -332,7 +329,6 @@ class MTProto
             $this->got_state = false;
         }
         $this->connect_to_all_dcs();
-        //datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         foreach ($this->calls as $id => $controller) {
             if (!is_object($controller)) {
                 unset($this->calls[$id]);
@@ -672,7 +668,7 @@ class MTProto
     // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
     public function connect_to_all_dcs()
     {
-        $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+        $this->datacenter->__construct($this, $this->settings['connection'], $this->settings['connection_settings']);
         foreach ($this->datacenter->get_dcs() as $new_dc) {
             $this->datacenter->dc_connect($new_dc);
         }
