@@ -80,7 +80,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return Generator
      */
-    public function getReadBufferAsync(int &$length): \Generator
+    public function getReadBufferAsync(&$length): \Generator
     {
         $this->stream->startReadHash();
         $buffer = yield $this->stream->getReadBuffer($l);

@@ -272,7 +272,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return Generator
      */
-    public function getReadBufferAsync(int &$length): \Generator
+    public function getReadBufferAsync(&$length): \Generator
     {
         if ($this->read_hash) {
             $this->read_buffer = yield $this->stream->getReadBuffer($length);

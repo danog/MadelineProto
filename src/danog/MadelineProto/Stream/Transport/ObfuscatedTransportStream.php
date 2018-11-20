@@ -133,7 +133,7 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
      *
      * @return Generator
      */
-    public function getReadBufferAsync(int &$length): \Generator
+    public function getReadBufferAsync(&$length): \Generator
     {
         $length = ord(yield $this->bufferRead(1));
         if ($length >= 127) {

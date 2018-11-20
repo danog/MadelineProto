@@ -75,7 +75,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return Generator
      */
-    public function getReadBufferAsync(int &$length): \Generator
+    public function getReadBufferAsync(&$length): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
         $length = ord(yield $buffer->bufferRead(1));

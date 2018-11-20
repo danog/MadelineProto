@@ -34,7 +34,7 @@ interface BufferedStreamInterface extends StreamInterface
      * 
      * @return Promise
      */
-    public function getReadBuffer(int &$length): Promise;
+    public function getReadBuffer(&$length): Promise;
 
     /**
      * Get write buffer asynchronously.

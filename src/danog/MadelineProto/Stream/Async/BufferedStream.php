@@ -39,7 +39,7 @@ trait BufferedStream
      *
      * @return Promise
      */
-    public function getReadBuffer(int &$length): Promise
+    public function getReadBuffer(&$length): Promise
     {
         try {
             $result = $this->getReadBufferAsync($length);

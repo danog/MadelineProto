@@ -340,7 +340,7 @@ trait CallHandler
 
     public function method_call($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
-        return wait($this->method_call_async($method, $args, $aargs));
+        return wait(wait($this->method_call_async($method, $args, $aargs)));
     }
 
     public function method_call_async($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
@@ -389,7 +389,7 @@ trait CallHandler
         }
 
         $promise = new Deferred;
-        $message = ['_' => $method, 'type' => $this->methods->find_by_method($method)['type'], 'content_related' => $this->content_related($method), 'promise' => $promise, 'method' => true];
+        $message = ['_' => $method, 'type' => $this->methods->find_by_method($method)['type'], 'content_related' => $this->content_related($method), 'promise' => $promise, 'method' => true, 'unencrypted' => $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key === null];
 
         if (isset($aargs['serialized'])) {
             $message['body'] = $aargs['serialized'];

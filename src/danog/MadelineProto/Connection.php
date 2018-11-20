@@ -20,13 +20,14 @@ namespace danog\MadelineProto;
 
 use Amp\Deferred;
 use Amp\Promise;
+use Amp\Success;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTools\MsgIdHandler;
 use danog\MadelineProto\Stream\MTProtoTools\SeqNoHandler;
+use function Amp\asyncCall;
 use function Amp\call;
 use function Amp\Socket\connect;
-use function Amp\Promise\timeout;
 
 /**
  * Connection class.
@@ -117,7 +118,7 @@ class Connection
 
     public function readLoop()
     {
-        call([$this, 'readLoopAsync']);
+        asyncCall([$this, 'readLoopAsync']);
     }
     public function readLoopAsync(): \Generator
     {
@@ -144,7 +145,7 @@ class Connection
 
     public function readMessage(): Promise
     {
-        return call([$this, 'readAsync']);
+        return call([$this, 'readMessageAsync']);
     }
     public function readMessageAsync(): \Generator
     {
@@ -243,7 +244,7 @@ class Connection
     }
     public function writeLoop()
     {
-        call([$this, 'writeLoopAsync']);
+        asyncCall([$this, 'writeLoopAsync']);
     }
     public function writeLoopAsync(): \Generator
     {
@@ -254,18 +255,7 @@ class Connection
             }
         }
         if (empty($this->pending_outgoing)) {
-            $dc_config_number = isset($this->API->settings['connection_settings'][$this->datacenter]) ? $this->datacenter : 'all';
-
-            if (!$this->API->is_http($this->datacenter)) {
-                if ($this->API->altervista) {
-                    if ($this->last_http_wait + $this->API->settings['connection_settings'][$dc_config_number]['timeout'] > time()) {
-                        return;
-                    }
-                    $this->method_call_async('ping', ['ping_id' => $this->random(8)]);
-                }
-            } elseif ($this->last_http_wait + $this->API->settings['connection_settings'][$dc_config_number]['timeout'] > time()) {
-                $this->pauseWriteLoop();
-            }
+            yield $this->pauseWriteLoop();
         }
 
         if ($this->temp_auth_key === null) {
@@ -277,42 +267,46 @@ class Connection
     }
     public function unencryptedWriteLoopAsync(): \Generator
     {
-        yield;
         while ($this->pending_outgoing) {
-            if ($this->temp_auth_key !== null) {
-                return;
+            foreach ($this->pending_outgoing as $message) {
+                if ($this->temp_auth_key !== null) {
+                    yield new Success(0);
+                    return;
+                }
+                if (!$message['unencrypted']) {
+                    continue;
+                }
+
+                $body = is_object($message['body']) ? yield $message['body'] : $message['body'];
+
+                $this->API->logger->logger("Sending {$message['_']} as unencrypted message to DC {$this->datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
+                $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id();
+                $length = strlen($body);
+                $buffer = yield $this->stream->getWriteBuffer(8 + 8 + 4 + $length);
+                yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int($length) . $body);
+
+                $this->outgoing_messages[$message_id] = $message;
+                $this->outgoing_messages[$message_id]['sent'] = time();
+                $this->outgoing_messages[$message_id]['tries'] = 0;
+                $this->outgoing_messages[$message_id]['unencrypted'] = true;
+                $this->new_outgoing[$message_id] = $message_id;
+
+                $message['send_promise']->resolve(true);
             }
-            if (!$message['unencrypted']) {
-                continue;
-            }
-
-            $body = yield $message['body'];
-
-            $this->API->logger->logger("Sending {$message['_']} as unencrypted message to DC {$this->datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-
-            $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id();
-            $length = strlen($body);
-            $buffer = yield $this->stream->getWriteBuffer(8 + 8 + 4 + $length);
-            yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int($length) . $body);
-
-            $this->outgoing_messages[$message_id] = $message;
-            $this->outgoing_messages[$message_id]['sent'] = time();
-            $this->outgoing_messages[$message_id]['tries'] = 0;
-            $this->outgoing_messages[$message_id]['unencrypted'] = true;
-            $this->new_outgoing[$message_id] = $message_id;
-
-            $message['send_promise']->resolve(true);
         }
+        yield new Success(0);
     }
     public function encryptedWriteLoopAsync(): \Generator
     {
         $this->API->check_pending_calls_dc($this->datacenter);
         do {
             if ($this->temp_auth_key === null) {
+                yield new Success(0);
                 return;
             }
             if (count($to_ack = $this->ack_queue)) {
-                $this->pending_outgoing[] = ['_' => 'msgs_ack', 'body' => $this->API->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->ack_queue], 'msgs_ack'), 'content_related' => false];
+                $this->pending_outgoing[$this->pending_outgoing_key = ($this->pending_outgoing_key + 1) % self::PENDING_MAX] = ['_' => 'msgs_ack', 'body' => $this->API->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->ack_queue], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false];
             }
 
             $has_http_wait = false;
@@ -329,7 +323,7 @@ class Connection
             if ($this->API->is_http($this->datacenter) && !$has_http_wait) {
                 $dc_config_number = isset($this->API->settings['connection_settings'][$this->datacenter]) ? $this->datacenter : 'all';
 
-                $this->pending_outgoing[$this->pending_outgoing_key = ($this->pending_outgoing_key + 1) % self::PENDING_MAX] = ['_' => 'http_wait', 'body' => $this->API->serialize_method('http_wait', ['max_wait' => $this->API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0]), 'content_related' => false];
+                $this->pending_outgoing[$this->pending_outgoing_key = ($this->pending_outgoing_key + 1) % self::PENDING_MAX] = ['_' => 'http_wait', 'body' => $this->API->serialize_method('http_wait', ['max_wait' => $this->API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0]), 'content_related' => false, 'unencrypted' => false];
                 $has_http_wait = true;
             }
 
@@ -337,6 +331,7 @@ class Connection
             $count = 0;
             ksort($this->pending_outgoing);
             foreach ($this->pending_outgoing as $k => $message) {
+
                 if ($message['unencrypted']) {
                     continue;
                 }
@@ -350,7 +345,7 @@ class Connection
                     break;
                 }
 
-                $body = yield $message['body'];
+                $body = is_object($message['body']) ? yield $message['body'] : $message['body'];
 
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id($this->datacenter);
 
@@ -418,6 +413,7 @@ class Connection
                 $seq_no = $message['seqno'];
             } else {
                 $this->API->logger->logger('NO MESSAGE SENT', \danog\MadelineProto\Logger::WARNING);
+                yield new Success(0);
 
                 return;
             }
@@ -445,6 +441,9 @@ class Connection
                     $this->outgoing_messages[$message_id]['sent'] = $sent;
                     $this->outgoing_messages[$message_id]['tries'] = 0;
                 }
+                if (isset($this->outgoing_messages[$message_id]['send_promise'])) {
+                    $this->outgoing_messages[$message_id]['send_promise']->resolve();
+                }
                 unset($this->pending_outgoing[$key]);
             }
 
@@ -454,15 +453,15 @@ class Connection
 
             if ($has_http_wait) {
                 $this->last_http_wait = $sent;
-            } elseif ($this->API->altervista) {
+            } elseif ($this->API->isAltervista()) {
                 $this->last_http_wait = PHP_INT_MAX;
             }
             //if (!empty($this->pending_outgoing)) $this->select();
         } while (!empty($this->pending_outgoing));
 
         $this->pending_outgoing_key = 0;
+        yield new Success(0);
 
-        yield;
     }
     public function setExtra($extra)
     {
@@ -484,5 +483,10 @@ class Connection
     public function __sleep()
     {
         return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'peer_tag', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'ack_queue'];
+    }
+    public function __wakeup()
+    {
+        $this->time_delta = 0;
+        $this->pending_outgoing = [];
     }
 }

@@ -108,10 +108,10 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      *
      * @return Promise
      */
-    public function getReadBuffer(int &$length): Promise
+    public function getReadBuffer(&$length): Promise
     {
         $size = fstat($this->memory_stream)['size'];
-        $offset = fstat($this->memory_stream);
+        $offset = ftell($this->memory_stream);
         $length = $size - $offset;
         if ($length === 0 || $size > MAX_SIZE) {
             $new_memory_stream = fopen('php://memory', 'r+');
@@ -147,7 +147,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     public function bufferRead(int $length): Promise
     {
         $size = fstat($this->memory_stream)['size'];
-        $offset = fstat($this->memory_stream);
+        $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
         if ($buffer_length >= $length) {
             return new Success(fread($this->memory_stream, $length));
@@ -166,7 +166,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     public function bufferReadAsync(int $length): \Generator
     {
         $size = fstat($this->memory_stream)['size'];
-        $offset = fstat($this->memory_stream);
+        $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
         while ($buffer_length < $length) {
             $chunk = yield $this->read();
