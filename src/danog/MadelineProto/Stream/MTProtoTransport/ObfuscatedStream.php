@@ -99,6 +99,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
      */
     public function getWriteBufferAsync(int $length): \Generator
     {
+        $length >>= 2;
         if ($length < 127) {
             $message = chr($length);
         } else {
@@ -125,6 +126,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
         if ($length >= 127) {
             $length = unpack('V', (yield $buffer->bufferRead(3))."\0")[1];
         }
+        $length <<= 2;
 
         $this->read_buffer = $buffer;
 

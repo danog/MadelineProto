@@ -45,6 +45,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     private $read_check_after = 0;
     private $read_check_pos = 0;
     private $stream;
+    private $rev = false;
 
     /**
      * Enable read hashing.
@@ -76,6 +77,9 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     public function getReadHash(): string
     {
         $hash = hash_final($this->read_hash, true);
+        if ($this->rev) {
+            $hash = strrev($hash);
+        }
         $this->read_hash = null;
         $this->read_check_after = 0;
         $this->read_check_pos = 0;
@@ -123,6 +127,9 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     public function getWriteHash(): string
     {
         $hash = hash_final($this->write_hash, true);
+        if ($this->rev) {
+            $hash = strrev($hash);
+        }
         $this->write_hash = null;
         $this->write_check_after = 0;
         $this->write_check_pos = 0;
@@ -155,10 +162,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
             if ($length + $this->read_check_pos > $this->read_check_after) {
                 throw new \danog\MadelineProto\Exception('Tried to read too much out of frame data');
             }
-            $data = yield $this->read_buffer->bufferRead($read_length);
-            if ($data === null) {
-                return $data;
-            }
+            $data = yield $this->read_buffer->bufferRead($length);
             hash_update($this->read_hash, $data);
             $hash = $this->getReadHash();
             if ($hash !== yield $this->read_buffer->bufferRead(strlen($hash))) {
@@ -168,9 +172,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
             return $data;
         }
         $data = yield $this->read_buffer->bufferRead($length);
-        if ($data === null) {
-            return $data;
-        }
         hash_update($this->read_hash, $data);
         if ($this->read_check_after) {
             $this->read_check_pos += $length;
@@ -207,7 +208,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
             hash_update($this->write_hash, $data);
         }
 
-        return yield $this->buffer_write->bufferWrite($data);
+        return yield $this->write_buffer->bufferWrite($data);
     }
 
     /**
@@ -238,7 +239,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
             hash_update($this->write_hash, $finalData);
         }
 
-        return $this->buffer_write->bufferEnd($finalData);
+        return $this->write_buffer->bufferEnd($finalData);
     }
 
     /**
@@ -250,6 +251,12 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      */
     public function setExtra($hash)
     {
+        $rev = strpos($hash, '_rev');
+        $this->rev = false;
+        if ($rev !== false) {
+            $hash = substr($hash, 0, $rev);
+            $this->rev = true;
+        }
         $this->hash_name = $hash;
     }
 
@@ -260,7 +267,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return \Generator
      */
-    private function connectAsync(ConnectionContext $ctx): \Generator
+    public function connectAsync(ConnectionContext $ctx): \Generator
     {
         $this->stream = yield $ctx->getStream();
     }
@@ -347,10 +354,10 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     public function bufferEnd(string $finalData = ''): Promise
     {
         if ($this->write_hash === null) {
-            return $this->write_buffer->bufferEnd($length);
+            return $this->write_buffer->bufferEnd($finalData);
         }
 
-        return call([$this, 'bufferEndAsync'], $data);
+        return call([$this, 'bufferEndAsync'], $finalData);
     }
 
     public static function getName(): string

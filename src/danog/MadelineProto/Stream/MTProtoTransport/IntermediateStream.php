@@ -71,7 +71,7 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      *
      * @return Generator
      */
-    public function getReadBufferAsync(int $length): \Generator
+    public function getReadBufferAsync(&$length): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
         $length = unpack('V', yield $buffer->bufferRead(4))[1];

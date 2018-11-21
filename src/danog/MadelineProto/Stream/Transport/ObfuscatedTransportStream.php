@@ -23,6 +23,8 @@ use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
+use Amp\Coroutine;
+use danog\MadelineProto\Tools;
 
 /**
  * Obfuscated2 AMP stream wrapper.
@@ -34,6 +36,7 @@ use danog\MadelineProto\Stream\RawProxyStreamInterface;
 class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamInterface, MTProtoBufferInterface
 {
     use BufferedStream;
+    use Tools;
     private $encrypt;
     private $decrypt;
     private $stream;
@@ -51,19 +54,22 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
             $ctx = $ctx->getCtx();
             $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port']);
         }
-        yield parent::connect($ctx);
+        yield new Coroutine(parent::connectAsync($ctx));
 
         do {
             $random = $this->random(64);
         } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
         $random[56] = $random[57] = $random[58] = $random[59] = chr(0xef);
 
-        $random = substr_replace(pack('s', $ctx->getDc()), 60, 2);
+        list($a, $b) = str_split(pack('s', intval($ctx->getDc())));
+        $random[60] = $a;
+        $random[61] = $b;
 
         $reversed = strrev(substr($random, 8, 48));
 
         $key = substr($random, 8, 32);
         $keyRev = substr($reversed, 0, 32);
+
         if (isset($this->extra['secret'])) {
             $key = hash('sha256', $key.$this->extra['secret'], true);
             $keyRev = hash('sha256', $keyRev.$this->extra['secret'], true);
@@ -80,8 +86,9 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
         $this->decrypt->setIV(substr($reversed, 32, 16));
 
         $random = substr_replace($random, substr(@$this->encrypt->encrypt($random), 56, 8), 56, 8);
-
-        yield parent::write($random);
+        
+        $buffer = yield parent::getWriteBuffer(64);
+        yield $buffer->bufferWrite($random);
     }
 
     /**
@@ -135,12 +142,13 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
      */
     public function getReadBufferAsync(&$length): \Generator
     {
-        $length = ord(yield $this->bufferRead(1));
+        $buffer = yield parent::getReadBuffer($length);
+        $length = ord(yield $buffer->bufferRead(1));
         if ($length >= 127) {
-            $length = unpack('V', (yield $this->bufferRead(3))."\0")[1];
+            $length = unpack('V', (yield $buffer->bufferRead(3))."\0")[1];
         }
 
-        return $this;
+        return $buffer;
     }
 
 
@@ -158,9 +166,10 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
         } else {
             $message = chr(127).substr(pack('V', $length), 0, 3);
         }
-        yield $this->bufferWrite($message);
+        $buffer = yield parent::getWriteBuffer($length);
+        yield $buffer->bufferWrite($message);
 
-        return $this;
+        return $buffer;
     }
 
     public static function getName(): string

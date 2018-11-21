@@ -258,6 +258,7 @@ class ConnectionContext
     public function addStream(string $streamName, $extra = null): self
     {
         $this->nextStreams[] = [$streamName, $extra];
+        $this->key = count($this->nextStreams)-1;
 
         return $this;
     }
@@ -281,7 +282,7 @@ class ConnectionContext
      */
     public function getStreamAsync(): \Generator
     {
-        list($clazz, $extra) = $this->nextStreams[$this->key++];
+        list($clazz, $extra) = $this->nextStreams[$this->key--];
         $obj = new $clazz();
         if ($obj instanceof ProxyStreamInterface) {
             $obj->setExtra($extra);
@@ -307,7 +308,7 @@ class ConnectionContext
         $string .= ', via ';
         $string .= $this->getIpv6() ? 'ipv6' : 'ipv4';
         $string .= ' using ';
-        foreach ($this->nextStreams as $k => $stream) {
+        foreach (array_reverse($this->nextStreams) as $k => $stream) {
             if ($k) {
                 $string .= ' => ';
             }

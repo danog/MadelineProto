@@ -23,6 +23,7 @@ use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
+use danog\MadelineProto\Stream\Common\HashedBufferedStream;
 
 /**
  * TCP full stream wrapper.
@@ -41,7 +42,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
     /**
      * Stream to use as data source.
      *
-     * @param mixed $stream The stream
+     * @param ConnectionContext $ctx
      *
      * @return Promise
      */
@@ -50,7 +51,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
         $this->in_seq_no = -1;
         $this->out_seq_no = -1;
         $this->stream = new HashedBufferedStream();
-        $this->stream->setExtra('crc32b');
+        $this->stream->setExtra('crc32b_rev');
 
         return $this->stream->connect($ctx);
     }
@@ -88,7 +89,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
         $length = $read_length - 12;
         $this->stream->checkReadHash($read_length - 8);
         $this->in_seq_no++;
-        $in_seq_no = unpack('V', $buffer->bufferRead(4))[1];
+        $in_seq_no = unpack('V', yield $buffer->bufferRead(4))[1];
         if ($in_seq_no != $this->in_seq_no) {
             throw new Exception('Incoming seq_no mismatch');
         }

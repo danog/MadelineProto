@@ -19,6 +19,7 @@
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Promise;
+use Amp\Success;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -67,9 +68,9 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
      */
     public function getWriteBufferAsync(int $length): \Generator
     {
-        $header_data = 'POST '.$this->uri->getAbsoluteUri()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length."\r\n\r\n";
-        $buffer = yield $this->stream->getWriteBuffer(strlen($header_data) + $length);
-        yield $buffer->bufferWrite($header_data);
+        $headers = 'POST ' . $this->uri->getPath() . " HTTP/1.1\r\nHost: " . $this->uri->getHost() . ':' . $this->uri->getPort() . "\r\n" . "Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: " . $length . "\r\n\r\n";
+        $buffer = yield $this->stream->getWriteBuffer(strlen($headers) + $length);
+        yield $buffer->bufferWrite($headers);
 
         return $buffer;
     }
@@ -84,13 +85,13 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
     public function getReadBufferAsync(&$length): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
-        $header_data = '';
+        $headers = '';
         $was_crlf = false;
         while (true) {
             $piece = yield $buffer->bufferRead(2);
-            $header_data .= $piece;
+            $headers .= $piece;
             if ($piece === "\n\r") { // Assume end of headers with \r\n\r\n
-                $header_data .= yield $buffer->bufferRead(1);
+                $headers .= yield $buffer->bufferRead(1);
                 break;
             }
             if ($was_crlf && $piece === "\r\n") {
@@ -98,17 +99,20 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
             }
             $was_crlf = $piece === "\r\n";
         }
-        $header_data = explode("\r\n", $header_data);
+        $headers = explode("\r\n", $headers);
 
-        list($protocol, $code, $description) = explode(' ', $header_data[0], 3);
+        list($protocol, $code, $description) = explode(' ', $headers[0], 3);
         list($protocol, $protocol_version) = explode('/', $protocol);
         if ($protocol !== 'HTTP') {
             throw new \danog\MadelineProto\Exception('Wrong protocol');
         }
         $code = (int) $code;
-        unset($header_data[0]);
-        $headers = [];
-        foreach ($header_data as $current_header) {
+        unset($headers[0]);
+        if (array_pop($headers) . array_pop($headers) !== '') {
+            throw new \danog\MadelineProto\Exception('Wrong last header');
+        }
+        foreach ($headers as $key => $current_header) {
+            unset($headers[$key]);
             $current_header = explode(':', $current_header, 2);
             $headers[strtolower($current_header[0])] = trim($current_header[1]);
         }
@@ -117,15 +121,16 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
         if (isset($headers['connection'])) {
             $close = strtolower($headers['connection']) === 'close';
         }
-        if ($close) {
-            yield $this->stream->bufferEnd();
-            yield $this->connect($this->ctx);
-        }
 
-        if ($response['code'] !== 200) {
+        if ($code !== 200) {
             $read = '';
             if (isset($headers['content-length'])) {
                 $read = yield $buffer->bufferRead((int) $headers['content-length']);
+            }
+
+            if ($close) {
+                yield $buffer->bufferEnd();
+                yield $this->connect($this->ctx);
             }
 
             \danog\MadelineProto\Logger::log($read);
@@ -134,6 +139,11 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
             $length = 4;
 
             return $this;
+        }
+
+        if ($close) {
+            yield $buffer->bufferEnd();
+            yield $this->connect($this->ctx);
         }
         if (isset($headers['content-length'])) {
             $length = (int) $headers['content-length'];
@@ -146,8 +156,7 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
     {
         return new Success($this->code);
     }
-
-
+    
     public static function getName(): string
     {
         return __CLASS__;

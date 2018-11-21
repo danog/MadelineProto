@@ -20,6 +20,9 @@ namespace danog\MadelineProto\Stream\Async;
 
 use Amp\Promise;
 use function Amp\call;
+use Amp\Failure;
+use Amp\Coroutine;
+use Amp\Success;
 
 /**
  * Buffered stream helper trait.
@@ -51,9 +54,6 @@ trait BufferedStream
         }
         if ($result instanceof Promise) {
             return $result;
-        }
-        if ($result instanceof ReactPromise) {
-            return Promise\adapt($result);
         }
         return new Success($result);
     }

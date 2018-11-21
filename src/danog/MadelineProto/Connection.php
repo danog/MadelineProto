@@ -81,6 +81,7 @@ class Connection
     public $datacenter;
     public $API;
     public $resumeWriterDeferred;
+    public $ctx;
 
     /**
      * Connect function.
@@ -110,6 +111,7 @@ class Connection
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
+        $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
         $this->stream = yield $ctx->getStream();
         $this->readLoop();
@@ -125,7 +127,9 @@ class Connection
         $error = yield $this->readMessage();
 
         if (is_integer($error)) {
-            $this->closeAndReopen($dc);
+            yield $this->closeAndReopen();
+            $this->readLoop();
+
             if ($error === -404) {
                 if ($this->temp_auth_key !== null) {
                     $this->API->logger->logger('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
@@ -138,9 +142,10 @@ class Connection
 
             throw new \danog\MadelineProto\RPCErrorException($error, $error);
         }
-        $this->API->handle_messages($dc);
+
 
         $this->readLoop();
+        $this->API->handle_messages($dc);
     }
 
     public function readMessage(): Promise
@@ -150,6 +155,8 @@ class Connection
     public function readMessageAsync(): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($payload_length);
+        $this->buffer = $buffer;
+
         if ($payload_length === 4) {
             $payload = $this->unpack_signed_int(yield $buffer->bufferRead(4));
             $this->API->logger->logger("Received $payload from DC " . $this->datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
@@ -186,7 +193,7 @@ class Connection
             $message_id = substr($decrypted_data, 16, 8);
             $this->check_message_id($message_id, ['outgoing' => false, 'container' => false]);
             $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
-            // Dunno how to handle any incorrect sequence numbers
+
             $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
             if ($message_data_length > strlen($decrypted_data)) {
                 throw new \danog\MadelineProto\SecurityException('message_data_length is too big');
@@ -238,8 +245,9 @@ class Connection
     public function resumeWriteLoop()
     {
         if ($this->resumeWriterDeferred) {
-            $this->resumeWriterDeferred->resolve();
+            $resume = $this->resumeWriterDeferred;
             $this->resumeWriterDeferred = null;
+            $resume->resolve();
         }
     }
     public function writeLoop()
@@ -268,7 +276,7 @@ class Connection
     public function unencryptedWriteLoopAsync(): \Generator
     {
         while ($this->pending_outgoing) {
-            foreach ($this->pending_outgoing as $message) {
+            foreach ($this->pending_outgoing as $k => $message) {
                 if ($this->temp_auth_key !== null) {
                     yield new Success(0);
                     return;
@@ -284,6 +292,8 @@ class Connection
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id();
                 $length = strlen($body);
                 $buffer = yield $this->stream->getWriteBuffer(8 + 8 + 4 + $length);
+                $this->buffer = $buffer;
+
                 yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int($length) . $body);
 
                 $this->outgoing_messages[$message_id] = $message;
@@ -293,6 +303,10 @@ class Connection
                 $this->new_outgoing[$message_id] = $message_id;
 
                 $message['send_promise']->resolve(true);
+                
+                $this->API->logger->logger("Sent {$message['_']} as unencrypted message to DC {$this->datacenter}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
+                unset($this->pending_outgoing[$k]);
             }
         }
         yield new Success(0);
@@ -431,7 +445,10 @@ class Connection
             $message = $this->temp_auth_key['id'] . $message_key . $this->ige_encrypt($plaintext . $padding, $aes_key, $aes_iv);
 
             $buffer = yield $this->stream->getWriteBuffer(strlen($message));
+            $this->buffer = $buffer;
+
             yield $buffer->bufferWrite($message);
+
             $sent = time();
 
             foreach ($keys as $key => $message_id) {
@@ -468,6 +485,15 @@ class Connection
         $this->API = $extra;
     }
 
+    public function closeAndReopen(): Promise
+    {
+        return call([$this, 'closeAndReopenAsync']);
+    }
+    public function closeAndReopenAsync(): \Generator
+    {
+        yield $this->buffer->bufferEnd();
+        yield $this->connect($this->ctx);
+    }
     public function getName(): string
     {
         return __CLASS__;

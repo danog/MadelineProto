@@ -111,6 +111,7 @@ class DataCenter
         $dc_config_number = isset($this->settings[$dc_number]) ? $dc_number : 'all';
         $test = $this->settings[$dc_config_number]['test_mode'] ? 'test' : 'main';
         $ipv6 = $this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4';
+        $this->settings[$dc_config_number]['protocol'] = 'tcp_abridged';
 
         switch ($this->settings[$dc_config_number]['protocol']) {
             case 'tcp_abridged':

@@ -57,6 +57,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      */
     public function getWriteBufferAsync(int $length): \Generator
     {
+        $length >>= 2;
         if ($length < 127) {
             $message = chr($length);
         } else {
@@ -82,7 +83,8 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
         if ($length >= 127) {
             $length = unpack('V', (yield $buffer->bufferRead(3))."\0")[1];
         }
-
+        $length <<= 2;
+        
         return $buffer;
     }
 

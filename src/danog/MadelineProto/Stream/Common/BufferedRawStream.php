@@ -24,6 +24,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use function Amp\call;
 use function Amp\Socket\connect;
 use function Amp\Socket\cryptoConnect;
+use Amp\Success;
 
 /**
  * Buffered raw stream.
@@ -171,13 +172,14 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
         while ($buffer_length < $length) {
             $chunk = yield $this->read();
             if ($chunk === null) {
-                $this->close();
+                yield $this->end();
 
                 throw new \danog\MadelineProto\NothingInTheSocketException();
             }
             fwrite($this->memory_stream, $chunk);
             $buffer_length += strlen($chunk);
         }
+        fseek($this->memory_stream, $offset);
 
         return fread($this->memory_stream, $length);
     }
@@ -191,7 +193,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      */
     public function bufferWrite(string $data): Promise
     {
-        return $this->sock->write($data);
+        return $this->write($data);
     }
 
     /**
