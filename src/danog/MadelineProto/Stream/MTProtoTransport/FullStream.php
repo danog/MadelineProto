@@ -55,6 +55,15 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
 
         return $this->stream->connect($ctx);
     }
+    /**
+     * Async close.
+     *
+     * @return Promise
+     */
+    public function disconnect(): Promise
+    {
+        return $this->stream->disconnect();
+    }
 
     /**
      * Get write buffer asynchronously.

@@ -84,13 +84,11 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     }
 
     /**
-     * Async write and close.
-     *
-     * @param string $finalData Final chunk of data to write
+     * Async close.
      *
      * @return Generator
      */
-    public function endAsync(string $finalData = ''): \Generator
+    public function disconnectAsync(string $finalData = ''): \Generator
     {
         try {
             yield $this->sock->end($finalData);
@@ -172,7 +170,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
         while ($buffer_length < $length) {
             $chunk = yield $this->read();
             if ($chunk === null) {
-                yield $this->end();
+                yield $this->disconnect();
 
                 throw new \danog\MadelineProto\NothingInTheSocketException();
             }
@@ -194,18 +192,6 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     public function bufferWrite(string $data): Promise
     {
         return $this->write($data);
-    }
-
-    /**
-     * Async write and close.
-     *
-     * @param string $finalData Final chunk of data to write
-     *
-     * @return Promise
-     */
-    public function bufferEnd(string $finalData = ''): Promise
-    {
-        return call([$this, 'endAsync'], $finalData);
     }
 
     /**

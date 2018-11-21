@@ -35,4 +35,10 @@ interface StreamInterface
      * @return Promise
      */
     public function connect(ConnectionContext $ctx): Promise;
+    /**
+     * Disonnect from the server.
+     *
+     * @return Promise
+     */
+    public function disconnect(): Promise;
 }

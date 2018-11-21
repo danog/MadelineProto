@@ -35,4 +35,8 @@ trait Stream
     {
         return call([$this, 'connectAsync'], $ctx);
     }
+    public function disconnect(): Promise
+    {
+        return call([$this, 'disconnectAsync']);
+    }
 }

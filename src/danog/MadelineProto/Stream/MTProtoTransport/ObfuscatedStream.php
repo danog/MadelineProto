@@ -89,6 +89,15 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
         $buffer = yield $this->stream->getWriteBuffer(64);
         yield $buffer->bufferWrite($random);
     }
+    /**
+     * Async close.
+     *
+     * @return Promise
+     */
+    public function disconnect(): Promise
+    {
+        return $this->stream->disconnect();
+    }
 
     /**
      * Get write buffer asynchronously.
@@ -161,19 +170,6 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
         return $this->buffer_write->bufferWrite(@$this->encrypt->encrypt($data));
     }
 
-    /**
-     * Writes data to the stream and closes it.
-     *
-     * @param string $data Bytes to write.
-     *
-     * @throws ClosedException If the stream has already been closed.
-     *
-     * @return Promise Succeeds once the data has been successfully written to the stream.
-     */
-    public function bufferEnd(string $finalData = ''): Promise
-    {
-        return $this->buffer_write->bufferEnd(@$this->encrypt->encrypt($finalData));
-    }
 
     /**
      * Does nothing.

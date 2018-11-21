@@ -90,6 +90,15 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
         $buffer = yield parent::getWriteBuffer(64);
         yield $buffer->bufferWrite($random);
     }
+    /**
+     * Async close.
+     *
+     * @return Promise
+     */
+    public function disconnect(): Promise
+    {
+        return parent::disconnect();
+    }
 
     /**
      * Decrypts read data asynchronously.
@@ -117,20 +126,6 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
     public function write(string $data): Promise
     {
         return parent::write(@$this->encrypt->encrypt($data));
-    }
-
-    /**
-     * Writes data to the stream and closes it.
-     *
-     * @param string $data Bytes to write.
-     *
-     * @throws ClosedException If the stream has already been closed.
-     *
-     * @return Promise Succeeds once the data has been successfully written to the stream.
-     */
-    public function end(string $finalData = ''): Promise
-    {
-        return parent::end(@$this->encrypt->encrypt($finalData));
     }
 
     /**

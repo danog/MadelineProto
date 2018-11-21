@@ -211,36 +211,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         return yield $this->write_buffer->bufferWrite($data);
     }
 
-    /**
-     * Writes data to the stream and closes it.
-     *
-     * @param string $data Bytes to write.
-     *
-     * @throws ClosedException If the stream has already been closed.
-     *
-     * @return Generator Succeeds once the data has been successfully written to the stream.
-     */
-    public function bufferEndAsync(string $finalData = ''): \Generator
-    {
-        $length = strlen($finalData);
-        if ($this->write_check_after && $length + $this->write_check_pos >= $this->write_check_after) {
-            if ($length + $this->write_check_pos > $this->write_check_after) {
-                throw new \danog\MadelineProto\Exception('Too much out of frame data was sent, cannot check hash');
-            }
-            yield $this->write_buffer->bufferWrite($finalData);
-            hash_update($this->write_hash, $finalData);
-
-            return yield $this->write_buffer->bufferEnd($this->getWriteHash());
-        }
-        if ($this->write_check_after) {
-            $this->write_check_pos += $length;
-        }
-        if ($this->write_hash) {
-            hash_update($this->write_hash, $finalData);
-        }
-
-        return $this->write_buffer->bufferEnd($finalData);
-    }
 
     /**
      * Set the hash algorithm.
@@ -269,7 +239,24 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
+        $this->write_hash = null;
+        $this->write_check_after = 0;
+        $this->write_check_pos = 0;
+        $this->read_hash = null;
+        $this->read_check_after = 0;
+        $this->read_check_pos = 0;
+
         $this->stream = yield $ctx->getStream();
+    }
+    
+    /**
+     * Async close.
+     *
+     * @return Promise
+     */
+    public function disconnect(): Promise
+    {
+        return $this->stream->disconnect();
     }
 
     /**
@@ -340,24 +327,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         }
 
         return call([$this, 'bufferWriteAsync'], $data);
-    }
-
-    /**
-     * Writes data to the stream and closes it.
-     *
-     * @param string $data Bytes to write.
-     *
-     * @throws ClosedException If the stream has already been closed.
-     *
-     * @return Promise Succeeds once the data has been successfully written to the stream.
-     */
-    public function bufferEnd(string $finalData = ''): Promise
-    {
-        if ($this->write_hash === null) {
-            return $this->write_buffer->bufferEnd($finalData);
-        }
-
-        return call([$this, 'bufferEndAsync'], $finalData);
     }
 
     public static function getName(): string

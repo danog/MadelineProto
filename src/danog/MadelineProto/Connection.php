@@ -112,6 +112,8 @@ class Connection
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
+        $this->API->logger->logger("Trying connection via $ctx", \danog\MadelineProto\Logger::WARNING);
+
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
         $this->stream = yield $ctx->getStream();
@@ -129,8 +131,7 @@ class Connection
         $error = yield $this->readMessage();
 
         if (is_int($error)) {
-            yield $this->closeAndReopen();
-            $this->readLoop();
+            yield $this->reconnect();
 
             if ($error === -404) {
                 if ($this->temp_auth_key !== null) {
@@ -146,7 +147,7 @@ class Connection
         }
 
         $this->readLoop();
-        $this->API->handle_messages($dc);
+        $this->API->handle_messages($this->datacenter);
     }
 
     public function readMessage(): Promise
@@ -165,14 +166,13 @@ class Connection
 
             return $payload;
         }
-
         $auth_key_id = yield $buffer->bufferRead(8);
         if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
             $message_id = yield $buffer->bufferRead(8);
             $this->check_message_id($message_id, ['outgoing' => false, 'container' => false]);
-            $message_length = unpack('V', $buffer->bufferRead(4))[1];
+            $message_length = unpack('V', yield $buffer->bufferRead(4))[1];
             $message_data = yield $buffer->bufferRead($message_length);
-            $left = $payload_length - $message_length - 4 - 8;
+            $left = $payload_length - $message_length - 4 - 8 - 8;
             if ($left) {
                 yield $buffer->bufferRead($left);
             }
@@ -495,16 +495,23 @@ class Connection
         $this->API = $extra;
     }
 
-    public function closeAndReopen(): Promise
+    public function disconnect(): Promise
     {
-        return call([$this, 'closeAndReopenAsync']);
+        return $this->stream->disconnect();
     }
 
-    public function closeAndReopenAsync(): \Generator
+    public function reconnect(): Promise
     {
-        yield $this->buffer->bufferEnd();
+        return call([$this, 'reconnectAsync']);
+    }
+
+    public function reconnectAsync(): \Generator
+    {
+        $this->API->logger->logger("Reconnecting");
+        yield $this->disconnect();
         yield $this->connect($this->ctx);
     }
+
 
     public function getName(): string
     {

@@ -44,13 +44,4 @@ interface BufferInterface
      * @return Promise
      */
     public function bufferWrite(string $data): Promise;
-
-    /**
-     * Write data and close buffer asynchronously.
-     *
-     * @param string $finalData Data to write before closing buffer
-     *
-     * @return Promise
-     */
-    public function bufferEnd(string $finalData = ''): Promise;
 }

@@ -22,6 +22,7 @@ use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
+use Amp\Promise;
 
 /**
  * Abridged stream wrapper.
@@ -33,6 +34,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
     use BufferedStream;
 
     private $stream;
+    private $ctx;
 
     /**
      * Connect to stream.
@@ -43,11 +45,21 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
+        $this->ctx = $ctx->getCtx();
         $this->stream = yield $ctx->getStream();
         $buffer = yield $this->stream->getWriteBuffer(1);
         yield $buffer->bufferWrite(chr(239));
     }
 
+    /**
+     * Async close.
+     *
+     * @return Promise
+     */
+    public function disconnect(): Promise
+    {
+        return $this->stream->disconnect();
+    }
     /**
      * Get write buffer asynchronously.
      *

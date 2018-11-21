@@ -79,8 +79,6 @@ class DataCenter
         }
         $ctxs = $this->generate_contexts($dc_number);
         foreach ($ctxs as $ctx) {
-            $this->API->logger->logger("Trying connection via $ctx", \danog\MadelineProto\Logger::WARNING);
-
             try {
                 if (isset($this->sockets[$dc_number]->old)) {
                     $this->sockets[$dc_number]->setExtra($this->API);

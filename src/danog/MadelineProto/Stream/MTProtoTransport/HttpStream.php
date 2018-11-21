@@ -58,6 +58,15 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
         $this->stream = yield $ctx->getStream();
         $this->uri = $ctx->getUri();
     }
+    /**
+     * Async close.
+     *
+     * @return Promise
+     */
+    public function disconnect(): Promise
+    {
+        return $this->stream->disconnect();
+    }
 
     /**
      * Get write buffer asynchronously.
@@ -117,7 +126,7 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
             $headers[strtolower($current_header[0])] = trim($current_header[1]);
         }
 
-        $close = $protocol === 'HTTP/1.0' || $code !== 200;
+        $close = $protocol === 'HTTP/1.0';
         if (isset($headers['connection'])) {
             $close = strtolower($headers['connection']) === 'close';
         }
@@ -129,7 +138,7 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
             }
 
             if ($close) {
-                yield $buffer->bufferEnd();
+                yield $this->disconnect();
                 yield $this->connect($this->ctx);
             }
 

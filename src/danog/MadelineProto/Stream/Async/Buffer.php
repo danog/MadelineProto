@@ -39,9 +39,4 @@ trait Buffer
     {
         return call([$this, 'bufferWriteAsync'], $data);
     }
-
-    public function bufferEnd(string $finalData = ''): Promise
-    {
-        return call([$this, 'bufferEndAsync'], $finalData);
-    }
 }
