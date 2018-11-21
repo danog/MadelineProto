@@ -18,11 +18,8 @@
 
 namespace danog\MadelineProto\Async;
 
-use \Amp\Promise;
-use function Amp\call;
-
 /**
- * Async parameters class
+ * Async parameters class.
  *
  * Manages asynchronous generation of method parameters
  *
@@ -32,6 +29,5 @@ class FileUploadParameters extends Parameters
 {
     public function __construct(resource $file)
     {
-        
     }
 }

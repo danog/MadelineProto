@@ -18,11 +18,8 @@
 
 namespace danog\MadelineProto\Async;
 
-use \Amp\Promise;
-use function Amp\call;
-
 /**
- * Async parameters class
+ * Async parameters class.
  *
  * Manages asynchronous generation of method parameters
  *
@@ -32,7 +29,7 @@ class AsyncParameters extends Parameters
 {
     private $callable;
     private $refetchable = true;
-    
+
     public function __construct(callable $callable, bool $refetchable = true)
     {
         $this->callable = $callable;
@@ -43,17 +40,21 @@ class AsyncParameters extends Parameters
     {
         $this->refetchable = $refetchable;
     }
+
     public function setCallable(callable $callable)
     {
         $this->callable = $callable;
     }
+
     public function isRefetchable(): bool
     {
         return $this->refetchable;
     }
+
     public function getParameters(): \Generator
     {
         $callable = $this->callable;
+
         return $callable();
     }
 }

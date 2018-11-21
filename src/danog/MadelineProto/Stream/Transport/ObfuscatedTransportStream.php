@@ -18,12 +18,12 @@
 
 namespace danog\MadelineProto\Stream\Transport;
 
+use Amp\Coroutine;
 use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
-use Amp\Coroutine;
 use danog\MadelineProto\Tools;
 
 /**
@@ -86,7 +86,7 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
         $this->decrypt->setIV(substr($reversed, 32, 16));
 
         $random = substr_replace($random, substr(@$this->encrypt->encrypt($random), 56, 8), 56, 8);
-        
+
         $buffer = yield parent::getWriteBuffer(64);
         yield $buffer->bufferWrite($random);
     }
@@ -150,7 +150,6 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
 
         return $buffer;
     }
-
 
     /**
      * Get write buffer asynchronously.

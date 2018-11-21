@@ -50,5 +50,4 @@ trait SeqNoHandler
         //$this->logger->logger("IN: $value + $in = ".$this->session_in_seq_no);
         return $value * 2 + $in;
     }
-
 }

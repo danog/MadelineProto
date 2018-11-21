@@ -102,7 +102,6 @@ class DataCenter
         throw new \danog\MadelineProto\Exception("Could not connect to DC $dc_number");
     }
 
-
     public function generate_contexts($dc_number)
     {
         $ctxs = [];

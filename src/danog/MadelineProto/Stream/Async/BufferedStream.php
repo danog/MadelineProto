@@ -18,11 +18,11 @@
 
 namespace danog\MadelineProto\Stream\Async;
 
-use Amp\Promise;
-use function Amp\call;
-use Amp\Failure;
 use Amp\Coroutine;
+use Amp\Failure;
+use Amp\Promise;
 use Amp\Success;
+use function Amp\call;
 
 /**
  * Buffered stream helper trait.
@@ -55,6 +55,7 @@ trait BufferedStream
         if ($result instanceof Promise) {
             return $result;
         }
+
         return new Success($result);
     }
 

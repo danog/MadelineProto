@@ -200,6 +200,7 @@ class MTProto
     {
         return $this->altervista;
     }
+
     public function __wakeup()
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);

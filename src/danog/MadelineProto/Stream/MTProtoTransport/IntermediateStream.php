@@ -79,7 +79,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
         return $buffer;
     }
 
-
     public static function getName(): string
     {
         return __CLASS__;

@@ -258,7 +258,7 @@ class ConnectionContext
     public function addStream(string $streamName, $extra = null): self
     {
         $this->nextStreams[] = [$streamName, $extra];
-        $this->key = count($this->nextStreams)-1;
+        $this->key = count($this->nextStreams) - 1;
 
         return $this;
     }

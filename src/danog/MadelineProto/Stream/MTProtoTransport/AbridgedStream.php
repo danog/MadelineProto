@@ -84,10 +84,9 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
             $length = unpack('V', (yield $buffer->bufferRead(3))."\0")[1];
         }
         $length <<= 2;
-        
+
         return $buffer;
     }
-
 
     public static function getName(): string
     {

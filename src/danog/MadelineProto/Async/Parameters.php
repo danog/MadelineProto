@@ -18,7 +18,7 @@
 
 namespace danog\MadelineProto\Async;
 
-use \Amp\Promise;
+use Amp\Promise;
 use function Amp\call;
 
 /**
@@ -32,8 +32,9 @@ abstract class Parameters
 {
     private $fetched = false;
     private $params = [];
+
     /**
-     * Fetch parameters asynchronously
+     * Fetch parameters asynchronously.
      *
      * @return Promise
      */
@@ -41,8 +42,9 @@ abstract class Parameters
     {
         return call([$this, 'fetchParametersAsync']);
     }
+
     /**
-     * Fetch parameters asynchronously
+     * Fetch parameters asynchronously.
      *
      * @return \Generator
      */
@@ -56,16 +58,19 @@ abstract class Parameters
         if (!$refetchable) {
             $this->params = $params;
         }
+
         return $params;
     }
+
     /**
-     * Check if the parameters can be fetched more than once
+     * Check if the parameters can be fetched more than once.
      *
-     * @return boolean
+     * @return bool
      */
     abstract public function isRefetchable(): bool;
+
     /**
-     * Gets the parameters asynchronously
+     * Gets the parameters asynchronously.
      *
      * @return \Generator
      */

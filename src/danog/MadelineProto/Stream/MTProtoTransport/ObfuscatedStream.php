@@ -133,7 +133,6 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
         return $this;
     }
 
-
     /**
      * Decrypts read data asynchronously.
      *

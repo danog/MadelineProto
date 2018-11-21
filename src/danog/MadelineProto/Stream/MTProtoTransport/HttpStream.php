@@ -68,7 +68,7 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
      */
     public function getWriteBufferAsync(int $length): \Generator
     {
-        $headers = 'POST ' . $this->uri->getPath() . " HTTP/1.1\r\nHost: " . $this->uri->getHost() . ':' . $this->uri->getPort() . "\r\n" . "Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: " . $length . "\r\n\r\n";
+        $headers = 'POST '.$this->uri->getPath()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length."\r\n\r\n";
         $buffer = yield $this->stream->getWriteBuffer(strlen($headers) + $length);
         yield $buffer->bufferWrite($headers);
 
@@ -108,7 +108,7 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
         }
         $code = (int) $code;
         unset($headers[0]);
-        if (array_pop($headers) . array_pop($headers) !== '') {
+        if (array_pop($headers).array_pop($headers) !== '') {
             throw new \danog\MadelineProto\Exception('Wrong last header');
         }
         foreach ($headers as $key => $current_header) {
@@ -156,7 +156,7 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
     {
         return new Success($this->code);
     }
-    
+
     public static function getName(): string
     {
         return __CLASS__;

@@ -98,6 +98,7 @@ class Connection
     {
         return call([$this, 'connectAsync'], $ctx);
     }
+
     /**
      * Connect function.
      *
@@ -122,11 +123,12 @@ class Connection
     {
         asyncCall([$this, 'readLoopAsync']);
     }
+
     public function readLoopAsync(): \Generator
     {
         $error = yield $this->readMessage();
 
-        if (is_integer($error)) {
+        if (is_int($error)) {
             yield $this->closeAndReopen();
             $this->readLoop();
 
@@ -143,7 +145,6 @@ class Connection
             throw new \danog\MadelineProto\RPCErrorException($error, $error);
         }
 
-
         $this->readLoop();
         $this->API->handle_messages($dc);
     }
@@ -152,6 +153,7 @@ class Connection
     {
         return call([$this, 'readMessageAsync']);
     }
+
     public function readMessageAsync(): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($payload_length);
@@ -159,7 +161,7 @@ class Connection
 
         if ($payload_length === 4) {
             $payload = $this->unpack_signed_int(yield $buffer->bufferRead(4));
-            $this->API->logger->logger("Received $payload from DC " . $this->datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->API->logger->logger("Received $payload from DC ".$this->datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             return $payload;
         }
@@ -211,7 +213,7 @@ class Connection
                 throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
             }
             $message_data = substr($decrypted_data, 32, $message_data_length);
-            if ($message_key != substr(hash('sha256', substr($this->temp_auth_key['auth_key'], 96, 32) . $decrypted_data, true), 8, 16)) {
+            if ($message_key != substr(hash('sha256', substr($this->temp_auth_key['auth_key'], 96, 32).$decrypted_data, true), 8, 16)) {
                 throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
             }
             $this->incoming_messages[$message_id] = ['seq_no' => $seq_no];
@@ -234,14 +236,17 @@ class Connection
         $message['send_promise'] = $deferred;
         $this->pending_outgoing[$this->pending_outgoing_key = ($this->pending_outgoing_key + 1) % self::PENDING_MAX] = $message;
         $this->resumeWriteLoop();
+
         return $deferred->promise();
     }
 
     public function pauseWriteLoop(): Promise
     {
-        $this->resumeWriterDeferred = new Deferred;
+        $this->resumeWriterDeferred = new Deferred();
+
         return $this->resumeWriterDeferred->promise();
     }
+
     public function resumeWriteLoop()
     {
         if ($this->resumeWriterDeferred) {
@@ -250,10 +255,12 @@ class Connection
             $resume->resolve();
         }
     }
+
     public function writeLoop()
     {
         asyncCall([$this, 'writeLoopAsync']);
     }
+
     public function writeLoopAsync(): \Generator
     {
         if (empty($this->pending_outgoing) && $this->temp_auth_key === null) {
@@ -273,12 +280,14 @@ class Connection
         }
         $this->writeLoop();
     }
+
     public function unencryptedWriteLoopAsync(): \Generator
     {
         while ($this->pending_outgoing) {
             foreach ($this->pending_outgoing as $k => $message) {
                 if ($this->temp_auth_key !== null) {
                     yield new Success(0);
+
                     return;
                 }
                 if (!$message['unencrypted']) {
@@ -294,7 +303,7 @@ class Connection
                 $buffer = yield $this->stream->getWriteBuffer(8 + 8 + 4 + $length);
                 $this->buffer = $buffer;
 
-                yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int($length) . $body);
+                yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int($length).$body);
 
                 $this->outgoing_messages[$message_id] = $message;
                 $this->outgoing_messages[$message_id]['sent'] = time();
@@ -303,7 +312,7 @@ class Connection
                 $this->new_outgoing[$message_id] = $message_id;
 
                 $message['send_promise']->resolve(true);
-                
+
                 $this->API->logger->logger("Sent {$message['_']} as unencrypted message to DC {$this->datacenter}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 unset($this->pending_outgoing[$k]);
@@ -311,12 +320,14 @@ class Connection
         }
         yield new Success(0);
     }
+
     public function encryptedWriteLoopAsync(): \Generator
     {
         $this->API->check_pending_calls_dc($this->datacenter);
         do {
             if ($this->temp_auth_key === null) {
                 yield new Success(0);
+
                 return;
             }
             if (count($to_ack = $this->ack_queue)) {
@@ -345,7 +356,6 @@ class Connection
             $count = 0;
             ksort($this->pending_outgoing);
             foreach ($this->pending_outgoing as $k => $message) {
-
                 if ($message['unencrypted']) {
                     continue;
                 }
@@ -388,7 +398,7 @@ class Connection
                         if ($this->API->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $this->API->settings['requests']['gzip_encode_if_gt']) {
                             if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
                                 $MTmessage['body'] = $this->API->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
-                                $this->API->logger->logger('Using GZIP compression for ' . $message['_'] . ', saved ' . ($l - $g) . ' bytes of data, reduced call size by ' . $g * 100 / $l . '%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                                $this->API->logger->logger('Using GZIP compression for '.$message['_'].', saved '.($l - $g).' bytes of data, reduced call size by '.$g * 100 / $l.'%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                             }
                             unset($gzipped);
                         }
@@ -434,15 +444,15 @@ class Connection
 
             unset($messages);
 
-            $plaintext = $this->temp_auth_key['server_salt'] . $this->session_id . $message_id . pack('VV', $seq_no, $message_data_length) . $message_data;
+            $plaintext = $this->temp_auth_key['server_salt'].$this->session_id.$message_id.pack('VV', $seq_no, $message_data_length).$message_data;
             $padding = $this->posmod(-strlen($plaintext), 16);
             if ($padding < 12) {
                 $padding += 16;
             }
             $padding = $this->random($padding);
-            $message_key = substr(hash('sha256', substr($this->temp_auth_key['auth_key'], 88, 32) . $plaintext . $padding, true), 8, 16);
+            $message_key = substr(hash('sha256', substr($this->temp_auth_key['auth_key'], 88, 32).$plaintext.$padding, true), 8, 16);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->temp_auth_key['auth_key']);
-            $message = $this->temp_auth_key['id'] . $message_key . $this->ige_encrypt($plaintext . $padding, $aes_key, $aes_iv);
+            $message = $this->temp_auth_key['id'].$message_key.$this->ige_encrypt($plaintext.$padding, $aes_key, $aes_iv);
 
             $buffer = yield $this->stream->getWriteBuffer(strlen($message));
             $this->buffer = $buffer;
@@ -478,8 +488,8 @@ class Connection
 
         $this->pending_outgoing_key = 0;
         yield new Success(0);
-
     }
+
     public function setExtra($extra)
     {
         $this->API = $extra;
@@ -489,11 +499,13 @@ class Connection
     {
         return call([$this, 'closeAndReopenAsync']);
     }
+
     public function closeAndReopenAsync(): \Generator
     {
         yield $this->buffer->bufferEnd();
         yield $this->connect($this->ctx);
     }
+
     public function getName(): string
     {
         return __CLASS__;
@@ -510,6 +522,7 @@ class Connection
     {
         return ['proxy', 'extra', 'protocol', 'ip', 'port', 'timeout', 'parsed', 'peer_tag', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'ipv6', 'max_incoming_id', 'max_outgoing_id', 'obfuscated', 'authorized', 'ack_queue'];
     }
+
     public function __wakeup()
     {
         $this->time_delta = 0;
