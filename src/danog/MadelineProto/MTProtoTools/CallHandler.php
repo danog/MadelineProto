@@ -315,10 +315,16 @@ trait CallHandler
         }
     }
 
-    public function method_recall($message_id, $new_datacenter, $old_datacenter = false, $postpone = false)
+    public function method_recall($watcherId, $args)
     {
-        if ($old_datacenter === false) {
+        $message_id = $args['message_id'];
+        $new_datacenter = $args['datacenter'];
+        if (!isset($args['old_datacenter'])) {
             $old_datacenter = $new_datacenter;
+        }
+        $postpone = false;
+        if (isset($args['postpone'])) {
+            $postpone = $args['postpone'];
         }
 
         if (isset($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id]['container'])) {
@@ -329,13 +335,13 @@ trait CallHandler
 
         foreach ($message_ids as $message_id) {
             if (isset($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id]['body'])) {
-                $this->append_message($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id], $new_datacenter);
+                $this->datacenter->sockets[$new_datacenter]->sendMessage($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id], false);
                 $this->ack_outgoing_message_id($message_id, $old_datacenter);
                 $this->got_response_for_outgoing_message_id($message_id, $old_datacenter);
             }
         }
-        if ($this->datacenter->sockets[$new_datacenter]->temp_auth_key !== null && !$postpone) {
-            $this->send_messages($new_datacenter);
+        if (!$postpone) {
+            $this->datacenter->sockets[$new_datacenter]->resumeWriteLoop();
         }
     }
 

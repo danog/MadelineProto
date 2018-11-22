@@ -553,7 +553,7 @@ class Connection
                                 case 2:
                                 case 3:
                                     $this->API->logger->logger('Message ' . $this->outgoing_messages[$message_id]['_'] . ' with message ID ' . $this->unpack_signed_long($message_id) . ' not received by server, resending...', \danog\MadelineProto\Logger::ERROR);
-                                    $this->API->method_recall($message_id, $this->datacenter, false, true);
+                                    $this->API->method_recall(['message_id' => $message_id, 'datacenter' => $this->datacenter, 'postpone' => true]);
                                     break;
                                 case 4:
                                     if ($chr & 32) {
@@ -585,11 +585,12 @@ class Connection
                         && $this->outgoing_messages[$message_id]['unencrypted']
                     ) {
                         $this->API->logger->logger('Still missing ' . $this->outgoing_messages[$message_id]['_'] . ' with message id ' . $this->unpack_signed_long($message_id) . " on DC $this->datacenter, resending", \danog\MadelineProto\Logger::ERROR);
-                        $this->API->method_recall($message_id, $this->datacenter, false, true);
+                        $this->API->method_recall(['message_id' => $message_id, 'datacenter' => $this->datacenter, 'postpone' => true]);
                     }
                 }
             }
             $this->pendingCheckWatcherId = Loop::delay($timeout * 1000, [$this, 'pendingCallsCheck']);
+            $this->resumeWriteLoop();
         } else if (!empty($this->new_outgoing)) {
             $this->pendingCheckWatcherId = Loop::delay($timeout * 1000, [$this, 'pendingCallsCheck']);
         }
