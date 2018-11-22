@@ -659,7 +659,8 @@ class MTProto
 
     public function is_http($datacenter)
     {
-        return in_array($this->datacenter->sockets[$datacenter]->protocol, ['http', 'https', 'https_proxied']);
+        $dc_config_number = isset($this->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
+        return in_array($this->settings['connection_settings'][$dc_config_number]['protocol'], ['http', 'https']);
     }
 
     public function close_and_reopen($datacenter)
