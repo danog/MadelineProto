@@ -494,7 +494,7 @@ trait AuthKeyHandler
                 $perm_auth_key_id = $this->datacenter->sockets[$datacenter]->auth_key['id'];
                 $temp_session_id = $this->datacenter->sockets[$datacenter]->session_id;
                 $message_data = $this->serialize_object(['type' => 'bind_auth_key_inner'], ['nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bind_temp_auth_key_inner');
-                $message_id = $this->generate_message_id($datacenter);
+                $message_id = $this->datacenter->sockets[$datacenter]->generate_message_id();
                 $seq_no = 0;
                 $encrypted_data = $this->random(16).$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;
                 $message_key = substr(sha1($encrypted_data, true), -16);

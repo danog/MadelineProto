@@ -340,7 +340,12 @@ trait CallHandler
 
     public function method_call($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
-        return wait(wait($this->method_call_async($method, $args, $aargs)));
+        try {
+            return wait($this->method_call_async($method, $args, $aargs));
+        } catch (\Throwable $e) {
+            $this->logger->logger("AN EXCEPTION SURFACED ".$e, \danog\MadelineProto\Logger::ERROR);
+            throw $e;
+        }
     }
 
     public function method_call_async($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
@@ -415,7 +420,7 @@ trait CallHandler
             $message['user_related'] = true;
         }
 
-        yield $this->datacenter->sockets[$aargs['datacenter']]->sendMessage($message);
+        yield $this->datacenter->sockets[$aargs['datacenter']]->sendMessage($message, isset($aargs['postpone']) ? !$aargs['postpone'] : true);
 
         return $promise->promise();
     }
@@ -426,7 +431,7 @@ trait CallHandler
         if (isset($aargs['promise'])) {
             $message['promise'] = $aargs['promise'];
         }
-        $this->append_message($message, $aargs['datacenter']);
+        $this->datacenter->sockets[$aargs['datacenter']]->sendMessage($message, false);
     }
 
     /*

@@ -31,14 +31,14 @@ trait SeqNoHandler
         $in = $content_related ? 1 : 0;
         $value = $this->session_out_seq_no;
         $this->session_out_seq_no += $in;
-        //$this->logger->logger("OUT: $value + $in = ".$this->session_out_seq_no);
+        //$this->API->logger->logger("OUT: $value + $in = ".$this->session_out_seq_no);
         return $value * 2 + $in;
     }
 
     public function check_in_seq_no($current_msg_id)
     {
         if (isset($this->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generate_in_seq_no($this->content_related($this->incoming_messages[$current_msg_id]['content']))) !== $this->incoming_messages[$current_msg_id]['seq_no']) {
-            $this->logger->logger('SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$this->incoming_messages[$current_msg_id]['seq_no'].', '.$this->incoming_messages[$current_msg_id]['content']['_'].')', \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger('SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$this->incoming_messages[$current_msg_id]['seq_no'].', '.$this->incoming_messages[$current_msg_id]['content']['_'].')', \danog\MadelineProto\Logger::ERROR);
         }
     }
 
@@ -47,7 +47,7 @@ trait SeqNoHandler
         $in = $content_related ? 1 : 0;
         $value = $this->session_in_seq_no;
         $this->session_in_seq_no += $in;
-        //$this->logger->logger("IN: $value + $in = ".$this->session_in_seq_no);
+        //$this->API->logger->logger("IN: $value + $in = ".$this->session_in_seq_no);
         return $value * 2 + $in;
     }
 }

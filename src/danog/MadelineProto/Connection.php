@@ -137,9 +137,10 @@ class Connection
                 if ($this->temp_auth_key !== null) {
                     $this->API->logger->logger('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
                     $this->temp_auth_key = null;
+                    $this->session_id = null;
                     $this->API->init_authorization();
 
-                    return $result;
+                    return;
                 }
             }
 
@@ -158,7 +159,6 @@ class Connection
     public function readMessageAsync(): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($payload_length);
-        $this->buffer = $buffer;
 
         if ($payload_length === 4) {
             $payload = $this->unpack_signed_int(yield $buffer->bufferRead(4));
@@ -227,15 +227,20 @@ class Connection
         $this->last_recv = time();
         $this->last_http_wait = 0;
 
+        $this->API->logger->logger('Received payload from DC '.$this->datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
         return true;
     }
 
-    public function sendMessage($message): Promise
+    public function sendMessage($message, $flush = true): Promise
     {
         $deferred = new Deferred();
         $message['send_promise'] = $deferred;
-        $this->pending_outgoing[$this->pending_outgoing_key = ($this->pending_outgoing_key + 1) % self::PENDING_MAX] = $message;
-        $this->resumeWriteLoop();
+        $this->pending_outgoing[$this->pending_outgoing_key++] = $message;
+        $this->pending_outgoing_key %= self::PENDING_MAX;
+        if ($flush) {
+            $this->resumeWriteLoop();
+        }
 
         return $deferred->promise();
     }
@@ -301,7 +306,6 @@ class Connection
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id();
                 $length = strlen($body);
                 $buffer = yield $this->stream->getWriteBuffer(8 + 8 + 4 + $length);
-                $this->buffer = $buffer;
 
                 yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int($length).$body);
 
@@ -331,7 +335,8 @@ class Connection
                 return;
             }
             if (count($to_ack = $this->ack_queue)) {
-                $this->pending_outgoing[$this->pending_outgoing_key = ($this->pending_outgoing_key + 1) % self::PENDING_MAX] = ['_' => 'msgs_ack', 'body' => $this->API->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->ack_queue], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false];
+                $this->pending_outgoing[$this->pending_outgoing_key++] = ['_' => 'msgs_ack', 'body' => $this->API->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->ack_queue], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false];
+                $this->pending_outgoing_key %= self::PENDING_MAX;
             }
 
             $has_http_wait = false;
@@ -348,7 +353,9 @@ class Connection
             if ($this->API->is_http($this->datacenter) && !$has_http_wait) {
                 $dc_config_number = isset($this->API->settings['connection_settings'][$this->datacenter]) ? $this->datacenter : 'all';
 
-                $this->pending_outgoing[$this->pending_outgoing_key = ($this->pending_outgoing_key + 1) % self::PENDING_MAX] = ['_' => 'http_wait', 'body' => $this->API->serialize_method('http_wait', ['max_wait' => $this->API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0]), 'content_related' => false, 'unencrypted' => false];
+                $this->pending_outgoing[$this->pending_outgoing_key] = ['_' => 'http_wait', 'body' => $this->API->serialize_method('http_wait', ['max_wait' => $this->API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0]), 'content_related' => false, 'unencrypted' => false];
+                $this->pending_outgoing_key %= self::PENDING_MAX;
+
                 $has_http_wait = true;
             }
 
@@ -374,8 +381,8 @@ class Connection
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id($this->datacenter);
 
                 $this->API->logger->logger("Sending {$message['_']} as encrypted message to DC {$this->datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $body, 'seqno' => $this->generate_out_seq_no($this->datacenter, $message['content_related'])];
-
+                $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $body, 'seqno' => $this->generate_out_seq_no($message['content_related'])];
+                
                 if (isset($message['method']) && $message['method']) {
                     if (!isset($this->temp_auth_key['connection_inited']) || $this->temp_auth_key['connection_inited'] === false) {
                         $this->API->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $message['_']), \danog\MadelineProto\Logger::NOTICE);
@@ -420,15 +427,18 @@ class Connection
             if (count($messages) > 1) {
                 $this->API->logger->logger("Wrapping in msg_container as encrypted message for DC {$this->datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
+
                 $message_id = $this->generate_message_id($this->datacenter);
                 $this->pending_outgoing[$this->pending_outgoing_key] = ['_' => 'msg_container', 'container' => array_values($keys), 'content_related' => false];
 
-                $keys[$this->pending_outgoing_key = ($this->pending_outgoing_key + 1) % self::PENDING_MAX] = $message_id;
+                $keys[$this->pending_outgoing_key++] = $message_id;
+                $this->pending_outgoing_key %= self::PENDING_MAX;
+
 
                 $message_data = $this->API->serialize_object(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'container');
 
                 $message_data_length = strlen($message_data);
-                $seq_no = $this->generate_out_seq_no($this->datacenter, false);
+                $seq_no = $this->generate_out_seq_no(false);
             } elseif (count($messages)) {
                 $message = $messages[0];
                 $message_data = $message['body'];
@@ -455,9 +465,10 @@ class Connection
             $message = $this->temp_auth_key['id'].$message_key.$this->ige_encrypt($plaintext.$padding, $aes_key, $aes_iv);
 
             $buffer = yield $this->stream->getWriteBuffer(strlen($message));
-            $this->buffer = $buffer;
 
             yield $buffer->bufferWrite($message);
+
+            $this->API->logger->logger("Sent encrypted payload to DC {$this->datacenter}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             $sent = time();
 

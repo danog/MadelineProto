@@ -112,7 +112,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
         $size = fstat($this->memory_stream)['size'];
         $offset = ftell($this->memory_stream);
         $length = $size - $offset;
-        if ($length === 0 || $size > MAX_SIZE) {
+        if ($length === 0 || $size > self::MAX_SIZE) {
             $new_memory_stream = fopen('php://memory', 'r+');
             if ($length) {
                 fwrite($new_memory_stream, fread($this->memory_stream, $length));

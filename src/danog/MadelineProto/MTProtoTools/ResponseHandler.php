@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Loop;
+
+
 /**
  * Manages responses.
  */
@@ -56,11 +59,10 @@ trait ResponseHandler
         foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
             $this->logger->logger((isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['from_container']) ? 'Inside of container, received ' : 'Received ').$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].' from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
-            //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']) {
                 case 'msgs_ack':
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
                         $this->ack_outgoing_message_id($msg_id, $datacenter);
@@ -73,7 +75,7 @@ trait ResponseHandler
                     // Acknowledge that the server received my request
                     $req_msg_id = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id'];
                     $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['result'];
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
 
                     $this->handle_response($req_msg_id, $current_msg_id, $datacenter);
 
@@ -81,25 +83,25 @@ trait ResponseHandler
                     break;
                 case 'future_salts':
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     $this->handle_response($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id'], $current_msg_id, $datacenter);
                     break;
                 case 'bad_server_salt':
                 case 'bad_msg_notification':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     $this->handle_response($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['bad_msg_id'], $current_msg_id, $datacenter);
                     break;
                 case 'pong':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     $this->handle_response($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id'], $current_msg_id, $datacenter);
                     break;
                 case 'new_session_created':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'] = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['server_salt'];
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
@@ -115,17 +117,17 @@ trait ResponseHandler
                 case 'msg_container':
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['messages'] as $message) {
-                        $this->check_message_id($message['msg_id'], ['outgoing' => false, 'datacenter' => $datacenter, 'container' => true]);
+                        $this->datacenter->sockets[$datacenter]->check_message_id($message['msg_id'], ['outgoing' => false, 'container' => true]);
                         $this->datacenter->sockets[$datacenter]->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body'], 'from_container' => true];
                         $this->datacenter->sockets[$datacenter]->new_incoming[$message['msg_id']] = $message['msg_id'];
                         $this->handle_messages($datacenter);
                     }
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
                     break;
                 case 'msg_copy':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     $this->ack_incoming_message_id($current_msg_id, $datacenter);
                     // Acknowledge that I received the server's response
@@ -133,7 +135,7 @@ trait ResponseHandler
                         $this->ack_incoming_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id'], $datacenter);
                     // Acknowledge that I received the server's response
                     } else {
-                        $this->check_message_id($message['orig_message']['msg_id'], ['outgoing' => false, 'datacenter' => $datacenter, 'container' => true]);
+                        $this->datacenter->sockets[$datacenter]->check_message_id($message['orig_message']['msg_id'], ['outgoing' => false, 'container' => true]);
                         $this->datacenter->sockets[$datacenter]->incoming_messages[$message['orig_message']['msg_id']] = ['content' => $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']];
                         $this->datacenter->sockets[$datacenter]->new_incoming[$message['orig_message']['msg_id']] = $message['orig_message']['msg_id'];
                         $this->handle_messages($datacenter);
@@ -142,26 +144,26 @@ trait ResponseHandler
                     unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
                     break;
                 case 'http_wait':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     $this->logger->logger($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], \danog\MadelineProto\Logger::NOTICE);
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
                     break;
                 case 'msgs_state_info':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     $this->handle_response($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['req_msg_id'], $current_msg_id, $datacenter);
                     break;
                 case 'msgs_state_req':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     $this->send_msgs_state_info($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter);
                     break;
                 case 'msgs_all_info':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'] as $key => $msg_id) {
@@ -179,7 +181,7 @@ trait ResponseHandler
                     }
                     break;
                 case 'msg_detailed_info':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id']])) {
                         if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {
@@ -190,7 +192,7 @@ trait ResponseHandler
                         }
                     }
                 case 'msg_new_detailed_info':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {
                         $this->ack_incoming_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id'], $datacenter);
@@ -200,7 +202,7 @@ trait ResponseHandler
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     break;
                 case 'msg_resend_req':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     $ok = true;
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
@@ -218,7 +220,7 @@ trait ResponseHandler
                     }
                     break;
                 case 'msg_resend_ans_req':
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     $this->send_msgs_state_info($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter);
@@ -229,10 +231,11 @@ trait ResponseHandler
                     }
                     break;
                 default:
-                    $this->check_in_seq_no($datacenter, $current_msg_id);
+                    $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $this->ack_incoming_message_id($current_msg_id, $datacenter);
                     // Acknowledge that I received the server's response
                     $response_type = $this->constructors->find_by_predicate($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'])['type'];
+
                     switch ($response_type) {
                         case 'Updates':
                             unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
@@ -271,14 +274,14 @@ trait ResponseHandler
         return $only_updates;
     }
 
-    public function handle_reject($datacenter, $request, $data)
+    public function handle_reject($datacenter, &$request, $data)
     {
-        if (isset($request['promise']) && is_object($request['promise']) && $request['promise']->getState() === 'pending') {
-            $request['promise']->reject($data);
-            $request['promise'] = $request['promise']->getState();
+        if (isset($request['promise']) && is_object($request['promise'])) {
+            $request['promise']->fail($data);
+            unset($request['promise']);
         } elseif (isset($request['container'])) {
             foreach ($request['container'] as $message_id) {
-                $this->handle_reject($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]);
+                $this->handle_reject($datacenter, $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id], $data);
             }
         } else {
             $this->logger->logger('Rejecting: already got response for '.(isset($request['_']) ? $request['_'] : '-'));
@@ -425,6 +428,7 @@ trait ResponseHandler
                     break;
                 case 'bad_server_salt':
                 case 'bad_msg_notification':
+
                     $this->logger->logger('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$response['error_code']], \danog\MadelineProto\Logger::WARNING);
                     switch ($response['error_code']) {
                         case 48:
@@ -445,14 +449,13 @@ trait ResponseHandler
                             return;
                     }
                     $this->got_response_for_outgoing_message_id($request_id, $datacenter);
-
                     $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code']));
 
                     return;
             }
         }
 
-        if (!isset($request['promise']) || (is_object($request['promise']) ? $request['promise']->getState() : $request['promise']) !== 'pending') {
+        if (!isset($request['promise'])) {
             $this->logger->logger('Response: already got response for '.(isset($request['_']) ? $request['_'] : '-').' with message ID '.$this->unpack_signed_long($request_id));
 
             return;
@@ -461,11 +464,10 @@ trait ResponseHandler
         if (isset($request['botAPI']) && $request['botAPI']) {
             $response = $this->MTProto_to_botAPI($response);
         }
-
         unset($request);
         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
         $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
-        $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise'] = $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->getState();
+        unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']);
     }
 
     public function handle_pending_updates()
@@ -487,7 +489,6 @@ trait ResponseHandler
 
     public function handle_updates($updates)
     {
-        //var_dump($updates);
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
