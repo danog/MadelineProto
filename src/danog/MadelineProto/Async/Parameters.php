@@ -54,7 +54,8 @@ abstract class Parameters
         if ($this->fetched && !$refetchable) {
             return $this->params;
         }
-        $params = yield $this->getParameters();
+        $params = yield call([$this, 'getParameters']);
+
         if (!$refetchable) {
             $this->params = $params;
         }
