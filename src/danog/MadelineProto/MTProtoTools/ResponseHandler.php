@@ -316,7 +316,7 @@ trait ResponseHandler
                                 $this->datacenter->sockets[$datacenter]->call_queue[$request['queue']] = [];
                             }
 
-                            Loop::defer([$this, 'method_recall'], $request_id, $datacenter);
+                            Loop::defer([$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
 
                             return;
                         case 303:
@@ -332,7 +332,7 @@ trait ResponseHandler
                                 $this->settings['connection_settings']['default_dc'] = $this->authorized_dc = $this->datacenter->curdc;
                             }
 
-                            Loop::defer([$this, 'method_recall'], $request_id, $datacenter, $old_datacenter);
+                            Loop::defer([$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter, 'old_datacenter' => $old_datacenter]);
 
                             return;
                         case 401:
@@ -395,7 +395,7 @@ trait ResponseHandler
                                     Loop::defer(function () use ($request_id, $datacenter) {
                                         $this->init_authorization();
 
-                                        $this->method_recall($request_id, $datacenter);
+                                        $this->method_recall(['message_id' => $request_id, 'datacenter' => $datacenter]);
                                     });
                                     return;
                                 case 'AUTH_KEY_PERM_EMPTY':
@@ -404,8 +404,8 @@ trait ResponseHandler
                                     $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
                                     Loop::defer(function () use ($request_id, $datacenter) {
                                         $this->init_authorization();
+                                        $this->method_recall(['message_id' => $request_id, 'datacenter' => $datacenter]);
 
-                                        $this->method_recall($request_id, $datacenter);
                                     });
 
                                     return;
@@ -420,7 +420,7 @@ trait ResponseHandler
                             $limit = isset($aargs['FloodWaitLimit']) ? $aargs['FloodWaitLimit'] : $this->settings['flood_timeout']['wait_if_lt'];
                             if (is_numeric($seconds) && $seconds < $limit) {
                                 $this->logger->logger('Flood, waiting ' . $seconds . ' seconds before repeating async call...', \danog\MadelineProto\Logger::NOTICE);
-                                Loop::delay($seconds*1000, [$this, 'method_recall'], $request_id, $datacenter);
+                                Loop::delay($seconds*1000, [$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
                                 return;
                             }
                         // no break
@@ -444,7 +444,7 @@ trait ResponseHandler
                     switch ($response['error_code']) {
                         case 48:
                             $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'] = $response['new_server_salt'];
-                            Loop::defer([$this, 'method_recall'], $request_id, $datacenter);
+                            Loop::defer([$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
 
                             return;
                         case 16:
@@ -455,8 +455,8 @@ trait ResponseHandler
                             $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
                             Loop::defer(function () use ($request_id, $datacenter) {
                                 $this->init_authorization();
+                                $this->method_recall(['message_id' => $request_id, 'datacenter' => $datacenter]);
 
-                                $this->method_recall($request_id, $datacenter);
                             });
 
                             return;
