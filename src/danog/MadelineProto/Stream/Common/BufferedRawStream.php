@@ -116,6 +116,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
             $new_memory_stream = fopen('php://memory', 'r+');
             if ($length) {
                 fwrite($new_memory_stream, fread($this->memory_stream, $length));
+                fseek($new_memory_stream, 0);
             }
             fclose($this->memory_stream);
             $this->memory_stream = $new_memory_stream;
