@@ -1,6 +1,6 @@
 <?php
 /**
- * Buffered raw stream.
+ * Websocket stream wrapper.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -16,80 +16,56 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\Common;
+namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\Promise;
 use Amp\Success;
-use danog\MadelineProto\Stream\Async\RawStream;
+use danog\MadelineProto\Stream\Async\BufferedStream;
+use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
-use function Amp\call;
-use function Amp\Socket\connect;
-use function Amp\Socket\cryptoConnect;
+use danog\MadelineProto\Stream\MTProtoBufferInterface;
+use danog\MadelineProto\Tools;
+use danog\MadelineProto\Stream\RawStreamInterface;
+use function Amp\Websocket\connect;
+use danog\MadelineProto\Stream\BufferInterface;
+use danog\MadelineProto\Stream\Async\RawStream;
 
 /**
- * Buffered raw stream.
+ * Websocket stream wrapper.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInterface, \danog\MadelineProto\Stream\BufferInterface, \danog\MadelineProto\Stream\RawStreamInterface
+class WsStream implements BufferedStreamInterface, RawStreamInterface, BufferInterface
 {
+    use BufferedStream;
     use RawStream;
-
-    const MAX_SIZE = 10 * 1024 * 1024;
-
+    use Tools;
     private $sock;
     private $memory_stream;
+    private $buffer;
 
     /**
-     * Asynchronously connect to a TCP/TLS server.
+     * Connect to stream.
      *
-     * @param ConnectionContext $ctx Connection context
+     * @param ConnectionContext $ctx The connection context
      *
      * @return \Generator
      */
     public function connectAsync(ConnectionContext $ctx): \Generator
     {
-        if ($ctx->isSecure()) {
-            $this->sock = yield cryptoConnect($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
-        } else {
-            $this->sock = yield connect($ctx->getStringUri(), $ctx->getSocketContext());
-        }
+        $this->sock = yield connect($ctx->getStringUri(), $ctx->getSocketContext());
         $this->memory_stream = fopen('php://memory', 'r+');
-
         return true;
     }
-
-    /**
-     * Async chunked read.
-     *
-     * @return Promise
-     */
-    public function read(): Promise
-    {
-        return $this->sock->read();
-    }
-
-    /**
-     * Async write.
-     *
-     * @param string $data Data to write
-     *
-     * @return Promise
-     */
-    public function write(string $data): Promise
-    {
-        return $this->sock->write($data);
-    }
-
     /**
      * Async close.
      *
-     * @return Generator
+     * @return Promise
      */
     public function disconnectAsync(): \Generator
     {
         try {
-            yield $this->sock->end();
+            yield $this->sock->close();
             $this->sock = null;
             fclose($this->memory_stream);
             $this->memory_stream = null;
@@ -99,13 +75,25 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     }
 
     /**
+     * Get write buffer asynchronously.
+     *
+     * @param int $length Length of data that is going to be written to the write buffer
+     *
+     * @return Generator
+     */
+    public function getWriteBuffer(int $length): Promise
+    {
+        return new Success($this);
+    }
+
+    /**
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Promise
+     * @return Generator
      */
-    public function getReadBuffer(&$length): Promise
+    public function getReadBufferAsync(&$length): \Generator
     {
         $size = fstat($this->memory_stream)['size'];
         $offset = ftell($this->memory_stream);
@@ -119,20 +107,9 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
             fclose($this->memory_stream);
             $this->memory_stream = $new_memory_stream;
         }
+        fwrite($this->memory_stream, yield (yield $this->sock->receive())->buffer());
 
-        return new \Amp\Success($this);
-    }
-
-    /**
-     * Get write buffer asynchronously.
-     *
-     * @param int $length Total length of data that is going to be piped in the buffer
-     *
-     * @return Promise
-     */
-    public function getWriteBuffer(int $length): Promise
-    {
-        return new \Amp\Success($this);
+        return $this;
     }
 
     /**
@@ -151,7 +128,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
             return new Success(fread($this->memory_stream, $length));
         }
 
-        return call([$this, 'bufferReadAsync'], $length);
+        throw new \danog\MadelineProto\Exception('Not enough data');
     }
 
     /**
@@ -182,23 +159,11 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
         return fread($this->memory_stream, $length);
     }
 
-    /**
-     * Async write.
-     *
-     * @param string $data Data to write
-     *
-     * @return Promise
-     */
+
     public function bufferWrite(string $data): Promise
     {
-        return $this->write($data);
+        return $this->sock->sendBinary($data);
     }
-
-    /**
-     * Get class name.
-     *
-     * @return string
-     */
     public static function getName(): string
     {
         return __CLASS__;

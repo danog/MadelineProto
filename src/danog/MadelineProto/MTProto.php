@@ -160,7 +160,7 @@ class MTProto
         // Connect to servers
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
         if (!isset($this->datacenter)) {
-            $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
+            $this->datacenter = new DataCenter($this, $this->settings['connection'], $this->settings['connection_settings']);
         }
         // Load rsa keys
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);

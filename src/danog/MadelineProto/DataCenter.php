@@ -27,6 +27,8 @@ use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
+use danog\MadelineProto\Stream\Transport\WssStream;
+use danog\MadelineProto\Stream\Transport\WsStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\ObfuscatedTransportStream;
 use function Amp\call;
@@ -60,7 +62,7 @@ class DataCenter
             if ($socket instanceof Connection) {
                 $this->API->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
                 $socket->old = true;
-            //wait($socket->end());
+                //wait($socket->end());
             } else {
                 unset($this->sockets[$key]);
             }
@@ -93,7 +95,7 @@ class DataCenter
 
                 return true;
             } catch (\Throwable $e) {
-                $this->API->logger->logger('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Connection failed: ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             }
         }
 
@@ -124,6 +126,12 @@ class DataCenter
                 break;
             case 'https':
                 $default = [[DefaultStream::getName(), []], [HttpsStream::getName(), []]];
+                break;
+            case 'ws':
+                $default = [[WsStream::getName(), []], [AbridgedStream::getName(), []]];
+                break;
+            case 'wss':
+                $default = [[WssStream::getName(), []], [AbridgedStream::getName(), []]];
                 break;
             case 'obfuscated2':
                 $default = [[ObfuscatedTransportStream::getName()]];
@@ -199,11 +207,12 @@ class DataCenter
                 $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
                 $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
                 if ($ipv6 === 'ipv6') {
-                    $address = '['.$address.']';
+                    $address = '[' . $address . ']';
                 }
 
-                foreach (array_unique([$port, 443, 80, 88]) as $port) {
+                foreach (array_unique([$port, 443, 80, 88, 5222]) as $port) {
                     $stream = end($combo)[0];
+                    $start_stream = $combo[0][0];
 
                     if ($stream === HttpsStream::getName()) {
                         $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
@@ -212,11 +221,23 @@ class DataCenter
                         }
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
 
-                        $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
+                        $uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
                     } elseif ($stream === HttpStream::getName()) {
-                        $uri = 'tcp://'.$address.':'.$port.'/api';
+                        $uri = 'tcp://' . $address . ':' . $port . '/api';
                     } else {
-                        $uri = 'tcp://'.$address.':'.$port;
+                        $uri = 'tcp://' . $address . ':' . $port;
+                    }
+
+                    if ($start_stream === WssStream::getName()) {
+                        $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
+                        if (strpos($dc_number, '_media') !== false) {
+                            $subdomain .= '-1';
+                        }
+                        $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
+
+                        $uri = 'wss://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
+                    } elseif ($start_stream === WsStream::getName()) {
+                        $uri = 'ws://' . $address . ':' . $port . '/apiws';
                     }
 
                     /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
@@ -234,8 +255,8 @@ class DataCenter
             }
         }
 
-        if (isset($this->dclist[$test][$ipv6][$dc_number.'_bk']['ip_address'])) {
-            $ctxs = array_merge($ctxs, $this->generate_contexts($dc_number.'_bk'));
+        if (isset($this->dclist[$test][$ipv6][$dc_number . '_bk']['ip_address'])) {
+            $ctxs = array_merge($ctxs, $this->generate_contexts($dc_number . '_bk'));
         }
 
         return $ctxs;
