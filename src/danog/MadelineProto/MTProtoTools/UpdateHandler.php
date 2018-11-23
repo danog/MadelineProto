@@ -258,7 +258,7 @@ trait UpdateHandler
         return $this->updates_state;
     }
 
-    public function get_updates_difference()
+    public function get_updates_difference($w = null)
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;

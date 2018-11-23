@@ -19,6 +19,10 @@
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+
+
 /**
  * Manages all of the mtproto stuff.
  */
@@ -77,7 +81,7 @@ class MTProto
     const TD_IGNORE = ['updateMessageID'];
     const BOTAPI_PARAMS_CONVERSION = ['disable_web_page_preview' => 'no_webpage', 'disable_notification' => 'silent', 'reply_to_message_id' => 'reply_to_msg_id', 'chat_id' => 'peer', 'text' => 'message'];
     const NOT_CONTENT_RELATED = [
-        'rpc_result',
+        //'rpc_result',
         //'rpc_error',
         'rpc_drop_answer',
         'rpc_answer_unknown',
@@ -659,8 +663,7 @@ class MTProto
 
     public function is_http($datacenter)
     {
-        $dc_config_number = isset($this->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
-        return in_array($this->settings['connection_settings'][$dc_config_number]['protocol'], ['http', 'https']);
+        return in_array($this->datacenter->sockets[$datacenter]->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
     }
 
     public function close_and_reopen($datacenter)

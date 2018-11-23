@@ -85,6 +85,11 @@ class Connection
     public $ctx;
     public $pendingCheckWatcherId;
 
+    public function getCtx()
+    {
+        return $this->ctx;
+    }
+
     /**
      * Connect function.
      *
@@ -320,7 +325,6 @@ class Connection
         }
         yield new Success(0);
     }
-
     public function encryptedWriteLoopAsync(): \Generator
     {
         do {
@@ -366,11 +370,6 @@ class Connection
                     continue;
                 }
 
-                if ($count > 1020 || $total_length + 32 > 512 * 1024) {
-                    $this->API->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::NOTICE);
-                    break;
-                }
-
                 $body = is_object($message['body']) ? yield $message['body'] : $message['body'];
 
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $this->generate_message_id($this->datacenter);
@@ -397,13 +396,13 @@ class Connection
                             }
                         }
 
-                        if ($this->API->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $this->API->settings['requests']['gzip_encode_if_gt']) {
+/*                        if ($this->API->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $this->API->settings['requests']['gzip_encode_if_gt']) {
                             if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
                                 $MTmessage['body'] = $this->API->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
                                 $this->API->logger->logger('Using GZIP compression for ' . $message['_'] . ', saved ' . ($l - $g) . ' bytes of data, reduced call size by ' . $g * 100 / $l . '%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                             }
                             unset($gzipped);
-                        }
+                        }*/
                     }
                 }
                 $body_length = strlen($MTmessage['body']);
@@ -417,6 +416,11 @@ class Connection
                 $MTmessage['bytes'] = $body_length;
                 $messages[] = $MTmessage;
                 $keys[$k] = $message_id;
+
+                if ($total_length && $total_length + 32 > 655360) {
+                    $this->API->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::NOTICE);
+                    break;
+                }
             }
 
             if (count($messages) > 1) {
@@ -457,11 +461,12 @@ class Connection
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->temp_auth_key['auth_key']);
             $message = $this->temp_auth_key['id'] . $message_key . $this->ige_encrypt($plaintext . $padding, $aes_key, $aes_iv);
 
-            $buffer = yield $this->stream->getWriteBuffer(strlen($message));
+            $buffer = yield $this->stream->getWriteBuffer($len = strlen($message));
 
+            $t = microtime(true);
             yield $buffer->bufferWrite($message);
 
-            $this->API->logger->logger("Sent encrypted payload to DC {$this->datacenter}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->API->logger->logger("Sent encrypted payload to DC {$this->datacenter}, speed ".((($len*8)/(microtime(true)-$t))/1000000)." mbps!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             $sent = time();
 
@@ -553,7 +558,7 @@ class Connection
                                 case 2:
                                 case 3:
                                     $this->API->logger->logger('Message ' . $this->outgoing_messages[$message_id]['_'] . ' with message ID ' . $this->unpack_signed_long($message_id) . ' not received by server, resending...', \danog\MadelineProto\Logger::ERROR);
-                                    $this->API->method_recall(['message_id' => $message_id, 'datacenter' => $this->datacenter, 'postpone' => true]);
+                                    $this->API->method_recall('', ['message_id' => $message_id, 'datacenter' => $this->datacenter, 'postpone' => true]);
                                     break;
                                 case 4:
                                     if ($chr & 32) {
@@ -585,7 +590,7 @@ class Connection
                         && $this->outgoing_messages[$message_id]['unencrypted']
                     ) {
                         $this->API->logger->logger('Still missing ' . $this->outgoing_messages[$message_id]['_'] . ' with message id ' . $this->unpack_signed_long($message_id) . " on DC $this->datacenter, resending", \danog\MadelineProto\Logger::ERROR);
-                        $this->API->method_recall(['message_id' => $message_id, 'datacenter' => $this->datacenter, 'postpone' => true]);
+                        $this->API->method_recall('', ['message_id' => $message_id, 'datacenter' => $this->datacenter, 'postpone' => true]);
                     }
                 }
             }

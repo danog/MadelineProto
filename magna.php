@@ -21,8 +21,9 @@ if (!file_exists(__DIR__.'/vendor/autoload.php')) {
 } else {
     require_once 'vendor/autoload.php';
 }
-if (file_exists('web_data.php')) {
-    require_once 'web_data.php';
+
+if (!file_exists('songs.php')) {
+
 }
 
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;

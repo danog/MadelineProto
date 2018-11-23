@@ -53,11 +53,14 @@ trait ResponseHandler
     }
 
     public $n = 0;
-    public function handle_messages($datacenter)
+    public function handle_messages($datacenter, $actual_datacenter = null)
     {
+        if ($actual_datacenter) $datacenter = $actual_datacenter;
+
         $n = $this->n++;
         $only_updates = true;
         foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
+//var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
             $this->logger->logger((isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['from_container']) ? 'Inside of container, received ' : 'Received ') . $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'] . ' from DC ' . $datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']) {
@@ -395,7 +398,7 @@ trait ResponseHandler
                                     Loop::defer(function () use ($request_id, $datacenter) {
                                         $this->init_authorization();
 
-                                        $this->method_recall(['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                        $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
                                     });
                                     return;
                                 case 'AUTH_KEY_PERM_EMPTY':
@@ -404,7 +407,7 @@ trait ResponseHandler
                                     $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
                                     Loop::defer(function () use ($request_id, $datacenter) {
                                         $this->init_authorization();
-                                        $this->method_recall(['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                        $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
 
                                     });
 
@@ -455,7 +458,7 @@ trait ResponseHandler
                             $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
                             Loop::defer(function () use ($request_id, $datacenter) {
                                 $this->init_authorization();
-                                $this->method_recall(['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
 
                             });
 
@@ -502,11 +505,13 @@ trait ResponseHandler
         }
     }
 
-    public function handle_updates($updates)
+    public function handle_updates($updates, $actual_updates = null)
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
+        if ($actual_updates) $updates = $actual_updates;
+
         if ($this->postpone_updates) {
             $this->logger->logger('Postpone update handling', \danog\MadelineProto\Logger::VERBOSE);
             $this->pending_updates[] = $updates;

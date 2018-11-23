@@ -347,19 +347,7 @@ trait CallHandler
 
     public function method_call($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
-        $restart = false;
-        do {
-            try {
-                return wait($this->method_call_async_read($method, $args, $aargs));
-            } catch (\Throwable $e) {
-                if ($e->getMessage() === 'Loop stopped without resolving the promise') {
-                    $restart = true;
-                    continue;
-                }
-                $this->logger->logger("AN EXCEPTION SURFACED " . $e, \danog\MadelineProto\Logger::ERROR);
-                throw $e;
-            }    
-        } while ($restart);
+        return $this->wait($this->method_call_async_read($method, $args, $aargs));
     }
 
     public function method_call_async_read($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
@@ -474,19 +462,7 @@ trait CallHandler
 
     public function object_call($object, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
-        $restart = false;
-        do {
-            try {
-                return wait($this->object_call_async($object, $args, $aargs));
-            } catch (\Throwable $e) {
-                if ($e->getMessage() === 'Loop stopped without resolving the promise') {
-                    $restart = true;
-                    continue;
-                }
-                $this->logger->logger("AN EXCEPTION SURFACED " . $e, \danog\MadelineProto\Logger::ERROR);
-                throw $e;
-            }    
-        } while ($restart);
+        return $this->wait($this->object_call_async($object, $args, $aargs));
     }
     public function object_call_async($object, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
     {

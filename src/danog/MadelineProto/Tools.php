@@ -18,6 +18,9 @@
 
 namespace danog\MadelineProto;
 
+use function Amp\Promise\wait;
+use Amp\Loop;
+
 /**
  * Some tools.
  */
@@ -148,5 +151,24 @@ trait Tools
         }
 
         return unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
+    }
+    public function infloop()
+    {
+        while (true) {
+            Loop::loop();
+        }
+    }
+    public function wait($promise)
+    {
+        do {
+            try {
+                return wait($promise);
+            } catch (\Throwable $e) {
+                if ($e->getMessage() !== 'Loop stopped without resolving the promise') {
+                    $this->logger->logger("AN EXCEPTION SURFACED " . $e, \danog\MadelineProto\Logger::ERROR);
+                    throw $e;
+                }
+            }
+        } while (true);
     }
 }

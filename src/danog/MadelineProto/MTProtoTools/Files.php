@@ -85,6 +85,7 @@ trait Files
         $cur_part_num = 0;
 
         while ($part_num < $part_total_num) {
+            $t = microtime(true);
             $read_deferred = yield $this->method_call_async_write(
                 $method,
                 new AsyncParameters(
@@ -102,9 +103,9 @@ trait Files
                     },
                     $seekable
                 ),
-                ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]
+                ['heavy' => true, 'file' => true, 'datacenter' => $datacenter]
             );
-
+            $this->logger->logger("Speed for chunk: ".(($part_size*8/1000000)/(microtime(true)-$t)));
             $part_num++;
             $promises[] = $read_deferred->promise();
         }

@@ -264,6 +264,16 @@ class ConnectionContext
     }
 
     /**
+     * Get the current stream name from the stream chain.
+     *
+     * @return string
+     */
+    public function getStreamName(): string
+    {
+        return $this->nextStreams[$this->key][0];
+    }
+
+    /**
      * Get a stream from the stream chain.
      *
      * @return Promise
