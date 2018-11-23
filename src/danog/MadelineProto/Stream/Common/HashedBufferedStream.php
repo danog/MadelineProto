@@ -34,7 +34,6 @@ use function Amp\call;
 class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterface
 {
     use BufferedStream;
-    use Stream;
     private $hash_name;
     private $read_hash;
     private $write_hash;

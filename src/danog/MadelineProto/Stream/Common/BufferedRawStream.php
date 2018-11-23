@@ -39,8 +39,6 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
 
     private $sock;
     private $memory_stream;
-    private $deferred;
-    private $need = 0;
 
     /**
      * Asynchronously connect to a TCP/TLS server.

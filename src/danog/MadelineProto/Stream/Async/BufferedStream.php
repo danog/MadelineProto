@@ -34,7 +34,6 @@ use function Amp\call;
 trait BufferedStream
 {
     use Stream;
-
     /**
      * Get read buffer asynchronously.
      *

@@ -110,7 +110,7 @@ trait ResponseHandler
 
                     // Acknowledge that I received the server's response
                     if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
-                        $this->get_updates_difference();
+                        Loop::defer([$this, 'get_updates_difference']);
                     }
 
                     unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
