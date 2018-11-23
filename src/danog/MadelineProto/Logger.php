@@ -22,6 +22,8 @@
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\ResourceOutputStream;
+
 class Logger
 {
     const foreground = ['default' => 39, 'black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'magenta' => 35, 'cyan' => 36, 'light_gray' => 37, 'dark_gray' => 90, 'light_red' => 91, 'light_green' => 92, 'light_yellow' => 93, 'light_blue' => 94, 'light_magenta' => 95, 'light_cyan' => 96, 'white' => 97];
@@ -88,6 +90,10 @@ class Logger
         $this->colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
         $this->colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
         $this->colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
+
+        if ($this->mode === 3) {
+            $this->stdout = new ResourceOutputStream(STDOUT);
+        }
     }
 
     public static function log($param, $level = self::NOTICE)
@@ -138,7 +144,7 @@ class Logger
                     error_log($param.PHP_EOL, 3, $this->optional);
                     break;
                 case 3:
-                    echo Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".PHP_EOL : $param.PHP_EOL;
+                    $this->stdout->write(Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".PHP_EOL : $param.PHP_EOL);
                     break;
             }
     }

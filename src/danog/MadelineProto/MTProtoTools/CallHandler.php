@@ -319,8 +319,9 @@ trait CallHandler
     {
         $message_id = $args['message_id'];
         $new_datacenter = $args['datacenter'];
-        if (!isset($args['old_datacenter'])) {
-            $old_datacenter = $new_datacenter;
+        $old_datacenter = $new_datacenter;
+        if (isset($args['old_datacenter'])) {
+            $old_datacenter = $args['old_datacenter'];
         }
         $postpone = false;
         if (isset($args['postpone'])) {
