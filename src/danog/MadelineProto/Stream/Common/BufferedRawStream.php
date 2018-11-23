@@ -168,6 +168,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
         $size = fstat($this->memory_stream)['size'];
         $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
+        if ($buffer_length < $length && $buffer_length) fseek($this->memory_stream, $offset+$buffer_length);
         while ($buffer_length < $length) {
             $chunk = yield $this->read();
             if ($chunk === null) {

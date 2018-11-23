@@ -187,7 +187,7 @@ class Connection
             /*
             $server_salt = substr($decrypted_data, 0, 8);
             if ($server_salt != $this->temp_auth_key['server_salt']) {
-            $this->API->logger->logger('WARNING: Server salt mismatch (my server salt '.$this->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').', \danog\MadelineProto\Logger::WARNING);
+                $this->API->logger->logger('WARNING: Server salt mismatch (my server salt '.$this->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').', \danog\MadelineProto\Logger::WARNING);
             }
              */
             $session_id = substr($decrypted_data, 8, 8);
