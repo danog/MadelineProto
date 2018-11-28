@@ -1,6 +1,6 @@
 <?php
 /**
- * Generic stream helper trait.
+ * Loop helper trait.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -18,21 +18,48 @@
 
 namespace danog\MadelineProto\Stream\Async;
 
+use Amp\Loop;
+use Amp\Success;
+use Amp\Deferred;
 use Amp\Promise;
-use danog\MadelineProto\Stream\ConnectionContext;
-use function Amp\call;
 
 /**
- * Generic stream helper trait.
- *
- * Wraps the asynchronous generator methods with asynchronous promise-based methods
+ * Resumable loop helper trait.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-trait Stream
+trait ResumableLoop
 {
-    public function connect(ConnectionContext $ctx): Promise
+    private $resume;
+    private $resumeWatcher;
+
+    public function pause($time = null): Promise
     {
-        return call([$this, 'connectAsync'], $ctx);
+        if (!is_null($time)) {
+            if ($time <= 0) {
+                return new Success(0);
+            } else {
+                $resume = microtime(true)+$time;
+                if ($this->resumeWatcher) {
+                    Loop::cancel($this->resumeWatcher);
+                    $this->resumeWatcher = null;
+                }
+                $this->resumeWatcher = Loop::delay($time * 1000, [$this, 'resume'], $resume);
+            }
+        }
+        $this->resume = new Deferred();
+        return $this->resume->promise();
+    }
+
+    public function resume($watcherId = null, $expected = 0)
+    {
+        if ($this->resumeWatcher) {
+            $this->resumeWatcher = null;
+        }
+        if ($this->resume) {
+            $resume = $this->resume;
+            $this->resume = null;
+            $resume->resolve();
+        }
     }
 }

@@ -149,8 +149,8 @@ class APIFactory
             $this->API->check_tos();
         }
 
-        if ($this->namespace === '' && !method_exists($this->API, $name) && method_exists($this->API, $camel = lcfirst(str_replace('_', '', ucwords($method, '_'))))) {
-            $method = $camel;
+        if ($this->namespace === '' && !method_exists($this->API, $name) && method_exists($this->API, $camel = lcfirst(str_replace('_', '', ucwords($name, '_'))))) {
+            $name = $camel;
         }
         if ($this->lua === false) {
             if (method_exists($this->API, $this->namespace.$name)) {

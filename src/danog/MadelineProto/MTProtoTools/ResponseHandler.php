@@ -55,9 +55,11 @@ trait ResponseHandler
     public $n = 0;
     public function handle_messages($datacenter, $actual_datacenter = null)
     {
-        if ($actual_datacenter) $datacenter = $actual_datacenter;
+        if ($actual_datacenter) {
+            $datacenter = $actual_datacenter;
+        }
 
-        $n = $this->n++;
+        //$n = $this->n++;
         $only_updates = true;
         foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
 //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
@@ -274,7 +276,7 @@ trait ResponseHandler
                     break;
             }
         }
-        $this->n--;
+        //$this->n--;
 
         return $only_updates;
     }
@@ -301,7 +303,7 @@ trait ResponseHandler
         unset($this->datacenter->sockets[$datacenter]->incoming_messages[$response_id]['content']);
         $request = &$this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id];
 
-        if (isset($request['method']) && $request['method'] && $this->datacenter->sockets[$datacenter]->temp_auth_key !== null && (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === false)) {
+        if (isset($request['method']) && $request['method'] && $request['_'] !== 'auth.bindTempAuthKey' && $this->datacenter->sockets[$datacenter]->temp_auth_key !== null && (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === false)) {
             $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] = true;
         }
         if (isset($response['_'])) {
@@ -310,6 +312,15 @@ trait ResponseHandler
                     if (in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_OUTDATED', 'PERSISTENT_TIMESTAMP_INVALID'])) {
                         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
                         $this->handle_reject($datacenter, $request, new \danog\MadelineProto\PTSException($response['error_message']));
+
+                        return;
+                    }
+                    if (strpos($response['error_message'], 'FILE_REFERENCE_') === 0) {
+                        $this->logger->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
+
+                        $request['refresh_references'] = true;
+
+                        Loop::defer([$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
 
                         return;
                     }
@@ -348,6 +359,7 @@ trait ResponseHandler
                                     $this->logger->logger($response['error_message'], \danog\MadelineProto\Logger::FATAL_ERROR);
                                     foreach ($this->datacenter->sockets as $socket) {
                                         $socket->temp_auth_key = null;
+                                        $socket->session_id = null;
                                         $socket->auth_key = null;
                                         $socket->authorized = false;
                                     }
@@ -363,18 +375,24 @@ trait ResponseHandler
                                     return;
                                 case 'AUTH_KEY_UNREGISTERED':
                                 case 'AUTH_KEY_INVALID':
+                                    $this->datacenter->sockets[$datacenter]->session_id = null;
+                                    $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
+                                    $this->datacenter->sockets[$datacenter]->auth_key = null;
+                                    $this->datacenter->sockets[$datacenter]->authorized = false;
+
                                     if ($this->authorized !== self::LOGGED_IN) {
                                         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
 
-                                        $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                        Loop::defer(function () use ($datacenter, &$request, &$response) {
+                                            $this->init_authorization();
+
+                                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                        });
 
                                         return;
                                     }
                                     $this->logger->logger('Auth key not registered, resetting temporary and permanent auth keys...', \danog\MadelineProto\Logger::ERROR);
 
-                                    $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
-                                    $this->datacenter->sockets[$datacenter]->auth_key = null;
-                                    $this->datacenter->sockets[$datacenter]->authorized = false;
                                     if ($this->authorized_dc === $datacenter && $this->authorized === self::LOGGED_IN) {
                                         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
 
@@ -423,7 +441,7 @@ trait ResponseHandler
                             $limit = isset($aargs['FloodWaitLimit']) ? $aargs['FloodWaitLimit'] : $this->settings['flood_timeout']['wait_if_lt'];
                             if (is_numeric($seconds) && $seconds < $limit) {
                                 $this->logger->logger('Flood, waiting ' . $seconds . ' seconds before repeating async call...', \danog\MadelineProto\Logger::NOTICE);
-                                Loop::delay($seconds*1000, [$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                Loop::delay($seconds * 1000, [$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
                                 return;
                             }
                         // no break
@@ -510,7 +528,9 @@ trait ResponseHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
-        if ($actual_updates) $updates = $actual_updates;
+        if ($actual_updates) {
+            $updates = $actual_updates;
+        }
 
         if ($this->postpone_updates) {
             $this->logger->logger('Postpone update handling', \danog\MadelineProto\Logger::VERBOSE);

@@ -558,8 +558,6 @@ trait AuthKeyHandler
                             $config = $this->method_call('help.getConfig', [], ['datacenter' => $id]);
                             $this->sync_authorization($id);
                             $this->get_config($config);
-
-                        //$this->method_call('auth.dropTempAuthKeys', ['except_auth_keys' => [$socket->temp_auth_key['id']]], ['datacenter' => $id]);
                         } elseif ($socket->temp_auth_key === null) {
                             $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
                             $socket->temp_auth_key = $this->create_auth_key($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);

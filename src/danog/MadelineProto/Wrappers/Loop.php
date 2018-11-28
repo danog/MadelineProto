@@ -45,39 +45,24 @@ trait Loop
             } catch (\danog\MadelineProto\Exception $e) {
                 register_shutdown_function(function () {
                     //$this->logger->logger(['Restarting script...']);
-                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
-                    fwrite($a, $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n");
+                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp') . '://' . $_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
+                    fwrite($a, $_SERVER['REQUEST_METHOD'] . ' ' . $_SERVER['REQUEST_URI'] . ' ' . $_SERVER['SERVER_PROTOCOL'] . "\r\n" . 'Host: ' . $_SERVER['SERVER_NAME'] . "\r\n\r\n");
                 });
             }
         }
         $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
         $offset = 0;
-        if ($max_forks === -1) {
-            while (true) {
-                $updates = $this->get_updates(['offset' => $offset]);
-                foreach ($updates as $update) {
-                    $offset = $update['update_id'] + 1;
-                    if (!pcntl_fork()) {
-                        $this->settings['updates']['callback']($update['update']);
-                        die;
-                    }
-                }
-                if ($this->loop_callback !== null) {
-                    $callback = $this->loop_callback;
-                    $callback();
-                }
+        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->startUpdateLoop();
+
+        while (true) {
+            $updates = $this->get_updates(['offset' => $offset]);
+            foreach ($updates as $update) {
+                $offset = $update['update_id'] + 1;
+                $this->settings['updates']['callback']($update['update']);
             }
-        } else {
-            while (true) {
-                $updates = $this->get_updates(['offset' => $offset]);
-                foreach ($updates as $update) {
-                    $offset = $update['update_id'] + 1;
-                    $this->settings['updates']['callback']($update['update']);
-                }
-                if ($this->loop_callback !== null) {
-                    $callback = $this->loop_callback;
-                    $callback();
-                }
+            if ($this->loop_callback !== null) {
+                $callback = $this->loop_callback;
+                $callback();
             }
         }
     }

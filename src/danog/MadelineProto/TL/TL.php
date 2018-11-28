@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\TL;
 
+use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
+
 trait TL
 {
     public $encrypted_layer = -1;
@@ -153,7 +155,7 @@ trait TL
             }
 
             if (empty($TL_dict) || empty($TL_dict['constructors']) || !isset($TL_dict['methods'])) {
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['src_file_invalid'].$file);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['src_file_invalid'] . $file);
             }
             $orig = $this->encrypted_layer;
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_obj'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
@@ -161,11 +163,11 @@ trait TL
                 if ($scheme_type === 'secret') {
                     $this->encrypted_layer = max($this->encrypted_layer, $elem['layer']);
                 }
-                $this->{($scheme_type === 'td' ? 'td_' : '').'constructors'}->add($elem, $scheme_type);
+                $this->{($scheme_type === 'td' ? 'td_' : '') . 'constructors'}->add($elem, $scheme_type);
             }
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_methods'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
-                $this->{($scheme_type === 'td' ? 'td_' : '').'methods'}->add($elem);
+                $this->{($scheme_type === 'td' ? 'td_' : '') . 'methods'}->add($elem);
                 if ($scheme_type === 'secret') {
                     $this->encrypted_layer = max($this->encrypted_layer, $elem['layer']);
                 }
@@ -288,12 +290,12 @@ trait TL
                 if ($l <= 253) {
                     $concat .= chr($l);
                     $concat .= $object;
-                    $concat .= pack('@'.$this->posmod(-$l - 1, 4));
+                    $concat .= pack('@' . $this->posmod(-$l - 1, 4));
                 } else {
                     $concat .= chr(254);
                     $concat .= substr($this->pack_signed_int($l), 0, 3);
                     $concat .= $object;
-                    $concat .= pack('@'.$this->posmod(-$l, 4));
+                    $concat .= pack('@' . $this->posmod(-$l, 4));
                 }
 
                 return $concat;
@@ -309,12 +311,12 @@ trait TL
                 if ($l <= 253) {
                     $concat .= chr($l);
                     $concat .= $object;
-                    $concat .= pack('@'.$this->posmod(-$l - 1, 4));
+                    $concat .= pack('@' . $this->posmod(-$l - 1, 4));
                 } else {
                     $concat .= chr(254);
                     $concat .= substr($this->pack_signed_int($l), 0, 3);
                     $concat .= $object;
-                    $concat .= pack('@'.$this->posmod(-$l, 4));
+                    $concat .= pack('@' . $this->posmod(-$l, 4));
                 }
 
                 return $concat;
@@ -329,7 +331,7 @@ trait TL
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['array_invalid']);
                 }
                 if (isset($object['_'])) {
-                    throw new Exception('You must provide an array of '.$type['subtype'].' objects, not a '.$type['subtype']." object. Example: [['_' => ".$type['subtype'].', ... ]]');
+                    throw new Exception('You must provide an array of ' . $type['subtype'] . ' objects, not a ' . $type['subtype'] . " object. Example: [['_' => " . $type['subtype'] . ', ... ]]');
                 }
                 $concat = $this->constructors->find_by_predicate('vector')['id'];
                 $concat .= $this->pack_unsigned_int(count($object));
@@ -354,20 +356,25 @@ trait TL
                 }
         }
         $auto = false;
+
         if ($type['type'] === 'InputMessage' && !is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];
-        }
-        if (in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer', 'InputDialogPeer', 'InputNotifyPeer']) && (!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
+        } else if (in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer', 'InputDialogPeer', 'InputNotifyPeer']) && (!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
             $object = $this->get_info($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
             }
             $object = $object[$type['type']];
-        }
-        if (in_array($type['type'], ['InputMedia', 'InputDocument', 'InputPhoto']) && (!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
+        } else if (in_array($type['type'], ['InputMedia', 'InputDocument', 'InputPhoto']) && (!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
             $object = $this->get_file_info($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception('Could not convert media object');
+            }
+            $object = $object[$type['type']];
+        } else if (isset($object['_']) && in_array($object['_'], ['inputDocument', 'inputPhoto', 'inputFileLocation', 'inputDocumentFileLocation'])) {
+            $object = $this->get_download_info($object);
+            if (!isset($object[$type['type']])) {
+                throw new \danog\MadelineProto\Exception('Could not convert dl media object');
             }
             $object = $object[$type['type']];
         }
@@ -400,7 +407,7 @@ trait TL
             $concat = $constructorData['id'];
         }
 
-        return $concat.$this->serialize_params($constructorData, $object, '', $layer);
+        return $concat . $this->serialize_params($constructorData, $object, '', $layer);
     }
 
     public function serialize_method($method, $arguments)
@@ -459,10 +466,10 @@ trait TL
 
         $tl = $this->methods->find_by_method($method);
         if ($tl === false) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'].$method);
+            throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'] . $method);
         }
 
-        return $tl['id'].$this->serialize_params($tl, $arguments, $method);
+        return $tl['id'] . $this->serialize_params($tl, $arguments, $method);
     }
 
     public function serialize_params($tl, $arguments, $ctx, $layer = -1)
@@ -498,7 +505,7 @@ trait TL
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= $this->serialize_object(['type' => 'bytes'], $this->random(15 + 4 * (random_int(0, PHP_INT_MAX) % 3)), 'random_bytes');
+                    $serialized .= $this->serialize_object(['type' => 'bytes'], $this->random(15 + 4 * $this->random_int($modulus = 3)), 'random_bytes');
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService']) && isset($arguments['message'])) {
@@ -538,11 +545,11 @@ trait TL
                     $serialized .= pack('@4');
                     continue;
                 }
-                if (($id = $this->constructors->find_by_predicate(lcfirst($current_argument['type']).'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
+                if (($id = $this->constructors->find_by_predicate(lcfirst($current_argument['type']) . 'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
                     $serialized .= $id['id'];
                     continue;
                 }
-                if (($id = $this->constructors->find_by_predicate('input'.$current_argument['type'].'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
+                if (($id = $this->constructors->find_by_predicate('input' . $current_argument['type'] . 'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
                     $serialized .= $id['id'];
                     continue;
                 }
@@ -637,7 +644,7 @@ trait TL
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['length_too_big']);
                 }
                 if ($l === 254) {
-                    $long_len = unpack('V', stream_get_contents($stream, 3).chr(0))[1];
+                    $long_len = unpack('V', stream_get_contents($stream, 3) . chr(0))[1];
                     $x = stream_get_contents($stream, $long_len);
                     $resto = $this->posmod(-$long_len, 4);
                     if ($resto > 0) {
@@ -660,7 +667,7 @@ trait TL
                 $constructorData = $this->constructors->find_by_id($id);
                 if ($constructorData === false) {
                     $constructorData = $this->methods->find_by_id($id);
-                    $constructorData['predicate'] = 'method_'.$constructorData['method'];
+                    $constructorData['predicate'] = 'method_' . $constructorData['method'];
                 }
                 if ($constructorData === false) {
                     throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
@@ -672,7 +679,7 @@ trait TL
                     case 'vector':
                         break;
                     default:
-                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['vector_invalid'].$constructorData['predicate']);
+                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['vector_invalid'] . $constructorData['predicate']);
                 }
             case 'vector':
                 $count = unpack('V', stream_get_contents($stream, 4))[1];
@@ -688,7 +695,7 @@ trait TL
             $checkType = substr($type['type'], 1);
             $constructorData = $this->constructors->find_by_type($checkType);
             if ($constructorData === false) {
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['constructor_not_found'].$checkType);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['constructor_not_found'] . $checkType);
             }
         } else {
             $constructorData = $this->constructors->find_by_predicate($type['type']);
@@ -700,7 +707,7 @@ trait TL
                     if ($constructorData === false) {
                         throw new Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
                     }
-                    $constructorData['predicate'] = 'method_'.$constructorData['method'];
+                    $constructorData['predicate'] = 'method_' . $constructorData['method'];
                 }
             }
         }
@@ -725,6 +732,9 @@ trait TL
             return false;
         }
         $x = ['_' => $constructorData['predicate']];
+        if (in_array($x['_'], array_keys(ReferenceDatabase::CONSTRUCTOR_CONTEXT))) {
+            $this->referenceDatabase->addOriginContext($x);
+        }
         foreach ($constructorData['params'] as $arg) {
             if (isset($arg['pow'])) {
                 switch ($arg['type']) {
@@ -752,8 +762,18 @@ trait TL
             if (in_array($arg['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'])) {
                 $arg['type'] = 'string';
             }
-            if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type']) && stripos($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type'], '<') !== false) {
-                $arg['subtype'] = str_replace(['Vector<', '>'], '', $this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type']);
+            if ($x['_'] === 'rpc_result' && $arg['name'] === 'result') {
+                if (isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'])
+                    && in_array($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'], array_keys(ReferenceDatabase::METHOD_CONTEXT))
+                ) {
+                    $this->referenceDatabase->addOriginMethodContext($$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['body']);
+                }
+
+                if (isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type'])
+                    && stripos($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type'], '<') !== false
+                ) {
+                    $arg['subtype'] = str_replace(['Vector<', '>'], '', $this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type']);
+                }
             }
             if (isset($type['datacenter'])) {
                 $arg['datacenter'] = $type['datacenter'];
@@ -780,6 +800,17 @@ trait TL
         if ($constructorData['type'] === 'User') {
             $this->add_user($x);
         }
+        if (in_array($x['_'], ['document', 'photo', 'fileLocation'])) {
+            $this->referenceDatabase->addReference($x);
+        } elseif (in_array($x['_'], array_keys(ReferenceDatabase::CONSTRUCTOR_CONTEXT))) {
+            $this->referenceDatabase->addOrigin($x);
+        } elseif ($x['_'] === 'rpc_result'
+            && isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'])
+            && in_array($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'], array_keys(ReferenceDatabase::METHOD_CONTEXT))
+        ) {
+            $this->referenceDatabase->addOrigin($$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['body'], $x);
+        }
+
         if ($x['_'] === 'message' && isset($x['reply_markup']['rows'])) {
             foreach ($x['reply_markup']['rows'] as $key => $row) {
                 foreach ($row['buttons'] as $bkey => $button) {

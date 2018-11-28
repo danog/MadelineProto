@@ -54,7 +54,7 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      *
      * @return Promise
      */
-    public function disconnect(): Promise
+    public function disconnect()
     {
         return $this->stream->disconnect();
     }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Generic stream helper trait.
+ * Loop helper trait.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -18,21 +18,46 @@
 
 namespace danog\MadelineProto\Stream\Async;
 
-use Amp\Promise;
-use danog\MadelineProto\Stream\ConnectionContext;
-use function Amp\call;
+use danog\MadelineProto\Logger;
+use function Amp\asyncCall;
 
 /**
- * Generic stream helper trait.
+ * Loop helper trait.
  *
  * Wraps the asynchronous generator methods with asynchronous promise-based methods
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-trait Stream
+trait Loop
 {
-    public function connect(ConnectionContext $ctx): Promise
+    private $count = 0;
+
+    protected $API;
+    protected $connection;
+    protected $datacenter;
+
+    public function __construct($API, $datacenter)
     {
-        return call([$this, 'connectAsync'], $ctx);
+        $this->API = $API;
+        $this->datacenter = $datacenter;
+        $this->connection = $API->datacenter->sockets[$datacenter];
+    }
+
+    public function start()
+    {
+        if ($this->count) {
+            $this->API->logger->logger("NOT entering check loop in DC {$this->datacenter} with running count {$this->count}", Logger::ERROR);
+            return false;
+        }
+        asyncCall([$this, 'loop']);
+        return true;
+    }
+    public function exitedLoop()
+    {
+        $this->count--;
+    }
+    public function startedLoop()
+    {
+        $this->count++;
     }
 }

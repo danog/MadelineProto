@@ -40,5 +40,5 @@ interface StreamInterface
      *
      * @return Promise
      */
-    public function disconnect(): Promise;
+    public function disconnect();
 }

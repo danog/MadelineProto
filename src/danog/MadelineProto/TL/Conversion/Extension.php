@@ -22,7 +22,7 @@ trait Extension
     public function get_extension_from_mime($mime)
     {
         foreach (self::ALL_MIMES as $key => $value) {
-            if (array_search($mime, (array) $value) !== false) {
+            if (array_search($mime, $value) !== false) {
                 return '.'.$key;
             }
         }
@@ -30,6 +30,24 @@ trait Extension
         return '';
     }
 
+    public function get_mime_from_extension($extension, $default)
+    {
+        $ext = ltrim($extension, '.');
+        if (isset(self::ALL_MIMES[$ext])) {
+            return self::ALL_MIMES[$ext][0];
+        }
+        return $default;
+    }
+    public function get_mime_from_file($file)
+    {
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        return $finfo->file($file);
+    }
+    public function get_mime_from_buffer($buffer)
+    {
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        return $finfo->buffer($buffer);
+    }
     public function get_extension_from_location($location, $default)
     {
         return $default;

@@ -63,7 +63,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
         } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
         $random[56] = $random[57] = $random[58] = $random[59] = chr(0xef);
 
-        $random = substr_replace(pack('s', $ctx->getDc()), 60, 2);
+        $random = substr_replace(pack('s', $ctx->getIntDc()), 60, 2);
 
         $reversed = strrev(substr($random, 8, 48));
 
@@ -94,7 +94,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
      *
      * @return Promise
      */
-    public function disconnect(): Promise
+    public function disconnect()
     {
         return $this->stream->disconnect();
     }

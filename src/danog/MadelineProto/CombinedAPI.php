@@ -219,6 +219,7 @@ class CombinedAPI
             }
             if (!$instance->API->settings['updates']['handle_updates']) {
                 $instance->API->settings['updates']['handle_updates'] = true;
+                $instance->API->datacenter->sockets[$instance->API->settings['connection_settings']['default_dc']]->updater->start();
             }
             ksort($instance->API->updates);
             foreach ($instance->API->updates as $key => $value) {

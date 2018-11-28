@@ -41,6 +41,12 @@ class ConnectionContext
      */
     private $secure = false;
     /**
+     * Whether to use test servers
+     *
+     * @var bool
+     */
+    private $test = false;
+    /**
      * The connection URI.
      *
      * @var \Amp\Uri\Uri
@@ -172,6 +178,30 @@ class ConnectionContext
      *
      * @return self
      */
+    public function setTest(bool $test): self
+    {
+        $this->test = $test;
+
+        return $this;
+    }
+
+    /**
+     * Whether to use TLS with socket connections.
+     *
+     * @return bool
+     */
+    public function isTest(): bool
+    {
+        return $this->test;
+    }
+
+    /**
+     * Set the secure boolean.
+     *
+     * @param bool $secure
+     *
+     * @return self
+     */
     public function secure(bool $secure): self
     {
         $this->secure = $secure;
@@ -211,6 +241,22 @@ class ConnectionContext
     public function getDc()
     {
         return $this->dc;
+    }
+    /**
+     * Get the int DC ID.
+     *
+     * @return string|int
+     */
+    public function getIntDc()
+    {
+        $dc = intval($this->dc);
+        if ($this->test) {
+            $dc += 10000;
+        }
+        if (strpos($this->dc, '_media')) {
+            $dc = -$dc;
+        }
+        return $dc;
     }
 
     /**

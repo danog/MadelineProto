@@ -61,7 +61,7 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
         } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
         $random[56] = $random[57] = $random[58] = $random[59] = chr(0xef);
 
-        list($a, $b) = str_split(pack('s', intval($ctx->getDc())));
+        list($a, $b) = str_split(pack('s', $ctx->getIntDc()));
         $random[60] = $a;
         $random[61] = $b;
 
@@ -95,7 +95,7 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
      *
      * @return Promise
      */
-    public function disconnect(): Promise
+    public function disconnect()
     {
         return parent::disconnect();
     }

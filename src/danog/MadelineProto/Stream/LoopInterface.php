@@ -1,6 +1,6 @@
 <?php
 /**
- * Generic stream helper trait.
+ * Loop interface.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -16,23 +16,29 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\Async;
+namespace danog\MadelineProto\Stream;
 
-use Amp\Promise;
-use danog\MadelineProto\Stream\ConnectionContext;
-use function Amp\call;
+use danog\MadelineProto\MTProto;
+
 
 /**
- * Generic stream helper trait.
- *
- * Wraps the asynchronous generator methods with asynchronous promise-based methods
+ * Loop interface
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-trait Stream
+interface LoopInterface
 {
-    public function connect(ConnectionContext $ctx): Promise
-    {
-        return call([$this, 'connectAsync'], $ctx);
-    }
+    /**
+     * Start the loop
+     *
+     * @return void
+     */
+    public function start();
+
+    /**
+     * The actual loop
+     *
+     * @return void
+     */
+    public function loop(): \Generator;
 }

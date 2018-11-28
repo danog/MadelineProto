@@ -1,6 +1,6 @@
 <?php
 /**
- * Generic stream helper trait.
+ * Resumable loop interface.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -16,23 +16,30 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\Async;
+namespace danog\MadelineProto\Stream;
 
-use Amp\Promise;
-use danog\MadelineProto\Stream\ConnectionContext;
-use function Amp\call;
+use \Amp\Promise;
 
 /**
- * Generic stream helper trait.
- *
- * Wraps the asynchronous generator methods with asynchronous promise-based methods
+ * Resumable loop interface
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-trait Stream
+interface ResumableLoopInterface extends LoopInterface
 {
-    public function connect(ConnectionContext $ctx): Promise
-    {
-        return call([$this, 'connectAsync'], $ctx);
-    }
+    /**
+     * Pause the loop
+     *
+     * @param int $time For how long to pause the loop
+     * 
+     * @return Promise
+     */
+    public function pause($time = null): Promise;
+
+    /**
+     * Resume the loop
+     *
+     * @return void
+     */
+    public function resume();
 }

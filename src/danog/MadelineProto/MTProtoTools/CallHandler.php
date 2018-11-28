@@ -342,13 +342,14 @@ trait CallHandler
             }
         }
         if (!$postpone) {
-            $this->datacenter->sockets[$new_datacenter]->resumeWriteLoop();
+            $this->datacenter->sockets[$new_datacenter]->writer->resume();
         }
     }
 
     public function method_call($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
-        return $this->wait($this->method_call_async_read($method, $args, $aargs));
+        $promise = $this->method_call_async_read($method, $args, $aargs);
+        return $this->wait($promise);
     }
 
     public function method_call_async_read($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
@@ -405,7 +406,7 @@ trait CallHandler
                 }
 
                 if (!isset($aargs['postpone'])) {
-                    $this->datacenter->sockets[$aargs['datacenter']]->resumeWriteLoop();
+                    $this->datacenter->sockets[$aargs['datacenter']]->writer->resume();
                 }
 
                 return yield $promises;
@@ -419,17 +420,12 @@ trait CallHandler
         $deferred = new Deferred();
         $message = ['_' => $method, 'type' => $this->methods->find_by_method($method)['type'], 'content_related' => $this->content_related($method), 'promise' => $deferred, 'method' => true, 'unencrypted' => $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key === null];
 
-        if (isset($aargs['serialized'])) {
-            $message['body'] = $aargs['serialized'];
-        } elseif (is_object($args) && $args instanceof Parameters) {
-            $message['body'] = call(
-                function () use ($method, $args): \Generator {
-                    return $this->serialize_method($method, $this->botAPI_to_MTProto(yield $args->fetchParameters()));
-                }
-            );
+        if (is_object($args) && $args instanceof Parameters) {
+            $message['body'] = call([$args, 'fetchParameters']);
         } else {
-            $message['body'] = $this->serialize_method($method, $args);
+            $message['body'] = $args;
         }
+
         if (isset($aargs['msg_id'])) {
             $message['msg_id'] = $aargs['msg_id'];
         }
@@ -445,19 +441,20 @@ trait CallHandler
 
         $write_deferred = yield $this->datacenter->sockets[$aargs['datacenter']]->sendMessage($message, isset($aargs['postpone']) ? !$aargs['postpone'] : true);
 
-        $this->datacenter->sockets[$aargs['datacenter']]->startPendingCallsCheck();
-        
         $deferred = new Deferred;
         $write_promise = $write_deferred->promise();
         $write_promise->onResolve(
             function ($e, $result) use ($aargs, $deferred) {
-                $this->datacenter->sockets[$aargs['datacenter']]->startPendingCallsCheck();
+                //$this->datacenter->sockets[$aargs['datacenter']]->checker->resume();
                 if ($e) {
                     return $deferred->fail($e);
                 }
                 $deferred->resolve($result);
             }
         );
+
+        $this->datacenter->sockets[$aargs['datacenter']]->checker->resume();
+
         return $deferred;
     }
 
@@ -467,11 +464,11 @@ trait CallHandler
     }
     public function object_call_async($object, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
     {
-        $message = ['_' => $object, 'body' => $this->serialize_object(['type' => $object], $args, $object), 'content_related' => $this->content_related($object), 'unencrypted' => $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key === null];
+        $message = ['_' => $object, 'body' => $args, 'content_related' => $this->content_related($object), 'unencrypted' => $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key === null, 'method' => false];
         if (isset($aargs['promise'])) {
             $message['promise'] = $aargs['promise'];
         }
-        return $this->datacenter->sockets[$aargs['datacenter']]->sendMessage($message, false);
+        return $this->datacenter->sockets[$aargs['datacenter']]->sendMessage($message, isset($aargs['postpone']) ? !$aargs['postpone'] : true);
     }
 
     /*

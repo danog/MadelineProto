@@ -46,6 +46,8 @@ trait Events
         $this->settings['updates']['callback'] = [$this, 'event_update_handler'];
         $this->settings['updates']['handle_updates'] = true;
         $this->settings['updates']['run_callback'] = true;
+        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
+
     }
 
     public function getEventHandler()

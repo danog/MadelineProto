@@ -56,7 +56,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return Promise
      */
-    public function disconnect(): Promise
+    public function disconnect()
     {
         return $this->stream->disconnect();
     }

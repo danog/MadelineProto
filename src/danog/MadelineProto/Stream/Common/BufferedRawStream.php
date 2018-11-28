@@ -86,15 +86,21 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      *
      * @return Generator
      */
-    public function disconnectAsync(): \Generator
+    public function disconnect()
     {
         try {
-            yield $this->sock->end();
-            $this->sock = null;
-            fclose($this->memory_stream);
-            $this->memory_stream = null;
+            if ($this->sock) {
+                $this->sock->close();
+                $this->sock = null;
+            }
+            if ($this->memory_stream) {
+                fclose($this->memory_stream);
+                $this->memory_stream = null;
+            }
         } catch (\Throwable $e) {
-            \danog\MadelineProto\Logger::log("Got exception while closing stream: $e");
+            \danog\MadelineProto\Logger::log("Got exception while closing stream: ".$e->getMessage());
+        } catch (\Exception $e) {
+            \danog\MadelineProto\Logger::log("Got exception while closing stream: ".$e->getMessage());
         }
     }
 
@@ -170,7 +176,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
         while ($buffer_length < $length) {
             $chunk = yield $this->read();
             if ($chunk === null) {
-                yield $this->disconnect();
+                $this->disconnect();
 
                 throw new \danog\MadelineProto\NothingInTheSocketException();
             }

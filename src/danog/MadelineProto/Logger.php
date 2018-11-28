@@ -93,6 +93,15 @@ class Logger
 
         if ($this->mode === 3) {
             $this->stdout = new ResourceOutputStream(STDOUT);
+        } else if ($this->mode === 2) {
+            $this->stdout = new ResourceOutputStream(fopen($this->optional, 'a+'));
+        } else if ($this->mode === 1) {
+            $result = @ini_get('error_log');
+            if ($result === 'syslog') {
+                $this->stdout = new ResourceOutputStream(STDERR);
+            } else if ($result) {
+                $this->stdout = new ResourceOutputStream(fopen($result, 'a+'));
+            }
         }
     }
 
@@ -138,10 +147,7 @@ class Logger
         $param = str_pad($file.$prefix.': ', 16 + strlen($prefix))."\t".$param;
         switch ($this->mode) {
                 case 1:
-                    error_log($param);
-                    break;
-                case 2:
-                    error_log($param.PHP_EOL, 3, $this->optional);
+                    $this->stdout->write($param.PHP_EOL);
                     break;
                 case 3:
                     $this->stdout->write(Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".PHP_EOL : $param.PHP_EOL);

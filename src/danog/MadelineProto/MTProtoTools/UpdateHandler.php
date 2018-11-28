@@ -58,6 +58,7 @@ trait UpdateHandler
     {
         if (!$this->settings['updates']['handle_updates']) {
             $this->settings['updates']['handle_updates'] = true;
+            $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
         }
         if (!$this->settings['updates']['run_callback']) {
             $this->settings['updates']['run_callback'] = true;
@@ -69,7 +70,6 @@ trait UpdateHandler
         });
         $time = microtime(true);
 
-        $this->iorun();
 
         $params = array_merge(self::DEFAULT_GETUPDATES_PARAMS, $params);
         $params['timeout'] = (int) ($params['timeout'] * 1000000 - (microtime(true) - $time));
@@ -286,6 +286,8 @@ trait UpdateHandler
         $this->postpone_updates = true;
         $this->updates_state['sync_loading'] = true;
         $this->last_getdifference = time();
+        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->resume();
+
 
         try {
             switch ($difference['_']) {

@@ -21,14 +21,13 @@ namespace danog\MadelineProto\Stream\Transport;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Stream\Async\BufferedStream;
-use danog\MadelineProto\Stream\BufferedStreamInterface;
-use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\MTProtoBufferInterface;
-use danog\MadelineProto\Tools;
-use danog\MadelineProto\Stream\RawStreamInterface;
-use function Amp\Websocket\connect;
-use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\Async\RawStream;
+use danog\MadelineProto\Stream\BufferedStreamInterface;
+use danog\MadelineProto\Stream\BufferInterface;
+use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\RawStreamInterface;
+use danog\MadelineProto\Tools;
+use function Amp\Websocket\connect;
 
 /**
  * Websocket stream wrapper.
@@ -59,16 +58,18 @@ class WsStream implements BufferedStreamInterface, RawStreamInterface, BufferInt
     }
     /**
      * Async close.
-     *
-     * @return Promise
      */
-    public function disconnectAsync(): \Generator
+    public function disconnect()
     {
         try {
-            yield $this->sock->close();
-            $this->sock = null;
-            fclose($this->memory_stream);
-            $this->memory_stream = null;
+            if ($this->sock) {
+                $this->sock->close();
+                $this->sock = null;
+            }
+            if ($this->memory_stream) {
+                fclose($this->memory_stream);
+                $this->memory_stream = null;
+            }
         } catch (\Throwable $e) {
             \danog\MadelineProto\Logger::log("Got exception while closing stream: $e");
         }
@@ -143,7 +144,10 @@ class WsStream implements BufferedStreamInterface, RawStreamInterface, BufferInt
         $size = fstat($this->memory_stream)['size'];
         $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
-        if ($buffer_length < $length && $buffer_length) fseek($this->memory_stream, $offset+$buffer_length);
+        if ($buffer_length < $length && $buffer_length) {
+            fseek($this->memory_stream, $offset + $buffer_length);
+        }
+
         while ($buffer_length < $length) {
             $chunk = yield $this->read();
             if ($chunk === null) {
@@ -158,7 +162,6 @@ class WsStream implements BufferedStreamInterface, RawStreamInterface, BufferInt
 
         return fread($this->memory_stream, $length);
     }
-
 
     public function bufferWrite(string $data): Promise
     {

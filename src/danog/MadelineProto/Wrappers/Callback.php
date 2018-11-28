@@ -29,5 +29,7 @@ trait Callback
         $this->settings['updates']['callback'] = $callback;
         $this->settings['updates']['run_callback'] = true;
         $this->settings['updates']['handle_updates'] = true;
+
+        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
     }
 }

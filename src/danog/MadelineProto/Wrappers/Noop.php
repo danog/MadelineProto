@@ -26,6 +26,7 @@ trait Noop
         $this->settings['updates']['callback'] = [$this, 'noop'];
         $this->settings['updates']['run_callback'] = false;
         $this->settings['updates']['handle_updates'] = true;
+        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
     }
 
     public function noop()

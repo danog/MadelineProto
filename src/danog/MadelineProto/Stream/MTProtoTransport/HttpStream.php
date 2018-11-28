@@ -63,7 +63,7 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return Promise
      */
-    public function disconnect(): Promise
+    public function disconnect()
     {
         return $this->stream->disconnect();
     }
@@ -138,7 +138,7 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
             }
 
             if ($close) {
-                yield $this->disconnect();
+                $this->disconnect();
                 yield $this->connect($this->ctx);
             }
 

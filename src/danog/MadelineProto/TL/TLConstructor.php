@@ -28,10 +28,6 @@ class TLConstructor
     public $by_predicate_and_layer = [];
     public $layers = [];
 
-    //public $type = [];
-    //public $params = [];
-    //public $layer = [];
-    //public $key = 0;
     public function __sleep()
     {
         return ['by_predicate_and_layer', 'by_id', 'layers'];
