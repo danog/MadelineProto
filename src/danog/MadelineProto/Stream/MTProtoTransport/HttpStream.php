@@ -25,19 +25,21 @@ use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 
 /**
  * HTTP stream wrapper.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
+class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
 {
     use BufferedStream;
     use Tools;
     private $stream;
     private $code;
     private $ctx;
+    private $headers = '';
     /**
      * URI of the HTTP API.
      *
@@ -59,6 +61,18 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
         $this->uri = $ctx->getUri();
     }
     /**
+     * Set proxy data
+     *
+     * @param array $extra Proxy parameters
+     * @return void
+     */
+    public function setExtra(array $extra) 
+    {
+        if (isset($extra['user']) && isset($extra['password'])) {
+            $this->header = \base64_encode($extra['user'].':'.$extra['password'])."\r\n";
+        }
+    }
+    /**
      * Async close.
      *
      * @return Promise
@@ -77,7 +91,7 @@ class HttpStream implements BufferedStreamInterface, MTProtoBufferInterface
      */
     public function getWriteBufferAsync(int $length): \Generator
     {
-        $headers = 'POST '.$this->uri->getPath()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length."\r\n\r\n";
+        $headers = 'POST '.$this->uri->getPath()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length.$this->header."\r\n\r\n";
         $buffer = yield $this->stream->getWriteBuffer(strlen($headers) + $length);
         yield $buffer->bufferWrite($headers);
 

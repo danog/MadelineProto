@@ -23,7 +23,7 @@ if (!file_exists(__DIR__.'/vendor/autoload.php')) {
 }
 
 if (!file_exists('songs.php')) {
-
+    copy('https://github.com/danog/MadelineProto/raw/master/songs.php', 'songs.php');
 }
 
 echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;

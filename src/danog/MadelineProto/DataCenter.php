@@ -134,10 +134,10 @@ class DataCenter
                 $default = [[DefaultStream::getName(), []], [HttpsStream::getName(), []]];
                 break;
             case 'ws':
-                $default = [[WsStream::getName(), []], [AbridgedStream::getName(), []]];
+                $default = [[WsStream::getName(), []], [FullStream::getName(), []]];
                 break;
             case 'wss':
-                $default = [[WssStream::getName(), []], [AbridgedStream::getName(), []]];
+                $default = [[WssStream::getName(), []], [FullStream::getName(), []]];
                 break;
             case 'obfuscated2':
                 $default = [[ObfuscatedTransportStream::getName()]];
@@ -240,7 +240,14 @@ class DataCenter
 
                         $uri = 'wss://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
                     } elseif ($start_stream === WsStream::getName()) {
-                        $uri = 'ws://' . $address . ':' . $port . '/apiws';
+                        $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
+                        if (strpos($dc_number, '_media') !== false) {
+                            $subdomain .= '-1';
+                        }
+                        $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
+
+                        $uri = 'ws://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
+                        //$uri = 'ws://' . $address . ':' . $port . '/apiws';
                     }
 
                     /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */

@@ -172,3 +172,4 @@ class WsStream implements BufferedStreamInterface, RawStreamInterface, BufferInt
         return __CLASS__;
     }
 }
+
