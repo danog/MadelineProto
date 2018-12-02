@@ -16,19 +16,18 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\Async;
+namespace danog\MadelineProto\Loop\Impl;
 
-use Amp\Loop;
-use Amp\Success;
 use Amp\Deferred;
 use Amp\Promise;
+use danog\MadelineProto\Loop\SignalLoopInterface;
 
 /**
  * Signal loop helper trait.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-trait SignalLoop
+abstract class SignalLoop extends Loop implements SignalLoopInterface
 {
     private $signalDeferred;
 

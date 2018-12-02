@@ -16,30 +16,23 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\Loop;
+namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\Promise;
 use Amp\Success;
 use Amp\Deferred;
 use function Amp\call;
 use function Amp\asyncCall;
-use danog\MadelineProto\Stream\Async\Loop;
-use danog\MadelineProto\Stream\Async\ResumableLoop;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Stream\ResumableLoopInterface;
-use danog\MadelineProto\Stream\SignalLoopInterface;
-use danog\MadelineProto\Stream\Async\SignalLoop;
+use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 
 /**
  * Update loop
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class UpdateLoop implements ResumableLoopInterface, SignalLoopInterface
+class UpdateLoop extends ResumableSignalLoop
 {
-    use Loop;
-    use ResumableLoop;
-    use SignalLoop;
     public function loop(): \Generator
     {
         $API = $this->API;

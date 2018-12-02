@@ -16,28 +16,21 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\Loop;
+namespace danog\MadelineProto\Loop\Connection;
 
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
-use danog\MadelineProto\Stream\ResumableLoopInterface;
-use danog\MadelineProto\Stream\Async\ResumableLoop;
-use danog\MadelineProto\Stream\Async\Loop;
 use danog\MadelineProto\Logger;
 use Amp\Success;
-use danog\MadelineProto\Stream\SignalLoopInterface;
-use danog\MadelineProto\Stream\Async\SignalLoop;
+use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 
 /**
  * HttpWait loop
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class HttpWaitLoop implements ResumableLoopInterface, SignalLoopInterface
+class HttpWaitLoop extends ResumableSignalLoop
 {
-    use Loop;
-    use ResumableLoop;
-    use SignalLoop;
     public function loop(): \Generator
     {
         $API = $this->API;

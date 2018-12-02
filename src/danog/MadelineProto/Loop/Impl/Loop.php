@@ -16,10 +16,11 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\Async;
+namespace danog\MadelineProto\Loop\Impl;
 
 use danog\MadelineProto\Logger;
 use function Amp\asyncCall;
+use danog\MadelineProto\Loop\LoopInterface;
 
 /**
  * Loop helper trait.
@@ -28,7 +29,7 @@ use function Amp\asyncCall;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-trait Loop
+abstract class Loop implements LoopInterface
 {
     private $count = 0;
 

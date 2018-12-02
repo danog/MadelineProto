@@ -16,19 +16,20 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\Async;
+namespace danog\MadelineProto\Loop\Impl;
 
 use Amp\Loop;
 use Amp\Success;
 use Amp\Deferred;
 use Amp\Promise;
+use danog\MadelineProto\Loop\ResumableLoopInterface;
 
 /**
- * Resumable loop helper trait.
+ * Resumable signal loop helper trait.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-trait ResumableLoop
+abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopInterface
 {
     private $resume;
     private $resumeWatcher;

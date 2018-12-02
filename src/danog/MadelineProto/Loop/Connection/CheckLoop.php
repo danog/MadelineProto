@@ -16,29 +16,21 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\Loop;
+namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\Deferred;
 use Amp\Success;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Stream\Async\Loop;
-use danog\MadelineProto\Stream\Async\ResumableLoop;
-use danog\MadelineProto\Stream\ResumableLoopInterface;
 use function Amp\call;
-use danog\MadelineProto\Stream\SignalLoopInterface;
-use danog\MadelineProto\Stream\Async\SignalLoop;
+use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 
 /**
  * RPC call status check loop
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class CheckLoop implements ResumableLoopInterface, SignalLoopInterface
+class CheckLoop extends ResumableSignalLoop
 {
-    use Loop;
-    use ResumableLoop;
-    use SignalLoop;
-
     public function hasPendingCalls()
     {
         $API = $this->API;

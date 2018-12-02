@@ -16,32 +16,27 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\Loop;
+namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\Success;
 use Amp\Deferred;
 use Amp\Promise;
 use danog\MadelineProto\NothingInTheSocketException;
 use function Amp\call;
-use danog\MadelineProto\Stream\LoopInterface;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\MTProtoTools\Crypt;
-use danog\MadelineProto\Stream\Async\Loop;
 use danog\MadelineProto\Logger;
 use function Amp\Promise\timeout;
 use Amp\TimeoutException;
-use danog\MadelineProto\Stream\Async\SignalLoop;
-use danog\MadelineProto\Stream\SignalLoopInterface;
+use danog\MadelineProto\Loop\Impl\SignalLoop;
 
 /**
  * Socket read loop
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class ReadLoop implements LoopInterface, SignalLoopInterface
+class ReadLoop extends SignalLoop
 {
-    use SignalLoop;
-    use Loop;
     use Tools;
     use Crypt;
 

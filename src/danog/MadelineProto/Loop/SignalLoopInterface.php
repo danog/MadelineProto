@@ -16,7 +16,7 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream;
+namespace danog\MadelineProto\Loop;
 
 use \Amp\Promise;
 

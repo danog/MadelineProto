@@ -1,6 +1,6 @@
 <?php
 /**
- * Loop interface.
+ * Resumable loop interface.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -16,29 +16,30 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream;
+namespace danog\MadelineProto\Loop;
 
-use danog\MadelineProto\MTProto;
-
+use \Amp\Promise;
 
 /**
- * Loop interface
+ * Resumable loop interface
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-interface LoopInterface
+interface ResumableLoopInterface extends LoopInterface
 {
     /**
-     * Start the loop
+     * Pause the loop
      *
-     * @return void
+     * @param int $time For how long to pause the loop
+     * 
+     * @return Promise
      */
-    public function start();
+    public function pause($time = null): Promise;
 
     /**
-     * The actual loop
+     * Resume the loop
      *
      * @return void
      */
-    public function loop(): \Generator;
+    public function resume();
 }

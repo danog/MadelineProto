@@ -66,7 +66,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      * @param array $extra Proxy parameters
      * @return void
      */
-    public function setExtra(array $extra) 
+    public function setExtra($extra) 
     {
         if (isset($extra['user']) && isset($extra['password'])) {
             $this->header = \base64_encode($extra['user'].':'.$extra['password'])."\r\n";

@@ -16,30 +16,23 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\Loop;
+namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\Coroutine;
 use Amp\Success;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\Crypt;
-use danog\MadelineProto\Stream\Async\Loop;
-use danog\MadelineProto\Stream\Async\ResumableLoop;
-use danog\MadelineProto\Stream\Async\SignalLoop;
-use danog\MadelineProto\Stream\ResumableLoopInterface;
-use danog\MadelineProto\Stream\SignalLoopInterface;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 
 /**
  * Socket write loop
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class WriteLoop implements ResumableLoopInterface, SignalLoopInterface
+class WriteLoop extends ResumableSignalLoop
 {
-    use Loop;
-    use ResumableLoop;
-    use SignalLoop;
     use Crypt;
     use Tools;
 
