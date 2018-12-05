@@ -193,8 +193,9 @@ class MyTelegramOrgWrapper
         $cose = explode('<label for="app_hash" class="col-md-4 text-right control-label">App api_hash:</label>
       <div class="col-md-7">
         <span class="form-control input-xlarge uneditable-input" onclick="this.select();">', $result);
-        $asd = explode('</span>', $cose['1']);
-        $api_hash = $asd['0'];
+        $asd = explode('</span>', $cose[1]);
+        $api_hash = $asd[0];
+
 
         return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
     }
