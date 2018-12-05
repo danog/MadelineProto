@@ -152,7 +152,7 @@ trait Files
                     throw new \danog\MadelineProto\Exception('No access hash');
                 }
                 $res['Photo'] = $media['photo'];
-                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['photo']['id'], 'access_hash' => $media['photo']['access_hash'], 'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $media['photo'])];
+                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['photo']['id'], 'access_hash' => $media['photo']['access_hash'], 'file_reference' => $this->wait($this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $media['photo']))];
                 $res['InputMedia'] = ['_' => 'inputMediaPhoto', 'id' => $res['InputPhoto']];
                 if (isset($media['ttl_seconds'])) {
                     $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
@@ -163,7 +163,7 @@ trait Files
                     throw new \danog\MadelineProto\Exception('No access hash');
                 }
                 $res['Document'] = $media['document'];
-                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['document']['id'], 'access_hash' => $media['document']['access_hash'], 'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $media['document'])];
+                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['document']['id'], 'access_hash' => $media['document']['access_hash'], 'file_reference' => $this->wait($this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $media['document']))];
                 $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
                 if (isset($media['ttl_seconds'])) {
                     $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
@@ -173,7 +173,7 @@ trait Files
                 if (!isset($media['access_hash'])) {
                     throw new \danog\MadelineProto\Exception('No access hash');
                 }
-                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['id'], 'access_hash' => $media['access_hash'], 'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $media)];
+                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['id'], 'access_hash' => $media['access_hash'], 'file_reference' => $this->wait($this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $media))];
                 $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
                 $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $media];
                 break;
@@ -181,7 +181,7 @@ trait Files
                 if (!isset($media['access_hash'])) {
                     throw new \danog\MadelineProto\Exception('No access hash');
                 }
-                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['id'], 'access_hash' => $media['access_hash'], $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $media)];
+                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['id'], 'access_hash' => $media['access_hash'], $this->wait($this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $media))];
                 $res['InputMedia'] = ['_' => 'inputMediaPhoto', 'id' => $res['InputPhoto']];
                 $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $media];
                 break;
@@ -322,7 +322,7 @@ trait Files
                 throw new \danog\MadelineProto\Exception('File location unavailable');
             case 'fileLocation':
                 $res['name'] = $message_media['volume_id'] . '_' . $message_media['local_id'];
-                $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['volume_id'], 'local_id' => $message_media['local_id'], 'secret' => $message_media['secret'], 'dc_id' => $message_media['dc_id'], 'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION_LOCATION, $message_media)];
+                $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['volume_id'], 'local_id' => $message_media['local_id'], 'secret' => $message_media['secret'], 'dc_id' => $message_media['dc_id'], 'file_reference' => $this->wait($this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION_LOCATION, $message_media))];
                 $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], '.jpg');
                 $res['mime'] = $this->get_mime_from_extension($res['ext']);
                 return $res;
@@ -354,7 +354,7 @@ trait Files
                         $res['name'] .= ' - ' . $audio['performer'];
                     }
                 }
-                $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => isset($message_media['document']['version']) ? $message_media['document']['version'] : 0, 'dc_id' => $message_media['document']['dc_id'], 'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION_LOCATION, $message_media['document'])];
+                $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => isset($message_media['document']['version']) ? $message_media['document']['version'] : 0, 'dc_id' => $message_media['document']['dc_id'], 'file_reference' => $this->wait($this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION_LOCATION, $message_media['document']))];
                 if (!isset($res['ext'])) {
                     $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime($message_media['document']['mime_type']));
                 }

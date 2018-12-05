@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Exception module.
+ * TL callback module.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,18 +18,15 @@
 
 namespace danog\MadelineProto\TL;
 
-class Exception extends \Exception
+interface TLCallback
 {
-    use PrettyException;
-
-    public function __toString()
-    {
-        return get_class($this).($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.\danog\MadelineProto\Magic::$revision.PHP_EOL.'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
-    }
-
-    public function __construct($message, $file = '')
-    {
-        parent::__construct($message);
-        $this->prettify_tl($file);
-    }
+    const METHOD_CALLBACK = 0;
+    const METHOD_BEFORE_CALLBACK = 1;
+    const CONSTRUCTOR_CALLBACK = 2;
+    const CONSTRUCTOR_BEFORE_CALLBACK = 3;
+    
+    public function getMethodCallbacks(): array;
+    public function getMethodBeforeCallbacks(): array;
+    public function getConstructorCallbacks(): array;
+    public function getConstructorBeforeCallbacks(): array;
 }

@@ -29,10 +29,12 @@ trait TL
     public $td_constructors;
     public $td_methods;
     public $td_descriptions;
+    public $tl_callbacks = [];
 
-    public function construct_tl($files)
+    public function construct_tl($files, $objects)
     {
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_loading'], \danog\MadelineProto\Logger::VERBOSE);
+        $this->update_callbacks($objects);
         $this->constructors = new TLConstructor();
         $this->methods = new TLMethod();
         $this->td_constructors = new TLConstructor();
@@ -215,7 +217,29 @@ trait TL
     {
         return $this->methods->method_namespace;
     }
-
+    public function update_callbacks($objects)
+    {
+        $this->tl_callbacks = [];
+        foreach ($objects as $object) {
+            if (!isset(class_implements(get_class($object))['danog\\MadelineProto\\TL\\TLCallback'])) {
+                throw new Exception('Invalid callback object provided!');
+            }
+            $new = [
+                TLCallback::METHOD_BEFORE_CALLBACK => $object->getMethodBeforeCallbacks(),
+                TLCallback::METHOD_CALLBACK => $object->getMethodBeforeCallbacks(),
+                TLCallback::CONSTRUCTOR_BEFORE_CALLBACK => $object->getConstructorBeforeCallbacks(),
+                TLCallback::CONSTRUCTOR_CALLBACK => $object->getConstructorCallbacks(),
+            ];
+            foreach ($new as $type => $values) {
+                foreach ($values as $match => $callback) {
+                    if (!isset($this->tl_callbacks[$type][$match])) {
+                        $this->tl_callbacks[$type][$match] = [];
+                    }
+                    $this->tl_callbacks[$type][$match][] = $callback;
+                }
+            }
+        }
+    }
     public function deserialize_bool($id)
     {
         $tl_elem = $this->constructors->find_by_id($id);
@@ -732,8 +756,8 @@ trait TL
             return false;
         }
         $x = ['_' => $constructorData['predicate']];
-        if (in_array($x['_'], array_keys(ReferenceDatabase::CONSTRUCTOR_CONTEXT))) {
-            $this->referenceDatabase->addOriginContext($x);
+        if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_BEFORE_CALLBACK][$x['_']])) {
+            foreach ($this->tl_callbacks[TLCallback::CONSTRUCTOR_BEFORE_CALLBACK][$x['_']] as $callback) { $callback($x['_']); }
         }
         foreach ($constructorData['params'] as $arg) {
             if (isset($arg['pow'])) {
@@ -764,9 +788,9 @@ trait TL
             }
             if ($x['_'] === 'rpc_result' && $arg['name'] === 'result') {
                 if (isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'])
-                    && in_array($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'], array_keys(ReferenceDatabase::METHOD_CONTEXT))
+                    && isset($this->tl_callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']])
                 ) {
-                    $this->referenceDatabase->addOriginMethodContext($$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['body']);
+                    foreach ($this->tl_callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']] as $callback) { $callback($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']); }
                 }
 
                 if (isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type'])
@@ -794,21 +818,13 @@ trait TL
         if ($x['_'] === 'dataJSON') {
             return json_decode($x['data'], true);
         }
-        if ($constructorData['type'] === 'Chat') {
-            $this->add_chat($x);
-        }
-        if ($constructorData['type'] === 'User') {
-            $this->add_user($x);
-        }
-        if (in_array($x['_'], ['document', 'photo', 'fileLocation'])) {
-            $this->referenceDatabase->addReference($x);
-        } elseif (in_array($x['_'], array_keys(ReferenceDatabase::CONSTRUCTOR_CONTEXT))) {
-            $this->referenceDatabase->addOrigin($x);
+        if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
+            foreach ($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) { $callback($x); }
         } elseif ($x['_'] === 'rpc_result'
             && isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'])
-            && in_array($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'], array_keys(ReferenceDatabase::METHOD_CONTEXT))
+            && isset($this->tl_callbacks[TLCallback::METHOD_CALLBACK][$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']])
         ) {
-            $this->referenceDatabase->addOrigin($$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['body'], $x);
+            foreach ($this->tl_callbacks[TLCallback::METHOD_CALLBACK][$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']] as $callback) { $callback($x); }
         }
 
         if ($x['_'] === 'message' && isset($x['reply_markup']['rows'])) {

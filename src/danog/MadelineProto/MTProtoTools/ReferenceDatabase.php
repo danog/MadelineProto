@@ -21,11 +21,15 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\TL\TLCallback;
+use function Amp\call;
+use Amp\Promise;
+use Amp\Coroutine;
 
 /**
  * Manages upload and download of files.
  */
-class ReferenceDatabase
+class ReferenceDatabase implements TLCallback
 {
     use Tools;
     // Reference from a document
@@ -114,6 +118,22 @@ class ReferenceDatabase
     public function init()
     {
     }
+    public function getMethodCallbacks(): array
+    {
+        return array_fill_keys(array_keys(self::METHOD_CONTEXT), [$this, 'addOriginMethod']);
+    }
+    public function getMethodBeforeCallbacks(): array
+    {
+        return array_fill_keys(array_keys(self::METHOD_CONTEXT), [$this, 'addOriginMethodContext']);
+    }
+    public function getConstructorCallbacks(): array
+    {
+        return array_merge(array_fill_keys(['document', 'photo', 'fileLocation'], [$this, 'addReference']), array_fill_keys(array_keys(self::CONSTRUCTOR_CONTEXT), [$this, 'addOrigin']));
+    }
+    public function getConstructorBeforeCallbacks(): array
+    {
+        return array_fill_keys(array_keys(self::CONSTRUCTOR_CONTEXT), [$this, 'addOriginContext']);
+    }
     public function reset()
     {
         if ($this->cacheContexts) {
@@ -165,25 +185,25 @@ class ReferenceDatabase
         if (!isset($this->cache[$key])) {
             $this->cache[$key] = [];
         }
-        $this->cache[$key][$this->serializeLocation($locationType, $location)] = $location['file_reference'];
+        $this->cache[$key][$this->serializeLocation($locationType, $location)] = (string) $location['file_reference'];
         return true;
     }
-    public function addOriginContext(array $data)
+    public function addOriginContext(string $type)
     {
-        if (!isset(self::CONSTRUCTOR_CONTEXT[$data['_']])) {
-            throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$data['_']}");
+        if (!isset(self::CONSTRUCTOR_CONTEXT[$type])) {
+            throw new \danog\MadelineProto\Exception("Unknown origin type provided: $type");
         }
-        $originContext = self::CONSTRUCTOR_CONTEXT[$data['_']];
-        $this->API->logger->logger("Adding origin context $originContext for {$data['_']}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $originContext = self::CONSTRUCTOR_CONTEXT[$type];
+        $this->API->logger->logger("Adding origin context $originContext for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
-    public function addOriginMethodContext(array $data)
+    public function addOriginMethodContext(string $type)
     {
-        if (!isset(self::METHOD_CONTEXT[$data['_']])) {
-            throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$data['_']}");
+        if (!isset(self::METHOD_CONTEXT[$type])) {
+            throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$type}");
         }
-        $originContext = self::METHOD_CONTEXT[$data['_']];
-        $this->API->logger->logger("Adding origin context $originContext for {$data['_']}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $originContext = self::METHOD_CONTEXT[$type];
+        $this->API->logger->logger("Adding origin context $originContext for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
 
@@ -316,11 +336,19 @@ class ReferenceDatabase
     {
         return $this->refresh = $refresh;
     }
-    public function refreshReference(int $locationType, array $location)
+    public function refreshReference(int $locationType, array $location): Promise
     {
         return $this->refreshReferenceInternal($this->serializeLocation($locationType, $location));
     }
-    public function refreshReferenceInternal(string $location)
+    public function refreshReferenceInternal(string $location): Promise
+    {
+        $generator = $this->refreshReferenceInternalGenerator($location);
+        if ($generator instanceof \Generator) {
+            return new Coroutine($generator);
+        }
+        return new Success($generator);
+    }
+    public function refreshReferenceInternalGenerator(string $location)
     {
         $this->API->logger("Refreshing file reference", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
@@ -331,9 +359,9 @@ class ReferenceDatabase
             // Peer + msg ID
             case self::MESSAGE_ORIGIN:
                 if ($origin['peer'] < 0) {
-                    $this->API->method_call('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield $this->API->method_call_async_read('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                 } else {
-                    $this->API->method_call('messages.getMessages', ['id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield $this->API->method_call_async_read('messages.getMessages', ['id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                 }
                 break;
             // Peer + photo ID
@@ -345,31 +373,39 @@ class ReferenceDatabase
                 break;
             // Peer (default photo ID)
             case self::USER_PHOTO_ORIGIN:
-                $this->API->method_call('photos.getUserPhotos', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                yield $this->API->method_call_async_read('photos.getUserPhotos', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                 break;
             case self::SAVED_GIFS_ORIGIN:
-                $this->API->method_call('messages.getSavedGifs', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                yield $this->API->method_call_async_read('messages.getSavedGifs', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                 break;
             case self::STICKER_SET_ID_ORIGIN:
-                $this->API->method_call('messages.getStickerSet', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                yield $this->API->method_call_async_read('messages.getStickerSet', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                 break;
             case self::STICKER_SET_RECENT_ORIGIN:
-                $this->API->method_call('messages.getRecentStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                yield $this->API->method_call_async_read('messages.getRecentStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                 break;
             case self::STICKER_SET_FAVED_ORIGIN:
-                $this->API->method_call('messages.getFavedStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                yield $this->API->method_call_async_read('messages.getFavedStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                 break;
             case self::STICKER_SET_EMOTICON_ORIGIN:
-                $this->API->method_call('messages.getStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                yield $this->API->method_call_async_read('messages.getStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                 break;
             case self::WALLPAPER_ORIGIN:
-                $this->API->method_call('account.getWallPapers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                yield $this->API->method_call_async_read('account.getWallPapers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                 break;
             default:
                 throw new \danog\MadelineProto\Exception("Unknown origin type $originType");
         }
     }
-    public function getReference(int $locationType, array $location)
+    public function getReference(int $locationType, array $location): Promise
+    {
+        $generator = $this->getReferenceGenerator($locationType, $location);
+        if ($generator instanceof \Generator) {
+            return new Coroutine($generator);
+        }
+        return new Success($generator);
+    }
+    public function getReferenceGenerator(int $locationType, array $location)
     {
         $locationString = $this->serializeLocation($locationType, $location);
         if (!isset($this->db[$locationString]['reference'])) {
@@ -380,7 +416,7 @@ class ReferenceDatabase
             throw new \danog\MadelineProto\Exception("Could not find file reference for location of type $locationType object {$location['_']}");
         }
         if ($this->refresh || true) {
-            $this->refreshReferenceInternal($locationString);
+            yield $this->refreshReferenceInternal($locationString);
         }
         $this->API->logger("Getting file reference for location of type $locationType object {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 

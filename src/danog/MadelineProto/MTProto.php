@@ -22,12 +22,13 @@ namespace danog\MadelineProto;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
+use danog\MadelineProto\TL\TLCallback;
 
 
 /**
  * Manages all of the mtproto stuff.
  */
-class MTProto
+class MTProto implements TLCallback
 {
     use \danog\Serializable;
     use \danog\MadelineProto\MTProtoTools\AckHandler;
@@ -64,7 +65,7 @@ class MTProto
     /*
         const V = 71;
     */
-    const V = 111;
+    const V = 112;
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
@@ -178,7 +179,7 @@ class MTProto
          * Define some needed numbers for BigInteger
          */
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_translation'], Logger::ULTRA_VERBOSE);
-        $this->construct_TL($this->settings['tl_schema']['src']);
+        $this->construct_TL($this->settings['tl_schema']['src'], [$this, $this->referenceDatabase]);
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
         if (!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) {
@@ -202,7 +203,7 @@ class MTProto
 
     public function __sleep()
     {
-        return ['referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'pending_pwrchat', 'postpone_pwrchat', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
+        return ['referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'pending_pwrchat', 'postpone_pwrchat', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
     }
 
     public function isAltervista()
@@ -232,6 +233,7 @@ class MTProto
         if (!isset($this->referenceDatabase)) {
             $this->referenceDatabase = new ReferenceDatabase($this);
         }
+        $this->update_callbacks([$this, $this->referenceDatabase]);
         $this->altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
 
         $this->settings['connection_settings']['all']['ipv6'] = \danog\MadelineProto\Magic::$ipv6;
@@ -773,6 +775,26 @@ class MTProto
         }
 
         return $this->authorization['user'];
+    }
+
+    public function getMethodCallbacks(): array
+    {
+        return [];
+    }
+    public function getMethodBeforeCallbacks(): array
+    {
+        return [];
+    }
+    public function getConstructorCallbacks(): array
+    {
+        return array_merge(
+            array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [$this, 'add_chat']),
+            array_fill_keys(['user', 'userEmpty'], [$this, 'add_user']),
+        );
+    }
+    public function getConstructorBeforeCallbacks(): array
+    {
+        return [];
     }
 
     public function __debugInfo()

@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use danog\MadelineProto\MTProtoTools\PasswordCalculator;
+
+
 /**
  * Manages logging in and out.
  */
@@ -100,8 +103,8 @@ trait Login
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_2fa_enabled'], \danog\MadelineProto\Logger::NOTICE);
-                $this->authorized = self::WAITING_PASSWORD;
                 $this->authorization = $this->method_call('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]);
+                $this->authorized = self::WAITING_PASSWORD;
 
                 return $this->authorization;
             }
@@ -184,9 +187,11 @@ trait Login
         if ($this->authorized !== self::WAITING_PASSWORD) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['2fa_uncalled']);
         }
-        $this->authorized = self::NOT_LOGGED_IN;
+        //$this->authorized = self::NOT_LOGGED_IN;
+        $hasher = new PasswordCalculator($this->logger);
+        $hasher->addInfo($this->authorization);
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_user'], \danog\MadelineProto\Logger::NOTICE);
-        $this->authorization = $this->method_call('auth.checkPassword', ['password_hash' => hash('sha256', $this->authorization['current_salt'].$password.$this->authorization['current_salt'], true)], ['datacenter' => $this->datacenter->curdc]);
+        $this->authorization = $this->method_call('auth.checkPassword', ['password_hash' => $hasher->getCheckPassword($password)], ['datacenter' => $this->datacenter->curdc]);
         $this->authorized = self::LOGGED_IN;
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         $this->init_authorization();
