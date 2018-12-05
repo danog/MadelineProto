@@ -478,7 +478,7 @@ class MTProto implements TLCallback
             $lang_pack = 'android';
         }
         // Detect app version
-        $app_version = self::RELEASE.' ('.self::V.')';
+        $app_version = self::RELEASE.' ('.self::V.', '.Magic::$revision.')';
         if ($settings['app_info']['api_id'] === 6) {
             // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
             // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
