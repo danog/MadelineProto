@@ -28,17 +28,17 @@ trait ApiTemplates
         </head>
         <body>
         <h1>MadelineProto</h1>
+        <p>%s</p>
         <form method="POST">
         %s
         <button type="submit"/>Go</button>
         </form>
-        <p>%s</p>
         </body>
         </html>';
 
     public function web_api_echo_template($message, $form)
     {
-        return sprintf($this->web_api_template, $form, $message);
+        return sprintf($this->web_api_template, $message, $form);
     }
 
     public function get_web_api_template()
@@ -76,7 +76,43 @@ trait ApiTemplates
                 echo $this->web_api_echo_template('Do you want to enter the API id and the API hash manually or automatically?<br>Note that you can also provide it directly in the code using the <a href="https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id">settings</a>.<b>'.$message.'</b>', '<select name="type"><option value="automatic">Automatically</option><option value="manual">Manually</option></select>');
             }
         } else {
-            echo $this->web_api_echo_template('Enter your code<br><b>'.$message.'</b>', '<input type="text" name="code" placeholder="Code" required/>');
+            if (!$this->my_telegram_org_wrapper->logged_in()) {
+                echo $this->web_api_echo_template('Enter your code<br><b>'.$message.'</b>', '<input type="text" name="code" placeholder="Code" required/>');
+            } else {
+                echo $this->web_api_echo_template(
+                    'Enter the API info<br><b>'.$message.'</b>',
+                    '<input type="hidden" name="creating_app" value="yes" required/>
+                    Enter the app name, can be anything: <br><input type="text" name="app_title" required/><br>
+                    <br>Enter the app&apos;s short name, alphanumeric, 5-32 chars: <br><input type="text" name="app_shortname" required/><br>
+                    <br>Enter the app/website URL, or https://t.me/yourusername: <br><input type="text" name="app_url" required/><br>
+                    <br>Enter the app platform: <br>
+          <label>
+            <input type="radio" name="app_platform" value="android" checked> Android
+          </label>
+          <label>
+            <input type="radio" name="app_platform" value="ios"> iOS
+          </label>
+          <label>
+            <input type="radio" name="app_platform" value="wp"> Windows Phone
+          </label>
+          <label>
+            <input type="radio" name="app_platform" value="bb"> BlackBerry
+          </label>
+          <label>
+            <input type="radio" name="app_platform" value="desktop"> Desktop
+          </label>
+          <label>
+            <input type="radio" name="app_platform" value="web"> Web
+          </label>
+          <label>
+            <input type="radio" name="app_platform" value="ubp"> Ubuntu phone
+          </label>
+          <label>
+            <input type="radio" name="app_platform" value="other"> Other (specify in description)
+          </label>
+          <br><br>Enter the app description, can be anything: <br><textarea name="app_desc" required></textarea><br><br>
+                    ');
+            }
         }
     }
 }

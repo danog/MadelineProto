@@ -130,6 +130,7 @@ class WriteLoop extends ResumableSignalLoop
             if ($connection->temp_auth_key === null) {
                 return;
             }
+
             if (count($to_ack = $connection->ack_queue)) {
                 $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'msgs_ack', 'body' => ['msg_ids' => $connection->ack_queue], 'content_related' => false, 'unencrypted' => false, 'method' => false];
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
@@ -204,7 +205,7 @@ class WriteLoop extends ResumableSignalLoop
                                         'app_version' => $API->settings['app_info']['app_version'],
                                         'system_lang_code' => $API->settings['app_info']['lang_code'],
                                         'lang_code' => $API->settings['app_info']['lang_code'],
-                                        'lang_pack' => '',
+                                        'lang_pack' => $API->settings['app_info']['lang_pack'],
                                         'query' => $MTmessage['body'],
                                     ]
                                 ),

@@ -31,7 +31,7 @@ trait Start
         }
         if (php_sapi_name() === 'cli') {
             if (!function_exists('readline')) {
-                function readline($prompt = null)
+                $readline = function($prompt = null)
                 {
                     if ($prompt) {
                         echo $prompt;
@@ -40,18 +40,20 @@ trait Start
                     $line = rtrim(fgets($fp, 1024));
 
                     return $line;
-                }
-            }
-            if (strpos(readline('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
-                $this->bot_login(readline('Enter your bot token: '));
+                };
             } else {
-                $this->phone_login(readline('Enter your phone number: '));
-                $authorization = $this->complete_phone_login(readline('Enter the phone code: '));
+                $readline = 'readline';
+            }
+            if (strpos($readline('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
+                $this->bot_login($readline('Enter your bot token: '));
+            } else {
+                $this->phone_login($readline('Enter your phone number: '));
+                $authorization = $this->complete_phone_login($readline('Enter the phone code: '));
                 if ($authorization['_'] === 'account.password') {
-                    $authorization = $this->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
+                    $authorization = $this->complete_2fa_login($readline('Please enter your password (hint '.$authorization['hint'].'): '));
                 }
                 if ($authorization['_'] === 'account.needSignup') {
-                    $authorization = $this->complete_signup(readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
+                    $authorization = $this->complete_signup($readline('Please enter your first name: '), $readline('Please enter your last name (can be empty): '));
                 }
             }
             $this->serialize();

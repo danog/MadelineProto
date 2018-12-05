@@ -28,8 +28,7 @@ trait ApiStart
     {
         if (php_sapi_name() === 'cli') {
             if (!function_exists('readline')) {
-                function readline($prompt = null)
-                {
+                $readline = function ($prompt = null) {
                     if ($prompt) {
                         echo $prompt;
                     }
@@ -37,28 +36,34 @@ trait ApiStart
                     $line = rtrim(fgets($fp, 1024));
 
                     return $line;
-                }
+                };
+            } else {
+                $readline = 'readline';
             }
             echo 'You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a)
-Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id'.PHP_EOL;
-            if (strpos($res = readline('Your choice (m/a): '), 'm') !== false) {
+Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id' . PHP_EOL;
+            if (strpos($res = $readline('Your choice (m/a): '), 'm') !== false) {
                 echo '1) Login to my.telegram.org
 2) Go to API development tools
 3) App title: your app\'s name, can be anything
     Short name: your app\'s short name, can be anything
     URL: your app/website\'s URL, or t.me/yourusername
-    Platform: Web
+    Platform: anything
     Description: Describe your app here
-4) Click on create application'.PHP_EOL;
-                $app['api_id'] = readline('5) Enter your API ID: ');
-                $app['api_hash'] = readline('6) Enter your API hash: ');
+4) Click on create application' . PHP_EOL;
+                $app['api_id'] = $readline('5) Enter your API ID: ');
+                $app['api_hash'] = $readline('6) Enter your API hash: ');
 
                 return $app;
             } else {
-                $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper(readline('Enter a phone number that is already registered on Telegram: '));
-                $this->my_telegram_org_wrapper->complete_login(readline('Enter the verification code you received in telegram: '));
+                $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($readline('Enter a phone number that is already registered on Telegram: '));
+                $this->my_telegram_org_wrapper->complete_login($readline('Enter the verification code you received in telegram: '));
                 if (!$this->my_telegram_org_wrapper->has_app()) {
-                    $app = $this->my_telegram_org_wrapper->create_app(['app_title' => 'MadelineProto app', 'app_shortname' => 'MadelineProtoApp', 'app_url' => 'https://madelineproto.xyz', 'app_platform' => 'web', 'app_desc' => 'MadelineProto application']);
+                    $app_title = $readline('Enter the app\'s name, can be anything: ');
+                    $short_name = $readline('Enter the app\'s short name, can be anything: ');
+                    $url = $readline('Enter the app/website\'s URL, or t.me/yourusername: ');
+                    $description = $readline('Describe your app: ');
+                    $app = $this->my_telegram_org_wrapper->create_app(['app_title' => $app_title, 'app_shortname' => $short_name, 'app_url' => $short_name, 'app_platform' => 'web', 'app_desc' => $description]);
                 } else {
                     $app = $this->my_telegram_org_wrapper->get_app();
                 }
@@ -80,14 +85,25 @@ Note that you can also provide the API parameters directly in the code using the
                     $this->web_api_echo();
                 }
             } elseif (!$this->my_telegram_org_wrapper->logged_in()) {
-                if (isset($_POST['code'])) {
-                    $app = $this->web_api_complete_login();
+                    if (isset($_POST['code'])) {
+                        $this->web_api_complete_login();
+                        if ($this->my_telegram_org_wrapper->has_app()) {
+                            return $this->my_telegram_org_wrapper->get_app();
+                        }
+                        $this->web_api_echo();
+                    } else {
+                        $this->web_api_echo("You didn't provide a phone code!");
+                    }
+            } else {
+                if (isset($_POST['app_title'], $_POST['app_shortname'], $_POST['app_url'], $_POST['app_platform'], $_POST['app_desc'])) {
+                    $app = $this->web_api_create_app();
                     $this->getting_api_id = false;
 
                     return $app;
                 } else {
-                    $this->web_api_echo("You didn't provide a phone code!");
+                    $this->web_api_echo("You didn't provide all of the required parameters!");
                 }
+
             }
             exit;
         }
@@ -99,9 +115,9 @@ Note that you can also provide the API parameters directly in the code using the
             $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($_POST['phone_number']);
             $this->web_api_echo();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->web_api_echo('ERROR: '.$e->getMessage().'. Try again.');
+            $this->web_api_echo('ERROR: ' . $e->getMessage() . '. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            $this->web_api_echo('ERROR: '.$e->getMessage().'. Try again.');
+            $this->web_api_echo('ERROR: ' . $e->getMessage() . '. Try again.');
         }
     }
 
@@ -109,17 +125,25 @@ Note that you can also provide the API parameters directly in the code using the
     {
         try {
             $this->my_telegram_org_wrapper->complete_login($_POST['code']);
-            if (!$this->my_telegram_org_wrapper->has_app()) {
-                $app = $this->my_telegram_org_wrapper->create_app(['app_title' => 'MadelineProto app', 'app_shortname' => 'MadelineProtoApp', 'app_url' => 'https://madelineproto.xyz', 'app_platform' => 'web', 'app_desc' => 'MadelineProto application']);
-            } else {
-                $app = $this->my_telegram_org_wrapper->get_app();
-            }
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            $this->web_api_echo('ERROR: ' . $e->getMessage() . '. Try again.');
+        } catch (\danog\MadelineProto\Exception $e) {
+            $this->web_api_echo('ERROR: ' . $e->getMessage() . '. Try again.');
+        }
+    }
+    public function web_api_create_app()
+    {
+        try {
+            $params = $_POST;
+            unset($params['creating_app']);
+            $app = $this->my_telegram_org_wrapper->create_app($params);
 
             return $app;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->web_api_echo('ERROR: '.$e->getMessage().'. Try again.');
+            $this->web_api_echo('ERROR: ' . $e->getMessage() . ' Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            $this->web_api_echo('ERROR: '.$e->getMessage().'. Try again.');
+            $this->web_api_echo('ERROR: ' . $e->getMessage() . ' Try again.');
         }
+
     }
 }
