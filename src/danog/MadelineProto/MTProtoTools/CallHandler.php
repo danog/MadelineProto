@@ -31,6 +31,7 @@ use function Amp\Promise\wait;
  */
 trait CallHandler
 {
+    /*
     public function select()
     {
         $result = [];
@@ -41,7 +42,7 @@ trait CallHandler
             $this->logger->logger("Initial HTTP short poll");
             $waiting = $this->datacenter->select(0.1);
             $result = $this->handle_select($waiting, $result);
-            }*/
+            }/
             $tries = 10; // TODO add setting
             $this->logger->logger('Long poll');
             $t = microtime(true);
@@ -95,7 +96,6 @@ trait CallHandler
 
         return $result;
     }
-
     public function iorun($updates)
     {
         do {
@@ -214,6 +214,8 @@ trait CallHandler
         }
     }
 
+    */
+    
     public function has_pending_calls()
     {
         $result = [];

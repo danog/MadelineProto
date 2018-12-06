@@ -86,12 +86,7 @@ class WriteLoop extends ResumableSignalLoop
                     continue;
                 }
 
-                $body = is_object($message['body']) ? yield $message['body'] : $message['body'];
-                if ($message['method']) {
-                    $body = $API->serialize_method($message['_'], $body);
-                } else {
-                    $body = $API->serialize_object(['type' => $message['_']], $body, $message['_']);
-                }
+                $body = $message['serialized_body'];
 
                 $API->logger->logger("Sending {$message['_']} as unencrypted message to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
@@ -132,7 +127,7 @@ class WriteLoop extends ResumableSignalLoop
             }
 
             if (count($to_ack = $connection->ack_queue)) {
-                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'msgs_ack', 'body' => ['msg_ids' => $connection->ack_queue], 'content_related' => false, 'unencrypted' => false, 'method' => false];
+                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'msgs_ack', 'serialized_body' => $this->API->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $connection->ack_queue], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false, 'method' => false];
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
             }
 
@@ -150,7 +145,7 @@ class WriteLoop extends ResumableSignalLoop
             if ($API->is_http($datacenter) && !$has_http_wait) {
                 $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
 
-                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'http_wait', 'body' => ['max_wait' => $API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'content_related' => false, 'unencrypted' => false, 'method' => true];
+                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'http_wait', 'body' => $this->API->serialize_object(['type' => 'http_wait'], ['max_wait' => $API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => false, 'unencrypted' => false, 'method' => true];
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
 
                 $has_http_wait = true;
@@ -167,22 +162,8 @@ class WriteLoop extends ResumableSignalLoop
                     unset($connection->pending_outgoing[$k]);
                     continue;
                 }
-                $body = is_object($message['body']) ? yield $message['body'] : $message['body'];
+                $body = $message['serialized_body'];
 
-                $refresh_next = isset($message['refresh_next']) && $message['refresh_next'];
-
-                if ($refresh_next) {
-                    $API->referenceDatabase->refreshNext(true);
-                }
-
-                if ($message['method']) {
-                    $body = $API->serialize_method($message['_'], $body);
-                } else {
-                    $body = $API->serialize_object(['type' => $message['_']], $body, $message['_']);
-                }
-                if ($refresh_next) {
-                    $API->referenceDatabase->refreshNext(false);
-                }
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $connection->generate_message_id($datacenter);
 
                 $API->logger->logger("Sending {$message['_']} as encrypted message to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);

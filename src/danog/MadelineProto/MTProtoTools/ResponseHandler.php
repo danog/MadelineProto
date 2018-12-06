@@ -319,6 +319,7 @@ trait ResponseHandler
                         $this->logger->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
 
                         $request['refresh_references'] = true;
+                        if (isset($request['serialized_body'])) unset($request['serialized_body']);
 
                         Loop::defer([$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
 

@@ -20,13 +20,13 @@ namespace danog\MadelineProto;
 
 use Amp\Deferred;
 use Amp\Promise;
-use danog\MadelineProto\MTProtoTools\Crypt;
-use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
 use danog\MadelineProto\Loop\Connection\ReadLoop;
 use danog\MadelineProto\Loop\Connection\UpdateLoop;
 use danog\MadelineProto\Loop\Connection\WriteLoop;
+use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTools\MsgIdHandler;
 use danog\MadelineProto\Stream\MTProtoTools\SeqNoHandler;
 use function Amp\call;
@@ -156,7 +156,32 @@ class Connection
 
     public function sendMessage($message, $flush = true): Promise
     {
+        return call([$this, 'sendMessageGenerator'], $message, $flush);
+    }
+    public function sendMessageGenerator($message, $flush = true): \Generator
+    {
         $deferred = new Deferred();
+
+        if (!isset($message['serialized_body'])) {
+            $body = is_object($message['body']) ? yield $message['body'] : $message['body'];
+
+            $refresh_next = isset($message['refresh_next']) && $message['refresh_next'];
+
+            if ($refresh_next) {
+                $this->API->referenceDatabase->refreshNext(true);
+            }
+
+            if ($message['method']) {
+                $body = $this->API->serialize_method($message['_'], $body);
+            } else {
+                $body = $this->API->serialize_object(['type' => $message['_']], $body, $message['_']);
+            }
+            if ($refresh_next) {
+                $this->API->referenceDatabase->refreshNext(false);
+            }
+            $message['serialized_body'] = $body;
+        }
+
         $message['send_promise'] = $deferred;
         $this->pending_outgoing[$this->pending_outgoing_key++] = $message;
         $this->pending_outgoing_key %= self::PENDING_MAX;
@@ -164,7 +189,7 @@ class Connection
             $this->writer->resume();
         }
 
-        return $deferred->promise();
+        return yield $deferred->promise();
     }
     public function setExtra($extra)
     {

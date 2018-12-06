@@ -406,11 +406,11 @@ trait AuthKeyHandler
          */
         $this->logger->logger('Executing g_a check (1/2)...', \danog\MadelineProto\Logger::VERBOSE);
         if ($g_a->compare(\danog\MadelineProto\Magic::$one) <= 0 || $g_a->compare($p->subtract(\danog\MadelineProto\Magic::$one)) >= 0) {
-            throw new \danog\MadelineProto\SecurityException('g_a is invalid (1 < g_a < dh_prime - 1 is false).');
+            throw new \danog\MadelineProto\SecurityException('g_a is invalid (1 < g_a < p - 1 is false).');
         }
         $this->logger->logger('Executing g_a check (2/2)...', \danog\MadelineProto\Logger::VERBOSE);
         if ($g_a->compare(\danog\MadelineProto\Magic::$twoe1984) < 0 || $g_a->compare($p->subtract(\danog\MadelineProto\Magic::$twoe1984)) >= 0) {
-            throw new \danog\MadelineProto\SecurityException('g_a is invalid (2^1984 < gA < dh_prime - 2^1984 is false).');
+            throw new \danog\MadelineProto\SecurityException('g_a is invalid (2^1984 < g_a < p - 2^1984 is false).');
         }
 
         return true;
