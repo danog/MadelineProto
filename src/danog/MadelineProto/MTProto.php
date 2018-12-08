@@ -889,7 +889,7 @@ class MTProto implements TLCallback
         return array_merge(
             array_fill_keys(['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer', 'InputDialogPeer', 'InputNotifyPeer'], [$this, 'get_info']),
             array_fill_keys(['InputMedia', 'InputDocument', 'InputPhoto'], [$this, 'get_file_info']),
-            array_fill_keys(['InputFileLocation'], [$this, 'get_download_info']),
+            array_fill_keys(['InputFileLocation'], [$this, 'get_download_info'])
         );
     }
 
