@@ -20,6 +20,9 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\Async\AsyncParameters;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\RPCErrorException;
 use function Amp\call;
 use function Amp\Promise\wait;
 
@@ -181,14 +184,13 @@ trait Files
                 if (!isset($media['access_hash'])) {
                     throw new \danog\MadelineProto\Exception('No access hash');
                 }
-                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['id'], 'access_hash' => $media['access_hash'], $this->wait($this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $media))];
+                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['id'], 'access_hash' => $media['access_hash'], 'file_reference' => $this->wait($this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $media))];
                 $res['InputMedia'] = ['_' => 'inputMediaPhoto', 'id' => $res['InputPhoto']];
                 $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $media];
                 break;
             default:
                 throw new \danog\MadelineProto\Exception('Could not convert media object');
         }
-
 
         return $res;
     }
@@ -277,14 +279,17 @@ trait Files
                     $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime(isset($res['mime']) ? $res['mime'] : 'image/jpeg'));
                 }
                 if (!isset($res['mime'])) {
-                    $res['mime'] = $this->get_mime_from_extension($res['ext']);
+                    $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
                 }
                 if (!isset($res['name'])) {
                     $res['name'] = $message_media['file']['access_hash'];
                 }
 
                 return $res;
-
+            // Wallpapers
+            case 'wallPaper':
+                $photo = end($message_media['sizes']);
+                return array_merge($res, $this->get_download_info($photo));
             // Photos
             case 'photo':
             case 'messageMediaPhoto':
@@ -315,7 +320,9 @@ trait Files
                 return $res;
             case 'photoSize':
                 $res = $this->get_download_info($message_media['location']);
-                $res['size'] = $message_media['size'];
+                if (isset($message_media['size'])) {
+                    $res['size'] = $message_media['size'];
+                }
                 return $res;
 
             case 'fileLocationUnavailable':
@@ -324,7 +331,7 @@ trait Files
                 $res['name'] = $message_media['volume_id'] . '_' . $message_media['local_id'];
                 $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['volume_id'], 'local_id' => $message_media['local_id'], 'secret' => $message_media['secret'], 'dc_id' => $message_media['dc_id'], 'file_reference' => $this->wait($this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION_LOCATION, $message_media))];
                 $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], '.jpg');
-                $res['mime'] = $this->get_mime_from_extension($res['ext']);
+                $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
                 return $res;
 
             // Documents
@@ -381,7 +388,6 @@ trait Files
         }
 
         $message_media = $this->get_download_info($message_media);
-
         return $this->download_to_file($message_media, $dir . '/' . $message_media['name'] . $message_media['ext'], $cb);
     }
 
@@ -398,11 +404,12 @@ trait Files
         $file = realpath($file);
         $message_media = $this->get_download_info($message_media);
         $stream = fopen($file, 'r+b');
+        $size = fstat($stream)['size'];
         $this->logger->logger('Waiting for lock of file to download...');
         flock($stream, LOCK_EX);
 
         try {
-            $this->download_to_stream($message_media, $stream, $cb, filesize($file), -1);
+            $this->download_to_stream($message_media, $stream, $cb, $size, -1);
         } finally {
             flock($stream, LOCK_UN);
             fclose($stream);
@@ -440,7 +447,10 @@ trait Files
         $size = $end - $offset;
         $part_size = $this->settings['download']['part_size'];
         $percent = 0;
-        $datacenter = isset($message_media['InputFileLocation']['dc_id']) ? $message_media['InputFileLocation']['dc_id'] : $this->datacenter->curdc;
+        $datacenter = isset($message_media['InputFileLocation']['dc_id']) ? $message_media['InputFileLocation']['dc_id'] : $this->settings['connection_settings']['default_dc'];
+        if (isset($this->datacenter->sockets[$datacenter . '_media'])) {
+            $datacenter .= '_media';
+        }
         if (isset($message_media['key'])) {
             $digest = hash('md5', $message_media['key'] . $message_media['iv'], true);
             $fingerprint = $this->unpack_signed_int(substr($digest, 0, 4) ^ substr($digest, 4, 4));
@@ -455,6 +465,18 @@ trait Files
         $theend = false;
         $cdn = false;
 
+        /*
+        if (isset($message_media['MessageMedia']) && !$this->authorization['user']['bot'] && $this->settings['download']['report_broken_media']) {
+            var_dump($this->get_info('support'));
+            try {
+                $this->method_call('messages.sendMedia', ['peer' => '@danogentili', 'media' => $message_media['MessageMedia'], 'message' => "I can't download this file, could you please help?"], ['datacenter' => $this->datacenter->curdc]);
+            } catch (RPCErrorException $e) {
+                $this->logger->logger("An error occurred while reporting the broken file: " . $e->rpc, Logger::FATAL_ERROR);
+            } catch (Exception $e) {
+                $this->logger->logger("An error occurred while reporting the broken file: " . $e->getMessage(), Logger::FATAL_ERROR);
+            }
+        }*/
+
         while (true) {
             if ($start_at = $offset % $part_size) {
                 $offset -= $start_at;
@@ -464,7 +486,15 @@ trait Files
                 $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'file' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
-                    //if (isset($message_media['MessageMedia']) && !$this->get_self()['bot']) $this->method_call('messages.sendMedia', ['peer' => '@danogentili', 'media' => $message_media['MessageMedia'], 'message' => 'This is broken'], ['datacenter' => $this->datacenter->curdc]);
+                    if (isset($message_media['MessageMedia']) && !$this->authorization['user']['bot'] && $this->settings['download']['report_broken_media']) {
+                        try {
+                            $this->method_call('messages.sendMedia', ['peer' => '@danogentili', 'media' => $message_media['MessageMedia'], 'message' => "I can't download this file, could you please help?"], ['datacenter' => $this->datacenter->curdc]);
+                        } catch (RPCErrorException $e) {
+                            $this->logger->logger("An error occurred while reporting the broken file: " . $e->rpc, Logger::FATAL_ERROR);
+                        } catch (Exception $e) {
+                            $this->logger->logger("An error occurred while reporting the broken file: " . $e->getMessage(), Logger::FATAL_ERROR);
+                        }
+                    }
                     throw new \danog\MadelineProto\Exception('The media server where this file is hosted is offline/overloaded, please try again later. Send the media to the telegram devs or to @danogentili to fix this.');
                 }
                 switch ($e->rpc) {

@@ -166,7 +166,8 @@ class Connection
             $body = is_object($message['body']) ? yield $message['body'] : $message['body'];
 
             $refresh_next = isset($message['refresh_next']) && $message['refresh_next'];
-
+            //$refresh_next = true;
+            
             if ($refresh_next) {
                 $this->API->referenceDatabase->refreshNext(true);
             }

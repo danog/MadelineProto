@@ -61,6 +61,10 @@ trait PeerHandler
         }
     }
 
+    public function add_support($support)
+    {
+        $this->supportUser = $support['user']['id'];
+    }
     public function add_users($users)
     {
         foreach ($users as $user) {
@@ -378,6 +382,12 @@ trait PeerHandler
         if ($id === 'me') {
             return $this->get_info($this->authorization['user']['id']);
         }
+        if ($id === 'support') {
+            if (!$this->supportUser) {
+                $this->method_call('help.getSupport', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+            }
+            return $this->get_info($this->supportUser);
+        }
         foreach ($this->chats as $chat) {
             if (isset($chat['username']) && strtolower($chat['username']) === $id) {
                 return $this->gen_all($chat);
@@ -459,9 +469,9 @@ trait PeerHandler
     public function get_full_info($id)
     {
         $partial = $this->get_info($id);
-        if (time() - $this->full_chat_last_updated($partial['bot_api_id']) < (isset($this->settings['peer']['full_info_cache_time']) ? $this->settings['peer']['full_info_cache_time'] : 0)) {
-            return array_merge($partial, $this->full_chats[$partial['bot_api_id']]);
-        }
+        //if (time() - $this->full_chat_last_updated($partial['bot_api_id']) < (isset($this->settings['peer']['full_info_cache_time']) ? $this->settings['peer']['full_info_cache_time'] : 0)) {
+        //    return array_merge($partial, $this->full_chats[$partial['bot_api_id']]);
+        //}
         switch ($partial['type']) {
             case 'user':
             case 'bot':
@@ -504,7 +514,7 @@ trait PeerHandler
                     }
                 }
                 if (isset($full['full']['profile_photo']['sizes'])) {
-                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['profile_photo']['sizes']), []);
+                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['profile_photo']['sizes']), $full['full']['profile_photo']);
                 }
                 /*$bio = '';
                 if ($full['type'] === 'user' && isset($res['username']) && !isset($res['about']) && $fullfetch) {
@@ -533,7 +543,7 @@ trait PeerHandler
                     $res['all_members_are_administrators'] = !$res['admins_enabled'];
                 }
                 if (isset($full['full']['chat_photo']['sizes'])) {
-                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['chat_photo']['sizes']), []);
+                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['chat_photo']['sizes']), $full['full']['chat_photo']);
                 }
                 if (isset($full['full']['exported_invite']['link'])) {
                     $res['invite'] = $full['full']['exported_invite']['link'];
@@ -555,7 +565,7 @@ trait PeerHandler
                     }
                 }
                 if (isset($full['full']['chat_photo']['sizes'])) {
-                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['chat_photo']['sizes']), []);
+                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['chat_photo']['sizes']), $full['full']['chat_photo']);
                 }
                 if (isset($full['full']['exported_invite']['link'])) {
                     $res['invite'] = $full['full']['exported_invite']['link'];
@@ -607,7 +617,7 @@ trait PeerHandler
                 $res['participants'][$key] = $newres;
             }
         }
-        if (!isset($res['participants']) && $fullfetch) {
+        if (!isset($res['participants']) && $fullfetch && in_array($res['type'], ['supergroup', 'channel'])) {
             $total_count = (isset($res['participants_count']) ? $res['participants_count'] : 0) + (isset($res['admins_count']) ? $res['admins_count'] : 0) + (isset($res['kicked_count']) ? $res['kicked_count'] : 0) + (isset($res['banned_count']) ? $res['banned_count'] : 0);
             $res['participants'] = [];
             $limit = 200;

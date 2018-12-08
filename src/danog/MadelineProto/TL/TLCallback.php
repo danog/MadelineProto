@@ -24,9 +24,13 @@ interface TLCallback
     const METHOD_BEFORE_CALLBACK = 1;
     const CONSTRUCTOR_CALLBACK = 2;
     const CONSTRUCTOR_BEFORE_CALLBACK = 3;
+    const CONSTRUCTOR_SERIALIZE_CALLBACK = 4;
+    const TYPE_MISMATCH_CALLBACK = 5;
     
     public function getMethodCallbacks(): array;
     public function getMethodBeforeCallbacks(): array;
     public function getConstructorCallbacks(): array;
     public function getConstructorBeforeCallbacks(): array;
+    public function getConstructorSerializeCallbacks(): array;
+    public function getTypeMismatchCallbacks(): array;
 }

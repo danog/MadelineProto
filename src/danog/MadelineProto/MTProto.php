@@ -64,14 +64,14 @@ class MTProto implements TLCallback
     /*
     const V = 71;
      */
-    const V = 115;
+    const V = 116;
     const RELEASE = '4.0';
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
     const WAITING_PASSWORD = 2;
     const LOGGED_IN = 3;
-    const DISALLOWED_METHODS = ['messages.receivedQueue' => 'You cannot use this method directly', 'messages.getDhConfig' => 'You cannot use this method directly, instead use $MadelineProto->get_dh_config();', 'auth.bindTempAuthKey' => 'You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info', 'auth.exportAuthorization' => 'You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.importAuthorization' => 'You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.logOut' => 'You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info)', 'auth.importBotAuthorization' => 'You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.sendCode' => 'You cannot use this method directly, use the phone_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signIn' => 'You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.checkPassword' => 'You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signUp' => 'You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)', 'users.getFullUser' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'channels.getFullChannel' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.getFullChat' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'contacts.resolveUsername' => 'You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.acceptEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.discardEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.requestEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'phone.requestCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.acceptCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.confirmCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.discardCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'updates.getChannelDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getState' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'upload.getCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getCdnFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.reuploadCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveBigFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info'];
+    const DISALLOWED_METHODS = ['account.updatePasswordSettings' => 'You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)', 'messages.receivedQueue' => 'You cannot use this method directly', 'messages.getDhConfig' => 'You cannot use this method directly, instead use $MadelineProto->get_dh_config();', 'auth.bindTempAuthKey' => 'You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info', 'auth.exportAuthorization' => 'You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.importAuthorization' => 'You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.logOut' => 'You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info)', 'auth.importBotAuthorization' => 'You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.sendCode' => 'You cannot use this method directly, use the phone_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signIn' => 'You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.checkPassword' => 'You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signUp' => 'You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)', 'users.getFullUser' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'channels.getFullChannel' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.getFullChat' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'contacts.resolveUsername' => 'You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.acceptEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.discardEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.requestEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'phone.requestCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.acceptCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.confirmCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.discardCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'updates.getChannelDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getState' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'upload.getCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getCdnFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.reuploadCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveBigFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info'];
     const BAD_MSG_ERROR_CODES = [16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the â€œcorrectâ€ msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)', 17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)', 18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)', 19 => 'container msg_id is the same as msg_id of a previously received message (this must never happen)', 20 => 'message too old, and it cannot be verified whether the server has received a message with this msg_id or not', 32 => 'msg_seqno too low (the server has already received a message with a lower msg_id but with either a higher or an equal and odd seqno)', 33 => 'msg_seqno too high (similarly, there is a message with a higher msg_id but with either a lower or an equal and odd seqno)', 34 => 'an even msg_seqno expected (irrelevant message), but odd received', 35 => 'odd msg_seqno expected (relevant message), but even received', 48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)', 64 => 'invalid container.'];
     const MSGS_INFO_FLAGS = [1 => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)', 2 => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)', 3 => 'message not received (msg_id too high; however, the other party has certainly not received it yet)', 4 => 'message received (note that this response is also at the same time a receipt acknowledgment)', 8 => ' and message already acknowledged', 16 => ' and message not requiring acknowledgment', 32 => ' and RPC query contained in message being processed or processing already complete', 64 => ' and content-related response to message already generated', 128 => ' and other party knows for a fact that message is already received'];
     const REQUESTED = 0;
@@ -144,6 +144,7 @@ class MTProto implements TLCallback
     private $postpone_pwrchat = false;
     private $pending_pwrchat = [];
     private $altervista = false;
+    private $supportUser = 0;
     public $referenceDatabase;
 
     public function __magic_construct($settings = [])
@@ -203,7 +204,7 @@ class MTProto implements TLCallback
 
     public function __sleep()
     {
-        return ['referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'pending_pwrchat', 'postpone_pwrchat', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
+        return ['supportUser', 'referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'pending_pwrchat', 'postpone_pwrchat', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
     }
 
     public function isAltervista()
@@ -391,6 +392,9 @@ class MTProto implements TLCallback
 
     public function parse_settings($settings)
     {
+        if (isset($this->settings['connection_settings']['default_dc'])) {
+            $settings['connection_settings']['default_dc'] = $this->settings['connection_settings']['default_dc'];
+        }
         if (!isset($settings['app_info']['api_id']) || !$settings['app_info']['api_id']) {
             if (isset($this->settings['app_info']['api_id']) && $this->settings['app_info']['api_id']) {
                 $settings['app_info']['api_id'] = $this->settings['app_info']['api_id'];
@@ -478,7 +482,7 @@ class MTProto implements TLCallback
             $lang_pack = 'android';
         }
         // Detect app version
-        $app_version = self::RELEASE.' ('.self::V.', '.Magic::$revision.')';
+        $app_version = self::RELEASE . ' (' . self::V . ', ' . Magic::$revision . ')';
         if ($settings['app_info']['api_id'] === 6) {
             // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
             // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
@@ -661,6 +665,7 @@ class MTProto implements TLCallback
             'allow_automatic_upload' => true,
             'part_size' => 512 * 1024,
         ], 'download' => [
+            'report_broken_media' => true,
             'part_size' => 1024 * 1024,
         ], 'pwr' => [
             'pwr' => false,
@@ -866,13 +871,26 @@ class MTProto implements TLCallback
     public function getConstructorCallbacks(): array
     {
         return array_merge(
-            array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [$this, 'add_chat']),
-            array_fill_keys(['user', 'userEmpty'], [$this, 'add_user']),
+            array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [[$this, 'add_chat']]),
+            array_fill_keys(['user', 'userEmpty'], [[$this, 'add_user']]),
+            ['help.support' => [[$this, 'add_support']]]
         );
     }
     public function getConstructorBeforeCallbacks(): array
     {
         return [];
+    }
+    public function getConstructorSerializeCallbacks(): array
+    {
+        return [];
+    }
+    public function getTypeMismatchCallbacks(): array
+    {
+        return array_merge(
+            array_fill_keys(['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer', 'InputDialogPeer', 'InputNotifyPeer'], [$this, 'get_info']),
+            array_fill_keys(['InputMedia', 'InputDocument', 'InputPhoto'], [$this, 'get_file_info']),
+            array_fill_keys(['InputFileLocation'], [$this, 'get_download_info']),
+        );
     }
 
     public function __debugInfo()
