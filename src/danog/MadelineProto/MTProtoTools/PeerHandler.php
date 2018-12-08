@@ -469,9 +469,9 @@ trait PeerHandler
     public function get_full_info($id)
     {
         $partial = $this->get_info($id);
-        //if (time() - $this->full_chat_last_updated($partial['bot_api_id']) < (isset($this->settings['peer']['full_info_cache_time']) ? $this->settings['peer']['full_info_cache_time'] : 0)) {
-        //    return array_merge($partial, $this->full_chats[$partial['bot_api_id']]);
-        //}
+        if (time() - $this->full_chat_last_updated($partial['bot_api_id']) < (isset($this->settings['peer']['full_info_cache_time']) ? $this->settings['peer']['full_info_cache_time'] : 0)) {
+            return array_merge($partial, $this->full_chats[$partial['bot_api_id']]);
+        }
         switch ($partial['type']) {
             case 'user':
             case 'bot':
