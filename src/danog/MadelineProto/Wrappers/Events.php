@@ -55,11 +55,6 @@ trait Events
         return $this->event_handler_instance;
     }
 
-    public function getEventHandler()
-    {
-        return $this->event_handler_instance;
-    }
-
     public function event_update_handler($update)
     {
         $method_name = 'on'.ucfirst($update['_']);

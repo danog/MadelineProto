@@ -34,10 +34,9 @@ use function Amp\Websocket\connect;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class WsStream implements BufferedStreamInterface, RawStreamInterface, BufferInterface
+class WsStream implements BufferedStreamInterface, BufferInterface
 {
     use BufferedStream;
-    use RawStream;
     use Tools;
     private $sock;
     private $memory_stream;
