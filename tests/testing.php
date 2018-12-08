@@ -53,9 +53,6 @@ try {
     }
 }
 
-$id = $MadelineProto->get_pwr_chat('@danogentili')['photo']['file_id'];
-var_dumP($MadelineProto->download_to_dir($id, '/tmp'));
-
 /*
  * If this session is not logged in, login
  */

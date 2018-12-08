@@ -465,18 +465,7 @@ trait Files
         $theend = false;
         $cdn = false;
 
-        /*
-        if (isset($message_media['MessageMedia']) && !$this->authorization['user']['bot'] && $this->settings['download']['report_broken_media']) {
-            var_dump($this->get_info('support'));
-            try {
-                $this->method_call('messages.sendMedia', ['peer' => '@danogentili', 'media' => $message_media['MessageMedia'], 'message' => "I can't download this file, could you please help?"], ['datacenter' => $this->datacenter->curdc]);
-            } catch (RPCErrorException $e) {
-                $this->logger->logger("An error occurred while reporting the broken file: " . $e->rpc, Logger::FATAL_ERROR);
-            } catch (Exception $e) {
-                $this->logger->logger("An error occurred while reporting the broken file: " . $e->getMessage(), Logger::FATAL_ERROR);
-            }
-        }*/
-
+        
         while (true) {
             if ($start_at = $offset % $part_size) {
                 $offset -= $start_at;
@@ -488,7 +477,7 @@ trait Files
                 if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
                     if (isset($message_media['MessageMedia']) && !$this->authorization['user']['bot'] && $this->settings['download']['report_broken_media']) {
                         try {
-                            $this->method_call('messages.sendMedia', ['peer' => '@danogentili', 'media' => $message_media['MessageMedia'], 'message' => "I can't download this file, could you please help?"], ['datacenter' => $this->datacenter->curdc]);
+                            $this->method_call('messages.sendMedia', ['peer' => 'support', 'media' => $message_media['MessageMedia'], 'message' => "I can't download this file, could you please help?"], ['datacenter' => $this->datacenter->curdc]);
                         } catch (RPCErrorException $e) {
                             $this->logger->logger("An error occurred while reporting the broken file: " . $e->rpc, Logger::FATAL_ERROR);
                         } catch (Exception $e) {
