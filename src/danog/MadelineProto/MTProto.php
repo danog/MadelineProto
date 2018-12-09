@@ -771,15 +771,23 @@ class MTProto implements TLCallback
     // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
     public function connect_to_all_dcs()
     {
+        return $this->wait($this->connect_to_all_dcs_async());
+    }
+    public function connect_to_all_dcs_async(): \Generator
+    {
         $this->datacenter->__construct($this, $this->settings['connection'], $this->settings['connection_settings']);
+        $dcs = [];
         foreach ($this->datacenter->get_dcs() as $new_dc) {
-            $this->datacenter->dc_connect($new_dc);
+            $dcs []= $this->datacenter->dc_connect_async($new_dc);
         }
-        $this->init_authorization();
+        yield $dcs;
+        yield $this->init_authorization_async();
+        $dcs = [];
         foreach ($this->datacenter->get_dcs(false) as $new_dc) {
-            $this->datacenter->dc_connect($new_dc);
+            $dcs []= $this->datacenter->dc_connect_async($new_dc);
         }
-        $this->init_authorization();
+        yield $dcs;
+        yield $this->init_authorization_async();
     }
 
     public function get_config($config = [], $options = [])

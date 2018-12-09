@@ -20,6 +20,8 @@ namespace danog\MadelineProto;
 
 use function Amp\Promise\wait;
 use Amp\Loop;
+use Amp\Promise;
+use Amp\Coroutine;
 
 /**
  * Some tools.
@@ -185,6 +187,11 @@ trait Tools
     }
     public function wait($promise)
     {
+        if ($promise instanceof \Generator) {
+            $promise = new Coroutine($promise);
+        } else if (!($promise instanceof Promise)) {
+            return $promise;
+        }
         do {
             try {
                 return wait($promise);
@@ -195,5 +202,14 @@ trait Tools
                 }
             }
         } while (true);
+    }
+    public function call($promise)
+    {
+        if ($promise instanceof \Generator) {
+            $promise = new Coroutine($promise);
+        } else if (!($promise instanceof Promise)) {
+            return new Success($promise);
+        }
+        return $promise;
     }
 }
