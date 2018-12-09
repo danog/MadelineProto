@@ -387,11 +387,6 @@ trait ResponseHandler
                                     return;
                                 case 'AUTH_KEY_UNREGISTERED':
                                 case 'AUTH_KEY_INVALID':
-                                    $this->datacenter->sockets[$datacenter]->session_id = null;
-                                    $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
-                                    $this->datacenter->sockets[$datacenter]->auth_key = null;
-                                    $this->datacenter->sockets[$datacenter]->authorized = false;
-
                                     if ($this->authorized !== self::LOGGED_IN) {
                                         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
 
@@ -403,6 +398,11 @@ trait ResponseHandler
 
                                         return;
                                     }
+                                    $this->datacenter->sockets[$datacenter]->session_id = null;
+                                    $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
+                                    $this->datacenter->sockets[$datacenter]->auth_key = null;
+                                    $this->datacenter->sockets[$datacenter]->authorized = false;
+
                                     $this->logger->logger('Auth key not registered, resetting temporary and permanent auth keys...', \danog\MadelineProto\Logger::ERROR);
 
                                     if ($this->authorized_dc === $datacenter && $this->authorized === self::LOGGED_IN) {

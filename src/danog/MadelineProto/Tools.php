@@ -22,6 +22,8 @@ use function Amp\Promise\wait;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Coroutine;
+use Amp\Deferred;
+use Amp\Success;
 
 /**
  * Some tools.
@@ -211,5 +213,19 @@ trait Tools
             return new Success($promise);
         }
         return $promise;
+    }
+    public function after($a, $b)
+    {
+        $a = $this->call($a);
+        $deferred = new Deferred;
+        $a->onResolve(function ($e, $res) use ($b, $deferred) {
+            if ($e) throw $e;
+            $b = $this->call($b());
+            $b->onResolve(static function ($e, $res) use ($deferred) {
+                if ($e) throw $e;
+                $deferred->resolve($res);
+            });
+        });
+        return $deferred->promise();
     }
 }

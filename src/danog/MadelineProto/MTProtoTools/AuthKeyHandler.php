@@ -560,18 +560,7 @@ trait AuthKeyHandler
             foreach ($postpone as $id => $socket) {
                 $oid = intval($id);
                 if (isset($dcs[$oid])) {
-                    $deferred = new \Amp\Deferred;
-                    $dcs[$oid]->onResolve(function ($e, $res) use ($id, $socket, $deferred) {
-                        if ($e) throw $e;
-                        $res = $this->init_authorization_socket($id, $socket);
-                        if ($res instanceof \Generator) {
-                            (new Coroutine($res))->onResolve(function ($e, $res) use ($deferred) {
-                                if ($e) throw $e;
-                                $deferred->resolve(true);
-                            });
-                        }
-                    });
-                    $dcs[$oid] = $deferred->promise();
+                    $dcs[$oid] = $this->after($dcs[$oid], function () use ($id, $socket) { return $this->init_authorization_socket($id, $socket); });
                 } else {
                     $res = $this->init_authorization_socket($id, $socket);
                     if ($res instanceof \Generator) {
