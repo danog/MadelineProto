@@ -25,6 +25,8 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use function Amp\call;
 use function Amp\Socket\connect;
 use function Amp\Socket\cryptoConnect;
+use danog\MadelineProto\Exception;
+use Amp\Socket\Socket;
 
 /**
  * Buffered raw stream.
@@ -37,8 +39,10 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
 
     const MAX_SIZE = 10 * 1024 * 1024;
 
-    private $sock;
-    private $memory_stream;
+    protected $stream;
+    protected $memory_stream;
+    private $append = '';
+    private $append_after = 0;
 
     /**
      * Asynchronously connect to a TCP/TLS server.
@@ -47,13 +51,9 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx): \Generator
+    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        if ($ctx->isSecure()) {
-            $this->sock = yield cryptoConnect($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
-        } else {
-            $this->sock = yield connect($ctx->getStringUri(), $ctx->getSocketContext());
-        }
+        $this->stream = yield $ctx->getStream($header);
         $this->memory_stream = fopen('php://memory', 'r+');
 
         return true;
@@ -66,7 +66,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      */
     public function read(): Promise
     {
-        return $this->sock->read();
+        return $this->stream->read();
     }
 
     /**
@@ -78,7 +78,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      */
     public function write(string $data): Promise
     {
-        return $this->sock->write($data);
+        return $this->stream->write($data);
     }
 
     /**
@@ -88,19 +88,13 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      */
     public function disconnect()
     {
-        try {
-            if ($this->sock) {
-                $this->sock->close();
-                $this->sock = null;
-            }
-            if ($this->memory_stream) {
-                fclose($this->memory_stream);
-                $this->memory_stream = null;
-            }
-        } catch (\Throwable $e) {
-            \danog\MadelineProto\Logger::log("Got exception while closing stream: ".$e->getMessage());
-        } catch (\Exception $e) {
-            \danog\MadelineProto\Logger::log("Got exception while closing stream: ".$e->getMessage());
+        if ($this->memory_stream) {
+            fclose($this->memory_stream);
+            $this->memory_stream = null;
+        }
+        if ($this->stream) {
+            $this->stream->disconnect();
+            $this->stream = null;
         }
     }
 
@@ -136,8 +130,12 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      *
      * @return Promise
      */
-    public function getWriteBuffer(int $length): Promise
+    public function getWriteBuffer(int $length, string $append = ''): Promise
     {
+        if (strlen($append)) {
+            $this->append = $append;
+            $this->append_after = $length-strlen($append);
+        }
         return new \Amp\Success($this);
     }
 
@@ -197,6 +195,17 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      */
     public function bufferWrite(string $data): Promise
     {
+        if ($this->append_after) {
+            $this->append_after -= strlen($data);
+            if ($this->append_after === 0) {
+                $data .= $this->append;
+                $this->append = '';
+            } else if ($this->append_after < 0) {
+                $this->append_after = 0;
+                $this->append = '';
+                throw new Exception('Tried to send too much out of frame data, cannot append');
+            }
+        }
         return $this->write($data);
     }
 

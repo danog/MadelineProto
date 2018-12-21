@@ -29,8 +29,6 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTools\MsgIdHandler;
 use danog\MadelineProto\Stream\MTProtoTools\SeqNoHandler;
-use function Amp\call;
-use function Amp\Socket\connect;
 
 /**
  * Connection class.
@@ -104,7 +102,7 @@ class Connection
      */
     public function connect(ConnectionContext $ctx): Promise
     {
-        return call([$this, 'connectAsync'], $ctx);
+        return $this->call($this->connectAsync($ctx));
     }
 
     /**
@@ -156,7 +154,7 @@ class Connection
 
     public function sendMessage($message, $flush = true): Promise
     {
-        return call([$this, 'sendMessageGenerator'], $message, $flush);
+        return $this->call($this->sendMessageGenerator($message, $flush));
     }
     public function sendMessageGenerator($message, $flush = true): \Generator
     {
@@ -212,7 +210,7 @@ class Connection
 
     public function reconnect(): Promise
     {
-        return call([$this, 'reconnectAsync']);
+        return $this->call($this->reconnectAsync());
     }
 
     public function reconnectAsync(): \Generator

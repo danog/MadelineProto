@@ -43,7 +43,7 @@ interface BufferedStreamInterface extends StreamInterface
      *
      * @return Promise
      */
-    public function getWriteBuffer(int $length): Promise;
+    public function getWriteBuffer(int $length, string $append = ''): Promise;
 
     /**
      * Get stream name.

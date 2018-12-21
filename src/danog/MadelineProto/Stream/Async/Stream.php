@@ -31,8 +31,8 @@ use function Amp\call;
  */
 trait Stream
 {
-    public function connect(ConnectionContext $ctx): Promise
+    public function connect(ConnectionContext $ctx, string $header = ''): Promise
     {
-        return call([$this, 'connectAsync'], $ctx);
+        return call([$this, 'connectAsync'], $ctx, $header);
     }
 }

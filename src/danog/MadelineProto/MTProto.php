@@ -327,6 +327,10 @@ class MTProto implements TLCallback
                 if (!isset($connection['pfs'])) {
                     $connection['pfs'] = extension_loaded('gmp');
                 }
+                if ($connection['protocol'] === 'obfuscated2') {
+                    $connection['protocol'] = 'tcp_intermediate_padded';
+                    $connection['obfuscated'] = true;
+                }
             }
             if ($settings['app_info']['api_id'] === 6) {
                 unset($settings['app_info']);
@@ -581,6 +585,8 @@ class MTProto implements TLCallback
                 // The proxy class to use
                 'proxy_extra' => $this->altervista ? ['address' => 'localhost', 'port' => 80] : [],
                 // Extra parameters to pass to the proxy class using setExtra
+                'obfuscated' => false,
+                'transport' => 'tcp',
                 'pfs' => extension_loaded('gmp'),
             ],
             'default_dc' => 2,
@@ -792,11 +798,15 @@ class MTProto implements TLCallback
 
     public function get_config($config = [], $options = [])
     {
+        return $this->wait($this->get_config_async($config, $options));
+    }
+    public function get_config_async($config = [], $options = [])
+    {
         if ($this->config['expires'] > time()) {
             return;
         }
-        $this->config = empty($config) ? $this->method_call('help.getConfig', $config, $options) : $config;
-        $this->parse_config();
+        $this->config = empty($config) ? yield $this->method_call_async_read('help.getConfig', $config, $options) : $config;
+        yield $this->parse_config();
     }
 
     public function get_cdn_config($datacenter)
@@ -818,7 +828,7 @@ class MTProto implements TLCallback
     public function parse_config()
     {
         if (isset($this->config['dc_options'])) {
-            $this->parse_dc_options($this->config['dc_options']);
+            yield $this->parse_dc_options($this->config['dc_options']);
             unset($this->config['dc_options']);
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['config_updated'], Logger::NOTICE);
@@ -851,7 +861,7 @@ class MTProto implements TLCallback
         }
         $curdc = $this->datacenter->curdc;
         $this->logger->logger('Got new DC options, reconnecting');
-        $this->connect_to_all_dcs();
+        yield $this->connect_to_all_dcs();
         $this->datacenter->curdc = $curdc;
     }
 

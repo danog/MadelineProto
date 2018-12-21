@@ -19,22 +19,20 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Promise;
 use Amp\Socket\ClientConnectContext;
+use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
 use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use danog\MadelineProto\Stream\MTProtoTransport\IntermediatePaddedStream;
 use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\ObfuscatedTransportStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
-use function Amp\call;
-use function Amp\Promise\wait;
-use function Amp\Socket\connect;
 
 /**
  * Manages datacenters.
@@ -75,11 +73,7 @@ class DataCenter
         return $this->wait($this->dc_connect_async($dc_number));
     }
 
-    public function dc_connect_async($dc_number): Promise
-    {
-        return call([$this, 'dc_connect_async_generator'], $dc_number);
-    }
-    public function dc_connect_async_generator($dc_number): \Generator
+    public function dc_connect_async($dc_number): \Generator
     {
         if (isset($this->sockets[$dc_number]) && !isset($this->sockets[$dc_number]->old)) {
             return false;
@@ -119,38 +113,58 @@ class DataCenter
 
         switch ($this->settings[$dc_config_number]['protocol']) {
             case 'tcp_abridged':
-                $default = [[DefaultStream::getName(), []], [AbridgedStream::getName(), []]];
+                $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [AbridgedStream::getName(), []]];
                 break;
             case 'tcp_intermediate':
-                $default = [[DefaultStream::getName(), []], [IntermediateStream::getName(), []]];
+                $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [IntermediateStream::getName(), []]];
+                break;
+            case 'tcp_intermediate_padded':
+                $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [IntermediatePaddedStream::getName(), []]];
                 break;
             case 'tcp_full':
-                $default = [[DefaultStream::getName(), []], [FullStream::getName(), []]];
+                $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [FullStream::getName(), []]];
                 break;
             case 'http':
-                $default = [[DefaultStream::getName(), []], [HttpStream::getName(), []]];
+                $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [HttpStream::getName(), []]];
                 break;
             case 'https':
-                $default = [[DefaultStream::getName(), []], [HttpsStream::getName(), []]];
-                break;
-            case 'ws':
-                $default = [[WsStream::getName(), []], [FullStream::getName(), []]];
-                break;
-            case 'wss':
-                $default = [[WssStream::getName(), []], [FullStream::getName(), []]];
-                break;
-            case 'obfuscated2':
-                $default = [[ObfuscatedTransportStream::getName()]];
+                $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [HttpsStream::getName(), []]];
                 break;
             default:
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
+        }
+        if ($this->settings[$dc_config_number]['obfuscated'] && !in_array($default[1][0], [HttpsStream::getName(), HttpStream::getName()])) {
+            $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
+        }
+        if ($this->settings[$dc_config_number]['transport'] && !in_array($default[1][0], [HttpsStream::getName(), HttpStream::getName()])) {
+            switch ($this->settings[$dc_config_number]['transport']) {
+                case 'tcp':
+                    if ($this->settings[$dc_config_number]['obfuscated']) {
+                        $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
+                    }
+                    break;
+                case 'wss':
+                    if ($this->settings[$dc_config_number]['obfuscated']) {
+                        $default = [[DefaultStream::getName(), []], [WssStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
+                    } else {
+                        $default = [[DefaultStream::getName(), []], [WssStream::getName(), []], [BufferedRawStream::getName(), []], end($default)];
+                    }
+                    break;
+                case 'ws':
+                    if ($this->settings[$dc_config_number]['obfuscated']) {
+                        $default = [[DefaultStream::getName(), []], [WsStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
+                    } else {
+                        $default = [[DefaultStream::getName(), []], [WsStream::getName(), []], [BufferedRawStream::getName(), []], end($default)];
+                    }
+                    break;
+            }
         }
         $combos[] = $default;
 
         if (!isset($this->settings[$dc_config_number]['do_not_retry'])) {
             if ((isset($this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) && $this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
                 $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];
-                $combos[] = [[ObfuscatedTransportStream::getName(), $extra]];
+                $combos[] = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), $extra], [IntermediatePaddedStream::getName(), []]];
             }
 
             // Convert old settings
@@ -158,7 +172,7 @@ class DataCenter
                 $this->settings[$dc_config_number]['proxy'] = DefaultStream::getName();
             }
             if ($this->settings[$dc_config_number]['proxy'] === '\\MTProxySocket') {
-                $this->settings[$dc_config_number]['proxy'] = ObfuscatedTransportStream::getName();
+                $this->settings[$dc_config_number]['proxy'] = ObfuscatedStream::getName();
             }
             if (is_array($this->settings[$dc_config_number]['proxy'])) {
                 $proxies = $this->settings[$dc_config_number]['proxy'];
@@ -174,26 +188,26 @@ class DataCenter
                 }
                 foreach ($combos as $orig) {
                     $combo = [];
-                    if (isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\MTProtoBufferInterface'])) {
-                        $combo[] = [$proxy, $extra];
+                    if ($proxy === ObfuscatedStream::getName()) {
+                        $combo = $orig;
+                        if ($combo[count($combo) - 2][0] === ObfuscatedStream::getName()) {
+                            $combo[count($combo) - 2][1] = $extra;
+                        } else {
+                            $mtproto = end($combo);
+                            $combo[count($combo) - 1] = [$proxy, $extra];
+                            $combo []= $mtproto;
+                        }
                     } else {
-                        if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\RawStreamInterface'])) {
-                            $combo[] = [DefaultStream::getName()];
-                        }
-                        if (isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\BufferedStreamInterface'])) {
-                            $combo[] = [$proxy, $extra];
-                        }
-                        $default_protocol = end($orig);
-                        if ($default_protocol[0] === ObfuscatedTransportStream::getName()) {
-                            $default_protocol[0] = ObfuscatedStream::getName();
-                        }
-                        $combo[] = $default_protocol;
+                        $combo = $orig;
+                        array_unshift($combo, $combo[0]);
+                        $combo[1] = [$proxy, $extra];
                     }
+
                     $combos[] = $combo;
                 }
             }
 
-            $combos[] = [[DefaultStream::getName(), []], [HttpsStream::getName(), []]];
+            $combos[] = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [HttpsStream::getName(), []]];
             $combos = array_unique($combos, SORT_REGULAR);
         }
         /* @var $context \Amp\ClientConnectContext */
@@ -215,7 +229,6 @@ class DataCenter
 
                 foreach (array_unique([$port, 443, 80, 88, 5222]) as $port) {
                     $stream = end($combo)[0];
-                    $start_stream = $combo[0][0];
 
                     if ($stream === HttpsStream::getName()) {
                         $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
@@ -231,23 +244,23 @@ class DataCenter
                         $uri = 'tcp://' . $address . ':' . $port;
                     }
 
-                    if ($start_stream === WssStream::getName()) {
+                    if ($combo[1][0] === WssStream::getName()) {
                         $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
                         if (strpos($dc_number, '_media') !== false) {
                             $subdomain .= '-1';
                         }
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
 
-                        $uri = 'wss://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
-                    } elseif ($start_stream === WsStream::getName()) {
+                        $uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
+                    } elseif ($combo[1][0] === WsStream::getName()) {
                         $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
                         if (strpos($dc_number, '_media') !== false) {
                             $subdomain .= '-1';
                         }
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
 
-                        $uri = 'ws://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
-                        //$uri = 'ws://' . $address . ':' . $port . '/apiws';
+                        //$uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
+                        $uri = 'tcp://' . $address . ':' . $port . '/' . $path;
                     }
 
                     /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */

@@ -46,14 +46,14 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return Promise
      */
-    public function connect(ConnectionContext $ctx): Promise
+    public function connect(ConnectionContext $ctx, string $header = ''): Promise
     {
         $this->in_seq_no = -1;
         $this->out_seq_no = -1;
         $this->stream = new HashedBufferedStream();
         $this->stream->setExtra('crc32b_rev');
 
-        return $this->stream->connect($ctx);
+        return $this->stream->connect($ctx, $header);
     }
     /**
      * Async close.
@@ -72,11 +72,11 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return Generator
      */
-    public function getWriteBufferAsync(int $length): \Generator
+    public function getWriteBufferAsync(int $length, string $append = ''): \Generator
     {
         $this->stream->startWriteHash();
         $this->stream->checkWriteHash($length + 8);
-        $buffer = yield $this->stream->getWriteBuffer($length + 12);
+        $buffer = yield $this->stream->getWriteBuffer($length + 12, $append);
         $this->out_seq_no++;
         $buffer->bufferWrite(pack('VV', $length + 12, $this->out_seq_no));
 

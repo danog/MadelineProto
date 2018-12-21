@@ -179,37 +179,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         return $data;
     }
 
-    /**
-     * Writes data to the stream.
-     *
-     * @param string $data Bytes to write.
-     *
-     * @throws ClosedException If the stream has already been closed.
-     *
-     * @return Generator Succeeds once the data has been successfully written to the stream.
-     */
-    public function bufferWriteAsync(string $data): \Generator
-    {
-        $length = strlen($data);
-        if ($this->write_check_after && $length + $this->write_check_pos >= $this->write_check_after) {
-            if ($length + $this->write_check_pos > $this->write_check_after) {
-                throw new \danog\MadelineProto\Exception('Too much out of frame data was sent, cannot check hash');
-            }
-            yield $this->write_buffer->bufferWrite($data);
-            hash_update($this->write_hash, $data);
-
-            return yield $this->write_buffer->bufferWrite($this->getWriteHash());
-        }
-        if ($this->write_check_after) {
-            $this->write_check_pos += $length;
-        }
-        if ($this->write_hash) {
-            hash_update($this->write_hash, $data);
-        }
-
-        return yield $this->write_buffer->bufferWrite($data);
-    }
-
 
     /**
      * Set the hash algorithm.
@@ -283,15 +252,15 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return Generator
      */
-    public function getWriteBufferAsync(int $length): \Generator
+    public function getWriteBufferAsync(int $length, string $append = ''): \Generator
     {
         if ($this->write_hash) {
-            $this->write_buffer = yield $this->stream->getWriteBuffer($length);
+            $this->write_buffer = yield $this->stream->getWriteBuffer($length, $append);
 
             return $this;
         }
 
-        return yield $this->stream->getWriteBuffer($length);
+        return yield $this->stream->getWriteBuffer($length, $append);
     }
 
     /**
@@ -325,7 +294,22 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
             return $this->write_buffer->bufferWrite($length);
         }
 
-        return call([$this, 'bufferWriteAsync'], $data);
+        $length = strlen($data);
+        if ($this->write_check_after && $length + $this->write_check_pos >= $this->write_check_after) {
+            if ($length + $this->write_check_pos > $this->write_check_after) {
+                throw new \danog\MadelineProto\Exception('Too much out of frame data was sent, cannot check hash');
+            }
+            hash_update($this->write_hash, $data);
+            return $this->write_buffer->bufferWrite($data.$this->getWriteHash());
+        }
+        if ($this->write_check_after) {
+            $this->write_check_pos += $length;
+        }
+        if ($this->write_hash) {
+            hash_update($this->write_hash, $data);
+        }
+
+        return $this->write_buffer->bufferWrite($data);
     }
 
     public static function getName(): string

@@ -24,6 +24,8 @@ use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
+use danog\MadelineProto\Tools;
+use danog\MadelineProto\Exception;
 
 /**
  * Obfuscated2 stream wrapper.
@@ -32,8 +34,9 @@ use danog\MadelineProto\Stream\MTProtoBufferInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInterface
+class ObfuscatedStream implements BufferedProxyStreamInterface
 {
+    use Tools;
     use Buffer;
     use BufferedStream;
     private $encrypt;
@@ -42,6 +45,9 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
     private $write_buffer;
     private $read_buffer;
     private $extra;
+    private $append = '';
+    private $append_after = 0;
+
 
     /**
      * Connect to stream.
@@ -50,25 +56,28 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx): \Generator
+    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
     {
         if (isset($this->extra['address'])) {
             $ctx = $ctx->getCtx();
             $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port']);
         }
-        $this->stream = yield $ctx->getStream();
 
         do {
             $random = $this->random(64);
-        } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
-        $random[56] = $random[57] = $random[58] = $random[59] = chr(0xef);
+        } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4), str_repeat(chr(221), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
 
-        $random = substr_replace(pack('s', $ctx->getIntDc()), 60, 2);
+        if (strlen($header) === 1) {
+            $header = str_repeat($header, 4);
+        }
+        $random = substr_replace($random, $header.substr($random, 56+strlen($header)), 56);
+        $random = substr_replace($random, pack('s', $ctx->getIntDc()).substr($random, 60+2), 60);
 
-        $reversed = strrev(substr($random, 8, 48));
+        $reversed = strrev($random);
 
         $key = substr($random, 8, 32);
-        $keyRev = substr($reversed, 0, 32);
+        $keyRev = substr($reversed, 8, 32);
+
         if (isset($this->extra['secret'])) {
             $key = hash('sha256', $key.$this->extra['secret'], true);
             $keyRev = hash('sha256', $keyRev.$this->extra['secret'], true);
@@ -82,12 +91,12 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
         $this->decrypt = new \phpseclib\Crypt\AES('ctr');
         $this->decrypt->enableContinuousBuffer();
         $this->decrypt->setKey($keyRev);
-        $this->decrypt->setIV(substr($reversed, 32, 16));
+        $this->decrypt->setIV(substr($reversed, 40, 16));
 
         $random = substr_replace($random, substr(@$this->encrypt->encrypt($random), 56, 8), 56, 8);
+        
 
-        $buffer = yield $this->stream->getWriteBuffer(64);
-        yield $buffer->bufferWrite($random);
+        $this->stream = yield $ctx->getStream($random);
     }
     /**
      * Async close.
@@ -106,18 +115,13 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
      *
      * @return Generator
      */
-    public function getWriteBufferAsync(int $length): \Generator
+    public function getWriteBufferAsync(int $length, string $append = ''): \Generator
     {
-        $length >>= 2;
-        if ($length < 127) {
-            $message = chr($length);
-        } else {
-            $message = chr(127).substr(pack('V', $length), 0, 3);
+        $this->write_buffer = yield $this->stream->getWriteBuffer($length);
+        if (strlen($append)) {
+            $this->append = $append;
+            $this->append_after = $length-strlen($append);
         }
-        $buffer = yield $this->stream->getWriteBuffer(strlen($message) + $length);
-        yield $buffer->bufferWrite($message);
-        $this->write_buffer = $buffer;
-
         return $this;
     }
 
@@ -130,14 +134,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
      */
     public function getReadBufferAsync(&$length): \Generator
     {
-        $buffer = yield $this->stream->getReadBuffer($l);
-        $length = ord(yield $buffer->bufferRead(1));
-        if ($length >= 127) {
-            $length = unpack('V', (yield $buffer->bufferRead(3))."\0")[1];
-        }
-        $length <<= 2;
-
-        $this->read_buffer = $buffer;
+        $this->read_buffer = yield $this->stream->getReadBuffer($l);
 
         return $this;
     }
@@ -167,7 +164,18 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
      */
     public function bufferWrite(string $data): Promise
     {
-        return $this->buffer_write->bufferWrite(@$this->encrypt->encrypt($data));
+        if ($this->append_after) {
+            $this->append_after -= strlen($data);
+            if ($this->append_after === 0) {
+                $data .= $this->append;
+                $this->append = '';
+            } else if ($this->append_after < 0) {
+                $this->append_after = 0;
+                $this->append = '';
+                throw new Exception('Tried to send too much out of frame data, cannot append');
+            }
+        }
+        return $this->write_buffer->bufferWrite(@$this->encrypt->encrypt($data));
     }
 
 
@@ -180,6 +188,12 @@ class ObfuscatedStream implements BufferedProxyStreamInterface, MTProtoBufferInt
      */
     public function setExtra($extra)
     {
+        if (isset($extra['secret']) && strlen($extra) > 17) {
+            $extra = hex2bin($extra);
+        }
+        if (isset($extra['secret']) && strlen($extra) == 17) {
+            $extra = substr($extra, 0, 16);
+        }
         $this->extra = $extra;
     }
 

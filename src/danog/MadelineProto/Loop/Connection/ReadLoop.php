@@ -18,17 +18,14 @@
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use Amp\Success;
-use Amp\Deferred;
 use Amp\Promise;
-use danog\MadelineProto\NothingInTheSocketException;
-use function Amp\call;
-use danog\MadelineProto\Tools;
-use danog\MadelineProto\MTProtoTools\Crypt;
+use Amp\Websocket\ClosedException;
 use danog\MadelineProto\Logger;
-use function Amp\Promise\timeout;
-use Amp\TimeoutException;
 use danog\MadelineProto\Loop\Impl\SignalLoop;
+use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\NothingInTheSocketException;
+use danog\MadelineProto\Tools;
+use function Amp\call;
 
 /**
  * Socket read loop
@@ -62,6 +59,9 @@ class ReadLoop extends SignalLoop
                 $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
                 yield $connection->reconnect();
                 continue;
+            } catch (ClosedException $e) {
+                $API->logger->logger($e->getMessage(), Logger::FATAL_ERROR);
+                throw $e;
             }
 
             if (is_int($error)) {
@@ -108,8 +108,19 @@ class ReadLoop extends SignalLoop
         $datacenter = $this->datacenter;
         $connection = $this->connection;
 
-        $buffer = yield $connection->stream->getReadBuffer($payload_length);
-        
+        try {
+            $buffer = yield $connection->stream->getReadBuffer($payload_length);
+        } catch (ClosedException $e) {
+            $API->logger->logger($e->getReason());
+            if (strpos($e->getReason(), "       ") === 0) {
+                $payload = -substr($e->getReason(), 7);
+                $API->logger->logger("Received $payload from DC " . $datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
+                return $payload;
+            }
+            throw $e;
+        }
+
         if ($payload_length === 4) {
             $payload = $this->unpack_signed_int(yield $buffer->bufferRead(4));
             $API->logger->logger("Received $payload from DC " . $datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);

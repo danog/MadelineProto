@@ -153,14 +153,14 @@ class ObfuscatedTransportStream extends DefaultStream implements RawProxyStreamI
      *
      * @return Generator
      */
-    public function getWriteBufferAsync(int $length): \Generator
+    public function getWriteBufferAsync(int $length, string $append = ''): \Generator
     {
         if ($length < 127) {
             $message = chr($length);
         } else {
             $message = chr(127).substr(pack('V', $length), 0, 3);
         }
-        $buffer = yield parent::getWriteBuffer($length);
+        $buffer = yield parent::getWriteBuffer($length, $append);
         yield $buffer->bufferWrite($message);
 
         return $buffer;

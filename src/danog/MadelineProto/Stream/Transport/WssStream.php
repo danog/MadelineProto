@@ -26,7 +26,7 @@ use danog\MadelineProto\Stream\MTProtoBufferInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class WssStream extends WsStream implements MTProtoBufferInterface
+class WssStream extends WsStream
 {
     /**
      * Connect to stream.
@@ -35,9 +35,9 @@ class WssStream extends WsStream implements MTProtoBufferInterface
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx): \Generator
+    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        return parent::connectAsync($ctx->getCtx()->secure(true));
+        return parent::connectAsync($ctx->getCtx()->secure(true), $header);
     }
 
     public static function getName(): string

@@ -54,10 +54,10 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx): \Generator
+    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $this->ctx = $ctx->getCtx();
-        $this->stream = yield $ctx->getStream();
+        $this->stream = yield $ctx->getStream($header);
         $this->uri = $ctx->getUri();
     }
     /**
@@ -89,10 +89,10 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @return Generator
      */
-    public function getWriteBufferAsync(int $length): \Generator
+    public function getWriteBufferAsync(int $length, string $append = ''): \Generator
     {
         $headers = 'POST '.$this->uri->getPath()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length.$this->header."\r\n\r\n";
-        $buffer = yield $this->stream->getWriteBuffer(strlen($headers) + $length);
+        $buffer = yield $this->stream->getWriteBuffer(strlen($headers) + $length, $append);
         yield $buffer->bufferWrite($headers);
 
         return $buffer;

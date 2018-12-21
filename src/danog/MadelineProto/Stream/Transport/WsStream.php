@@ -19,29 +19,28 @@
 namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\Promise;
-use Amp\Success;
-use danog\MadelineProto\Stream\Async\BufferedStream;
+use Amp\Websocket\ClosedException;
+use Amp\Websocket\Handshake;
+use Amp\Websocket\Options;
+use Amp\Websocket\Rfc6455Connection;
 use danog\MadelineProto\Stream\Async\RawStream;
-use danog\MadelineProto\Stream\BufferedStreamInterface;
-use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
 use danog\MadelineProto\Tools;
-use function Amp\Websocket\connect;
+use danog\MadelineProto\Logger;
 
 /**
  * Websocket stream wrapper.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class WsStream implements BufferedStreamInterface, BufferInterface
+class WsStream implements RawStreamInterface
 {
-    use BufferedStream;
+    use RawStream;
     use Tools;
-    private $sock;
-    private $memory_stream;
-    private $buffer;
 
+    private $stream;
+    private $message;
     /**
      * Connect to stream.
      *
@@ -49,126 +48,73 @@ class WsStream implements BufferedStreamInterface, BufferInterface
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx): \Generator
+    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->sock = yield connect($ctx->getStringUri(), $ctx->getSocketContext());
-        $this->memory_stream = fopen('php://memory', 'r+');
-        return true;
+        $this->stream = yield $ctx->getStream();
+        $handshake = new Handshake($ctx->getStringUri());
+
+        yield $this->stream->write($handshake->generateRequest());
+
+        $buffer = '';
+        while (($chunk = yield $this->stream->read()) !== null) {
+            $buffer .= $chunk;
+            if ($position = \strpos($buffer, "\r\n\r\n")) {
+                $headerBuffer = \substr($buffer, 0, $position + 4);
+                $buffer = \substr($buffer, $position + 4);
+                $headers = $handshake->decodeResponse($headerBuffer);
+                $this->stream = new Rfc6455Connection($this->stream, $headers, $buffer, new Options);
+                break;
+            }
+        }
+        if (!$this->stream) {
+            throw new WebSocketException('Failed to read response from server');
+        }
+        yield $this->write($header);
     }
+
     /**
      * Async close.
+     *
      */
     public function disconnect()
     {
         try {
-            if ($this->sock) {
-                $this->sock->close();
-                $this->sock = null;
-            }
-            if ($this->memory_stream) {
-                fclose($this->memory_stream);
-                $this->memory_stream = null;
-            }
-        } catch (\Throwable $e) {
-            \danog\MadelineProto\Logger::log("Got exception while closing stream: $e");
+            $this->stream->close();
+        } catch (\Amp\Websocket\ClosedException $e) {
         }
     }
 
-    /**
-     * Get write buffer asynchronously.
-     *
-     * @param int $length Length of data that is going to be written to the write buffer
-     *
-     * @return Generator
-     */
-    public function getWriteBuffer(int $length): Promise
+    public function readAsync(): \Generator
     {
-        return new Success($this);
-    }
-
-    /**
-     * Get read buffer asynchronously.
-     *
-     * @param int $length Length of payload, as detected by this layer
-     *
-     * @return Generator
-     */
-    public function getReadBufferAsync(&$length): \Generator
-    {
-        $size = fstat($this->memory_stream)['size'];
-        $offset = ftell($this->memory_stream);
-        $length = $size - $offset;
-        if ($length === 0 || $size > self::MAX_SIZE) {
-            $new_memory_stream = fopen('php://memory', 'r+');
-            if ($length) {
-                fwrite($new_memory_stream, fread($this->memory_stream, $length));
-                fseek($new_memory_stream, 0);
+        try {
+            if (!$this->message || ($data = yield $this->message->read()) === null) {
+                $this->message = yield $this->stream->receive();
+                $data = yield $this->message->read();
             }
-            fclose($this->memory_stream);
-            $this->memory_stream = $new_memory_stream;
+        } catch (\Amp\Websocket\ClosedException $e) {
+            if ($e->getReason() !== 'Client closed the underlying TCP connection') {
+                throw $e;
+            }
+            return null;
         }
-        fwrite($this->memory_stream, yield (yield $this->sock->receive())->buffer());
 
-        return $this;
+        return $data;
     }
 
     /**
-     * Read data asynchronously.
+     * Async write.
      *
-     * @param int $length Amount of data to read
+     * @param string $data Data to write
      *
      * @return Promise
      */
-    public function bufferRead(int $length): Promise
+    public function write(string $data): \Amp\Promise
     {
-        $size = fstat($this->memory_stream)['size'];
-        $offset = ftell($this->memory_stream);
-        $buffer_length = $size - $offset;
-        if ($buffer_length >= $length) {
-            return new Success(fread($this->memory_stream, $length));
-        }
-
-        throw new \danog\MadelineProto\Exception('Not enough data');
+        return $this->stream->sendBinary($data);
     }
 
-    /**
-     * Read data asynchronously.
-     *
-     * @param int $length Amount of data to read
-     *
-     * @return \Generator
-     */
-    public function bufferReadAsync(int $length): \Generator
-    {
-        $size = fstat($this->memory_stream)['size'];
-        $offset = ftell($this->memory_stream);
-        $buffer_length = $size - $offset;
-        if ($buffer_length < $length && $buffer_length) {
-            fseek($this->memory_stream, $offset + $buffer_length);
-        }
-
-        while ($buffer_length < $length) {
-            $chunk = yield $this->read();
-            if ($chunk === null) {
-                yield $this->disconnect();
-
-                throw new \danog\MadelineProto\NothingInTheSocketException();
-            }
-            fwrite($this->memory_stream, $chunk);
-            $buffer_length += strlen($chunk);
-        }
-        fseek($this->memory_stream, $offset);
-
-        return fread($this->memory_stream, $length);
-    }
-
-    public function bufferWrite(string $data): Promise
-    {
-        return $this->sock->sendBinary($data);
-    }
     public static function getName(): string
     {
         return __CLASS__;
     }
 }
-

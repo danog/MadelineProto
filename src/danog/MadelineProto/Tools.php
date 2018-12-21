@@ -21,7 +21,6 @@ namespace danog\MadelineProto;
 use function Amp\Promise\wait;
 use Amp\Loop;
 use Amp\Promise;
-use Amp\Coroutine;
 use Amp\Deferred;
 use Amp\Success;
 

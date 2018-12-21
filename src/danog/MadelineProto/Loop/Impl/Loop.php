@@ -19,8 +19,8 @@
 namespace danog\MadelineProto\Loop\Impl;
 
 use danog\MadelineProto\Logger;
-use function Amp\asyncCall;
 use danog\MadelineProto\Loop\LoopInterface;
+use Amp\Promise;
 
 /**
  * Loop helper trait.
@@ -31,6 +31,8 @@ use danog\MadelineProto\Loop\LoopInterface;
  */
 abstract class Loop implements LoopInterface
 {
+    use \danog\MadelineProto\Tools;
+
     private $count = 0;
 
     protected $API;
@@ -50,7 +52,7 @@ abstract class Loop implements LoopInterface
             $this->API->logger->logger("NOT entering check loop in DC {$this->datacenter} with running count {$this->count}", Logger::ERROR);
             return false;
         }
-        asyncCall([$this, 'loop']);
+        Promise\rethrow($this->call($this->loop()));
         return true;
     }
     public function exitedLoop()

@@ -324,9 +324,9 @@ class ConnectionContext
      *
      * @return Promise
      */
-    public function getStream(): Promise
+    public function getStream(string $buffer = ''): Promise
     {
-        return call([$this, 'getStreamAsync']);
+        return call([$this, 'getStreamAsync'], $buffer);
     }
 
     /**
@@ -336,14 +336,14 @@ class ConnectionContext
      *
      * @return \Generator
      */
-    public function getStreamAsync(): \Generator
+    public function getStreamAsync(string $buffer = ''): \Generator
     {
         list($clazz, $extra) = $this->nextStreams[$this->key--];
         $obj = new $clazz();
         if ($obj instanceof ProxyStreamInterface) {
             $obj->setExtra($extra);
         }
-        yield $obj->connect($this);
+        yield $obj->connect($this, $buffer);
 
         return $obj;
     }

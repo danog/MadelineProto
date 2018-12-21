@@ -18,7 +18,12 @@
 
 namespace danog\MadelineProto\Stream\Transport;
 
-use danog\MadelineProto\Stream\Common\BufferedRawStream;
+use danog\MadelineProto\Stream\RawStreamInterface;
+use danog\MadelineProto\Stream\Async\RawStream;
+use Amp\Promise;
+use function Amp\Socket\cryptoConnect;
+use function Amp\Socket\connect;
+use Amp\Socket\Socket;
 
 /**
  * Default stream wrapper.
@@ -27,8 +32,74 @@ use danog\MadelineProto\Stream\Common\BufferedRawStream;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class DefaultStream extends BufferedRawStream
+class DefaultStream extends Socket implements RawStreamInterface
 {
+    use RawStream;
+    private $stream;
+
+    public function enableCrypto(): Promise
+    {
+
+    }
+    public function __construct()
+    {
+
+    }
+    
+    public function connectAsync(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
+    {
+        if ($ctx->isSecure()) {
+            $this->stream = yield cryptoConnect($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
+        } else {
+            $this->stream = yield connect($ctx->getStringUri(), $ctx->getSocketContext());
+        }
+        yield $this->stream->write($header);
+    }
+
+    /**
+     * Async chunked read.
+     *
+     * @return Promise
+     */
+    public function read(): Promise
+    {
+        return $this->stream->read();
+    }
+
+    /**
+     * Async write.
+     *
+     * @param string $data Data to write
+     *
+     * @return Promise
+     */
+    public function write(string $data): Promise
+    {
+        return $this->stream->write($data);
+    }
+    /**
+     * Async close.
+     *
+     * @return Generator
+     */
+    public function disconnect()
+    {
+        try {
+            if ($this->stream) {
+                $this->stream->close();
+                $this->stream = null;
+            }
+        } catch (\Throwable $e) {
+            \danog\MadelineProto\Logger::log("Got exception while closing stream: ".$e->getMessage());
+        } catch (\Exception $e) {
+            \danog\MadelineProto\Logger::log("Got exception while closing stream: ".$e->getMessage());
+        }
+    }
+
+    public function close()
+    {
+        $this->disconnect();
+    }
     public static function getName(): string
     {
         return __CLASS__;

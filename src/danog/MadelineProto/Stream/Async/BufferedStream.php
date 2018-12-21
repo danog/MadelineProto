@@ -61,12 +61,13 @@ trait BufferedStream
     /**
      * Get write buffer asynchronously.
      *
-     * @param int $length Total length of data that is going to be piped in the buffer
+     * @param int $length    Total length of data that is going to be piped in the buffer
+     * @param string $append Data to append after entire buffer is written
      *
      * @return Promise
      */
-    public function getWriteBuffer(int $length): Promise
+    public function getWriteBuffer(int $length, string $append = ''): Promise
     {
-        return call([$this, 'getWriteBufferAsync'], $length);
+        return call([$this, 'getWriteBufferAsync'], $length, $append);
     }
 }
