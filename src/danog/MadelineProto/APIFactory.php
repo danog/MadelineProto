@@ -185,7 +185,7 @@ class APIFactory
         $result = $this->methods[$name](...$arguments);
         if (is_object($result) && ($result instanceof \Generator || $result instanceof Promise)) {
             $async = isset(end($arguments)['async']) ? end($arguments)['async'] : $this->async;
-            if ($async) {
+            if ($async && $name !== 'loop') {
                 return $res;
             } else {
                 return $this->wait($result);

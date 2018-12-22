@@ -116,6 +116,10 @@ class API extends APIFactory
             $namespace = key($pair);
             $this->{$namespace}->async = $async;
         }
+
+        if ($this->API->event_handler && class_exists($this->API->event_handler)) {
+            $this->API->setEventHandler($this->API->event_handler);
+        }
     }
     public function __wakeup()
     {
@@ -224,6 +228,9 @@ class API extends APIFactory
                 }
             }
             $this->API->wrapper = $this;
+            if ($this->API->event_handler && class_exists($this->API->event_handler)) {
+                $this->API->setEventHandler($this->API->event_handler);
+            }
         }
     }
 

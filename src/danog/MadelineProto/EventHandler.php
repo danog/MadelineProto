@@ -23,9 +23,12 @@ class EventHandler extends APIFactory
 {
     public function __construct($MadelineProto)
     {
-        $this->API = $MadelineProto;
+        $this->API = $MadelineProto->API;
+        $this->async = $MadelineProto->async;
+        $this->methods = $MadelineProto->methods;
         foreach ($this->API->get_method_namespaces() as $namespace) {
             $this->{$namespace} = new APIFactory($namespace, $this->API);
+            $this->{$namespace}->async = $MadelineProto->async;
         }
     }
 

@@ -33,7 +33,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             return;
         }
         if (isset($update['message']['media'])) {
-            $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
+            yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
         }
 
         $res = json_encode($update, JSON_PRETTY_PRINT);
@@ -42,7 +42,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         }
         yield $this->sleep_async(3);
         try {
-            $this->messages->sendMessage(['peer' => $update, 'message' => $res."\n\nDopo 3 secondi, in modo asincrono", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
+            yield $this->messages->sendMessage(['peer' => $update, 'message' => $res."\n\nDopo 3 secondi, in modo asincrono", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             \danog\MadelineProto\Logger::log((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
         } catch (\danog\MadelineProto\Exception $e) {
@@ -56,4 +56,6 @@ $MadelineProto = new \danog\MadelineProto\API('bot.madeline');
 
 $MadelineProto->start();
 $MadelineProto->setEventHandler('\EventHandler');
+$MadelineProto->async(true);
+
 $MadelineProto->loop();

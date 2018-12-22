@@ -38,7 +38,9 @@ trait Events
 
         if (!($this->event_handler_instance instanceof $this->event_handler)) {
             $class_name = $this->event_handler;
-            $this->event_handler_instance = new $class_name($this);
+            $this->event_handler_instance = new $class_name($this->wrapper);
+        } else if ($this->wrapper) {
+            $this->event_handler_instance->__construct($this->wrapper);
         }
         $this->event_handler_methods = [];
         foreach (\get_class_methods($this->event_handler) as $method) {
