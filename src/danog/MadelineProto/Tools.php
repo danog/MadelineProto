@@ -227,4 +227,8 @@ trait Tools
         });
         return $deferred->promise();
     }
+    public function sleep_async($time)
+    {
+        return new \Amp\Delayed($time*1000);
+    }
 }

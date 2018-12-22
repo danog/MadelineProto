@@ -63,7 +63,7 @@ class DefaultStream extends Socket implements RawStreamInterface
      */
     public function read(): Promise
     {
-        return $this->stream->read();
+        return $this->stream ? $this->stream->read() : new \Amp\Success(null);
     }
 
     /**

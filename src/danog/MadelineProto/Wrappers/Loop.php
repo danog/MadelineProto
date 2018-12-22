@@ -63,11 +63,7 @@ trait Loop
         $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
         $offset = 0;
 
-        while (true) {
-            $this->update_deferred = new Deferred();
-            yield $this->update_deferred->promise();
-            
-            var_dumP('unlocked');
+        while (true) {            
             foreach ($this->updates as $update) {
                 $r = $this->settings['updates']['callback']($update);
                 if (is_object($r)) {
@@ -85,7 +81,9 @@ trait Loop
                     $controller->discard();
                 }
             });
-    
+            $this->update_deferred = new Deferred();
+            yield $this->update_deferred->promise();
+
         }
     }
 }

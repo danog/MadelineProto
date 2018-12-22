@@ -362,9 +362,9 @@ trait CallHandler
                 $deferred->fail($e);
             } else {
                 if (is_array($read_deferred)) {
-                    array_map($read_deferred, function ($value) {
+                    $read_deferred = array_map(function ($value) {
                         return $value->promise();
-                    });
+                    }, $read_deferred);
                     $deferred->resolve(all($read_deferred));
                 } else {
                     $deferred->resolve($read_deferred->promise());
@@ -403,6 +403,7 @@ trait CallHandler
                 $new_aargs = $aargs;
                 $new_aargs['postpone'] = true;
                 $new_aargs['queue'] = $method;
+                
                 foreach ($arg_chunks as $args) {
                     $promises[] = $this->method_call_async_write($method, $args, $new_aargs);
                 }
