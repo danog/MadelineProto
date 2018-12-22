@@ -19,6 +19,10 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Delayed;
+use Amp\Deferred;
+
+
 /**
  * Manages updates.
  */
@@ -51,10 +55,10 @@ trait UpdateHandler
             return;
         }
         $this->updates[$this->updates_key++] = $update;
-        //$this->logger->logger(['Stored ', $update);
+        $this->logger->logger('Stored ');
     }
 
-    public function get_updates($params = [])
+    public function get_updates_async($params = [])
     {
         if (!$this->settings['updates']['handle_updates']) {
             $this->settings['updates']['handle_updates'] = true;
@@ -68,15 +72,16 @@ trait UpdateHandler
                 $controller->discard();
             }
         });
-        $time = microtime(true);
-
 
         $params = array_merge(self::DEFAULT_GETUPDATES_PARAMS, $params);
-        $params['timeout'] = (int) ($params['timeout'] * 1000000 - (microtime(true) - $time));
-        usleep($params['timeout'] > 0 ? $params['timeout'] : 0);
+
+        $this->update_deferred = new Deferred();
+        yield any($this->update_deferred->promise(), new Delayed($params['timeout'] * 1000));
+
         if (empty($this->updates)) {
             return [];
         }
+        
         if ($params['offset'] < 0) {
             $params['offset'] = array_reverse(array_keys((array) $this->updates))[abs($params['offset']) - 1];
         }
@@ -321,6 +326,13 @@ trait UpdateHandler
             $this->updates_state['sync_loading'] = false;
         }
         $this->handle_pending_updates();
+
+        if ($this->updates && $this->update_deferred) {
+            $d = $this->update_deferred;
+            $this->update_deferred = null;
+
+            $d->resolve();
+        }
     }
 
     public function get_updates_state()

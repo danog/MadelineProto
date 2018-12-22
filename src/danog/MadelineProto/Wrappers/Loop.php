@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use \Amp\Deferred;
+
 /**
  * Manages logging in and out.
  */
@@ -31,7 +33,7 @@ trait Loop
         $this->loop_callback = $callback;
     }
 
-    public function loop($max_forks = 0)
+    public function loop_async($max_forks = 0)
     {
         if (in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler'])) {
             return true;
@@ -50,20 +52,40 @@ trait Loop
                 });
             }
         }
+        if (!$this->settings['updates']['handle_updates']) {
+            $this->settings['updates']['handle_updates'] = true;
+        }
+        if (!$this->settings['updates']['run_callback']) {
+            $this->settings['updates']['run_callback'] = true;
+        }
+        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
+
         $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
         $offset = 0;
-        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->startUpdateLoop();
 
         while (true) {
-            $updates = $this->get_updates(['offset' => $offset]);
-            foreach ($updates as $update) {
-                $offset = $update['update_id'] + 1;
-                $this->settings['updates']['callback']($update['update']);
+            $this->update_deferred = new Deferred();
+            yield $this->update_deferred->promise();
+            
+            var_dumP('unlocked');
+            foreach ($this->updates as $update) {
+                $r = $this->settings['updates']['callback']($update);
+                if (is_object($r)) {
+                    \Amp\Promise\rethrow($this->call($r));
+                }
             }
+            $this->updates = [];
+
             if ($this->loop_callback !== null) {
                 $callback = $this->loop_callback;
                 $callback();
             }
+            array_walk($this->calls, function ($controller, $id) {
+                if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                    $controller->discard();
+                }
+            });
+    
         }
     }
 }

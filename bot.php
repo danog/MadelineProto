@@ -35,6 +35,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         if (isset($update['message']['media'])) {
             $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
         }
+var_dump($update);
         return;
         $res = json_encode($update, JSON_PRETTY_PRINT);
         if ($res == '') {

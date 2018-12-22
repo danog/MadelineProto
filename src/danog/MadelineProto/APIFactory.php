@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Promise;
+
+
 class APIFactory
 {
     /**
@@ -111,14 +114,18 @@ class APIFactory
      * @var auth
      */
     public $auth;
+
     use Tools;
     public $namespace = '';
     public $API;
     public $lua = false;
+    public $async = false;
+
+    protected $methods = [];
 
     public function __construct($namespace, $API)
     {
-        $this->namespace = $namespace.'.';
+        $this->namespace = $namespace . '.';
         $this->API = $API;
     }
 
@@ -138,9 +145,7 @@ class APIFactory
             $this->API->__construct($this->API->settings);
         }
         $this->API->get_config([], ['datacenter' => $this->API->datacenter->curdc]);
-        $aargs = isset($arguments[1]) && is_array($arguments[1]) ? $arguments[1] : [];
-        $aargs['datacenter'] = $this->API->datacenter->curdc;
-        $aargs['apifactory'] = true;
+
         if (isset($this->session) && !is_null($this->session) && time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
             Logger::log("Didn't serialize in a while, doing that now...");
             $this->serialize($this->session);
@@ -149,21 +154,13 @@ class APIFactory
             $this->API->check_tos();
         }
 
-        if ($this->namespace === '' && !method_exists($this->API, $name) && method_exists($this->API, $camel = lcfirst(str_replace('_', '', ucwords($name, '_'))))) {
-            $name = $camel;
-        }
         if ($this->lua === false) {
-            if (method_exists($this->API, $this->namespace.$name)) {
-                return $this->API->{$this->namespace.$name}(...$arguments);
-            } elseif (array_key_exists($this->namespace.$name, \danog\MadelineProto\MTProto::DISALLOWED_METHODS)) {
-                throw new \danog\MadelineProto\Exception(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$this->namespace.$name], 0, null, 'MadelineProto', 1);
-            } else {
-                return $this->API->method_call($this->namespace.$name, isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [], $aargs);
-            }
+            return $this->namespace !== '' || !isset($this->methods[$name]) ? $this->__mtproto_call($this->namespace . $name, $arguments) : $this->__api_call($name, $arguments);
         }
 
         try {
-            $deserialized = method_exists($this->API, $this->namespace.$name) ? $this->API->{$this->namespace.$name}(...$arguments) : $this->API->method_call($this->namespace.$name, isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [], $aargs);
+            $deserialized = $this->namespace !== '' || !isset($this->methods[$name]) ? $this->__mtproto_call($this->namespace . $name, $arguments) : $this->__api_call($name, $arguments);
+
             Lua::convert_objects($deserialized);
 
             return $deserialized;
@@ -181,6 +178,39 @@ class APIFactory
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         } catch (\danog\MadelineProto\TL\Conversion\Exception $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
+        }
+    }
+    public function __api_call($name, $arguments)
+    {
+        $result = $this->methods[$name](...$arguments);
+        if (is_object($result) && ($result instanceof \Generator || $result instanceof Promise)) {
+            $async = isset(end($arguments)['async']) ? end($arguments)['async'] : $this->async;
+            if ($async) {
+                return $res;
+            } else {
+                return $this->wait($result);
+            }
+        }
+        return $result;
+    }
+    public function __mtproto_call($name, $arguments)
+    {
+        if (array_key_exists($name, \danog\MadelineProto\MTProto::DISALLOWED_METHODS)) {
+            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$name], 0, null, 'MadelineProto', 1);
+        }
+
+        $aargs = isset($arguments[1]) && is_array($arguments[1]) ? $arguments[1] : [];
+        $aargs['datacenter'] = $this->API->datacenter->curdc;
+        $aargs['apifactory'] = true;
+        $args = isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [];
+
+        $async = isset(end($arguments)['async']) ? end($arguments)['async'] : $this->async;
+        $res = $this->API->method_call_async_read($name, $args, $aargs);
+
+        if ($async) {
+            return $res;
+        } else {
+            return $this->wait($res);
         }
     }
 }

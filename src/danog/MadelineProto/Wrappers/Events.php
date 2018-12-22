@@ -26,6 +26,7 @@ trait Events
 {
     public $event_handler;
     private $event_handler_instance;
+    private $event_handler_methods = [];
 
     public function setEventHandler($event_handler)
     {
@@ -39,14 +40,29 @@ trait Events
             $class_name = $this->event_handler;
             $this->event_handler_instance = new $class_name($this);
         }
-        if (method_exists($this->event_handler_instance, 'onLoop')) {
-            $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
+        $this->event_handler_methods = [];
+        foreach (\get_class_methods($this->event_handler) as $method) {
+            if ($method === 'onLoop') {
+                $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
+            } else if ($method === 'onAny') {
+                foreach ($this->constructors->by_id as $id => $constructor) {
+                    if ($constructor['type'] === 'Update' && !isset($this->event_handler_methods[$constructor['predicate']])) {
+                        $this->event_handler_methods[$constructor['predicate']] = [$this->event_handler_instance, 'onAny'];
+                    }
+                }
+            } else {
+                $method_name = lcfirst(substr($method, 2));
+                $this->event_handler_methods[$method_name] = [$this->event_handler_instance, $method];
+            }
         }
 
         $this->settings['updates']['callback'] = [$this, 'event_update_handler'];
         $this->settings['updates']['handle_updates'] = true;
         $this->settings['updates']['run_callback'] = true;
-        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
+
+        if (isset($this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater)) {
+            $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
+        }
 
     }
 
@@ -57,11 +73,8 @@ trait Events
 
     public function event_update_handler($update)
     {
-        $method_name = 'on'.ucfirst($update['_']);
-        if (method_exists($this->event_handler_instance, $method_name)) {
-            $this->event_handler_instance->$method_name($update);
-        } elseif (method_exists($this->event_handler_instance, 'onAny')) {
-            $this->event_handler_instance->onAny($update);
+        if (isset($this->event_handler_methods[$update['_']])) {
+            return $this->event_handler_methods[$update['_']]($update);
         }
     }
 }

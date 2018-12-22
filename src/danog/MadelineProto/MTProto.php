@@ -146,6 +146,7 @@ class MTProto implements TLCallback
     private $altervista = false;
     private $supportUser = 0;
     public $referenceDatabase;
+    public $update_deferred;
 
     public function __magic_construct($settings = [])
     {
@@ -261,6 +262,9 @@ class MTProto implements TLCallback
         }
         $this->postpone_updates = false;
         $this->postpone_pwrchat = false;
+        if ($this->event_handler && class_exists($this->event_handler)) {
+            $this->setEventHandler($this->event_handler);
+        }
         $force = false;
         $this->reset_session();
 

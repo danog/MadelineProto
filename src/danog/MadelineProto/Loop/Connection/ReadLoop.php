@@ -89,7 +89,7 @@ class ReadLoop extends SignalLoop
             }
             $connection->waiter->resume();
             try {
-                $API->handle_messages($datacenter);
+                $API->handle_messages($datacenter);    
             } finally {
                 $this->exitedLoop();
             }

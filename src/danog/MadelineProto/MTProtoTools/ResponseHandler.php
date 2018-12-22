@@ -619,5 +619,11 @@ trait ResponseHandler
         } finally {
             $this->postpone_updates = false;
         }
+        if ($this->updates && $this->update_deferred) {
+            $d = $this->update_deferred;
+            $this->update_deferred = null;
+
+            $d->resolve();
+        }
     }
 }

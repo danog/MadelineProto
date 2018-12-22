@@ -61,14 +61,14 @@ class API extends APIFactory
                     class_exists('\\Volatile');
                     $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                     foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                        class_exists('\\danog\\MadelineProto\\'.$class);
+                        class_exists('\\danog\\MadelineProto\\' . $class);
                     }
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Exception $e) {
                     class_exists('\\Volatile');
                     $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                     foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                        class_exists('\\danog\\MadelineProto\\'.$class);
+                        class_exists('\\danog\\MadelineProto\\' . $class);
                     }
                     Logger::log((string) $e, Logger::ERROR);
                     if (strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
@@ -105,10 +105,18 @@ class API extends APIFactory
         $this->APIFactory();
         \danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
         $pong = $this->ping(['ping_id' => 3]);
-        \danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log('Pong: ' . $pong['ping_id'], Logger::ULTRA_VERBOSE);
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 
+    public function async($async)
+    {
+        $this->async = $async;
+        foreach ($this->API->get_methods_namespaced() as $pair) {
+            $namespace = key($pair);
+            $this->{$namespace}->async = $async;
+        }
+    }
     public function __wakeup()
     {
         $this->APIFactory();
@@ -167,11 +175,53 @@ class API extends APIFactory
         unset($this->API->storage[$name]);
     }
 
+    private function from_camel_case($input)
+    {
+        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
+        $ret = $matches[0];
+        foreach ($ret as &$match) {
+            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+        }
+        return implode('_', $ret);
+    }
     public function APIFactory()
     {
         if ($this->API) {
             foreach ($this->API->get_method_namespaces() as $namespace) {
                 $this->{$namespace} = new APIFactory($namespace, $this->API);
+            }
+            $methods =  get_class_methods($this->API);
+            foreach ($methods as $key => $method) {
+                if ($method == 'method_call_async_read') {
+                    unset($methods[array_search('method_call')]);
+                } else if (stripos($method, 'async') !== false) {
+                    if (strpos($method, '_async') !== false) {
+                        unset($methods[array_search(str_replace('_async', '', $method))]);
+                    } else {
+                        unset($methods[array_search(str_replace('async', '', $method))]);
+                    }
+                }
+            }
+            $this->methods = [];
+            foreach ($methods as $method) {
+                $actual_method = $method;
+
+                if ($method == 'method_call_async_read') {
+                    $method = 'method_call';
+                } else if (stripos($method, 'async') !== false) {
+                    if (strpos($method, '_async') !== false) {
+                        $method = str_replace('_async', '', $method);
+                    } else {
+                        $method = str_replace('async', '', $method);
+                    }
+                }
+
+                $this->methods[$method] = [$this->API, $actual_method];
+                if (strpos($method, '_') !== false) {
+                    $this->methods[lcfirst(str_replace('_', '', ucwords($method, '_')))] = [$this->API, $actual_method];
+                } else {
+                    $this->methods[$this->from_camel_case($method)] = [$this->API, $actual_method];
+                }
             }
             $this->API->wrapper = $this;
         }
