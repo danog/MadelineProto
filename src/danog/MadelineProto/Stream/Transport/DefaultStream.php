@@ -39,7 +39,7 @@ class DefaultStream extends Socket implements RawStreamInterface
 
     public function enableCrypto(): Promise
     {
-
+        return $this->stream->enableCrypto();
     }
     public function __construct()
     {

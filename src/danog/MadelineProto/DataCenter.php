@@ -29,8 +29,8 @@ use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\MTProtoTransport\IntermediatePaddedStream;
 use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
+use danog\MadelineProto\Stream\Proxy\SocksProxy;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
-use danog\MadelineProto\Stream\Transport\ObfuscatedTransportStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
 
@@ -171,6 +171,9 @@ class DataCenter
             if ($this->settings[$dc_config_number]['proxy'] === '\\Socket') {
                 $this->settings[$dc_config_number]['proxy'] = DefaultStream::getName();
             }
+            if ($this->settings[$dc_config_number]['proxy'] === '\\SocksProxy') {
+                $this->settings[$dc_config_number]['proxy'] = SocksProxy::getName();
+            }
             if ($this->settings[$dc_config_number]['proxy'] === '\\MTProxySocket') {
                 $this->settings[$dc_config_number]['proxy'] = ObfuscatedStream::getName();
             }
@@ -186,7 +189,7 @@ class DataCenter
                 if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\StreamInterface'])) {
                     throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
                 }
-                foreach ($combos as $orig) {
+                foreach ($combos as $k => $orig) {
                     $combo = [];
                     if ($proxy === ObfuscatedStream::getName()) {
                         $combo = $orig;
@@ -195,15 +198,23 @@ class DataCenter
                         } else {
                             $mtproto = end($combo);
                             $combo[count($combo) - 1] = [$proxy, $extra];
-                            $combo []= $mtproto;
+                            $combo[] = $mtproto;
                         }
                     } else {
-                        $combo = $orig;
-                        array_unshift($combo, $combo[0]);
-                        $combo[1] = [$proxy, $extra];
+                        if ($orig[1][0] === BufferedRawStream::getName()) {
+                            list($first, $second) = [array_slice($orig, 0, 2), array_slice($orig, 2)];
+                            $first[] = [$proxy, $extra];
+                            $combo = array_merge($first, $second);
+                        } else if ($orig[1][0] === WssStream::getName()) {
+                            list($first, $second) = [array_slice($orig, 0, 1), array_slice($orig, 1)];
+                            $first[] = [BufferedRawStream::getName(), []];
+                            $first[] = [$proxy, $extra];
+                            $combo = array_merge($first, $second);
+                        }
                     }
 
                     $combos[] = $combo;
+                    //unset($combos[$k]);
                 }
             }
 

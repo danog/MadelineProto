@@ -208,7 +208,13 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
         }
         return $this->write($data);
     }
-
+    public function enableCrypto()
+    {
+        if (method_exists($this->stream, 'enableCrypto')) {
+            return $this->stream->enableCrypto();
+        }
+        return new Success(0);
+    }
     /**
      * Get class name.
      *
