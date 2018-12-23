@@ -35,6 +35,9 @@ trait Loop
 
     public function loop_async($max_forks = 0)
     {
+        if (is_callable($max_forks)) {
+            return $max_forks();
+        }
         if (in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler'])) {
             return true;
         }
