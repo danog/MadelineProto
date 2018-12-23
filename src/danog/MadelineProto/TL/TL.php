@@ -825,7 +825,21 @@ trait TL
         }
         if ($x['_'] === 'dataJSON') {
             return json_decode($x['data'], true);
+        } else if ($constructorData['type'] === 'JSONValue') {
+            switch ($x['_']) {
+                case 'jsonNull':
+                    return null;
+                case 'jsonObject':
+                    $res = [];
+                    foreach ($x['value'] as $pair) {
+                        $res[$pair['key']] = $pair['value'];
+                    }
+                    return $res;
+                default:
+                    return $x['value'];
+            }
         }
+
         if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
             foreach ($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) {
                 $callback($x);
