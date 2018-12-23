@@ -197,12 +197,12 @@ class API extends APIFactory
             $methods =  get_class_methods($this->API);
             foreach ($methods as $key => $method) {
                 if ($method == 'method_call_async_read') {
-                    unset($methods[array_search('method_call')]);
+                    unset($methods[array_search('method_call', $methods)]);
                 } else if (stripos($method, 'async') !== false) {
                     if (strpos($method, '_async') !== false) {
-                        unset($methods[array_search(str_replace('_async', '', $method))]);
+                        unset($methods[array_search(str_replace('_async', '', $method), $methods)]);
                     } else {
-                        unset($methods[array_search(str_replace('async', '', $method))]);
+                        unset($methods[array_search(str_replace('async', '', $method), $methods)]);
                     }
                 }
             }
