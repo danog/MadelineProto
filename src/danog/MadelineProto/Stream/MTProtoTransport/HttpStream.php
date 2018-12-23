@@ -165,8 +165,8 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
         }
 
         if ($close) {
-            yield $buffer->bufferEnd();
-            yield $this->connect($this->ctx);
+            $this->stream->disconnect();
+            yield $this->stream->connect($this->ctx);
         }
         if (isset($headers['content-length'])) {
             $length = (int) $headers['content-length'];

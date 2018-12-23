@@ -33,6 +33,7 @@ use danog\MadelineProto\Stream\Proxy\SocksProxy;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
+use danog\MadelineProto\Stream\Proxy\HttpProxy;
 
 /**
  * Manages datacenters.
@@ -173,6 +174,9 @@ class DataCenter
             }
             if ($this->settings[$dc_config_number]['proxy'] === '\\SocksProxy') {
                 $this->settings[$dc_config_number]['proxy'] = SocksProxy::getName();
+            }
+            if ($this->settings[$dc_config_number]['proxy'] === '\\HttpProxy') {
+                $this->settings[$dc_config_number]['proxy'] = HttpProxy::getName();
             }
             if ($this->settings[$dc_config_number]['proxy'] === '\\MTProxySocket') {
                 $this->settings[$dc_config_number]['proxy'] = ObfuscatedStream::getName();

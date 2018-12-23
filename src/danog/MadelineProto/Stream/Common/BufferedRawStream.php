@@ -20,13 +20,11 @@ namespace danog\MadelineProto\Stream\Common;
 
 use Amp\Promise;
 use Amp\Success;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use function Amp\call;
 use function Amp\Socket\connect;
-use function Amp\Socket\cryptoConnect;
-use danog\MadelineProto\Exception;
-use Amp\Socket\Socket;
 
 /**
  * Buffered raw stream.
@@ -134,7 +132,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     {
         if (strlen($append)) {
             $this->append = $append;
-            $this->append_after = $length-strlen($append);
+            $this->append_after = $length - strlen($append);
         }
         return new \Amp\Success($this);
     }
@@ -152,6 +150,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
         $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
         if ($buffer_length >= $length) {
+
             return new Success(fread($this->memory_stream, $length));
         }
 
@@ -170,7 +169,10 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
         $size = fstat($this->memory_stream)['size'];
         $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
-        if ($buffer_length < $length && $buffer_length) fseek($this->memory_stream, $offset+$buffer_length);
+        if ($buffer_length < $length && $buffer_length) {
+            fseek($this->memory_stream, $offset + $buffer_length);
+        }
+
         while ($buffer_length < $length) {
             $chunk = yield $this->read();
             if ($chunk === null) {
@@ -207,13 +209,6 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
             }
         }
         return $this->write($data);
-    }
-    public function enableCrypto()
-    {
-        if (method_exists($this->stream, 'enableCrypto')) {
-            return $this->stream->enableCrypto();
-        }
-        return new Success(0);
     }
     /**
      * Get class name.
