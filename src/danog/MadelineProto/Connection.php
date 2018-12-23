@@ -142,7 +142,18 @@ class Connection
         if (!isset($this->updater)) {
             $this->updater = new UpdateLoop($this->API, $this->datacenter);
         }
-        $this->checker->start();
+        foreach ($this->new_outgoing as $message_id) {
+            if ($this->outgoing_messages[$message_id]['unencrypted']) {
+                $promise = $this->outgoing_messages[$message_id]['promise'];
+                \Amp\Loop::defer(function () use ($promise) { $promise->fail(new Exception('Restart')); });
+                unset($this->new_outgoing[$message_id]);
+                unset($this->outgoing_messages[$message_id]);
+            }
+        }
+
+        if (!$this->checker->start()) {
+            $this->checker->resume();
+        }
         $this->waiter->start();
         $this->writer->start();
         $this->reader->start();
@@ -241,5 +252,9 @@ class Connection
     {
         $this->time_delta = 0;
         $this->pending_outgoing = [];
+        $this->new_outgoing = [];
+        $this->new_incoming = [];
+        $this->outgoing_messages = [];
+        $this->incoming_messages = [];
     }
 }

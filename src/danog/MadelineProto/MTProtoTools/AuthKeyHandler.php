@@ -29,8 +29,12 @@ use danog\MadelineProto\Coroutine;
  */
 trait AuthKeyHandler
 {
+    private $init_auth_dcs = [];
+    private $pending_auth = false;
     public function create_auth_key_async($expires_in, $datacenter): \Generator
     {
+        $this->init_auth_dcs[$datacenter] = true;
+
         $req_pq = strpos($datacenter, 'cdn') ? 'req_pq' : 'req_pq_multi';
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
@@ -388,12 +392,11 @@ trait AuthKeyHandler
                 $this->logger->logger('An exception occurred while generating the authorization key: ' . $e->getMessage() . ' in ' . basename($e->getFile(), '.php') . ' on line ' . $e->getLine() . '. Retrying...', \danog\MadelineProto\Logger::WARNING);
                 $req_pq = $req_pq === 'req_pq_multi' ? 'req_pq' : 'req_pq_multi';
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                if ($e->rpc === 'RPC_CALL_FAIL') {
-                    throw $e;
-                }
                 $this->logger->logger('An RPCErrorException occurred while generating the authorization key: ' . $e->getMessage() . ' Retrying (try number ' . $retry_id_total . ')...', \danog\MadelineProto\Logger::WARNING);
             }
         }
+        unset($this->init_auth_dcs[$datacenter]);
+
         if (strpos($datacenter, 'cdn') === false) {
             throw new \danog\MadelineProto\SecurityException('Auth Failed');
         }
@@ -533,11 +536,16 @@ trait AuthKeyHandler
         $this->postpone_updates = true;
 
         try {
+            $first = true;
             $dcs = [];
             $postpone = [];
             foreach ($this->datacenter->sockets as $id => $socket) {
                 if (strpos($id, 'media') !== false) {
                     $postpone[$id] = $socket;
+                    continue;
+                }
+                if (isset($this->init_auth_dcs[$id])) {
+                    $this->pending_auth = true;
                     continue;
                 }
                 $dcs[$id] = $this->init_authorization_socket($id, $socket);
@@ -551,6 +559,9 @@ trait AuthKeyHandler
                 }
             }
             yield $dcs;
+            if ($this->pending_auth && empty($this->init_auth_dcs)) {
+                yield $this->init_authorization_async();
+            }
         } finally {
             $this->postpone_updates = false;
             $this->initing_authorization = false;

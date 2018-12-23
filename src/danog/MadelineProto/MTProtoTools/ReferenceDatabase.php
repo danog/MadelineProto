@@ -127,6 +127,7 @@ class ReferenceDatabase implements TLCallback
     public function init()
     {
     }
+
     public function getMethodCallbacks(): array
     {
         return array_fill_keys(array_keys(self::METHOD_CONTEXT), [[$this, 'addOriginMethod']]);

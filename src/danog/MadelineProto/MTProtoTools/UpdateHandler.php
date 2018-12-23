@@ -333,6 +333,7 @@ trait UpdateHandler
 
             $d->resolve();
         }
+        return true;
     }
 
     public function get_updates_state()

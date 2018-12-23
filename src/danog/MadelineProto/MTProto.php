@@ -278,6 +278,7 @@ class MTProto implements TLCallback
         if (isset($this->settings['tl_schema']['src']['botAPI']) && $this->settings['tl_schema']['src']['botAPI'] !== __DIR__ . '/TL_botAPI.tl') {
             unset($this->v);
         }
+
         if (!isset($this->v) || $this->v !== self::V) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['serialization_ofd'], Logger::WARNING);
             foreach ($this->datacenter->sockets as $dc_id => $socket) {
@@ -353,6 +354,7 @@ class MTProto implements TLCallback
                 }
             }
         }
+
         if (!$this->settings['updates']['handle_old_updates']) {
             $this->channels_state = [];
             $this->got_state = false;
@@ -382,6 +384,7 @@ class MTProto implements TLCallback
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
             $this->get_updates_difference();
         }
+        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
     }
 
     public function __destruct()

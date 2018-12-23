@@ -50,12 +50,14 @@ class UpdateLoop extends ResumableSignalLoop
 
         $timeout = $API->settings['updates']['getdifference_interval'];
         while (true) {
-            if (!$this->API->settings['updates']['handle_updates']) {
+            if (!$this->API->settings['updates']['handle_updates'] || $connection->temp_auth_key === null) {
                 $this->exitedLoop();
                 return false;
             }
             if (time() - $API->last_getdifference > $timeout) {
-                $API->get_updates_difference();
+                if (!$API->get_updates_difference()) {
+                    return false;
+                }
             }
             if (yield $this->waitSignal($this->pause(($API->last_getdifference + $timeout) - time()))) {
                 $API->logger->logger("Exiting update loop");

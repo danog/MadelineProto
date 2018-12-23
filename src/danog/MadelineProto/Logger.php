@@ -149,7 +149,7 @@ class Logger
                 case 1:
                     $this->stdout->write($param.PHP_EOL);
                     break;
-                case 3:
+                default:
                     $this->stdout->write(Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".PHP_EOL : $param.PHP_EOL);
                     break;
             }

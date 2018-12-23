@@ -75,7 +75,7 @@ class ReadLoop extends SignalLoop
                         $connection->session_id = null;
                         $API->init_authorization();
                     } else {
-                        throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                        //throw new \danog\MadelineProto\RPCErrorException($error, $error);
                     }
                 } else if ($error === -1) {
                     $API->logger->logger("WARNING: Got quick ack from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);

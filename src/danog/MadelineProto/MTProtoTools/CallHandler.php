@@ -231,7 +231,7 @@ trait CallHandler
         //$result = 0;
         $dc_config_number = isset($this->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
         foreach ($this->datacenter->sockets[$datacenter]->new_outgoing as $message_id) {
-            if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent']) && ($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent'] + $this->settings['connection_settings'][$dc_config_number]['timeout'] < time()) && ($this->datacenter->sockets[$datacenter]->temp_auth_key === null) === isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['unencrypted']) && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'] !== 'msgs_state_req') {
+            if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent']) && ($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent'] + $this->settings['connection_settings'][$dc_config_number]['timeout'] < time()) && ($this->datacenter->sockets[$datacenter]->temp_auth_key === null) === (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['unencrypted']) && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['unencrypted']) && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'] !== 'msgs_state_req') {
                 return true;
                 //$result |= 1;
             }
