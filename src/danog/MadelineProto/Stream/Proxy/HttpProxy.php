@@ -45,7 +45,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
-        $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port']);
+        $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port'])->secure(false);
 
         $this->stream = yield $ctx->getStream();
 
