@@ -64,7 +64,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         }
         if ($method === 2) {
             $auth = chr(1) . chr(strlen($this->extra['username'])) . $this->extra['username'] . chr(strlen($this->extra['password'])) . $this->extra['password'];
-            yield (yield $this->stream->getWriteBuffer(strlen($auth)))->bufferWrite($auth);
+            yield $this->stream->write($auth);
             
             $buffer = yield $this->stream->getReadBuffer($l);
 
@@ -89,8 +89,8 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
             $payload .= pack('C2', 0x03, strlen($uri->getHost())) . $uri->getHost();
         }
         $payload .= pack('n', $uri->getPort());
+        yield $this->stream->write($payload);
 
-        yield (yield $this->stream->getWriteBuffer(strlen($payload)))->bufferWrite($payload);
         $l = 4;
         $buffer = yield $this->stream->getReadBuffer($l);
 

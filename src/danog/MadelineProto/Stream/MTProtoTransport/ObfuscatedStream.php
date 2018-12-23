@@ -188,11 +188,11 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
      */
     public function setExtra($extra)
     {
-        if (isset($extra['secret']) && strlen($extra) > 17) {
-            $extra = hex2bin($extra);
+        if (isset($extra['secret']) && strlen($extra['secret']) > 17) {
+            $extra['secret'] = hex2bin($extra['secret']);
         }
-        if (isset($extra['secret']) && strlen($extra) == 17) {
-            $extra = substr($extra, 0, 16);
+        if (isset($extra['secret']) && strlen($extra['secret']) == 17) {
+            $extra['secret'] = substr($extra['secret'], 0, 16);
         }
         $this->extra = $extra;
     }
