@@ -25,6 +25,7 @@ if (!file_exists(__DIR__.'/vendor/autoload.php')) {
     require_once 'vendor/autoload.php';
 }
 
+
 class EventHandler extends \danog\MadelineProto\EventHandler
 {
     public function onAny($update)
