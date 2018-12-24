@@ -29,7 +29,7 @@ echo '{
         }
     ]
 }' > composer.json
-composer update
+#composer update
 cd ..
 
 cp -a phar7 phar5

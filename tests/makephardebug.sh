@@ -28,7 +28,7 @@ echo '{
         }
     ]
 }' > composer.json
-composer update
+#composer update
 cp -a ../src vendor/danog/madelineproto
 cd ..
 
