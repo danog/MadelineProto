@@ -145,7 +145,7 @@ class WriteLoop extends ResumableSignalLoop
             if ($API->is_http($datacenter) && !$has_http_wait) {
                 $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
 
-                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'http_wait', 'body' => $this->API->serialize_object(['type' => 'http_wait'], ['max_wait' => $API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => false, 'unencrypted' => false, 'method' => true];
+                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'http_wait', 'body' => $this->API->serialize_object(['type' => 'http_wait'], ['_' => 'http_wait', 'max_wait' => $API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => false, 'unencrypted' => false, 'method' => true];
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
 
                 $has_http_wait = true;

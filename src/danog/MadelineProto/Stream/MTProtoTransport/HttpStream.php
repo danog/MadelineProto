@@ -39,7 +39,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     private $stream;
     private $code;
     private $ctx;
-    private $headers = '';
+    private $header = '';
     /**
      * URI of the HTTP API.
      *

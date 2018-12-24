@@ -151,12 +151,12 @@ class Connection
             }
         }
 
+        $this->writer->start();
+        $this->reader->start();
         if (!$this->checker->start()) {
             $this->checker->resume();
         }
         $this->waiter->start();
-        $this->writer->start();
-        $this->reader->start();
 
         if ($this->datacenter === $this->API->settings['connection_settings']['default_dc']) {
             $this->updater->start();

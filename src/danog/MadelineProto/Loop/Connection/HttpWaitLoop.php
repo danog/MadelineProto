@@ -53,7 +53,7 @@ class HttpWaitLoop extends ResumableSignalLoop
                 return;
             }
             if (time() - $connection->last_http_wait > $timeout) {
-                yield $connection->sendMessage(['_' => 'http_wait', 'body' => ['max_wait' => $timeout * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'content_related' => false, 'unencrypted' => false, 'method' => true]);
+                yield $connection->sendMessage(['_' => 'http_wait', 'body' => ['max_wait' => $timeout * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'content_related' => false, 'unencrypted' => false, 'method' => false]);
             }
             if (yield $this->waitSignal($this->pause(($connection->last_http_wait + $timeout) - time()))) {
                 $API->logger->logger("Exiting HTTP wait loop");

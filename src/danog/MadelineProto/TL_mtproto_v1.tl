@@ -59,6 +59,8 @@ msg_new_detailed_info#809db6df answer_msg_id:long bytes:int status:int = MsgDeta
 
 rsa_public_key n:string e:string = RSAPublicKey;
 
+http_wait#9299359f max_delay:int wait_after:int max_wait:int = HttpWait;
+
 ---functions---
 
 req_pq_multi#be7e8ef1 nonce:int128 = ResPQ;
@@ -74,8 +76,6 @@ get_future_salts#b921bd04 num:int = FutureSalts;
 ping#7abe77ec ping_id:long = Pong;
 ping_delay_disconnect#f3427b8c ping_id:long disconnect_delay:int = Pong;
 destroy_session#e7512126 session_id:long = DestroySessionRes;
-
-http_wait#9299359f max_delay:int wait_after:int max_wait:int = HttpWait;
 
 //test.useGzipPacked = GzipPacked;
 //test.useServerDhInnerData = Server_DH_inner_data;

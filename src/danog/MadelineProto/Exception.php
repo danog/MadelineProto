@@ -81,8 +81,7 @@ class Exception extends \Exception
     {
         // If error is suppressed with @, don't throw an exception
         if (error_reporting() === 0 || $errfile && strpos($errfile, 'vendor/amphp') !== false) {
-            return true;
-            // return true to continue through the others error handlers
+            return false;
         }
 
         throw new self($errstr, $errno, null, $errfile, $errline);
