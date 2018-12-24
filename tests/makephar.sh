@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-composer global require spatie/7to5 dev-master#7b3e0f4254aadd81cf1a7ef2ddad68d5fcdadcc1
+#composer global require spatie/7to5 dev-master#7b3e0f4254aadd81cf1a7ef2ddad68d5fcdadcc1
 
 [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
 [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
@@ -29,7 +29,7 @@ echo '{
         }
     ]
 }' > composer.json
-#composer update
+composer update
 cd ..
 
 cp -a phar7 phar5
