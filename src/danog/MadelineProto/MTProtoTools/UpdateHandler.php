@@ -75,8 +75,10 @@ trait UpdateHandler
 
         $params = array_merge(self::DEFAULT_GETUPDATES_PARAMS, $params);
 
-        $this->update_deferred = new Deferred();
-        yield any([$this->update_deferred->promise(), new Delayed($params['timeout'] * 1000)]);
+        if (empty($this->updates)) {
+            $this->update_deferred = new Deferred();
+            yield any([$this->update_deferred->promise(), new Delayed($params['timeout'] * 1000)]);
+        }
 
         if (empty($this->updates)) {
             return [];

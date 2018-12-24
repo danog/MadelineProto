@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto;
 
+use function Amp\Promise\wait;
+
+
 class Magic
 {
     public static $storage = [];
@@ -28,6 +31,7 @@ class Magic
     public static $isatty = false;
     public static $is_fork = false;
     public static $can_getmypid = true;
+    public static $can_parallel = false;
     public static $processed_fork = false;
     public static $ipv6;
     public static $pid;
@@ -81,14 +85,35 @@ class Magic
             } catch (\danog\MadelineProto\Exception $e) {
             }
             self::$can_getmypid = !(isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org'));
-            self::$revision = @file_get_contents(__DIR__.'/../../../.git/refs/heads/master');
+            self::$revision = @file_get_contents(__DIR__ . '/../../../.git/refs/heads/master');
             if (self::$revision) {
                 self::$revision = trim(self::$revision);
                 $latest = @file_get_contents('https://phar.madelineproto.xyz/release');
                 if ($latest) {
                     $latest = self::$revision === trim($latest) ? '' : ' (AN UPDATE IS REQUIRED)';
                 }
-                self::$revision = 'Revision: '.self::$revision.$latest;
+                self::$revision = 'Revision: ' . self::$revision . $latest;
+            }
+            self::$can_parallel = false;
+            try {
+                $back = debug_backtrace(0);
+                $promise = \Amp\File\get(end($back)['file']);
+                do {
+                    try {
+                        if (wait($promise)) {
+                            self::$can_parallel = true;
+                            break;
+                        }
+                    } catch (\Throwable $e) {
+                        if ($e->getMessage() !== 'Loop stopped without resolving the promise') {
+                            throw $e;
+                        }
+                    }
+                } while (true);
+            } catch (\Exception $e) {
+            }
+            if (!self::$can_parallel && !defined('AMP_WORKER')) {
+                define('AMP_WORKER', 1);
             }
             self::$inited = true;
         }

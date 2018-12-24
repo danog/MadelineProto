@@ -14,6 +14,7 @@ if (!file_exists('madeline.phar') || !file_exists('madeline.phar.version') || (f
     unset($release);
     unset($phar);
 }
+
 $file = debug_backtrace(0, 1)[0]['file'];
 if (file_exists($file)) {
     $contents = file_get_contents($file);
