@@ -31,8 +31,8 @@ if (PHP_MAJOR_VERSION === 5 && PHP_MINOR_VERSION < 6) {
         $release_default = '5';
     }
 
-    if (!($release = file_get_contents(sprintf($release_template, $release_branch)))) {
-        if (!($release = file_get_contents(sprintf($release_template, $release_default)))) {
+    if (!($release = @file_get_contents(sprintf($release_template, $release_branch)))) {
+        if (!($release = @file_get_contents(sprintf($release_template, $release_default)))) {
             return;
         }
         $release_branch = $release_default;
