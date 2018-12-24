@@ -217,7 +217,7 @@ class DataCenter
                         }
                     }
 
-                    $combos[] = $combo;
+                    array_unshift($combos, $combo);
                     //unset($combos[$k]);
                 }
             }
