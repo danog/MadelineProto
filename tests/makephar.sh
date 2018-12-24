@@ -32,10 +32,11 @@ echo '{
 composer update
 cd ..
 
-$php7to5 convert --copy-all phar7 phar5 >/dev/null
-find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
-sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
-echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
+#$php7to5 convert --copy-all phar7 phar5 >/dev/null
+#find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
+#sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
+#echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
+cp -a phar7 phar5
 
 [ "$TRAVIS_BRANCH" != "master" ] && branch="-$TRAVIS_BRANCH" || branch=""
 

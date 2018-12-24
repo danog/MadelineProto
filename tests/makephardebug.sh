@@ -32,10 +32,11 @@ composer update
 cp -a ../src vendor/danog/madelineproto
 cd ..
 
-$php7to5 convert --copy-all phar7 phar5 >/dev/null
-find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
-sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
-echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
+#$php7to5 convert --copy-all phar7 phar5 >/dev/null
+#find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
+#sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
+#echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
+cp -a phar7 phar5
 
 php makephar.php phar5 madeline.phar $(cat .git/refs/heads/master)
 
