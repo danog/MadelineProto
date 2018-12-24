@@ -29,11 +29,11 @@ use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\MTProtoTransport\IntermediatePaddedStream;
 use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
+use danog\MadelineProto\Stream\Proxy\HttpProxy;
 use danog\MadelineProto\Stream\Proxy\SocksProxy;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
-use danog\MadelineProto\Stream\Proxy\HttpProxy;
 
 /**
  * Manages datacenters.
@@ -168,19 +168,6 @@ class DataCenter
                 $combos[] = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), $extra], [IntermediatePaddedStream::getName(), []]];
             }
 
-            // Convert old settings
-            if ($this->settings[$dc_config_number]['proxy'] === '\\Socket') {
-                $this->settings[$dc_config_number]['proxy'] = DefaultStream::getName();
-            }
-            if ($this->settings[$dc_config_number]['proxy'] === '\\SocksProxy') {
-                $this->settings[$dc_config_number]['proxy'] = SocksProxy::getName();
-            }
-            if ($this->settings[$dc_config_number]['proxy'] === '\\HttpProxy') {
-                $this->settings[$dc_config_number]['proxy'] = HttpProxy::getName();
-            }
-            if ($this->settings[$dc_config_number]['proxy'] === '\\MTProxySocket') {
-                $this->settings[$dc_config_number]['proxy'] = ObfuscatedStream::getName();
-            }
             if (is_array($this->settings[$dc_config_number]['proxy'])) {
                 $proxies = $this->settings[$dc_config_number]['proxy'];
                 $proxy_extras = $this->settings[$dc_config_number]['proxy_extra'];
@@ -189,6 +176,22 @@ class DataCenter
                 $proxy_extras = [$this->settings[$dc_config_number]['proxy_extra']];
             }
             foreach ($proxies as $key => $proxy) {
+                // Convert old settings
+                if ($proxy === '\\Socket') {
+                    $proxy = DefaultStream::getName();
+                }
+                if ($proxy === '\\SocksProxy') {
+                    $proxy = SocksProxy::getName();
+                }
+                if ($proxy === '\\HttpProxy') {
+                    $proxy = HttpProxy::getName();
+                }
+                if ($proxy === '\\MTProxySocket') {
+                    $proxy = ObfuscatedStream::getName();
+                }
+                if ($proxy === DefaultStream::getName()) {
+                    continue;
+                }
                 $extra = $proxy_extras[$key];
                 if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\StreamInterface'])) {
                     throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
