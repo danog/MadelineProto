@@ -26,6 +26,7 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Tools;
 use function Amp\call;
+use Amp\Loop;
 
 /**
  * Socket read loop
@@ -87,13 +88,13 @@ class ReadLoop extends SignalLoop
 
                 return;
             }
-            $connection->waiter->resume();
             try {
                 $API->handle_messages($datacenter);    
             } finally {
                 $this->exitedLoop();
             }
             $this->startedLoop();
+            Loop::defer(function () use ($datacenter) { $this->API->datacenter->sockets[$datacenter]->waiter->resume(); });
         }
     }
 

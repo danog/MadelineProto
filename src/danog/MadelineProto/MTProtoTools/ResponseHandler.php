@@ -294,11 +294,13 @@ trait ResponseHandler
             }
         } else {
             $this->logger->logger('Rejecting: already got response for ' . (isset($request['_']) ? $request['_'] : '-'));
+            $this->logger->logger("Rejecting: $data");
         }
     }
 
     public function handle_response($request_id, $response_id, $datacenter)
     {
+        //var_dumP("Response ".bin2hex($request_id));
         $response = &$this->datacenter->sockets[$datacenter]->incoming_messages[$response_id]['content'];
         unset($this->datacenter->sockets[$datacenter]->incoming_messages[$response_id]['content']);
         $request = &$this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id];

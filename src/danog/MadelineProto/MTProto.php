@@ -184,7 +184,7 @@ class MTProto implements TLCallback
         $this->construct_TL($this->settings['tl_schema']['src'], [$this, $this->referenceDatabase]);
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
-        if (!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) {
+        if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== NULL) {
             try {
                 $nearest_dc = $this->method_call('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
                 $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
@@ -211,6 +211,11 @@ class MTProto implements TLCallback
     public function isAltervista()
     {
         return $this->altervista;
+    }
+
+    public function isInitingAuthorization()
+    {
+        return $this->initing_authorization;
     }
 
     public function __wakeup()

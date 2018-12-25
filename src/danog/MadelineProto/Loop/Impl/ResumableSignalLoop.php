@@ -46,6 +46,7 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
                     $this->resumeWatcher = null;
                 }
                 $this->resumeWatcher = Loop::delay($time * 1000, [$this, 'resume'], $resume);
+                //var_dump("resume {$this->resumeWatcher} ".get_class($this)." DC {$this->datacenter} after ", ($time * 1000), $resume);
             }
         }
         $this->resume = new Deferred();
@@ -55,7 +56,15 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
     public function resume($watcherId = null, $expected = 0)
     {
         if ($this->resumeWatcher) {
+            $storedWatcherId = $this->resumeWatcher;
+            Loop::cancel($storedWatcherId);
             $this->resumeWatcher = null;
+            if ($watcherId && $storedWatcherId !== $watcherId) {
+                return;
+            }
+        }
+        if ($expected) {
+            //var_dump("=======", "resume $watcherId ".get_class($this)." DC {$this->datacenter} diff ".(microtime(true) - $expected).": expected $expected, actual ".microtime(true));
         }
         if ($this->resume) {
             $resume = $this->resume;

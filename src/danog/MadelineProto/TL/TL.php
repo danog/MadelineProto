@@ -422,6 +422,7 @@ trait TL
         if ($predicate === 'messageEntityMentionName') {
             $constructorData = $this->constructors->find_by_predicate('inputMessageEntityMentionName');
         }
+
         $concat = '';
         if (!$bare) {
             $concat = $constructorData['id'];

@@ -57,6 +57,6 @@ abstract class SignalLoop extends Loop implements SignalLoopInterface
             }
         });
 
-        return $promise;
+        return $dpromise;
     }
 }

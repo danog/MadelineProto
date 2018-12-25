@@ -63,4 +63,8 @@ abstract class Loop implements LoopInterface
     {
         $this->count++;
     }
+    public function isRunning()
+    {
+        return $this->count;
+    }
 }

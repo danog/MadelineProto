@@ -47,18 +47,27 @@ class HttpWaitLoop extends ResumableSignalLoop
 
         $timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
         while (true) {
+            //var_dump("http loop DC $datacenter");
             if (!in_array($connection->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()])) {
                 $this->exitedLoop();
                 yield new Success(0);
                 return;
             }
-            if (time() - $connection->last_http_wait > $timeout) {
-                yield $connection->sendMessage(['_' => 'http_wait', 'body' => ['max_wait' => $timeout * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'content_related' => false, 'unencrypted' => false, 'method' => false]);
+            while ($connection->temp_auth_key === NULL) {
+                if (yield $this->waitSignal($this->pause())) {
+                    $API->logger->logger("Exiting HTTP wait loop");
+                    $this->exitedLoop();
+                    return;
+                }
             }
-            if (yield $this->waitSignal($this->pause(($connection->last_http_wait + $timeout) - time()))) {
+            //if (time() - $connection->last_http_wait >= $timeout) {
+                yield $connection->sendMessage(['_' => 'http_wait', 'body' => ['max_wait' => $timeout * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'content_related' => true, 'unencrypted' => false, 'method' => false]);
+                //var_dump('sent wait');
+            //}
+            //($connection->last_http_wait + $timeout) - time()
+            if ($a = yield $this->waitSignal($this->pause())) {
                 $API->logger->logger("Exiting HTTP wait loop");
                 $this->exitedLoop();
-                yield new Success(0);
                 return;
             }
         }

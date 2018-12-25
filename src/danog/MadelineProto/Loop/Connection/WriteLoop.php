@@ -68,6 +68,8 @@ class WriteLoop extends ResumableSignalLoop
                 $this->exitedLoop();
             }
             $this->startedLoop();
+
+            //$connection->waiter->resume();
         }
     }
 
@@ -78,6 +80,7 @@ class WriteLoop extends ResumableSignalLoop
         $connection = $this->connection;
 
         while ($connection->pending_outgoing) {
+            $skipped_all = true;
             foreach ($connection->pending_outgoing as $k => $message) {
                 if ($connection->temp_auth_key !== null) {
                     return;
@@ -85,6 +88,7 @@ class WriteLoop extends ResumableSignalLoop
                 if (!$message['unencrypted']) {
                     continue;
                 }
+                $skipped_all = false;
 
                 $body = $message['serialized_body'];
 
@@ -101,6 +105,8 @@ class WriteLoop extends ResumableSignalLoop
 
                 yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int($length) . $body . $pad);
 
+                //var_dump("plain ".bin2hex($message_id));
+
                 $connection->outgoing_messages[$message_id] = $message;
                 $connection->outgoing_messages[$message_id]['sent'] = time();
                 $connection->outgoing_messages[$message_id]['tries'] = 0;
@@ -113,6 +119,7 @@ class WriteLoop extends ResumableSignalLoop
 
                 unset($connection->pending_outgoing[$k]);
             }
+            if ($skipped_all) break;
         }
     }
     public function encryptedWriteLoopAsync(): \Generator
@@ -145,7 +152,7 @@ class WriteLoop extends ResumableSignalLoop
             if ($API->is_http($datacenter) && !$has_http_wait) {
                 $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
 
-                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'http_wait', 'body' => $this->API->serialize_object(['type' => 'http_wait'], ['_' => 'http_wait', 'max_wait' => $API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => false, 'unencrypted' => false, 'method' => true];
+                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => $this->API->serialize_object(['type' => ''], ['_' => 'http_wait', 'max_wait' => $API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
 
                 $has_http_wait = true;
@@ -240,6 +247,7 @@ unset($gzipped);
                 $message_id = $connection->generate_message_id($datacenter);
                 $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msg_container', 'container' => array_values($keys), 'content_related' => false, 'method' => false];
 
+                //var_dumP("container ".bin2hex($message_id));
                 $keys[$connection->pending_outgoing_key++] = $message_id;
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
 
@@ -278,6 +286,16 @@ unset($gzipped);
             $API->logger->logger("Sent encrypted payload to DC {$datacenter}, speed " . ((($len * 8) / (microtime(true) - $t)) / 1000000) . " mbps!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             $sent = time();
+            
+            if ($to_ack) {
+                $connection->ack_queue = [];
+            }
+
+            if ($has_http_wait) {
+                $connection->last_http_wait = $sent;
+            } elseif ($API->isAltervista()) {
+                $connection->last_http_wait = PHP_INT_MAX;
+            }
 
             foreach ($keys as $key => $message_id) {
                 $connection->outgoing_messages[$message_id] = &$connection->pending_outgoing[$key];
@@ -289,18 +307,10 @@ unset($gzipped);
                 if (isset($connection->outgoing_messages[$message_id]['send_promise'])) {
                     $connection->outgoing_messages[$message_id]['send_promise']->resolve(isset($connection->outgoing_messages[$message_id]['promise']) ? $connection->outgoing_messages[$message_id]['promise'] : true);
                 }
+                //var_dumP("encrypted ".bin2hex($message_id)." ".$connection->outgoing_messages[$message_id]['_']);
                 unset($connection->pending_outgoing[$key]);
             }
 
-            if ($to_ack) {
-                $connection->ack_queue = [];
-            }
-
-            if ($has_http_wait) {
-                $connection->last_http_wait = $sent;
-            } elseif ($API->isAltervista()) {
-                $connection->last_http_wait = PHP_INT_MAX;
-            }
             //if (!empty($connection->pending_outgoing)) $connection->select();
         } while (!empty($connection->pending_outgoing));
 

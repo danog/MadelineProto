@@ -19,8 +19,6 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use danog\MadelineProto\Coroutine;
-
 /**
  * Manages the creation of the authorization key.
  *
@@ -33,8 +31,6 @@ trait AuthKeyHandler
     private $pending_auth = false;
     public function create_auth_key_async($expires_in, $datacenter): \Generator
     {
-        $this->init_auth_dcs[$datacenter] = true;
-
         $req_pq = strpos($datacenter, 'cdn') ? 'req_pq' : 'req_pq_multi';
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
@@ -395,8 +391,6 @@ trait AuthKeyHandler
                 $this->logger->logger('An RPCErrorException occurred while generating the authorization key: ' . $e->getMessage() . ' Retrying (try number ' . $retry_id_total . ')...', \danog\MadelineProto\Logger::WARNING);
             }
         }
-        unset($this->init_auth_dcs[$datacenter]);
-
         if (strpos($datacenter, 'cdn') === false) {
             throw new \danog\MadelineProto\SecurityException('Auth Failed');
         }
@@ -531,93 +525,118 @@ trait AuthKeyHandler
     }
     public function init_authorization_async()
     {
+        if ($this->pending_auth) {
+            return;
+        }
+        $initing = $this->initing_authorization;
+
         $this->initing_authorization = true;
         $this->updates_state['sync_loading'] = true;
         $this->postpone_updates = true;
 
         try {
-            $first = true;
-            $dcs = [];
+            $dcs = [];            
             $postpone = [];
             foreach ($this->datacenter->sockets as $id => $socket) {
                 if (strpos($id, 'media') !== false) {
-                    $postpone[$id] = $socket;
+                    $oid = intval($id);
+                    if (isset($dcs[$oid])) {
+                        $postpone[$id] = $socket;
+                    }
                     continue;
                 }
                 if (isset($this->init_auth_dcs[$id])) {
                     $this->pending_auth = true;
                     continue;
                 }
-                $dcs[$id] = $this->init_authorization_socket($id, $socket);
+                $dcs[$id] = function () use ($id, $socket) {return $this->init_authorization_socket($id, $socket); };
             }
-            foreach ($postpone as $id => $socket) {
-                $oid = intval($id);
-                if (isset($dcs[$oid])) {
-                    $dcs[$oid] = $this->after($dcs[$oid], function () use ($id, $socket) {return $this->init_authorization_socket($id, $socket);});
-                } else {
-                    $dcs[$id] = $this->init_authorization_socket($id, $socket);
-                }
+            yield array_shift($dcs)();
+            foreach ($dcs as &$dc) {
+                $dc = $dc();
             }
             yield $dcs;
+
+            foreach ($postpone as $id => $socket) {
+                yield $this->init_authorization_socket($id, $socket);
+            }
+            //foreach ($dcs as $dc) { yield $dc; }
+
             if ($this->pending_auth && empty($this->init_auth_dcs)) {
+                $this->pending_auth = false;
                 yield $this->init_authorization_async();
             }
         } finally {
+            $this->pending_auth = false;
             $this->postpone_updates = false;
-            $this->initing_authorization = false;
+            $this->initing_authorization = $initing;
             $this->updates_state['sync_loading'] = false;
             $this->handle_pending_updates();
         }
     }
     public function init_authorization_socket($id, $socket)
     {
-        if ($socket->session_id === null) {
-            $socket->session_id = $this->random(8);
-            $socket->session_in_seq_no = 0;
-            $socket->session_out_seq_no = 0;
-        }
-        $cdn = strpos($id, 'cdn');
-        $media = strpos($id, 'media');
+        $this->init_auth_dcs[$id] = true;
 
-        if ($socket->temp_auth_key === null || $socket->auth_key === null) {
-            $dc_config_number = isset($this->settings['connection_settings'][$id]) ? $id : 'all';
-            if ($socket->auth_key === null && !$cdn && !$media) {
-                $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                $socket->auth_key = yield $this->create_auth_key_async(-1, $id);
-                $socket->authorized = false;
-            } elseif ($socket->auth_key === null && $media) {
-                $socket->auth_key = $this->datacenter->sockets[intval($id)]->auth_key;
-                $socket->authorized = &$this->datacenter->sockets[intval($id)]->authorized;
+        try {
+            if ($socket->session_id === null) {
+                $socket->session_id = $this->random(8);
+                $socket->session_in_seq_no = 0;
+                $socket->session_out_seq_no = 0;
             }
-            if ($media) {
-                $socket->authorized = &$this->datacenter->sockets[intval($id)]->authorized;
-            }
-            if ($this->settings['connection_settings'][$dc_config_number]['pfs']) {
-                if (!$cdn) {
-                    $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                    $socket->temp_auth_key = null;
-                    $socket->temp_auth_key = yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
-                    yield $this->bind_temp_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
-                    $config = yield $this->method_call_async_read('help.getConfig', [], ['datacenter' => $id]);
-                    yield $this->sync_authorization_async($id);
-                    yield $this->get_config_async($config);
-                } elseif ($socket->temp_auth_key === null) {
-                    $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                    $socket->temp_auth_key = yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+            $cdn = strpos($id, 'cdn');
+            $media = strpos($id, 'media');
+
+            if ($socket->temp_auth_key === null || $socket->auth_key === null) {
+                $dc_config_number = isset($this->settings['connection_settings'][$id]) ? $id : 'all';
+                if ($socket->auth_key === null && !$cdn && !$media) {
+                    $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
+                    $socket->auth_key = yield $this->create_auth_key_async(-1, $id);
+                    $socket->authorized = false;
+                } elseif ($socket->auth_key === null && $media) {
+                    $socket->auth_key = $this->datacenter->sockets[intval($id)]->auth_key;
+                    $socket->authorized = &$this->datacenter->sockets[intval($id)]->authorized;
                 }
-            } else {
-                if (!$cdn) {
-                    $socket->temp_auth_key = $socket->auth_key;
-                    $config = yield $this->method_call_async_read('help.getConfig', [], ['datacenter' => $id]);
-                    yield $this->sync_authorization_async($id);
-                    yield $this->get_config_async($config);
-                } elseif ($socket->temp_auth_key === null) {
-                    $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                    $socket->temp_auth_key = yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                if ($media) {
+                    $socket->authorized = &$this->datacenter->sockets[intval($id)]->authorized;
                 }
+                if ($this->settings['connection_settings'][$dc_config_number]['pfs']) {
+                    if (!$cdn) {
+                        $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
+
+                        //$authorized = $socket->authorized;
+                        //$socket->authorized = false;
+
+                        $socket->temp_auth_key = null;
+                        $socket->temp_auth_key = yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                        yield $this->bind_temp_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+
+                        //$socket->authorized = $authorized;
+
+                        $config = yield $this->method_call_async_read('help.getConfig', [], ['datacenter' => $id]);
+
+                        yield $this->sync_authorization_async($id);
+                        yield $this->get_config_async($config);
+                    } elseif ($socket->temp_auth_key === null) {
+                        $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
+                        $socket->temp_auth_key = yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                    }
+                } else {
+                    if (!$cdn) {
+                        $socket->temp_auth_key = $socket->auth_key;
+                        $config = yield $this->method_call_async_read('help.getConfig', [], ['datacenter' => $id]);
+                        yield $this->sync_authorization_async($id);
+                        yield $this->get_config_async($config);
+                    } elseif ($socket->temp_auth_key === null) {
+                        $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
+                        $socket->temp_auth_key = yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                    }
+                }
+            } elseif (!$cdn) {
+                yield $this->sync_authorization_async($id);
             }
-        } elseif (!$cdn) {
-            yield $this->sync_authorization_async($id);
+        } finally {
+            unset($this->init_auth_dcs[$id]);
         }
 
     }

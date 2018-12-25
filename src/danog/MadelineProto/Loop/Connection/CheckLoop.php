@@ -61,6 +61,8 @@ class CheckLoop extends ResumableSignalLoop
         $this->startedLoop();
         $API->logger->logger("Entered check loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
 
+        $try_count = 0;
+
         $timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
         while (true) {
             while (empty($connection->new_outgoing)) {
@@ -69,6 +71,7 @@ class CheckLoop extends ResumableSignalLoop
                     $this->exitedLoop();
                     return;
                 }
+                $try_count = 0;
             }
 
             if ($this->hasPendingCalls()) {
@@ -100,6 +103,7 @@ class CheckLoop extends ResumableSignalLoop
                                     case 1:
                                     case 2:
                                     case 3:
+                                        if ($connection->outgoing_messages[$message_id]['_'] === 'msgs_state_req') break;
                                         $API->logger->logger('Message ' . $connection->outgoing_messages[$message_id]['_'] . ' with message ID ' . ($message_id) . ' not received by server, resending...', \danog\MadelineProto\Logger::ERROR);
                                         $API->method_recall('', ['message_id' => $message_id, 'datacenter' => $datacenter, 'postpone' => true]);
                                         break;
@@ -124,7 +128,11 @@ class CheckLoop extends ResumableSignalLoop
                             $connection->writer->resume();
                         }
                     );
-                    $API->logger->logger("Still missing something on DC $datacenter, sending state request", \danog\MadelineProto\Logger::ERROR);
+                    $list = '';
+                    foreach ($message_ids as $message_id) {
+                        $list .= $connection->outgoing_messages[$message_id]['_'].', ';
+                    }
+                    $API->logger->logger("Still missing $list on DC $datacenter, sending state request", \danog\MadelineProto\Logger::ERROR);
                     yield $API->object_call_async('msgs_state_req', ['msg_ids' => $message_ids], ['datacenter' => $datacenter, 'promise' => $deferred]);
                 } else {
                     foreach ($connection->new_outgoing as $message_id) {
@@ -138,13 +146,17 @@ class CheckLoop extends ResumableSignalLoop
                     }
                     $connection->writer->resume();
                 }
+                //$t = time();
                 if (yield $this->waitSignal($this->pause($timeout))) {
                     $API->logger->logger("Exiting check loop");
                     $this->exitedLoop();
                     return;
                 }
+                //var_dumP("after ".(time() - $t).", with timeout ".$timeout);
+
+                $try_count++;
                 if ($connection->last_recv === $last_recv) {
-                    $API->logger->logger("Reconnecting and exiting check loop");
+                    $API->logger->logger("Reconnecting and exiting check loop on DC $datacenter");
                     $this->exitedLoop();
                     yield $connection->reconnect();
                     return;
@@ -155,6 +167,7 @@ class CheckLoop extends ResumableSignalLoop
                     $this->exitedLoop();
                     return;
                 }
+                $try_count = 0;
             }
         }
     }
