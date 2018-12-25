@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use \Amp\Loop;
+
 /**
  * Manages peers.
  */
@@ -27,6 +29,11 @@ trait PeerHandler
     public function to_supergroup($id)
     {
         return -($id + pow(10, (int) floor(log($id, 10) + 3)));
+    }
+
+    public function from_supergroup($id)
+    {
+        return -$id - pow(10, (int) floor(log(-$id, 10)));
     }
 
     public function is_supergroup($id)
@@ -144,6 +151,7 @@ trait PeerHandler
         if ($this->postpone_pwrchat) {
             $this->pending_pwrchat[$id] = [$full_fetch, $send];
         } else {
+            Loop::defer(function () use ($id, $full_fetch, $send) {
             try {
                 $this->get_pwr_chat($id, $full_fetch, $send);
             } catch (\danog\MadelineProto\Exception $e) {
@@ -151,6 +159,7 @@ trait PeerHandler
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
             }
+            });
         }
     }
 
@@ -341,8 +350,22 @@ trait PeerHandler
             if (is_string($id)) {
                 $id = \danog\MadelineProto\Magic::$bigint ? (float) $id : (int) $id;
             }
-            if (!isset($this->chats[$id]) && $id < 0 && !$this->is_supergroup($id)) {
-                $this->method_call('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);
+            if (!isset($this->chats[$id])) {
+                try {
+                    if ($id < 0) {
+                        if ($this->is_supergroup($id)) {
+                            $this->method_call('channels.getChannels', ['id' => [['access_hash' => 0, 'channel_id' => $this->from_supergroup($id), '_' => 'inputChannel']]], ['datacenter' => $this->datacenter->curdc]);
+                        } else {
+                            $this->method_call('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);
+                        }
+                    } else {
+                        $this->method_call('users.getUsers', ['id' => [['access_hash' => 0, 'user_id' => $id, '_' => 'inputUser']]], ['datacenter' => $this->datacenter->curdc]);
+                    }
+                } catch (\danog\MadelineProto\Exception $e) {
+                    $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                }
             }
             if (isset($this->chats[$id])) {
                 try {

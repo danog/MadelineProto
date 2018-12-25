@@ -53,10 +53,9 @@ class EventHandler extends \danog\MadelineProto\EventHandler
     }
 }
 
-$MadelineProto = new \danog\MadelineProto\API('bot.madeline');
+$MadelineProto = new \danog\MadelineProto\API('bot.madeline', ['logger' => ['logger_level' => 5]]);
 
 $MadelineProto->start();
-$MadelineProto->setEventHandler('\EventHandler');
 $MadelineProto->async(true);
-
+$MadelineProto->setEventHandler('\EventHandler');
 $MadelineProto->loop();
