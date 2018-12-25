@@ -117,6 +117,10 @@ trait ResponseHandler
                     if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
                         Loop::defer([$this, 'get_updates_difference']);
                     }
+                    //foreach ($this->datacenter->sockets[$datacenter]->new_outgoing as $message_id) {
+                    //    $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent'] = 0;
+                    //}
+//                    Loop::defer([$this->datacenter->sockets[$datacenter]->checker, 'resume']);
 
                     unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
                     break;

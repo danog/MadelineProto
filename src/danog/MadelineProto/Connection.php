@@ -84,6 +84,9 @@ class Connection
     public $ctx;
     public $pendingCheckWatcherId;
 
+    public $http_req_count = 0;
+    public $http_res_count = 0;
+
     public function getCtx()
     {
         return $this->ctx;
@@ -150,6 +153,8 @@ class Connection
                 unset($this->outgoing_messages[$message_id]);
             }
         }
+        $this->http_req_count = 0;
+        $this->http_res_count = 0;
 
         $this->writer->start();
         $this->reader->start();
@@ -230,6 +235,27 @@ class Connection
         $this->disconnect();
         yield $this->API->datacenter->dc_connect_async($this->ctx->getDc());
     }
+
+    public function hasPendingCalls()
+    {
+        $API = $this->API;
+        $datacenter = $this->datacenter;
+
+        $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
+        $timeout = $API->settings['connection_settings'][$dc_config_number]['timeout'];
+        foreach ($this->new_outgoing as $message_id) {
+            if (isset($this->outgoing_messages[$message_id]['sent'])
+                && $this->outgoing_messages[$message_id]['sent'] + $timeout < time()
+                && ($this->temp_auth_key === null) === $this->outgoing_messages[$message_id]['unencrypted']
+                && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     public function getName(): string
     {

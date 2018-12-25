@@ -74,6 +74,9 @@ class ReadLoop extends SignalLoop
                         $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", \danog\MadelineProto\Logger::WARNING);
                         $connection->temp_auth_key = null;
                         $connection->session_id = null;
+                        foreach ($connection->new_outgoing as $message_id) {
+                            $connection->outgoing_messages[$message_id]['sent'] = 0;
+                        }
                         $API->init_authorization();
                     } else {
                         //throw new \danog\MadelineProto\RPCErrorException($error, $error);
@@ -88,13 +91,17 @@ class ReadLoop extends SignalLoop
 
                 return;
             }
+
+            $connection->http_res_count++;
+
             try {
                 $API->handle_messages($datacenter);    
             } finally {
                 $this->exitedLoop();
             }
             $this->startedLoop();
-            Loop::defer(function () use ($datacenter) { $this->API->datacenter->sockets[$datacenter]->waiter->resume(); });
+//            Loop::defer(function () use ($datacenter) { 
+$this->API->datacenter->sockets[$datacenter]->waiter->resume();// });
         }
     }
 

@@ -101,6 +101,8 @@ class Logger
                 $this->stdout = new ResourceOutputStream(STDERR);
             } else if ($result) {
                 $this->stdout = new ResourceOutputStream(fopen($result, 'a+'));
+            } else {
+                $this->stdout = new ResourceOutputStream(STDERR);
             }
         }
     }

@@ -106,18 +106,20 @@ class WriteLoop extends ResumableSignalLoop
                 yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int($length) . $body . $pad);
 
                 //var_dump("plain ".bin2hex($message_id));
-
+                $connection->http_req_count++;
                 $connection->outgoing_messages[$message_id] = $message;
                 $connection->outgoing_messages[$message_id]['sent'] = time();
                 $connection->outgoing_messages[$message_id]['tries'] = 0;
                 $connection->outgoing_messages[$message_id]['unencrypted'] = true;
                 $connection->new_outgoing[$message_id] = $message_id;
 
-                $message['send_promise']->resolve(isset($message['promise']) ? $message['promise'] : true);
+                unset($connection->pending_outgoing[$k]);
 
                 $API->logger->logger("Sent {$message['_']} as unencrypted message to DC {$datacenter}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
-                unset($connection->pending_outgoing[$k]);
+                $message['send_promise']->resolve(isset($message['promise']) ? $message['promise'] : true);
+
+
             }
             if ($skipped_all) break;
         }
@@ -132,7 +134,9 @@ class WriteLoop extends ResumableSignalLoop
             if ($connection->temp_auth_key === null) {
                 return;
             }
-
+            if ($this->API->is_http($datacenter) && empty($connection->pending_outgoing)) {
+                return;
+            }
             if (count($to_ack = $connection->ack_queue)) {
                 $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'msgs_ack', 'serialized_body' => $this->API->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $connection->ack_queue], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false, 'method' => false];
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
@@ -152,7 +156,8 @@ class WriteLoop extends ResumableSignalLoop
             if ($API->is_http($datacenter) && !$has_http_wait) {
                 $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
 
-                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => $this->API->serialize_object(['type' => ''], ['_' => 'http_wait', 'max_wait' => $API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
+                //$connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => $this->API->serialize_object(['type' => ''], ['_' => 'http_wait', 'max_wait' => $API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
+                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => $this->API->serialize_object(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 1], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
 
                 $has_http_wait = true;
@@ -282,6 +287,8 @@ unset($gzipped);
 
             $t = microtime(true);
             yield $buffer->bufferWrite($message);
+
+            $connection->http_req_count++;
 
             $API->logger->logger("Sent encrypted payload to DC {$datacenter}, speed " . ((($len * 8) / (microtime(true) - $t)) / 1000000) . " mbps!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 

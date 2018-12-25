@@ -31,27 +31,6 @@ use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
  */
 class CheckLoop extends ResumableSignalLoop
 {
-    public function hasPendingCalls()
-    {
-        $API = $this->API;
-        $datacenter = $this->datacenter;
-        $connection = $this->connection;
-
-        $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
-        $timeout = $API->settings['connection_settings'][$dc_config_number]['timeout'];
-        foreach ($connection->new_outgoing as $message_id) {
-            if (isset($connection->outgoing_messages[$message_id]['sent'])
-                && $connection->outgoing_messages[$message_id]['sent'] + $timeout < time()
-                && ($connection->temp_auth_key === null) === $connection->outgoing_messages[$message_id]['unencrypted']
-                && $connection->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
-            ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public function loop(): \Generator
     {
         $API = $this->API;
@@ -74,7 +53,7 @@ class CheckLoop extends ResumableSignalLoop
                 $try_count = 0;
             }
 
-            if ($this->hasPendingCalls()) {
+            if ($connection->hasPendingCalls()) {
                 $last_recv = $connection->last_recv;
                 if ($connection->temp_auth_key !== null) {
                     $message_ids = array_values($connection->new_outgoing);
