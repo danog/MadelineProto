@@ -585,7 +585,7 @@ class MTProto implements TLCallback
             // connection settings
             'all' => [
                 // These settings will be applied on every datacenter that hasn't a custom settings subarray...
-                'protocol' => 'tcp_abridged',
+                'protocol' => $this->altervista ? 'http' : 'tcp_abridged',
                 // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, obfuscated2, udp (unsupported)
                 'test_mode' => false,
                 // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
