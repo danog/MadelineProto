@@ -60,10 +60,10 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
         if ($value == '') {
             $value = $key;
         }
-        preg_match('/^.+_(.*?)(?:_param_(.*)_type_(.*))?$/', $key, $matches);
+        preg_match('/^[^_]+_(.*?)(?:_param_(.*)_type_(.*))?$/', $key, $matches);
         $method_name = isset($matches[1]) ? $matches[1] : '';
-        $param_name = isset($matches[1]) ? $matches[1] : '';
-        $param_type = isset($matches[2]) ? $matches[2] : '';
+        $param_name = isset($matches[2]) ? $matches[2] : '';
+        $param_type = isset($matches[3]) ? $matches[3] : '';
 
         if ($param_name === 'nonce' && $param_type === 'int128') {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = 'Random number for cryptographic security';
@@ -77,12 +77,16 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = readline($value.' => ');
             if (\danog\MadelineProto\Lang::$lang[$lang_code][$key] === '') {
                 if ($param_name) {
-                    $l = str_replace('_', ' ', $l);
+                    $l = str_replace('_', ' ', $param_name);
                 } else {
                     $l = explode('.', $method_name);
                     $l = from_camel_case(end($l));
                 }
-                $l = str_replace(['Id', ' id'], ' ID', ucfirst(strtolower($l)));
+                $l = ucfirst(strtolower($l));
+                if (preg_match('/ empty$/', $l)) $l = 'Empty '.strtolower(preg_replace('/ empty$/', '', $l));
+                foreach (['id', 'url', 'dc'] as $upper) {
+                    $l = str_replace([ucfirst($upper), ' '.$upper], [strtoupper($upper), ' '.strtoupper($upper)], $l);
+                }
 
                 if (in_array($param_type, ['Bool', 'true', 'false'])) $l .= '?';
 
