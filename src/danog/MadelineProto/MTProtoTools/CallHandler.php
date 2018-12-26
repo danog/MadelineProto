@@ -371,7 +371,7 @@ trait CallHandler
                 }
             }
         });
-        return $deferred->promise();
+        return isset($aargs['noResponse']) && $aargs['noResponse'] ? new \Amp\Success(0) : $deferred->promise();
     }
 
     public function method_call_async_write($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
