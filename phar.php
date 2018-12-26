@@ -4,7 +4,7 @@ if (PHP_MAJOR_VERSION === 5 && PHP_MINOR_VERSION < 6) {
     throw new \Exception('MadelineProto requires at least PHP 5.6 to run');
 }
 
-(static function () {
+function ___install_madeline() {
     if (count(debug_backtrace(0)) === 1) {
         die('You must include this file in another PHP script'.PHP_EOL);
     }
@@ -46,6 +46,8 @@ if (PHP_MAJOR_VERSION === 5 && PHP_MINOR_VERSION < 6) {
             file_put_contents('madeline.phar.version', $release);
         }
     }
-})();
+}
+
+___install_madeline();
 
 require 'madeline.phar';
