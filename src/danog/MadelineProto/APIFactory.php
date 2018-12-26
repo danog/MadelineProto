@@ -153,13 +153,14 @@ class APIFactory
         if ($name !== 'accept_tos' && $name !== 'decline_tos') {
             $this->API->check_tos();
         }
+        $lower_name = strtolower($name);
 
         if ($this->lua === false) {
-            return $this->namespace !== '' || !isset($this->methods[$name]) ? $this->__mtproto_call($this->namespace . $name, $arguments) : $this->__api_call($name, $arguments);
+            return $this->namespace !== '' || !isset($this->methods[$lower_name]) ? $this->__mtproto_call($this->namespace . $name, $arguments) : $this->__api_call($lower_name, $arguments);
         }
 
         try {
-            $deserialized = $this->namespace !== '' || !isset($this->methods[$name]) ? $this->__mtproto_call($this->namespace . $name, $arguments) : $this->__api_call($name, $arguments);
+            $deserialized = $this->namespace !== '' || !isset($this->methods[$lower_name]) ? $this->__mtproto_call($this->namespace . $name, $arguments) : $this->__api_call($lower_name, $arguments);
 
             Lua::convert_objects($deserialized);
 

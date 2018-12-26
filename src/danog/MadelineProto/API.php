@@ -200,9 +200,9 @@ class API extends APIFactory
                     unset($methods[array_search('method_call', $methods)]);
                 } else if (stripos($method, 'async') !== false) {
                     if (strpos($method, '_async') !== false) {
-                        unset($methods[array_search(str_replace('_async', '', $method), $methods)]);
+                        unset($methods[array_search(str_ireplace('_async', '', $method), $methods)]);
                     } else {
-                        unset($methods[array_search(str_replace('async', '', $method), $methods)]);
+                        unset($methods[array_search(str_ireplace('async', '', $method), $methods)]);
                     }
                 }
             }
@@ -214,19 +214,20 @@ class API extends APIFactory
                     $method = 'method_call';
                 } else if (stripos($method, 'async') !== false) {
                     if (strpos($method, '_async') !== false) {
-                        $method = str_replace('_async', '', $method);
+                        $method = str_ireplace('_async', '', $method);
                     } else {
-                        $method = str_replace('async', '', $method);
+                        $method = str_ireplace('async', '', $method);
                     }
                 }
 
-                $this->methods[$method] = [$this->API, $actual_method];
+                $this->methods[strtolower($method)] = [$this->API, $actual_method];
                 if (strpos($method, '_') !== false) {
-                    $this->methods[lcfirst(str_replace('_', '', ucwords($method, '_')))] = [$this->API, $actual_method];
+                    $this->methods[strtolower(str_replace('_', ''))] = [$this->API, $actual_method];
                 } else {
-                    $this->methods[$this->from_camel_case($method)] = [$this->API, $actual_method];
+                    $this->methods[strtolower($this->from_camel_case($method))] = [$this->API, $actual_method];
                 }
             }
+
             $this->API->wrapper = $this;
             if ($this->API->event_handler && class_exists($this->API->event_handler) && is_subclass_of($this->API->event_handler, '\danog\MadelineProto\EventHandler')) {
                 $this->API->setEventHandler($this->API->event_handler);
