@@ -19,7 +19,6 @@
 namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\Promise;
-use Amp\Websocket\ClosedException;
 use Amp\Websocket\Handshake;
 use Amp\Websocket\Options;
 use Amp\Websocket\Rfc6455Connection;
@@ -27,7 +26,6 @@ use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
 use danog\MadelineProto\Tools;
-use danog\MadelineProto\Logger;
 
 /**
  * Websocket stream wrapper.
@@ -41,6 +39,7 @@ class WsStream implements RawStreamInterface
 
     private $stream;
     private $message;
+
     /**
      * Connect to stream.
      *
@@ -62,7 +61,7 @@ class WsStream implements RawStreamInterface
                 $headerBuffer = \substr($buffer, 0, $position + 4);
                 $buffer = \substr($buffer, $position + 4);
                 $headers = $handshake->decodeResponse($headerBuffer);
-                $this->stream = new Rfc6455Connection($this->stream, $headers, $buffer, new Options);
+                $this->stream = new Rfc6455Connection($this->stream, $headers, $buffer, new Options());
                 break;
             }
         }
@@ -74,7 +73,6 @@ class WsStream implements RawStreamInterface
 
     /**
      * Async close.
-     *
      */
     public function disconnect()
     {
@@ -95,6 +93,7 @@ class WsStream implements RawStreamInterface
             if ($e->getReason() !== 'Client closed the underlying TCP connection') {
                 throw $e;
             }
+
             return null;
         }
 

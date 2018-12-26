@@ -18,12 +18,12 @@
 
 namespace danog\MadelineProto\Stream\Transport;
 
-use danog\MadelineProto\Stream\RawStreamInterface;
-use danog\MadelineProto\Stream\Async\RawStream;
 use Amp\Promise;
-use function Amp\Socket\cryptoConnect;
-use function Amp\Socket\connect;
 use Amp\Socket\Socket;
+use danog\MadelineProto\Stream\Async\RawStream;
+use danog\MadelineProto\Stream\RawStreamInterface;
+use function Amp\Socket\connect;
+use function Amp\Socket\cryptoConnect;
 
 /**
  * Default stream wrapper.
@@ -41,11 +41,11 @@ class DefaultStream extends Socket implements RawStreamInterface
     {
         return $this->stream->enableCrypto();
     }
+
     public function __construct()
     {
-
     }
-    
+
     public function connectAsync(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
     {
         if ($ctx->isSecure()) {
@@ -77,6 +77,7 @@ class DefaultStream extends Socket implements RawStreamInterface
     {
         return $this->stream->write($data);
     }
+
     /**
      * Async close.
      *
@@ -90,9 +91,9 @@ class DefaultStream extends Socket implements RawStreamInterface
                 $this->stream = null;
             }
         } catch (\Throwable $e) {
-            \danog\MadelineProto\Logger::log("Got exception while closing stream: ".$e->getMessage());
+            \danog\MadelineProto\Logger::log('Got exception while closing stream: '.$e->getMessage());
         } catch (\Exception $e) {
-            \danog\MadelineProto\Logger::log("Got exception while closing stream: ".$e->getMessage());
+            \danog\MadelineProto\Logger::log('Got exception while closing stream: '.$e->getMessage());
         }
     }
 
@@ -100,6 +101,7 @@ class DefaultStream extends Socket implements RawStreamInterface
     {
         $this->disconnect();
     }
+
     public static function getName(): string
     {
         return __CLASS__;

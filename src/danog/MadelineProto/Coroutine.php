@@ -1,19 +1,19 @@
 <?php
 /**
- * Coroutine (modified version of AMP Coroutine)
+ * Coroutine (modified version of AMP Coroutine).
  *
  * The MIT License (MIT)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,10 +29,10 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Promise;
-use Amp\Internal;
-use Amp\Success;
 use Amp\Failure;
+use Amp\Internal;
+use Amp\Promise;
+use Amp\Success;
 
 /**
  * Creates a promise from a generator function yielding promises.
@@ -54,26 +54,30 @@ final class Coroutine implements Promise
     private $exception;
     /** @var mixed Promise success value when executing next coroutine step, null at all other times. */
     private $value;
+
     /**
      * @param \Generator $generator
      */
     public function __construct(\Generator $generator)
     {
         $this->generator = $generator;
+
         try {
             $yielded = $this->generator->current();
             if (!$yielded instanceof Promise) {
                 if (!$this->generator->valid()) {
                     $this->resolve($this->generator->getReturn());
+
                     return;
                 }
                 $yielded = $this->transform($yielded);
             }
         } catch (\Throwable $exception) {
             $this->fail($exception);
+
             return;
         }
-        /**
+        /*
          * @param \Throwable|null $exception Exception to be thrown into the generator.
          * @param mixed           $value Value to be sent into the generator.
          */
@@ -82,8 +86,10 @@ final class Coroutine implements Promise
             $this->value = $value;
             if (!$this->immediate) {
                 $this->immediate = true;
+
                 return;
             }
+
             try {
                 do {
                     if ($this->exception) {
@@ -97,6 +103,7 @@ final class Coroutine implements Promise
                         if (!$this->generator->valid()) {
                             $this->resolve($this->generator->getReturn());
                             $this->onResolve = null;
+
                             return;
                         }
                         $yielded = $this->transform($yielded);
@@ -115,6 +122,7 @@ final class Coroutine implements Promise
         };
         $yielded->onResolve($this->onResolve);
     }
+
     /**
      * Attempts to transform the non-promise yielded from the generator into a promise, otherwise returns an instance
      * `Amp\Failure` failed with an instance of `Amp\InvalidYieldError`.
@@ -132,6 +140,7 @@ final class Coroutine implements Promise
                         $val = new self($val);
                     }
                 }
+
                 return Promise\all($yielded);
             }
             if ($yielded instanceof \Generator) {
@@ -141,6 +150,7 @@ final class Coroutine implements Promise
         } catch (\Throwable $exception) {
             // Conversion to promise failed, fall-through to returning Failure below.
         }
+
         return $yielded instanceof \Throwable || $yielded instanceof \Exception ? new Failure($yielded) : new Success($yielded);
     }
 }

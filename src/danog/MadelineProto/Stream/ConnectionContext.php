@@ -41,7 +41,7 @@ class ConnectionContext
      */
     private $secure = false;
     /**
-     * Whether to use test servers
+     * Whether to use test servers.
      *
      * @var bool
      */
@@ -242,6 +242,7 @@ class ConnectionContext
     {
         return $this->dc;
     }
+
     /**
      * Get the int DC ID.
      *
@@ -256,6 +257,7 @@ class ConnectionContext
         if (strpos($this->dc, '_media')) {
             $dc = -$dc;
         }
+
         return $dc;
     }
 

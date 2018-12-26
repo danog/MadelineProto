@@ -21,7 +21,6 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\MTProto;
 
-
 /**
  * Manages sequence number.
  */
@@ -30,6 +29,7 @@ trait SeqNoHandler
     public function content_related($method)
     {
         $method = is_array($method) && isset($method['_']) ? $method['_'] : $method;
+
         return is_string($method) ? !in_array($method, MTProto::NOT_CONTENT_RELATED) : true;
     }
 }

@@ -19,13 +19,13 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\Magic;
+use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 use phpseclib\Math\BigInteger;
-use danog\MadelineProto\SecurityException;
-use danog\MadelineProto\Magic;
 
 /**
- * Manages password calculation
+ * Manages password calculation.
  */
 class PasswordCalculator
 {
@@ -38,7 +38,7 @@ class PasswordCalculator
     private $srp_B;
     private $srp_BForHash;
     private $srp_id;
-    
+
     public function __construct($logger)
     {
         $this->logger = $logger;
@@ -56,7 +56,6 @@ class PasswordCalculator
             switch ($object['current_algo']['_']) {
                 case 'passwordKdfAlgoUnknown':
                     throw new Exception('Update your client to continue');
-
                 case 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow':
                     $object['current_algo']['g'] = new BigInteger($object['current_algo']['g']);
                     $object['current_algo']['p'] = new BigInteger((string) $object['current_algo']['p'], 256);
@@ -88,7 +87,6 @@ class PasswordCalculator
         switch ($object['new_algo']['_']) {
             case 'passwordKdfAlgoUnknown':
                 throw new Exception('Update your client to continue');
-
             case 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow':
                 $object['new_algo']['g'] = new BigInteger($object['new_algo']['g']);
                 $object['new_algo']['p'] = new BigInteger((string) $object['new_algo']['p'], 256);
@@ -103,21 +101,26 @@ class PasswordCalculator
         $this->new_algo = $object['new_algo'];
         $this->secure_random = $object['secure_random'];
     }
+
     public function createSalt(string $prefix = ''): string
     {
-        return $prefix . $this->random(32);
+        return $prefix.$this->random(32);
     }
+
     public function hashSha256(string $data, string $salt): string
     {
-        return hash('sha256', $salt . $data . $salt, true);
+        return hash('sha256', $salt.$data.$salt, true);
     }
+
     public function hashPassword(string $password, string $client_salt, string $server_salt): string
     {
         $buf = $this->hashSha256($password, $client_salt);
         $buf = $this->hashSha256($buf, $server_salt);
         $hash = hash_pbkdf2('sha512', $buf, $client_salt, 100000, 0, true);
+
         return $this->hashSha256($hash, $server_salt);
     }
+
     public function getCheckPassword(string $password): array
     {
         if ($password === '') {
@@ -136,9 +139,8 @@ class PasswordCalculator
         $x = new BigInteger($this->hashPassword($password, $client_salt, $server_salt), 256);
         $g_x = $g->powMod($x, $p);
 
-        $k = new BigInteger(hash('sha256', $pForHash . $gForHash, true), 256);
+        $k = new BigInteger(hash('sha256', $pForHash.$gForHash, true), 256);
         $kg_x = $k->multiply($g_x)->powMod(Magic::$one, $p);
-
 
         $a = new BigInteger($this->random(2048 / 8), 256);
         $A = $g->powMod($a, $p);
@@ -147,12 +149,11 @@ class PasswordCalculator
 
         $b_kg_x = $B->powMod(Magic::$one, $p)->subtract($kg_x);
 
-        $u = new BigInteger(hash('sha256', $AForHash . $BForHash, true), 256);
+        $u = new BigInteger(hash('sha256', $AForHash.$BForHash, true), 256);
         $ux = $u->multiply($x);
         $a_ux = $a->add($ux);
-        
-        $S = $b_kg_x->powMod($a_ux, $p);
 
+        $S = $b_kg_x->powMod($a_ux, $p);
 
         $SForHash = str_pad($S->toBytes(), 256, chr(0), \STR_PAD_LEFT);
         $K = hash('sha256', $SForHash, true);
@@ -161,10 +162,11 @@ class PasswordCalculator
         $h2 = hash('sha256', $gForHash, true);
         $h1 ^= $h2;
 
-        $M1 = hash('sha256', $h1 . hash('sha256', $client_salt, true) . hash('sha256', $server_salt, true) . $AForHash . $BForHash . $K, true);
+        $M1 = hash('sha256', $h1.hash('sha256', $client_salt, true).hash('sha256', $server_salt, true).$AForHash.$BForHash.$K, true);
 
         return ['_' => 'inputCheckPasswordSRP', 'srp_id' => $id, 'A' => $AForHash, 'M1' => $M1];
     }
+
     public function getPassword(array $params): array
     {
         $return = ['password' => $this->getCheckPassword(isset($params['password']) ? $params['password'] : ''), 'new_settings' => ['_' => 'account.passwordInputSettings', 'new_algo' => ['_' => 'passwordKdfAlgoUnknown'], 'new_password_hash' => '', 'hint' => '']];
@@ -182,11 +184,11 @@ class PasswordCalculator
             $vForHash = str_pad($v->toBytes(), 256, chr(0), \STR_PAD_LEFT);
 
             $new_settings['new_algo'] = [
-                '_' => 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow',
+                '_'     => 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow',
                 'salt1' => $client_salt,
                 'salt2' => $server_salt,
-                'g' => (int) $g->toString(),
-                'p' => $pForHash,
+                'g'     => (int) $g->toString(),
+                'p'     => $pForHash,
             ];
             $new_settings['new_password_hash'] = $vForHash;
             $new_settings['hint'] = $params['hint'];
@@ -194,6 +196,7 @@ class PasswordCalculator
                 $new_settings['email'] = $params['email'];
             }
         }
+
         return $return;
     }
 }

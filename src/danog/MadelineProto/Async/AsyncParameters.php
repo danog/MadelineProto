@@ -20,7 +20,6 @@ namespace danog\MadelineProto\Async;
 
 use Amp\Success;
 
-
 /**
  * Async parameters class.
  *
@@ -64,6 +63,7 @@ class AsyncParameters extends Parameters
         } else {
             $params = yield new Success($params);
         }
+
         return $params;
     }
 }

@@ -18,25 +18,22 @@
 
 namespace danog\MadelineProto\Loop;
 
-use danog\MadelineProto\MTProto;
-
-
 /**
- * Loop interface
+ * Loop interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 interface LoopInterface
 {
     /**
-     * Start the loop
+     * Start the loop.
      *
      * @return void
      */
     public function start();
 
     /**
-     * The actual loop
+     * The actual loop.
      *
      * @return void
      */

@@ -93,13 +93,13 @@ class Logger
 
         if ($this->mode === 3) {
             $this->stdout = new ResourceOutputStream(STDOUT);
-        } else if ($this->mode === 2) {
+        } elseif ($this->mode === 2) {
             $this->stdout = new ResourceOutputStream(fopen($this->optional, 'a+'));
-        } else if ($this->mode === 1) {
+        } elseif ($this->mode === 1) {
             $result = @ini_get('error_log');
             if ($result === 'syslog') {
                 $this->stdout = new ResourceOutputStream(STDERR);
-            } else if ($result) {
+            } elseif ($result) {
                 $this->stdout = new ResourceOutputStream(fopen($result, 'a+'));
             } else {
                 $this->stdout = new ResourceOutputStream(STDERR);

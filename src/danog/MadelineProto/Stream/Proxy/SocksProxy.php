@@ -18,11 +18,11 @@
 
 namespace danog\MadelineProto\Stream\Proxy;
 
+use Amp\Promise;
+use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
-use Amp\Promise;
-use danog\MadelineProto\Stream\Async\RawStream;
 
 /**
  * Socks5 stream wrapper.
@@ -46,13 +46,13 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
         $secure = $ctx->isSecure();
-        $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port'])->secure(false);
+        $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
 
         $methods = chr(0);
         if (isset($this->extra['username']) && isset($this->extra['password'])) {
             $methods .= chr(2);
         }
-        $this->stream = yield $ctx->getStream(chr(5) . chr(strlen($methods)) . $methods);
+        $this->stream = yield $ctx->getStream(chr(5).chr(strlen($methods)).$methods);
         $l = 2;
         $buffer = yield $this->stream->getReadBuffer($l);
 
@@ -63,9 +63,9 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
             throw new \danog\MadelineProto\Exception("Wrong SOCKS5 version: $version");
         }
         if ($method === 2) {
-            $auth = chr(1) . chr(strlen($this->extra['username'])) . $this->extra['username'] . chr(strlen($this->extra['password'])) . $this->extra['password'];
+            $auth = chr(1).chr(strlen($this->extra['username'])).$this->extra['username'].chr(strlen($this->extra['password'])).$this->extra['password'];
             yield $this->stream->write($auth);
-            
+
             $buffer = yield $this->stream->getReadBuffer($l);
 
             $version = ord(yield $buffer->bufferRead(1));
@@ -84,9 +84,9 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
 
         try {
             $ip = inet_pton($uri->getHost());
-            $payload .= pack('C1', strlen($ip) === 4 ? 0x01 : 0x04) . $ip;
+            $payload .= pack('C1', strlen($ip) === 4 ? 0x01 : 0x04).$ip;
         } catch (\danog\MadelineProto\Exception $e) {
-            $payload .= pack('C2', 0x03, strlen($uri->getHost())) . $uri->getHost();
+            $payload .= pack('C2', 0x03, strlen($uri->getHost())).$uri->getHost();
         }
         $payload .= pack('n', $uri->getPort());
         yield $this->stream->write($payload);
@@ -130,7 +130,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $l = 2;
         $buffer = yield $this->stream->getReadBuffer($l);
         $port = unpack('n', yield $buffer->bufferRead(2))[1];
-        \danog\MadelineProto\Logger::log(['Connected to ' . $ip . ':' . $port . ' via socks5']);
+        \danog\MadelineProto\Logger::log(['Connected to '.$ip.':'.$port.' via socks5']);
 
         if ($secure && method_exists($this->stream, 'enableCrypto')) {
             yield $this->stream->enableCrypto();
@@ -139,6 +139,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
             yield (yield $this->stream->getWriteBuffer(strlen($header)))->bufferWrite($header);
         }
     }
+
     /**
      * Async close.
      *
@@ -183,10 +184,8 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         return $this->stream->write($data);
     }
 
-    
-
     /**
-     * Sets proxy data
+     * Sets proxy data.
      *
      * @param array $extra Proxy data
      *
@@ -196,6 +195,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     {
         $this->extra = $extra;
     }
+
     public static function getName(): string
     {
         return __CLASS__;

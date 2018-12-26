@@ -185,7 +185,7 @@ class CombinedAPI
         foreach (\get_class_methods($this->event_handler) as $method) {
             if ($method === 'onLoop') {
                 $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
-            } else if ($method === 'onAny') {
+            } elseif ($method === 'onAny') {
                 foreach (end($this->instances)->API->constructors->by_id as $id => $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($this->event_handler_methods[$constructor['predicate']])) {
                         $this->event_handler_methods[$constructor['predicate']] = [$this->event_handler_instance, 'onAny'];
@@ -232,8 +232,8 @@ class CombinedAPI
             } catch (\danog\MadelineProto\Exception $e) {
                 register_shutdown_function(function () {
                     \danog\MadelineProto\Logger::log(['Restarting script...']);
-                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp') . '://' . $_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
-                    fwrite($a, $_SERVER['REQUEST_METHOD'] . ' ' . $_SERVER['REQUEST_URI'] . ' ' . $_SERVER['SERVER_PROTOCOL'] . "\r\n" . 'Host: ' . $_SERVER['SERVER_NAME'] . "\r\n\r\n");
+                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
+                    fwrite($a, $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n");
                 });
             }
         }
@@ -253,7 +253,7 @@ class CombinedAPI
             if ($this->loop_callback !== null) {
                 $instance->setLoopCallback($this->loop_callback);
             }
-            $loops []= $this->call($instance->loop(0, ['async' => true]));
+            $loops[] = $this->call($instance->loop(0, ['async' => true]));
         }
 
         Loop::repeat($this->serialization_interval * 1000, function () {

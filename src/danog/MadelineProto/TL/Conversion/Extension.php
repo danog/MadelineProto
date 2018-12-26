@@ -25,6 +25,7 @@ trait Extension
         if (isset(self::ALL_MIMES[$ext])) {
             return self::ALL_MIMES[$ext][0];
         }
+
         return $default;
     }
 
@@ -71,11 +72,14 @@ trait Extension
     public function get_mime_from_file($file)
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
+
         return $finfo->file($file);
     }
+
     public function get_mime_from_buffer($buffer)
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
+
         return $finfo->buffer($buffer);
     }
 }

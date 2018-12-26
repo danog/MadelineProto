@@ -21,7 +21,6 @@ namespace danog\MadelineProto;
 
 use Amp\Promise;
 
-
 class APIFactory
 {
     /**
@@ -125,7 +124,7 @@ class APIFactory
 
     public function __construct($namespace, $API)
     {
-        $this->namespace = $namespace . '.';
+        $this->namespace = $namespace.'.';
         $this->API = $API;
     }
 
@@ -156,11 +155,11 @@ class APIFactory
         $lower_name = strtolower($name);
 
         if ($this->lua === false) {
-            return $this->namespace !== '' || !isset($this->methods[$lower_name]) ? $this->__mtproto_call($this->namespace . $name, $arguments) : $this->__api_call($lower_name, $arguments);
+            return $this->namespace !== '' || !isset($this->methods[$lower_name]) ? $this->__mtproto_call($this->namespace.$name, $arguments) : $this->__api_call($lower_name, $arguments);
         }
 
         try {
-            $deserialized = $this->namespace !== '' || !isset($this->methods[$lower_name]) ? $this->__mtproto_call($this->namespace . $name, $arguments) : $this->__api_call($lower_name, $arguments);
+            $deserialized = $this->namespace !== '' || !isset($this->methods[$lower_name]) ? $this->__mtproto_call($this->namespace.$name, $arguments) : $this->__api_call($lower_name, $arguments);
 
             Lua::convert_objects($deserialized);
 
@@ -181,6 +180,7 @@ class APIFactory
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         }
     }
+
     public function __api_call($name, $arguments)
     {
         $result = $this->methods[$name](...$arguments);
@@ -192,8 +192,10 @@ class APIFactory
                 return $this->wait($result);
             }
         }
+
         return $result;
     }
+
     public function __mtproto_call($name, $arguments)
     {
         if (array_key_exists($name, \danog\MadelineProto\MTProto::DISALLOWED_METHODS)) {

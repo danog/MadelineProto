@@ -34,6 +34,7 @@ use function Amp\call;
 trait BufferedStream
 {
     use Stream;
+
     /**
      * Get read buffer asynchronously.
      *
@@ -61,7 +62,7 @@ trait BufferedStream
     /**
      * Get write buffer asynchronously.
      *
-     * @param int $length    Total length of data that is going to be piped in the buffer
+     * @param int    $length Total length of data that is going to be piped in the buffer
      * @param string $append Data to append after entire buffer is written
      *
      * @return Promise

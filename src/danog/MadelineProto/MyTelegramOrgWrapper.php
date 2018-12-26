@@ -55,7 +55,7 @@ class MyTelegramOrgWrapper
 
         $result = curl_exec($ch);
         if (curl_errno($ch)) {
-            throw new Exception('Curl error: ' . curl_error($ch));
+            throw new Exception('Curl error: '.curl_error($ch));
         }
         curl_close($ch);
         $resulta = json_decode($result, true);
@@ -96,7 +96,7 @@ class MyTelegramOrgWrapper
         curl_setopt($ch, CURLOPT_HEADER, 1);
         $result = curl_exec($ch);
         if (curl_errno($ch)) {
-            throw new Exception('Curl error: ' . curl_error($ch));
+            throw new Exception('Curl error: '.curl_error($ch));
         }
         curl_close($ch);
 
@@ -136,13 +136,13 @@ class MyTelegramOrgWrapper
         $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
         $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
         $headers[] = 'Referer: https://my.telegram.org/';
-        $headers[] = 'Cookie: stel_token=' . $this->token;
+        $headers[] = 'Cookie: stel_token='.$this->token;
         $headers[] = 'Connection: keep-alive';
         $headers[] = 'Cache-Control: max-age=0';
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         $result = curl_exec($ch);
         if (curl_errno($ch)) {
-            throw new Exception('Curl error: ' . curl_error($ch));
+            throw new Exception('Curl error: '.curl_error($ch));
         }
         curl_close($ch);
         $title = explode('</title>', explode('<title>', $result)[1])[0];
@@ -175,13 +175,13 @@ class MyTelegramOrgWrapper
         $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
         $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
         $headers[] = 'Referer: https://my.telegram.org/';
-        $headers[] = 'Cookie: stel_token=' . $this->token;
+        $headers[] = 'Cookie: stel_token='.$this->token;
         $headers[] = 'Connection: keep-alive';
         $headers[] = 'Cache-Control: max-age=0';
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         $result = curl_exec($ch);
         if (curl_errno($ch)) {
-            throw new Exception('Curl error: ' . curl_error($ch));
+            throw new Exception('Curl error: '.curl_error($ch));
         }
         curl_close($ch);
 
@@ -195,7 +195,6 @@ class MyTelegramOrgWrapper
         <span class="form-control input-xlarge uneditable-input" onclick="this.select();">', $result);
         $asd = explode('</span>', $cose[1]);
         $api_hash = $asd[0];
-
 
         return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
     }
@@ -218,7 +217,7 @@ class MyTelegramOrgWrapper
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
 
         $headers = [];
-        $headers[] = 'Cookie: stel_token=' . $this->token;
+        $headers[] = 'Cookie: stel_token='.$this->token;
         $headers[] = 'Origin: https://my.telegram.org';
         $headers[] = 'Accept-Encoding: gzip, deflate, br';
         $headers[] = 'Accept-Language: it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4';
@@ -233,7 +232,7 @@ class MyTelegramOrgWrapper
 
         $result = curl_exec($ch);
         if (curl_errno($ch)) {
-            throw new Exception('Curl error:' . curl_error($ch));
+            throw new Exception('Curl error:'.curl_error($ch));
         }
         curl_close($ch);
 
@@ -257,20 +256,21 @@ class MyTelegramOrgWrapper
         $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
         $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
         $headers[] = 'Referer: https://my.telegram.org/';
-        $headers[] = 'Cookie: stel_token=' . $this->token;
+        $headers[] = 'Cookie: stel_token='.$this->token;
         $headers[] = 'Connection: keep-alive';
         $headers[] = 'Cache-Control: max-age=0';
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
         if (curl_errno($ch)) {
-            throw new Exception('Curl error:' . curl_error($ch));
+            throw new Exception('Curl error:'.curl_error($ch));
         }
         curl_close($ch);
 
         $title = explode('</title>', explode('<title>', $result)[1])[0];
         if ($title === 'Create new application') {
             $this->creation_hash = explode('"/>', explode('<input type="hidden" name="hash" value="', $result)[1])[0];
+
             throw new \danog\MadelineProto\Exception('App creation failed');
         }
 
@@ -284,6 +284,7 @@ class MyTelegramOrgWrapper
         <span class="form-control input-xlarge uneditable-input" onclick="this.select();">', $result);
         $asd = explode('</span>', $cose['1']);
         $api_hash = $asd['0'];
+
         return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
     }
 }
