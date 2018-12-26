@@ -21,7 +21,6 @@ namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 
-
 /**
  * Manages logging in and out.
  */
@@ -196,10 +195,12 @@ trait Login
 
         return $this->authorization;
     }
+
     public function update_2fa(array $params): bool
     {
         $hasher = new PasswordCalculator($this->logger);
         $hasher->addInfo($this->method_call('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]));
+
         return $this->method_call('account.updatePasswordSettings', $hasher->getPassword($params), ['datacenter' => $this->datacenter->curdc]);
     }
 }

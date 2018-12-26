@@ -41,7 +41,7 @@ trait ApiStart
                 $readline = 'readline';
             }
             echo 'You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a)
-Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id' . PHP_EOL;
+Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id'.PHP_EOL;
             if (strpos($res = $readline('Your choice (m/a): '), 'm') !== false) {
                 echo '1) Login to my.telegram.org
 2) Go to API development tools
@@ -50,7 +50,7 @@ Note that you can also provide the API parameters directly in the code using the
     URL: your app/website\'s URL, or t.me/yourusername
     Platform: anything
     Description: Describe your app here
-4) Click on create application' . PHP_EOL;
+4) Click on create application'.PHP_EOL;
                 $app['api_id'] = $readline('5) Enter your API ID: ');
                 $app['api_hash'] = $readline('6) Enter your API hash: ');
 
@@ -85,15 +85,15 @@ Note that you can also provide the API parameters directly in the code using the
                     $this->web_api_echo();
                 }
             } elseif (!$this->my_telegram_org_wrapper->logged_in()) {
-                    if (isset($_POST['code'])) {
-                        $this->web_api_complete_login();
-                        if ($this->my_telegram_org_wrapper->has_app()) {
-                            return $this->my_telegram_org_wrapper->get_app();
-                        }
-                        $this->web_api_echo();
-                    } else {
-                        $this->web_api_echo("You didn't provide a phone code!");
+                if (isset($_POST['code'])) {
+                    $this->web_api_complete_login();
+                    if ($this->my_telegram_org_wrapper->has_app()) {
+                        return $this->my_telegram_org_wrapper->get_app();
                     }
+                    $this->web_api_echo();
+                } else {
+                    $this->web_api_echo("You didn't provide a phone code!");
+                }
             } else {
                 if (isset($_POST['app_title'], $_POST['app_shortname'], $_POST['app_url'], $_POST['app_platform'], $_POST['app_desc'])) {
                     $app = $this->web_api_create_app();
@@ -103,7 +103,6 @@ Note that you can also provide the API parameters directly in the code using the
                 } else {
                     $this->web_api_echo("You didn't provide all of the required parameters!");
                 }
-
             }
             exit;
         }
@@ -115,9 +114,9 @@ Note that you can also provide the API parameters directly in the code using the
             $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($_POST['phone_number']);
             $this->web_api_echo();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->web_api_echo('ERROR: ' . $e->getMessage() . '. Try again.');
+            $this->web_api_echo('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            $this->web_api_echo('ERROR: ' . $e->getMessage() . '. Try again.');
+            $this->web_api_echo('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
 
@@ -126,11 +125,12 @@ Note that you can also provide the API parameters directly in the code using the
         try {
             $this->my_telegram_org_wrapper->complete_login($_POST['code']);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->web_api_echo('ERROR: ' . $e->getMessage() . '. Try again.');
+            $this->web_api_echo('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            $this->web_api_echo('ERROR: ' . $e->getMessage() . '. Try again.');
+            $this->web_api_echo('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
+
     public function web_api_create_app()
     {
         try {
@@ -140,10 +140,9 @@ Note that you can also provide the API parameters directly in the code using the
 
             return $app;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->web_api_echo('ERROR: ' . $e->getMessage() . ' Try again.');
+            $this->web_api_echo('ERROR: '.$e->getMessage().' Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            $this->web_api_echo('ERROR: ' . $e->getMessage() . ' Try again.');
+            $this->web_api_echo('ERROR: '.$e->getMessage().' Try again.');
         }
-
     }
 }

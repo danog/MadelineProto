@@ -18,27 +18,27 @@
 
 namespace danog\MadelineProto\Loop;
 
-use \Amp\Promise;
+use Amp\Promise;
 
 /**
- * Signal loop interface
+ * Signal loop interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 interface SignalLoopInterface extends LoopInterface
 {
     /**
-     * Resolve the promise or return|throw the signal
+     * Resolve the promise or return|throw the signal.
      *
-     * @param Promise $promise The origin promise 
-     * 
+     * @param Promise $promise The origin promise
+     *
      * @return Promise
      */
     public function waitSignal(Promise $promise): Promise;
 
     /**
-     * Send a signal to the the loop
-     * 
+     * Send a signal to the the loop.
+     *
      * @param Exception|any $data Signal to send
      *
      * @return void

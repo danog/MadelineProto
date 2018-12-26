@@ -18,11 +18,11 @@
 
 namespace danog\MadelineProto;
 
-use function Amp\Promise\wait;
+use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
-use Amp\Deferred;
 use Amp\Success;
+use function Amp\Promise\wait;
 
 /**
  * Some tools.
@@ -53,6 +53,7 @@ trait Tools
         if ($modulus === false) {
             $modulus = PHP_INT_MAX;
         }
+
         try {
             return \random_int(0, PHP_INT_MAX) % $modulus;
         } catch (\Exception $e) {
@@ -71,8 +72,10 @@ trait Tools
         } else {
             $number = $this->unpack_signed_long($this->random(8));
         }
+
         return ($number & PHP_INT_MAX) % $modulus;
     }
+
     public function random($length)
     {
         return $length === 0 ? '' : \phpseclib\Crypt\Random::string($length);
@@ -180,17 +183,19 @@ trait Tools
 
         return unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
+
     public function infloop()
     {
         while (true) {
             Loop::loop();
         }
     }
+
     public function wait($promise)
     {
         if ($promise instanceof \Generator) {
             $promise = new Coroutine($promise);
-        } else if (!($promise instanceof Promise)) {
+        } elseif (!($promise instanceof Promise)) {
             return $promise;
         }
         do {
@@ -204,31 +209,40 @@ trait Tools
             }
         } while (true);
     }
+
     public function call($promise)
     {
         if ($promise instanceof \Generator) {
             $promise = new Coroutine($promise);
-        } else if (!($promise instanceof Promise)) {
+        } elseif (!($promise instanceof Promise)) {
             return new Success($promise);
         }
+
         return $promise;
     }
+
     public function after($a, $b)
     {
         $a = $this->call($a);
-        $deferred = new Deferred;
+        $deferred = new Deferred();
         $a->onResolve(function ($e, $res) use ($b, $deferred) {
-            if ($e) throw $e;
+            if ($e) {
+                throw $e;
+            }
             $b = $this->call($b());
             $b->onResolve(static function ($e, $res) use ($deferred) {
-                if ($e) throw $e;
+                if ($e) {
+                    throw $e;
+                }
                 $deferred->resolve($res);
             });
         });
+
         return $deferred->promise();
     }
+
     public function sleep_async($time)
     {
-        return new \Amp\Delayed($time*1000);
+        return new \Amp\Delayed($time * 1000);
     }
 }

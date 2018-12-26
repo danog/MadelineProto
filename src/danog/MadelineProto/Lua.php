@@ -34,7 +34,7 @@ class Lua
         $this->MadelineProto = $MadelineProto;
         $this->MadelineProto->settings['updates']['handle_updates'] = true;
         $this->MadelineProto->API->datacenter->sockets[$this->MadelineProto->settings['connection_settings']['default_dc']]->startUpdateLoop();
-        
+
         $this->script = $script;
         $this->__wakeup();
     }

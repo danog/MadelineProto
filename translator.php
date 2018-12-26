@@ -28,13 +28,15 @@ class Lang
     // THIS WILL BE OVERWRITTEN BY $lang["en"]
     public static $current_lang = %s;
 }';
-function from_camel_case($input) {
-  preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
-  $ret = $matches[0];
-  foreach ($ret as &$match) {
-    $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
-  }
-  return implode(' ', $ret);
+function from_camel_case($input)
+{
+    preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
+    $ret = $matches[0];
+    foreach ($ret as &$match) {
+        $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+    }
+
+    return implode(' ', $ret);
 }
 
 $lang_code = readline('Enter the language you whish to localize: ');
@@ -52,7 +54,7 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
     if (!isset(\danog\MadelineProto\Lang::$lang[$lang_code][$key])) {
         \danog\MadelineProto\Lang::$lang[$lang_code][$key] = $value;
     }
-    if (\danog\MadelineProto\Lang::$lang[$lang_code][$key] === $value && ($lang_code !== 'en' || $value == '' || 
+    if (\danog\MadelineProto\Lang::$lang[$lang_code][$key] === $value && ($lang_code !== 'en' || $value == '' ||
         strpos($value, 'You cannot use this method directly') === 0 ||
         strpos($value, 'Update ') === 0 ||
         ctype_lower($value[0])
@@ -92,15 +94,19 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
                     $l = from_camel_case(end($l));
                 }
                 $l = ucfirst(strtolower($l));
-                if (preg_match('/ empty$/', $l)) $l = 'Empty '.strtolower(preg_replace('/ empty$/', '', $l));
+                if (preg_match('/ empty$/', $l)) {
+                    $l = 'Empty '.strtolower(preg_replace('/ empty$/', '', $l));
+                }
                 foreach (['id', 'url', 'dc'] as $upper) {
                     $l = str_replace([ucfirst($upper), ' '.$upper], [strtoupper($upper), ' '.strtoupper($upper)], $l);
                 }
 
-                if (in_array($param_type, ['Bool', 'true', 'false'])) $l .= '?';
+                if (in_array($param_type, ['Bool', 'true', 'false'])) {
+                    $l .= '?';
+                }
 
                 \danog\MadelineProto\Lang::$lang[$lang_code][$key] = $l;
-                echo "Using default value ".\danog\MadelineProto\Lang::$lang[$lang_code][$key].PHP_EOL;
+                echo 'Using default value '.\danog\MadelineProto\Lang::$lang[$lang_code][$key].PHP_EOL;
             }
         }
         \danog\MadelineProto\Lang::$lang[$lang_code][$key] = ucfirst(\danog\MadelineProto\Lang::$lang[$lang_code][$key]);

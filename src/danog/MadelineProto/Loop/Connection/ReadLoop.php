@@ -1,6 +1,6 @@
 <?php
 /**
- * Socket read loop
+ * Socket read loop.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -18,6 +18,7 @@
 
 namespace danog\MadelineProto\Loop\Connection;
 
+use Amp\Loop;
 use Amp\Promise;
 use Amp\Websocket\ClosedException;
 use danog\MadelineProto\Logger;
@@ -26,10 +27,9 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Tools;
 use function Amp\call;
-use Amp\Loop;
 
 /**
- * Socket read loop
+ * Socket read loop.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
@@ -55,6 +55,7 @@ class ReadLoop extends SignalLoop
                 if (isset($connection->old)) {
                     $this->exitedLoop();
                     $API->logger->logger("Exiting read loop in DC $datacenter");
+
                     return;
                 }
                 $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
@@ -62,6 +63,7 @@ class ReadLoop extends SignalLoop
                 continue;
             } catch (ClosedException $e) {
                 $API->logger->logger($e->getMessage(), Logger::FATAL_ERROR);
+
                 throw $e;
             }
 
@@ -81,9 +83,9 @@ class ReadLoop extends SignalLoop
                     } else {
                         //throw new \danog\MadelineProto\RPCErrorException($error, $error);
                     }
-                } else if ($error === -1) {
+                } elseif ($error === -1) {
                     $API->logger->logger("WARNING: Got quick ack from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
-                } else if ($error === 0) {
+                } elseif ($error === 0) {
                     $API->logger->logger("Got NOOP from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
                 } else {
                     throw new \danog\MadelineProto\RPCErrorException($error, $error);
@@ -95,13 +97,15 @@ class ReadLoop extends SignalLoop
             $connection->http_res_count++;
 
             try {
-                $API->handle_messages($datacenter);    
+                $API->handle_messages($datacenter);
             } finally {
                 $this->exitedLoop();
             }
             $this->startedLoop();
-//            Loop::defer(function () use ($datacenter) { 
-            if ($this->API->is_http($datacenter)) $this->API->datacenter->sockets[$datacenter]->waiter->resume();// });
+//            Loop::defer(function () use ($datacenter) {
+            if ($this->API->is_http($datacenter)) {
+                $this->API->datacenter->sockets[$datacenter]->waiter->resume();
+            } // });
         }
     }
 
@@ -120,18 +124,19 @@ class ReadLoop extends SignalLoop
             $buffer = yield $connection->stream->getReadBuffer($payload_length);
         } catch (ClosedException $e) {
             $API->logger->logger($e->getReason());
-            if (strpos($e->getReason(), "       ") === 0) {
+            if (strpos($e->getReason(), '       ') === 0) {
                 $payload = -substr($e->getReason(), 7);
-                $API->logger->logger("Received $payload from DC " . $datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $API->logger->logger("Received $payload from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 return $payload;
             }
+
             throw $e;
         }
 
         if ($payload_length === 4) {
             $payload = $this->unpack_signed_int(yield $buffer->bufferRead(4));
-            $API->logger->logger("Received $payload from DC " . $datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $API->logger->logger("Received $payload from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             return $payload;
         }
@@ -192,7 +197,7 @@ class ReadLoop extends SignalLoop
                 throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
             }
             $message_data = substr($decrypted_data, 32, $message_data_length);
-            if ($message_key != substr(hash('sha256', substr($connection->temp_auth_key['auth_key'], 96, 32) . $decrypted_data, true), 8, 16)) {
+            if ($message_key != substr(hash('sha256', substr($connection->temp_auth_key['auth_key'], 96, 32).$decrypted_data, true), 8, 16)) {
                 throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
             }
             $connection->incoming_messages[$message_id] = ['seq_no' => $seq_no];
@@ -208,9 +213,8 @@ class ReadLoop extends SignalLoop
         $connection->last_recv = time();
         $connection->last_http_wait = 0;
 
-        $API->logger->logger('Received payload from DC ' . $datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $API->logger->logger('Received payload from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
         return true;
     }
-
 }

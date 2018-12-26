@@ -148,7 +148,9 @@ class Connection
         foreach ($this->new_outgoing as $message_id) {
             if ($this->outgoing_messages[$message_id]['unencrypted']) {
                 $promise = $this->outgoing_messages[$message_id]['promise'];
-                \Amp\Loop::defer(function () use ($promise) { $promise->fail(new Exception('Restart')); });
+                \Amp\Loop::defer(function () use ($promise) {
+                    $promise->fail(new Exception('Restart'));
+                });
                 unset($this->new_outgoing[$message_id]);
                 unset($this->outgoing_messages[$message_id]);
             }
@@ -172,6 +174,7 @@ class Connection
     {
         return $this->call($this->sendMessageGenerator($message, $flush));
     }
+
     public function sendMessageGenerator($message, $flush = true): \Generator
     {
         $deferred = new Deferred();
@@ -181,7 +184,7 @@ class Connection
 
             $refresh_next = isset($message['refresh_next']) && $message['refresh_next'];
             //$refresh_next = true;
-            
+
             if ($refresh_next) {
                 $this->API->referenceDatabase->refreshNext(true);
             }
@@ -206,6 +209,7 @@ class Connection
 
         return yield $deferred->promise();
     }
+
     public function setExtra($extra)
     {
         $this->API = $extra;
@@ -231,7 +235,7 @@ class Connection
 
     public function reconnectAsync(): \Generator
     {
-        $this->API->logger->logger("Reconnecting");
+        $this->API->logger->logger('Reconnecting');
         $this->disconnect();
         yield $this->API->datacenter->dc_connect_async($this->ctx->getDc());
     }
@@ -255,7 +259,6 @@ class Connection
 
         return false;
     }
-
 
     public function getName(): string
     {

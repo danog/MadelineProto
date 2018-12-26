@@ -19,7 +19,6 @@
 namespace danog\MadelineProto\Stream\Transport;
 
 use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 /**
  * Websocket TLS stream wrapper.

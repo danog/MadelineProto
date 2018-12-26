@@ -18,11 +18,11 @@
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
+use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
-use Amp\Promise;
 
 /**
  * TCP Intermediate stream wrapper.
@@ -47,6 +47,7 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     {
         $this->stream = yield $ctx->getStream(str_repeat(chr(238), 4).$header);
     }
+
     /**
      * Async close.
      *

@@ -39,14 +39,14 @@ trait Events
         if (!($this->event_handler_instance instanceof $this->event_handler)) {
             $class_name = $this->event_handler;
             $this->event_handler_instance = new $class_name($this->wrapper);
-        } else if ($this->wrapper) {
+        } elseif ($this->wrapper) {
             $this->event_handler_instance->__construct($this->wrapper);
         }
         $this->event_handler_methods = [];
         foreach (\get_class_methods($this->event_handler) as $method) {
             if ($method === 'onLoop') {
                 $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
-            } else if ($method === 'onAny') {
+            } elseif ($method === 'onAny') {
                 foreach ($this->constructors->by_id as $id => $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($this->event_handler_methods[$constructor['predicate']])) {
                         $this->event_handler_methods[$constructor['predicate']] = [$this->event_handler_instance, 'onAny'];
@@ -65,7 +65,6 @@ trait Events
         if (isset($this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater)) {
             $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
         }
-
     }
 
     public function getEventHandler()

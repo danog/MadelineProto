@@ -21,11 +21,10 @@ namespace danog\MadelineProto\Stream\MTProtoTransport;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Stream\Async\BufferedStream;
-use danog\MadelineProto\Stream\BufferedStreamInterface;
+use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Tools;
-use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 
 /**
  * HTTP stream wrapper.
@@ -60,18 +59,21 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
         $this->stream = yield $ctx->getStream($header);
         $this->uri = $ctx->getUri();
     }
+
     /**
-     * Set proxy data
+     * Set proxy data.
      *
      * @param array $extra Proxy parameters
+     *
      * @return void
      */
-    public function setExtra($extra) 
+    public function setExtra($extra)
     {
         if (isset($extra['user']) && isset($extra['password'])) {
             $this->header = \base64_encode($extra['user'].':'.$extra['password'])."\r\n";
         }
     }
+
     /**
      * Async close.
      *

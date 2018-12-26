@@ -134,6 +134,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
             $this->append = $append;
             $this->append_after = $length - strlen($append);
         }
+
         return new \Amp\Success($this);
     }
 
@@ -150,7 +151,6 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
         $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
         if ($buffer_length >= $length) {
-
             return new Success(fread($this->memory_stream, $length));
         }
 
@@ -202,14 +202,17 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
             if ($this->append_after === 0) {
                 $data .= $this->append;
                 $this->append = '';
-            } else if ($this->append_after < 0) {
+            } elseif ($this->append_after < 0) {
                 $this->append_after = 0;
                 $this->append = '';
+
                 throw new Exception('Tried to send too much out of frame data, cannot append');
             }
         }
+
         return $this->write($data);
     }
+
     /**
      * Get class name.
      *

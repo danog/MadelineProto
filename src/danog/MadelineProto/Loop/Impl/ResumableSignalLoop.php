@@ -18,10 +18,10 @@
 
 namespace danog\MadelineProto\Loop\Impl;
 
-use Amp\Loop;
-use Amp\Success;
 use Amp\Deferred;
+use Amp\Loop;
 use Amp\Promise;
+use Amp\Success;
 use danog\MadelineProto\Loop\ResumableLoopInterface;
 
 /**
@@ -40,7 +40,7 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
             if ($time <= 0) {
                 return new Success(0);
             } else {
-                $resume = microtime(true)+$time;
+                $resume = microtime(true) + $time;
                 if ($this->resumeWatcher) {
                     Loop::cancel($this->resumeWatcher);
                     $this->resumeWatcher = null;
@@ -50,6 +50,7 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
             }
         }
         $this->resume = new Deferred();
+
         return $this->resume->promise();
     }
 

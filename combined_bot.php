@@ -25,7 +25,6 @@ if (!file_exists(__DIR__.'/vendor/autoload.php')) {
     require_once 'vendor/autoload.php';
 }
 
-
 class EventHandler extends \danog\MadelineProto\CombinedEventHandler
 {
     public function onAny($update, $path)
@@ -44,6 +43,7 @@ class EventHandler extends \danog\MadelineProto\CombinedEventHandler
             $res = var_export($update, true);
         }
         yield $MadelineProto->sleep_async(3);
+
         try {
             yield $MadelineProto->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>\n\nDopo 3 secondi, in modo asincrono", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']); //'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -54,7 +54,6 @@ class EventHandler extends \danog\MadelineProto\CombinedEventHandler
         }
     }
 }
-
 
 $settings = ['logger' => ['logger_level' => 5]];
 $CombinedMadelineProto = new \danog\MadelineProto\CombinedAPI('combined_session.madeline', ['bot.madeline' => $settings, 'user.madeline' => $settings]);

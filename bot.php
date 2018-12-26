@@ -25,7 +25,6 @@ if (!file_exists(__DIR__.'/vendor/autoload.php')) {
     require_once 'vendor/autoload.php';
 }
 
-
 class EventHandler extends \danog\MadelineProto\EventHandler
 {
     public function onAny($update)
@@ -42,6 +41,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             $res = var_export($update, true);
         }
         yield $this->sleep_async(3);
+
         try {
             yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>\n\nDopo 3 secondi, in modo asincrono", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']); //'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
