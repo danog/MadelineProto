@@ -222,7 +222,7 @@ class API extends APIFactory
 
                 $this->methods[strtolower($method)] = [$this->API, $actual_method];
                 if (strpos($method, '_') !== false) {
-                    $this->methods[strtolower(str_replace('_', ''))] = [$this->API, $actual_method];
+                    $this->methods[strtolower(str_replace('_', '', $method))] = [$this->API, $actual_method];
                 } else {
                     $this->methods[strtolower($this->from_camel_case($method))] = [$this->API, $actual_method];
                 }
