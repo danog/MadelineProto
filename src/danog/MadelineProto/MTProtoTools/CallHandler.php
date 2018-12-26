@@ -432,6 +432,9 @@ trait CallHandler
         if (isset($aargs['msg_id'])) {
             $message['msg_id'] = $aargs['msg_id'];
         }
+        if (isset($aargs['queue'])) {
+            $message['queue'] = $aargs['queue'];
+        }
         if (isset($aargs['file'])) {
             $message['file'] = $aargs['file'];
         }

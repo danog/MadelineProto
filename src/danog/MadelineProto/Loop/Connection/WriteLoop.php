@@ -179,6 +179,7 @@ class WriteLoop extends ResumableSignalLoop
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $connection->generate_message_id($datacenter);
 
                 $API->logger->logger("Sending {$message['_']} as encrypted message to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
                 $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $body, 'seqno' => $connection->generate_out_seq_no($message['content_related'])];
 
                 if (isset($message['method']) && $message['method'] && $message['_'] !== 'http_wait') {
@@ -210,6 +211,7 @@ class WriteLoop extends ResumableSignalLoop
                                 $connection->call_queue[$message['queue']] = [];
                             }
                             $MTmessage['body'] = $API->serialize_method('invokeAfterMsgs', ['msg_ids' => $connection->call_queue[$message['queue']], 'query' => $MTmessage['body']]);
+
 
                             $connection->call_queue[$message['queue']][$message_id] = $message_id;
                             if (count($connection->call_queue[$message['queue']]) > $API->settings['msg_array_limit']['call_queue']) {
