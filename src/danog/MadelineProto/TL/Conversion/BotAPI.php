@@ -72,7 +72,15 @@ trait BotAPI
 
         return $new_text;
     }
-
+    public function mb_str_split($text, $length)
+    {
+        $tlength = $this->mb_strlen($text);
+        $result = [];
+        for ($x = 0; $x < $tlength; $x += $length) {
+            $result []= $this->mb_substr($text, $x, $length);
+        }
+        return $result;
+    }
     public function parse_buttons($rows)
     {
         $newrows = [];
@@ -489,7 +497,7 @@ trait BotAPI
         if (stripos($arguments['parse_mode'], 'html') !== false) {
             $new_message = '';
 
-            $arguments['message'] = $this->html_fixtags($arguments['message']);
+            $arguments['message'] = rtrim($this->html_fixtags($arguments['message']), "\n");
             $dom = new \DOMDocument();
             if (!extension_loaded('mbstring')) {
                 throw new \danog\MadelineProto\Exception(['extension', 'mbstring']);
@@ -523,11 +531,11 @@ trait BotAPI
         $multiple_args_base = array_merge($args, ['entities' => [], 'parse_mode' => 'text', 'message' => '']);
         $multiple_args = [$multiple_args_base];
 
-        $max_length = $this->config['message_length_max'];
+        $max_length = isset($args['media']) ? $this->config['caption_length_max'] : $this->config['message_length_max'];
         $text_arr = [];
         foreach ($this->multipleExplodeKeepDelimiters(["\n"], $args['message']) as $word) {
             if ($this->mb_strlen($word) > $max_length) {
-                foreach (str_split($word, $max_length) as $vv) {
+                foreach ($this->mb_str_split($word, $max_length) as $vv) {
                     $text_arr[] = $vv;
                 }
             } else {
@@ -558,15 +566,26 @@ trait BotAPI
                     $newentity = $entity;
                     $newentity['length'] = $entity['length'] - ($this->mb_strlen($multiple_args[$i]['message']) - $entity['offset']);
                     $entity['length'] = $this->mb_strlen($multiple_args[$i]['message']) - $entity['offset'];
-                    $multiple_args[$i]['entities'][] = $entity;
 
                     $offset += $this->mb_strlen($multiple_args[$i]['message']);
                     $newentity['offset'] = $offset;
+
+
+                    $prev_length = $this->mb_strlen($multiple_args[$i]['message']);
+                    $multiple_args[$i]['message'] = rtrim($multiple_args[$i]['message'], "\n");
+                    $entity['length'] -= $prev_length - $this->mb_strlen($multiple_args[$i]['message']);
+
+                    $multiple_args[$i]['entities'][] = $entity;
+
                     $i++;
                     $entity = $newentity;
 
                     continue;
                 } else {
+                    $prev_length = $this->mb_strlen($multiple_args[$i]['message']);
+                    $multiple_args[$i]['message'] = rtrim($multiple_args[$i]['message'], "\n");
+                    $entity['length'] -= $prev_length - $this->mb_strlen($multiple_args[$i]['message']);
+
                     $multiple_args[$i]['entities'][] = $entity;
                     break;
                 }
