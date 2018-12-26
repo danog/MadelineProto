@@ -88,21 +88,12 @@ trait UpdateHandler
             $params['offset'] = array_reverse(array_keys((array) $this->updates))[abs($params['offset']) - 1];
         }
         $updates = [];
-        if (isset($this->updates["\0*\0state"])) {
-            unset($this->updates["\0*\0state"]);
-        }
-        $supdates = (array) $this->updates;
-        ksort($supdates);
-        foreach ($supdates as $key => $value) {
+        foreach ($this->updates as $key => $value) {
             if ($params['offset'] > $key) {
                 unset($this->updates[$key]);
             } elseif ($params['limit'] === null || count($updates) < $params['limit']) {
                 $updates[] = ['update_id' => $key, 'update' => $value];
             }
-        }
-
-        if (empty($this->updates)) {
-            $this->updates_key = 0;
         }
 
         return $updates;
