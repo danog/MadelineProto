@@ -25,7 +25,11 @@ class Exception extends \Exception
 
     public function __toString()
     {
-        return get_class($this).($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.\danog\MadelineProto\Magic::$revision.PHP_EOL.'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
+        $result = get_class($this).($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.\danog\MadelineProto\Magic::$revision.PHP_EOL.'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
+        if (php_sapi_name() !== 'cli') {
+            $result = str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
+        }
+        return $result;
     }
 
     public function __construct($message, $file = '')

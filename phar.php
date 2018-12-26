@@ -4,7 +4,8 @@ if (PHP_MAJOR_VERSION === 5) {
     if (PHP_MINOR_VERSION < 6) {
         throw new \Exception('MadelineProto requires at least PHP 5.6 to run');
     }
-    $newline = php_sapi_name() === 'cli' ? "\n" : '<br>';
+    $newline = PHP_EOL;
+    if (php_sapi_name() !== 'cli') $newline = '<br>'.$newline;
     echo "**********************************************************************$newline";
     echo "**********************************************************************$newline$newline";
     echo "YOU ARE USING AN OLD AND BUGGED VERSION OF PHP, PLEASE UPDATE TO PHP 7$newline";

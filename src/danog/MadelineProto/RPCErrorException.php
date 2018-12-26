@@ -39,7 +39,11 @@ class RPCErrorException extends \Exception
 
     public function __toString()
     {
-        return sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], $this->getMess(), $this->rpc, $this->file, $this->line.PHP_EOL.PHP_EOL).PHP_EOL.\danog\MadelineProto\Magic::$revision.PHP_EOL.$this->getTLTrace().PHP_EOL;
+        $result = sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], $this->getMess(), $this->rpc, $this->file, $this->line.PHP_EOL.PHP_EOL).PHP_EOL.\danog\MadelineProto\Magic::$revision.PHP_EOL.$this->getTLTrace().PHP_EOL;
+        if (php_sapi_name() !== 'cli') {
+            $result = str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
+        }
+        return $result;
     }
 
     public function __construct($message = null, $code = 0, Exception $previous = null)

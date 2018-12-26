@@ -36,6 +36,7 @@ class Logger
     public $prefix = '';
     public $level = 3;
     public $colors = [];
+    public $newline = "\n";
 
     public static $default;
     public static $printed = false;
@@ -90,9 +91,11 @@ class Logger
         $this->colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
         $this->colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
         $this->colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
+        $this->newline = PHP_EOL;
 
         if ($this->mode === 3) {
             $this->stdout = new ResourceOutputStream(STDOUT);
+            if (php_sapi_name() !== 'cli') $this->newline = '<br>'.$this->newline;
         } elseif ($this->mode === 2) {
             $this->stdout = new ResourceOutputStream(fopen($this->optional, 'a+'));
         } elseif ($this->mode === 1) {
@@ -149,10 +152,10 @@ class Logger
         $param = str_pad($file.$prefix.': ', 16 + strlen($prefix))."\t".$param;
         switch ($this->mode) {
                 case 1:
-                    $this->stdout->write($param.PHP_EOL);
+                    $this->stdout->write($param.$this->newline);
                     break;
                 default:
-                    $this->stdout->write(Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".PHP_EOL : $param.PHP_EOL);
+                    $this->stdout->write(Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline);
                     break;
             }
     }
