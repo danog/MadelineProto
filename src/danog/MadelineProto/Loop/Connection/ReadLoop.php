@@ -156,6 +156,10 @@ class ReadLoop extends SignalLoop
             $message_key = yield $buffer->bufferRead(16);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $connection->temp_auth_key['auth_key'], false);
             $encrypted_data = yield $buffer->bufferRead($payload_length - 24);
+            $protocol_padding = strlen($encrypted_data) % 16;
+            if ($protocol_padding) {
+                $encrypted_data = substr($encrypted_data, 0, -$protocol_padding);
+            }
             $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
             /*
             $server_salt = substr($decrypted_data, 0, 8);

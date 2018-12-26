@@ -196,6 +196,9 @@ class DataCenter
                 if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\StreamInterface'])) {
                     throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
                 }
+                if ($proxy === ObfuscatedStream::getName() && in_array(strlen($extra['secret']), [17, 34])) {
+                    $combos []= [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [$proxy, $extra], [IntermediatePaddedStream::getName(), []]];
+                }
                 foreach ($combos as $k => $orig) {
                     $combo = [];
                     if ($proxy === ObfuscatedStream::getName()) {

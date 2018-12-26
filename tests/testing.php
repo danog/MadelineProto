@@ -52,7 +52,6 @@ try {
         $MadelineProto->accept_tos();
     }
 }
-var_dump($MadelineProto->help->getSupportName());
 
 
 /*
