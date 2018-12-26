@@ -72,15 +72,18 @@ trait BotAPI
 
         return $new_text;
     }
+
     public function mb_str_split($text, $length)
     {
         $tlength = $this->mb_strlen($text);
         $result = [];
         for ($x = 0; $x < $tlength; $x += $length) {
-            $result []= $this->mb_substr($text, $x, $length);
+            $result[] = $this->mb_substr($text, $x, $length);
         }
+
         return $result;
     }
+
     public function parse_buttons($rows)
     {
         $newrows = [];
@@ -569,7 +572,6 @@ trait BotAPI
 
                     $offset += $this->mb_strlen($multiple_args[$i]['message']);
                     $newentity['offset'] = $offset;
-
 
                     $prev_length = $this->mb_strlen($multiple_args[$i]['message']);
                     $multiple_args[$i]['message'] = rtrim($multiple_args[$i]['message']);

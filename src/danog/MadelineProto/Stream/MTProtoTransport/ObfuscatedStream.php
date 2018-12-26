@@ -19,13 +19,12 @@
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Promise;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\Buffer;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Tools;
-use danog\MadelineProto\Exception;
 
 /**
  * Obfuscated2 stream wrapper.
@@ -48,7 +47,6 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
     private $append = '';
     private $append_after = 0;
 
-
     /**
      * Connect to stream.
      *
@@ -70,8 +68,8 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
         if (strlen($header) === 1) {
             $header = str_repeat($header, 4);
         }
-        $random = substr_replace($random, $header.substr($random, 56+strlen($header)), 56);
-        $random = substr_replace($random, pack('s', $ctx->getIntDc()).substr($random, 60+2), 60);
+        $random = substr_replace($random, $header.substr($random, 56 + strlen($header)), 56);
+        $random = substr_replace($random, pack('s', $ctx->getIntDc()).substr($random, 60 + 2), 60);
 
         $reversed = strrev($random);
 
@@ -94,10 +92,10 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
         $this->decrypt->setIV(substr($reversed, 40, 16));
 
         $random = substr_replace($random, substr(@$this->encrypt->encrypt($random), 56, 8), 56, 8);
-        
 
         $this->stream = yield $ctx->getStream($random);
     }
+
     /**
      * Async close.
      *
@@ -120,8 +118,9 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
         $this->write_buffer = yield $this->stream->getWriteBuffer($length);
         if (strlen($append)) {
             $this->append = $append;
-            $this->append_after = $length-strlen($append);
+            $this->append_after = $length - strlen($append);
         }
+
         return $this;
     }
 
@@ -169,15 +168,16 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
             if ($this->append_after === 0) {
                 $data .= $this->append;
                 $this->append = '';
-            } else if ($this->append_after < 0) {
+            } elseif ($this->append_after < 0) {
                 $this->append_after = 0;
                 $this->append = '';
+
                 throw new Exception('Tried to send too much out of frame data, cannot append');
             }
         }
+
         return $this->write_buffer->bufferWrite(@$this->encrypt->encrypt($data));
     }
-
 
     /**
      * Does nothing.

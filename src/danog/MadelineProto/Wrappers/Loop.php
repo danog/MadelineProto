@@ -19,7 +19,7 @@
 
 namespace danog\MadelineProto\Wrappers;
 
-use \Amp\Deferred;
+use Amp\Deferred;
 
 /**
  * Manages logging in and out.
@@ -50,8 +50,8 @@ trait Loop
             } catch (\danog\MadelineProto\Exception $e) {
                 register_shutdown_function(function () {
                     //$this->logger->logger(['Restarting script...']);
-                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp') . '://' . $_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
-                    fwrite($a, $_SERVER['REQUEST_METHOD'] . ' ' . $_SERVER['REQUEST_URI'] . ' ' . $_SERVER['SERVER_PROTOCOL'] . "\r\n" . 'Host: ' . $_SERVER['SERVER_NAME'] . "\r\n\r\n");
+                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
+                    fwrite($a, $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n");
                 });
             }
         }
@@ -66,7 +66,7 @@ trait Loop
         $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
         $offset = 0;
 
-        while (true) {            
+        while (true) {
             foreach ($this->updates as $update) {
                 $r = $this->settings['updates']['callback']($update);
                 if (is_object($r)) {
@@ -86,7 +86,6 @@ trait Loop
             });
             $this->update_deferred = new Deferred();
             yield $this->update_deferred->promise();
-
         }
     }
 }

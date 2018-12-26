@@ -31,8 +31,7 @@ trait Start
         }
         if (php_sapi_name() === 'cli') {
             if (!function_exists('readline')) {
-                $readline = function($prompt = null)
-                {
+                $readline = function ($prompt = null) {
                     if ($prompt) {
                         echo $prompt;
                     }

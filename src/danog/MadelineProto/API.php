@@ -61,14 +61,14 @@ class API extends APIFactory
                     class_exists('\\Volatile');
                     $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                     foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                        class_exists('\\danog\\MadelineProto\\' . $class);
+                        class_exists('\\danog\\MadelineProto\\'.$class);
                     }
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Exception $e) {
                     class_exists('\\Volatile');
                     $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                     foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                        class_exists('\\danog\\MadelineProto\\' . $class);
+                        class_exists('\\danog\\MadelineProto\\'.$class);
                     }
                     Logger::log((string) $e, Logger::ERROR);
                     if (strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
@@ -105,7 +105,7 @@ class API extends APIFactory
         $this->APIFactory();
         \danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
         $pong = $this->ping(['ping_id' => 3]);
-        \danog\MadelineProto\Logger::log('Pong: ' . $pong['ping_id'], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 
@@ -121,6 +121,7 @@ class API extends APIFactory
             $this->API->setEventHandler($this->API->event_handler);
         }
     }
+
     public function __wakeup()
     {
         $this->APIFactory();
@@ -186,19 +187,21 @@ class API extends APIFactory
         foreach ($ret as &$match) {
             $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
         }
+
         return implode('_', $ret);
     }
+
     public function APIFactory()
     {
         if ($this->API) {
             foreach ($this->API->get_method_namespaces() as $namespace) {
                 $this->{$namespace} = new APIFactory($namespace, $this->API);
             }
-            $methods =  get_class_methods($this->API);
+            $methods = get_class_methods($this->API);
             foreach ($methods as $key => $method) {
                 if ($method == 'method_call_async_read') {
                     unset($methods[array_search('method_call', $methods)]);
-                } else if (stripos($method, 'async') !== false) {
+                } elseif (stripos($method, 'async') !== false) {
                     if (strpos($method, '_async') !== false) {
                         unset($methods[array_search(str_ireplace('_async', '', $method), $methods)]);
                     } else {
@@ -212,7 +215,7 @@ class API extends APIFactory
 
                 if ($method == 'method_call_async_read') {
                     $method = 'method_call';
-                } else if (stripos($method, 'async') !== false) {
+                } elseif (stripos($method, 'async') !== false) {
                     if (strpos($method, '_async') !== false) {
                         $method = str_ireplace('_async', '', $method);
                     } else {

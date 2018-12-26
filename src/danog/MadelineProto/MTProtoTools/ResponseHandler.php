@@ -53,6 +53,7 @@ trait ResponseHandler
     }
 
     public $n = 0;
+
     public function handle_messages($datacenter, $actual_datacenter = null)
     {
         if ($actual_datacenter) {
@@ -62,8 +63,8 @@ trait ResponseHandler
         //$n = $this->n++;
         $only_updates = true;
         foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
-//var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
-            $this->logger->logger((isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['from_container']) ? 'Inside of container, received ' : 'Received ') . $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'] . ' from DC ' . $datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
+            $this->logger->logger((isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['from_container']) ? 'Inside of container, received ' : 'Received ').$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].' from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']) {
                 case 'msgs_ack':
@@ -143,7 +144,7 @@ trait ResponseHandler
                     // Acknowledge that I received the server's response
                     if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id']])) {
                         $this->ack_incoming_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id'], $datacenter);
-                        // Acknowledge that I received the server's response
+                    // Acknowledge that I received the server's response
                     } else {
                         $this->datacenter->sockets[$datacenter]->check_message_id($message['orig_message']['msg_id'], ['outgoing' => false, 'container' => true]);
                         $this->datacenter->sockets[$datacenter]->incoming_messages[$message['orig_message']['msg_id']] = ['content' => $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']];
@@ -178,7 +179,7 @@ trait ResponseHandler
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'] as $key => $msg_id) {
                         $msg_id = new \phpseclib\Math\BigInteger(strrev($msg_id), 256);
-                        $status = 'Status for message id ' . $msg_id . ': ';
+                        $status = 'Status for message id '.$msg_id.': ';
                         if (($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['info'][$key] & 4) !== 0) {
                             $this->got_response_for_outgoing_message_id($msg_id, $datacenter);
                         }
@@ -260,11 +261,11 @@ trait ResponseHandler
                             break;
                         default:
                             $only_updates = false;
-                            $this->logger->logger('Trying to assign a response of type ' . $response_type . ' to its request...', \danog\MadelineProto\Logger::VERBOSE);
+                            $this->logger->logger('Trying to assign a response of type '.$response_type.' to its request...', \danog\MadelineProto\Logger::VERBOSE);
                             foreach ($this->datacenter->sockets[$datacenter]->new_outgoing as $key => $expecting_msg_id) {
                                 $expecting = $this->datacenter->sockets[$datacenter]->outgoing_messages[$expecting_msg_id];
 
-                                $this->logger->logger('Does the request of return type ' . $expecting['type'] . ' match?', \danog\MadelineProto\Logger::VERBOSE);
+                                $this->logger->logger('Does the request of return type '.$expecting['type'].' match?', \danog\MadelineProto\Logger::VERBOSE);
                                 if ($response_type === $expecting['type']) {
                                     $this->logger->logger('Yes', \danog\MadelineProto\Logger::VERBOSE);
                                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
@@ -274,7 +275,7 @@ trait ResponseHandler
                                 $this->logger->logger('No', \danog\MadelineProto\Logger::VERBOSE);
                             }
 
-                            throw new \danog\MadelineProto\ResponseException('Dunno how to handle ' . PHP_EOL . var_export($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], true));
+                            throw new \danog\MadelineProto\ResponseException('Dunno how to handle '.PHP_EOL.var_export($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'], true));
                             break;
                     }
                     break;
@@ -297,7 +298,7 @@ trait ResponseHandler
                 $this->handle_reject($datacenter, $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id], $data);
             }
         } else {
-            $this->logger->logger('Rejecting: already got response for ' . (isset($request['_']) ? $request['_'] : '-'));
+            $this->logger->logger('Rejecting: already got response for '.(isset($request['_']) ? $request['_'] : '-'));
             $this->logger->logger("Rejecting: $data");
         }
     }
@@ -325,7 +326,9 @@ trait ResponseHandler
                         $this->logger->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
 
                         $request['refresh_references'] = true;
-                        if (isset($request['serialized_body'])) unset($request['serialized_body']);
+                        if (isset($request['serialized_body'])) {
+                            unset($request['serialized_body']);
+                        }
 
                         Loop::defer([$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
 
@@ -344,7 +347,7 @@ trait ResponseHandler
                             $old_datacenter = $datacenter;
                             $this->datacenter->curdc = $datacenter = (int) preg_replace('/[^0-9]+/', '', $response['error_message']);
 
-                            if (isset($request['file']) && $request['file'] && isset($this->datacenter->sockets[$datacenter . '_media'])) {
+                            if (isset($request['file']) && $request['file'] && isset($this->datacenter->sockets[$datacenter.'_media'])) {
                                 \danog\MadelineProto\Logger::log('Using media DC');
                                 $datacenter .= '_media';
                             }
@@ -372,15 +375,15 @@ trait ResponseHandler
                                     }
 
                                     if ($response['error_message'] === 'USER_DEACTIVATED') {
-                                        $this->logger->logger("!!!!!!! WARNING !!!!!!!", \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $this->logger->logger('!!!!!!! WARNING !!!!!!!', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger("Telegram's flood prevention system suspended this account.", \danog\MadelineProto\Logger::ERROR);
-                                        $this->logger->logger("To continue, manual verification is required.", \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $this->logger->logger('To continue, manual verification is required.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $phone = isset($this->authorization['user']['phone']) ? '+'.$this->authorization['user']['phone'] : 'you are currently using';
-                                        $this->logger->logger("Send an email to recover@telegram.org, asking to unban the phone number " . $phone . ", and quickly describe what will you do with this phone number.", \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $this->logger->logger("Then login again.", \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $this->logger->logger("If you intentionally deleted this account, ignore this message.", \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number '.$phone.', and quickly describe what will you do with this phone number.', \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $this->logger->logger('Then login again.', \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $this->logger->logger('If you intentionally deleted this account, ignore this message.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                     }
-                                    
+
                                     $this->authorized = self::NOT_LOGGED_IN;
                                     $this->authorization = null;
 
@@ -420,13 +423,13 @@ trait ResponseHandler
                                             $socket->auth_key = null;
                                             $socket->authorized = false;
                                         }
-                                        $this->logger->logger("!!!!!!! WARNING !!!!!!!", \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $this->logger->logger('!!!!!!! WARNING !!!!!!!', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger("Telegram's flood prevention system suspended this account.", \danog\MadelineProto\Logger::ERROR);
-                                        $this->logger->logger("To continue, manual verification is required.", \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $this->logger->logger('To continue, manual verification is required.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $phone = isset($this->authorization['user']['phone']) ? '+'.$this->authorization['user']['phone'] : 'you are currently using';
-                                        $this->logger->logger("Send an email to recover@telegram.org, asking to unban the phone number " . $phone . ", and quickly describe what will you do with this phone number.", \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $this->logger->logger("Then login again.", \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $this->logger->logger("If you intentionally deleted this account, ignore this message.", \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number '.$phone.', and quickly describe what will you do with this phone number.', \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $this->logger->logger('Then login again.', \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $this->logger->logger('If you intentionally deleted this account, ignore this message.', \danog\MadelineProto\Logger::FATAL_ERROR);
 
                                         $this->authorized = self::NOT_LOGGED_IN;
                                         $this->authorization = null;
@@ -444,6 +447,7 @@ trait ResponseHandler
 
                                         $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
                                     });
+
                                     return;
                                 case 'AUTH_KEY_PERM_EMPTY':
                                     $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', \danog\MadelineProto\Logger::ERROR);
@@ -452,7 +456,6 @@ trait ResponseHandler
                                     Loop::defer(function () use ($request_id, $datacenter) {
                                         $this->init_authorization();
                                         $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
-
                                     });
 
                                     return;
@@ -466,8 +469,9 @@ trait ResponseHandler
                             $seconds = preg_replace('/[^0-9]+/', '', $response['error_message']);
                             $limit = isset($aargs['FloodWaitLimit']) ? $aargs['FloodWaitLimit'] : $this->settings['flood_timeout']['wait_if_lt'];
                             if (is_numeric($seconds) && $seconds < $limit) {
-                                $this->logger->logger('Flood, waiting ' . $seconds . ' seconds before repeating async call...', \danog\MadelineProto\Logger::NOTICE);
+                                $this->logger->logger('Flood, waiting '.$seconds.' seconds before repeating async call...', \danog\MadelineProto\Logger::NOTICE);
                                 Loop::delay($seconds * 1000, [$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
+
                                 return;
                             }
                         // no break
@@ -487,7 +491,7 @@ trait ResponseHandler
                 case 'bad_server_salt':
                 case 'bad_msg_notification':
 
-                    $this->logger->logger('Received bad_msg_notification: ' . self::BAD_MSG_ERROR_CODES[$response['error_code']], \danog\MadelineProto\Logger::WARNING);
+                    $this->logger->logger('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$response['error_code']], \danog\MadelineProto\Logger::WARNING);
                     switch ($response['error_code']) {
                         case 48:
                             $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'] = $response['new_server_salt'];
@@ -497,26 +501,25 @@ trait ResponseHandler
                         case 16:
                         case 17:
                             $this->datacenter->sockets[$datacenter]->time_delta = (int) (new \phpseclib\Math\BigInteger(strrev($response_id), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(time()))->toString();
-                            $this->logger->logger('Set time delta to ' . $this->datacenter->sockets[$datacenter]->time_delta, \danog\MadelineProto\Logger::WARNING);
+                            $this->logger->logger('Set time delta to '.$this->datacenter->sockets[$datacenter]->time_delta, \danog\MadelineProto\Logger::WARNING);
                             $this->reset_session();
                             $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
                             Loop::defer(function () use ($request_id, $datacenter) {
                                 $this->init_authorization();
                                 $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
-
                             });
 
                             return;
                     }
                     $this->got_response_for_outgoing_message_id($request_id, $datacenter);
-                    $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: ' . self::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code']));
+                    $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code']));
 
                     return;
             }
         }
 
         if (!isset($request['promise'])) {
-            $this->logger->logger('Response: already got response for ' . (isset($request['_']) ? $request['_'] : '-') . ' with message ID ' . $this->unpack_signed_long($request_id));
+            $this->logger->logger('Response: already got response for '.(isset($request['_']) ? $request['_'] : '-').' with message ID '.$this->unpack_signed_long($request_id));
 
             return;
         }
@@ -619,7 +622,7 @@ trait ResponseHandler
                     $this->get_updates_difference();
                     break;
                 default:
-                    throw new \danog\MadelineProto\ResponseException('Unrecognized update received: ' . var_export($updates, true));
+                    throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.var_export($updates, true));
                     break;
             }
         } finally {

@@ -18,26 +18,26 @@
 
 namespace danog\MadelineProto\Loop;
 
-use \Amp\Promise;
+use Amp\Promise;
 
 /**
- * Resumable loop interface
+ * Resumable loop interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 interface ResumableLoopInterface extends LoopInterface
 {
     /**
-     * Pause the loop
+     * Pause the loop.
      *
      * @param int $time For how long to pause the loop
-     * 
+     *
      * @return Promise
      */
     public function pause($time = null): Promise;
 
     /**
-     * Resume the loop
+     * Resume the loop.
      *
      * @return void
      */

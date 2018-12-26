@@ -45,14 +45,14 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
-        $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port'])->secure(false);
+        $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
 
         $this->stream = yield $ctx->getStream();
 
         $address = $uri->getHost();
         $port = $uri->getPort();
 
-        yield $this->stream->write("CONNECT $address:$port HTTP/1.1\r\nHost: $address:$port\r\nAccept: */*\r\n" . $this->getProxyAuthHeader() . "Connection: keep-Alive\r\n\r\n");
+        yield $this->stream->write("CONNECT $address:$port HTTP/1.1\r\nHost: $address:$port\r\nAccept: */*\r\n".$this->getProxyAuthHeader()."Connection: keep-Alive\r\n\r\n");
 
         $buffer = yield $this->stream->getReadBuffer($l);
         $headers = '';
@@ -78,7 +78,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         }
         $code = (int) $code;
         unset($headers[0]);
-        if (array_pop($headers) . array_pop($headers) !== '') {
+        if (array_pop($headers).array_pop($headers) !== '') {
             throw new \danog\MadelineProto\Exception('Wrong last header');
         }
         foreach ($headers as $key => $current_header) {
@@ -116,12 +116,13 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             $length = (int) $headers['content-length'];
             $read = yield $buffer->bufferRead($length);
         }
-        \danog\MadelineProto\Logger::log('Connected to ' . $address . ':' . $port . ' via http');
+        \danog\MadelineProto\Logger::log('Connected to '.$address.':'.$port.' via http');
 
         if (strlen($header)) {
             yield (yield $this->stream->getWriteBuffer(strlen($header)))->bufferWrite($header);
         }
     }
+
     /**
      * Async close.
      *
@@ -172,11 +173,11 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             return '';
         }
 
-        return 'Proxy-Authorization: Basic ' . base64_encode($this->extra['username'] . ':' . $this->extra['password']) . "\r\n";
+        return 'Proxy-Authorization: Basic '.base64_encode($this->extra['username'].':'.$this->extra['password'])."\r\n";
     }
 
     /**
-     * Sets proxy data
+     * Sets proxy data.
      *
      * @param array $extra Proxy data
      *
@@ -186,6 +187,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     {
         $this->extra = $extra;
     }
+
     public static function getName(): string
     {
         return __CLASS__;

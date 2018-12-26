@@ -18,11 +18,11 @@
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
+use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
-use Amp\Promise;
 use danog\MadelineProto\Tools;
 
 /**
@@ -49,6 +49,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     {
         $this->stream = yield $ctx->getStream(str_repeat(chr(221), 4).$header);
     }
+
     /**
      * Async close.
      *
@@ -70,7 +71,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     {
         $padding_length = $this->random_int($modulus = 16);
         $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.$this->random($padding_length));
-        yield $buffer->bufferWrite(pack('V', $padding_length+$length));
+        yield $buffer->bufferWrite(pack('V', $padding_length + $length));
 
         return $buffer;
     }
@@ -86,7 +87,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     {
         $buffer = yield $this->stream->getReadBuffer($l);
         $length = unpack('V', yield $buffer->bufferRead(4))[1];
-        
+
         return $buffer;
     }
 

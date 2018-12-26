@@ -46,7 +46,7 @@ abstract class SignalLoop extends Loop implements SignalLoopInterface
 
     public function waitSignal(Promise $promise): Promise
     {
-        $this->signalDeferred = new Deferred;
+        $this->signalDeferred = new Deferred();
         $dpromise = $this->signalDeferred->promise();
 
         $promise->onResolve(function () use ($promise) {

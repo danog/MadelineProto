@@ -1,6 +1,6 @@
 <?php
 /**
- * Update loop
+ * Update loop.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -18,16 +18,12 @@
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use Amp\Promise;
 use Amp\Success;
-use Amp\Deferred;
-use function Amp\call;
-use function Amp\asyncCall;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 
 /**
- * Update loop
+ * Update loop.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
@@ -52,8 +48,9 @@ class UpdateLoop extends ResumableSignalLoop
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting update loop");
+                    $API->logger->logger('Exiting update loop');
                     $this->exitedLoop();
+
                     return;
                 }
             }
@@ -63,19 +60,26 @@ class UpdateLoop extends ResumableSignalLoop
                 }
             }
             if (yield $this->waitSignal($this->pause(($API->last_getdifference + $timeout) - time()))) {
-                $API->logger->logger("Exiting update loop");
+                $API->logger->logger('Exiting update loop');
                 $this->exitedLoop();
+
                 return;
             }
         }
     }
+
     public function has_all_auth()
     {
-        if ($this->API->isInitingAuthorization()) return false;
+        if ($this->API->isInitingAuthorization()) {
+            return false;
+        }
 
         foreach ($this->API->datacenter->sockets as $dc) {
-            if (!$dc->authorized || $dc->temp_auth_key === NULL) return false;
+            if (!$dc->authorized || $dc->temp_auth_key === null) {
+                return false;
+            }
         }
+
         return true;
     }
 }

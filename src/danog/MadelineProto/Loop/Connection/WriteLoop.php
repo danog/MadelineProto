@@ -1,6 +1,6 @@
 <?php
 /**
- * Socket write loop
+ * Socket write loop.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -22,12 +22,12 @@ use Amp\Coroutine;
 use Amp\Success;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
-use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 
 /**
- * Socket write loop
+ * Socket write loop.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
@@ -48,9 +48,10 @@ class WriteLoop extends ResumableSignalLoop
         while (true) {
             if (empty($connection->pending_outgoing)) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting write loop");
+                    $API->logger->logger('Exiting write loop');
                     $this->exitedLoop();
                     yield new Success(0);
+
                     return;
                 }
             }
@@ -103,7 +104,7 @@ class WriteLoop extends ResumableSignalLoop
                 $pad = $this->random($pad_length);
                 $buffer = yield $connection->stream->getWriteBuffer(8 + 8 + 4 + $pad_length + $length);
 
-                yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0" . $message_id . $this->pack_unsigned_int($length) . $body . $pad);
+                yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int($length).$body.$pad);
 
                 //var_dump("plain ".bin2hex($message_id));
                 $connection->http_req_count++;
@@ -118,12 +119,13 @@ class WriteLoop extends ResumableSignalLoop
                 $API->logger->logger("Sent {$message['_']} as unencrypted message to DC {$datacenter}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 $message['send_promise']->resolve(isset($message['promise']) ? $message['promise'] : true);
-
-
             }
-            if ($skipped_all) break;
+            if ($skipped_all) {
+                break;
+            }
         }
     }
+
     public function encryptedWriteLoopAsync(): \Generator
     {
         $API = $this->API;
@@ -192,15 +194,15 @@ class WriteLoop extends ResumableSignalLoop
                                 'query' => $API->serialize_method(
                                     'initConnection',
                                     [
-                                        'api_id' => $API->settings['app_info']['api_id'],
-                                        'api_hash' => $API->settings['app_info']['api_hash'],
-                                        'device_model' => strpos($datacenter, 'cdn') === false ? $API->settings['app_info']['device_model'] : 'n/a',
-                                        'system_version' => strpos($datacenter, 'cdn') === false ? $API->settings['app_info']['system_version'] : 'n/a',
-                                        'app_version' => $API->settings['app_info']['app_version'],
+                                        'api_id'           => $API->settings['app_info']['api_id'],
+                                        'api_hash'         => $API->settings['app_info']['api_hash'],
+                                        'device_model'     => strpos($datacenter, 'cdn') === false ? $API->settings['app_info']['device_model'] : 'n/a',
+                                        'system_version'   => strpos($datacenter, 'cdn') === false ? $API->settings['app_info']['system_version'] : 'n/a',
+                                        'app_version'      => $API->settings['app_info']['app_version'],
                                         'system_lang_code' => $API->settings['app_info']['lang_code'],
-                                        'lang_code' => $API->settings['app_info']['lang_code'],
-                                        'lang_pack' => $API->settings['app_info']['lang_pack'],
-                                        'query' => $MTmessage['body'],
+                                        'lang_code'        => $API->settings['app_info']['lang_code'],
+                                        'lang_pack'        => $API->settings['app_info']['lang_pack'],
+                                        'query'            => $MTmessage['body'],
                                     ]
                                 ),
                             ]
@@ -212,7 +214,6 @@ class WriteLoop extends ResumableSignalLoop
                             }
                             $MTmessage['body'] = $API->serialize_method('invokeAfterMsgs', ['msg_ids' => $connection->call_queue[$message['queue']], 'query' => $MTmessage['body']]);
 
-
                             $connection->call_queue[$message['queue']][$message_id] = $message_id;
                             if (count($connection->call_queue[$message['queue']]) > $API->settings['msg_array_limit']['call_queue']) {
                                 reset($connection->call_queue[$message['queue']]);
@@ -221,13 +222,13 @@ class WriteLoop extends ResumableSignalLoop
                             }
                         }
 
-/*                        if ($API->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $API->settings['requests']['gzip_encode_if_gt']) {
-if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
-$MTmessage['body'] = $API->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
-$API->logger->logger('Using GZIP compression for ' . $message['_'] . ', saved ' . ($l - $g) . ' bytes of data, reduced call size by ' . $g * 100 / $l . '%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-}
-unset($gzipped);
-}*/
+                        /*                        if ($API->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $API->settings['requests']['gzip_encode_if_gt']) {
+                        if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
+                        $MTmessage['body'] = $API->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
+                        $API->logger->logger('Using GZIP compression for ' . $message['_'] . ', saved ' . ($l - $g) . ' bytes of data, reduced call size by ' . $g * 100 / $l . '%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                        }
+                        unset($gzipped);
+                        }*/
                     }
                 }
                 $body_length = strlen($MTmessage['body']);
@@ -270,20 +271,21 @@ unset($gzipped);
                 $seq_no = $message['seqno'];
             } else {
                 $API->logger->logger('NO MESSAGE SENT', \danog\MadelineProto\Logger::WARNING);
+
                 return;
             }
 
             unset($messages);
 
-            $plaintext = $connection->temp_auth_key['server_salt'] . $connection->session_id . $message_id . pack('VV', $seq_no, $message_data_length) . $message_data;
+            $plaintext = $connection->temp_auth_key['server_salt'].$connection->session_id.$message_id.pack('VV', $seq_no, $message_data_length).$message_data;
             $padding = $this->posmod(-strlen($plaintext), 16);
             if ($padding < 12) {
                 $padding += 16;
             }
             $padding = $this->random($padding);
-            $message_key = substr(hash('sha256', substr($connection->temp_auth_key['auth_key'], 88, 32) . $plaintext . $padding, true), 8, 16);
+            $message_key = substr(hash('sha256', substr($connection->temp_auth_key['auth_key'], 88, 32).$plaintext.$padding, true), 8, 16);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $connection->temp_auth_key['auth_key']);
-            $message = $connection->temp_auth_key['id'] . $message_key . $this->ige_encrypt($plaintext . $padding, $aes_key, $aes_iv);
+            $message = $connection->temp_auth_key['id'].$message_key.$this->ige_encrypt($plaintext.$padding, $aes_key, $aes_iv);
 
             $buffer = yield $connection->stream->getWriteBuffer($len = strlen($message));
 
@@ -292,10 +294,10 @@ unset($gzipped);
 
             $connection->http_req_count++;
 
-            $API->logger->logger("Sent encrypted payload to DC {$datacenter}, speed " . ((($len * 8) / (microtime(true) - $t)) / 1000000) . " mbps!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $API->logger->logger("Sent encrypted payload to DC {$datacenter}, speed ".((($len * 8) / (microtime(true) - $t)) / 1000000).' mbps!', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             $sent = time();
-            
+
             if ($to_ack) {
                 $connection->ack_queue = [];
             }
@@ -325,5 +327,4 @@ unset($gzipped);
 
         $connection->pending_outgoing_key = 0;
     }
-
 }

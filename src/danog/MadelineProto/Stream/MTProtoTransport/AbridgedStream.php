@@ -18,11 +18,11 @@
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
+use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
-use Amp\Promise;
 
 /**
  * Abridged stream wrapper.
@@ -58,6 +58,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
     {
         return $this->stream->disconnect();
     }
+
     /**
      * Get write buffer asynchronously.
      *

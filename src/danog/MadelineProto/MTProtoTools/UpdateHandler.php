@@ -19,8 +19,8 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Delayed;
 use Amp\Deferred;
+use Amp\Delayed;
 use function Amp\Promise\any;
 
 /**
@@ -83,7 +83,7 @@ trait UpdateHandler
         if (empty($this->updates)) {
             return [];
         }
-        
+
         if ($params['offset'] < 0) {
             $params['offset'] = array_reverse(array_keys((array) $this->updates))[abs($params['offset']) - 1];
         }
@@ -295,7 +295,6 @@ trait UpdateHandler
         $this->last_getdifference = time();
         $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->resume();
 
-
         try {
             switch ($difference['_']) {
                 case 'updates.differenceEmpty':
@@ -335,6 +334,7 @@ trait UpdateHandler
 
             $d->resolve();
         }
+
         return true;
     }
 
