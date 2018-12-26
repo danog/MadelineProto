@@ -29,7 +29,7 @@ trait TL
     public $td_descriptions;
     public $tl_callbacks = [];
 
-    public function construct_tl($files, $objects)
+    public function construct_tl($files, $objects = [])
     {
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_loading'], \danog\MadelineProto\Logger::VERBOSE);
         $this->update_callbacks($objects);

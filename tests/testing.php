@@ -52,6 +52,8 @@ try {
         $MadelineProto->accept_tos();
     }
 }
+var_dump($MadelineProto->help->getSupportName());
+
 
 /*
  * If this session is not logged in, login

@@ -1,14 +1,14 @@
 <?php
 /**
  * Lang module
- * 
+ *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details.
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
@@ -5179,7 +5179,7 @@ class Lang
   'method_updates.getChannelDifference_param_filter_type_ChannelMessagesFilter' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates',
   'method_updates.getChannelDifference_param_pts_type_int' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates',
   'method_updates.getChannelDifference_param_limit_type_int' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates',
-  'method_photos.updateProfilePhoto' => 'Update the profile photo',
+  'method_photos.updateProfilePhoto' => 'Change the profile photo',
   'method_photos.updateProfilePhoto_param_id_type_InputPhoto' => 'The photo to use',
   'method_photos.uploadProfilePhoto' => 'Upload profile photo',
   'method_photos.uploadProfilePhoto_param_file_type_InputFile' => 'The photo',
