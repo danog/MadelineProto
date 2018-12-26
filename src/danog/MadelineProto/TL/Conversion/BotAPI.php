@@ -536,9 +536,10 @@ trait BotAPI
 
         $max_length = isset($args['media']) ? $this->config['caption_length_max'] : $this->config['message_length_max'];
         $text_arr = [];
+		mb_regex_encoding('UTF-8');
         foreach ($this->multipleExplodeKeepDelimiters(["\n"], $args['message']) as $word) {
-            if ($this->mb_strlen($word) > $max_length) {
-                foreach ($this->mb_str_split($word, $max_length) as $vv) {
+            if (mb_strlen($word, 'UTF-8') > $max_length) {
+                foreach (mb_str_split($word, $max_length) as $vv) {
                     $text_arr[] = $vv;
                 }
             } else {
