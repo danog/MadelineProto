@@ -110,7 +110,7 @@ class Magic
                         }
                     }
                 } while (true);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
             }
             if (!self::$can_parallel && !defined('AMP_WORKER')) {
                 define('AMP_WORKER', 1);
