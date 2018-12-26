@@ -32,7 +32,7 @@ trait AckHandler
 
             return false;
         }
-        $this->logger->logger("Ack-ed ".$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_']." with message ID $message_id on DC $datacenter");
+        //$this->logger->logger("Ack-ed ".$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_']." with message ID $message_id on DC $datacenter");
         /*
         if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['body'])) {
             unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['body']);

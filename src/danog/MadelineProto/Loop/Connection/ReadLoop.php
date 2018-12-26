@@ -54,7 +54,7 @@ class ReadLoop extends SignalLoop
             } catch (NothingInTheSocketException $e) {
                 if (isset($connection->old)) {
                     $this->exitedLoop();
-                    $API->logger->logger("Got nothing in the socket in DC {$datacenter} while closing socket, exiting...", Logger::ERROR);
+                    $API->logger->logger("Exiting read loop in DC $datacenter");
                     return;
                 }
                 $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
