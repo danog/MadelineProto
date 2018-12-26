@@ -52,7 +52,11 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
     if (!isset(\danog\MadelineProto\Lang::$lang[$lang_code][$key])) {
         \danog\MadelineProto\Lang::$lang[$lang_code][$key] = $value;
     }
-    if (\danog\MadelineProto\Lang::$lang[$lang_code][$key] === $value && ($lang_code !== 'en' || $value == '' || strpos($value, 'You cannot use this method directly') === 0)) {
+    if (\danog\MadelineProto\Lang::$lang[$lang_code][$key] === $value && ($lang_code !== 'en' || $value == '' || 
+        strpos($value, 'You cannot use this method directly') === 0 ||
+        strpos($value, 'Update ') === 0 ||
+        ctype_lower($value[0])
+    )) {
         $value = \danog\MadelineProto\Lang::$lang[$lang_code][$key];
         if (in_array($key, ['v_error', 'v_tgerror'])) {
             $value = hex2bin($value);
@@ -73,6 +77,11 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = 'Random number for cryptographic security';
         } elseif (isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$method_name])) {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = \danog\MadelineProto\MTProto::DISALLOWED_METHODS[$method_name];
+        } elseif (strpos($value, 'Update ') === 0) {
+            if (!$param_name && strpos($key, 'object_') === 0) {
+                $value = str_replace('Update ', '', $value).' update';
+            }
+        } elseif (ctype_lower($value[0])) {
         } else {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = readline($value.' => ');
             if (\danog\MadelineProto\Lang::$lang[$lang_code][$key] === '') {
@@ -94,6 +103,7 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
                 echo "Using default value ".\danog\MadelineProto\Lang::$lang[$lang_code][$key].PHP_EOL;
             }
         }
+        \danog\MadelineProto\Lang::$lang[$lang_code][$key] = ucfirst(\danog\MadelineProto\Lang::$lang[$lang_code][$key]);
         if (in_array($key, ['v_error', 'v_tgerror'])) {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = bin2hex(\danog\MadelineProto\Lang::$lang[$lang_code][$key]);
         }
