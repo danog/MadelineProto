@@ -19,15 +19,20 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Loop;
+use function Amp\Promise\all;
+
 class CombinedAPI
 {
     use \danog\Serializable;
+    use Tools;
     public $session;
     public $instance_paths = [];
     public $instances = [];
     public $timeout = 5;
     public $serialization_interval = 30;
     public $serialized = 0;
+    protected $async;
 
     public function __magic_construct($session, $paths = [])
     {
@@ -159,6 +164,7 @@ class CombinedAPI
 
     public $event_handler;
     private $event_handler_instance;
+    private $event_handler_methods = [];
 
     public function setEventHandler($event_handler)
     {
@@ -174,22 +180,40 @@ class CombinedAPI
         } elseif ($this->event_handler_instance) {
             $this->event_handler_instance->__construct($this);
         }
-        if (method_exists($this->event_handler_instance, 'onLoop')) {
-            $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
+        $this->event_handler_methods = [];
+
+        foreach (\get_class_methods($this->event_handler) as $method) {
+            if ($method === 'onLoop') {
+                $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
+            } else if ($method === 'onAny') {
+                foreach (end($this->instances)->API->constructors->by_id as $id => $constructor) {
+                    if ($constructor['type'] === 'Update' && !isset($this->event_handler_methods[$constructor['predicate']])) {
+                        $this->event_handler_methods[$constructor['predicate']] = [$this->event_handler_instance, 'onAny'];
+                    }
+                }
+            } else {
+                $method_name = lcfirst(substr($method, 2));
+                $this->event_handler_methods[$method_name] = [$this->event_handler_instance, $method];
+            }
         }
     }
 
     public function event_update_handler($update, $instance)
     {
-        $method_name = 'on'.ucfirst($update['_']);
-        if (method_exists($this->event_handler_instance, $method_name)) {
-            $this->event_handler_instance->$method_name($update, $instance);
-        } elseif (method_exists($this->event_handler_instance, 'onAny')) {
-            $this->event_handler_instance->onAny($update, $instance);
+        if (isset($this->event_handler_methods[$update['_']])) {
+            return $this->event_handler_methods[$update['_']]($update, $instance);
         }
     }
 
     private $loop_callback;
+
+    public function async($async)
+    {
+        $this->async = $async;
+        foreach ($this->instances as $instance) {
+            $instance->async($async);
+        }
+    }
 
     public function setLoopCallback($callback)
     {
@@ -208,11 +232,13 @@ class CombinedAPI
             } catch (\danog\MadelineProto\Exception $e) {
                 register_shutdown_function(function () {
                     \danog\MadelineProto\Logger::log(['Restarting script...']);
-                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
-                    fwrite($a, $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n");
+                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp') . '://' . $_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
+                    fwrite($a, $_SERVER['REQUEST_METHOD'] . ' ' . $_SERVER['REQUEST_URI'] . ' ' . $_SERVER['SERVER_PROTOCOL'] . "\r\n" . 'Host: ' . $_SERVER['SERVER_NAME'] . "\r\n\r\n");
                 });
             }
         }
+
+        $loops = [];
         foreach ($this->instances as $path => $instance) {
             if ($instance->API->authorized !== MTProto::LOGGED_IN) {
                 continue;
@@ -221,82 +247,21 @@ class CombinedAPI
                 $instance->API->settings['updates']['handle_updates'] = true;
                 $instance->API->datacenter->sockets[$instance->API->settings['connection_settings']['default_dc']]->updater->start();
             }
-            ksort($instance->API->updates);
-            foreach ($instance->API->updates as $key => $value) {
-                unset($instance->API->updates[$key]);
-                $this->event_update_handler($value, $path);
-            }
-        }
-        \danog\MadelineProto\Logger::log('Started update loop', \danog\MadelineProto\Logger::NOTICE);
-
-        while (true) {
-            $read = [];
-            $write = [];
-            $except = [];
-            foreach ($this->instances as $path => $instance) {
-                if ($instance->API->authorized !== MTProto::LOGGED_IN) {
-                    continue;
-                }
-                if (time() - $instance->API->last_getdifference > $instance->API->settings['updates']['getdifference_interval']) {
-                    $instance->API->get_updates_difference();
-                }
-                if (isset($instance->session) && !is_null($instance->session) && time() - $instance->serialized > $instance->API->settings['serialization']['serialization_interval']) {
-                    $instance->API->logger->logger("Didn't serialize in a while, doing that now...");
-                    $instance->serialize($instance->session);
-                }
-
-                foreach ($instance->API->datacenter->sockets as $id => $connection) {
-                    $read[$id.'-'.$path] = $connection->getSocket();
-                }
-            }
-            if (time() - $this->serialized > $this->serialization_interval) {
-                \danog\MadelineProto\Logger::log('Serializing combined event handler');
-                $this->serialize();
-            }
-
-            try {
-                \Socket::select($read, $write, $except, $this->timeout);
-                if (count($read)) {
-                    foreach (array_keys($read) as $id) {
-                        list($dc, $path) = explode('-', $id, 2);
-                        if (($error = $this->instances[$path]->API->recv_message($dc)) !== true) {
-                            if ($error === -404) {
-                                if ($this->instances[$path]->API->datacenter->sockets[$dc]->temp_auth_key !== null) {
-                                    $this->instances[$path]->API->logger->logger('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
-                                    $this->instances[$path]->API->datacenter->sockets[$dc]->temp_auth_key = null;
-                                    $this->instances[$path]->API->init_authorization();
-
-                                    throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
-                                }
-                            }
-
-                            throw new \danog\MadelineProto\RPCErrorException($error, $error);
-                        }
-                        $only_updates = $this->instances[$path]->API->handle_messages($dc);
-                    }
-                }
-            } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
-                foreach ($this->instances as $instance) {
-                    $instance->get_updates_difference();
-                }
-            } catch (\danog\MadelineProto\RPCErrorException $e) {
-                if ($e->rpc !== 'RPC_CALL_FAIL') {
-                    throw $e;
-                }
-            } catch (\danog\MadelineProto\Exception $e) {
-                $this->instances[$path]->API->connect_to_all_dcs();
-            }
-            foreach ($this->instances as $path => $instance) {
-                ksort($instance->API->updates);
-                foreach ($instance->API->updates as $key => $value) {
-                    unset($instance->API->updates[$key]);
-                    $this->event_update_handler($value, $path);
-                }
-            }
+            $instance->setCallback(function ($update) use ($path) {
+                return $this->event_update_handler($update, $path);
+            });
             if ($this->loop_callback !== null) {
-                $callback = $this->loop_callback;
-                $callback();
+                $instance->setLoopCallback($this->loop_callback);
             }
+            $loops []= $this->call($instance->loop(0, ['async' => true]));
         }
+
+        Loop::repeat($this->serialization_interval * 1000, function () {
+            \danog\MadelineProto\Logger::log('Serializing combined event handler');
+            $this->serialize();
+        });
+
+        \danog\MadelineProto\Logger::log('Started update loop', \danog\MadelineProto\Logger::NOTICE);
+        $this->wait(all($loops));
     }
 }

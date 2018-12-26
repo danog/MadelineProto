@@ -497,7 +497,7 @@ trait BotAPI
         if (stripos($arguments['parse_mode'], 'html') !== false) {
             $new_message = '';
 
-            $arguments['message'] = rtrim($this->html_fixtags($arguments['message']), "\n");
+            $arguments['message'] = rtrim($this->html_fixtags($arguments['message']));
             $dom = new \DOMDocument();
             if (!extension_loaded('mbstring')) {
                 throw new \danog\MadelineProto\Exception(['extension', 'mbstring']);
@@ -572,7 +572,7 @@ trait BotAPI
 
 
                     $prev_length = $this->mb_strlen($multiple_args[$i]['message']);
-                    $multiple_args[$i]['message'] = rtrim($multiple_args[$i]['message'], "\n");
+                    $multiple_args[$i]['message'] = rtrim($multiple_args[$i]['message']);
                     $entity['length'] -= $prev_length - $this->mb_strlen($multiple_args[$i]['message']);
 
                     $multiple_args[$i]['entities'][] = $entity;
@@ -583,7 +583,7 @@ trait BotAPI
                     continue;
                 } else {
                     $prev_length = $this->mb_strlen($multiple_args[$i]['message']);
-                    $multiple_args[$i]['message'] = rtrim($multiple_args[$i]['message'], "\n");
+                    $multiple_args[$i]['message'] = rtrim($multiple_args[$i]['message']);
                     $entity['length'] -= $prev_length - $this->mb_strlen($multiple_args[$i]['message']);
 
                     $multiple_args[$i]['entities'][] = $entity;

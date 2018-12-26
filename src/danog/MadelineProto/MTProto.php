@@ -267,7 +267,7 @@ class MTProto implements TLCallback
         }
         $this->postpone_updates = false;
         $this->postpone_pwrchat = false;
-        if ($this->event_handler && class_exists($this->event_handler)) {
+        if ($this->event_handler && class_exists($this->event_handler) && is_subclass_of($this->event_handler, '\danog\MadelineProto\EventHandler')) {
             $this->setEventHandler($this->event_handler);
         }
         $force = false;

@@ -117,7 +117,7 @@ class API extends APIFactory
             $this->{$namespace}->async = $async;
         }
 
-        if ($this->API->event_handler && class_exists($this->API->event_handler)) {
+        if ($this->API->event_handler && class_exists($this->API->event_handler) && is_subclass_of($this->API->event_handler, '\danog\MadelineProto\EventHandler')) {
             $this->API->setEventHandler($this->API->event_handler);
         }
     }
@@ -228,7 +228,7 @@ class API extends APIFactory
                 }
             }
             $this->API->wrapper = $this;
-            if ($this->API->event_handler && class_exists($this->API->event_handler)) {
+            if ($this->API->event_handler && class_exists($this->API->event_handler) && is_subclass_of($this->API->event_handler, '\danog\MadelineProto\EventHandler')) {
                 $this->API->setEventHandler($this->API->event_handler);
             }
         }
