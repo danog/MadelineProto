@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
-composer global require spatie/7to5
+#composer global require spatie/7to5 dev-master#7b3e0f4254aadd81cf1a7ef2ddad68d5fcdadcc1
+
 [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
 [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
 
@@ -13,7 +14,10 @@ echo '{
     "name": "danog/madelineprototests",
     "minimum-stability":"dev",
     "require": {
-        "danog/madelineproto": "dev-'$TRAVIS_BRANCH'#'$TRAVIS_COMMIT'"
+        "danog/madelineproto": "dev-'$TRAVIS_BRANCH'#'$TRAVIS_COMMIT'",
+        "amphp/dns": "dev-master#861cc857b1ba6e02e8a7439c30403682785fce96 as 0.9.9",
+        "amphp/file": "dev-master#5a69fca406ac5fd220de0aa68c887bc8046eb93c as 0.3.3",
+        "amphp/uri": "dev-master#f3195b163275383909ded7770a11d8eb865cbc86 as 0.1.3"
     },
     "repositories": [
         {
@@ -31,8 +35,11 @@ echo '{
 composer update
 cd ..
 
-$php7to5 convert --copy-all phar7 phar5 >/dev/null
+cp -a phar7 phar5
+#$php7to5 convert --copy-all phar7 phar5 >/dev/null
 find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
+#sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
+#echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
 
 [ "$TRAVIS_BRANCH" != "master" ] && branch="-$TRAVIS_BRANCH" || branch=""
 
@@ -46,9 +53,9 @@ git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
 cp "../madeline$branch.phar" .
 cp ../phar.php ../mtproxyd .
-[ "$TRAVIS_BRANCH" == "master" ] && echo -n $TRAVIS_COMMIT > release
+echo -n $TRAVIS_COMMIT > release$branch
 git add -A
-git commit -am "Release $TRAVIS_BRANCH $TRAVIS_COMMIT"
+git commit -am "Release $TRAVIS_BRANCH - $TRAVIS_COMMIT_MESSAGE"
 git push origin master
 cd ..
 echo "$TRAVIS_COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit

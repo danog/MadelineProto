@@ -1,20 +1,28 @@
 <?php
 
-/*
-Copyright 2016-2018 Daniil Gentili
-(https://daniil.it)
-This file is part of MadelineProto.
-MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
-You should have received a copy of the GNU General Public License along with MadelineProto.
-If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Logger module.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
 /*
  * Logger class
  */
 
 namespace danog\MadelineProto;
+
+use Amp\ByteStream\ResourceOutputStream;
 
 class Logger
 {
@@ -28,6 +36,7 @@ class Logger
     public $prefix = '';
     public $level = 3;
     public $colors = [];
+    public $newline = "\n";
 
     public static $default;
     public static $printed = false;
@@ -82,6 +91,23 @@ class Logger
         $this->colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
         $this->colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
         $this->colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
+        $this->newline = PHP_EOL;
+
+        if ($this->mode === 3) {
+            $this->stdout = new ResourceOutputStream(STDOUT);
+            if (php_sapi_name() !== 'cli') $this->newline = '<br>'.$this->newline;
+        } elseif ($this->mode === 2) {
+            $this->stdout = new ResourceOutputStream(fopen($this->optional, 'a+'));
+        } elseif ($this->mode === 1) {
+            $result = @ini_get('error_log');
+            if ($result === 'syslog') {
+                $this->stdout = new ResourceOutputStream(STDERR);
+            } elseif ($result) {
+                $this->stdout = new ResourceOutputStream(fopen($result, 'a+'));
+            } else {
+                $this->stdout = new ResourceOutputStream(STDERR);
+            }
+        }
     }
 
     public static function log($param, $level = self::NOTICE)
@@ -126,13 +152,10 @@ class Logger
         $param = str_pad($file.$prefix.': ', 16 + strlen($prefix))."\t".$param;
         switch ($this->mode) {
                 case 1:
-                    error_log($param);
+                    $this->stdout->write($param.$this->newline);
                     break;
-                case 2:
-                    error_log($param.PHP_EOL, 3, $this->optional);
-                    break;
-                case 3:
-                    echo Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".PHP_EOL : $param.PHP_EOL;
+                default:
+                    $this->stdout->write(Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline);
                     break;
             }
     }

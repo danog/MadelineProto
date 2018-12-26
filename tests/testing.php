@@ -9,7 +9,7 @@ MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY
 See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 /**
  * Various ways to load MadelineProto.
@@ -109,11 +109,11 @@ if (stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== 
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
             switch ($update['update']['_']) {
                 case 'updatePhoneCall':
-                if (is_object($update['update']['phone_call']) && $update['update']['phone_call']->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
-                    $update['update']['phone_call']->accept()->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
-                    $howmany--;
-                }
-           }
+                    if (is_object($update['update']['phone_call']) && $update['update']['phone_call']->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
+                        $update['update']['phone_call']->accept()->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
+                        $howmany--;
+                    }
+            }
         }
     }
 }
@@ -252,7 +252,7 @@ $mention = $mention['user_id']; // Selects only the numeric user id
 $t = time();
 $MadelineProto->upload('big');
 var_dump(time()-$t);
-*/
+ */
 
 foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);

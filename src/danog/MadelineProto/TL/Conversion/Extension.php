@@ -1,7 +1,7 @@
 <?php
 
 /*
-opyright 2016-2017 Daniil Gentili
+Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
 This file is part of MadelineProto.
 MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,10 +19,20 @@ namespace danog\MadelineProto\TL\Conversion;
  */
 trait Extension
 {
+    public function get_mime_from_extension($extension, $default)
+    {
+        $ext = ltrim($extension, '.');
+        if (isset(self::ALL_MIMES[$ext])) {
+            return self::ALL_MIMES[$ext][0];
+        }
+
+        return $default;
+    }
+
     public function get_extension_from_mime($mime)
     {
         foreach (self::ALL_MIMES as $key => $value) {
-            if (array_search($mime, (array) $value) !== false) {
+            if (array_search($mime, $value) !== false) {
                 return '.'.$key;
             }
         }
@@ -57,5 +67,19 @@ trait Extension
             default:
                 return $default;
         }
+    }
+
+    public function get_mime_from_file($file)
+    {
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+
+        return $finfo->file($file);
+    }
+
+    public function get_mime_from_buffer($buffer)
+    {
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+
+        return $finfo->buffer($buffer);
     }
 }

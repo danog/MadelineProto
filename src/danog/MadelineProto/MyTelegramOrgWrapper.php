@@ -1,14 +1,20 @@
 <?php
-/*
-Copyright 2016-2018 Daniil Gentili
-(https://daniil.it)
-This file is part of MadelineProto.
-MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
-You should have received a copy of the GNU General Public License along with MadelineProto.
-If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * MyTelegramOrgWrapper module.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto;
 
@@ -18,6 +24,7 @@ namespace danog\MadelineProto;
 class MyTelegramOrgWrapper
 {
     private $logged = false;
+    private $hash = '';
 
     public function __construct($number)
     {
@@ -140,10 +147,11 @@ class MyTelegramOrgWrapper
         curl_close($ch);
         $title = explode('</title>', explode('<title>', $result)[1])[0];
         switch ($title) {
-            case 'App configuration': return true;
-            case 'Create new application': $this->creation_hash = explode('"/>', explode('<input type="hidden" name="hash" value="', $result)[1])[0];
+            case 'App configuration':return true;
+            case 'Create new application':
+                $this->creation_hash = explode('"/>', explode('<input type="hidden" name="hash" value="', $result)[1])[0];
 
-return false;
+                return false;
         }
 
         throw new Exception($title);
@@ -180,13 +188,13 @@ return false;
         $cose = explode('<label for="app_id" class="col-md-4 text-right control-label">App api_id:</label>
       <div class="col-md-7">
         <span class="form-control input-xlarge uneditable-input" onclick="this.select();"><strong>', $result);
-        $asd = explode('</strong></span>', $cose['1']);
-        $api_id = $asd['0'];
+        $asd = explode('</strong></span>', $cose[1]);
+        $api_id = $asd[0];
         $cose = explode('<label for="app_hash" class="col-md-4 text-right control-label">App api_hash:</label>
       <div class="col-md-7">
         <span class="form-control input-xlarge uneditable-input" onclick="this.select();">', $result);
-        $asd = explode('</span>', $cose['1']);
-        $api_hash = $asd['0'];
+        $asd = explode('</span>', $cose[1]);
+        $api_hash = $asd[0];
 
         return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
     }
@@ -199,6 +207,7 @@ return false;
         if ($this->has_app()) {
             throw new Exception('The app was already created!');
         }
+
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, 'https://my.telegram.org/apps/create');
@@ -227,6 +236,10 @@ return false;
         }
         curl_close($ch);
 
+        if ($result) {
+            throw new Exception($result);
+        }
+
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, 'https://my.telegram.org/apps');
@@ -253,6 +266,13 @@ return false;
             throw new Exception('Curl error:'.curl_error($ch));
         }
         curl_close($ch);
+
+        $title = explode('</title>', explode('<title>', $result)[1])[0];
+        if ($title === 'Create new application') {
+            $this->creation_hash = explode('"/>', explode('<input type="hidden" name="hash" value="', $result)[1])[0];
+
+            throw new \danog\MadelineProto\Exception('App creation failed');
+        }
 
         $cose = explode('<label for="app_id" class="col-md-4 text-right control-label">App api_id:</label>
       <div class="col-md-7">

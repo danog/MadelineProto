@@ -1,16 +1,28 @@
 <?php
-/*
-Copyright 2016-2018 Daniil Gentili
-(https://daniil.it)
-This file is part of MadelineProto.
-MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
-You should have received a copy of the GNU General Public License along with the MadelineProto.
-If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Tools module.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto;
+
+use Amp\Deferred;
+use Amp\Loop;
+use Amp\Promise;
+use Amp\Success;
+use function Amp\Promise\wait;
 
 /**
  * Some tools.
@@ -34,6 +46,34 @@ trait Tools
         }
 
         return $hash;
+    }
+
+    public function random_int($modulus = false)
+    {
+        if ($modulus === false) {
+            $modulus = PHP_INT_MAX;
+        }
+
+        try {
+            return \random_int(0, PHP_INT_MAX) % $modulus;
+        } catch (\Exception $e) {
+            // random_compat will throw an Exception, which in PHP 5 does not implement Throwable
+        } catch (\Throwable $e) {
+            // If a sufficient source of randomness is unavailable, random_bytes() will throw an
+            // object that implements the Throwable interface (Exception, TypeError, Error).
+            // We don't actually need to do anything here. The string() method should just continue
+            // as normal. Note, however, that if we don't have a sufficient source of randomness for
+            // random_bytes(), most of the other calls here will fail too, so we'll end up using
+            // the PHP implementation.
+        }
+
+        if (Magic::$bigint) {
+            $number = $this->unpack_signed_int($this->random(4));
+        } else {
+            $number = $this->unpack_signed_long($this->random(8));
+        }
+
+        return ($number & PHP_INT_MAX) % $modulus;
     }
 
     public function random($length)
@@ -142,5 +182,67 @@ trait Tools
         }
 
         return unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
+    }
+
+    public function infloop()
+    {
+        while (true) {
+            Loop::loop();
+        }
+    }
+
+    public function wait($promise)
+    {
+        if ($promise instanceof \Generator) {
+            $promise = new Coroutine($promise);
+        } elseif (!($promise instanceof Promise)) {
+            return $promise;
+        }
+        do {
+            try {
+                return wait($promise);
+            } catch (\Throwable $e) {
+                if ($e->getMessage() !== 'Loop stopped without resolving the promise') {
+                    //$this->logger->logger("AN EXCEPTION SURFACED " . $e, \danog\MadelineProto\Logger::ERROR);
+                    throw $e;
+                }
+            }
+        } while (true);
+    }
+
+    public function call($promise)
+    {
+        if ($promise instanceof \Generator) {
+            $promise = new Coroutine($promise);
+        } elseif (!($promise instanceof Promise)) {
+            return new Success($promise);
+        }
+
+        return $promise;
+    }
+
+    public function after($a, $b)
+    {
+        $a = $this->call($a);
+        $deferred = new Deferred();
+        $a->onResolve(function ($e, $res) use ($b, $deferred) {
+            if ($e) {
+                throw $e;
+            }
+            $b = $this->call($b());
+            $b->onResolve(static function ($e, $res) use ($deferred) {
+                if ($e) {
+                    throw $e;
+                }
+                $deferred->resolve($res);
+            });
+        });
+
+        return $deferred->promise();
+    }
+
+    public function sleep_async($time)
+    {
+        return new \Amp\Delayed($time * 1000);
     }
 }

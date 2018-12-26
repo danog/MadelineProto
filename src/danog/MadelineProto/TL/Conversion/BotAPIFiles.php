@@ -1,15 +1,21 @@
 <?php
 
-/*
-Copyright 2016-2018 Daniil Gentili
-(https://daniil.it)
-This file is part of MadelineProto.
-MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
-You should have received a copy of the GNU General Public License along with MadelineProto.
-If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * BotAPIFiles module.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\TL\Conversion;
 
@@ -64,15 +70,15 @@ trait BotAPIFiles
         return $new;
     }
 
-    public function photosize_to_botapi($photo, $message_media, $thumbnail = false)
+    public function photosize_to_botapi($photoSize, $photo, $thumbnail = false)
     {
-        $ext = $this->get_extension_from_location(['_' => 'inputFileLocation', 'volume_id' => $photo['location']['volume_id'], 'local_id' => $photo['location']['local_id'], 'secret' => $photo['location']['secret'], 'dc_id' => $photo['location']['dc_id']], '.jpg');
-        $photo['location']['access_hash'] = isset($message_media['access_hash']) ? $message_media['access_hash'] : 0;
-        $photo['location']['id'] = isset($message_media['id']) ? $message_media['id'] : 0;
-        $photo['location']['_'] = $thumbnail ? 'bot_thumbnail' : 'bot_photo';
-        $data = $this->serialize_object(['type' => 'File'], $photo['location'], 'File').chr(2);
+        $ext = $this->get_extension_from_location(['_' => 'inputFileLocation', 'volume_id' => $photoSize['location']['volume_id'], 'local_id' => $photoSize['location']['local_id'], 'secret' => $photoSize['location']['secret'], 'dc_id' => $photoSize['location']['dc_id']], '.jpg');
+        $photoSize['location']['access_hash'] = isset($photo['access_hash']) ? $photo['access_hash'] : 0;
+        $photoSize['location']['id'] = isset($photo['id']) ? $photo['id'] : 0;
+        $photoSize['location']['_'] = $thumbnail ? 'bot_thumbnail' : 'bot_photo';
+        $data = $this->serialize_object(['type' => 'File'], $photoSize['location'], 'File').chr(2);
 
-        return ['file_id' => $this->base64url_encode($this->rle_encode($data)), 'width' => $photo['w'], 'height' => $photo['h'], 'file_size' => isset($photo['size']) ? $photo['size'] : strlen($photo['bytes']), 'mime_type' => 'image/jpeg', 'file_name' => $photo['location']['volume_id'].'_'.$photo['location']['local_id'].$ext];
+        return ['file_id' => $this->base64url_encode($this->rle_encode($data)), 'width' => $photoSize['w'], 'height' => $photoSize['h'], 'file_size' => isset($photoSize['size']) ? $photoSize['size'] : strlen($photoSize['bytes']), 'mime_type' => 'image/jpeg', 'file_name' => $photoSize['location']['volume_id'].'_'.$photoSize['location']['local_id'].$ext];
     }
 
     public function unpack_file_id($file_id)
@@ -92,7 +98,8 @@ trait BotAPIFiles
                 unset($deserialized['id']);
                 unset($deserialized['access_hash']);
                 unset($deserialized['_']);
-                $constructor['sizes'][0]['location'] = $deserialized;
+                $deserialized['_'] = 'fileLocation';
+                $constructor['sizes'][0] = ['_' => 'photoSize', 'location' => $deserialized];
                 $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $constructor, 'caption' => ''];
 
                 return $res;

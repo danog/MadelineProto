@@ -1,15 +1,21 @@
 <?php
 
-/*
-Copyright 2016-2018 Daniil Gentili
-(https://daniil.it)
-This file is part of MadelineProto.
-MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
-You should have received a copy of the GNU General Public License along with MadelineProto.
-If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * BotAPI module.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\TL\Conversion;
 
@@ -32,6 +38,50 @@ trait BotAPI
         }
 
         return $length;
+    }
+
+    public function mb_substr($text, $offset, $length = null)
+    {
+        $mb_text_length = $this->mb_strlen($text);
+        if ($offset < 0) {
+            $offset = $mb_text_length + $offset;
+        }
+        if ($length < 0) {
+            $length = ($mb_text_length - $offset) + $length;
+        } elseif ($length === null) {
+            $length = $mb_text_length - $offset;
+        }
+        $new_text = '';
+        $current_offset = 0;
+        $current_length = 0;
+        $text_length = strlen($text);
+        for ($x = 0; $x < $text_length; $x++) {
+            $char = ord($text[$x]);
+            if (($char & 0xC0) != 0x80) {
+                $current_offset += 1 + ($char >= 0xf0);
+                if ($current_offset > $offset) {
+                    $current_length += 1 + ($char >= 0xf0);
+                }
+            }
+            if ($current_offset > $offset) {
+                if ($current_length <= $length) {
+                    $new_text .= $text[$x];
+                }
+            }
+        }
+
+        return $new_text;
+    }
+
+    public function mb_str_split($text, $length)
+    {
+        $tlength = $this->mb_strlen($text);
+        $result = [];
+        for ($x = 0; $x < $tlength; $x += $length) {
+            $result[] = $this->mb_substr($text, $x, $length);
+        }
+
+        return $result;
     }
 
     public function parse_buttons($rows)
@@ -328,11 +378,9 @@ trait BotAPI
         }
     }
 
-    public $botapi_params = ['disable_web_page_preview' => 'no_webpage', 'disable_notification' => 'silent', 'reply_to_message_id' => 'reply_to_msg_id', 'chat_id' => 'peer', 'text' => 'message'];
-
     public function botAPI_to_MTProto($arguments)
     {
-        foreach ($this->botapi_params as $bot => $mtproto) {
+        foreach (self::BOTAPI_PARAMS_CONVERSION as $bot => $mtproto) {
             if (isset($arguments[$bot]) && !isset($arguments[$mtproto])) {
                 $arguments[$mtproto] = $arguments[$bot];
                 //unset($arguments[$bot]);
@@ -452,10 +500,10 @@ trait BotAPI
         if (stripos($arguments['parse_mode'], 'html') !== false) {
             $new_message = '';
 
-            $arguments['message'] = $this->html_fixtags($arguments['message']);
+            $arguments['message'] = rtrim($this->html_fixtags($arguments['message']));
             $dom = new \DOMDocument();
             if (!extension_loaded('mbstring')) {
-                throw new Exception(['extension', 'mbstring']);
+                throw new \danog\MadelineProto\Exception(['extension', 'mbstring']);
             }
             $dom->loadHTML(mb_convert_encoding($arguments['message'], 'HTML-ENTITIES', 'UTF-8'));
             if (!isset($arguments['entities'])) {
@@ -486,11 +534,11 @@ trait BotAPI
         $multiple_args_base = array_merge($args, ['entities' => [], 'parse_mode' => 'text', 'message' => '']);
         $multiple_args = [$multiple_args_base];
 
-        $max_length = $this->config['message_length_max'];
+        $max_length = isset($args['media']) ? $this->config['caption_length_max'] : $this->config['message_length_max'];
         $text_arr = [];
         foreach ($this->multipleExplodeKeepDelimiters(["\n"], $args['message']) as $word) {
             if ($this->mb_strlen($word) > $max_length) {
-                foreach (str_split($word, $max_length) as $vv) {
+                foreach ($this->mb_str_split($word, $max_length) as $vv) {
                     $text_arr[] = $vv;
                 }
             } else {
@@ -521,15 +569,25 @@ trait BotAPI
                     $newentity = $entity;
                     $newentity['length'] = $entity['length'] - ($this->mb_strlen($multiple_args[$i]['message']) - $entity['offset']);
                     $entity['length'] = $this->mb_strlen($multiple_args[$i]['message']) - $entity['offset'];
-                    $multiple_args[$i]['entities'][] = $entity;
 
                     $offset += $this->mb_strlen($multiple_args[$i]['message']);
                     $newentity['offset'] = $offset;
+
+                    $prev_length = $this->mb_strlen($multiple_args[$i]['message']);
+                    $multiple_args[$i]['message'] = rtrim($multiple_args[$i]['message']);
+                    $entity['length'] -= $prev_length - $this->mb_strlen($multiple_args[$i]['message']);
+
+                    $multiple_args[$i]['entities'][] = $entity;
+
                     $i++;
                     $entity = $newentity;
 
                     continue;
                 } else {
+                    $prev_length = $this->mb_strlen($multiple_args[$i]['message']);
+                    $multiple_args[$i]['message'] = rtrim($multiple_args[$i]['message']);
+                    $entity['length'] -= $prev_length - $this->mb_strlen($multiple_args[$i]['message']);
+
                     $multiple_args[$i]['entities'][] = $entity;
                     break;
                 }
@@ -557,7 +615,7 @@ trait BotAPI
 
     public function html_fixtags($text)
     {
-        preg_match_all('#(.*?)(<(a|b|strong|em|i|code|pre)[^>]*>)([^<]*?)(<\\/\\3>)(.*)?#is', $text, $matches, PREG_SET_ORDER);
+        preg_match_all('#(.*?)(<(a|b|\bstrong\b|\bem\b|i|\bcode\b|\bpre\b)[^>]*>)([^<]*?)(<\\/\\3>)(.*)?#is', $text, $matches, PREG_SET_ORDER);
         if ($matches) {
             $last = count($matches) - 1;
             foreach ($matches as $val) {

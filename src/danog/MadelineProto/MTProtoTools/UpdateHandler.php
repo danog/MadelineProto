@@ -1,17 +1,27 @@
 <?php
 
-/*
-Copyright 2016-2018 Daniil Gentili
-(https://daniil.it)
-This file is part of MadelineProto.
-MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
-You should have received a copy of the GNU General Public License along with MadelineProto.
-If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * UpdateHandler module.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\MTProtoTools;
+
+use Amp\Deferred;
+use Amp\Delayed;
+use function Amp\Promise\any;
 
 /**
  * Manages updates.
@@ -45,71 +55,35 @@ trait UpdateHandler
             return;
         }
         $this->updates[$this->updates_key++] = $update;
-        //$this->logger->logger(['Stored ', $update);
+        $this->logger->logger('Stored ');
     }
 
-    public function get_updates($params = [])
+    public function get_updates_async($params = [])
     {
         if (!$this->settings['updates']['handle_updates']) {
             $this->settings['updates']['handle_updates'] = true;
+            $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
+        }
+        if (!$this->settings['updates']['run_callback']) {
+            $this->settings['updates']['run_callback'] = true;
         }
         array_walk($this->calls, function ($controller, $id) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 $controller->discard();
             }
         });
-        $time = microtime(true);
 
-        try {
-            if (!$this->is_http($this->datacenter->curdc) && !$this->altervista) {
-                try {
-                    $waiting = $this->datacenter->select();
-                    if (count($waiting)) {
-                        $tries = 10;
-                        while (count($waiting) && $tries--) {
-                            $dc = $waiting[0];
-                            if (($error = $this->recv_message($dc)) !== true) {
-                                if ($error === -404) {
-                                    if ($this->datacenter->sockets[$dc]->temp_auth_key !== null) {
-                                        $this->logger->logger('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
-                                        $this->datacenter->sockets[$dc]->temp_auth_key = null;
-                                        $this->init_authorization();
+        $params = array_merge(self::DEFAULT_GETUPDATES_PARAMS, $params);
 
-                                        throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
-                                    }
-                                }
-
-                                throw new \danog\MadelineProto\RPCErrorException($error, $error);
-                            }
-                            $only_updates = $this->handle_messages($dc);
-                            $waiting = $this->datacenter->select(true);
-                        }
-                    } else {
-                        $this->get_updates_difference();
-                    }
-                } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
-                    $this->get_updates_difference();
-                }
-            } else {
-                $this->get_updates_difference();
-            }
-            if (time() - $this->last_getdifference > $this->settings['updates']['getdifference_interval']) {
-                $this->get_updates_difference();
-            }
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
-            if ($e->rpc !== 'RPC_CALL_FAIL') {
-                throw $e;
-            }
-        } catch (\danog\MadelineProto\Exception $e) {
-            $this->connect_to_all_dcs();
+        if (empty($this->updates)) {
+            $this->update_deferred = new Deferred();
+            yield any([$this->update_deferred->promise(), new Delayed($params['timeout'] * 1000)]);
         }
-        $default_params = ['offset' => 0, 'limit' => null, 'timeout' => 0];
-        $params = array_merge($default_params, $params);
-        $params['timeout'] = (int) ($params['timeout'] * 1000000 - (microtime(true) - $time));
-        usleep($params['timeout'] > 0 ? $params['timeout'] : 0);
+
         if (empty($this->updates)) {
             return [];
         }
+
         if ($params['offset'] < 0) {
             $params['offset'] = array_reverse(array_keys((array) $this->updates))[abs($params['offset']) - 1];
         }
@@ -125,6 +99,10 @@ trait UpdateHandler
             } elseif ($params['limit'] === null || count($updates) < $params['limit']) {
                 $updates[] = ['update_id' => $key, 'update' => $value];
             }
+        }
+
+        if (empty($this->updates)) {
+            $this->updates_key = 0;
         }
 
         return $updates;
@@ -287,7 +265,7 @@ trait UpdateHandler
         return $this->updates_state;
     }
 
-    public function get_updates_difference()
+    public function get_updates_difference($w = null)
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
@@ -315,6 +293,7 @@ trait UpdateHandler
         $this->postpone_updates = true;
         $this->updates_state['sync_loading'] = true;
         $this->last_getdifference = time();
+        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->resume();
 
         try {
             switch ($difference['_']) {
@@ -348,6 +327,15 @@ trait UpdateHandler
             $this->updates_state['sync_loading'] = false;
         }
         $this->handle_pending_updates();
+
+        if ($this->updates && $this->update_deferred) {
+            $d = $this->update_deferred;
+            $this->update_deferred = null;
+
+            $d->resolve();
+        }
+
+        return true;
     }
 
     public function get_updates_state()
@@ -558,7 +546,7 @@ trait UpdateHandler
                         return;
                     }
 
-                    return $this->calls[$update['phone_call']['id']]->discard(['_' => 'phoneCallDiscardReasonHangup'], [], $update['phone_call']['need_debug']);
+                    return $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'], [], $update['phone_call']['need_debug']);
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
@@ -629,7 +617,7 @@ trait UpdateHandler
         $this->logger->logger('Saving an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
         if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict'] && isset($this->settings['pwr']['update_handler'])) {
             $this->pwr_update_handler($update);
-        } else {
+        } elseif ($this->settings['updates']['run_callback']) {
             $this->get_updates_update_handler($update);
         }
     }

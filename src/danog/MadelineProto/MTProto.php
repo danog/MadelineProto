@@ -1,33 +1,41 @@
 <?php
 
-/*
-Copyright 2016-2018 Daniil Gentili
-(https://daniil.it)
-This file is part of MadelineProto.
-MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
-You should have received a copy of the GNU General Public License along with MadelineProto.
-If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * MTProto module.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto;
+
+use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use danog\MadelineProto\TL\TLCallback;
 
 /**
  * Manages all of the mtproto stuff.
  */
-class MTProto
+class MTProto implements TLCallback
 {
     use \danog\Serializable;
     use \danog\MadelineProto\MTProtoTools\AckHandler;
     use \danog\MadelineProto\MTProtoTools\AuthKeyHandler;
     use \danog\MadelineProto\MTProtoTools\CallHandler;
     use \danog\MadelineProto\MTProtoTools\Crypt;
-    use \danog\MadelineProto\MTProtoTools\MessageHandler;
-    use \danog\MadelineProto\MTProtoTools\MsgIdHandler;
     use \danog\MadelineProto\MTProtoTools\PeerHandler;
     use \danog\MadelineProto\MTProtoTools\ResponseHandler;
-    use \danog\MadelineProto\MTProtoTools\SaltHandler;
     use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
     use \danog\MadelineProto\MTProtoTools\UpdateHandler;
     use \danog\MadelineProto\MTProtoTools\Files;
@@ -54,15 +62,16 @@ class MTProto
     use \danog\MadelineProto\Wrappers\TOS;
 
     /*
-        const V = 71;
-    */
-    const V = 105;
+    const V = 71;
+     */
+    const V = 118;
+    const RELEASE = '4.0';
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
     const WAITING_SIGNUP = -1;
     const WAITING_PASSWORD = 2;
     const LOGGED_IN = 3;
-    const DISALLOWED_METHODS = ['messages.receivedQueue' => 'You cannot use this method directly', 'messages.getDhConfig' => 'You cannot use this method directly, instead use $MadelineProto->get_dh_config();', 'auth.bindTempAuthKey' => 'You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info', 'auth.exportAuthorization' => 'You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.importAuthorization' => 'You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.logOut' => 'You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info)', 'auth.importBotAuthorization' => 'You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.sendCode' => 'You cannot use this method directly, use the phone_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signIn' => 'You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.checkPassword' => 'You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signUp' => 'You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)', 'users.getFullUser' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'channels.getFullChannel' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.getFullChat' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'contacts.resolveUsername' => 'You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.acceptEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.discardEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.requestEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'phone.requestCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.acceptCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.confirmCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.discardCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'updates.getChannelDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getState' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'upload.getCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getCdnFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.reuploadCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveBigFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info'];
+    const DISALLOWED_METHODS = ['account.updatePasswordSettings' => 'You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)', 'account.getPasswordSettings' => 'You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)', 'messages.receivedQueue' => 'You cannot use this method directly', 'messages.getDhConfig' => 'You cannot use this method directly, instead use $MadelineProto->get_dh_config();', 'auth.bindTempAuthKey' => 'You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info', 'auth.exportAuthorization' => 'You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.importAuthorization' => 'You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.logOut' => 'You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info)', 'auth.importBotAuthorization' => 'You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.sendCode' => 'You cannot use this method directly, use the phone_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signIn' => 'You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.checkPassword' => 'You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signUp' => 'You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)', 'users.getFullUser' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'channels.getFullChannel' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.getFullChat' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'contacts.resolveUsername' => 'You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.acceptEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.discardEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.requestEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'phone.requestCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.acceptCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.confirmCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.discardCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'updates.getChannelDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getState' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'upload.getCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getCdnFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.reuploadCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveBigFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info'];
     const BAD_MSG_ERROR_CODES = [16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the â€œcorrectâ€ msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)', 17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)', 18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)', 19 => 'container msg_id is the same as msg_id of a previously received message (this must never happen)', 20 => 'message too old, and it cannot be verified whether the server has received a message with this msg_id or not', 32 => 'msg_seqno too low (the server has already received a message with a lower msg_id but with either a higher or an equal and odd seqno)', 33 => 'msg_seqno too high (similarly, there is a message with a higher msg_id but with either a lower or an equal and odd seqno)', 34 => 'an even msg_seqno expected (irrelevant message), but odd received', 35 => 'odd msg_seqno expected (relevant message), but even received', 48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)', 64 => 'invalid container.'];
     const MSGS_INFO_FLAGS = [1 => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)', 2 => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)', 3 => 'message not received (msg_id too high; however, the other party has certainly not received it yet)', 4 => 'message received (note that this response is also at the same time a receipt acknowledgment)', 8 => ' and message already acknowledged', 16 => ' and message not requiring acknowledgment', 32 => ' and RPC query contained in message being processed or processing already complete', 64 => ' and content-related response to message already generated', 128 => ' and other party knows for a fact that message is already received'];
     const REQUESTED = 0;
@@ -72,6 +81,42 @@ class MTProto
     const TD_PARAMS_CONVERSION = ['updateNewMessage' => ['_' => 'updateNewMessage', 'disable_notification' => ['message', 'silent'], 'message' => ['message']], 'message' => ['_' => 'message', 'id' => ['id'], 'sender_user_id' => ['from_id'], 'chat_id' => ['to_id', 'choose_chat_id_from_botapi'], 'send_state' => ['choose_incoming_or_sent'], 'can_be_edited' => ['choose_can_edit'], 'can_be_deleted' => ['choose_can_delete'], 'is_post' => ['post'], 'date' => ['date'], 'edit_date' => ['edit_date'], 'forward_info' => ['fwd_info', 'choose_forward_info'], 'reply_to_message_id' => ['reply_to_msg_id'], 'ttl' => ['choose_ttl'], 'ttl_expires_in' => ['choose_ttl_expires_in'], 'via_bot_user_id' => ['via_bot_id'], 'views' => ['views'], 'content' => ['choose_message_content'], 'reply_markup' => ['reply_markup']], 'messages.sendMessage' => ['chat_id' => ['peer'], 'reply_to_message_id' => ['reply_to_msg_id'], 'disable_notification' => ['silent'], 'from_background' => ['background'], 'input_message_content' => ['choose_message_content'], 'reply_markup' => ['reply_markup']]];
     const TD_REVERSE = ['sendMessage' => 'messages.sendMessage'];
     const TD_IGNORE = ['updateMessageID'];
+    const BOTAPI_PARAMS_CONVERSION = ['disable_web_page_preview' => 'no_webpage', 'disable_notification' => 'silent', 'reply_to_message_id' => 'reply_to_msg_id', 'chat_id' => 'peer', 'text' => 'message'];
+    const NOT_CONTENT_RELATED = [
+        //'rpc_result',
+        //'rpc_error',
+        'rpc_drop_answer',
+        'rpc_answer_unknown',
+        'rpc_answer_dropped_running',
+        'rpc_answer_dropped',
+        'get_future_salts',
+        'future_salt',
+        'future_salts',
+        'ping',
+        'pong',
+        'ping_delay_disconnect',
+        'destroy_session',
+        'destroy_session_ok',
+        'destroy_session_none',
+        //'new_session_created',
+        'msg_container',
+        'msg_copy',
+        'gzip_packed',
+        'http_wait',
+        'msgs_ack',
+        'bad_msg_notification',
+        'bad_server_salt',
+        'msgs_state_req',
+        'msgs_state_info',
+        'msgs_all_info',
+        'msg_detailed_info',
+        'msg_new_detailed_info',
+        'msg_resend_req',
+        'msg_resend_ans_req',
+    ];
+    const DEFAULT_GETUPDATES_PARAMS = ['offset' => 0, 'limit' => null, 'timeout' => 0];
+
+    public $wrapper;
     public $hook_url = false;
     public $settings = [];
     private $config = ['expires' => -1];
@@ -99,6 +144,9 @@ class MTProto
     private $postpone_pwrchat = false;
     private $pending_pwrchat = [];
     private $altervista = false;
+    private $supportUser = 0;
+    public $referenceDatabase;
+    public $update_deferred;
 
     public function __magic_construct($settings = [])
     {
@@ -117,7 +165,10 @@ class MTProto
         // Connect to servers
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
         if (!isset($this->datacenter)) {
-            $this->datacenter = new DataCenter($this->settings['connection'], $this->settings['connection_settings']);
+            $this->datacenter = new DataCenter($this, $this->settings['connection'], $this->settings['connection_settings']);
+        }
+        if (!isset($this->referenceDatabase)) {
+            $this->referenceDatabase = new ReferenceDatabase($this);
         }
         // Load rsa keys
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);
@@ -130,10 +181,10 @@ class MTProto
          * Define some needed numbers for BigInteger
          */
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_translation'], Logger::ULTRA_VERBOSE);
-        $this->construct_TL($this->settings['tl_schema']['src']);
+        $this->construct_TL($this->settings['tl_schema']['src'], [$this, $this->referenceDatabase]);
         $this->connect_to_all_dcs();
         $this->datacenter->curdc = 2;
-        if (!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) {
+        if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
             try {
                 $nearest_dc = $this->method_call('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
                 $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
@@ -154,7 +205,17 @@ class MTProto
 
     public function __sleep()
     {
-        return ['channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'pending_pwrchat', 'postpone_pwrchat', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
+        return ['supportUser', 'referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'last_recv', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'pending_pwrchat', 'postpone_pwrchat', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
+    }
+
+    public function isAltervista()
+    {
+        return $this->altervista;
+    }
+
+    public function isInitingAuthorization()
+    {
+        return $this->initing_authorization;
     }
 
     public function __wakeup()
@@ -175,12 +236,17 @@ class MTProto
         if (!extension_loaded('xml')) {
             throw new Exception(['extension', 'xml']);
         }
+
+        if (!isset($this->referenceDatabase)) {
+            $this->referenceDatabase = new ReferenceDatabase($this);
+        }
+        $this->update_callbacks([$this, $this->referenceDatabase]);
         $this->altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
 
         $this->settings['connection_settings']['all']['ipv6'] = \danog\MadelineProto\Magic::$ipv6;
         /*if (isset($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'] === $this->settings['updates']['callback']) {
-            unset($this->settings['pwr']['update_handler']);
-            $this->updates = [];
+        unset($this->settings['pwr']['update_handler']);
+        $this->updates = [];
         }*/
         $keys = array_keys((array) get_object_vars($this));
         if (count($keys) !== count(array_unique($keys))) {
@@ -201,21 +267,23 @@ class MTProto
         }
         $this->postpone_updates = false;
         $this->postpone_pwrchat = false;
+        if ($this->event_handler && class_exists($this->event_handler) && is_subclass_of($this->event_handler, '\danog\MadelineProto\EventHandler')) {
+            $this->setEventHandler($this->event_handler);
+        }
         $force = false;
         $this->reset_session();
 
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
         if (isset($backtrace[2]['function']) && isset($backtrace[2]['class']) && isset($backtrace[2]['args']) && $backtrace[2]['class'] === 'danog\\MadelineProto\\API' && $backtrace[2]['function'] === '__magic_construct') {
             if (count($backtrace[2]['args']) === 2) {
-                //$this->logger->logger('Updating settings on wakeup');
                 $this->parse_settings(array_replace_recursive($this->settings, $backtrace[2]['args'][1]));
             }
-            //$this->wrapper = $backtrace[2]['object'];
         }
 
         if (isset($this->settings['tl_schema']['src']['botAPI']) && $this->settings['tl_schema']['src']['botAPI'] !== __DIR__.'/TL_botAPI.tl') {
             unset($this->v);
         }
+
         if (!isset($this->v) || $this->v !== self::V) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['serialization_ofd'], Logger::WARNING);
             foreach ($this->datacenter->sockets as $dc_id => $socket) {
@@ -269,9 +337,13 @@ class MTProto
                 if (!isset($connection['pfs'])) {
                     $connection['pfs'] = extension_loaded('gmp');
                 }
+                if ($connection['protocol'] === 'obfuscated2') {
+                    $connection['protocol'] = 'tcp_intermediate_padded';
+                    $connection['obfuscated'] = true;
+                }
             }
-            if (!isset($settings['authorization']['rsa_key'])) {
-                unset($settings['authorization']['rsa_key']);
+            if ($settings['app_info']['api_id'] === 6) {
+                unset($settings['app_info']);
             }
             $this->reset_session(true, true);
             $this->config = ['expires' => -1];
@@ -287,12 +359,12 @@ class MTProto
                 }
             }
         }
+
         if (!$this->settings['updates']['handle_old_updates']) {
             $this->channels_state = [];
             $this->got_state = false;
         }
         $this->connect_to_all_dcs();
-        //datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
         foreach ($this->calls as $id => $controller) {
             if (!is_object($controller)) {
                 unset($this->calls[$id]);
@@ -317,6 +389,7 @@ class MTProto
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
             $this->get_updates_difference();
         }
+        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
     }
 
     public function __destruct()
@@ -335,6 +408,9 @@ class MTProto
 
     public function parse_settings($settings)
     {
+        if (isset($this->settings['connection_settings']['default_dc'])) {
+            $settings['connection_settings']['default_dc'] = $this->settings['connection_settings']['default_dc'];
+        }
         if (!isset($settings['app_info']['api_id']) || !$settings['app_info']['api_id']) {
             if (isset($this->settings['app_info']['api_id']) && $this->settings['app_info']['api_id']) {
                 $settings['app_info']['api_id'] = $this->settings['app_info']['api_id'];
@@ -349,11 +425,46 @@ class MTProto
         } catch (\danog\MadelineProto\Exception $e) {
             $device_model = 'Web server';
         }
+        if ($settings['app_info']['api_id'] === 6) {
+            // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
+            // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
+            // This makes usage of all MTProto libraries very difficult, at least for new users.
+            // To help a bit, when the android API ID is used, the android app infos are spoofed too.
+            // THE ANDROID API HASH IS NOT PRESENT IN THIS REPOSITORY, AND WILL NOT BE GIVEN TO EVERYONE.
+            // This measure was NOT created with the intent to aid spammers, flooders, and other scum.
+            //
+            // I understand that automated account registration through headless libraries may indicate the creation of a botnet,
+            // ...and I understand why these automatic bans were implemented in the first place.
+            // Manual requests to activate numbers through recover@telegram.org will still be required for the majority of users of this library,
+            // ...those that choose to user their own API ID for their application.
+            //
+            // To be honest, I wrote this feature just for me, since I honestly don't want to
+            // ...go through the hassle of registering => recovering => logging in to every account I use for my services (mainly webradios and test userbots)
+            $device_model = 'LGENexus 5';
+        }
         // Detect system version
         try {
             $system_version = php_uname('r');
         } catch (\danog\MadelineProto\Exception $e) {
             $system_version = phpversion();
+        }
+        if ($settings['app_info']['api_id'] === 6) {
+            // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
+            // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
+            // This makes usage of all MTProto libraries very difficult, at least for new users.
+            // To help a bit, when the android API ID is used, the android app infos are spoofed too.
+            // THE ANDROID API HASH IS NOT PRESENT IN THIS REPOSITORY, AND WILL NOT BE GIVEN TO EVERYONE.
+            // This measure was NOT created with the intent to aid spammers, flooders, and other scum.
+            //
+            // I understand that automated account registration through headless libraries may indicate the creation of a botnet,
+            // ...and I understand why these automatic bans were implemented in the first place.
+            // Manual requests to activate numbers through recover@telegram.org will still be required for the majority of users of this library,
+            // ...and in particular those that choose to user their own API ID for their application.
+            //
+            // To be honest, I wrote this feature just for me, since I honestly don't want to
+            // ...go through the hassle of registering => recovering => logging in to every account I use for my services (mainly webradios and test userbots)
+
+            $system_version = 'SDK 28';
         }
         // Detect language
         $lang_code = 'en';
@@ -366,6 +477,47 @@ class MTProto
         if (isset(Lang::$lang[$lang_code])) {
             Lang::$current_lang = &Lang::$lang[$lang_code];
         }
+        // Detect language pack
+        $lang_pack = '';
+        if ($settings['app_info']['api_id'] === 6) {
+            // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
+            // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
+            // This makes usage of all MTProto libraries very difficult, at least for new users.
+            // To help a bit, when the android API ID is used, the android app infos are spoofed too.
+            // THE ANDROID API HASH IS NOT PRESENT IN THIS REPOSITORY, AND WILL NOT BE GIVEN TO EVERYONE.
+            // This measure was NOT created with the intent to aid spammers, flooders, and other scum.
+            //
+            // I understand that automated account registration through headless libraries may indicate the creation of a botnet,
+            // ...and I understand why these automatic bans were implemented in the first place.
+            // Manual requests to activate numbers through recover@telegram.org will still be required for the majority of users of this library,
+            // ...and in particular those that choose to user their own API ID for their application.
+            //
+            // To be honest, I wrote this feature just for me, since I honestly don't want to
+            // ...go through the hassle of registering => recovering => logging in to every account I use for my services (mainly webradios and test userbots)
+
+            $lang_pack = 'android';
+        }
+        // Detect app version
+        $app_version = self::RELEASE.' ('.self::V.', '.Magic::$revision.')';
+        if ($settings['app_info']['api_id'] === 6) {
+            // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
+            // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
+            // This makes usage of all MTProto libraries very difficult, at least for new users.
+            // To help a bit, when the android API ID is used, the android app infos are spoofed too.
+            // THE ANDROID API HASH IS NOT PRESENT IN THIS REPOSITORY, AND WILL NOT BE GIVEN TO EVERYONE.
+            // This measure was NOT created with the intent to aid spammers, flooders, and other scum.
+            //
+            // I understand that automated account registration through headless libraries may indicate the creation of a botnet,
+            // ...and I understand why these automatic bans were implemented in the first place.
+            // Manual requests to activate numbers through recover@telegram.org will still be required for the majority of users of this library,
+            // ...and in particular those that choose to user their own API ID for their application.
+            //
+            // To be honest, I wrote this feature just for me, since I honestly don't want to
+            // ...go through the hassle of registering => recovering => logging in to every account I use for my services (mainly webradios and test userbots)
+
+            $app_version = '4.9.1 (13613)';
+        }
+
         $this->altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
         // Set default settings
         $default_settings = ['authorization' => [
@@ -433,7 +585,7 @@ class MTProto
             // connection settings
             'all' => [
                 // These settings will be applied on every datacenter that hasn't a custom settings subarray...
-                'protocol' => 'tcp_abridged',
+                'protocol' => $this->altervista ? 'http' : 'tcp_abridged',
                 // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, obfuscated2, udp (unsupported)
                 'test_mode' => false,
                 // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
@@ -445,7 +597,9 @@ class MTProto
                 // The proxy class to use
                 'proxy_extra' => $this->altervista ? ['address' => 'localhost', 'port' => 80] : [],
                 // Extra parameters to pass to the proxy class using setExtra
-                'pfs' => extension_loaded('gmp'),
+                'obfuscated' => false,
+                'transport'  => 'tcp',
+                'pfs'        => extension_loaded('gmp'),
             ],
             'default_dc' => 2,
         ], 'app_info' => [
@@ -454,18 +608,19 @@ class MTProto
             //'api_hash'        => you should put an API hash in the settings array you provide
             'device_model'   => $device_model,
             'system_version' => $system_version,
-            'app_version'    => 'Unicorn',
+            'app_version'    => $app_version,
             // ðŸŒš
             //                'app_version'     => self::V,
             'lang_code' => $lang_code,
+            'lang_pack' => $lang_pack,
         ], 'tl_schema' => [
             // TL scheme files
-            'layer' => 82,
+            'layer' => 91,
             // layer version
             'src' => [
-                'mtproto' => __DIR__.'/TL_mtproto_v1.json',
+                'mtproto' => __DIR__.'/TL_mtproto_v1.tl',
                 // mtproto TL scheme
-                'telegram' => __DIR__.'/TL_telegram_v82.tl',
+                'telegram' => __DIR__.'/TL_telegram_v91.tl',
                 // telegram TL scheme
                 'secret' => __DIR__.'/TL_secret.tl',
                 // secret chats TL scheme
@@ -510,7 +665,7 @@ class MTProto
             'full_fetch' => false,
             // Should madeline fetch the full member list of every group it meets?
             'cache_all_peers_on_startup' => false,
-        ], 'requests' => ['gzip_encode_if_gt' => 500], 'updates' => [
+        ], 'requests' => ['gzip_encode_if_gt' => 1024 * 1024], 'updates' => [
             'handle_updates' => false,
             // Should I handle updates?
             'handle_old_updates' => true,
@@ -518,6 +673,8 @@ class MTProto
             'getdifference_interval' => 10,
             // Getdifference manual polling interval
             'callback' => 'get_updates_update_handler',
+            // Update callback
+            'run_callback' => true,
         ], 'secret_chats' => ['accept_chats' => true], 'serialization' => ['serialization_interval' => 30], 'threading' => [
             'allow_threading' => false,
             // Should I use threading, if it is enabled?
@@ -526,7 +683,8 @@ class MTProto
             'allow_automatic_upload' => true,
             'part_size'              => 512 * 1024,
         ], 'download' => [
-            'part_size' => 1024 * 1024,
+            'report_broken_media' => true,
+            'part_size'           => 1024 * 1024,
         ], 'pwr' => [
             'pwr' => false,
             // Need info ?
@@ -536,6 +694,7 @@ class MTProto
             // Need info ?
             'requests' => true,
         ]];
+
         if (!is_array($settings)) {
             $settings = [];
         }
@@ -544,8 +703,8 @@ class MTProto
             Lang::$current_lang = &Lang::$lang[$settings['app_info']['lang_code']];
         }
         /*if ($settings['app_info']['api_id'] < 20) {
-              $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
-          }*/
+        $settings['connection_settings']['all']['protocol'] = 'obfuscated2';
+        }*/
         switch ($settings['logger']['logger_level']) {
             case 'ULTRA_VERBOSE':
                 $settings['logger']['logger_level'] = 5;
@@ -605,47 +764,65 @@ class MTProto
             if ($auth_key) {
                 $socket->temp_auth_key = null;
             }
-            $socket->incoming_messages = [];
-            $socket->outgoing_messages = [];
-            $socket->new_outgoing = [];
-            $socket->new_incoming = [];
+            /*
+        $socket->incoming_messages = [];
+        $socket->outgoing_messages = [];
+        $socket->new_outgoing = [];
+        $socket->new_incoming = [];
+         */
         }
     }
 
     public function is_http($datacenter)
     {
-        return in_array($this->datacenter->sockets[$datacenter]->protocol, ['http', 'https', 'https_proxied']);
+        return in_array($this->datacenter->sockets[$datacenter]->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
     }
 
     public function close_and_reopen($datacenter)
     {
-        $this->datacenter->sockets[$datacenter]->close_and_reopen();
+        $this->wait($this->datacenter->sockets[$datacenter]->reconnect());
         /*if ($this->is_http($datacenter) && $this->datacenter->sockets[$datacenter]->temp_auth_key !== null && isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) && $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === true) {
-            $this->method_call('ping', ['ping_id' => 0], ['datacenter' => $datacenter]);
-        }*/
+    $this->method_call('ping', ['ping_id' => 0], ['datacenter' => $datacenter]);
+    }*/
     }
 
     // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
     public function connect_to_all_dcs()
     {
-        $this->datacenter->__construct($this->settings['connection'], $this->settings['connection_settings']);
+        return $this->wait($this->connect_to_all_dcs_async());
+    }
+
+    public function connect_to_all_dcs_async(): \Generator
+    {
+        $this->datacenter->__construct($this, $this->settings['connection'], $this->settings['connection_settings']);
+        $dcs = [];
         foreach ($this->datacenter->get_dcs() as $new_dc) {
-            $this->datacenter->dc_connect($new_dc);
+            $dcs[] = $this->datacenter->dc_connect_async($new_dc);
         }
-        $this->init_authorization();
+        yield $dcs;
+        yield $this->init_authorization_async();
+        $dcs = [];
         foreach ($this->datacenter->get_dcs(false) as $new_dc) {
-            $this->datacenter->dc_connect($new_dc);
+            $dcs[] = $this->datacenter->dc_connect_async($new_dc);
         }
-        $this->init_authorization();
+        yield $dcs;
+        yield $this->init_authorization_async();
     }
 
     public function get_config($config = [], $options = [])
     {
+        return $this->wait($this->get_config_async($config, $options));
+    }
+
+    public function get_config_async($config = [], $options = [])
+    {
         if ($this->config['expires'] > time()) {
-            return;
+            return $this->config;
         }
-        $this->config = empty($config) ? $this->method_call('help.getConfig', $config, $options) : $config;
-        $this->parse_config();
+        $this->config = empty($config) ? yield $this->method_call_async_read('help.getConfig', $config, $options) : $config;
+        yield $this->parse_config();
+
+        return $this->config;
     }
 
     public function get_cdn_config($datacenter)
@@ -667,7 +844,7 @@ class MTProto
     public function parse_config()
     {
         if (isset($this->config['dc_options'])) {
-            $this->parse_dc_options($this->config['dc_options']);
+            yield $this->parse_dc_options($this->config['dc_options']);
             unset($this->config['dc_options']);
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['config_updated'], Logger::NOTICE);
@@ -700,7 +877,7 @@ class MTProto
         }
         $curdc = $this->datacenter->curdc;
         $this->logger->logger('Got new DC options, reconnecting');
-        $this->connect_to_all_dcs();
+        yield $this->connect_to_all_dcs();
         $this->datacenter->curdc = $curdc;
     }
 
@@ -717,5 +894,48 @@ class MTProto
         return $this->authorization['user'];
     }
 
-    const ALL_MIMES = ['png' => [0 => 'image/png', 1 => 'image/x-png'], 'bmp' => [0 => 'image/bmp', 1 => 'image/x-bmp', 2 => 'image/x-bitmap', 3 => 'image/x-xbitmap', 4 => 'image/x-win-bitmap', 5 => 'image/x-windows-bmp', 6 => 'image/ms-bmp', 7 => 'image/x-ms-bmp', 8 => 'application/bmp', 9 => 'application/x-bmp', 10 => 'application/x-win-bitmap'], 'gif' => [0 => 'image/gif'], 'jpeg' => [0 => 'image/jpeg', 1 => 'image/pjpeg'], 'xspf' => [0 => 'application/xspf+xml'], 'vlc' => [0 => 'application/videolan'], 'wmv' => [0 => 'video/x-ms-wmv', 1 => 'video/x-ms-asf'], 'au' => [0 => 'audio/x-au'], 'ac3' => [0 => 'audio/ac3'], 'flac' => [0 => 'audio/x-flac'], 'ogg' => [0 => 'audio/ogg', 1 => 'video/ogg', 2 => 'application/ogg'], 'kmz' => [0 => 'application/vnd.google-earth.kmz'], 'kml' => [0 => 'application/vnd.google-earth.kml+xml'], 'rtx' => [0 => 'text/richtext'], 'rtf' => [0 => 'text/rtf'], 'jar' => [0 => 'application/java-archive', 1 => 'application/x-java-application', 2 => 'application/x-jar'], 'zip' => [0 => 'application/x-zip', 1 => 'application/zip', 2 => 'application/x-zip-compressed', 3 => 'application/s-compressed', 4 => 'multipart/x-zip'], '7zip' => [0 => 'application/x-compressed'], 'xml' => [0 => 'application/xml', 1 => 'text/xml'], 'svg' => [0 => 'image/svg+xml'], '3g2' => [0 => 'video/3gpp2'], '3gp' => [0 => 'video/3gp', 1 => 'video/3gpp'], 'mp4' => [0 => 'video/mp4'], 'm4a' => [0 => 'audio/x-m4a'], 'f4v' => [0 => 'video/x-f4v'], 'flv' => [0 => 'video/x-flv'], 'webm' => [0 => 'video/webm'], 'aac' => [0 => 'audio/x-acc'], 'm4u' => [0 => 'application/vnd.mpegurl'], 'pdf' => [0 => 'application/pdf', 1 => 'application/octet-stream'], 'pptx' => [0 => 'application/vnd.openxmlformats-officedocument.presentationml.presentation'], 'ppt' => [0 => 'application/powerpoint', 1 => 'application/vnd.ms-powerpoint', 2 => 'application/vnd.ms-office', 3 => 'application/msword'], 'docx' => [0 => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'], 'xlsx' => [0 => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 1 => 'application/vnd.ms-excel'], 'xl' => [0 => 'application/excel'], 'xls' => [0 => 'application/msexcel', 1 => 'application/x-msexcel', 2 => 'application/x-ms-excel', 3 => 'application/x-excel', 4 => 'application/x-dos_ms_excel', 5 => 'application/xls', 6 => 'application/x-xls'], 'xsl' => [0 => 'text/xsl'], 'mpeg' => [0 => 'video/mpeg'], 'mov' => [0 => 'video/quicktime'], 'avi' => [0 => 'video/x-msvideo', 1 => 'video/msvideo', 2 => 'video/avi', 3 => 'application/x-troff-msvideo'], 'movie' => [0 => 'video/x-sgi-movie'], 'log' => [0 => 'text/x-log'], 'txt' => [0 => 'text/plain'], 'css' => [0 => 'text/css'], 'html' => [0 => 'text/html'], 'wav' => [0 => 'audio/x-wav', 1 => 'audio/wave', 2 => 'audio/wav'], 'xhtml' => [0 => 'application/xhtml+xml'], 'tar' => [0 => 'application/x-tar'], 'tgz' => [0 => 'application/x-gzip-compressed'], 'psd' => [0 => 'application/x-photoshop', 1 => 'image/vnd.adobe.photoshop'], 'exe' => [0 => 'application/x-msdownload'], 'js' => [0 => 'application/x-javascript'], 'mp3' => [0 => 'audio/mpeg', 1 => 'audio/mpg', 2 => 'audio/mpeg3', 3 => 'audio/mp3'], 'rar' => [0 => 'application/x-rar', 1 => 'application/rar', 2 => 'application/x-rar-compressed'], 'gzip' => [0 => 'application/x-gzip'], 'hqx' => [0 => 'application/mac-binhex40', 1 => 'application/mac-binhex', 2 => 'application/x-binhex40', 3 => 'application/x-mac-binhex40'], 'cpt' => [0 => 'application/mac-compactpro'], 'bin' => [0 => 'application/macbinary', 1 => 'application/mac-binary', 2 => 'application/x-binary', 3 => 'application/x-macbinary'], 'oda' => [0 => 'application/oda'], 'ai' => [0 => 'application/postscript'], 'smil' => [0 => 'application/smil'], 'mif' => [0 => 'application/vnd.mif'], 'wbxml' => [0 => 'application/wbxml'], 'wmlc' => [0 => 'application/wmlc'], 'dcr' => [0 => 'application/x-director'], 'dvi' => [0 => 'application/x-dvi'], 'gtar' => [0 => 'application/x-gtar'], 'php' => [0 => 'application/x-httpd-php', 1 => 'application/php', 2 => 'application/x-php', 3 => 'text/php', 4 => 'text/x-php', 5 => 'application/x-httpd-php-source'], 'swf' => [0 => 'application/x-shockwave-flash'], 'sit' => [0 => 'application/x-stuffit'], 'z' => [0 => 'application/x-compress'], 'mid' => [0 => 'audio/midi'], 'aif' => [0 => 'audio/x-aiff', 1 => 'audio/aiff'], 'ram' => [0 => 'audio/x-pn-realaudio'], 'rpm' => [0 => 'audio/x-pn-realaudio-plugin'], 'ra' => [0 => 'audio/x-realaudio'], 'rv' => [0 => 'video/vnd.rn-realvideo'], 'jp2' => [0 => 'image/jp2', 1 => 'video/mj2', 2 => 'image/jpx', 3 => 'image/jpm'], 'tiff' => [0 => 'image/tiff'], 'eml' => [0 => 'message/rfc822'], 'pem' => [0 => 'application/x-x509-user-cert', 1 => 'application/x-pem-file'], 'p10' => [0 => 'application/x-pkcs10', 1 => 'application/pkcs10'], 'p12' => [0 => 'application/x-pkcs12'], 'p7a' => [0 => 'application/x-pkcs7-signature'], 'p7c' => [0 => 'application/pkcs7-mime', 1 => 'application/x-pkcs7-mime'], 'p7r' => [0 => 'application/x-pkcs7-certreqresp'], 'p7s' => [0 => 'application/pkcs7-signature'], 'crt' => [0 => 'application/x-x509-ca-cert', 1 => 'application/pkix-cert'], 'crl' => [0 => 'application/pkix-crl', 1 => 'application/pkcs-crl'], 'pgp' => [0 => 'application/pgp'], 'gpg' => [0 => 'application/gpg-keys'], 'rsa' => [0 => 'application/x-pkcs7'], 'ics' => [0 => 'text/calendar'], 'zsh' => [0 => 'text/x-scriptzsh'], 'cdr' => [0 => 'application/cdr', 1 => 'application/coreldraw', 2 => 'application/x-cdr', 3 => 'application/x-coreldraw', 4 => 'image/cdr', 5 => 'image/x-cdr', 6 => 'zz-application/zz-winassoc-cdr'], 'wma' => [0 => 'audio/x-ms-wma'], 'vcf' => [0 => 'text/x-vcard'], 'srt' => [0 => 'text/srt'], 'vtt' => [0 => 'text/vtt'], 'ico' => [0 => 'image/x-icon', 1 => 'image/x-ico', 2 => 'image/vnd.microsoft.icon'], 'csv' => [0 => 'text/x-comma-separated-values', 1 => 'text/comma-separated-values', 2 => 'application/vnd.msexcel'], 'json' => [0 => 'application/json', 1 => 'text/json']];
+    public function getMethodCallbacks(): array
+    {
+        return [];
+    }
+
+    public function getMethodBeforeCallbacks(): array
+    {
+        return [];
+    }
+
+    public function getConstructorCallbacks(): array
+    {
+        return array_merge(
+            array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [[$this, 'add_chat']]),
+            array_fill_keys(['user', 'userEmpty'], [[$this, 'add_user']]),
+            ['help.support' => [[$this, 'add_support']]]
+        );
+    }
+
+    public function getConstructorBeforeCallbacks(): array
+    {
+        return [];
+    }
+
+    public function getConstructorSerializeCallbacks(): array
+    {
+        return [];
+    }
+
+    public function getTypeMismatchCallbacks(): array
+    {
+        return array_merge(
+            array_fill_keys(['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer', 'InputDialogPeer', 'InputNotifyPeer'], [$this, 'get_info']),
+            array_fill_keys(['InputMedia', 'InputDocument', 'InputPhoto'], [$this, 'get_file_info']),
+            array_fill_keys(['InputFileLocation'], [$this, 'get_download_info'])
+        );
+    }
+
+    public function __debugInfo()
+    {
+        return ['MadelineProto instance '.spl_object_hash($this)];
+    }
+
+    const ALL_MIMES = ['webp' => [0 => 'image/webp'], 'png' => [0 => 'image/png', 1 => 'image/x-png'], 'bmp' => [0 => 'image/bmp', 1 => 'image/x-bmp', 2 => 'image/x-bitmap', 3 => 'image/x-xbitmap', 4 => 'image/x-win-bitmap', 5 => 'image/x-windows-bmp', 6 => 'image/ms-bmp', 7 => 'image/x-ms-bmp', 8 => 'application/bmp', 9 => 'application/x-bmp', 10 => 'application/x-win-bitmap'], 'gif' => [0 => 'image/gif'], 'jpeg' => [0 => 'image/jpeg', 1 => 'image/pjpeg'], 'xspf' => [0 => 'application/xspf+xml'], 'vlc' => [0 => 'application/videolan'], 'wmv' => [0 => 'video/x-ms-wmv', 1 => 'video/x-ms-asf'], 'au' => [0 => 'audio/x-au'], 'ac3' => [0 => 'audio/ac3'], 'flac' => [0 => 'audio/x-flac'], 'ogg' => [0 => 'audio/ogg', 1 => 'video/ogg', 2 => 'application/ogg'], 'kmz' => [0 => 'application/vnd.google-earth.kmz'], 'kml' => [0 => 'application/vnd.google-earth.kml+xml'], 'rtx' => [0 => 'text/richtext'], 'rtf' => [0 => 'text/rtf'], 'jar' => [0 => 'application/java-archive', 1 => 'application/x-java-application', 2 => 'application/x-jar'], 'zip' => [0 => 'application/x-zip', 1 => 'application/zip', 2 => 'application/x-zip-compressed', 3 => 'application/s-compressed', 4 => 'multipart/x-zip'], '7zip' => [0 => 'application/x-compressed'], 'xml' => [0 => 'application/xml', 1 => 'text/xml'], 'svg' => [0 => 'image/svg+xml'], '3g2' => [0 => 'video/3gpp2'], '3gp' => [0 => 'video/3gp', 1 => 'video/3gpp'], 'mp4' => [0 => 'video/mp4'], 'm4a' => [0 => 'audio/x-m4a'], 'f4v' => [0 => 'video/x-f4v'], 'flv' => [0 => 'video/x-flv'], 'webm' => [0 => 'video/webm'], 'aac' => [0 => 'audio/x-acc'], 'm4u' => [0 => 'application/vnd.mpegurl'], 'pdf' => [0 => 'application/pdf', 1 => 'application/octet-stream'], 'pptx' => [0 => 'application/vnd.openxmlformats-officedocument.presentationml.presentation'], 'ppt' => [0 => 'application/powerpoint', 1 => 'application/vnd.ms-powerpoint', 2 => 'application/vnd.ms-office', 3 => 'application/msword'], 'docx' => [0 => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'], 'xlsx' => [0 => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 1 => 'application/vnd.ms-excel'], 'xl' => [0 => 'application/excel'], 'xls' => [0 => 'application/msexcel', 1 => 'application/x-msexcel', 2 => 'application/x-ms-excel', 3 => 'application/x-excel', 4 => 'application/x-dos_ms_excel', 5 => 'application/xls', 6 => 'application/x-xls'], 'xsl' => [0 => 'text/xsl'], 'mpeg' => [0 => 'video/mpeg'], 'mov' => [0 => 'video/quicktime'], 'avi' => [0 => 'video/x-msvideo', 1 => 'video/msvideo', 2 => 'video/avi', 3 => 'application/x-troff-msvideo'], 'movie' => [0 => 'video/x-sgi-movie'], 'log' => [0 => 'text/x-log'], 'txt' => [0 => 'text/plain'], 'css' => [0 => 'text/css'], 'html' => [0 => 'text/html'], 'wav' => [0 => 'audio/x-wav', 1 => 'audio/wave', 2 => 'audio/wav'], 'xhtml' => [0 => 'application/xhtml+xml'], 'tar' => [0 => 'application/x-tar'], 'tgz' => [0 => 'application/x-gzip-compressed'], 'psd' => [0 => 'application/x-photoshop', 1 => 'image/vnd.adobe.photoshop'], 'exe' => [0 => 'application/x-msdownload'], 'js' => [0 => 'application/x-javascript'], 'mp3' => [0 => 'audio/mpeg', 1 => 'audio/mpg', 2 => 'audio/mpeg3', 3 => 'audio/mp3'], 'rar' => [0 => 'application/x-rar', 1 => 'application/rar', 2 => 'application/x-rar-compressed'], 'gzip' => [0 => 'application/x-gzip'], 'hqx' => [0 => 'application/mac-binhex40', 1 => 'application/mac-binhex', 2 => 'application/x-binhex40', 3 => 'application/x-mac-binhex40'], 'cpt' => [0 => 'application/mac-compactpro'], 'bin' => [0 => 'application/macbinary', 1 => 'application/mac-binary', 2 => 'application/x-binary', 3 => 'application/x-macbinary'], 'oda' => [0 => 'application/oda'], 'ai' => [0 => 'application/postscript'], 'smil' => [0 => 'application/smil'], 'mif' => [0 => 'application/vnd.mif'], 'wbxml' => [0 => 'application/wbxml'], 'wmlc' => [0 => 'application/wmlc'], 'dcr' => [0 => 'application/x-director'], 'dvi' => [0 => 'application/x-dvi'], 'gtar' => [0 => 'application/x-gtar'], 'php' => [0 => 'application/x-httpd-php', 1 => 'application/php', 2 => 'application/x-php', 3 => 'text/php', 4 => 'text/x-php', 5 => 'application/x-httpd-php-source'], 'swf' => [0 => 'application/x-shockwave-flash'], 'sit' => [0 => 'application/x-stuffit'], 'z' => [0 => 'application/x-compress'], 'mid' => [0 => 'audio/midi'], 'aif' => [0 => 'audio/x-aiff', 1 => 'audio/aiff'], 'ram' => [0 => 'audio/x-pn-realaudio'], 'rpm' => [0 => 'audio/x-pn-realaudio-plugin'], 'ra' => [0 => 'audio/x-realaudio'], 'rv' => [0 => 'video/vnd.rn-realvideo'], 'jp2' => [0 => 'image/jp2', 1 => 'video/mj2', 2 => 'image/jpx', 3 => 'image/jpm'], 'tiff' => [0 => 'image/tiff'], 'eml' => [0 => 'message/rfc822'], 'pem' => [0 => 'application/x-x509-user-cert', 1 => 'application/x-pem-file'], 'p10' => [0 => 'application/x-pkcs10', 1 => 'application/pkcs10'], 'p12' => [0 => 'application/x-pkcs12'], 'p7a' => [0 => 'application/x-pkcs7-signature'], 'p7c' => [0 => 'application/pkcs7-mime', 1 => 'application/x-pkcs7-mime'], 'p7r' => [0 => 'application/x-pkcs7-certreqresp'], 'p7s' => [0 => 'application/pkcs7-signature'], 'crt' => [0 => 'application/x-x509-ca-cert', 1 => 'application/pkix-cert'], 'crl' => [0 => 'application/pkix-crl', 1 => 'application/pkcs-crl'], 'pgp' => [0 => 'application/pgp'], 'gpg' => [0 => 'application/gpg-keys'], 'rsa' => [0 => 'application/x-pkcs7'], 'ics' => [0 => 'text/calendar'], 'zsh' => [0 => 'text/x-scriptzsh'], 'cdr' => [0 => 'application/cdr', 1 => 'application/coreldraw', 2 => 'application/x-cdr', 3 => 'application/x-coreldraw', 4 => 'image/cdr', 5 => 'image/x-cdr', 6 => 'zz-application/zz-winassoc-cdr'], 'wma' => [0 => 'audio/x-ms-wma'], 'vcf' => [0 => 'text/x-vcard'], 'srt' => [0 => 'text/srt'], 'vtt' => [0 => 'text/vtt'], 'ico' => [0 => 'image/x-icon', 1 => 'image/x-ico', 2 => 'image/vnd.microsoft.icon'], 'csv' => [0 => 'text/x-comma-separated-values', 1 => 'text/comma-separated-values', 2 => 'application/vnd.msexcel'], 'json' => [0 => 'application/json', 1 => 'text/json']];
 }

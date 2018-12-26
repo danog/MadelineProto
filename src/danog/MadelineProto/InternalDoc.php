@@ -100,7 +100,7 @@ interface auth
 
     /**
      * @param array params [
-     *               bytes password_hash,
+     *               InputCheckPasswordSRP password,
      *              ]
      *
      * @return auth_Authorization
@@ -348,7 +348,7 @@ interface account
 
     /**
      * @param array params [
-     *               bytes current_password_hash,
+     *               InputCheckPasswordSRP password,
      *              ]
      *
      * @return account_PasswordSettings
@@ -357,7 +357,7 @@ interface account
 
     /**
      * @param array params [
-     *               bytes current_password_hash,
+     *               InputCheckPasswordSRP password,
      *               account_PasswordInputSettings new_settings,
      *              ]
      *
@@ -388,7 +388,7 @@ interface account
 
     /**
      * @param array params [
-     *               bytes password_hash,
+     *               InputCheckPasswordSRP password,
      *               int period,
      *              ]
      *
@@ -536,6 +536,49 @@ interface account
      * @return bool
      */
     public function finishTakeoutSession(array $params);
+
+    /**
+     * @param array params [
+     *               string code,
+     *              ]
+     *
+     * @return bool
+     */
+    public function confirmPasswordEmail(array $params);
+
+    /**
+     * @return bool
+     */
+    public function resendPasswordEmail();
+
+    /**
+     * @return bool
+     */
+    public function cancelPasswordEmail();
+
+    /**
+     * @return bool
+     */
+    public function getContactSignUpNotification();
+
+    /**
+     * @param array params [
+     *               Bool silent,
+     *              ]
+     *
+     * @return bool
+     */
+    public function setContactSignUpNotification(array $params);
+
+    /**
+     * @param array params [
+     *               boolean compare_sound,
+     *               InputNotifyPeer peer,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function getNotifyExceptions(array $params);
 }
 
 interface users
@@ -571,6 +614,15 @@ interface users
 
 interface contacts
 {
+    /**
+     * @param array params [
+     *               int hash,
+     *              ]
+     *
+     * @return Vector_of_int
+     */
+    public function getContactIDs(array $params);
+
     /**
      * @return Vector_of_ContactStatus
      */
@@ -614,6 +666,15 @@ interface contacts
 
     /**
      * @param array params [
+     *               string phones,
+     *              ]
+     *
+     * @return bool
+     */
+    public function deleteByPhones(array $params);
+
+    /**
+     * @param array params [
      *               InputUser id,
      *              ]
      *
@@ -639,20 +700,6 @@ interface contacts
      * @return contacts_Blocked
      */
     public function getBlocked(array $params);
-
-    /**
-     * @return Vector_of_int
-     */
-    public function exportCard();
-
-    /**
-     * @param array params [
-     *               int export_card,
-     *              ]
-     *
-     * @return User
-     */
-    public function importCard(array $params);
 
     /**
      * @param array params [
@@ -1337,6 +1384,7 @@ interface messages
      *               boolean silent,
      *               boolean background,
      *               boolean clear_draft,
+     *               boolean hide_via,
      *               InputPeer peer,
      *               int reply_to_msg_id,
      *               long query_id,
@@ -1360,14 +1408,12 @@ interface messages
     /**
      * @param array params [
      *               boolean no_webpage,
-     *               boolean stop_geo_live,
      *               InputPeer peer,
      *               int id,
      *               string message,
      *               InputMedia media,
      *               ReplyMarkup reply_markup,
      *               MessageEntity entities,
-     *               InputGeoPoint geo_point,
      *              ]
      *
      * @return Updates
@@ -1377,13 +1423,11 @@ interface messages
     /**
      * @param array params [
      *               boolean no_webpage,
-     *               boolean stop_geo_live,
      *               InputBotInlineMessageID id,
      *               string message,
      *               InputMedia media,
      *               ReplyMarkup reply_markup,
      *               MessageEntity entities,
-     *               InputGeoPoint geo_point,
      *              ]
      *
      * @return bool
@@ -1771,6 +1815,61 @@ interface messages
      * @return Vector_of_DialogPeer
      */
     public function getDialogUnreadMarks();
+
+    /**
+     * @return bool
+     */
+    public function clearAllDrafts();
+
+    /**
+     * @param array params [
+     *               boolean silent,
+     *               InputPeer peer,
+     *               int id,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function updatePinnedMessage(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               int msg_id,
+     *               bytes options,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function sendVote(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               int msg_id,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function getPollResults(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *              ]
+     *
+     * @return ChatOnlines
+     */
+    public function getOnlines(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *              ]
+     *
+     * @return StatsURL
+     */
+    public function getStatsURL(array $params);
 }
 
 interface updates
@@ -1950,18 +2049,13 @@ interface help
     public function getNearestDc();
 
     /**
-     * @return help_AppUpdate
-     */
-    public function getAppUpdate();
-
-    /**
      * @param array params [
-     *               InputAppEvent events,
+     *               string source,
      *              ]
      *
-     * @return bool
+     * @return help_AppUpdate
      */
-    public function saveAppLog(array $params);
+    public function getAppUpdate(array $params);
 
     /**
      * @return help_InviteText
@@ -2033,6 +2127,54 @@ interface help
      * @return help_DeepLinkInfo
      */
     public function getDeepLinkInfo(array $params);
+
+    /**
+     * @return JSONValue
+     */
+    public function getAppConfig();
+
+    /**
+     * @param array params [
+     *               InputAppEvent events,
+     *              ]
+     *
+     * @return bool
+     */
+    public function saveAppLog(array $params);
+
+    /**
+     * @param array params [
+     *               int hash,
+     *              ]
+     *
+     * @return help_PassportConfig
+     */
+    public function getPassportConfig(array $params);
+
+    /**
+     * @return help_SupportName
+     */
+    public function getSupportName();
+
+    /**
+     * @param array params [
+     *               InputUser user_id,
+     *              ]
+     *
+     * @return help_UserInfo
+     */
+    public function getUserInfo(array $params);
+
+    /**
+     * @param array params [
+     *               InputUser user_id,
+     *               string message,
+     *               MessageEntity entities,
+     *              ]
+     *
+     * @return help_UserInfo
+     */
+    public function editUserInfo(array $params);
 }
 
 interface channels
@@ -2278,17 +2420,6 @@ interface channels
      * @return Updates
      */
     public function toggleSignatures(array $params);
-
-    /**
-     * @param array params [
-     *               boolean silent,
-     *               InputChannel channel,
-     *               int id,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function updatePinnedMessage(array $params);
 
     /**
      * @return messages_Chats
@@ -2586,6 +2717,7 @@ interface langpack
 {
     /**
      * @param array params [
+     *               string lang_pack,
      *               string lang_code,
      *              ]
      *
@@ -2595,6 +2727,7 @@ interface langpack
 
     /**
      * @param array params [
+     *               string lang_pack,
      *               string lang_code,
      *               string keys,
      *              ]
@@ -2605,6 +2738,7 @@ interface langpack
 
     /**
      * @param array params [
+     *               string lang_code,
      *               int from_version,
      *              ]
      *
@@ -2613,7 +2747,21 @@ interface langpack
     public function getDifference(array $params);
 
     /**
+     * @param array params [
+     *               string lang_pack,
+     *              ]
+     *
      * @return Vector_of_LangPackLanguage
      */
-    public function getLanguages();
+    public function getLanguages(array $params);
+
+    /**
+     * @param array params [
+     *               string lang_pack,
+     *               string lang_code,
+     *              ]
+     *
+     * @return LangPackLanguage
+     */
+    public function getLanguage(array $params);
 }

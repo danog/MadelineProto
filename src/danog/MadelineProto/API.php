@@ -1,15 +1,21 @@
 <?php
 
-/*
-Copyright 2016-2018 Daniil Gentili
-(https://daniil.it)
-This file is part of MadelineProto.
-MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
-You should have received a copy of the GNU General Public License along with MadelineProto.
-If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * API module.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto;
 
@@ -103,6 +109,19 @@ class API extends APIFactory
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 
+    public function async($async)
+    {
+        $this->async = $async;
+        foreach ($this->API->get_methods_namespaced() as $pair) {
+            $namespace = key($pair);
+            $this->{$namespace}->async = $async;
+        }
+
+        if ($this->API->event_handler && class_exists($this->API->event_handler) && is_subclass_of($this->API->event_handler, '\danog\MadelineProto\EventHandler')) {
+            $this->API->setEventHandler($this->API->event_handler);
+        }
+    }
+
     public function __wakeup()
     {
         $this->APIFactory();
@@ -161,13 +180,61 @@ class API extends APIFactory
         unset($this->API->storage[$name]);
     }
 
+    private function from_camel_case($input)
+    {
+        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
+        $ret = $matches[0];
+        foreach ($ret as &$match) {
+            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+        }
+
+        return implode('_', $ret);
+    }
+
     public function APIFactory()
     {
         if ($this->API) {
             foreach ($this->API->get_method_namespaces() as $namespace) {
                 $this->{$namespace} = new APIFactory($namespace, $this->API);
             }
+            $methods = get_class_methods($this->API);
+            foreach ($methods as $key => $method) {
+                if ($method == 'method_call_async_read') {
+                    unset($methods[array_search('method_call', $methods)]);
+                } elseif (stripos($method, 'async') !== false) {
+                    if (strpos($method, '_async') !== false) {
+                        unset($methods[array_search(str_ireplace('_async', '', $method), $methods)]);
+                    } else {
+                        unset($methods[array_search(str_ireplace('async', '', $method), $methods)]);
+                    }
+                }
+            }
+            $this->methods = [];
+            foreach ($methods as $method) {
+                $actual_method = $method;
+
+                if ($method == 'method_call_async_read') {
+                    $method = 'method_call';
+                } elseif (stripos($method, 'async') !== false) {
+                    if (strpos($method, '_async') !== false) {
+                        $method = str_ireplace('_async', '', $method);
+                    } else {
+                        $method = str_ireplace('async', '', $method);
+                    }
+                }
+
+                $this->methods[strtolower($method)] = [$this->API, $actual_method];
+                if (strpos($method, '_') !== false) {
+                    $this->methods[strtolower(str_replace('_', '', $method))] = [$this->API, $actual_method];
+                } else {
+                    $this->methods[strtolower($this->from_camel_case($method))] = [$this->API, $actual_method];
+                }
+            }
+
             $this->API->wrapper = $this;
+            if ($this->API->event_handler && class_exists($this->API->event_handler) && is_subclass_of($this->API->event_handler, '\danog\MadelineProto\EventHandler')) {
+                $this->API->setEventHandler($this->API->event_handler);
+            }
         }
     }
 

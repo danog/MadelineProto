@@ -1,15 +1,21 @@
 <?php
 
-/*
-Copyright 2016-2018 Daniil Gentili
-(https://daniil.it)
-This file is part of MadelineProto.
-MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
-You should have received a copy of the GNU General Public License along with MadelineProto.
-If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * TL module.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\TL;
 
@@ -21,10 +27,12 @@ trait TL
     public $td_constructors;
     public $td_methods;
     public $td_descriptions;
+    public $tl_callbacks = [];
 
-    public function construct_tl($files)
+    public function construct_tl($files, $objects = [])
     {
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_loading'], \danog\MadelineProto\Logger::VERBOSE);
+        $this->update_callbacks($objects);
         $this->constructors = new TLConstructor();
         $this->methods = new TLMethod();
         $this->td_constructors = new TLConstructor();
@@ -116,19 +124,24 @@ trait TL
                     $TL_dict[$type][$key][$type === 'constructors' ? 'predicate' : 'method'] = $name;
                     $TL_dict[$type][$key]['id'] = strrev(hex2bin($id));
                     $TL_dict[$type][$key]['params'] = [];
-                    $TL_dict[$type][$key]['type'] = preg_replace(['/.+\\s/', '/;/'], '', $line);
+                    $TL_dict[$type][$key]['type'] = preg_replace(['/.+\\s+=\\s+/', '/;/'], '', $line);
                     if ($layer !== null) {
                         $TL_dict[$type][$key]['layer'] = $layer;
                     }
-                    foreach (explode(' ', preg_replace(['/^[^\\s]+\\s/', '/=\\s[^\\s]+/', '/\\s$/'], '', $line)) as $param) {
-                        if ($param === '') {
-                            continue;
+                    if ($name !== 'vector' && $TL_dict[$type][$key]['type'] !== 'Vector t') {
+                        foreach (explode(' ', preg_replace(['/^[^\\s]+\\s/', '/=\\s[^\\s]+/', '/\\s$/'], '', $line)) as $param) {
+                            if ($param === '') {
+                                continue;
+                            }
+                            if ($param[0] === '{') {
+                                continue;
+                            }
+                            if ($param === '#') {
+                                continue;
+                            }
+                            $explode = explode(':', $param);
+                            $TL_dict[$type][$key]['params'][] = ['name' => $explode[0], 'type' => $explode[1]];
                         }
-                        if ($param[0] === '{') {
-                            continue;
-                        }
-                        $explode = explode(':', $param);
-                        $TL_dict[$type][$key]['params'][] = ['name' => $explode[0], 'type' => $explode[1]];
                     }
                     $key++;
                 }
@@ -201,6 +214,36 @@ trait TL
     public function get_methods_namespaced()
     {
         return $this->methods->method_namespace;
+    }
+
+    public function update_callbacks($objects)
+    {
+        $this->tl_callbacks = [];
+        foreach ($objects as $object) {
+            if (!isset(class_implements(get_class($object))['danog\\MadelineProto\\TL\\TLCallback'])) {
+                throw new Exception('Invalid callback object provided!');
+            }
+            $new = [
+                TLCallback::METHOD_BEFORE_CALLBACK         => $object->getMethodBeforeCallbacks(),
+                TLCallback::METHOD_CALLBACK                => $object->getMethodCallbacks(),
+                TLCallback::CONSTRUCTOR_BEFORE_CALLBACK    => $object->getConstructorBeforeCallbacks(),
+                TLCallback::CONSTRUCTOR_CALLBACK           => $object->getConstructorCallbacks(),
+                TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK => $object->getConstructorSerializeCallbacks(),
+                TLCallback::TYPE_MISMATCH_CALLBACK         => $object->getTypeMismatchCallbacks(),
+            ];
+            foreach ($new as $type => $values) {
+                foreach ($values as $match => $callback) {
+                    if (!isset($this->tl_callbacks[$type][$match])) {
+                        $this->tl_callbacks[$type][$match] = [];
+                    }
+                    if (in_array($type, [TLCallback::TYPE_MISMATCH_CALLBACK, TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK])) {
+                        $this->tl_callbacks[$type][$match] = $callback;
+                    } else {
+                        $this->tl_callbacks[$type][$match] = array_merge($callback, $this->tl_callbacks[$type][$match]);
+                    }
+                }
+            }
+        }
     }
 
     public function deserialize_bool($id)
@@ -343,20 +386,13 @@ trait TL
                 }
         }
         $auto = false;
+
         if ($type['type'] === 'InputMessage' && !is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];
-        }
-        if (in_array($type['type'], ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer', 'InputDialogPeer', 'InputNotifyPeer']) && (!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
-            $object = $this->get_info($object);
+        } elseif (isset($this->tl_callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
+            $object = $this->tl_callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
             if (!isset($object[$type['type']])) {
-                throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
-            }
-            $object = $object[$type['type']];
-        }
-        if (in_array($type['type'], ['InputMedia', 'InputDocument', 'InputPhoto']) && (!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
-            $object = $this->get_file_info($object);
-            if (!isset($object[$type['type']])) {
-                throw new \danog\MadelineProto\Exception('Could not convert media object');
+                throw new \danog\MadelineProto\Exception("Could not convert {$type['type']} object");
             }
             $object = $object[$type['type']];
         }
@@ -368,6 +404,10 @@ trait TL
             $auto = true;
             $object['_'] = $constructorData['predicate'];
         }
+        if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']])) {
+            $object = $this->tl_callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']]($object);
+        }
+
         $predicate = $object['_'];
         $constructorData = $this->constructors->find_by_predicate($predicate, $layer);
         if ($constructorData === false) {
@@ -384,6 +424,7 @@ trait TL
         if ($predicate === 'messageEntityMentionName') {
             $constructorData = $this->constructors->find_by_predicate('inputMessageEntityMentionName');
         }
+
         $concat = '';
         if (!$bare) {
             $concat = $constructorData['id'];
@@ -401,17 +442,14 @@ trait TL
             } else {
                 $arguments['hash'] = $matches[2];
             }
-        }
-        if ($method === 'messages.checkChatInvite' && isset($arguments['hash']) && is_string($arguments['hash']) && preg_match('@(?:t|telegram)\.(?:me|dog)/joinchat/([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
+        } elseif ($method === 'messages.checkChatInvite' && isset($arguments['hash']) && is_string($arguments['hash']) && preg_match('@(?:t|telegram)\.(?:me|dog)/joinchat/([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
             $arguments['hash'] = $matches[1];
-        }
-        if ($method === 'channels.joinChannel' && isset($arguments['channel']) && is_string($arguments['channel']) && preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['channel'], $matches)) {
+        } elseif ($method === 'channels.joinChannel' && isset($arguments['channel']) && is_string($arguments['channel']) && preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['channel'], $matches)) {
             if ($matches[1] !== '') {
                 $method = 'messages.importChatInvite';
                 $arguments['hash'] = $matches[2];
             }
-        }
-        if ($method === 'messages.sendMessage' && isset($arguments['peer']['_']) && $arguments['peer']['_'] === 'inputEncryptedChat') {
+        } elseif ($method === 'messages.sendMessage' && isset($arguments['peer']['_']) && $arguments['peer']['_'] === 'inputEncryptedChat') {
             $method = 'messages.sendEncrypted';
             $arguments = ['peer' => $arguments['peer'], 'message' => $arguments];
             if (!isset($arguments['message']['_'])) {
@@ -423,8 +461,7 @@ trait TL
             if (isset($arguments['message']['reply_to_msg_id'])) {
                 $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to_msg_id'];
             }
-        }
-        if ($method === 'messages.sendEncryptedFile') {
+        } elseif ($method === 'messages.sendEncryptedFile') {
             if (isset($arguments['file'])) {
                 if (!is_array($arguments['file']) && $this->settings['upload']['allow_automatic_upload']) {
                     $arguments['file'] = $this->upload_encrypted($arguments['file']);
@@ -436,7 +473,32 @@ trait TL
                     $arguments['message']['media']['iv'] = $arguments['file']['iv'];
                 }
             }
+        } elseif (in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && isset($arguments['chat_id']) && (!is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
+            $res = $this->get_info($arguments['chat_id']);
+            if ($res['type'] !== 'chat') {
+                throw new \danog\MadelineProto\Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
+            }
+            $arguments['chat_id'] = $res['chat_id'];
+        } elseif ($method === 'photos.updateProfilePhoto') {
+            if (isset($arguments['id'])) {
+                if (!is_array($arguments['id'])) {
+                    $method = 'photos.uploadProfilePhoto';
+                    $arguments['file'] = $arguments['id'];
+                }
+            } elseif (isset($arguments['file'])) {
+                $method = 'photos.uploadProfilePhoto';
+            }
+        } elseif ($method === 'photos.uploadProfilePhoto') {
+            if (isset($arguments['file'])) {
+                if (is_array($arguments['file']) && !in_array($arguments['file']['_'], ['inputFile', 'inputFileBig'])) {
+                    $method = 'photos.uploadProfilePhoto';
+                    $arguments['id'] = $arguments['file'];
+                }
+            } elseif (isset($arguments['id'])) {
+                $method = 'photos.updateProfilePhoto';
+            }
         }
+
         $tl = $this->methods->find_by_method($method);
         if ($tl === false) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'].$method);
@@ -478,7 +540,7 @@ trait TL
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= $this->serialize_object(['type' => 'bytes'], $this->random(15 + 4 * (random_int(0, PHP_INT_MAX) % 3)), 'random_bytes');
+                    $serialized .= $this->serialize_object(['type' => 'bytes'], $this->random(15 + 4 * $this->random_int($modulus = 3)), 'random_bytes');
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService']) && isset($arguments['message'])) {
@@ -705,6 +767,11 @@ trait TL
             return false;
         }
         $x = ['_' => $constructorData['predicate']];
+        if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_BEFORE_CALLBACK][$x['_']])) {
+            foreach ($this->tl_callbacks[TLCallback::CONSTRUCTOR_BEFORE_CALLBACK][$x['_']] as $callback) {
+                $callback($x['_']);
+            }
+        }
         foreach ($constructorData['params'] as $arg) {
             if (isset($arg['pow'])) {
                 switch ($arg['type']) {
@@ -732,8 +799,20 @@ trait TL
             if (in_array($arg['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'])) {
                 $arg['type'] = 'string';
             }
-            if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($this->datacenter->sockets[$type['datacenter']]->new_outgoing[$x['req_msg_id']]['type']) && stripos($this->datacenter->sockets[$type['datacenter']]->new_outgoing[$x['req_msg_id']]['type'], '<') !== false) {
-                $arg['subtype'] = preg_replace(['|Vector[<]|', '|[>]|'], '', $this->datacenter->sockets[$type['datacenter']]->new_outgoing[$x['req_msg_id']]['type']);
+            if ($x['_'] === 'rpc_result' && $arg['name'] === 'result') {
+                if (isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'])
+                    && isset($this->tl_callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']])
+                ) {
+                    foreach ($this->tl_callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {
+                        $callback($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']);
+                    }
+                }
+
+                if (isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type'])
+                    && stripos($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type'], '<') !== false
+                ) {
+                    $arg['subtype'] = str_replace(['Vector<', '>'], '', $this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type']);
+                }
             }
             if (isset($type['datacenter'])) {
                 $arg['datacenter'] = $type['datacenter'];
@@ -753,7 +832,35 @@ trait TL
         }
         if ($x['_'] === 'dataJSON') {
             return json_decode($x['data'], true);
+        } elseif ($constructorData['type'] === 'JSONValue') {
+            switch ($x['_']) {
+                case 'jsonNull':
+                    return;
+                case 'jsonObject':
+                    $res = [];
+                    foreach ($x['value'] as $pair) {
+                        $res[$pair['key']] = $pair['value'];
+                    }
+
+                    return $res;
+                default:
+                    return $x['value'];
+            }
         }
+
+        if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
+            foreach ($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) {
+                $callback($x);
+            }
+        } elseif ($x['_'] === 'rpc_result'
+            && isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'])
+            && isset($this->tl_callbacks[TLCallback::METHOD_CALLBACK][$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']])
+        ) {
+            foreach ($this->tl_callbacks[TLCallback::METHOD_CALLBACK][$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {
+                $callback($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']], $x['result']);
+            }
+        }
+
         if ($x['_'] === 'message' && isset($x['reply_markup']['rows'])) {
             foreach ($x['reply_markup']['rows'] as $key => $row) {
                 foreach ($row['buttons'] as $bkey => $button) {

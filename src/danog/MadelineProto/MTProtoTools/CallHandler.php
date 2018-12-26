@@ -1,96 +1,109 @@
 <?php
 
-/*
-Copyright 2016-2018 Daniil Gentili
-(https://daniil.it)
-This file is part of MadelineProto.
-MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
-You should have received a copy of the GNU General Public License along with MadelineProto.
-If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * CallHandler module.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\MTProtoTools;
+
+use Amp\Deferred;
+use Amp\Promise;
+use danog\MadelineProto\Async\Parameters;
+use function Amp\call;
+use function Amp\Promise\all;
 
 /**
  * Manages method and object calls.
  */
 trait CallHandler
 {
-    public $wrapper;
-
-    public function method_call($method, $args = [], $aargs = ['message_id' => null, 'heavy' => false])
+    /*
+    public function select()
     {
-        if (!is_array($args)) {
-            throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
-        }
-        if (!is_array($aargs)) {
-            throw new \danog\MadelineProto\Exception("Additonal arguments aren't an array.");
-        }
-        if (isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID') {
-            $aargs['datacenter'] = $args['id']['dc_id'];
-        }
-        if (!isset($aargs['datacenter'])) {
-            throw new \danog\MadelineProto\Exception('No datacenter provided');
-        }
-        if (isset($aargs['apifactory']) && array_key_exists($method, self::DISALLOWED_METHODS)) {
-            throw new \danog\MadelineProto\Exception(self::DISALLOWED_METHODS[$method], 0, null, 'MadelineProto', 1);
-        }
-        if ($this->wrapper instanceof \danog\MadelineProto\API && isset($this->wrapper->session) && !is_null($this->wrapper->session) && time() - $this->wrapper->serialized > $this->settings['serialization']['serialization_interval']) {
-            $this->logger->logger("Didn't serialize in a while, doing that now...");
-            $this->wrapper->serialize($this->wrapper->session);
-        }
-        if (isset($aargs['file']) && $aargs['file'] && isset($this->datacenter->sockets[$aargs['datacenter'].'_media'])) {
-            \danog\MadelineProto\Logger::log('Using media DC');
-            $aargs['datacenter'] .= '_media';
-        }
-        if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > $this->config['message_length_max']) {
-            $arg_chunks = $this->split_to_chunks($args);
-            $args = array_shift($arg_chunks);
-        }
-        $args = $this->botAPI_to_MTProto($args);
-        if (isset($args['ping_id']) && is_int($args['ping_id'])) {
-            $args['ping_id'] = $this->pack_signed_long($args['ping_id']);
-        }
-        if (isset($args['chat_id']) && in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && (!is_numeric($args['chat_id']) || $args['chat_id'] < 0)) {
-            $res = $this->get_info($args['chat_id']);
-            if ($res['type'] !== 'chat') {
-                throw new \danog\MadelineProto\Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
+        $result = [];
+
+        try {
+            /*
+            if ($this->is_http($this->settings['connection_settings']['default_dc']) || $this->altervista) {
+            $this->logger->logger("Initial HTTP short poll");
+            $waiting = $this->datacenter->select(0.1);
+            $result = $this->handle_select($waiting, $result);
+            }/
+            $tries = 10; // TODO add setting
+            $this->logger->logger('Long poll');
+            $t = microtime(true);
+            $waiting = $this->datacenter->select();
+            $t = microtime(true) - $t;
+            $this->logger->logger("Long poll took $t");
+
+            $result = $this->handle_select($waiting, $result);
+
+            do {
+                $this->logger->logger('Short poll');
+                $waiting = $this->datacenter->select($this->is_http($this->settings['connection_settings']['default_dc']) || $this->altervista ? $this->settings['connection_settings']['all']['timeout'] / 10 : true);
+                $result = $this->handle_select($waiting, $result);
+            } while ($tries-- && $waiting);
+        } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+            $this->logger->logger('Nothing in the socket while selecting', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            foreach ($this->datacenter->sockets as $dc => $socket) {
+                $this->close_and_reopen($dc);
+                $this->send_messages($dc);
             }
-            $args['chat_id'] = $res['chat_id'];
         }
-        if (in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) {
-            $aargs['queue'] = 'secret';
-        }
-        if (isset($aargs['queue'])) {
-            $queue = $aargs['queue'];
-            if (!isset($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue])) {
-                $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue] = [];
+
+        return $result;
+    }
+
+    public $did = [];
+
+    public function handle_select($waiting, $result)
+    {
+        foreach ($waiting as $dc) {
+            $error = $this->recv_message($dc);
+            if ($error !== true) {
+                $this->close_and_reopen($dc);
+                if ($error === -404) {
+                    if ($this->datacenter->sockets[$dc]->temp_auth_key !== null) {
+                        $this->logger->logger('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
+                        $this->datacenter->sockets[$dc]->temp_auth_key = null;
+                        $this->init_authorization();
+
+                        return $result;
+                    }
+                }
+
+                throw new \danog\MadelineProto\RPCErrorException($error, $error);
             }
-            unset($aargs['queue']);
+            $result[$dc] = $this->handle_messages($dc) && (isset($result[$dc]) ? $result[$dc] : true);
+            if (($this->is_http($dc) || $this->altervista) && $this->datacenter->sockets[$dc]->new_outgoing) {
+                $this->send_messages($dc);
+            }
         }
-        if (isset($aargs['serialized'])) {
-            $serialized = $args['serialized'];
-        } else {
-            $serialized = $this->serialize_method($method, $args);
-        }
-        if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null && (!isset($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['connection_inited'] === false)) {
-            $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $method), \danog\MadelineProto\Logger::NOTICE);
-            $serialized = $this->serialize_method('invokeWithLayer', ['layer' => $this->settings['tl_schema']['layer'], 'query' => $this->serialize_method('initConnection', ['api_id' => $this->settings['app_info']['api_id'], 'api_hash' => $this->settings['app_info']['api_hash'], 'device_model' => strpos($aargs['datacenter'], 'cdn') === false ? $this->settings['app_info']['device_model'] : 'n/a', 'system_version' => strpos($aargs['datacenter'], 'cdn') === false ? $this->settings['app_info']['system_version'] : 'n/a', 'app_version' => $this->settings['app_info']['app_version'], 'system_lang_code' => $this->settings['app_info']['lang_code'], 'lang_code' => $this->settings['app_info']['lang_code'], 'lang_pack' => '', 'query' => $serialized])]);
-        }
-        $content_related = $this->content_related($method);
-        $type = $this->methods->find_by_method($method)['type'];
-        if (isset($queue)) {
-            $serialized = $this->serialize_method('invokeAfterMsgs', ['msg_ids' => $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue], 'query' => $serialized]);
-        }
-        if ($this->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($serialized)) > $this->settings['requests']['gzip_encode_if_gt'] && ($g = strlen($gzipped = gzencode($serialized))) < $l) {
-            $serialized = $this->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
-            $this->logger->logger('Using GZIP compression for '.$method.', saved '.($l - $g).' bytes of data, reduced call size by '.$g * 100 / $l.'%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-        }
-        $to_ack = [];
-        $last_recv = $this->datacenter->sockets[$aargs['datacenter']]->last_recv;
-        for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
+
+        return $result;
+    }
+    public function iorun($updates)
+    {
+        do {
+            if ($updates && time() - $this->last_getdifference > $this->settings['updates']['getdifference_interval']) {
+                $this->get_updates_difference();
+
+                return;
+            }
+
             if ($canunset = !$this->updates_state['sync_loading']) {
                 $this->updates_state['sync_loading'] = true;
             }
@@ -101,240 +114,395 @@ trait CallHandler
                 $this->postpone_pwrchat = true;
             }
 
-            try {
-                $this->logger->logger('Calling method (try number '.$count.' for '.$method.')...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
-                    if (isset($message_id)) {
-                        $this->logger->logger('Clearing old method call', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                        if (isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id])) {
-                            unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]);
-                        }
-                        if (isset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id])) {
-                            unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id]);
-                        }
-                    }
+            if (($this->is_http($this->settings['connection_settings']['default_dc']) || $this->altervista) && $updates) {
+                $this->send_messages($this->settings['connection_settings']['default_dc']);
+            }
+            foreach ($this->datacenter->sockets as $id => $datacenter) {
+                if ($datacenter->pending_outgoing) {
+                    $this->send_messages($id);
+                }
+            }
 
-                    $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['_' => $method, 'body' => $serialized, 'content_related' => $content_related, 'msg_id' => $message_id = isset($aargs['message_id']) ? $aargs['message_id'] : $this->generate_message_id($aargs['datacenter'])];
-                    if (count($to_ack = $this->datacenter->sockets[$aargs['datacenter']]->ack_queue)) {
-                        $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['_' => 'msgs_ack', 'body' => $this->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $this->datacenter->sockets[$aargs['datacenter']]->ack_queue], 'msgs_ack'), 'content_related' => false, 'msg_id' => $this->generate_message_id($aargs['datacenter'])];
+            $this->logger->logger('Polling for ' . ($updates ? 'updates' : 'replies') . ': selecting', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $t = microtime(true);
+            $only_updates = $this->select();
+            $t = microtime(true) - $t;
+            $this->logger->logger('Polling for ' . ($updates ? 'updates' : 'replies') . ': selecting took ' . $t, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $response_result = $this->has_pending_calls();
+
+            $repeat = 0;
+            foreach ($this->datacenter->sockets as $id => $datacenter) {
+                if ($updates) {
+                    if (isset($only_updates[$id])) {
+                        if ($only_updates[$id]) {
+                            $this->logger->logger("Polling for updates: got only updates for DC $id", \danog\MadelineProto\Logger::VERBOSE);
+                        } else {
+                            $this->logger->logger("Polling for updates: got also RPC replies for DC $id", \danog\MadelineProto\Logger::NOTICE);
+                        }
+                        if ($response_result[$id]) {
+                            $this->logger->logger("Polling for updates: still pending requests, resending for DC $id", \danog\MadelineProto\Logger::WARNING);
+                            $this->send_messages($id);
+                        }
+                    } else {
+                        if ($response_result[$id] || $id === $this->settings['connection_settings']['default_dc']) {
+                            $this->logger->logger("Polling for updates: got nothing for DC $id", \danog\MadelineProto\Logger::ERROR);
+
+                            if ($this->is_http($id) || $this->altervista) {
+                                $this->logger->logger("Polling for updates: closing and reopening DC $id since we're on HTTP, and we polled");
+                                $this->close_and_reopen($id);
+                                $datacenter->last_http_wait = 0;
+                                $repeat |= 1;
+                                $this->logger->logger("Polling for updates: and now repolling for DC $id");
+                                $this->send_messages($id);
+                            }
+                        }
                     }
-                    if ($this->is_http($aargs['datacenter']) && $method !== 'http_wait') {
-                        $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['_' => 'http_wait', 'body' => $this->serialize_method('http_wait', ['max_wait' => 500, 'wait_after' => 150, 'max_delay' => 500]), 'content_related' => false, 'msg_id' => $this->generate_message_id($aargs['datacenter'])];
-                    }
-                    $this->send_messages($aargs['datacenter']);
                 } else {
-                    $this->send_unencrypted_message($method, $serialized, $message_id = isset($aargs['message_id']) ? $aargs['message_id'] : $this->generate_message_id($aargs['datacenter']), $aargs['datacenter']);
-                    $aargs['message_id'] = $message_id;
-                }
+                    if (isset($only_updates[$id])) {
+                        if ($only_updates[$id]) {
+                            $this->logger->logger("Polling for replies: got only updates for DC $id", \danog\MadelineProto\Logger::WARNING);
 
-                if (isset($queue)) {
-                    $this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue][] = $message_id;
-                    if (count($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue]) > $this->settings['msg_array_limit']['call_queue']) {
-                        reset($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue]);
-                        $key = key($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue]);
-                        if ($key[0] === "\0") {
-                            $key = $key;
-                        }
-                        unset($this->datacenter->sockets[$aargs['datacenter']]->call_queue[$queue][$key]);
-                    }
-                }
-                if ($method === 'http_wait' || isset($aargs['noResponse']) && $aargs['noResponse']) {
-                    return true;
-                }
-                //$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['content'] = ['method' => $method, 'args' => $args];
-                $this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id] = ['msg_id' => $message_id, 'method' => $method, 'type' => $type];
-                $res_count = 0;
-                $server_answer = null;
-                $update_count = 0;
-                $only_updates = false;
-                $response_tries = $this->settings['max_tries']['response'] + 1;
-                if ($last_recv) {
-                    $additional = (int) floor((time() - $last_recv) / 10);
-                    if ($additional > $this->settings['max_tries']['response'] * 2) {
-                        $additional = $this->settings['max_tries']['response'] * 2;
-                    }
-                    $response_tries += $additional;
-                }
-                while ($server_answer === null && $res_count++ < $response_tries) {
-                    // Loop until we get a response, loop for a max of $this->settings['max_tries']['response'] times
-                    try {
-                        $this->logger->logger('Getting response (try number '.$res_count.' for '.$method.')...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                        if (!isset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']) || !isset($this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'])) {
-                            // Checks if I have received the response to the called method, if not continue looping
-                            if ($only_updates) {
-                                if ($update_count > 50) {
-                                    $update_count = 0;
-                                } else {
-                                    $res_count--;
-                                    $update_count++;
-                                }
+                            if ($response_result[$id]) {
+                                $this->logger->logger("Polling for replies: still pending requests, repolling for DC $id", \danog\MadelineProto\Logger::WARNING);
+                                $this->send_messages($id);
+                                $repeat |= 1;
+                            } else {
+                                $this->logger->logger("Polling for replies: got all RPC replies for DC $id", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                             }
                         } else {
-                            $server_answer = $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'];
-                            $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['response']]['content'] = '';
-                            break;
+                            if ($response_result[$id]) {
+                                $this->logger->logger("Polling for replies: still pending requests, repolling for DC $id", \danog\MadelineProto\Logger::WARNING);
+                                $this->send_messages($id);
+                            } else {
+                                $this->logger->logger("Polling for replies: got all RPC replies for DC $id", \danog\MadelineProto\Logger::NOTICE);
+                            }
                         }
-                        if (($error = $this->recv_message($aargs['datacenter'])) !== true) {
-                            if ($error === -404) {
-                                if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
-                                    $this->logger->logger('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
-                                    $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
-                                    $this->init_authorization();
+                    } else {
+                        if ($response_result[$id]) {
+                            $this->logger->logger("Polling for replies: got nothing for DC $id", \danog\MadelineProto\Logger::ERROR);
+                            $this->logger->logger("Polling for replies: closing and reopening DC $id", \danog\MadelineProto\Logger::ERROR);
+                            $this->close_and_reopen($id);
+                            $datacenter->last_http_wait = 0;
+                            $repeat |= 1;
+                            $this->logger->logger("Polling for replies: resending for DC $id", \danog\MadelineProto\Logger::WARNING);
+                            $this->send_messages($id);
+                        } else {
+                            $this->logger->logger("Polling for replies: got all RPC replies for DC $id", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                        }
+                    }
+                }
+            }
+            $this->logger->logger('Running guzzle promise queue');
+            \GuzzleHttp\Promise\queue()->run();
 
-                                    throw new \danog\MadelineProto\Exception('I had to recreate the temporary authorization key');
+            if ($repeat) {
+                $this->logger->logger('Repeat iowait');
+            }
+        } while ($repeat);
+
+        if ($canunset) {
+            $this->updates_state['sync_loading'] = false;
+        }
+        if ($canunsetpostponepwrchat) {
+            $this->postpone_pwrchat = false;
+            $this->handle_pending_pwrchat();
+        }
+        if ($canunsetpostponeupdates) {
+            $this->postpone_updates = false;
+            $this->handle_pending_updates();
+        }
+    }
+
+    */
+
+    public function has_pending_calls()
+    {
+        $result = [];
+        foreach ($this->datacenter->sockets as $id => $socket) {
+            $result[$id] = $this->has_pending_calls_dc($id);
+        }
+
+        return $result;
+    }
+
+    public function has_pending_calls_dc($datacenter)
+    {
+        //$result = 0;
+        $dc_config_number = isset($this->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
+        foreach ($this->datacenter->sockets[$datacenter]->new_outgoing as $message_id) {
+            if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent']) && ($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent'] + $this->settings['connection_settings'][$dc_config_number]['timeout'] < time()) && ($this->datacenter->sockets[$datacenter]->temp_auth_key === null) === (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['unencrypted']) && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['unencrypted']) && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'] !== 'msgs_state_req') {
+                return true;
+                //$result |= 1;
+            }
+        }
+
+        return false; //(bool) $result;
+    }
+
+    public function check_pending_calls()
+    {
+        foreach ($this->datacenter->sockets as $datacenter => $socket) {
+            $this->check_pending_calls_dc($datacenter);
+        }
+    }
+
+    public function check_pending_calls_dc($datacenter)
+    {
+        if (!empty($this->datacenter->sockets[$datacenter]->new_outgoing)) {
+            if ($this->has_pending_calls_dc($datacenter)) {
+                if ($this->datacenter->sockets[$datacenter]->temp_auth_key !== null) {
+                    $message_ids = array_values($this->datacenter->sockets[$datacenter]->new_outgoing);
+                    $deferred = new \danog\MadelineProto\ImmediatePromise();
+                    $deferred->then(
+                        function ($result) use ($datacenter, $message_ids) {
+                            $reply = [];
+                            foreach (str_split($result['info']) as $key => $chr) {
+                                $message_id = $message_ids[$key];
+                                if (!isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id])) {
+                                    $this->logger->logger('Already got response for and forgot about message ID '.$this->unpack_signed_long($message_id));
+                                    continue;
+                                }
+                                if (!isset($this->datacenter->sockets[$datacenter]->new_outgoing[$message_id])) {
+                                    $this->logger->logger('Already got response for '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id));
+                                    continue;
+                                }
+                                $chr = ord($chr);
+                                switch ($chr & 7) {
+                                    case 0:
+                                        $this->logger->logger('Wrong message status 0 for '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'], \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        break;
+                                    case 1:
+                                    case 2:
+                                    case 3:
+                                        $this->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' not received by server, resending...', \danog\MadelineProto\Logger::ERROR);
+                                        $this->method_recall($message_id, $datacenter, false, true);
+                                        break;
+                                    case 4:
+                                        if ($chr & 32) {
+                                            $this->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' received by server and is being processed, waiting...', \danog\MadelineProto\Logger::ERROR);
+                                        } elseif ($chr & 64) {
+                                            $this->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' received by server and was already processed, requesting reply...', \danog\MadelineProto\Logger::ERROR);
+                                            $reply[] = $message_id;
+                                        } elseif ($chr & 128) {
+                                            $this->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' received by server and was already sent, requesting reply...', \danog\MadelineProto\Logger::ERROR);
+                                            $reply[] = $message_id;
+                                        } else {
+                                            $this->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' received by server, requesting reply...', \danog\MadelineProto\Logger::ERROR);
+                                            $reply[] = $message_id;
+                                        }
                                 }
                             }
-
-                            throw new \danog\MadelineProto\RPCErrorException($error, $error);
-                        }
-                        $only_updates = $this->handle_messages($aargs['datacenter']);
-                        // This method receives data from the socket, and parses stuff
-                    } catch (\danog\MadelineProto\Exception $e) {
-                        $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
-                        if (in_array($e->getMessage(), ['Resend query', 'I had to recreate the temporary authorization key', 'Got bad message notification']) || $e->getCode() === 404) {
-                            continue 2;
-                        }
-                        $this->logger->logger('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
-                        $this->logger->logger('Full trace '.$e, \danog\MadelineProto\Logger::WARNING);
-                        continue;
-                    } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
-                        $last_error = 'Nothing in the socket';
-                        $this->logger->logger('An error getting response of method '.$method.': '.$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
-                        $only_updates = false;
-                        if ($last_recv === $this->datacenter->sockets[$aargs['datacenter']]->last_recv) { // the socket is dead, resend request
-                            $this->close_and_reopen($aargs['datacenter']);
-                            if ($this->altervista) {
-                                continue 2;
+                            if ($reply) {
+                                $this->object_call('msg_resend_ans_req', ['msg_ids' => $reply], ['datacenter' => $datacenter, 'postpone' => true]);
                             }
+                            $this->send_messages($datacenter);
+                        },
+                        function ($error) use ($datacenter) {
+                            throw $error;
                         }
-                        //if ($this->datacenter->sockets[$aargs['datacenter']]->last_recv < time() - 1 && $this->is_http($aargs['datacenter'])) {
-                        //    $this->close_and_reopen($aargs['datacenter']);
-                        //    continue 2;
-                        //}
-                        continue; //2;
+                    );
+                    $this->logger->logger("Still missing something on DC $datacenter, sending state request", \danog\MadelineProto\Logger::ERROR);
+                    $this->object_call('msgs_state_req', ['msg_ids' => $message_ids], ['datacenter' => $datacenter, 'promise' => $deferred]);
+                } else {
+                    $dc_config_number = isset($this->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
+                    foreach ($this->datacenter->sockets[$datacenter]->new_outgoing as $message_id) {
+                        if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent']) && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent'] + $this->settings['connection_settings'][$dc_config_number]['timeout'] < time() && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['unencrypted']) {
+                            $this->logger->logger('Still missing '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message id '.$this->unpack_signed_long($message_id)." on DC $datacenter, resending", \danog\MadelineProto\Logger::ERROR);
+                            $this->method_recall($message_id, $datacenter, false, true);
+                        }
                     }
                 }
-                if ($canunset) {
-                    $this->updates_state['sync_loading'] = false;
-                }
-                if ($canunsetpostponepwrchat) {
-                    $this->postpone_pwrchat = false;
-                    $this->handle_pending_pwrchat();
-                }
-                if ($canunsetpostponeupdates) {
-                    $this->postpone_updates = false;
-                    $this->handle_pending_updates();
-                }
-                foreach ($to_ack as $msg_id) {
-                    $this->datacenter->sockets[$aargs['datacenter']]->incoming_messages[$msg_id]['ack'] = true;
-                    if (isset($this->datacenter->sockets[$aargs['datacenter']]->ack_queue[$msg_id])) {
-                        unset($this->datacenter->sockets[$aargs['datacenter']]->ack_queue[$msg_id]);
-                    }
-                }
-                if ($server_answer === null) {
-                    throw new \danog\MadelineProto\Exception("Couldn't get response");
-                }
-                if (!isset($server_answer['_'])) {
-                    return $server_answer;
-                }
-                switch ($server_answer['_']) {
-                    case 'rpc_error':
-                        $this->handle_rpc_error($server_answer, $aargs);
-                        break;
-                    case 'bad_server_salt':
-                    case 'bad_msg_notification':
-                        throw new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$server_answer['error_code']], $server_answer['error_code']);
-                    case 'boolTrue':
-                    case 'boolFalse':
-                        $server_answer = $server_answer['_'] === 'boolTrue';
-                        break;
-                }
-                if (isset($aargs['botAPI']) && $aargs['botAPI']) {
-                    $server_answer = $this->MTProto_to_botAPI($server_answer, $args);
-                }
-            } catch (\danog\MadelineProto\Exception $e) {
-                $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
-                if (strpos($e->getMessage(), 'Received request to switch to DC ') === 0) {
-                    if (($method === 'users.getUsers' && $args = ['id' => [['_' => 'inputUserSelf']]]) || $method === 'auth.exportAuthorization' || $method === 'updates.getDifference') {
-                        $this->settings['connection_settings']['default_dc'] = $this->authorized_dc = $this->datacenter->curdc;
-                    }
-                    $last_recv = $this->datacenter->sockets[$aargs['datacenter']]->last_recv;
-                    $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
-                    continue;
-                }
-                $this->close_and_reopen($aargs['datacenter']);
-                if ($e->getMessage() === 'Re-executing query after server error...') {
-                    return $this->method_call($method, $args, $aargs);
-                }
-                continue;
-            } catch (\RuntimeException $e) {
-                $last_error = $e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine();
-                $this->logger->logger('An error occurred while calling method '.$method.': '.$last_error.'. Recreating connection and retrying to call method...', \danog\MadelineProto\Logger::WARNING);
-                $this->close_and_reopen($aargs['datacenter']);
-                continue;
-            } finally {
-                if (isset($aargs['heavy']) && $aargs['heavy'] && isset($message_id)) {
-                    //$this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]['args'] = [];
-                    unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]);
-                    unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id]);
-                }
-                if (isset($message_id) && $method === 'req_pq') {
-                    unset($this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id]);
-                    unset($this->datacenter->sockets[$aargs['datacenter']]->new_outgoing[$message_id]);
-                }
-                if ($canunset) {
-                    $this->updates_state['sync_loading'] = false;
-                }
-                if ($canunsetpostponepwrchat) {
-                    $this->postpone_pwrchat = false;
-                    $this->handle_pending_pwrchat();
-                }
-                if ($canunsetpostponeupdates) {
-                    $this->postpone_updates = false;
-                    $this->handle_pending_updates();
-                }
             }
-            if ($server_answer === null) {
-                if ($last_recv === $this->datacenter->sockets[$aargs['datacenter']]->last_recv && $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null) {
-                    $this->logger->logger('WARNING: Resetting auth key...', \danog\MadelineProto\Logger::WARNING);
-                    $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key = null;
-                    $this->init_authorization();
-
-                    return $this->method_call($method, $args, $aargs);
-                }
-
-                throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.' ('.$last_error.').');
-            }
-            $this->logger->logger('Got response for method '.$method.' @ try '.$count.' (response try '.$res_count.')', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            if ($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key !== null && (!isset($this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['connection_inited'] === false)) {
-                $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key['connection_inited'] = true;
-            }
-            $this->datacenter->sockets[$aargs['datacenter']]->outgoing_messages[$message_id] = [];
-            if (isset($arg_chunks) && count($arg_chunks)) {
-                $server_answer = [$server_answer];
-                foreach ($arg_chunks as $args) {
-                    $server_answer[] = $this->method_call($method, $args, $aargs);
-                }
-            }
-
-            return $server_answer;
         }
-        if ($method === 'req_pq') {
-            throw new \danog\MadelineProto\RPCErrorException('RPC_CALL_FAIL');
-        }
-
-        throw new \danog\MadelineProto\Exception('An error occurred while calling method '.$method.' ('.$last_error.').');
     }
 
-    public function object_call($object, $args = [], $aargs = ['message_id' => null, 'heavy' => false])
+    public function method_recall($watcherId, $args)
     {
-        if (!is_array($args)) {
-            throw new \danog\MadelineProto\Exception("Arguments aren't an array.");
+        $message_id = $args['message_id'];
+        $new_datacenter = $args['datacenter'];
+        $old_datacenter = $new_datacenter;
+        if (isset($args['old_datacenter'])) {
+            $old_datacenter = $args['old_datacenter'];
         }
-        if (!isset($aargs['datacenter'])) {
-            throw new \danog\MadelineProto\Exception('No datacenter provided');
+        $postpone = false;
+        if (isset($args['postpone'])) {
+            $postpone = $args['postpone'];
         }
-        $serialized = $this->serialize_object(['type' => $object], $args, $object);
-        $this->datacenter->sockets[$aargs['datacenter']]->object_queue[] = ['_' => $object, 'body' => $serialized, 'content_related' => $this->content_related($object), 'msg_id' => $this->generate_message_id($aargs['datacenter'])];
+
+        if (isset($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id]['container'])) {
+            $message_ids = $this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id]['container'];
+        } else {
+            $message_ids = [$message_id];
+        }
+
+        foreach ($message_ids as $message_id) {
+            if (isset($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id]['body'])) {
+                $this->datacenter->sockets[$new_datacenter]->sendMessage($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id], false);
+                $this->ack_outgoing_message_id($message_id, $old_datacenter);
+                $this->got_response_for_outgoing_message_id($message_id, $old_datacenter);
+            }
+        }
+        if (!$postpone) {
+            $this->datacenter->sockets[$new_datacenter]->writer->resume();
+        }
     }
+
+    public function method_call($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
+    {
+        $promise = $this->method_call_async_read($method, $args, $aargs);
+
+        return $this->wait($promise);
+    }
+
+    public function method_call_async_read($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
+    {
+        $deferred = new Deferred();
+        $this->method_call_async_write($method, $args, $aargs)->onResolve(function ($e, $read_deferred) use ($deferred) {
+            if ($e) {
+                $deferred->fail($e);
+            } else {
+                if (is_array($read_deferred)) {
+                    $read_deferred = array_map(function ($value) {
+                        return $value->promise();
+                    }, $read_deferred);
+                    $deferred->resolve(all($read_deferred));
+                } else {
+                    $deferred->resolve($read_deferred->promise());
+                }
+            }
+        });
+
+        return isset($aargs['noResponse']) && $aargs['noResponse'] ? new \Amp\Success(0) : $deferred->promise();
+    }
+
+    public function method_call_async_write($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
+    {
+        return call([$this, 'method_call_async_write_generator'], $method, $args, $aargs);
+    }
+
+    public function method_call_async_write_generator($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): \Generator
+    {
+        if (is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID') {
+            $aargs['datacenter'] = $args['id']['dc_id'];
+        }
+        if ($this->wrapper instanceof \danog\MadelineProto\API && isset($this->wrapper->session) && !is_null($this->wrapper->session) && time() - $this->wrapper->serialized > $this->settings['serialization']['serialization_interval']) {
+            $this->logger->logger("Didn't serialize in a while, doing that now...");
+            $this->wrapper->serialize($this->wrapper->session);
+        }
+        if (isset($aargs['file']) && $aargs['file'] && isset($this->datacenter->sockets[$aargs['datacenter'].'_media'])) {
+            \danog\MadelineProto\Logger::log('Using media DC');
+            $aargs['datacenter'] .= '_media';
+        }
+        if (in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) {
+            $aargs['queue'] = 'secret';
+        }
+
+        if (is_array($args)) {
+            if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > $this->config['message_length_max']) {
+                $arg_chunks = $this->split_to_chunks($args);
+                $promises = [];
+                $new_aargs = $aargs;
+                $new_aargs['postpone'] = true;
+                $new_aargs['queue'] = $method;
+
+                foreach ($arg_chunks as $args) {
+                    $promises[] = $this->method_call_async_write($method, $args, $new_aargs);
+                }
+
+                if (!isset($aargs['postpone'])) {
+                    $this->datacenter->sockets[$aargs['datacenter']]->writer->resume();
+                }
+
+                return yield $promises;
+            }
+            $args = $this->botAPI_to_MTProto($args);
+            if (isset($args['ping_id']) && is_int($args['ping_id'])) {
+                $args['ping_id'] = $this->pack_signed_long($args['ping_id']);
+            }
+        }
+
+        $deferred = new Deferred();
+        $message = ['_' => $method, 'type' => $this->methods->find_by_method($method)['type'], 'content_related' => $this->content_related($method), 'promise' => $deferred, 'method' => true, 'unencrypted' => $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key === null && strpos($method, '.') === false];
+
+        if (is_object($args) && $args instanceof Parameters) {
+            $message['body'] = call([$args, 'fetchParameters']);
+        } else {
+            $message['body'] = $args;
+        }
+
+        if (isset($aargs['msg_id'])) {
+            $message['msg_id'] = $aargs['msg_id'];
+        }
+        if (isset($aargs['queue'])) {
+            $message['queue'] = $aargs['queue'];
+        }
+        if (isset($aargs['file'])) {
+            $message['file'] = $aargs['file'];
+        }
+        if (isset($aargs['botAPI'])) {
+            $message['botAPI'] = $aargs['botAPI'];
+        }
+        if (($method === 'users.getUsers' && $args === ['id' => [['_' => 'inputUserSelf']]]) || $method === 'auth.exportAuthorization' || $method === 'updates.getDifference') {
+            $message['user_related'] = true;
+        }
+
+        $write_deferred = yield $this->datacenter->sockets[$aargs['datacenter']]->sendMessage($message, isset($aargs['postpone']) ? !$aargs['postpone'] : true);
+
+        $deferred = new Deferred();
+        $write_promise = $write_deferred->promise();
+        $write_promise->onResolve(
+            function ($e, $result) use ($aargs, $deferred) {
+                //$this->datacenter->sockets[$aargs['datacenter']]->checker->resume();
+                if ($e) {
+                    return $deferred->fail($e);
+                }
+                $deferred->resolve($result);
+            }
+        );
+
+        $this->datacenter->sockets[$aargs['datacenter']]->checker->resume();
+
+        return $deferred;
+    }
+
+    public function object_call($object, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
+    {
+        return $this->wait($this->object_call_async($object, $args, $aargs));
+    }
+
+    public function object_call_async($object, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
+    {
+        $message = ['_' => $object, 'body' => $args, 'content_related' => $this->content_related($object), 'unencrypted' => $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key === null, 'method' => false];
+        if (isset($aargs['promise'])) {
+            $message['promise'] = $aargs['promise'];
+        }
+
+        return $this->datacenter->sockets[$aargs['datacenter']]->sendMessage($message, isset($aargs['postpone']) ? !$aargs['postpone'] : true);
+    }
+
+    /*
+$message = [
+// only in outgoing messages
+'body' => 'serialized body', (optional if container)
+'content_related' => bool,
+'_' => 'predicate',
+'promise' => deferred promise that gets resolved when a response to the message is received (optional),
+'send_promise' => deferred promise that gets resolved when the message is sent (optional),
+'file' => bool (optional),
+'type' => 'type' (optional),
+'queue' => queue ID (optional),
+'container' => [message ids] (optional),
+
+// only in incoming messages
+'content' => deserialized body,
+'seq_no' => number (optional),
+'from_container' => bool (optional),
+
+// can be present in both
+'response' => message id (optional),
+'msg_id' => message id (optional),
+'sent' => timestamp,
+'tries' => number
+];
+ */
 }

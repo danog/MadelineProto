@@ -1,15 +1,21 @@
 <?php
 
-/*
-Copyright 2016-2018 Daniil Gentili
-(https://daniil.it)
-This file is part of MadelineProto.
-MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
-You should have received a copy of the GNU General Public License along with MadelineProto.
-If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Start module.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\Wrappers;
 
@@ -25,8 +31,7 @@ trait Start
         }
         if (php_sapi_name() === 'cli') {
             if (!function_exists('readline')) {
-                function readline($prompt = null)
-                {
+                $readline = function ($prompt = null) {
                     if ($prompt) {
                         echo $prompt;
                     }
@@ -34,18 +39,20 @@ trait Start
                     $line = rtrim(fgets($fp, 1024));
 
                     return $line;
-                }
-            }
-            if (strpos(readline('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
-                $this->bot_login(readline('Enter your bot token: '));
+                };
             } else {
-                $this->phone_login(readline('Enter your phone number: '));
-                $authorization = $this->complete_phone_login(readline('Enter the phone code: '));
+                $readline = 'readline';
+            }
+            if (strpos($readline('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
+                $this->bot_login($readline('Enter your bot token: '));
+            } else {
+                $this->phone_login($readline('Enter your phone number: '));
+                $authorization = $this->complete_phone_login($readline('Enter the phone code: '));
                 if ($authorization['_'] === 'account.password') {
-                    $authorization = $this->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
+                    $authorization = $this->complete_2fa_login($readline('Please enter your password (hint '.$authorization['hint'].'): '));
                 }
                 if ($authorization['_'] === 'account.needSignup') {
-                    $authorization = $this->complete_signup(readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
+                    $authorization = $this->complete_signup($readline('Please enter your first name: '), $readline('Please enter your last name (can be empty): '));
                 }
             }
             $this->serialize();

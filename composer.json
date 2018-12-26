@@ -19,13 +19,21 @@
         "ext-curl": "*",
         "ext-mbstring": "*",
         "ext-json": "*",
-        "ext-xml": "*"
+        "ext-xml": "*",
+        "amphp/amp": "^2.0",
+        "amphp/socket": "^0.10.11",
+        "amphp/log": "^1.0",
+        "amphp/parser": "^1.0",
+        "amphp/dns": "dev-master#861cc857b1ba6e02e8a7439c30403682785fce96 as 0.9.9",
+        "amphp/file": "dev-master#5a69fca406ac5fd220de0aa68c887bc8046eb93c as 0.3.3",
+        "amphp/uri": "dev-master#f3195b163275383909ded7770a11d8eb865cbc86 as 0.1.3",
+        "amphp/websocket-client": "dev-master"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1"
     },
     "suggest": {
-        "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https:/github.com/danog/php-libtgvoip)",
+        "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)",
         "ext-sockets": "Install the socket extension to speed up MadelineProto"
     },
     "authors": [
