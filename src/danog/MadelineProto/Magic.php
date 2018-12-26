@@ -94,23 +94,24 @@ class Magic
                 self::$revision = 'Revision: '.self::$revision.$latest;
             }
             self::$can_parallel = false;
-
-            try {
-                $back = debug_backtrace(0);
-                $promise = \Amp\File\get(end($back)['file']);
-                do {
-                    try {
-                        if (wait($promise)) {
-                            self::$can_parallel = true;
-                            break;
+            if (php_sapi_name() === 'cli') {
+                try {
+                    $back = debug_backtrace(0);
+                    $promise = \Amp\File\get(end($back)['file']);
+                    do {
+                        try {
+                            if (wait($promise)) {
+                                self::$can_parallel = true;
+                                break;
+                            }
+                        } catch (\Throwable $e) {
+                            if ($e->getMessage() !== 'Loop stopped without resolving the promise') {
+                                throw $e;
+                            }
                         }
-                    } catch (\Throwable $e) {
-                        if ($e->getMessage() !== 'Loop stopped without resolving the promise') {
-                            throw $e;
-                        }
-                    }
-                } while (true);
-            } catch (\Throwable $e) {
+                    } while (true);
+                } catch (\Throwable $e) {
+                }
             }
             if (!self::$can_parallel && !defined('AMP_WORKER')) {
                 define('AMP_WORKER', 1);
