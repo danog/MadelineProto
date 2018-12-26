@@ -1,7 +1,18 @@
 <?php
 
-if (PHP_MAJOR_VERSION === 5 && PHP_MINOR_VERSION < 6) {
-    throw new \Exception('MadelineProto requires at least PHP 5.6 to run');
+if (PHP_MAJOR_VERSION === 5) {
+    if (PHP_MINOR_VERSION < 6) {
+        throw new \Exception('MadelineProto requires at least PHP 5.6 to run');
+    }
+    $newline = php_sapi_name() === 'cli' ? "\n" : '<br>';
+    echo "***********************************************************************$newline";
+    echo "***********************************************************************$newline";
+    echo "YOU ARE USING AN OLD AND BUGGED VERSION OF PHP, PLEASE UPDATE TO PHP 7 $newline";
+    echo "PHP 5 USERS WILL NOT RECEIVE MADELINEPROTO UPDATES AND BUGFIXES ANYMORE$newline";
+    echo "PLEASE UPDATE TO PHP 7$newline";
+    echo "***********************************************************************$newline";
+    echo "**********************************************************************$newline";
+    unset($newline);
 }
 
 function ___install_madeline()
