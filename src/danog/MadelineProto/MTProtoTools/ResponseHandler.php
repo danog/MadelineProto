@@ -540,10 +540,12 @@ trait ResponseHandler
         }
         if (count($this->pending_updates)) {
             $this->logger->logger('Parsing pending updates...');
-            $updates = $this->pending_updates;
-            $this->pending_updates = [];
-            foreach ($updates as $update) {
-                $this->handle_updates($update);
+            foreach (array_keys($this->pending_updates) as $key) {
+                if (isset($this->pending_updates[$key])) {
+                    $updates = $this->pending_updates[$key];
+                    unset($this->pending_updates[$key]);
+                    $this->handle_updates($updates);
+                }
             }
         }
     }
