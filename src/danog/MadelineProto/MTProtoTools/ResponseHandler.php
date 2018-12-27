@@ -63,7 +63,6 @@ trait ResponseHandler
         //$n = $this->n++;
         $only_updates = true;
         foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
-            //var_dump($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]);
             $this->logger->logger((isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['from_container']) ? 'Inside of container, received ' : 'Received ').$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].' from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']) {
@@ -305,7 +304,6 @@ trait ResponseHandler
 
     public function handle_response($request_id, $response_id, $datacenter)
     {
-        //var_dumP("Response ".bin2hex($request_id));
         $response = &$this->datacenter->sockets[$datacenter]->incoming_messages[$response_id]['content'];
         unset($this->datacenter->sockets[$datacenter]->incoming_messages[$response_id]['content']);
         $request = &$this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id];
@@ -542,12 +540,10 @@ trait ResponseHandler
         }
         if (count($this->pending_updates)) {
             $this->logger->logger('Parsing pending updates...');
-            foreach (array_keys($this->pending_updates) as $key) {
-                if (isset($this->pending_updates[$key])) {
-                    $updates = $this->pending_updates[$key];
-                    unset($this->pending_updates[$key]);
-                    $this->handle_updates($updates);
-                }
+            $updates = $this->pending_updates;
+            $this->pending_updates = [];
+            foreach ($updates as $update) {
+                $this->handle_updates($update);
             }
         }
     }
@@ -579,6 +575,7 @@ trait ResponseHandler
                     $opts[$key] = $updates[$key];
                 }
             }
+
             switch ($updates['_']) {
                 case 'updates':
                 case 'updatesCombined':

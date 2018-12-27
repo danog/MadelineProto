@@ -351,6 +351,7 @@ trait PeerHandler
             if (is_string($id)) {
                 $id = \danog\MadelineProto\Magic::$bigint ? (float) $id : (int) $id;
             }
+
             if (!isset($this->chats[$id])) {
                 try {
                     if ($id < 0) {

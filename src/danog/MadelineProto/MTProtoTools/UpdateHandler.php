@@ -405,7 +405,12 @@ trait UpdateHandler
             case 'updateEditMessage':
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
-                if (isset($update['message']['from_id']) && !$this->peer_isset($update['message']['from_id']) || !$this->peer_isset($update['message']['to_id']) || isset($update['message']['via_bot_id']) && !$this->peer_isset($update['message']['via_bot_id']) || isset($update['message']['entities']) && !$this->entities_peer_isset($update['message']['entities']) || isset($update['message']['fwd_from']) && !$this->fwd_peer_isset($update['message']['fwd_from'])) {
+                if ((isset($update['message']['from_id']) && !$this->peer_isset($update['message']['from_id'])) ||
+                    !$this->peer_isset($update['message']['to_id']) ||
+                    isset($update['message']['via_bot_id']) && !$this->peer_isset($update['message']['via_bot_id']) ||
+                    isset($update['message']['entities']) && !$this->entities_peer_isset($update['message']['entities']) // ||
+                    //isset($update['message']['fwd_from']) && !$this->fwd_peer_isset($update['message']['fwd_from'])
+                ) {
                     $this->logger->logger('Not enough data for message update, getting difference...', \danog\MadelineProto\Logger::VERBOSE);
                     if ($channel_id !== false && $this->peer_isset($this->to_supergroup($channel_id))) {
                         $this->get_channel_difference($channel_id);
