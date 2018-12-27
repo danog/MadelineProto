@@ -242,7 +242,16 @@ trait UpdateHandler
             $this->load_update_state()['date'] = $data['date'];
         }
     }
-
+    public function reset_update_state()
+    {
+        $this->load_update_state()['pts'] = 0;
+        $this->load_update_state()['qts'] = 0;
+        $this->load_update_state()['seq'] = 0;
+        $this->load_update_state()['date'] = 0;
+        foreach ($this->channels_state as &$state) {
+            $state['pts'] = 0;
+        }
+    }
     public function &load_update_state()
     {
         if (!isset($this->updates_state['qts'])) {
