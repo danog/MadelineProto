@@ -48,11 +48,42 @@ trait Loop
             try {
                 set_time_limit(-1);
             } catch (\danog\MadelineProto\Exception $e) {
-                register_shutdown_function(function () {
-                    //$this->logger->logger(['Restarting script...']);
+                $backtrace = debug_backtrace(0);
+                $lockfile = dirname(end($backtrace)['file']).'/bot.lock';
+                unset($backtrace);
+                $try_locking = true;
+                if (!file_exists($lockfile)) {
+                    touch($lockfile);
+                    $lock = fopen('bot.lock', 'r+');
+                } else if (isset($GLOBALS['lock'])) (
+                    $try_locking = false;
+                    $lock = $GLOBALS['lock'];
+                } else {
+                    $lock = fopen('bot.lock', 'r+');
+                }
+                if ($try_locking) {
+                    $try = 1;
+                    $locked = false;
+                    while (!$locked) {
+                        $locked = flock($lock, LOCK_EX | LOCK_NB);
+                        if (!$locked) {
+                            $this->closeConnection("Bot is already running");
+                            if ($try++ >= 30) {
+                                exit;
+                            }
+                            sleep(1);
+                        }
+                    }
+                }
+
+                register_shutdown_function(function () use ($lock) {
+                    flock($lock, LOCK_UN);
+                    fclose($lock);
                     $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
                     fwrite($a, $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n");
                 });
+
+                $this->closeConnection("Bot was started");
             }
         }
         if (!$this->settings['updates']['handle_updates']) {
@@ -87,5 +118,22 @@ trait Loop
             $this->update_deferred = new Deferred();
             yield $this->update_deferred->promise();
         }
+    }
+    public function closeConnection($message = 'OK!')
+    {
+        if (php_sapi_name() === 'cli' || isset($GLOBALS['exited'])) {
+            return;
+        }
+        @ob_end_clean();
+        header('Connection: close');
+        ignore_user_abort(true);
+        ob_start();
+        echo '<html><body><h1>'.$message.'</h1></body</html>';
+        $size = ob_get_length();
+        header("Content-Length: $size");
+        header('Content-Type: text/html');
+        ob_end_flush();
+        flush();
+        $GLOBALS['exited'] = true;
     }
 }
