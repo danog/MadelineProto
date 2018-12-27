@@ -34,6 +34,8 @@ use Amp\Internal;
 use Amp\Promise;
 use Amp\Success;
 
+use React\Promise\PromiseInterface as ReactPromise;
+
 /**
  * Creates a promise from a generator function yielding promises.
  *
@@ -65,8 +67,18 @@ final class Coroutine implements Promise
         try {
             $yielded = $this->generator->current();
             if (!$yielded instanceof Promise) {
+                if ($yielded instanceof \YieldReturnValue) {
+                    $this->resolve($yielded->getReturn());
+
+                    return;
+                }
                 if (!$this->generator->valid()) {
-                    $this->resolve($this->generator->getReturn());
+                    if (method_exists($this->generator, 'getReturn')) {
+                        $this->resolve($this->generator->getReturn());
+                    } else {
+                        $this->resolve(null);
+                    }
+
 
                     return;
                 }
@@ -100,8 +112,19 @@ final class Coroutine implements Promise
                         $yielded = $this->generator->send($this->value);
                     }
                     if (!$yielded instanceof Promise) {
+                        if ($yielded instanceof \YieldReturnValue) {
+                            $this->resolve($yielded->getReturn());
+                            $this->onResolve = null;
+
+                            return;
+                        }
+
                         if (!$this->generator->valid()) {
-                            $this->resolve($this->generator->getReturn());
+                            if (method_exists($this->generator, 'getReturn')) {
+                                $this->resolve($this->generator->getReturn());
+                            } else {
+                                $this->resolve(null);
+                            }
                             $this->onResolve = null;
 
                             return;
@@ -145,6 +168,10 @@ final class Coroutine implements Promise
             }
             if ($yielded instanceof \Generator) {
                 return new self($yielded);
+            }
+
+            if ($yielded instanceof ReactPromise) {
+                return Promise\adapt($yielded);
             }
             // No match, continue to returning Failure below.
         } catch (\Throwable $exception) {
