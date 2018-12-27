@@ -127,7 +127,7 @@ trait Loop
     }
     public function closeConnection($message = 'OK!')
     {
-        if (php_sapi_name() === 'cli' || isset($GLOBALS['exited'])) {
+        if (php_sapi_name() === 'cli' || isset($GLOBALS['exited']) || headers_sent()) {
             return;
         }
         @ob_end_clean();
