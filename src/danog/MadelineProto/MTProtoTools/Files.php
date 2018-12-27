@@ -202,6 +202,8 @@ trait Files
         switch ($constructor['_']) {
             case 'updateNewMessage':
             case 'updateNewChannelMessage':
+            case 'updateEditMessage':
+            case 'updateEditChannelMessage':
                 $constructor = $constructor['message'];
 
             case 'message':
