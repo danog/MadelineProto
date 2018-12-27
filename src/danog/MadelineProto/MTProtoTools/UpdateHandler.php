@@ -244,13 +244,14 @@ trait UpdateHandler
     }
     public function reset_update_state()
     {
-        $this->load_update_state()['pts'] = 0;
+        $this->load_update_state()['pts'] = 1;
         $this->load_update_state()['qts'] = 0;
         $this->load_update_state()['seq'] = 0;
-        $this->load_update_state()['date'] = 0;
+        $this->load_update_state()['date'] = 1;
         foreach ($this->channels_state as &$state) {
-            $state['pts'] = 0;
+            $state['pts'] = 1;
         }
+        $this->msg_ids = [];
     }
     public function &load_update_state()
     {
