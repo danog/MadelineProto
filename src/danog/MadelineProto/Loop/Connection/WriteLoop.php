@@ -62,9 +62,7 @@ class WriteLoop extends ResumableSignalLoop
                 } else {
                     $res = $this->encryptedWriteLoopAsync();
                 }
-                if ($res instanceof \Generator) {
-                    yield new Coroutine($res);
-                }
+                yield $res;
             } finally {
                 $this->exitedLoop();
             }

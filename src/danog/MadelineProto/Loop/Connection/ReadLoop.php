@@ -152,7 +152,7 @@ class ReadLoop extends SignalLoop
             if ($left) {
                 $API->logger->logger('Padded unencrypted message', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 if ($left < (-$message_length & 15)) {
-                    throw new \danog\MadelineProto\SecurityException('padding is too small');
+                    $API->logger->logger('Protocol padded unencrypted message', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 }
                 yield $buffer->bufferRead($left);
             }
