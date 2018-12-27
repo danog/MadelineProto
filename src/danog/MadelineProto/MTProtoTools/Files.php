@@ -39,6 +39,9 @@ trait Files
             $cb = $file;
             $file = $file->getFile();
         }
+
+        $t = microtime(true);
+
         $file = \danog\MadelineProto\Absolute::absolute($file);
         if (!file_exists($file)) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['file_not_exist']);
@@ -127,17 +130,16 @@ trait Files
         }
 
         fclose($f);
+        clearstatcache();
+
+        $this->logger->logger('Speed: '.((filesize($file) * 8) / (microtime(true) - $t) / 1000000));
 
         return $constructor;
     }
 
     public function upload($file, $file_name = '', $cb = null, $encrypted = false, $datacenter = null)
     {
-        $t = microtime(true);
-        $res = $this->wait(call([$this, 'upload_async'], $file, $file_name, $cb, $encrypted, $datacenter));
-        $this->logger->logger('Speed: '.((filesize($file) * 8) / (microtime(true) - $t) / 1000000));
-
-        return $res;
+        return $this->wait(call([$this, 'upload_async'], $file, $file_name, $cb, $encrypted, $datacenter));
     }
 
     public function upload_encrypted($file, $file_name = '', $cb = null)
