@@ -45,7 +45,7 @@ trait Loop
             $this->loop_callback = null;
         }
         if (php_sapi_name() !== 'cli') {
-            $needs_restart = false;
+            $needs_restart = true;
             try {
                 set_time_limit(-1);
             } catch (\danog\MadelineProto\Exception $e) {
