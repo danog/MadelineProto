@@ -51,17 +51,9 @@ trait Loop
             } catch (\danog\MadelineProto\Exception $e) {
                 $needs_restart = true;
             }
-            $backtrace = debug_backtrace(0);
-            try {
-                error_reporting(E_ALL);
-                ini_set("log_errors", 1);
-                ini_set("error_log", dirname(end($backtrace)['file']) . "/MadelineProto.log");
-                error_log('Enabled PHP logging');
-            } catch (\danog\MadelineProto\Exception $e) {
-                $this->logger->logger("Could not enable PHP logging");
-            }
             $this->logger->logger($needs_restart ? 'Will self-restart' : 'Will not self-restart');
-            
+
+            $backtrace = debug_backtrace(0);
             $lockfile = dirname(end($backtrace)['file']) . '/bot.lock';
             unset($backtrace);
             $try_locking = true;

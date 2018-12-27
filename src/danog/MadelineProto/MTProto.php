@@ -742,9 +742,29 @@ class MTProto implements TLCallback
             Exception::$rollbar = false;
             RPCErrorException::$rollbar = false;
         }
+
+        $backtrace = debug_backtrace(0);
+
+        if (php_sapi_name() !== 'cli') {
+            if (isset($this->settings['logger']['logger_param']) && basename($this->settings['logger']['logger_param']) === 'MadelineProto.log') {
+                $this->settings['logger']['logger_param'] = dirname(end($backtrace)['file']) . "/MadelineProto.log";
+            }
+        }
+
         $this->logger = new \danog\MadelineProto\Logger($this->settings['logger']['logger'], isset($this->settings['logger']['logger_param']) ? $this->settings['logger']['logger_param'] : '', isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE, isset($this->settings['logger']['max_size']) ? $this->settings['logger']['max_size'] : 100 * 1024 * 1024);
         if (!\danog\MadelineProto\Logger::$default) {
             \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE, isset($this->settings['logger']['max_size']) ? $this->settings['logger']['max_size'] : 100 * 1024 * 1024);
+        }
+
+        if (php_sapi_name() !== 'cli') {
+            try {
+                error_reporting(E_ALL);
+                ini_set("log_errors", 1);
+                ini_set("error_log", dirname(end($backtrace)['file']) . "/MadelineProto.log");
+                error_log('Enabled PHP logging');
+            } catch (\danog\MadelineProto\Exception $e) {
+                $this->logger->logger("Could not enable PHP logging");
+            }
         }
     }
 
