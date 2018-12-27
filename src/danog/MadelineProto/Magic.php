@@ -94,7 +94,7 @@ class Magic
                 self::$revision = 'Revision: '.self::$revision.$latest;
             }
             self::$can_parallel = false;
-            if (php_sapi_name() === 'cli') {
+            if (php_sapi_name() === 'cli' && !(class_exists('\\Phar') && \Phar::running())) {
                 try {
                     $back = debug_backtrace(0);
                     $promise = \Amp\File\get(end($back)['file']);
