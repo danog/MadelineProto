@@ -45,55 +45,60 @@ trait Loop
             $this->loop_callback = null;
         }
         if (php_sapi_name() !== 'cli') {
+            $needs_restart = false;
             try {
                 set_time_limit(-1);
             } catch (\danog\MadelineProto\Exception $e) {
-                $backtrace = debug_backtrace(0);
-                try {
-                    error_reporting(E_ALL);
-                    ini_set("log_errors", 1);
-                    ini_set("error_log", dirname(end($backtrace)['file'])."/MadelineProto.log");
-                    error_log('Enabled PHP logging');
-                } catch (\danog\MadelineProto\Exception $e) {
-                    $this->logger->logger("Could not enable PHP logging");
-                }
-
-                $lockfile = dirname(end($backtrace)['file']).'/bot.lock';
-                unset($backtrace);
-                $try_locking = true;
-                if (!file_exists($lockfile)) {
-                    touch($lockfile);
-                    $lock = fopen('bot.lock', 'r+');
-                } else if (isset($GLOBALS['lock'])) {
-                    $try_locking = false;
-                    $lock = $GLOBALS['lock'];
-                } else {
-                    $lock = fopen('bot.lock', 'r+');
-                }
-                if ($try_locking) {
-                    $try = 1;
-                    $locked = false;
-                    while (!$locked) {
-                        $locked = flock($lock, LOCK_EX | LOCK_NB);
-                        if (!$locked) {
-                            $this->closeConnection("Bot is already running");
-                            if ($try++ >= 30) {
-                                exit;
-                            }
-                            sleep(1);
+                $needs_restart = true;
+            }
+            $backtrace = debug_backtrace(0);
+            try {
+                error_reporting(E_ALL);
+                ini_set("log_errors", 1);
+                ini_set("error_log", dirname(end($backtrace)['file']) . "/MadelineProto.log");
+                error_log('Enabled PHP logging');
+            } catch (\danog\MadelineProto\Exception $e) {
+                $this->logger->logger("Could not enable PHP logging");
+            }
+            $this->logger->logger($needs_restart ? 'Will self-restart' : 'Will not self-restart');
+            
+            $lockfile = dirname(end($backtrace)['file']) . '/bot.lock';
+            unset($backtrace);
+            $try_locking = true;
+            if (!file_exists($lockfile)) {
+                touch($lockfile);
+                $lock = fopen('bot.lock', 'r+');
+            } else if (isset($GLOBALS['lock'])) {
+                $try_locking = false;
+                $lock = $GLOBALS['lock'];
+            } else {
+                $lock = fopen('bot.lock', 'r+');
+            }
+            if ($try_locking) {
+                $try = 1;
+                $locked = false;
+                while (!$locked) {
+                    $locked = flock($lock, LOCK_EX | LOCK_NB);
+                    if (!$locked) {
+                        $this->closeConnection("Bot is already running");
+                        if ($try++ >= 30) {
+                            exit;
                         }
+                        sleep(1);
                     }
                 }
-
-                register_shutdown_function(function () use ($lock) {
-                    flock($lock, LOCK_UN);
-                    fclose($lock);
-                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
-                    fwrite($a, $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n");
-                });
-
-                $this->closeConnection("Bot was started");
             }
+
+            register_shutdown_function(function () use ($lock, $needs_restart) {
+                flock($lock, LOCK_UN);
+                fclose($lock);
+                if ($needs_restart) {
+                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp') . '://' . $_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
+                    fwrite($a, $_SERVER['REQUEST_METHOD'] . ' ' . $_SERVER['REQUEST_URI'] . ' ' . $_SERVER['SERVER_PROTOCOL'] . "\r\n" . 'Host: ' . $_SERVER['SERVER_NAME'] . "\r\n\r\n");
+                }
+            });
+
+            $this->closeConnection("Bot was started");
         }
         if (!$this->settings['updates']['handle_updates']) {
             $this->settings['updates']['handle_updates'] = true;
@@ -137,7 +142,7 @@ trait Loop
         header('Connection: close');
         ignore_user_abort(true);
         ob_start();
-        echo '<html><body><h1>'.$message.'</h1></body</html>';
+        echo '<html><body><h1>' . $message . '</h1></body</html>';
         $size = ob_get_length();
         header("Content-Length: $size");
         header('Content-Type: text/html');
