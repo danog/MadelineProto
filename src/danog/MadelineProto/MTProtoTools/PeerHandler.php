@@ -83,6 +83,7 @@ trait PeerHandler
     public function add_user($user)
     {
         if (!isset($user['access_hash'])) {
+            $this->cache_pwr_chat($user['id'], false, true);
             if (isset($user['username']) && !isset($this->chats[$user['id']])) {
                 $this->cache_pwr_chat($user['username'], false, true);
             }
@@ -127,6 +128,7 @@ trait PeerHandler
             case 'channelForbidden':
                 $bot_api_id = $this->to_supergroup($chat['id']);
                 if (!isset($chat['access_hash'])) {
+                    $this->cache_pwr_chat($bot_api_id, $this->settings['peer']['full_fetch'], true);
                     if (isset($chat['username']) && !isset($this->chats[$bot_api_id])) {
                         $this->cache_pwr_chat($chat['username'], $this->settings['peer']['full_fetch'], true);
                     }
