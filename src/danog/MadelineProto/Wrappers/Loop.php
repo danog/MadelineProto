@@ -49,6 +49,15 @@ trait Loop
                 set_time_limit(-1);
             } catch (\danog\MadelineProto\Exception $e) {
                 $backtrace = debug_backtrace(0);
+                try {
+                    error_reporting(E_ALL);
+                    ini_set("log_errors", 1);
+                    ini_set("error_log", dirname(end($backtrace)['file'])."/MadelineProto.log");
+                    error_log('Enabled PHP logging');
+                } catch (\danog\MadelineProto\Exception $e) {
+                    $this->logger->logger("Could not enable PHP logging");
+                }
+
                 $lockfile = dirname(end($backtrace)['file']).'/bot.lock';
                 unset($backtrace);
                 $try_locking = true;
