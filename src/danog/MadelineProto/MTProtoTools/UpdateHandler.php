@@ -77,6 +77,9 @@ trait UpdateHandler
 
         if (empty($this->updates)) {
             $this->update_deferred = new Deferred();
+            if (!$params['timeout']) {
+                $params['timeout'] = 0.001;
+            }
             yield any([$this->update_deferred->promise(), new Delayed($params['timeout'] * 1000)]);
         }
 
