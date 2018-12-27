@@ -110,6 +110,7 @@ trait Files
                 ),
                 ['heavy' => true, 'file' => true, 'datacenter' => $datacenter]
             );
+            $cb(ftell($f) * 100 / $file_size);
             $this->logger->logger('Speed for chunk: '.(($part_size * 8 / 1000000) / (microtime(true) - $t)));
             $part_num++;
             $promises[] = $read_deferred->promise();
@@ -132,19 +133,14 @@ trait Files
         fclose($f);
         clearstatcache();
 
-        $this->logger->logger('Speed: '.((filesize($file) * 8) / (microtime(true) - $t) / 1000000));
+        $this->logger->logger('Speed: '.(($file_size * 8) / (microtime(true) - $t) / 1000000));
 
         return $constructor;
     }
 
-    public function upload($file, $file_name = '', $cb = null, $encrypted = false, $datacenter = null)
+    public function upload_encrypted_async($file, $file_name = '', $cb = null)
     {
-        return $this->wait(call([$this, 'upload_async'], $file, $file_name, $cb, $encrypted, $datacenter));
-    }
-
-    public function upload_encrypted($file, $file_name = '', $cb = null)
-    {
-        return $this->upload($file, $file_name, $cb, true);
+        return $this->upload_async($file, $file_name, $cb, true);
     }
 
     public function gen_all_file($media, $regenerate)

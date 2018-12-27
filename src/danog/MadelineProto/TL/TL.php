@@ -256,7 +256,7 @@ trait TL
         return $tl_elem['predicate'] === 'boolTrue';
     }
 
-    public function serialize_object($type, $object, $ctx, $layer = -1)
+    public function serialize_object_async($type, $object, $ctx, $layer = -1)
     {
         switch ($type['type']) {
             case 'int':
@@ -366,7 +366,7 @@ trait TL
                 $concat = $this->constructors->find_by_predicate('vector')['id'];
                 $concat .= $this->pack_unsigned_int(count($object));
                 foreach ($object as $k => $current_object) {
-                    $concat .= $this->serialize_object(['type' => $type['subtype']], $current_object, $k);
+                    $concat .= yield $this->serialize_object_async(['type' => $type['subtype']], $current_object, $k);
                 }
 
                 return $concat;
@@ -376,7 +376,7 @@ trait TL
                 }
                 $concat = $this->pack_unsigned_int(count($object));
                 foreach ($object as $k => $current_object) {
-                    $concat .= $this->serialize_object(['type' => $type['subtype']], $current_object, $k);
+                    $concat .= yield $this->serialize_object_async(['type' => $type['subtype']], $current_object, $k);
                 }
 
                 return $concat;
@@ -430,10 +430,19 @@ trait TL
             $concat = $constructorData['id'];
         }
 
-        return $concat.$this->serialize_params($constructorData, $object, '', $layer);
+        return $concat.yield $this->serialize_params($constructorData, $object, '', $layer);
     }
 
+    public function serialize_object($type, $object, $ctx, $layer = -1)
+    {
+        return $this->wait($this->serialize_object_async($type, $object, $ctx, $layer));
+    }
     public function serialize_method($method, $arguments)
+    {
+        return $this->wait($this->serialize_method_async($method, $arguments));
+    }
+
+    public function serialize_method_async($method, $arguments)
     {
         if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && is_string($arguments['hash']) && preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
             if ($matches[1] === '') {
@@ -464,7 +473,7 @@ trait TL
         } elseif ($method === 'messages.sendEncryptedFile') {
             if (isset($arguments['file'])) {
                 if (!is_array($arguments['file']) && $this->settings['upload']['allow_automatic_upload']) {
-                    $arguments['file'] = $this->upload_encrypted($arguments['file']);
+                    $arguments['file'] = yield $this->upload_encrypted_async($arguments['file']);
                 }
                 if (isset($arguments['file']['key'])) {
                     $arguments['message']['media']['key'] = $arguments['file']['key'];
@@ -504,7 +513,7 @@ trait TL
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'].$method);
         }
 
-        return $tl['id'].$this->serialize_params($tl, $arguments, $method);
+        return $tl['id'].yield $this->serialize_params($tl, $arguments, $method);
     }
 
     public function serialize_params($tl, $arguments, $ctx, $layer = -1)
@@ -540,11 +549,11 @@ trait TL
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= $this->serialize_object(['type' => 'bytes'], $this->random(15 + 4 * $this->random_int($modulus = 3)), 'random_bytes');
+                    $serialized .= yield $this->serialize_object_async(['type' => 'bytes'], $this->random(15 + 4 * $this->random_int($modulus = 3)), 'random_bytes');
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService']) && isset($arguments['message'])) {
-                    $serialized .= $this->serialize_object($current_argument, $this->encrypt_secret_message($arguments['peer']['chat_id'], $arguments['message']), 'data');
+                    $serialized .= yield $this->serialize_object_async($current_argument, $this->encrypt_secret_message($arguments['peer']['chat_id'], $arguments['message']), 'data');
                     continue;
                 }
                 if ($current_argument['name'] === 'random_id') {
@@ -569,7 +578,7 @@ trait TL
                     continue;
                 }
                 if ($tl['type'] === 'InputMedia' && $current_argument['name'] === 'mime_type') {
-                    $serialized .= $this->serialize_object($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer);
+                    $serialized .= yield $this->serialize_object_async($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer);
                     continue;
                 }
                 if ($tl['type'] === 'DocumentAttribute' && in_array($current_argument['name'], ['w', 'h', 'duration'])) {
@@ -603,7 +612,7 @@ trait TL
             }
 
             if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputFile' && $this->settings['upload']['allow_automatic_upload']) {
-                $arguments[$current_argument['name']] = $this->upload($arguments[$current_argument['name']]);
+                $arguments[$current_argument['name']] = yield $this->upload_async($arguments[$current_argument['name']]);
             }
 
             if ($current_argument['type'] === 'InputEncryptedChat' && (!is_array($arguments[$current_argument['name']]) || isset($arguments[$current_argument['name']]['_']) && $this->constructors->find_by_predicate($arguments[$current_argument['name']]['_'])['type'] !== $current_argument['type'])) {
@@ -617,7 +626,7 @@ trait TL
                 }
             }
             //$this->logger->logger('Serializing '.$current_argument['name'].' of type '.$current_argument['type');
-            $serialized .= $this->serialize_object($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer);
+            $serialized .= yield $this->serialize_object_async($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer);
         }
 
         return $serialized;

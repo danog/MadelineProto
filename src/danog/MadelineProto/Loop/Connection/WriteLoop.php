@@ -187,11 +187,11 @@ class WriteLoop extends ResumableSignalLoop
                 if (isset($message['method']) && $message['method'] && $message['_'] !== 'http_wait') {
                     if ((!isset($connection->temp_auth_key['connection_inited']) || $connection->temp_auth_key['connection_inited'] === false) && $message['_'] !== 'auth.bindTempAuthKey') {
                         $API->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $message['_']), \danog\MadelineProto\Logger::NOTICE);
-                        $MTmessage['body'] = $API->serialize_method(
+                        $MTmessage['body'] = yield $API->serialize_method_async(
                             'invokeWithLayer',
                             [
                                 'layer' => $API->settings['tl_schema']['layer'],
-                                'query' => $API->serialize_method(
+                                'query' => yield $API->serialize_method_async(
                                     'initConnection',
                                     [
                                         'api_id'           => $API->settings['app_info']['api_id'],
@@ -212,7 +212,7 @@ class WriteLoop extends ResumableSignalLoop
                             if (!isset($connection->call_queue[$message['queue']])) {
                                 $connection->call_queue[$message['queue']] = [];
                             }
-                            $MTmessage['body'] = $API->serialize_method('invokeAfterMsgs', ['msg_ids' => $connection->call_queue[$message['queue']], 'query' => $MTmessage['body']]);
+                            $MTmessage['body'] = yield $API->serialize_method_async('invokeAfterMsgs', ['msg_ids' => $connection->call_queue[$message['queue']], 'query' => $MTmessage['body']]);
 
                             $connection->call_queue[$message['queue']][$message_id] = $message_id;
                             if (count($connection->call_queue[$message['queue']]) > $API->settings['msg_array_limit']['call_queue']) {
@@ -224,7 +224,7 @@ class WriteLoop extends ResumableSignalLoop
 
                         /*                        if ($API->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $API->settings['requests']['gzip_encode_if_gt']) {
                         if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
-                        $MTmessage['body'] = $API->serialize_object(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
+                        $MTmessage['body'] = yield $API->serialize_object_async(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
                         $API->logger->logger('Using GZIP compression for ' . $message['_'] . ', saved ' . ($l - $g) . ' bytes of data, reduced call size by ' . $g * 100 / $l . '%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                         }
                         unset($gzipped);
@@ -259,7 +259,7 @@ class WriteLoop extends ResumableSignalLoop
                 $keys[$connection->pending_outgoing_key++] = $message_id;
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
 
-                $message_data = $API->serialize_object(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'container');
+                $message_data = yield $API->serialize_object_async(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'container');
 
                 $message_data_length = strlen($message_data);
                 $seq_no = $connection->generate_out_seq_no(false);

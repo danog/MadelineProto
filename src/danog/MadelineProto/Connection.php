@@ -190,9 +190,9 @@ class Connection
             }
 
             if ($message['method']) {
-                $body = $this->API->serialize_method($message['_'], $body);
+                $body = yield $this->API->serialize_method_async($message['_'], $body);
             } else {
-                $body = $this->API->serialize_object(['type' => $message['_']], $body, $message['_']);
+                $body = yield $this->API->serialize_object_async(['type' => $message['_']], $body, $message['_']);
             }
             if ($refresh_next) {
                 $this->API->referenceDatabase->refreshNext(false);
