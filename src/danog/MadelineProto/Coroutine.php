@@ -69,7 +69,7 @@ final class Coroutine implements Promise
             if (!$yielded instanceof Promise) {
                 if ($yielded instanceof \YieldReturnValue) {
                     $this->resolve($yielded->getReturn());
-
+                    $this->generator->next();
                     return;
                 }
                 if (!$this->generator->valid()) {
@@ -115,6 +115,7 @@ final class Coroutine implements Promise
                         if ($yielded instanceof \YieldReturnValue) {
                             $this->resolve($yielded->getReturn());
                             $this->onResolve = null;
+                            $this->generator->next();
 
                             return;
                         }
