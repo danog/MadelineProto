@@ -64,7 +64,7 @@ trait Loop
                 if (!file_exists($lockfile)) {
                     touch($lockfile);
                     $lock = fopen('bot.lock', 'r+');
-                } else if (isset($GLOBALS['lock'])) (
+                } else if (isset($GLOBALS['lock'])) {
                     $try_locking = false;
                     $lock = $GLOBALS['lock'];
                 } else {
