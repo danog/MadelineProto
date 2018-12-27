@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-composer global require spatie/7to5 dev-master#171ed9b96940f12cb348ffd11f9be4f596bb0146
+composer global require spatie/7to5 dev-master#b20463417bcd2c9d141a5733c6e649b6c468beee
 
 [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
 [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
