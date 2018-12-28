@@ -408,6 +408,10 @@ trait UpdateHandler
             case 'updateEditMessage':
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
+                $to = false;
+                $from = false;
+                $via_bot = false;
+                $entities = false;
                 if (($from = isset($update['message']['from_id']) && !$this->peer_isset($update['message']['from_id'])) ||
                     ($to = !$this->peer_isset($update['message']['to_id'])) ||
                     ($via_bot = isset($update['message']['via_bot_id']) && !$this->peer_isset($update['message']['via_bot_id'])) ||
