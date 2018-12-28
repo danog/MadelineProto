@@ -213,6 +213,10 @@ class ReferenceDatabase implements TLCallback
 
             return false;
         }
+        if (!isset($location['file_reference'])) {
+            $this->API->logger->logger("Object {$location['_']} does not have reference", \danog\MadelineProto\Logger::ERROR);
+            return false;
+        }
         $key = count($this->cacheContexts) - 1;
         switch ($location['_']) {
             case 'document':
