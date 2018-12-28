@@ -528,7 +528,8 @@ trait ResponseHandler
         unset($request);
         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
         Loop::defer(function () use ($request_id, $response, $datacenter) {
-            $this->logger->logger("Deferred: sent {$response['_']} to deferred");
+            $r = isset($response['_']) ? $response['_'] : json_encode($response);
+            $this->logger->logger("Deferred: sent $r to deferred");
             $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
             unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']);
         });

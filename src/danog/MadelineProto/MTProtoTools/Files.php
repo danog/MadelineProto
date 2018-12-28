@@ -186,7 +186,7 @@ trait Files
                 $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $media];
                 break;
             default:
-                throw new \danog\MadelineProto\Exception('Could not convert media object');
+                throw new \danog\MadelineProto\Exception("Could not convert media object of type {$media['_']}");
         }
 
         return $res;
