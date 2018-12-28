@@ -83,8 +83,10 @@ trait PeerHandler
     public function add_user($user)
     {
         if (!isset($user['access_hash'])) {
+            $this->logger->logger("No access hash with user {$user['id']}, trying to fetch by ID...");
             $this->cache_pwr_chat($user['id'], false, true);
             if (isset($user['username']) && !isset($this->chats[$user['id']])) {
+                $this->logger->logger("No access hash with user {$user['id']}, trying to fetch by username...");
                 $this->cache_pwr_chat($user['username'], false, true);
             }
 
@@ -93,6 +95,7 @@ trait PeerHandler
         switch ($user['_']) {
             case 'user':
                 if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
+                    $this->logger->logger("Updated user {$user['id']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     $this->chats[$user['id']] = $user;
                     $this->cache_pwr_chat($user['id'], false, true);
                 }
@@ -118,6 +121,7 @@ trait PeerHandler
             case 'chatEmpty':
             case 'chatForbidden':
                 if (!isset($this->chats[-$chat['id']]) || $this->chats[-$chat['id']] !== $chat) {
+                    $this->logger->logger("Updated chat -{$chat['id']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     $this->chats[-$chat['id']] = $chat;
                     $this->cache_pwr_chat(-$chat['id'], $this->settings['peer']['full_fetch'], true);
                 }
@@ -128,14 +132,18 @@ trait PeerHandler
             case 'channelForbidden':
                 $bot_api_id = $this->to_supergroup($chat['id']);
                 if (!isset($chat['access_hash'])) {
+                    $this->logger->logger("Chat $bot_api_id does not have access hash, fetching by ID...");
                     $this->cache_pwr_chat($bot_api_id, $this->settings['peer']['full_fetch'], true);
                     if (isset($chat['username']) && !isset($this->chats[$bot_api_id])) {
+                        $this->logger->logger("Chat $bot_api_id does not have access hash, fetching by username...");
                         $this->cache_pwr_chat($chat['username'], $this->settings['peer']['full_fetch'], true);
                     }
 
                     return;
                 }
                 if (!isset($this->chats[$bot_api_id]) || $this->chats[$bot_api_id] !== $chat) {
+                    $this->logger->logger("Updated chat $bot_api_id", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
                     $this->chats[$bot_api_id] = $chat;
 
                     if ($this->settings['peer']['full_fetch'] && (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== $this->get_full_info($bot_api_id)['full']['participants_count'])) {
@@ -217,7 +225,7 @@ trait PeerHandler
         return true;
     }
 
-    public function get_info($id, $recursive = true)
+    public function get_id($id)
     {
         if (is_array($id)) {
             switch ($id['_']) {
@@ -232,54 +240,38 @@ trait PeerHandler
                 case 'notifyPeer':
                 case 'dialog':
                 case 'help.proxyDataPromo':
-                    return $this->get_info($id['peer']);
+                    return $this->get_id($id['peer']);
                 case 'inputUserSelf':
                 case 'inputPeerSelf':
-                    $id = $this->authorization['user']['id'];
-                    break;
+                    return $this->authorization['user']['id'];
                 case 'user':
-                    $id = $id['id'];
-                    break;
+                    return $id['id'];
                 case 'userFull':
-                    $id = $id['user']['id'];
-                    break;
+                    return $id['user']['id'];
                 case 'inputPeerUser':
                 case 'inputUser':
                 case 'peerUser':
-                    $id = $id['user_id'];
-                    break;
+                    return $id['user_id'];
                 case 'chat':
                 case 'chatFull':
-                    $id = -$id['id'];
-                    break;
+                    return -$id['id'];
                 case 'inputPeerChat':
                 case 'peerChat':
-                    $id = -$id['chat_id'];
-                    break;
+                    return -$id['chat_id'];
                 case 'channel':
                 case 'channelFull':
-                    $id = $this->to_supergroup($id['id']);
-                    break;
+                    return $this->to_supergroup($id['id']);
                 case 'inputPeerChannel':
                 case 'inputChannel':
                 case 'peerChannel':
-                    $id = $this->to_supergroup($id['channel_id']);
-                    break;
+                    return $this->to_supergroup($id['channel_id']);
                 case 'message':
                 case 'messageService':
                     if (!isset($id['from_id']) || $id['to_id']['_'] !== 'peerUser' || $id['to_id']['user_id'] !== $this->authorization['user']['id']) {
-                        return $this->get_info($id['to_id']);
+                        return $this->get_id($id['to_id']);
                     }
-                    $id = $id['from_id'];
-                    break;
-                case 'encryptedMessage':
-                case 'encryptedMessageService':
-                    $id = $id['chat_id'];
-                    if (!isset($this->secret_chats[$id])) {
-                        throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
-                    }
+                    return $id['from_id'];
 
-                    return $this->secret_chats[$id];
                 case 'updateChannelReadMessagesContents':
                 case 'updateChannelAvailableMessages':
                 case 'updateChannel':
@@ -290,7 +282,7 @@ trait PeerHandler
                 case 'updateReadChannelOutbox':
                 case 'updateDeleteChannelMessages':
                 case 'updateChannelPinnedMessage':
-                    return $this->get_info($this->to_supergroup($id['channel_id']));
+                    return $this->to_supergroup($id['channel_id']);
                 case 'updateChatParticipants':
                     $id = $id['participants'];
                 case 'updateChatUserTyping':
@@ -298,7 +290,7 @@ trait PeerHandler
                 case 'updateChatParticipantDelete':
                 case 'updateChatParticipantAdmin':
                 case 'updateChatAdmins':
-                    return $this->get_info(-$id['chat_id']);
+                    return -$id['chat_id'];
                 case 'updateUserTyping':
                 case 'updateUserStatus':
                 case 'updateUserName':
@@ -313,47 +305,69 @@ trait PeerHandler
                 case 'updateBotCallbackQuery':
                 case 'updateBotPrecheckoutQuery':
                 case 'updateBotShippingQuery':
-                    return $this->get_info($id['user_id']);
+                    return $id['user_id'];
                 case 'updatePhoneCall':
-                    return $this->get_info($id->getOtherID());
+                    return $id->getOtherID();
                 case 'updateReadHistoryInbox':
                 case 'updateReadHistoryOutbox':
-                    return $this->get_info($id['peer']);
+                    return $this->get_id($id['peer']);
                 case 'updateNewMessage':
                 case 'updateNewChannelMessage':
                 case 'updateEditMessage':
                 case 'updateEditChannelMessage':
                 case 'updateNewEncryptedMessage':
-                    return $this->get_info($id['message']);
-                case 'updateEncryption':
-                    return $this->get_secret_chat($id['chat']['id']);
-                case 'updateEncryptedChatTyping':
-                case 'updateEncryptedMessagesRead':
-                    return $this->get_secret_chat($id['chat_id']);
+                    return $this->get_id($id['message']);
                 case 'chatForbidden':
                 case 'channelForbidden':
                     throw new \danog\MadelineProto\RPCErrorException('CHAT_FORBIDDEN');
                 default:
                     throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($id, true));
-                    break;
             }
         }
-        if (is_string($id) && strpos($id, '#') !== false) {
-            if (preg_match('/^channel#(\d*)/', $id, $matches)) {
-                $id = $this->to_supergroup($matches[1]);
-            }
-            if (preg_match('/^chat#(\d*)/', $id, $matches)) {
-                $id = '-'.$matches[1];
-            }
-            if (preg_match('/^user#(\d*)/', $id, $matches)) {
-                $id = $matches[1];
+        if (is_string($id)) {
+            if (strpos($id, '#') !== false) {
+                if (preg_match('/^channel#(\d*)/', $id, $matches)) {
+                    return $this->to_supergroup($matches[1]);
+                }
+                if (preg_match('/^chat#(\d*)/', $id, $matches)) {
+                    $id = '-'.$matches[1];
+                }
+                if (preg_match('/^user#(\d*)/', $id, $matches)) {
+                    return $matches[1];
+                }
             }
         }
         if (is_numeric($id)) {
             if (is_string($id)) {
                 $id = \danog\MadelineProto\Magic::$bigint ? (float) $id : (int) $id;
             }
+            return $id;
+        }
+        return false;
+    }
+    public function get_info($id, $recursive = true)
+    {
+        if (is_array($id)) {
+            switch ($id['_']) {
+                case 'updateEncryption':
+                    return $this->get_secret_chat($id['chat']['id']);
+                case 'updateEncryptedChatTyping':
+                case 'updateEncryptedMessagesRead':
+                    return $this->get_secret_chat($id['chat_id']);
+                case 'encryptedMessage':
+                case 'encryptedMessageService':
+                    $id = $id['chat_id'];
+                    if (!isset($this->secret_chats[$id])) {
+                        throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
+                    }
 
+                    return $this->secret_chats[$id];
+            }
+        }
+        $try_id = $this->get_id($id);
+        if ($try_id !== false) $id = $try_id;
+
+        if (is_numeric($id)) {
             if (!isset($this->chats[$id])) {
                 try {
                     if ($id < 0) {

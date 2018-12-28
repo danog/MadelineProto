@@ -121,7 +121,7 @@ trait UpdateHandler
     public function check_msg_id($message)
     {
         try {
-            $peer_id = $this->get_info($message['to_id'])['bot_api_id'];
+            $peer_id = $this->get_id($message['to_id']);
         } catch (\danog\MadelineProto\Exception $e) {
             return true;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -408,13 +408,18 @@ trait UpdateHandler
             case 'updateEditMessage':
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
-                if ((isset($update['message']['from_id']) && !$this->peer_isset($update['message']['from_id'])) ||
-                    !$this->peer_isset($update['message']['to_id']) ||
-                    isset($update['message']['via_bot_id']) && !$this->peer_isset($update['message']['via_bot_id']) ||
-                    isset($update['message']['entities']) && !$this->entities_peer_isset($update['message']['entities']) // ||
+                if (($from = isset($update['message']['from_id']) && !$this->peer_isset($update['message']['from_id'])) ||
+                    ($to = !$this->peer_isset($update['message']['to_id'])) ||
+                    ($via_bot = isset($update['message']['via_bot_id']) && !$this->peer_isset($update['message']['via_bot_id'])) ||
+                    ($entities = isset($update['message']['entities']) && !$this->entities_peer_isset($update['message']['entities'])) // ||
                     //isset($update['message']['fwd_from']) && !$this->fwd_peer_isset($update['message']['fwd_from'])
                 ) {
-                    $this->logger->logger('Not enough data for message update, getting difference...', \danog\MadelineProto\Logger::VERBOSE);
+                    $log = '';
+                    if ($from) $log .= "from_id {$update['message']['from_id']}, ";
+                    if ($to) $log .= "to_id ".json_encode($update['message']['to_id']).", ";
+                    if ($via_bot) $log .= "via_bot {$update['message']['via_bot_id']}, ";
+                    if ($entities) $log .= "entities ".json_encode($update['message']['entities']).", ";
+                    $this->logger->logger("Not enough data: for message update $log, getting difference...", \danog\MadelineProto\Logger::VERBOSE);
                     if ($channel_id !== false && $this->peer_isset($this->to_supergroup($channel_id))) {
                         $this->get_channel_difference($channel_id);
                     } else {
@@ -513,7 +518,7 @@ trait UpdateHandler
             $this->get_config();
         }
         if (in_array($update['_'], ['updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'])) {
-            $id = $this->get_info($update)['bot_api_id'];
+            $id = $this->get_id($update);
             $this->full_chats[$id]['last_update'] = 0;
             $this->get_full_info($id);
         }

@@ -119,6 +119,9 @@ class DataCenter
             case 'tcp_intermediate':
                 $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [IntermediateStream::getName(), []]];
                 break;
+            case 'obfuscated2':
+                $this->settings[$dc_config_number]['protocol'] = 'tcp_intermediate_padded';
+                $this->settings[$dc_config_number]['obfuscated'] = true;
             case 'tcp_intermediate_padded':
                 $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [IntermediatePaddedStream::getName(), []]];
                 break;

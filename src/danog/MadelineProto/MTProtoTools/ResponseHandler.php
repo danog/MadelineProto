@@ -528,6 +528,7 @@ trait ResponseHandler
         unset($request);
         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
         Loop::defer(function () use ($request_id, $response, $datacenter) {
+            $this->logger->logger("Deferred: sent {$response['_']} to deferred");
             $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
             unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']);
         });

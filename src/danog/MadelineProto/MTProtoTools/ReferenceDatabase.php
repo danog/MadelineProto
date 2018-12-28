@@ -86,8 +86,6 @@ class ReferenceDatabase implements TLCallback
         'user'            => self::USER_PHOTO_ORIGIN,
         'userFull'        => self::USER_PHOTO_ORIGIN,
 
-        'message'        => self::MESSAGE_ORIGIN,
-        'messageService' => self::MESSAGE_ORIGIN,
 
         'wallPaper' => self::WALLPAPER_ORIGIN,
 
@@ -266,7 +264,7 @@ class ReferenceDatabase implements TLCallback
         switch ($data['_']) {
             case 'message':
             case 'messageService':
-                $origin['peer'] = $data;
+                $origin['peer'] = $this->API->get_id($data);
                 $origin['msg_id'] = $data['id'];
                 break;
             case 'messages.savedGifs':
@@ -481,7 +479,7 @@ class ReferenceDatabase implements TLCallback
                 // Peer + msg ID
                 case self::MESSAGE_ORIGIN:
                     if (is_array($origin['peer'])) {
-                        $origin['peer'] = $this->API->get_info($origin['peer'])['bot_api_id'];
+                        $origin['peer'] = $this->API->get_id($origin['peer']);
                     }
                     if ($origin['peer'] < 0) {
                         yield $this->API->method_call_async_read('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
