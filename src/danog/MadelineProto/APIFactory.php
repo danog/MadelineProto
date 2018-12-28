@@ -133,8 +133,8 @@ class APIFactory
         if (Magic::is_fork() && !Magic::$processed_fork) {
             \danog\MadelineProto\Logger::log('Detected fork');
             $this->API->reset_session();
-            foreach ($this->API->datacenter->sockets as $datacenter) {
-                $datacenter->close_and_reopen();
+            foreach ($this->API->datacenter->sockets as $id => $datacenter) {
+                $this->API->close_and_reopen($id);
             }
             Magic::$processed_fork = true;
         }

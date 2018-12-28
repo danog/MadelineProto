@@ -772,6 +772,8 @@ trait PeerHandler
             $offset += count($gres['participants']);
         } while (count($gres['participants']));
 
+        if ($offset === $limit) return true;
+
         return $has_more;
     }
 

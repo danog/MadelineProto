@@ -67,6 +67,8 @@ if ($MadelineProto->get_self() === false) {
     }
 }
 
+var_dump(count($MadelineProto->get_pwr_chat('@madelineproto')['participants']));
+
 /*
  * Test logging
  */
