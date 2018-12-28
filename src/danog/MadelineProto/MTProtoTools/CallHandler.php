@@ -446,19 +446,7 @@ trait CallHandler
             $message['user_related'] = true;
         }
 
-        $write_deferred = yield $this->datacenter->sockets[$aargs['datacenter']]->sendMessage($message, isset($aargs['postpone']) ? !$aargs['postpone'] : true);
-
-        $deferred = new Deferred();
-        $write_promise = $write_deferred->promise();
-        $write_promise->onResolve(
-            function ($e, $result) use ($aargs, $deferred) {
-                //$this->datacenter->sockets[$aargs['datacenter']]->checker->resume();
-                if ($e) {
-                    return $deferred->fail($e);
-                }
-                $deferred->resolve($result);
-            }
-        );
+        $deferred = yield $this->datacenter->sockets[$aargs['datacenter']]->sendMessage($message, isset($aargs['postpone']) ? !$aargs['postpone'] : true);
 
         $this->datacenter->sockets[$aargs['datacenter']]->checker->resume();
 

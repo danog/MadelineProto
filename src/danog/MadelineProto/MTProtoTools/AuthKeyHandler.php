@@ -161,7 +161,7 @@ trait AuthKeyHandler
                 $q_bytes = $q->toBytes();
                 $new_nonce = $this->random(32);
                 $data_unserialized = ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => preg_replace('|_.*|', '', $datacenter)];
-                $p_q_inner_data = $this->serialize_object(['type' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp')], $data_unserialized, 'p_q_inner_data');
+                $p_q_inner_data = yield $this->serialize_object_async(['type' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp')], $data_unserialized, 'p_q_inner_data');
                 /*
                  * ***********************************************************************
                  * Encrypt serialized object
@@ -295,7 +295,7 @@ trait AuthKeyHandler
                      *         string        $g_b                            : g^b mod dh_prime
                      * ]
                      */
-                    $data = $this->serialize_object(['type' => 'client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str], 'client_DH_inner_data');
+                    $data = yield $this->serialize_object_async(['type' => 'client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str], 'client_DH_inner_data');
                     /*
                      * ***********************************************************************
                      * encrypt client_DH_inner_data
@@ -493,7 +493,7 @@ trait AuthKeyHandler
                 $temp_auth_key_id = $this->datacenter->sockets[$datacenter]->temp_auth_key['id'];
                 $perm_auth_key_id = $this->datacenter->sockets[$datacenter]->auth_key['id'];
                 $temp_session_id = $this->datacenter->sockets[$datacenter]->session_id;
-                $message_data = $this->serialize_object(['type' => 'bind_auth_key_inner'], ['nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bind_temp_auth_key_inner');
+                $message_data = yield $this->serialize_object_async(['type' => 'bind_auth_key_inner'], ['nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bind_temp_auth_key_inner');
                 $message_id = $this->datacenter->sockets[$datacenter]->generate_message_id();
                 $seq_no = 0;
                 $encrypted_data = $this->random(16).$message_id.pack('VV', $seq_no, strlen($message_data)).$message_data;

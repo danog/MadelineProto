@@ -138,7 +138,7 @@ class WriteLoop extends ResumableSignalLoop
                 return;
             }
             if (count($to_ack = $connection->ack_queue)) {
-                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'msgs_ack', 'serialized_body' => $this->API->serialize_object(['type' => 'msgs_ack'], ['msg_ids' => $connection->ack_queue], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false, 'method' => false];
+                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'msgs_ack', 'serialized_body' => yield $this->API->serialize_object_async(['type' => 'msgs_ack'], ['msg_ids' => $connection->ack_queue], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false, 'method' => false];
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
             }
 
@@ -157,7 +157,7 @@ class WriteLoop extends ResumableSignalLoop
                 $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
 
                 //$connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => $this->API->serialize_object(['type' => ''], ['_' => 'http_wait', 'max_wait' => $API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
-                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => $this->API->serialize_object(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 1], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
+                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => yield $this->API->serialize_object_async(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 1], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
 
                 $has_http_wait = true;
