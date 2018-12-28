@@ -40,6 +40,7 @@ function ___install_madeline()
     $phar_template = 'https://phar.madelineproto.xyz/madeline%s.phar?v=new';
 
     $release_branch = defined('MADELINE_BRANCH') ? '-'.MADELINE_BRANCH : '-old';
+    if ($release_branch === '-') $release_branch = '';
     $release_default = '';
 
     if (PHP_MAJOR_VERSION === 5) {
