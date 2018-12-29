@@ -30,7 +30,7 @@ use function Amp\call;
  */
 trait Files
 {
-    public function upload_async($file, $file_name = '', $cb = null, $encrypted = false, $datacenter = null): \Generator
+    public function upload_async($file, $file_name = '', $cb = null, $encrypted = false): \Generator
     {
         if (is_object($file)) {
             if (!isset(class_implements($file)['danog\MadelineProto\FileCallbackInterface'])) {
@@ -49,7 +49,7 @@ trait Files
         if (empty($file_name)) {
             $file_name = basename($file);
         }
-        $datacenter = is_null($datacenter) ? $this->settings['connection_settings']['default_dc'] : $datacenter;
+        $datacenter = $this->settings['connection_settings']['default_dc'];
         if (isset($this->datacenter->sockets[$datacenter.'_media'])) {
             $datacenter .= '_media';
         }

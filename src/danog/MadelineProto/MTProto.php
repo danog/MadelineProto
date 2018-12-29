@@ -517,7 +517,6 @@ class MTProto implements TLCallback
 
             $app_version = '4.9.1 (13613)';
         }
-        $backtrace = debug_backtrace(0);
 
         $this->altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
         // Set default settings
@@ -642,7 +641,7 @@ class MTProto implements TLCallback
              *     $message is an array containing the messages the log, $level, is the logging level
              */
             // write to
-            'logger_param' => dirname(end($backtrace)['file']).'/MadelineProto.log',
+            'logger_param' => Magic::$script_cwd.'/MadelineProto.log',
             'logger'       => php_sapi_name() === 'cli' ? 3 : 2,
             // overwrite previous setting and echo logs
             'logger_level' => Logger::VERBOSE,
@@ -743,11 +742,9 @@ class MTProto implements TLCallback
             RPCErrorException::$rollbar = false;
         }
 
-        $backtrace = debug_backtrace(0);
-
         if (php_sapi_name() !== 'cli') {
             if (isset($this->settings['logger']['logger_param']) && basename($this->settings['logger']['logger_param']) === 'MadelineProto.log') {
-                $this->settings['logger']['logger_param'] = dirname(end($backtrace)['file']) . "/MadelineProto.log";
+                $this->settings['logger']['logger_param'] = Magic::$script_cwd . "/MadelineProto.log";
             }
         }
 
@@ -760,7 +757,7 @@ class MTProto implements TLCallback
             try {
                 error_reporting(E_ALL);
                 ini_set("log_errors", 1);
-                ini_set("error_log", dirname(end($backtrace)['file']) . "/MadelineProto.log");
+                ini_set("error_log", Magic::$script_cwd . "/MadelineProto.log");
                 error_log('Enabled PHP logging');
             } catch (\danog\MadelineProto\Exception $e) {
                 $this->logger->logger("Could not enable PHP logging");

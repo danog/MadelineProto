@@ -33,6 +33,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             return;
         }
         if (isset($update['message']['media'])) {
+            yield $MadelineProto->download_to_dir($update, '/tmp');
             yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
         }
 

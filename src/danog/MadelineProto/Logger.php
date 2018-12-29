@@ -74,7 +74,7 @@ class Logger
         $this->level = $level;
 
         if ($this->mode === 2 && !file_exists(pathinfo($this->optional, PATHINFO_DIRNAME))) {
-            $this->optional = Absolute::absolute(getcwd().'/MadelineProto.log');
+            $this->optional = Magic::$script_cwd.'/MadelineProto.log';
         }
 
         if ($this->mode === 2 && !preg_match('/\.log$/', $this->optional)) {
