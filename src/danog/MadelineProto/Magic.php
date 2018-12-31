@@ -116,7 +116,7 @@ class Magic
                 } catch (\Throwable $e) {
                 }
             }
-            if (!self::$can_parallel && !defined('AMP_WORKER')) {
+            if (!self::$can_parallel && !defined('AMP_WORKER') || true) {
                 define('AMP_WORKER', 1);
             }
             $backtrace = debug_backtrace(0);
