@@ -117,6 +117,7 @@ class WriteLoop extends ResumableSignalLoop
                 $API->logger->logger("Sent {$message['_']} as unencrypted message to DC {$datacenter}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 $message['send_promise']->resolve(isset($message['promise']) ? $message['promise'] : true);
+                unset($message['send_promise']);
             }
             if ($skipped_all) {
                 break;
@@ -315,6 +316,7 @@ class WriteLoop extends ResumableSignalLoop
                 }
                 if (isset($connection->outgoing_messages[$message_id]['send_promise'])) {
                     $connection->outgoing_messages[$message_id]['send_promise']->resolve(isset($connection->outgoing_messages[$message_id]['promise']) ? $connection->outgoing_messages[$message_id]['promise'] : true);
+                    unset($connection->outgoing_messages[$message_id]['send_promise']);
                 }
                 //var_dumP("encrypted ".bin2hex($message_id)." ".$connection->outgoing_messages[$message_id]['_']);
                 unset($connection->pending_outgoing[$key]);
