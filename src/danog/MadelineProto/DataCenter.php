@@ -80,6 +80,9 @@ class DataCenter
             return false;
         }
         $ctxs = $this->generate_contexts($dc_number);
+        if (empty($ctxs)) {
+            return false;
+        }
         foreach ($ctxs as $ctx) {
             try {
                 if (isset($this->sockets[$dc_number]->old)) {
@@ -242,12 +245,10 @@ class DataCenter
 
             foreach ($ipv6 as $ipv6) {
                 if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
-                    unset($this->sockets[$dc_number]);
-
-                    $this->API->logger->logger("No info for DC $dc_number", \danog\MadelineProto\Logger::ERROR);
-
                     continue;
                 }
+
+
                 $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
                 $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
 
@@ -305,6 +306,13 @@ class DataCenter
 
         if (isset($this->dclist[$test][$ipv6][$dc_number.'_bk']['ip_address'])) {
             $ctxs = array_merge($ctxs, $this->generate_contexts($dc_number.'_bk'));
+        }
+
+        if (empty($ctxs)) {
+            unset($this->sockets[$dc_number]);
+
+            $this->API->logger->logger("No info for DC $dc_number", \danog\MadelineProto\Logger::ERROR);
+
         }
 
         return $ctxs;

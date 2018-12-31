@@ -895,7 +895,7 @@ class MTProto implements TLCallback
         }
         $curdc = $this->datacenter->curdc;
         $this->logger->logger('Got new DC options, reconnecting');
-        yield $this->connect_to_all_dcs();
+        yield $this->connect_to_all_dcs_async();
         $this->datacenter->curdc = $curdc;
     }
 

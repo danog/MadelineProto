@@ -556,7 +556,7 @@ trait AuthKeyHandler
                 };
             }
             yield array_shift($dcs)();
-            foreach ($dcs as &$dc) {
+            foreach ($dcs as $id => &$dc) {
                 $dc = $dc();
             }
             yield $dcs;
@@ -591,6 +591,7 @@ trait AuthKeyHandler
             }
             $cdn = strpos($id, 'cdn');
             $media = strpos($id, 'media');
+
 
             if ($socket->temp_auth_key === null || $socket->auth_key === null) {
                 $dc_config_number = isset($this->settings['connection_settings'][$id]) ? $id : 'all';

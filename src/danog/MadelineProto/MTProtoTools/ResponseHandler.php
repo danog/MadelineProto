@@ -308,12 +308,13 @@ trait ResponseHandler
         unset($this->datacenter->sockets[$datacenter]->incoming_messages[$response_id]['content']);
         $request = &$this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id];
 
-        if (isset($request['method']) && $request['method'] && $request['_'] !== 'auth.bindTempAuthKey' && $this->datacenter->sockets[$datacenter]->temp_auth_key !== null && (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === false)) {
-            $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] = true;
-        }
         if (isset($response['_'])) {
             switch ($response['_']) {
                 case 'rpc_error':
+                    if (isset($request['method']) && $request['method'] && $request['_'] !== 'auth.bindTempAuthKey' && $this->datacenter->sockets[$datacenter]->temp_auth_key !== null && (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === false)) {
+                        $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] = true;
+                    }
+
                     if (in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_OUTDATED', 'PERSISTENT_TIMESTAMP_INVALID'])) {
                         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
                         $this->handle_reject($datacenter, $request, new \danog\MadelineProto\PTSException($response['error_message']));
@@ -488,7 +489,6 @@ trait ResponseHandler
                     break;
                 case 'bad_server_salt':
                 case 'bad_msg_notification':
-
                     $this->logger->logger('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$response['error_code']], \danog\MadelineProto\Logger::WARNING);
                     switch ($response['error_code']) {
                         case 48:
@@ -514,6 +514,10 @@ trait ResponseHandler
 
                     return;
             }
+        }
+
+        if (isset($request['method']) && $request['method'] && $request['_'] !== 'auth.bindTempAuthKey' && $this->datacenter->sockets[$datacenter]->temp_auth_key !== null && (!isset($this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited']) || $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] === false)) {
+            $this->datacenter->sockets[$datacenter]->temp_auth_key['connection_inited'] = true;
         }
 
         if (!isset($request['promise'])) {
