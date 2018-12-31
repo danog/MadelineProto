@@ -32,8 +32,8 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         if (isset($update['message']['out']) && $update['message']['out']) {
             return;
         }
-        if (isset($update['message']['media'])) {
-            yield $MadelineProto->download_to_dir($update, '/tmp');
+        if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
+            //yield $this->download_to_dir($update, '/tmp');
             yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
         }
 

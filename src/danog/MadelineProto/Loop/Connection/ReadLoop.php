@@ -79,7 +79,7 @@ class ReadLoop extends SignalLoop
                         foreach ($connection->new_outgoing as $message_id) {
                             $connection->outgoing_messages[$message_id]['sent'] = 0;
                         }
-                        $API->init_authorization();
+                        yield $API->init_authorization_async();
                     } else {
                         //throw new \danog\MadelineProto\RPCErrorException($error, $error);
                     }
@@ -102,6 +102,7 @@ class ReadLoop extends SignalLoop
                 $this->exitedLoop();
             }
             $this->startedLoop();
+            //var_dump(count($connection->incoming_messages));
 //            Loop::defer(function () use ($datacenter) {
             if ($this->API->is_http($datacenter)) {
                 $this->API->datacenter->sockets[$datacenter]->waiter->resume();
@@ -202,7 +203,8 @@ class ReadLoop extends SignalLoop
             }
             $connection->incoming_messages[$message_id] = ['seq_no' => $seq_no];
         } else {
-            throw new \danog\MadelineProto\Exception('Got unknown auth_key id');
+            $API->logger->logger('Got unknown auth_key id', \danog\MadelineProto\Logger::ERROR);
+            return -404;
         }
         $deserialized = $API->deserialize($message_data, ['type' => '', 'datacenter' => $datacenter]);
         $API->referenceDatabase->reset();
