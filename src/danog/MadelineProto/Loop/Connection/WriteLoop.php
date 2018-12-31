@@ -292,7 +292,7 @@ class WriteLoop extends ResumableSignalLoop
 
             $connection->http_req_count++;
 
-            $API->logger->logger("Sent encrypted payload to DC {$datacenter}, speed ".((($len * 8) / (microtime(true) - $t)) / 1000000).' mbps!', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $API->logger->logger("Sent encrypted payload to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             $sent = time();
 
