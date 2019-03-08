@@ -1,55 +1,36 @@
 <?php
-
+$order = [
+    'CREATING_A_CLIENT',
+    'LOGIN',
+    'FEATURES',
+    'REQUIREMENTS',
+    'INSTALLATION',
+    'UPDATES',
+    'SETTINGS',
+    'SELF',
+    'EXCEPTIONS',
+    'FLOOD_WAIT',
+    'LOGGING',
+    'CALLS',
+    'FILES',
+    'CHAT_INFO',
+    'DIALOGS',
+    'INLINE_BUTTONS',
+    'SECRET_CHATS',
+    'LUA',
+    'PROXY',
+    'USING_METHODS',
+    'CONTRIB',
+    'TEMPLATES'
+];
 $index = '';
 $files = glob('docs/docs/docs/*md');
 foreach ($files as $file) {
     $base = basename($file, '.md');
-    if ($base === 'CREATING_A_CLIENT') {
-        $orderedfiles[0] = $file;
-    } elseif ($base === 'LOGIN') {
-        $orderedfiles[1] = $file;
-    } elseif ($base === 'FEATURES') {
-        $orderedfiles[2] = $file;
-    } elseif ($base === 'REQUIREMENTS') {
-        $orderedfiles[3] = $file;
-    } elseif ($base === 'INSTALLATION') {
-        $orderedfiles[4] = $file;
-    } elseif ($base === 'UPDATES') {
-        $orderedfiles[5] = $file;
-    } elseif ($base === 'SETTINGS') {
-        $orderedfiles[6] = $file;
-    } elseif ($base === 'SELF') {
-        $orderedfiles[7] = $file;
-    } elseif ($base === 'EXCEPTIONS') {
-        $orderedfiles[8] = $file;
-    } elseif ($base === 'FLOOD_WAIT') {
-        $orderedfiles[9] = $file;
-    } elseif ($base === 'LOGGING') {
-        $orderedfiles[10] = $file;
-    } elseif ($base === 'USING_METHODS') {
-        $orderedfiles[11] = $file;
-    } elseif ($base === 'FILES') {
-        $orderedfiles[12] = $file;
-    } elseif ($base === 'CHAT_INFO') {
-        $orderedfiles[13] = $file;
-    } elseif ($base === 'DIALOGS') {
-        $orderedfiles[14] = $file;
-    } elseif ($base === 'INLINE_BUTTONS') {
-        $orderedfiles[15] = $file;
-    } elseif ($base === 'CALLS') {
-        $orderedfiles[16] = $file;
-    } elseif ($base === 'SECRET_CHATS') {
-        $orderedfiles[17] = $file;
-    } elseif ($base === 'LUA') {
-        $orderedfiles[18] = $file;
-    } elseif ($base === 'PROXY') {
-        $orderedfiles[19] = $file;
-    } elseif ($base === 'CONTRIB') {
-        $orderedfiles[20] = $file;
-    } elseif ($base === 'TEMPLATES') {
-        $orderedfiles[21] = $file;
+    $key = array_search($base, $order);
+    if ($key !== false) {
+        $orderedfiles[$key] = $file;
     }
-    ksort($orderedfiles);
 }
 ksort($orderedfiles);
 foreach ($orderedfiles as $key => $filename) {
@@ -90,6 +71,13 @@ foreach ($orderedfiles as $key => $filename) {
             $name = $matches[2][$key];
             $url = $matches[3][$key][0] === '#' ? $file.$matches[3][$key] : $matches[3][$key];
             $index .= "$spaces* [$name]($url)\n";
+            if ($name === 'FULL API Documentation with descriptions') {
+                $spaces .= "  ";
+                preg_match_all('|\* (.*)|', file_get_contents('docs/docs/API_docs/methods/index.md'), $smatches);
+                foreach ($smatches[1] as $key => $match) {
+                    $index .= "$spaces* ".$match."\n";
+                }
+            }
         }
     }
 }
