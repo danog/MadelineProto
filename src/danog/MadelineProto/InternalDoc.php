@@ -11,11 +11,10 @@ interface auth
 {
     /**
      * @param array params [
-     *               boolean allow_flashcall,
      *               string phone_number,
-     *               Bool current_number,
      *               int api_id,
      *               string api_hash,
+     *               CodeSettings settings,
      *              ]
      *
      * @return auth_SentCode
@@ -222,9 +221,13 @@ interface account
     public function updateStatus(array $params);
 
     /**
-     * @return Vector_of_WallPaper
+     * @param array params [
+     *               int hash,
+     *              ]
+     *
+     * @return account_WallPapers
      */
-    public function getWallPapers();
+    public function getWallPapers(array $params);
 
     /**
      * @param array params [
@@ -298,9 +301,8 @@ interface account
 
     /**
      * @param array params [
-     *               boolean allow_flashcall,
      *               string phone_number,
-     *               Bool current_number,
+     *               CodeSettings settings,
      *              ]
      *
      * @return auth_SentCode
@@ -367,9 +369,8 @@ interface account
 
     /**
      * @param array params [
-     *               boolean allow_flashcall,
      *               string hash,
-     *               Bool current_number,
+     *               CodeSettings settings,
      *              ]
      *
      * @return auth_SentCode
@@ -474,9 +475,8 @@ interface account
 
     /**
      * @param array params [
-     *               boolean allow_flashcall,
      *               string phone_number,
-     *               Bool current_number,
+     *               CodeSettings settings,
      *              ]
      *
      * @return auth_SentCode
@@ -579,6 +579,52 @@ interface account
      * @return Updates
      */
     public function getNotifyExceptions(array $params);
+
+    /**
+     * @param array params [
+     *               InputWallPaper wallpaper,
+     *              ]
+     *
+     * @return WallPaper
+     */
+    public function getWallPaper(array $params);
+
+    /**
+     * @param array params [
+     *               InputFile file,
+     *               string mime_type,
+     *               WallPaperSettings settings,
+     *              ]
+     *
+     * @return WallPaper
+     */
+    public function uploadWallPaper(array $params);
+
+    /**
+     * @param array params [
+     *               InputWallPaper wallpaper,
+     *               Bool unsave,
+     *               WallPaperSettings settings,
+     *              ]
+     *
+     * @return bool
+     */
+    public function saveWallPaper(array $params);
+
+    /**
+     * @param array params [
+     *               InputWallPaper wallpaper,
+     *               WallPaperSettings settings,
+     *              ]
+     *
+     * @return bool
+     */
+    public function installWallPaper(array $params);
+
+    /**
+     * @return bool
+     */
+    public function resetWallPapers();
 }
 
 interface users
@@ -1183,7 +1229,7 @@ interface messages
 
     /**
      * @param array params [
-     *               int chat_id,
+     *               InputPeer peer,
      *              ]
      *
      * @return ExportedChatInvite
@@ -1257,16 +1303,6 @@ interface messages
      * @return Vector_of_int
      */
     public function getMessagesViews(array $params);
-
-    /**
-     * @param array params [
-     *               int chat_id,
-     *               Bool enabled,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function toggleChatAdmins(array $params);
 
     /**
      * @param array params [
@@ -1870,6 +1906,26 @@ interface messages
      * @return StatsURL
      */
     public function getStatsURL(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               string about,
+     *              ]
+     *
+     * @return bool
+     */
+    public function editChatAbout(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               ChatBannedRights banned_rights,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function editChatDefaultBannedRights(array $params);
 }
 
 interface updates
@@ -2286,18 +2342,8 @@ interface channels
     /**
      * @param array params [
      *               InputChannel channel,
-     *               string about,
-     *              ]
-     *
-     * @return bool
-     */
-    public function editAbout(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
      *               InputUser user_id,
-     *               ChannelAdminRights admin_rights,
+     *               ChatAdminRights admin_rights,
      *              ]
      *
      * @return Updates
@@ -2377,28 +2423,9 @@ interface channels
      *               InputChannel channel,
      *              ]
      *
-     * @return ExportedChatInvite
-     */
-    public function exportInvite(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *              ]
-     *
      * @return Updates
      */
     public function deleteChannel(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               Bool enabled,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function toggleInvites(array $params);
 
     /**
      * @param array params [
@@ -2430,7 +2457,7 @@ interface channels
      * @param array params [
      *               InputChannel channel,
      *               InputUser user_id,
-     *               ChannelBannedRights banned_rights,
+     *               ChatBannedRights banned_rights,
      *              ]
      *
      * @return Updates
