@@ -75,6 +75,7 @@ foreach ($orderedfiles as $key => $filename) {
                 $spaces .= "  ";
                 preg_match_all('|\* (.*)|', file_get_contents('docs/docs/API_docs/methods/index.md'), $smatches);
                 foreach ($smatches[1] as $key => $match) {
+                    $match = str_replace('href="', 'href="https://docs.madelineproto.xyz/API_docs/methods/');
                     $index .= "$spaces* ".$match."\n";
                 }
             }
