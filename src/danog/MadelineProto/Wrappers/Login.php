@@ -74,7 +74,7 @@ trait Login
             $this->logout();
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_code_sending'], \danog\MadelineProto\Logger::NOTICE);
-        $this->authorization = $this->method_call('auth.sendCode', ['phone_number' => $number, 'sms_type' => $sms_type, 'api_id' => $this->settings['app_info']['api_id'], 'api_hash' => $this->settings['app_info']['api_hash'], 'lang_code' => $this->settings['app_info']['lang_code']], ['datacenter' => $this->datacenter->curdc]);
+        $this->authorization = $this->method_call('auth.sendCode', ['settings' => ['_' => 'codeSettings'], 'phone_number' => $number, 'sms_type' => $sms_type, 'api_id' => $this->settings['app_info']['api_id'], 'api_hash' => $this->settings['app_info']['api_hash'], 'lang_code' => $this->settings['app_info']['lang_code']], ['datacenter' => $this->datacenter->curdc]);
         $this->authorized_dc = $this->datacenter->curdc;
         $this->authorization['phone_number'] = $number;
         //$this->authorization['_'] .= 'MP';
@@ -100,6 +100,7 @@ trait Login
             if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_2fa_enabled'], \danog\MadelineProto\Logger::NOTICE);
                 $this->authorization = $this->method_call('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]);
+                if (!isset($this->authorization['hint'])) $this->authorization['hint'] = '';
                 $this->authorized = self::WAITING_PASSWORD;
 
                 return $this->authorization;
