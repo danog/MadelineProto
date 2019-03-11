@@ -398,7 +398,7 @@ trait CallHandler
         }
 
         if (is_array($args)) {
-            if (isset($args['message']) && is_string($args['message']) && $this->mb_strlen($args['message']) > $this->config['message_length_max']) {
+            if (isset($args['message']) && is_string($args['message']) && mb_strlen($args['message'], 'UTF-8') > $this->config['message_length_max']) {
                 $arg_chunks = $this->split_to_chunks($args);
                 $promises = [];
                 $new_aargs = $aargs;
