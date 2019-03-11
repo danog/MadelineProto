@@ -199,7 +199,7 @@ class APIFactory
     public function __mtproto_call($name, $arguments)
     {
         if (array_key_exists($name, \danog\MadelineProto\MTProto::DISALLOWED_METHODS)) {
-            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$name], 0, null, 'MadelineProto', 1);
+            //throw new \danog\MadelineProto\Exception(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$name], 0, null, 'MadelineProto', 1);
         }
 
         $aargs = isset($arguments[1]) && is_array($arguments[1]) ? $arguments[1] : [];
