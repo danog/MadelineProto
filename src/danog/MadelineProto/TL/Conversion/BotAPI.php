@@ -75,10 +75,10 @@ trait BotAPI
 
     public function mb_str_split($text, $length)
     {
-        $tlength = $this->mb_strlen($text, 'UTF-8');
+        $tlength = mb_strlen($text, 'UTF-8');
         $result = [];
         for ($x = 0; $x < $tlength; $x += $length) {
-            $result[] = $this->mb_substr($text, $x, $length, 'UTF-8');
+            $result[] = mb_substr($text, $x, $length, 'UTF-8');
         }
 
         return $result;
