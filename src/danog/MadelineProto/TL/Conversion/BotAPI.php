@@ -538,7 +538,7 @@ trait BotAPI
         $text_arr = [];
         foreach ($this->multipleExplodeKeepDelimiters(["\n"], $args['message']) as $word) {
             if (mb_strlen($word, 'UTF-8') > $max_length) {
-                foreach (mb_str_split($word, $max_length) as $vv) {
+                foreach ($this->mb_str_split($word, $max_length) as $vv) {
                     $text_arr[] = $vv;
                 }
             } else {
