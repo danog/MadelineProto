@@ -75,10 +75,10 @@ trait BotAPI
 
     public function mb_str_split($text, $length)
     {
-        $tlength = $this->mb_strlen($text);
+        $tlength = $this->mb_strlen($text, 'UTF-8');
         $result = [];
         for ($x = 0; $x < $tlength; $x += $length) {
-            $result[] = $this->mb_substr($text, $x, $length);
+            $result[] = $this->mb_substr($text, $x, $length, 'UTF-8');
         }
 
         return $result;
@@ -536,10 +536,9 @@ trait BotAPI
 
         $max_length = isset($args['media']) ? $this->config['caption_length_max'] : $this->config['message_length_max'];
         $text_arr = [];
-        mb_regex_encoding('UTF-8');
         foreach ($this->multipleExplodeKeepDelimiters(["\n"], $args['message']) as $word) {
             if (mb_strlen($word, 'UTF-8') > $max_length) {
-                foreach (mb_split($word, $max_length) as $vv) {
+                foreach (mb_str_split($word, $max_length) as $vv) {
                     $text_arr[] = $vv;
                 }
             } else {
