@@ -14,9 +14,9 @@
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
-
+    
 namespace danog\MadelineProto;
-
+    
 class Lang
 {
     public static $lang = array (
@@ -4856,9 +4856,11 @@ class Lang
     'object_wallPaperSettings_param_motion_type_true' => 'Motion?',
     'object_wallPaperSettings_param_background_color_type_int' => 'Background color',
     'object_wallPaperSettings_param_intensity_type_int' => 'Intensity',
+    'object_inputPrivacyKeyProfilePhoto' => '',
+    'object_inputPrivacyKeyForwards' => '',
   ),
 );
-
+    
     // THIS WILL BE OVERWRITTEN BY $lang["en"]
     public static $current_lang = array (
   'req_pq' => 'Requesting pq...',
@@ -9553,5 +9555,7 @@ class Lang
   'object_wallPaperSettings_param_motion_type_true' => 'Motion?',
   'object_wallPaperSettings_param_background_color_type_int' => 'Background color',
   'object_wallPaperSettings_param_intensity_type_int' => 'Intensity',
+  'object_inputPrivacyKeyProfilePhoto' => '',
+  'object_inputPrivacyKeyForwards' => '',
 );
 }

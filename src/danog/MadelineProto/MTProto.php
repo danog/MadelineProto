@@ -64,7 +64,7 @@ class MTProto implements TLCallback
     /*
     const V = 71;
      */
-    const V = 119;
+    const V = 120;
     const RELEASE = '4.0';
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;

@@ -409,6 +409,8 @@ inputPrivacyKeyStatusTimestamp#4f96cb18 = InputPrivacyKey;
 inputPrivacyKeyChatInvite#bdfb0426 = InputPrivacyKey;
 inputPrivacyKeyPhoneCall#fabadc5f = InputPrivacyKey;
 inputPrivacyKeyPhoneP2P#db9e70d2 = InputPrivacyKey;
+inputPrivacyKeyProfilePhoto#5719bacc = InputPrivacyKey;
+inputPrivacyKeyForwards#a4dd4c08 = InputPrivacyKey;
 
 privacyKeyStatusTimestamp#bc2eab30 = PrivacyKey;
 privacyKeyChatInvite#500e6dfa = PrivacyKey;
