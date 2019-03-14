@@ -49,7 +49,6 @@ class TLMethod
         if (isset($this->by_id[$id])) {
             $method = $this->by_id[$id];
             $method['id'] = $id;
-            $method['params'] = $method['params'];
 
             return $method;
         }
@@ -62,7 +61,6 @@ class TLMethod
         if (isset($this->by_method[$method_name])) {
             $method = $this->by_id[$this->by_method[$method_name]];
             $method['id'] = $this->by_method[$method_name];
-            $method['params'] = $method['params'];
 
             return $method;
         }
