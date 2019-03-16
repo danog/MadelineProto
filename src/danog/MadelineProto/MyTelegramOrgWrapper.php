@@ -25,7 +25,7 @@ class MyTelegramOrgWrapper
 {
     private $logged = false;
     private $hash = '';
-    final static $MY_TELEGRAM_URL = 'https://my.telegram.org';
+    public static $MY_TELEGRAM_URL = 'https://my.telegram.org';
 
     public function __construct($number)
     {
