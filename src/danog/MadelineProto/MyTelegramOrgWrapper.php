@@ -18,12 +18,6 @@
 
 namespace danog\MadelineProto;
 
-// For testing
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-$wrapper = new MyTelegramOrgWrapper(1);
-
 /**
  * Wrapper for my.telegram.org.
  */
