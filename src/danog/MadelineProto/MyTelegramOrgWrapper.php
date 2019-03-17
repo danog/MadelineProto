@@ -97,7 +97,7 @@ class MyTelegramOrgWrapper
 
         // Add every cookie to the header.
         foreach ($cookies as $cookie) {
-            $headers[] = 'Cookie: ' . $cookie;
+            $headers[] = 'Cookie: '.$cookie;
         }
 
         return $headers;
