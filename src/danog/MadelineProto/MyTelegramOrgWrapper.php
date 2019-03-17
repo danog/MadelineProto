@@ -56,9 +56,9 @@ class MyTelegramOrgWrapper
         $this->hash = $resulta['random_hash'];
     }
 
-   /**
-    * Function for generating curl request headers.
-    */
+    /**
+     * Function for generating curl request headers.
+     */
     private function get_headers($httpType, $cookies)
     {
         // Common header flags.
@@ -97,7 +97,7 @@ class MyTelegramOrgWrapper
 
         // Add every cookie to the header.
         foreach ($cookies as $cookie) {
-          $headers[] = 'Cookie: ' . $cookie;
+            $headers[] = 'Cookie: ' . $cookie;
         }
 
         return $headers;
