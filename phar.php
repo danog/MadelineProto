@@ -50,7 +50,7 @@ function ___install_madeline()
     if (PHP_MAJOR_VERSION <= 5) {
         $release_branch = '5'.$release_branch;
         $release_default_branch = '5';
-    } else if (PHP_MINOR_VERSION >= 2) {
+    } else if (PHP_MINOR_VERSION >= 3) {
         $release_branch = '';
     }
 
