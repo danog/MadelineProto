@@ -31,7 +31,8 @@
         "amphp/websocket-client": "dev-master"
     },
     "require-dev": {
-        "phpdocumentor/reflection-docblock": "^3.1"
+        "phpdocumentor/reflection-docblock": "^3.1",
+        "ennexa/amp-update-cache": "dev-master"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)",

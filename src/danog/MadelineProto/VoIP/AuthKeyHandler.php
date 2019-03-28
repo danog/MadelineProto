@@ -83,7 +83,7 @@ trait AuthKeyHandler
         $this->check_G($g_b, $dh_config['p']);
 
         try {
-            $res = $this->method_call('phone.acceptCall', ['peer' => $call, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => $call['p2p_allowed'], 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc]);
+            $res = $this->method_call('phone.acceptCall', ['peer' => $call, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => 65]], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
                 $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['call_already_accepted'], $call['id']));

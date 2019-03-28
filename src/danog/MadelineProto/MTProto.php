@@ -837,7 +837,7 @@ class MTProto implements TLCallback
         if ($this->config['expires'] > time()) {
             return $this->config;
         }
-        $this->config = empty($config) ? yield $this->method_call_async_read('help.getConfig', $config, $options) : $config;
+        $this->config = empty($config) ? yield $this->method_call_async_read('help.getConfig', $config, empty($options) ? ['datacenter' => $this->datacenter->curdc] : $options) : $config;
         yield $this->parse_config();
 
         return $this->config;
