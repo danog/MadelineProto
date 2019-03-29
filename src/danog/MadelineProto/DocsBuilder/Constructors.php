@@ -212,12 +212,6 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 $'.$constructor.$layer.' = '.$params.';
 ```  
 
-[PWRTelegram](https://pwrtelegram.xyz) json-encoded version:
-
-```
-'.$pwr_params.'
-```
-
 
 Or, if you\'re into Lua:
 

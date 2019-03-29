@@ -337,9 +337,12 @@ trait ResponseHandler
                         case 500:
                             if ($response['error_message'] === 'MSG_WAIT_FAILED') {
                                 $this->datacenter->sockets[$datacenter]->call_queue[$request['queue']] = [];
+                                Loop::defer([$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                return;
                             }
+                            $this->got_response_for_outgoing_message_id($request_id, $datacenter);
 
-                            Loop::defer([$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
 
                             return;
                         case 303:

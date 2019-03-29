@@ -464,10 +464,14 @@ trait AuthKeyHandler
 
     public function get_dh_config()
     {
+        return $this->wait($this->get_dh_config_async());
+    }
+    public function get_dh_config_async()
+    {
         $this->updates_state['sync_loading'] = true;
 
         try {
-            $dh_config = $this->method_call('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0], ['datacenter' => $this->datacenter->curdc]);
+            $dh_config = yield $this->method_call_async_read('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0], ['datacenter' => $this->datacenter->curdc]);
         } finally {
             $this->updates_state['sync_loading'] = false;
         }

@@ -9,11 +9,11 @@ MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY
 See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
-*/
-set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelineProto/'));
+ */
+set_include_path(get_include_path() . ':' . realpath(dirname(__FILE__) . '/MadelineProto/'));
 
-if (!file_exists(__DIR__.'/vendor/autoload.php')) {
-    echo 'You did not run composer update, using madeline.php'.PHP_EOL;
+if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
+    echo 'You did not run composer update, using madeline.php' . PHP_EOL;
     if (!file_exists('madeline.php')) {
         copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
@@ -26,15 +26,15 @@ if (!file_exists('songs.php')) {
     copy('https://github.com/danog/MadelineProto/raw/master/songs.php', 'songs.php');
 }
 
-echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
+echo 'Deserializing MadelineProto from session.madeline...' . PHP_EOL;
 
 /*if (!isset($MadelineProto->inputEncryptedFilePhoto) && false) {
-    $MadelineProto->inputEncryptedFilePhoto = $MadelineProto->upload_encrypted('tests/faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
-    $MadelineProto->inputEncryptedFileGif = $MadelineProto->upload_encrypted('tests/pony.mp4');
-    $MadelineProto->inputEncryptedFileSticker = $MadelineProto->upload_encrypted('tests/lel.webp');
-    $MadelineProto->inputEncryptedFileDocument = $MadelineProto->upload_encrypted('tests/60', 'magic'); // This gets an inputFile object with file name magic
-    $MadelineProto->inputEncryptedFileVideo = $MadelineProto->upload_encrypted('tests/swing.mp4');
-    $MadelineProto->inputEncryptedFileAudio = $MadelineProto->upload_encrypted('tests/mosconi.mp3');
+$MadelineProto->inputEncryptedFilePhoto = $MadelineProto->upload_encrypted('tests/faust.jpg', 'fausticorn.jpg'); // This gets an inputFile object with file name magic
+$MadelineProto->inputEncryptedFileGif = $MadelineProto->upload_encrypted('tests/pony.mp4');
+$MadelineProto->inputEncryptedFileSticker = $MadelineProto->upload_encrypted('tests/lel.webp');
+$MadelineProto->inputEncryptedFileDocument = $MadelineProto->upload_encrypted('tests/60', 'magic'); // This gets an inputFile object with file name magic
+$MadelineProto->inputEncryptedFileVideo = $MadelineProto->upload_encrypted('tests/swing.mp4');
+$MadelineProto->inputEncryptedFileAudio = $MadelineProto->upload_encrypted('tests/mosconi.mp3');
 }*/
 
 class EventHandler extends \danog\MadelineProto\EventHandler
@@ -45,15 +45,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         $call->configuration['enable_NS'] = false;
         $call->configuration['enable_AGC'] = false;
         $call->configuration['enable_AEC'] = false;
-        $call->configuration['shared_config'] = [
-            'audio_init_bitrate'      => 100 * 1000,
-            'audio_max_bitrate'       => 100 * 1000,
-            'audio_min_bitrate'       => 10 * 1000,
-            'audio_congestion_window' => 4 * 1024,
-            //'audio_bitrate_step_decr' => 0,
-            //'audio_bitrate_step_incr' => 2000,
-        ];
-        $call->configuration['log_file_path'] = '/tmp/logs'.$call->getCallID()['id'].'.log'; // Default is /dev/null
+        $call->configuration['log_file_path'] = '/tmp/logs' . $call->getCallID()['id'] . '.log'; // Default is /dev/null
         //$call->configuration["stats_dump_file_path"] = "/tmp/stats".$call->getCallID()['id'].".txt"; // Default is /dev/null
         $call->parseConfig();
         $call->playOnHold($songs);
@@ -91,7 +83,7 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
                 $this->configureCall($call);
                 if ($call->getCallState() !== \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                     $this->calls[$call->getOtherID()] = $call;
-                    $this->times[$call->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL.$call->getDebugString()])['id']];
+                    $this->times[$call->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: ' . count($this->calls) . PHP_EOL . PHP_EOL . $call->getDebugString()])['id']];
                 }
             }
             if (strpos($message, '/program') === 0) {
@@ -181,7 +173,7 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
             $this->calls[$update['phone_call']->getOtherID()] = $update['phone_call'];
 
             try {
-                $this->times[$update['phone_call']->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $update['phone_call']->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL])['id']];
+                $this->times[$update['phone_call']->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $update['phone_call']->getOtherID(), 'message' => 'Total running calls: ' . count($this->calls) . PHP_EOL . PHP_EOL])['id']];
             } catch (\danog\MadelineProto\RPCErrorException $e) {
             }
         }
@@ -203,7 +195,7 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
                         $this->configureCall($call);
                         if ($call->getCallState() !== \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                             $this->calls[$call->getOtherID()] = $call;
-                            $this->times[$call->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL.$call->getDebugString()])['id']];
+                            $this->times[$call->getOtherID()] = [time(), $this->messages->sendMessage(['peer' => $call->getOtherID(), 'message' => 'Total running calls: ' . count($this->calls) . PHP_EOL . PHP_EOL . $call->getDebugString()])['id']];
                         }
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                         try {
@@ -239,7 +231,7 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
             }
             break;
         }
-        \danog\MadelineProto\Logger::log(count($this->calls).' calls running!');
+        \danog\MadelineProto\Logger::log(count($this->calls) . ' calls running!');
         foreach ($this->calls as $key => $call) {
             if ($call->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 try {
@@ -248,24 +240,24 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
                         'reply_to_msg_id' => $this->times[$call->getOtherID()][1],
                         'peer' => $call->getOtherID(), 'message' => 'Call statistics by @magnaluna',
                         'media' => [
-                            '_' => 'inputMediaUploadedDocument',
-                            'file' => "/tmp/stats".$call->getCallID()['id'].".txt",
-                            'attributes' => [
-                                ['_' => 'documentAttributeFilename', 'file_name' => "stats".$call->getCallID()['id'].".txt"]
-                            ]
+                        '_' => 'inputMediaUploadedDocument',
+                        'file' => "/tmp/stats".$call->getCallID()['id'].".txt",
+                        'attributes' => [
+                        ['_' => 'documentAttributeFilename', 'file_name' => "stats".$call->getCallID()['id'].".txt"]
+                        ]
                         ],
                         ]);*/
                         $this->messages->sendMedia([
-                    'reply_to_msg_id' => $this->times[$call->getOtherID()][1],
-                    'peer'            => $call->getOtherID(), 'message' => 'Debug info by @magnaluna',
-                    'media'           => [
-                        '_'          => 'inputMediaUploadedDocument',
-                        'file'       => '/tmp/logs'.$call->getCallID()['id'].'.log',
-                        'attributes' => [
-                            ['_' => 'documentAttributeFilename', 'file_name' => 'logs'.$call->getCallID()['id'].'.log'],
-                        ],
-                    ],
-                    ]);
+                            'reply_to_msg_id' => $this->times[$call->getOtherID()][1],
+                            'peer' => $call->getOtherID(), 'message' => 'Debug info by @magnaluna',
+                            'media' => [
+                                '_' => 'inputMediaUploadedDocument',
+                                'file' => '/tmp/logs' . $call->getCallID()['id'] . '.log',
+                                'attributes' => [
+                                    ['_' => 'documentAttributeFilename', 'file_name' => 'logs' . $call->getCallID()['id'] . '.log'],
+                                ],
+                            ],
+                        ]);
                     }
                 } catch (\danog\MadelineProto\Exception $e) {
                     echo $e;
@@ -274,14 +266,14 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
                 } catch (\danog\MadelineProto\Exception $e) {
                     echo $e;
                 }
-                @unlink('/tmp/logs'.$call->getCallID()['id'].'.log');
-                @unlink('/tmp/stats'.$call->getCallID()['id'].'.txt');
+                @unlink('/tmp/logs' . $call->getCallID()['id'] . '.log');
+                @unlink('/tmp/stats' . $call->getCallID()['id'] . '.txt');
                 unset($this->calls[$key]);
             } elseif (isset($this->times[$call->getOtherID()]) && $this->times[$call->getOtherID()][0] < time()) {
                 $this->times[$call->getOtherID()][0] += 30 + count($this->calls);
 
                 try {
-                    $this->messages->editMessage(['id' => $this->times[$call->getOtherID()][1], 'peer' => $call->getOtherID(), 'message' => 'Total running calls: '.count($this->calls).PHP_EOL.PHP_EOL.$call->getDebugString()]);
+                    $this->messages->editMessage(['id' => $this->times[$call->getOtherID()][1], 'peer' => $call->getOtherID(), 'message' => 'Total running calls: ' . count($this->calls) . PHP_EOL . PHP_EOL . $call->getDebugString()]);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     echo $e;
                 }
@@ -289,7 +281,16 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
         }
     }
 }
-$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['secret_chats' => ['accept_chats' => false], 'logger' => ['logger' => 3, 'logger_param' => getcwd().'/MadelineProto.log']]);
+
+\danog\MadelineProto\VoIPServerConfig::update(
+    [
+        'audio_init_bitrate' => 100 * 1000,
+        'audio_max_bitrate' => 100 * 1000,
+        'audio_min_bitrate' => 10 * 1000,
+        'audio_congestion_window' => 4 * 1024,
+    ]
+);
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['secret_chats' => ['accept_chats' => false], 'logger' => ['logger' => 3, 'logger_param' => getcwd() . '/MadelineProto.log']]);
 $MadelineProto->start();
 
 if (!isset($MadelineProto->programmed_call)) {

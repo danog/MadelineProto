@@ -230,28 +230,6 @@ $MadelineProto->start();
 $'.$type.' = $MadelineProto->'.$php_method.'(['.$params.']);
 ```
 
-### [PWRTelegram HTTP API](https://pwrtelegram.xyz) example (NOT FOR MadelineProto):
-
-'.($bot ? '### As a bot:
-
-POST/GET to `https://api.pwrtelegram.xyz/botTOKEN/madeline`
-
-Parameters:
-
-* method - '.$data['method'].'
-* params - `{'.$json_params.'}`
-
-' : '').'
-
-### As a user:
-
-POST/GET to `https://api.pwrtelegram.xyz/userTOKEN/'.$data['method'].'`
-
-Parameters:
-
-'.$pwr_params.'
-
-
 Or, if you\'re into Lua:
 
 ```lua

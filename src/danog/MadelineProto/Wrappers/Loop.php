@@ -102,7 +102,6 @@ trait Loop
         $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
 
         $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
-        $offset = 0;
 
         while (true) {
             foreach ($this->updates as $update) {
