@@ -222,6 +222,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_getAdminedPublicChannels.html" name="channels_getAdminedPublicChannels">Get all supergroups/channels where you're admin: channels.getAdminedPublicChannels</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getMessagesViews.html" name="messages_getMessagesViews">Get and increase message views: messages.getMessagesViews</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help_getAppConfig.html" name="help_getAppConfig">Get app config: help.getAppConfig</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_getAutoDownloadSettings.html" name="account_getAutoDownloadSettings">Get autodownload settings: account.getAutoDownloadSettings</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/langpack_getLanguages.html" name="langpack_getLanguages">Get available languages: langpack.getLanguages</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_getBlocked.html" name="contacts_getBlocked">Get blocked users: contacts.getBlocked</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone_getCallConfig.html" name="phone_getCallConfig">Get call configuration: phone.getCallConfig</a>  
@@ -233,6 +234,9 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getPeerDialogs.html" name="messages_getPeerDialogs">Get dialog info of peers: messages.getPeerDialogs</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getDialogUnreadMarks.html" name="messages_getDialogUnreadMarks">Get dialogs marked as unread manually: messages.getDialogUnreadMarks</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getDocumentByHash.html" name="messages_getDocumentByHash">Get document by SHA256 hash: messages.getDocumentByHash</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getEmojiURL.html" name="messages_getEmojiURL">Get emoji URL: messages.getEmojiURL</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getEmojiKeywordsDifference.html" name="messages_getEmojiKeywordsDifference">Get emoji keyword difference: messages.getEmojiKeywordsDifference</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getEmojiKeywords.html" name="messages_getEmojiKeywords">Get emoji keywords: messages.getEmojiKeywords</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getFavedStickers.html" name="messages_getFavedStickers">Get favorite stickers: messages.getFavedStickers</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getFeaturedStickers.html" name="messages_getFeaturedStickers">Get featured stickers: messages.getFeaturedStickers</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getInlineGameHighScores.html" name="messages_getInlineGameHighScores">Get high scores of a game sent in an inline message: messages.getInlineGameHighScores</a>  
@@ -339,6 +343,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_getWallPapers.html" name="account_getWallPapers">Returns a list of available wallpapers.: account.getWallPapers</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_saveGif.html" name="messages_saveGif">Save a GIF: messages.saveGif</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_saveDraft.html" name="messages_saveDraft">Save a message draft: messages.saveDraft</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_saveAutoDownloadSettings.html" name="account_saveAutoDownloadSettings">Save autodownload settings: account.saveAutoDownloadSettings</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone_saveCallDebug.html" name="phone_saveCallDebug">Save call debugging info: phone.saveCallDebug</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_saveSecureValue.html" name="account_saveSecureValue">Save telegram passport secure value: account.saveSecureValue</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_saveWallPaper.html" name="account_saveWallPaper">Save wallpaper: account.saveWallPaper</a>  
@@ -377,7 +382,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_toggleTopPeers.html" name="contacts_toggleTopPeers">Toggle top peers: contacts.toggleTopPeers</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_unblock.html" name="contacts_unblock">Unblock a user: contacts.unblock</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_updateStatus.html" name="account_updateStatus">Update online status: account.updateStatus</a>  
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_updatePinnedMessage.html" name="messages_updatePinnedMessage">Update pinned message (private chat only): messages.updatePinnedMessage</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_updatePinnedMessage.html" name="messages_updatePinnedMessage">Update pinned message: messages.updatePinnedMessage</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_updateProfile.html" name="account_updateProfile">Update profile info: account.updateProfile</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_updateUsername.html" name="channels_updateUsername">Update the username of a supergroup/channel: channels.updateUsername</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_updateUsername.html" name="account_updateUsername">Update this user's username: account.updateUsername</a>  
