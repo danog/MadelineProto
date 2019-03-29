@@ -625,6 +625,22 @@ interface account
      * @return bool
      */
     public function resetWallPapers();
+
+    /**
+     * @return account_AutoDownloadSettings
+     */
+    public function getAutoDownloadSettings();
+
+    /**
+     * @param array params [
+     *               boolean low,
+     *               boolean high,
+     *               AutoDownloadSettings settings,
+     *              ]
+     *
+     * @return bool
+     */
+    public function saveAutoDownloadSettings(array $params);
 }
 
 interface users
@@ -887,6 +903,7 @@ interface messages
     /**
      * @param array params [
      *               boolean just_clear,
+     *               boolean revoke,
      *               InputPeer peer,
      *               int max_id,
      *              ]
@@ -1900,7 +1917,9 @@ interface messages
 
     /**
      * @param array params [
+     *               boolean dark,
      *               InputPeer peer,
+     *               string params,
      *              ]
      *
      * @return StatsURL
@@ -1926,6 +1945,34 @@ interface messages
      * @return Updates
      */
     public function editChatDefaultBannedRights(array $params);
+
+    /**
+     * @param array params [
+     *               string lang_code,
+     *              ]
+     *
+     * @return EmojiKeywordsDifference
+     */
+    public function getEmojiKeywords(array $params);
+
+    /**
+     * @param array params [
+     *               string lang_code,
+     *               int from_version,
+     *              ]
+     *
+     * @return EmojiKeywordsDifference
+     */
+    public function getEmojiKeywordsDifference(array $params);
+
+    /**
+     * @param array params [
+     *               string lang_code,
+     *              ]
+     *
+     * @return EmojiURL
+     */
+    public function getEmojiURL(array $params);
 }
 
 interface updates
@@ -2720,6 +2767,7 @@ interface phone
 
     /**
      * @param array params [
+     *               boolean user_initiative,
      *               InputPhoneCall peer,
      *               int rating,
      *               string comment,
@@ -2765,6 +2813,7 @@ interface langpack
 
     /**
      * @param array params [
+     *               string lang_pack,
      *               string lang_code,
      *               int from_version,
      *              ]
