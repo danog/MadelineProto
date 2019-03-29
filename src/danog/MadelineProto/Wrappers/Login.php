@@ -123,7 +123,7 @@ trait Login
         $this->authorization = $authorization;
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         yield $this->init_authorization_async();
-        VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]));
+        yield $this->get_phone_config_async();
 
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
 
@@ -154,7 +154,7 @@ trait Login
         $this->datacenter->sockets[$dc_id]->authorized = true;
         $this->authorized = self::LOGGED_IN;
         yield $this->init_authorization_async();
-        VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]));
+        yield $this->get_phone_config_async();
 
         return yield $this->get_self_async();
     }
@@ -181,7 +181,7 @@ trait Login
         $this->authorized = self::LOGGED_IN;
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         yield $this->init_authorization_async();
-        VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]));
+        yield $this->get_phone_config_async();
 
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['signup_ok'], \danog\MadelineProto\Logger::NOTICE);
 
@@ -202,7 +202,7 @@ trait Login
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         yield $this->init_authorization_async();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
-        VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]));
+        yield $this->get_phone_config_async();
 
         return $this->authorization;
     }

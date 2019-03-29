@@ -839,16 +839,19 @@ class MTProto implements TLCallback
         }
         yield $dcs;
         yield $this->init_authorization_async();
-        $this->phoneConfigWatcherId = Loop::repeat(24 * 3600 * 1000, function ($watcherId) {
-            if ($this->authorized === self::LOGGED_IN) {
-                $this->logger->logger("Fetching phone config...");
-                VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]));
-            } else {
-                $this->logger->logger("Not fetching phone config");
-            }
-        });
-        VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->datacenter->curdc]));
+        if (!$this->phoneConfigWatcherId) $this->phoneConfigWatcherId = Loop::repeat(24 * 3600 * 1000, [$this, 'get_phone_config_async']);
+        yield $this->get_phone_config_async();
         $this->logger->logger("Started phone config fetcher");
+    }
+
+    public function get_phone_config_async($watcherId = null)
+    {
+       if ($this->authorized === self::LOGGED_IN && extension_loaded('libtgvoip')) {
+            $this->logger->logger("Fetching phone config...");
+            VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]));
+        } else {
+            $this->logger->logger("Not fetching phone config");
+        }
     }
 
     public function get_config($config = [], $options = [])
@@ -861,7 +864,7 @@ class MTProto implements TLCallback
         if ($this->config['expires'] > time()) {
             return $this->config;
         }
-        $this->config = empty($config) ? yield $this->method_call_async_read('help.getConfig', $config, empty($options) ? ['datacenter' => $this->datacenter->curdc] : $options) : $config;
+        $this->config = empty($config) ? yield $this->method_call_async_read('help.getConfig', $config, empty($options) ? ['datacenter' => $this->settings['connection_settings']['default_dc']] : $options) : $config;
         yield $this->parse_config();
 
         return $this->config;

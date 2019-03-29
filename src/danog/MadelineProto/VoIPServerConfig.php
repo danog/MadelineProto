@@ -89,9 +89,4 @@ if (class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
             return array_merge(self::$_configDefault, self::$_config);
         }
     }
-} else {
-    class VoIPServerConfig
-    {
-        public static function update(array $config) {}
-    }
 }
