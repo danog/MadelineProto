@@ -282,6 +282,8 @@ Propic art by @magnaluna on [deviantart](https://magnaluna.deviantart.com).", 'p
     }
 }
 
+if (!class_exists('\\danog\\MadelineProto\\VoIPServerConfig')) die('Install the libtgvoip extension: https://voip.madelineproto.xyz'.PHP_EOL);
+
 \danog\MadelineProto\VoIPServerConfig::update(
     [
         'audio_init_bitrate' => 100 * 1000,
