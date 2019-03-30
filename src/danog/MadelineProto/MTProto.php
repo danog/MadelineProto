@@ -846,7 +846,7 @@ class MTProto implements TLCallback
 
     public function get_phone_config_async($watcherId = null)
     {
-       if ($this->authorized === self::LOGGED_IN && class_exists('\\danog\\MadelineProto\\VoIPServerConfig')) {
+       if ($this->authorized === self::LOGGED_IN && class_exists('\\danog\\MadelineProto\\VoIPServerConfig') && !$this->authorization['user']['bot']) {
             $this->logger->logger("Fetching phone config...");
             VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]));
         } else {
