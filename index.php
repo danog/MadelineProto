@@ -2,7 +2,7 @@
 
 require 'vendor/autoload.php';
 
-$MadelineProto = new \danog\MadelineProto\API('session.madeline');
+$MadelineProto = new \danog\MadelineProto\API('sessionf.madeline');
 $me = $MadelineProto->start();
 
 $me = $MadelineProto->get_self();
