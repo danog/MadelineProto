@@ -25,6 +25,7 @@ class MyTelegramOrgWrapper
 {
     private $logged = false;
     private $hash = '';
+    public static $MY_TELEGRAM_URL = 'https://my.telegram.org';
 
     public function __construct($number)
     {
@@ -34,23 +35,13 @@ class MyTelegramOrgWrapper
         $this->number = $number;
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, 'https://my.telegram.org/auth/send_password');
+        curl_setopt($ch, CURLOPT_URL, $this->MY_TELEGRAM_URL.'/auth/send_password');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(['phone' => $number]));
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
 
-        $headers = [];
-        $headers[] = 'Origin: https://my.telegram.org';
-        $headers[] = 'Accept-Encoding: gzip, deflate, br';
-        $headers[] = 'Accept-Language: it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4';
-        $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
-        $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
-        $headers[] = 'Accept: application/json, text/javascript, */*; q=0.01';
-        $headers[] = 'Referer: https://my.telegram.org/auth';
-        $headers[] = 'X-Requested-With: XMLHttpRequest';
-        $headers[] = 'Connection: keep-alive';
-        $headers[] = 'Dnt: 1';
+        $headers = $this->get_headers('origin', []);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
@@ -65,6 +56,53 @@ class MyTelegramOrgWrapper
         $this->hash = $resulta['random_hash'];
     }
 
+    /**
+     * Function for generating curl request headers.
+     */
+    private function get_headers($httpType, $cookies)
+    {
+        // Common header flags.
+        $headers = [];
+        $headers[] = 'Dnt: 1';
+        $headers[] = 'Connection: keep-alive';
+        $headers[] = 'Accept-Language: it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4';
+        $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
+
+        // Add additional headers based on the type of request.
+        switch ($httpType) {
+        case 'origin':
+          $headers[] = 'Origin: '.$this->MY_TELEGRAM_URL;
+          $headers[] = 'Accept-Encoding: gzip, deflate, br';
+          $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
+          $headers[] = 'Accept: application/json, text/javascript, */*; q=0.01';
+          $headers[] = 'Referer: '.$this->MY_TELEGRAM_URL.'/auth';
+          $headers[] = 'X-Requested-With: XMLHttpRequest';
+        break;
+        case 'refer':
+          $headers[] = 'Accept-Encoding: gzip, deflate, sdch, br';
+          $headers[] = 'Upgrade-Insecure-Requests: 1';
+          $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
+          $headers[] = 'Referer: '.$this->MY_TELEGRAM_URL;
+          $headers[] = 'Cache-Control: max-age=0';
+        break;
+        case 'app':
+          $headers[] = 'Origin: '.$this->MY_TELEGRAM_URL;
+          $headers[] = 'Accept-Encoding: gzip, deflate, br';
+          $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
+          $headers[] = 'Accept: */*';
+          $headers[] = 'Referer: '.$this->MY_TELEGRAM_URL.'/apps';
+          $headers[] = 'X-Requested-With: XMLHttpRequest';
+        break;
+        }
+
+        // Add every cookie to the header.
+        foreach ($cookies as $cookie) {
+            $headers[] = 'Cookie: '.$cookie;
+        }
+
+        return $headers;
+    }
+
     public function complete_login($password)
     {
         if ($this->logged) {
@@ -72,23 +110,14 @@ class MyTelegramOrgWrapper
         }
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, 'https://my.telegram.org/auth/login');
+        curl_setopt($ch, CURLOPT_URL, $this->MY_TELEGRAM_URL.'/auth/login');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(['phone' => $this->number, 'random_hash' => $this->hash, 'password' => $password]));
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
 
-        $headers = [];
-        $headers[] = 'Origin: https://my.telegram.org';
-        $headers[] = 'Accept-Encoding: gzip, deflate, br';
-        $headers[] = 'Accept-Language: it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4';
-        $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
-        $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
-        $headers[] = 'Accept: application/json, text/javascript, */*; q=0.01';
-        $headers[] = 'Referer: https://my.telegram.org/auth';
-        $headers[] = 'X-Requested-With: XMLHttpRequest';
-        $headers[] = 'Connection: keep-alive';
-        $headers[] = 'Dnt: 1';
+        $headers = $this->get_headers('origin', []);
+
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
@@ -125,20 +154,14 @@ class MyTelegramOrgWrapper
         }
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, 'https://my.telegram.org/apps');
+        curl_setopt($ch, CURLOPT_URL, $this->MY_TELEGRAM_URL.'/apps');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-        $headers = [];
-        $headers[] = 'Dnt: 1';
-        $headers[] = 'Accept-Encoding: gzip, deflate, sdch, br';
-        $headers[] = 'Accept-Language: it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4';
-        $headers[] = 'Upgrade-Insecure-Requests: 1';
-        $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
-        $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
-        $headers[] = 'Referer: https://my.telegram.org/';
-        $headers[] = 'Cookie: stel_token='.$this->token;
-        $headers[] = 'Connection: keep-alive';
-        $headers[] = 'Cache-Control: max-age=0';
+
+        $cookies = [];
+        array_push($cookies, 'stel_token='.$this->token);
+        $headers = $this->get_headers('refer', $cookies);
+
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         $result = curl_exec($ch);
         if (curl_errno($ch)) {
@@ -164,20 +187,14 @@ class MyTelegramOrgWrapper
         }
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, 'https://my.telegram.org/apps');
+        curl_setopt($ch, CURLOPT_URL, $this->MY_TELEGRAM_URL.'/apps');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-        $headers = [];
-        $headers[] = 'Dnt: 1';
-        $headers[] = 'Accept-Encoding: gzip, deflate, sdch, br';
-        $headers[] = 'Accept-Language: it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4';
-        $headers[] = 'Upgrade-Insecure-Requests: 1';
-        $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
-        $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
-        $headers[] = 'Referer: https://my.telegram.org/';
-        $headers[] = 'Cookie: stel_token='.$this->token;
-        $headers[] = 'Connection: keep-alive';
-        $headers[] = 'Cache-Control: max-age=0';
+
+        $cookies = [];
+        array_push($cookies, 'stel_token='.$this->token);
+        $headers = $this->get_headers('refer', $cookies);
+
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         $result = curl_exec($ch);
         if (curl_errno($ch)) {
@@ -210,24 +227,16 @@ class MyTelegramOrgWrapper
 
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, 'https://my.telegram.org/apps/create');
+        curl_setopt($ch, CURLOPT_URL, $this->MY_TELEGRAM_URL.'/apps/create');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(['hash' => $this->creation_hash, 'app_title' => $settings['app_title'], 'app_shortname' => $settings['app_shortname'], 'app_url' => $settings['app_url'], 'app_platform' => $settings['app_platform'], 'app_desc' => $settings['app_desc']]));
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
 
-        $headers = [];
-        $headers[] = 'Cookie: stel_token='.$this->token;
-        $headers[] = 'Origin: https://my.telegram.org';
-        $headers[] = 'Accept-Encoding: gzip, deflate, br';
-        $headers[] = 'Accept-Language: it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4';
-        $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
-        $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
-        $headers[] = 'Accept: */*';
-        $headers[] = 'Referer: https://my.telegram.org/apps';
-        $headers[] = 'X-Requested-With: XMLHttpRequest';
-        $headers[] = 'Connection: keep-alive';
-        $headers[] = 'Dnt: 1';
+        $cookies = [];
+        array_push($cookies, 'stel_token='.$this->token);
+        $headers = $this->get_headers('app', $cookies);
+
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
@@ -242,23 +251,16 @@ class MyTelegramOrgWrapper
 
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, 'https://my.telegram.org/apps');
+        curl_setopt($ch, CURLOPT_URL, $this->MY_TELEGRAM_URL.'/apps');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
 
-        $headers = [];
-        $headers[] = 'Dnt: 1';
-        $headers[] = 'Accept-Encoding: gzip, deflate, sdch, br';
-        $headers[] = 'Accept-Language: it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4';
-        $headers[] = 'Upgrade-Insecure-Requests: 1';
-        $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
-        $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
-        $headers[] = 'Referer: https://my.telegram.org/';
-        $headers[] = 'Cookie: stel_token='.$this->token;
-        $headers[] = 'Connection: keep-alive';
-        $headers[] = 'Cache-Control: max-age=0';
+        $cookies = [];
+        array_push($cookies, 'stel_token='.$this->token);
+        $headers = $this->get_headers('refer', $cookies);
+
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
