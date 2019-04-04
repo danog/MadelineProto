@@ -25,7 +25,7 @@ class MyTelegramOrgWrapper
 {
     private $logged = false;
     private $hash = '';
-    public static $MY_TELEGRAM_URL = 'https://my.telegram.org';
+    const MY_TELEGRAM_URL = 'https://my.telegram.org';
 
     public function __construct($number)
     {
@@ -35,7 +35,7 @@ class MyTelegramOrgWrapper
         $this->number = $number;
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, $this->MY_TELEGRAM_URL.'/auth/send_password');
+        curl_setopt($ch, CURLOPT_URL, self::MY_TELEGRAM_URL.'/auth/send_password');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(['phone' => $number]));
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -71,26 +71,26 @@ class MyTelegramOrgWrapper
         // Add additional headers based on the type of request.
         switch ($httpType) {
         case 'origin':
-          $headers[] = 'Origin: '.$this->MY_TELEGRAM_URL;
+          $headers[] = 'Origin: '.self::MY_TELEGRAM_URL;
           $headers[] = 'Accept-Encoding: gzip, deflate, br';
           $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
           $headers[] = 'Accept: application/json, text/javascript, */*; q=0.01';
-          $headers[] = 'Referer: '.$this->MY_TELEGRAM_URL.'/auth';
+          $headers[] = 'Referer: '.self::MY_TELEGRAM_URL.'/auth';
           $headers[] = 'X-Requested-With: XMLHttpRequest';
         break;
         case 'refer':
           $headers[] = 'Accept-Encoding: gzip, deflate, sdch, br';
           $headers[] = 'Upgrade-Insecure-Requests: 1';
           $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
-          $headers[] = 'Referer: '.$this->MY_TELEGRAM_URL;
+          $headers[] = 'Referer: '.self::MY_TELEGRAM_URL;
           $headers[] = 'Cache-Control: max-age=0';
         break;
         case 'app':
-          $headers[] = 'Origin: '.$this->MY_TELEGRAM_URL;
+          $headers[] = 'Origin: '.self::MY_TELEGRAM_URL;
           $headers[] = 'Accept-Encoding: gzip, deflate, br';
           $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
           $headers[] = 'Accept: */*';
-          $headers[] = 'Referer: '.$this->MY_TELEGRAM_URL.'/apps';
+          $headers[] = 'Referer: '.self::MY_TELEGRAM_URL.'/apps';
           $headers[] = 'X-Requested-With: XMLHttpRequest';
         break;
         }
@@ -110,7 +110,7 @@ class MyTelegramOrgWrapper
         }
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, $this->MY_TELEGRAM_URL.'/auth/login');
+        curl_setopt($ch, CURLOPT_URL, self::MY_TELEGRAM_URL.'/auth/login');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(['phone' => $this->number, 'random_hash' => $this->hash, 'password' => $password]));
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -154,7 +154,7 @@ class MyTelegramOrgWrapper
         }
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, $this->MY_TELEGRAM_URL.'/apps');
+        curl_setopt($ch, CURLOPT_URL, self::MY_TELEGRAM_URL.'/apps');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
 
@@ -187,7 +187,7 @@ class MyTelegramOrgWrapper
         }
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, $this->MY_TELEGRAM_URL.'/apps');
+        curl_setopt($ch, CURLOPT_URL, self::MY_TELEGRAM_URL.'/apps');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
 
@@ -227,7 +227,7 @@ class MyTelegramOrgWrapper
 
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, $this->MY_TELEGRAM_URL.'/apps/create');
+        curl_setopt($ch, CURLOPT_URL, self::MY_TELEGRAM_URL.'/apps/create');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(['hash' => $this->creation_hash, 'app_title' => $settings['app_title'], 'app_shortname' => $settings['app_shortname'], 'app_url' => $settings['app_url'], 'app_platform' => $settings['app_platform'], 'app_desc' => $settings['app_desc']]));
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -251,7 +251,7 @@ class MyTelegramOrgWrapper
 
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, $this->MY_TELEGRAM_URL.'/apps');
+        curl_setopt($ch, CURLOPT_URL, self::MY_TELEGRAM_URL.'/apps');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 
