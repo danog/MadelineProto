@@ -17,6 +17,7 @@ set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelinePro
  */
 if (!file_exists(__DIR__.'/vendor/autoload.php')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
+    define('MADELINE_BRANCH','');
     if (!file_exists('madeline.php')) {
         copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
