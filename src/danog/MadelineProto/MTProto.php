@@ -434,10 +434,14 @@ class MTProto implements TLCallback
             }
         }
         // Detect device model
-        try {
-            $device_model = php_uname('s');
-        } catch (\danog\MadelineProto\Exception $e) {
-            $device_model = 'Web server';
+        if (isset($settings['device_model']) AND $settings['device_model']) {
+            $device_model = $settings['device_model'];
+        } else {
+            try {
+                $device_model = php_uname('s');
+            } catch (\danog\MadelineProto\Exception $e) {
+                $device_model = 'Web server';
+            }
         }
         if ($settings['app_info']['api_id'] === 6) {
             // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
@@ -457,10 +461,14 @@ class MTProto implements TLCallback
             $device_model = 'LGENexus 5';
         }
         // Detect system version
-        try {
-            $system_version = php_uname('r');
-        } catch (\danog\MadelineProto\Exception $e) {
-            $system_version = phpversion();
+        if (isset($settings['system_version']) AND $settings['system_version']) {
+            $system_version = $settings['system_version'];
+        } else {
+            try {
+                $system_version = php_uname('r');
+            } catch (\danog\MadelineProto\Exception $e) {
+                $system_version = phpversion();
+            }
         }
         if ($settings['app_info']['api_id'] === 6) {
             // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
@@ -623,7 +631,6 @@ class MTProto implements TLCallback
             'device_model' => $device_model,
             'system_version' => $system_version,
             'app_version' => $app_version,
-            // ðŸŒš
             //                'app_version'     => self::V,
             'lang_code' => $lang_code,
             'lang_pack' => $lang_pack,
