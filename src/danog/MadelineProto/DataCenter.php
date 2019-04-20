@@ -97,9 +97,9 @@ class DataCenter
 
                 return true;
             } catch (\Throwable $e) {
-                $this->API->logger->logger('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Connection failed: ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             } catch (\Exception $e) {
-                $this->API->logger->logger('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Connection failed: ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             }
         }
 
@@ -203,7 +203,7 @@ class DataCenter
                     throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
                 }
                 if ($proxy === ObfuscatedStream::getName() && in_array(strlen($extra['secret']), [17, 34])) {
-                    $combos []= [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [$proxy, $extra], [IntermediatePaddedStream::getName(), []]];
+                    $combos[] = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [$proxy, $extra], [IntermediatePaddedStream::getName(), []]];
                 }
                 foreach ($combos as $k => $orig) {
                     $combo = [];
@@ -248,7 +248,6 @@ class DataCenter
                     continue;
                 }
 
-
                 $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
                 $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
 
@@ -262,11 +261,11 @@ class DataCenter
                         }
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
 
-                        $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
+                        $uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
                     } elseif ($stream === HttpStream::getName()) {
-                        $uri = 'tcp://'.$address.':'.$port.'/api';
+                        $uri = 'tcp://' . $address . ':' . $port . '/api';
                     } else {
-                        $uri = 'tcp://'.$address.':'.$port;
+                        $uri = 'tcp://' . $address . ':' . $port;
                     }
 
                     if ($combo[1][0] === WssStream::getName()) {
@@ -276,7 +275,7 @@ class DataCenter
                         }
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
 
-                        $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
+                        $uri = 'tcp://' . $subdomain . '.'.'web.telegram.org'.':' . $port . '/' . $path;
                     } elseif ($combo[1][0] === WsStream::getName()) {
                         $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
                         if (strpos($dc_number, '_media') !== false) {
@@ -285,7 +284,7 @@ class DataCenter
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
 
                         //$uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
-                        $uri = 'tcp://'.$address.':'.$port.'/'.$path;
+                        $uri = 'tcp://' . $address . ':' . $port . '/' . $path;
                     }
 
                     /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
@@ -304,8 +303,8 @@ class DataCenter
             }
         }
 
-        if (isset($this->dclist[$test][$ipv6][$dc_number.'_bk']['ip_address'])) {
-            $ctxs = array_merge($ctxs, $this->generate_contexts($dc_number.'_bk'));
+        if (isset($this->dclist[$test][$ipv6][$dc_number . '_bk']['ip_address'])) {
+            $ctxs = array_merge($ctxs, $this->generate_contexts($dc_number . '_bk'));
         }
 
         if (empty($ctxs)) {

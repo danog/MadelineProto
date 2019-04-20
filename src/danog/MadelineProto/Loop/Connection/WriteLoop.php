@@ -98,7 +98,7 @@ class WriteLoop extends ResumableSignalLoop
 
                 $pad_length = -$length & 15;
                 $pad_length += 16 * $this->random_int($modulus = 16);
-
+                
                 $pad = $this->random($pad_length);
                 $buffer = yield $connection->stream->getWriteBuffer(8 + 8 + 4 + $pad_length + $length);
 
