@@ -264,7 +264,7 @@ trait ResponseHandler
                             foreach ($this->datacenter->sockets[$datacenter]->new_outgoing as $key => $expecting_msg_id) {
                                 $expecting = $this->datacenter->sockets[$datacenter]->outgoing_messages[$expecting_msg_id];
 
-                                $this->logger->logger('Does the request of return type '.$expecting['type'].' match?', \danog\MadelineProto\Logger::VERBOSE);
+                                $this->logger->logger('Does the request of return type '.(isset($expecting['type']) ? $expecting['type'] : json_encode($expecting)).' match?', \danog\MadelineProto\Logger::VERBOSE);
                                 if ($response_type === $expecting['type']) {
                                     $this->logger->logger('Yes', \danog\MadelineProto\Logger::VERBOSE);
                                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
