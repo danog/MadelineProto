@@ -104,13 +104,15 @@ trait Loop
         $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
 
         while (true) {
-            foreach ($this->updates as $update) {
+            $updates = $this->updates;
+            $this->updates = [];
+            foreach ($updates as $update) {
                 $r = $this->settings['updates']['callback']($update);
                 if (is_object($r)) {
                     \Amp\Promise\rethrow($this->call($r));
                 }
             }
-            $this->updates = [];
+            $updates = [];
 
             if ($this->loop_callback !== null) {
                 $callback = $this->loop_callback;

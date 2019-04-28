@@ -42,10 +42,10 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         if ($res == '') {
             $res = var_export($update, true);
         }
-        yield $this->sleep_async(3);
+        //yield $this->sleep_async(3);
 
         try {
-            yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>\n\nDopo 3 secondi, in modo asincrono", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']); //'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
+            yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']); //'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             \danog\MadelineProto\Logger::log((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
         } catch (\danog\MadelineProto\Exception $e) {
