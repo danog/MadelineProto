@@ -26,6 +26,10 @@ use Amp\Loop;
  */
 trait PeerHandler
 {
+    public $caching_simple = [];
+    public $caching_simple_username = [];
+    public $caching_possible_username = [];
+    
     public function to_supergroup($id)
     {
         return -($id + pow(10, (int) floor(log($id, 10) + 3)));
@@ -43,51 +47,30 @@ trait PeerHandler
         return ($log - intval($log)) * 1000 < 10;
     }
 
-    public function handle_pending_pwrchat()
-    {
-        if ($this->postpone_pwrchat || empty($this->pending_pwrchat)) {
-            return false;
-        }
-        $this->postpone_pwrchat = true;
-
-        try {
-            $this->logger->logger('Handling pending pwrchat queries...', \danog\MadelineProto\Logger::VERBOSE);
-            foreach ($this->pending_pwrchat as $query => $params) {
-                unset($this->pending_pwrchat[$query]);
-
-                try {
-                    $this->get_pwr_chat($query, ...$params);
-                } catch (\danog\MadelineProto\Exception $e) {
-                    $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
-                } catch (\danog\MadelineProto\RPCErrorException $e) {
-                    $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
-                }
-            }
-        } finally {
-            $this->postpone_pwrchat = false;
-        }
-    }
-
     public function add_support($support)
     {
         $this->supportUser = $support['user']['id'];
     }
 
-    public function add_users($users)
-    {
-        foreach ($users as $user) {
-            $this->add_user($user);
-        }
-    }
-
     public function add_user($user)
     {
         if (!isset($user['access_hash'])) {
-            $this->logger->logger("No access hash with user {$user['id']}, trying to fetch by ID...");
-            $this->cache_pwr_chat($user['id'], false, true);
-            if (isset($user['username']) && !isset($this->chats[$user['id']])) {
+            /*if (isset($this->chats[$user['id']]['access_hash']) && $this->chats[$user['id']]['access_hash']) {
+                $this->logger->logger("No access hash with user {$user['id']}, using backup");
+                $user['access_hash'] = $this->chats[$user['id']]['access_hash'];
+            } else {
+                $this->logger->logger("No access hash with user {$user['id']}, not trying to fetch it");
+                $user['access_hash'] = 0;
+            }*/
+            if (!isset($this->caching_simple[$user['id']]) && !(isset($user['username']) && isset($this->caching_simple_username[$user['username']]))) {
+                $this->logger->logger("No access hash with user {$user['id']}, trying to fetch by ID...");
+                if (isset($user['username']) && !isset($this->caching_simple_username[$user['username']])) $this->caching_possible_username[$user['id']] = $user['username'];
+                $this->cache_pwr_chat($user['id'], false, true);
+            } else if (isset($user['username']) && !isset($this->chats[$user['id']]) && !isset($this->caching_simple_username[$user['username']])) {
                 $this->logger->logger("No access hash with user {$user['id']}, trying to fetch by username...");
                 $this->cache_pwr_chat($user['username'], false, true);
+            } else {
+                $this->logger->logger("No access hash with user {$user['id']}, tried and failed to fetch data...");
             }
 
             return;
@@ -104,13 +87,6 @@ trait PeerHandler
             default:
                 throw new \danog\MadelineProto\Exception('Invalid user provided', $user);
                 break;
-        }
-    }
-
-    public function add_chats($chats)
-    {
-        foreach ($chats as $chat) {
-            $this->add_chat($chat);
         }
     }
 
@@ -132,13 +108,17 @@ trait PeerHandler
             case 'channelForbidden':
                 $bot_api_id = $this->to_supergroup($chat['id']);
                 if (!isset($chat['access_hash'])) {
-                    $this->logger->logger("Chat $bot_api_id does not have access hash, fetching by ID...");
-                    $this->cache_pwr_chat($bot_api_id, $this->settings['peer']['full_fetch'], true);
-                    if (isset($chat['username']) && !isset($this->chats[$bot_api_id])) {
-                        $this->logger->logger("Chat $bot_api_id does not have access hash, fetching by username...");
-                        $this->cache_pwr_chat($chat['username'], $this->settings['peer']['full_fetch'], true);
-                    }
+                    if (!isset($this->caching_simple[$bot_api_id]) && !(isset($chat['username']) && isset($this->caching_simple_username[$chat['username']]))) {
+                        $this->logger->logger("No access hash with {$chat['_']} {$bot_api_id}, trying to fetch by ID...");
+                        if (isset($chat['username']) && !isset($this->caching_simple_username[$chat['username']])) $this->caching_possible_username[$bot_api_id] = $chat['username'];
 
+                        $this->cache_pwr_chat($bot_api_id, false, true);
+                    } else if (isset($chat['username']) && !isset($this->chats[$bot_api_id]) && !isset($this->caching_simple_username[$chat['username']])) {
+                        $this->logger->logger("No access hash with {$chat['_']} {$bot_api_id}, trying to fetch by username...");
+                        $this->cache_pwr_chat($chat['username'], false, true);
+                    } else {
+                        $this->logger->logger("No access hash with {$chat['_']} {$bot_api_id}, tried and failed to fetch data...");
+                    }
                     return;
                 }
                 if (!isset($this->chats[$bot_api_id]) || $this->chats[$bot_api_id] !== $chat) {
@@ -159,19 +139,15 @@ trait PeerHandler
 
     public function cache_pwr_chat($id, $full_fetch, $send)
     {
-        if ($this->postpone_pwrchat) {
-            $this->pending_pwrchat[$id] = [$full_fetch, $send];
-        } else {
             Loop::defer(function () use ($id, $full_fetch, $send) {
                 try {
                     $this->get_pwr_chat($id, $full_fetch, $send);
                 } catch (\danog\MadelineProto\Exception $e) {
-                    $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                    $this->logger->logger("While caching: ".$e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
-                    $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                    $this->logger->logger("While caching: ".$e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                 }
             });
-        }
     }
 
     public function peer_isset($id)
@@ -370,9 +346,12 @@ trait PeerHandler
         $try_id = $this->get_id($id);
         if ($try_id !== false) $id = $try_id;
 
+        $tried_simple = false;
+
         if (is_numeric($id)) {
             if (!isset($this->chats[$id])) {
                 try {
+                    $this->caching_simple[$id] = true;
                     if ($id < 0) {
                         if ($this->is_supergroup($id)) {
                             $this->method_call('channels.getChannels', ['id' => [['access_hash' => 0, 'channel_id' => $this->from_supergroup($id), '_' => 'inputChannel']]], ['datacenter' => $this->datacenter->curdc]);
@@ -386,6 +365,9 @@ trait PeerHandler
                     $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                } finally {
+                    if (isset($this->caching_simple[$id])) unset($this->caching_simple[$id]);
+                    $tried_simple = true;
                 }
             }
             if (isset($this->chats[$id])) {
@@ -407,7 +389,13 @@ trait PeerHandler
                     return $this->get_info($id, false);
                 }
             }
+            if ($tried_simple && isset($this->caching_possible_username[$id])) {
+                $this->logger->logger("No access hash with $id, trying to fetch by username...");
 
+                $user = $this->caching_possible_username[$id];
+                unset($this->caching_possible_username[$id]);
+                return $this->get_info($user);
+            }
             throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
         }
         if (preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $id, $matches)) {
@@ -860,6 +848,7 @@ trait PeerHandler
     public function resolve_username($username)
     {
         try {
+            $this->caching_simple_username[$username] = true;
             $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             $this->logger->logger('Username resolution failed with error '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
@@ -868,6 +857,8 @@ trait PeerHandler
             }
 
             return false;
+        } finally {
+            if (isset($this->caching_simple_username[$username])) unset($this->caching_simple_username[$username]);
         }
         if ($res['_'] === 'contacts.resolvedPeer') {
             return $res;

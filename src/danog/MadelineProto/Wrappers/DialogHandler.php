@@ -23,8 +23,12 @@ trait DialogHandler
 {
     public function get_dialogs($force = true)
     {
+        return $this->wait($this->get_dialogs_async($force));
+    }
+    public function get_dialogs_async($force = true)
+    {
         if ($force || !isset($this->dialog_params['offset_date']) || is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || is_null($this->dialog_params['count'])) {
-            $this->dialog_params = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
+            $this->dialog_params = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];
         }
         if (!isset($this->dialog_params['hash'])) {
             $this->dialog_params['hash'] = 0;
@@ -36,18 +40,40 @@ trait DialogHandler
         $this->postpone_updates = true;
 
         try {
+            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getting_dialogs']);
             while ($this->dialog_params['count'] < $res['count']) {
-                $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getting_dialogs']);
-                $res = $this->method_call('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
-                foreach ($res['dialogs'] as $dialog) {
+                $res = yield $this->method_call_async_read('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
+                $last_peer = [];
+                $last_date = 0;
+                $last_id = 0;
+                $res['messages'] = array_reverse($res['messages']);
+                foreach (array_reverse($res['dialogs']) as $dialog) {
                     if (!in_array($dialog['peer'], $peers)) {
                         $peers[] = $dialog['peer'];
                     }
+                    if (!$last_date) {
+                        if (!$last_peer) {
+                            $last_peer = $dialog['peer'];
+                        }
+                        if (!$last_id) {
+                            $last_id = $dialog['top_message'];
+                        }
+                        foreach ($res['messages'] as $message) {
+                            if (yield $this->get_info($message)['Peer'] === $last_peer && $last_id === $message['id']) {
+                                $last_date = $message['date'];
+                                break;
+                            }
+                        }
+                    }
                 }
-                $this->dialog_params['count'] += count($res['dialogs']);
-                $this->dialog_params['offset_date'] = end($res['messages'])['date'];
-                $this->dialog_params['offset_peer'] = end($res['dialogs'])['peer'];
-                $this->dialog_params['offset_id'] = end($res['messages'])['id'] & 4294967296;
+                if ($last_date) {
+                    $this->dialog_params['offset_date'] = $last_date;
+                    $this->dialog_params['offset_peer'] = $last_peer;
+                    $this->dialog_params['offset_id'] = $last_id;
+                    $this->dialog_params['count'] = count($peers);
+                } else {
+                    break;
+                }
                 if (!isset($res['count'])) {
                     break;
                 }

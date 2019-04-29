@@ -632,7 +632,7 @@ trait UpdateHandler
         if (isset($update['message']['from_id']) && $update['message']['from_id'] === $this->authorization['user']['id']) {
             $update['message']['out'] = true;
         }
-        $this->logger->logger('Saving an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
+        //$this->logger->logger('Saving an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict'] && isset($this->settings['pwr']['update_handler'])) {
             $this->pwr_update_handler($update);
         } elseif ($this->settings['updates']['run_callback']) {

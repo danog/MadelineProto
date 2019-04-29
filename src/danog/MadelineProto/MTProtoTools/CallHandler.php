@@ -257,6 +257,9 @@ trait CallHandler
         if (isset($aargs['botAPI'])) {
             $message['botAPI'] = $aargs['botAPI'];
         }
+        if (isset($aargs['FloodWaitLimit'])) {
+            $message['FloodWaitLimit'] = $aargs['FloodWaitLimit'];
+        }
         if (($method === 'users.getUsers' && $args === ['id' => [['_' => 'inputUserSelf']]]) || $method === 'auth.exportAuthorization' || $method === 'updates.getDifference') {
             $message['user_related'] = true;
         }

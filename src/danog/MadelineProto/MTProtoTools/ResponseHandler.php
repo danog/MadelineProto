@@ -469,9 +469,12 @@ trait ResponseHandler
                             return;
                         case 420:
                             $seconds = preg_replace('/[^0-9]+/', '', $response['error_message']);
-                            $limit = isset($aargs['FloodWaitLimit']) ? $aargs['FloodWaitLimit'] : $this->settings['flood_timeout']['wait_if_lt'];
+                            $limit = isset($request['FloodWaitLimit']) ? $request['FloodWaitLimit'] : $this->settings['flood_timeout']['wait_if_lt'];
                             if (is_numeric($seconds) && $seconds < $limit) {
+                                //$this->got_response_for_outgoing_message_id($request_id, $datacenter);
+
                                 $this->logger->logger('Flood, waiting '.$seconds.' seconds before repeating async call...', \danog\MadelineProto\Logger::NOTICE);
+                                $request['sent'] += $seconds;
                                 Loop::delay($seconds * 1000, [$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
 
                                 return;
