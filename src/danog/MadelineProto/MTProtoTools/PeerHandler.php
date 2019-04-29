@@ -240,6 +240,7 @@ trait PeerHandler
                 case 'notifyPeer':
                 case 'dialog':
                 case 'help.proxyDataPromo':
+                case 'updateChatDefaultBannedRights':
                     return $this->get_id($id['peer']);
                 case 'inputUserSelf':
                 case 'inputPeerSelf':
@@ -290,6 +291,7 @@ trait PeerHandler
                 case 'updateChatParticipantDelete':
                 case 'updateChatParticipantAdmin':
                 case 'updateChatAdmins':
+                case 'updateChatPinnedMessage':
                     return -$id['chat_id'];
                 case 'updateUserTyping':
                 case 'updateUserStatus':
@@ -305,6 +307,7 @@ trait PeerHandler
                 case 'updateBotCallbackQuery':
                 case 'updateBotPrecheckoutQuery':
                 case 'updateBotShippingQuery':
+                case 'updateUserPinnedMessage':
                     return $id['user_id'];
                 case 'updatePhoneCall':
                     return $id->getOtherID();
