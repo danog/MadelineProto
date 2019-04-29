@@ -1,7 +1,8 @@
 # MadelineProto, a PHP MTProto telegram client
 
-Do join the official channel, [@MadelineProto](https://t.me/MadelineProto) and the [support groups](https://t.me/pwrtelegramgroup)!
+Created by <a href="https://daniil.it" target="_blank" rel="noopener">Daniil Gentili</a>
 
+Do join the official channel, [@MadelineProto](https://t.me/MadelineProto) and the [support groups](https://t.me/pwrtelegramgroup)!
 
 ## What's this?
 
