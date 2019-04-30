@@ -441,13 +441,20 @@ trait UpdateHandler
                 break;
         }
         if (isset($update['pts'])) {
+            $logger = function ($msg) use ($update, $cur_state, $channel_id) {
+                $pts_count = isset($update['pts_count']) ? $update['pts_count'] : 0;
+                $this->logger->logger($update);
+                $double = isset($update['message']['id']) ? $update['message']['id']*2 : '-';
+                $mid = isset($update['message']['id']) ? $update['message']['id'] : '-';
+                $this->logger->logger("$msg. My pts: {$cur_state['pts']}, remote pts: {$update['pts']}, remote pts count: {$pts_count}, msg id: {$mid} (*2=$double), channel id: $channel_id", \danog\MadelineProto\Logger::ERROR);
+            };
             if ($update['pts'] < $cur_state['pts']) {
-                $this->logger->logger('Duplicate update, channel id: '.$channel_id, \danog\MadelineProto\Logger::ERROR);
+                $logger("PTS duplicate");
 
                 return false;
             }
             if ($cur_state['pts'] + (isset($update['pts_count']) ? $update['pts_count'] : 0) !== $update['pts']) {
-                $this->logger->logger('Pts hole. current pts: '.$cur_state['pts'].', pts count: '.(isset($update['pts_count']) ? $update['pts_count'] : 0).', pts: '.$update['pts'].', channel id: '.$channel_id, \danog\MadelineProto\Logger::ERROR);
+                $logger("PTS hole");
                 if ($channel_id !== false && $this->peer_isset($this->to_supergroup($channel_id))) {
                     $this->get_channel_difference($channel_id);
                 } else {
@@ -458,12 +465,14 @@ trait UpdateHandler
             }
             if (isset($update['message']['id'], $update['message']['to_id']) && !in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage'])) {
                 if (!$this->check_msg_id($update['message'])) {
-                    $this->logger->logger('Duplicate update by message id, channel id: '.$channel_id, \danog\MadelineProto\Logger::ERROR);
+                    $logger("MSGID duplicate");
 
                     return false;
                 }
             }
-            $this->logger->logger('Applying pts. current pts: '.$cur_state['pts'].', new pts: '.$update['pts'].', channel id: '.$channel_id, \danog\MadelineProto\Logger::VERBOSE);
+            $logger("PTS OK");
+
+            //$this->logger->logger('Applying pts. my pts: '.$cur_state['pts'].', remote pts: '.$update['pts'].', channel id: '.$channel_id, \danog\MadelineProto\Logger::VERBOSE);
             $cur_state['pts'] = $update['pts'];
             if ($channel_id === false && isset($options['date']) && $cur_state['date'] < $options['date']) {
                 $cur_state['date'] = $options['date'];
@@ -623,6 +632,9 @@ trait UpdateHandler
             }
             //$this->logger->logger($update, \danog\MadelineProto\Logger::NOTICE);
         }
+        //if ($update['_'] === 'updateServiceNotification' && strpos($update['type'], 'AUTH_KEY_DROP_') === 0) {
+            
+        //}
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
