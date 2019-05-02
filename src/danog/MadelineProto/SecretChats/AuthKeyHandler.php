@@ -110,7 +110,11 @@ trait AuthKeyHandler
 
     public function notify_layer($chat)
     {
-        $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNotifyLayer', 'layer' => $this->encrypted_layer]]], ['datacenter' => $this->datacenter->curdc]);
+        return $this->wait($this->notify_layer_async($chat));
+    }
+    public function notify_layer_async($chat)
+    {
+        yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNotifyLayer', 'layer' => $this->encrypted_layer]]], ['datacenter' => $this->datacenter->curdc]);
     }
 
     protected $temp_rekeyed_secret_chats = [];

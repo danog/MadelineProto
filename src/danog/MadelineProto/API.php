@@ -62,14 +62,17 @@ class API extends APIFactory
                     class_exists('\\Volatile');
                     $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                     foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                        class_exists('\\danog\\MadelineProto\\'.$class);
+                        class_exists('\\danog\\MadelineProto\\' . $class);
                     }
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Exception $e) {
+                    if ($e->getFile() === 'MadelineProto' && $e->getLine() === 1) {
+                        throw $e;
+                    }
                     class_exists('\\Volatile');
                     $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                     foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                        class_exists('\\danog\\MadelineProto\\'.$class);
+                        class_exists('\\danog\\MadelineProto\\' . $class);
                     }
                     Logger::log((string) $e, Logger::ERROR);
                     if (strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
@@ -89,6 +92,15 @@ class API extends APIFactory
 
                 if (isset($unserialized->API)) {
                     $this->API = $unserialized->API;
+                    $promise = $this->call(function () {
+                        yield $this->API->asyncInitPromise;
+                        $this->API->asyncInitPromise = null;
+                        $this->APIFactory();
+                        \danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
+                        $pong = $this->ping(['ping_id' => 3], ['async' => true]);
+                        \danog\MadelineProto\Logger::log('Pong: ' . $pong['ping_id'], Logger::ULTRA_VERBOSE);
+                        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
+                    });            
                     $this->APIFactory();
 
                     return;
@@ -103,11 +115,16 @@ class API extends APIFactory
         }
         $this->API = new MTProto($params);
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['apifactory_start'], Logger::VERBOSE);
-        $this->APIFactory();
-        \danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
-        $pong = $this->ping(['ping_id' => 3]);
-        \danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
-        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
+        $promise = $this->call(function () {
+            yield $this->API->asyncInitPromise;
+            $this->API->asyncInitPromise = null;
+            $this->APIFactory();
+            \danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
+            $pong = $this->ping(['ping_id' => 3], ['async' => true]);
+            \danog\MadelineProto\Logger::log('Pong: ' . $pong['ping_id'], Logger::ULTRA_VERBOSE);
+            \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
+        });
+        $this->APIFactory();        
     }
 
     public function async($async)
@@ -156,6 +173,10 @@ class API extends APIFactory
     public function __set($name, $value)
     {
         if ($name === 'settings') {
+            if ($this->API->phoneConfigWatcherId) {
+                $this->wait($this->API->phoneConfigWatcherId);
+                $this->API->phoneConfigWatcherId = null;
+            }
             if (Magic::is_fork() && !Magic::$processed_fork) {
                 \danog\MadelineProto\Logger::log('Detected fork');
                 $this->API->reset_session();

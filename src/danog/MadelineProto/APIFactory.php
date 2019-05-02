@@ -124,7 +124,7 @@ class APIFactory
 
     public function __construct($namespace, $API)
     {
-        $this->namespace = $namespace.'.';
+        $this->namespace = $namespace . '.';
         $this->API = $API;
     }
 
@@ -143,23 +143,24 @@ class APIFactory
             $this->API->setdem = false;
             $this->API->__construct($this->API->settings);
         }
-        $this->API->get_config([], ['datacenter' => $this->API->datacenter->curdc]);
+        //$this->API->get_config([], ['datacenter' => $this->API->datacenter->curdc]);
 
         if (isset($this->session) && !is_null($this->session) && time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
             Logger::log("Didn't serialize in a while, doing that now...");
             $this->serialize($this->session);
         }
+        /*
         if ($name !== 'accept_tos' && $name !== 'decline_tos') {
             $this->API->check_tos();
-        }
+        }*/
         $lower_name = strtolower($name);
 
         if ($this->lua === false) {
-            return $this->namespace !== '' || !isset($this->methods[$lower_name]) ? $this->__mtproto_call($this->namespace.$name, $arguments) : $this->__api_call($lower_name, $arguments);
+            return $this->namespace !== '' || !isset($this->methods[$lower_name]) ? $this->__mtproto_call($this->namespace . $name, $arguments) : $this->__api_call($lower_name, $arguments);
         }
 
         try {
-            $deserialized = $this->namespace !== '' || !isset($this->methods[$lower_name]) ? $this->__mtproto_call($this->namespace.$name, $arguments) : $this->__api_call($lower_name, $arguments);
+            $deserialized = $this->namespace !== '' || !isset($this->methods[$lower_name]) ? $this->__mtproto_call($this->namespace . $name, $arguments) : $this->__api_call($lower_name, $arguments);
 
             Lua::convert_objects($deserialized);
 
@@ -183,10 +184,23 @@ class APIFactory
 
     public function __api_call($name, $arguments)
     {
+        if ($this->API->asyncInitPromise) {
+            $async = is_array(end($arguments)) && isset(end($arguments)['async']) ? end($arguments)['async'] : ($this->async && $name !== 'loop');
+            if ($async) {
+                return $this->call(function () use ($name, $arguments) {
+                    yield $this->API->asyncInitPromise;
+                    $this->API->asyncInitPromise = null;
+                    return yield $this->methods[$name](...$arguments);
+                });
+            } else {
+                $this->wait($this->API->asyncInitPromise);
+                $this->API->asyncInitPromise = null;
+            }
+        }
         $result = $this->methods[$name](...$arguments);
         if (is_object($result) && ($result instanceof \Generator || $result instanceof Promise)) {
-            $async = is_array(end($arguments)) && isset(end($arguments)['async']) ? end($arguments)['async'] : $this->async;
-            if ($async && ($name !== 'loop' || isset(end($arguments)['async']))) {
+            $async = is_array(end($arguments)) && isset(end($arguments)['async']) ? end($arguments)['async'] : ($this->async && $name !== 'loop');
+            if ($async) {
                 return $result;
             } else {
                 return $this->wait($result);
@@ -204,6 +218,20 @@ class APIFactory
         $args = isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [];
 
         $async = isset(end($arguments)['async']) ? end($arguments)['async'] : $this->async;
+
+        if ($this->API->asyncInitPromise) {
+            if ($async) {
+                return $this->call(function () use ($name, $args, $aargs) {
+                    yield $this->API->asyncInitPromise;
+                    $this->API->asyncInitPromise = null;
+                    return yield $this->API->method_call_async_read($name, $args, $aargs);
+                    ;
+                });
+            } else {
+                $this->wait($this->API->asyncInitPromise);
+                $this->API->asyncInitPromise = null;
+            }
+        }
         $res = $this->API->method_call_async_read($name, $args, $aargs);
 
         if ($async) {
