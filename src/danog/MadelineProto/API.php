@@ -100,7 +100,7 @@ class API extends APIFactory
                         $pong = $this->ping(['ping_id' => 3], ['async' => true]);
                         \danog\MadelineProto\Logger::log('Pong: ' . $pong['ping_id'], Logger::ULTRA_VERBOSE);
                         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
-                    });            
+                    });
                     $this->APIFactory();
 
                     return;

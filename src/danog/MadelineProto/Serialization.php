@@ -57,7 +57,13 @@ class Serialization
         if ($filename == '') {
             throw new \danog\MadelineProto\Exception('Empty filename');
         }
-
+        if ($instance->API->asyncInitPromise) {
+            return $instance->call(static function () use ($filename, $instance, $force) {
+                yield $instance->API->asyncInitPromise;
+                $instance->API->asyncInitPromise = null;
+                return self::serialize($filename, $instance, $force);
+            });
+        }
         if (isset($instance->API->setdem) && $instance->API->setdem) {
             $instance->API->setdem = false;
             $instance->API->__construct($instance->API->settings);
