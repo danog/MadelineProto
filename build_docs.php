@@ -85,6 +85,7 @@ chdir(__DIR__);
 
 $orderedfiles = [];
 $order = [
+    'ASYNC',
     'CREATING_A_CLIENT',
     'LOGIN',
     'FEATURES',
