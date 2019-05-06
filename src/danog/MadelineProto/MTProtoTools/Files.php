@@ -147,6 +147,15 @@ trait Files
     {
         $res = [$this->constructors->find_by_predicate($media['_'])['type'] => $media];
         switch ($media['_']) {
+            case 'messageMediaPoll':
+                $res['Poll'] = $media['poll'];
+                $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
+                break;
+            case 'updateMessagePoll':
+                $res['Poll'] = $media['poll'];
+                $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
+                $res['MessageMedia'] = ['_' => 'messageMediaPoll', 'poll' => $res['Poll'], 'results' => $media['results']];
+                break;
             case 'messageMediaPhoto':
                 if (!isset($media['photo']['access_hash'])) {
                     throw new \danog\MadelineProto\Exception('No access hash');
@@ -168,6 +177,9 @@ trait Files
                 if (isset($media['ttl_seconds'])) {
                     $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
                 }
+                break;
+            case 'poll':
+                $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
                 break;
             case 'document':
                 if (!isset($media['access_hash'])) {
