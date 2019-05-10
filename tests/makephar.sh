@@ -7,14 +7,16 @@
 
 
 rm -rf phar7 phar5 MadelineProtoPhar
-
+madelinePath=$PWD
+cd
+rm -rf phar7 phar5 MadelineProtoPhar
 mkdir phar7
 cd phar7
 echo '{
     "name": "danog/madelineprototests",
     "minimum-stability":"dev",
     "require": {
-        "danog/madelineproto": "dev-'$TRAVIS_BRANCH'",
+        "danog/madelineproto": "*",
         "amphp/dns": "dev-master#861cc857b1ba6e02e8a7439c30403682785fce96 as 0.9.9",
         "amphp/file": "dev-master#5a69fca406ac5fd220de0aa68c887bc8046eb93c as 0.3.3",
         "amphp/uri": "dev-master#f3195b163275383909ded7770a11d8eb865cbc86 as 0.1.3"
@@ -23,6 +25,13 @@ echo '{
         {
             "type": "git",
             "url": "https://github.com/danog/phpseclib"
+        },
+        {
+            "type": "path",
+            "url": "'$madelinePath'",
+            "options": {
+                "symlink": false
+            }
         }
     ],
     "authors": [
@@ -32,6 +41,7 @@ echo '{
         }
     ]
 }' > composer.json
+composer clearcache
 composer update
 cd ..
 
@@ -42,8 +52,8 @@ find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
 #echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
 
 [ "$TRAVIS_BRANCH" != "master" ] && branch="-$TRAVIS_BRANCH" || branch=""
-
-php makephar.php phar5 "madeline$branch.phar" $TRAVIS_COMMIT
+cd $madelinePath
+php makephar.php $HOME/phar5 "madeline$branch.phar" $TRAVIS_COMMIT
 
 eval "$(ssh-agent -s)"
 echo -e "$private_key" > madeline_rsa

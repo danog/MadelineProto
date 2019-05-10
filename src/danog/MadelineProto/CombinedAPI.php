@@ -226,6 +226,9 @@ class CombinedAPI
 
     public function loop($max_forks = 0)
     {
+        if (is_callable($max_forks)) {
+            return $this->wait($max_forks());
+        }
         if (php_sapi_name() !== 'cli') {
             try {
                 set_time_limit(-1);
