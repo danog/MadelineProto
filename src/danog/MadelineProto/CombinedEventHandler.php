@@ -35,7 +35,7 @@ abstract class CombinedEventHandler
     {
         $keys = method_exists($this, '__magic_sleep') ? $this->__magic_sleep() : get_object_vars($this);
         unset($keys['CombinedAPI']);
-        if (isset($this->CombinedAPI)) {
+        if (isset($this->CombinedAPI) && $this->CombinedAPI instanceof CombinedAPI) {
             foreach ($this->CombinedAPI->instance_paths as $path) {
                 unset($keys[$path]);
             }
