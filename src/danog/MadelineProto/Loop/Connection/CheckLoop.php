@@ -83,10 +83,11 @@ class CheckLoop extends ResumableSignalLoop
                                     case 2:
                                     case 3:
                                         if ($connection->outgoing_messages[$message_id]['_'] === 'msgs_state_req') {
+                                            $API->got_response_for_outgoing_message_id($message_id, $datacenter);
                                             break;
                                         }
                                         $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.($message_id).' not received by server, resending...', \danog\MadelineProto\Logger::ERROR);
-                                        $API->method_recall('', ['message_id' => $message_id, 'datacenter' => $datacenter, 'postpone' => true]);
+                                        $API->method_recall('watcherId', ['message_id' => $message_id, 'datacenter' => $datacenter, 'postpone' => true]);
                                         break;
                                     case 4:
                                         if ($chr & 32) {

@@ -309,6 +309,7 @@ class WriteLoop extends ResumableSignalLoop
 
             foreach ($keys as $key => $message_id) {
                 $connection->outgoing_messages[$message_id] = &$connection->pending_outgoing[$key];
+
                 if (isset($connection->outgoing_messages[$message_id]['promise'])) {
                     $connection->new_outgoing[$message_id] = $message_id;
                     $connection->outgoing_messages[$message_id]['sent'] = $sent;

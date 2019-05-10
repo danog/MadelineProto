@@ -30,7 +30,6 @@ use function Amp\call;
  */
 abstract class Parameters
 {
-    private $fetched = false;
     private $params = [];
 
     /**
@@ -51,7 +50,7 @@ abstract class Parameters
     public function fetchParametersAsync(): \Generator
     {
         $refetchable = $this->isRefetchable();
-        if ($this->fetched && !$refetchable) {
+        if ($this->params && !$refetchable) {
             return $this->params;
         }
         $params = yield call([$this, 'getParameters']);

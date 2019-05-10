@@ -54,6 +54,9 @@ trait AckHandler
         if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['body'])) {
             unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['body']);
         }
+        if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['serialized_body'])) {
+            unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['serialized_body']);
+        }
         if (isset($this->datacenter->sockets[$datacenter]->new_outgoing[$message_id])) {
             unset($this->datacenter->sockets[$datacenter]->new_outgoing[$message_id]);
         }

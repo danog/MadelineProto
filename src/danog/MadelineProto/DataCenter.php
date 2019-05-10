@@ -97,6 +97,9 @@ class DataCenter
 
                 return true;
             } catch (\Throwable $e) {
+                if (defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
+                    throw $e;
+                }
                 $this->API->logger->logger('Connection failed: ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             } catch (\Exception $e) {
                 $this->API->logger->logger('Connection failed: ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
@@ -312,6 +315,9 @@ class DataCenter
 
             $this->API->logger->logger("No info for DC $dc_number", \danog\MadelineProto\Logger::ERROR);
 
+        }
+        if (defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
+            return [$ctxs[0]];
         }
 
         return $ctxs;

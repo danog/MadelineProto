@@ -559,7 +559,7 @@ trait AuthKeyHandler
                     return $this->init_authorization_socket($id, $socket);
                 };
             }
-            yield array_shift($dcs)();
+            if ($dcs) yield array_shift($dcs)();
             foreach ($dcs as $id => &$dc) {
                 $dc = $dc();
             }

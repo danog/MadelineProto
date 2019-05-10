@@ -97,7 +97,10 @@ trait Files
                     static function () use ($file_id, $part_num, $part_total_num, $part_size, $f, $ctx, $ige, $seekable) {
                         if ($seekable) {
                             fseek($f, $part_num * $part_size);
+                        } else if (ftell($f) !== $part_num * $part_size) {
+                            throw new \danog\MadelineProto\Exception('Wrong position!');
                         }
+
                         $bytes = stream_get_contents($f, $part_size);
                         if ($ige) {
                             $bytes = $ige->encrypt(str_pad($bytes, $part_size, chr(0)));

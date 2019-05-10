@@ -30,107 +30,6 @@ use function Amp\Promise\all;
  */
 trait CallHandler
 {
-    public function has_pending_calls()
-    {
-        $result = [];
-        foreach ($this->datacenter->sockets as $id => $socket) {
-            $result[$id] = $this->has_pending_calls_dc($id);
-        }
-
-        return $result;
-    }
-
-    public function has_pending_calls_dc($datacenter)
-    {
-        //$result = 0;
-        $dc_config_number = isset($this->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
-        foreach ($this->datacenter->sockets[$datacenter]->new_outgoing as $message_id) {
-            if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent']) && ($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent'] + $this->settings['connection_settings'][$dc_config_number]['timeout'] < time()) && ($this->datacenter->sockets[$datacenter]->temp_auth_key === null) === (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['unencrypted']) && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['unencrypted']) && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'] !== 'msgs_state_req') {
-                return true;
-                //$result |= 1;
-            }
-        }
-
-        return false; //(bool) $result;
-    }
-
-    public function check_pending_calls()
-    {
-        foreach ($this->datacenter->sockets as $datacenter => $socket) {
-            $this->check_pending_calls_dc($datacenter);
-        }
-    }
-
-    public function check_pending_calls_dc($datacenter)
-    {
-        if (!empty($this->datacenter->sockets[$datacenter]->new_outgoing)) {
-            if ($this->has_pending_calls_dc($datacenter)) {
-                if ($this->datacenter->sockets[$datacenter]->temp_auth_key !== null) {
-                    $message_ids = array_values($this->datacenter->sockets[$datacenter]->new_outgoing);
-                    $deferred = new \danog\MadelineProto\ImmediatePromise();
-                    $deferred->then(
-                        function ($result) use ($datacenter, $message_ids) {
-                            $reply = [];
-                            foreach (str_split($result['info']) as $key => $chr) {
-                                $message_id = $message_ids[$key];
-                                if (!isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id])) {
-                                    $this->logger->logger('Already got response for and forgot about message ID '.$this->unpack_signed_long($message_id));
-                                    continue;
-                                }
-                                if (!isset($this->datacenter->sockets[$datacenter]->new_outgoing[$message_id])) {
-                                    $this->logger->logger('Already got response for '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id));
-                                    continue;
-                                }
-                                $chr = ord($chr);
-                                switch ($chr & 7) {
-                                    case 0:
-                                        $this->logger->logger('Wrong message status 0 for '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'], \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        break;
-                                    case 1:
-                                    case 2:
-                                    case 3:
-                                        $this->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' not received by server, resending...', \danog\MadelineProto\Logger::ERROR);
-                                        $this->method_recall($message_id, $datacenter, false, true);
-                                        break;
-                                    case 4:
-                                        if ($chr & 32) {
-                                            $this->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' received by server and is being processed, waiting...', \danog\MadelineProto\Logger::ERROR);
-                                        } elseif ($chr & 64) {
-                                            $this->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' received by server and was already processed, requesting reply...', \danog\MadelineProto\Logger::ERROR);
-                                            $reply[] = $message_id;
-                                        } elseif ($chr & 128) {
-                                            $this->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' received by server and was already sent, requesting reply...', \danog\MadelineProto\Logger::ERROR);
-                                            $reply[] = $message_id;
-                                        } else {
-                                            $this->logger->logger('Message '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message ID '.$this->unpack_signed_long($message_id).' received by server, requesting reply...', \danog\MadelineProto\Logger::ERROR);
-                                            $reply[] = $message_id;
-                                        }
-                                }
-                            }
-                            if ($reply) {
-                                $this->object_call('msg_resend_ans_req', ['msg_ids' => $reply], ['datacenter' => $datacenter, 'postpone' => true]);
-                            }
-                            $this->send_messages($datacenter);
-                        },
-                        function ($error) use ($datacenter) {
-                            throw $error;
-                        }
-                    );
-                    $this->logger->logger("Still missing something on DC $datacenter, sending state request", \danog\MadelineProto\Logger::ERROR);
-                    $this->object_call('msgs_state_req', ['msg_ids' => $message_ids], ['datacenter' => $datacenter, 'promise' => $deferred]);
-                } else {
-                    $dc_config_number = isset($this->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
-                    foreach ($this->datacenter->sockets[$datacenter]->new_outgoing as $message_id) {
-                        if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent']) && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['sent'] + $this->settings['connection_settings'][$dc_config_number]['timeout'] < time() && $this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['unencrypted']) {
-                            $this->logger->logger('Still missing '.$this->datacenter->sockets[$datacenter]->outgoing_messages[$message_id]['_'].' with message id '.$this->unpack_signed_long($message_id)." on DC $datacenter, resending", \danog\MadelineProto\Logger::ERROR);
-                            $this->method_recall($message_id, $datacenter, false, true);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public function method_recall($watcherId, $args)
     {
         $message_id = $args['message_id'];
@@ -289,7 +188,8 @@ trait CallHandler
     /*
 $message = [
 // only in outgoing messages
-'body' => 'serialized body', (optional if container)
+'body' => deserialized body, (optional if container)
+'serialized_body' => 'serialized body', (optional if container)
 'content_related' => bool,
 '_' => 'predicate',
 'promise' => deferred promise that gets resolved when a response to the message is received (optional),

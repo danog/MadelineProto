@@ -198,6 +198,7 @@ class Connection
                 $this->API->referenceDatabase->refreshNext(false);
             }
             $message['serialized_body'] = $body;
+            unset($body);
         }
 
         $message['send_promise'] = $deferred;

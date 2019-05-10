@@ -213,7 +213,6 @@ class APIFactory
     public function __mtproto_call($name, $arguments)
     {
         $aargs = isset($arguments[1]) && is_array($arguments[1]) ? $arguments[1] : [];
-        $aargs['datacenter'] = $this->API->datacenter->curdc;
         $aargs['apifactory'] = true;
         $args = isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [];
 
@@ -224,6 +223,7 @@ class APIFactory
                 return $this->call(function () use ($name, $args, $aargs) {
                     yield $this->API->asyncInitPromise;
                     $this->API->asyncInitPromise = null;
+                    $aargs['datacenter'] = $this->API->datacenter->curdc;
                     return yield $this->API->method_call_async_read($name, $args, $aargs);
                     ;
                 });
@@ -232,6 +232,7 @@ class APIFactory
                 $this->API->asyncInitPromise = null;
             }
         }
+        $aargs['datacenter'] = $this->API->datacenter->curdc;
         $res = $this->API->method_call_async_read($name, $args, $aargs);
 
         if ($async) {

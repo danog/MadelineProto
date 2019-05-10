@@ -361,6 +361,7 @@ class ConnectionContext
         if ($this->isSecure()) {
             $string .= ' (TLS)';
         }
+        $string .= $this->isTest() ? ' test' : ' main';
         $string .= ' DC ';
         $string .= $this->getDc();
         $string .= ', via ';

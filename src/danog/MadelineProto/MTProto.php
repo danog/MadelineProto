@@ -228,9 +228,10 @@ class MTProto implements TLCallback
 
     public function __wakeup()
     {
-        $this->asyncInitPromise = $this->call($this->__async_wakeup());
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
+        $this->asyncInitPromise = $this->call($this->__async_wakeup($backtrace));
     }
-    public function __async_wakeup()
+    public function __async_wakeup($backtrace)
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         set_exception_handler(['\\danog\\MadelineProto\\Serialization', 'serialize_all']);
@@ -289,13 +290,12 @@ class MTProto implements TLCallback
         }
         $force = false;
         $this->reset_session();
-
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
         if (isset($backtrace[2]['function']) && isset($backtrace[2]['class']) && isset($backtrace[2]['args']) && $backtrace[2]['class'] === 'danog\\MadelineProto\\API' && $backtrace[2]['function'] === '__magic_construct') {
             if (count($backtrace[2]['args']) === 2) {
                 $this->parse_settings(array_replace_recursive($this->settings, $backtrace[2]['args'][1]));
             }
         }
+
 
         if (isset($this->settings['tl_schema']['src']['botAPI']) && $this->settings['tl_schema']['src']['botAPI'] !== __DIR__ . '/TL_botAPI.tl') {
             unset($this->v);
@@ -676,8 +676,8 @@ class MTProto implements TLCallback
             'response' => 5,
         ], 'flood_timeout' => ['wait_if_lt' => 20], 'msg_array_limit' => [
             // How big should be the arrays containing the incoming and outgoing messages?
-            'incoming' => 200,
-            'outgoing' => 200,
+            'incoming' => 100,
+            'outgoing' => 100,
             'call_queue' => 200,
         ], 'peer' => [
             'full_info_cache_time' => 3600,
