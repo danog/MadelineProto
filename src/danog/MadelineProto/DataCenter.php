@@ -69,11 +69,6 @@ class DataCenter
         }
     }
 
-    public function dc_connect($dc_number)
-    {
-        return $this->wait($this->dc_connect_async($dc_number));
-    }
-
     public function dc_connect_async($dc_number): \Generator
     {
         if (isset($this->sockets[$dc_number]) && !isset($this->sockets[$dc_number]->old)) {

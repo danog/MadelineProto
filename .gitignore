@@ -112,3 +112,4 @@ madeline.phar.version
 big
 *.phar
 madeline.php
+.phpunit.result.cache
