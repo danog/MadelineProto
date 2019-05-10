@@ -41,7 +41,7 @@ abstract class CombinedEventHandler
             }
         } else {
             foreach ($keys as $key => $value) {
-                if ($value instanceof API) {
+                if ($value instanceof API && $key === $value->session) {
                     unset($keys[$key]);
                 }
             }
