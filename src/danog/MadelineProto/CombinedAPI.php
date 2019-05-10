@@ -37,11 +37,11 @@ class CombinedAPI
     public function __magic_construct($session, $paths = [])
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        $realpaths = Serialization::realpaths($session);
+        \danog\MadelineProto\Magic::class_exists();
 
+        $realpaths = Serialization::realpaths($session);
         $this->session = $realpaths['file'];
 
-        \danog\MadelineProto\Magic::class_exists();
 
         foreach ($paths as $path => $settings) {
             $this->addInstance($path, $settings);
@@ -138,7 +138,6 @@ class CombinedAPI
             $filename = $this->session;
         }
         Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
-
         $realpaths = Serialization::realpaths($filename);
         if (!file_exists($realpaths['lockfile'])) {
             touch($realpaths['lockfile']);
@@ -177,7 +176,7 @@ class CombinedAPI
         if (!($this->event_handler_instance instanceof $this->event_handler)) {
             $class_name = $this->event_handler;
             $this->event_handler_instance = new $class_name($this);
-        } elseif ($this->event_handler_instance) {
+        } else {
             $this->event_handler_instance->__construct($this);
         }
         $this->event_handler_methods = [];
