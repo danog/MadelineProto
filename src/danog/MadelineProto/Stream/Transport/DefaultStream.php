@@ -37,13 +37,12 @@ class DefaultStream extends Socket implements RawStreamInterface
     use RawStream;
     private $stream;
 
-    public function enableCrypto(): Promise
-    {
-        return $this->stream->enableCrypto();
-    }
-
     public function __construct()
     {
+    }
+    public function enableCrypto(ClientTlsContext $tlsContext = null): \Amp\Promise
+    {
+        return $this->enableCrypto($tlsContext);
     }
 
     public function getStream()
@@ -54,9 +53,9 @@ class DefaultStream extends Socket implements RawStreamInterface
     public function connectAsync(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
     {
         if ($ctx->isSecure()) {
-            $this->stream = yield cryptoConnect($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
+            $this->stream = yield cryptoConnect($ctx->getStringUri(), $ctx->getSocketContext(), null, $ctx->getCancellationToken());
         } else {
-            $this->stream = yield connect($ctx->getStringUri(), $ctx->getSocketContext());
+            $this->stream = yield connect($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
         }
         yield $this->stream->write($header);
     }
@@ -105,6 +104,15 @@ class DefaultStream extends Socket implements RawStreamInterface
     public function close()
     {
         $this->disconnect();
+    }
+    /**
+     * @inheritDoc
+     * 
+     * @return \Amp\Socket\Socket
+     */
+    public function getSocket(): \Amp\Socket\Socket
+    {
+        return $this->stream;
     }
 
     public static function getName(): string

@@ -39,6 +39,15 @@ class HttpsStream extends HttpStream implements MTProtoBufferInterface
     {
         return parent::connectAsync($ctx->getCtx()->secure(true), $header);
     }
+    /**
+     * @inheritDoc
+     * 
+     * @return \Amp\Socket\Socket
+     */
+    public function getSocket(): \Amp\Socket\Socket
+    {
+        return $this->stream->getSocket();
+    }
 
     public static function getName(): string
     {

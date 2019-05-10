@@ -106,6 +106,15 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
 
         return $buffer;
     }
+    /**
+     * @inheritDoc
+     * 
+     * @return \Amp\Socket\Socket
+     */
+    public function getSocket(): \Amp\Socket\Socket
+    {
+        return $this->stream->getSocket();
+    }
 
     public static function getName(): string
     {

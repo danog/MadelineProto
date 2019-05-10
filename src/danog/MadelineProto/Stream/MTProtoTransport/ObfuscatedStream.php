@@ -196,6 +196,15 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
         }
         $this->extra = $extra;
     }
+    /**
+     * @inheritDoc
+     * 
+     * @return \Amp\Socket\Socket
+     */
+    public function getSocket(): \Amp\Socket\Socket
+    {
+        return $this->stream->getSocket();
+    }
 
     public static function getName(): string
     {

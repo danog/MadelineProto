@@ -23,6 +23,7 @@ use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
+use Amp\Socket\ClientTlsContext;
 
 /**
  * Socks5 stream wrapper.
@@ -53,7 +54,9 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
             $methods .= chr(2);
         }
         $this->stream = yield $ctx->getStream(chr(5).chr(strlen($methods)).$methods);
+        
         $l = 2;
+
         $buffer = yield $this->stream->getReadBuffer($l);
 
         $version = ord(yield $buffer->bufferRead(1));
@@ -84,10 +87,11 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
 
         try {
             $ip = inet_pton($uri->getHost());
-            $payload .= pack('C1', strlen($ip) === 4 ? 0x01 : 0x04).$ip;
+            $payload .= $ip ? pack('C1', strlen($ip) === 4 ? 0x01 : 0x04).$ip : pack('C2', 0x03, strlen($uri->getHost())).$uri->getHost();
         } catch (\danog\MadelineProto\Exception $e) {
             $payload .= pack('C2', 0x03, strlen($uri->getHost())).$uri->getHost();
         }
+
         $payload .= pack('n', $uri->getPort());
         yield $this->stream->write($payload);
 
@@ -108,6 +112,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         if ($rsv !== 0) {
             throw new \danog\MadelineProto\Exception("Wrong socks5 final RSV: $rsv");
         }
+
         switch (ord(yield $buffer->bufferRead(1))) {
             case 1:
                 $buffer = yield $this->stream->getReadBuffer($l);
@@ -130,10 +135,11 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $l = 2;
         $buffer = yield $this->stream->getReadBuffer($l);
         $port = unpack('n', yield $buffer->bufferRead(2))[1];
+
         \danog\MadelineProto\Logger::log(['Connected to '.$ip.':'.$port.' via socks5']);
 
-        if ($secure && method_exists($this->stream, 'enableCrypto')) {
-            yield $this->stream->enableCrypto();
+        if ($secure && method_exists($this->getSocket(), 'enableCrypto')) {
+            yield $this->getSocket()->enableCrypto((new ClientTlsContext)->withPeerName($uri->getHost()));
         }
         if (strlen($header)) {
             yield (yield $this->stream->getWriteBuffer(strlen($header)))->bufferWrite($header);
@@ -194,6 +200,15 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     public function setExtra($extra)
     {
         $this->extra = $extra;
+    }
+    /**
+     * @inheritDoc
+     *
+     * @return \Amp\Socket\Socket
+     */
+    public function getSocket(): \Amp\Socket\Socket
+    {
+        return $this->stream->getSocket();
     }
 
     public static function getName(): string

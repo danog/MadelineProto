@@ -19,6 +19,7 @@
 namespace danog\MadelineProto\Stream;
 
 use Amp\Promise;
+use Amp\Socket\Socket;
 
 /**
  * Generic stream interface.
@@ -37,9 +38,16 @@ interface StreamInterface
     public function connect(ConnectionContext $ctx, string $header = ''): Promise;
 
     /**
-     * Disonnect from the server.
+     * Disconnect from the server.
      *
-     * @return Promise
+     * @return void
      */
     public function disconnect();
+
+    /**
+     * Get underlying AMPHP socket resource
+     * 
+     * @return \Amp\Socket\Socket
+     */
+    public function getSocket(): Socket;
 }

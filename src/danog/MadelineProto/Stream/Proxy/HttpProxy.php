@@ -23,6 +23,7 @@ use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
+use Amp\Socket\ClientTlsContext;
 
 /**
  * HTTP proxy stream wrapper.
@@ -45,13 +46,17 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
+        $secure = $ctx->isSecure();
         $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
 
         $this->stream = yield $ctx->getStream();
-
         $address = $uri->getHost();
         $port = $uri->getPort();
 
+        if (strlen(inet_pton($address)) === 16) {
+            $address = '['.$address.']';
+        }
+        
         yield $this->stream->write("CONNECT $address:$port HTTP/1.1\r\nHost: $address:$port\r\nAccept: */*\r\n".$this->getProxyAuthHeader()."Connection: keep-Alive\r\n\r\n");
 
         $buffer = yield $this->stream->getReadBuffer($l);
@@ -100,7 +105,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
 
             if ($close) {
                 $this->disconnect();
-                yield $this->connect($this->ctx);
+                yield $this->connect($ctx);
             }
 
             \danog\MadelineProto\Logger::log(trim($read));
@@ -117,6 +122,10 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             $read = yield $buffer->bufferRead($length);
         }
         \danog\MadelineProto\Logger::log('Connected to '.$address.':'.$port.' via http');
+
+        if ($secure && method_exists($this->getSocket(), 'enableCrypto')) {
+            yield $this->getSocket()->enableCrypto((new ClientTlsContext)->withPeerName($uri->getHost()));
+        }
 
         if (strlen($header)) {
             yield (yield $this->stream->getWriteBuffer(strlen($header)))->bufferWrite($header);
@@ -186,6 +195,15 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     public function setExtra($extra)
     {
         $this->extra = $extra;
+    }
+    /**
+     * @inheritDoc
+     * 
+     * @return \Amp\Socket\Socket
+     */
+    public function getSocket(): \Amp\Socket\Socket
+    {
+        return $this->stream->getSocket();
     }
 
     public static function getName(): string

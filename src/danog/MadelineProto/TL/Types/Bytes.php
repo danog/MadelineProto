@@ -19,7 +19,7 @@
 
 namespace danog\MadelineProto\TL\Types;
 
-class Bytes extends \Volatile implements \JsonSerializable
+class Bytes implements \JsonSerializable
 {
     use \danog\Serializable;
     private $bytes = [];

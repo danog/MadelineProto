@@ -214,6 +214,16 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     }
 
     /**
+     * @inheritDoc
+     * 
+     * @return \Amp\Socket\Socket
+     */
+    public function getSocket(): \Amp\Socket\Socket
+    {
+        return $this->stream->getSocket();
+    }
+
+    /**
      * Get class name.
      *
      * @return string

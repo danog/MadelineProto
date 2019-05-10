@@ -25,8 +25,8 @@ use Amp\Socket\ConnectException;
 use Amp\Websocket\Client\ConnectionException;
 use Amp\Websocket\Client\Handshake;
 use Amp\Websocket\Client\Internal\ClientSocket;
-use Amp\Websocket\Rfc6455Client;
 use Amp\Websocket\Client\Rfc6455Connection;
+use Amp\Websocket\Rfc6455Client;
 use Amp\Websocket\Rfc7692CompressionFactory;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -153,7 +153,7 @@ class WsStream implements RawStreamInterface
             $path = '/';
         }
         if (($query = $uri->getQuery()) !== '') {
-            $path .= '?' . $query;
+            $path .= '?'.$query;
         }
         return \sprintf("GET %s HTTP/1.1\r\n%s\r\n", $path, Rfc7230::formatHeaders($headers));
     }
@@ -165,13 +165,12 @@ class WsStream implements RawStreamInterface
         $position = \strpos($headerBuffer, "\r\n");
         $startLine = \substr($headerBuffer, 0, $position);
         if (!\preg_match("/^HTTP\/(1\.[01]) (\d{3}) ([^\x01-\x08\x10-\x19]*)$/i", $startLine, $matches)) {
-            throw new ConnectException('Invalid response start line: ' . $startLine);
+            throw new ConnectException('Invalid response start line: '.$startLine);
         }
         $version = $matches[1];
         $status = (int) $matches[2];
         $reason = $matches[3];
 
-        
         if ($version !== '1.1' || $status !== Status::SWITCHING_PROTOCOLS) {
             throw new ConnectionException(
                 \sprintf('Did not receive switching protocols response: %d %s on DC %d', $status, $reason, $this->dc),
@@ -205,6 +204,16 @@ class WsStream implements RawStreamInterface
         }
         return null;
     }
+    /**
+     * @inheritDoc
+     *
+     * @return \Amp\Socket\Socket
+     */
+    public function getSocket(): \Amp\Socket\Socket
+    {
+        return $this->stream->getSocket();
+    }
+
     public static function getName(): string
     {
         return __CLASS__;

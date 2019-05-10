@@ -238,7 +238,7 @@ class Connection
     {
         $this->API->logger->logger('Reconnecting');
         $this->disconnect();
-        yield $this->API->datacenter->dc_connect_async($this->ctx->getDc());
+        yield $this->API->datacenter->dcConnectAsync($this->ctx->getDc());
     }
 
     public function hasPendingCalls()
