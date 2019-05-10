@@ -170,11 +170,6 @@ trait CallHandler
         return $deferred;
     }
 
-    public function object_call($object, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
-    {
-        return $this->wait($this->object_call_async($object, $args, $aargs));
-    }
-
     public function object_call_async($object, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
     {
         $message = ['_' => $object, 'body' => $args, 'content_related' => $this->content_related($object), 'unencrypted' => $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key === null, 'method' => false];

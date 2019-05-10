@@ -105,7 +105,7 @@ class CheckLoop extends ResumableSignalLoop
                                 }
                             }
                             if ($reply) {
-                                $API->object_call('msg_resend_ans_req', ['msg_ids' => $reply], ['datacenter' => $datacenter, 'postpone' => true]);
+                                $API->object_call_async('msg_resend_ans_req', ['msg_ids' => $reply], ['datacenter' => $datacenter, 'postpone' => true]);
                             }
                             $connection->writer->resume();
                         }
