@@ -251,9 +251,9 @@ class CombinedAPI
             }
             $instance->setCallback(function ($update) use ($path) {
                 return $this->event_update_handler($update, $path);
-            });
+            }, ['async' => false]);
             if ($this->loop_callback !== null) {
-                $instance->setLoopCallback($this->loop_callback);
+                $instance->setLoopCallback($this->loop_callback, ['async' => false]);
             }
             $loops[] = $this->call($instance->loop(0, ['async' => true]));
         }
