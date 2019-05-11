@@ -40,10 +40,10 @@ trait Extension
         return '';
     }
 
-    public function get_extension_from_location_async($location, $default)
+    public function get_extension_from_location($location, $default)
     {
         return $default;
-        $res = yield $this->method_call_async_read('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 2], ['heavy' => true, 'datacenter' => $location['dc_id']]);
+        //('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 2], ['heavy' => true, 'datacenter' => $location['dc_id']]);
         if (!isset($res['type']['_'])) {
             return $default;
         }

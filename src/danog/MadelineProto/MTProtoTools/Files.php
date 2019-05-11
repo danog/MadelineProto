@@ -207,7 +207,7 @@ trait Files
         return $res;
     }
 
-    public function get_file_info($constructor, $regenerate = false)
+    public function get_file_info_async($constructor, $regenerate = false)
     {
         if (is_string($constructor)) {
             $constructor = $this->unpack_file_id($constructor)['MessageMedia'];
@@ -223,7 +223,7 @@ trait Files
                 $constructor = $constructor['media'];
         }
 
-        return $this->gen_all_file($constructor, $regenerate);
+        return yield $this->gen_all_file_async($constructor, $regenerate);
     }
 
     public function get_download_info_async($message_media)
@@ -290,7 +290,7 @@ trait Files
                     }
                 }
                 if (!isset($res['ext'])) {
-                    $res['ext'] = yield $this->get_extension_from_location_async($res['InputFileLocation'], $this->get_extension_from_mime(isset($res['mime']) ? $res['mime'] : 'image/jpeg'));
+                    $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime(isset($res['mime']) ? $res['mime'] : 'image/jpeg'));
                 }
                 if (!isset($res['mime'])) {
                     $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
@@ -348,7 +348,7 @@ trait Files
             case 'fileLocation':
                 $res['name'] = $message_media['volume_id'].'_'.$message_media['local_id'];
                 $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['volume_id'], 'local_id' => $message_media['local_id'], 'secret' => $message_media['secret'], 'dc_id' => $message_media['dc_id'], 'file_reference' => yield $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION_LOCATION, $message_media)];
-                $res['ext'] = yield $this->get_extension_from_location_async($res['InputFileLocation'], '.jpg');
+                $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], '.jpg');
                 $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
 
                 return $res;
@@ -382,7 +382,7 @@ trait Files
                 }
                 $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => isset($message_media['document']['version']) ? $message_media['document']['version'] : 0, 'dc_id' => $message_media['document']['dc_id'], 'file_reference' => yield $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION_LOCATION, $message_media['document'])];
                 if (!isset($res['ext'])) {
-                    $res['ext'] = yield $this->get_extension_from_location_async($res['InputFileLocation'], $this->get_extension_from_mime($message_media['document']['mime_type']));
+                    $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime($message_media['document']['mime_type']));
                 }
                 if (!isset($res['name'])) {
                     $res['name'] = $message_media['document']['access_hash'];

@@ -433,15 +433,6 @@ trait TL
         return $concat.yield $this->serialize_params_async($constructorData, $object, '', $layer);
     }
 
-    public function serialize_object($type, $object, $ctx, $layer = -1)
-    {
-        return $this->wait($this->serialize_object_async($type, $object, $ctx, $layer));
-    }
-    public function serialize_method($method, $arguments)
-    {
-        return $this->wait($this->serialize_method_async($method, $arguments));
-    }
-
     public function serialize_method_async($method, $arguments)
     {
         if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && is_string($arguments['hash']) && preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {

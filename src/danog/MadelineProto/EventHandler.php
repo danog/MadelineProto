@@ -46,6 +46,10 @@ class EventHandler extends APIFactory
     public function __set($name, $value)
     {
         if ($name === 'settings') {
+            if ($this->API->phoneConfigWatcherId) {
+                $this->wait($this->API->phoneConfigWatcherId);
+                $this->API->phoneConfigWatcherId = null;
+            }
             if (Magic::is_fork() && !Magic::$processed_fork) {
                 \danog\MadelineProto\Logger::log('Detected fork');
                 $this->API->reset_session();

@@ -854,11 +854,6 @@ class MTProto implements TLCallback
         }
     }
 
-    public function get_config($config = [], $options = [])
-    {
-        return $this->wait($this->get_config_async($config, $options));
-    }
-
     public function get_config_async($config = [], $options = [])
     {
         if ($this->config['expires'] > time()) {
@@ -870,10 +865,6 @@ class MTProto implements TLCallback
         return $this->config;
     }
 
-    public function get_cdn_config($datacenter)
-    {
-        return $this->wait($this->get_cdn_config_async($datacenter));
-    }
     public function get_cdn_config_async($datacenter)
     {
         /*
@@ -930,10 +921,6 @@ class MTProto implements TLCallback
         $this->datacenter->curdc = $curdc;
     }
 
-    public function get_self()
-    {
-        return $this->wait($this->get_self_async());
-    }
     public function get_self_async()
     {
         try {
