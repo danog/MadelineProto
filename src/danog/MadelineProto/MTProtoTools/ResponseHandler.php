@@ -26,7 +26,7 @@ use Amp\Loop;
  */
 trait ResponseHandler
 {
-    public function send_msgs_state_info($req_msg_id, $msg_ids, $datacenter)
+    public function send_msgs_state_info_async($req_msg_id, $msg_ids, $datacenter)
     {
         $this->logger->logger("Sending state info for ".count($msg_ids)." message IDs");
         $info = '';
@@ -168,7 +168,7 @@ trait ResponseHandler
                     $only_updates = false;
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
 
-                    $this->call($this->send_msgs_state_info($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter));
+                    $this->call($this->send_msgs_state_info_async($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter));
                     unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
                     break;
                 case 'msgs_all_info':
@@ -230,7 +230,7 @@ trait ResponseHandler
                             $this->method_recall('', ['message_id' => $msg_id, 'datacenter' => $datacenter]);
                         }
                     } else {
-                        $this->call($this->send_msgs_state_info($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter));
+                        $this->call($this->send_msgs_state_info_async($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter));
                     }
                     break;
                 case 'msg_resend_ans_req':
@@ -238,7 +238,7 @@ trait ResponseHandler
                     $only_updates = false;
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
 
-                    $this->call($this->send_msgs_state_info($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter));
+                    $this->call($this->send_msgs_state_info_async($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter));
                     foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
                         if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']) && isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']])) {
                             $this->call($this->object_call_async($this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']]['_'], $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']]['body'], ['datacenter' => $datacenter]));

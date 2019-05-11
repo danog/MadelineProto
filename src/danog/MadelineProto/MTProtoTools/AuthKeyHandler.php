@@ -596,7 +596,7 @@ trait AuthKeyHandler
                     continue;
                 }
                 $dcs[$id] = function () use ($id, $socket) {
-                    return $this->init_authorization_socket($id, $socket);
+                    return $this->init_authorization_socket_async($id, $socket);
                 };
             }
             if ($dcs) yield array_shift($dcs)();
@@ -606,7 +606,7 @@ trait AuthKeyHandler
             yield $dcs;
 
             foreach ($postpone as $id => $socket) {
-                yield $this->init_authorization_socket($id, $socket);
+                yield $this->init_authorization_socket_async($id, $socket);
             }
             //foreach ($dcs as $dc) { yield $dc; }
 
@@ -623,7 +623,7 @@ trait AuthKeyHandler
         }
     }
 
-    public function init_authorization_socket($id, $socket)
+    public function init_authorization_socket_async($id, $socket)
     {
         $this->init_auth_dcs[$id] = true;
 
