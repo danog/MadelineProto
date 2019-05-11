@@ -131,11 +131,8 @@ trait AuthKeyHandler
 
                                 if (!$pq->equals($p->multiply($q))) {
                                     $this->logger->logger('Automatic factorization failed, trying wolfram module', \danog\MadelineProto\Logger::ERROR);
-                                    if (!extension_loaded('curl')) {
-                                        throw new Exception(['extension', 'curl']);
-                                    }
 
-                                    $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::wolfram_single($pq->__toString()));
+                                    $p = new \phpseclib\Math\BigInteger(yield $this->wolfram_single_async($pq->__toString()));
                                     if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                                         $q = $pq->divide($p)[0];
                                         if ($p->compare($q) > 0) {
@@ -521,6 +518,49 @@ trait AuthKeyHandler
         }
 
         throw new \danog\MadelineProto\SecurityException('An error occurred while binding temporary and permanent authorization keys.');
+    }
+
+    public function wolfram_single_async($what)
+    {
+        $code = yield (yield $this->datacenter->getHTTPClient()->request('http://www.wolframalpha.com/api/v1/code'))->getBody();
+        $query = 'Do prime factorization of '.$what;
+        $params = [
+            'async' => true,
+            'banners' => 'raw',
+            'debuggingdata' => false,
+            'format' => 'moutput',
+            'formattimeout' => 8,
+            'input' => $query,
+            'output' => 'JSON',
+            'proxycode' => json_decode($code, true)['code'],
+        ];
+        $url = 'https://www.wolframalpha.com/input/json.jsp?'.http_build_query($params);
+
+        $request = (new Request($url))->withHeader('referer', 'https://www.wolframalpha.com/input/?i='.urlencode($query));
+
+        $res = json_decode(yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody(), true);
+        if (!isset($res['queryresult']['pods'])) {
+            return false;
+        }
+        $fres = false;
+        foreach ($res['queryresult']['pods'] as $cur) {
+            if ($cur['id'] === 'Divisors') {
+                $fres = explode(', ', preg_replace(["/{\d+, /", "/, \d+}$/"], '', $cur['subpods'][0]['moutput']));
+                break;
+            }
+        }
+        if (is_array($fres)) {
+            $fres = $fres[0];
+
+            $newval = intval($fres);
+            if (is_int($newval)) {
+                $fres = $newval;
+            }
+
+            return $fres;
+        }
+
+        return false;
     }
 
     // Creates authorization keys
