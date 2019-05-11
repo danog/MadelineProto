@@ -47,6 +47,7 @@ class Button implements \JsonSerializable, \ArrayAccess
             $async = $params;
         }
         $async = isset($async['async']) ? $async['async'] : (isset($this->info['API']->wrapper) ? $this->info['API']->wrapper->async : true);
+        $method = $donotwait === true ? 'method_call_async_write' : 'method_call_async_read';
         switch ($this->data['_']) {
             default:
                 return false;
@@ -56,10 +57,10 @@ class Button implements \JsonSerializable, \ArrayAccess
                 $res = $this->info['API']->method_call_async_read('messages.sendMessage', ['peer' => $this->info['peer'], 'message' => $this->data['text'], 'reply_to_msg_id' => $this->info['id']], ['datacenter' => $this->info['API']->datacenter->curdc]);
                 break;
             case 'keyboardButtonCallback':
-                $res = $this->info['API']->method_call_async_read('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'data' => $this->data['data']], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
+                $res = $this->info['API']->$method('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'data' => $this->data['data']], ['datacenter' => $this->info['API']->datacenter->curdc]);
                 break;
             case 'keyboardButtonGame':
-                $res = $this->info['API']->method_call_async_read('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'game' => true], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
+                $res = $this->info['API']->$method('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'game' => true], ['datacenter' => $this->info['API']->datacenter->curdc]);
                 break;
         }
         return $async ? $res : $this->wait($res);
