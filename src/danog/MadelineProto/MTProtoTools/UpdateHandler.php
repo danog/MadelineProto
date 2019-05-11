@@ -196,8 +196,8 @@ trait UpdateHandler
 
                 try {
                     $this->set_channel_state($channel, $difference);
-                    $this->handle_update_messages($difference['new_messages'], $channel);
-                    $this->handle_multiple_update($difference['other_updates'], [], $channel);
+                    yield $this->handle_update_messages_async($difference['new_messages'], $channel);
+                    yield $this->handle_multiple_update_async($difference['other_updates'], [], $channel);
                 } finally {
                     $this->postpone_updates = false;
                     $this->load_channel_state($channel)['sync_loading'] = false;
@@ -214,7 +214,7 @@ trait UpdateHandler
 
                 try {
                     $this->set_channel_state($channel, $difference);
-                    $this->handle_update_messages($difference['messages'], $channel);
+                    yield $this->handle_update_messages_async($difference['messages'], $channel);
                     unset($difference);
                 } finally {
                     $this->postpone_updates = false;
@@ -226,7 +226,7 @@ trait UpdateHandler
                 throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
                 break;
         }
-        $this->handle_pending_updates();
+        yield $this->handle_pending_updates_async();
     }
 
     public function set_update_state_async($data)
@@ -305,17 +305,17 @@ trait UpdateHandler
                     break;
                 case 'updates.difference':
                     $this->updates_state['sync_loading'] = true;
-                    $this->handle_multiple_update($difference['other_updates']);
+                    yield $this->handle_multiple_update_async($difference['other_updates']);
                     foreach ($difference['new_encrypted_messages'] as $encrypted) {
                         yield $this->handle_encrypted_update_async(['_' => 'updateNewEncryptedMessage', 'message' => $encrypted], true);
                     }
-                    $this->handle_update_messages($difference['new_messages']);
+                    yield $this->handle_update_messages_async($difference['new_messages']);
                     yield $this->set_update_state_async($difference['state']);
                     break;
                 case 'updates.differenceSlice':
                     $this->updates_state['sync_loading'] = true;
-                    $this->handle_multiple_update($difference['other_updates']);
-                    $this->handle_update_messages($difference['new_messages']);
+                    yield $this->handle_multiple_update_async($difference['other_updates']);
+                    yield $this->handle_update_messages_async($difference['new_messages']);
                     yield $this->set_update_state_async($difference['intermediate_state']);
                     unset($difference);
                     $this->updates_state['sync_loading'] = false;
@@ -329,7 +329,7 @@ trait UpdateHandler
             $this->postpone_updates = false;
             $this->updates_state['sync_loading'] = false;
         }
-        $this->handle_pending_updates();
+        yield $this->handle_pending_updates_async();
 
         if ($this->updates && $this->update_deferred) {
             $d = $this->update_deferred;
@@ -414,8 +414,8 @@ trait UpdateHandler
                 if (($from = isset($update['message']['from_id']) && !yield $this->peer_isset_async($update['message']['from_id'])) ||
                     ($to = !yield $this->peer_isset_async($update['message']['to_id'])) ||
                     ($via_bot = isset($update['message']['via_bot_id']) && !yield $this->peer_isset_async($update['message']['via_bot_id'])) ||
-                    ($entities = isset($update['message']['entities']) && !$this->entities_peer_isset($update['message']['entities'])) // ||
-                    //isset($update['message']['fwd_from']) && !$this->fwd_peer_isset($update['message']['fwd_from'])
+                    ($entities = isset($update['message']['entities']) && !yield $this->entities_peer_isset_async($update['message']['entities'])) // ||
+                    //isset($update['message']['fwd_from']) && !yield $this->fwd_peer_isset_async($update['message']['fwd_from'])
                 ) {
                     $log = '';
                     if ($from) $log .= "from_id {$update['message']['from_id']}, ";

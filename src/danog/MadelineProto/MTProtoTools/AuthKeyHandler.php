@@ -619,7 +619,7 @@ trait AuthKeyHandler
             $this->postpone_updates = false;
             $this->initing_authorization = $initing;
             $this->updates_state['sync_loading'] = false;
-            $this->handle_pending_updates();
+            yield $this->handle_pending_updates_async();
         }
     }
 

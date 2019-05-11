@@ -56,7 +56,7 @@ trait AuthKeyHandler
         $res = yield $this->method_call_async_read('phone.requestCall', ['user_id' => $user, 'g_a_hash' => hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => \danog\MadelineProto\VoIP::getConnectionMaxLayer()]], ['datacenter' => $this->datacenter->curdc]);
         $controller->setCall($res['phone_call']);
         $this->calls[$res['phone_call']['id']] = $controller;
-        $this->handle_pending_updates();
+        yield $this->handle_pending_updates_async();
         yield $this->get_updates_difference_async();
 
         return $controller;
@@ -102,7 +102,7 @@ trait AuthKeyHandler
             throw $e;
         }
         $this->calls[$res['phone_call']['id']]->storage['b'] = $b;
-        $this->handle_pending_updates();
+        yield $this->handle_pending_updates_async();
         yield $this->get_updates_difference_async();
 
         return true;
@@ -141,7 +141,7 @@ trait AuthKeyHandler
         $this->calls[$params['id']]->configuration = array_merge(['recv_timeout' => $this->config['call_receive_timeout_ms'] / 1000, 'init_timeout' => $this->config['call_connect_timeout_ms'] / 1000, 'data_saving' => \danog\MadelineProto\VoIP::DATA_SAVING_NEVER, 'enable_NS' => true, 'enable_AEC' => true, 'enable_AGC' => true, 'auth_key' => $key, 'auth_key_id' => substr(sha1($key, true), -8), 'call_id' => substr(hash('sha256', $key, true), -16), 'network_type' => \danog\MadelineProto\VoIP::NET_TYPE_ETHERNET], $this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
         $res = $this->calls[$params['id']]->startTheMagic();
-        $this->handle_pending_updates();
+        yield $this->handle_pending_updates_async();
 
         return $res;
     }

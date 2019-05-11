@@ -378,7 +378,7 @@ trait BotAPI
         }
     }
 
-    public function botAPI_to_MTProto($arguments)
+    public function botAPI_to_MTProto_async($arguments)
     {
         foreach (self::BOTAPI_PARAMS_CONVERSION as $bot => $mtproto) {
             if (isset($arguments[$bot]) && !isset($arguments[$mtproto])) {
@@ -390,7 +390,7 @@ trait BotAPI
             $arguments['reply_markup'] = $this->parse_reply_markup($arguments['reply_markup']);
         }
         if (isset($arguments['parse_mode'])) {
-            $arguments = $this->parse_mode($arguments);
+            $arguments = yield $this->parse_mode_async($arguments);
         }
 
         return $arguments;
@@ -524,9 +524,9 @@ trait BotAPI
         return $arguments;
     }
 
-    public function split_to_chunks($args)
+    public function split_to_chunks_async($args)
     {
-        $args = $this->parse_mode($args);
+        $args = yield $this->parse_mode_async($args);
         if (!isset($args['entities'])) {
             $args['entities'] = [];
         }
