@@ -461,12 +461,12 @@ trait AuthKeyHandler
 
     public function get_dh_config_async()
     {
-        $this->updates_state['sync_loading'] = true;
+        $this->updates_state->syncLoading(true);
 
         try {
             $dh_config = yield $this->method_call_async_read('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0], ['datacenter' => $this->datacenter->curdc]);
         } finally {
-            $this->updates_state['sync_loading'] = false;
+            $this->updates_state->syncLoading(false);
         }
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {
             $this->logger->logger(\danog\MadelineProto\Logger::VERBOSE, ['DH configuration not modified']);
@@ -568,7 +568,7 @@ trait AuthKeyHandler
         $initing = $this->initing_authorization;
 
         $this->initing_authorization = true;
-        $this->updates_state['sync_loading'] = true;
+        $this->updates_state->syncLoading(true);
         $this->postpone_updates = true;
 
         try {
@@ -590,7 +590,10 @@ trait AuthKeyHandler
                     return $this->init_authorization_socket_async($id, $socket);
                 };
             }
-            if ($dcs) yield array_shift($dcs)();
+            if ($dcs) {
+                yield array_shift($dcs)();
+            }
+
             foreach ($dcs as $id => &$dc) {
                 $dc = $dc();
             }
@@ -609,7 +612,7 @@ trait AuthKeyHandler
             $this->pending_auth = false;
             $this->postpone_updates = false;
             $this->initing_authorization = $initing;
-            $this->updates_state['sync_loading'] = false;
+            $this->updates_state->syncLoading(false);
             yield $this->handle_pending_updates_async();
         }
     }
@@ -626,7 +629,6 @@ trait AuthKeyHandler
             }
             $cdn = strpos($id, 'cdn');
             $media = strpos($id, 'media');
-
 
             if ($socket->temp_auth_key === null || $socket->auth_key === null) {
                 $dc_config_number = isset($this->settings['connection_settings'][$id]) ? $id : 'all';

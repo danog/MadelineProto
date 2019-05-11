@@ -113,7 +113,7 @@ trait ResponseHandler
 
                     // Acknowledge that I received the server's response
                     if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
-                        Loop::defer([$this, 'get_updates_difference']);
+                        Loop::defer(function () { $this->call($this->get_updates_difference_async()); });
                     }
 
                     unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
@@ -256,7 +256,7 @@ trait ResponseHandler
                             unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
 
                             if (strpos($datacenter, 'cdn') === false) {
-                                Loop::defer([$this, 'handle_updates'], $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
+                                Loop::defer(function ($updates) { $this->call($this->handle_updates($updates)); }, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
                             }
 
                             unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);

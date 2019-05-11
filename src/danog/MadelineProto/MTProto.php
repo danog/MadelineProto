@@ -21,9 +21,11 @@ namespace danog\MadelineProto;
 
 use Amp\Loop;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
+use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\TL\TLCallback;
+use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
 
 /**
  * Manages all of the mtproto stuff.
@@ -173,6 +175,12 @@ class MTProto implements TLCallback
         }
         // Connect to servers
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
+        if (!($this->updates_state instanceof UpdatesState)) {
+            $this->updates_state = new UpdatesState($this->updates_state);
+        }
+        if (!($this->channels_state instanceof CombinedUpdatesState)) {
+            $this->channels_state = new CombinedUpdatesState($this->channels_state);
+        }
         if (!isset($this->datacenter)) {
             $this->datacenter = new DataCenter($this, $this->settings['connection'], $this->settings['connection_settings']);
         }
@@ -280,10 +288,13 @@ class MTProto implements TLCallback
         if ($this->authorized === true) {
             $this->authorized = self::LOGGED_IN;
         }
-        $this->updates_state['sync_loading'] = false;
-        foreach ($this->channels_state as $key => $state) {
-            $this->channels_state[$key]['sync_loading'] = false;
+        if (is_array($this->updates_state)) {
+            $this->updates_state = new UpdatesState($this->updates_state);
         }
+        if (is_array($this->channels_state)) {
+            $this->channels_state = new CombinedUpdatesState($this->channels_state);
+        }
+
         $this->postpone_updates = false;
         if ($this->event_handler && class_exists($this->event_handler) && is_subclass_of($this->event_handler, '\danog\MadelineProto\EventHandler')) {
             $this->setEventHandler($this->event_handler);
@@ -401,7 +412,7 @@ class MTProto implements TLCallback
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings['peer']['cache_all_peers_on_startup']) {
             yield $this->get_dialogs_async($force);
         }
-        if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->updates_state['sync_loading']) {
+        if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->updates_state->syncLoading()) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
             yield $this->get_updates_difference_async();
         }

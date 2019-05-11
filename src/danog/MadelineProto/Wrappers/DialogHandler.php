@@ -29,7 +29,6 @@ trait DialogHandler
         if (!isset($this->dialog_params['hash'])) {
             $this->dialog_params['hash'] = 0;
         }
-        $this->updates_state['sync_loading'] = true;
         $res = ['dialogs' => [0], 'count' => 1];
         $datacenter = $this->datacenter->curdc;
         $peers = [];
@@ -76,8 +75,7 @@ trait DialogHandler
             }
         } finally {
             $this->postpone_updates = false;
-            $this->updates_state['sync_loading'] = false;
-            yield $this->handle_pending_updates_async();
+            $this->handle_pending_updates_async();
         }
 
         return $peers;

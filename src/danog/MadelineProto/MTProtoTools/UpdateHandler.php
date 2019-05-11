@@ -29,9 +29,9 @@ use function Amp\Promise\any;
 trait UpdateHandler
 {
     private $pending_updates = [];
-    private $updates_state = ['_' => 'MadelineProto.Updates_state', 'seq' => 0, 'pts' => 0, 'date' => 0, 'qts' => 0];
+    private $updates_state;
     private $got_state = false;
-    private $channels_state = [];
+    private $channels_state;
     public $updates = [];
     public $updates_key = 0;
     public $last_getdifference = 0;
@@ -101,22 +101,6 @@ trait UpdateHandler
         return $updates;
     }
 
-    public function &load_channel_state($channel, $pts = 1)
-    {
-        if (!isset($this->channels_state[$channel])) {
-            $this->channels_state[$channel] = ['pts' => $pts, 'sync_loading' => false];
-        }
-
-        return $this->channels_state[$channel];
-    }
-
-    public function set_channel_state($channel, $data)
-    {
-        if (isset($data['pts']) && $data['pts'] !== 0) {
-            $this->load_channel_state($channel)['pts'] = $data['pts'];
-        }
-    }
-
     public function check_msg_id($message)
     {
         try {
@@ -141,12 +125,12 @@ trait UpdateHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
-        if ($this->load_channel_state($channel)['sync_loading']) {
+        if ($this->channels_state->syncLoading($channel)) {
             $this->logger->logger('Not fetching '.$channel.' difference, I am already fetching it');
 
             return;
         }
-        $this->load_channel_state($channel)['sync_loading'] = true;
+        $this->channels_state->syncLoading($channel, true);
         $this->postpone_updates = true;
 
         try {
@@ -161,14 +145,14 @@ trait UpdateHandler
             return false;
         } finally {
             $this->postpone_updates = false;
-            $this->load_channel_state($channel)['sync_loading'] = false;
+            $this->channels_state->syncLoading($channel, false);
         }
         $this->logger->logger('Fetching '.$channel.' difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-        $this->load_channel_state($channel)['sync_loading'] = true;
+        $this->channels_state->syncLoading($channel, true);
         $this->postpone_updates = true;
 
         try {
-            $difference = yield $this->method_call_async_read('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->load_channel_state($channel)['pts'], 'limit' => 30], ['datacenter' => $this->datacenter->curdc]);
+            $difference = yield $this->method_call_async_read('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->channels_state->get($channel)->pts(), 'limit' => 30], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->getMessage() === "You haven't joined this channel/supergroup") {
                 return false;
@@ -177,30 +161,30 @@ trait UpdateHandler
             throw $e;
         } catch (\danog\MadelineProto\PTSException $e) {
             $this->logger->logger($e->getMessage());
-            unset($this->channels_state[$channel]);
+            $this->channels_state->remove($channel);
 
             return false; //yield $this->get_channel_difference_async($channel);
         } finally {
             $this->postpone_updates = false;
-            $this->load_channel_state($channel)['sync_loading'] = false;
+            $this->channels_state->syncLoading($channel, false);
         }
         unset($input);
 
         switch ($difference['_']) {
             case 'updates.channelDifferenceEmpty':
-                $this->set_channel_state($channel, $difference);
+                $this->channels_state->get($channel, $difference);
                 break;
             case 'updates.channelDifference':
-                $this->load_channel_state($channel)['sync_loading'] = true;
+                $this->channels_state->syncLoading($channel, true);
                 $this->postpone_updates = true;
 
                 try {
-                    $this->set_channel_state($channel, $difference);
+                    $this->channels_state->get($channel, $difference);
                     yield $this->handle_update_messages_async($difference['new_messages'], $channel);
                     yield $this->handle_multiple_update_async($difference['other_updates'], [], $channel);
                 } finally {
                     $this->postpone_updates = false;
-                    $this->load_channel_state($channel)['sync_loading'] = false;
+                    $this->channels_state->syncLoading($channel, false);
                 }
                 if (!$difference['final']) {
                     unset($difference);
@@ -209,16 +193,16 @@ trait UpdateHandler
                 break;
             case 'updates.channelDifferenceTooLong':
                 $this->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
-                $this->load_channel_state($channel)['sync_loading'] = true;
+                $this->channels_state->syncLoading($channel, true);
                 $this->postpone_updates = true;
 
                 try {
-                    $this->set_channel_state($channel, $difference);
+                    $this->channels_state->get($channel, $difference);
                     yield $this->handle_update_messages_async($difference['messages'], $channel);
                     unset($difference);
                 } finally {
                     $this->postpone_updates = false;
-                    $this->load_channel_state($channel)['sync_loading'] = false;
+                    $this->channels_state->syncLoading($channel, false);
                 }
                 yield $this->get_channel_difference_async($channel);
                 break;
@@ -229,40 +213,11 @@ trait UpdateHandler
         yield $this->handle_pending_updates_async();
     }
 
-    public function set_update_state_async($data)
-    {
-        if (isset($data['pts']) && $data['pts'] !== 0) {
-            (yield $this->load_update_state_async())['pts'] = $data['pts'];
-        }
-        if (isset($data['qts']) && $data['qts'] !== 0) {
-            (yield $this->load_update_state_async())['qts'] = $data['qts'];
-        }
-        if (isset($data['seq']) && $data['seq'] !== 0) {
-            (yield $this->load_update_state_async())['seq'] = $data['seq'];
-        }
-        if (isset($data['date']) && $data['date'] > (yield $this->load_update_state_async())['date']) {
-            (yield $this->load_update_state_async())['date'] = $data['date'];
-        }
-    }
-    public function reset_update_state_async()
-    {
-        (yield $this->load_update_state_async())['pts'] = 1;
-        (yield $this->load_update_state_async())['qts'] = 0;
-        (yield $this->load_update_state_async())['seq'] = 0;
-        (yield $this->load_update_state_async())['date'] = 1;
-        foreach ($this->channels_state as &$state) {
-            $state['pts'] = 1;
-        }
-        $this->msg_ids = [];
-    }
     public function load_update_state_async()
     {
-        if (!isset($this->updates_state['qts'])) {
-            $this->updates_state['qts'] = 0;
-        }
         if (!$this->got_state) {
             $this->got_state = true;
-            yield $this->set_update_state_async(yield $this->get_updates_state_async());
+            $this->updates_state->update(yield $this->get_updates_state_async());
         }
 
         return $this->updates_state;
@@ -273,52 +228,53 @@ trait UpdateHandler
         if (!$this->settings['updates']['handle_updates']) {
             return;
         }
-        if ($this->updates_state['sync_loading']) {
+        if ($this->updates_state->syncLoading()) {
             $this->logger->logger('Not fetching normal difference, I am already fetching it');
 
             return false;
         }
-        $this->updates_state['sync_loading'] = true;
+        $this->updates_state->syncLoading(true);
         $this->postpone_updates = true;
         $this->logger->logger('Fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         while (!isset($difference)) {
             try {
-                $difference = yield $this->method_call_async_read('updates.getDifference', ['pts' => (yield $this->load_update_state_async())['pts'], 'date' => (yield $this->load_update_state_async())['date'], 'qts' => (yield $this->load_update_state_async())['qts']], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+                $state = yield $this->load_update_state_async();
+                $difference = yield $this->method_call_async_read('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             } catch (\danog\MadelineProto\PTSException $e) {
-                $this->updates_state['sync_loading'] = false;
+                $this->updates_state->syncLoading(false);
                 $this->got_state = false;
             } finally {
                 $this->postpone_updates = false;
-                $this->updates_state['sync_loading'] = false;
+                $this->updates_state->syncLoading(false);
             }
         }
         $this->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->postpone_updates = true;
-        $this->updates_state['sync_loading'] = true;
+        $this->updates_state->syncLoading(true);
         $this->last_getdifference = time();
         $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->resume();
 
         try {
             switch ($difference['_']) {
                 case 'updates.differenceEmpty':
-                    yield $this->set_update_state_async($difference);
+                    $this->updates_state->update($difference);
                     break;
                 case 'updates.difference':
-                    $this->updates_state['sync_loading'] = true;
+                    $this->updates_state->syncLoading(true);
                     yield $this->handle_multiple_update_async($difference['other_updates']);
                     foreach ($difference['new_encrypted_messages'] as $encrypted) {
                         yield $this->handle_encrypted_update_async(['_' => 'updateNewEncryptedMessage', 'message' => $encrypted], true);
                     }
                     yield $this->handle_update_messages_async($difference['new_messages']);
-                    yield $this->set_update_state_async($difference['state']);
+                    $this->updates_state->update($difference['state']);
                     break;
                 case 'updates.differenceSlice':
-                    $this->updates_state['sync_loading'] = true;
+                    $this->updates_state->syncLoading(true);
                     yield $this->handle_multiple_update_async($difference['other_updates']);
                     yield $this->handle_update_messages_async($difference['new_messages']);
-                    yield $this->set_update_state_async($difference['intermediate_state']);
+                    $this->updates_state->update($difference['intermediate_state']);
                     unset($difference);
-                    $this->updates_state['sync_loading'] = false;
+                    $this->updates_state->syncLoading(false);
                     yield $this->get_updates_difference_async();
                     break;
                 default:
@@ -327,7 +283,7 @@ trait UpdateHandler
             }
         } finally {
             $this->postpone_updates = false;
-            $this->updates_state['sync_loading'] = false;
+            $this->updates_state->syncLoading(false);
         }
         yield $this->handle_pending_updates_async();
 
@@ -343,14 +299,14 @@ trait UpdateHandler
 
     public function get_updates_state_async()
     {
-        $last = $this->updates_state['sync_loading'];
-        $this->updates_state['sync_loading'] = true;
+        $last = $this->updates_state->syncLoading();
+        $this->updates_state->syncLoading(true);
 
         try {
             $data = yield $this->method_call_async_read('updates.getState', [], ['datacenter' =>  $this->settings['connection_settings']['default_dc']]);
             yield $this->get_cdn_config_async($this->settings['connection_settings']['default_dc']);
         } finally {
-            $this->updates_state['sync_loading'] = $last;
+            $this->updates_state->syncLoading($last);
         }
 
         return $data;
@@ -379,7 +335,7 @@ trait UpdateHandler
             case 'updateChannelTooLong':
                 $channel_id = $update['channel_id'];
                 $this->logger->logger('Got channel too long update, getting difference...', \danog\MadelineProto\Logger::VERBOSE);
-                if (!isset($this->channels_state[$channel_id]) && !isset($update['pts'])) {
+                if (!$this->channels_state->has($channel_id) && !isset($update['pts'])) {
                     $this->logger->logger('I do not have the channel in the states and the pts is not set.', \danog\MadelineProto\Logger::ERROR);
 
                     return;
@@ -390,7 +346,7 @@ trait UpdateHandler
         if ($channel_id === false) {
             $cur_state = yield $this->load_update_state_async();
         } else {
-            $cur_state = &$this->load_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
+            $cur_state = $this->channels_state->get($channel_id, $update);
         }
         /*
                 if ($cur_state['sync_loading'] && in_array($update['_'], ['updateNewMessage', 'updateEditMessage', 'updateNewChannelMessage', 'updateEditChannelMessage'])) {
@@ -519,7 +475,7 @@ trait UpdateHandler
             return;
         }
         foreach ($messages as $message) {
-            yield $this->handle_update_async(['_' => $channel === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel === false ? (yield $this->load_update_state_async())['pts'] : $this->load_channel_state($channel)['pts'], 'pts_count' => 0]);
+            yield $this->handle_update_async(['_' => $channel === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel === false ? (yield $this->load_update_state_async())->pts() : $this->channels_state->get($channel), 'pts_count' => 0]);
         }
     }
 
@@ -652,42 +608,44 @@ trait UpdateHandler
         }
     }
 
-    public function pwr_webhook_async($update)
+    public function pwr_webhook($update)
     {
-        $payload = json_encode($update);
-        //$this->logger->logger($update, $payload, json_last_error());
-        if ($payload === '') {
-            $this->logger->logger('EMPTY UPDATE');
+        $this->call((function () use ($update) {
+            $payload = json_encode($update);
+            //$this->logger->logger($update, $payload, json_last_error());
+            if ($payload === '') {
+                $this->logger->logger('EMPTY UPDATE');
 
-            return false;
-        }
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_URL, $this->hook_url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        $parse = parse_url($this->hook_url);
-        if (isset($parse['scheme']) && $parse['scheme'] == 'https') {
-            if (isset($this->pem_path) && file_exists($this->pem_path)) {
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-                curl_setopt($ch, CURLOPT_CAINFO, $this->pem_path);
-            } else {
-                //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                return false;
             }
-        }
-        $result = curl_exec($ch);
-        curl_close($ch);
-        $this->logger->logger('Result of webhook query is '.$result, \danog\MadelineProto\Logger::NOTICE);
-        $result = json_decode($result, true);
-        if (is_array($result) && isset($result['method']) && $result['method'] != '' && is_string($result['method'])) {
-            try {
-                $this->logger->logger('Reverse webhook command returned', yield $this->method_call_async_read($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
-            } catch (\danog\MadelineProto\Exception $e) {
-            } catch (\danog\MadelineProto\TL\Exception $e) {
-            } catch (\danog\MadelineProto\RPCErrorException $e) {
-            } catch (\danog\MadelineProto\SecurityException $e) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_URL, $this->hook_url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            $parse = parse_url($this->hook_url);
+            if (isset($parse['scheme']) && $parse['scheme'] == 'https') {
+                if (isset($this->pem_path) && file_exists($this->pem_path)) {
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+                    curl_setopt($ch, CURLOPT_CAINFO, $this->pem_path);
+                } else {
+                    //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                }
             }
-        }
+            $result = curl_exec($ch);
+            curl_close($ch);
+            $this->logger->logger('Result of webhook query is '.$result, \danog\MadelineProto\Logger::NOTICE);
+            $result = json_decode($result, true);
+            if (is_array($result) && isset($result['method']) && $result['method'] != '' && is_string($result['method'])) {
+                try {
+                    $this->logger->logger('Reverse webhook command returned', yield $this->method_call_async_read($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
+                } catch (\danog\MadelineProto\Exception $e) {
+                } catch (\danog\MadelineProto\TL\Exception $e) {
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                } catch (\danog\MadelineProto\SecurityException $e) {
+                }
+            }
+        })());
     }
 }
