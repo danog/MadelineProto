@@ -136,7 +136,7 @@ trait UpdateHandler
         return false;
     }
 
-    public function get_channel_difference($channel)
+    public function get_channel_difference_async($channel)
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
@@ -168,7 +168,7 @@ trait UpdateHandler
         $this->postpone_updates = true;
 
         try {
-            $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->load_channel_state($channel)['pts'], 'limit' => 30], ['datacenter' => $this->datacenter->curdc]);
+            $difference = yield $this->method_call_async_read('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->load_channel_state($channel)['pts'], 'limit' => 30], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->getMessage() === "You haven't joined this channel/supergroup") {
                 return false;
@@ -268,7 +268,7 @@ trait UpdateHandler
         return $this->updates_state;
     }
 
-    public function get_updates_difference($w = null)
+    public function get_updates_difference_async($w = null)
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
@@ -283,7 +283,7 @@ trait UpdateHandler
         $this->logger->logger('Fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         while (!isset($difference)) {
             try {
-                $difference = $this->method_call('updates.getDifference', ['pts' => $this->load_update_state()['pts'], 'date' => $this->load_update_state()['date'], 'qts' => $this->load_update_state()['qts']], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+                $difference = yield $this->method_call_async_read('updates.getDifference', ['pts' => $this->load_update_state()['pts'], 'date' => $this->load_update_state()['date'], 'qts' => $this->load_update_state()['qts']], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             } catch (\danog\MadelineProto\PTSException $e) {
                 $this->updates_state['sync_loading'] = false;
                 $this->got_state = false;
@@ -341,14 +341,14 @@ trait UpdateHandler
         return true;
     }
 
-    public function get_updates_state()
+    public function get_updates_state_async()
     {
         $last = $this->updates_state['sync_loading'];
         $this->updates_state['sync_loading'] = true;
 
         try {
-            $data = $this->method_call('updates.getState', [], ['datacenter' =>  $this->settings['connection_settings']['default_dc']]);
-            $this->get_cdn_config($this->settings['connection_settings']['default_dc']);
+            $data = yield $this->method_call_async_read('updates.getState', [], ['datacenter' =>  $this->settings['connection_settings']['default_dc']]);
+            yield $this->get_cdn_config_async($this->settings['connection_settings']['default_dc']);
         } finally {
             $this->updates_state['sync_loading'] = $last;
         }
@@ -523,11 +523,11 @@ trait UpdateHandler
         }
     }
 
-    public function save_update($update)
+    public function save_update_async($update)
     {
         if ($update['_'] === 'updateConfig') {
             $this->config['expires'] = 0;
-            $this->get_config();
+            yield $this->get_config_async();
         }
         if (in_array($update['_'], ['updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'])) {
             $id = $this->get_id($update);
@@ -593,7 +593,7 @@ trait UpdateHandler
                 return false;
             }
             $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state['qts'].', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
-            $this->method_call('messages.receivedQueue', ['max_qts' => $cur_state['qts'] = $update['qts']], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+            yield $this->method_call_async_read('messages.receivedQueue', ['max_qts' => $cur_state['qts'] = $update['qts']], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             $this->handle_encrypted_update($update);
 
             return;
@@ -652,7 +652,7 @@ trait UpdateHandler
         }
     }
 
-    public function pwr_webhook($update)
+    public function pwr_webhook_async($update)
     {
         $payload = json_encode($update);
         //$this->logger->logger($update, $payload, json_last_error());
@@ -682,7 +682,7 @@ trait UpdateHandler
         $result = json_decode($result, true);
         if (is_array($result) && isset($result['method']) && $result['method'] != '' && is_string($result['method'])) {
             try {
-                $this->logger->logger('Reverse webhook command returned', $this->method_call($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
+                $this->logger->logger('Reverse webhook command returned', yield $this->method_call_async_read($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
             } catch (\danog\MadelineProto\Exception $e) {
             } catch (\danog\MadelineProto\TL\Exception $e) {
             } catch (\danog\MadelineProto\RPCErrorException $e) {

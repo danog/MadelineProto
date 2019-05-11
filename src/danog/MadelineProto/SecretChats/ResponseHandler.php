@@ -24,7 +24,7 @@ namespace danog\MadelineProto\SecretChats;
  */
 trait ResponseHandler
 {
-    public function handle_decrypted_update($update)
+    public function handle_decrypted_update_async($update)
     {
         /*if (isset($update['message']['decrypted_message']['random_bytes']) && strlen($update['message']['decrypted_message']['random_bytes']) < 15) {
               throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['rand_bytes_too_short']);
@@ -48,7 +48,7 @@ trait ResponseHandler
                     case 'decryptedMessageActionNotifyLayer':
                         $this->secret_chats[$update['message']['chat_id']]['layer'] = $update['message']['decrypted_message']['action']['layer'];
                         if ($update['message']['decrypted_message']['action']['layer'] >= 17 && time() - $this->secret_chats[$update['message']['chat_id']]['created'] > 15) {
-                            $this->notify_layer($update['message']['chat_id']);
+                            yield $this->notify_layer_async($update['message']['chat_id']);
                         }
                         if ($update['message']['decrypted_message']['action']['layer'] >= 73) {
                             $this->secret_chats[$update['message']['chat_id']]['mtproto'] = 2;
@@ -72,7 +72,7 @@ trait ResponseHandler
                         foreach ($this->secret_chats[$update['message']['chat_id']]['outgoing'] as $seq => $message) {
                             if ($seq >= $update['message']['decrypted_message']['action']['start_seq_no'] && $seq <= $update['message']['decrypted_message']['action']['end_seq_no']) {
                                 //throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['resending_unsupported']);
-                                $this->method_call('messages.sendEncrypted', ['peer' => $update['message']['chat_id'], 'message' => $update['message']['decrypted_message']], ['datacenter' => $this->datacenter->curdc]);
+                                yield $this->method_call_async_read('messages.sendEncrypted', ['peer' => $update['message']['chat_id'], 'message' => $update['message']['decrypted_message']], ['datacenter' => $this->datacenter->curdc]);
                             }
                         }
 
@@ -91,7 +91,7 @@ trait ResponseHandler
                     if ($update['message']['decrypted_message']['layer'] >= 17) {
                         $this->secret_chats[$update['message']['chat_id']]['layer'] = $update['message']['decrypted_message']['layer'];
                         if ($update['message']['decrypted_message']['layer'] >= 17 && time() - $this->secret_chats[$update['message']['chat_id']]['created'] > 15) {
-                            $this->notify_layer($update['message']['chat_id']);
+                            yield $this->notify_layer_async($update['message']['chat_id']);
                         }
                     }
                     $update['message']['decrypted_message'] = $update['message']['decrypted_message']['message'];

@@ -254,17 +254,17 @@ class Handler extends \danog\MadelineProto\Connection
             }
             $exception['trace']['frames'][] = $tl_frame;
         }
-        $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageException', 'request_id' => $request_id, 'exception' => $exception], 'exception'));
+        $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], ['_' => 'socketMessageException', 'request_id' => $request_id, 'exception' => $exception], 'exception'));
     }
 
     public function send_response($request_id, $response)
     {
-        $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageResponse', 'request_id' => $request_id, 'data' => $response], 'exception'));
+        $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], ['_' => 'socketMessageResponse', 'request_id' => $request_id, 'data' => $response], 'exception'));
     }
 
     public function send_data($stream_id, $data)
     {
-        $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageRawData', 'stream_id' => $stream_id, 'data' => $data], 'data'));
+        $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], ['_' => 'socketMessageRawData', 'stream_id' => $stream_id, 'data' => $data], 'data'));
     }
 
     public $logging = false;
@@ -277,7 +277,7 @@ class Handler extends \danog\MadelineProto\Connection
 
                 $message = ['_' => 'socketMessageLog', 'data' => $message, 'level' => $level, 'thread' => \danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread()), 'process' => \danog\MadelineProto\Magic::is_fork(), 'file' => basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'], '.php')];
 
-                $this->send_message_safe($this->serialize_object(['type' => ''], $message, 'log'));
+                $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], $message, 'log'));
             } finally {
                 $this->logging = false;
             }
@@ -300,11 +300,11 @@ class Handler extends \danog\MadelineProto\Connection
 
     public function update_handler($update)
     {
-        $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageUpdate', 'data' => $update], 'update'));
+        $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], ['_' => 'socketMessageUpdate', 'data' => $update], 'update'));
     }
 
     public function __call($method, $args)
     {
-        $this->send_message_safe($this->serialize_object(['type' => ''], ['_' => 'socketMessageRequest', 'request_id' => 0, 'method' => [$method], 'args' => $args], 'method'));
+        $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], ['_' => 'socketMessageRequest', 'request_id' => 0, 'method' => [$method], 'args' => $args], 'method'));
     }
 }

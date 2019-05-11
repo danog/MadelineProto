@@ -398,9 +398,11 @@ trait ResponseHandler
                                     $this->authorization = null;
 
                                     Loop::defer(function () use ($datacenter, &$request, &$response) {
-                                        $this->init_authorization();
+                                        $this->call((function () use ($datacenter, &$request, &$response) {
+                                            yield $this->init_authorization_async();
 
-                                        $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                        })());
                                     });
 
                                     return;
@@ -410,9 +412,11 @@ trait ResponseHandler
                                         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
 
                                         Loop::defer(function () use ($datacenter, &$request, &$response) {
-                                            $this->init_authorization();
+                                            $this->call((function () use ($datacenter, &$request, &$response) {
+                                                yield $this->init_authorization_async();
 
-                                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                                $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                            })());
                                         });
 
                                         return;
@@ -445,17 +449,21 @@ trait ResponseHandler
                                         $this->authorization = null;
 
                                         Loop::defer(function () use ($datacenter, &$request, &$response) {
-                                            $this->init_authorization();
+                                            $this->call((function () use ($datacenter, &$request, &$response) {
+                                                yield $this->init_authorization_async();
 
-                                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                                $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                            })());
                                         });
 
                                         return;
                                     }
                                     Loop::defer(function () use ($request_id, $datacenter) {
-                                        $this->init_authorization();
+                                        $this->call((function () use ($request_id, $datacenter) {
+                                            yield $this->init_authorization_async();
 
-                                        $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                            $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                        })());
                                     });
 
                                     return;
@@ -464,8 +472,10 @@ trait ResponseHandler
 
                                     $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
                                     Loop::defer(function () use ($request_id, $datacenter) {
-                                        $this->init_authorization();
-                                        $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                        $this->call((function () use ($request_id, $datacenter) {
+                                            yield $this->init_authorization_async();
+                                            $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                        })());
                                     });
 
                                     return;
@@ -517,8 +527,11 @@ trait ResponseHandler
                             $this->reset_session();
                             $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
                             Loop::defer(function () use ($request_id, $datacenter) {
-                                $this->init_authorization();
-                                $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
+
+                                $this->call((function () use ($datacenter, $request_id) {
+                                    yield $this->init_authorization_async();
+                                    $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                })());
                             });
 
                             return;

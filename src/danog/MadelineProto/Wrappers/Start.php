@@ -95,7 +95,7 @@ trait Start
         }
     }
 
-    public function web_phone_login()
+    public function web_phone_login_async()
     {
         try {
             yield $this->phone_login_async($_POST['phone_number']);
@@ -107,7 +107,7 @@ trait Start
         }
     }
 
-    public function web_complete_phone_login()
+    public function web_complete_phone_login_async()
     {
         try {
             yield $this->complete_phone_login_async($_POST['phone_code']);
@@ -119,7 +119,7 @@ trait Start
         }
     }
 
-    public function web_complete_2fa_login()
+    public function web_complete_2fa_login_async()
     {
         try {
             yield $this->complete_2fa_login_async($_POST['password']);
@@ -131,7 +131,7 @@ trait Start
         }
     }
 
-    public function web_complete_signup()
+    public function web_complete_signup_async()
     {
         try {
             yield $this->complete_signup_async($_POST['first_name'], isset($_POST['last_name']) ? $_POST['last_name'] : '');
@@ -143,7 +143,7 @@ trait Start
         }
     }
 
-    public function web_bot_login()
+    public function web_bot_login_async()
     {
         try {
             yield $this->bot_login_async($_POST['token']);

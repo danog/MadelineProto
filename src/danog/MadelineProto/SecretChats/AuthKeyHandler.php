@@ -29,7 +29,7 @@ trait AuthKeyHandler
     protected $temp_requested_secret_chats = [];
     protected $secret_chats = [];
 
-    public function accept_secret_chat($params)
+    public function accept_secret_chat_async($params)
     {
         //$this->logger->logger($params['id'],$this->secret_chat_status($params['id']));
         if ($this->secret_chat_status($params['id']) !== 0) {
@@ -38,7 +38,7 @@ trait AuthKeyHandler
 
             return false;
         }
-        $dh_config = $this->get_dh_config();
+        $dh_config = yield $this->get_dh_config_async();
         $this->logger->logger('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
         $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
         $params['g_a'] = new \phpseclib\Math\BigInteger($params['g_a'], 256);
@@ -51,13 +51,13 @@ trait AuthKeyHandler
         $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => false, 'user_id' => $params['admin_id'], 'InputEncryptedChat' => ['_' => 'inputEncryptedChat', 'chat_id' => $params['id'], 'access_hash' => $params['access_hash']], 'in_seq_no_x' => 1, 'out_seq_no_x' => 0, 'in_seq_no' => 0, 'out_seq_no' => 0, 'layer' => 8, 'ttl' => 0, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0], 'key_x' => 'from server', 'mtproto' => 1];
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->check_G($g_b, $dh_config['p']);
-        $this->method_call('messages.acceptEncryption', ['peer' => $params['id'], 'g_b' => $g_b->toBytes(), 'key_fingerprint' => $key['fingerprint']], ['datacenter' => $this->datacenter->curdc]);
-        $this->notify_layer($params['id']);
+        yield $this->method_call_async_read('messages.acceptEncryption', ['peer' => $params['id'], 'g_b' => $g_b->toBytes(), 'key_fingerprint' => $key['fingerprint']], ['datacenter' => $this->datacenter->curdc]);
+        yield $this->notify_layer_async($params['id']);
         $this->handle_pending_updates();
         $this->logger->logger('Secret chat '.$params['id'].' accepted successfully!', \danog\MadelineProto\Logger::NOTICE);
     }
 
-    public function request_secret_chat($user)
+    public function request_secret_chat_async($user)
     {
         $user = $this->get_info($user);
         if (!isset($user['InputUser'])) {
@@ -65,13 +65,13 @@ trait AuthKeyHandler
         }
         $user = $user['InputUser'];
         $this->logger->logger('Creating secret chat with '.$user['user_id'].'...', \danog\MadelineProto\Logger::VERBOSE);
-        $dh_config = $this->get_dh_config();
+        $dh_config = yield $this->get_dh_config_async();
         $this->logger->logger('Generating a...', \danog\MadelineProto\Logger::VERBOSE);
         $a = new \phpseclib\Math\BigInteger($this->random(256), 256);
         $this->logger->logger('Generating g_a...', \danog\MadelineProto\Logger::VERBOSE);
         $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
         $this->check_G($g_a, $dh_config['p']);
-        $res = $this->method_call('messages.requestEncryption', ['user_id' => $user, 'g_a' => $g_a->toBytes()], ['datacenter' => $this->datacenter->curdc]);
+        $res = yield $this->method_call_async_read('messages.requestEncryption', ['user_id' => $user, 'g_a' => $g_a->toBytes()], ['datacenter' => $this->datacenter->curdc]);
         $this->temp_requested_secret_chats[$res['id']] = $a;
         $this->handle_pending_updates();
         $this->get_updates_difference();
@@ -80,7 +80,7 @@ trait AuthKeyHandler
         return $res['id'];
     }
 
-    public function complete_secret_chat($params)
+    public function complete_secret_chat_async($params)
     {
         if ($this->secret_chat_status($params['id']) !== 1) {
             //$this->logger->logger($this->secret_chat_status($params['id']));
@@ -88,7 +88,7 @@ trait AuthKeyHandler
 
             return false;
         }
-        $dh_config = $this->get_dh_config();
+        $dh_config = yield $this->get_dh_config_async();
         $params['g_a_or_b'] = new \phpseclib\Math\BigInteger($params['g_a_or_b'], 256);
         $this->check_G($params['g_a_or_b'], $dh_config['p']);
         $key = ['auth_key' => str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
@@ -103,7 +103,7 @@ trait AuthKeyHandler
         $key['visualization_orig'] = substr(sha1($key['auth_key'], true), 16);
         $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
         $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputEncryptedChat' => ['chat_id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputEncryptedChat'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'in_seq_no' => 0, 'out_seq_no' => 0, 'layer' => 8, 'ttl' => 0, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0], 'key_x' => 'to server', 'mtproto' => 1];
-        $this->notify_layer($params['id']);
+        yield $this->notify_layer_async($params['id']);
         $this->handle_pending_updates();
         $this->logger->logger('Secret chat '.$params['id'].' completed successfully!', \danog\MadelineProto\Logger::NOTICE);
     }
@@ -119,13 +119,13 @@ trait AuthKeyHandler
 
     protected $temp_rekeyed_secret_chats = [];
 
-    public function rekey($chat)
+    public function rekey_async($chat)
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
             return;
         }
         $this->logger->logger('Rekeying secret chat '.$chat.'...', \danog\MadelineProto\Logger::VERBOSE);
-        $dh_config = $this->get_dh_config();
+        $dh_config = yield $this->get_dh_config_async();
         $this->logger->logger('Generating a...', \danog\MadelineProto\Logger::VERBOSE);
         $a = new \phpseclib\Math\BigInteger($this->random(256), 256);
         $this->logger->logger('Generating g_a...', \danog\MadelineProto\Logger::VERBOSE);
@@ -134,14 +134,14 @@ trait AuthKeyHandler
         $e = $this->random(8);
         $this->temp_rekeyed_secret_chats[$e] = $a;
         $this->secret_chats[$chat]['rekeying'] = [1, $e];
-        $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionRequestKey', 'g_a' => $g_a->toBytes(), 'exchange_id' => $e]]], ['datacenter' => $this->datacenter->curdc]);
+        yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionRequestKey', 'g_a' => $g_a->toBytes(), 'exchange_id' => $e]]], ['datacenter' => $this->datacenter->curdc]);
         $this->handle_pending_updates();
         $this->get_updates_difference();
 
         return $e;
     }
 
-    public function accept_rekey($chat, $params)
+    public function accept_rekey_async($chat, $params)
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
             $my_exchange_id = new \phpseclib\Math\BigInteger($this->secret_chats[$chat]['rekeying'][1], -256);
@@ -157,7 +157,7 @@ trait AuthKeyHandler
             }
         }
         $this->logger->logger('Accepting rekeying of secret chat '.$chat.'...', \danog\MadelineProto\Logger::VERBOSE);
-        $dh_config = $this->get_dh_config();
+        $dh_config = yield $this->get_dh_config_async();
         $this->logger->logger('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
         $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
         $params['g_a'] = new \phpseclib\Math\BigInteger($params['g_a'], 256);
@@ -170,12 +170,12 @@ trait AuthKeyHandler
         $this->secret_chats[$chat]['rekeying'] = [2, $params['exchange_id']];
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->check_G($g_b, $dh_config['p']);
-        $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAcceptKey', 'g_b' => $g_b->toBytes(), 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]], ['datacenter' => $this->datacenter->curdc]);
+        yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAcceptKey', 'g_b' => $g_b->toBytes(), 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]], ['datacenter' => $this->datacenter->curdc]);
         $this->handle_pending_updates();
         $this->get_updates_difference();
     }
 
-    public function commit_rekey($chat, $params)
+    public function commit_rekey_async($chat, $params)
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 1 || !isset($this->temp_rekeyed_secret_chats[$params['exchange_id']])) {
             $this->secret_chats[$chat]['rekeying'] = [0];
@@ -183,7 +183,7 @@ trait AuthKeyHandler
             return;
         }
         $this->logger->logger('Committing rekeying of secret chat '.$chat.'...', \danog\MadelineProto\Logger::VERBOSE);
-        $dh_config = $this->get_dh_config();
+        $dh_config = yield $this->get_dh_config_async();
         $params['g_b'] = new \phpseclib\Math\BigInteger($params['g_b'], 256);
         $this->check_G($params['g_b'], $dh_config['p']);
         $key = ['auth_key' => str_pad($params['g_b']->powMod($this->temp_rekeyed_secret_chats[$params['exchange_id']], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
@@ -191,11 +191,11 @@ trait AuthKeyHandler
         $key['visualization_orig'] = $this->secret_chats[$chat]['key']['visualization_orig'];
         $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
         if ($key['fingerprint'] !== $params['key_fingerprint']) {
-            $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]], ['datacenter' => $this->datacenter->curdc]);
+            yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]], ['datacenter' => $this->datacenter->curdc]);
 
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
-        $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionCommitKey', 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]], ['datacenter' => $this->datacenter->curdc]);
+        yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionCommitKey', 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]], ['datacenter' => $this->datacenter->curdc]);
         unset($this->temp_rekeyed_secret_chats[$chat]);
         $this->secret_chats[$chat]['rekeying'] = [0];
         $this->secret_chats[$chat]['old_key'] = $this->secret_chats[$chat]['key'];
@@ -206,13 +206,13 @@ trait AuthKeyHandler
         $this->get_updates_difference();
     }
 
-    public function complete_rekey($chat, $params)
+    public function complete_rekey_async($chat, $params)
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 2 || !isset($this->temp_rekeyed_secret_chats['fingerprint'])) {
             return;
         }
         if ($this->temp_rekeyed_secret_chats['fingerprint'] !== $params['key_fingerprint']) {
-            $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]], ['datacenter' => $this->datacenter->curdc]);
+            yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]], ['datacenter' => $this->datacenter->curdc]);
 
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
@@ -223,7 +223,7 @@ trait AuthKeyHandler
         $this->secret_chats[$chat]['ttr'] = 100;
         $this->secret_chats[$chat]['updated'] = time();
         unset($this->temp_rekeyed_secret_chats[$params['exchange_id']]);
-        $this->method_call('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNoop']]], ['datacenter' => $this->datacenter->curdc]);
+        yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNoop']]], ['datacenter' => $this->datacenter->curdc]);
         $this->logger->logger('Secret chat '.$chat.' rekeyed successfully!', \danog\MadelineProto\Logger::VERBOSE);
 
         return true;
@@ -246,7 +246,7 @@ trait AuthKeyHandler
         return $this->secret_chats[is_array($chat) ? $chat['chat_id'] : $chat];
     }
 
-    public function discard_secret_chat($chat)
+    public function discard_secret_chat_async($chat)
     {
         $this->logger->logger('Discarding secret chat '.$chat.'...', \danog\MadelineProto\Logger::VERBOSE);
         //$this->logger->logger(debug_backtrace(0)[0]);
@@ -261,7 +261,7 @@ trait AuthKeyHandler
         }
 
         try {
-            $this->method_call('messages.discardEncryption', ['chat_id' => $chat], ['datacenter' => $this->datacenter->curdc]);
+            yield $this->method_call_async_read('messages.discardEncryption', ['chat_id' => $chat], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc !== 'ENCRYPTION_ALREADY_DECLINED') {
                 throw $e;

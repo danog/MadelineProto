@@ -439,7 +439,7 @@ trait Files
         return $file;
     }
 
-    public function download_to_stream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
+    public function download_to_stream_async($message_media, $stream, $cb = null, $offset = 0, $end = -1)
     {
         if (is_object($stream) && class_implements($stream)['danog\MadelineProto\FileCallbackInterface']) {
             $cb = $stream;
@@ -491,12 +491,12 @@ trait Files
             }
 
             try {
-                $res = $cdn ? $this->method_call('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'file' => true, 'datacenter' => $datacenter]) : $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]);
+                $res = $cdn ? yield $this->method_call_async_read('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'file' => true, 'datacenter' => $datacenter]) : yield $this->method_call_async_read('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
                     if (isset($message_media['MessageMedia']) && !$this->authorization['user']['bot'] && $this->settings['download']['report_broken_media']) {
                         try {
-                            $this->method_call('messages.sendMedia', ['peer' => 'support', 'media' => $message_media['MessageMedia'], 'message' => "I can't download this file, could you please help?"], ['datacenter' => $this->datacenter->curdc]);
+                            yield $this->method_call_async_read('messages.sendMedia', ['peer' => 'support', 'media' => $message_media['MessageMedia'], 'message' => "I can't download this file, could you please help?"], ['datacenter' => $this->datacenter->curdc]);
                         } catch (RPCErrorException $e) {
                             $this->logger->logger('An error occurred while reporting the broken file: '.$e->rpc, Logger::FATAL_ERROR);
                         } catch (Exception $e) {
@@ -523,17 +523,17 @@ trait Files
                 $datacenter = $res['dc_id'].'_cdn';
                 if (!isset($this->datacenter->sockets[$datacenter])) {
                     $this->config['expires'] = -1;
-                    $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
+                    yield $this->get_config_async([], ['datacenter' => $this->datacenter->curdc]);
                 }
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['stored_on_cdn'], \danog\MadelineProto\Logger::NOTICE);
                 continue;
             }
             if ($res['_'] === 'upload.cdnFileReuploadNeeded') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['cdn_reupload'], \danog\MadelineProto\Logger::NOTICE);
-                $this->get_config([], ['datacenter' => $this->datacenter->curdc]);
+                yield $this->get_config_async([], ['datacenter' => $this->datacenter->curdc]);
 
                 try {
-                    $this->add_cdn_hashes($message_media['file_token'], $this->method_call('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
+                    $this->add_cdn_hashes($message_media['file_token'], yield $this->method_call_async_read('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     switch ($e->rpc) {
                         case 'FILE_TOKEN_INVALID':
@@ -550,7 +550,7 @@ trait Files
                 $datacenter = 1;
             }
             while ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
-                $res = $this->method_call('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
+                $res = yield $this->method_call_async_read('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'datacenter' => $datacenter]);
                 $datacenter++;
                 if (!isset($this->datacenter->sockets[$datacenter])) {
                     break;
@@ -610,7 +610,7 @@ trait Files
     {
         while (strlen($data)) {
             if (!isset($this->cdn_hashes[$file][$offset])) {
-                $this->add_cdn_hashes($file, $this->method_call('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => $datacenter]));
+                $this->add_cdn_hashes($file, yield $this->method_call_async_read('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => $datacenter]));
             }
             if (!isset($this->cdn_hashes[$file][$offset])) {
                 throw new \danog\MadelineProto\Exception('Could not fetch CDN hashes for offset '.$offset);

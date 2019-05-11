@@ -890,7 +890,7 @@ class MTProto implements TLCallback
         }
     }
 
-    public function parse_config()
+    public function parse_config_async()
     {
         if (isset($this->config['dc_options'])) {
             yield $this->parse_dc_options($this->config['dc_options']);
@@ -900,7 +900,7 @@ class MTProto implements TLCallback
         $this->logger->logger($this->config, Logger::NOTICE);
     }
 
-    public function parse_dc_options($dc_options)
+    public function parse_dc_options_async($dc_options)
     {
         unset($this->settings[$this->config['test_mode']]);
         foreach ($dc_options as $dc) {

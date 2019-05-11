@@ -516,7 +516,7 @@ trait TL
         return $tl['id'].yield $this->serialize_params($tl, $arguments, $method);
     }
 
-    public function serialize_params($tl, $arguments, $ctx, $layer = -1)
+    public function serialize_params_async($tl, $arguments, $ctx, $layer = -1)
     {
         $serialized = '';
         $arguments = $this->botAPI_to_MTProto($arguments);

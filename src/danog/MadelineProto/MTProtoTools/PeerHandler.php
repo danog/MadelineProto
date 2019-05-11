@@ -324,7 +324,7 @@ trait PeerHandler
         }
         return false;
     }
-    public function get_info($id, $recursive = true)
+    public function get_info_async($id, $recursive = true)
     {
         if (is_array($id)) {
             switch ($id['_']) {
@@ -354,12 +354,12 @@ trait PeerHandler
                     $this->caching_simple[$id] = true;
                     if ($id < 0) {
                         if ($this->is_supergroup($id)) {
-                            $this->method_call('channels.getChannels', ['id' => [['access_hash' => 0, 'channel_id' => $this->from_supergroup($id), '_' => 'inputChannel']]], ['datacenter' => $this->datacenter->curdc]);
+                            yield $this->method_call_async_read('channels.getChannels', ['id' => [['access_hash' => 0, 'channel_id' => $this->from_supergroup($id), '_' => 'inputChannel']]], ['datacenter' => $this->datacenter->curdc]);
                         } else {
-                            $this->method_call('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);
+                            yield $this->method_call_async_read('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);
                         }
                     } else {
-                        $this->method_call('users.getUsers', ['id' => [['access_hash' => 0, 'user_id' => $id, '_' => 'inputUser']]], ['datacenter' => $this->datacenter->curdc]);
+                        yield $this->method_call_async_read('users.getUsers', ['id' => [['access_hash' => 0, 'user_id' => $id, '_' => 'inputUser']]], ['datacenter' => $this->datacenter->curdc]);
                     }
                 } catch (\danog\MadelineProto\Exception $e) {
                     $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
@@ -402,7 +402,7 @@ trait PeerHandler
             if ($matches[1] === '') {
                 $id = $matches[2];
             } else {
-                $invite = $this->method_call('messages.checkChatInvite', ['hash' => $matches[2]], ['datacenter' => $this->datacenter->curdc]);
+                $invite = yield $this->method_call_async_read('messages.checkChatInvite', ['hash' => $matches[2]], ['datacenter' => $this->datacenter->curdc]);
                 if (isset($invite['chat'])) {
                     return $this->get_info($invite['chat']);
                 } else {
@@ -416,7 +416,7 @@ trait PeerHandler
         }
         if ($id === 'support') {
             if (!$this->supportUser) {
-                $this->method_call('help.getSupport', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+                yield $this->method_call_async_read('help.getSupport', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             }
 
             return $this->get_info($this->supportUser);
@@ -499,7 +499,7 @@ trait PeerHandler
         return isset($this->full_chats[$id]['last_update']) ? $this->full_chats[$id]['last_update'] : 0;
     }
 
-    public function get_full_info($id)
+    public function get_full_info_async($id)
     {
         $partial = $this->get_info($id);
         if (time() - $this->full_chat_last_updated($partial['bot_api_id']) < (isset($this->settings['peer']['full_info_cache_time']) ? $this->settings['peer']['full_info_cache_time'] : 0)) {
@@ -508,14 +508,14 @@ trait PeerHandler
         switch ($partial['type']) {
             case 'user':
             case 'bot':
-                $full = $this->method_call('users.getFullUser', ['id' => $partial['InputUser']], ['datacenter' => $this->datacenter->curdc]);
+                $full = yield $this->method_call_async_read('users.getFullUser', ['id' => $partial['InputUser']], ['datacenter' => $this->datacenter->curdc]);
                 break;
             case 'chat':
-                $full = $this->method_call('messages.getFullChat', $partial, ['datacenter' => $this->datacenter->curdc])['full_chat'];
+                $full = yield $this->method_call_async_read('messages.getFullChat', $partial, ['datacenter' => $this->datacenter->curdc])['full_chat'];
                 break;
             case 'channel':
             case 'supergroup':
-                $full = $this->method_call('channels.getFullChannel', ['channel' => $partial['InputChannel']], ['datacenter' => $this->datacenter->curdc])['full_chat'];
+                $full = yield $this->method_call_async_read('channels.getFullChannel', ['channel' => $partial['InputChannel']], ['datacenter' => $this->datacenter->curdc])['full_chat'];
                 break;
         }
 
@@ -688,7 +688,7 @@ trait PeerHandler
         }
     }
 
-    public function fetch_participants($channel, $filter, $q, $total_count, &$res)
+    public function fetch_participants_async($channel, $filter, $q, $total_count, &$res)
     {
         $offset = 0;
         $limit = 200;
@@ -698,7 +698,7 @@ trait PeerHandler
 
         do {
             try {
-                $gres = $this->method_call('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset, 'limit' => $limit, 'hash' => $hash = $this->get_participants_hash($channel, $filter, $q, $offset, $limit)], ['datacenter' => $this->datacenter->curdc, 'heavy' => true]);
+                $gres = yield $this->method_call_async_read('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset, 'limit' => $limit, 'hash' => $hash = $this->get_participants_hash($channel, $filter, $q, $offset, $limit)], ['datacenter' => $this->datacenter->curdc, 'heavy' => true]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if ($e->rpc === 'CHAT_ADMIN_REQUIRED') {
                     return $has_more;
@@ -845,11 +845,11 @@ trait PeerHandler
         }
     }
 
-    public function resolve_username($username)
+    public function resolve_username_async($username)
     {
         try {
             $this->caching_simple_username[$username] = true;
-            $res = $this->method_call('contacts.resolveUsername', ['username' => str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
+            $res = yield $this->method_call_async_read('contacts.resolveUsername', ['username' => str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             $this->logger->logger('Username resolution failed with error '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             if (strpos($e->rpc, 'FLOOD_WAIT_') === 0 || $e->rpc === 'AUTH_KEY_UNREGISTERED' || $e->rpc === 'USERNAME_INVALID') {

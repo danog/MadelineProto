@@ -96,7 +96,7 @@ class API extends APIFactory
 
                 if (isset($unserialized->API)) {
                     $this->API = $unserialized->API;
-                    $promise = $this->call(function () {
+                    $promise = $this->call((function () {
                         yield $this->API->asyncInitPromise;
                         $this->API->asyncInitPromise = null;
                         $this->APIFactory();
@@ -104,7 +104,7 @@ class API extends APIFactory
                         $pong = $this->ping(['ping_id' => 3], ['async' => true]);
                         \danog\MadelineProto\Logger::log('Pong: ' . $pong['ping_id'], Logger::ULTRA_VERBOSE);
                         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
-                    });
+                    })());
                     $this->APIFactory();
 
                     return;
@@ -119,7 +119,7 @@ class API extends APIFactory
         }
         $this->API = new MTProto($params);
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['apifactory_start'], Logger::VERBOSE);
-        $promise = $this->call(function () {
+        $promise = $this->call((function () {
             yield $this->API->asyncInitPromise;
             $this->API->asyncInitPromise = null;
             $this->APIFactory();
@@ -127,7 +127,7 @@ class API extends APIFactory
             $pong = $this->ping(['ping_id' => 3], ['async' => true]);
             \danog\MadelineProto\Logger::log('Pong: ' . $pong['ping_id'], Logger::ULTRA_VERBOSE);
             \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
-        });
+        })());
         $this->APIFactory();        
     }
 

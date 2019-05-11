@@ -24,7 +24,7 @@ namespace danog\MadelineProto\SecretChats;
  */
 trait MessageHandler
 {
-    public function encrypt_secret_message($chat_id, $message)
+    public function encrypt_secret_message_async($chat_id, $message)
     {
         if (!isset($this->secret_chats[$chat_id])) {
             $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $chat_id));
@@ -41,7 +41,7 @@ trait MessageHandler
             $this->secret_chats[$chat_id]['out_seq_no']++;
         }
         $this->secret_chats[$chat_id]['outgoing'][$this->secret_chats[$chat_id]['out_seq_no']] = $message;
-        $message = $this->serialize_object(['type' => $constructor = $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer'], $message, $constructor, $this->secret_chats[$chat_id]['layer']);
+        $message = yield $this->serialize_object_async(['type' => $constructor = $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer'], $message, $constructor, $this->secret_chats[$chat_id]['layer']);
         $message = $this->pack_unsigned_int(strlen($message)).$message;
         if ($this->secret_chats[$chat_id]['mtproto'] === 2) {
             $padding = $this->posmod(-strlen($message), 16);

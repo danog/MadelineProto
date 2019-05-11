@@ -187,11 +187,11 @@ class APIFactory
         if ($this->API->asyncInitPromise) {
             $async = is_array(end($arguments)) && isset(end($arguments)['async']) ? end($arguments)['async'] : ($this->async && $name !== 'loop');
             if ($async) {
-                return $this->call(function () use ($name, $arguments) {
+                return $this->call((function () use ($name, $arguments) {
                     yield $this->API->asyncInitPromise;
                     $this->API->asyncInitPromise = null;
                     return yield $this->methods[$name](...$arguments);
-                });
+                })());
             } else {
                 $this->wait($this->API->asyncInitPromise);
                 $this->API->asyncInitPromise = null;
@@ -220,13 +220,13 @@ class APIFactory
 
         if ($this->API->asyncInitPromise) {
             if ($async) {
-                return $this->call(function () use ($name, $args, $aargs) {
+                return $this->call((function () use ($name, $args, $aargs) {
                     yield $this->API->asyncInitPromise;
                     $this->API->asyncInitPromise = null;
                     $aargs['datacenter'] = $this->API->datacenter->curdc;
                     return yield $this->API->method_call_async_read($name, $args, $aargs);
                     ;
-                });
+                })());
             } else {
                 $this->wait($this->API->asyncInitPromise);
                 $this->API->asyncInitPromise = null;
