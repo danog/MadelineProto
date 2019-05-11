@@ -25,11 +25,14 @@ $p->addFromString('.git/refs/heads/master', $argv[3]);
 
 $p->setStub('<?php
 $backtrace = debug_backtrace();
-if ($backtrace && in_array(basename($backtrace[0]["file"]), ["madeline.php", "phar.php"]) && isset($backtrace[1]["file"]) && !defined("PHAR_DEBUG")) {
+if (!isset($backtrace[0]["file"]) || !in_array(basename($backtrace[0]["file"]), ["madeline.php", "phar.php"])) {
+    die("madeline.phar cannot be required manually: use the automatic loader, instead: https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple".PHP_EOL);
+}
+if (isset($backtrace[1]["file"])) {
     chdir(dirname($backtrace[1]["file"]));
-    if ($contents = file_get_contents("https://phar.madelineproto.xyz/phar.php?v=new")) {
-        file_put_contents($backtrace[0]["file"], $contents);
-    }
+}
+if ($contents = file_get_contents("https://phar.madelineproto.xyz/phar.php?v=new")) {
+    file_put_contents($backtrace[0]["file"], $contents);
 }
 
 Phar::interceptFileFuncs(); 
