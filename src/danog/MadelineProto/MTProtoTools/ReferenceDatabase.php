@@ -155,7 +155,7 @@ class ReferenceDatabase implements TLCallback
 
     public function getConstructorSerializeCallbacks(): array
     {
-        return array_fill_keys(array_keys(self::LOCATION_CONTEXT), [$this, 'populateReferenceSync']);
+        return array_fill_keys(array_keys(self::LOCATION_CONTEXT), [$this, 'populateReference']);
     }
 
     public function getTypeMismatchCallbacks(): array
@@ -530,11 +530,6 @@ class ReferenceDatabase implements TLCallback
         }
 
         throw new Exception('Did not refresh reference');
-    }
-
-    public function populateReferenceSync(array $object): array
-    {
-        return $this->wait($this->populateReference($object));
     }
 
     public function populateReference(array $object): Promise

@@ -232,24 +232,24 @@ trait UpdateHandler
     public function set_update_state_async($data)
     {
         if (isset($data['pts']) && $data['pts'] !== 0) {
-            yield $this->load_update_state_async()['pts'] = $data['pts'];
+            (yield $this->load_update_state_async())['pts'] = $data['pts'];
         }
         if (isset($data['qts']) && $data['qts'] !== 0) {
-            yield $this->load_update_state_async()['qts'] = $data['qts'];
+            (yield $this->load_update_state_async())['qts'] = $data['qts'];
         }
         if (isset($data['seq']) && $data['seq'] !== 0) {
-            yield $this->load_update_state_async()['seq'] = $data['seq'];
+            (yield $this->load_update_state_async())['seq'] = $data['seq'];
         }
-        if (isset($data['date']) && $data['date'] > yield $this->load_update_state_async()['date']) {
-            yield $this->load_update_state_async()['date'] = $data['date'];
+        if (isset($data['date']) && $data['date'] > (yield $this->load_update_state_async())['date']) {
+            (yield $this->load_update_state_async())['date'] = $data['date'];
         }
     }
     public function reset_update_state_async()
     {
-        yield $this->load_update_state_async()['pts'] = 1;
-        yield $this->load_update_state_async()['qts'] = 0;
-        yield $this->load_update_state_async()['seq'] = 0;
-        yield $this->load_update_state_async()['date'] = 1;
+        (yield $this->load_update_state_async())['pts'] = 1;
+        (yield $this->load_update_state_async())['qts'] = 0;
+        (yield $this->load_update_state_async())['seq'] = 0;
+        (yield $this->load_update_state_async())['date'] = 1;
         foreach ($this->channels_state as &$state) {
             $state['pts'] = 1;
         }
@@ -283,7 +283,7 @@ trait UpdateHandler
         $this->logger->logger('Fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         while (!isset($difference)) {
             try {
-                $difference = yield $this->method_call_async_read('updates.getDifference', ['pts' => yield $this->load_update_state_async()['pts'], 'date' => yield $this->load_update_state_async()['date'], 'qts' => yield $this->load_update_state_async()['qts']], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+                $difference = yield $this->method_call_async_read('updates.getDifference', ['pts' => (yield $this->load_update_state_async())['pts'], 'date' => (yield $this->load_update_state_async())['date'], 'qts' => (yield $this->load_update_state_async())['qts']], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             } catch (\danog\MadelineProto\PTSException $e) {
                 $this->updates_state['sync_loading'] = false;
                 $this->got_state = false;
@@ -388,7 +388,7 @@ trait UpdateHandler
         }
 
         if ($channel_id === false) {
-            $cur_state = &yield $this->load_update_state_async();
+            $cur_state = yield $this->load_update_state_async();
         } else {
             $cur_state = &$this->load_channel_state($channel_id, (isset($update['pts']) ? $update['pts'] : 0) - (isset($update['pts_count']) ? $update['pts_count'] : 0));
         }
@@ -519,7 +519,7 @@ trait UpdateHandler
             return;
         }
         foreach ($messages as $message) {
-            yield $this->handle_update_async(['_' => $channel === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel === false ? yield $this->load_update_state_async()['pts'] : $this->load_channel_state($channel)['pts'], 'pts_count' => 0]);
+            yield $this->handle_update_async(['_' => $channel === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel === false ? (yield $this->load_update_state_async())['pts'] : $this->load_channel_state($channel)['pts'], 'pts_count' => 0]);
         }
     }
 

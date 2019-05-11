@@ -21,10 +21,6 @@ namespace danog\MadelineProto\Wrappers;
 
 trait DialogHandler
 {
-    public function get_dialogs($force = true)
-    {
-        return $this->wait($this->get_dialogs_async($force));
-    }
     public function get_dialogs_async($force = true)
     {
         if ($force || !isset($this->dialog_params['offset_date']) || is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || is_null($this->dialog_params['count'])) {

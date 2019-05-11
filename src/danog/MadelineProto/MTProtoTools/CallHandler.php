@@ -60,13 +60,13 @@ trait CallHandler
             $this->datacenter->sockets[$new_datacenter]->writer->resume();
         }
     }
-
+    /*
     public function method_call($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
         $promise = $this->method_call_async_read($method, $args, $aargs);
 
         return $this->wait($promise);
-    }
+    }*/
 
     public function method_call_async_read($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
     {

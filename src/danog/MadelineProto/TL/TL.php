@@ -405,7 +405,7 @@ trait TL
             $object['_'] = $constructorData['predicate'];
         }
         if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']])) {
-            $object = $this->tl_callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']]($object);
+            $object = yield $this->tl_callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']]($object);
         }
 
         $predicate = $object['_'];

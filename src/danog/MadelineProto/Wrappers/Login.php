@@ -28,10 +28,6 @@ use function Amp\Promise\wait;
  */
 trait Login
 {
-    public function logout()
-    {
-        return $this->wait($this->logout_async());
-    }
     public function logout_async()
     {
         foreach ($this->datacenter->sockets as $socket) {

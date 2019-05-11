@@ -459,10 +459,6 @@ trait AuthKeyHandler
         return true;
     }
 
-    public function get_dh_config()
-    {
-        return $this->wait($this->get_dh_config_async());
-    }
     public function get_dh_config_async()
     {
         $this->updates_state['sync_loading'] = true;
@@ -564,11 +560,6 @@ trait AuthKeyHandler
     }
 
     // Creates authorization keys
-    public function init_authorization()
-    {
-        return $this->wait($this->init_authorization_async());
-    }
-
     public function init_authorization_async()
     {
         if ($this->pending_auth) {
