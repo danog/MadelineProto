@@ -519,7 +519,7 @@ trait TL
     public function serialize_params_async($tl, $arguments, $ctx, $layer = -1)
     {
         $serialized = '';
-        $arguments = $this->botAPI_to_MTProto($arguments);
+        $arguments = yield $this->botAPI_to_MTProto_async($arguments);
         $flags = 0;
         foreach ($tl['params'] as $cur_flag) {
             if (isset($cur_flag['pow'])) {

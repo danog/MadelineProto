@@ -113,7 +113,7 @@ trait CallHandler
 
         if (is_array($args)) {
             if (isset($args['message']) && is_string($args['message']) && mb_strlen($args['message'], 'UTF-8') > $this->config['message_length_max']) {
-                $arg_chunks = $this->split_to_chunks($args);
+                $arg_chunks = yield $this->split_to_chunks_async($args);
                 $promises = [];
                 $new_aargs = $aargs;
                 $new_aargs['postpone'] = true;
@@ -129,7 +129,7 @@ trait CallHandler
 
                 return yield $promises;
             }
-            $args = $this->botAPI_to_MTProto($args);
+            $args = yield $this->botAPI_to_MTProto_async($args);
             if (isset($args['ping_id']) && is_int($args['ping_id'])) {
                 $args['ping_id'] = $this->pack_signed_long($args['ping_id']);
             }
