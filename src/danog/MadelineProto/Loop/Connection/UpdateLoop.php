@@ -55,7 +55,7 @@ class UpdateLoop extends ResumableSignalLoop
                 }
             }
             if (time() - $API->last_getdifference > $timeout) {
-                if (!$API->get_updates_difference()) {
+                if (!yield $API->get_updates_difference_async()) {
                     return false;
                 }
             }

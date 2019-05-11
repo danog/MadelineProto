@@ -556,15 +556,17 @@ trait ResponseHandler
         unset($request);
         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
         Loop::defer(function () use ($request_id, $response, $datacenter, $botAPI) {
-            $this->call((function ()use ($request_id, $response, $datacenter, $botAPI) {
-            $r = isset($response['_']) ? $response['_'] : json_encode($response);
-            $this->logger->logger("Deferred: sent $r to deferred");
-            if ($botAPI) {
-                $response = yield $this->MTProto_to_botAPI_async($response);
-            }
-            $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
-            unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']);
-            })());
+            $this->call((
+                function () use ($request_id, $response, $datacenter, $botAPI) {
+                    $r = isset($response['_']) ? $response['_'] : json_encode($response);
+                    $this->logger->logger("Deferred: sent $r to deferred");
+                    if ($botAPI) {
+                        $response = yield $this->MTProto_to_botAPI_async($response);
+                    }
+                    $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
+                    unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']);
+                }
+            )());
         });
     }
 
