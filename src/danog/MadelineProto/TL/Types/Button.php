@@ -22,6 +22,7 @@ namespace danog\MadelineProto\TL\Types;
 class Button implements \JsonSerializable, \ArrayAccess
 {
     use \danog\Serializable;
+    use \danog\MadelineProto\Tools;
     private $info = [];
     private $data = [];
 
@@ -38,20 +39,30 @@ class Button implements \JsonSerializable, \ArrayAccess
         return ['data', 'info'];
     }
 
-    public function click($donotwait = false)
+    public function click($donotwait = false, $params = [])
     {
+        if (is_array($donotwait)) {
+            $async = $donotwait;
+        } else {
+            $async = $params;
+        }
+        $async = isset($async['async']) ? $async['async'] : (isset($this->info['API']->wrapper) ? $this->info['API']->wrapper->async : true);
         switch ($this->data['_']) {
             default:
                 return false;
             case 'keyboardButtonUrl':
                 return $this->data['url'];
             case 'keyboardButton':
-                return $this->info['API']->method_call('messages.sendMessage', ['peer' => $this->info['peer'], 'message' => $this->data['text'], 'reply_to_msg_id' => $this->info['id']], ['datacenter' => $this->info['API']->datacenter->curdc]);
+                $res = $this->info['API']->method_call_async_read('messages.sendMessage', ['peer' => $this->info['peer'], 'message' => $this->data['text'], 'reply_to_msg_id' => $this->info['id']], ['datacenter' => $this->info['API']->datacenter->curdc]);
+                break;
             case 'keyboardButtonCallback':
-                return $this->info['API']->method_call('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'data' => $this->data['data']], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
+                $res = $this->info['API']->method_call_async_read('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'data' => $this->data['data']], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
+                break;
             case 'keyboardButtonGame':
-                return $this->info['API']->method_call('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'game' => true], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
+                $res = $this->info['API']->method_call_async_read('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'game' => true], ['noResponse' => $donotwait, 'datacenter' => $this->info['API']->datacenter->curdc]);
+                break;
         }
+        return $async ? $res : $this->wait($res);
     }
 
     public function __debugInfo()
