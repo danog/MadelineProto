@@ -171,9 +171,9 @@ trait BotAPI
                 $newd['date'] = $data['date'];
                 $newd['text'] = $sent_arguments['message'];
                 if ($data['out']) {
-                    $newd['from'] = $this->get_pwr_chat($this->authorization['user']);
+                    $newd['from'] = yield $this->get_pwr_chat_async($this->authorization['user']);
                 }
-                $newd['chat'] = $this->get_pwr_chat($sent_arguments['peer']);
+                $newd['chat'] = yield $this->get_pwr_chat_async($sent_arguments['peer']);
                 if (isset($data['entities'])) {
                     $newd['entities'] = yield $this->MTProto_to_botAPI_async($data['entities'], $sent_arguments);
                 }
@@ -192,9 +192,9 @@ trait BotAPI
                 $newd['post'] = $data['post'];
                 $newd['silent'] = $data['silent'];
                 if (isset($data['from_id'])) {
-                    $newd['from'] = $this->get_pwr_chat($data['from_id']);
+                    $newd['from'] = yield $this->get_pwr_chat_async($data['from_id']);
                 }
-                $newd['chat'] = $this->get_pwr_chat($data['to_id']);
+                $newd['chat'] = yield $this->get_pwr_chat_async($data['to_id']);
                 if (isset($data['entities'])) {
                     $newd['entities'] = yield $this->MTProto_to_botAPI_async($data['entities'], $sent_arguments);
                 }
@@ -205,13 +205,13 @@ trait BotAPI
                     $newd['edit_date'] = $data['edit_date'];
                 }
                 if (isset($data['via_bot_id'])) {
-                    $newd['via_bot'] = $this->get_pwr_chat($data['via_bot_id']);
+                    $newd['via_bot'] = yield $this->get_pwr_chat_async($data['via_bot_id']);
                 }
                 if (isset($data['fwd_from']['from_id'])) {
-                    $newd['froward_from'] = $this->get_pwr_chat($data['fwd_from']['from_id']);
+                    $newd['forward_from'] = yield $this->get_pwr_chat_async($data['fwd_from']['from_id']);
                 }
                 if (isset($data['fwd_from']['channel_id'])) {
-                    $newd['forward_from_chat'] = $this->get_pwr_chat($data['fwd_from']['channel_id']);
+                    $newd['forward_from_chat'] = yield $this->get_pwr_chat_async($data['fwd_from']['channel_id']);
                 }
                 if (isset($data['fwd_from']['date'])) {
                     $newd['forward_date'] = $data['fwd_from']['date'];
@@ -277,7 +277,7 @@ trait BotAPI
             case 'messageEntityMentionName':
                 unset($data['_']);
                 $data['type'] = 'text_mention';
-                $data['user'] = $this->get_pwr_chat($data['user_id']);
+                $data['user'] = yield $this->get_pwr_chat_async($data['user_id']);
                 unset($data['user_id']);
 
                 return $data;
@@ -447,7 +447,7 @@ trait BotAPI
                 break;
             case 'p':
                 foreach ($node->childNodes as $node) {
-                    $this->parse_node($node, $entities, $new_message, $offset);
+                    yield $this->parse_node_async($node, $entities, $new_message, $offset);
                 }
                 break;
             case 'a':
@@ -485,7 +485,7 @@ trait BotAPI
         }
     }
 
-    public function parse_mode($arguments)
+    public function parse_mode_async($arguments)
     {
         if ($arguments['message'] === '' || !isset($arguments['message']) || !isset($arguments['parse_mode'])) {
             return $arguments;
@@ -511,7 +511,7 @@ trait BotAPI
             }
             $offset = 0;
             foreach ($dom->getElementsByTagName('body')->item(0)->childNodes as $node) {
-                $this->parse_node($node, $arguments['entities'], $new_message, $offset);
+                yield $this->parse_node_async($node, $arguments['entities'], $new_message, $offset);
             }
             if (isset($arguments['entities']['buttons'])) {
                 $arguments['reply_markup'] = $this->build_rows($arguments['entities']['buttons']);

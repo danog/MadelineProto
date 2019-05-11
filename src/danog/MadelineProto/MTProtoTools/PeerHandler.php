@@ -141,7 +141,7 @@ trait PeerHandler
     {
             Loop::defer(function () use ($id, $full_fetch, $send) {
                 try {
-                    $this->get_pwr_chat($id, $full_fetch, $send);
+                    yield $this->get_pwr_chat_async($id, $full_fetch, $send);
                 } catch (\danog\MadelineProto\Exception $e) {
                     $this->logger->logger("While caching: ".$e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -168,12 +168,12 @@ trait PeerHandler
         }
     }
 
-    public function entities_peer_isset($entities)
+    public function entities_peer_isset_async($entities)
     {
         try {
             foreach ($entities as $entity) {
                 if ($entity['_'] === 'messageEntityMentionName' || $entity['_'] === 'inputMessageEntityMentionName') {
-                    if (!$this->peer_isset($entity['user_id'])) {
+                    if (!yield $this->peer_isset_async($entity['user_id'])) {
                         return false;
                     }
                 }
@@ -185,13 +185,13 @@ trait PeerHandler
         return true;
     }
 
-    public function fwd_peer_isset($fwd)
+    public function fwd_peer_isset_async($fwd)
     {
         try {
-            if (isset($fwd['user_id']) && !$this->peer_isset($fwd['user_id'])) {
+            if (isset($fwd['user_id']) && !yield $this->peer_isset_async($fwd['user_id'])) {
                 return false;
             }
-            if (isset($fwd['channel_id']) && !$this->peer_isset($this->to_supergroup($fwd['channel_id']))) {
+            if (isset($fwd['channel_id']) && !yield $this->peer_isset_async($this->to_supergroup($fwd['channel_id']))) {
                 return false;
             }
         } catch (\danog\MadelineProto\Exception $e) {
@@ -600,15 +600,15 @@ trait PeerHandler
         if (isset($res['participants']) && $fullfetch) {
             foreach ($res['participants'] as $key => $participant) {
                 $newres = [];
-                $newres['user'] = $this->get_pwr_chat($participant['user_id'], false, true);
+                $newres['user'] = yield $this->get_pwr_chat_async($participant['user_id'], false, true);
                 if (isset($participant['inviter_id'])) {
-                    $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, true);
+                    $newres['inviter'] = yield $this->get_pwr_chat_async($participant['inviter_id'], false, true);
                 }
                 if (isset($participant['promoted_by'])) {
-                    $newres['promoted_by'] = $this->get_pwr_chat($participant['promoted_by'], false, true);
+                    $newres['promoted_by'] = yield $this->get_pwr_chat_async($participant['promoted_by'], false, true);
                 }
                 if (isset($participant['kicked_by'])) {
-                    $newres['kicked_by'] = $this->get_pwr_chat($participant['kicked_by'], false, true);
+                    $newres['kicked_by'] = yield $this->get_pwr_chat_async($participant['kicked_by'], false, true);
                 }
                 if (isset($participant['date'])) {
                     $newres['date'] = $participant['date'];
@@ -651,7 +651,7 @@ trait PeerHandler
 
             $filters = ['channelParticipantsSearch', 'channelParticipantsKicked', 'channelParticipantsBanned'];
             foreach ($filters as $filter) {
-                $this->recurse_alphabet_search_participants($full['InputChannel'], $filter, $q, $total_count, $res);
+                yield $this->recurse_alphabet_search_participants_async($full['InputChannel'], $filter, $q, $total_count, $res);
             }
             $this->logger->logger('Fetched '.count($res['participants'])." out of $total_count");
             $res['participants'] = array_values($res['participants']);
@@ -673,7 +673,7 @@ trait PeerHandler
         }
 
         for ($x = 'a'; $x !== 'aa' && $total_count > count($res['participants']); $x++) {
-            $this->recurse_alphabet_search_participants($channel, $filter, $q.$x, $total_count, $res);
+            yield $this->recurse_alphabet_search_participants_async($channel, $filter, $q.$x, $total_count, $res);
         }
     }
 
@@ -710,15 +710,15 @@ trait PeerHandler
 
             foreach ($gres['participants'] as $participant) {
                 $newres = [];
-                $newres['user'] = $this->get_pwr_chat($participant['user_id'], false, true);
+                $newres['user'] = yield $this->get_pwr_chat_async($participant['user_id'], false, true);
                 if (isset($participant['inviter_id'])) {
-                    $newres['inviter'] = $this->get_pwr_chat($participant['inviter_id'], false, true);
+                    $newres['inviter'] = yield $this->get_pwr_chat_async($participant['inviter_id'], false, true);
                 }
                 if (isset($participant['kicked_by'])) {
-                    $newres['kicked_by'] = $this->get_pwr_chat($participant['kicked_by'], false, true);
+                    $newres['kicked_by'] = yield $this->get_pwr_chat_async($participant['kicked_by'], false, true);
                 }
                 if (isset($participant['promoted_by'])) {
-                    $newres['promoted_by'] = $this->get_pwr_chat($participant['promoted_by'], false, true);
+                    $newres['promoted_by'] = yield $this->get_pwr_chat_async($participant['promoted_by'], false, true);
                 }
                 if (isset($participant['date'])) {
                     $newres['date'] = $participant['date'];

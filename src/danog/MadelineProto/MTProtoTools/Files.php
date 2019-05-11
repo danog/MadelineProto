@@ -241,14 +241,14 @@ trait Files
             case 'updateNewChannelMessage':
                 $message_media = $message_media['message'];
             case 'message':
-                return $this->get_download_info($message_media['media']);
+                return yield $this->get_download_info_async($message_media['media']);
             case 'updateNewEncryptedMessage':
                 $message_media = $message_media['message'];
 
             // Secret media
             case 'encryptedMessage':
                 if ($message_media['decrypted_message']['media']['_'] === 'decryptedMessageMediaExternalDocument') {
-                    return $this->get_download_info($message_media['decrypted_message']['media']);
+                    return yield $this->get_download_info_async($message_media['decrypted_message']['media']);
                 }
                 $res['InputFileLocation'] = ['_' => 'inputEncryptedFileLocation', 'id' => $message_media['file']['id'], 'access_hash' => $message_media['file']['access_hash'], 'dc_id' => $message_media['file']['dc_id']];
                 $res['size'] = $message_media['decrypted_message']['media']['size'];
@@ -304,7 +304,7 @@ trait Files
             case 'wallPaper':
                 $photo = end($message_media['sizes']);
 
-                return array_merge($res, $this->get_download_info($photo));
+                return array_merge($res, yield $this->get_download_info_async($photo));
             // Photos
             case 'photo':
             case 'messageMediaPhoto':
@@ -316,11 +316,11 @@ trait Files
                     $photo = end($message_media['photo']['sizes']);
                 }
 
-                return array_merge($res, $this->get_download_info($photo));
+                return array_merge($res, yield $this->get_download_info_async($photo));
 
             case 'userProfilePhoto':
             case 'chatPhoto':
-                return array_merge($res, $this->get_download_info($message_media['photo_big']));
+                return array_merge($res, yield $this->get_download_info_async($message_media['photo_big']));
 
             case 'photoCachedSize':
                 $res['size'] = strlen($message_media['bytes']);
@@ -331,12 +331,12 @@ trait Files
                     $res['mime'] = $this->get_mime_from_buffer($res['data']);
                     $res['ext'] = $this->get_extension_from_mime($res['mime']);
                 } else {
-                    $res = array_merge($res, $this->get_download_info($message_media['location']));
+                    $res = array_merge($res, yield $this->get_download_info_async($message_media['location']));
                 }
 
                 return $res;
             case 'photoSize':
-                $res = $this->get_download_info($message_media['location']);
+                $res = yield $this->get_download_info_async($message_media['location']);
                 if (isset($message_media['size'])) {
                     $res['size'] = $message_media['size'];
                 }
@@ -399,16 +399,16 @@ trait Files
         }
     }
 
-    public function download_to_dir($message_media, $dir, $cb = null)
+    public function download_to_dir_async($message_media, $dir, $cb = null)
     {
         if (is_object($dir) && class_implements($dir)['danog\MadelineProto\FileCallbackInterface']) {
             $cb = $dir;
             $dir = $dir->getFile();
         }
 
-        $message_media = $this->get_download_info($message_media);
+        $message_media = yield $this->get_download_info_async($message_media);
 
-        return $this->download_to_file($message_media, $dir.'/'.$message_media['name'].$message_media['ext'], $cb);
+        return yield $this->download_to_file_async($message_media, $dir.'/'.$message_media['name'].$message_media['ext'], $cb);
     }
 
     public function download_to_file_async($message_media, $file, $cb = null)
@@ -422,7 +422,7 @@ trait Files
             touch($file);
         }
         $file = realpath($file);
-        $message_media = $this->get_download_info($message_media);
+        $message_media = yield $this->get_download_info_async($message_media);
         $stream = fopen($file, 'r+b');
         $size = fstat($stream)['size'];
         $this->logger->logger('Waiting for lock of file to download...');
@@ -452,7 +452,7 @@ trait Files
             };
         }
 
-        $message_media = $this->get_download_info($message_media);
+        $message_media = yield $this->get_download_info_async($message_media);
 
         try {
             if (stream_get_meta_data($stream)['seekable']) {

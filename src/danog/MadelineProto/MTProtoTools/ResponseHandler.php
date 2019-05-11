@@ -568,7 +568,7 @@ trait ResponseHandler
         });
     }
 
-    public function handle_pending_updates()
+    public function handle_pending_updates_async()
     {
         if ($this->postpone_updates) {
             return false;
@@ -579,7 +579,7 @@ trait ResponseHandler
                 if (isset($this->pending_updates[$key])) {
                     $updates = $this->pending_updates[$key];
                     unset($this->pending_updates[$key]);
-                    $this->handle_updates($updates);
+                    yield $this->handle_updates_async($updates);
                 }
             }
         }
@@ -617,17 +617,17 @@ trait ResponseHandler
                 case 'updates':
                 case 'updatesCombined':
                     foreach ($updates['updates'] as $update) {
-                        $this->handle_update($update, $opts);
+                        yield $this->handle_update_async($update, $opts);
                     }
                     break;
                 case 'updateShort':
-                    $this->handle_update($updates['update'], $opts);
+                    yield $this->handle_update_async($updates['update'], $opts);
                     break;
                 case 'updateShortMessage':
                 case 'updateShortChatMessage':
                     $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                     $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
-                    if (!$this->peer_isset($from_id) || !$this->peer_isset($to_id) || isset($updates['via_bot_id']) && !$this->peer_isset($updates['via_bot_id']) || isset($updates['entities']) && !$this->entities_peer_isset($updates['entities']) || isset($updates['fwd_from']) && !$this->fwd_peer_isset($updates['fwd_from'])) {
+                    if (!yield $this->peer_isset_async($from_id) || !yield $this->peer_isset_async($to_id) || isset($updates['via_bot_id']) && !yield $this->peer_isset_async($updates['via_bot_id']) || isset($updates['entities']) && !$this->entities_peer_isset($updates['entities']) || isset($updates['fwd_from']) && !$this->fwd_peer_isset($updates['fwd_from'])) {
                         $this->logger->logger('getDifference: good - getting user for updateShortMessage', \danog\MadelineProto\Logger::VERBOSE);
                         yield $this->get_updates_difference_async();
                     }
@@ -647,10 +647,10 @@ trait ResponseHandler
                         break;
                     }
                     $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
-                    $this->handle_update($update, $opts);
+                    yield $this->handle_update_async($update, $opts);
                     break;
                 case 'updateShortSentMessage':
-                    //$this->set_update_state(['date' => $updates['date']]);
+                    //yield $this->set_update_state_async(['date' => $updates['date']]);
                     break;
                 case 'updatesTooLong':
                     yield $this->get_updates_difference_async();
