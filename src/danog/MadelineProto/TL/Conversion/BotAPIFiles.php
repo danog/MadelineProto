@@ -72,7 +72,7 @@ trait BotAPIFiles
 
     public function photosize_to_botapi_async($photoSize, $photo, $thumbnail = false)
     {
-        $ext = $this->get_extension_from_location(['_' => 'inputFileLocation', 'volume_id' => $photoSize['location']['volume_id'], 'local_id' => $photoSize['location']['local_id'], 'secret' => $photoSize['location']['secret'], 'dc_id' => $photoSize['location']['dc_id']], '.jpg');
+        $ext = yield $this->get_extension_from_location_async(['_' => 'inputFileLocation', 'volume_id' => $photoSize['location']['volume_id'], 'local_id' => $photoSize['location']['local_id'], 'secret' => $photoSize['location']['secret'], 'dc_id' => $photoSize['location']['dc_id']], '.jpg');
         $photoSize['location']['access_hash'] = isset($photo['access_hash']) ? $photo['access_hash'] : 0;
         $photoSize['location']['id'] = isset($photo['id']) ? $photo['id'] : 0;
         $photoSize['location']['_'] = $thumbnail ? 'bot_thumbnail' : 'bot_photo';

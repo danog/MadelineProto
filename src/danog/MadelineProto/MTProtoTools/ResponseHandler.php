@@ -552,17 +552,19 @@ trait ResponseHandler
 
             return;
         }
-
-        if (isset($request['botAPI']) && $request['botAPI']) {
-            $response = $this->MTProto_to_botAPI($response);
-        }
+        $botAPI = isset($request['botAPI']) && $request['botAPI'];
         unset($request);
         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
-        Loop::defer(function () use ($request_id, $response, $datacenter) {
+        Loop::defer(function () use ($request_id, $response, $datacenter, $botAPI) {
+            $this->call((function ()use ($request_id, $response, $datacenter, $botAPI) {
             $r = isset($response['_']) ? $response['_'] : json_encode($response);
             $this->logger->logger("Deferred: sent $r to deferred");
+            if ($botAPI) {
+                $response = yield $this->MTProto_to_botAPI_async($response);
+            }
             $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
             unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']);
+            })());
         });
     }
 
@@ -583,7 +585,7 @@ trait ResponseHandler
         }
     }
 
-    public function handle_updates($updates, $actual_updates = null)
+    public function handle_updates_async($updates, $actual_updates = null)
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
@@ -627,14 +629,14 @@ trait ResponseHandler
                     $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                     if (!$this->peer_isset($from_id) || !$this->peer_isset($to_id) || isset($updates['via_bot_id']) && !$this->peer_isset($updates['via_bot_id']) || isset($updates['entities']) && !$this->entities_peer_isset($updates['entities']) || isset($updates['fwd_from']) && !$this->fwd_peer_isset($updates['fwd_from'])) {
                         $this->logger->logger('getDifference: good - getting user for updateShortMessage', \danog\MadelineProto\Logger::VERBOSE);
-                        $this->get_updates_difference();
+                        yield $this->get_updates_difference_async();
                     }
                     $message = $updates;
                     $message['_'] = 'message';
                     $message['from_id'] = $from_id;
 
                     try {
-                        $message['to_id'] = $this->get_info($to_id)['Peer'];
+                        $message['to_id'] = yield $this->get_info_async($to_id)['Peer'];
                     } catch (\danog\MadelineProto\Exception $e) {
                         $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
                         //$this->pending_updates[] = $updates;
@@ -651,7 +653,7 @@ trait ResponseHandler
                     //$this->set_update_state(['date' => $updates['date']]);
                     break;
                 case 'updatesTooLong':
-                    $this->get_updates_difference();
+                    yield $this->get_updates_difference_async();
                     break;
                 default:
                     throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.var_export($updates, true));

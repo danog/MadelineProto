@@ -403,7 +403,7 @@ class MTProto implements TLCallback
         }
         if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->updates_state['sync_loading']) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
-            $this->get_updates_difference();
+            yield $this->get_updates_difference_async();
         }
         $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
     }
@@ -865,7 +865,7 @@ class MTProto implements TLCallback
             return $this->config;
         }
         $this->config = empty($config) ? yield $this->method_call_async_read('help.getConfig', $config, empty($options) ? ['datacenter' => $this->settings['connection_settings']['default_dc']] : $options) : $config;
-        yield $this->parse_config();
+        yield $this->parse_config_async();
 
         return $this->config;
     }
@@ -893,7 +893,7 @@ class MTProto implements TLCallback
     public function parse_config_async()
     {
         if (isset($this->config['dc_options'])) {
-            yield $this->parse_dc_options($this->config['dc_options']);
+            yield $this->parse_dc_options_async($this->config['dc_options']);
             unset($this->config['dc_options']);
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['config_updated'], Logger::NOTICE);

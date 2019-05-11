@@ -430,7 +430,7 @@ trait TL
             $concat = $constructorData['id'];
         }
 
-        return $concat.yield $this->serialize_params($constructorData, $object, '', $layer);
+        return $concat.yield $this->serialize_params_async($constructorData, $object, '', $layer);
     }
 
     public function serialize_object($type, $object, $ctx, $layer = -1)
@@ -483,7 +483,7 @@ trait TL
                 }
             }
         } elseif (in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && isset($arguments['chat_id']) && (!is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
-            $res = $this->get_info($arguments['chat_id']);
+            $res = yield $this->get_info_async($arguments['chat_id']);
             if ($res['type'] !== 'chat') {
                 throw new \danog\MadelineProto\Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
             }
@@ -513,7 +513,7 @@ trait TL
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'].$method);
         }
 
-        return $tl['id'].yield $this->serialize_params($tl, $arguments, $method);
+        return $tl['id'].yield $this->serialize_params_async($tl, $arguments, $method);
     }
 
     public function serialize_params_async($tl, $arguments, $ctx, $layer = -1)
@@ -553,7 +553,7 @@ trait TL
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService']) && isset($arguments['message'])) {
-                    $serialized .= yield $this->serialize_object_async($current_argument, $this->encrypt_secret_message($arguments['peer']['chat_id'], $arguments['message']), 'data');
+                    $serialized .= yield $this->serialize_object_async($current_argument, yield $this->encrypt_secret_message_async($arguments['peer']['chat_id'], $arguments['message']), 'data');
                     continue;
                 }
                 if ($current_argument['name'] === 'random_id') {
@@ -617,7 +617,7 @@ trait TL
 
             if ($current_argument['type'] === 'InputEncryptedChat' && (!is_array($arguments[$current_argument['name']]) || isset($arguments[$current_argument['name']]['_']) && $this->constructors->find_by_predicate($arguments[$current_argument['name']]['_'])['type'] !== $current_argument['type'])) {
                 if (is_array($arguments[$current_argument['name']])) {
-                    $arguments[$current_argument['name']] = $this->get_info($arguments[$current_argument['name']])['InputEncryptedChat'];
+                    $arguments[$current_argument['name']] = yield $this->get_info_async($arguments[$current_argument['name']])['InputEncryptedChat'];
                 } else {
                     if (!isset($this->secret_chats[$arguments[$current_argument['name']]])) {
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);

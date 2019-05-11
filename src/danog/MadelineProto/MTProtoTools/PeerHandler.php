@@ -90,7 +90,7 @@ trait PeerHandler
         }
     }
 
-    public function add_chat($chat)
+    public function add_chat_async($chat)
     {
         switch ($chat['_']) {
             case 'chat':
@@ -126,7 +126,7 @@ trait PeerHandler
 
                     $this->chats[$bot_api_id] = $chat;
 
-                    if ($this->settings['peer']['full_fetch'] && (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== $this->get_full_info($bot_api_id)['full']['participants_count'])) {
+                    if ($this->settings['peer']['full_fetch'] && (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== yield $this->get_full_info_async($bot_api_id)['full']['participants_count'])) {
                         $this->cache_pwr_chat($bot_api_id, $this->settings['peer']['full_fetch'], true);
                     }
                 }
@@ -150,10 +150,10 @@ trait PeerHandler
             });
     }
 
-    public function peer_isset($id)
+    public function peer_isset_async($id)
     {
         try {
-            return isset($this->chats[$this->get_info($id)['bot_api_id']]);
+            return isset($this->chats[yield $this->get_info_async($id)['bot_api_id']]);
         } catch (\danog\MadelineProto\Exception $e) {
             return false;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -384,9 +384,9 @@ trait PeerHandler
             if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true && $recursive) {
                 $dbres = json_decode(@file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http' => ['timeout' => 2]])), true);
                 if (isset($dbres['ok']) && $dbres['ok']) {
-                    $this->resolve_username('@'.$dbres['result']);
+                    yield $this->resolve_username_async('@'.$dbres['result']);
 
-                    return $this->get_info($id, false);
+                    return yield $this->get_info_async($id, false);
                 }
             }
             if ($tried_simple && isset($this->caching_possible_username[$id])) {
@@ -394,7 +394,7 @@ trait PeerHandler
 
                 $user = $this->caching_possible_username[$id];
                 unset($this->caching_possible_username[$id]);
-                return $this->get_info($user);
+                return yield $this->get_info_async($user);
             }
             throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
         }
@@ -404,7 +404,7 @@ trait PeerHandler
             } else {
                 $invite = yield $this->method_call_async_read('messages.checkChatInvite', ['hash' => $matches[2]], ['datacenter' => $this->datacenter->curdc]);
                 if (isset($invite['chat'])) {
-                    return $this->get_info($invite['chat']);
+                    return yield $this->get_info_async($invite['chat']);
                 } else {
                     throw new \danog\MadelineProto\Exception('You have not joined this chat');
                 }
@@ -412,14 +412,14 @@ trait PeerHandler
         }
         $id = strtolower(str_replace('@', '', $id));
         if ($id === 'me') {
-            return $this->get_info($this->authorization['user']['id']);
+            return yield $this->get_info_async($this->authorization['user']['id']);
         }
         if ($id === 'support') {
             if (!$this->supportUser) {
                 yield $this->method_call_async_read('help.getSupport', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             }
 
-            return $this->get_info($this->supportUser);
+            return yield $this->get_info_async($this->supportUser);
         }
         foreach ($this->chats as $chat) {
             if (isset($chat['username']) && strtolower($chat['username']) === $id) {
@@ -427,9 +427,9 @@ trait PeerHandler
             }
         }
         if ($recursive) {
-            $this->resolve_username($id);
+            yield $this->resolve_username_async($id);
 
-            return $this->get_info($id, false);
+            return yield $this->get_info_async($id, false);
         }
 
         throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
@@ -501,7 +501,7 @@ trait PeerHandler
 
     public function get_full_info_async($id)
     {
-        $partial = $this->get_info($id);
+        $partial = yield $this->get_info_async($id);
         if (time() - $this->full_chat_last_updated($partial['bot_api_id']) < (isset($this->settings['peer']['full_info_cache_time']) ? $this->settings['peer']['full_info_cache_time'] : 0)) {
             return array_merge($partial, $this->full_chats[$partial['bot_api_id']]);
         }
@@ -524,14 +524,14 @@ trait PeerHandler
         $res['last_update'] = time();
         $this->full_chats[$partial['bot_api_id']] = $res;
 
-        $partial = $this->get_info($id);
+        $partial = yield $this->get_info_async($id);
 
         return array_merge($partial, $res);
     }
 
-    public function get_pwr_chat($id, $fullfetch = true, $send = true)
+    public function get_pwr_chat_async($id, $fullfetch = true, $send = true)
     {
-        $full = $fullfetch ? $this->get_full_info($id) : $this->get_info($id);
+        $full = $fullfetch ? yield $this->get_full_info_async($id) : yield $this->get_info_async($id);
         $res = ['id' => $full['bot_api_id'], 'type' => $full['type']];
         switch ($full['type']) {
             case 'user':
@@ -547,19 +547,8 @@ trait PeerHandler
                     }
                 }
                 if (isset($full['full']['profile_photo']['sizes'])) {
-                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['profile_photo']['sizes']), $full['full']['profile_photo']);
+                    $res['photo'] = yield $this->photosize_to_botapi_async(end($full['full']['profile_photo']['sizes']), $full['full']['profile_photo']);
                 }
-                /*$bio = '';
-                if ($full['type'] === 'user' && isset($res['username']) && !isset($res['about']) && $fullfetch) {
-                if (preg_match('/meta property="og:description" content=".+/', file_get_contents('https://telegram.me/'.$res['username']), $biores)) {
-                $bio = html_entity_decode(preg_replace_callback('/(&#[0-9]+;)/', function ($m) {
-                return mb_convert_encoding($m[1], 'UTF-8', 'HTML-ENTITIES');
-                }, str_replace(['meta property="og:description" content="', '">'], '', $biores[0])));
-                }
-                if ($bio != '' && $bio != 'You can contact @'.$res['username'].' right away.') {
-                $res['about'] = $bio;
-                }
-                }*/
                 break;
             case 'chat':
                 foreach (['title', 'participants_count', 'admin', 'admins_enabled'] as $key) {
@@ -576,7 +565,7 @@ trait PeerHandler
                     $res['all_members_are_administrators'] = !$res['admins_enabled'];
                 }
                 if (isset($full['full']['chat_photo']['sizes'])) {
-                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['chat_photo']['sizes']), $full['full']['chat_photo']);
+                    $res['photo'] = yield $this->photosize_to_botapi_async(end($full['full']['chat_photo']['sizes']), $full['full']['chat_photo']);
                 }
                 if (isset($full['full']['exported_invite']['link'])) {
                     $res['invite'] = $full['full']['exported_invite']['link'];
@@ -598,7 +587,7 @@ trait PeerHandler
                     }
                 }
                 if (isset($full['full']['chat_photo']['sizes'])) {
-                    $res['photo'] = $this->photosize_to_botapi(end($full['full']['chat_photo']['sizes']), $full['full']['chat_photo']);
+                    $res['photo'] = yield $this->photosize_to_botapi_async(end($full['full']['chat_photo']['sizes']), $full['full']['chat_photo']);
                 }
                 if (isset($full['full']['exported_invite']['link'])) {
                     $res['invite'] = $full['full']['exported_invite']['link'];
@@ -656,7 +645,7 @@ trait PeerHandler
             $limit = 200;
             $filters = ['channelParticipantsAdmins', 'channelParticipantsBots'];
             foreach ($filters as $filter) {
-                $this->fetch_participants($full['InputChannel'], $filter, '', $total_count, $res);
+                yield $this->fetch_participants_async($full['InputChannel'], $filter, '', $total_count, $res);
             }
             $q = '';
 
@@ -677,9 +666,9 @@ trait PeerHandler
         return $res;
     }
 
-    public function recurse_alphabet_search_participants($channel, $filter, $q, $total_count, &$res)
+    public function recurse_alphabet_search_participants_async($channel, $filter, $q, $total_count, &$res)
     {
-        if (!$this->fetch_participants($channel, $filter, $q, $total_count, $res)) {
+        if (!yield $this->fetch_participants_async($channel, $filter, $q, $total_count, $res)) {
             return false;
         }
 

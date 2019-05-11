@@ -39,7 +39,7 @@ trait AuthKeyHandler
                 $controller->discard();
             }
         });
-        $user = $this->get_info($user);
+        $user = yield $this->get_info_async($user);
         if (!isset($user['InputUser']) || $user['InputUser']['_'] === 'inputUserSelf') {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
         }
@@ -57,7 +57,7 @@ trait AuthKeyHandler
         $controller->setCall($res['phone_call']);
         $this->calls[$res['phone_call']['id']] = $controller;
         $this->handle_pending_updates();
-        $this->get_updates_difference();
+        yield $this->get_updates_difference_async();
 
         return $controller;
     }
@@ -94,7 +94,7 @@ trait AuthKeyHandler
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['call_already_declined']);
-                $this->discard_call($call['id'], 'phoneCallDiscardReasonHangup');
+                yield $this->discard_call_async($call['id'], 'phoneCallDiscardReasonHangup');
 
                 return false;
             }
@@ -103,7 +103,7 @@ trait AuthKeyHandler
         }
         $this->calls[$res['phone_call']['id']]->storage['b'] = $b;
         $this->handle_pending_updates();
-        $this->get_updates_difference();
+        yield $this->get_updates_difference_async();
 
         return true;
     }

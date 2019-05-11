@@ -34,15 +34,15 @@ trait ResponseHandler
             case 'decryptedMessageService':
                 switch ($update['message']['decrypted_message']['action']['_']) {
                     case 'decryptedMessageActionRequestKey':
-                        $this->accept_rekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
+                        yield $this->accept_rekey_async($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
 
                         return;
                     case 'decryptedMessageActionAcceptKey':
-                        $this->commit_rekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
+                        yield $this->commit_rekey_async($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
 
                         return;
                     case 'decryptedMessageActionCommitKey':
-                        $this->complete_rekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
+                        yield $this->complete_rekey_async($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
 
                         return;
                     case 'decryptedMessageActionNotifyLayer':
@@ -58,7 +58,7 @@ trait ResponseHandler
                     case 'decryptedMessageActionSetMessageTTL':
                         $this->secret_chats[$update['message']['chat_id']]['ttl'] = $update['message']['decrypted_message']['action']['ttl_seconds'];
 
-                        $this->save_update($update);
+                        yield $this->save_update_async($update);
 
                         return;
                     case 'decryptedMessageActionNoop':
@@ -78,12 +78,12 @@ trait ResponseHandler
 
                         return;
                     default:
-                        //                $this->save_update(['_' => 'updateNewDecryptedMessage', 'peer' => $this->secret_chats[$update['message']['chat_id']]['InputEncryptedChat'], 'in_seq_no' => $this->get_in_seq_no($update['message']['chat_id']), 'out_seq_no' => $this->get_out_seq_no($update['message']['chat_id']), 'message' => $update['message']['decrypted_message']]);
-                        $this->save_update($update);
+                        //                yield $this->save_update_async(['_' => 'updateNewDecryptedMessage', 'peer' => $this->secret_chats[$update['message']['chat_id']]['InputEncryptedChat'], 'in_seq_no' => $this->get_in_seq_no($update['message']['chat_id']), 'out_seq_no' => $this->get_out_seq_no($update['message']['chat_id']), 'message' => $update['message']['decrypted_message']]);
+                        yield $this->save_update_async($update);
                 }
                 break;
             case 'decryptedMessage':
-                $this->save_update($update);
+                yield $this->save_update_async($update);
                 break;
             case 'decryptedMessageLayer':
                 if ($this->check_secret_out_seq_no($update['message']['chat_id'], $update['message']['decrypted_message']['out_seq_no']) && $this->check_secret_in_seq_no($update['message']['chat_id'], $update['message']['decrypted_message']['in_seq_no'])) {
@@ -95,7 +95,7 @@ trait ResponseHandler
                         }
                     }
                     $update['message']['decrypted_message'] = $update['message']['decrypted_message']['message'];
-                    $this->handle_decrypted_update($update);
+                    yield $this->handle_decrypted_update_async($update);
                 }
                 break;
             default:

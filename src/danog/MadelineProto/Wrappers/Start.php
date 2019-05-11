@@ -61,27 +61,27 @@ trait Start
         } else {
             if ($this->authorized === self::NOT_LOGGED_IN) {
                 if (isset($_POST['phone_number'])) {
-                    yield $this->web_phone_login();
+                    yield $this->web_phone_login_async();
                 } elseif (isset($_POST['token'])) {
-                    yield $this->web_bot_login();
+                    yield $this->web_bot_login_async();
                 } else {
                     $this->web_echo();
                 }
             } elseif ($this->authorized === self::WAITING_CODE) {
                 if (isset($_POST['phone_code'])) {
-                    yield $this->web_complete_phone_login();
+                    yield $this->web_complete_phone_login_async();
                 } else {
                     $this->web_echo("You didn't provide a phone code!");
                 }
             } elseif ($this->authorized === self::WAITING_PASSWORD) {
                 if (isset($_POST['password'])) {
-                    yield $this->web_complete_2fa_login();
+                    yield $this->web_complete_2fa_login_async();
                 } else {
                     $this->web_echo("You didn't provide the password!");
                 }
             } elseif ($this->authorized === self::WAITING_SIGNUP) {
                 if (isset($_POST['first_name'])) {
-                    yield $this->web_complete_signup();
+                    yield $this->web_complete_signup_async();
                 } else {
                     $this->web_echo("You didn't provide the first name!");
                 }

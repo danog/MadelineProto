@@ -226,7 +226,7 @@ trait Files
         return $this->gen_all_file($constructor, $regenerate);
     }
 
-    public function get_download_info($message_media)
+    public function get_download_info_async($message_media)
     {
         if (is_string($message_media)) {
             $message_media = $this->unpack_file_id($message_media)['MessageMedia'];
@@ -290,7 +290,7 @@ trait Files
                     }
                 }
                 if (!isset($res['ext'])) {
-                    $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime(isset($res['mime']) ? $res['mime'] : 'image/jpeg'));
+                    $res['ext'] = yield $this->get_extension_from_location_async($res['InputFileLocation'], $this->get_extension_from_mime(isset($res['mime']) ? $res['mime'] : 'image/jpeg'));
                 }
                 if (!isset($res['mime'])) {
                     $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
@@ -348,7 +348,7 @@ trait Files
             case 'fileLocation':
                 $res['name'] = $message_media['volume_id'].'_'.$message_media['local_id'];
                 $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['volume_id'], 'local_id' => $message_media['local_id'], 'secret' => $message_media['secret'], 'dc_id' => $message_media['dc_id'], 'file_reference' => $this->wait($this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION_LOCATION, $message_media))];
-                $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], '.jpg');
+                $res['ext'] = yield $this->get_extension_from_location_async($res['InputFileLocation'], '.jpg');
                 $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
 
                 return $res;
@@ -382,7 +382,7 @@ trait Files
                 }
                 $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => isset($message_media['document']['version']) ? $message_media['document']['version'] : 0, 'dc_id' => $message_media['document']['dc_id'], 'file_reference' => $this->wait($this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION_LOCATION, $message_media['document']))];
                 if (!isset($res['ext'])) {
-                    $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime($message_media['document']['mime_type']));
+                    $res['ext'] = yield $this->get_extension_from_location_async($res['InputFileLocation'], $this->get_extension_from_mime($message_media['document']['mime_type']));
                 }
                 if (!isset($res['name'])) {
                     $res['name'] = $message_media['document']['access_hash'];
@@ -411,7 +411,7 @@ trait Files
         return $this->download_to_file($message_media, $dir.'/'.$message_media['name'].$message_media['ext'], $cb);
     }
 
-    public function download_to_file($message_media, $file, $cb = null)
+    public function download_to_file_async($message_media, $file, $cb = null)
     {
         if (is_object($file) && class_implements($file)['danog\MadelineProto\FileCallbackInterface']) {
             $cb = $file;
@@ -429,7 +429,7 @@ trait Files
         flock($stream, LOCK_EX);
 
         try {
-            $this->download_to_stream($message_media, $stream, $cb, $size, -1);
+            yield $this->download_to_stream_async($message_media, $stream, $cb, $size, -1);
         } finally {
             flock($stream, LOCK_UN);
             fclose($stream);

@@ -150,7 +150,7 @@ trait UpdateHandler
         $this->postpone_updates = true;
 
         try {
-            $input = $this->get_info('channel#'.$channel);
+            $input = yield $this->get_info_async('channel#'.$channel);
             if (!isset($input['InputChannel'])) {
                 throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
             }
@@ -179,7 +179,7 @@ trait UpdateHandler
             $this->logger->logger($e->getMessage());
             unset($this->channels_state[$channel]);
 
-            return false; //$this->get_channel_difference($channel);
+            return false; //yield $this->get_channel_difference_async($channel);
         } finally {
             $this->postpone_updates = false;
             $this->load_channel_state($channel)['sync_loading'] = false;
@@ -204,7 +204,7 @@ trait UpdateHandler
                 }
                 if (!$difference['final']) {
                     unset($difference);
-                    $this->get_channel_difference($channel);
+                    yield $this->get_channel_difference_async($channel);
                 }
                 break;
             case 'updates.channelDifferenceTooLong':
@@ -220,7 +220,7 @@ trait UpdateHandler
                     $this->postpone_updates = false;
                     $this->load_channel_state($channel)['sync_loading'] = false;
                 }
-                $this->get_channel_difference($channel);
+                yield $this->get_channel_difference_async($channel);
                 break;
             default:
                 throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
@@ -229,7 +229,7 @@ trait UpdateHandler
         $this->handle_pending_updates();
     }
 
-    public function set_update_state($data)
+    public function set_update_state_async($data)
     {
         if (isset($data['pts']) && $data['pts'] !== 0) {
             $this->load_update_state()['pts'] = $data['pts'];
@@ -244,7 +244,7 @@ trait UpdateHandler
             $this->load_update_state()['date'] = $data['date'];
         }
     }
-    public function reset_update_state()
+    public function reset_update_state_async()
     {
         $this->load_update_state()['pts'] = 1;
         $this->load_update_state()['qts'] = 0;
@@ -255,14 +255,14 @@ trait UpdateHandler
         }
         $this->msg_ids = [];
     }
-    public function &load_update_state()
+    public function &load_update_state_async()
     {
         if (!isset($this->updates_state['qts'])) {
             $this->updates_state['qts'] = 0;
         }
         if (!$this->got_state) {
             $this->got_state = true;
-            $this->set_update_state($this->get_updates_state());
+            $this->set_update_state(yield $this->get_updates_state_async());
         }
 
         return $this->updates_state;
@@ -319,7 +319,7 @@ trait UpdateHandler
                     $this->set_update_state($difference['intermediate_state']);
                     unset($difference);
                     $this->updates_state['sync_loading'] = false;
-                    $this->get_updates_difference();
+                    yield $this->get_updates_difference_async();
                     break;
                 default:
                     throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
@@ -356,7 +356,7 @@ trait UpdateHandler
         return $data;
     }
 
-    public function handle_update($update, $options = [])
+    public function handle_update_async($update, $options = [])
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
@@ -400,7 +400,7 @@ trait UpdateHandler
                 }*/
         switch ($update['_']) {
             case 'updateChannelTooLong':
-                $this->get_channel_difference($channel_id);
+                yield $this->get_channel_difference_async($channel_id);
 
                 return false;
             case 'updateNewMessage':
@@ -424,9 +424,9 @@ trait UpdateHandler
                     if ($entities) $log .= "entities ".json_encode($update['message']['entities']).", ";
                     $this->logger->logger("Not enough data: for message update $log, getting difference...", \danog\MadelineProto\Logger::VERBOSE);
                     if ($channel_id !== false && $this->peer_isset($this->to_supergroup($channel_id))) {
-                        $this->get_channel_difference($channel_id);
+                        yield $this->get_channel_difference_async($channel_id);
                     } else {
-                        $this->get_updates_difference();
+                        yield $this->get_updates_difference_async();
                     }
 
                     return false;
@@ -456,9 +456,9 @@ trait UpdateHandler
             if ($cur_state['pts'] + (isset($update['pts_count']) ? $update['pts_count'] : 0) !== $update['pts']) {
                 $logger("PTS hole");
                 if ($channel_id !== false && $this->peer_isset($this->to_supergroup($channel_id))) {
-                    $this->get_channel_difference($channel_id);
+                    yield $this->get_channel_difference_async($channel_id);
                 } else {
-                    $this->get_updates_difference();
+                    yield $this->get_updates_difference_async();
                 }
 
                 return false;
@@ -483,7 +483,7 @@ trait UpdateHandler
             $seq_start = isset($options['seq_start']) ? $options['seq_start'] : $options['seq'];
             if ($seq_start != $cur_state['seq'] + 1 && $seq_start > $cur_state['seq']) {
                 $this->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.$cur_state['seq'].' + 1', \danog\MadelineProto\Logger::ERROR);
-                $this->get_updates_difference();
+                yield $this->get_updates_difference_async();
 
                 return false;
             }
@@ -494,7 +494,7 @@ trait UpdateHandler
                 }
             }
         }
-        $this->save_update($update);
+        yield $this->save_update_async($update);
     }
 
     public function handle_multiple_update($updates, $options = [], $channel = false)
@@ -532,11 +532,11 @@ trait UpdateHandler
         if (in_array($update['_'], ['updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'])) {
             $id = $this->get_id($update);
             $this->full_chats[$id]['last_update'] = 0;
-            $this->get_full_info($id);
+            yield $this->get_full_info_async($id);
         }
         if ($update['_'] === 'updateDcOptions') {
             $this->logger->logger('Got new dc options', \danog\MadelineProto\Logger::VERBOSE);
-            $this->parse_dc_options($update['dc_options']);
+            yield $this->parse_dc_options_async($update['dc_options']);
 
             return;
         }
@@ -557,13 +557,13 @@ trait UpdateHandler
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']] = $controller;
                     break;
                 case 'phoneCallAccepted':
-                    if (!$this->confirm_call($update['phone_call'])) {
+                    if (!yield $this->confirm_call_async($update['phone_call'])) {
                         return;
                     }
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']];
                     break;
                 case 'phoneCall':
-                    if (!$this->complete_call($update['phone_call'])) {
+                    if (!yield $this->complete_call_async($update['phone_call'])) {
                         return;
                     }
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']];
@@ -588,7 +588,7 @@ trait UpdateHandler
             }
             if ($update['qts'] > $cur_state['qts'] + 1) {
                 $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state['qts'].'+1, chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
-                $this->get_updates_difference();
+                yield $this->get_updates_difference_async();
 
                 return false;
             }
@@ -610,7 +610,7 @@ trait UpdateHandler
                         return;
                     }
                     $this->logger->logger('Accepting secret chat '.$update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
-                    $this->accept_secret_chat($update['chat']);
+                    yield $this->accept_secret_chat_async($update['chat']);
                     break;
                 case 'encryptedChatDiscarded':
                     $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user', \danog\MadelineProto\Logger::NOTICE);
@@ -627,7 +627,7 @@ trait UpdateHandler
                     break;
                 case 'encryptedChat':
                     $this->logger->logger('Completing creation of secret chat '.$update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
-                    $this->complete_secret_chat($update['chat']);
+                    yield $this->complete_secret_chat_async($update['chat']);
                     break;
             }
             //$this->logger->logger($update, \danog\MadelineProto\Logger::NOTICE);

@@ -59,7 +59,7 @@ trait AuthKeyHandler
 
     public function request_secret_chat_async($user)
     {
-        $user = $this->get_info($user);
+        $user = yield $this->get_info_async($user);
         if (!isset($user['InputUser'])) {
             throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
         }
@@ -74,7 +74,7 @@ trait AuthKeyHandler
         $res = yield $this->method_call_async_read('messages.requestEncryption', ['user_id' => $user, 'g_a' => $g_a->toBytes()], ['datacenter' => $this->datacenter->curdc]);
         $this->temp_requested_secret_chats[$res['id']] = $a;
         $this->handle_pending_updates();
-        $this->get_updates_difference();
+        yield $this->get_updates_difference_async();
         $this->logger->logger('Secret chat '.$res['id'].' requested successfully!', \danog\MadelineProto\Logger::NOTICE);
 
         return $res['id'];
@@ -96,7 +96,7 @@ trait AuthKeyHandler
         $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
         //$this->logger->logger($key);
         if ($key['fingerprint'] !== $params['key_fingerprint']) {
-            $this->discard_secret_chat($params['id']);
+            yield $this->discard_secret_chat_async($params['id']);
 
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
@@ -136,7 +136,7 @@ trait AuthKeyHandler
         $this->secret_chats[$chat]['rekeying'] = [1, $e];
         yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionRequestKey', 'g_a' => $g_a->toBytes(), 'exchange_id' => $e]]], ['datacenter' => $this->datacenter->curdc]);
         $this->handle_pending_updates();
-        $this->get_updates_difference();
+        yield $this->get_updates_difference_async();
 
         return $e;
     }
@@ -172,7 +172,7 @@ trait AuthKeyHandler
         $this->check_G($g_b, $dh_config['p']);
         yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAcceptKey', 'g_b' => $g_b->toBytes(), 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]], ['datacenter' => $this->datacenter->curdc]);
         $this->handle_pending_updates();
-        $this->get_updates_difference();
+        yield $this->get_updates_difference_async();
     }
 
     public function commit_rekey_async($chat, $params)
@@ -203,7 +203,7 @@ trait AuthKeyHandler
         $this->secret_chats[$chat]['ttr'] = 100;
         $this->secret_chats[$chat]['updated'] = time();
         $this->handle_pending_updates();
-        $this->get_updates_difference();
+        yield $this->get_updates_difference_async();
     }
 
     public function complete_rekey_async($chat, $params)

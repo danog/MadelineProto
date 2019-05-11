@@ -160,7 +160,7 @@ trait BotAPI
         $newd = [];
         if (!isset($data['_'])) {
             foreach ($data as $key => $element) {
-                $newd[$key] = $this->MTProto_to_botAPI($element, $sent_arguments);
+                $newd[$key] = yield $this->MTProto_to_botAPI_async($element, $sent_arguments);
             }
 
             return $newd;
@@ -175,16 +175,16 @@ trait BotAPI
                 }
                 $newd['chat'] = $this->get_pwr_chat($sent_arguments['peer']);
                 if (isset($data['entities'])) {
-                    $newd['entities'] = $this->MTProto_to_botAPI($data['entities'], $sent_arguments);
+                    $newd['entities'] = yield $this->MTProto_to_botAPI_async($data['entities'], $sent_arguments);
                 }
                 if (isset($data['media'])) {
-                    $newd = array_merge($newd, $this->MTProto_to_botAPI($data['media'], $sent_arguments));
+                    $newd = array_merge($newd, yield $this->MTProto_to_botAPI_async($data['media'], $sent_arguments));
                 }
 
                 return $newd;
             case 'updateNewChannelMessage':
             case 'updateNewMessage':
-                return $this->MTProto_to_botAPI($data['message']);
+                return yield $this->MTProto_to_botAPI_async($data['message']);
             case 'message':
                 $newd['message_id'] = $data['id'];
                 $newd['date'] = $data['date'];
@@ -196,7 +196,7 @@ trait BotAPI
                 }
                 $newd['chat'] = $this->get_pwr_chat($data['to_id']);
                 if (isset($data['entities'])) {
-                    $newd['entities'] = $this->MTProto_to_botAPI($data['entities'], $sent_arguments);
+                    $newd['entities'] = yield $this->MTProto_to_botAPI_async($data['entities'], $sent_arguments);
                 }
                 if (isset($data['views'])) {
                     $newd['views'] = $data['views'];
@@ -220,7 +220,7 @@ trait BotAPI
                     $newd['forward_from_message_id'] = $data['fwd_from']['channel_post'];
                 }
                 if (isset($data['media'])) {
-                    $newd = array_merge($newd, $this->MTProto_to_botAPI($data['media'], $sent_arguments));
+                    $newd = array_merge($newd, yield $this->MTProto_to_botAPI_async($data['media'], $sent_arguments));
                 }
 
                 return $newd;
@@ -287,7 +287,7 @@ trait BotAPI
                 }
                 $res['photo'] = [];
                 foreach ($data['photo']['sizes'] as $key => $photo) {
-                    $res['photo'][$key] = $this->photosize_to_botapi($photo, $data['photo']);
+                    $res['photo'][$key] = yield $this->photosize_to_botapi_async($photo, $data['photo']);
                 }
 
                 return $res;
@@ -297,7 +297,7 @@ trait BotAPI
                 $type_name = 'document';
                 $res = [];
                 if ($data['document']['thumb']['_'] === 'photoSize') {
-                    $res['thumb'] = $this->photosize_to_botapi($data['document']['thumb'], [], true);
+                    $res['thumb'] = yield $this->photosize_to_botapi_async($data['document']['thumb'], [], true);
                 }
                 foreach ($data['document']['attributes'] as $attribute) {
                     switch ($attribute['_']) {
@@ -396,7 +396,7 @@ trait BotAPI
         return $arguments;
     }
 
-    public function parse_node($node, &$entities, &$new_message, &$offset)
+    public function parse_node_async($node, &$entities, &$new_message, &$offset)
     {
         switch ($node->nodeName) {
             case 'br':
@@ -455,7 +455,7 @@ trait BotAPI
                 $length = $this->mb_strlen($text);
                 $href = $node->getAttribute('href');
                 if (preg_match('|mention:(.*)|', $href, $matches) || preg_match('|tg://user\?id=(.*)|', $href, $matches)) {
-                    $mention = $this->get_info($matches[1]);
+                    $mention = yield $this->get_info_async($matches[1]);
                     if (!isset($mention['InputUser'])) {
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
                     }
