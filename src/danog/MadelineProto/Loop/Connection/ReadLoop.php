@@ -71,13 +71,13 @@ class ReadLoop extends SignalLoop
 
                 if ($error === -404) {
                     if ($connection->temp_auth_key !== null) {
-                        yield $connection->reconnect();
                         $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", \danog\MadelineProto\Logger::WARNING);
                         $connection->temp_auth_key = null;
                         $connection->session_id = null;
                         foreach ($connection->new_outgoing as $message_id) {
                             $connection->outgoing_messages[$message_id]['sent'] = 0;
                         }
+                        yield $connection->reconnect();
                         yield $API->init_authorization_async();
                     } else {
                         yield $connection->reconnect();

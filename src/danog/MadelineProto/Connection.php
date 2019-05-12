@@ -69,6 +69,8 @@ class Connection
     public $new_outgoing = [];
     public $pending_outgoing = [];
     public $pending_outgoing_key = 0;
+    public $pending_outgoing_unencrypted = [];
+    public $pending_outgoing_unencrypted_key = 0;
     public $max_incoming_id;
     public $max_outgoing_id;
     public $authorized = false;
@@ -134,7 +136,7 @@ class Connection
             if ($this->outgoing_messages[$message_id]['unencrypted']) {
                 $promise = $this->outgoing_messages[$message_id]['promise'];
                 \Amp\Loop::defer(function () use ($promise) {
-                    $promise->fail(new Exception('Restart'));
+                    $promise->fail(new Exception('Restart because we were reconnected'));
                 });
                 unset($this->new_outgoing[$message_id]);
                 unset($this->outgoing_messages[$message_id]);

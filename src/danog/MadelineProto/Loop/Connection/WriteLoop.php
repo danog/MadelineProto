@@ -44,9 +44,10 @@ class WriteLoop extends ResumableSignalLoop
 
         $this->startedLoop();
         $API->logger->logger("Entered write loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
-
+        
+        $please_wait = false;
         while (true) {
-            if (empty($connection->pending_outgoing)) {
+            if (empty($connection->pending_outgoing) || $please_wait) {
                 if (yield $this->waitSignal($this->pause())) {
                     $API->logger->logger("Exiting write loop in DC $datacenter");
                     $this->exitedLoop();
@@ -62,7 +63,7 @@ class WriteLoop extends ResumableSignalLoop
                 } else {
                     $res = $this->encryptedWriteLoopAsync();
                 }
-                yield $res;
+                $please_wait = yield $res;
             } finally {
                 $this->exitedLoop();
             }
@@ -120,7 +121,7 @@ class WriteLoop extends ResumableSignalLoop
                 unset($message['send_promise']);
             }
             if ($skipped_all) {
-                break;
+                return true;
             }
         }
     }
@@ -271,7 +272,7 @@ class WriteLoop extends ResumableSignalLoop
             } else {
                 $API->logger->logger("NO MESSAGE SENT in DC $datacenter", \danog\MadelineProto\Logger::WARNING);
 
-                return;
+                return true;
             }
 
             unset($messages);
