@@ -114,6 +114,9 @@ class ReadLoop extends SignalLoop
         $API = $this->API;
         $datacenter = $this->datacenter;
         $connection = $this->connection;
+        if (isset($this->connection->old)) {
+            throw new NothingInTheSocketException();
+        }
 
         try {
             $buffer = yield $connection->stream->getReadBuffer($payload_length);

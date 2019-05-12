@@ -25,6 +25,7 @@ use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use function Amp\call;
 use function Amp\Socket\connect;
+use danog\MadelineProto\NothingInTheSocketException;
 
 /**
  * Buffered raw stream.
