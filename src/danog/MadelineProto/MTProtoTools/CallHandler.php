@@ -22,7 +22,6 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Deferred;
 use Amp\Promise;
 use danog\MadelineProto\Async\Parameters;
-use function Amp\call;
 use function Amp\Promise\all;
 
 /**
@@ -91,7 +90,7 @@ trait CallHandler
 
     public function method_call_async_write($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
     {
-        return call([$this, 'method_call_async_write_generator'], $method, $args, $aargs);
+        return $this->call($this->method_call_async_write_generator($method, $args, $aargs));
     }
 
     public function method_call_async_write_generator($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): \Generator
@@ -139,7 +138,7 @@ trait CallHandler
         $message = ['_' => $method, 'type' => $this->methods->find_by_method($method)['type'], 'content_related' => $this->content_related($method), 'promise' => $deferred, 'method' => true, 'unencrypted' => $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key === null && strpos($method, '.') === false];
 
         if (is_object($args) && $args instanceof Parameters) {
-            $message['body'] = call([$args, 'fetchParameters']);
+            $message['body'] = $this->call($args->fetchParameters());
         } else {
             $message['body'] = $args;
         }
