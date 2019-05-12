@@ -22,6 +22,7 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Artax\Request;
 use Amp\Deferred;
 use Amp\Delayed;
+use Amp\Loop;
 use function Amp\Promise\any;
 
 /**
@@ -292,7 +293,7 @@ trait UpdateHandler
             $d = $this->update_deferred;
             $this->update_deferred = null;
 
-            $d->resolve();
+            Loop::defer([$d, 'resolve']);
         }
 
         return true;

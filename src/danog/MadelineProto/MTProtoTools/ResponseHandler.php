@@ -543,6 +543,8 @@ trait ResponseHandler
         $botAPI = isset($request['botAPI']) && $request['botAPI'];
         unset($request);
         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
+        $r = isset($response['_']) ? $response['_'] : json_encode($response);
+        $this->logger->logger("Defer sending $r to deferred");
         $this->callFork((
             function () use ($request_id, $response, $datacenter, $botAPI) {
                 $r = isset($response['_']) ? $response['_'] : json_encode($response);
@@ -653,7 +655,7 @@ trait ResponseHandler
             $d = $this->update_deferred;
             $this->update_deferred = null;
 
-            $d->resolve();
+            Loop::defer([$d, 'resolve']);
         }
     }
 }
