@@ -190,7 +190,7 @@ class MTProto implements TLCallback
         // Load rsa keys
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);
         foreach ($this->settings['authorization']['rsa_keys'] as $key) {
-            $key = new RSA($key);
+            $key = yield (new RSA())->load($key);
             $this->rsa_keys[$key->fp] = $key;
         }
         /*

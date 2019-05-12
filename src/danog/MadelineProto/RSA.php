@@ -27,7 +27,7 @@ class RSA
     public $n;
     public $fp;
 
-    public function __magic_construct_async($rsa_key)
+    public function load($rsa_key)
     {
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_init'], Logger::ULTRA_VERBOSE);
         $key = new \phpseclib\Crypt\RSA();
@@ -36,9 +36,9 @@ class RSA
         $this->n = \phpseclib\Common\Functions\Objects::getVar($key, 'modulus');
         $this->e = \phpseclib\Common\Functions\Objects::getVar($key, 'exponent');
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['computing_fingerprint'], Logger::ULTRA_VERBOSE);
-        $this->fp = substr(sha1(yield $this->serialize_object_async(['type' => 'bytes'], $this->n->toBytes(), 'key').yield $this->serialize_object_async(['type' => 'bytes'], $this->e->toBytes(), 'key'), true), -8);
+        $this->fp = substr(sha1((yield $this->serialize_object_async(['type' => 'bytes'], $this->n->toBytes(), 'key')).(yield $this->serialize_object_async(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
 
-        return true;
+        return $this;
     }
 
     public function __sleep()
