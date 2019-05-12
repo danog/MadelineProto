@@ -292,7 +292,7 @@ if (!class_exists('\\danog\\MadelineProto\\VoIPServerConfig')) die('Install the 
         'audio_congestion_window' => 4 * 1024,
     ]
 );
-$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['connection_settings' => ['all' => ['ipv6' => false]], 'secret_chats' => ['accept_chats' => false], 'logger' => ['logger' => 3, 'logger_param' => getcwd() . '/MadelineProto.log']]);
+$MadelineProto = new \danog\MadelineProto\API('session.madeline', ['secret_chats' => ['accept_chats' => false], 'logger' => ['logger' => 3, 'logger_param' => getcwd() . '/MadelineProto.log']]);
 $MadelineProto->start();
 
 if (!isset($MadelineProto->programmed_call)) {
