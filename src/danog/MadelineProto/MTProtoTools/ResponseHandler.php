@@ -600,7 +600,6 @@ trait ResponseHandler
                     $opts[$key] = $updates[$key];
                 }
             }
-            var_dump($updates);
             switch ($updates['_']) {
                 case 'updates':
                 case 'updatesCombined':
