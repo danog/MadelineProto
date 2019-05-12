@@ -34,7 +34,6 @@ use danog\MadelineProto\Tools;
 class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
 {
     use BufferedStream;
-    use Tools;
     private $stream;
     private $code;
     private $ctx;

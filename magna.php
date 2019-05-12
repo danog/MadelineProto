@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /*
 Copyright 2016-2018 Daniil Gentili
 (https://daniil.it)
@@ -306,4 +307,5 @@ foreach (['my_users', 'times', 'times_messages', 'calls'] as $key) {
 }
 
 $MadelineProto->setEventHandler('\EventHandler');
+
 $MadelineProto->loop();

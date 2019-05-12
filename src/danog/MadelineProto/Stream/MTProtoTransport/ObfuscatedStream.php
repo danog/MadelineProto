@@ -35,7 +35,6 @@ use danog\MadelineProto\Tools;
  */
 class ObfuscatedStream implements BufferedProxyStreamInterface
 {
-    use Tools;
     use Buffer;
     use BufferedStream;
     private $encrypt;

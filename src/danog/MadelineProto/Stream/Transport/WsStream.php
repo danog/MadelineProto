@@ -43,7 +43,6 @@ use function Amp\Websocket\validateAcceptForKey;
 class WsStream implements RawStreamInterface
 {
     use RawStream;
-    use Tools;
 
     private $stream;
     private $message;
