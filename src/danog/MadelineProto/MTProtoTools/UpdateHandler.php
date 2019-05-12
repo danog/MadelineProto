@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Artax\Request;
 use Amp\Deferred;
 use Amp\Delayed;
 use function Amp\Promise\any;
@@ -303,7 +304,7 @@ trait UpdateHandler
         $this->updates_state->syncLoading(true);
 
         try {
-            $data = yield $this->method_call_async_read('updates.getState', [], ['datacenter' =>  $this->settings['connection_settings']['default_dc']]);
+            $data = yield $this->method_call_async_read('updates.getState', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             yield $this->get_cdn_config_async($this->settings['connection_settings']['default_dc']);
         } finally {
             $this->updates_state->syncLoading($last);
@@ -349,11 +350,11 @@ trait UpdateHandler
             $cur_state = $this->channels_state->get($channel_id, $update);
         }
         /*
-                if ($cur_state['sync_loading'] && in_array($update['_'], ['updateNewMessage', 'updateEditMessage', 'updateNewChannelMessage', 'updateEditChannelMessage'])) {
-                    $this->logger->logger('Sync loading, not handling update', \danog\MadelineProto\Logger::NOTICE);
+        if ($cur_state['sync_loading'] && in_array($update['_'], ['updateNewMessage', 'updateEditMessage', 'updateNewChannelMessage', 'updateEditChannelMessage'])) {
+        $this->logger->logger('Sync loading, not handling update', \danog\MadelineProto\Logger::NOTICE);
 
-                    return false;
-                }*/
+        return false;
+        }*/
         switch ($update['_']) {
             case 'updateChannelTooLong':
                 yield $this->get_channel_difference_async($channel_id);
@@ -374,10 +375,22 @@ trait UpdateHandler
                     //isset($update['message']['fwd_from']) && !yield $this->fwd_peer_isset_async($update['message']['fwd_from'])
                 ) {
                     $log = '';
-                    if ($from) $log .= "from_id {$update['message']['from_id']}, ";
-                    if ($to) $log .= "to_id ".json_encode($update['message']['to_id']).", ";
-                    if ($via_bot) $log .= "via_bot {$update['message']['via_bot_id']}, ";
-                    if ($entities) $log .= "entities ".json_encode($update['message']['entities']).", ";
+                    if ($from) {
+                        $log .= "from_id {$update['message']['from_id']}, ";
+                    }
+
+                    if ($to) {
+                        $log .= "to_id ".json_encode($update['message']['to_id']).", ";
+                    }
+
+                    if ($via_bot) {
+                        $log .= "via_bot {$update['message']['via_bot_id']}, ";
+                    }
+
+                    if ($entities) {
+                        $log .= "entities ".json_encode($update['message']['entities']).", ";
+                    }
+
                     $this->logger->logger("Not enough data: for message update $log, getting difference...", \danog\MadelineProto\Logger::VERBOSE);
                     if ($channel_id !== false && yield $this->peer_isset_async($this->to_supergroup($channel_id))) {
                         yield $this->get_channel_difference_async($channel_id);
@@ -400,7 +413,7 @@ trait UpdateHandler
             $logger = function ($msg) use ($update, $cur_state, $channel_id) {
                 $pts_count = isset($update['pts_count']) ? $update['pts_count'] : 0;
                 $this->logger->logger($update);
-                $double = isset($update['message']['id']) ? $update['message']['id']*2 : '-';
+                $double = isset($update['message']['id']) ? $update['message']['id'] * 2 : '-';
                 $mid = isset($update['message']['id']) ? $update['message']['id'] : '-';
                 $mypts = $cur_state->pts();
                 $this->logger->logger("$msg. My pts: {$mypts}, remote pts: {$update['pts']}, remote pts count: {$pts_count}, msg id: {$mid} (*2=$double), channel id: $channel_id", \danog\MadelineProto\Logger::ERROR);
@@ -557,9 +570,9 @@ trait UpdateHandler
         }
         /*
         if ($update['_'] === 'updateEncryptedChatTyping') {
-            $update = ['_' => 'updateUserTyping', 'user_id' => $this->encrypted_chats[$update['chat_id']]['user_id'], 'action' => ['_' => 'sendMessageTypingAction']];
+        $update = ['_' => 'updateUserTyping', 'user_id' => $this->encrypted_chats[$update['chat_id']]['user_id'], 'action' => ['_' => 'sendMessageTypingAction']];
         }
-        */
+         */
         if ($update['_'] === 'updateEncryption') {
             switch ($update['chat']['_']) {
                 case 'encryptedChatRequested':
@@ -590,7 +603,7 @@ trait UpdateHandler
             //$this->logger->logger($update, \danog\MadelineProto\Logger::NOTICE);
         }
         //if ($update['_'] === 'updateServiceNotification' && strpos($update['type'], 'AUTH_KEY_DROP_') === 0) {
-            
+
         //}
         if (!$this->settings['updates']['handle_updates']) {
             return;
@@ -611,40 +624,25 @@ trait UpdateHandler
 
     public function pwr_webhook($update)
     {
-        $this->call((function () use ($update) {
-            $payload = json_encode($update);
-            //$this->logger->logger($update, $payload, json_last_error());
-            if ($payload === '') {
-                $this->logger->logger('EMPTY UPDATE');
+        $payload = json_encode($update);
+        //$this->logger->logger($update, $payload, json_last_error());
+        if ($payload === '') {
+            $this->logger->logger('EMPTY UPDATE');
 
-                return false;
-            }
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_URL, $this->hook_url);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-            $parse = parse_url($this->hook_url);
-            if (isset($parse['scheme']) && $parse['scheme'] == 'https') {
-                if (isset($this->pem_path) && file_exists($this->pem_path)) {
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-                    curl_setopt($ch, CURLOPT_CAINFO, $this->pem_path);
-                } else {
-                    //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                }
-            }
-            $result = curl_exec($ch);
-            curl_close($ch);
+            return false;
+        }
+        $this->call((function () use ($payload) {
+            $request = (new Request($this->hook_url, 'POST'))->withHeader('content-type', 'application/json')->withBody($payload);
+
+            $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody();
+
             $this->logger->logger('Result of webhook query is '.$result, \danog\MadelineProto\Logger::NOTICE);
             $result = json_decode($result, true);
             if (is_array($result) && isset($result['method']) && $result['method'] != '' && is_string($result['method'])) {
                 try {
                     $this->logger->logger('Reverse webhook command returned', yield $this->method_call_async_read($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
-                } catch (\danog\MadelineProto\Exception $e) {
-                } catch (\danog\MadelineProto\TL\Exception $e) {
-                } catch (\danog\MadelineProto\RPCErrorException $e) {
-                } catch (\danog\MadelineProto\SecurityException $e) {
+                } catch (\Throwable $e) {
+                    $this->logger->logger("Reverse webhook command returned: $e");
                 }
             }
         })());

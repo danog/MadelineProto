@@ -369,9 +369,18 @@ class DataCenter
 
         return $ctxs;
     }
+    /**
+     * Get Artax async HTTP client
+     *
+     * @return \Amp\Artax\DefaultClient
+     */
     public function getHTTPClient()
     {
         return $this->HTTPClient;
+    }
+    public function fileGetContents($url): \Generator
+    {
+        return yield (yield $this->getHTTPClient()->request($url))->getBody();
     }
     public function get_dcs($all = true)
     {

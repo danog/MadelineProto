@@ -518,7 +518,7 @@ trait AuthKeyHandler
 
     public function wolfram_single_async($what)
     {
-        $code = yield (yield $this->datacenter->getHTTPClient()->request('http://www.wolframalpha.com/api/v1/code'))->getBody();
+        $code = yield $this->datacenter->fileGetContents('http://www.wolframalpha.com/api/v1/code');
         $query = 'Do prime factorization of '.$what;
         $params = [
             'async' => true,

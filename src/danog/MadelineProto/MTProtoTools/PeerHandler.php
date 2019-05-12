@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Loop;
+use Amp\Artax\Request;
 
 /**
  * Manages peers.
@@ -382,7 +383,12 @@ trait PeerHandler
                 }
             }
             if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true && $recursive) {
-                $dbres = json_decode(@file_get_contents('https://id.pwrtelegram.xyz/db/getusername?id='.$id, false, stream_context_create(['http' => ['timeout' => 2]])), true);
+                $dbres = [];
+                try {
+                    $dbres = json_decode(yield $this->datacenter->fileGetContents('https://id.pwrtelegram.xyz/db/getusername?id='.$id), true);
+                } catch (\Throwable $e) {
+                    $this->logger->logger($e);
+                }
                 if (isset($dbres['ok']) && $dbres['ok']) {
                     yield $this->resolve_username_async('@'.$dbres['result']);
 
@@ -814,22 +820,15 @@ trait PeerHandler
             //$path = '/tmp/ids'.hash('sha256', $payload);
             //file_put_contents($path, $payload);
             $id = isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'];
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_URL, 'https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-            $result = curl_exec($ch);
-            curl_close($ch);
-            //$result = shell_exec('curl '.escapeshellarg('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id).' -d '.escapeshellarg('@'.$path).' -s >/dev/null 2>/dev/null & ');
+
+            $request = (new Request('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id, 'POST'))->withHeader('content-type', 'application/json')->withBody($payload);
+
+            $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody();
+    
             $this->logger->logger("============ $result =============", \danog\MadelineProto\Logger::VERBOSE);
             $this->qres = [];
             $this->last_stored = time() + 10;
         } catch (\danog\MadelineProto\Exception $e) {
-            if (file_exists($path)) {
-                unlink($path);
-            }
             $this->logger->logger('======= COULD NOT STORE IN DB DUE TO '.$e->getMessage().' =============', \danog\MadelineProto\Logger::VERBOSE);
         }
     }
