@@ -25,7 +25,7 @@ namespace danog\MadelineProto\MTProtoTools;
 class CombinedUpdatesState
 {
     private $states = [];
-    public function __construct($init)
+    public function __construct($init = [])
     {
         if (!is_array($init)) {
             return;

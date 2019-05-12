@@ -387,7 +387,7 @@ class MTProto implements TLCallback
         }
 
         if (!$this->settings['updates']['handle_old_updates']) {
-            $this->channels_state = [];
+            $this->channels_state = new CombinedUpdatesState();
             $this->got_state = false;
         }
         yield $this->connect_to_all_dcs_async();
