@@ -128,7 +128,7 @@ trait AuthKeyHandler
         $params['g_b'] = new \phpseclib\Math\BigInteger($params['g_b'], 256);
         $this->check_G($params['g_b'], $dh_config['p']);
         $key = str_pad($params['g_b']->powMod($this->calls[$params['id']]->storage['a'], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT);
-        $res = yield $this->method_call_async_read('phone.confirmCall', ['key_fingerprint' => substr(sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->calls[$params['id']]->storage['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => \danog\MadelineProto\VoIP::getConnectionMaxLayer()]], ['datacenter' => $this->datacenter->curdc])['phone_call'];
+        $res = (yield $this->method_call_async_read('phone.confirmCall', ['key_fingerprint' => substr(sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->calls[$params['id']]->storage['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => \danog\MadelineProto\VoIP::getConnectionMaxLayer()]], ['datacenter' => $this->datacenter->curdc]))['phone_call'];
         $visualization = [];
         $length = new \phpseclib\Math\BigInteger(count(\danog\MadelineProto\Magic::$emojis));
         foreach (str_split(hash('sha256', $key.str_pad($this->calls[$params['id']]->storage['g_a'], 256, chr(0), \STR_PAD_LEFT), true), 8) as $number) {

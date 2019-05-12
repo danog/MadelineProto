@@ -517,11 +517,11 @@ trait PeerHandler
                 $full = yield $this->method_call_async_read('users.getFullUser', ['id' => $partial['InputUser']], ['datacenter' => $this->datacenter->curdc]);
                 break;
             case 'chat':
-                $full = yield $this->method_call_async_read('messages.getFullChat', $partial, ['datacenter' => $this->datacenter->curdc])['full_chat'];
+                $full = (yield $this->method_call_async_read('messages.getFullChat', $partial, ['datacenter' => $this->datacenter->curdc]))['full_chat'];
                 break;
             case 'channel':
             case 'supergroup':
-                $full = yield $this->method_call_async_read('channels.getFullChannel', ['channel' => $partial['InputChannel']], ['datacenter' => $this->datacenter->curdc])['full_chat'];
+                $full = (yield $this->method_call_async_read('channels.getFullChannel', ['channel' => $partial['InputChannel']], ['datacenter' => $this->datacenter->curdc]))['full_chat'];
                 break;
         }
 

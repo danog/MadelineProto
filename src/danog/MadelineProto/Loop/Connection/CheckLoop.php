@@ -133,10 +133,9 @@ class CheckLoop extends ResumableSignalLoop
 
                     return;
                 }
-                //var_dumP("after ".(time() - $t).", with timeout ".$timeout);
 
                 if ($connection->get_max_id(true) === $last_recv) {
-                    $API->logger->logger("Reconnecting and exiting check loop on DC $datacenter");
+                    $API->logger->logger("We did not receive a response for $timeout seconds: reconnecting and exiting check loop on DC $datacenter");
                     $this->exitedLoop();
                     yield $connection->reconnect();
 
