@@ -5,4 +5,4 @@ before_install:
 - echo "phar.readonly = 0" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 script:
-- tests/makephar.sh
+#- tests/makephar.sh

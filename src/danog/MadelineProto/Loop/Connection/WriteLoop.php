@@ -48,6 +48,7 @@ class WriteLoop extends ResumableSignalLoop
         $please_wait = false;
         while (true) {
             if (empty($connection->pending_outgoing) || $please_wait) {
+                $API->logger->logger("Waiting in write loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
                 if (yield $this->waitSignal($this->pause())) {
                     $API->logger->logger("Exiting write loop in DC $datacenter");
                     $this->exitedLoop();
@@ -55,6 +56,7 @@ class WriteLoop extends ResumableSignalLoop
 
                     return;
                 }
+                $API->logger->logger("Done waiting in write loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
             }
 
             try {
@@ -131,6 +133,7 @@ class WriteLoop extends ResumableSignalLoop
         $API = $this->API;
         $datacenter = $this->datacenter;
         $connection = $this->connection;
+        $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
 
         do {
             if ($connection->temp_auth_key === null) {
@@ -156,8 +159,6 @@ class WriteLoop extends ResumableSignalLoop
             }
 
             if ($API->is_http($datacenter) && !$has_http_wait) {
-                $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
-
                 //$connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => $this->API->serialize_object(['type' => ''], ['_' => 'http_wait', 'max_wait' => $API->settings['connection_settings'][$dc_config_number]['timeout'] * 1000 - 100, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
                 $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => yield $this->API->serialize_object_async(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 1], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
@@ -176,6 +177,11 @@ class WriteLoop extends ResumableSignalLoop
                     unset($connection->pending_outgoing[$k]);
                     continue;
                 }
+                if ($API->settings['connection_settings'][$dc_config_number]['pfs'] && !isset($connection->temp_auth_key['bound']) && !strpos($datacenter, 'cdn') && $message['_'] !== 'auth.bindTempAuthKey') {
+                    $API->logger->logger("Skipping {$message['_']} due to unbound keys in DC {$datacenter}");
+                    continue;
+                }
+
                 $body = $message['serialized_body'];
 
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $connection->generate_message_id($datacenter);
@@ -185,6 +191,7 @@ class WriteLoop extends ResumableSignalLoop
                 $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $body, 'seqno' => $connection->generate_out_seq_no($message['content_related'])];
 
                 if (isset($message['method']) && $message['method'] && $message['_'] !== 'http_wait') {
+
                     if ((!isset($connection->temp_auth_key['connection_inited']) || $connection->temp_auth_key['connection_inited'] === false) && $message['_'] !== 'auth.bindTempAuthKey') {
                         $API->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $message['_']), \danog\MadelineProto\Logger::NOTICE);
                         $MTmessage['body'] = yield $API->serialize_method_async(

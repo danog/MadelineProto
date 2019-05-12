@@ -503,6 +503,8 @@ trait AuthKeyHandler
                 $res = yield $this->method_call_async_read('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], ['msg_id' => $message_id, 'datacenter' => $datacenter]);
                 if ($res === true) {
                     $this->logger->logger('Successfully binded temporary and permanent authorization keys, DC '.$datacenter, \danog\MadelineProto\Logger::NOTICE);
+                    $this->datacenter->sockets[$datacenter]->temp_auth_key['bound'] = true;
+                    $this->datacenter->sockets[$datacenter]->writer->resume();
 
                     return true;
                 }
@@ -658,8 +660,6 @@ trait AuthKeyHandler
                         $socket->temp_auth_key = null;
                         $socket->temp_auth_key = yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
                         yield $this->bind_temp_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
-
-                        //$socket->authorized = $authorized;
 
                         $config = yield $this->method_call_async_read('help.getConfig', [], ['datacenter' => $id]);
 

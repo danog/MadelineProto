@@ -489,7 +489,7 @@ trait UpdateHandler
             return;
         }
         foreach ($messages as $message) {
-            yield $this->handle_update_async(['_' => $channel === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => $channel === false ? (yield $this->load_update_state_async())->pts() : $this->channels_state->get($channel), 'pts_count' => 0]);
+            yield $this->handle_update_async(['_' => $channel === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => ($channel === false ? (yield $this->load_update_state_async()) : $this->channels_state->get($channel))->pts(), 'pts_count' => 0]);
         }
     }
 
