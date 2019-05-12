@@ -223,7 +223,7 @@ trait Tools
 
     public function after($a, $b)
     {
-        $a = $this->call($a);
+        $a = $this->call($a());
         $deferred = new Deferred();
         $a->onResolve(function ($e, $res) use ($b, $deferred) {
             if ($e) {
