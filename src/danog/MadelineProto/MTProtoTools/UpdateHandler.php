@@ -631,7 +631,7 @@ trait UpdateHandler
 
             return false;
         }
-        $this->call((function () use ($payload) {
+        $this->callFork((function () use ($payload) {
             $request = (new Request($this->hook_url, 'POST'))->withHeader('content-type', 'application/json')->withBody($payload);
 
             $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody();

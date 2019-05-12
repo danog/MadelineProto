@@ -109,7 +109,7 @@ trait Loop
             foreach ($updates as $update) {
                 $r = $this->settings['updates']['callback']($update);
                 if (is_object($r)) {
-                    \Amp\Promise\rethrow($this->call($r));
+                    $this->callFork($r);
                 }
             }
             $updates = [];

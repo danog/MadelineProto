@@ -38,8 +38,6 @@ class CheckLoop extends ResumableSignalLoop
         $this->startedLoop();
         $API->logger->logger("Entered check loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
 
-        $try_count = 0;
-
         $timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
         while (true) {
             while (empty($connection->new_outgoing)) {
@@ -49,18 +47,19 @@ class CheckLoop extends ResumableSignalLoop
 
                     return;
                 }
-                $try_count = 0;
             }
 
             if ($connection->hasPendingCalls()) {
-                $last_recv = $connection->last_recv;
+                $last_recv = $connection->get_max_id(true);
                 if ($connection->temp_auth_key !== null) {
                     $message_ids = array_values($connection->new_outgoing);
                     $deferred = new Deferred();
                     $deferred->promise()->onResolve(
                         function ($e, $result) use ($message_ids, $API, $connection, $datacenter) {
                             if ($e) {
-                                throw $e;
+                                $API->logger("Got exception in check loop for DC $datacenter");
+                                $API->logger((string) $e);
+                                return;
                             }
                             $reply = [];
                             foreach (str_split($result['info']) as $key => $chr) {
@@ -104,7 +103,7 @@ class CheckLoop extends ResumableSignalLoop
                                 }
                             }
                             if ($reply) {
-                                $API->object_call_async('msg_resend_ans_req', ['msg_ids' => $reply], ['datacenter' => $datacenter, 'postpone' => true]);
+                                $this->callFork($API->object_call_async('msg_resend_ans_req', ['msg_ids' => $reply], ['datacenter' => $datacenter, 'postpone' => true]));
                             }
                             $connection->writer->resume();
                         }
@@ -136,8 +135,7 @@ class CheckLoop extends ResumableSignalLoop
                 }
                 //var_dumP("after ".(time() - $t).", with timeout ".$timeout);
 
-                $try_count++;
-                if ($connection->last_recv === $last_recv) {
+                if ($connection->get_max_id(true) === $last_recv) {
                     $API->logger->logger("Reconnecting and exiting check loop on DC $datacenter");
                     $this->exitedLoop();
                     yield $connection->reconnect();
@@ -151,7 +149,6 @@ class CheckLoop extends ResumableSignalLoop
 
                     return;
                 }
-                $try_count = 0;
             }
         }
     }

@@ -155,7 +155,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
             return new Success(fread($this->memory_stream, $length));
         }
 
-        return call([$this, 'bufferReadAsync'], $length);
+        return $this->call($this->bufferReadAsync($length));
     }
 
     /**

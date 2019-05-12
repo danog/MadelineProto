@@ -53,7 +53,7 @@ abstract class Loop implements LoopInterface
 
             return false;
         }
-        Promise\rethrow($this->call($this->loop()));
+        $this->callFork($this->loop());
 
         return true;
     }

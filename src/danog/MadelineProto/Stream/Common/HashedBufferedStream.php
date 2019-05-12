@@ -275,7 +275,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
             return $this->read_buffer->bufferRead($length);
         }
 
-        return call([$this, 'bufferReadAsync'], $length);
+        return call($this->bufferReadAsync($length));
     }
 
     /**

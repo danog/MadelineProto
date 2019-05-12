@@ -140,7 +140,7 @@ trait PeerHandler
 
     public function cache_pwr_chat($id, $full_fetch, $send)
     {
-                $this->call((function () use ($id, $full_fetch, $send) {
+                $this->callFork((function () use ($id, $full_fetch, $send) {
                 try {
                     yield $this->get_pwr_chat_async($id, $full_fetch, $send);
                 } catch (\danog\MadelineProto\Exception $e) {

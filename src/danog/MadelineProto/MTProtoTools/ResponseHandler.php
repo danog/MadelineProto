@@ -114,7 +114,7 @@ trait ResponseHandler
                     // Acknowledge that I received the server's response
                     if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
 
-                        $this->call($this->get_updates_difference_async());
+                        $this->callFork($this->get_updates_difference_async());
                     }
 
                     unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
@@ -169,7 +169,7 @@ trait ResponseHandler
                     $only_updates = false;
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
 
-                    $this->call($this->send_msgs_state_info_async($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter));
+                    $this->callFork($this->send_msgs_state_info_async($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter));
                     unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
                     break;
                 case 'msgs_all_info':
@@ -200,7 +200,7 @@ trait ResponseHandler
                         if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {
                             $this->handle_response($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id'], $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id'], $datacenter);
                         } else {
-                            $this->call($this->object_call_async('msg_resend_req', ['msg_ids' => [$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['datacenter' => $datacenter]));
+                            $this->callFork($this->object_call_async('msg_resend_req', ['msg_ids' => [$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['datacenter' => $datacenter]));
                         }
                     }
                     break;
@@ -212,7 +212,7 @@ trait ResponseHandler
                     if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {
                         $this->ack_incoming_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id'], $datacenter);
                     } else {
-                        $this->call($this->object_call_async('msg_resend_req', ['msg_ids' => [$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['datacenter' => $datacenter]));
+                        $this->callFork($this->object_call_async('msg_resend_req', ['msg_ids' => [$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['datacenter' => $datacenter]));
                     }
                     break;
                 case 'msg_resend_req':
@@ -231,7 +231,7 @@ trait ResponseHandler
                             $this->method_recall('', ['message_id' => $msg_id, 'datacenter' => $datacenter]);
                         }
                     } else {
-                        $this->call($this->send_msgs_state_info_async($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter));
+                        $this->callFork($this->send_msgs_state_info_async($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter));
                     }
                     break;
                 case 'msg_resend_ans_req':
@@ -239,10 +239,10 @@ trait ResponseHandler
                     $only_updates = false;
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
 
-                    $this->call($this->send_msgs_state_info_async($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter));
+                    $this->callFork($this->send_msgs_state_info_async($current_msg_id, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'], $datacenter));
                     foreach ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
                         if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']) && isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']])) {
-                            $this->call($this->object_call_async($this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']]['_'], $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']]['body'], ['datacenter' => $datacenter]));
+                            $this->callFork($this->object_call_async($this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']]['_'], $this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$msg_id]['response']]['body'], ['datacenter' => $datacenter]));
                         }
                     }
                     break;
@@ -257,7 +257,7 @@ trait ResponseHandler
                             unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
 
                             if (strpos($datacenter, 'cdn') === false) {
-                                $this->call($this->handle_updates_async($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']));
+                                $this->callFork($this->handle_updates_async($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']));
                             }
 
                             unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
@@ -398,7 +398,7 @@ trait ResponseHandler
                                     $this->authorized = self::NOT_LOGGED_IN;
                                     $this->authorization = null;
 
-                                    $this->call((function () use ($datacenter, &$request, &$response) {
+                                    $this->callFork((function () use ($datacenter, &$request, &$response) {
                                         yield $this->init_authorization_async();
 
                                         $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
@@ -410,7 +410,7 @@ trait ResponseHandler
                                     if ($this->authorized !== self::LOGGED_IN) {
                                         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
 
-                                        $this->call((function () use ($datacenter, &$request, &$response) {
+                                        $this->callFork((function () use ($datacenter, &$request, &$response) {
                                             yield $this->init_authorization_async();
 
                                             $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
@@ -445,7 +445,7 @@ trait ResponseHandler
                                         $this->authorized = self::NOT_LOGGED_IN;
                                         $this->authorization = null;
 
-                                        $this->call((function () use ($datacenter, &$request, &$response) {
+                                        $this->callFork((function () use ($datacenter, &$request, &$response) {
                                             yield $this->init_authorization_async();
 
                                             $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
@@ -453,7 +453,7 @@ trait ResponseHandler
 
                                         return;
                                     }
-                                    $this->call((function () use ($request_id, $datacenter) {
+                                    $this->callFork((function () use ($request_id, $datacenter) {
                                         yield $this->init_authorization_async();
 
                                         $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
@@ -464,7 +464,7 @@ trait ResponseHandler
                                     $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', \danog\MadelineProto\Logger::ERROR);
 
                                     $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
-                                    $this->call((function () use ($request_id, $datacenter) {
+                                    $this->callFork((function () use ($request_id, $datacenter) {
                                         yield $this->init_authorization_async();
                                         $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
                                     })());
@@ -517,7 +517,7 @@ trait ResponseHandler
                             $this->logger->logger('Set time delta to '.$this->datacenter->sockets[$datacenter]->time_delta, \danog\MadelineProto\Logger::WARNING);
                             $this->reset_session();
                             $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
-                            $this->call((function () use ($datacenter, $request_id) {
+                            $this->callFork((function () use ($datacenter, $request_id) {
                                 yield $this->init_authorization_async();
                                 $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
                             })());
@@ -543,7 +543,7 @@ trait ResponseHandler
         $botAPI = isset($request['botAPI']) && $request['botAPI'];
         unset($request);
         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
-        $this->call((
+        $this->callFork((
             function () use ($request_id, $response, $datacenter, $botAPI) {
                 $r = isset($response['_']) ? $response['_'] : json_encode($response);
                 $this->logger->logger("Deferred: sent $r to deferred");

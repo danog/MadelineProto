@@ -454,7 +454,7 @@ class ReferenceDatabase implements TLCallback
         }
     }
 
-    public function refreshReference(int $locationType, array $location): Promise
+    public function refreshReference(int $locationType, array $location)
     {
         return $this->refreshReferenceInternal($this->serializeLocation($locationType, $location));
     }
@@ -525,18 +525,10 @@ class ReferenceDatabase implements TLCallback
         throw new Exception('Did not refresh reference');
     }
 
-    public function populateReference(array $object): Promise
+    public function populateReference(array $object)
     {
-        $deferred = new Deferred();
-        $this->getReference(self::LOCATION_CONTEXT[$object['_']], $object)->onResolve(function ($e, $res) use ($deferred, $object) {
-            if ($e) {
-                throw $e;
-            }
-            $object['file_reference'] = $res;
-            $deferred->resolve($object);
-        });
-
-        return $deferred->promise();
+        $object['file_reference'] = yield $this->getReference(self::LOCATION_CONTEXT[$object['_']], $object);
+        return $object;
     }
 
     public function getReference(int $locationType, array $location)

@@ -564,7 +564,10 @@ trait AuthKeyHandler
     // Creates authorization keys
     public function init_authorization_async()
     {
-        var_dump((string) new Exception());
+        return $this->ainit_authorization_async();
+    }
+    public function ainit_authorization_async()
+    {
         if ($this->pending_auth) {
             return;
         }
@@ -595,17 +598,13 @@ trait AuthKeyHandler
             }
             if ($dcs) {
                 $first = array_shift($dcs)();
-                var_dumP("Yielding first ");
-                var_dump(yield $first);
-                var_dumP("Yielded first");
+                yield $first;
             }
 
             foreach ($dcs as $id => &$dc) {
                 $dc = $dc();
             }
-            var_dump("yielding all", array_keys($dcs));
             yield $dcs;
-            var_dump("yielded all");
 
             foreach ($postpone as $id => $socket) {
                 yield $this->init_authorization_socket_async($id, $socket);
@@ -657,9 +656,7 @@ trait AuthKeyHandler
                         //$socket->authorized = false;
 
                         $socket->temp_auth_key = null;
-                        var_dump("creating auth k $id");
                         $socket->temp_auth_key = yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
-                        var_dump("done creating auth k $id");
                         yield $this->bind_temp_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
 
                         //$socket->authorized = $authorized;

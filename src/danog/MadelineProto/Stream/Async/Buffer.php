@@ -19,7 +19,6 @@
 namespace danog\MadelineProto\Stream\Async;
 
 use Amp\Promise;
-use function Amp\call;
 
 /**
  * Buffer helper trait.
@@ -32,11 +31,11 @@ trait Buffer
 {
     public function bufferRead(int $length): Promise
     {
-        return call([$this, 'bufferReadAsync'], $length);
+        return $this->call($this->bufferReadAsync($length));
     }
 
     public function bufferWrite(string $data): Promise
     {
-        return call([$this, 'bufferWriteAsync'], $data);
+        return $this->call($this->bufferWriteAsync($data));
     }
 }

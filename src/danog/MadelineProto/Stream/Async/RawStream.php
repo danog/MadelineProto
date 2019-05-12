@@ -19,7 +19,6 @@
 namespace danog\MadelineProto\Stream\Async;
 
 use Amp\Promise;
-use function Amp\call;
 
 /**
  * Raw stream helper trait.
@@ -34,16 +33,16 @@ trait RawStream
 
     public function read(): Promise
     {
-        return call([$this, 'readAsync']);
+        return $this->call($this->readAsync());
     }
 
     public function write(string $data): Promise
     {
-        return call([$this, 'writeAsync'], $data);
+        return $this->call($this->writeAsync($data));
     }
 
     public function end(string $finalData = ''): Promise
     {
-        return call([$this, 'endAsync'], $finalData);
+        return $this->call($this->endAsync($finalData));
     }
 }

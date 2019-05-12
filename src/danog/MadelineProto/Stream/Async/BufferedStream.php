@@ -18,11 +18,9 @@
 
 namespace danog\MadelineProto\Stream\Async;
 
-use Amp\Coroutine;
 use Amp\Failure;
 use Amp\Promise;
 use Amp\Success;
-use function Amp\call;
 
 /**
  * Buffered stream helper trait.
@@ -44,19 +42,7 @@ trait BufferedStream
      */
     public function getReadBuffer(&$length): Promise
     {
-        try {
-            $result = $this->getReadBufferAsync($length);
-        } catch (\Throwable $exception) {
-            return new Failure($exception);
-        }
-        if ($result instanceof \Generator) {
-            return new Coroutine($result);
-        }
-        if ($result instanceof Promise) {
-            return $result;
-        }
-
-        return new Success($result);
+        return $this->call($this->getReadBufferAsync($length));
     }
 
     /**
@@ -69,6 +55,6 @@ trait BufferedStream
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
-        return call([$this, 'getWriteBufferAsync'], $length, $append);
+        return $this->call($this->getWriteBufferAsync($length, $append));
     }
 }

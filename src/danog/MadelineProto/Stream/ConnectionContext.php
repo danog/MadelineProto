@@ -22,7 +22,6 @@ use Amp\CancellationToken;
 use Amp\Promise;
 use Amp\Socket\ClientConnectContext;
 use Amp\Uri\Uri;
-use function Amp\call;
 
 /**
  * Connection context class.
@@ -321,15 +320,6 @@ class ConnectionContext
         return $this->nextStreams[$this->key][0];
     }
 
-    /**
-     * Get a stream from the stream chain.
-     *
-     * @return Promise
-     */
-    public function getStream(string $buffer = ''): Promise
-    {
-        return call([$this, 'getStreamAsync'], $buffer);
-    }
 
     /**
      * Get a stream from the stream chain.
@@ -338,7 +328,7 @@ class ConnectionContext
      *
      * @return \Generator
      */
-    public function getStreamAsync(string $buffer = ''): \Generator
+    public function getStream(string $buffer = ''): \Generator
     {
         list($clazz, $extra) = $this->nextStreams[$this->key--];
         $obj = new $clazz();

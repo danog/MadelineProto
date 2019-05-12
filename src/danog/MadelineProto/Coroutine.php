@@ -33,7 +33,6 @@ use Amp\Failure;
 use Amp\Internal;
 use Amp\Promise;
 use Amp\Success;
-
 use React\Promise\PromiseInterface as ReactPromise;
 
 /**
@@ -64,12 +63,6 @@ final class Coroutine implements Promise
      */
     public function __construct(\Generator $generator)
     {
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
-        $frame = '';
-        $frame .= basename($backtrace[1]['file']).': '.$backtrace[2]['function'];
-        $this->frames []= $frame;
-        var_dump($frame);
-
         $this->generator = $generator;
 
         try {
@@ -87,12 +80,9 @@ final class Coroutine implements Promise
                         $this->resolve(null);
                     }
 
-
                     return;
                 }
                 $yielded = $this->transform($yielded);
-            } else {
-                var_dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
             }
         } catch (\Throwable $exception) {
             $this->fail($exception);
@@ -149,6 +139,7 @@ final class Coroutine implements Promise
             } catch (\Throwable $exception) {
                 $this->fail($exception);
                 $this->onResolve = null;
+
             } finally {
                 $this->exception = null;
                 $this->value = null;
@@ -168,6 +159,9 @@ final class Coroutine implements Promise
     private function transform($yielded): Promise
     {
         try {
+            if ($yielded instanceof \Generator) {
+                return new self($yielded);
+            }
             if (\is_array($yielded)) {
                 foreach ($yielded as &$val) {
                     if ($val instanceof \Generator) {
@@ -176,9 +170,6 @@ final class Coroutine implements Promise
                 }
 
                 return Promise\all($yielded);
-            }
-            if ($yielded instanceof \Generator) {
-                return new self($yielded);
             }
 
             if ($yielded instanceof ReactPromise) {

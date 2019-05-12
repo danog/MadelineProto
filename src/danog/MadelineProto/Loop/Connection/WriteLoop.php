@@ -269,7 +269,7 @@ class WriteLoop extends ResumableSignalLoop
                 $message_id = $message['msg_id'];
                 $seq_no = $message['seqno'];
             } else {
-                $API->logger->logger('NO MESSAGE SENT', \danog\MadelineProto\Logger::WARNING);
+                $API->logger->logger("NO MESSAGE SENT in DC $datacenter", \danog\MadelineProto\Logger::WARNING);
 
                 return;
             }

@@ -850,7 +850,7 @@ trait TL
 
         if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
             foreach ($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) {
-                $this->call($callback($x));
+                $this->callFork($callback($x));
             }
         } elseif ($x['_'] === 'rpc_result'
             && isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'])

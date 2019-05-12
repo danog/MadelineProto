@@ -50,9 +50,11 @@ trait CallHandler
 
         foreach ($message_ids as $message_id) {
             if (isset($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id]['body'])) {
-                $this->datacenter->sockets[$new_datacenter]->sendMessage($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id], false);
+                $this->callFork($this->datacenter->sockets[$new_datacenter]->sendMessage($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id], false));
                 $this->ack_outgoing_message_id($message_id, $old_datacenter);
                 $this->got_response_for_outgoing_message_id($message_id, $old_datacenter);
+            } else {
+                $this->logger->logger("Could not resend ".isset($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id]['_']) ? $this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id]['_'] : $message_id);
             }
         }
         if (!$postpone) {
@@ -62,12 +64,10 @@ trait CallHandler
     
     public function method_call($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
-        $promise = $this->method_call_async_read($method, $args, $aargs);
-
-        return $this->wait($promise);
+        return $this->wait($this->method_call_async_read($method, $args, $aargs));
     }
 
-    public function method_call_async_read($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
+    public function method_call_async_read($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
         $deferred = new Deferred();
         $this->method_call_async_write($method, $args, $aargs)->onResolve(function ($e, $read_deferred) use ($deferred) {
@@ -85,7 +85,7 @@ trait CallHandler
             }
         });
 
-        return isset($aargs['noResponse']) && $aargs['noResponse'] ? new \Amp\Success(0) : $deferred->promise();
+        return isset($aargs['noResponse']) && $aargs['noResponse'] ? 0 : $deferred->promise();
     }
 
     public function method_call_async_write($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
@@ -168,7 +168,7 @@ trait CallHandler
         return $deferred;
     }
 
-    public function object_call_async($object, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): Promise
+    public function object_call_async($object, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
         $message = ['_' => $object, 'body' => $args, 'content_related' => $this->content_related($object), 'unencrypted' => $this->datacenter->sockets[$aargs['datacenter']]->temp_auth_key === null, 'method' => false];
         if (isset($aargs['promise'])) {

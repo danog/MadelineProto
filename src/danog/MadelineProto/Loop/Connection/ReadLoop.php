@@ -104,11 +104,9 @@ class ReadLoop extends SignalLoop
                 $this->exitedLoop();
             }
             $this->startedLoop();
-            //var_dump(count($connection->incoming_messages));
-            //            Loop::defer(function () use ($datacenter) {
             if ($this->API->is_http($datacenter)) {
                 $this->API->datacenter->sockets[$datacenter]->waiter->resume();
-            } // });
+            }
         }
     }
 

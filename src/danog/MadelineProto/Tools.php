@@ -23,6 +23,7 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use function Amp\Promise\wait;
+use Amp\Failure;
 
 /**
  * Some tools.
@@ -220,19 +221,33 @@ trait Tools
 
         return $promise;
     }
-
+    public function callFork($promise)
+    {
+        $this->call($promise)->onResolve(function ($e, $res) {
+            if ($e) {
+                $this->rethrow($e);
+            }
+        });
+    }
+    public function rethrow($e)
+    {
+        $logger = isset($this->logger) ? $this->logger : Logger::$default;
+        $logger->logger("Got the following exception within a forked strand, trying to rethrow");
+        $logger->logger((string) $e);
+        Promise\rethrow(new Failure($e));
+    }
     public function after($a, $b)
     {
         $a = $this->call($a());
         $deferred = new Deferred();
         $a->onResolve(function ($e, $res) use ($b, $deferred) {
             if ($e) {
-                throw $e;
+                return $this->rethrow($e);
             }
             $b = $this->call($b());
             $b->onResolve(static function ($e, $res) use ($deferred) {
                 if ($e) {
-                    throw $e;
+                    return $this->rethrow($e);
                 }
                 $deferred->resolve($res);
             });
