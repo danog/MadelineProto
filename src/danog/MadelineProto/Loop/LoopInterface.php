@@ -37,5 +37,5 @@ interface LoopInterface
      *
      * @return void
      */
-    public function loop(): \Generator;
+    public function loop();
 }

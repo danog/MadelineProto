@@ -72,7 +72,7 @@ class WriteLoop extends ResumableSignalLoop
         }
     }
 
-    public function unencryptedWriteLoopAsync(): \Generator
+    public function unencryptedWriteLoopAsync()
     {
         $API = $this->API;
         $datacenter = $this->datacenter;

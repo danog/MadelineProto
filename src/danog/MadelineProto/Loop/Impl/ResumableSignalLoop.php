@@ -64,9 +64,10 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
                 return;
             }
         }
+        /*
         if ($expected) {
-            //var_dump("=======", "resume $watcherId ".get_class($this)." DC {$this->datacenter} diff ".(microtime(true) - $expected).": expected $expected, actual ".microtime(true));
-        }
+        //var_dump("=======", "resume $watcherId ".get_class($this)." DC {$this->datacenter} diff ".(microtime(true) - $expected).": expected $expected, actual ".microtime(true));
+        }*/
         if ($this->resume) {
             $resume = $this->resume;
             $this->resume = null;

@@ -21,7 +21,6 @@ namespace danog\MadelineProto\Loop\Connection;
 use Amp\Deferred;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
-use function Amp\call;
 
 /**
  * RPC call status check loop.
@@ -30,7 +29,7 @@ use function Amp\call;
  */
 class CheckLoop extends ResumableSignalLoop
 {
-    public function loop(): \Generator
+    public function loop()
     {
         $API = $this->API;
         $datacenter = $this->datacenter;

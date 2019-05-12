@@ -31,7 +31,7 @@ class UpdateLoop extends ResumableSignalLoop
 {
     use \danog\MadelineProto\Tools;
 
-    public function loop(): \Generator
+    public function loop()
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -57,7 +57,7 @@ class UpdateLoop extends ResumableSignalLoop
                 }
             }
             if (time() - $API->last_getdifference > $timeout) {
-                if (!yield $this->call($API->get_updates_difference_async())) {
+                if (!yield $API->get_updates_difference_async()) {
                     return false;
                 }
             }

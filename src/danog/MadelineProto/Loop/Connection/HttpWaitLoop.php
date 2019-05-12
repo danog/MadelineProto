@@ -31,7 +31,7 @@ use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
  */
 class HttpWaitLoop extends ResumableSignalLoop
 {
-    public function loop(): \Generator
+    public function loop()
     {
         $API = $this->API;
         $datacenter = $this->datacenter;

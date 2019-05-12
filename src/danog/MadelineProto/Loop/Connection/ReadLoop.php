@@ -26,7 +26,6 @@ use danog\MadelineProto\Loop\Impl\SignalLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Tools;
-use function Amp\call;
 
 /**
  * Socket read loop.
@@ -38,7 +37,7 @@ class ReadLoop extends SignalLoop
     use Tools;
     use Crypt;
 
-    public function loop(): \Generator
+    public function loop()
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
@@ -46,7 +45,7 @@ class ReadLoop extends SignalLoop
 
         $this->startedLoop();
         $API->logger->logger("Entered read loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
-        $timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
+        //$timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
 
         while (true) {
             try {
@@ -110,12 +109,7 @@ class ReadLoop extends SignalLoop
         }
     }
 
-    public function readMessage(): Promise
-    {
-        return call([$this, 'readMessageAsync']);
-    }
-
-    public function readMessageAsync(): \Generator
+    public function readMessage()
     {
         $API = $this->API;
         $datacenter = $this->datacenter;

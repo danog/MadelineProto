@@ -19,7 +19,6 @@
 namespace danog\MadelineProto\Async;
 
 use Amp\Promise;
-use function Amp\call;
 
 /**
  * Parameters module.
@@ -37,23 +36,13 @@ abstract class Parameters
      *
      * @return Promise
      */
-    public function fetchParameters(): Promise
-    {
-        return call([$this, 'fetchParametersAsync']);
-    }
-
-    /**
-     * Fetch parameters asynchronously.
-     *
-     * @return \Generator
-     */
-    public function fetchParametersAsync(): \Generator
+    public function fetchParameters()
     {
         $refetchable = $this->isRefetchable();
         if ($this->params && !$refetchable) {
             return $this->params;
         }
-        $params = yield call([$this, 'getParameters']);
+        $params = yield $this->getParameters();
 
         if (!$refetchable) {
             $this->params = $params;
@@ -74,5 +63,5 @@ abstract class Parameters
      *
      * @return \Generator
      */
-    abstract public function getParameters(): \Generator;
+    abstract public function getParameters();
 }

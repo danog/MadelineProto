@@ -18,8 +18,6 @@
 
 namespace danog\MadelineProto\Async;
 
-use Amp\Success;
-
 /**
  * Async parameters class.
  *
@@ -53,17 +51,9 @@ class AsyncParameters extends Parameters
         return $this->refetchable;
     }
 
-    public function getParameters(): \Generator
+    public function getParameters()
     {
         $callable = $this->callable;
-        $params = $callable();
-
-        if ($params instanceof \Generator) {
-            $params = yield coroutine($params);
-        } else {
-            $params = yield new Success($params);
-        }
-
-        return $params;
+        return yield $callable();
     }
 }

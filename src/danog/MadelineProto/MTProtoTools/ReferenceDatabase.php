@@ -25,7 +25,6 @@ use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Tools;
-use function Amp\call;
 
 /**
  * Manages upload and download of files.
@@ -460,19 +459,14 @@ class ReferenceDatabase implements TLCallback
         return $this->refreshReferenceInternal($this->serializeLocation($locationType, $location));
     }
 
-    public function refreshReferenceInternal(string $location): Promise
+    public function refreshReferenceInternal(string $location)
     {
         if (isset($this->refreshed[$location])) {
             $this->API->logger->logger('Reference already refreshed!', \danog\MadelineProto\Logger::VERBOSE);
 
-            return new Success($this->db[$location]['reference']);
+            return $this->db[$location]['reference'];
         }
 
-        return call([$this, 'refreshReferenceInternalGenerator'], $location);
-    }
-
-    public function refreshReferenceInternalGenerator(string $location): \Generator
-    {
         ksort($this->db[$location]['origins']);
         $count = 0;
 
@@ -497,7 +491,6 @@ class ReferenceDatabase implements TLCallback
                         $this->API->full_chats[$origin['peer']]['last_update'] = 0;
                     }
                     $this->API->get_full_info($origin['peer']);
-                    yield new Success(0);
                     break;
                 // Peer (default photo ID)
                 case self::USER_PHOTO_ORIGIN:
@@ -546,14 +539,14 @@ class ReferenceDatabase implements TLCallback
         return $deferred->promise();
     }
 
-    public function getReference(int $locationType, array $location): Promise
+    public function getReference(int $locationType, array $location)
     {
         $locationString = $this->serializeLocation($locationType, $location);
         if (!isset($this->db[$locationString]['reference'])) {
             if (isset($location['file_reference'])) {
                 $this->API->logger->logger("Using outdated file reference for location of type $locationType object {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
-                return new Success($location['file_reference']);
+                return $location['file_reference'];
             }
 
             throw new \danog\MadelineProto\Exception("Could not find file reference for location of type $locationType object {$location['_']}");
@@ -564,7 +557,7 @@ class ReferenceDatabase implements TLCallback
             return $this->refreshReferenceInternal($locationString);
         }
 
-        return new Success($this->db[$locationString]['reference']);
+        return $this->db[$locationString]['reference'];
     }
 
     private function serializeLocation(int $locationType, array $location)
