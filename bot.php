@@ -54,7 +54,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         }
     }
 }
-$settings = ['logger' => ['logger_level' => 5]];
+$settings = ['logger' => ['logger_level' => 5], 'connection_settings' => ['all' => ['proxy' => '\\Socket', 'protocol' => 'tcp_abridged']]];
 
 
 $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);

@@ -256,7 +256,9 @@ trait ResponseHandler
                             unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
 
                             if (strpos($datacenter, 'cdn') === false) {
-                                Loop::defer(function ($updates) { $this->call($this->handle_updates($updates)); }, $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
+                                $updates = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'];
+                                Loop::defer(function () use ($updates) { $this->call($this->handle_updates_async($updates)); });
+                                unset($updates);
                             }
 
                             unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
@@ -614,7 +616,7 @@ trait ResponseHandler
                     $opts[$key] = $updates[$key];
                 }
             }
-
+            var_dump($updates);
             switch ($updates['_']) {
                 case 'updates':
                 case 'updatesCombined':
@@ -638,7 +640,7 @@ trait ResponseHandler
                     $message['from_id'] = $from_id;
 
                     try {
-                        $message['to_id'] = yield $this->get_info_async($to_id)['Peer'];
+                        $message['to_id'] = (yield $this->get_info_async($to_id))['Peer'];
                     } catch (\danog\MadelineProto\Exception $e) {
                         $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
                         //$this->pending_updates[] = $updates;

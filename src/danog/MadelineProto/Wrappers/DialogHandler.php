@@ -54,7 +54,7 @@ trait DialogHandler
                             $last_id = $dialog['top_message'];
                         }
                         foreach ($res['messages'] as $message) {
-                            if (yield $this->get_info_async($message)['Peer'] === $last_peer && $last_id === $message['id']) {
+                            if ((yield $this->get_info_async($message))['Peer'] === $last_peer && $last_id === $message['id']) {
                                 $last_date = $message['date'];
                                 break;
                             }

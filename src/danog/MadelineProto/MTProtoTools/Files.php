@@ -23,7 +23,6 @@ use danog\MadelineProto\Async\AsyncParameters;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\RPCErrorException;
-use function Amp\call;
 
 /**
  * Manages upload and download of files.

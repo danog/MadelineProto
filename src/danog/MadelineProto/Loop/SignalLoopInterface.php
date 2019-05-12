@@ -34,7 +34,7 @@ interface SignalLoopInterface extends LoopInterface
      *
      * @return Promise
      */
-    public function waitSignal(Promise $promise): Promise;
+    public function waitSignal($promise): Promise;
 
     /**
      * Send a signal to the the loop.

@@ -126,7 +126,7 @@ trait PeerHandler
 
                     $this->chats[$bot_api_id] = $chat;
 
-                    if ($this->settings['peer']['full_fetch'] && (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== yield $this->get_full_info_async($bot_api_id)['full']['participants_count'])) {
+                    if ($this->settings['peer']['full_fetch'] && (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== (yield $this->get_full_info_async($bot_api_id))['full']['participants_count'])) {
                         $this->cache_pwr_chat($bot_api_id, $this->settings['peer']['full_fetch'], true);
                     }
                 }
@@ -140,6 +140,7 @@ trait PeerHandler
     public function cache_pwr_chat($id, $full_fetch, $send)
     {
             Loop::defer(function () use ($id, $full_fetch, $send) {
+                $this->call((function () use ($id, $full_fetch, $send) {
                 try {
                     yield $this->get_pwr_chat_async($id, $full_fetch, $send);
                 } catch (\danog\MadelineProto\Exception $e) {
@@ -147,13 +148,14 @@ trait PeerHandler
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $this->logger->logger("While caching: ".$e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                 }
+                })());
             });
     }
 
     public function peer_isset_async($id)
     {
         try {
-            return isset($this->chats[yield $this->get_info_async($id)['bot_api_id']]);
+            return isset($this->chats[(yield $this->get_info_async($id))['bot_api_id']]);
         } catch (\danog\MadelineProto\Exception $e) {
             return false;
         } catch (\danog\MadelineProto\RPCErrorException $e) {

@@ -958,7 +958,7 @@ class MTProto implements TLCallback
     public function getConstructorCallbacks(): array
     {
         return array_merge(
-            array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [[$this, 'add_chat']]),
+            array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [[$this, 'add_chat_async']]),
             array_fill_keys(['user', 'userEmpty'], [[$this, 'add_user']]),
             ['help.support' => [[$this, 'add_support']]]
         );
@@ -977,9 +977,9 @@ class MTProto implements TLCallback
     public function getTypeMismatchCallbacks(): array
     {
         return array_merge(
-            array_fill_keys(['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer', 'InputDialogPeer', 'InputNotifyPeer'], [$this, 'get_info']),
-            array_fill_keys(['InputMedia', 'InputDocument', 'InputPhoto'], [$this, 'get_file_info']),
-            array_fill_keys(['InputFileLocation'], [$this, 'get_download_info'])
+            array_fill_keys(['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer', 'InputDialogPeer', 'InputNotifyPeer'], [$this, 'get_info_async']),
+            array_fill_keys(['InputMedia', 'InputDocument', 'InputPhoto'], [$this, 'get_file_info_async']),
+            array_fill_keys(['InputFileLocation'], [$this, 'get_download_info_async'])
         );
     }
 

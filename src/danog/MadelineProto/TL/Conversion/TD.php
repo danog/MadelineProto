@@ -100,7 +100,7 @@ trait TD
             } else {
                 switch (end($mtproto)) {
                     case 'choose_chat_id_from_botapi':
-                        $newparams[$td] = yield $this->get_info_async($params[$mtproto[0]])['bot_api_id'] == $this->authorization['user']['id'] ? $params['from_id'] : yield $this->get_info_async($params[$mtproto[0]])['bot_api_id'];
+                        $newparams[$td] = (yield $this->get_info_async($params[$mtproto[0]]))['bot_api_id'] == $this->authorization['user']['id'] ? $params['from_id'] : yield $this->get_info_async($params[$mtproto[0]])['bot_api_id'];
                         break;
                     case 'choose_incoming_or_sent':
                         $newparams[$td] = ['_' => $params['out'] ? 'messageIsSuccessfullySent' : 'messageIsIncoming'];

@@ -402,14 +402,15 @@ trait UpdateHandler
                 $this->logger->logger($update);
                 $double = isset($update['message']['id']) ? $update['message']['id']*2 : '-';
                 $mid = isset($update['message']['id']) ? $update['message']['id'] : '-';
-                $this->logger->logger("$msg. My pts: {$cur_state['pts']}, remote pts: {$update['pts']}, remote pts count: {$pts_count}, msg id: {$mid} (*2=$double), channel id: $channel_id", \danog\MadelineProto\Logger::ERROR);
+                $mypts = $cur_state->pts();
+                $this->logger->logger("$msg. My pts: {$mypts}, remote pts: {$update['pts']}, remote pts count: {$pts_count}, msg id: {$mid} (*2=$double), channel id: $channel_id", \danog\MadelineProto\Logger::ERROR);
             };
-            if ($update['pts'] < $cur_state['pts']) {
+            if ($update['pts'] < $cur_state->pts()) {
                 $logger("PTS duplicate");
 
                 return false;
             }
-            if ($cur_state['pts'] + (isset($update['pts_count']) ? $update['pts_count'] : 0) !== $update['pts']) {
+            if ($cur_state->pts() + (isset($update['pts_count']) ? $update['pts_count'] : 0) !== $update['pts']) {
                 $logger("PTS hole");
                 if ($channel_id !== false && yield $this->peer_isset_async($this->to_supergroup($channel_id))) {
                     yield $this->get_channel_difference_async($channel_id);
@@ -428,25 +429,25 @@ trait UpdateHandler
             }
             $logger("PTS OK");
 
-            //$this->logger->logger('Applying pts. my pts: '.$cur_state['pts'].', remote pts: '.$update['pts'].', channel id: '.$channel_id, \danog\MadelineProto\Logger::VERBOSE);
-            $cur_state['pts'] = $update['pts'];
-            if ($channel_id === false && isset($options['date']) && $cur_state['date'] < $options['date']) {
-                $cur_state['date'] = $options['date'];
+            //$this->logger->logger('Applying pts. my pts: '.$cur_state->pts().', remote pts: '.$update['pts'].', channel id: '.$channel_id, \danog\MadelineProto\Logger::VERBOSE);
+            $cur_state->pts($update['pts']);
+            if ($channel_id === false && isset($options['date'])) {
+                $cur_state->date($options['date']);
             }
         }
         if ($channel_id === false && isset($options['seq']) || isset($options['seq_start'])) {
             $seq = $options['seq'];
             $seq_start = isset($options['seq_start']) ? $options['seq_start'] : $options['seq'];
-            if ($seq_start != $cur_state['seq'] + 1 && $seq_start > $cur_state['seq']) {
-                $this->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.$cur_state['seq'].' + 1', \danog\MadelineProto\Logger::ERROR);
+            if ($seq_start != $cur_state->seq() + 1 && $seq_start > $cur_state->seq()) {
+                $this->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.$cur_state->seq().' + 1', \danog\MadelineProto\Logger::ERROR);
                 yield $this->get_updates_difference_async();
 
                 return false;
             }
-            if ($cur_state['seq'] !== $seq) {
-                $cur_state['seq'] = $seq;
-                if (isset($options['date']) && $cur_state['date'] < $options['date']) {
-                    $cur_state['date'] = $options['date'];
+            if ($cur_state->seq() !== $seq) {
+                $cur_state->seq($seq);
+                if (isset($options['date'])) {
+                    $cur_state->date($options['date']);
                 }
             }
         }
@@ -534,22 +535,22 @@ trait UpdateHandler
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
             $cur_state = yield $this->load_update_state_async();
-            if ($cur_state['qts'] === -1) {
-                $cur_state['qts'] = $update['qts'];
+            if ($cur_state->qts() === -1) {
+                $cur_state->qts($update['qts']);
             }
-            if ($update['qts'] < $cur_state['qts']) {
-                $this->logger->logger('Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state['qts'].', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
+            if ($update['qts'] < $cur_state->qts()) {
+                $this->logger->logger('Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
 
                 return false;
             }
-            if ($update['qts'] > $cur_state['qts'] + 1) {
-                $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state['qts'].'+1, chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
+            if ($update['qts'] > $cur_state->qts() + 1) {
+                $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
                 yield $this->get_updates_difference_async();
 
                 return false;
             }
-            $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state['qts'].', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
-            yield $this->method_call_async_read('messages.receivedQueue', ['max_qts' => $cur_state['qts'] = $update['qts']], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+            $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
+            yield $this->method_call_async_read('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             yield $this->handle_encrypted_update_async($update);
 
             return;

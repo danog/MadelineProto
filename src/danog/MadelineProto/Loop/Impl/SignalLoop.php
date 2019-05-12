@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Loop\Impl;
 use Amp\Deferred;
 use Amp\Promise;
 use danog\MadelineProto\Loop\SignalLoopInterface;
+use danog\MadelineProto\Coroutine;
 
 /**
  * Signal loop helper trait.
@@ -44,8 +45,11 @@ abstract class SignalLoop extends Loop implements SignalLoopInterface
         }
     }
 
-    public function waitSignal(Promise $promise): Promise
+    public function waitSignal($promise): Promise
     {
+        if ($promise instanceof \Generator) {
+            $promise = new Coroutine($promise);
+        }
         $this->signalDeferred = new Deferred();
         $dpromise = $this->signalDeferred->promise();
 

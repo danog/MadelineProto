@@ -35,7 +35,7 @@ class UpdatesState
      *
      * @var int
      */
-    private $qts = 0;
+    private $qts = -1;
     /**
      * Seq
      *

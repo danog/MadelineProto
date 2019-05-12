@@ -390,7 +390,7 @@ trait TL
         if ($type['type'] === 'InputMessage' && !is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];
         } elseif (isset($this->tl_callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
-            $object = $this->tl_callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
+            $object = yield $this->tl_callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception("Could not convert {$type['type']} object");
             }
@@ -608,7 +608,7 @@ trait TL
 
             if ($current_argument['type'] === 'InputEncryptedChat' && (!is_array($arguments[$current_argument['name']]) || isset($arguments[$current_argument['name']]['_']) && $this->constructors->find_by_predicate($arguments[$current_argument['name']]['_'])['type'] !== $current_argument['type'])) {
                 if (is_array($arguments[$current_argument['name']])) {
-                    $arguments[$current_argument['name']] = yield $this->get_info_async($arguments[$current_argument['name']])['InputEncryptedChat'];
+                    $arguments[$current_argument['name']] = (yield $this->get_info_async($arguments[$current_argument['name']]))['InputEncryptedChat'];
                 } else {
                     if (!isset($this->secret_chats[$arguments[$current_argument['name']]])) {
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
@@ -850,7 +850,7 @@ trait TL
 
         if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
             foreach ($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) {
-                $callback($x);
+                $this->call($callback($x));
             }
         } elseif ($x['_'] === 'rpc_result'
             && isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'])
