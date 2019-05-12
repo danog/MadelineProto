@@ -139,7 +139,6 @@ trait PeerHandler
 
     public function cache_pwr_chat($id, $full_fetch, $send)
     {
-            Loop::defer(function () use ($id, $full_fetch, $send) {
                 $this->call((function () use ($id, $full_fetch, $send) {
                 try {
                     yield $this->get_pwr_chat_async($id, $full_fetch, $send);
@@ -149,7 +148,6 @@ trait PeerHandler
                     $this->logger->logger("While caching: ".$e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                 }
                 })());
-            });
     }
 
     public function peer_isset_async($id)

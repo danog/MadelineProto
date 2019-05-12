@@ -113,7 +113,8 @@ trait ResponseHandler
 
                     // Acknowledge that I received the server's response
                     if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
-                        Loop::defer(function () { $this->call($this->get_updates_difference_async()); });
+
+                        $this->call($this->get_updates_difference_async());
                     }
 
                     unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
@@ -256,9 +257,7 @@ trait ResponseHandler
                             unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
 
                             if (strpos($datacenter, 'cdn') === false) {
-                                $updates = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'];
-                                Loop::defer(function () use ($updates) { $this->call($this->handle_updates_async($updates)); });
-                                unset($updates);
+                                $this->call($this->handle_updates_async($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']));
                             }
 
                             unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
@@ -399,13 +398,11 @@ trait ResponseHandler
                                     $this->authorized = self::NOT_LOGGED_IN;
                                     $this->authorization = null;
 
-                                    Loop::defer(function () use ($datacenter, &$request, &$response) {
-                                        $this->call((function () use ($datacenter, &$request, &$response) {
-                                            yield $this->init_authorization_async();
+                                    $this->call((function () use ($datacenter, &$request, &$response) {
+                                        yield $this->init_authorization_async();
 
-                                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
-                                        })());
-                                    });
+                                        $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                    })());
 
                                     return;
                                 case 'AUTH_KEY_UNREGISTERED':
@@ -413,13 +410,11 @@ trait ResponseHandler
                                     if ($this->authorized !== self::LOGGED_IN) {
                                         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
 
-                                        Loop::defer(function () use ($datacenter, &$request, &$response) {
-                                            $this->call((function () use ($datacenter, &$request, &$response) {
-                                                yield $this->init_authorization_async();
+                                        $this->call((function () use ($datacenter, &$request, &$response) {
+                                            yield $this->init_authorization_async();
 
-                                                $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
-                                            })());
-                                        });
+                                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                        })());
 
                                         return;
                                     }
@@ -450,35 +445,29 @@ trait ResponseHandler
                                         $this->authorized = self::NOT_LOGGED_IN;
                                         $this->authorization = null;
 
-                                        Loop::defer(function () use ($datacenter, &$request, &$response) {
-                                            $this->call((function () use ($datacenter, &$request, &$response) {
-                                                yield $this->init_authorization_async();
+                                        $this->call((function () use ($datacenter, &$request, &$response) {
+                                            yield $this->init_authorization_async();
 
-                                                $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
-                                            })());
-                                        });
+                                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                        })());
 
                                         return;
                                     }
-                                    Loop::defer(function () use ($request_id, $datacenter) {
-                                        $this->call((function () use ($request_id, $datacenter) {
-                                            yield $this->init_authorization_async();
+                                    $this->call((function () use ($request_id, $datacenter) {
+                                        yield $this->init_authorization_async();
 
-                                            $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
-                                        })());
-                                    });
+                                        $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                    })());
 
                                     return;
                                 case 'AUTH_KEY_PERM_EMPTY':
                                     $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', \danog\MadelineProto\Logger::ERROR);
 
                                     $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
-                                    Loop::defer(function () use ($request_id, $datacenter) {
-                                        $this->call((function () use ($request_id, $datacenter) {
-                                            yield $this->init_authorization_async();
-                                            $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
-                                        })());
-                                    });
+                                    $this->call((function () use ($request_id, $datacenter) {
+                                        yield $this->init_authorization_async();
+                                        $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                    })());
 
                                     return;
                             }
@@ -528,13 +517,10 @@ trait ResponseHandler
                             $this->logger->logger('Set time delta to '.$this->datacenter->sockets[$datacenter]->time_delta, \danog\MadelineProto\Logger::WARNING);
                             $this->reset_session();
                             $this->datacenter->sockets[$datacenter]->temp_auth_key = null;
-                            Loop::defer(function () use ($request_id, $datacenter) {
-
-                                $this->call((function () use ($datacenter, $request_id) {
-                                    yield $this->init_authorization_async();
-                                    $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
-                                })());
-                            });
+                            $this->call((function () use ($datacenter, $request_id) {
+                                yield $this->init_authorization_async();
+                                $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                            })());
 
                             return;
                     }
@@ -557,19 +543,17 @@ trait ResponseHandler
         $botAPI = isset($request['botAPI']) && $request['botAPI'];
         unset($request);
         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
-        Loop::defer(function () use ($request_id, $response, $datacenter, $botAPI) {
-            $this->call((
-                function () use ($request_id, $response, $datacenter, $botAPI) {
-                    $r = isset($response['_']) ? $response['_'] : json_encode($response);
-                    $this->logger->logger("Deferred: sent $r to deferred");
-                    if ($botAPI) {
-                        $response = yield $this->MTProto_to_botAPI_async($response);
-                    }
-                    $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
-                    unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']);
+        $this->call((
+            function () use ($request_id, $response, $datacenter, $botAPI) {
+                $r = isset($response['_']) ? $response['_'] : json_encode($response);
+                $this->logger->logger("Deferred: sent $r to deferred");
+                if ($botAPI) {
+                    $response = yield $this->MTProto_to_botAPI_async($response);
                 }
-            )());
-        });
+                $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
+                unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']);
+            }
+        )());
     }
 
     public function handle_pending_updates_async()
