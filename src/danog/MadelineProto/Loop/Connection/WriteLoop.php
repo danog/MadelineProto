@@ -48,7 +48,7 @@ class WriteLoop extends ResumableSignalLoop
         while (true) {
             if (empty($connection->pending_outgoing)) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger('Exiting write loop');
+                    $API->logger->logger("Exiting write loop in DC $datacenter");
                     $this->exitedLoop();
                     yield new Success(0);
 

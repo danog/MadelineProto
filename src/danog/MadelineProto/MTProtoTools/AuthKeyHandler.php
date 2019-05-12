@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use danog\MadelineProto\Exception;
+
 /**
  * Manages the creation of the authorization key.
  *
@@ -562,6 +564,7 @@ trait AuthKeyHandler
     // Creates authorization keys
     public function init_authorization_async()
     {
+        var_dump((string) new Exception());
         if ($this->pending_auth) {
             return;
         }
@@ -591,13 +594,18 @@ trait AuthKeyHandler
                 };
             }
             if ($dcs) {
-                yield array_shift($dcs)();
+                $first = array_shift($dcs)();
+                var_dumP("Yielding first ");
+                var_dump(yield $first);
+                var_dumP("Yielded first");
             }
 
             foreach ($dcs as $id => &$dc) {
                 $dc = $dc();
             }
+            var_dump("yielding all", array_keys($dcs));
             yield $dcs;
+            var_dump("yielded all");
 
             foreach ($postpone as $id => $socket) {
                 yield $this->init_authorization_socket_async($id, $socket);
@@ -620,7 +628,6 @@ trait AuthKeyHandler
     public function init_authorization_socket_async($id, $socket)
     {
         $this->init_auth_dcs[$id] = true;
-
         try {
             if ($socket->session_id === null) {
                 $socket->session_id = $this->random(8);
@@ -629,7 +636,6 @@ trait AuthKeyHandler
             }
             $cdn = strpos($id, 'cdn');
             $media = strpos($id, 'media');
-
             if ($socket->temp_auth_key === null || $socket->auth_key === null) {
                 $dc_config_number = isset($this->settings['connection_settings'][$id]) ? $id : 'all';
                 if ($socket->auth_key === null && !$cdn && !$media) {
@@ -651,7 +657,9 @@ trait AuthKeyHandler
                         //$socket->authorized = false;
 
                         $socket->temp_auth_key = null;
+                        var_dump("creating auth k $id");
                         $socket->temp_auth_key = yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                        var_dump("done creating auth k $id");
                         yield $this->bind_temp_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
 
                         //$socket->authorized = $authorized;

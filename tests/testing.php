@@ -126,7 +126,7 @@ if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y')
     /**
      * Request a secret chat.
      */
-    $secret_chat_id = $MadelineProto->API->request_secret_chat(getenv('TEST_SECRET_CHAT'));
+    $secret_chat_id = $MadelineProto->request_secret_chat(getenv('TEST_SECRET_CHAT'));
     echo 'Waiting for '.getenv('TEST_SECRET_CHAT').' (secret chat id '.$secret_chat_id.') to accept the secret chat...'.PHP_EOL;
 
     /*

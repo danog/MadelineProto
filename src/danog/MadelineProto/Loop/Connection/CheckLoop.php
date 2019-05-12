@@ -44,7 +44,7 @@ class CheckLoop extends ResumableSignalLoop
         while (true) {
             while (empty($connection->new_outgoing)) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger('Exiting check loop');
+                    $API->logger->logger("Exiting check loop in DC {$datacenter}");
                     $this->exitedLoop();
 
                     return;
@@ -129,7 +129,7 @@ class CheckLoop extends ResumableSignalLoop
                 }
                 //$t = time();
                 if (yield $this->waitSignal($this->pause($timeout))) {
-                    $API->logger->logger('Exiting check loop');
+                    $API->logger->logger("Exiting check loop in DC $datacenter");
                     $this->exitedLoop();
 
                     return;
@@ -146,7 +146,7 @@ class CheckLoop extends ResumableSignalLoop
                 }
             } else {
                 if (yield $this->waitSignal($this->pause($timeout))) {
-                    $API->logger->logger('Exiting check loop');
+                    $API->logger->logger("Exiting check loop in DC $datacenter");
                     $this->exitedLoop();
 
                     return;

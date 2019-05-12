@@ -68,10 +68,10 @@ class ReadLoop extends SignalLoop
 
             if (is_int($error)) {
                 $this->exitedLoop();
-                yield $connection->reconnect();
 
                 if ($error === -404) {
                     if ($connection->temp_auth_key !== null) {
+                        yield $connection->reconnect();
                         $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", \danog\MadelineProto\Logger::WARNING);
                         $connection->temp_auth_key = null;
                         $connection->session_id = null;
@@ -80,13 +80,16 @@ class ReadLoop extends SignalLoop
                         }
                         yield $API->init_authorization_async();
                     } else {
-                        //throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                        yield $connection->reconnect();
                     }
                 } elseif ($error === -1) {
+                    yield $connection->reconnect();
                     $API->logger->logger("WARNING: Got quick ack from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
                 } elseif ($error === 0) {
+                    yield $connection->reconnect();
                     $API->logger->logger("Got NOOP from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
                 } else {
+                    yield $connection->reconnect();
                     throw new \danog\MadelineProto\RPCErrorException($error, $error);
                 }
 

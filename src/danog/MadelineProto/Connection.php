@@ -92,21 +92,6 @@ class Connection
         return $this->ctx;
     }
 
-    /**
-     * Connect function.
-     *
-     * Connects to a telegram DC using the specified protocol, proxy and connection parameters
-     *
-     * @param string $proxy Proxy class name
-     *
-     * @internal
-     *
-     * @return \Amp\Promise
-     */
-    public function connect(ConnectionContext $ctx): Promise
-    {
-        return $this->call($this->connectAsync($ctx));
-    }
 
     /**
      * Connect function.
@@ -119,7 +104,7 @@ class Connection
      *
      * @return \Amp\Promise
      */
-    public function connectAsync(ConnectionContext $ctx): \Generator
+    public function connect(ConnectionContext $ctx): \Generator
     {
         $this->API->logger->logger("Trying connection via $ctx", \danog\MadelineProto\Logger::WARNING);
 
@@ -170,12 +155,8 @@ class Connection
         }
     }
 
-    public function sendMessage($message, $flush = true): Promise
-    {
-        return $this->call($this->sendMessageGenerator($message, $flush));
-    }
 
-    public function sendMessageGenerator($message, $flush = true): \Generator
+    public function sendMessage($message, $flush = true): \Generator
     {
         $deferred = new Deferred();
 
@@ -229,14 +210,9 @@ class Connection
         }
     }
 
-    public function reconnect(): Promise
+    public function reconnect(): \Generator
     {
-        return $this->call($this->reconnectAsync());
-    }
-
-    public function reconnectAsync(): \Generator
-    {
-        $this->API->logger->logger('Reconnecting');
+        $this->API->logger->logger("Reconnecting DC {$this->datacenter}");
         $this->disconnect();
         yield $this->API->datacenter->dcConnectAsync($this->ctx->getDc());
     }

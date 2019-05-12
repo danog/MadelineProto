@@ -57,11 +57,19 @@ final class Coroutine implements Promise
     /** @var mixed Promise success value when executing next coroutine step, null at all other times. */
     private $value;
 
+    private $frames = [];
+
     /**
      * @param \Generator $generator
      */
     public function __construct(\Generator $generator)
     {
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+        $frame = '';
+        $frame .= basename($backtrace[1]['file']).': '.$backtrace[2]['function'];
+        $this->frames []= $frame;
+        var_dump($frame);
+
         $this->generator = $generator;
 
         try {
@@ -73,7 +81,7 @@ final class Coroutine implements Promise
                     return;
                 }
                 if (!$this->generator->valid()) {
-                    if (method_exists($this->generator, 'getReturn')) {
+                    if (PHP_MAJOR_VERSION >= 7) {
                         $this->resolve($this->generator->getReturn());
                     } else {
                         $this->resolve(null);
@@ -83,6 +91,8 @@ final class Coroutine implements Promise
                     return;
                 }
                 $yielded = $this->transform($yielded);
+            } else {
+                var_dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
             }
         } catch (\Throwable $exception) {
             $this->fail($exception);
@@ -121,7 +131,7 @@ final class Coroutine implements Promise
                         }
 
                         if (!$this->generator->valid()) {
-                            if (method_exists($this->generator, 'getReturn')) {
+                            if (PHP_MAJOR_VERSION >= 7) {
                                 $this->resolve($this->generator->getReturn());
                             } else {
                                 $this->resolve(null);

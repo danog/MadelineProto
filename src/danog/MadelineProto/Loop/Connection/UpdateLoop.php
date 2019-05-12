@@ -50,7 +50,7 @@ class UpdateLoop extends ResumableSignalLoop
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger('Exiting update loop');
+                    $API->logger->logger("Exiting update loop in DC $datacenter");
                     $this->exitedLoop();
 
                     return;
@@ -62,7 +62,7 @@ class UpdateLoop extends ResumableSignalLoop
                 }
             }
             if (yield $this->waitSignal($this->pause(($API->last_getdifference + $timeout) - time()))) {
-                $API->logger->logger('Exiting update loop');
+                $API->logger->logger("Exiting update loop in DC $datacenter");
                 $this->exitedLoop();
 
                 return;

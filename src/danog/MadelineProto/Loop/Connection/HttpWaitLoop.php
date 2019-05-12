@@ -50,7 +50,7 @@ class HttpWaitLoop extends ResumableSignalLoop
         while (true) {
             //var_dump("http loop DC $datacenter");
             if ($a = yield $this->waitSignal($this->pause())) {
-                $API->logger->logger('Exiting HTTP wait loop');
+                $API->logger->logger("Exiting HTTP wait loop in DC $datacenter");
                 $this->exitedLoop();
 
                 return;
@@ -63,7 +63,7 @@ class HttpWaitLoop extends ResumableSignalLoop
             }
             while ($connection->temp_auth_key === null) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger('Exiting HTTP wait loop');
+                    $API->logger->logger("Exiting HTTP wait loop in DC $datacenter");
                     $this->exitedLoop();
 
                     return;

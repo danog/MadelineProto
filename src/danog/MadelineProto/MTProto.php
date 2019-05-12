@@ -405,6 +405,7 @@ class MTProto implements TLCallback
         if (yield $this->get_self_async()) {
             $this->authorized = self::LOGGED_IN;
         }
+
         if ($this->authorized === self::LOGGED_IN) {
             yield $this->get_cdn_config_async($this->datacenter->curdc);
             $this->setup_logger();
@@ -857,7 +858,7 @@ class MTProto implements TLCallback
 
     public function get_phone_config_async($watcherId = null)
     {
-        if ($this->authorized === self::LOGGED_IN && class_exists('\\danog\\MadelineProto\\VoIPServerConfig') && !$this->authorization['user']['bot']) {
+        if ($this->authorized === self::LOGGED_IN && class_exists('\\danog\\MadelineProto\\VoIPServerConfig') && !$this->authorization['user']['bot'] && $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->temp_auth_key !== null) {
             $this->logger->logger("Fetching phone config...");
             VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]));
         } else {
