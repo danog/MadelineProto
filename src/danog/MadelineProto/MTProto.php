@@ -274,7 +274,7 @@ class MTProto implements TLCallback
         unset($this->settings['pwr']['update_handler']);
         $this->updates = [];
         }*/
-        $keys = array_keys((array) get_object_vars($this));
+        /*$keys = array_keys((array) get_object_vars($this));
         if (count($keys) !== count(array_unique($keys))) {
             throw new Bug74586Exception();
         }
@@ -283,7 +283,7 @@ class MTProto implements TLCallback
                 $this->{$k} = $v;
             }
             unset($this->data);
-        }
+        }*/
         if ($this->authorized === true) {
             $this->authorized = self::LOGGED_IN;
         }
