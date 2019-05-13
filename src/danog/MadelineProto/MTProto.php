@@ -336,7 +336,7 @@ class MTProto implements TLCallback
             }
 
             foreach ($this->full_chats as $id => $full) {
-                $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
+                if (isset($full['full'], $full['last_update'])) $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
             }
             foreach ($this->secret_chats as $key => &$chat) {
                 if (!is_array($chat)) {
