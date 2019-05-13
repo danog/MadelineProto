@@ -200,16 +200,28 @@ trait Tools
         } elseif (!($promise instanceof Promise)) {
             return $promise;
         }
+
+        $resolved = false;
         do {
             try {
-                return wait($promise);
-            } catch (\Throwable $e) {
-                if ($e->getMessage() !== 'Loop stopped without resolving the promise') {
-                    //$this->logger->logger("AN EXCEPTION SURFACED " . $e, \danog\MadelineProto\Logger::ERROR);
-                    throw $e;
-                }
+                Loop::run(function () use (&$resolved, &$value, &$exception, $promise) {
+                    $promise->onResolve(function ($e, $v) use (&$resolved, &$value, &$exception) {
+                        Loop::stop();
+                        $resolved = true;
+                        $exception = $e;
+                        $value = $v;
+                    });
+                });
+            } catch (\Throwable $throwable) {
+                throw new \Error("Loop exceptionally stopped without resolving the promise", 0, $throwable);
             }
-        } while (true);
+        } while (!$resolved);
+
+        if ($exception) {
+            throw $exception;
+        }
+
+        return $value;
     }
     public function all($promises)
     {
