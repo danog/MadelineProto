@@ -29,7 +29,7 @@ if (!file_exists(__DIR__.'/../vendor/autoload.php')) {
  */
 if (file_exists('.env')) {
     echo 'Loading .env...'.PHP_EOL;
-    $dotenv = new Dotenv\Dotenv(getcwd());
+    $dotenv = Dotenv\Dotenv::create(getcwd());
     $dotenv->load();
 }
 if (getenv('TEST_SECRET_CHAT') == '') {
