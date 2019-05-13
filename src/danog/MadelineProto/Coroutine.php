@@ -33,7 +33,6 @@ use Amp\Failure;
 use Amp\Internal;
 use Amp\Promise;
 use Amp\Success;
-use React\Promise\PromiseInterface as ReactPromise;
 
 /**
  * Creates a promise from a generator function yielding promises.
@@ -67,7 +66,7 @@ final class Coroutine implements Promise
 
         try {
             $yielded = $this->generator->current();
-            if (!$yielded instanceof Promise) {
+            while (!$yielded instanceof Promise) {
                 if ($yielded instanceof \YieldReturnValue) {
                     $this->resolve($yielded->getReturn());
                     $this->generator->next();
@@ -82,7 +81,11 @@ final class Coroutine implements Promise
 
                     return;
                 }
-                $yielded = $this->transform($yielded);
+                if ($yielded instanceof \Generator) {
+                    $yielded = new self($yielded);
+                } else {
+                    $yielded = $this->generator->send($yielded);
+                }
             }
         } catch (\Throwable $exception) {
             $this->fail($exception);
@@ -111,12 +114,11 @@ final class Coroutine implements Promise
                         // Send the new value and execute to next yield statement.
                         $yielded = $this->generator->send($this->value);
                     }
-                    if (!$yielded instanceof Promise) {
+                    while (!$yielded instanceof Promise) {
                         if ($yielded instanceof \YieldReturnValue) {
                             $this->resolve($yielded->getReturn());
                             $this->onResolve = null;
                             $this->generator->next();
-
                             return;
                         }
 
@@ -130,7 +132,11 @@ final class Coroutine implements Promise
 
                             return;
                         }
-                        $yielded = $this->transform($yielded);
+                        if ($yielded instanceof \Generator) {
+                            $yielded = new self($yielded);
+                        } else {
+                            $yielded = $this->generator->send($yielded);
+                        }
                     }
                     $this->immediate = false;
                     $yielded->onResolve($this->onResolve);
@@ -139,47 +145,11 @@ final class Coroutine implements Promise
             } catch (\Throwable $exception) {
                 $this->fail($exception);
                 $this->onResolve = null;
-
             } finally {
                 $this->exception = null;
                 $this->value = null;
             }
         };
         $yielded->onResolve($this->onResolve);
-    }
-
-    /**
-     * Attempts to transform the non-promise yielded from the generator into a promise, otherwise returns an instance
-     * `Amp\Failure` failed with an instance of `Amp\InvalidYieldError`.
-     *
-     * @param mixed $yielded Non-promise yielded from generator.
-     *
-     * @return \Amp\Promise
-     */
-    private function transform($yielded): Promise
-    {
-        try {
-            if ($yielded instanceof \Generator) {
-                return new self($yielded);
-            }
-            if (\is_array($yielded)) {
-                foreach ($yielded as &$val) {
-                    if ($val instanceof \Generator) {
-                        $val = new self($val);
-                    }
-                }
-
-                return Promise\all($yielded);
-            }
-
-            if ($yielded instanceof ReactPromise) {
-                return Promise\adapt($yielded);
-            }
-            // No match, continue to returning Failure below.
-        } catch (\Throwable $exception) {
-            // Conversion to promise failed, fall-through to returning Failure below.
-        }
-
-        return $yielded instanceof \Throwable || $yielded instanceof \Exception ? new Failure($yielded) : new Success($yielded);
     }
 }

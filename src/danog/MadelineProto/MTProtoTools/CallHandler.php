@@ -125,7 +125,7 @@ trait CallHandler
                     $this->datacenter->sockets[$aargs['datacenter']]->writer->resume();
                 }
 
-                return yield $promises;
+                return yield all($promises);
             }
             $args = yield $this->botAPI_to_MTProto_async($args);
             if (isset($args['ping_id']) && is_int($args['ping_id'])) {

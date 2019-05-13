@@ -23,6 +23,7 @@ use danog\MadelineProto\Async\AsyncParameters;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\RPCErrorException;
+use function Amp\Promise\all;
 
 /**
  * Manages upload and download of files.
@@ -118,7 +119,7 @@ trait Files
             $promises[] = $read_deferred->promise();
         }
 
-        $result = yield $promises;
+        $result = yield all($promises);
         foreach ($result as $key => $result) {
             if (!$result) {
                 throw new \danog\MadelineProto\Exception('Upload of part '.$key.' failed');

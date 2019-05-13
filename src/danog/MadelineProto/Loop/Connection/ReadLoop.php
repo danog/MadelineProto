@@ -99,9 +99,9 @@ class ReadLoop extends SignalLoop
             $connection->http_res_count++;
 
             try {
-                $API->logger->logger("Handling messages from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                $API->handle_messages($datacenter);
-                $API->logger->logger("Handled messages from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                //$API->logger->logger("Handling messages from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                Loop::defer([$API, 'handle_messages'], $datacenter);
+                //$API->logger->logger("Handled messages from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             } finally {
                 $this->exitedLoop();
             }

@@ -19,11 +19,12 @@
 namespace danog\MadelineProto;
 
 use Amp\Deferred;
+use Amp\Failure;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
+use function Amp\Promise\all;
 use function Amp\Promise\wait;
-use Amp\Failure;
 
 /**
  * Some tools.
@@ -210,7 +211,13 @@ trait Tools
             }
         } while (true);
     }
-
+    public function all($promises)
+    {
+        foreach ($promises as &$promise) {
+            $promise = $this->call($promise);
+        }
+        return all($promises);
+    }
     public function call($promise)
     {
         if ($promise instanceof \Generator) {
@@ -223,11 +230,16 @@ trait Tools
     }
     public function callFork($promise)
     {
-        $this->call($promise)->onResolve(function ($e, $res) {
-            if ($e) {
-                $this->rethrow($e);
-            }
-        });
+        if ($promise instanceof \Generator) {
+            $promise = new Coroutine($promise);
+        }
+        if ($promise instanceof Promise) {
+            $promise->onResolve(function ($e, $res) {
+                if ($e) {
+                    $this->rethrow($e);
+                }
+            });
+        }
     }
     public function rethrow($e)
     {

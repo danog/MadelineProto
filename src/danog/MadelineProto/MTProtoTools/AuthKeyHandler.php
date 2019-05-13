@@ -606,12 +606,11 @@ trait AuthKeyHandler
             foreach ($dcs as $id => &$dc) {
                 $dc = $dc();
             }
-            yield $dcs;
+            yield $this->all($dcs);
 
             foreach ($postpone as $id => $socket) {
                 yield $this->init_authorization_socket_async($id, $socket);
             }
-            //foreach ($dcs as $dc) { yield $dc; }
 
             if ($this->pending_auth && empty($this->init_auth_dcs)) {
                 $this->pending_auth = false;
