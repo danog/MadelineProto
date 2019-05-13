@@ -370,7 +370,7 @@ trait BotAPI
                 $data['document']['_'] = 'bot_'.$type_name;
                 $res['file_size'] = $data['document']['size'];
                 $res['mime_type'] = $data['document']['mime_type'];
-                $res['file_id'] = $this->base64url_encode($this->rle_encode(yield $this->serialize_object_async(['type' => 'File'], $data['document'], 'File').chr(2)));
+                $res['file_id'] = $this->base64url_encode($this->rle_encode((yield $this->serialize_object_async(['type' => 'File'], $data['document'], 'File')).chr(2)));
 
                 return [$type_name => $res, 'caption' => isset($data['caption']) ? $data['caption'] : ''];
             default:

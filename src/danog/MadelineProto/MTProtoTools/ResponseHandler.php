@@ -61,7 +61,9 @@ trait ResponseHandler
             $datacenter = $actual_datacenter;
         }
         $only_updates = true;
-        foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
+        while ($this->datacenter->sockets[$datacenter]->new_incoming) {
+            reset($this->datacenter->sockets[$datacenter]->new_incoming);
+            $current_msg_id = key($this->datacenter->sockets[$datacenter]->new_incoming);
             $this->logger->logger((isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['from_container']) ? 'Inside of container, received ' : 'Received ').$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].' from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']) {
@@ -127,8 +129,9 @@ trait ResponseHandler
                         $this->datacenter->sockets[$datacenter]->check_message_id($message['msg_id'], ['outgoing' => false, 'container' => true]);
                         $this->datacenter->sockets[$datacenter]->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body'], 'from_container' => true];
                         $this->datacenter->sockets[$datacenter]->new_incoming[$message['msg_id']] = $message['msg_id'];
-                        $this->handle_messages($datacenter);
                     }
+                    ksort($this->datacenter->sockets[$datacenter]->new_incoming);
+                    $this->handle_messages($datacenter);
                     $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
 
                     unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
