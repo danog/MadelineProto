@@ -30,6 +30,8 @@ trait PrettyException
 
     public function prettify_tl($init = '')
     {
+        $eol = PHP_EOL;
+        if (php_sapi_name() !== 'cli') $eol = '<br>'.PHP_EOL;
         $tl = false;
         foreach (array_reverse($this->getTrace()) as $k => $frame) {
             if (isset($frame['function']) && in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
@@ -39,7 +41,7 @@ trait PrettyException
                 }
             } else {
                 if ($tl) {
-                    $this->tl_trace .= PHP_EOL;
+                    $this->tl_trace .= $eol;
                 }
                 if (isset($frame['function']) && ($frame['function'] === 'handle_rpc_error' && $k === count($this->getTrace()) - 1) || $frame['function'] === 'unserialize') {
                     continue;
@@ -48,11 +50,11 @@ trait PrettyException
                 $this->tl_trace .= isset($frame['function']) ? $frame['function'].'(' : '';
                 $this->tl_trace .= isset($frame['args']) ? substr(json_encode($frame['args']), 1, -1) : '';
                 $this->tl_trace .= ')';
-                $this->tl_trace .= PHP_EOL;
+                $this->tl_trace .= $eol;
                 $tl = false;
             }
         }
         $this->tl_trace .= $init !== '' ? "['".$init."']" : '';
-        $this->tl_trace = implode(PHP_EOL, array_reverse(explode(PHP_EOL, $this->tl_trace)));
+        $this->tl_trace = implode($eol, array_reverse(explode($eol, $this->tl_trace)));
     }
 }
