@@ -257,7 +257,7 @@ class DataCenter
                             list($first, $second) = [array_slice($orig, 0, 2), array_slice($orig, 2)];
                             $first[] = [$proxy, $extra];
                             $combo = array_merge($first, $second);
-                        } elseif ($orig[1][0] === WssStream::getName()) {
+                        } elseif (in_array($orig[1][0], [WsStream::getName(), WssStream::getName()])) {
                             list($first, $second) = [array_slice($orig, 0, 1), array_slice($orig, 1)];
                             $first[] = [BufferedRawStream::getName(), []];
                             $first[] = [$proxy, $extra];

@@ -158,7 +158,7 @@ class Connection
     }
 
 
-    public function sendMessage($message, $flush = true): \Generator
+    public function sendMessage($message, $flush = true)
     {
         $deferred = new Deferred();
 
@@ -191,7 +191,7 @@ class Connection
             $this->writer->resume();
         }
 
-        return yield $deferred->promise();
+        return $deferred->promise();
     }
 
     public function setExtra($extra)
