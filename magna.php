@@ -307,5 +307,4 @@ foreach (['my_users', 'times', 'times_messages', 'calls'] as $key) {
 }
 
 $MadelineProto->setEventHandler('\EventHandler');
-
 $MadelineProto->loop();

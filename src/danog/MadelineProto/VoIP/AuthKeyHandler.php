@@ -28,7 +28,18 @@ namespace danog\MadelineProto\VoIP;
 trait AuthKeyHandler
 {
     private $calls = [];
-
+    public function request_call($user)
+    {
+        return $this->wait($this->request_call_async($user));
+    }
+    public function accept_call($user)
+    {
+        return $this->wait($this->accept_call_async($user));
+    }
+    public function discard_call($user)
+    {
+        return $this->wait($this->discard_call_async($user));
+    }
     public function request_call_async($user)
     {
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {

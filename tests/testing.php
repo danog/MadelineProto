@@ -43,6 +43,7 @@ $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
  */
 echo 'Loading MadelineProto...'.PHP_EOL;
 $MadelineProto = new \danog\MadelineProto\API(getcwd().'/testing.madeline', $settings);
+var_dump($MadelineProto->get_dialogs_full());
 
 try {
     $MadelineProto->get_self();
