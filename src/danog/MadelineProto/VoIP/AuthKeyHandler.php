@@ -36,9 +36,9 @@ trait AuthKeyHandler
     {
         return $this->wait($this->accept_call_async($user));
     }
-    public function discard_call($user)
+    public function discard_call($call, $reason, $rating = [], $need_debug = true)
     {
-        return $this->wait($this->discard_call_async($user));
+        return $this->wait($this->discard_call_async($call, $reason, $rating, $need_debug));
     }
     public function request_call_async($user)
     {
