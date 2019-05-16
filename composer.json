@@ -24,12 +24,11 @@
         "amphp/socket": "^0.10.11",
         "amphp/log": "^1.0",
         "amphp/parser": "^1.0",
-        "amphp/dns": "dev-master#861cc857b1ba6e02e8a7439c30403682785fce96 as 0.9.9",
         "amphp/websocket": "dev-master",
         "amphp/websocket-client": "dev-master",
         "amphp/artax": "^3.0",
         "amphp/file": "^0.3.5",
-        "amphp/uri": "dev-master as 0.1.4"
+        "amphp/uri": "^0.1.4"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1",
