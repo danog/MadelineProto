@@ -38,6 +38,7 @@ use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
 use danog\MadelineProto\TL\Conversion\Exception;
+use Amp\Artax\Cookie\ArrayCookieJar;
 
 /**
  * Manages datacenters.
@@ -67,12 +68,13 @@ class DataCenter
             if ($socket instanceof Connection && !strpos($key, '_bk')) {
                 $this->API->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
                 $socket->old = true;
+                $socket->setExtra($this->API);
                 $socket->disconnect();
             } else {
                 unset($this->sockets[$key]);
             }
         }
-        $this->HTTPClient = new DefaultClient(null, new HttpSocketPool(new ProxySocketPool($this)));
+        $this->HTTPClient = new DefaultClient(new ArrayCookieJar, new HttpSocketPool(new ProxySocketPool($this)));
     }
     public function rawConnectAsync(string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null): \Generator
     {
@@ -170,10 +172,10 @@ class DataCenter
             default:
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
         }
-        if ($this->settings[$dc_config_number]['obfuscated'] && !in_array($default[1][0], [HttpsStream::getName(), HttpStream::getName()])) {
+        if ($this->settings[$dc_config_number]['obfuscated'] && !in_array($default[2][0], [HttpsStream::getName(), HttpStream::getName()])) {
             $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
         }
-        if ($this->settings[$dc_config_number]['transport'] && !in_array($default[1][0], [HttpsStream::getName(), HttpStream::getName()])) {
+        if ($this->settings[$dc_config_number]['transport'] && !in_array($default[2][0], [HttpsStream::getName(), HttpStream::getName()])) {
             switch ($this->settings[$dc_config_number]['transport']) {
                 case 'tcp':
                     if ($this->settings[$dc_config_number]['obfuscated']) {

@@ -16,7 +16,6 @@
         "vlucas/phpdotenv": "^3",
         "erusev/parsedown": "^1.6",
         "rollbar/rollbar": "dev-master",
-        "ext-curl": "*",
         "ext-mbstring": "*",
         "ext-json": "*",
         "ext-xml": "*",
@@ -28,7 +27,8 @@
         "amphp/websocket-client": "dev-master",
         "amphp/artax": "^3.0",
         "amphp/file": "^0.3.5",
-        "amphp/uri": "^0.1.4"
+        "amphp/uri": "^0.1.4",
+        "amphp/byte-stream": "dev-master#bc191a8 as 1.5"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1",

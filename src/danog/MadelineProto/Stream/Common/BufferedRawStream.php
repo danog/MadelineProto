@@ -42,7 +42,6 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     protected $memory_stream;
     private $append = '';
     private $append_after = 0;
-
     /**
      * Asynchronously connect to a TCP/TLS server.
      *
@@ -178,7 +177,6 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
             $chunk = yield $this->read();
             if ($chunk === null) {
                 $this->disconnect();
-
                 throw new \danog\MadelineProto\NothingInTheSocketException();
             }
             fwrite($this->memory_stream, $chunk);

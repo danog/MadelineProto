@@ -38,7 +38,9 @@ class CheckLoop extends ResumableSignalLoop
         $this->startedLoop();
         $API->logger->logger("Entered check loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
 
-        $timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
+        $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
+
+        $timeout = $API->settings['connection_settings'][$dc_config_number]['timeout'];
         while (true) {
             while (empty($connection->new_outgoing)) {
                 if (yield $this->waitSignal($this->pause())) {
@@ -52,7 +54,7 @@ class CheckLoop extends ResumableSignalLoop
             if ($connection->hasPendingCalls()) {
                 $last_recv = $connection->get_max_id(true);
                 if ($connection->temp_auth_key !== null) {
-                    $message_ids = array_values($connection->new_outgoing);
+                    $message_ids = $connection->getPendingCalls();//array_values($connection->new_outgoing);
                     $deferred = new Deferred();
                     $deferred->promise()->onResolve(
                         function ($e, $result) use ($message_ids, $API, $connection, $datacenter) {
@@ -109,6 +111,7 @@ class CheckLoop extends ResumableSignalLoop
                         }
                     );
                     $list = '';
+                    // Don't edit this here pls
                     foreach ($message_ids as $message_id) {
                         $list .= $connection->outgoing_messages[$message_id]['_'].', ';
                     }
@@ -126,7 +129,6 @@ class CheckLoop extends ResumableSignalLoop
                     }
                     $connection->writer->resume();
                 }
-                //$t = time();
                 if (yield $this->waitSignal($this->pause($timeout))) {
                     $API->logger->logger("Exiting check loop in DC $datacenter");
                     $this->exitedLoop();

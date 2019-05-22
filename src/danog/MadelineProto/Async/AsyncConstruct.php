@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Serialization module.
+ * Async constructor abstract class.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -17,24 +16,38 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto;
+namespace danog\MadelineProto\Async;
+
+use danog\MadelineProto\Tools;
 
 /**
- * Manages serialization of the MadelineProto instance.
+ * Async constructor class.
+ *
+ * Manages asynchronous construction and wakeup of classes
+ *
+ * @author Daniil Gentili <daniil@daniil.it>
  */
-class Serialization
+class AsyncConstruct
 {
-    public static function serialize_all($exception)
+    use Tools;
+    public $asyncInitPromise;
+    public function init()
     {
-        echo $exception.PHP_EOL;
-
-        return;
+        if ($this->asyncInitPromise) {
+            $this->wait($this->asyncInitPromise);
+        }
     }
-
-    public static function realpaths($file)
+    public function initAsync()
     {
-        $file = Absolute::absolute($file);
-
-        return ['file' => $file, 'lockfile' => $file.'.lock', 'tempfile' => $file.'.temp.session'];
+        if ($this->asyncInitPromise) {
+            yield $this->asyncInitPromise;
+        }
+    }
+    public function setInitPromise($promise)
+    {
+        $this->asyncInitPromise = $this->call($promise);
+        $this->asyncInitPromise->onResolve(function () {
+            $this->asyncInitPromise = null;
+        });
     }
 }

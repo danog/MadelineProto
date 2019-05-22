@@ -29,7 +29,7 @@ if (!isset($backtrace[0]["file"]) || !in_array(basename($backtrace[0]["file"]), 
     die("madeline.phar cannot be required manually: use the automatic loader, instead: https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple".PHP_EOL);
 }
 if (isset($backtrace[1]["file"])) {
-    chdir(dirname($backtrace[1]["file"]));
+    @chdir(dirname($backtrace[1]["file"]));
 }
 if ($contents = file_get_contents("https://phar.madelineproto.xyz/phar.php?v=new")) {
     file_put_contents($backtrace[0]["file"], $contents);

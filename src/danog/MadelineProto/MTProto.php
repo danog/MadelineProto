@@ -26,11 +26,12 @@ use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
+use danog\MadelineProto\Async\AsyncConstruct;
 
 /**
  * Manages all of the mtproto stuff.
  */
-class MTProto implements TLCallback
+class MTProto extends AsyncConstruct implements TLCallback
 {
     use \danog\Serializable;
     use \danog\MadelineProto\MTProtoTools\AckHandler;
@@ -142,20 +143,18 @@ class MTProto implements TLCallback
     public $setdem = false;
     public $storage = [];
     private $postpone_updates = false;
-    private $altervista = false;
     private $supportUser = 0;
     public $referenceDatabase;
     public $update_deferred;
     public $phoneConfigWatcherId;
 
-    public $asyncInitPromise;
 
     public function __magic_construct($settings = [])
     {
-        $this->asyncInitPromise = $this->call($this->__async_construct($settings));
+        $this->setInitPromise($this->__construct_async($settings));
     }
 
-    public function __async_construct($settings = [])
+    public function __construct_async($settings = [])
     {
         \danog\MadelineProto\Magic::class_exists();
         // Parse settings
@@ -215,7 +214,6 @@ class MTProto implements TLCallback
         }
         yield $this->get_config_async([], ['datacenter' => $this->datacenter->curdc]);
         $this->v = self::V;
-
     }
 
     public function __sleep()
@@ -225,7 +223,7 @@ class MTProto implements TLCallback
 
     public function isAltervista()
     {
-        return $this->altervista;
+        return Magic::$altervista;
     }
 
     public function isInitingAuthorization()
@@ -236,9 +234,9 @@ class MTProto implements TLCallback
     public function __wakeup()
     {
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
-        $this->asyncInitPromise = $this->call($this->__async_wakeup($backtrace));
+        $this->setInitPromise($this->__wakeup_async($backtrace));
     }
-    public function __async_wakeup($backtrace)
+    public function __wakeup_async($backtrace)
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         set_exception_handler(['\\danog\\MadelineProto\\Serialization', 'serialize_all']);
@@ -267,7 +265,6 @@ class MTProto implements TLCallback
             $this->referenceDatabase = new ReferenceDatabase($this);
         }
         $this->update_callbacks([$this, $this->referenceDatabase]);
-        $this->altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
 
         $this->settings['connection_settings']['all']['ipv6'] = \danog\MadelineProto\Magic::$ipv6;
         /*if (isset($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'] === $this->settings['updates']['callback']) {
@@ -374,7 +371,7 @@ class MTProto implements TLCallback
             $this->reset_session(true, true);
             $this->config = ['expires' => -1];
             $this->dh_config = ['version' => 0];
-            yield $this->__async_construct($settings);
+            yield $this->__construct_async($settings);
             $force = true;
             foreach ($this->secret_chats as $chat => $data) {
                 try {
@@ -548,7 +545,6 @@ class MTProto implements TLCallback
             $app_version = '4.9.1 (13613)';
         }
 
-        $this->altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
         // Set default settings
         $default_settings = ['authorization' => [
             // Authorization settings
@@ -615,7 +611,7 @@ class MTProto implements TLCallback
             // connection settings
             'all' => [
                 // These settings will be applied on every datacenter that hasn't a custom settings subarray...
-                'protocol' => $this->altervista ? 'http' : 'tcp_abridged',
+                'protocol' => Magic::$altervista ? 'http' : 'tcp_abridged',
                 // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, obfuscated2, udp (unsupported)
                 'test_mode' => false,
                 // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
@@ -623,9 +619,9 @@ class MTProto implements TLCallback
                 // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
                 'timeout' => 2,
                 // timeout for sockets
-                'proxy' => $this->altervista ? '\\HttpProxy' : '\\Socket',
+                'proxy' => Magic::$altervista ? '\\HttpProxy' : '\\Socket',
                 // The proxy class to use
-                'proxy_extra' => $this->altervista ? ['address' => 'localhost', 'port' => 80] : [],
+                'proxy_extra' => Magic::$altervista ? ['address' => 'localhost', 'port' => 80] : [],
                 // Extra parameters to pass to the proxy class using setExtra
                 'obfuscated' => false,
                 'transport' => 'tcp',

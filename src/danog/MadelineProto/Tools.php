@@ -252,6 +252,7 @@ trait Tools
                 }
             });
         }
+        return $promise;
     }
     public function rethrow($e)
     {

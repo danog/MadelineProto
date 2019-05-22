@@ -94,7 +94,6 @@ class Connection
         return $this->ctx;
     }
 
-
     /**
      * Connect function.
      *
@@ -157,7 +156,6 @@ class Connection
         }
     }
 
-
     public function sendMessage($message, $flush = true)
     {
         $deferred = new Deferred();
@@ -201,6 +199,7 @@ class Connection
 
     public function disconnect()
     {
+        $this->API->logger->logger("Disconnecting from DC {$this->datacenter}");
         $this->old = true;
         foreach (['reader', 'writer', 'checker', 'waiter', 'updater'] as $loop) {
             if (isset($this->{$loop}) && $this->{$loop}) {
@@ -210,6 +209,7 @@ class Connection
         if ($this->stream) {
             $this->stream->disconnect();
         }
+        $this->API->logger->logger("Disconnected from DC {$this->datacenter}");
     }
 
     public function reconnect(): \Generator
@@ -226,17 +226,49 @@ class Connection
 
         $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
         $timeout = $API->settings['connection_settings'][$dc_config_number]['timeout'];
+        $pfs = $API->settings['connection_settings'][$dc_config_number]['pfs'];
+
         foreach ($this->new_outgoing as $message_id) {
             if (isset($this->outgoing_messages[$message_id]['sent'])
                 && $this->outgoing_messages[$message_id]['sent'] + $timeout < time()
                 && ($this->temp_auth_key === null) === $this->outgoing_messages[$message_id]['unencrypted']
                 && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
             ) {
+                if ($pfs && !isset($this->temp_auth_key['bound']) && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+                    continue;
+                }
                 return true;
             }
         }
 
         return false;
+    }
+
+    public function getPendingCalls()
+    {
+        $API = $this->API;
+        $datacenter = $this->datacenter;
+
+        $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
+        $timeout = $API->settings['connection_settings'][$dc_config_number]['timeout'];
+        $pfs = $API->settings['connection_settings'][$dc_config_number]['pfs'];
+
+        $result = [];
+        foreach ($this->new_outgoing as $message_id) {
+            if (isset($this->outgoing_messages[$message_id]['sent'])
+                && $this->outgoing_messages[$message_id]['sent'] + $timeout < time()
+                && ($this->temp_auth_key === null) === $this->outgoing_messages[$message_id]['unencrypted']
+                && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
+            ) {
+                if ($pfs && !isset($this->temp_auth_key['bound']) && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+                    continue;
+                }
+
+                $result[] = $message_id;
+            }
+        }
+
+        return $result;
     }
 
     public function getName(): string

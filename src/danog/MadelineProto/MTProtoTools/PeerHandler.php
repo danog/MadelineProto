@@ -790,15 +790,6 @@ trait PeerHandler
     {
         $settings = isset($this->settings['connection_settings'][$this->datacenter->curdc]) ? $this->settings['connection_settings'][$this->datacenter->curdc] : $this->settings['connection_settings']['all'];
         if (!isset($this->settings['pwr']) || $this->settings['pwr']['pwr'] === false || $settings['test_mode']) {
-            /*
-            try {
-            if (isset($res['username'])) {
-            shell_exec('curl '.escapeshellarg('https://api.pwrtelegram.xyz/getchat?chat_id=@'.$res['username']).' -s -o /dev/null >/dev/null 2>/dev/null & ');
-            }
-            } catch (\danog\MadelineProto\Exception $e) {
-            $this->logger->logger([$e->getMessage());
-            }
-             */
             return;
         }
         if (!empty($res)) {

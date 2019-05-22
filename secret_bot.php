@@ -92,7 +92,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
 
 if (file_exists('.env')) {
     echo 'Loading .env...'.PHP_EOL;
-    $dotenv = new Dotenv\Dotenv(getcwd());
+    $dotenv = Dotenv\Dotenv::create(getcwd());
     $dotenv->load();
 }
 

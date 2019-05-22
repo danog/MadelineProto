@@ -19,33 +19,36 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use function Amp\ByteStream\getOutput;
+
 trait Templates
 {
-    public function web_echo($message = '')
+    public function web_echo_async($message = '')
     {
+        $stdout = getOutput();
         switch ($this->authorized) {
             case self::NOT_LOGGED_IN:
             if (isset($_POST['type'])) {
                 if ($_POST['type'] === 'phone') {
-                    echo $this->web_echo_template('Enter your phone number<br><b>'.$message.'</b>', '<input type="text" name="phone_number" placeholder="Phone number" required/>');
+                    yield $stdout->write($this->web_echo_template('Enter your phone number<br><b>'.$message.'</b>', '<input type="text" name="phone_number" placeholder="Phone number" required/>'));
                 } else {
-                    echo $this->web_echo_template('Enter your bot token<br><b>'.$message.'</b>', '<input type="text" name="token" placeholder="Bot token" required/>');
+                    yield $stdout->write($this->web_echo_template('Enter your bot token<br><b>'.$message.'</b>', '<input type="text" name="token" placeholder="Bot token" required/>'));
                 }
             } else {
-                echo $this->web_echo_template('Do you want to login as user or bot?<br><b>'.$message.'</b>', '<select name="type"><option value="phone">User</option><option value="bot">Bot</option></select>');
+                yield $stdout->write($this->web_echo_template('Do you want to login as user or bot?<br><b>'.$message.'</b>', '<select name="type"><option value="phone">User</option><option value="bot">Bot</option></select>'));
             }
             break;
 
             case self::WAITING_CODE:
-            echo $this->web_echo_template('Enter your code<br><b>'.$message.'</b>', '<input type="text" name="phone_code" placeholder="Phone code" required/>');
+            yield $stdout->write($this->web_echo_template('Enter your code<br><b>'.$message.'</b>', '<input type="text" name="phone_code" placeholder="Phone code" required/>'));
             break;
 
             case self::WAITING_PASSWORD:
-            echo $this->web_echo_template('Enter your password<br><b>'.$message.'</b>', '<input type="password" name="password" placeholder="Hint: '.$this->authorization['hint'].'" required/>');
+            yield $stdout->write($this->web_echo_template('Enter your password<br><b>'.$message.'</b>', '<input type="password" name="password" placeholder="Hint: '.$this->authorization['hint'].'" required/>'));
             break;
 
             case self::WAITING_SIGNUP:
-            echo $this->web_echo_template('Sign up please<br><b>'.$message.'</b>', '<input type="text" name="first_name" placeholder="First name" required/><input type="text" name="last_name" placeholder="Last name"/>');
+            yield $stdout->write($this->web_echo_template('Sign up please<br><b>'.$message.'</b>', '<input type="text" name="first_name" placeholder="First name" required/><input type="text" name="last_name" placeholder="Last name"/>'));
             break;
         }
     }

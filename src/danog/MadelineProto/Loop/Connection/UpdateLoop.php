@@ -35,7 +35,6 @@ class UpdateLoop extends ResumableSignalLoop
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
-        $connection = $this->connection;
 
         if (!$this->API->settings['updates']['handle_updates']) {
             yield new Success(0);

@@ -107,7 +107,7 @@ class ReadLoop extends SignalLoop
             }
             $this->startedLoop();
             if ($this->API->is_http($datacenter)) {
-                $this->API->datacenter->sockets[$datacenter]->waiter->resume();
+                Loop::defer([$connection->waiter, 'resume']);
             }
         }
     }
@@ -118,6 +118,7 @@ class ReadLoop extends SignalLoop
         $datacenter = $this->datacenter;
         $connection = $this->connection;
         if (isset($this->connection->old)) {
+            $API->logger->logger("Not reading because connection is old");
             throw new NothingInTheSocketException();
         }
 

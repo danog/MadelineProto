@@ -18,6 +18,8 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Artax\Request;
+
 /**
  * Wrapper for my.telegram.org.
  */
@@ -25,119 +27,98 @@ class MyTelegramOrgWrapper
 {
     private $logged = false;
     private $hash = '';
+    private $token;
+    private $number;
+    private $creation_hash;
+    private $settings;
     const MY_TELEGRAM_URL = 'https://my.telegram.org';
 
-    public function __construct($number)
+    public function __sleep()
     {
-        if (!extension_loaded('curl')) {
-            throw new Exception(['extension', 'curl']);
+        return ['logged', 'hash', 'token', 'number', 'creation_hash', 'settings'];
+    }
+    public function __construct($settings)
+    {
+        if (!isset($settings['all'])) {
+            $settings['connection_settings'] = ['all' => [
+                // These settings will be applied on every datacenter that hasn't a custom settings subarray...
+                'protocol' => Magic::$altervista ? 'http' : 'tcp_abridged',
+                // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, obfuscated2, udp (unsupported)
+                'test_mode' => false,
+                // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
+                'ipv6' => \danog\MadelineProto\Magic::$ipv6,
+                // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
+                'timeout' => 2,
+                // timeout for sockets
+                'proxy' => Magic::$altervista ? '\\HttpProxy' : '\\Socket',
+                // The proxy class to use
+                'proxy_extra' => Magic::$altervista ? ['address' => 'localhost', 'port' => 80] : [],
+                // Extra parameters to pass to the proxy class using setExtra
+                'obfuscated' => false,
+                'transport' => 'tcp',
+                'pfs' => extension_loaded('gmp'),
+            ],
+            ];
         }
+        $this->settings = $settings;
+        $this->__wakeup();
+    }
+    public function __wakeup()
+    {
+        $this->datacenter = new DataCenter(
+            new class($this->settings)
+        {
+                public function __construct($settings)
+            {
+                    $this->logger = new Logger(
+                        isset($settings['logger']['logger']) ? $settings['logger']['logger'] : php_sapi_name() === 'cli' ? 3 : 2,
+                        isset($settings['logger']['logger_param']) ? $settings['logger']['logger_param'] : Magic::$script_cwd.'/MadelineProto.log',
+                        isset($settings['logger']['logger_level']) ? $settings['logger']['logger_level'] : Logger::VERBOSE,
+                        isset($settings['logger']['max_size']) ? $settings['logger']['max_size'] : 100 * 1024 * 1024);
+                }
+            },
+            [],
+            $this->settings['connection_settings']
+        );
+    }
+    public function login_async($number)
+    {
         $this->number = $number;
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, self::MY_TELEGRAM_URL.'/auth/send_password');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(['phone' => $number]));
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-
-        $headers = $this->get_headers('origin', []);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            throw new Exception('Curl error: '.curl_error($ch));
-        }
-        curl_close($ch);
+        $request = new Request(self::MY_TELEGRAM_URL.'/auth/send_password', 'POST');
+        $request = $request->withBody(http_build_query(['phone' => $number]));
+        $request = $request->withHeaders($this->getHeaders('origin'));
+        $response = yield $this->datacenter->getHTTPClient()->request($request);
+        $result = yield $response->getBody();
         $resulta = json_decode($result, true);
+
         if (!isset($resulta['random_hash'])) {
             throw new Exception($result);
         }
         $this->hash = $resulta['random_hash'];
     }
 
-    /**
-     * Function for generating curl request headers.
-     */
-    private function get_headers($httpType, $cookies)
-    {
-        // Common header flags.
-        $headers = [];
-        $headers[] = 'Dnt: 1';
-        $headers[] = 'Connection: keep-alive';
-        $headers[] = 'Accept-Language: it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4';
-        $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
-
-        // Add additional headers based on the type of request.
-        switch ($httpType) {
-        case 'origin':
-          $headers[] = 'Origin: '.self::MY_TELEGRAM_URL;
-          $headers[] = 'Accept-Encoding: gzip, deflate, br';
-          $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
-          $headers[] = 'Accept: application/json, text/javascript, */*; q=0.01';
-          $headers[] = 'Referer: '.self::MY_TELEGRAM_URL.'/auth';
-          $headers[] = 'X-Requested-With: XMLHttpRequest';
-        break;
-        case 'refer':
-          $headers[] = 'Accept-Encoding: gzip, deflate, sdch, br';
-          $headers[] = 'Upgrade-Insecure-Requests: 1';
-          $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
-          $headers[] = 'Referer: '.self::MY_TELEGRAM_URL;
-          $headers[] = 'Cache-Control: max-age=0';
-        break;
-        case 'app':
-          $headers[] = 'Origin: '.self::MY_TELEGRAM_URL;
-          $headers[] = 'Accept-Encoding: gzip, deflate, br';
-          $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
-          $headers[] = 'Accept: */*';
-          $headers[] = 'Referer: '.self::MY_TELEGRAM_URL.'/apps';
-          $headers[] = 'X-Requested-With: XMLHttpRequest';
-        break;
-        }
-
-        // Add every cookie to the header.
-        foreach ($cookies as $cookie) {
-            $headers[] = 'Cookie: '.$cookie;
-        }
-
-        return $headers;
-    }
-
-    public function complete_login($password)
+    public function complete_login_async($password)
     {
         if ($this->logged) {
             throw new Exception('Already logged in!');
         }
-        $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, self::MY_TELEGRAM_URL.'/auth/login');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(['phone' => $this->number, 'random_hash' => $this->hash, 'password' => $password]));
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
+        $request = new Request(self::MY_TELEGRAM_URL.'/auth/login', 'POST');
+        $request = $request->withBody(http_build_query(['phone' => $this->number, 'random_hash' => $this->hash, 'password' => $password]));
+        $request = $request->withHeaders($this->getHeaders('origin'));
+        $request = $request->withHeader('user-agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
+        $response = yield $this->datacenter->getHTTPClient()->request($request);
+        $result = yield $response->getBody();
 
-        $headers = $this->get_headers('origin', []);
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            throw new Exception('Curl error: '.curl_error($ch));
-        }
-        curl_close($ch);
-
-        list($response_headers, $response_content) = preg_split('/(\r\n){2}/', $result, 2);
-        switch ($response_content) {
+        switch ($result) {
             case 'true':
                 //Logger::log(['Login OK'], Logger::VERBOSE);
                 break;
             default:
-                throw new Exception($response_content);
+                throw new Exception($result);
         }
-        $this->token = explode(';', explode('stel_token=', $response_headers)[1])[0];
+
+        $this->token = explode(';', explode('stel_token=', $response->getHeader('Set-Cookie'))[1])[0];
 
         return $this->logged = true;
     }
@@ -147,27 +128,17 @@ class MyTelegramOrgWrapper
         return $this->logged;
     }
 
-    public function has_app()
+    public function has_app_async()
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
         }
-        $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, self::MY_TELEGRAM_URL.'/apps');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
+        $request = new Request(self::MY_TELEGRAM_URL.'/apps');
+        $request = $request->withHeaders($this->getHeaders('refer'));
+        $response = yield $this->datacenter->getHTTPClient()->request($request);
+        $result = yield $response->getBody();
 
-        $cookies = [];
-        array_push($cookies, 'stel_token='.$this->token);
-        $headers = $this->get_headers('refer', $cookies);
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            throw new Exception('Curl error: '.curl_error($ch));
-        }
-        curl_close($ch);
         $title = explode('</title>', explode('<title>', $result)[1])[0];
         switch ($title) {
             case 'App configuration':return true;
@@ -180,27 +151,16 @@ class MyTelegramOrgWrapper
         throw new Exception($title);
     }
 
-    public function get_app()
+    public function get_app_async()
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
         }
-        $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, self::MY_TELEGRAM_URL.'/apps');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-
-        $cookies = [];
-        array_push($cookies, 'stel_token='.$this->token);
-        $headers = $this->get_headers('refer', $cookies);
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            throw new Exception('Curl error: '.curl_error($ch));
-        }
-        curl_close($ch);
+        $request = new Request(self::MY_TELEGRAM_URL.'/apps');
+        $request = $request->withHeaders($this->getHeaders('refer'));
+        $response = yield $this->datacenter->getHTTPClient()->request($request);
+        $result = yield $response->getBody();
 
         $cose = explode('<label for="app_id" class="col-md-4 text-right control-label">App api_id:</label>
       <div class="col-md-7">
@@ -216,58 +176,29 @@ class MyTelegramOrgWrapper
         return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
     }
 
-    public function create_app($settings)
+    public function create_app_async($settings)
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
         }
-        if ($this->has_app()) {
+        if (yield $this->has_app_async()) {
             throw new Exception('The app was already created!');
         }
 
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, self::MY_TELEGRAM_URL.'/apps/create');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(['hash' => $this->creation_hash, 'app_title' => $settings['app_title'], 'app_shortname' => $settings['app_shortname'], 'app_url' => $settings['app_url'], 'app_platform' => $settings['app_platform'], 'app_desc' => $settings['app_desc']]));
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-
-        $cookies = [];
-        array_push($cookies, 'stel_token='.$this->token);
-        $headers = $this->get_headers('app', $cookies);
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            throw new Exception('Curl error:'.curl_error($ch));
-        }
-        curl_close($ch);
+        $request = new Request(self::MY_TELEGRAM_URL.'/apps/create', 'POST');
+        $request = $request->withHeaders($this->getHeaders('app'));
+        $request = $request->withBody(http_build_query(['hash' => $this->creation_hash, 'app_title' => $settings['app_title'], 'app_shortname' => $settings['app_shortname'], 'app_url' => $settings['app_url'], 'app_platform' => $settings['app_platform'], 'app_desc' => $settings['app_desc']]));
+        $response = yield $this->datacenter->getHTTPClient()->request($request);
+        $result = yield $response->getBody();
 
         if ($result) {
             throw new Exception($result);
         }
 
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, self::MY_TELEGRAM_URL.'/apps');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-        curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-
-        $cookies = [];
-        array_push($cookies, 'stel_token='.$this->token);
-        $headers = $this->get_headers('refer', $cookies);
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            throw new Exception('Curl error:'.curl_error($ch));
-        }
-        curl_close($ch);
+        $request = new Request(self::MY_TELEGRAM_URL.'/apps');
+        $request = $request->withHeaders($this->getHeaders('refer'));
+        $response = yield $this->datacenter->getHTTPClient()->request($request);
+        $result = yield $response->getBody();
 
         $title = explode('</title>', explode('<title>', $result)[1])[0];
         if ($title === 'Create new application') {
@@ -289,4 +220,53 @@ class MyTelegramOrgWrapper
 
         return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
     }
+
+    /**
+     * Function for generating curl request headers.
+     */
+    private function getHeaders($httpType)
+    {
+        // Common header flags.
+        $headers = [];
+        $headers[] = 'Dnt: 1';
+        $headers[] = 'Connection: keep-alive';
+        $headers[] = 'Accept-Language: it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4';
+        $headers[] = 'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
+
+        // Add additional headers based on the type of request.
+        switch ($httpType) {
+            case 'origin':
+                $headers[] = 'Origin: '.self::MY_TELEGRAM_URL;
+                //$headers[] = 'Accept-Encoding: gzip, deflate, br';
+                $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
+                $headers[] = 'Accept: application/json, text/javascript, */*; q=0.01';
+                $headers[] = 'Referer: '.self::MY_TELEGRAM_URL.'/auth';
+                $headers[] = 'X-Requested-With: XMLHttpRequest';
+                break;
+            case 'refer':
+                //$headers[] = 'Accept-Encoding: gzip, deflate, sdch, br';
+                $headers[] = 'Upgrade-Insecure-Requests: 1';
+                $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
+                $headers[] = 'Referer: '.self::MY_TELEGRAM_URL;
+                $headers[] = 'Cache-Control: max-age=0';
+                break;
+            case 'app':
+                $headers[] = 'Origin: '.self::MY_TELEGRAM_URL;
+                //$headers[] = 'Accept-Encoding: gzip, deflate, br';
+                $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
+                $headers[] = 'Accept: */*';
+                $headers[] = 'Referer: '.self::MY_TELEGRAM_URL.'/apps';
+                $headers[] = 'X-Requested-With: XMLHttpRequest';
+                break;
+        }
+
+        $final_headers = [];
+        foreach ($headers as $header) {
+            list($key, $value) = explode(':', $header, 2);
+            $final_headers[trim($key)] = trim($value);
+        }
+
+        return $final_headers;
+    }
+
 }
