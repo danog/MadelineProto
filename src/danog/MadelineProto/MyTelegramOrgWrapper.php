@@ -25,12 +25,15 @@ use Amp\Artax\Request;
  */
 class MyTelegramOrgWrapper
 {
+    use Tools;
+
     private $logged = false;
     private $hash = '';
     private $token;
     private $number;
     private $creation_hash;
     private $settings;
+    public $async = false;
     const MY_TELEGRAM_URL = 'https://my.telegram.org';
 
     public function __sleep()
@@ -268,5 +271,14 @@ class MyTelegramOrgWrapper
 
         return $final_headers;
     }
-
+    public function async($async)
+    {
+        $this->async = $async;
+    }
+    public function __call($name, $arguments)
+    {
+        $name .= '_async';
+        $async = is_array(end($arguments)) && isset(end($arguments)['async']) ? end($arguments)['async'] : $this->async;
+        return $async ? $this->{$name}(...$arguments) : $this->wait($this->{$name}(...$arguments));
+    }
 }
