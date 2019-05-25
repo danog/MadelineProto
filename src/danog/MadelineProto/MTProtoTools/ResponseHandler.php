@@ -101,8 +101,9 @@ trait ResponseHandler
                     unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
                     $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
                     $only_updates = false;
-
-                    $this->handle_response($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'][$msg_id_type], $current_msg_id, $datacenter);
+                    if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'][$msg_id_type])) {
+                        $this->handle_response($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'][$msg_id_type], $current_msg_id, $datacenter);
+                    }
                     break;
 
                 case 'new_session_created':
