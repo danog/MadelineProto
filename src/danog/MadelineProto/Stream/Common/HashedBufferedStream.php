@@ -24,7 +24,6 @@ use danog\MadelineProto\Stream\Async\Stream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
-use function Amp\call;
 
 /**
  * Hash stream wrapper.
@@ -275,7 +274,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
             return $this->read_buffer->bufferRead($length);
         }
 
-        return call($this->bufferReadAsync($length));
+        return $this->call($this->bufferReadAsync($length));
     }
 
     /**
