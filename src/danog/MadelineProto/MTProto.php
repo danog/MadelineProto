@@ -29,6 +29,7 @@ use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\Loop\Update\FeedLoop;
+use danog\MadelineProto\Loop\Update\SeqLoop;
 
 /**
  * Manages all of the mtproto stuff.
@@ -422,7 +423,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
             yield $this->updaters[false]->resume();
         }
-        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
+        $this->updaters[false]->start();
     }
 
     public function __destruct()
@@ -869,6 +870,10 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->feeders[$channelId]->start();
             $this->updaters[$channelId]->start();
         }
+        if (!isset($this->seqUpdater)) {
+            $this->seqUpdater = new SeqLoop($this);
+        }
+        $this->seqUpdater->start();
     }
 
     public function get_phone_config_async($watcherId = null)

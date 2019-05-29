@@ -83,7 +83,7 @@ class SeqLoop extends ResumableSignalLoop
             }
             while ($this->incomingUpdates) {
                 $updates = $this->incomingUpdates;
-                $this->incomingUpdates = null;
+                $this->incomingUpdates = [];
                 yield $this->parse($updates);
                 $updates = null;
             }
@@ -100,25 +100,28 @@ class SeqLoop extends ResumableSignalLoop
             unset($updates[$key]);
             $options = $update['options'];
             $updates = $update['updates'];
-            unset($update);
 
             $seq_start = $options['seq_start'];
             $seq_end = $options['seq_end'];
+
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
-                $this->logger->logger('Seq hole of $result. seq_start: '.$seq_start.' != cur seq: '.$this->state->seq().' + 1', \danog\MadelineProto\Logger::ERROR);
-                yield $this->updaters[false]->resume();
+                $this->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
+                yield $this->pause(1.0);
+                if (!$this->incomingUpdates) {
+                    yield $this->updaters[false]->resume();
+                }
+                $this->incomingUpdates = array_merge($this->incomingUpdates, [$update], $updates);
 
                 continue;
             }
             if ($result < 0) {
-
+                $this->logger->logger('Seq too old. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
+                continue;
             }
-            if ($this->state->seq() !== $seq) {
-                $this->state->seq($seq);
-                if (isset($options['date'])) {
-                    $this->state->date($options['date']);
-                }
+            $this->state->seq($seq_end);
+            if (isset($options['date'])) {
+                $this->state->date($options['date']);
             }
 
             $this->save($updates);

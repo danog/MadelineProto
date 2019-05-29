@@ -100,7 +100,7 @@ class UpdateLoop extends ResumableSignalLoop
                             $state->update($difference);
                             $feeder->feed($difference['other_updates']);
 
-                            yield $this->handle_update_messages_async($difference['new_messages'], $channel);
+                            $feeder->saveMessages($difference['new_messages']);
                             if (!$difference['final']) {
                                 if ($difference['pts'] >= $toPts) {
                                     unset($difference);
@@ -114,7 +114,7 @@ class UpdateLoop extends ResumableSignalLoop
                         case 'updates.channelDifferenceTooLong':
                             $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
                             $state->update($difference);
-                            yield $this->handle_update_messages_async($difference['messages'], $channel);
+                            $feeder->saveMessages($difference['messages']);
                             unset($difference);
                             break;
                         default:
@@ -137,7 +137,7 @@ class UpdateLoop extends ResumableSignalLoop
                             }
                             $feeder->feed($difference['other_updates']);
                             $feeder->feed($difference['new_encrypted_messages']);
-                            yield $this->handle_update_messages_async($difference['new_messages']);
+                            $feeder->saveMessages($difference['new_messages']);
                             $state->update($difference['state']);
                             unset($difference);
                             break 2;
@@ -147,7 +147,7 @@ class UpdateLoop extends ResumableSignalLoop
                             }
                             $feeder->feed($difference['other_updates']);
                             $feeder->feed($difference['new_encrypted_messages']);
-                            yield $this->handle_update_messages_async($difference['new_messages']);
+                            $feeder->saveMessages($difference['new_messages']);
                             $state->update($difference['intermediate_state']);
                             if ($difference['intermediate_state']['pts'] >= $toPts) {
                                 unset($difference);

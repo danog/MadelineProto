@@ -63,7 +63,7 @@ trait Events
         $this->settings['updates']['run_callback'] = true;
 
         if (isset($this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater) && !$this->asyncInitPromise) {
-            $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
+            $this->updaters[false]->start();
         }
     }
 

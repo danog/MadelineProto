@@ -20,6 +20,7 @@ namespace danog\MadelineProto\Loop\Impl;
 
 use Amp\Promise;
 use danog\MadelineProto\Loop\LoopInterface;
+use danog\MadelineProto\Logger;
 
 /**
  * Loop helper trait.

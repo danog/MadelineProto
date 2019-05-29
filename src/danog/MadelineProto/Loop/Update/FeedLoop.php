@@ -78,14 +78,14 @@ class FeedLoop extends ResumableSignalLoop
 
                 return;
             }
-            if (!$this->settings['updates']['handle_updates']) {
+            if (!$this->API->settings['updates']['handle_updates']) {
                 $API->logger->logger("Exiting update feed loop channel {$this->channelId}");
                 $this->exitedLoop();
                 return;
             }
             while ($this->incomingUpdates) {
                 $updates = $this->incomingUpdates;
-                $this->incomingUpdates = null;
+                $this->incomingUpdates = [];
                 yield $this->parse($updates);
                 $updates = null;
             }
@@ -101,7 +101,6 @@ class FeedLoop extends ResumableSignalLoop
     {
         reset($updates);
         while ($updates) {
-            $options = [];
             $key = key($updates);
             $update = $updates[$key];
             unset($updates[$key]);
@@ -138,10 +137,8 @@ class FeedLoop extends ResumableSignalLoop
                 $logger("PTS OK");
 
                 $this->state->pts($update['pts']);
-                if ($this->channelId === false && isset($options['date'])) {
-                    $this->state->date($options['date']);
-                }
             }
+
             $this->save($update);
         }
     }
@@ -157,6 +154,13 @@ class FeedLoop extends ResumableSignalLoop
     {
         $this->parsedUpdates []= $update;
     }
+    public function saveMessages($messages)
+    {
+        foreach ($messages as $message) {
+            $this->parsedUpdates []= ['_' => $this->channelId === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
+        }
+    }
+
     public function has_all_auth()
     {
         if ($this->API->isInitingAuthorization()) {

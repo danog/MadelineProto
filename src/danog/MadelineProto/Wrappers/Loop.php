@@ -99,7 +99,7 @@ trait Loop
         if (!$this->settings['updates']['run_callback']) {
             $this->settings['updates']['run_callback'] = true;
         }
-        $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
+        $this->updaters[false]->start();
 
         $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
 

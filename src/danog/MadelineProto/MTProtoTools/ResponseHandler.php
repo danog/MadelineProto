@@ -571,7 +571,6 @@ trait ResponseHandler
         }
 
         $this->logger->logger('Parsing updates received via the socket...', \danog\MadelineProto\Logger::VERBOSE);
-
         $result = [];
         switch ($updates['_']) {
             case 'updates':
@@ -585,6 +584,7 @@ trait ResponseHandler
                         unset($updates['updates'][$key]);
                     }
                 }
+
                 if ($updates['updates']) {
                     if ($updates['_'] === 'updatesCombined') {
                         $updates['updates'][0]['options'] = ['seq_start' => $updates['seq_start'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
@@ -592,7 +592,7 @@ trait ResponseHandler
                         $updates['updates'][0]['options'] = ['seq_start' => $updates['seq'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
                     }
                     foreach ($updates as $update) {
-                        $result[yield $this->feedSingle($update)] = true;
+                        $result[yield $this->seqUpdater->feed($update)] = true;
                     }
                 }
                 break;

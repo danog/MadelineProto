@@ -62,7 +62,7 @@ trait UpdateHandler
     {
         if (!$this->settings['updates']['handle_updates']) {
             $this->settings['updates']['handle_updates'] = true;
-            $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
+            $this->updaters[false]->start();
         }
         if (!$this->settings['updates']['run_callback']) {
             $this->settings['updates']['run_callback'] = true;
@@ -236,13 +236,6 @@ trait UpdateHandler
         }
         $this->feeders[$channelId]->feedSingle($update);
         return $channelId;
-    }
-
-    public function handle_update_messages_async($messages, $channel = false)
-    {
-        foreach ($messages as $message) {
-            yield $this->save_update_async(['_' => $channel === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => ($channel === false ? (yield $this->load_update_state_async()) : $this->channels_state->get($channel))->pts(), 'pts_count' => 0]);
-        }
     }
 
     public function save_update_async($update)
