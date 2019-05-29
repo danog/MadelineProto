@@ -29,6 +29,16 @@ use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
  */
 class CheckLoop extends ResumableSignalLoop
 {
+    protected $connection;
+    protected $datacenter;
+
+    public function __construct($API, $datacenter)
+    {
+        $this->API = $API;
+        $this->datacenter = $datacenter;
+        $this->connection = $API->datacenter->sockets[$datacenter];
+    }
+    
     public function loop()
     {
         $API = $this->API;

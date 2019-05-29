@@ -158,12 +158,15 @@ class APIFactory extends AsyncConstruct
             yield $this->initAsync();
         }
         if (Magic::is_fork() && !Magic::$processed_fork) {
+            throw new Exception("Forking not supported");
+            /*
             \danog\MadelineProto\Logger::log('Detected fork');
             $this->API->reset_session();
             foreach ($this->API->datacenter->sockets as $datacenter) {
                 yield $datacenter->reconnect();
             }
             Magic::$processed_fork = true;
+            */
         }
         if (isset($this->session) && !is_null($this->session) && time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
             Logger::log("Didn't serialize in a while, doing that now...");

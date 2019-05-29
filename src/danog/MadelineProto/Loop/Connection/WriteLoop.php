@@ -36,6 +36,16 @@ class WriteLoop extends ResumableSignalLoop
     use Crypt;
     use Tools;
 
+    protected $connection;
+    protected $datacenter;
+
+    public function __construct($API, $datacenter)
+    {
+        $this->API = $API;
+        $this->datacenter = $datacenter;
+        $this->connection = $API->datacenter->sockets[$datacenter];
+    }
+    
     public function loop(): \Generator
     {
         $API = $this->API;

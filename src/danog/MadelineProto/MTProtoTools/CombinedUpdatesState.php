@@ -40,12 +40,15 @@ class CombinedUpdatesState
     /**
      * Update multiple parameters
      *
-     * @param array $init
+     * @param array|null $init
      * @param integer $channel
      * @return UpdatesState
      */
-    public function get($channel, $init = [])
+    public function get($channel = null, $init = [])
     {
+        if ($channel === null) {
+            return $this->states;
+        }
         if (!isset($this->states[$channel])) {
             return $this->states[$channel] = new UpdatesState($init, $channel);
         }

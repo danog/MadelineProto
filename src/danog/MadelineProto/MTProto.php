@@ -20,13 +20,15 @@
 namespace danog\MadelineProto;
 
 use Amp\Loop;
+use danog\MadelineProto\Async\AsyncConstruct;
+use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\TL\TLCallback;
-use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
-use danog\MadelineProto\Async\AsyncConstruct;
+use danog\MadelineProto\Loop\Update\UpdateLoop;
+use danog\MadelineProto\Loop\Update\FeedLoop;
 
 /**
  * Manages all of the mtproto stuff.
@@ -147,7 +149,8 @@ class MTProto extends AsyncConstruct implements TLCallback
     public $referenceDatabase;
     public $update_deferred;
     public $phoneConfigWatcherId;
-
+    public $feeders = [];
+    public $updaters = [];
 
     public function __magic_construct($settings = [])
     {
@@ -179,6 +182,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!($this->channels_state instanceof CombinedUpdatesState)) {
             $this->channels_state = new CombinedUpdatesState($this->channels_state);
         }
+        $this->channels_state->__construct([false => $this->updates_state]);
         if (!isset($this->datacenter)) {
             $this->datacenter = new DataCenter($this, $this->settings['connection'], $this->settings['connection_settings']);
         }
@@ -273,13 +277,13 @@ class MTProto extends AsyncConstruct implements TLCallback
         }*/
         /*$keys = array_keys((array) get_object_vars($this));
         if (count($keys) !== count(array_unique($keys))) {
-            throw new Bug74586Exception();
+        throw new Bug74586Exception();
         }
         if (isset($this->data)) {
-            foreach ($this->data as $k => $v) {
-                $this->{$k} = $v;
-            }
-            unset($this->data);
+        foreach ($this->data as $k => $v) {
+        $this->{$k} = $v;
+        }
+        unset($this->data);
         }*/
         if ($this->authorized === true) {
             $this->authorized = self::LOGGED_IN;
@@ -290,6 +294,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (is_array($this->channels_state)) {
             $this->channels_state = new CombinedUpdatesState($this->channels_state);
         }
+        $this->channels_state->__construct([false => $this->updates_state]);
 
         $this->postpone_updates = false;
         if ($this->event_handler && class_exists($this->event_handler) && is_subclass_of($this->event_handler, '\danog\MadelineProto\EventHandler')) {
@@ -333,7 +338,10 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
 
             foreach ($this->full_chats as $id => $full) {
-                if (isset($full['full'], $full['last_update'])) $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
+                if (isset($full['full'], $full['last_update'])) {
+                    $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
+                }
+
             }
             foreach ($this->secret_chats as $key => &$chat) {
                 if (!is_array($chat)) {
@@ -385,6 +393,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
         if (!$this->settings['updates']['handle_old_updates']) {
             $this->channels_state = new CombinedUpdatesState();
+            $this->channels_state->__construct([false => $this->updates_state]);
             $this->got_state = false;
         }
         yield $this->connect_to_all_dcs_async();
@@ -848,6 +857,18 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
 
         yield $this->get_phone_config_async();
+
+        foreach ($this->channels_state->get() as $state) {
+            $channelId = $state->getChannel();
+            if (!isset($this->feeders[$channelId])) {
+                $this->feeders[$channelId] = new FeedLoop($this, $channelId);
+            }
+            if (!isset($this->updaters[$channelId])) {
+                $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
+            }
+            $this->feeders[$channelId]->start();
+            $this->updaters[$channelId]->start();
+        }
     }
 
     public function get_phone_config_async($watcherId = null)

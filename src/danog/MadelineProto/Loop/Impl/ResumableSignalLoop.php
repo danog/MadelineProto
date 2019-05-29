@@ -23,6 +23,7 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Loop\ResumableLoopInterface;
+use danog\MadelineProto\Tools;
 
 /**
  * Resumable signal loop helper trait.
@@ -31,7 +32,9 @@ use danog\MadelineProto\Loop\ResumableLoopInterface;
  */
 abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopInterface
 {
+    use Tools;
     private $resume;
+    private $pause;
     private $resumeWatcher;
 
     public function pause($time = null): Promise
@@ -46,10 +49,13 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
                     $this->resumeWatcher = null;
                 }
                 $this->resumeWatcher = Loop::delay($time * 1000, [$this, 'resume'], $resume);
-                //var_dump("resume {$this->resumeWatcher} ".get_class($this)." DC {$this->datacenter} after ", ($time * 1000), $resume);
             }
         }
         $this->resume = new Deferred();
+
+        $pause = $this->pause;
+        $this->pause = new Deferred;
+        Loop::defer([$pause, 'resolve']);
 
         return $this->resume->promise();
     }
@@ -64,14 +70,18 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
                 return;
             }
         }
-        /*
-        if ($expected) {
-        //var_dump("=======", "resume $watcherId ".get_class($this)." DC {$this->datacenter} diff ".(microtime(true) - $expected).": expected $expected, actual ".microtime(true));
-        }*/
         if ($this->resume) {
             $resume = $this->resume;
             $this->resume = null;
             $resume->resolve();
+
+            return $this->pause ? $this->pause->promise() : null;
         }
+    }
+
+    public function resumeDefer()
+    {
+        Loop::defer([$this, 'resume']);
+        return $this->pause ? $this->pause->promise() : null;
     }
 }

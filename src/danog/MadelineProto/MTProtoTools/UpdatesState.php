@@ -44,7 +44,7 @@ class UpdatesState
     private $seq = 0;
     /**
      * Date
-     * 
+     *
      * @var int
      */
     private $date = 1;
@@ -64,7 +64,7 @@ class UpdatesState
     private $syncLoading = false;
 
     /**
-     * Init function 
+     * Init function
      *
      * @param array $init Initial parameters
      * @param boolean $channelId Channel ID
@@ -181,5 +181,16 @@ class UpdatesState
             $this->date = $set;
         }
         return $this->date;
+    }
+
+    /**
+     * Check validity of PTS contained in update
+     *
+     * @param array $update
+     * @return int -1 if it's too old, 0 if it's ok, 1 if it's too new
+     */
+    public function checkPts($update)
+    {
+        return ($this->pts + $update['pts_count']) - $update['pts'];
     }
 }

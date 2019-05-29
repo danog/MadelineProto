@@ -19,7 +19,6 @@
 namespace danog\MadelineProto\Loop\Impl;
 
 use Amp\Promise;
-use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\LoopInterface;
 
 /**
@@ -36,20 +35,15 @@ abstract class Loop implements LoopInterface
     private $count = 0;
 
     protected $API;
-    protected $connection;
-    protected $datacenter;
-
-    public function __construct($API, $datacenter)
+    public function __construct($API)
     {
         $this->API = $API;
-        $this->datacenter = $datacenter;
-        $this->connection = $API->datacenter->sockets[$datacenter];
     }
 
     public function start()
     {
         if ($this->count) {
-            $this->API->logger->logger("NOT entering check loop in DC {$this->datacenter} with running count {$this->count}", Logger::ERROR);
+            $this->API->logger->logger("NOT entering loop with running count {$this->count}", Logger::ERROR);
 
             return false;
         }

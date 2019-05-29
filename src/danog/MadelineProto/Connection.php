@@ -23,7 +23,6 @@ use Amp\Promise;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
 use danog\MadelineProto\Loop\Connection\ReadLoop;
-use danog\MadelineProto\Loop\Connection\UpdateLoop;
 use danog\MadelineProto\Loop\Connection\WriteLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -128,9 +127,6 @@ class Connection
         if (!isset($this->waiter)) {
             $this->waiter = new HttpWaitLoop($this->API, $this->datacenter);
         }
-        if (!isset($this->updater)) {
-            $this->updater = new UpdateLoop($this->API, $this->datacenter);
-        }
         foreach ($this->new_outgoing as $message_id) {
             if ($this->outgoing_messages[$message_id]['unencrypted']) {
                 $promise = $this->outgoing_messages[$message_id]['promise'];
@@ -151,9 +147,6 @@ class Connection
         }
         $this->waiter->start();
 
-        if ($this->datacenter === $this->API->settings['connection_settings']['default_dc']) {
-            $this->updater->start();
-        }
     }
 
     public function sendMessage($message, $flush = true)

@@ -1,0 +1,190 @@
+<?php
+/**
+ * Update feeder loop.
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2018 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
+
+namespace danog\MadelineProto\Loop\Connection;
+
+use Amp\Success;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+
+/**
+ * update feed loop.
+ *
+ * @author Daniil Gentili <daniil@daniil.it>
+ */
+class FeedLoop extends ResumableSignalLoop
+{
+    use \danog\MadelineProto\Tools;
+    private $incomingUpdates = [];
+    private $parsedUpdates = [];
+    private $channelId;
+    private $updater;
+
+    public function __construct($API, $channelId = false)
+    {
+        $this->API = $API;
+        $this->channelId = $channelId;
+    }
+    public function loop()
+    {
+        $API = $this->API;
+        $updater = $this->updater = $API->updater[$this->channelId];
+
+        if (!$this->API->settings['updates']['handle_updates']) {
+            yield new Success(0);
+
+            return false;
+        }
+
+        $this->startedLoop();
+        $API->logger->logger("Entered update feed loop in channel {$this->channelId}", Logger::ULTRA_VERBOSE);
+        while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
+            if (yield $this->waitSignal($this->pause())) {
+                $API->logger->logger("Exiting update feed loop in channel {$this->channelId}");
+                $this->exitedLoop();
+
+                return;
+            }
+        }
+        $this->state = $this->channelId === false ? (yield $API->load_update_state_async()) : $API->loadChannelState($this->channelId);
+
+        while (true) {
+            while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
+                if (yield $this->waitSignal($this->pause())) {
+                    $API->logger->logger("Exiting update feed loop channel {$this->channelId}");
+                    $this->exitedLoop();
+
+                    return;
+                }
+            }
+            if (yield $this->waitSignal($this->pause())) {
+                $API->logger->logger("Exiting update feed loop channel {$this->channelId}");
+                $this->exitedLoop();
+
+                return;
+            }
+            if (!$this->settings['updates']['handle_updates']) {
+                $API->logger->logger("Exiting update feed loop channel {$this->channelId}");
+                $this->exitedLoop();
+                return;
+            }
+            while ($this->incomingUpdates) {
+                $updates = $this->incomingUpdates;
+                $this->incomingUpdates = null;
+                yield $this->parse($updates);
+                $updates = null;
+            }
+        }
+    }
+    public function parse($updates)
+    {
+        reset($updates);
+        while ($updates) {
+            $options = [];
+            $key = key($updates);
+            $update = $updates[$key];
+            unset($updates[$key]);
+            if (isset($update['options'])) {
+                $options = $update['options'];
+                unset($update['options']);
+            }
+            if (isset($update['pts'])) {
+                $logger = function ($msg) use ($update) {
+                    $pts_count = isset($update['pts_count']) ? $update['pts_count'] : 0;
+                    $this->logger->logger($update);
+                    $double = isset($update['message']['id']) ? $update['message']['id'] * 2 : '-';
+                    $mid = isset($update['message']['id']) ? $update['message']['id'] : '-';
+                    $mypts = $this->state->pts();
+                    $this->logger->logger("$msg. My pts: {$mypts}, remote pts: {$update['pts']}, remote pts count: {$pts_count}, msg id: {$mid} (*2=$double), channel id: {$this->channelId}", \danog\MadelineProto\Logger::ERROR);
+                };
+                $result = $this->state->checkPts($update);
+                if ($result < 0) {
+                    $logger("PTS duplicate");
+
+                    continue;
+                }
+                if ($result > 0) {
+                    $logger("PTS hole");
+                    $this->updater->setLimit($state->pts + $result);
+                    yield $this->updater->resume();
+                    $updates = array_merge($this->incomingUpdates, $updates);
+                    $this->incomingUpdates = null;
+                    continue;
+                }
+                if (isset($update['message']['id'], $update['message']['to_id']) && !in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage'])) {
+                    if (!$this->API->check_msg_id($update['message'])) {
+                        $logger("MSGID duplicate");
+
+                        continue;
+                    }
+                }
+                $logger("PTS OK");
+
+                $this->state->pts($update['pts']);
+                if ($this->channelId === false && isset($options['date'])) {
+                    $this->state->date($options['date']);
+                }
+            }
+            if ($this->channelId === false && isset($options['seq']) || isset($options['seq_start'])) {
+                $seq = $options['seq'];
+                $seq_start = isset($options['seq_start']) ? $options['seq_start'] : $options['seq'];
+                if ($seq_start != $this->state->seq() + 1 && $seq_start > $this->state->seq()) {
+                    $this->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.$this->state->seq().' + 1', \danog\MadelineProto\Logger::ERROR);
+                    yield $this->get_updates_difference_async();
+
+                    return false;
+                }
+                if ($this->state->seq() !== $seq) {
+                    $this->state->seq($seq);
+                    if (isset($options['date'])) {
+                        $this->state->date($options['date']);
+                    }
+                }
+            }
+
+            $this->save($update);
+        }
+    }
+    public function feed($updates)
+    {
+        $this->incomingUpdates = array_merge($this->incomingUpdates, $updates);
+    }
+    public function fetchSlice($to_pts)
+    {
+        $difference = yield $this->method_call_async_read('updates.getDifference', ['pts' => $this->state->pts(), 'pts_total_limit' => $to_pts, 'date' => $this->state->date(), 'qts' => $this->state->qts()], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+        var_dumP($difference);
+    }
+    public function save($update)
+    {
+        $this->parsedUpdates []= $update;
+    }
+    public function has_all_auth()
+    {
+        if ($this->API->isInitingAuthorization()) {
+            return false;
+        }
+
+        foreach ($this->API->datacenter->sockets as $dc) {
+            if (!$dc->authorized || $dc->temp_auth_key === null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}

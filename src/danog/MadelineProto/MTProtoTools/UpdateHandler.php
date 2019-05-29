@@ -224,6 +224,10 @@ trait UpdateHandler
 
         return $this->updates_state;
     }
+    public function loadChannelState($channelId = null)
+    {
+        return $this->channels_state->get($channelId);
+    }
 
     public function get_updates_difference_async($w = null)
     {
@@ -322,13 +326,9 @@ trait UpdateHandler
         $this->logger->logger('Handling an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
         $channel_id = false;
         switch ($update['_']) {
+            case 'updateChannelWebPage':
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
-                if ($update['message']['_'] === 'messageEmpty') {
-                    $this->logger->logger('Got message empty, not saving', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-
-                    return false;
-                }
                 $channel_id = $update['message']['to_id']['channel_id'];
                 break;
             case 'updateDeleteChannelMessages':
@@ -350,14 +350,10 @@ trait UpdateHandler
         } else {
             $cur_state = $this->channels_state->get($channel_id, $update);
         }
-        /*
-        if ($cur_state['sync_loading'] && in_array($update['_'], ['updateNewMessage', 'updateEditMessage', 'updateNewChannelMessage', 'updateEditChannelMessage'])) {
-        $this->logger->logger('Sync loading, not handling update', \danog\MadelineProto\Logger::NOTICE);
 
-        return false;
-        }*/
         switch ($update['_']) {
             case 'updateChannelTooLong':
+                $this->datacenter->sockets[]
                 yield $this->get_channel_difference_async($channel_id);
 
                 return false;
