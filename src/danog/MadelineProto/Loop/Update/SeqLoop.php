@@ -76,7 +76,7 @@ class SeqLoop extends ResumableSignalLoop
 
                 return;
             }
-            if (!$this->settings['updates']['handle_updates']) {
+            if (!$this->API->settings['updates']['handle_updates']) {
                 $API->logger->logger("Exiting update seq loop");
                 $this->exitedLoop();
                 return;
@@ -85,7 +85,7 @@ class SeqLoop extends ResumableSignalLoop
             while ($this->incomingUpdates) {
                 $updates = $this->incomingUpdates;
                 $this->incomingUpdates = [];
-                $result += yield $this->parse($updates);
+                $result = array_merge(yield $this->parse($updates), $result);
                 $updates = null;
             }
             foreach ($result as $channelId => $boh) {
@@ -95,22 +95,22 @@ class SeqLoop extends ResumableSignalLoop
     }
     public function parse($updates)
     {
-        $result = [];
+        $fresult = [];
         reset($updates);
         while ($updates) {
             $options = [];
             $key = key($updates);
             $update = $updates[$key];
             unset($updates[$key]);
+            
+            
             $options = $update['options'];
-            $updates = $update['updates'];
-
             $seq_start = $options['seq_start'];
             $seq_end = $options['seq_end'];
 
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
-                $this->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
                 yield $this->pause(1.0);
                 if (!$this->incomingUpdates) {
                     yield $this->updaters[false]->resume();
@@ -120,7 +120,7 @@ class SeqLoop extends ResumableSignalLoop
                 continue;
             }
             if ($result < 0) {
-                $this->logger->logger('Seq too old. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Seq too old. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
                 continue;
             }
             $this->state->seq($seq_end);
@@ -128,9 +128,9 @@ class SeqLoop extends ResumableSignalLoop
                 $this->state->date($options['date']);
             }
 
-            $result += $this->save($updates);
+            $fresult = array_merge(yield $this->save($update), $fresult);
         }
-        return $result;
+        return $fresult;
     }
     public function feed($updates)
     {

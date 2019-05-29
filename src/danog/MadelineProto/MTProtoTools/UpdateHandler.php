@@ -23,6 +23,8 @@ use Amp\Artax\Request;
 use Amp\Deferred;
 use Amp\Delayed;
 use function Amp\Promise\any;
+use danog\MadelineProto\Loop\Update\FeedLoop;
+use danog\MadelineProto\Loop\Update\UpdateLoop;
 
 /**
  * Manages updates.
@@ -180,11 +182,6 @@ trait UpdateHandler
         }
 
         switch ($update['_']) {
-            case 'updateChannelTooLong':
-                $this->logger->logger('Got channel too long update, getting difference...', \danog\MadelineProto\Logger::VERBOSE);
-                $this->updaters[$channelId]->resumeDefer();
-
-                return;
             case 'updateNewMessage':
             case 'updateEditMessage':
             case 'updateNewChannelMessage':

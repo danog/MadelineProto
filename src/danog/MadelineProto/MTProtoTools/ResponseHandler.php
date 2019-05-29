@@ -587,9 +587,9 @@ trait ResponseHandler
 
                 if ($updates['updates']) {
                     if ($updates['_'] === 'updatesCombined') {
-                        $updates['updates'][0]['options'] = ['seq_start' => $updates['seq_start'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
+                        $updates['options'] = ['seq_start' => $updates['seq_start'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
                     } else {
-                        $updates['updates'][0]['options'] = ['seq_start' => $updates['seq'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
+                        $updates['options'] = ['seq_start' => $updates['seq'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
                     }
                     $this->seqUpdater->feed($updates);
                     $this->seqUpdater->resumeDefer();

@@ -80,7 +80,7 @@ class UpdateLoop extends ResumableSignalLoop
                     } else {
                         $limit = 100;
                     }
-                    $difference = yield $this->method_call_async_read('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $state->pts(), 'limit' => $limit, 'force' => true], ['datacenter' => $this->datacenter->curdc]);
+                    $difference = yield $this->API->method_call_async_read('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $state->pts(), 'limit' => $limit, 'force' => true], ['datacenter' => $this->API->datacenter->curdc]);
                     if (isset($difference['timeout'])) {
                         $timeout = $difference['timeout'];
                     }

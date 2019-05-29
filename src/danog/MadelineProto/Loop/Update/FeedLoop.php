@@ -106,6 +106,12 @@ class FeedLoop extends ResumableSignalLoop
             $key = key($updates);
             $update = $updates[$key];
             unset($updates[$key]);
+            if ($update['_'] === 'updateChannelTooLong') {
+                $this->API->logger->logger('Got channel too long update, getting difference...', \danog\MadelineProto\Logger::VERBOSE);
+                $this->API->updaters[$this->channelId]->resumeDefer();
+
+                continue;
+            }
             if (isset($update['pts'])) {
                 $logger = function ($msg) use ($update) {
                     $pts_count = isset($update['pts_count']) ? $update['pts_count'] : 0;
@@ -123,7 +129,7 @@ class FeedLoop extends ResumableSignalLoop
                 }
                 if ($result > 0) {
                     $logger("PTS hole");
-                    $this->updater->setLimit($state->pts + $result);
+                    $this->updater->setLimit($this->state->pts() + $result);
                     yield $this->updater->resume();
                     $updates = array_merge($this->incomingUpdates, $updates);
                     $this->incomingUpdates = null;

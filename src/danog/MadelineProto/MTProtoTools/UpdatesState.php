@@ -201,6 +201,6 @@ class UpdatesState
      */
     public function checkSeq($seq)
     {
-        return $seq - ($this->seq + 1);
+        return $seq ? $seq - ($this->seq + 1) : $seq;
     }
 }
