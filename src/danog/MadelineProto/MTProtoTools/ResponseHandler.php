@@ -258,7 +258,7 @@ trait ResponseHandler
                             unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
 
                             if (strpos($datacenter, 'cdn') === false) {
-                                $this->callFork($this->handle_updates_async($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']));
+                                $this->callForkDefer($this->handle_updates_async($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']));
                             }
 
                             unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
@@ -572,40 +572,41 @@ trait ResponseHandler
 
         $this->logger->logger('Parsing updates received via the socket...', \danog\MadelineProto\Logger::VERBOSE);
 
-        $opts = [];
+        $result = [];
         switch ($updates['_']) {
             case 'updates':
             case 'updatesCombined':
-                $handle_updates = [];
                 foreach ($updates['updates'] as $key => $update) {
                     if ($update['_'] === 'updateNewMessage' || $update['_'] === 'updateReadMessagesContents' ||
                         $update['_'] === 'updateEditMessage' || $update['_'] === 'updateDeleteMessages' ||
                         $update['_'] === 'updateReadHistoryInbox' || $update['_'] === 'updateReadHistoryOutbox' ||
                         $update['_'] === 'updateWebPage' || $update['_'] === 'updateMessageID') {
-                        $handle_updates[] = $update;
+                        $result[yield $this->feedSingle($update)] = true;
                         unset($updates['updates'][$key]);
                     }
                 }
-                $this->feeders[false]->feed($handle_updates);
                 if ($updates['updates']) {
                     if ($updates['_'] === 'updatesCombined') {
                         $updates['updates'][0]['options'] = ['seq_start' => $updates['seq_start'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
                     } else {
                         $updates['updates'][0]['options'] = ['seq_start' => $updates['seq'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
                     }
-                    $this->feeders[false]->feed($updates);
+                    foreach ($updates as $update) {
+                        $result[yield $this->feedSingle($update)] = true;
+                    }
                 }
                 break;
             case 'updateShort':
                 $updates['update']['options'] = ['date' => $updates['date']];
-                $this->feeders[false]->feed([$updates['update']]);
+                $this->feedSingle($updates['update']);
                 break;
             case 'updateShortMessage':
             case 'updateShortChatMessage':
                 $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 if (!yield $this->peer_isset_async($from_id) || !yield $this->peer_isset_async($to_id) || isset($updates['via_bot_id']) && !yield $this->peer_isset_async($updates['via_bot_id']) || isset($updates['entities']) && !yield $this->entities_peer_isset_async($updates['entities']) || isset($updates['fwd_from']) && !yield $this->fwd_peer_isset_async($updates['fwd_from'])) {
-                    yield $this->updaters[false]->resume();
+                    yield $this->updaters[false]->resumeDefer();
+                    return;
                     // TOFIX
                 }
                 $message = $updates;
@@ -624,7 +625,8 @@ trait ResponseHandler
                     break;
                 }
                 $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
-                yield $this->handle_update_async($update, $opts);
+                $updates['update']['options'] = ['date' => $updates['date']];
+                $result[yield $this->feedSingle($update)] = true;
                 break;
             case 'updateShortSentMessage':
                 //yield $this->set_update_state_async(['date' => $updates['date']]);
@@ -635,6 +637,9 @@ trait ResponseHandler
             default:
                 throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.var_export($updates, true));
                 break;
+        }
+        foreach ($result as $channelId => $Boh) {
+            $this->feeders[$channelId]->resumeDefer();
         }
     }
 }

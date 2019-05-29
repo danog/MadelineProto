@@ -240,8 +240,11 @@ trait Tools
 
         return $promise;
     }
-    public function callFork($promise)
+    public function callFork($promise, $actual = null)
     {
+        if ($actual) {
+            $promise = $actual;
+        }
         if ($promise instanceof \Generator) {
             $promise = new Coroutine($promise);
         }
@@ -253,6 +256,10 @@ trait Tools
             });
         }
         return $promise;
+    }
+    public function callForkDefer($promise)
+    {
+        Loop::defer([$this, 'callFork'], $promise);
     }
     public function rethrow($e)
     {

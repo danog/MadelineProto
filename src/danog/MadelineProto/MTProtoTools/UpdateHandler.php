@@ -22,7 +22,6 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Artax\Request;
 use Amp\Deferred;
 use Amp\Delayed;
-use Amp\Loop;
 use function Amp\Promise\any;
 
 /**
@@ -144,7 +143,7 @@ trait UpdateHandler
         return $data;
     }
 
-    public function handle_update_async($update, $options = [])
+    public function feedSingle($update)
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
@@ -168,20 +167,16 @@ trait UpdateHandler
                 break;
         }
 
-        if ($channelId === false) {
-            $cur_state = yield $this->load_update_state_async();
-        } else {
-            if (!$this->channels_state->has($channelId)) {
-                if (!isset($this->feeders[$channelId])) {
-                    $this->feeders[$channelId] = new FeedLoop($this, $channelId);
-                }
-                if (!isset($this->updaters[$channelId])) {
-                    $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
-                }
-                $this->feeders[$channelId]->start();
-                $this->updaters[$channelId]->start();
+        if ($channelId && !$this->channels_state->has($channelId)) {
+            $this->channels_state->get($channelId, $update);
+            if (!isset($this->feeders[$channelId])) {
+                $this->feeders[$channelId] = new FeedLoop($this, $channelId);
             }
-            $cur_state = $this->channels_state->get($channelId, $update);
+            if (!isset($this->updaters[$channelId])) {
+                $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
+            }
+            $this->feeders[$channelId]->start();
+            $this->updaters[$channelId]->start();
         }
 
         switch ($update['_']) {
@@ -189,7 +184,7 @@ trait UpdateHandler
                 $this->logger->logger('Got channel too long update, getting difference...', \danog\MadelineProto\Logger::VERBOSE);
                 $this->updaters[$channelId]->resumeDefer();
 
-                return false;
+                return;
             case 'updateNewMessage':
             case 'updateEditMessage':
             case 'updateNewChannelMessage':
@@ -228,17 +223,19 @@ trait UpdateHandler
                         $this->updaters[false]->resumeDefer();
                     }
 
-                    return false;
+                    return;
                 }
                 break;
             default:
                 if ($channelId !== false && !yield $this->peer_isset_async($this->to_supergroup($channelId))) {
                     $this->logger->logger('Skipping update, I do not have the channel id '.$channelId, \danog\MadelineProto\Logger::ERROR);
 
-                    return false;
+                    return;
                 }
                 break;
         }
+        $this->feeders[$channelId]->feedSingle($update);
+        return $channelId;
     }
 
     public function handle_update_messages_async($messages, $channel = false)
@@ -313,7 +310,7 @@ trait UpdateHandler
             }
             if ($update['qts'] > $cur_state->qts() + 1) {
                 $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
-                $this->updaters[$channelId]->resumeDefer();
+                $this->updaters[false]->resumeDefer();
 
                 return false;
             }

@@ -27,23 +27,21 @@ use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class FeedLoop extends ResumableSignalLoop
+class SeqLoop extends ResumableSignalLoop
 {
     use \danog\MadelineProto\Tools;
     private $incomingUpdates = [];
-    private $parsedUpdates = [];
     private $channelId;
-    private $updater;
+    private $feeder;
 
-    public function __construct($API, $channelId = false)
+    public function __construct($API)
     {
         $this->API = $API;
-        $this->channelId = $channelId;
     }
     public function loop()
     {
         $API = $this->API;
-        $updater = $this->updater = $API->updaters[$this->channelId];
+        $feeder = $this->feeder = $API->feeders[false];
 
         if (!$this->API->settings['updates']['handle_updates']) {
             yield new Success(0);
@@ -52,34 +50,34 @@ class FeedLoop extends ResumableSignalLoop
         }
 
         $this->startedLoop();
-        $API->logger->logger("Entered update feed loop in channel {$this->channelId}", Logger::ULTRA_VERBOSE);
+        $API->logger->logger("Entered update seq loop", Logger::ULTRA_VERBOSE);
         while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
             if (yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting update feed loop in channel {$this->channelId}");
+                $API->logger->logger("Exiting update seq loop");
                 $this->exitedLoop();
 
                 return;
             }
         }
-        $this->state = $this->channelId === false ? (yield $API->load_update_state_async()) : $API->loadChannelState($this->channelId);
+        $this->state = yield $API->load_update_state_async();
 
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting update feed loop channel {$this->channelId}");
+                    $API->logger->logger("Exiting update seq loop");
                     $this->exitedLoop();
 
                     return;
                 }
             }
             if (yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting update feed loop channel {$this->channelId}");
+                $API->logger->logger("Exiting update seq loop");
                 $this->exitedLoop();
 
                 return;
             }
             if (!$this->settings['updates']['handle_updates']) {
-                $API->logger->logger("Exiting update feed loop channel {$this->channelId}");
+                $API->logger->logger("Exiting update seq loop");
                 $this->exitedLoop();
                 return;
             }
@@ -89,12 +87,7 @@ class FeedLoop extends ResumableSignalLoop
                 yield $this->parse($updates);
                 $updates = null;
             }
-            if ($this->parsedUpdates) {
-                foreach ($this->parsedUpdates as $update) {
-                    yield $API->save_update_async($update);
-                }
-                $this->parsedUpdates = [];
-            }
+            $feeder->resumeDefer();
         }
     }
     public function parse($updates)
@@ -105,57 +98,39 @@ class FeedLoop extends ResumableSignalLoop
             $key = key($updates);
             $update = $updates[$key];
             unset($updates[$key]);
-            if (isset($update['pts'])) {
-                $logger = function ($msg) use ($update) {
-                    $pts_count = isset($update['pts_count']) ? $update['pts_count'] : 0;
-                    $this->logger->logger($update);
-                    $double = isset($update['message']['id']) ? $update['message']['id'] * 2 : '-';
-                    $mid = isset($update['message']['id']) ? $update['message']['id'] : '-';
-                    $mypts = $this->state->pts();
-                    $this->logger->logger("$msg. My pts: {$mypts}, remote pts: {$update['pts']}, remote pts count: {$pts_count}, msg id: {$mid} (*2=$double), channel id: {$this->channelId}", \danog\MadelineProto\Logger::ERROR);
-                };
-                $result = $this->state->checkPts($update);
-                if ($result < 0) {
-                    $logger("PTS duplicate");
+            $options = $update['options'];
+            $updates = $update['updates'];
+            unset($update);
 
-                    continue;
-                }
-                if ($result > 0) {
-                    $logger("PTS hole");
-                    $this->updater->setLimit($state->pts + $result);
-                    yield $this->updater->resume();
-                    $updates = array_merge($this->incomingUpdates, $updates);
-                    $this->incomingUpdates = null;
-                    continue;
-                }
-                if (isset($update['message']['id'], $update['message']['to_id']) && !in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage'])) {
-                    if (!$this->API->check_msg_id($update['message'])) {
-                        $logger("MSGID duplicate");
+            $seq_start = $options['seq_start'];
+            $seq_end = $options['seq_end'];
+            $result = $this->state->checkSeq($seq_start);
+            if ($result > 0) {
+                $this->logger->logger('Seq hole of $result. seq_start: '.$seq_start.' != cur seq: '.$this->state->seq().' + 1', \danog\MadelineProto\Logger::ERROR);
+                yield $this->updaters[false]->resume();
 
-                        continue;
-                    }
-                }
-                $logger("PTS OK");
+                continue;
+            }
+            if ($result < 0) {
 
-                $this->state->pts($update['pts']);
-                if ($this->channelId === false && isset($options['date'])) {
+            }
+            if ($this->state->seq() !== $seq) {
+                $this->state->seq($seq);
+                if (isset($options['date'])) {
                     $this->state->date($options['date']);
                 }
             }
-            $this->save($update);
+
+            $this->save($updates);
         }
     }
     public function feed($updates)
     {
-        $this->incomingUpdates = array_merge($this->incomingUpdates, $updates);
+        $this->incomingUpdates[] = $updates;
     }
-    public function feedSingle($update)
+    public function save($updates)
     {
-        $this->incomingUpdates []= $update;
-    }
-    public function save($update)
-    {
-        $this->parsedUpdates []= $update;
+        $this->feeder->feed($updates);
     }
     public function has_all_auth()
     {

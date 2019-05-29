@@ -193,4 +193,14 @@ class UpdatesState
     {
         return ($this->pts + $update['pts_count']) - $update['pts'];
     }
+    /**
+     * Check validity of seq contained in update
+     *
+     * @param int $seq
+     * @return int -1 if it's too old, 0 if it's ok, 1 if it's too new
+     */
+    public function checkSeq($seq)
+    {
+        return $seq - ($this->seq + 1);
+    }
 }

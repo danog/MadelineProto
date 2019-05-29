@@ -42,7 +42,7 @@ class UpdateLoop extends ResumableSignalLoop
     public function loop()
     {
         $API = $this->API;
-        $feeder = $this->feeder = $API->feeder[$this->channelId];
+        $feeder = $this->feeder = $API->feeders[$this->channelId];
 
         while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
             if (yield $this->waitSignal($this->pause())) {
@@ -56,13 +56,13 @@ class UpdateLoop extends ResumableSignalLoop
 
         $this->startedLoop();
 
-        $API->logger->logger("Entered updates loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
+        $API->logger->logger("Entered updates loop in channel {$this->channelId}", Logger::ULTRA_VERBOSE);
 
         $timeout = $API->settings['updates']['getdifference_interval'];
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting update loop in DC $datacenter");
+                    $API->logger->logger("Exiting update loop in channel {$this->channelId}");
                     $this->exitedLoop();
 
                     return;
@@ -160,8 +160,9 @@ class UpdateLoop extends ResumableSignalLoop
                     }
                 }
             }
+            $feeder->resumeDefer();
             if (yield $this->waitSignal($this->pause($timeout))) {
-                $API->logger->logger("Exiting update loop in DC $datacenter");
+                $API->logger->logger("Exiting update loop in channel {$this->channelId}");
                 $this->exitedLoop();
 
                 return;
