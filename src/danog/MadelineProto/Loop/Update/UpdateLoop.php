@@ -42,7 +42,6 @@ class UpdateLoop extends ResumableSignalLoop
     public function loop()
     {
         $API = $this->API;
-        $datacenter = $this->datacenter;
         $feeder = $this->feeder = $API->feeder[$this->channelId];
 
         while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
@@ -69,101 +68,99 @@ class UpdateLoop extends ResumableSignalLoop
                     return;
                 }
             }
-            if (time() - $API->last_getdifference > $timeout) {
-                $toPts = $this->toPts;
-                $this->toPts = null;
-                while (true) {
-                    if ($this->channelId) {
-                        $this->API->logger->logger('Fetching '.$this->channelId.' difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                        if ($state->pts() <= 1) {
-                            $limit = 10;
-                        } else if ($API->authorization['user']['bot']) {
-                            $limit = 100000;
-                        } else {
-                            $limit = 100;
-                        }
-                        $difference = yield $this->method_call_async_read('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $state->pts(), 'limit' => $limit, 'force' => true], ['datacenter' => $this->datacenter->curdc]);
-                        if (isset($difference['timeout'])) {
-                            $timeout = $difference['timeout'];
-                        }
-
-                        switch ($difference['_']) {
-                            case 'updates.channelDifferenceEmpty':
-                                $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
-                                $state->update($difference);
-                                unset($difference);
-                                break 2;
-                            case 'updates.channelDifference':
-                                $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
-                                if ($state->pts() >= $difference['pts'] && $state->pts() > 1) {
-                                    $this->API->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().", using ".($state->pts()+1), \danog\MadelineProto\Logger::VERBOSE);
-                                    $difference['pts'] = $state->pts() + 1;
-                                }
-                                $state->update($difference);
-                                $feeder->feed($difference['other_updates']);
-
-                                yield $this->handle_update_messages_async($difference['new_messages'], $channel);
-                                if (!$difference['final']) {
-                                    if ($difference['pts'] >= $toPts) {
-                                        unset($difference);
-                                        break 2;
-                                    }
-                                    unset($difference);
-                                    break;
-                                }
-                                unset($difference);
-                                break 2;
-                            case 'updates.channelDifferenceTooLong':
-                                $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
-                                $state->update($difference);
-                                yield $this->handle_update_messages_async($difference['messages'], $channel);
-                                unset($difference);
-                                break;
-                            default:
-                                throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
-                        }
+            $toPts = $this->toPts;
+            $this->toPts = null;
+            while (true) {
+                if ($this->channelId) {
+                    $this->API->logger->logger('Fetching '.$this->channelId.' difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    if ($state->pts() <= 1) {
+                        $limit = 10;
+                    } else if ($API->authorization['user']['bot']) {
+                        $limit = 100000;
                     } else {
-                        $this->API->logger->logger('Fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                        $limit = 100;
+                    }
+                    $difference = yield $this->method_call_async_read('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $state->pts(), 'limit' => $limit, 'force' => true], ['datacenter' => $this->datacenter->curdc]);
+                    if (isset($difference['timeout'])) {
+                        $timeout = $difference['timeout'];
+                    }
 
-                        $difference = yield $this->API->method_call_async_read('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
-                        $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    switch ($difference['_']) {
+                        case 'updates.channelDifferenceEmpty':
+                            $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
+                            $state->update($difference);
+                            unset($difference);
+                            break 2;
+                        case 'updates.channelDifference':
+                            $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
+                            if ($state->pts() >= $difference['pts'] && $state->pts() > 1) {
+                                $this->API->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().", using ".($state->pts() + 1), \danog\MadelineProto\Logger::VERBOSE);
+                                $difference['pts'] = $state->pts() + 1;
+                            }
+                            $state->update($difference);
+                            $feeder->feed($difference['other_updates']);
 
-                        switch ($difference['_']) {
-                            case 'updates.differenceEmpty':
-                                $state->update($difference);
-                                unset($difference);
-                                break 2;
-                            case 'updates.difference':
-                                foreach ($difference['new_encrypted_messages'] as &$encrypted) {
-                                    $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
-                                }
-                                $feeder->feed($difference['other_updates']);
-                                $feeder->feed($difference['new_encrypted_messages']);
-                                yield $this->handle_update_messages_async($difference['new_messages']);
-                                $state->update($difference['state']);
-                                unset($difference);
-                                break 2;
-                            case 'updates.differenceSlice':
-                                foreach ($difference['new_encrypted_messages'] as &$encrypted) {
-                                    $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
-                                }
-                                $feeder->feed($difference['other_updates']);
-                                $feeder->feed($difference['new_encrypted_messages']);
-                                yield $this->handle_update_messages_async($difference['new_messages']);
-                                $state->update($difference['intermediate_state']);
-                                if ($difference['intermediate_state']['pts'] >= $toPts) {
+                            yield $this->handle_update_messages_async($difference['new_messages'], $channel);
+                            if (!$difference['final']) {
+                                if ($difference['pts'] >= $toPts) {
                                     unset($difference);
                                     break 2;
                                 }
                                 unset($difference);
                                 break;
-                            default:
-                                throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
-                        }
+                            }
+                            unset($difference);
+                            break 2;
+                        case 'updates.channelDifferenceTooLong':
+                            $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
+                            $state->update($difference);
+                            yield $this->handle_update_messages_async($difference['messages'], $channel);
+                            unset($difference);
+                            break;
+                        default:
+                            throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
+                    }
+                } else {
+                    $this->API->logger->logger('Fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
+                    $difference = yield $this->API->method_call_async_read('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
+                    switch ($difference['_']) {
+                        case 'updates.differenceEmpty':
+                            $state->update($difference);
+                            unset($difference);
+                            break 2;
+                        case 'updates.difference':
+                            foreach ($difference['new_encrypted_messages'] as &$encrypted) {
+                                $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
+                            }
+                            $feeder->feed($difference['other_updates']);
+                            $feeder->feed($difference['new_encrypted_messages']);
+                            yield $this->handle_update_messages_async($difference['new_messages']);
+                            $state->update($difference['state']);
+                            unset($difference);
+                            break 2;
+                        case 'updates.differenceSlice':
+                            foreach ($difference['new_encrypted_messages'] as &$encrypted) {
+                                $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
+                            }
+                            $feeder->feed($difference['other_updates']);
+                            $feeder->feed($difference['new_encrypted_messages']);
+                            yield $this->handle_update_messages_async($difference['new_messages']);
+                            $state->update($difference['intermediate_state']);
+                            if ($difference['intermediate_state']['pts'] >= $toPts) {
+                                unset($difference);
+                                break 2;
+                            }
+                            unset($difference);
+                            break;
+                        default:
+                            throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
                     }
                 }
             }
-            if (yield $this->waitSignal($this->pause(($API->last_getdifference + $timeout) - time()))) {
+            if (yield $this->waitSignal($this->pause($timeout))) {
                 $API->logger->logger("Exiting update loop in DC $datacenter");
                 $this->exitedLoop();
 

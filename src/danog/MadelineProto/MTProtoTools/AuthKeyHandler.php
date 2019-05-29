@@ -463,13 +463,7 @@ trait AuthKeyHandler
 
     public function get_dh_config_async()
     {
-        $this->updates_state->syncLoading(true);
-
-        try {
-            $dh_config = yield $this->method_call_async_read('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0], ['datacenter' => $this->datacenter->curdc]);
-        } finally {
-            $this->updates_state->syncLoading(false);
-        }
+        $dh_config = yield $this->method_call_async_read('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0], ['datacenter' => $this->datacenter->curdc]);
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {
             $this->logger->logger(\danog\MadelineProto\Logger::VERBOSE, ['DH configuration not modified']);
 
@@ -563,12 +557,7 @@ trait AuthKeyHandler
         return false;
     }
 
-    // Creates authorization keys
     public function init_authorization_async()
-    {
-        return $this->ainit_authorization_async();
-    }
-    public function ainit_authorization_async()
     {
         if ($this->pending_auth) {
             return;
@@ -576,8 +565,6 @@ trait AuthKeyHandler
         $initing = $this->initing_authorization;
 
         $this->initing_authorization = true;
-        $this->updates_state->syncLoading(true);
-        $this->postpone_updates = true;
 
         try {
             $dcs = [];
@@ -618,10 +605,7 @@ trait AuthKeyHandler
             }
         } finally {
             $this->pending_auth = false;
-            $this->postpone_updates = false;
             $this->initing_authorization = $initing;
-            $this->updates_state->syncLoading(false);
-            yield $this->handle_pending_updates_async();
         }
     }
 

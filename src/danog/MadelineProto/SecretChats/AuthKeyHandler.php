@@ -53,7 +53,6 @@ trait AuthKeyHandler
         $this->check_G($g_b, $dh_config['p']);
         yield $this->method_call_async_read('messages.acceptEncryption', ['peer' => $params['id'], 'g_b' => $g_b->toBytes(), 'key_fingerprint' => $key['fingerprint']], ['datacenter' => $this->datacenter->curdc]);
         yield $this->notify_layer_async($params['id']);
-        yield $this->handle_pending_updates_async();
         $this->logger->logger('Secret chat '.$params['id'].' accepted successfully!', \danog\MadelineProto\Logger::NOTICE);
     }
 
@@ -73,8 +72,7 @@ trait AuthKeyHandler
         $this->check_G($g_a, $dh_config['p']);
         $res = yield $this->method_call_async_read('messages.requestEncryption', ['user_id' => $user, 'g_a' => $g_a->toBytes()], ['datacenter' => $this->datacenter->curdc]);
         $this->temp_requested_secret_chats[$res['id']] = $a;
-        yield $this->handle_pending_updates_async();
-        yield $this->get_updates_difference_async();
+        $this->updaters[false]->resume();
         $this->logger->logger('Secret chat '.$res['id'].' requested successfully!', \danog\MadelineProto\Logger::NOTICE);
 
         return $res['id'];
@@ -104,7 +102,6 @@ trait AuthKeyHandler
         $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
         $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputEncryptedChat' => ['chat_id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputEncryptedChat'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'in_seq_no' => 0, 'out_seq_no' => 0, 'layer' => 8, 'ttl' => 0, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0], 'key_x' => 'to server', 'mtproto' => 1];
         yield $this->notify_layer_async($params['id']);
-        yield $this->handle_pending_updates_async();
         $this->logger->logger('Secret chat '.$params['id'].' completed successfully!', \danog\MadelineProto\Logger::NOTICE);
     }
 
@@ -131,8 +128,7 @@ trait AuthKeyHandler
         $this->temp_rekeyed_secret_chats[$e] = $a;
         $this->secret_chats[$chat]['rekeying'] = [1, $e];
         yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionRequestKey', 'g_a' => $g_a->toBytes(), 'exchange_id' => $e]]], ['datacenter' => $this->datacenter->curdc]);
-        yield $this->handle_pending_updates_async();
-        yield $this->get_updates_difference_async();
+        $this->updaters[false]->resume();
 
         return $e;
     }
@@ -167,8 +163,7 @@ trait AuthKeyHandler
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->check_G($g_b, $dh_config['p']);
         yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAcceptKey', 'g_b' => $g_b->toBytes(), 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]], ['datacenter' => $this->datacenter->curdc]);
-        yield $this->handle_pending_updates_async();
-        yield $this->get_updates_difference_async();
+        $this->updaters[false]->resume();
     }
 
     public function commit_rekey_async($chat, $params)
@@ -198,8 +193,7 @@ trait AuthKeyHandler
         $this->secret_chats[$chat]['key'] = $key;
         $this->secret_chats[$chat]['ttr'] = 100;
         $this->secret_chats[$chat]['updated'] = time();
-        yield $this->handle_pending_updates_async();
-        yield $this->get_updates_difference_async();
+        $this->updaters[false]->resume();
     }
 
     public function complete_rekey_async($chat, $params)

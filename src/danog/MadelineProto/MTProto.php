@@ -420,7 +420,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->updates_state->syncLoading()) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
-            yield $this->get_updates_difference_async();
+            yield $this->updaters[false]->resume();
         }
         $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->updater->start();
     }

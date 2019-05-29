@@ -16,7 +16,7 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Loop\Connection;
+namespace danog\MadelineProto\Loop\Update;
 
 use Amp\Success;
 use danog\MadelineProto\Logger;
@@ -43,7 +43,7 @@ class FeedLoop extends ResumableSignalLoop
     public function loop()
     {
         $API = $this->API;
-        $updater = $this->updater = $API->updater[$this->channelId];
+        $updater = $this->updater = $API->updaters[$this->channelId];
 
         if (!$this->API->settings['updates']['handle_updates']) {
             yield new Success(0);
@@ -145,7 +145,7 @@ class FeedLoop extends ResumableSignalLoop
                 $seq_start = isset($options['seq_start']) ? $options['seq_start'] : $options['seq'];
                 if ($seq_start != $this->state->seq() + 1 && $seq_start > $this->state->seq()) {
                     $this->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.$this->state->seq().' + 1', \danog\MadelineProto\Logger::ERROR);
-                    yield $this->get_updates_difference_async();
+                    yield $this->updaters[false]->resume();
 
                     return false;
                 }
@@ -164,10 +164,9 @@ class FeedLoop extends ResumableSignalLoop
     {
         $this->incomingUpdates = array_merge($this->incomingUpdates, $updates);
     }
-    public function fetchSlice($to_pts)
+    public function feedSingle($update)
     {
-        $difference = yield $this->method_call_async_read('updates.getDifference', ['pts' => $this->state->pts(), 'pts_total_limit' => $to_pts, 'date' => $this->state->date(), 'qts' => $this->state->qts()], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
-        var_dumP($difference);
+        $this->incomingUpdates []= $update;
     }
     public function save($update)
     {

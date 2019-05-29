@@ -115,8 +115,7 @@ trait ResponseHandler
 
                     // Acknowledge that I received the server's response
                     if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
-
-                        $this->callFork($this->get_updates_difference_async());
+                        $this->updaters[false]->resumeDefer();
                     }
 
                     unset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']);
@@ -292,7 +291,7 @@ trait ResponseHandler
             }
         }
         $this->datacenter->sockets[$datacenter]->writer->resume();
- 
+
         //$this->n--;
 
         return $only_updates;
@@ -562,23 +561,6 @@ trait ResponseHandler
         )());
     }
 
-    public function handle_pending_updates_async()
-    {
-        if ($this->postpone_updates) {
-            return false;
-        }
-        if (count($this->pending_updates)) {
-            $this->logger->logger('Parsing pending updates...');
-            foreach (array_keys($this->pending_updates) as $key) {
-                if (isset($this->pending_updates[$key])) {
-                    $updates = $this->pending_updates[$key];
-                    unset($this->pending_updates[$key]);
-                    yield $this->handle_updates_async($updates);
-                }
-            }
-        }
-    }
-
     public function handle_updates_async($updates, $actual_updates = null)
     {
         if (!$this->settings['updates']['handle_updates']) {
@@ -588,78 +570,71 @@ trait ResponseHandler
             $updates = $actual_updates;
         }
 
-        if ($this->postpone_updates) {
-            $this->logger->logger('Postpone update handling', \danog\MadelineProto\Logger::VERBOSE);
-            $this->pending_updates[] = $updates;
-
-            return false;
-        }
-        yield $this->handle_pending_updates_async();
         $this->logger->logger('Parsing updates received via the socket...', \danog\MadelineProto\Logger::VERBOSE);
 
-        try {
-            $this->postpone_updates = true;
-
-            $opts = [];
-            foreach (['date', 'seq', 'seq_start'] as $key) {
-                if (isset($updates[$key])) {
-                    $opts[$key] = $updates[$key];
+        $opts = [];
+        switch ($updates['_']) {
+            case 'updates':
+            case 'updatesCombined':
+                $handle_updates = [];
+                foreach ($updates['updates'] as $key => $update) {
+                    if ($update['_'] === 'updateNewMessage' || $update['_'] === 'updateReadMessagesContents' ||
+                        $update['_'] === 'updateEditMessage' || $update['_'] === 'updateDeleteMessages' ||
+                        $update['_'] === 'updateReadHistoryInbox' || $update['_'] === 'updateReadHistoryOutbox' ||
+                        $update['_'] === 'updateWebPage' || $update['_'] === 'updateMessageID') {
+                        $handle_updates[] = $update;
+                        unset($updates['updates'][$key]);
+                    }
                 }
-            }
-            switch ($updates['_']) {
-                case 'updates':
-                case 'updatesCombined':
-                    foreach ($updates['updates'] as $update) {
-                        yield $this->handle_update_async($update, $opts);
+                $this->feeders[false]->feed($handle_updates);
+                if ($updates['updates']) {
+                    if ($updates['_'] === 'updatesCombined') {
+                        $updates['updates'][0]['options'] = ['seq_start' => $updates['seq_start'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
+                    } else {
+                        $updates['updates'][0]['options'] = ['seq_start' => $updates['seq'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
                     }
-                    break;
-                case 'updateShort':
-                    yield $this->handle_update_async($updates['update'], $opts);
-                    break;
-                case 'updateShortMessage':
-                case 'updateShortChatMessage':
-                    $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
-                    $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
-                    if (!yield $this->peer_isset_async($from_id) || !yield $this->peer_isset_async($to_id) || isset($updates['via_bot_id']) && !yield $this->peer_isset_async($updates['via_bot_id']) || isset($updates['entities']) && !yield $this->entities_peer_isset_async($updates['entities']) || isset($updates['fwd_from']) && !yield $this->fwd_peer_isset_async($updates['fwd_from'])) {
-                        $this->logger->logger('getDifference: good - getting user for updateShortMessage', \danog\MadelineProto\Logger::VERBOSE);
-                        yield $this->get_updates_difference_async();
-                    }
-                    $message = $updates;
-                    $message['_'] = 'message';
-                    $message['from_id'] = $from_id;
+                    $this->feeders[false]->feed($updates);
+                }
+                break;
+            case 'updateShort':
+                $updates['update']['options'] = ['date' => $updates['date']];
+                $this->feeders[false]->feed([$updates['update']]);
+                break;
+            case 'updateShortMessage':
+            case 'updateShortChatMessage':
+                $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
+                $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
+                if (!yield $this->peer_isset_async($from_id) || !yield $this->peer_isset_async($to_id) || isset($updates['via_bot_id']) && !yield $this->peer_isset_async($updates['via_bot_id']) || isset($updates['entities']) && !yield $this->entities_peer_isset_async($updates['entities']) || isset($updates['fwd_from']) && !yield $this->fwd_peer_isset_async($updates['fwd_from'])) {
+                    yield $this->updaters[false]->resume();
+                    // TOFIX
+                }
+                $message = $updates;
+                $message['_'] = 'message';
+                $message['from_id'] = $from_id;
 
-                    try {
-                        $message['to_id'] = (yield $this->get_info_async($to_id))['Peer'];
-                    } catch (\danog\MadelineProto\Exception $e) {
-                        $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
-                        //$this->pending_updates[] = $updates;
-                        break;
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
-                        //$this->pending_updates[] = $updates;
-                        break;
-                    }
-                    $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
-                    yield $this->handle_update_async($update, $opts);
+                try {
+                    $message['to_id'] = (yield $this->get_info_async($to_id))['Peer'];
+                } catch (\danog\MadelineProto\Exception $e) {
+                    $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
+                    //$this->pending_updates[] = $updates;
                     break;
-                case 'updateShortSentMessage':
-                    //yield $this->set_update_state_async(['date' => $updates['date']]);
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
+                    //$this->pending_updates[] = $updates;
                     break;
-                case 'updatesTooLong':
-                    yield $this->get_updates_difference_async();
-                    break;
-                default:
-                    throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.var_export($updates, true));
-                    break;
-            }
-        } finally {
-            $this->postpone_updates = false;
-        }
-        if ($this->updates && $this->update_deferred) {
-            $d = $this->update_deferred;
-            $this->update_deferred = null;
-
-            Loop::defer([$d, 'resolve']);
+                }
+                $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
+                yield $this->handle_update_async($update, $opts);
+                break;
+            case 'updateShortSentMessage':
+                //yield $this->set_update_state_async(['date' => $updates['date']]);
+                break;
+            case 'updatesTooLong':
+                $this->updaters[false]->resumeDefer();
+                break;
+            default:
+                throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.var_export($updates, true));
+                break;
         }
     }
 }

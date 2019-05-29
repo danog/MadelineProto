@@ -40,9 +40,7 @@ trait DialogHandler
         $res = ['dialogs' => [0], 'count' => 1];
         $datacenter = $this->datacenter->curdc;
         $dialogs = [];
-        $this->postpone_updates = true;
 
-        try {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getting_dialogs']);
             while ($this->dialog_params['count'] < $res['count']) {
                 $res = yield $this->method_call_async_read('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
@@ -82,10 +80,6 @@ trait DialogHandler
                     break;
                 }
             }
-        } finally {
-            $this->postpone_updates = false;
-            $this->callFork($this->handle_pending_updates_async());
-        }
 
         return $dialogs;
     }
