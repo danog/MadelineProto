@@ -81,17 +81,21 @@ class SeqLoop extends ResumableSignalLoop
                 $this->exitedLoop();
                 return;
             }
+            $result = [];
             while ($this->incomingUpdates) {
                 $updates = $this->incomingUpdates;
                 $this->incomingUpdates = [];
-                yield $this->parse($updates);
+                $result += yield $this->parse($updates);
                 $updates = null;
             }
-            $feeder->resumeDefer();
+            foreach ($result as $channelId => $boh) {
+                $this->API->feeders[$channelId]->resumeDefer();
+            }
         }
     }
     public function parse($updates)
     {
+        $result = [];
         reset($updates);
         while ($updates) {
             $options = [];
@@ -124,8 +128,9 @@ class SeqLoop extends ResumableSignalLoop
                 $this->state->date($options['date']);
             }
 
-            $this->save($updates);
+            $result += $this->save($updates);
         }
+        return $result;
     }
     public function feed($updates)
     {
@@ -133,7 +138,11 @@ class SeqLoop extends ResumableSignalLoop
     }
     public function save($updates)
     {
-        $this->feeder->feed($updates);
+        $result = [];
+        foreach ($updates['updates'] as $update) {
+            $result[yield $this->API->feedSingle($update)] = true;
+        }
+        return $result;
     }
     public function has_all_auth()
     {

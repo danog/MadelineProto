@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Loop\Update;
 use Amp\Success;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use Amp\Loop;
 
 /**
  * update feed loop.
@@ -95,6 +96,7 @@ class FeedLoop extends ResumableSignalLoop
                 }
                 $this->parsedUpdates = [];
             }
+            if ($API->update_deferred) Loop::defer([$API->update_deferred, 'resolve']);
         }
     }
     public function parse($updates)
@@ -107,11 +109,11 @@ class FeedLoop extends ResumableSignalLoop
             if (isset($update['pts'])) {
                 $logger = function ($msg) use ($update) {
                     $pts_count = isset($update['pts_count']) ? $update['pts_count'] : 0;
-                    $this->logger->logger($update);
+                    $this->API->logger->logger($update);
                     $double = isset($update['message']['id']) ? $update['message']['id'] * 2 : '-';
                     $mid = isset($update['message']['id']) ? $update['message']['id'] : '-';
                     $mypts = $this->state->pts();
-                    $this->logger->logger("$msg. My pts: {$mypts}, remote pts: {$update['pts']}, remote pts count: {$pts_count}, msg id: {$mid} (*2=$double), channel id: {$this->channelId}", \danog\MadelineProto\Logger::ERROR);
+                    $this->API->logger->logger("$msg. My pts: {$mypts}, remote pts: {$update['pts']}, remote pts count: {$pts_count}, msg id: {$mid} (*2=$double), channel id: {$this->channelId}", \danog\MadelineProto\Logger::ERROR);
                 };
                 $result = $this->state->checkPts($update);
                 if ($result < 0) {

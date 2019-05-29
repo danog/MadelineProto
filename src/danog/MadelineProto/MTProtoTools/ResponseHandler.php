@@ -591,9 +591,8 @@ trait ResponseHandler
                     } else {
                         $updates['updates'][0]['options'] = ['seq_start' => $updates['seq'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
                     }
-                    foreach ($updates as $update) {
-                        $result[yield $this->seqUpdater->feed($update)] = true;
-                    }
+                    $this->seqUpdater->feed($updates);
+                    $this->seqUpdater->resumeDefer();
                 }
                 break;
             case 'updateShort':
