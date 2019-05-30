@@ -261,6 +261,12 @@ class FeedLoop extends ResumableSignalLoop
     public function saveMessages($messages)
     {
         foreach ($messages as $message) {
+            if (!$this->API->check_msg_id($message)) {
+                $this->API->logger->logger("MSGID duplicate ({$message['id']}) in $this");
+
+                continue;
+            }
+
             $this->parsedUpdates[] = ['_' => $this->channelId === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
         }
     }
