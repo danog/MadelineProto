@@ -20,6 +20,7 @@ namespace danog\MadelineProto\Loop\Update;
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use Amp\Loop;
 
 /**
  * Update loop.
@@ -164,9 +165,13 @@ class UpdateLoop extends ResumableSignalLoop
                 $this->API->feeders[$channelId]->resumeDefer();
             }
             if ($API->update_deferred) {
-                $API->logger->logger("Resuming deferred in $this", Logger::VERBOSE);
-                $API->update_deferred->resolve();
-                $API->logger->logger("Done resuming deferred in $this", Logger::VERBOSE);
+                Loop::defer(function () use ($API) {
+                    if ($API->update_deferred) {
+                        $API->logger->logger("Resuming deferred in $this", Logger::VERBOSE);
+                        $API->update_deferred->resolve();
+                        $API->logger->logger("Done resuming deferred in $this", Logger::VERBOSE);
+                    }
+                });
             }
 
             if (yield $this->waitSignal($this->pause($timeout))) {

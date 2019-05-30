@@ -44,7 +44,7 @@ class FeedLoop extends ResumableSignalLoop
     public function loop()
     {
         $API = $this->API;
-        $updater = $this->updater = $API->updaters[$this->channelId];
+        $updater = ($this->updater = $API->updaters[$this->channelId]);
 
         if (!$this->API->settings['updates']['handle_updates']) {
             yield new Success(0);
@@ -97,9 +97,13 @@ class FeedLoop extends ResumableSignalLoop
                 }
                 $this->parsedUpdates = [];
                 if ($API->update_deferred) {
-                    $API->logger->logger("Resuming deferred in $this", Logger::VERBOSE);
-                    $API->update_deferred->resolve();
-                    $API->logger->logger("Done resuming deferred in $this", Logger::VERBOSE);
+                    Loop::defer(function () use ($API) {
+                        if ($API->update_deferred) {
+                            $API->logger->logger("Resuming deferred in $this", Logger::VERBOSE);
+                            $API->update_deferred->resolve();
+                            $API->logger->logger("Done resuming deferred in $this", Logger::VERBOSE);
+                        }
+                    });
                 }
             }
 
@@ -193,10 +197,10 @@ class FeedLoop extends ResumableSignalLoop
         if ($channelId && !$this->API->getChannelStates()->has($channelId)) {
             $this->API->loadChannelState($channelId, $update);
             if (!isset($this->API->feeders[$channelId])) {
-                $this->API->feeders[$channelId] = new FeedLoop($this, $channelId);
+                $this->API->feeders[$channelId] = new FeedLoop($this->API, $channelId);
             }
             if (!isset($this->API->updaters[$channelId])) {
-                $this->API->updaters[$channelId] = new UpdateLoop($this, $channelId);
+                $this->API->updaters[$channelId] = new UpdateLoop($this->API, $channelId);
             }
             $this->API->feeders[$channelId]->start();
             $this->API->updaters[$channelId]->start();
