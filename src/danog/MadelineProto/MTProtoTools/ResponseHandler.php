@@ -301,8 +301,13 @@ trait ResponseHandler
     {
         if (isset($request['promise']) && is_object($request['promise'])) {
             Loop::defer(function () use (&$request, $data) {
-                $request['promise']->fail($data);
-                unset($request['promise']);
+                if (isset($request['promise'])) {
+                    $request['promise']->fail($data);
+                    unset($request['promise']);
+                } else {
+                    $this->logger->logger('Rejecting: already got response for '.(isset($request['_']) ? $request['_'] : '-'));
+                    $this->logger->logger("Rejecting: $data");
+                }
             });
         } elseif (isset($request['container'])) {
             foreach ($request['container'] as $message_id) {
