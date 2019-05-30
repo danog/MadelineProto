@@ -33,13 +33,13 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         if (isset($update['message']['out']) && $update['message']['out']) {
             return;
         }
+        if ($update['_'] === 'updateReadChannelOutbox') return;
 
         $res = json_encode($update, JSON_PRETTY_PRINT);
         if ($res == '') {
             $res = var_export($update, true);
         }
         //yield $this->sleep_async(3);
-
         try {
             yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']); //'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
             if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
@@ -49,7 +49,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             \danog\MadelineProto\Logger::log((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
         } catch (\danog\MadelineProto\Exception $e) {
-            \danog\MadelineProto\Logger::log((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
+            if (stripos($e->getMessage(), 'invalid constructor given') === false) \danog\MadelineProto\Logger::log((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
             //$this->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
         }
     }

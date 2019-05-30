@@ -546,6 +546,9 @@ trait ResponseHandler
         $botAPI = isset($request['botAPI']) && $request['botAPI'];
         unset($request);
         $this->got_response_for_outgoing_message_id($request_id, $datacenter);
+        if (isset($response['_']) && strpos($datacenter, 'cdn') === false && $this->constructors->find_by_predicate($response['_'])['type'] === 'Updates') {
+            $this->callForkDefer($this->handle_updates_async($response));
+        }
         $r = isset($response['_']) ? $response['_'] : json_encode($response);
         $this->logger->logger("Defer sending $r to deferred");
         $this->callFork((

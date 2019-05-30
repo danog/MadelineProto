@@ -81,7 +81,8 @@ class UpdateLoop extends ResumableSignalLoop
                     } else {
                         $limit = 100;
                     }
-                    $difference = yield $this->API->method_call_async_read('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $state->pts(), 'limit' => $limit, 'force' => true], ['datacenter' => $this->API->datacenter->curdc]);
+                    $request_pts = $state->pts();
+                    $difference = yield $this->API->method_call_async_read('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $this->API->datacenter->curdc]);
                     if (isset($difference['timeout'])) {
                         $timeout = $difference['timeout'];
                     }
@@ -93,9 +94,9 @@ class UpdateLoop extends ResumableSignalLoop
                             unset($difference);
                             break 2;
                         case 'updates.channelDifference':
-                            if ($state->pts() >= $difference['pts'] && $state->pts() > 1) {
+                            if ($request_pts >= $difference['pts'] && $request_pts > 1) {
                                 $this->API->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().", using ".($state->pts() + 1), \danog\MadelineProto\Logger::VERBOSE);
-                                $difference['pts'] = $state->pts() + 1;
+                                $difference['pts'] = $request_pts + 1;
                             }
                             $state->update($difference);
                             $result += yield $feeder->feed($difference['other_updates']);
@@ -162,6 +163,12 @@ class UpdateLoop extends ResumableSignalLoop
             foreach ($result as $channelId => $boh) {
                 $this->API->feeders[$channelId]->resumeDefer();
             }
+            if ($API->update_deferred) {
+                $API->logger->logger("Resuming deferred in $this", Logger::VERBOSE);
+                $API->update_deferred->resolve();
+                $API->logger->logger("Done resuming deferred in $this", Logger::VERBOSE);
+            }
+
             if (yield $this->waitSignal($this->pause($timeout))) {
                 $API->logger->logger("Exiting $this");
                 $this->exitedLoop();

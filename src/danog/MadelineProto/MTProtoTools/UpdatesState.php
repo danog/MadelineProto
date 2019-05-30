@@ -191,7 +191,7 @@ class UpdatesState
      */
     public function checkPts($update)
     {
-        return ($this->pts + $update['pts_count']) - $update['pts'];
+        return $update['pts'] - ($this->pts + $update['pts_count']);
     }
     /**
      * Check validity of seq contained in update

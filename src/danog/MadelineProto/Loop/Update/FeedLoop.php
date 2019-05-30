@@ -97,7 +97,9 @@ class FeedLoop extends ResumableSignalLoop
                 }
                 $this->parsedUpdates = [];
                 if ($API->update_deferred) {
-                    Loop::defer([$API->update_deferred, 'resolve']);
+                    $API->logger->logger("Resuming deferred in $this", Logger::VERBOSE);
+                    $API->update_deferred->resolve();
+                    $API->logger->logger("Done resuming deferred in $this", Logger::VERBOSE);
                 }
             }
 
@@ -118,12 +120,13 @@ class FeedLoop extends ResumableSignalLoop
             }
             if (isset($update['pts'])) {
                 $logger = function ($msg) use ($update) {
-                    $pts_count = isset($update['pts_count']) ? $update['pts_count'] : 0;
+                    $pts_count = $update['pts_count'];
                     $this->API->logger->logger($update);
                     $double = isset($update['message']['id']) ? $update['message']['id'] * 2 : '-';
                     $mid = isset($update['message']['id']) ? $update['message']['id'] : '-';
                     $mypts = $this->state->pts();
-                    $this->API->logger->logger("$msg. My pts: {$mypts}, remote pts: {$update['pts']}, remote pts count: {$pts_count}, msg id: {$mid} (*2=$double), channel id: {$this->channelId}", \danog\MadelineProto\Logger::ERROR);
+                    $computed = $mypts + $pts_count;
+                    $this->API->logger->logger("$msg. My pts: {$mypts}, remote pts: {$update['pts']}, computed pts: $computed, msg id: {$mid} (*2=$double), channel id: {$this->channelId}", \danog\MadelineProto\Logger::ERROR);
                 };
                 $result = $this->state->checkPts($update);
                 if ($result < 0) {
@@ -149,6 +152,7 @@ class FeedLoop extends ResumableSignalLoop
                 $logger("PTS OK");
 
                 $this->state->pts($update['pts']);
+
             }
 
             $this->save($update);
@@ -170,11 +174,11 @@ class FeedLoop extends ResumableSignalLoop
     {
         $channelId = false;
         switch ($update['_']) {
-            case 'updateChannelWebPage':
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
                 $channelId = $update['message']['to_id']['channel_id'];
                 break;
+            case 'updateChannelWebPage':
             case 'updateDeleteChannelMessages':
                 $channelId = $update['channel_id'];
                 break;
