@@ -53,13 +53,13 @@ class HttpWaitLoop extends ResumableSignalLoop
         }
 
         $this->startedLoop();
-        $API->logger->logger("Entered HTTP wait loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
+        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
 
         $timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
         while (true) {
             //var_dump("http loop DC $datacenter");
             if ($a = yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting HTTP wait loop in DC $datacenter");
+                $API->logger->logger("Exiting $this");
                 $this->exitedLoop();
 
                 return;
@@ -72,7 +72,7 @@ class HttpWaitLoop extends ResumableSignalLoop
             }
             while ($connection->temp_auth_key === null) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting HTTP wait loop in DC $datacenter");
+                    $API->logger->logger("Exiting $this");
                     $this->exitedLoop();
 
                     return;
@@ -88,5 +88,10 @@ class HttpWaitLoop extends ResumableSignalLoop
 
             //($connection->last_http_wait + $timeout) - time()
         }
+    }
+
+    public function __toString(): string
+    {
+        return "HTTP wait loop in DC {$this->datacenter}";
     }
 }

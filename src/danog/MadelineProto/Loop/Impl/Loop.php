@@ -44,7 +44,7 @@ abstract class Loop implements LoopInterface
     public function start()
     {
         if ($this->count) {
-            $this->API->logger->logger("NOT entering loop with running count {$this->count}", Logger::ERROR);
+            $this->API->logger->logger("NOT entering $this with running count {$this->count}", Logger::ERROR);
 
             return false;
         }
@@ -67,4 +67,6 @@ abstract class Loop implements LoopInterface
     {
         return $this->count;
     }
+
+    abstract public function __toString(): string;
 }

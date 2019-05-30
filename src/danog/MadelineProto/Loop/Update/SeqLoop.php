@@ -50,10 +50,10 @@ class SeqLoop extends ResumableSignalLoop
         }
 
         $this->startedLoop();
-        $API->logger->logger("Entered update seq loop", Logger::ULTRA_VERBOSE);
+        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
         while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
             if (yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting update seq loop");
+                $API->logger->logger("Exiting $this");
                 $this->exitedLoop();
 
                 return;
@@ -64,20 +64,20 @@ class SeqLoop extends ResumableSignalLoop
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting update seq loop");
+                    $API->logger->logger("Exiting $this");
                     $this->exitedLoop();
 
                     return;
                 }
             }
             if (yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting update seq loop");
+                $API->logger->logger("Exiting $this");
                 $this->exitedLoop();
 
                 return;
             }
             if (!$this->API->settings['updates']['handle_updates']) {
-                $API->logger->logger("Exiting update seq loop");
+                $API->logger->logger("Exiting $this");
                 $this->exitedLoop();
                 return;
             }
@@ -134,6 +134,8 @@ class SeqLoop extends ResumableSignalLoop
     }
     public function feed($updates)
     {
+        $this->API->logger->logger('Was fed updates of type '.$updates['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
+
         $this->incomingUpdates[] = $updates;
     }
     public function save($updates)
@@ -157,5 +159,10 @@ class SeqLoop extends ResumableSignalLoop
         }
 
         return true;
+    }
+
+    public function __toString(): string
+    {
+        return "update seq loop";
     }
 }

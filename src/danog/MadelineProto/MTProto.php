@@ -236,6 +236,10 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->initing_authorization;
     }
 
+    public function getHTTPClient()
+    {
+        return $this->datacenter->getHTTPClient();
+    }
     public function __wakeup()
     {
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
@@ -848,13 +852,10 @@ class MTProto extends AsyncConstruct implements TLCallback
             if (!isset($this->updaters[$channelId])) {
                 $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
             }
-            $this->feeders[$channelId]->start();
-            $this->updaters[$channelId]->start();
         }
         if (!isset($this->seqUpdater)) {
             $this->seqUpdater = new SeqLoop($this);
         }
-        $this->seqUpdater->start();
 
         $this->datacenter->__construct($this, $this->settings['connection'], $this->settings['connection_settings']);
         $dcs = [];
@@ -875,6 +876,18 @@ class MTProto extends AsyncConstruct implements TLCallback
 
         yield $this->get_phone_config_async();
 
+        foreach ($this->channels_state->get() as $state) {
+            $channelId = $state->getChannel();
+            if (!isset($this->feeders[$channelId])) {
+                $this->feeders[$channelId] = new FeedLoop($this, $channelId);
+            }
+            if (!isset($this->updaters[$channelId])) {
+                $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
+            }
+            $this->feeders[$channelId]->start();
+            $this->updaters[$channelId]->start();
+        }
+        $this->seqUpdater->start();
     }
 
     public function get_phone_config_async($watcherId = null)

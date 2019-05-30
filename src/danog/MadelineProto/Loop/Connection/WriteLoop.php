@@ -53,20 +53,20 @@ class WriteLoop extends ResumableSignalLoop
         $connection = $this->connection;
 
         $this->startedLoop();
-        $API->logger->logger("Entered write loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
+        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
 
         $please_wait = false;
         while (true) {
             if (empty($connection->pending_outgoing) || $please_wait) {
-                $API->logger->logger("Waiting in write loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
+                $API->logger->logger("Waiting in $this", Logger::ULTRA_VERBOSE);
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting write loop in DC $datacenter");
+                    $API->logger->logger("Exiting $this");
                     $this->exitedLoop();
                     yield new Success(0);
 
                     return;
                 }
-                $API->logger->logger("Done waiting in write loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
+                $API->logger->logger("Done waiting in $this", Logger::ULTRA_VERBOSE);
             }
 
             try {
@@ -344,5 +344,10 @@ class WriteLoop extends ResumableSignalLoop
 
         $connection->pending_outgoing_key = 0;
         return $skipped;
+    }
+
+    public function __toString(): string
+    {
+        return "write loop in DC {$this->datacenter}";
     }
 }

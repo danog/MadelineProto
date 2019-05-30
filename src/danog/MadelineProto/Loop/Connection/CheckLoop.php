@@ -46,7 +46,7 @@ class CheckLoop extends ResumableSignalLoop
         $connection = $this->connection;
 
         $this->startedLoop();
-        $API->logger->logger("Entered check loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
+        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
 
         $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
 
@@ -54,7 +54,7 @@ class CheckLoop extends ResumableSignalLoop
         while (true) {
             while (empty($connection->new_outgoing)) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting check loop in DC {$datacenter}");
+                    $API->logger->logger("Exiting $this");
                     $this->exitedLoop();
 
                     return;
@@ -140,7 +140,7 @@ class CheckLoop extends ResumableSignalLoop
                     $connection->writer->resume();
                 }
                 if (yield $this->waitSignal($this->pause($timeout))) {
-                    $API->logger->logger("Exiting check loop in DC $datacenter");
+                    $API->logger->logger("Exiting $this");
                     $this->exitedLoop();
 
                     return;
@@ -155,12 +155,17 @@ class CheckLoop extends ResumableSignalLoop
                 }
             } else {
                 if (yield $this->waitSignal($this->pause($timeout))) {
-                    $API->logger->logger("Exiting check loop in DC $datacenter");
+                    $API->logger->logger("Exiting $this");
                     $this->exitedLoop();
 
                     return;
                 }
             }
         }
+    }
+
+    public function __toString(): string
+    {
+        return "check loop in DC {$this->datacenter}";
     }
 }

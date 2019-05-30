@@ -574,6 +574,7 @@ trait ResponseHandler
         switch ($updates['_']) {
             case 'updates':
             case 'updatesCombined':
+                $result = [];
                 foreach ($updates['updates'] as $key => $update) {
                     if ($update['_'] === 'updateNewMessage' || $update['_'] === 'updateReadMessagesContents' ||
                         $update['_'] === 'updateEditMessage' || $update['_'] === 'updateDeleteMessages' ||

@@ -46,7 +46,7 @@ class UpdateLoop extends ResumableSignalLoop
 
         while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
             if (yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting update feed loop in channel {$this->channelId}");
+                $API->logger->logger("Exiting $this");
                 $this->exitedLoop();
 
                 return;
@@ -56,13 +56,13 @@ class UpdateLoop extends ResumableSignalLoop
 
         $this->startedLoop();
 
-        $API->logger->logger("Entered updates loop in channel {$this->channelId}", Logger::ULTRA_VERBOSE);
+        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
 
         $timeout = $API->settings['updates']['getdifference_interval'];
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting update loop in channel {$this->channelId}");
+                    $API->logger->logger("Exiting $this");
                     $this->exitedLoop();
 
                     return;
@@ -73,7 +73,7 @@ class UpdateLoop extends ResumableSignalLoop
             $this->toPts = null;
             while (true) {
                 if ($this->channelId) {
-                    $this->API->logger->logger('Fetching '.$this->channelId.' difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $this->API->logger->logger('Resumed and fetching '.$this->channelId.' difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     if ($state->pts() <= 1) {
                         $limit = 10;
                     } else if ($API->authorization['user']['bot']) {
@@ -86,14 +86,13 @@ class UpdateLoop extends ResumableSignalLoop
                         $timeout = $difference['timeout'];
                     }
 
+                    $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
                     switch ($difference['_']) {
                         case 'updates.channelDifferenceEmpty':
-                            $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
                             $state->update($difference);
                             unset($difference);
                             break 2;
                         case 'updates.channelDifference':
-                            $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
                             if ($state->pts() >= $difference['pts'] && $state->pts() > 1) {
                                 $this->API->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().", using ".($state->pts() + 1), \danog\MadelineProto\Logger::VERBOSE);
                                 $difference['pts'] = $state->pts() + 1;
@@ -113,7 +112,6 @@ class UpdateLoop extends ResumableSignalLoop
                             unset($difference);
                             break 2;
                         case 'updates.channelDifferenceTooLong':
-                            $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
                             $state->update($difference);
                             $feeder->saveMessages($difference['messages']);
                             unset($difference);
@@ -122,7 +120,7 @@ class UpdateLoop extends ResumableSignalLoop
                             throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
                     }
                 } else {
-                    $this->API->logger->logger('Fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $this->API->logger->logger('Resumed and fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                     $difference = yield $this->API->method_call_async_read('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     $this->API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
@@ -161,11 +159,11 @@ class UpdateLoop extends ResumableSignalLoop
                     }
                 }
             }
-            foreach ($result as $channelId) {
+            foreach ($result as $channelId => $boh) {
                 $this->API->feeders[$channelId]->resumeDefer();
             }
             if (yield $this->waitSignal($this->pause($timeout))) {
-                $API->logger->logger("Exiting update loop in channel {$this->channelId}");
+                $API->logger->logger("Exiting $this");
                 $this->exitedLoop();
 
                 return;
@@ -189,5 +187,10 @@ class UpdateLoop extends ResumableSignalLoop
         }
 
         return true;
+    }
+
+    public function __toString(): string
+    {
+        return !$this->channelId ? "getUpdate loop generic" : "getUpdate loop channel {$this->channelId}";
     }
 }

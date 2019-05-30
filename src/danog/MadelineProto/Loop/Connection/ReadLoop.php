@@ -53,7 +53,7 @@ class ReadLoop extends SignalLoop
         $connection = $this->connection;
 
         $this->startedLoop();
-        $API->logger->logger("Entered read loop in DC {$datacenter}", Logger::ULTRA_VERBOSE);
+        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
         //$timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
 
         while (true) {
@@ -62,7 +62,7 @@ class ReadLoop extends SignalLoop
             } catch (NothingInTheSocketException $e) {
                 if (isset($connection->old)) {
                     $this->exitedLoop();
-                    $API->logger->logger("Exiting read loop in DC $datacenter");
+                    $API->logger->logger("Exiting $this");
 
                     return;
                 }
@@ -230,5 +230,10 @@ class ReadLoop extends SignalLoop
         $API->logger->logger('Received payload from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
         return true;
+    }
+
+    public function __toString(): string
+    {
+        return "read loop in DC {$this->datacenter}";
     }
 }
