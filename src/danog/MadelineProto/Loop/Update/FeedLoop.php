@@ -96,15 +96,7 @@ class FeedLoop extends ResumableSignalLoop
                     yield $API->save_update_async($update);
                 }
                 $this->parsedUpdates = [];
-                if ($API->update_deferred) {
-                    Loop::defer(function () use ($API) {
-                        if ($API->update_deferred) {
-                            $API->logger->logger("Resuming deferred in $this", Logger::VERBOSE);
-                            $API->update_deferred->resolve();
-                            $API->logger->logger("Done resuming deferred in $this", Logger::VERBOSE);
-                        }
-                    });
-                }
+                $this->API->signalUpdate();
             }
 
         }

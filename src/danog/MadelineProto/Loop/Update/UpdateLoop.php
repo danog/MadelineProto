@@ -164,15 +164,7 @@ class UpdateLoop extends ResumableSignalLoop
             foreach ($result as $channelId => $boh) {
                 $this->API->feeders[$channelId]->resumeDefer();
             }
-            if ($API->update_deferred) {
-                Loop::defer(function () use ($API) {
-                    if ($API->update_deferred) {
-                        $API->logger->logger("Resuming deferred in $this", Logger::VERBOSE);
-                        $API->update_deferred->resolve();
-                        $API->logger->logger("Done resuming deferred in $this", Logger::VERBOSE);
-                    }
-                });
-            }
+            $this->API->signalUpdate();
 
             if (yield $this->waitSignal($this->pause($timeout))) {
                 $API->logger->logger("Exiting $this");

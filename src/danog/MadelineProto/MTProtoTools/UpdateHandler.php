@@ -25,6 +25,7 @@ use Amp\Delayed;
 use function Amp\Promise\any;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
+use Amp\Loop;
 
 /**
  * Manages updates.
@@ -80,7 +81,7 @@ trait UpdateHandler
             if (!$params['timeout']) {
                 $params['timeout'] = 0.001;
             }
-            yield any([$this->update_deferred->promise(), new Delayed($params['timeout'] * 1000)]);
+            yield any([$this->waitUpdate(), new Delayed($params['timeout'] * 1000)]);
         }
 
         if (empty($this->updates)) {
@@ -100,6 +101,30 @@ trait UpdateHandler
         }
 
         return $updates;
+    }
+    public $update_resolved = false;
+    public $update_deferred;
+
+    public function waitUpdate()
+    {
+        if (!$this->update_deferred) {
+            $this->update_deferred = new Deferred;
+        }
+        yield $this->update_deferred->promise();
+        $this->update_resolved = false;
+        $this->update_deferred = new Deferred;
+    }
+    public function signalUpdate()
+    {
+        if (!$this->update_deferred) {
+            $this->update_deferred = new Deferred;
+        }
+        Loop::defer(function () {
+            if (!$this->update_resolved) {
+                $this->update_resolved = true;
+                $this->update_deferred->resolve();
+            }
+        });
     }
 
     public function check_msg_id($message)

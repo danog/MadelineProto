@@ -123,8 +123,7 @@ trait Loop
                     $controller->discard();
                 }
             });
-            $this->update_deferred = new Deferred();
-            yield $this->update_deferred->promise();
+            yield $this->waitUpdate();
         }
     }
     public function closeConnection($message = 'OK!')

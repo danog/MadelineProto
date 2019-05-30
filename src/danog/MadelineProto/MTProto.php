@@ -148,7 +148,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     private $postpone_updates = false;
     private $supportUser = 0;
     public $referenceDatabase;
-    public $update_deferred;
     public $phoneConfigWatcherId;
     public $feeders = [];
     public $updaters = [];
