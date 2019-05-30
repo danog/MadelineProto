@@ -21,15 +21,15 @@ namespace danog\MadelineProto;
 
 use Amp\Loop;
 use danog\MadelineProto\Async\AsyncConstruct;
+use danog\MadelineProto\Loop\Update\FeedLoop;
+use danog\MadelineProto\Loop\Update\SeqLoop;
+use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\TL\TLCallback;
-use danog\MadelineProto\Loop\Update\UpdateLoop;
-use danog\MadelineProto\Loop\Update\FeedLoop;
-use danog\MadelineProto\Loop\Update\SeqLoop;
 
 /**
  * Manages all of the mtproto stuff.
@@ -223,7 +223,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function __sleep()
     {
-        return ['supportUser', 'referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'dh_config', 'chats', 'last_stored', 'qres', 'pending_updates', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
+        return ['supportUser', 'referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'dh_config', 'chats', 'last_stored', 'qres', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
     }
 
     public function isAltervista()
@@ -840,6 +840,22 @@ class MTProto extends AsyncConstruct implements TLCallback
     // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
     public function connect_to_all_dcs_async(): \Generator
     {
+        foreach ($this->channels_state->get() as $state) {
+            $channelId = $state->getChannel();
+            if (!isset($this->feeders[$channelId])) {
+                $this->feeders[$channelId] = new FeedLoop($this, $channelId);
+            }
+            if (!isset($this->updaters[$channelId])) {
+                $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
+            }
+            $this->feeders[$channelId]->start();
+            $this->updaters[$channelId]->start();
+        }
+        if (!isset($this->seqUpdater)) {
+            $this->seqUpdater = new SeqLoop($this);
+        }
+        $this->seqUpdater->start();
+
         $this->datacenter->__construct($this, $this->settings['connection'], $this->settings['connection_settings']);
         $dcs = [];
         foreach ($this->datacenter->get_dcs() as $new_dc) {
@@ -859,21 +875,6 @@ class MTProto extends AsyncConstruct implements TLCallback
 
         yield $this->get_phone_config_async();
 
-        foreach ($this->channels_state->get() as $state) {
-            $channelId = $state->getChannel();
-            if (!isset($this->feeders[$channelId])) {
-                $this->feeders[$channelId] = new FeedLoop($this, $channelId);
-            }
-            if (!isset($this->updaters[$channelId])) {
-                $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
-            }
-            $this->feeders[$channelId]->start();
-            $this->updaters[$channelId]->start();
-        }
-        if (!isset($this->seqUpdater)) {
-            $this->seqUpdater = new SeqLoop($this);
-        }
-        $this->seqUpdater->start();
     }
 
     public function get_phone_config_async($watcherId = null)

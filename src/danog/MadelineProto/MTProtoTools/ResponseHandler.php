@@ -341,7 +341,7 @@ trait ResponseHandler
                             unset($request['serialized_body']);
                         }
 
-                        $this->method_recall(['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
+                        $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
 
                         return;
                     }
@@ -349,7 +349,7 @@ trait ResponseHandler
                         case 500:
                             if ($response['error_message'] === 'MSG_WAIT_FAILED') {
                                 $this->datacenter->sockets[$datacenter]->call_queue[$request['queue']] = [];
-                                $this->method_recall(['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
+                                $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
                                 return;
                             }
                             $this->got_response_for_outgoing_message_id($request_id, $datacenter);
@@ -370,7 +370,7 @@ trait ResponseHandler
                                 $this->settings['connection_settings']['default_dc'] = $this->authorized_dc = $this->datacenter->curdc;
                             }
                             Loop::defer([$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter, 'old_datacenter' => $old_datacenter]);
-                            //$this->method_recall(['message_id' => $request_id, 'datacenter' => $datacenter, 'old_datacenter' => $old_datacenter, 'postpone' => true]);
+                            //$this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'old_datacenter' => $old_datacenter, 'postpone' => true]);
 
                             return;
                         case 401:
@@ -511,7 +511,7 @@ trait ResponseHandler
                     switch ($response['error_code']) {
                         case 48:
                             $this->datacenter->sockets[$datacenter]->temp_auth_key['server_salt'] = $response['new_server_salt'];
-                            $this->method_recall(['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
+                            $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
 
                             return;
                         case 16:
@@ -570,8 +570,7 @@ trait ResponseHandler
             $updates = $actual_updates;
         }
 
-        $this->logger->logger('Parsing updates received via the socket...', \danog\MadelineProto\Logger::VERBOSE);
-        $result = [];
+        $this->logger->logger('Parsing updates ('.$updates['_'].') received via the socket...', \danog\MadelineProto\Logger::VERBOSE);
         switch ($updates['_']) {
             case 'updates':
             case 'updatesCombined':
@@ -580,11 +579,11 @@ trait ResponseHandler
                         $update['_'] === 'updateEditMessage' || $update['_'] === 'updateDeleteMessages' ||
                         $update['_'] === 'updateReadHistoryInbox' || $update['_'] === 'updateReadHistoryOutbox' ||
                         $update['_'] === 'updateWebPage' || $update['_'] === 'updateMessageID') {
-                        $result[yield $this->feedSingle($update)] = true;
+                        $result[yield $this->feeder[false]->feedSingle($update)] = true;
                         unset($updates['updates'][$key]);
                     }
                 }
-
+                $this->seqUpdater->addPendingWakeups($result);
                 if ($updates['updates']) {
                     if ($updates['_'] === 'updatesCombined') {
                         $updates['options'] = ['seq_start' => $updates['seq_start'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
@@ -592,19 +591,18 @@ trait ResponseHandler
                         $updates['options'] = ['seq_start' => $updates['seq'], 'seq_end' => $updates['seq'], 'date' => $updates['date']];
                     }
                     $this->seqUpdater->feed($updates);
-                    $this->seqUpdater->resumeDefer();
                 }
+                $this->seqUpdater->resume();
                 break;
             case 'updateShort':
-                $updates['update']['options'] = ['date' => $updates['date']];
-                $this->feedSingle($updates['update']);
+                $this->feeders[yield $this->feeder[false]->feedSingle($update)]->resume();
                 break;
             case 'updateShortMessage':
             case 'updateShortChatMessage':
                 $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 if (!yield $this->peer_isset_async($from_id) || !yield $this->peer_isset_async($to_id) || isset($updates['via_bot_id']) && !yield $this->peer_isset_async($updates['via_bot_id']) || isset($updates['entities']) && !yield $this->entities_peer_isset_async($updates['entities']) || isset($updates['fwd_from']) && !yield $this->fwd_peer_isset_async($updates['fwd_from'])) {
-                    yield $this->updaters[false]->resumeDefer();
+                    yield $this->updaters[false]->resume();
                     return;
                     // TOFIX
                 }
@@ -624,21 +622,17 @@ trait ResponseHandler
                     break;
                 }
                 $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
-                $updates['update']['options'] = ['date' => $updates['date']];
-                $result[yield $this->feedSingle($update)] = true;
+                $this->feeders[yield $this->feeders[false]->feedSingle($update)]->resume();
                 break;
             case 'updateShortSentMessage':
                 //yield $this->set_update_state_async(['date' => $updates['date']]);
                 break;
             case 'updatesTooLong':
-                $this->updaters[false]->resumeDefer();
+                $this->updaters[false]->resume();
                 break;
             default:
                 throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.var_export($updates, true));
                 break;
-        }
-        foreach ($result as $channelId => $Boh) {
-            $this->feeders[$channelId]->resumeDefer();
         }
     }
 }

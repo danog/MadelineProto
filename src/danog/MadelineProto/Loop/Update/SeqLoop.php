@@ -31,8 +31,8 @@ class SeqLoop extends ResumableSignalLoop
 {
     use \danog\MadelineProto\Tools;
     private $incomingUpdates = [];
-    private $channelId;
     private $feeder;
+    private $pendingWakeups = [];
 
     public function __construct($API)
     {
@@ -81,21 +81,22 @@ class SeqLoop extends ResumableSignalLoop
                 $this->exitedLoop();
                 return;
             }
-            $result = [];
             while ($this->incomingUpdates) {
                 $updates = $this->incomingUpdates;
                 $this->incomingUpdates = [];
-                $result = array_merge(yield $this->parse($updates), $result);
+                yield $this->parse($updates);
                 $updates = null;
             }
-            foreach ($result as $channelId => $boh) {
-                $this->API->feeders[$channelId]->resumeDefer();
+            while ($this->pendingWakeups) {
+                reset($this->pendingWakeups);
+                $channelId = key($this->pendingWakeups);
+                unset($this->pendingWakeups[$channelId]);
+                $this->API->feeders[$channelId]->resume();
             }
         }
     }
     public function parse($updates)
     {
-        $fresult = [];
         reset($updates);
         while ($updates) {
             $options = [];
@@ -128,9 +129,8 @@ class SeqLoop extends ResumableSignalLoop
                 $this->state->date($options['date']);
             }
 
-            $fresult = array_merge(yield $this->save($update), $fresult);
+            yield $this->save($update);
         }
-        return $fresult;
     }
     public function feed($updates)
     {
@@ -138,11 +138,11 @@ class SeqLoop extends ResumableSignalLoop
     }
     public function save($updates)
     {
-        $result = [];
-        foreach ($updates['updates'] as $update) {
-            $result[yield $this->API->feedSingle($update)] = true;
-        }
-        return $result;
+        $this->pendingWakeups = array_merge($this->pendingWakeups, yield $this->feeder->feed($updates['updates']));
+    }
+    public function addPendingWakeups($wakeups)
+    {
+        $this->pendingWakeups = array_merge($wakeups, $this->pendingWakeups);
     }
     public function has_all_auth()
     {

@@ -31,13 +31,11 @@ use danog\MadelineProto\Loop\Update\UpdateLoop;
  */
 trait UpdateHandler
 {
-    private $pending_updates = [];
     private $updates_state;
     private $got_state = false;
     private $channels_state;
     public $updates = [];
     public $updates_key = 0;
-    public $last_getdifference = 0;
 
     public function pwr_update_handler($update)
     {
@@ -132,9 +130,13 @@ trait UpdateHandler
 
         return $this->updates_state;
     }
-    public function loadChannelState($channelId = null)
+    public function loadChannelState($channelId = null, $init = [])
     {
-        return $this->channels_state->get($channelId);
+        return $this->channels_state->get($channelId, $init);
+    }
+    public function getChannelStates()
+    {
+        return $this->channels_state;
     }
 
     public function get_updates_state_async()
@@ -143,96 +145,6 @@ trait UpdateHandler
         yield $this->get_cdn_config_async($this->settings['connection_settings']['default_dc']);
 
         return $data;
-    }
-
-    public function feedSingle($update)
-    {
-        if (!$this->settings['updates']['handle_updates']) {
-            return;
-        }
-        $this->logger->logger('Handling an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
-        $channelId = false;
-        switch ($update['_']) {
-            case 'updateChannelWebPage':
-            case 'updateNewChannelMessage':
-            case 'updateEditChannelMessage':
-                $channelId = $update['message']['to_id']['channel_id'];
-                break;
-            case 'updateDeleteChannelMessages':
-                $channelId = $update['channel_id'];
-                break;
-            case 'updateChannelTooLong':
-                $channelId = $update['channel_id'];
-                if (!$this->channels_state->has($channelId) && !isset($update['pts'])) {
-                    $update['pts'] = 1;
-                }
-                break;
-        }
-
-        if ($channelId && !$this->channels_state->has($channelId)) {
-            $this->channels_state->get($channelId, $update);
-            if (!isset($this->feeders[$channelId])) {
-                $this->feeders[$channelId] = new FeedLoop($this, $channelId);
-            }
-            if (!isset($this->updaters[$channelId])) {
-                $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
-            }
-            $this->feeders[$channelId]->start();
-            $this->updaters[$channelId]->start();
-        }
-
-        switch ($update['_']) {
-            case 'updateNewMessage':
-            case 'updateEditMessage':
-            case 'updateNewChannelMessage':
-            case 'updateEditChannelMessage':
-                $to = false;
-                $from = false;
-                $via_bot = false;
-                $entities = false;
-                if (($from = isset($update['message']['from_id']) && !yield $this->peer_isset_async($update['message']['from_id'])) ||
-                    ($to = !yield $this->peer_isset_async($update['message']['to_id'])) ||
-                    ($via_bot = isset($update['message']['via_bot_id']) && !yield $this->peer_isset_async($update['message']['via_bot_id'])) ||
-                    ($entities = isset($update['message']['entities']) && !yield $this->entities_peer_isset_async($update['message']['entities'])) // ||
-                    //isset($update['message']['fwd_from']) && !yield $this->fwd_peer_isset_async($update['message']['fwd_from'])
-                ) {
-                    $log = '';
-                    if ($from) {
-                        $log .= "from_id {$update['message']['from_id']}, ";
-                    }
-
-                    if ($to) {
-                        $log .= "to_id ".json_encode($update['message']['to_id']).", ";
-                    }
-
-                    if ($via_bot) {
-                        $log .= "via_bot {$update['message']['via_bot_id']}, ";
-                    }
-
-                    if ($entities) {
-                        $log .= "entities ".json_encode($update['message']['entities']).", ";
-                    }
-
-                    $this->logger->logger("Not enough data: for message update $log, getting difference...", \danog\MadelineProto\Logger::VERBOSE);
-                    if ($channelId !== false && yield $this->peer_isset_async($this->to_supergroup($channelId))) {
-                        $this->updaters[$channelId]->resumeDefer();
-                    } else {
-                        $this->updaters[false]->resumeDefer();
-                    }
-
-                    return;
-                }
-                break;
-            default:
-                if ($channelId !== false && !yield $this->peer_isset_async($this->to_supergroup($channelId))) {
-                    $this->logger->logger('Skipping update, I do not have the channel id '.$channelId, \danog\MadelineProto\Logger::ERROR);
-
-                    return;
-                }
-                break;
-        }
-        $this->feeders[$channelId]->feedSingle($update);
-        return $channelId;
     }
 
     public function save_update_async($update)

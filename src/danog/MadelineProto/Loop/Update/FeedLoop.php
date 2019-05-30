@@ -18,10 +18,10 @@
 
 namespace danog\MadelineProto\Loop\Update;
 
+use Amp\Loop;
 use Amp\Success;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
-use Amp\Loop;
 
 /**
  * update feed loop.
@@ -96,7 +96,10 @@ class FeedLoop extends ResumableSignalLoop
                 }
                 $this->parsedUpdates = [];
             }
-            if ($API->update_deferred) Loop::defer([$API->update_deferred, 'resolve']);
+            if ($API->update_deferred) {
+                Loop::defer([$API->update_deferred, 'resolve']);
+            }
+
         }
     }
     public function parse($updates)
@@ -152,20 +155,110 @@ class FeedLoop extends ResumableSignalLoop
     }
     public function feed($updates)
     {
-        $this->incomingUpdates = array_merge($this->incomingUpdates, $updates);
+        $result = [];
+        foreach ($updates as $update) {
+            $res = $this->feedSingle($update);
+            if ($res instanceof \Generator) {
+                $res = yield $res;
+            }
+            $result[$res] = true;
+        }
+        return $result;
     }
     public function feedSingle($update)
     {
-        $this->incomingUpdates []= $update;
+        if (!$this->channelId) {
+            $channelId = false;
+            switch ($update['_']) {
+                case 'updateChannelWebPage':
+                case 'updateNewChannelMessage':
+                case 'updateEditChannelMessage':
+                    $channelId = $update['message']['to_id']['channel_id'];
+                    break;
+                case 'updateDeleteChannelMessages':
+                    $channelId = $update['channel_id'];
+                    break;
+                case 'updateChannelTooLong':
+                    $channelId = $update['channel_id'];
+                    if (!isset($update['pts'])) {
+                        $update['pts'] = 1;
+                    }
+                    break;
+            }
+
+            if ($channelId && !$this->API->getChannelStates()->has($channelId)) {
+                $this->API->loadChannelState($channelId, $update);
+                if (!isset($this->API->feeders[$channelId])) {
+                    $this->API->feeders[$channelId] = new FeedLoop($this, $channelId);
+                }
+                if (!isset($this->API->updaters[$channelId])) {
+                    $this->API->updaters[$channelId] = new UpdateLoop($this, $channelId);
+                }
+                $this->API->feeders[$channelId]->start();
+                $this->API->updaters[$channelId]->start();
+            }
+
+            switch ($update['_']) {
+                case 'updateNewMessage':
+                case 'updateEditMessage':
+                case 'updateNewChannelMessage':
+                case 'updateEditChannelMessage':
+                    $to = false;
+                    $from = false;
+                    $via_bot = false;
+                    $entities = false;
+                    if (($from = isset($update['message']['from_id']) && !yield $this->peer_isset_async($update['message']['from_id'])) ||
+                        ($to = !yield $this->peer_isset_async($update['message']['to_id'])) ||
+                        ($via_bot = isset($update['message']['via_bot_id']) && !yield $this->peer_isset_async($update['message']['via_bot_id'])) ||
+                        ($entities = isset($update['message']['entities']) && !yield $this->entities_peer_isset_async($update['message']['entities'])) // ||
+                        //isset($update['message']['fwd_from']) && !yield $this->fwd_peer_isset_async($update['message']['fwd_from'])
+                    ) {
+                        $log = '';
+                        if ($from) {
+                            $log .= "from_id {$update['message']['from_id']}, ";
+                        }
+
+                        if ($to) {
+                            $log .= "to_id ".json_encode($update['message']['to_id']).", ";
+                        }
+
+                        if ($via_bot) {
+                            $log .= "via_bot {$update['message']['via_bot_id']}, ";
+                        }
+
+                        if ($entities) {
+                            $log .= "entities ".json_encode($update['message']['entities']).", ";
+                        }
+
+                        $this->logger->logger("Not enough data: for message update $log, getting difference...", \danog\MadelineProto\Logger::VERBOSE);
+                        $update = ['_' => 'updateChannelTooLong'];
+                    }
+                    break;
+                default:
+                    if ($channelId !== false && !yield $this->peer_isset_async($this->to_supergroup($channelId))) {
+                        $this->logger->logger('Skipping update, I do not have the channel id '.$channelId, \danog\MadelineProto\Logger::ERROR);
+
+                        return;
+                    }
+                    break;
+            }
+            if ($channelId) {
+                return $this->feeders[$channelId]->feedSingle($update);
+            }
+        }
+
+        $this->logger->logger('Was fed an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
+        $this->incomingUpdates[] = $update;
+        return $this->channelId;
     }
     public function save($update)
     {
-        $this->parsedUpdates []= $update;
+        $this->parsedUpdates[] = $update;
     }
     public function saveMessages($messages)
     {
         foreach ($messages as $message) {
-            $this->parsedUpdates []= ['_' => $this->channelId === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
+            $this->parsedUpdates[] = ['_' => $this->channelId === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
         }
     }
 
