@@ -136,7 +136,7 @@ class FeedLoop extends ResumableSignalLoop
                     $this->updater->setLimit($this->state->pts() + $result);
                     yield $this->updater->resume();
                     $updates = array_merge($this->incomingUpdates, $updates);
-                    $this->incomingUpdates = null;
+                    $this->incomingUpdates = [];
                     continue;
                 }
                 if (isset($update['message']['id'], $update['message']['to_id']) && !in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage'])) {

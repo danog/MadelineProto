@@ -98,7 +98,7 @@ class UpdateLoop extends ResumableSignalLoop
                                 $difference['pts'] = $state->pts() + 1;
                             }
                             $state->update($difference);
-                            $result = array_merge($result, yield $feeder->feed($difference['other_updates']));
+                            $result += yield $feeder->feed($difference['other_updates']);
 
                             $feeder->saveMessages($difference['new_messages']);
                             if (!$difference['final']) {
@@ -134,8 +134,8 @@ class UpdateLoop extends ResumableSignalLoop
                             foreach ($difference['new_encrypted_messages'] as &$encrypted) {
                                 $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
                             }
-                            $result = array_merge($result, yield $feeder->feed($difference['other_updates']));
-                            $result = array_merge($result, yield $feeder->feed($difference['new_encrypted_messages']));
+                            $result += yield $feeder->feed($difference['other_updates']);
+                            $result += yield $feeder->feed($difference['new_encrypted_messages']);
                             $feeder->saveMessages($difference['new_messages']);
                             $state->update($difference['state']);
                             unset($difference);
@@ -144,8 +144,8 @@ class UpdateLoop extends ResumableSignalLoop
                             foreach ($difference['new_encrypted_messages'] as &$encrypted) {
                                 $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
                             }
-                            $result = array_merge($result, yield $feeder->feed($difference['other_updates']));
-                            $result = array_merge($result, yield $feeder->feed($difference['new_encrypted_messages']));
+                            $result += yield $feeder->feed($difference['other_updates']);
+                            $result += yield $feeder->feed($difference['new_encrypted_messages']);
                             $feeder->saveMessages($difference['new_messages']);
                             $state->update($difference['intermediate_state']);
                             if ($difference['intermediate_state']['pts'] >= $toPts) {

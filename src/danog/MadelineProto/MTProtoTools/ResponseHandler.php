@@ -580,7 +580,7 @@ trait ResponseHandler
                         $update['_'] === 'updateEditMessage' || $update['_'] === 'updateDeleteMessages' ||
                         $update['_'] === 'updateReadHistoryInbox' || $update['_'] === 'updateReadHistoryOutbox' ||
                         $update['_'] === 'updateWebPage' || $update['_'] === 'updateMessageID') {
-                        $result[yield $this->feeder[false]->feedSingle($update)] = true;
+                        $result[yield $this->feeders[false]->feedSingle($update)] = true;
                         unset($updates['updates'][$key]);
                     }
                 }
@@ -596,7 +596,7 @@ trait ResponseHandler
                 $this->seqUpdater->resume();
                 break;
             case 'updateShort':
-                $this->feeders[yield $this->feeder[false]->feedSingle($update)]->resume();
+                $this->feeders[yield $this->feeders[false]->feedSingle($updates['update'])]->resume();
                 break;
             case 'updateShortMessage':
             case 'updateShortChatMessage':

@@ -140,11 +140,11 @@ class SeqLoop extends ResumableSignalLoop
     }
     public function save($updates)
     {
-        $this->pendingWakeups = array_merge($this->pendingWakeups, yield $this->feeder->feed($updates['updates']));
+        $this->pendingWakeups += yield $this->feeder->feed($updates['updates']);
     }
     public function addPendingWakeups($wakeups)
     {
-        $this->pendingWakeups = array_merge($wakeups, $this->pendingWakeups);
+        $this->pendingWakeups += $wakeups;
     }
     public function has_all_auth()
     {
