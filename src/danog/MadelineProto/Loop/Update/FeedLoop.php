@@ -110,7 +110,7 @@ class FeedLoop extends ResumableSignalLoop
             unset($updates[$key]);
             if ($update['_'] === 'updateChannelTooLong') {
                 $this->API->logger->logger('Got channel too long update, getting difference...', \danog\MadelineProto\Logger::VERBOSE);
-                $this->API->updaters[$this->channelId]->resume();
+                yield $this->updater->resume();
 
                 continue;
             }

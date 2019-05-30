@@ -138,7 +138,7 @@ class UpdatesState
      */
     public function pts($set = 0)
     {
-        if ($set !== 0) {
+        if ($set !== 0 && $set > $this->pts) {
             $this->pts = $set;
         }
         return $this->pts;
@@ -151,7 +151,7 @@ class UpdatesState
      */
     public function qts($set = 0)
     {
-        if ($set !== 0) {
+        if ($set !== 0 && $set > $this->qts) {
             $this->qts = $set;
         }
         return $this->qts;
@@ -164,7 +164,7 @@ class UpdatesState
      */
     public function seq($set = 0)
     {
-        if ($set !== 0) {
+        if ($set !== 0 && $set > $this->seq) {
             $this->seq = $set;
         }
         return $this->seq;
