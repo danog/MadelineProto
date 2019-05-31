@@ -4,6 +4,8 @@ Created by <a href="https://daniil.it" target="_blank" rel="noopener">Daniil Gen
 
 Do join the official channel, [@MadelineProto](https://t.me/MadelineProto) and the [support groups](https://t.me/pwrtelegramgroup)!
 
+<a href="https://telegram.org/apps" target="_blank" rel="noopener">Approved by Telegram!</a>
+
 ## What's this?
 
 This library can be used to easily interact with Telegram **without** the bot API, just like the official apps.
