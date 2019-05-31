@@ -21,8 +21,6 @@
         "ext-xml": "*",
         "amphp/amp": "^2.0",
         "amphp/socket": "^0.10.11",
-        "amphp/log": "^1.0",
-        "amphp/parser": "^1.0",
         "amphp/websocket": "dev-master",
         "amphp/websocket-client": "dev-master",
         "amphp/artax": "^3.0",
