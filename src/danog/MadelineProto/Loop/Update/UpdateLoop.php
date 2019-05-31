@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Loop\Update;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 use Amp\Loop;
+use danog\MadelineProto\RPCErrorException;
 
 /**
  * Update loop.
@@ -83,7 +84,17 @@ class UpdateLoop extends ResumableSignalLoop
                         $limit = 100;
                     }
                     $request_pts = $state->pts();
-                    $difference = yield $this->API->method_call_async_read('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $this->API->datacenter->curdc]);
+                    try {
+                        $difference = yield $this->API->method_call_async_read('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $this->API->datacenter->curdc]);
+                    } catch (RPCErrorException $e) {
+                        if (in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN'])) {
+                            $feeder->signal(true);
+                            $API->logger->logger("Exiting $this");
+                            $this->exitedLoop();            
+                            return true;
+                        }
+                        throw $e;            
+                    }
                     if (isset($difference['timeout'])) {
                         $timeout = $difference['timeout'];
                     }
@@ -154,6 +165,10 @@ class UpdateLoop extends ResumableSignalLoop
                                 unset($difference);
                                 break 2;
                             }
+                            unset($difference);
+                            break;
+                        case 'updates.differenceTooLong':
+                            $state->update($difference);
                             unset($difference);
                             break;
                         default:

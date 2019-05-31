@@ -184,7 +184,10 @@ class API extends APIFactory
 
         return implode('_', $ret);
     }
-
+    public function my_get_self()
+    {
+        return $this->API->authorization['user'];
+    }
     public function APIFactory()
     {
         if ($this->API) {
@@ -216,12 +219,12 @@ class API extends APIFactory
                         $method = str_ireplace('async', '', $method);
                     }
                 }
-
-                $this->methods[strtolower($method)] = [$this->API, $actual_method];
+                $actual_method = $actual_method === 'get_self_async' ? [$this, 'my_get_self'] : [$this->API, $actual_method];
+                $this->methods[strtolower($method)] = $actual_method;
                 if (strpos($method, '_') !== false) {
-                    $this->methods[strtolower(str_replace('_', '', $method))] = [$this->API, $actual_method];
+                    $this->methods[strtolower(str_replace('_', '', $method))] = $actual_method;
                 } else {
-                    $this->methods[strtolower($this->from_camel_case($method))] = [$this->API, $actual_method];
+                    $this->methods[strtolower($this->from_camel_case($method))] = $actual_method;
                 }
             }
 

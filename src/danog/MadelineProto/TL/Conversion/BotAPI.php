@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\TL\Conversion;
 
+use danog\MadelineProto\Logger;
+
 trait BotAPI
 {
     public function html_entity_decode($stuff)
@@ -531,10 +533,10 @@ trait BotAPI
             $args['entities'] = [];
         }
 
-        $multiple_args_base = array_merge($args, ['entities' => [], 'parse_mode' => 'text', 'message' => '']);
-        $multiple_args = [$multiple_args_base];
-
         $max_length = isset($args['media']) ? $this->config['caption_length_max'] : $this->config['message_length_max'];
+        $max_entity_length = 100;
+        $max_entity_size = 8110;
+
         $text_arr = [];
         foreach ($this->multipleExplodeKeepDelimiters(["\n"], $args['message']) as $word) {
             if (mb_strlen($word, 'UTF-8') > $max_length) {
@@ -545,6 +547,10 @@ trait BotAPI
                 $text_arr[] = $word;
             }
         }
+
+
+        $multiple_args_base = array_merge($args, ['entities' => [], 'parse_mode' => 'text', 'message' => '']);
+        $multiple_args = [$multiple_args_base];
         $i = 0;
         foreach ($text_arr as $word) {
             if ($this->mb_strlen($multiple_args[$i]['message'].$word) <= $max_length) {
@@ -610,7 +616,24 @@ trait BotAPI
                 }
             } while (true);
         }
-
+        $total = 0;
+        foreach ($multiple_args as $args) {
+            if (count($args['entities']) > 100) {
+                $total += count($args['entities']) - 100;
+            }
+            $c = 0;
+            foreach ($args['entities'] as $entity) {
+                if (isset($entity['url'])) {
+                    $c += strlen($entity['url']);
+                }
+            }
+            if ($c >= 8110) {
+                $this->logger->logger("Entity size limit possibly exceeded, you may get an error indicating that the entities are too long. Reduce the number of entities and/or size of the URLs used.", Logger::FATAL_ERROR);
+            }
+        }
+        if ($total) {
+            $this->logger->logger("Too many entities, $total entities will be truncated", Logger::FATAL_ERROR);
+        }
         return $multiple_args;
     }
 
@@ -632,7 +655,7 @@ trait BotAPI
 
     public function html_fixtags($text)
     {
-        preg_match_all('#(.*?)(<(a|b|\bstrong\b|\bem\b|i|\bcode\b|\bpre\b)[^>]*>)(.*?)(<\s*/\s*\3>)#is', $text, $matches, PREG_SET_ORDER|PREG_OFFSET_CAPTURE);
+        preg_match_all('#(.*?)(<(a|b|\bstrong\b|\bem\b|i|\bcode\b|\bpre\b)[^>]*>)(.*?)(<\s*/\s*\3>)#is', $text, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
         if ($matches) {
             foreach ($matches as $match) {
                 if (trim($match[1][0]) != '') {
@@ -645,9 +668,6 @@ trait BotAPI
                 $temp .= htmlentities($match[4][0]);
                 $temp .= substr($text, $match[4][1] + strlen($match[4][0]));
                 $text = $temp;
-                /*if ($match == $matches[$last]) {
-                    $text = str_replace($match[6], $this->html_fixtags($match[6]), $text);
-                }*/
             }
             preg_match_all('#<a\s*href=("|\')(.+?)("|\')\s*>#is', $text, $matches, PREG_OFFSET_CAPTURE);
             foreach ($matches[2] as $match) {
