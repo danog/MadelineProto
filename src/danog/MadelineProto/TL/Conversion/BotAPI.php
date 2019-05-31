@@ -558,27 +558,37 @@ trait BotAPI
 
         $i = 0;
         $offset = 0;
-        foreach ($args['entities'] as $entity) {
+        for ($k = 0; $k < count($args['entities']); $k++) {
+            $entity = $args['entities'][$k];
             do {
                 while ($entity['offset'] > $offset + $this->mb_strlen($multiple_args[$i]['message'])) {
                     $offset += $this->mb_strlen($multiple_args[$i]['message']);
                     $i++;
                 }
                 $entity['offset'] -= $offset;
+
                 if ($entity['offset'] + $entity['length'] > $this->mb_strlen($multiple_args[$i]['message'])) {
                     $newentity = $entity;
                     $newentity['length'] = $entity['length'] - ($this->mb_strlen($multiple_args[$i]['message']) - $entity['offset']);
                     $entity['length'] = $this->mb_strlen($multiple_args[$i]['message']) - $entity['offset'];
 
-                    $offset += $this->mb_strlen($multiple_args[$i]['message']);
+                    $offset += $entity['length']; //$this->mb_strlen($multiple_args[$i]['message']);
                     $newentity['offset'] = $offset;
 
                     $prev_length = $this->mb_strlen($multiple_args[$i]['message']);
                     $multiple_args[$i]['message'] = rtrim($multiple_args[$i]['message']);
-                    $entity['length'] -= $prev_length - $this->mb_strlen($multiple_args[$i]['message']);
+                    $diff = $prev_length - $this->mb_strlen($multiple_args[$i]['message']);
+
+                    if ($diff) {
+                        $entity['length'] -= $diff;
+                        foreach ($args['entities'] as $key => &$eentity) {
+                            if ($key > $k) {
+                                $eentity['offset'] -= $diff;
+                            }
+                        }
+                    }
 
                     $multiple_args[$i]['entities'][] = $entity;
-
                     $i++;
                     $entity = $newentity;
 
@@ -586,8 +596,15 @@ trait BotAPI
                 } else {
                     $prev_length = $this->mb_strlen($multiple_args[$i]['message']);
                     $multiple_args[$i]['message'] = rtrim($multiple_args[$i]['message']);
-                    $entity['length'] -= $prev_length - $this->mb_strlen($multiple_args[$i]['message']);
-
+                    $diff = $prev_length - $this->mb_strlen($multiple_args[$i]['message']);
+                    if ($diff) {
+                        $entity['length'] -= $diff;
+                        foreach ($args['entities'] as $key => &$eentity) {
+                            if ($key > $k) {
+                                $eentity['offset'] -= $diff;
+                            }
+                        }
+                    }
                     $multiple_args[$i]['entities'][] = $entity;
                     break;
                 }
@@ -615,23 +632,30 @@ trait BotAPI
 
     public function html_fixtags($text)
     {
-        preg_match_all('#(.*?)(<(a|b|\bstrong\b|\bem\b|i|\bcode\b|\bpre\b)[^>]*>)([^<]*?)(<\\/\\3>)(.*)?#is', $text, $matches, PREG_SET_ORDER);
+        preg_match_all('#(.*?)(<(a|b|\bstrong\b|\bem\b|i|\bcode\b|\bpre\b)[^>]*>)(.*?)(<\s*/\s*\3>)#is', $text, $matches, PREG_SET_ORDER|PREG_OFFSET_CAPTURE);
         if ($matches) {
-            $last = count($matches) - 1;
-            foreach ($matches as $val) {
-                if (trim($val[1]) != '') {
-                    $text = str_replace($val[1], htmlentities($val[1]), $text);
+            foreach ($matches as $match) {
+                if (trim($match[1][0]) != '') {
+                    $temp = substr($text, 0, $match[1][1]);
+                    $temp .= htmlentities($match[1][0]);
+                    $temp .= substr($text, $match[1][1] + strlen($match[1][0]));
+                    $text = $temp;
                 }
-                $text = str_replace($val[4], htmlentities(trim($val[4])), $text);
-                if ($val == $matches[$last]) {
-                    $text = str_replace($val[6], $this->html_fixtags($val[6]), $text);
-                }
+                $temp = substr($text, 0, $match[4][1]);
+                $temp .= htmlentities($match[4][0]);
+                $temp .= substr($text, $match[4][1] + strlen($match[4][0]));
+                $text = $temp;
+                /*if ($match == $matches[$last]) {
+                    $text = str_replace($match[6], $this->html_fixtags($match[6]), $text);
+                }*/
             }
-            preg_match_all('#<a href="(.+?)">#is', $text, $matches);
-            foreach ($matches[1] as $match) {
-                $text = str_replace($match, htmlentities($match), $text);
+            preg_match_all('#<a\s*href=("|\')(.+?)("|\')\s*>#is', $text, $matches, PREG_OFFSET_CAPTURE);
+            foreach ($matches[2] as $match) {
+                $temp = substr($text, 0, $match[1]);
+                $temp .= htmlentities($match[0]);
+                $temp .= substr($text, $match[1] + strlen($match[0]));
+                $text = $temp;
             }
-
             return $text;
         } else {
             return htmlentities($text);
