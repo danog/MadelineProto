@@ -48,7 +48,7 @@ class UpdateLoop extends ResumableSignalLoop
 
         while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
             if (yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting $this");
+                $API->logger->logger("Exiting $this due to signal");
                 $this->exitedLoop();
 
                 return;
@@ -64,7 +64,7 @@ class UpdateLoop extends ResumableSignalLoop
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting $this");
+                    $API->logger->logger("Exiting $this due to signal");
                     $this->exitedLoop();
 
                     return;
@@ -89,7 +89,7 @@ class UpdateLoop extends ResumableSignalLoop
                     } catch (RPCErrorException $e) {
                         if (in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN'])) {
                             $feeder->signal(true);
-                            $API->logger->logger("Exiting $this");
+                            $API->logger->logger("Channel private, exiting $this");
                             $this->exitedLoop();            
                             return true;
                         }
@@ -182,7 +182,7 @@ class UpdateLoop extends ResumableSignalLoop
             $this->API->signalUpdate();
 
             if (yield $this->waitSignal($this->pause($timeout))) {
-                $API->logger->logger("Exiting $this");
+                $API->logger->logger("Exiting $this due to signal");
                 $this->exitedLoop();
 
                 return;

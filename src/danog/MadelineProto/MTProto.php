@@ -217,6 +217,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
         }
         yield $this->get_config_async([], ['datacenter' => $this->datacenter->curdc]);
+        $this->startUpdateSystem();
         $this->v = self::V;
     }
 
@@ -419,6 +420,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             yield $this->get_cdn_config_async($this->datacenter->curdc);
             $this->setup_logger();
         }
+        $this->startUpdateSystem();
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings['peer']['cache_all_peers_on_startup']) {
             yield $this->get_dialogs_async($force);
         }
@@ -874,7 +876,12 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
 
         yield $this->get_phone_config_async();
-
+    }
+    public function startUpdateSystem()
+    {
+        if (!isset($this->seqUpdater)) {
+            $this->seqUpdater = new SeqLoop($this);
+        }
         foreach ($this->channels_state->get() as $state) {
             $channelId = $state->getChannel();
             if (!isset($this->feeders[$channelId])) {
@@ -888,7 +895,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         $this->seqUpdater->start();
     }
-
     public function get_phone_config_async($watcherId = null)
     {
         if ($this->authorized === self::LOGGED_IN && class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal') && !$this->authorization['user']['bot'] && $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->temp_auth_key !== null) {

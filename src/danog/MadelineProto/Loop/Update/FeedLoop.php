@@ -172,7 +172,7 @@ class FeedLoop extends ResumableSignalLoop
         switch ($update['_']) {
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
-                $channelId = $update['message']['to_id']['channel_id'];
+                $channelId = isset($update['message']['to_id']['channel_id']) ? $update['message']['to_id']['channel_id'] : false;
                 break;
             case 'updateChannelWebPage':
             case 'updateDeleteChannelMessages':
@@ -207,12 +207,13 @@ class FeedLoop extends ResumableSignalLoop
                 $from = false;
                 $via_bot = false;
                 $entities = false;
-                if (($from = isset($update['message']['from_id']) && !yield $this->API->peer_isset_async($update['message']['from_id'])) ||
+                if ($update['message']['_'] !== 'messageEmpty' && (
+                    ($from = isset($update['message']['from_id']) && !yield $this->API->peer_isset_async($update['message']['from_id'])) ||
                     ($to = !yield $this->API->peer_isset_async($update['message']['to_id'])) ||
                     ($via_bot = isset($update['message']['via_bot_id']) && !yield $this->API->peer_isset_async($update['message']['via_bot_id'])) ||
                     ($entities = isset($update['message']['entities']) && !yield $this->API->entities_peer_isset_async($update['message']['entities'])) // ||
                     //isset($update['message']['fwd_from']) && !yield $this->fwd_peer_isset_async($update['message']['fwd_from'])
-                ) {
+                )) {
                     $log = '';
                     if ($from) {
                         $log .= "from_id {$update['message']['from_id']}, ";
