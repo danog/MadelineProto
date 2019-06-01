@@ -64,7 +64,10 @@ trait ResponseHandler
         while ($this->datacenter->sockets[$datacenter]->new_incoming) {
             reset($this->datacenter->sockets[$datacenter]->new_incoming);
             $current_msg_id = key($this->datacenter->sockets[$datacenter]->new_incoming);
-            if (!isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id])) continue;
+            if (!isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id])) {
+                unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
+                continue;
+            }
             $this->logger->logger((isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['from_container']) ? 'Inside of container, received ' : 'Received ').$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].' from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']) {

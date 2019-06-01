@@ -289,7 +289,9 @@ trait BotAPI
                 }
                 $res['photo'] = [];
                 foreach ($data['photo']['sizes'] as $key => $photo) {
-                    $res['photo'][$key] = yield $this->photosize_to_botapi_async($photo, $data['photo']);
+                    if (in_array($photo['_'], ['photoCachedSize', 'photoSize'])) {
+                        $res['photo'][$key] = yield $this->photosize_to_botapi_async($photo, $data['photo']);
+                    }
                 }
 
                 return $res;
@@ -298,8 +300,8 @@ trait BotAPI
             case 'messageMediaDocument':
                 $type_name = 'document';
                 $res = [];
-                if ($data['document']['thumb']['_'] === 'photoSize') {
-                    $res['thumb'] = yield $this->photosize_to_botapi_async($data['document']['thumb'], [], true);
+                if (isset($data['document']['thumbs']) && $data['document']['thumbs'] && in_array(end($data['document']['thumbs'])['_'], ['photoCachedSize', 'photoSize'])) {
+                    $res['thumb'] = yield $this->photosize_to_botapi_async(end($data['document']['thumbs']), [], true);
                 }
                 foreach ($data['document']['attributes'] as $attribute) {
                     switch ($attribute['_']) {
