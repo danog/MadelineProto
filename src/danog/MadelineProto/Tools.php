@@ -24,6 +24,7 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use function Amp\Promise\all;
+use function Amp\Promise\any;
 use function Amp\Promise\wait;
 
 /**
@@ -229,6 +230,13 @@ trait Tools
             $promise = $this->call($promise);
         }
         return all($promises);
+    }
+    public function any($promises)
+    {
+        foreach ($promises as &$promise) {
+            $promise = $this->call($promise);
+        }
+        return any($promises);
     }
     public function call($promise)
     {

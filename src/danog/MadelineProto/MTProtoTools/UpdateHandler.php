@@ -22,9 +22,6 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Artax\Request;
 use Amp\Deferred;
 use Amp\Delayed;
-use function Amp\Promise\any;
-use danog\MadelineProto\Loop\Update\FeedLoop;
-use danog\MadelineProto\Loop\Update\UpdateLoop;
 use Amp\Loop;
 
 /**
@@ -81,7 +78,7 @@ trait UpdateHandler
             if (!$params['timeout']) {
                 $params['timeout'] = 0.001;
             }
-            yield any([$this->waitUpdate(), new Delayed($params['timeout'] * 1000)]);
+            yield $this->any([$this->waitUpdate(), new Delayed($params['timeout'] * 1000)]);
         }
 
         if (empty($this->updates)) {
