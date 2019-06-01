@@ -615,7 +615,7 @@ trait ResponseHandler
                 if (!isset($updates['request']['body'])) {
                     break;
                 }
-                $updates['user_id'] = $updates['request']['body']['peer'];
+                $updates['user_id'] = (yield $this->get_info_async($updates['request']['body']['peer']))['bot_api_id'];
                 $updates['message'] = $updates['request']['body']['message'];
                 unset($updates['request']);
             case 'updateShortMessage':
@@ -625,7 +625,6 @@ trait ResponseHandler
                 if (!yield $this->peer_isset_async($from_id) || !yield $this->peer_isset_async($to_id) || isset($updates['via_bot_id']) && !yield $this->peer_isset_async($updates['via_bot_id']) || isset($updates['entities']) && !yield $this->entities_peer_isset_async($updates['entities']) || isset($updates['fwd_from']) && !yield $this->fwd_peer_isset_async($updates['fwd_from'])) {
                     yield $this->updaters[false]->resume();
                     return;
-                    // TOFIX
                 }
                 $message = $updates;
                 $message['_'] = 'message';

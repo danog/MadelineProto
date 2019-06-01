@@ -52,7 +52,7 @@ class HttpWaitLoop extends ResumableSignalLoop
 
         $timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
         while (true) {
-            if (yield $this->waitSignal($this->pause($timeout))) {
+            if (yield $this->waitSignal($this->pause())) {
                 return;
             }
             if (!in_array($connection->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()])) {
