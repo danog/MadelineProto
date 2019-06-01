@@ -44,6 +44,7 @@ trait Login
         $this->tos = ['expires' => 0, 'accepted' => true];
         yield $this->method_call_async_read('auth.logOut', [], ['datacenter' => $this->datacenter->curdc]);
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['logout_ok'], \danog\MadelineProto\Logger::NOTICE);
+        $this->startUpdateSystem();
 
         return true;
     }
@@ -62,6 +63,8 @@ trait Login
         $this->updates = [];
         $this->updates_key = 0;
         yield $this->init_authorization_async();
+        $this->startUpdateSystem();
+
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
 
         return $this->authorization;
@@ -120,6 +123,7 @@ trait Login
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
         yield $this->init_authorization_async();
         yield $this->get_phone_config_async();
+        $this->startUpdateSystem();
 
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
 
@@ -152,7 +156,10 @@ trait Login
         yield $this->init_authorization_async();
         yield $this->get_phone_config_async();
 
-        return yield $this->get_self_async();
+        $res = yield $this->get_self_async();
+
+        $this->startUpdateSystem();
+        return $res;
     }
 
     public function export_authorization_async()
@@ -180,6 +187,7 @@ trait Login
         yield $this->get_phone_config_async();
 
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['signup_ok'], \danog\MadelineProto\Logger::NOTICE);
+        $this->startUpdateSystem();
 
         return $this->authorization;
     }
@@ -199,6 +207,7 @@ trait Login
         yield $this->init_authorization_async();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
         yield $this->get_phone_config_async();
+        $this->startUpdateSystem();
 
         return $this->authorization;
     }

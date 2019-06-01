@@ -99,7 +99,7 @@ trait Loop
         if (!$this->settings['updates']['run_callback']) {
             $this->settings['updates']['run_callback'] = true;
         }
-        $this->updaters[false]->start();
+        $this->startUpdateSystem();
 
         $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
 

@@ -696,6 +696,7 @@ trait PeerHandler
                 $gres = yield $this->method_call_async_read('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset, 'limit' => $limit, 'hash' => $hash = $this->get_participants_hash($channel, $filter, $q, $offset, $limit)], ['datacenter' => $this->datacenter->curdc, 'heavy' => true]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if ($e->rpc === 'CHAT_ADMIN_REQUIRED') {
+                    $this->logger->logger($e->rpc);
                     return $has_more;
                 } else {
                     throw $e;

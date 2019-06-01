@@ -247,7 +247,7 @@ class CombinedAPI
             }
             if (!$instance->API->settings['updates']['handle_updates']) {
                 $instance->API->settings['updates']['handle_updates'] = true;
-                $instance->API->updaters[false]->start();
+                $instance->API->startUpdateSystem();
             }
             $instance->setCallback(function ($update) use ($path) {
                 return $this->event_update_handler($update, $path);

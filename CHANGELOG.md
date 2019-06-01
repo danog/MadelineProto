@@ -14,7 +14,7 @@
 * get_full_dialogs
 * new APIfactory
 * sendmessage with secret messages
-
+* 2fa+++++
 Things to expect in the next releases:
 Document async apis
 optional max_id and min_id

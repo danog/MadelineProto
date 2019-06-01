@@ -29,7 +29,6 @@ trait Callback
         $this->settings['updates']['callback'] = $callback;
         $this->settings['updates']['run_callback'] = true;
         $this->settings['updates']['handle_updates'] = true;
-
-        return $this->updaters[false];
+        $this->startUpdateSystem();
     }
 }

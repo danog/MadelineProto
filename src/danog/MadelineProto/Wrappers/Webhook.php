@@ -31,6 +31,6 @@ trait Webhook
         $this->settings['updates']['callback'] = [$this, 'pwr_webhook'];
         $this->settings['updates']['run_callback'] = true;
         $this->settings['updates']['handle_updates'] = true;
-        $this->updaters[false]->start();
+        $this->startUpdateSystem();
     }
 }

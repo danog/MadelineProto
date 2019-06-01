@@ -176,13 +176,16 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         // Connect to servers
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
-        if (!($this->updates_state instanceof UpdatesState)) {
-            $this->updates_state = new UpdatesState($this->updates_state);
-        }
         if (!($this->channels_state instanceof CombinedUpdatesState)) {
             $this->channels_state = new CombinedUpdatesState($this->channels_state);
         }
-        $this->channels_state->__construct([false => $this->updates_state]);
+        if (isset($this->updates_state)) {
+            if (!($this->updates_state instanceof UpdatesState)) {
+                $this->updates_state = new UpdatesState($this->updates_state);
+            }
+            $this->channels_state->__construct([false => $this->updates_state]);
+            unset($this->updates_state);
+        }
         if (!isset($this->datacenter)) {
             $this->datacenter = new DataCenter($this, $this->settings['connection'], $this->settings['connection_settings']);
         }
@@ -223,7 +226,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function __sleep()
     {
-        return ['supportUser', 'referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'dh_config', 'chats', 'last_stored', 'qres', 'updates_state', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
+        return ['supportUser', 'referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'dh_config', 'chats', 'last_stored', 'qres', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
     }
 
     public function isAltervista()
@@ -243,6 +246,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function __wakeup()
     {
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
+        $this->asyncInitPromise = true;
         $this->setInitPromise($this->__wakeup_async($backtrace));
     }
     public function __wakeup_async($backtrace)
@@ -293,13 +297,16 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->authorized === true) {
             $this->authorized = self::LOGGED_IN;
         }
-        if (is_array($this->updates_state)) {
-            $this->updates_state = new UpdatesState($this->updates_state);
-        }
-        if (is_array($this->channels_state)) {
+        if (!($this->channels_state instanceof CombinedUpdatesState)) {
             $this->channels_state = new CombinedUpdatesState($this->channels_state);
         }
-        $this->channels_state->__construct([false => $this->updates_state]);
+        if (isset($this->updates_state)) {
+            if (!($this->updates_state instanceof UpdatesState)) {
+                $this->updates_state = new UpdatesState($this->updates_state);
+            }
+            $this->channels_state->__construct([false => $this->updates_state]);
+            unset($this->updates_state);
+        }
 
         $this->postpone_updates = false;
         if ($this->event_handler && class_exists($this->event_handler) && is_subclass_of($this->event_handler, '\danog\MadelineProto\EventHandler')) {
@@ -397,8 +404,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
 
         if (!$this->settings['updates']['handle_old_updates']) {
-            $this->channels_state = new CombinedUpdatesState();
-            $this->channels_state->__construct([false => $this->updates_state]);
+            $this->channels_state = new CombinedUpdatesState([false => new UpdatesState()]);
             $this->got_state = false;
         }
         yield $this->connect_to_all_dcs_async();
@@ -424,7 +430,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings['peer']['cache_all_peers_on_startup']) {
             yield $this->get_dialogs_async($force);
         }
-        if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates'] && !$this->updates_state->syncLoading()) {
+        if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates']) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
             yield $this->updaters[false]->resume();
         }
@@ -879,6 +885,8 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     public function startUpdateSystem()
     {
+        if ($this->asyncInitPromise) return;
+
         if (!isset($this->seqUpdater)) {
             $this->seqUpdater = new SeqLoop($this);
         }
@@ -890,10 +898,16 @@ class MTProto extends AsyncConstruct implements TLCallback
             if (!isset($this->updaters[$channelId])) {
                 $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
             }
-            $this->feeders[$channelId]->start();
-            $this->updaters[$channelId]->start();
+            if ($this->feeders[$channelId]->start()) {
+                $this->feeders[$channelId]->resume();
+            }
+            if ($this->updaters[$channelId]->start()) {
+                $this->updaters[$channelId]->resume();
+            }
         }
-        $this->seqUpdater->start();
+        if ($this->seqUpdater->start()) {
+            $this->seqUpdater->resume();
+        }
     }
     public function get_phone_config_async($watcherId = null)
     {

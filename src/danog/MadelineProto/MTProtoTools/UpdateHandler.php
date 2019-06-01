@@ -29,7 +29,6 @@ use Amp\Loop;
  */
 trait UpdateHandler
 {
-    private $updates_state;
     private $got_state = false;
     private $channels_state;
     public $updates = [];
@@ -60,7 +59,7 @@ trait UpdateHandler
     {
         if (!$this->settings['updates']['handle_updates']) {
             $this->settings['updates']['handle_updates'] = true;
-            $this->updaters[false]->start();
+            $this->startUpdateSystem();
         }
         if (!$this->settings['updates']['run_callback']) {
             $this->settings['updates']['run_callback'] = true;
@@ -148,10 +147,10 @@ trait UpdateHandler
     {
         if (!$this->got_state) {
             $this->got_state = true;
-            $this->updates_state->update(yield $this->get_updates_state_async());
+            $this->channels_state->get(false, yield $this->get_updates_state_async());
         }
 
-        return $this->updates_state;
+        return $this->channels_state->get(false);
     }
     public function loadChannelState($channelId = null, $init = [])
     {
