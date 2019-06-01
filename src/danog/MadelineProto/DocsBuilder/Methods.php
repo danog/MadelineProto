@@ -214,7 +214,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
             $example = '';
             if (!isset($this->settings['td'])) {
                 $example .= '### Can bots use this method: **'.($bot ? 'YES' : 'NO')."**\n\n\n";
-                $example .= str_replace('[]', '', '### MadelineProto Example ([now async!](https://docs.madelineproto.xyz/docs/ASYNC.html)):
+                $example .= str_replace('[]', '', '### MadelineProto Example ([now async for huge speed and parallelism!](https://docs.madelineproto.xyz/docs/ASYNC.html)):
 
 
 ```php

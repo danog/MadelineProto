@@ -45,22 +45,16 @@ class PeriodicFetcherLoop extends ResumableSignalLoop
     public function __construct($API, $callback, $name)
     {
         $this->API = $API;
-        $this->callback = $callback->bindTo($this);
+        $this->callback = $callback;
         $this->name = $name;
     }
     public function loop()
     {
-        $API = $this->API;
         $callback = $this->callback;
 
-        $this->startedLoop();
-        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
         while (true) {
             $timeout = yield $callback();
             if ($timeout === self::STOP || yield $this->waitSignal($this->pause($timeout))) {
-                $API->logger->logger("Exiting $this");
-                $this->exitedLoop();
-
                 return;
             }
         }

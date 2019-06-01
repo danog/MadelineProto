@@ -18,13 +18,12 @@
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use Amp\Success;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
-use danog\MadelineProto\Magic;
 
 /**
  * Socket write loop.
@@ -45,41 +44,28 @@ class WriteLoop extends ResumableSignalLoop
         $this->datacenter = $datacenter;
         $this->connection = $API->datacenter->sockets[$datacenter];
     }
-    
+
     public function loop(): \Generator
     {
         $API = $this->API;
-        $datacenter = $this->datacenter;
         $connection = $this->connection;
-
-        $this->startedLoop();
-        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
 
         $please_wait = false;
         while (true) {
             if (empty($connection->pending_outgoing) || $please_wait) {
                 $API->logger->logger("Waiting in $this", Logger::ULTRA_VERBOSE);
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting $this");
-                    $this->exitedLoop();
-                    yield new Success(0);
-
                     return;
                 }
                 $API->logger->logger("Done waiting in $this", Logger::ULTRA_VERBOSE);
             }
 
-            try {
-                if ($connection->temp_auth_key === null) {
-                    $res = $this->unencryptedWriteLoopAsync();
-                } else {
-                    $res = $this->encryptedWriteLoopAsync();
-                }
-                $please_wait = yield $res;
-            } finally {
-                $this->exitedLoop();
+            if ($connection->temp_auth_key === null) {
+                $res = $this->unencryptedWriteLoopAsync();
+            } else {
+                $res = $this->encryptedWriteLoopAsync();
             }
-            $this->startedLoop();
+            $please_wait = yield $res;
 
             //$connection->waiter->resume();
         }

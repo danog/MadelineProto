@@ -47,46 +47,28 @@ class HttpWaitLoop extends ResumableSignalLoop
         $connection = $this->connection;
 
         if (!in_array($connection->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()])) {
-            yield new Success(0);
-
             return;
         }
 
-        $this->startedLoop();
-        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
-
         $timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
         while (true) {
-            //var_dump("http loop DC $datacenter");
-            if ($a = yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting $this");
-                $this->exitedLoop();
-
+            if (yield $this->waitSignal($this->pause($timeout))) {
                 return;
             }
             if (!in_array($connection->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()])) {
-                $this->exitedLoop();
-                yield new Success(0);
-
                 return;
             }
             while ($connection->temp_auth_key === null) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting $this");
-                    $this->exitedLoop();
-
                     return;
                 }
             }
-            //if (time() - $connection->last_http_wait >= $timeout) {
             $API->logger->logger("DC $datacenter: request {$connection->http_req_count}, response {$connection->http_res_count}");
             if ($connection->http_req_count === $connection->http_res_count && (!empty($connection->pending_outgoing) || (!empty($connection->new_outgoing) && !$connection->hasPendingCalls()))) {
                 yield $connection->sendMessage(['_' => 'http_wait', 'body' => ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'content_related' => true, 'unencrypted' => false, 'method' => false]);
-                //var_dump('sent wait');
             }
             $API->logger->logger("DC $datacenter: request {$connection->http_req_count}, response {$connection->http_res_count}");
 
-            //($connection->last_http_wait + $timeout) - time()
         }
     }
 

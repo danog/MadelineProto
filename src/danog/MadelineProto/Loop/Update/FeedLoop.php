@@ -44,21 +44,14 @@ class FeedLoop extends ResumableSignalLoop
     public function loop()
     {
         $API = $this->API;
-        $updater = ($this->updater = $API->updaters[$this->channelId]);
+        $this->updater = $API->updaters[$this->channelId];
 
         if (!$this->API->settings['updates']['handle_updates']) {
-            yield new Success(0);
-
             return false;
         }
 
-        $this->startedLoop();
-        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
         while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
             if (yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting $this");
-                $this->exitedLoop();
-
                 return;
             }
         }
@@ -67,21 +60,13 @@ class FeedLoop extends ResumableSignalLoop
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting $this");
-                    $this->exitedLoop();
-
                     return;
                 }
             }
             if (yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting $this");
-                $this->exitedLoop();
-
                 return;
             }
             if (!$this->API->settings['updates']['handle_updates']) {
-                $API->logger->logger("Exiting $this");
-                $this->exitedLoop();
                 return;
             }
             $API->logger->logger("Resumed $this");
@@ -263,6 +248,7 @@ class FeedLoop extends ResumableSignalLoop
 
                 continue;
             }
+            $this->API->logger->logger('Getdiff fed me message of type '.$message['_']." in $this...", \danog\MadelineProto\Logger::VERBOSE);
 
             $this->parsedUpdates[] = ['_' => $this->channelId === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
         }

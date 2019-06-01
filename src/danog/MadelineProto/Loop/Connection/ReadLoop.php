@@ -19,7 +19,6 @@
 namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\Loop;
-use Amp\Promise;
 use Amp\Websocket\ClosedException;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\SignalLoop;
@@ -52,18 +51,12 @@ class ReadLoop extends SignalLoop
         $datacenter = $this->datacenter;
         $connection = $this->connection;
 
-        $this->startedLoop();
-        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
         //$timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
-
         while (true) {
             try {
                 $error = yield $this->waitSignal($this->readMessage());
             } catch (NothingInTheSocketException $e) {
                 if (isset($connection->old)) {
-                    $this->exitedLoop();
-                    $API->logger->logger("Exiting $this");
-
                     return;
                 }
                 $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
@@ -107,14 +100,8 @@ class ReadLoop extends SignalLoop
 
             $connection->http_res_count++;
 
-            try {
-                //$API->logger->logger("Handling messages from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                Loop::defer([$API, 'handle_messages'], $datacenter);
-                //$API->logger->logger("Handled messages from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            } finally {
-                $this->exitedLoop();
-            }
-            $this->startedLoop();
+            Loop::defer([$API, 'handle_messages'], $datacenter);
+
             if ($this->API->is_http($datacenter)) {
                 Loop::defer([$connection->waiter, 'resume']);
             }

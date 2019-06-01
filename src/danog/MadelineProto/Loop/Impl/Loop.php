@@ -19,8 +19,8 @@
 namespace danog\MadelineProto\Loop\Impl;
 
 use Amp\Promise;
-use danog\MadelineProto\Loop\LoopInterface;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Loop\LoopInterface;
 
 /**
  * Loop helper trait.
@@ -48,14 +48,28 @@ abstract class Loop implements LoopInterface
 
             return false;
         }
-        $this->callFork($this->loop());
+        $this->callFork($this->loopImpl());
 
         return true;
     }
 
+    private function loopImpl()
+    {
+        $this->startedLoop();
+        $this->API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
+        try {
+            yield $this->loop();
+        } finally {
+            $this->exitedLoop();
+            $this->API->logger->logger("Exited $this", Logger::ULTRA_VERBOSE);
+        }
+    }
+
     public function exitedLoop()
     {
-        $this->count--;
+        if ($this->count) {
+            $this->count--;
+        }
     }
 
     public function startedLoop()
@@ -68,5 +82,4 @@ abstract class Loop implements LoopInterface
         return $this->count;
     }
 
-    abstract public function __toString(): string;
 }

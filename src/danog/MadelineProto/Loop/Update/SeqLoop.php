@@ -41,21 +41,14 @@ class SeqLoop extends ResumableSignalLoop
     public function loop()
     {
         $API = $this->API;
-        $feeder = $this->feeder = $API->feeders[false];
+        $this->feeder = $API->feeders[false];
 
         if (!$this->API->settings['updates']['handle_updates']) {
-            yield new Success(0);
-
             return false;
         }
 
-        $this->startedLoop();
-        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
         while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
             if (yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting $this");
-                $this->exitedLoop();
-
                 return;
             }
         }
@@ -64,21 +57,13 @@ class SeqLoop extends ResumableSignalLoop
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
                 if (yield $this->waitSignal($this->pause())) {
-                    $API->logger->logger("Exiting $this");
-                    $this->exitedLoop();
-
                     return;
                 }
             }
             if (yield $this->waitSignal($this->pause())) {
-                $API->logger->logger("Exiting $this");
-                $this->exitedLoop();
-
                 return;
             }
             if (!$this->API->settings['updates']['handle_updates']) {
-                $API->logger->logger("Exiting $this");
-                $this->exitedLoop();
                 return;
             }
             while ($this->incomingUpdates) {

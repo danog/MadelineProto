@@ -553,11 +553,12 @@ trait ResponseHandler
             return;
         }
         $botAPI = isset($request['botAPI']) && $request['botAPI'];
-        unset($request);
-        $this->got_response_for_outgoing_message_id($request_id, $datacenter);
         if (isset($response['_']) && strpos($datacenter, 'cdn') === false && $this->constructors->find_by_predicate($response['_'])['type'] === 'Updates') {
+            $response['request'] = $request;
             $this->callForkDefer($this->handle_updates_async($response));
         }
+        unset($request);
+        $this->got_response_for_outgoing_message_id($request_id, $datacenter);
         $r = isset($response['_']) ? $response['_'] : json_encode($response);
         $this->logger->logger("Defer sending $r to deferred");
         $this->callFork((
@@ -610,6 +611,13 @@ trait ResponseHandler
             case 'updateShort':
                 $this->feeders[yield $this->feeders[false]->feedSingle($updates['update'])]->resume();
                 break;
+            case 'updateShortSentMessage':
+                if (!isset($updates['request']['body'])) {
+                    break;
+                }
+                $updates['user_id'] = $updates['request']['body']['peer'];
+                $updates['message'] = $updates['request']['body']['message'];
+                unset($updates['request']);
             case 'updateShortMessage':
             case 'updateShortChatMessage':
                 $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
@@ -636,9 +644,6 @@ trait ResponseHandler
                 }
                 $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
                 $this->feeders[yield $this->feeders[false]->feedSingle($update)]->resume();
-                break;
-            case 'updateShortSentMessage':
-                //yield $this->set_update_state_async(['date' => $updates['date']]);
                 break;
             case 'updatesTooLong':
                 $this->updaters[false]->resume();

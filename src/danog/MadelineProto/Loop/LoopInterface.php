@@ -38,4 +38,7 @@ interface LoopInterface
      * @return void
      */
     public function loop();
+
+
+    public function __toString(): string;
 }

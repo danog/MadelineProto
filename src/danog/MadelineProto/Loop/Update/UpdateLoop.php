@@ -49,24 +49,17 @@ class UpdateLoop extends ResumableSignalLoop
         while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
             if (yield $this->waitSignal($this->pause())) {
                 $API->logger->logger("Exiting $this due to signal");
-                $this->exitedLoop();
-
                 return;
             }
         }
         $this->state = $state = $this->channelId === false ? (yield $API->load_update_state_async()) : $API->loadChannelState($this->channelId);
 
-        $this->startedLoop();
-
-        $API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
 
         $timeout = $API->settings['updates']['getdifference_interval'];
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
                 if (yield $this->waitSignal($this->pause())) {
                     $API->logger->logger("Exiting $this due to signal");
-                    $this->exitedLoop();
-
                     return;
                 }
             }
@@ -90,7 +83,6 @@ class UpdateLoop extends ResumableSignalLoop
                         if (in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN'])) {
                             $feeder->signal(true);
                             $API->logger->logger("Channel private, exiting $this");
-                            $this->exitedLoop();            
                             return true;
                         }
                         throw $e;            
@@ -183,8 +175,6 @@ class UpdateLoop extends ResumableSignalLoop
 
             if (yield $this->waitSignal($this->pause($timeout))) {
                 $API->logger->logger("Exiting $this due to signal");
-                $this->exitedLoop();
-
                 return;
             }
         }
