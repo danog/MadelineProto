@@ -34,6 +34,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             return;
         }
         if ($update['_'] === 'updateReadChannelOutbox') return;
+        if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') return;
 
         $res = json_encode($update, JSON_PRETTY_PRINT);
         if ($res == '') {

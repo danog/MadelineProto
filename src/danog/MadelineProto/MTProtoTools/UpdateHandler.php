@@ -126,6 +126,7 @@ trait UpdateHandler
 
     public function check_msg_id($message)
     {
+        if (!isset($message['to_id'])) return true;
         try {
             $peer_id = $this->get_id($message['to_id']);
         } catch (\danog\MadelineProto\Exception $e) {
