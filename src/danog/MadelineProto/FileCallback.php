@@ -38,6 +38,6 @@ class FileCallback implements FileCallbackInterface
     public function __invoke($percent)
     {
         $callback = $this->callback;
-        $callback($percent);
+        return $callback($percent);
     }
 }

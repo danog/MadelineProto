@@ -113,7 +113,7 @@ trait Files
                 ),
                 ['heavy' => true, 'file' => true, 'datacenter' => $datacenter]
             );
-            $cb(ftell($f) * 100 / $file_size);
+            $this->callFork($cb(ftell($f) * 100 / $file_size));
             $this->logger->logger('Speed for chunk: '.(($part_size * 8 / 1000000) / (microtime(true) - $t)));
             $part_num++;
             $promises[] = $read_deferred->promise();
@@ -581,11 +581,11 @@ trait Files
                 break;
             }
             if ($end !== -1) {
-                $cb($percent = $downloaded_size * 100 / $size);
+                $this->callFork($cb($percent = $downloaded_size * 100 / $size));
             }
         }
         if ($end === -1) {
-            $cb(100);
+            $this->callFork($cb(100));
         }
         if ($cdn) {
             $this->clear_cdn_hashes($message_media['file_token']);

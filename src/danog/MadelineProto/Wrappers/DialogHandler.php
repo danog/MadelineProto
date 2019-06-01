@@ -24,12 +24,12 @@ trait DialogHandler
     public function get_dialogs_async($force = true)
     {
         $res = [];
-        foreach (yield $this->get_dialogs_full_async($force) as $dialog) {
+        foreach (yield $this->get_full_dialogs_async($force) as $dialog) {
             $res []= $dialog['peer'];
         }
         return $res;
     }
-    public function get_dialogs_full_async($force = true)
+    public function get_full_dialogs_async($force = true)
     {
         if ($force || !isset($this->dialog_params['offset_date']) || is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || is_null($this->dialog_params['count'])) {
             $this->dialog_params = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];

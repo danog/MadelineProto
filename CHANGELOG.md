@@ -11,6 +11,9 @@
 * Improved get_self method.  
 * Rewritten proxy stack
 * magic sleep
+* get_full_dialogs
+* new APIfactory
+* sendmessage with secret messages
 
 Things to expect in the next releases:
 Document async apis
@@ -19,3 +22,4 @@ async iterators
 Method name changes
 #MadelineProtoForNode async
 lua async
+improved get_pwr_chat
