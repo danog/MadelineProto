@@ -209,7 +209,7 @@ class DataCenter
                 $combos[] = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), $extra], [IntermediatePaddedStream::getName(), []]];
             }
 
-            if (is_array($this->settings[$dc_config_number]['proxy'])) {
+            if (is_iterable($this->settings[$dc_config_number]['proxy'])) {
                 $proxies = $this->settings[$dc_config_number]['proxy'];
                 $proxy_extras = $this->settings[$dc_config_number]['proxy_extra'];
             } else {
