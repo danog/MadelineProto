@@ -40,7 +40,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         if ($res == '') {
             $res = var_export($update, true);
         }
-        //yield $this->sleep_async(3);
+        //yield $this->sleep(3);
         try {
             yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']); //'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
             if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {

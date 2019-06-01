@@ -78,7 +78,7 @@ trait UpdateHandler
             if (!$params['timeout']) {
                 $params['timeout'] = 0.001;
             }
-            yield $this->any([$this->waitUpdate(), new Delayed($params['timeout'] * 1000)]);
+            yield $this->first([$this->waitUpdate(), $this->sleep($params['timeout'])]);
         }
 
         if (empty($this->updates)) {

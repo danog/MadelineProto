@@ -25,7 +25,10 @@ use Amp\Promise;
 use Amp\Success;
 use function Amp\Promise\all;
 use function Amp\Promise\any;
+use function Amp\Promise\some;
 use function Amp\Promise\wait;
+use function Amp\Promise\first;
+use function Amp\Promise\timeout;
 
 /**
  * Some tools.
@@ -93,23 +96,6 @@ trait Tools
         $resto = $a % $b;
 
         return $resto < 0 ? $resto + abs($b) : $resto;
-    }
-
-    public function array_cast_recursive($array, $force = false)
-    {
-        if (!\danog\MadelineProto\Magic::$has_thread && !$force) {
-            return $array;
-        }
-        if (is_array($array)) {
-            if (!is_array($array)) {
-                $array = (array) $array;
-            }
-            foreach ($array as $key => $value) {
-                $array[$key] = $this->array_cast_recursive($value, $force);
-            }
-        }
-
-        return $array;
     }
 
     public function unpack_signed_int($value)
@@ -186,14 +172,7 @@ trait Tools
 
         return unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
-
-    public function infloop()
-    {
-        while (true) {
-            Loop::loop();
-        }
-    }
-
+    
     public function wait($promise)
     {
         if ($promise instanceof \Generator) {
@@ -202,6 +181,8 @@ trait Tools
             return $promise;
         }
 
+        $exception = null;
+        $value = null;
         $resolved = false;
         do {
             try {
@@ -237,6 +218,24 @@ trait Tools
             $promise = $this->call($promise);
         }
         return any($promises);
+    }
+    public function some($promises)
+    {
+        foreach ($promises as &$promise) {
+            $promise = $this->call($promise);
+        }
+        return some($promises);
+    }
+    public function first($promises)
+    {
+        foreach ($promises as &$promise) {
+            $promise = $this->call($promise);
+        }
+        return first($promises);
+    }
+    public function timeout($promise, $timeout)
+    {
+        return timeout($this->call($promise), $timeout);
     }
     public function call($promise)
     {
@@ -296,7 +295,7 @@ trait Tools
         return $deferred->promise();
     }
 
-    public function sleep_async($time)
+    public function sleep($time)
     {
         return new \Amp\Delayed($time * 1000);
     }
