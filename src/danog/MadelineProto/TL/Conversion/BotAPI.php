@@ -298,7 +298,7 @@ trait BotAPI
             case 'messageMediaDocument':
                 $type_name = 'document';
                 $res = [];
-                if ($data['document']['thumb']['_'] === 'photoSize') {
+                if (isset($update['document']['thumb']) && $data['document']['thumb']['_'] === 'photoSize') {
                     $res['thumb'] = yield $this->photosize_to_botapi_async($data['document']['thumb'], [], true);
                 }
                 foreach ($data['document']['attributes'] as $attribute) {
