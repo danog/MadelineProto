@@ -568,8 +568,10 @@ trait ResponseHandler
                 if ($botAPI) {
                     $response = yield $this->MTProto_to_botAPI_async($response);
                 }
-                $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
-                unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']);
+                if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise'])) { // This should not happen but happens, should debug
+                    $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
+                    unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']);
+                }
             }
         )());
     }

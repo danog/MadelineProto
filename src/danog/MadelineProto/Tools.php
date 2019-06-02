@@ -25,10 +25,10 @@ use Amp\Promise;
 use Amp\Success;
 use function Amp\Promise\all;
 use function Amp\Promise\any;
-use function Amp\Promise\some;
-use function Amp\Promise\wait;
 use function Amp\Promise\first;
+use function Amp\Promise\some;
 use function Amp\Promise\timeout;
+use function Amp\Promise\wait;
 
 /**
  * Some tools.
@@ -172,7 +172,7 @@ trait Tools
 
         return unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
-    
+
     public function wait($promise)
     {
         if ($promise instanceof \Generator) {
@@ -247,18 +247,27 @@ trait Tools
 
         return $promise;
     }
-    public function callFork($promise, $actual = null)
+    public function callFork($promise, $actual = null, $file = '')
     {
         if ($actual) {
             $promise = $actual;
+        } else {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+            $file = '';
+            if (isset($trace['file'])) {
+                $file .= basename($trace['file'], '.php');
+            }
+            if (isset($trace['line'])) {
+                $file .= ":{$trace['line']}";
+            }
         }
         if ($promise instanceof \Generator) {
             $promise = new Coroutine($promise);
         }
         if ($promise instanceof Promise) {
-            $promise->onResolve(function ($e, $res) {
+            $promise->onResolve(function ($e, $res) use ($file) {
                 if ($e) {
-                    $this->rethrow($e);
+                    $this->rethrow($e, $file);
                 }
             });
         }
@@ -268,10 +277,13 @@ trait Tools
     {
         Loop::defer([$this, 'callFork'], $promise);
     }
-    public function rethrow($e)
+    public function rethrow($e, $file = '')
     {
         $logger = isset($this->logger) ? $this->logger : Logger::$default;
-        $logger->logger("Got the following exception within a forked strand, trying to rethrow");
+        if ($file) {
+            $file = " started @ $file";
+        }
+        $logger->logger("Got the following exception within a forked strand$file, trying to rethrow");
         $logger->logger((string) $e);
         Promise\rethrow(new Failure($e));
     }

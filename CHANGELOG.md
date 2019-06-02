@@ -15,6 +15,7 @@
 * new APIfactory
 * sendmessage with secret messages
 * 2fa+++++
+* improved callfork
 Things to expect in the next releases:
 Document async apis
 optional max_id and min_id
