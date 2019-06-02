@@ -163,7 +163,7 @@ class FeedLoop extends ResumableSignalLoop
                 $channelId = $update['channel_id'];
                 break;
             case 'updateChannelTooLong':
-                $channelId = $update['channel_id'];
+                $channelId = isset($update['channel_id']) ? $update['channel_id'] : false;
                 if (!isset($update['pts'])) {
                     $update['pts'] = 1;
                 }
