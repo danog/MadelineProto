@@ -102,6 +102,7 @@ class Magic
             if (php_sapi_name() === 'cli' && !(class_exists('\\Phar') && \Phar::running())) {
                 try {
                     $back = debug_backtrace(0);
+                    define('AMP_WORKER', 1);
                     $promise = \Amp\File\get(end($back)['file']);
                     do {
                         try {
@@ -119,7 +120,7 @@ class Magic
                 }
             }
             if (!self::$can_parallel && !defined('AMP_WORKER') || true) {
-                define('AMP_WORKER', 1);
+                //define('AMP_WORKER', 1);
             }
             $backtrace = debug_backtrace(0);
             self::$script_cwd = self::$cwd = dirname(end($backtrace)['file']);

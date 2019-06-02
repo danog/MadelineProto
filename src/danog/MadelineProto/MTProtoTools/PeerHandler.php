@@ -255,11 +255,11 @@ trait PeerHandler
                 case 'updateChannel':
                 case 'updateChannelWebPage':
                 case 'updateChannelMessageViews':
-                case 'updateChannelTooLong':
                 case 'updateReadChannelInbox':
                 case 'updateReadChannelOutbox':
                 case 'updateDeleteChannelMessages':
                 case 'updateChannelPinnedMessage':
+                case 'updateChannelTooLong':
                     return $this->to_supergroup($id['channel_id']);
                 case 'updateChatParticipants':
                     $id = $id['participants'];
