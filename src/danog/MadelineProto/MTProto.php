@@ -245,7 +245,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     public function __wakeup()
     {
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
+        $backtrace = debug_backtrace(0, 3);
         $this->asyncInitPromise = true;
         $this->setInitPromise($this->__wakeup_async($backtrace));
     }
@@ -314,8 +314,8 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         $force = false;
         $this->reset_session();
-        if (isset($backtrace[2]['function']) && isset($backtrace[2]['class']) && isset($backtrace[2]['args']) && $backtrace[2]['class'] === 'danog\\MadelineProto\\API' && $backtrace[2]['function'] === '__magic_construct') {
-            if (count($backtrace[2]['args']) === 2) {
+        if (isset($backtrace[2]['function'], $backtrace[2]['class'], $backtrace[2]['args']) && $backtrace[2]['class'] === 'danog\\MadelineProto\\API' && $backtrace[2]['function'] === '__construct_async') {
+            if (count($backtrace[2]['args']) >= 2) {
                 $this->parse_settings(array_replace_recursive($this->settings, $backtrace[2]['args'][1]));
             }
         }
