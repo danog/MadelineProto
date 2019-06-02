@@ -224,7 +224,7 @@ class WriteLoop extends ResumableSignalLoop
                                 unset($connection->call_queue[$message['queue']][$key]);
                             }
                         }
-
+                        // TODO
                         /*                        if ($API->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $API->settings['requests']['gzip_encode_if_gt']) {
                     if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
                     $MTmessage['body'] = yield $API->serialize_object_async(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
