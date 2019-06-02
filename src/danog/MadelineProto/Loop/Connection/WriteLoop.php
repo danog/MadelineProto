@@ -139,8 +139,10 @@ class WriteLoop extends ResumableSignalLoop
                 return;
             }
             if (count($to_ack = $connection->ack_queue)) {
-                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'msgs_ack', 'serialized_body' => yield $this->API->serialize_object_async(['type' => 'msgs_ack'], ['msg_ids' => $connection->ack_queue], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false, 'method' => false];
-                $connection->pending_outgoing_key %= Connection::PENDING_MAX;
+                foreach (array_chunk($connection->ack_queue, 8192) as $acks) {
+                    $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'msgs_ack', 'serialized_body' => yield $this->API->serialize_object_async(['type' => 'msgs_ack'], ['msg_ids' => $acks], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false, 'method' => false];
+                    $connection->pending_outgoing_key %= Connection::PENDING_MAX;
+                }
             }
 
             $has_http_wait = false;
