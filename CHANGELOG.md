@@ -17,7 +17,8 @@
 * 2fa+++++
 * improved callfork
 * split acks
-
+* TL callabck
+* channel state
 Things to expect in the next releases:
 Document async apis
 optional max_id and min_id

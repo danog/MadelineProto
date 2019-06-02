@@ -73,7 +73,7 @@ trait ApiTemplates
 <li>Click on create application</li>
 </ol>', '<input type="string" name="api_id" placeholder="API ID" required/><input type="string" name="api_hash" placeholder="API hash" required/>'));
                 } else {
-                    yield $stdout->write($this->web_api_echo_template('Enter your phone number<br><b>'.$message.'</b>', '<input type="text" name="phone_number" placeholder="Phone number" required/>'));
+                    yield $stdout->write($this->web_api_echo_template('Enter a phone number that is <b>already registered</b> on telegram to get the API ID<br><b>'.$message.'</b>', '<input type="text" name="phone_number" placeholder="Phone number" required/>'));
                 }
             } else {
                 if ($message) {
