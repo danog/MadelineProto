@@ -19,6 +19,7 @@
 * split acks
 * TL callabck
 * channel state
+* logger
 Things to expect in the next releases:
 Document async apis
 optional max_id and min_id

@@ -35,7 +35,7 @@ abstract class Loop implements LoopInterface
 
     private $count = 0;
 
-    protected $API;
+    public $API;
     public function __construct($API)
     {
         $this->API = $API;
