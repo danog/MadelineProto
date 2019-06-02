@@ -650,15 +650,22 @@ trait PeerHandler
             $res['participants'] = [];
             $limit = 200;
             $filters = ['channelParticipantsAdmins', 'channelParticipantsBots'];
+            
+            $coros = [];
             foreach ($filters as $filter) {
-                yield $this->fetch_participants_async($full['InputChannel'], $filter, '', $total_count, $res);
+                $coros[] = $this->fetch_participants_async($full['InputChannel'], $filter, '', $total_count, $res);
             }
+            yield $this->all($coros);
+            
             $q = '';
-
             $filters = ['channelParticipantsSearch', 'channelParticipantsKicked', 'channelParticipantsBanned'];
+            
+            $coros = [];
             foreach ($filters as $filter) {
-                yield $this->recurse_alphabet_search_participants_async($full['InputChannel'], $filter, $q, $total_count, $res);
+                $coros[] = $this->recurse_alphabet_search_participants_async($full['InputChannel'], $filter, $q, $total_count, $res);
             }
+            yield $this->all($coros);
+            
             $this->logger->logger('Fetched '.count($res['participants'])." out of $total_count");
             $res['participants'] = array_values($res['participants']);
         }
@@ -678,9 +685,11 @@ trait PeerHandler
             return false;
         }
 
+        $coros = [];
         for ($x = 'a'; $x !== 'aa' && $total_count > count($res['participants']); $x++) {
-            yield $this->recurse_alphabet_search_participants_async($channel, $filter, $q.$x, $total_count, $res);
+            $coros[] = $this->recurse_alphabet_search_participants_async($channel, $filter, $q.$x, $total_count, $res);
         }
+        yield $this->all($coros);
     }
 
     public function fetch_participants_async($channel, $filter, $q, $total_count, &$res)
