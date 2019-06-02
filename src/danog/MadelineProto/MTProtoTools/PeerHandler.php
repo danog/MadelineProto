@@ -659,13 +659,13 @@ trait PeerHandler
             
             $q = '';
             $filters = ['channelParticipantsSearch', 'channelParticipantsKicked', 'channelParticipantsBanned'];
-            
+
             $coros = [];
             foreach ($filters as $filter) {
                 $coros[] = $this->recurse_alphabet_search_participants_async($full['InputChannel'], $filter, $q, $total_count, $res);
             }
             yield $this->all($coros);
-            
+
             $this->logger->logger('Fetched '.count($res['participants'])." out of $total_count");
             $res['participants'] = array_values($res['participants']);
         }
@@ -678,18 +678,35 @@ trait PeerHandler
 
         return $res;
     }
-
-    public function recurse_alphabet_search_participants_async($channel, $filter, $q, $total_count, &$res)
-    {
+    
+    public function recurse_alphabet_search_participants_async($channel, $filter, $q, $total_count, &$res, $first = true)
+    {    
         if (!yield $this->fetch_participants_async($channel, $filter, $q, $total_count, $res)) {
-            return false;
+            return [];
         }
 
         $coros = [];
         for ($x = 'a'; $x !== 'aa' && $total_count > count($res['participants']); $x++) {
-            $coros[] = $this->recurse_alphabet_search_participants_async($channel, $filter, $q.$x, $total_count, $res);
+            $coros[] = $this->recurse_alphabet_search_participants_async($channel, $filter, $q.$x, $total_count, $res, false);
         }
-        yield $this->all($coros);
+
+        if (!$first) {
+            return $coros;
+        } 
+
+        $coross = yield $this->all($coros);
+
+        while (!empty($coross)) {
+            $new_coross = [];
+
+            foreach ($coross as $coros) {
+                if (!empty($coros)) {
+                    $new_coross = array_merge(yield $this->all($coros), $new_coross);
+                }
+            }
+
+            $coross = $new_coross;
+        }
     }
 
     public function fetch_participants_async($channel, $filter, $q, $total_count, &$res)
