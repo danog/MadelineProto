@@ -30,7 +30,7 @@ class CombinedUpdatesState
         if (!is_array($init)) {
             return;
         }
-        $this->states[$channel] = new UpdatesState();
+        $this->states[false] = new UpdatesState();
         foreach ($init as $channel => $state) {
             if (is_array($state)) {
                 $state = new UpdatesState($state, $channel);
