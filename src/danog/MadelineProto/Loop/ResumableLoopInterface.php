@@ -30,7 +30,7 @@ interface ResumableLoopInterface extends LoopInterface
     /**
      * Pause the loop.
      *
-     * @param int $time For how long to pause the loop
+     * @param int $time For how long to pause the loop, if null will pause forever (until resume is called from outside of the loop)
      *
      * @return Promise
      */

@@ -39,6 +39,10 @@ interface LoopInterface
      */
     public function loop();
 
-
+    /**
+     * Get name of the loop
+     *
+     * @return string
+     */
     public function __toString(): string;
 }

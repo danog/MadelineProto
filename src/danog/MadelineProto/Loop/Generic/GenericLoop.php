@@ -1,6 +1,6 @@
 <?php
 /**
- * Generic period fetcher loop
+ * Generic loop
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -18,15 +18,14 @@
 
 namespace danog\MadelineProto\Loop\Generic;
 
-use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 
 /**
- * Update loop.
+ * Generic loop.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class PeriodicFetcherLoop extends ResumableSignalLoop
+class GenericLoop extends ResumableSignalLoop
 {
     const STOP = -1;
     const PAUSE = null;
@@ -45,7 +44,7 @@ class PeriodicFetcherLoop extends ResumableSignalLoop
     public function __construct($API, $callback, $name)
     {
         $this->API = $API;
-        $this->callback = $callback;
+        $this->callback = $callback->bindTo($this);
         $this->name = $name;
     }
     public function loop()

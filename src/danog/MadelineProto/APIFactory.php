@@ -205,6 +205,9 @@ class APIFactory extends AsyncConstruct
 
             return $this->API->settings;
         }
+        if ($name === 'logger') {
+            return $this->API->logger;
+        }
 
         return $this->API->storage[$name];
     }
