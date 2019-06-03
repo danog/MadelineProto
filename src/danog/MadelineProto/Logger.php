@@ -23,6 +23,9 @@
 namespace danog\MadelineProto;
 
 use Amp\ByteStream\ResourceOutputStream;
+use Amp\Failure;
+use function \Amp\ByteStream\getStdout;
+use function \Amp\ByteStream\getStderr;
 
 class Logger
 {
@@ -96,18 +99,18 @@ class Logger
         $this->newline = PHP_EOL;
 
         if ($this->mode === 3) {
-            $this->stdout = new ResourceOutputStream(STDOUT);
+            $this->stdout = getStdout();
             if (php_sapi_name() !== 'cli') $this->newline = '<br>'.$this->newline;
         } elseif ($this->mode === 2) {
             $this->stdout = new ResourceOutputStream(fopen($this->optional, 'a+'));
         } elseif ($this->mode === 1) {
             $result = @ini_get('error_log');
             if ($result === 'syslog') {
-                $this->stdout = new ResourceOutputStream(STDERR);
+                $this->stdout = getStderr();
             } elseif ($result) {
                 $this->stdout = new ResourceOutputStream(fopen($result, 'a+'));
             } else {
-                $this->stdout = new ResourceOutputStream(STDERR);
+                $this->stdout = getStderr();
             }
         }
     }
@@ -142,9 +145,6 @@ class Logger
         if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread())) {
             $prefix .= ' (t)';
         }
-        if (\danog\MadelineProto\Magic::is_fork()) {
-            $prefix .= ' (p)';
-        }
         if (!is_string($param)) {
             $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
@@ -157,12 +157,15 @@ class Logger
                     $this->stdout->write($param.$this->newline);
                     break;
                 default:
-                    $this->stdout->write(Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline);
+                    $param = Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
+                    if ($this->stdout->write($param) instanceof Failure) {
+                        echo "(closed) $param";
+                    }
                     break;
             }
     }
     public function __destruct()
     {
-        $this->wait($this->stdout->write(''));
+        //$this->wait($this->stdout->write(''));
     }
 }

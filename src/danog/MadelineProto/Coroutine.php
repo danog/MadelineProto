@@ -62,8 +62,34 @@ final class Coroutine implements Promise
      */
     public function __construct(\Generator $generator)
     {
+        /*
+        $this->generator = new class($generator) {
+        private $s = '';
+        private $g;
+        private $trace;
+        public function __construct($g) {
+        $this->g = $g;
+        $this->s .= spl_object_hash($this).', ';
+        }
+        public function __call($a, $args) {
+        $this->s .= "$a, ";
+        try {
+        $res = $this->g->{$a}(...$args);
+        if (is_array($res) && isset($res['my_trace'])) {
+        $this->trace = $res;
+        $res = $this->g->{$a}(...$args);
+        }
+        return $res;
+        } catch (\Throwable $e) {
+        $this->s .= $e->getMessage();
+        $this->s .= ', ';
+        var_dump($this->s, $this->trace);
+        throw $e;
+        }
+        }
+        //public function __destruct() { var_dump($this->s); }
+        };*/
         $this->generator = $generator;
-
         try {
             $yielded = $this->generator->current();
             while (!$yielded instanceof Promise) {

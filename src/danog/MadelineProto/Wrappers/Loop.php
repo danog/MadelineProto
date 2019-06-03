@@ -36,10 +36,12 @@ trait Loop
     public function loop_async($max_forks = 0)
     {
         if (is_callable($max_forks)) {
+            $this->logger->logger('Running async callable and exiting from loop');
             return yield $max_forks();
         }
         if (in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler'])) {
-            return true;
+            $this->logger->logger('Getupdates event handler is enabled, exiting from loop', \danog\MadelineProto\Logger::FATAL_ERROR);
+            return false;
         }
         if (!is_callable($this->loop_callback) || (is_array($this->loop_callback) && $this->loop_callback[1] === 'onLoop' && !method_exists(...$this->loop_callback))) {
             $this->loop_callback = null;

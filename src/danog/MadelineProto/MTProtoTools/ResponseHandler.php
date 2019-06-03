@@ -200,6 +200,8 @@ trait ResponseHandler
                     break;
                 case 'msg_detailed_info':
                     $this->datacenter->sockets[$datacenter]->check_in_seq_no($current_msg_id);
+                    unset($this->datacenter->sockets[$datacenter]->new_incoming[$current_msg_id]);
+
                     $only_updates = false;
                     if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['msg_id']])) {
                         if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {

@@ -140,7 +140,7 @@ trait PeerHandler
 
     public function cache_pwr_chat($id, $full_fetch, $send)
     {
-                $this->callFork((function () use ($id, $full_fetch, $send) {
+        $this->callFork((function () use ($id, $full_fetch, $send) {
                 try {
                     yield $this->get_pwr_chat_async($id, $full_fetch, $send);
                 } catch (\danog\MadelineProto\Exception $e) {
@@ -148,7 +148,7 @@ trait PeerHandler
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $this->logger->logger("While caching: ".$e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                 }
-                })());
+        })());
     }
 
     public function peer_isset_async($id)

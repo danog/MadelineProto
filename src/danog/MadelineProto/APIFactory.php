@@ -133,7 +133,7 @@ class APIFactory extends AsyncConstruct
 
     public function __call($name, $arguments)
     {
-        $yielded = $this->__call_async($name, $arguments);
+        $yielded = $this->call($this->__call_async($name, $arguments));
         $async = $this->lua === false && (is_array(end($arguments)) && isset(end($arguments)['async']) ? end($arguments)['async'] : ($this->async && $name !== 'loop'));
         if ($async) {
             return $yielded;
@@ -158,15 +158,7 @@ class APIFactory extends AsyncConstruct
             yield $this->initAsync();
         }
         if (Magic::is_fork() && !Magic::$processed_fork) {
-            throw new Exception("Forking not supported");
-            /*
-            \danog\MadelineProto\Logger::log('Detected fork');
-            $this->API->reset_session();
-            foreach ($this->API->datacenter->sockets as $datacenter) {
-                yield $datacenter->reconnect();
-            }
-            Magic::$processed_fork = true;
-            */
+            throw new Exception("Forking not supported, use async logic, instead: https://docs.madelineproto.xyz/docs/ASYNC.html");
         }
         if (isset($this->session) && !is_null($this->session) && time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
             Logger::log("Didn't serialize in a while, doing that now...");
@@ -189,7 +181,7 @@ class APIFactory extends AsyncConstruct
             $aargs['datacenter'] = $this->API->datacenter->curdc;
             $args = isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [];
 
-            return yield $this->API->method_call_async_read($name, $args, $aargs);    
+            return yield $this->API->method_call_async_read($name, $args, $aargs);
         } else {
             return yield $this->methods[$lower_name](...$arguments);
         }

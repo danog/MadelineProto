@@ -122,6 +122,7 @@ class CombinedAPI
         if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread()) || Magic::is_fork()) {
             return;
         }
+
         $this->serialize();
     }
 
