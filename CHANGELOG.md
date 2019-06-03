@@ -40,6 +40,7 @@
 * even without access hash for bots
 * async HTTP requests internally
 * custom HTTP client with DoH
+* no more php 5
 
 Things to expect in the next releases:
 docs for update_2fa
@@ -54,3 +55,11 @@ lua async
 improved get_pwr_chat
 gzip
 no defer logs
+recover@tg docs
+startedLoop docs
+
+no error setting, madelineproto does that for you
+
+
+do not use manual
+tell about madeline.php loading in the same dire
