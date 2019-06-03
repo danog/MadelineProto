@@ -678,9 +678,9 @@ trait PeerHandler
 
         return $res;
     }
-    
+
     public function recurse_alphabet_search_participants_async($channel, $filter, $q, $total_count, &$res, $first = true)
-    {    
+    {
         if (!yield $this->fetch_participants_async($channel, $filter, $q, $total_count, $res)) {
             return [];
         }
@@ -700,9 +700,9 @@ trait PeerHandler
             $new_coross = [];
 
             foreach ($coross as $coros) {
-                if (!empty($coros)) {
-                    $new_coross = array_merge(yield $this->all($coros), $new_coross);
-                }
+                foreach (array_chunk($coros, 10) as $subcoros) {
+                    $new_coross = array_merge(yield $this->all($subcoros), $new_coross);
+                }                
             }
 
             $coross = $new_coross;
