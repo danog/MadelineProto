@@ -883,9 +883,19 @@ class MTProto extends AsyncConstruct implements TLCallback
 
         yield $this->get_phone_config_async();
     }
+    public function resetUpdateSystem()
+    {
+        foreach ($this->channels_state->get() as $state) {
+            $channelId = $state->getChannel();
+            $this->channels_state->__construct([$channelId => new UpdatesState()]);
+        }
+        $this->startUpdateSystem();
+    }
     public function startUpdateSystem()
     {
-        if ($this->asyncInitPromise) return;
+        if ($this->asyncInitPromise) {
+            return;
+        }
 
         if (!isset($this->seqUpdater)) {
             $this->seqUpdater = new SeqLoop($this);

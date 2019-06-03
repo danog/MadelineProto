@@ -60,6 +60,11 @@ class GenericLoop extends ResumableSignalLoop
 
         while (true) {
             $timeout = yield $callback();
+            if ($timeout === self::PAUSE) {
+                $this->API->logger->logger("Pausing $this", \danog\MadelineProto\Logger::VERBOSE);
+            } else if ($timeout > 0) {
+                $this->API->logger->logger("Pausing $this for $timeout", \danog\MadelineProto\Logger::VERBOSE);
+            }
             if ($timeout === self::STOP || yield $this->waitSignal($this->pause($timeout))) {
                 return;
             }
@@ -68,6 +73,6 @@ class GenericLoop extends ResumableSignalLoop
 
     public function __toString(): string
     {
-        return "{$this->name} loop";
+        return $this->name;
     }
 }

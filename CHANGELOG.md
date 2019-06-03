@@ -1,12 +1,15 @@
 # Changelog
 
-
 ## 4.0.0 Full async
 
-**Fully asynchronous MadelineProto, thanks to [amphp](https://github.com/danog/amphp)!**
+**Fully asynchronous MadelineProto!**
+
+MadelineProto now features async, for **incredible speed improvements**, and **parallel processing**.
+Powered by [amphp](https://amphp.org), MadelineProto wraps the AMPHP APIs to provide a simpler generator-based async API.  
 
 * Fully rewritten connection stack, with support for websockets, stuff
 * updates
+* simultaneous method calls
 * new TL callback system
 * added support for wallpapers
 * Improved message splitting algorithm: performance improvements, and it will now notify you via the logs if there are too many entities in the logs, or if the entities are too long.  
@@ -41,6 +44,7 @@
 * async HTTP requests internally
 * custom HTTP client with DoH
 * no more php 5
+* reset PTS to 0
 
 Things to expect in the next releases:
 docs for update_2fa

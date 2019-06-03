@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\Wrappers;
 
 use Amp\Deferred;
+use Amp\Promise;
 
 /**
  * Manages logging in and out.
@@ -36,8 +37,12 @@ trait Loop
     public function loop_async($max_forks = 0)
     {
         if (is_callable($max_forks)) {
-            $this->logger->logger('Running async callable and exiting from loop');
+            $this->logger->logger('Running async callable');
             return yield $max_forks();
+        }
+        if ($max_forks instanceof Promise) {
+            $this->logger->logger('Resolving async promise');
+            return yield $max_forks;
         }
         if (in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler'])) {
             $this->logger->logger('Getupdates event handler is enabled, exiting from loop', \danog\MadelineProto\Logger::FATAL_ERROR);

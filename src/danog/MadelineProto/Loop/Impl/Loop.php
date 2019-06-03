@@ -48,9 +48,7 @@ abstract class Loop implements LoopInterface
 
             return false;
         }
-        $this->callFork($this->loopImpl());
-
-        return true;
+        return $this->callFork($this->loopImpl());
     }
 
     private function loopImpl()
@@ -63,7 +61,7 @@ abstract class Loop implements LoopInterface
         } finally {
             $this->exitedLoop();
             $this->API->logger->logger("Exited $this", Logger::ULTRA_VERBOSE);
-            return null;
+            //return null;
         }
     }
 
