@@ -16,7 +16,7 @@ echo '{
     "name": "danog/madelineprototests",
     "minimum-stability":"dev",
     "require": {
-        "danog/madelineproto": "dev-master",
+        "danog/madelineproto": "dev-master"
     },
     "repositories": [
         {
