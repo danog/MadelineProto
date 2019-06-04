@@ -62,10 +62,11 @@ class WriteLoop extends ResumableSignalLoop
 
             try {
                 $please_wait = yield $this->{$connection->temp_auth_key === null ? 'unencryptedWriteLoopAsync' : 'encryptedWriteLoopAsync'}();
-            } catch (Amp\ByteStream\StreamException $e) {
+            } catch (\Amp\ByteStream\StreamException $e) {
                 if (isset($connection->old)) {
                     return;
                 }
+                $API->logger($e);
                 $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
                 yield $connection->reconnect();
                 continue;
