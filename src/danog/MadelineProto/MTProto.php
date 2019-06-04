@@ -249,6 +249,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->datacenter->getHTTPClient();
     }
 
+    public function fileGetContents($url): \Generator
+    {
+        return $this->datacenter->fileGetContents($url);
+    }
+
     public function __wakeup()
     {
         $backtrace = debug_backtrace(0, 3);
@@ -595,9 +600,9 @@ class MTProto extends AsyncConstruct implements TLCallback
                     2 => [
                         // The rest will be fetched using help.getConfig
                         'ip_address' => '149.154.167.40',
-                        'port'       => 443,
+                        'port' => 443,
                         'media_only' => false,
-                        'tcpo_only'  => false,
+                        'tcpo_only' => false,
                     ],
                 ],
                 'ipv6' => [
@@ -605,9 +610,9 @@ class MTProto extends AsyncConstruct implements TLCallback
                     2 => [
                         // The rest will be fetched using help.getConfig
                         'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000e',
-                        'port'       => 443,
+                        'port' => 443,
                         'media_only' => false,
-                        'tcpo_only'  => false,
+                        'tcpo_only' => false,
                     ],
                 ],
             ],
@@ -618,9 +623,9 @@ class MTProto extends AsyncConstruct implements TLCallback
                     2 => [
                         // The rest will be fetched using help.getConfig
                         'ip_address' => '149.154.167.51',
-                        'port'       => 443,
+                        'port' => 443,
                         'media_only' => false,
-                        'tcpo_only'  => false,
+                        'tcpo_only' => false,
                     ],
                 ],
                 'ipv6' => [
@@ -628,9 +633,9 @@ class MTProto extends AsyncConstruct implements TLCallback
                     2 => [
                         // The rest will be fetched using help.getConfig
                         'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000a',
-                        'port'       => 443,
+                        'port' => 443,
                         'media_only' => false,
-                        'tcpo_only'  => false,
+                        'tcpo_only' => false,
                     ],
                 ],
             ],
@@ -651,17 +656,17 @@ class MTProto extends AsyncConstruct implements TLCallback
                 'proxy_extra' => Magic::$altervista ? ['address' => 'localhost', 'port' => 80] : [],
                 // Extra parameters to pass to the proxy class using setExtra
                 'obfuscated' => false,
-                'transport'  => 'tcp',
-                'pfs'        => extension_loaded('gmp'),
+                'transport' => 'tcp',
+                'pfs' => extension_loaded('gmp'),
             ],
             'default_dc' => 2,
         ], 'app_info' => [
             // obtained in https://my.telegram.org
             //'api_id'          => you should put an API id in the settings array you provide
             //'api_hash'        => you should put an API hash in the settings array you provide
-            'device_model'   => $device_model,
+            'device_model' => $device_model,
             'system_version' => $system_version,
-            'app_version'    => $app_version,
+            'app_version' => $app_version,
             // ðŸŒš
             //                'app_version'     => self::V,
             'lang_code' => $lang_code,
@@ -695,10 +700,10 @@ class MTProto extends AsyncConstruct implements TLCallback
              */
             // write to
             'logger_param' => Magic::$script_cwd.'/MadelineProto.log',
-            'logger'       => php_sapi_name() === 'cli' ? 3 : 2,
+            'logger' => php_sapi_name() === 'cli' ? 3 : 2,
             // overwrite previous setting and echo logs
             'logger_level' => Logger::VERBOSE,
-            'max_size'     => 100 * 1024 * 1024,
+            'max_size' => 100 * 1024 * 1024,
             // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
             'rollbar_token' => '',
         ], 'max_tries' => [
@@ -707,10 +712,10 @@ class MTProto extends AsyncConstruct implements TLCallback
             'authorization' => 5,
             // How many times should I try to generate an authorization key before throwing an exception
             'response' => 5,
-        ], 'flood_timeout' => ['wait_if_lt' => 10*60], 'msg_array_limit' => [
+        ], 'flood_timeout' => ['wait_if_lt' => 10 * 60], 'msg_array_limit' => [
             // How big should be the arrays containing the incoming and outgoing messages?
-            'incoming'   => 100,
-            'outgoing'   => 100,
+            'incoming' => 100,
+            'outgoing' => 100,
             'call_queue' => 200,
         ], 'peer' => [
             'full_info_cache_time' => 3600,
@@ -734,10 +739,10 @@ class MTProto extends AsyncConstruct implements TLCallback
             'handler_workers' => 10,
         ], 'upload' => [
             'allow_automatic_upload' => true,
-            'part_size'              => 512 * 1024,
+            'part_size' => 512 * 1024,
         ], 'download' => [
             'report_broken_media' => true,
-            'part_size'           => 1024 * 1024,
+            'part_size' => 1024 * 1024,
         ], 'pwr' => [
             'pwr' => false,
             // Need info ?

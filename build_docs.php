@@ -27,14 +27,14 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 '.str_replace('<img', '<amp-img', file_get_contents('README.md')));
 
 $docs = [
-    [
+/*    [
         'tl_schema'   => ['td' => __DIR__.'/src/danog/MadelineProto/TL_td.tl'],
         'title'       => 'MadelineProto API documentation (td-lib)',
         'description' => 'MadelineProto API documentation (td-lib)',
         'output_dir'  => __DIR__.'/docs/docs/TD_docs',
         'readme'      => false,
         'td'          => true,
-    ],
+    ],*/
     [
         'tl_schema'   => ['mtproto' => __DIR__.'/src/danog/MadelineProto/TL_mtproto_v1.json'],
         'title'       => 'MadelineProto API documentation (mtproto)',

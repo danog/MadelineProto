@@ -1,28 +1,35 @@
 <?php
 
-if (PHP_MAJOR_VERSION === 5) {
-    if (PHP_MINOR_VERSION < 6) {
-        throw new \Exception('MadelineProto requires at least PHP 5.6 to run');
-    }
-    $newline = PHP_EOL;
-    if (php_sapi_name() !== 'cli') {
-        $newline = '<br>'.$newline;
-    }
-    echo "**********************************************************************$newline";
-    echo "**********************************************************************$newline$newline";
-    echo "YOU ARE USING AN OLD AND BUGGED VERSION OF PHP, PLEASE UPDATE TO PHP 7$newline";
-    echo "PHP 5 USERS WILL NOT RECEIVE MADELINEPROTO UPDATES AND BUGFIXES$newline$newline";
-    echo "SUPPORTED VERSIONS: PHP 7.0, 7.1, 7.2, 7.3+$newline";
-    echo "RECOMMENDED VERSION: PHP 7.3$newline$newline";
-    echo "**********************************************************************$newline";
-    echo "**********************************************************************$newline";
-    unset($newline);
-}
-
 function ___install_madeline()
 {
     if (count(debug_backtrace(0)) === 1) {
         die('You must include this file in another PHP script'.PHP_EOL);
+    }
+    $old = false;
+    if (PHP_MAJOR_VERSION === 5) {
+        if (PHP_MINOR_VERSION < 6) {
+            throw new \Exception('MadelineProto requires at least PHP 7.1 to run');
+        }
+        $old = true;
+    }
+    if (PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION === 0) {
+        $old = true;
+    }
+    if ($old) {
+        $newline = PHP_EOL;
+        if (php_sapi_name() !== 'cli') {
+            $newline = '<br>'.$newline;
+        }
+        echo "**********************************************************************************$newline";
+        echo "**********************************************************************************$newline$newline";
+        echo "YOU ARE USING AN OLD AND BUGGED VERSION OF PHP, PLEASE UPDATE TO PHP 7.3$newline";
+        echo "PHP 5/7.0 USERS WILL NOT RECEIVE PHP UPDATES AND BUGFIXES: https://www.php.net/eol.php$newline";
+        echo "PHP 5/7.0 USERS WILL NOT RECEIVE MADELINEPROTO UPDATES AND BUGFIXES$newline$newline";
+        echo "SUPPORTED VERSIONS: PHP 7.1, 7.2, 7.3+$newline";
+        echo "RECOMMENDED VERSION: PHP 7.3$newline$newline";
+        echo "**********************************************************************************$newline";
+        echo "**********************************************************************************$newline";
+        unset($newline);
     }
 
     // MTProxy update

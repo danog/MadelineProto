@@ -213,6 +213,14 @@ trait Login
         return $this->authorization;
     }
 
+    /**
+     * Update the 2FA password
+     *
+     * The params can contain password, new_password, email and hint params.
+     * 
+     * @param array $params The params
+     * @return void
+     */
     public function update_2fa_async(array $params)
     {
         $hasher = new PasswordCalculator();
