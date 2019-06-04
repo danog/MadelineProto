@@ -311,4 +311,11 @@ trait Tools
     {
         return new \Amp\Delayed($time * 1000);
     }
+    public function is_array_or_alike($var)
+    {
+        return is_array($var) ||
+            ($var instanceof ArrayAccess &&
+            $var instanceof Traversable &&
+            $var instanceof Countable);
+    }
 }

@@ -61,7 +61,7 @@ trait CallHandler
             $this->datacenter->sockets[$new_datacenter]->writer->resume();
         }
     }
-    
+
     public function method_call($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false])
     {
         return $this->wait($this->method_call_async_read($method, $args, $aargs));
@@ -111,14 +111,17 @@ trait CallHandler
 
         if (is_array($args)) {
             if (isset($args['message']) && is_string($args['message']) && mb_strlen($args['message'], 'UTF-8') > $this->config['message_length_max']) {
-                $arg_chunks = yield $this->split_to_chunks_async($args);
+                $args = yield $this->split_to_chunks_async($args);
                 $promises = [];
+                $aargs['queue'] = $method;
+                $aargs['multiple'] = true;
+            }
+            if (isset($aargs['multiple'])) {
                 $new_aargs = $aargs;
                 $new_aargs['postpone'] = true;
-                $new_aargs['queue'] = $method;
-
-                foreach ($arg_chunks as $args) {
-                    $promises[] = $this->method_call_async_write($method, $args, $new_aargs);
+                unset($new_aargs['multiple']);
+                foreach ($args as $single_args) {
+                    $promises[] = $this->method_call_async_write($method, $single_args, $new_aargs);
                 }
 
                 if (!isset($aargs['postpone'])) {
