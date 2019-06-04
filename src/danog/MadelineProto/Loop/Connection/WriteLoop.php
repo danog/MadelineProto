@@ -166,7 +166,7 @@ class WriteLoop extends ResumableSignalLoop
             ksort($connection->pending_outgoing);
             $skipped = false;
             foreach ($connection->pending_outgoing as $k => $message) {
-                if ($message['unencrypted']) {
+                if (isset($message['unencrypted']) && $message['unencrypted']) {
                     continue;
                 }
                 if (isset($message['container'])) {
