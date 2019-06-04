@@ -49,6 +49,7 @@ class WriteLoop extends ResumableSignalLoop
     {
         $API = $this->API;
         $connection = $this->connection;
+        $datacenter = $this->datacenter;
 
         $please_wait = false;
         while (true) {
