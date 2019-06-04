@@ -28,6 +28,7 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTools\MsgIdHandler;
 use danog\MadelineProto\Stream\MTProtoTools\SeqNoHandler;
+use Amp\ByteStream\ClosedException;
 
 /**
  * Connection class.
@@ -200,7 +201,11 @@ class Connection
             }
         }
         if ($this->stream) {
-            $this->stream->disconnect();
+            try {
+                $this->stream->disconnect();
+            } catch (ClosedException $e) {
+                $this->API->logger->logger($e);
+            }
         }
         $this->API->logger->logger("Disconnected from DC {$this->datacenter}");
     }

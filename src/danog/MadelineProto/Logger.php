@@ -145,7 +145,9 @@ class Logger
         if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread())) {
             $prefix .= ' (t)';
         }
-        if (!is_string($param)) {
+        if ($param instanceof \Throwable) {
+            $param = (string) $param;
+        } else if (!is_string($param)) {
             $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
         if ($file === null) {
