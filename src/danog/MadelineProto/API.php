@@ -166,6 +166,7 @@ class API extends APIFactory
         if ($this->asyncInitPromise) {
             $this->init();
         }
+        $this->API->logger('Shutting down MadelineProto (normally or due to an exception, idk)');
         $this->wait($this->serialize());
         //restore_error_handler();
     }
