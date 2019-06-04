@@ -707,7 +707,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             'authorization' => 5,
             // How many times should I try to generate an authorization key before throwing an exception
             'response' => 5,
-        ], 'flood_timeout' => ['wait_if_lt' => 20], 'msg_array_limit' => [
+        ], 'flood_timeout' => ['wait_if_lt' => 10*60], 'msg_array_limit' => [
             // How big should be the arrays containing the incoming and outgoing messages?
             'incoming'   => 100,
             'outgoing'   => 100,

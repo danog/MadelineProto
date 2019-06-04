@@ -7,6 +7,7 @@
 MadelineProto now features async, for **incredible speed improvements**, and **parallel processing**.
 Powered by [amphp](https://amphp.org), MadelineProto wraps the AMPHP APIs to provide a simpler generator-based async API.  
 
+
 * Fully rewritten connection stack, with support for websockets, stuff
 * updates
 * simultaneous method calls
@@ -46,6 +47,7 @@ Powered by [amphp](https://amphp.org), MadelineProto wraps the AMPHP APIs to pro
 * no more php 5
 * reset PTS to 0
 * arrayaccess on args
+* increased flood wait
 
 Things to expect in the next releases:
 docs for get mime funcs
