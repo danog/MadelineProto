@@ -256,7 +256,7 @@ class WriteLoop extends ResumableSignalLoop
                 $API->logger->logger("Wrapping in msg_container as encrypted message for DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 $message_id = $connection->generate_message_id($datacenter);
-                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msg_container', 'container' => array_values($keys), 'content_related' => false, 'method' => false];
+                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msg_container', 'container' => array_values($keys), 'content_related' => false, 'method' => false, 'unencrypted' => false];
 
                 //var_dumP("container ".bin2hex($message_id));
                 $keys[$connection->pending_outgoing_key++] = $message_id;
