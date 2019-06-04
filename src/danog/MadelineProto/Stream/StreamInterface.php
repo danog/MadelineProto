@@ -45,8 +45,8 @@ interface StreamInterface
     public function disconnect();
 
     /**
-     * Get underlying AMPHP socket resource
-     * 
+     * Get underlying AMPHP socket resource.
+     *
      * @return \Amp\Socket\Socket
      */
     public function getSocket(): Socket;

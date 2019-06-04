@@ -550,7 +550,6 @@ trait BotAPI
             }
         }
 
-
         $multiple_args_base = array_merge($args, ['entities' => [], 'parse_mode' => 'text', 'message' => '']);
         $multiple_args = [$multiple_args_base];
         $i = 0;
@@ -630,12 +629,13 @@ trait BotAPI
                 }
             }
             if ($c >= 8110) {
-                $this->logger->logger("Entity size limit possibly exceeded, you may get an error indicating that the entities are too long. Reduce the number of entities and/or size of the URLs used.", Logger::FATAL_ERROR);
+                $this->logger->logger('Entity size limit possibly exceeded, you may get an error indicating that the entities are too long. Reduce the number of entities and/or size of the URLs used.', Logger::FATAL_ERROR);
             }
         }
         if ($total) {
             $this->logger->logger("Too many entities, $total entities will be truncated", Logger::FATAL_ERROR);
         }
+
         return $multiple_args;
     }
 
@@ -678,6 +678,7 @@ trait BotAPI
                 $temp .= substr($text, $match[1] + strlen($match[0]));
                 $text = $temp;
             }
+
             return $text;
         } else {
             return htmlentities($text);

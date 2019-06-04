@@ -17,7 +17,7 @@ set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelinePro
  */
 if (!file_exists(__DIR__.'/vendor/autoload.php')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
-    define('MADELINE_BRANCH','');
+    define('MADELINE_BRANCH', '');
     if (!file_exists('madeline.php')) {
         copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
@@ -33,8 +33,12 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         if (isset($update['message']['out']) && $update['message']['out']) {
             return;
         }
-        if ($update['_'] === 'updateReadChannelOutbox') return;
-        if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') return;
+        if ($update['_'] === 'updateReadChannelOutbox') {
+            return;
+        }
+        if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') {
+            return;
+        }
 
         $res = json_encode($update, JSON_PRETTY_PRINT);
         if ($res == '') {
@@ -50,13 +54,14 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             \danog\MadelineProto\Logger::log((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
         } catch (\danog\MadelineProto\Exception $e) {
-            if (stripos($e->getMessage(), 'invalid constructor given') === false) \danog\MadelineProto\Logger::log((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
+            if (stripos($e->getMessage(), 'invalid constructor given') === false) {
+                \danog\MadelineProto\Logger::log((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
+            }
             //$this->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
         }
     }
 }
 $settings = ['logger' => ['logger_level' => 5]];
-
 
 $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
 $MadelineProto->async(true);

@@ -37,13 +37,14 @@ class API extends APIFactory
     {
         Magic::class_exists();
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        $deferred = new Deferred;
+        $deferred = new Deferred();
         $this->asyncAPIPromise = $deferred->promise();
         $this->asyncAPIPromise->onResolve(function () {
             $this->asyncAPIPromise = null;
         });
         $this->setInitPromise($this->__construct_async($params, $settings, $deferred));
     }
+
     public function __construct_async($params, $settings, $deferred)
     {
         if (is_string($params)) {
@@ -184,10 +185,12 @@ class API extends APIFactory
 
         return implode('_', $ret);
     }
+
     public function my_get_self()
     {
         return $this->API->authorization['user'];
     }
+
     public function APIFactory()
     {
         if ($this->API) {

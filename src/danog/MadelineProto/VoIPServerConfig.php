@@ -20,27 +20,28 @@ namespace danog\MadelineProto;
 
 if (class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
     /**
-     * Manages storage of VoIP server config
+     * Manages storage of VoIP server config.
      */
     class VoIPServerConfig extends VoIPServerConfigInternal
     {
         /**
-         * The configuration
+         * The configuration.
          *
          * @var array
          */
         private static $_config = [];
         /**
-         * The default configuration
+         * The default configuration.
          *
          * @var array
          */
         private static $_configDefault = [];
 
         /**
-         * Update shared call settings
+         * Update shared call settings.
          *
-         * @param  array $config The settings
+         * @param array $config The settings
+         *
          * @return void
          */
         public static function update(array $config)
@@ -48,8 +49,9 @@ if (class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
             self::$_config = $config;
             self::updateInternal(self::getFinal());
         }
+
         /**
-         * Get shared call settings
+         * Get shared call settings.
          *
          * @return array The settings
          */
@@ -59,9 +61,10 @@ if (class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
         }
 
         /**
-         * Update default shared call settings
+         * Update default shared call settings.
          *
-         * @param  array $configDefault The settings
+         * @param array $configDefault The settings
+         *
          * @return void
          */
         public static function updateDefault(array $configDefault)
@@ -69,8 +72,9 @@ if (class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
             self::$_configDefault = $configDefault;
             self::updateInternal(self::getFinal());
         }
+
         /**
-         * Get default shared call settings
+         * Get default shared call settings.
          *
          * @return array The settings
          */
@@ -80,7 +84,7 @@ if (class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
         }
 
         /**
-         * Get final settings
+         * Get final settings.
          *
          * @return void
          */

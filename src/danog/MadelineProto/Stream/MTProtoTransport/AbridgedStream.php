@@ -98,9 +98,10 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
 
         return $buffer;
     }
+
     /**
-     * @inheritDoc
-     * 
+     * {@inheritdoc}
+     *
      * @return \Amp\Socket\Socket
      */
     public function getSocket(): \Amp\Socket\Socket

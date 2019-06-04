@@ -20,11 +20,12 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 /**
- * Stores multiple states
+ * Stores multiple states.
  */
 class CombinedUpdatesState
 {
     private $states = [];
+
     public function __construct($init = [])
     {
         $this->states[false] = new UpdatesState();
@@ -38,11 +39,13 @@ class CombinedUpdatesState
             $this->states[$channel] = $state;
         }
     }
+
     /**
-     * Update multiple parameters
+     * Update multiple parameters.
      *
      * @param array|null $init
-     * @param integer $channel
+     * @param int        $channel
+     *
      * @return UpdatesState
      */
     public function get($channel = null, $init = [])
@@ -53,12 +56,15 @@ class CombinedUpdatesState
         if (!isset($this->states[$channel])) {
             return $this->states[$channel] = new UpdatesState($init, $channel);
         }
+
         return $this->states[$channel]->update($init);
     }
+
     /**
-     * Remove update state
+     * Remove update state.
      *
-     * @param integer $channel
+     * @param int $channel
+     *
      * @return void
      */
     public function remove($channel)
@@ -67,22 +73,26 @@ class CombinedUpdatesState
             unset($this->states[$channel]);
         }
     }
+
     /**
-     * Check if update state is present
+     * Check if update state is present.
      *
-     * @param integer $channel
+     * @param int $channel
+     *
      * @return void
      */
     public function has($channel)
     {
         return isset($this->states[$channel]);
     }
+
     /**
      * Are we currently busy?
      *
-     * @param integer $channel
-     * @param boolean|null $set
-     * @return boolean
+     * @param int       $channel
+     * @param bool|null $set
+     *
+     * @return bool
      */
     public function syncLoading($channel, $set = null)
     {

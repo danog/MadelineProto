@@ -19,11 +19,11 @@
 namespace danog\MadelineProto\Stream\Proxy;
 
 use Amp\Promise;
+use Amp\Socket\ClientTlsContext;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
-use Amp\Socket\ClientTlsContext;
 
 /**
  * HTTP proxy stream wrapper.
@@ -56,7 +56,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         if (strlen(inet_pton($address)) === 16) {
             $address = '['.$address.']';
         }
-        
+
         yield $this->stream->write("CONNECT $address:$port HTTP/1.1\r\nHost: $address:$port\r\nAccept: */*\r\n".$this->getProxyAuthHeader()."Connection: keep-Alive\r\n\r\n");
 
         $buffer = yield $this->stream->getReadBuffer($l);
@@ -124,7 +124,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         \danog\MadelineProto\Logger::log('Connected to '.$address.':'.$port.' via http');
 
         if ($secure && method_exists($this->getSocket(), 'enableCrypto')) {
-            yield $this->getSocket()->enableCrypto((new ClientTlsContext)->withPeerName($uri->getHost()));
+            yield $this->getSocket()->enableCrypto((new ClientTlsContext())->withPeerName($uri->getHost()));
         }
 
         if (strlen($header)) {
@@ -196,9 +196,10 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     {
         $this->extra = $extra;
     }
+
     /**
-     * @inheritDoc
-     * 
+     * {@inheritdoc}
+     *
      * @return \Amp\Socket\Socket
      */
     public function getSocket(): \Amp\Socket\Socket

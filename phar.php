@@ -5,7 +5,9 @@ if (PHP_MAJOR_VERSION === 5) {
         throw new \Exception('MadelineProto requires at least PHP 5.6 to run');
     }
     $newline = PHP_EOL;
-    if (php_sapi_name() !== 'cli') $newline = '<br>'.$newline;
+    if (php_sapi_name() !== 'cli') {
+        $newline = '<br>'.$newline;
+    }
     echo "**********************************************************************$newline";
     echo "**********************************************************************$newline$newline";
     echo "YOU ARE USING AN OLD AND BUGGED VERSION OF PHP, PLEASE UPDATE TO PHP 7$newline";
@@ -39,7 +41,6 @@ function ___install_madeline()
     $release_template = 'https://phar.madelineproto.xyz/release%s?v=new';
     $phar_template = 'https://phar.madelineproto.xyz/madeline%s.phar?v=new';
 
-
     // Version definition
     $release_branch = defined('MADELINE_BRANCH') ? '-'.MADELINE_BRANCH : '-old';
     if ($release_branch === '-') {
@@ -50,7 +51,7 @@ function ___install_madeline()
     if (PHP_MAJOR_VERSION <= 5) {
         $release_branch = '5'.$release_branch;
         $release_default_branch = '5';
-    } else if (PHP_MINOR_VERSION >= 3) {
+    } elseif (PHP_MINOR_VERSION >= 3) {
         $release_branch = '';
     }
 

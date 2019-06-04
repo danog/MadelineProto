@@ -19,7 +19,6 @@
 namespace danog\MadelineProto\Stream;
 
 use Amp\CancellationToken;
-use Amp\Promise;
 use Amp\Socket\ClientConnectContext;
 use Amp\Uri\Uri;
 
@@ -319,7 +318,6 @@ class ConnectionContext
     {
         return $this->nextStreams[$this->key][0];
     }
-
 
     /**
      * Get a stream from the stream chain.

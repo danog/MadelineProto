@@ -28,7 +28,7 @@ trait ResponseHandler
 {
     public function send_msgs_state_info_async($req_msg_id, $msg_ids, $datacenter)
     {
-        $this->logger->logger("Sending state info for ".count($msg_ids)." message IDs");
+        $this->logger->logger('Sending state info for '.count($msg_ids).' message IDs');
         $info = '';
         foreach ($msg_ids as $msg_id) {
             $cur_info = 0;
@@ -148,7 +148,7 @@ trait ResponseHandler
                     // Acknowledge that I received the server's response
                     if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id']])) {
                         $this->ack_incoming_message_id($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id'], $datacenter);
-                        // Acknowledge that I received the server's response
+                    // Acknowledge that I received the server's response
                     } else {
                         $message = $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'];
                         $this->datacenter->sockets[$datacenter]->check_message_id($message['orig_message']['msg_id'], ['outgoing' => false, 'container' => true]);
@@ -361,6 +361,7 @@ trait ResponseHandler
                             if ($response['error_message'] === 'MSG_WAIT_FAILED') {
                                 $this->datacenter->sockets[$datacenter]->call_queue[$request['queue']] = [];
                                 $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
+
                                 return;
                             }
                             $this->got_response_for_outgoing_message_id($request_id, $datacenter);
@@ -628,6 +629,7 @@ trait ResponseHandler
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 if (!yield $this->peer_isset_async($from_id) || !yield $this->peer_isset_async($to_id) || isset($updates['via_bot_id']) && !yield $this->peer_isset_async($updates['via_bot_id']) || isset($updates['entities']) && !yield $this->entities_peer_isset_async($updates['entities']) || isset($updates['fwd_from']) && !yield $this->fwd_peer_isset_async($updates['fwd_from'])) {
                     yield $this->updaters[false]->resume();
+
                     return;
                 }
                 $message = $updates;

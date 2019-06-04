@@ -24,7 +24,6 @@ use danog\MadelineProto\Stream\Async\Buffer;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Tools;
 
 /**
  * Obfuscated2 stream wrapper.
@@ -195,9 +194,10 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
         }
         $this->extra = $extra;
     }
+
     /**
-     * @inheritDoc
-     * 
+     * {@inheritdoc}
+     *
      * @return \Amp\Socket\Socket
      */
     public function getSocket(): \Amp\Socket\Socket

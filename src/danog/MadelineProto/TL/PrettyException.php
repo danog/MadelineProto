@@ -31,7 +31,9 @@ trait PrettyException
     public function prettify_tl($init = '')
     {
         $eol = PHP_EOL;
-        if (php_sapi_name() !== 'cli') $eol = '<br>'.PHP_EOL;
+        if (php_sapi_name() !== 'cli') {
+            $eol = '<br>'.PHP_EOL;
+        }
         $tl = false;
         foreach (array_reverse($this->getTrace()) as $k => $frame) {
             if (isset($frame['function']) && in_array($frame['function'], ['serialize_params', 'serialize_object'])) {

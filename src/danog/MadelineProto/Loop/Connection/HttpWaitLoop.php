@@ -18,8 +18,6 @@
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use Amp\Success;
-use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
@@ -40,6 +38,7 @@ class HttpWaitLoop extends ResumableSignalLoop
         $this->datacenter = $datacenter;
         $this->connection = $API->datacenter->sockets[$datacenter];
     }
+
     public function loop()
     {
         $API = $this->API;
@@ -68,7 +67,6 @@ class HttpWaitLoop extends ResumableSignalLoop
                 yield $connection->sendMessage(['_' => 'http_wait', 'body' => ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'content_related' => true, 'unencrypted' => false, 'method' => false]);
             }
             $API->logger->logger("DC $datacenter: request {$connection->http_req_count}, response {$connection->http_res_count}");
-
         }
     }
 

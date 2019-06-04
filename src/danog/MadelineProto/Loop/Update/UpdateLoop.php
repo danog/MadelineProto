@@ -18,9 +18,8 @@
 
 namespace danog\MadelineProto\Loop\Update;
 
-use danog\MadelineProto\Logger;
-use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 use Amp\Loop;
+use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 use danog\MadelineProto\RPCErrorException;
 
 /**
@@ -41,6 +40,7 @@ class UpdateLoop extends ResumableSignalLoop
         $this->API = $API;
         $this->channelId = $channelId;
     }
+
     public function loop()
     {
         $API = $this->API;
@@ -49,17 +49,18 @@ class UpdateLoop extends ResumableSignalLoop
         while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
             if (yield $this->waitSignal($this->pause())) {
                 $API->logger->logger("Exiting $this due to signal");
+
                 return;
             }
         }
         $this->state = $state = $this->channelId === false ? (yield $API->load_update_state_async()) : $API->loadChannelState($this->channelId);
-
 
         $timeout = $API->settings['updates']['getdifference_interval'];
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
                 if (yield $this->waitSignal($this->pause())) {
                     $API->logger->logger("Exiting $this due to signal");
+
                     return;
                 }
             }
@@ -71,21 +72,24 @@ class UpdateLoop extends ResumableSignalLoop
                     $this->API->logger->logger('Resumed and fetching '.$this->channelId.' difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     if ($state->pts() <= 1) {
                         $limit = 10;
-                    } else if ($API->authorization['user']['bot']) {
+                    } elseif ($API->authorization['user']['bot']) {
                         $limit = 100000;
                     } else {
                         $limit = 100;
                     }
                     $request_pts = $state->pts();
+
                     try {
                         $difference = yield $this->API->method_call_async_read('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $this->API->datacenter->curdc]);
                     } catch (RPCErrorException $e) {
                         if (in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN'])) {
                             $feeder->signal(true);
                             $API->logger->logger("Channel private, exiting $this");
+
                             return true;
                         }
-                        throw $e;            
+
+                        throw $e;
                     }
                     if (isset($difference['timeout'])) {
                         $timeout = $difference['timeout'];
@@ -99,7 +103,7 @@ class UpdateLoop extends ResumableSignalLoop
                             break 2;
                         case 'updates.channelDifference':
                             if ($request_pts >= $difference['pts'] && $request_pts > 1) {
-                                $this->API->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().", using ".($state->pts() + 1), \danog\MadelineProto\Logger::VERBOSE);
+                                $this->API->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().', using '.($state->pts() + 1), \danog\MadelineProto\Logger::VERBOSE);
                                 $difference['pts'] = $request_pts + 1;
                             }
                             $state->update($difference);
@@ -175,14 +179,17 @@ class UpdateLoop extends ResumableSignalLoop
 
             if (yield $this->waitSignal($this->pause($timeout))) {
                 $API->logger->logger("Exiting $this due to signal");
+
                 return;
             }
         }
     }
+
     public function setLimit($toPts)
     {
         $this->toPts = $toPts;
     }
+
     public function has_all_auth()
     {
         if ($this->API->isInitingAuthorization()) {
@@ -200,6 +207,6 @@ class UpdateLoop extends ResumableSignalLoop
 
     public function __toString(): string
     {
-        return !$this->channelId ? "getUpdate loop generic" : "getUpdate loop channel {$this->channelId}";
+        return !$this->channelId ? 'getUpdate loop generic' : "getUpdate loop channel {$this->channelId}";
     }
 }

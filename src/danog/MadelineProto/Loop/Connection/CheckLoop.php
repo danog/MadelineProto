@@ -19,7 +19,6 @@
 namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\Deferred;
-use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 
 /**
@@ -66,6 +65,7 @@ class CheckLoop extends ResumableSignalLoop
                                 if ($e) {
                                     $API->logger("Got exception in check loop for DC $datacenter");
                                     $API->logger((string) $e);
+
                                     return;
                                 }
                                 $reply = [];

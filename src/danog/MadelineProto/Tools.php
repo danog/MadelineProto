@@ -195,7 +195,7 @@ trait Tools
                     });
                 });
             } catch (\Throwable $throwable) {
-                throw new \Error("Loop exceptionally stopped without resolving the promise", 0, $throwable);
+                throw new \Error('Loop exceptionally stopped without resolving the promise', 0, $throwable);
             }
         } while (!$resolved);
 
@@ -205,38 +205,48 @@ trait Tools
 
         return $value;
     }
+
     public function all($promises)
     {
         foreach ($promises as &$promise) {
             $promise = $this->call($promise);
         }
+
         return all($promises);
     }
+
     public function any($promises)
     {
         foreach ($promises as &$promise) {
             $promise = $this->call($promise);
         }
+
         return any($promises);
     }
+
     public function some($promises)
     {
         foreach ($promises as &$promise) {
             $promise = $this->call($promise);
         }
+
         return some($promises);
     }
+
     public function first($promises)
     {
         foreach ($promises as &$promise) {
             $promise = $this->call($promise);
         }
+
         return first($promises);
     }
+
     public function timeout($promise, $timeout)
     {
         return timeout($this->call($promise), $timeout);
     }
+
     public function call($promise)
     {
         if ($promise instanceof \Generator) {
@@ -247,6 +257,7 @@ trait Tools
 
         return $promise;
     }
+
     public function callFork($promise, $actual = null, $file = '')
     {
         if ($actual) {
@@ -271,12 +282,15 @@ trait Tools
                 }
             });
         }
+
         return $promise;
     }
+
     public function callForkDefer($promise)
     {
         Loop::defer([$this, 'callFork'], $promise);
     }
+
     public function rethrow($e, $file = '')
     {
         $logger = isset($this->logger) ? $this->logger : Logger::$default;
@@ -287,6 +301,7 @@ trait Tools
         $logger->logger((string) $e);
         Promise\rethrow(new Failure($e));
     }
+
     public function after($a, $b)
     {
         $a = $this->call($a());
@@ -311,6 +326,7 @@ trait Tools
     {
         return new \Amp\Delayed($time * 1000);
     }
+
     public function is_array_or_alike($var)
     {
         return is_array($var) ||

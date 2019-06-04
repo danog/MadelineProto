@@ -42,6 +42,7 @@ trait ApiStart
                     $lines[count($lines) - 1] .= array_shift($chunk);
                     $lines = array_merge($lines, $chunk);
                 }
+
                 return array_shift($lines);
             };
             echo 'You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a)
@@ -96,7 +97,7 @@ Note that you can also provide the API parameters directly in the code using the
                         return yield $this->my_telegram_org_wrapper->get_app_async();
                     }
                     yield $this->web_api_echo_async();
-                } else if (isset($_POST['api_id']) && isset($_POST['api_hash'])) {
+                } elseif (isset($_POST['api_id']) && isset($_POST['api_hash'])) {
                     $app['api_id'] = (int) $_POST['api_id'];
                     $app['api_hash'] = $_POST['api_hash'];
                     $this->getting_api_id = false;

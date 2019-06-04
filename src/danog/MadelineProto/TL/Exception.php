@@ -29,6 +29,7 @@ class Exception extends \Exception
         if (php_sapi_name() !== 'cli') {
             $result = str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
         }
+
         return $result;
     }
 

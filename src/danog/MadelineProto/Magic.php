@@ -124,10 +124,12 @@ class Magic
             }
             $backtrace = debug_backtrace(0);
             self::$script_cwd = self::$cwd = dirname(end($backtrace)['file']);
+
             try {
                 self::$cwd = getcwd();
                 self::$can_getcwd = true;
-            } catch (\danog\MadelineProto\Exception $e) {}
+            } catch (\danog\MadelineProto\Exception $e) {
+            }
             self::$inited = true;
         }
     }
@@ -151,6 +153,7 @@ class Magic
             return self::$can_getmypid = false;
         }
     }
+
     public static function getcwd()
     {
         return self::$can_getcwd ? getcwd() : self::$cwd;

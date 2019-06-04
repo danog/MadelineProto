@@ -63,6 +63,7 @@ class Button implements \JsonSerializable, \ArrayAccess
                 $res = $this->info['API']->$method('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'game' => true], ['datacenter' => $this->info['API']->datacenter->curdc]);
                 break;
         }
+
         return $async ? $res : $this->wait($res);
     }
 

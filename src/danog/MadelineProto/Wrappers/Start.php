@@ -45,6 +45,7 @@ trait Start
                     $lines[count($lines) - 1] .= array_shift($chunk);
                     $lines = array_merge($lines, $chunk);
                 }
+
                 return array_shift($lines);
             };
             if (strpos(yield $readline('Do you want to login as user or bot (u/b)? '), 'b') !== false) {

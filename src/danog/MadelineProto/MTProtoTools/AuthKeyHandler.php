@@ -519,14 +519,14 @@ trait AuthKeyHandler
         $code = yield $this->datacenter->fileGetContents('http://www.wolframalpha.com/api/v1/code');
         $query = 'Do prime factorization of '.$what;
         $params = [
-            'async' => true,
-            'banners' => 'raw',
+            'async'         => true,
+            'banners'       => 'raw',
             'debuggingdata' => false,
-            'format' => 'moutput',
+            'format'        => 'moutput',
             'formattimeout' => 8,
-            'input' => $query,
-            'output' => 'JSON',
-            'proxycode' => json_decode($code, true)['code'],
+            'input'         => $query,
+            'output'        => 'JSON',
+            'proxycode'     => json_decode($code, true)['code'],
         ];
         $url = 'https://www.wolframalpha.com/input/json.jsp?'.http_build_query($params);
 
@@ -612,6 +612,7 @@ trait AuthKeyHandler
     public function init_authorization_socket_async($id, $socket)
     {
         $this->init_auth_dcs[$id] = true;
+
         try {
             if ($socket->session_id === null) {
                 $socket->session_id = $this->random(8);

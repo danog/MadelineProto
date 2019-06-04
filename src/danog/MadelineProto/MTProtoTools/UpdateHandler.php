@@ -21,7 +21,6 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Artax\Request;
 use Amp\Deferred;
-use Amp\Delayed;
 use Amp\Loop;
 
 /**
@@ -98,22 +97,24 @@ trait UpdateHandler
 
         return $updates;
     }
+
     public $update_resolved = false;
     public $update_deferred;
 
     public function waitUpdate()
     {
         if (!$this->update_deferred) {
-            $this->update_deferred = new Deferred;
+            $this->update_deferred = new Deferred();
         }
         yield $this->update_deferred->promise();
         $this->update_resolved = false;
-        $this->update_deferred = new Deferred;
+        $this->update_deferred = new Deferred();
     }
+
     public function signalUpdate()
     {
         if (!$this->update_deferred) {
-            $this->update_deferred = new Deferred;
+            $this->update_deferred = new Deferred();
         }
         Loop::defer(function () {
             if (!$this->update_resolved) {
@@ -125,7 +126,10 @@ trait UpdateHandler
 
     public function check_msg_id($message)
     {
-        if (!isset($message['to_id'])) return true;
+        if (!isset($message['to_id'])) {
+            return true;
+        }
+
         try {
             $peer_id = $this->get_id($message['to_id']);
         } catch (\danog\MadelineProto\Exception $e) {
@@ -152,10 +156,12 @@ trait UpdateHandler
 
         return $this->channels_state->get(false);
     }
+
     public function loadChannelState($channelId = null, $init = [])
     {
         return $this->channels_state->get($channelId, $init);
     }
+
     public function getChannelStates()
     {
         return $this->channels_state;

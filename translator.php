@@ -83,7 +83,7 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
             if (!$param_name && strpos($key, 'object_') === 0) {
                 $value = str_replace('Update ', '', $value).' update';
             }
-        //} elseif (ctype_lower($value[0])) {
+            //} elseif (ctype_lower($value[0])) {
         } else {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = readline($value.' => ');
             if (\danog\MadelineProto\Lang::$lang[$lang_code][$key] === '') {

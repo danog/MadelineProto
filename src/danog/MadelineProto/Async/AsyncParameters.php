@@ -54,6 +54,7 @@ class AsyncParameters extends Parameters
     public function getParameters()
     {
         $callable = $this->callable;
+
         return yield $callable();
     }
 }

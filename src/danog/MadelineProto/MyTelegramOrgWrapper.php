@@ -40,6 +40,7 @@ class MyTelegramOrgWrapper
     {
         return ['logged', 'hash', 'token', 'number', 'creation_hash', 'settings'];
     }
+
     public function __construct($settings)
     {
         if (!isset($settings['all'])) {
@@ -58,21 +59,21 @@ class MyTelegramOrgWrapper
                 'proxy_extra' => Magic::$altervista ? ['address' => 'localhost', 'port' => 80] : [],
                 // Extra parameters to pass to the proxy class using setExtra
                 'obfuscated' => false,
-                'transport' => 'tcp',
-                'pfs' => extension_loaded('gmp'),
+                'transport'  => 'tcp',
+                'pfs'        => extension_loaded('gmp'),
             ],
             ];
         }
         $this->settings = $settings;
         $this->__wakeup();
     }
+
     public function __wakeup()
     {
         $this->datacenter = new DataCenter(
-            new class($this->settings)
-        {
+            new class($this->settings) {
                 public function __construct($settings)
-            {
+                {
                     $this->logger = new Logger(
                         isset($settings['logger']['logger']) ? $settings['logger']['logger'] : php_sapi_name() === 'cli' ? 3 : 2,
                         isset($settings['logger']['logger_param']) ? $settings['logger']['logger_param'] : Magic::$script_cwd.'/MadelineProto.log',
@@ -84,6 +85,7 @@ class MyTelegramOrgWrapper
             $this->settings['connection_settings']
         );
     }
+
     public function login_async($number)
     {
         $this->number = $number;
@@ -271,14 +273,17 @@ class MyTelegramOrgWrapper
 
         return $final_headers;
     }
+
     public function async($async)
     {
         $this->async = $async;
     }
+
     public function __call($name, $arguments)
     {
         $name .= '_async';
         $async = is_array(end($arguments)) && isset(end($arguments)['async']) ? end($arguments)['async'] : $this->async;
+
         return $async ? $this->{$name}(...$arguments) : $this->wait($this->{$name}(...$arguments));
     }
 }

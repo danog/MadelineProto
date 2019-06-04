@@ -31,7 +31,6 @@ use Amp\Websocket\Rfc7692CompressionFactory;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use danog\MadelineProto\Tools;
 use function Amp\Websocket\generateKey;
 use function Amp\Websocket\validateAcceptForKey;
 
@@ -60,7 +59,7 @@ class WsStream implements RawStreamInterface
         $stream = yield $ctx->getStream();
         $resource = $stream->getStream()->getResource();
 
-        $this->compressionFactory = new Rfc7692CompressionFactory;
+        $this->compressionFactory = new Rfc7692CompressionFactory();
 
         $handshake = new Handshake(str_replace('tcp://', $ctx->isSecure() ? 'ws://' : 'wss://', $ctx->getStringUri()));
 
@@ -154,8 +153,10 @@ class WsStream implements RawStreamInterface
         if (($query = $uri->getQuery()) !== '') {
             $path .= '?'.$query;
         }
+
         return \sprintf("GET %s HTTP/1.1\r\n%s\r\n", $path, Rfc7230::formatHeaders($headers));
     }
+
     private function handleResponse(string $headerBuffer, string $key): array
     {
         if (\substr($headerBuffer, -4) !== "\r\n\r\n") {
@@ -190,8 +191,10 @@ class WsStream implements RawStreamInterface
         if (!validateAcceptForKey($secWebsocketAccept, $key)) {
             throw new ConnectionException('Invalid "Sec-WebSocket-Accept" header');
         }
+
         return $headers;
     }
+
     final protected function createCompressionContext(array $headers): ?Websocket\CompressionContext
     {
         $extensions = $headers['sec-websocket-extensions'][0] ?? '';
@@ -201,10 +204,12 @@ class WsStream implements RawStreamInterface
                 return $compressionContext;
             }
         }
+
         return null;
     }
+
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      *
      * @return \Amp\Socket\Socket
      */

@@ -31,18 +31,21 @@ class AsyncConstruct
 {
     use Tools;
     public $asyncInitPromise;
+
     public function init()
     {
         if ($this->asyncInitPromise) {
             $this->wait($this->asyncInitPromise);
         }
     }
+
     public function initAsync()
     {
         if ($this->asyncInitPromise) {
             yield $this->asyncInitPromise;
         }
     }
+
     public function setInitPromise($promise)
     {
         $this->asyncInitPromise = $this->call($promise);

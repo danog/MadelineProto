@@ -18,6 +18,7 @@
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\ClosedException;
 use Amp\Deferred;
 use Amp\Promise;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
@@ -28,7 +29,6 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTools\MsgIdHandler;
 use danog\MadelineProto\Stream\MTProtoTools\SeqNoHandler;
-use Amp\ByteStream\ClosedException;
 
 /**
  * Connection class.
@@ -147,7 +147,6 @@ class Connection
             $this->checker->resume();
         }
         $this->waiter->start();
-
     }
 
     public function sendMessage($message, $flush = true)
@@ -235,6 +234,7 @@ class Connection
                 if ($pfs && !isset($this->temp_auth_key['bound']) && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
                     continue;
                 }
+
                 return true;
             }
         }

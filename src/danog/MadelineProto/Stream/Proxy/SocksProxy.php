@@ -19,11 +19,11 @@
 namespace danog\MadelineProto\Stream\Proxy;
 
 use Amp\Promise;
+use Amp\Socket\ClientTlsContext;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
-use Amp\Socket\ClientTlsContext;
 
 /**
  * Socks5 stream wrapper.
@@ -54,7 +54,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
             $methods .= chr(2);
         }
         $this->stream = yield $ctx->getStream(chr(5).chr(strlen($methods)).$methods);
-        
+
         $l = 2;
 
         $buffer = yield $this->stream->getReadBuffer($l);
@@ -139,7 +139,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         \danog\MadelineProto\Logger::log(['Connected to '.$ip.':'.$port.' via socks5']);
 
         if ($secure && method_exists($this->getSocket(), 'enableCrypto')) {
-            yield $this->getSocket()->enableCrypto((new ClientTlsContext)->withPeerName($uri->getHost()));
+            yield $this->getSocket()->enableCrypto((new ClientTlsContext())->withPeerName($uri->getHost()));
         }
         if (strlen($header)) {
             yield (yield $this->stream->getWriteBuffer(strlen($header)))->bufferWrite($header);
@@ -201,8 +201,9 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     {
         $this->extra = $extra;
     }
+
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      *
      * @return \Amp\Socket\Socket
      */
