@@ -167,6 +167,8 @@ class API extends APIFactory
             $this->init();
         }
         $this->API->logger('Shutting down MadelineProto (normally or due to an exception, idk)');
+        $this->API->destructing = true;
+        $this->destructing = true;
         $this->wait($this->serialize());
         //restore_error_handler();
     }
