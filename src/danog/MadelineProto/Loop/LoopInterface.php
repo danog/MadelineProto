@@ -40,7 +40,7 @@ interface LoopInterface
     public function loop();
 
     /**
-     * Get name of the loop
+     * Get name of the loop.
      *
      * @return string
      */

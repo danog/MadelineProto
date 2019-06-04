@@ -54,8 +54,10 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
         $this->resume = new Deferred();
 
         $pause = $this->pause;
-        $this->pause = new Deferred;
-        if ($pause) Loop::defer([$pause, 'resolve']);
+        $this->pause = new Deferred();
+        if ($pause) {
+            Loop::defer([$pause, 'resolve']);
+        }
 
         return $this->resume->promise();
     }
@@ -82,6 +84,7 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
     public function resumeDefer()
     {
         Loop::defer([$this, 'resume']);
+
         return $this->pause ? $this->pause->promise() : null;
     }
 }

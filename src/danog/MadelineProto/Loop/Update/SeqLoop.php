@@ -18,8 +18,6 @@
 
 namespace danog\MadelineProto\Loop\Update;
 
-use Amp\Success;
-use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 
 /**
@@ -38,6 +36,7 @@ class SeqLoop extends ResumableSignalLoop
     {
         $this->API = $API;
     }
+
     public function loop()
     {
         $API = $this->API;
@@ -80,6 +79,7 @@ class SeqLoop extends ResumableSignalLoop
             }
         }
     }
+
     public function parse($updates)
     {
         reset($updates);
@@ -88,8 +88,7 @@ class SeqLoop extends ResumableSignalLoop
             $key = key($updates);
             $update = $updates[$key];
             unset($updates[$key]);
-            
-            
+
             $options = $update['options'];
             $seq_start = $options['seq_start'];
             $seq_end = $options['seq_end'];
@@ -117,20 +116,24 @@ class SeqLoop extends ResumableSignalLoop
             yield $this->save($update);
         }
     }
+
     public function feed($updates)
     {
         $this->API->logger->logger('Was fed updates of type '.$updates['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
 
         $this->incomingUpdates[] = $updates;
     }
+
     public function save($updates)
     {
         $this->pendingWakeups += yield $this->feeder->feed($updates['updates']);
     }
+
     public function addPendingWakeups($wakeups)
     {
         $this->pendingWakeups += $wakeups;
     }
+
     public function has_all_auth()
     {
         if ($this->API->isInitingAuthorization()) {
@@ -148,6 +151,6 @@ class SeqLoop extends ResumableSignalLoop
 
     public function __toString(): string
     {
-        return "update seq loop";
+        return 'update seq loop';
     }
 }

@@ -45,6 +45,7 @@ class ReadLoop extends SignalLoop
         $this->datacenter = $datacenter;
         $this->connection = $API->datacenter->sockets[$datacenter];
     }
+
     public function loop()
     {
         $API = $this->API;
@@ -92,6 +93,7 @@ class ReadLoop extends SignalLoop
                     $API->logger->logger("Got NOOP from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
                 } else {
                     yield $connection->reconnect();
+
                     throw new \danog\MadelineProto\RPCErrorException($error, $error);
                 }
 
@@ -114,7 +116,8 @@ class ReadLoop extends SignalLoop
         $datacenter = $this->datacenter;
         $connection = $this->connection;
         if (isset($this->connection->old)) {
-            $API->logger->logger("Not reading because connection is old");
+            $API->logger->logger('Not reading because connection is old');
+
             throw new NothingInTheSocketException();
         }
 
@@ -203,6 +206,7 @@ class ReadLoop extends SignalLoop
             $connection->incoming_messages[$message_id] = ['seq_no' => $seq_no];
         } else {
             $API->logger->logger('Got unknown auth_key id', \danog\MadelineProto\Logger::ERROR);
+
             return -404;
         }
         $deserialized = $API->deserialize($message_data, ['type' => '', 'datacenter' => $datacenter]);

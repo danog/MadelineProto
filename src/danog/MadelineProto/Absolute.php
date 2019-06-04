@@ -29,6 +29,7 @@ class Absolute
         if (($file[0] !== '/') && ($file[1] !== ':') && !in_array(substr($file, 0, 4), ['phar', 'http'])) {
             $file = Magic::getcwd().'/'.$file;
         }
+
         return $file;
     }
 }

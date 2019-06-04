@@ -20,8 +20,6 @@
 namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
-use danog\MadelineProto\VoIPServerConfig;
-use function Amp\Promise\wait;
 
 /**
  * Manages logging in and out.
@@ -103,7 +101,9 @@ trait Login
             if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_2fa_enabled'], \danog\MadelineProto\Logger::NOTICE);
                 $this->authorization = yield $this->method_call_async_read('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]);
-                if (!isset($this->authorization['hint'])) $this->authorization['hint'] = '';
+                if (!isset($this->authorization['hint'])) {
+                    $this->authorization['hint'] = '';
+                }
                 $this->authorized = self::WAITING_PASSWORD;
 
                 return $this->authorization;
@@ -159,6 +159,7 @@ trait Login
         $res = yield $this->get_self_async();
 
         $this->startUpdateSystem();
+
         return $res;
     }
 

@@ -23,7 +23,6 @@ use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
-use danog\MadelineProto\Tools;
 
 /**
  * TCP Intermediate stream wrapper.
@@ -89,9 +88,10 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
 
         return $buffer;
     }
+
     /**
-     * @inheritDoc
-     * 
+     * {@inheritdoc}
+     *
      * @return \Amp\Socket\Socket
      */
     public function getSocket(): \Amp\Socket\Socket

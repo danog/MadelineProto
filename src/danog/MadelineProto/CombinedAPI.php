@@ -42,7 +42,6 @@ class CombinedAPI
         $realpaths = Serialization::realpaths($session);
         $this->session = $realpaths['file'];
 
-
         foreach ($paths as $path => $settings) {
             $this->addInstance($path, $settings);
         }

@@ -18,9 +18,7 @@
 
 namespace danog\MadelineProto\Stream\Async;
 
-use Amp\Failure;
 use Amp\Promise;
-use Amp\Success;
 
 /**
  * Buffered stream helper trait.

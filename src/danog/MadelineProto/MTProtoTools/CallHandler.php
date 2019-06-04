@@ -54,7 +54,7 @@ trait CallHandler
                 $this->ack_outgoing_message_id($message_id, $old_datacenter);
                 $this->got_response_for_outgoing_message_id($message_id, $old_datacenter);
             } else {
-                $this->logger->logger("Could not resend ".isset($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id]['_']) ? $this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id]['_'] : $message_id);
+                $this->logger->logger('Could not resend '.isset($this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id]['_']) ? $this->datacenter->sockets[$old_datacenter]->outgoing_messages[$message_id]['_'] : $message_id);
             }
         }
         if (!$postpone) {
@@ -92,6 +92,7 @@ trait CallHandler
     {
         return $this->call($this->method_call_async_write_generator($method, $args, $aargs));
     }
+
     public function method_call_async_write_generator($method, $args = [], $aargs = ['msg_id' => null, 'heavy' => false]): \Generator
     {
         if (is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID') {

@@ -19,7 +19,6 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Promise;
 use danog\MadelineProto\Async\AsyncConstruct;
 
 class APIFactory extends AsyncConstruct
@@ -156,10 +155,10 @@ class APIFactory extends AsyncConstruct
     {
         if ($this->asyncInitPromise) {
             yield $this->initAsync();
-            $this->API->logger->logger("Finished init asynchronously");
+            $this->API->logger->logger('Finished init asynchronously');
         }
         if (Magic::is_fork() && !Magic::$processed_fork) {
-            throw new Exception("Forking not supported, use async logic, instead: https://docs.madelineproto.xyz/docs/ASYNC.html");
+            throw new Exception('Forking not supported, use async logic, instead: https://docs.madelineproto.xyz/docs/ASYNC.html');
         }
         if (isset($this->session) && !is_null($this->session) && time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
             Logger::log("Didn't serialize in a while, doing that now...");
@@ -172,7 +171,7 @@ class APIFactory extends AsyncConstruct
         }
         if ($this->API->asyncInitPromise) {
             yield $this->API->initAsync();
-            $this->API->logger->logger("Finished init asynchronously");
+            $this->API->logger->logger('Finished init asynchronously');
         }
 
         $lower_name = strtolower($name);
@@ -215,6 +214,7 @@ class APIFactory extends AsyncConstruct
             if ($this->API->asyncInitPromise) {
                 $this->API->init();
             }
+
             return $this->API->__construct(array_replace_recursive($this->API->settings, $value));
         }
 
@@ -226,6 +226,7 @@ class APIFactory extends AsyncConstruct
         if ($this->asyncAPIPromise) {
             $this->wait($this->asyncAPIPromise);
         }
+
         return isset($this->API->storage[$name]);
     }
 
@@ -236,5 +237,4 @@ class APIFactory extends AsyncConstruct
         }
         unset($this->API->storage[$name]);
     }
-
 }

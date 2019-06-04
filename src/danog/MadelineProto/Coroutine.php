@@ -90,12 +90,14 @@ final class Coroutine implements Promise
         //public function __destruct() { var_dump($this->s); }
         };*/
         $this->generator = $generator;
+
         try {
             $yielded = $this->generator->current();
             while (!$yielded instanceof Promise) {
                 if ($yielded instanceof \YieldReturnValue) {
                     $this->resolve($yielded->getReturn());
                     $this->generator->next();
+
                     return;
                 }
                 if (!$this->generator->valid()) {
@@ -145,6 +147,7 @@ final class Coroutine implements Promise
                             $this->resolve($yielded->getReturn());
                             $this->onResolve = null;
                             $this->generator->next();
+
                             return;
                         }
 

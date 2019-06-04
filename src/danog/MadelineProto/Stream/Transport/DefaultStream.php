@@ -40,6 +40,7 @@ class DefaultStream extends Socket implements RawStreamInterface
     public function __construct()
     {
     }
+
     public function enableCrypto(ClientTlsContext $tlsContext = null): \Amp\Promise
     {
         return $this->enableCrypto($tlsContext);
@@ -105,9 +106,10 @@ class DefaultStream extends Socket implements RawStreamInterface
     {
         $this->disconnect();
     }
+
     /**
-     * @inheritDoc
-     * 
+     * {@inheritdoc}
+     *
      * @return \Amp\Socket\Socket
      */
     public function getSocket(): \Amp\Socket\Socket

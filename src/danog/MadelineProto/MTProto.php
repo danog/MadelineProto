@@ -228,10 +228,12 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         return ['supportUser', 'referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'dh_config', 'chats', 'last_stored', 'qres', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
     }
+
     public function logger(...$params)
     {
         return $this->logger->logger(...$params);
     }
+
     public function isAltervista()
     {
         return Magic::$altervista;
@@ -246,12 +248,14 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         return $this->datacenter->getHTTPClient();
     }
+
     public function __wakeup()
     {
         $backtrace = debug_backtrace(0, 3);
         $this->asyncInitPromise = true;
         $this->setInitPromise($this->__wakeup_async($backtrace));
     }
+
     public function __wakeup_async($backtrace)
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
@@ -356,7 +360,6 @@ class MTProto extends AsyncConstruct implements TLCallback
                 if (isset($full['full'], $full['last_update'])) {
                     $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
                 }
-
             }
             foreach ($this->secret_chats as $key => &$chat) {
                 if (!is_array($chat)) {
@@ -592,9 +595,9 @@ class MTProto extends AsyncConstruct implements TLCallback
                     2 => [
                         // The rest will be fetched using help.getConfig
                         'ip_address' => '149.154.167.40',
-                        'port' => 443,
+                        'port'       => 443,
                         'media_only' => false,
-                        'tcpo_only' => false,
+                        'tcpo_only'  => false,
                     ],
                 ],
                 'ipv6' => [
@@ -602,9 +605,9 @@ class MTProto extends AsyncConstruct implements TLCallback
                     2 => [
                         // The rest will be fetched using help.getConfig
                         'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000e',
-                        'port' => 443,
+                        'port'       => 443,
                         'media_only' => false,
-                        'tcpo_only' => false,
+                        'tcpo_only'  => false,
                     ],
                 ],
             ],
@@ -615,9 +618,9 @@ class MTProto extends AsyncConstruct implements TLCallback
                     2 => [
                         // The rest will be fetched using help.getConfig
                         'ip_address' => '149.154.167.51',
-                        'port' => 443,
+                        'port'       => 443,
                         'media_only' => false,
-                        'tcpo_only' => false,
+                        'tcpo_only'  => false,
                     ],
                 ],
                 'ipv6' => [
@@ -625,9 +628,9 @@ class MTProto extends AsyncConstruct implements TLCallback
                     2 => [
                         // The rest will be fetched using help.getConfig
                         'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000a',
-                        'port' => 443,
+                        'port'       => 443,
                         'media_only' => false,
-                        'tcpo_only' => false,
+                        'tcpo_only'  => false,
                     ],
                 ],
             ],
@@ -648,17 +651,17 @@ class MTProto extends AsyncConstruct implements TLCallback
                 'proxy_extra' => Magic::$altervista ? ['address' => 'localhost', 'port' => 80] : [],
                 // Extra parameters to pass to the proxy class using setExtra
                 'obfuscated' => false,
-                'transport' => 'tcp',
-                'pfs' => extension_loaded('gmp'),
+                'transport'  => 'tcp',
+                'pfs'        => extension_loaded('gmp'),
             ],
             'default_dc' => 2,
         ], 'app_info' => [
             // obtained in https://my.telegram.org
             //'api_id'          => you should put an API id in the settings array you provide
             //'api_hash'        => you should put an API hash in the settings array you provide
-            'device_model' => $device_model,
+            'device_model'   => $device_model,
             'system_version' => $system_version,
-            'app_version' => $app_version,
+            'app_version'    => $app_version,
             // ðŸŒš
             //                'app_version'     => self::V,
             'lang_code' => $lang_code,
@@ -692,10 +695,10 @@ class MTProto extends AsyncConstruct implements TLCallback
              */
             // write to
             'logger_param' => Magic::$script_cwd.'/MadelineProto.log',
-            'logger' => php_sapi_name() === 'cli' ? 3 : 2,
+            'logger'       => php_sapi_name() === 'cli' ? 3 : 2,
             // overwrite previous setting and echo logs
             'logger_level' => Logger::VERBOSE,
-            'max_size' => 100 * 1024 * 1024,
+            'max_size'     => 100 * 1024 * 1024,
             // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
             'rollbar_token' => '',
         ], 'max_tries' => [
@@ -706,8 +709,8 @@ class MTProto extends AsyncConstruct implements TLCallback
             'response' => 5,
         ], 'flood_timeout' => ['wait_if_lt' => 20], 'msg_array_limit' => [
             // How big should be the arrays containing the incoming and outgoing messages?
-            'incoming' => 100,
-            'outgoing' => 100,
+            'incoming'   => 100,
+            'outgoing'   => 100,
             'call_queue' => 200,
         ], 'peer' => [
             'full_info_cache_time' => 3600,
@@ -731,10 +734,10 @@ class MTProto extends AsyncConstruct implements TLCallback
             'handler_workers' => 10,
         ], 'upload' => [
             'allow_automatic_upload' => true,
-            'part_size' => 512 * 1024,
+            'part_size'              => 512 * 1024,
         ], 'download' => [
             'report_broken_media' => true,
-            'part_size' => 1024 * 1024,
+            'part_size'           => 1024 * 1024,
         ], 'pwr' => [
             'pwr' => false,
             // Need info ?
@@ -794,7 +797,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
         if (php_sapi_name() !== 'cli') {
             if (isset($this->settings['logger']['logger_param']) && basename($this->settings['logger']['logger_param']) === 'MadelineProto.log') {
-                $this->settings['logger']['logger_param'] = Magic::$script_cwd."/MadelineProto.log";
+                $this->settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
             }
         }
 
@@ -806,11 +809,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (php_sapi_name() !== 'cli') {
             try {
                 error_reporting(E_ALL);
-                ini_set("log_errors", 1);
-                ini_set("error_log", Magic::$script_cwd."/MadelineProto.log");
+                ini_set('log_errors', 1);
+                ini_set('error_log', Magic::$script_cwd.'/MadelineProto.log');
                 error_log('Enabled PHP logging');
             } catch (\danog\MadelineProto\Exception $e) {
-                $this->logger->logger("Could not enable PHP logging");
+                $this->logger->logger('Could not enable PHP logging');
             }
         }
     }
@@ -886,6 +889,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
         yield $this->get_phone_config_async();
     }
+
     public function resetUpdateSystem()
     {
         foreach ($this->channels_state->get() as $state) {
@@ -894,6 +898,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         $this->startUpdateSystem();
     }
+
     public function startUpdateSystem()
     {
         if ($this->asyncInitPromise) {
@@ -922,13 +927,14 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->seqUpdater->resume();
         }
     }
+
     public function get_phone_config_async($watcherId = null)
     {
         if ($this->authorized === self::LOGGED_IN && class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal') && !$this->authorization['user']['bot'] && $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->temp_auth_key !== null) {
-            $this->logger->logger("Fetching phone config...");
+            $this->logger->logger('Fetching phone config...');
             VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]));
         } else {
-            $this->logger->logger("Not fetching phone config");
+            $this->logger->logger('Not fetching phone config');
         }
     }
 

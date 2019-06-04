@@ -1,6 +1,6 @@
 <?php
 /**
- * Generic loop
+ * Generic loop.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -35,7 +35,7 @@ class GenericLoop extends ResumableSignalLoop
     protected $name;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * The callback will be bound to the GenericLoop instance: this means that you will be able to use `$this` as if the callback were actually the `loop` function (you can access the API property, use the pause/waitSignal methods & so on).
      * The return value of the callable can be:
@@ -43,10 +43,10 @@ class GenericLoop extends ResumableSignalLoop
      *  GenericLoop::STOP - The loop will stop
      *  GenericLoop::PAUSE - The loop will pause forever (or until the `resume` method is called on the loop object from outside the loop)
      *  GenericLoop::CONTINUE - Return this if you want to rerun the loop without waiting
-     * 
-     * @param \danog\MadelineProto\API $API Instance of MadelineProto
-     * @param callback $callback Callback to run
-     * @param string $name Fetcher name
+     *
+     * @param \danog\MadelineProto\API $API      Instance of MadelineProto
+     * @param callable                 $callback Callback to run
+     * @param string                   $name     Fetcher name
      */
     public function __construct($API, $callback, $name)
     {
@@ -54,6 +54,7 @@ class GenericLoop extends ResumableSignalLoop
         $this->callback = $callback->bindTo($this);
         $this->name = $name;
     }
+
     public function loop()
     {
         $callback = $this->callback;
@@ -62,7 +63,7 @@ class GenericLoop extends ResumableSignalLoop
             $timeout = yield $callback();
             if ($timeout === self::PAUSE) {
                 $this->API->logger->logger("Pausing $this", \danog\MadelineProto\Logger::VERBOSE);
-            } else if ($timeout > 0) {
+            } elseif ($timeout > 0) {
                 $this->API->logger->logger("Pausing $this for $timeout", \danog\MadelineProto\Logger::VERBOSE);
             }
             if ($timeout === self::STOP || yield $this->waitSignal($this->pause($timeout))) {

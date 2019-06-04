@@ -197,15 +197,15 @@ class WriteLoop extends ResumableSignalLoop
                                 'query' => yield $API->serialize_method_async(
                                     'initConnection',
                                     [
-                                        'api_id' => $API->settings['app_info']['api_id'],
-                                        'api_hash' => $API->settings['app_info']['api_hash'],
-                                        'device_model' => strpos($datacenter, 'cdn') === false ? $API->settings['app_info']['device_model'] : 'n/a',
-                                        'system_version' => strpos($datacenter, 'cdn') === false ? $API->settings['app_info']['system_version'] : 'n/a',
-                                        'app_version' => $API->settings['app_info']['app_version'],
+                                        'api_id'           => $API->settings['app_info']['api_id'],
+                                        'api_hash'         => $API->settings['app_info']['api_hash'],
+                                        'device_model'     => strpos($datacenter, 'cdn') === false ? $API->settings['app_info']['device_model'] : 'n/a',
+                                        'system_version'   => strpos($datacenter, 'cdn') === false ? $API->settings['app_info']['system_version'] : 'n/a',
+                                        'app_version'      => $API->settings['app_info']['app_version'],
                                         'system_lang_code' => $API->settings['app_info']['lang_code'],
-                                        'lang_code' => $API->settings['app_info']['lang_code'],
-                                        'lang_pack' => $API->settings['app_info']['lang_pack'],
-                                        'query' => $MTmessage['body'],
+                                        'lang_code'        => $API->settings['app_info']['lang_code'],
+                                        'lang_pack'        => $API->settings['app_info']['lang_pack'],
+                                        'query'            => $MTmessage['body'],
                                     ]
                                 ),
                             ]
@@ -331,6 +331,7 @@ class WriteLoop extends ResumableSignalLoop
         } while (!empty($connection->pending_outgoing) && !$skipped);
 
         $connection->pending_outgoing_key = 0;
+
         return $skipped;
     }
 

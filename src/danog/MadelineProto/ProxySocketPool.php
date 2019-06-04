@@ -1,4 +1,5 @@
 <?php
+
 // Based on AMPHP's default socket pool
 
 namespace danog\MadelineProto;
@@ -8,22 +9,22 @@ use Amp\CancelledException;
 use Amp\Failure;
 use Amp\Loop;
 use Amp\Promise;
-use Amp\Struct;
-use Amp\Success;
-use Amp\Socket\SocketPool;
-use function Amp\call;
 use Amp\Socket\ClientConnectContext;
 use Amp\Socket\ClientSocket;
+use Amp\Socket\SocketPool;
+use Amp\Struct;
+use Amp\Success;
 use League\Uri;
+use function Amp\call;
 
 class ProxySocketPool implements SocketPool
 {
     use Tools;
     const ALLOWED_SCHEMES = [
-        'tcp' => null,
-        'udp' => null,
+        'tcp'  => null,
+        'udp'  => null,
         'unix' => null,
-        'udg' => null,
+        'udg'  => null,
     ];
     private $sockets = [];
     private $socketIdUriMap = [];
@@ -31,35 +32,38 @@ class ProxySocketPool implements SocketPool
     private $idleTimeout;
     private $socketContext;
     private $dataCenter;
+
     public function __construct(DataCenter $dataCenter, int $idleTimeout = 10000, ClientConnectContext $socketContext = null)
     {
         $this->idleTimeout = $idleTimeout;
-        $this->socketContext = $socketContext ?? new ClientConnectContext;
+        $this->socketContext = $socketContext ?? new ClientConnectContext();
         $this->dataCenter = $dataCenter;
     }
+
     /**
      * @param string $uri
      *
-     * @return string
-     *
      * @throws SocketException
+     *
+     * @return string
      */
     private function normalizeUri(string $uri): string
     {
         if (\stripos($uri, 'unix://') === 0) {
             return $uri;
         }
+
         try {
             $parts = Uri\parse($uri);
         } catch (\Exception $exception) {
-            throw new SocketException("Could not parse URI", 0, $exception);
+            throw new SocketException('Could not parse URI', 0, $exception);
         }
         if ($parts['scheme'] === null) {
-            throw new SocketException("Invalid URI for socket pool; no scheme given");
+            throw new SocketException('Invalid URI for socket pool; no scheme given');
         }
         $port = $parts['port'] ?? 0;
         if ($parts['host'] === null || $port === 0) {
-            throw new SocketException("Invalid URI for socket pool; missing host or port");
+            throw new SocketException('Invalid URI for socket pool; missing host or port');
         }
         $scheme = \strtolower($parts['scheme']);
         $host = \strtolower($parts['host']);
@@ -71,17 +75,19 @@ class ProxySocketPool implements SocketPool
             ));
         }
         if ($parts['query'] !== null || $parts['fragment'] !== null) {
-            throw new SocketException("Invalid URI for socket pool; query or fragment components not allowed");
+            throw new SocketException('Invalid URI for socket pool; query or fragment components not allowed');
         }
         if ($parts['path'] !== '') {
-            throw new SocketException("Invalid URI for socket pool; path component must be empty");
+            throw new SocketException('Invalid URI for socket pool; path component must be empty');
         }
         if ($parts['user'] !== null) {
-            throw new SocketException("Invalid URI for socket pool; user component not allowed");
+            throw new SocketException('Invalid URI for socket pool; user component not allowed');
         }
+
         return $scheme.'://'.$host.':'.$port;
     }
-    /** @inheritdoc */
+
+    /** {@inheritdoc} */
     public function checkout(string $uri, CancellationToken $token = null): Promise
     {
         // A request might already be cancelled before we reach the checkout, so do not even attempt to checkout in that
@@ -109,14 +115,18 @@ class ProxySocketPool implements SocketPool
             if ($socket->idleWatcher !== null) {
                 Loop::disable($socket->idleWatcher);
             }
+
             return new Success(new ClientSocket($socket->resource));
         }
+
         return $this->checkoutNewSocket($uri, $token);
     }
+
     private function checkoutNewSocket(string $uri, CancellationToken $token = null): Promise
     {
         return call(function () use ($uri, $token) {
             $this->pendingCount[$uri] = ($this->pendingCount[$uri] ?? 0) + 1;
+
             try {
                 /** @var ClientSocket $rawSocket */
                 $rawSocket = yield $this->call($this->dataCenter->rawConnectAsync($uri, $token, $this->socketContext));
@@ -126,9 +136,7 @@ class ProxySocketPool implements SocketPool
                 }
             }
             $socketId = (int) $rawSocket->getResource();
-            $socket = new class
-
-            {
+            $socket = new class() {
                 use Struct;
                 public $id;
                 public $uri;
@@ -142,14 +150,17 @@ class ProxySocketPool implements SocketPool
             $socket->isAvailable = false;
             $this->sockets[$uri][$socketId] = $socket;
             $this->socketIdUriMap[$socketId] = $uri;
+
             return $rawSocket;
         });
     }
-    /** @inheritdoc */
+
+    /** {@inheritdoc} */
     public function clear(ClientSocket $socket): void
     {
         $this->clearFromId((int) $socket->getResource());
     }
+
     /**
      * @param int $socketId
      */
@@ -173,7 +184,8 @@ class ProxySocketPool implements SocketPool
             unset($this->sockets[$uri]);
         }
     }
-    /** @inheritdoc */
+
+    /** {@inheritdoc} */
     public function checkin(ClientSocket $socket): void
     {
         $socketId = (int) $socket->getResource();
@@ -186,6 +198,7 @@ class ProxySocketPool implements SocketPool
         $resource = $socket->getResource();
         if (!\is_resource($resource) || \feof($resource)) {
             $this->clearFromId((int) $resource);
+
             return;
         }
         $socket = $this->sockets[$uri][$socketId];

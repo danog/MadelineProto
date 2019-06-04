@@ -19,9 +19,10 @@
 
 namespace danog\MadelineProto;
 
-use Amp\CancellationToken;
+use Amp\Artax\Cookie\ArrayCookieJar;
 use Amp\Artax\DefaultClient;
 use Amp\Artax\HttpSocketPool;
+use Amp\CancellationToken;
 use Amp\Socket\ClientConnectContext;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -38,7 +39,6 @@ use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
 use danog\MadelineProto\TL\Conversion\Exception;
-use Amp\Artax\Cookie\ArrayCookieJar;
 
 /**
  * Manages datacenters.
@@ -74,8 +74,9 @@ class DataCenter
                 unset($this->sockets[$key]);
             }
         }
-        $this->HTTPClient = new DefaultClient(new ArrayCookieJar, new HttpSocketPool(new ProxySocketPool($this)));
+        $this->HTTPClient = new DefaultClient(new ArrayCookieJar(), new HttpSocketPool(new ProxySocketPool($this)));
     }
+
     public function rawConnectAsync(string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null): \Generator
     {
         $ctxs = $this->generateContexts(0, $uri, $ctx);
@@ -83,7 +84,7 @@ class DataCenter
             throw new Exception("No contexts for raw connection to URI $uri");
         }
         foreach ($ctxs as $ctx) {
-            /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
+            /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
             try {
                 $ctx->setCancellationToken($token);
                 $result = yield $ctx->getStream();
@@ -364,15 +365,15 @@ class DataCenter
             unset($this->sockets[$dc_number]);
 
             $this->API->logger->logger("No info for DC $dc_number", \danog\MadelineProto\Logger::ERROR);
-
-        } else if (defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
+        } elseif (defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
             return [$ctxs[0]];
         }
 
         return $ctxs;
     }
+
     /**
-     * Get Artax async HTTP client
+     * Get Artax async HTTP client.
      *
      * @return \Amp\Artax\DefaultClient
      */
@@ -380,10 +381,12 @@ class DataCenter
     {
         return $this->HTTPClient;
     }
+
     public function fileGetContents($url): \Generator
     {
         return yield (yield $this->getHTTPClient()->request($url))->getBody();
     }
+
     public function get_dcs($all = true)
     {
         $test = $this->settings['all']['test_mode'] ? 'test' : 'main';

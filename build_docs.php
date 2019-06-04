@@ -107,7 +107,7 @@ $order = [
     'PROXY',
     'USING_METHODS',
     'CONTRIB',
-    'TEMPLATES'
+    'TEMPLATES',
 ];
 $index = '';
 $files = glob('docs/docs/docs/*md');
@@ -158,7 +158,7 @@ foreach ($orderedfiles as $key => $filename) {
             $url = $matches[3][$key][0] === '#' ? $file.$matches[3][$key] : $matches[3][$key];
             $index .= "$spaces* [$name]($url)\n";
             if ($name === 'FULL API Documentation with descriptions') {
-                $spaces .= "  ";
+                $spaces .= '  ';
                 preg_match_all('|\* (.*)|', file_get_contents('docs/docs/API_docs/methods/index.md'), $smatches);
                 foreach ($smatches[1] as $key => $match) {
                     $match = str_replace('href="', 'href="https://docs.madelineproto.xyz/API_docs/methods/', $match);

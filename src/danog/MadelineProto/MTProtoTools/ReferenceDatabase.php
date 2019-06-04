@@ -19,9 +19,6 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Deferred;
-use Amp\Promise;
-use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Tools;
@@ -84,7 +81,6 @@ class ReferenceDatabase implements TLCallback
         'updateUserPhoto' => self::USER_PHOTO_ORIGIN,
         'user'            => self::USER_PHOTO_ORIGIN,
         'userFull'        => self::USER_PHOTO_ORIGIN,
-
 
         'wallPaper' => self::WALLPAPER_ORIGIN,
 
@@ -214,6 +210,7 @@ class ReferenceDatabase implements TLCallback
         }
         if (!isset($location['file_reference'])) {
             $this->API->logger->logger("Object {$location['_']} does not have reference", \danog\MadelineProto\Logger::ERROR);
+
             return false;
         }
         $key = count($this->cacheContexts) - 1;
@@ -528,6 +525,7 @@ class ReferenceDatabase implements TLCallback
     public function populateReference(array $object)
     {
         $object['file_reference'] = yield $this->getReference(self::LOCATION_CONTEXT[$object['_']], $object);
+
         return $object;
     }
 

@@ -19,8 +19,6 @@
 namespace danog\MadelineProto\Loop\Update;
 
 use Amp\Loop;
-use Amp\Success;
-use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 
 /**
@@ -41,6 +39,7 @@ class FeedLoop extends ResumableSignalLoop
         $this->API = $API;
         $this->channelId = $channelId;
     }
+
     public function loop()
     {
         $API = $this->API;
@@ -83,9 +82,9 @@ class FeedLoop extends ResumableSignalLoop
                 $this->parsedUpdates = [];
                 $this->API->signalUpdate();
             }
-
         }
     }
+
     public function parse($updates)
     {
         reset($updates);
@@ -110,12 +109,12 @@ class FeedLoop extends ResumableSignalLoop
                 };
                 $result = $this->state->checkPts($update);
                 if ($result < 0) {
-                    $logger("PTS duplicate");
+                    $logger('PTS duplicate');
 
                     continue;
                 }
                 if ($result > 0) {
-                    $logger("PTS hole");
+                    $logger('PTS hole');
                     $this->updater->setLimit($this->state->pts() + $result);
                     yield $this->updater->resume();
                     $updates = array_merge($this->incomingUpdates, $updates);
@@ -124,20 +123,20 @@ class FeedLoop extends ResumableSignalLoop
                 }
                 if (isset($update['message']['id'], $update['message']['to_id']) && !in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage'])) {
                     if (!$this->API->check_msg_id($update['message'])) {
-                        $logger("MSGID duplicate");
+                        $logger('MSGID duplicate');
 
                         continue;
                     }
                 }
-                $logger("PTS OK");
+                $logger('PTS OK');
 
                 $this->state->pts($update['pts']);
-
             }
 
             $this->save($update);
         }
     }
+
     public function feed($updates)
     {
         $result = [];
@@ -148,8 +147,10 @@ class FeedLoop extends ResumableSignalLoop
             }
             $result[$res] = true;
         }
+
         return $result;
     }
+
     public function feedSingle($update)
     {
         $channelId = false;
@@ -173,7 +174,7 @@ class FeedLoop extends ResumableSignalLoop
         if ($channelId && !$this->API->getChannelStates()->has($channelId)) {
             $this->API->loadChannelState($channelId, $update);
             if (!isset($this->API->feeders[$channelId])) {
-                $this->API->feeders[$channelId] = new FeedLoop($this->API, $channelId);
+                $this->API->feeders[$channelId] = new self($this->API, $channelId);
             }
             if (!isset($this->API->updaters[$channelId])) {
                 $this->API->updaters[$channelId] = new UpdateLoop($this->API, $channelId);
@@ -204,7 +205,7 @@ class FeedLoop extends ResumableSignalLoop
                     }
 
                     if ($to) {
-                        $log .= "to_id ".json_encode($update['message']['to_id']).", ";
+                        $log .= 'to_id '.json_encode($update['message']['to_id']).', ';
                     }
 
                     if ($via_bot) {
@@ -212,7 +213,7 @@ class FeedLoop extends ResumableSignalLoop
                     }
 
                     if ($entities) {
-                        $log .= "entities ".json_encode($update['message']['entities']).", ";
+                        $log .= 'entities '.json_encode($update['message']['entities']).', ';
                     }
 
                     $this->API->logger->logger("Not enough data: for message update $log, getting difference...", \danog\MadelineProto\Logger::VERBOSE);
@@ -233,12 +234,15 @@ class FeedLoop extends ResumableSignalLoop
 
         $this->API->logger->logger('Was fed an update of type '.$update['_']." in $this...", \danog\MadelineProto\Logger::VERBOSE);
         $this->incomingUpdates[] = $update;
+
         return $this->channelId;
     }
+
     public function save($update)
     {
         $this->parsedUpdates[] = $update;
     }
+
     public function saveMessages($messages)
     {
         foreach ($messages as $message) {
@@ -270,6 +274,6 @@ class FeedLoop extends ResumableSignalLoop
 
     public function __toString(): string
     {
-        return !$this->channelId ? "update feed loop generic" : "update feed loop channel {$this->channelId}";
+        return !$this->channelId ? 'update feed loop generic' : "update feed loop channel {$this->channelId}";
     }
 }

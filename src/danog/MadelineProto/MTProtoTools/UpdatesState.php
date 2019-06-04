@@ -20,37 +20,37 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 /**
- * Stores the state of updates
+ * Stores the state of updates.
  */
 class UpdatesState
 {
     /**
-     * PTS
+     * PTS.
      *
      * @var int
      */
     private $pts = 1;
     /**
-     * QTS
+     * QTS.
      *
      * @var int
      */
     private $qts = -1;
     /**
-     * Seq
+     * Seq.
      *
      * @var int
      */
     private $seq = 0;
     /**
-     * Date
+     * Date.
      *
      * @var int
      */
     private $date = 1;
 
     /**
-     * Channel ID
+     * Channel ID.
      *
      * @var int|bool
      */
@@ -59,23 +59,24 @@ class UpdatesState
     /**
      * Is busy?
      *
-     * @var boolean
+     * @var bool
      */
     private $syncLoading = false;
 
     /**
-     * Init function
+     * Init function.
      *
-     * @param array $init Initial parameters
-     * @param boolean $channelId Channel ID
+     * @param array $init      Initial parameters
+     * @param bool  $channelId Channel ID
      */
     public function __construct($init = [], $channelId = false)
     {
         $this->channelId = $channelId;
         $this->update($init);
     }
+
     /**
-     * Sleep function
+     * Sleep function.
      *
      * @return array Parameters to serialize
      */
@@ -83,17 +84,19 @@ class UpdatesState
     {
         return $this->channelId ? ['pts', 'channelId'] : ['pts', 'qts', 'seq', 'date', 'channelId'];
     }
+
     /**
      * Is this state relative to a channel?
      *
-     * @return boolean
+     * @return bool
      */
     public function isChannel()
     {
         return (bool) $this->channelId;
     }
+
     /**
-     * Get the channel ID
+     * Get the channel ID.
      *
      * @return int|null
      */
@@ -101,24 +104,28 @@ class UpdatesState
     {
         return $this->channelId;
     }
+
     /**
      * Are we currently busy?
      *
-     * @param boolean|null $set
-     * @return boolean
+     * @param bool|null $set
+     *
+     * @return bool
      */
     public function syncLoading($set = null)
     {
         if ($set !== null) {
             $this->syncLoading = $set;
         }
+
         return $this->syncLoading;
     }
 
     /**
-     * Update multiple parameters
+     * Update multiple parameters.
      *
      * @param array $init
+     *
      * @return self
      */
     public function update($init)
@@ -128,75 +135,91 @@ class UpdatesState
                 $this->{$param}($init[$param]);
             }
         }
+
         return $this;
     }
+
     /**
-     * Get/set PTS
+     * Get/set PTS.
      *
-     * @param integer $set
-     * @return integer
+     * @param int $set
+     *
+     * @return int
      */
     public function pts($set = 0)
     {
         if ($set !== 0 && $set > $this->pts) {
             $this->pts = $set;
         }
+
         return $this->pts;
     }
+
     /**
-     * Get/set QTS
+     * Get/set QTS.
      *
-     * @param integer $set
-     * @return integer
+     * @param int $set
+     *
+     * @return int
      */
     public function qts($set = 0)
     {
         if ($set !== 0 && $set > $this->qts) {
             $this->qts = $set;
         }
+
         return $this->qts;
     }
+
     /**
-     * Get/set seq
+     * Get/set seq.
      *
-     * @param integer $set
-     * @return integer
+     * @param int $set
+     *
+     * @return int
      */
     public function seq($set = 0)
     {
         if ($set !== 0 && $set > $this->seq) {
             $this->seq = $set;
         }
+
         return $this->seq;
     }
+
     /**
-     * Get/set date
+     * Get/set date.
      *
-     * @param integer $set
-     * @return integer
+     * @param int $set
+     *
+     * @return int
      */
     public function date($set = 0)
     {
         if ($set !== 0 && $set > $this->date) {
             $this->date = $set;
         }
+
         return $this->date;
     }
 
     /**
-     * Check validity of PTS contained in update
+     * Check validity of PTS contained in update.
      *
      * @param array $update
+     *
      * @return int -1 if it's too old, 0 if it's ok, 1 if it's too new
      */
     public function checkPts($update)
     {
         return $update['pts'] - ($this->pts + $update['pts_count']);
     }
+
     /**
-     * Check validity of seq contained in update
+     * Check validity of seq contained in update.
      *
      * @param int $seq
+     *
      * @return int -1 if it's too old, 0 if it's ok, 1 if it's too new
      */
     public function checkSeq($seq)

@@ -310,9 +310,10 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
 
         return $this->write_buffer->bufferWrite($data);
     }
+
     /**
-     * @inheritDoc
-     * 
+     * {@inheritdoc}
+     *
      * @return \Amp\Socket\Socket
      */
     public function getSocket(): \Amp\Socket\Socket

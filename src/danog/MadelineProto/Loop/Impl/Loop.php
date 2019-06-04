@@ -36,6 +36,7 @@ abstract class Loop implements LoopInterface
     private $count = 0;
 
     public $API;
+
     public function __construct($API)
     {
         $this->API = $API;
@@ -48,6 +49,7 @@ abstract class Loop implements LoopInterface
 
             return false;
         }
+
         return $this->callFork($this->loopImpl());
     }
 
@@ -56,6 +58,7 @@ abstract class Loop implements LoopInterface
         //yield ['my_trace' => debug_backtrace(0, 1)[0], (string) $this];
         $this->startedLoop();
         $this->API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
+
         try {
             yield $this->loop();
         } finally {
@@ -81,5 +84,4 @@ abstract class Loop implements LoopInterface
     {
         return $this->count;
     }
-
 }

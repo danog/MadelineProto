@@ -1,4 +1,5 @@
 <?php
+
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\TL\TL;
 
@@ -24,28 +25,31 @@ if ($argc !== 3) {
     die("Usage: {$argv[0]} layernumberold layernumbernew\n");
 }
 /**
- * Get TL info of layer
+ * Get TL info of layer.
  *
  * @param int $layer Layer number
+ *
  * @return void
  */
 function getTL($layer)
 {
     $layer = __DIR__."/src/danog/MadelineProto/TL_telegram_v$layer.tl";
-    $layer = new class($layer)
-    {
+    $layer = new class($layer) {
         use TL;
+
         public function __construct($layer)
         {
             $this->logger = Logger::$default;
             $this->construct_TL(['telegram' => $layer]);
         }
     };
+
     return ['methods' => $layer->methods, 'constructors' => $layer->constructors];
 }
 function getUrl($constructor, $type)
 {
     $changed = str_replace('.', '_', $constructor);
+
     return "[$constructor](https://docs.madelineproto.xyz/API_docs/$type/$changed.html)";
 }
 $old = getTL($argv[1]);
@@ -105,7 +109,6 @@ foreach (['methods', 'constructors'] as $type) {
             $res .= "Removed $name\n";
         }
     }
-
 }
 
-echo($res);
+echo $res;

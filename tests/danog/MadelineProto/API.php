@@ -15,16 +15,16 @@ final class APITest extends TestCase
         $MadelineProto = new \danog\MadelineProto\API(
             [
                 'app_info' => [
-                    'api_id' => 25628,
-                    'api_hash' => '1fe17cda7d355166cdaa71f04122873c'
+                    'api_id'   => 25628,
+                    'api_hash' => '1fe17cda7d355166cdaa71f04122873c',
                 ],
                 'connection_settings' => [
                     'all' => [
-                        'ipv6' => $ipv6,
-                        'test_mode' => $test_mode,
-                        'protocol' => $protocol,
+                        'ipv6'       => $ipv6,
+                        'test_mode'  => $test_mode,
+                        'protocol'   => $protocol,
                         'obfuscated' => $obfuscated,
-                        'transport' => $transport,
+                        'transport'  => $transport,
                     ],
                 ],
             ]
@@ -33,6 +33,7 @@ final class APITest extends TestCase
         $this->assertContainsEquals('_', $pong, 'pong');
         $this->assertContainsEquals('ping_id', $pong, $ping['ping_id']);
     }
+
     public function protocolProvider(): \Generator
     {
         foreach ([false, true] as $test_mode) {
@@ -43,7 +44,9 @@ final class APITest extends TestCase
                             continue;
                         }
                         foreach (['tcp_abridged', 'tcp_intermediate', 'tcp_intermediate_padded', 'tcp_full'] as $protocol) {
-                            if ($protocol === 'tcp_full' && $obfuscated) continue;
+                            if ($protocol === 'tcp_full' && $obfuscated) {
+                                continue;
+                            }
                             yield [$transport, $obfuscated, $protocol, $test_mode, $ipv6];
                         }
                     }

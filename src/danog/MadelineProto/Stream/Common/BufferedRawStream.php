@@ -23,9 +23,7 @@ use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
-use function Amp\call;
 use function Amp\Socket\connect;
-use danog\MadelineProto\NothingInTheSocketException;
 
 /**
  * Buffered raw stream.
@@ -42,6 +40,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     protected $memory_stream;
     private $append = '';
     private $append_after = 0;
+
     /**
      * Asynchronously connect to a TCP/TLS server.
      *
@@ -177,6 +176,7 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
             $chunk = yield $this->read();
             if ($chunk === null) {
                 $this->disconnect();
+
                 throw new \danog\MadelineProto\NothingInTheSocketException();
             }
             fwrite($this->memory_stream, $chunk);
@@ -213,8 +213,8 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
     }
 
     /**
-     * @inheritDoc
-     * 
+     * {@inheritdoc}
+     *
      * @return \Amp\Socket\Socket
      */
     public function getSocket(): \Amp\Socket\Socket

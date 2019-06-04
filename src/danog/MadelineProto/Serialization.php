@@ -27,8 +27,6 @@ class Serialization
     public static function serialize_all($exception)
     {
         echo $exception.PHP_EOL;
-
-        return;
     }
 
     public static function realpaths($file)

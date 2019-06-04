@@ -24,8 +24,8 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\Failure;
-use function \Amp\ByteStream\getStdout;
-use function \Amp\ByteStream\getStderr;
+use function Amp\ByteStream\getStderr;
+use function Amp\ByteStream\getStdout;
 
 class Logger
 {
@@ -100,7 +100,9 @@ class Logger
 
         if ($this->mode === 3) {
             $this->stdout = getStdout();
-            if (php_sapi_name() !== 'cli') $this->newline = '<br>'.$this->newline;
+            if (php_sapi_name() !== 'cli') {
+                $this->newline = '<br>'.$this->newline;
+            }
         } elseif ($this->mode === 2) {
             $this->stdout = new ResourceOutputStream(fopen($this->optional, 'a+'));
         } elseif ($this->mode === 1) {
@@ -147,7 +149,7 @@ class Logger
         }
         if ($param instanceof \Throwable) {
             $param = (string) $param;
-        } else if (!is_string($param)) {
+        } elseif (!is_string($param)) {
             $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
         if ($file === null) {
@@ -171,6 +173,7 @@ class Logger
                     break;
             }
     }
+
     public function __destruct()
     {
         //$this->wait($this->stdout->write(''));

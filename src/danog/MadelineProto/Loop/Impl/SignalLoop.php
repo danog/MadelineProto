@@ -20,8 +20,8 @@ namespace danog\MadelineProto\Loop\Impl;
 
 use Amp\Deferred;
 use Amp\Promise;
-use danog\MadelineProto\Loop\SignalLoopInterface;
 use danog\MadelineProto\Coroutine;
+use danog\MadelineProto\Loop\SignalLoopInterface;
 
 /**
  * Signal loop helper trait.
