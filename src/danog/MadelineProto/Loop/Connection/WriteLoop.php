@@ -60,12 +60,16 @@ class WriteLoop extends ResumableSignalLoop
                 $API->logger->logger("Done waiting in $this", Logger::ULTRA_VERBOSE);
             }
 
-            if ($connection->temp_auth_key === null) {
-                $res = $this->unencryptedWriteLoopAsync();
-            } else {
-                $res = $this->encryptedWriteLoopAsync();
+            try {
+                $please_wait = yield $this->{$connection->temp_auth_key === null ? 'unencryptedWriteLoopAsync' : 'encryptedWriteLoopAsync'}();
+            } catch (Amp\ByteStream\StreamException $e) {
+                if (isset($connection->old)) {
+                    return;
+                }
+                $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
+                yield $connection->reconnect();
+                continue;
             }
-            $please_wait = yield $res;
 
             //$connection->waiter->resume();
         }
