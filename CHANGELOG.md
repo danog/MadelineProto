@@ -45,8 +45,10 @@ Powered by [amphp](https://amphp.org), MadelineProto wraps the AMPHP APIs to pro
 * custom HTTP client with DoH
 * no more php 5
 * reset PTS to 0
+* arrayaccess on args
 
 Things to expect in the next releases:
+docs for get mime funcs
 docs for update_2fa
 docs for ResponseException
 docs for PTSException
@@ -67,3 +69,4 @@ no error setting, madelineproto does that for you
 
 do not use manual
 tell about madeline.php loading in the same dire
+arrayaccess on promises

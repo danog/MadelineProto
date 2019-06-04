@@ -118,7 +118,7 @@ trait ResponseHandler
                     $this->ack_incoming_message_id($current_msg_id, $datacenter);
 
                     // Acknowledge that I received the server's response
-                    if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
+                    if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null && isset($this->updaters[false])) {
                         $this->updaters[false]->resumeDefer();
                     }
 

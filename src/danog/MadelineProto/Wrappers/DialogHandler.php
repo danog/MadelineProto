@@ -23,6 +23,13 @@ trait DialogHandler
 {
     public function get_dialogs_async($force = true)
     {
+        if ($this->authorization['user']['bot']) {
+            $res = [];
+            foreach ($this->chats as $chat) {
+                $res []= $this->gen_all($chat)['Peer'];
+            }
+            return $res;
+        }
         $res = [];
         foreach (yield $this->get_full_dialogs_async($force) as $dialog) {
             $res []= $dialog['peer'];
