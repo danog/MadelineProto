@@ -156,12 +156,17 @@ class Logger
         $param = str_pad($file.$prefix.': ', 16 + strlen($prefix))."\t".$param;
         switch ($this->mode) {
                 case 1:
-                    $this->stdout->write($param.$this->newline);
+                    if ($this->stdout->write($param.$this->newline) instanceof Failure) {
+                        error_log($param);
+                    }
                     break;
                 default:
                     $param = Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
                     if ($this->stdout->write($param) instanceof Failure) {
-                        echo "(closed) $param";
+                        switch ($this->mode) {
+                            case 3: echo "(closed) $param"; break;
+                            case 2: file_put_contents($this->optional, "(closed) $param", FILE_APPEND); break;
+                        }
                     }
                     break;
             }

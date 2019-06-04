@@ -19,7 +19,7 @@
 
 namespace danog\MadelineProto\Wrappers;
 
-use function Amp\ByteStream\getOutput;
+use function Amp\ByteStream\getOutputBufferStream;
 
 trait ApiTemplates
 {
@@ -55,7 +55,7 @@ trait ApiTemplates
 
     public function web_api_echo_async($message = '')
     {
-        $stdout = getOutput();
+        $stdout = getOutputBufferStream();
         if (!isset($this->my_telegram_org_wrapper)) {
             if (isset($_POST['type'])) {
                 if ($_POST['type'] === 'manual') {

@@ -19,13 +19,13 @@
 
 namespace danog\MadelineProto\Wrappers;
 
-use function Amp\ByteStream\getOutput;
+use function Amp\ByteStream\getOutputBufferStream;
 
 trait Templates
 {
     public function web_echo_async($message = '')
     {
-        $stdout = getOutput();
+        $stdout = getOutputBufferStream();
         switch ($this->authorized) {
             case self::NOT_LOGGED_IN:
             if (isset($_POST['type'])) {
