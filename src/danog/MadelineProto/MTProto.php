@@ -220,7 +220,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
         }
         yield $this->get_config_async([], ['datacenter' => $this->datacenter->curdc]);
-        $this->startUpdateSystem();
+        $this->startUpdateSystem(true);
         $this->v = self::V;
     }
 
@@ -432,7 +432,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             yield $this->get_cdn_config_async($this->datacenter->curdc);
             $this->setup_logger();
         }
-        $this->startUpdateSystem();
+        $this->startUpdateSystem(true);
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings['peer']['cache_all_peers_on_startup']) {
             yield $this->get_dialogs_async($force);
         }
@@ -899,9 +899,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->startUpdateSystem();
     }
 
-    public function startUpdateSystem()
+    public function startUpdateSystem($anyway = false)
     {
-        if ($this->asyncInitPromise) {
+        if ($this->asyncInitPromise || $anyway) {
             return;
         }
 
