@@ -73,7 +73,7 @@ description: Documentation of old mtproto layers
 
 '.$layer_list);
 
-$doc = new \danog\MadelineProto\AnnotationsBuilder($logger, $docs[2]);
+$doc = new \danog\MadelineProto\AnnotationsBuilder($logger, $docs[1]);
 $doc->mk_annotations();
 
 foreach ($docs as $settings) {

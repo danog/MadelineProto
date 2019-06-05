@@ -162,7 +162,7 @@ class WriteLoop extends ResumableSignalLoop
                 }
             }
             if ($API->is_http($datacenter) && !$has_http_wait) {
-                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => yield $this->API->serialize_object_async(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 1], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
+                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => yield $this->API->serialize_object_async(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
                 $connection->pending_outgoing_key %= Connection::PENDING_MAX;
                 $has_http_wait = true;
             }

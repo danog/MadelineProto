@@ -51,11 +51,6 @@ try {
         $MadelineProto->accept_tos();
     }
 }
-
-/*
- * If this session is not logged in, login
- */
-if ($MadelineProto->get_self() === false) {
     /*
      * If a BOT_TOKEN is defined in .env, use it to login, else prompt for login info
      */
@@ -64,7 +59,6 @@ if ($MadelineProto->get_self() === false) {
     } else {
         $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     }
-}
 
 //var_dump(count($MadelineProto->get_pwr_chat('@madelineproto')['participants']));
 

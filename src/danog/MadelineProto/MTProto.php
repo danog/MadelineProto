@@ -253,7 +253,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         return $this->datacenter->fileGetContents($url);
     }
-
+    
     public function __wakeup()
     {
         $backtrace = debug_backtrace(0, 3);
@@ -906,9 +906,11 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function startUpdateSystem($anyway = false)
     {
-        if ($this->asyncInitPromise || $anyway) {
+        if ($this->asyncInitPromise || !$anyway) {
+            $this->logger("Not starting update system");
             return;
         }
+        $this->logger("Starting update system");
 
         if (!isset($this->seqUpdater)) {
             $this->seqUpdater = new SeqLoop($this);

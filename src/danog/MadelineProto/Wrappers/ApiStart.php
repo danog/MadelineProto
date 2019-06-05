@@ -19,7 +19,6 @@
 
 namespace danog\MadelineProto\Wrappers;
 
-use function Amp\ByteStream\getStdin;
 use function Amp\ByteStream\getStdout;
 
 /**
@@ -30,45 +29,31 @@ trait ApiStart
     public function api_start_async($settings)
     {
         if (php_sapi_name() === 'cli') {
-            $stdin = getStdin();
             $stdout = getStdout();
-            $readline = function ($prompt = null) use ($stdout, $stdin) {
-                if ($prompt) {
-                    yield $stdout->write($prompt);
-                }
-                static $lines = [''];
-                while (count($lines) < 2 && ($chunk = yield $stdin->read()) !== null) {
-                    $chunk = explode("\n", str_replace(["\r", "\n\n"], "\n", $chunk));
-                    $lines[count($lines) - 1] .= array_shift($chunk);
-                    $lines = array_merge($lines, $chunk);
-                }
-
-                return array_shift($lines);
-            };
-            echo 'You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a)
-Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id'.PHP_EOL;
-            if (strpos(yield $readline('Your choice (m/a): '), 'm') !== false) {
-                echo '1) Login to my.telegram.org
+            yield $stdout->write('You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a)
+Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id'.PHP_EOL);
+            if (strpos(yield $this->readLine('Your choice (m/a): '), 'm') !== false) {
+                yield $stdout->write('1) Login to my.telegram.org
 2) Go to API development tools
 3) App title: your app\'s name, can be anything
     Short name: your app\'s short name, can be anything
     URL: your app/website\'s URL, or t.me/yourusername
     Platform: anything
     Description: Describe your app here
-4) Click on create application'.PHP_EOL;
-                $app['api_id'] = yield $readline('5) Enter your API ID: ');
-                $app['api_hash'] = yield $readline('6) Enter your API hash: ');
+4) Click on create application'.PHP_EOL);
+                $app['api_id'] = yield $this->readLine('5) Enter your API ID: ');
+                $app['api_hash'] = yield $this->readLine('6) Enter your API hash: ');
 
                 return $app;
             } else {
                 $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($settings);
-                yield $this->my_telegram_org_wrapper->login_async(yield $readline('Enter a phone number that is already registered on Telegram: '));
-                yield $this->my_telegram_org_wrapper->complete_login_async(yield $readline('Enter the verification code you received in telegram: '));
+                yield $this->my_telegram_org_wrapper->login_async(yield $this->readLine('Enter a phone number that is already registered on Telegram: '));
+                yield $this->my_telegram_org_wrapper->complete_login_async(yield $this->readLine('Enter the verification code you received in telegram: '));
                 if (!yield $this->my_telegram_org_wrapper->has_app_async()) {
-                    $app_title = yield $readline('Enter the app\'s name, can be anything: ');
-                    $short_name = yield $readline('Enter the app\'s short name, can be anything: ');
-                    $url = yield $readline('Enter the app/website\'s URL, or t.me/yourusername: ');
-                    $description = yield $readline('Describe your app: ');
+                    $app_title = yield $this->readLine('Enter the app\'s name, can be anything: ');
+                    $short_name = yield $this->readLine('Enter the app\'s short name, can be anything: ');
+                    $url = yield $this->readLine('Enter the app/website\'s URL, or t.me/yourusername: ');
+                    $description = yield $this->readLine('Describe your app: ');
                     $app = yield $this->my_telegram_org_wrapper->create_app_async(['app_title' => $app_title, 'app_shortname' => $short_name, 'app_url' => $url, 'app_platform' => 'web', 'app_desc' => $description]);
                 } else {
                     $app = yield $this->my_telegram_org_wrapper->get_app_async();

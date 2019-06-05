@@ -27,6 +27,7 @@ And now, on to the **API changes**:
 * First of all, we've got several bucketloads of telegram API changes, that can be viewed in the first posts.
 * Dropped support for PHP 5 and PHP 7.0: these versions of PHP have [officially reached their EOL](http://php.net/eol.php), so MadelineProto will not support them anymore.  
 You can use MadelineProto with PHP 7.3 (or PHP 7.2, PHP 7.1 is supported but not recommended).  
+* **Dropped support for get_updates**: it won't work properly on async, and I really recommend you stop using it
 * You can now use the `@support` username in sendMessage and other methods to send messages to the support user!
 * Now MadelineProto will automatically try to get the access hash of users not present in the internal peer database (this should reduce errors)!  
 * If any file cannot be downloaded to due issues with the tg media server that is hosting it, it will be automatically sent to the `@support` user ([settings](https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsdownloadreport_broken_media)).  
@@ -169,4 +170,5 @@ group calls
 native calls
 dnssec
 mytelegramorg docs
+web files
 telegram passport

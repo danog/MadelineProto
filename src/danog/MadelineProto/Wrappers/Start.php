@@ -33,31 +33,16 @@ trait Start
             return yield $this->get_self_async();
         }
         if (php_sapi_name() === 'cli') {
-            $stdin = getStdin();
-            $stdout = getStdout();
-            $readline = function ($prompt = null) use ($stdout, $stdin) {
-                if ($prompt) {
-                    yield $stdout->write($prompt);
-                }
-                static $lines = [''];
-                while (count($lines) < 2 && ($chunk = yield $stdin->read()) !== null) {
-                    $chunk = explode("\n", str_replace(["\r", "\n\n"], "\n", $chunk));
-                    $lines[count($lines) - 1] .= array_shift($chunk);
-                    $lines = array_merge($lines, $chunk);
-                }
-
-                return array_shift($lines);
-            };
-            if (strpos(yield $readline('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
-                yield $this->bot_login_async(yield $readline('Enter your bot token: '));
+            if (strpos(yield $this->readLine('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
+                yield $this->bot_login_async(yield $this->readLine('Enter your bot token: '));
             } else {
-                yield $this->phone_login_async(yield $readline('Enter your phone number: '));
-                $authorization = yield $this->complete_phone_login_async(yield $readline('Enter the phone code: '));
+                yield $this->phone_login_async(yield $this->readLine('Enter your phone number: '));
+                $authorization = yield $this->complete_phone_login_async(yield $this->readLine('Enter the phone code: '));
                 if ($authorization['_'] === 'account.password') {
-                    $authorization = yield $this->complete_2fa_login_async(yield $readline('Please enter your password (hint '.$authorization['hint'].'): '));
+                    $authorization = yield $this->complete_2fa_login_async(yield $this->readLine('Please enter your password (hint '.$authorization['hint'].'): '));
                 }
                 if ($authorization['_'] === 'account.needSignup') {
-                    $authorization = yield $this->complete_signup_async(yield $readline('Please enter your first name: '), yield $readline('Please enter your last name (can be empty): '));
+                    $authorization = yield $this->complete_signup_async(yield $this->readLine('Please enter your first name: '), yield $this->readLine('Please enter your last name (can be empty): '));
                 }
             }
             $this->serialize();

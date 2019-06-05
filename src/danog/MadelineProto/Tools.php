@@ -29,6 +29,8 @@ use function Amp\Promise\first;
 use function Amp\Promise\some;
 use function Amp\Promise\timeout;
 use function Amp\Promise\wait;
+use function Amp\ByteStream\getStdin;
+use function Amp\ByteStream\getStdout;
 
 /**
  * Some tools.
@@ -331,7 +333,26 @@ trait Tools
     {
         return new \Amp\Delayed($time * 1000);
     }
+    public function readLine($prompt = '')
+    {
+        return $this->call($this->readLineAsync($prompt));
+    }
+    public function readLineAsync($prompt = '')
+    {
+        $stdin = getStdin();
+        $stdout = getStdout();
+        if ($prompt) {
+            yield $stdout->write($prompt);
+        }
+        static $lines = [''];
+        while (count($lines) < 2 && ($chunk = yield $stdin->read()) !== null) {
+            $chunk = explode("\n", str_replace(["\r", "\n\n"], "\n", $chunk));
+            $lines[count($lines) - 1] .= array_shift($chunk);
+            $lines = array_merge($lines, $chunk);
+        }
 
+        return array_shift($lines);
+    }
     public function is_array_or_alike($var)
     {
         return is_array($var) ||
