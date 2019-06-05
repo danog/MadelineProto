@@ -114,7 +114,7 @@ trait CallHandler
             if (isset($args['multiple'])) {
                 $aargs['multiple'] = true;
             }
-            if (isset($args['message']) && is_string($args['message']) && mb_strlen($args['message'], 'UTF-8') > $this->config['message_length_max']) {
+            if (isset($args['message']) && is_string($args['message']) && mb_strlen($args['message'], 'UTF-8') > $this->config['message_length_max'] && mb_strlen((yield $this->parse_mode_async($args))['message'], 'UTF-8') > $this->config['message_length_max']) {
                 $args = yield $this->split_to_chunks_async($args);
                 $promises = [];
                 $aargs['queue'] = $method;

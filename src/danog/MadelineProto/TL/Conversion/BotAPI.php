@@ -504,7 +504,8 @@ trait BotAPI
         if (stripos($arguments['parse_mode'], 'html') !== false) {
             $new_message = '';
 
-            $arguments['message'] = rtrim($this->html_fixtags($arguments['message']));
+            $arguments['message'] = trim($this->html_fixtags($arguments['message']));
+
             $dom = new \DOMDocument();
             if (!extension_loaded('mbstring')) {
                 throw new \danog\MadelineProto\Exception(['extension', 'mbstring']);
