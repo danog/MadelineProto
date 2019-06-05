@@ -12,14 +12,34 @@ interface auth
     /**
      * @param array params [
      *               string phone_number,
+     *              ]
+     *
+     * @return auth_CheckedPhone
+     */
+    public function checkPhone(array $params);
+
+    /**
+     * @param array params [
+     *               string phone_number,
+     *               int sms_type,
      *               int api_id,
      *               string api_hash,
-     *               CodeSettings settings,
+     *               string lang_code,
      *              ]
      *
      * @return auth_SentCode
      */
     public function sendCode(array $params);
+
+    /**
+     * @param array params [
+     *               string phone_number,
+     *               string phone_code_hash,
+     *              ]
+     *
+     * @return bool
+     */
+    public function sendCall(array $params);
 
     /**
      * @param array params [
@@ -57,6 +77,16 @@ interface auth
 
     /**
      * @param array params [
+     *               string phone_numbers,
+     *               string message,
+     *              ]
+     *
+     * @return bool
+     */
+    public function sendInvites(array $params);
+
+    /**
+     * @param array params [
      *               int dc_id,
      *              ]
      *
@@ -88,66 +118,13 @@ interface auth
 
     /**
      * @param array params [
-     *               int api_id,
-     *               string api_hash,
-     *               string bot_auth_token,
-     *              ]
-     *
-     * @return auth_Authorization
-     */
-    public function importBotAuthorization(array $params);
-
-    /**
-     * @param array params [
-     *               InputCheckPasswordSRP password,
-     *              ]
-     *
-     * @return auth_Authorization
-     */
-    public function checkPassword(array $params);
-
-    /**
-     * @return auth_PasswordRecovery
-     */
-    public function requestPasswordRecovery();
-
-    /**
-     * @param array params [
-     *               string code,
-     *              ]
-     *
-     * @return auth_Authorization
-     */
-    public function recoverPassword(array $params);
-
-    /**
-     * @param array params [
-     *               string phone_number,
-     *               string phone_code_hash,
-     *              ]
-     *
-     * @return auth_SentCode
-     */
-    public function resendCode(array $params);
-
-    /**
-     * @param array params [
      *               string phone_number,
      *               string phone_code_hash,
      *              ]
      *
      * @return bool
      */
-    public function cancelCode(array $params);
-
-    /**
-     * @param array params [
-     *               long except_auth_keys,
-     *              ]
-     *
-     * @return bool
-     */
-    public function dropTempAuthKeys(array $params);
+    public function sendSms(array $params);
 }
 
 interface account
@@ -156,9 +133,11 @@ interface account
      * @param array params [
      *               int token_type,
      *               string token,
+     *               string device_model,
+     *               string system_version,
+     *               string app_version,
      *               Bool app_sandbox,
-     *               bytes secret,
-     *               int other_uids,
+     *               string lang_code,
      *              ]
      *
      * @return bool
@@ -169,7 +148,6 @@ interface account
      * @param array params [
      *               int token_type,
      *               string token,
-     *               int other_uids,
      *              ]
      *
      * @return bool
@@ -204,7 +182,6 @@ interface account
      * @param array params [
      *               string first_name,
      *               string last_name,
-     *               string about,
      *              ]
      *
      * @return User
@@ -221,23 +198,9 @@ interface account
     public function updateStatus(array $params);
 
     /**
-     * @param array params [
-     *               int hash,
-     *              ]
-     *
-     * @return account_WallPapers
+     * @return Vector_of_WallPaper
      */
-    public function getWallPapers(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               ReportReason reason,
-     *              ]
-     *
-     * @return bool
-     */
-    public function reportPeer(array $params);
+    public function getWallPapers();
 
     /**
      * @param array params [
@@ -256,391 +219,6 @@ interface account
      * @return User
      */
     public function updateUsername(array $params);
-
-    /**
-     * @param array params [
-     *               InputPrivacyKey key,
-     *              ]
-     *
-     * @return account_PrivacyRules
-     */
-    public function getPrivacy(array $params);
-
-    /**
-     * @param array params [
-     *               InputPrivacyKey key,
-     *               InputPrivacyRule rules,
-     *              ]
-     *
-     * @return account_PrivacyRules
-     */
-    public function setPrivacy(array $params);
-
-    /**
-     * @param array params [
-     *               string reason,
-     *              ]
-     *
-     * @return bool
-     */
-    public function deleteAccount(array $params);
-
-    /**
-     * @return AccountDaysTTL
-     */
-    public function getAccountTTL();
-
-    /**
-     * @param array params [
-     *               AccountDaysTTL ttl,
-     *              ]
-     *
-     * @return bool
-     */
-    public function setAccountTTL(array $params);
-
-    /**
-     * @param array params [
-     *               string phone_number,
-     *               CodeSettings settings,
-     *              ]
-     *
-     * @return auth_SentCode
-     */
-    public function sendChangePhoneCode(array $params);
-
-    /**
-     * @param array params [
-     *               string phone_number,
-     *               string phone_code_hash,
-     *               string phone_code,
-     *              ]
-     *
-     * @return User
-     */
-    public function changePhone(array $params);
-
-    /**
-     * @param array params [
-     *               int period,
-     *              ]
-     *
-     * @return bool
-     */
-    public function updateDeviceLocked(array $params);
-
-    /**
-     * @return account_Authorizations
-     */
-    public function getAuthorizations();
-
-    /**
-     * @param array params [
-     *               long hash,
-     *              ]
-     *
-     * @return bool
-     */
-    public function resetAuthorization(array $params);
-
-    /**
-     * @return account_Password
-     */
-    public function getPassword();
-
-    /**
-     * @param array params [
-     *               InputCheckPasswordSRP password,
-     *              ]
-     *
-     * @return account_PasswordSettings
-     */
-    public function getPasswordSettings(array $params);
-
-    /**
-     * @param array params [
-     *               InputCheckPasswordSRP password,
-     *               account_PasswordInputSettings new_settings,
-     *              ]
-     *
-     * @return bool
-     */
-    public function updatePasswordSettings(array $params);
-
-    /**
-     * @param array params [
-     *               string hash,
-     *               CodeSettings settings,
-     *              ]
-     *
-     * @return auth_SentCode
-     */
-    public function sendConfirmPhoneCode(array $params);
-
-    /**
-     * @param array params [
-     *               string phone_code_hash,
-     *               string phone_code,
-     *              ]
-     *
-     * @return bool
-     */
-    public function confirmPhone(array $params);
-
-    /**
-     * @param array params [
-     *               InputCheckPasswordSRP password,
-     *               int period,
-     *              ]
-     *
-     * @return account_TmpPassword
-     */
-    public function getTmpPassword(array $params);
-
-    /**
-     * @return account_WebAuthorizations
-     */
-    public function getWebAuthorizations();
-
-    /**
-     * @param array params [
-     *               long hash,
-     *              ]
-     *
-     * @return bool
-     */
-    public function resetWebAuthorization(array $params);
-
-    /**
-     * @return bool
-     */
-    public function resetWebAuthorizations();
-
-    /**
-     * @return Vector_of_SecureValue
-     */
-    public function getAllSecureValues();
-
-    /**
-     * @param array params [
-     *               SecureValueType types,
-     *              ]
-     *
-     * @return Vector_of_SecureValue
-     */
-    public function getSecureValue(array $params);
-
-    /**
-     * @param array params [
-     *               InputSecureValue value,
-     *               long secure_secret_id,
-     *              ]
-     *
-     * @return SecureValue
-     */
-    public function saveSecureValue(array $params);
-
-    /**
-     * @param array params [
-     *               SecureValueType types,
-     *              ]
-     *
-     * @return bool
-     */
-    public function deleteSecureValue(array $params);
-
-    /**
-     * @param array params [
-     *               int bot_id,
-     *               string scope,
-     *               string public_key,
-     *              ]
-     *
-     * @return account_AuthorizationForm
-     */
-    public function getAuthorizationForm(array $params);
-
-    /**
-     * @param array params [
-     *               int bot_id,
-     *               string scope,
-     *               string public_key,
-     *               SecureValueHash value_hashes,
-     *               SecureCredentialsEncrypted credentials,
-     *              ]
-     *
-     * @return bool
-     */
-    public function acceptAuthorization(array $params);
-
-    /**
-     * @param array params [
-     *               string phone_number,
-     *               CodeSettings settings,
-     *              ]
-     *
-     * @return auth_SentCode
-     */
-    public function sendVerifyPhoneCode(array $params);
-
-    /**
-     * @param array params [
-     *               string phone_number,
-     *               string phone_code_hash,
-     *               string phone_code,
-     *              ]
-     *
-     * @return bool
-     */
-    public function verifyPhone(array $params);
-
-    /**
-     * @param array params [
-     *               string email,
-     *              ]
-     *
-     * @return account_SentEmailCode
-     */
-    public function sendVerifyEmailCode(array $params);
-
-    /**
-     * @param array params [
-     *               string email,
-     *               string code,
-     *              ]
-     *
-     * @return bool
-     */
-    public function verifyEmail(array $params);
-
-    /**
-     * @param array params [
-     *               boolean contacts,
-     *               boolean message_users,
-     *               boolean message_chats,
-     *               boolean message_megagroups,
-     *               boolean message_channels,
-     *               boolean files,
-     *               int file_max_size,
-     *              ]
-     *
-     * @return account_Takeout
-     */
-    public function initTakeoutSession(array $params);
-
-    /**
-     * @param array params [
-     *               boolean success,
-     *              ]
-     *
-     * @return bool
-     */
-    public function finishTakeoutSession(array $params);
-
-    /**
-     * @param array params [
-     *               string code,
-     *              ]
-     *
-     * @return bool
-     */
-    public function confirmPasswordEmail(array $params);
-
-    /**
-     * @return bool
-     */
-    public function resendPasswordEmail();
-
-    /**
-     * @return bool
-     */
-    public function cancelPasswordEmail();
-
-    /**
-     * @return bool
-     */
-    public function getContactSignUpNotification();
-
-    /**
-     * @param array params [
-     *               Bool silent,
-     *              ]
-     *
-     * @return bool
-     */
-    public function setContactSignUpNotification(array $params);
-
-    /**
-     * @param array params [
-     *               boolean compare_sound,
-     *               InputNotifyPeer peer,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function getNotifyExceptions(array $params);
-
-    /**
-     * @param array params [
-     *               InputWallPaper wallpaper,
-     *              ]
-     *
-     * @return WallPaper
-     */
-    public function getWallPaper(array $params);
-
-    /**
-     * @param array params [
-     *               InputFile file,
-     *               string mime_type,
-     *               WallPaperSettings settings,
-     *              ]
-     *
-     * @return WallPaper
-     */
-    public function uploadWallPaper(array $params);
-
-    /**
-     * @param array params [
-     *               InputWallPaper wallpaper,
-     *               Bool unsave,
-     *               WallPaperSettings settings,
-     *              ]
-     *
-     * @return bool
-     */
-    public function saveWallPaper(array $params);
-
-    /**
-     * @param array params [
-     *               InputWallPaper wallpaper,
-     *               WallPaperSettings settings,
-     *              ]
-     *
-     * @return bool
-     */
-    public function installWallPaper(array $params);
-
-    /**
-     * @return bool
-     */
-    public function resetWallPapers();
-
-    /**
-     * @return account_AutoDownloadSettings
-     */
-    public function getAutoDownloadSettings();
-
-    /**
-     * @param array params [
-     *               boolean low,
-     *               boolean high,
-     *               AutoDownloadSettings settings,
-     *              ]
-     *
-     * @return bool
-     */
-    public function saveAutoDownloadSettings(array $params);
 }
 
 interface users
@@ -662,29 +240,10 @@ interface users
      * @return UserFull
      */
     public function getFullUser(array $params);
-
-    /**
-     * @param array params [
-     *               InputUser id,
-     *               SecureValueError errors,
-     *              ]
-     *
-     * @return bool
-     */
-    public function setSecureValueErrors(array $params);
 }
 
 interface contacts
 {
-    /**
-     * @param array params [
-     *               int hash,
-     *              ]
-     *
-     * @return Vector_of_int
-     */
-    public function getContactIDs(array $params);
-
     /**
      * @return Vector_of_ContactStatus
      */
@@ -692,7 +251,7 @@ interface contacts
 
     /**
      * @param array params [
-     *               int hash,
+     *               string hash,
      *              ]
      *
      * @return contacts_Contacts
@@ -702,11 +261,21 @@ interface contacts
     /**
      * @param array params [
      *               InputContact contacts,
+     *               Bool replace,
      *              ]
      *
      * @return contacts_ImportedContacts
      */
     public function importContacts(array $params);
+
+    /**
+     * @param array params [
+     *               int limit,
+     *              ]
+     *
+     * @return contacts_Suggested
+     */
+    public function getSuggested(array $params);
 
     /**
      * @param array params [
@@ -725,15 +294,6 @@ interface contacts
      * @return bool
      */
     public function deleteContacts(array $params);
-
-    /**
-     * @param array params [
-     *               string phones,
-     *              ]
-     *
-     * @return bool
-     */
-    public function deleteByPhones(array $params);
 
     /**
      * @param array params [
@@ -764,6 +324,20 @@ interface contacts
     public function getBlocked(array $params);
 
     /**
+     * @return Vector_of_int
+     */
+    public function exportCard();
+
+    /**
+     * @param array params [
+     *               int export_card,
+     *              ]
+     *
+     * @return User
+     */
+    public function importCard(array $params);
+
+    /**
      * @param array params [
      *               string q,
      *               int limit,
@@ -772,68 +346,13 @@ interface contacts
      * @return contacts_Found
      */
     public function search(array $params);
-
-    /**
-     * @param array params [
-     *               string username,
-     *              ]
-     *
-     * @return contacts_ResolvedPeer
-     */
-    public function resolveUsername(array $params);
-
-    /**
-     * @param array params [
-     *               boolean correspondents,
-     *               boolean bots_pm,
-     *               boolean bots_inline,
-     *               boolean phone_calls,
-     *               boolean groups,
-     *               boolean channels,
-     *               int offset,
-     *               int limit,
-     *               int hash,
-     *              ]
-     *
-     * @return contacts_TopPeers
-     */
-    public function getTopPeers(array $params);
-
-    /**
-     * @param array params [
-     *               TopPeerCategory category,
-     *               InputPeer peer,
-     *              ]
-     *
-     * @return bool
-     */
-    public function resetTopPeerRating(array $params);
-
-    /**
-     * @return bool
-     */
-    public function resetSaved();
-
-    /**
-     * @return Vector_of_SavedContact
-     */
-    public function getSaved();
-
-    /**
-     * @param array params [
-     *               Bool enabled,
-     *              ]
-     *
-     * @return bool
-     */
-    public function toggleTopPeers(array $params);
 }
 
 interface messages
 {
     /**
      * @param array params [
-     *               InputMessage id,
+     *               int id,
      *              ]
      *
      * @return messages_Messages
@@ -842,12 +361,9 @@ interface messages
 
     /**
      * @param array params [
-     *               boolean exclude_pinned,
-     *               int offset_date,
-     *               int offset_id,
-     *               InputPeer offset_peer,
+     *               int offset,
+     *               int max_id,
      *               int limit,
-     *               int hash,
      *              ]
      *
      * @return messages_Dialogs
@@ -857,13 +373,9 @@ interface messages
     /**
      * @param array params [
      *               InputPeer peer,
-     *               int offset_id,
-     *               int offset_date,
-     *               int add_offset,
-     *               int limit,
+     *               int offset,
      *               int max_id,
-     *               int min_id,
-     *               int hash,
+     *               int limit,
      *              ]
      *
      * @return messages_Messages
@@ -874,16 +386,12 @@ interface messages
      * @param array params [
      *               InputPeer peer,
      *               string q,
-     *               InputUser from_id,
      *               MessagesFilter filter,
      *               int min_date,
      *               int max_date,
-     *               int offset_id,
-     *               int add_offset,
-     *               int limit,
+     *               int offset,
      *               int max_id,
-     *               int min_id,
-     *               int hash,
+     *               int limit,
      *              ]
      *
      * @return messages_Messages
@@ -894,18 +402,18 @@ interface messages
      * @param array params [
      *               InputPeer peer,
      *               int max_id,
+     *               int offset,
+     *               Bool read_contents,
      *              ]
      *
-     * @return messages_AffectedMessages
+     * @return messages_AffectedHistory
      */
     public function readHistory(array $params);
 
     /**
      * @param array params [
-     *               boolean just_clear,
-     *               boolean revoke,
      *               InputPeer peer,
-     *               int max_id,
+     *               int offset,
      *              ]
      *
      * @return messages_AffectedHistory
@@ -914,11 +422,10 @@ interface messages
 
     /**
      * @param array params [
-     *               boolean revoke,
      *               int id,
      *              ]
      *
-     * @return messages_AffectedMessages
+     * @return Vector_of_int
      */
     public function deleteMessages(array $params);
 
@@ -927,7 +434,7 @@ interface messages
      *               int max_id,
      *              ]
      *
-     * @return Vector_of_ReceivedNotifyMessage
+     * @return Vector_of_int
      */
     public function receivedMessages(array $params);
 
@@ -943,50 +450,31 @@ interface messages
 
     /**
      * @param array params [
-     *               boolean no_webpage,
-     *               boolean silent,
-     *               boolean background,
-     *               boolean clear_draft,
      *               InputPeer peer,
-     *               int reply_to_msg_id,
      *               string message,
-     *               ReplyMarkup reply_markup,
-     *               MessageEntity entities,
      *              ]
      *
-     * @return Updates
+     * @return messages_SentMessage
      */
     public function sendMessage(array $params);
 
     /**
      * @param array params [
-     *               boolean silent,
-     *               boolean background,
-     *               boolean clear_draft,
      *               InputPeer peer,
-     *               int reply_to_msg_id,
      *               InputMedia media,
-     *               string message,
-     *               ReplyMarkup reply_markup,
-     *               MessageEntity entities,
      *              ]
      *
-     * @return Updates
+     * @return messages_StatedMessage
      */
     public function sendMedia(array $params);
 
     /**
      * @param array params [
-     *               boolean silent,
-     *               boolean background,
-     *               boolean with_my_score,
-     *               boolean grouped,
-     *               InputPeer from_peer,
+     *               InputPeer peer,
      *               int id,
-     *               InputPeer to_peer,
      *              ]
      *
-     * @return Updates
+     * @return messages_StatedMessages
      */
     public function forwardMessages(array $params);
 
@@ -998,35 +486,6 @@ interface messages
      * @return bool
      */
     public function reportSpam(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
-     *
-     * @return bool
-     */
-    public function hideReportSpam(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
-     *
-     * @return PeerSettings
-     */
-    public function getPeerSettings(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int id,
-     *               ReportReason reason,
-     *              ]
-     *
-     * @return bool
-     */
-    public function report(array $params);
 
     /**
      * @param array params [
@@ -1052,7 +511,7 @@ interface messages
      *               string title,
      *              ]
      *
-     * @return Updates
+     * @return messages_StatedMessage
      */
     public function editChatTitle(array $params);
 
@@ -1062,7 +521,7 @@ interface messages
      *               InputChatPhoto photo,
      *              ]
      *
-     * @return Updates
+     * @return messages_StatedMessage
      */
     public function editChatPhoto(array $params);
 
@@ -1073,7 +532,7 @@ interface messages
      *               int fwd_limit,
      *              ]
      *
-     * @return Updates
+     * @return messages_StatedMessage
      */
     public function addChatUser(array $params);
 
@@ -1083,7 +542,7 @@ interface messages
      *               InputUser user_id,
      *              ]
      *
-     * @return Updates
+     * @return messages_StatedMessage
      */
     public function deleteChatUser(array $params);
 
@@ -1093,9 +552,30 @@ interface messages
      *               string title,
      *              ]
      *
-     * @return Updates
+     * @return messages_StatedMessage
      */
     public function createChat(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               int id,
+     *              ]
+     *
+     * @return messages_StatedMessage
+     */
+    public function forwardMessage(array $params);
+
+    /**
+     * @param array params [
+     *               InputUser contacts,
+     *               string message,
+     *               InputMedia media,
+     *              ]
+     *
+     * @return messages_StatedMessages
+     */
+    public function sendBroadcast(array $params);
 
     /**
      * @param array params [
@@ -1199,780 +679,12 @@ interface messages
 
     /**
      * @param array params [
-     *               InputEncryptedChat peer,
-     *              ]
-     *
-     * @return bool
-     */
-    public function reportEncryptedSpam(array $params);
-
-    /**
-     * @param array params [
      *               int id,
-     *              ]
-     *
-     * @return messages_AffectedMessages
-     */
-    public function readMessageContents(array $params);
-
-    /**
-     * @param array params [
-     *               string emoticon,
-     *               int hash,
-     *              ]
-     *
-     * @return messages_Stickers
-     */
-    public function getStickers(array $params);
-
-    /**
-     * @param array params [
-     *               int hash,
-     *              ]
-     *
-     * @return messages_AllStickers
-     */
-    public function getAllStickers(array $params);
-
-    /**
-     * @param array params [
-     *               string message,
-     *               MessageEntity entities,
-     *              ]
-     *
-     * @return MessageMedia
-     */
-    public function getWebPagePreview(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
-     *
-     * @return ExportedChatInvite
-     */
-    public function exportChatInvite(array $params);
-
-    /**
-     * @param array params [
-     *               string hash,
-     *              ]
-     *
-     * @return ChatInvite
-     */
-    public function checkChatInvite(array $params);
-
-    /**
-     * @param array params [
-     *               string hash,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function importChatInvite(array $params);
-
-    /**
-     * @param array params [
-     *               InputStickerSet stickerset,
-     *              ]
-     *
-     * @return messages_StickerSet
-     */
-    public function getStickerSet(array $params);
-
-    /**
-     * @param array params [
-     *               InputStickerSet stickerset,
-     *               Bool archived,
-     *              ]
-     *
-     * @return messages_StickerSetInstallResult
-     */
-    public function installStickerSet(array $params);
-
-    /**
-     * @param array params [
-     *               InputStickerSet stickerset,
-     *              ]
-     *
-     * @return bool
-     */
-    public function uninstallStickerSet(array $params);
-
-    /**
-     * @param array params [
-     *               InputUser bot,
-     *               InputPeer peer,
-     *               string start_param,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function startBot(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int id,
-     *               Bool increment,
      *              ]
      *
      * @return Vector_of_int
      */
-    public function getMessagesViews(array $params);
-
-    /**
-     * @param array params [
-     *               int chat_id,
-     *               InputUser user_id,
-     *               Bool is_admin,
-     *              ]
-     *
-     * @return bool
-     */
-    public function editChatAdmin(array $params);
-
-    /**
-     * @param array params [
-     *               int chat_id,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function migrateChat(array $params);
-
-    /**
-     * @param array params [
-     *               string q,
-     *               int offset_date,
-     *               InputPeer offset_peer,
-     *               int offset_id,
-     *               int limit,
-     *              ]
-     *
-     * @return messages_Messages
-     */
-    public function searchGlobal(array $params);
-
-    /**
-     * @param array params [
-     *               boolean masks,
-     *               long order,
-     *              ]
-     *
-     * @return bool
-     */
-    public function reorderStickerSets(array $params);
-
-    /**
-     * @param array params [
-     *               bytes sha256,
-     *               int size,
-     *               string mime_type,
-     *              ]
-     *
-     * @return Document
-     */
-    public function getDocumentByHash(array $params);
-
-    /**
-     * @param array params [
-     *               string q,
-     *               int offset,
-     *              ]
-     *
-     * @return messages_FoundGifs
-     */
-    public function searchGifs(array $params);
-
-    /**
-     * @param array params [
-     *               int hash,
-     *              ]
-     *
-     * @return messages_SavedGifs
-     */
-    public function getSavedGifs(array $params);
-
-    /**
-     * @param array params [
-     *               InputDocument id,
-     *               Bool unsave,
-     *              ]
-     *
-     * @return bool
-     */
-    public function saveGif(array $params);
-
-    /**
-     * @param array params [
-     *               InputUser bot,
-     *               InputPeer peer,
-     *               InputGeoPoint geo_point,
-     *               string query,
-     *               string offset,
-     *              ]
-     *
-     * @return messages_BotResults
-     */
-    public function getInlineBotResults(array $params);
-
-    /**
-     * @param array params [
-     *               boolean gallery,
-     *               boolean private,
-     *               long query_id,
-     *               InputBotInlineResult results,
-     *               int cache_time,
-     *               string next_offset,
-     *               InlineBotSwitchPM switch_pm,
-     *              ]
-     *
-     * @return bool
-     */
-    public function setInlineBotResults(array $params);
-
-    /**
-     * @param array params [
-     *               boolean silent,
-     *               boolean background,
-     *               boolean clear_draft,
-     *               boolean hide_via,
-     *               InputPeer peer,
-     *               int reply_to_msg_id,
-     *               long query_id,
-     *               string id,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function sendInlineBotResult(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int id,
-     *              ]
-     *
-     * @return messages_MessageEditData
-     */
-    public function getMessageEditData(array $params);
-
-    /**
-     * @param array params [
-     *               boolean no_webpage,
-     *               InputPeer peer,
-     *               int id,
-     *               string message,
-     *               InputMedia media,
-     *               ReplyMarkup reply_markup,
-     *               MessageEntity entities,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function editMessage(array $params);
-
-    /**
-     * @param array params [
-     *               boolean no_webpage,
-     *               InputBotInlineMessageID id,
-     *               string message,
-     *               InputMedia media,
-     *               ReplyMarkup reply_markup,
-     *               MessageEntity entities,
-     *              ]
-     *
-     * @return bool
-     */
-    public function editInlineBotMessage(array $params);
-
-    /**
-     * @param array params [
-     *               boolean game,
-     *               InputPeer peer,
-     *               int msg_id,
-     *               bytes data,
-     *              ]
-     *
-     * @return messages_BotCallbackAnswer
-     */
-    public function getBotCallbackAnswer(array $params);
-
-    /**
-     * @param array params [
-     *               boolean alert,
-     *               long query_id,
-     *               string message,
-     *               string url,
-     *               int cache_time,
-     *              ]
-     *
-     * @return bool
-     */
-    public function setBotCallbackAnswer(array $params);
-
-    /**
-     * @param array params [
-     *               InputDialogPeer peers,
-     *              ]
-     *
-     * @return messages_PeerDialogs
-     */
-    public function getPeerDialogs(array $params);
-
-    /**
-     * @param array params [
-     *               boolean no_webpage,
-     *               int reply_to_msg_id,
-     *               InputPeer peer,
-     *               string message,
-     *               MessageEntity entities,
-     *              ]
-     *
-     * @return bool
-     */
-    public function saveDraft(array $params);
-
-    /**
-     * @return Updates
-     */
-    public function getAllDrafts();
-
-    /**
-     * @param array params [
-     *               int hash,
-     *              ]
-     *
-     * @return messages_FeaturedStickers
-     */
-    public function getFeaturedStickers(array $params);
-
-    /**
-     * @param array params [
-     *               long id,
-     *              ]
-     *
-     * @return bool
-     */
-    public function readFeaturedStickers(array $params);
-
-    /**
-     * @param array params [
-     *               boolean attached,
-     *               int hash,
-     *              ]
-     *
-     * @return messages_RecentStickers
-     */
-    public function getRecentStickers(array $params);
-
-    /**
-     * @param array params [
-     *               boolean attached,
-     *               InputDocument id,
-     *               Bool unsave,
-     *              ]
-     *
-     * @return bool
-     */
-    public function saveRecentSticker(array $params);
-
-    /**
-     * @param array params [
-     *               boolean attached,
-     *              ]
-     *
-     * @return bool
-     */
-    public function clearRecentStickers(array $params);
-
-    /**
-     * @param array params [
-     *               boolean masks,
-     *               long offset_id,
-     *               int limit,
-     *              ]
-     *
-     * @return messages_ArchivedStickers
-     */
-    public function getArchivedStickers(array $params);
-
-    /**
-     * @param array params [
-     *               int hash,
-     *              ]
-     *
-     * @return messages_AllStickers
-     */
-    public function getMaskStickers(array $params);
-
-    /**
-     * @param array params [
-     *               InputStickeredMedia media,
-     *              ]
-     *
-     * @return Vector_of_StickerSetCovered
-     */
-    public function getAttachedStickers(array $params);
-
-    /**
-     * @param array params [
-     *               boolean edit_message,
-     *               boolean force,
-     *               InputPeer peer,
-     *               int id,
-     *               InputUser user_id,
-     *               int score,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function setGameScore(array $params);
-
-    /**
-     * @param array params [
-     *               boolean edit_message,
-     *               boolean force,
-     *               InputBotInlineMessageID id,
-     *               InputUser user_id,
-     *               int score,
-     *              ]
-     *
-     * @return bool
-     */
-    public function setInlineGameScore(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int id,
-     *               InputUser user_id,
-     *              ]
-     *
-     * @return messages_HighScores
-     */
-    public function getGameHighScores(array $params);
-
-    /**
-     * @param array params [
-     *               InputBotInlineMessageID id,
-     *               InputUser user_id,
-     *              ]
-     *
-     * @return messages_HighScores
-     */
-    public function getInlineGameHighScores(array $params);
-
-    /**
-     * @param array params [
-     *               InputUser user_id,
-     *               int max_id,
-     *               int limit,
-     *              ]
-     *
-     * @return messages_Chats
-     */
-    public function getCommonChats(array $params);
-
-    /**
-     * @param array params [
-     *               int except_ids,
-     *              ]
-     *
-     * @return messages_Chats
-     */
-    public function getAllChats(array $params);
-
-    /**
-     * @param array params [
-     *               string url,
-     *               int hash,
-     *              ]
-     *
-     * @return WebPage
-     */
-    public function getWebPage(array $params);
-
-    /**
-     * @param array params [
-     *               boolean pinned,
-     *               InputDialogPeer peer,
-     *              ]
-     *
-     * @return bool
-     */
-    public function toggleDialogPin(array $params);
-
-    /**
-     * @param array params [
-     *               boolean force,
-     *               InputDialogPeer order,
-     *              ]
-     *
-     * @return bool
-     */
-    public function reorderPinnedDialogs(array $params);
-
-    /**
-     * @return messages_PeerDialogs
-     */
-    public function getPinnedDialogs();
-
-    /**
-     * @param array params [
-     *               long query_id,
-     *               string error,
-     *               ShippingOption shipping_options,
-     *              ]
-     *
-     * @return bool
-     */
-    public function setBotShippingResults(array $params);
-
-    /**
-     * @param array params [
-     *               boolean success,
-     *               long query_id,
-     *               string error,
-     *              ]
-     *
-     * @return bool
-     */
-    public function setBotPrecheckoutResults(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               InputMedia media,
-     *              ]
-     *
-     * @return MessageMedia
-     */
-    public function uploadMedia(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int reply_to_msg_id,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function sendScreenshotNotification(array $params);
-
-    /**
-     * @param array params [
-     *               int hash,
-     *              ]
-     *
-     * @return messages_FavedStickers
-     */
-    public function getFavedStickers(array $params);
-
-    /**
-     * @param array params [
-     *               InputDocument id,
-     *               Bool unfave,
-     *              ]
-     *
-     * @return bool
-     */
-    public function faveSticker(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int offset_id,
-     *               int add_offset,
-     *               int limit,
-     *               int max_id,
-     *               int min_id,
-     *              ]
-     *
-     * @return messages_Messages
-     */
-    public function getUnreadMentions(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
-     *
-     * @return messages_AffectedHistory
-     */
-    public function readMentions(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int limit,
-     *               int hash,
-     *              ]
-     *
-     * @return messages_Messages
-     */
-    public function getRecentLocations(array $params);
-
-    /**
-     * @param array params [
-     *               boolean silent,
-     *               boolean background,
-     *               boolean clear_draft,
-     *               InputPeer peer,
-     *               int reply_to_msg_id,
-     *               InputSingleMedia multi_media,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function sendMultiMedia(array $params);
-
-    /**
-     * @param array params [
-     *               InputEncryptedChat peer,
-     *               InputEncryptedFile file,
-     *              ]
-     *
-     * @return EncryptedFile
-     */
-    public function uploadEncryptedFile(array $params);
-
-    /**
-     * @param array params [
-     *               boolean exclude_featured,
-     *               string q,
-     *               int hash,
-     *              ]
-     *
-     * @return messages_FoundStickerSets
-     */
-    public function searchStickerSets(array $params);
-
-    /**
-     * @return Vector_of_MessageRange
-     */
-    public function getSplitRanges();
-
-    /**
-     * @param array params [
-     *               boolean unread,
-     *               InputDialogPeer peer,
-     *              ]
-     *
-     * @return bool
-     */
-    public function markDialogUnread(array $params);
-
-    /**
-     * @return Vector_of_DialogPeer
-     */
-    public function getDialogUnreadMarks();
-
-    /**
-     * @return bool
-     */
-    public function clearAllDrafts();
-
-    /**
-     * @param array params [
-     *               boolean silent,
-     *               InputPeer peer,
-     *               int id,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function updatePinnedMessage(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int msg_id,
-     *               bytes options,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function sendVote(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int msg_id,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function getPollResults(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
-     *
-     * @return ChatOnlines
-     */
-    public function getOnlines(array $params);
-
-    /**
-     * @param array params [
-     *               boolean dark,
-     *               InputPeer peer,
-     *               string params,
-     *              ]
-     *
-     * @return StatsURL
-     */
-    public function getStatsURL(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               string about,
-     *              ]
-     *
-     * @return bool
-     */
-    public function editChatAbout(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               ChatBannedRights banned_rights,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function editChatDefaultBannedRights(array $params);
-
-    /**
-     * @param array params [
-     *               string lang_code,
-     *              ]
-     *
-     * @return EmojiKeywordsDifference
-     */
-    public function getEmojiKeywords(array $params);
-
-    /**
-     * @param array params [
-     *               string lang_code,
-     *               int from_version,
-     *              ]
-     *
-     * @return EmojiKeywordsDifference
-     */
-    public function getEmojiKeywordsDifference(array $params);
-
-    /**
-     * @param array params [
-     *               string lang_code,
-     *              ]
-     *
-     * @return EmojiURL
-     */
-    public function getEmojiURL(array $params);
+    public function readMessageContents(array $params);
 }
 
 interface updates
@@ -1985,7 +697,6 @@ interface updates
     /**
      * @param array params [
      *               int pts,
-     *               int pts_total_limit,
      *               int date,
      *               int qts,
      *              ]
@@ -1993,19 +704,6 @@ interface updates
      * @return updates_Difference
      */
     public function getDifference(array $params);
-
-    /**
-     * @param array params [
-     *               boolean force,
-     *               InputChannel channel,
-     *               ChannelMessagesFilter filter,
-     *               int pts,
-     *               int limit,
-     *              ]
-     *
-     * @return updates_ChannelDifference
-     */
-    public function getChannelDifference(array $params);
 }
 
 interface photos
@@ -2013,6 +711,7 @@ interface photos
     /**
      * @param array params [
      *               InputPhoto id,
+     *               InputPhotoCrop crop,
      *              ]
      *
      * @return UserProfilePhoto
@@ -2022,6 +721,9 @@ interface photos
     /**
      * @param array params [
      *               InputFile file,
+     *               string caption,
+     *               InputGeoPoint geo_point,
+     *               InputPhotoCrop crop,
      *              ]
      *
      * @return photos_Photo
@@ -2041,7 +743,7 @@ interface photos
      * @param array params [
      *               InputUser user_id,
      *               int offset,
-     *               long max_id,
+     *               int max_id,
      *               int limit,
      *              ]
      *
@@ -2085,58 +787,6 @@ interface upload
      * @return bool
      */
     public function saveBigFilePart(array $params);
-
-    /**
-     * @param array params [
-     *               InputWebFileLocation location,
-     *               int offset,
-     *               int limit,
-     *              ]
-     *
-     * @return upload_WebFile
-     */
-    public function getWebFile(array $params);
-
-    /**
-     * @param array params [
-     *               bytes file_token,
-     *               int offset,
-     *               int limit,
-     *              ]
-     *
-     * @return upload_CdnFile
-     */
-    public function getCdnFile(array $params);
-
-    /**
-     * @param array params [
-     *               bytes file_token,
-     *               bytes request_token,
-     *              ]
-     *
-     * @return Vector_of_FileHash
-     */
-    public function reuploadCdnFile(array $params);
-
-    /**
-     * @param array params [
-     *               bytes file_token,
-     *               int offset,
-     *              ]
-     *
-     * @return Vector_of_FileHash
-     */
-    public function getCdnFileHashes(array $params);
-
-    /**
-     * @param array params [
-     *               InputFileLocation location,
-     *               int offset,
-     *              ]
-     *
-     * @return Vector_of_FileHash
-     */
-    public function getFileHashes(array $params);
 }
 
 interface help
@@ -2153,88 +803,15 @@ interface help
 
     /**
      * @param array params [
-     *               string source,
+     *               string device_model,
+     *               string system_version,
+     *               string app_version,
+     *               string lang_code,
      *              ]
      *
      * @return help_AppUpdate
      */
     public function getAppUpdate(array $params);
-
-    /**
-     * @return help_InviteText
-     */
-    public function getInviteText();
-
-    /**
-     * @return help_Support
-     */
-    public function getSupport();
-
-    /**
-     * @param array params [
-     *               string prev_app_version,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function getAppChangelog(array $params);
-
-    /**
-     * @param array params [
-     *               int pending_updates_count,
-     *               string message,
-     *              ]
-     *
-     * @return bool
-     */
-    public function setBotUpdatesStatus(array $params);
-
-    /**
-     * @return CdnConfig
-     */
-    public function getCdnConfig();
-
-    /**
-     * @param array params [
-     *               string referer,
-     *              ]
-     *
-     * @return help_RecentMeUrls
-     */
-    public function getRecentMeUrls(array $params);
-
-    /**
-     * @return help_ProxyData
-     */
-    public function getProxyData();
-
-    /**
-     * @return help_TermsOfServiceUpdate
-     */
-    public function getTermsOfServiceUpdate();
-
-    /**
-     * @param array params [
-     *               DataJSON id,
-     *              ]
-     *
-     * @return bool
-     */
-    public function acceptTermsOfService(array $params);
-
-    /**
-     * @param array params [
-     *               string path,
-     *              ]
-     *
-     * @return help_DeepLinkInfo
-     */
-    public function getDeepLinkInfo(array $params);
-
-    /**
-     * @return JSONValue
-     */
-    public function getAppConfig();
 
     /**
      * @param array params [
@@ -2247,597 +824,15 @@ interface help
 
     /**
      * @param array params [
-     *               int hash,
-     *              ]
-     *
-     * @return help_PassportConfig
-     */
-    public function getPassportConfig(array $params);
-
-    /**
-     * @return help_SupportName
-     */
-    public function getSupportName();
-
-    /**
-     * @param array params [
-     *               InputUser user_id,
-     *              ]
-     *
-     * @return help_UserInfo
-     */
-    public function getUserInfo(array $params);
-
-    /**
-     * @param array params [
-     *               InputUser user_id,
-     *               string message,
-     *               MessageEntity entities,
-     *              ]
-     *
-     * @return help_UserInfo
-     */
-    public function editUserInfo(array $params);
-}
-
-interface channels
-{
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               int max_id,
-     *              ]
-     *
-     * @return bool
-     */
-    public function readHistory(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               int id,
-     *              ]
-     *
-     * @return messages_AffectedMessages
-     */
-    public function deleteMessages(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser user_id,
-     *              ]
-     *
-     * @return messages_AffectedHistory
-     */
-    public function deleteUserHistory(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser user_id,
-     *               int id,
-     *              ]
-     *
-     * @return bool
-     */
-    public function reportSpam(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputMessage id,
-     *              ]
-     *
-     * @return messages_Messages
-     */
-    public function getMessages(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               ChannelParticipantsFilter filter,
-     *               int offset,
-     *               int limit,
-     *               int hash,
-     *              ]
-     *
-     * @return channels_ChannelParticipants
-     */
-    public function getParticipants(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser user_id,
-     *              ]
-     *
-     * @return channels_ChannelParticipant
-     */
-    public function getParticipant(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel id,
-     *              ]
-     *
-     * @return messages_Chats
-     */
-    public function getChannels(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *              ]
-     *
-     * @return messages_ChatFull
-     */
-    public function getFullChannel(array $params);
-
-    /**
-     * @param array params [
-     *               boolean broadcast,
-     *               boolean megagroup,
-     *               string title,
-     *               string about,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function createChannel(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser user_id,
-     *               ChatAdminRights admin_rights,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function editAdmin(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               string title,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function editTitle(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputChatPhoto photo,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function editPhoto(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               string username,
-     *              ]
-     *
-     * @return bool
-     */
-    public function checkUsername(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               string username,
-     *              ]
-     *
-     * @return bool
-     */
-    public function updateUsername(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function joinChannel(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function leaveChannel(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser users,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function inviteToChannel(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function deleteChannel(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               int id,
-     *               Bool grouped,
-     *              ]
-     *
-     * @return ExportedMessageLink
-     */
-    public function exportMessageLink(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               Bool enabled,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function toggleSignatures(array $params);
-
-    /**
-     * @return messages_Chats
-     */
-    public function getAdminedPublicChannels();
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser user_id,
-     *               ChatBannedRights banned_rights,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function editBanned(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               string q,
-     *               ChannelAdminLogEventsFilter events_filter,
-     *               InputUser admins,
-     *               long max_id,
-     *               long min_id,
-     *               int limit,
-     *              ]
-     *
-     * @return channels_AdminLogResults
-     */
-    public function getAdminLog(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputStickerSet stickerset,
-     *              ]
-     *
-     * @return bool
-     */
-    public function setStickers(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               int id,
-     *              ]
-     *
-     * @return bool
-     */
-    public function readMessageContents(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               int max_id,
-     *              ]
-     *
-     * @return bool
-     */
-    public function deleteHistory(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               Bool enabled,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function togglePreHistoryHidden(array $params);
-
-    /**
-     * @param array params [
-     *               int offset,
-     *              ]
-     *
-     * @return messages_Chats
-     */
-    public function getLeftChannels(array $params);
-}
-
-interface bots
-{
-    /**
-     * @param array params [
-     *               string custom_method,
-     *               DataJSON params,
-     *              ]
-     *
-     * @return DataJSON
-     */
-    public function sendCustomRequest(array $params);
-
-    /**
-     * @param array params [
-     *               long query_id,
-     *               DataJSON data,
-     *              ]
-     *
-     * @return bool
-     */
-    public function answerWebhookJSONQuery(array $params);
-}
-
-interface payments
-{
-    /**
-     * @param array params [
-     *               int msg_id,
-     *              ]
-     *
-     * @return payments_PaymentForm
-     */
-    public function getPaymentForm(array $params);
-
-    /**
-     * @param array params [
-     *               int msg_id,
-     *              ]
-     *
-     * @return payments_PaymentReceipt
-     */
-    public function getPaymentReceipt(array $params);
-
-    /**
-     * @param array params [
-     *               boolean save,
-     *               int msg_id,
-     *               PaymentRequestedInfo info,
-     *              ]
-     *
-     * @return payments_ValidatedRequestedInfo
-     */
-    public function validateRequestedInfo(array $params);
-
-    /**
-     * @param array params [
-     *               int msg_id,
-     *               string requested_info_id,
-     *               string shipping_option_id,
-     *               InputPaymentCredentials credentials,
-     *              ]
-     *
-     * @return payments_PaymentResult
-     */
-    public function sendPaymentForm(array $params);
-
-    /**
-     * @return payments_SavedInfo
-     */
-    public function getSavedInfo();
-
-    /**
-     * @param array params [
-     *               boolean credentials,
-     *               boolean info,
-     *              ]
-     *
-     * @return bool
-     */
-    public function clearSavedInfo(array $params);
-}
-
-interface stickers
-{
-    /**
-     * @param array params [
-     *               boolean masks,
-     *               InputUser user_id,
-     *               string title,
-     *               string short_name,
-     *               InputStickerSetItem stickers,
-     *              ]
-     *
-     * @return messages_StickerSet
-     */
-    public function createStickerSet(array $params);
-
-    /**
-     * @param array params [
-     *               InputDocument sticker,
-     *              ]
-     *
-     * @return messages_StickerSet
-     */
-    public function removeStickerFromSet(array $params);
-
-    /**
-     * @param array params [
-     *               InputDocument sticker,
-     *               int position,
-     *              ]
-     *
-     * @return messages_StickerSet
-     */
-    public function changeStickerPosition(array $params);
-
-    /**
-     * @param array params [
-     *               InputStickerSet stickerset,
-     *               InputStickerSetItem sticker,
-     *              ]
-     *
-     * @return messages_StickerSet
-     */
-    public function addStickerToSet(array $params);
-}
-
-interface phone
-{
-    /**
-     * @return DataJSON
-     */
-    public function getCallConfig();
-
-    /**
-     * @param array params [
-     *               InputUser user_id,
-     *               bytes g_a_hash,
-     *               PhoneCallProtocol protocol,
-     *              ]
-     *
-     * @return phone_PhoneCall
-     */
-    public function requestCall(array $params);
-
-    /**
-     * @param array params [
-     *               InputPhoneCall peer,
-     *               bytes g_b,
-     *               PhoneCallProtocol protocol,
-     *              ]
-     *
-     * @return phone_PhoneCall
-     */
-    public function acceptCall(array $params);
-
-    /**
-     * @param array params [
-     *               InputPhoneCall peer,
-     *               bytes g_a,
-     *               long key_fingerprint,
-     *               PhoneCallProtocol protocol,
-     *              ]
-     *
-     * @return phone_PhoneCall
-     */
-    public function confirmCall(array $params);
-
-    /**
-     * @param array params [
-     *               InputPhoneCall peer,
-     *              ]
-     *
-     * @return bool
-     */
-    public function receivedCall(array $params);
-
-    /**
-     * @param array params [
-     *               InputPhoneCall peer,
-     *               int duration,
-     *               PhoneCallDiscardReason reason,
-     *               long connection_id,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function discardCall(array $params);
-
-    /**
-     * @param array params [
-     *               boolean user_initiative,
-     *               InputPhoneCall peer,
-     *               int rating,
-     *               string comment,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function setCallRating(array $params);
-
-    /**
-     * @param array params [
-     *               InputPhoneCall peer,
-     *               DataJSON debug,
-     *              ]
-     *
-     * @return bool
-     */
-    public function saveCallDebug(array $params);
-}
-
-interface langpack
-{
-    /**
-     * @param array params [
-     *               string lang_pack,
      *               string lang_code,
      *              ]
      *
-     * @return LangPackDifference
+     * @return help_InviteText
      */
-    public function getLangPack(array $params);
+    public function getInviteText(array $params);
 
     /**
-     * @param array params [
-     *               string lang_pack,
-     *               string lang_code,
-     *               string keys,
-     *              ]
-     *
-     * @return Vector_of_LangPackString
+     * @return help_Support
      */
-    public function getStrings(array $params);
-
-    /**
-     * @param array params [
-     *               string lang_pack,
-     *               string lang_code,
-     *               int from_version,
-     *              ]
-     *
-     * @return LangPackDifference
-     */
-    public function getDifference(array $params);
-
-    /**
-     * @param array params [
-     *               string lang_pack,
-     *              ]
-     *
-     * @return Vector_of_LangPackLanguage
-     */
-    public function getLanguages(array $params);
-
-    /**
-     * @param array params [
-     *               string lang_pack,
-     *               string lang_code,
-     *              ]
-     *
-     * @return LangPackLanguage
-     */
-    public function getLanguage(array $params);
+    public function getSupport();
 }
