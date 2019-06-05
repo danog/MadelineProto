@@ -39,6 +39,9 @@ class PasswordCalculator
     private $srp_BForHash;
     private $srp_id;
 
+    // This is needed do not remove this
+    public function __construct($logger) { $this->logger = $logger; }
+
     public function addInfo(array $object)
     {
         if ($object['_'] !== 'account.password') {

@@ -199,7 +199,7 @@ trait Login
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['2fa_uncalled']);
         }
         $this->authorized = self::NOT_LOGGED_IN;
-        $hasher = new PasswordCalculator();
+        $hasher = new PasswordCalculator($this->logger);
         $hasher->addInfo($this->authorization);
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_user'], \danog\MadelineProto\Logger::NOTICE);
         $this->authorization = yield $this->method_call_async_read('auth.checkPassword', ['password' => $hasher->getCheckPassword($password)], ['datacenter' => $this->datacenter->curdc]);
@@ -223,7 +223,7 @@ trait Login
      */
     public function update_2fa_async(array $params)
     {
-        $hasher = new PasswordCalculator();
+        $hasher = new PasswordCalculator($this->logger);
         $hasher->addInfo(yield $this->method_call_async_read('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]));
 
         return yield $this->method_call_async_read('account.updatePasswordSettings', $hasher->getPassword($params), ['datacenter' => $this->datacenter->curdc]);

@@ -394,5 +394,5 @@ tell about madeline.php loading in the same dire
 
 remind about using the define
 
-fix trimming newlines in beginning
-weird splitting mmm ```
+Handle auth_restart
+splitting
