@@ -25,15 +25,15 @@ Just `yield $MadelineProto->messages->sendMessage` instead of `$MadelineProto->m
 
 And now, on to the **API changes**:
 * First of all, we've got several bucketloads of telegram API changes, that can be viewed in the first posts.
-* Dropped support for PHP 5 and PHP 7.0: these versions of PHP have [officially reached their EOL](http://php.net/eol.php), so MadelineProto will not support them anymore.  
-You can use MadelineProto with PHP 7.3 (or PHP 7.2, PHP 7.1 is supported but not recommended).  
+* **Very important**, I wrote [documentation](https://docs.madelineproto.xyz/docs/LOGIN.html#getting-permission-to-use-the-telegram-api) on what to do if your account gets banned.  * Dropped support for PHP 5 and PHP 7.0: these versions of PHP have [officially reached their EOL](http://php.net/eol.php), so MadelineProto will not support them anymore.  
+You should use MadelineProto with PHP 7.3 (or PHP 7.2; PHP 7.1 is supported but not recommended).  
 * **Dropped support for get_updates**: it won't work properly on async, and I really recommend you stop using it
 * You can now use the `@support` username in sendMessage and other methods to send messages to the support user!
 * Now MadelineProto will automatically try to get the access hash of users not present in the internal peer database (this should reduce errors)!  
 * If any file cannot be downloaded to due issues with the tg media server that is hosting it, it will be automatically sent to the `@support` user ([settings](https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsdownloadreport_broken_media)).  
 * Documented the [MyTelegramOrgWrapper](https://docs.madelineproto.xyz/docs/LOGIN.html#api-id) API, that can be used to login programmaticaly to the [my.telegram.org](https://my.telegram.org management page).  
 * Added an [update_2fa](https://docs.madelineproto.xyz/update_2fa.html) method to update the login password
-* Added a [get_full_dialogs](https://docs.madelineproto.xyz/docs/DIALOGS.html#get_full_dialogs-now-fully-async) method to get a full list of all chats you’re member of, including dialog info (such as the pinned/last message ID, unread count, tag count, notification settings and message drafts).  
+* Added a [get_full_dialogs](https://docs.madelineproto.xyz/docs/DIALOGS.html#get_full_dialogs-now-fully-async) method to get a full list of all chats you’re member of, including **dialog info** (such as the pinned/last message ID, unread count, tag count, notification settings and message drafts).  
 * [Added support for automatic file uploads by name in secret chats (as with normal chats); you can also now send secret chat messages using the sendMessage method as if it were a normal chat](https://github.com/danog/MadelineProto/blob/master/secret_bot.php)
 * Added a [resetUpdateState](https://docs.madelineproto.xyz/docs/UPDATES.html#fetch-all-updates-from-the-beginning) method to reset the update state and fetch ALL updates from the beginning
 * Improved chat message splitting algorithm (if the message you're trying to send is too long): performance improvements, and it will now notify you via the logs if there are too many entities in the logs, or if the entities are too long.  
@@ -96,7 +96,7 @@ The update state is now stored using a custom `UpdatesState` API, that will simp
 Possibly the most __exciting__ thing to work on in this version of MadelineProto was the new **update management system**: I whipped it up in merely two days a few weeks ago, and it has **absolutely improved** the overall reliability of MadelineProto.  
 Huge thanks to Aliaksei Levin, the developer of tdlib, for explaining to me how exactly does the MTProto update API work: he saved me a lot of time, and was really nice <3<3<3.  
 
-While thinking of an easy way I could implement the new update system, I had an inspiration:  
+While thinking of an easy way I could implement the new update system, **I had an inspiration**:  
 
 I created a **unique**, **reliable**, **fast** and **extremely simple** update handling system based on [MadelineProto's loop API](https://docs.madelineproto.xyz/docs/ASYNC.html#async-loop-apis), **not present in any** other MTProto client, **not even tdlib**.  
 
@@ -127,7 +127,7 @@ The same cached method mapping system is also used for the **event handler**, wh
 ***
 
 And now, let's elaborate on async:  
-With **MadelineProto 4.0**, each update is handled in **parallel** using a separate **thread**, and everything is done in **parallel** (even on restricted webhosts!).  
+With **MadelineProto 4.0**, each update is handled in **parallel** using a separate **thread**, and everything is done in **parallel** (even on restricted webhosts, perfect for creating **file downloader bots**!).  
 
 When I say **thread**, I actually mean **green thread** ([wikipedia](https://en.wikipedia.org/wiki/Green_threads)), often called **strand**.  
 **Strands** are behave exactly like normal **threads**, except that they're implemented in user-space, and they're much **faster**, **more reliable**, and **do not suffer** from synchronization issues present with normal threads.  
@@ -144,34 +144,32 @@ In
 * async construct
 * async readline
 * async filegetco
+* async echo
 
 Things to expect in the next releases:
-docs for get mime funcs
-docs for HTML parser (div to avoid escaping)
-docs for update_2fa
+ton
+video calls
+group calls
+native calls
+DNS over HTTPS
 optional max_id and min_id
 async iterators
+#phase1
+
+telegram passport
+get sponsor of proxies
+docs for get mime funcs
+docs for HTML parser
 Method name changes
 #MadelineProtoForNode async
 lua async
 improved get_pwr_chat
 gzip
 no defer logs
-recover@tg docs
 startedLoop docs
-
+arrayaccess on promises
+web files
 no error setting, madelineproto does that for you
 
-
-do not use manual
+tell about restart
 tell about madeline.php loading in the same dire
-arrayaccess on promises
-get sponsor of 
-ton
-video calls
-group calls
-native calls
-dnssec
-mytelegramorg docs
-web files
-telegram passport

@@ -30,6 +30,7 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\TL\TLCallback;
+use function Amp\ByteStream\getOutputBufferStream;
 
 /**
  * Manages all of the mtproto stuff.
@@ -233,7 +234,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         return $this->logger->logger(...$params);
     }
-
     public function isAltervista()
     {
         return Magic::$altervista;

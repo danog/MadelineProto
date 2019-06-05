@@ -31,6 +31,7 @@ use function Amp\Promise\timeout;
 use function Amp\Promise\wait;
 use function Amp\ByteStream\getStdin;
 use function Amp\ByteStream\getStdout;
+use function Amp\ByteStream\getOutputBufferStream;
 
 /**
  * Some tools.
@@ -352,6 +353,11 @@ trait Tools
         }
 
         return array_shift($lines);
+    }
+
+    public function echo($string)
+    {
+        return getOutputBufferStream()->write($string);
     }
     public function is_array_or_alike($var)
     {

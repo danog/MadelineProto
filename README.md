@@ -14,7 +14,7 @@ It can login with a phone number (MTProto API), or with a bot token (MTProto API
 
 [It is now fully async](https://docs.madelineproto.xyz/docs/ASYNC.html)!
 
-## Getting started
+## Getting started ([now fully async!](https://docs.madelineproto.xyz/docs/ASYNC.html))
 
 ```php
 <?php
@@ -25,24 +25,28 @@ if (!file_exists('madeline.php')) {
 include 'madeline.php';
 
 $MadelineProto = new \danog\MadelineProto\API('session.madeline');
-$MadelineProto->start();
+$MadelineProto->async(true);
+$MadelineProto->loop(function () use ($MadelineProto) {
+    yield $MadelineProto->start();
 
-$me = $MadelineProto->get_self();
+    $me = yield $MadelineProto->get_self();
 
-\danog\MadelineProto\Logger::log($me);
+    $MadelineProto->logger($me);
 
-if (!$me['bot']) {
-    $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => "Hi!\nThanks for creating MadelineProto! <3"]);
-    $MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
+    if (!$me['bot']) {
+        yield $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => "Hi!\nThanks for creating MadelineProto! <3"]);
+        yield $MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
 
-    try {
-        $MadelineProto->messages->importChatInvite(['hash' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg']);
-    } catch (\danog\MadelineProto\RPCErrorException $e) {
+        try {
+            yield $MadelineProto->messages->importChatInvite(['hash' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg']);
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            $MadelineProto->logger($e);
+        }
+
+        yield $MadelineProto->messages->sendMessage(['peer' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg', 'message' => 'Testing MadelineProto!']);
     }
-
-    $MadelineProto->messages->sendMessage(['peer' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg', 'message' => 'Testing MadelineProto!']);
-}
-echo 'OK, done!'.PHP_EOL;
+    yield $MadelineProto->echo('OK, done!');
+});
 ```
 
 [Try this code now!](https://try.madelineproto.xyz) or run this code in a browser or in a console. 
