@@ -31,6 +31,7 @@ You can use MadelineProto with PHP 7.3 (or PHP 7.2, PHP 7.1 is supported but not
 * You can now use the `@support` username in sendMessage and other methods to send messages to the support user!
 * Now MadelineProto will automatically try to get the access hash of users not present in the internal peer database (this should reduce errors)!  
 * If any file cannot be downloaded to due issues with the tg media server that is hosting it, it will be automatically sent to the `@support` user ([settings](https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsdownloadreport_broken_media)).  
+* Documented the [MyTelegramOrgWrapper](https://docs.madelineproto.xyz/docs/LOGIN.html#api-id) API, that can be used to login programmaticaly to the [my.telegram.org](https://my.telegram.org management page).  
 * Added an [update_2fa](https://docs.madelineproto.xyz/update_2fa.html) method to update the login password
 * Added a [get_full_dialogs](https://docs.madelineproto.xyz/docs/DIALOGS.html#get_full_dialogs-now-fully-async) method to get a full list of all chats you’re member of, including dialog info (such as the pinned/last message ID, unread count, tag count, notification settings and message drafts).  
 * [Added support for automatic file uploads by name in secret chats (as with normal chats); you can also now send secret chat messages using the sendMessage method as if it were a normal chat](https://github.com/danog/MadelineProto/blob/master/secret_bot.php)
@@ -141,6 +142,8 @@ In
 * improved callfork
 * new logging
 * async construct
+* async readline
+* async filegetco
 
 Things to expect in the next releases:
 docs for get mime funcs

@@ -33,15 +33,15 @@ class MyTelegramOrgWrapper
     private $number;
     private $creation_hash;
     private $settings;
-    public $async = false;
+    private $async = true;
     const MY_TELEGRAM_URL = 'https://my.telegram.org';
 
     public function __sleep()
     {
-        return ['logged', 'hash', 'token', 'number', 'creation_hash', 'settings'];
+        return ['logged', 'hash', 'token', 'number', 'creation_hash', 'settings', 'async'];
     }
 
-    public function __construct($settings)
+    public function __construct($settings = [])
     {
         if (!isset($settings['all'])) {
             $settings['connection_settings'] = ['all' => [
@@ -128,7 +128,7 @@ class MyTelegramOrgWrapper
         return $this->logged = true;
     }
 
-    public function logged_in()
+    public function logged_in_async()
     {
         return $this->logged;
     }
