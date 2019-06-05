@@ -44,6 +44,7 @@ You should use MadelineProto with PHP 7.3 (or PHP 7.2; PHP 7.1 is supported but 
 * Improved the `madeline.php` loader
 * Removed the old serialization APIs: now serialization is done automatically by MadelineProto!
 * Increased the default flood wait limit to 10 minutes, since with async waiting for the flood wait isn't blocking anymore
+* When running from web, MadelineProto will also automatically enable logging of **PHP errors** (not MadelineProto logs) to `MadelineProto.log`, located in the same directory as the script that loaded MadelineProto.  
 
 
 ***
@@ -132,44 +133,263 @@ With **MadelineProto 4.0**, each update is handled in **parallel** using a separ
 When I say **thread**, I actually mean **green thread** ([wikipedia](https://en.wikipedia.org/wiki/Green_threads)), often called **strand**.  
 **Strands** are behave exactly like normal **threads**, except that they're implemented in user-space, and they're much **faster**, **more reliable**, and **do not suffer** from synchronization issues present with normal threads.  
 
-In
+Each update you receive using the **event handler** or the **callback handler** is managed in parallel in separate **green threads**: the **only thing** you have to do to enable **async** with **green threads** is add a `yield` before calling MadelineProto methods.  
+
+[Full async documentation with examples](https://docs.madelineproto.xyz/docs/ASYNC.html).  
+
+If your code still relies on the **old synchronous behaviour**, __don't worry__, there is backward compatibility.  
+However, old synchronous behaviour is deprecated, and I **highly recommend** you switch to async, due to the **huge performance** and **parallelism benefits**.  
+
+***
+
+To implement async, I wrote loads of new async APIs in MadelineProto, as you may have seen above.  
+I used the **awesome** [amphp](https://amphp.org) async framework as base, on which to build the new MadelineProto APIs.  
+I heavily modified amphp coroutines and wrapped [all of the AMPHP event loop methods](https://docs.madelineproto.xyz/docs/ASYNC.html#madelineproto-and-amphp-async-apis) to add native support for yielding generators.  
+
+I have also wrapped multiple amphp async libraries for ease of use and compatiblity with MadelineProto settings:  
+* [MadelineProto artax HTTP client](https://docs.madelineproto.xyz/docs/ASYNC.html#madelineproto-artax-http-client):  
+I wrapped the amphp [artax](https://amphp.org/artax) HTTP library for greater security, and to add support for socks5 and HTTP **proxies**: the proxy settings are automatically extracted from MadelineProto settings.  
+Soon, MadelineProto's artax will support DNS over HTTPS by default.  
+
+I also provided a wrapper version of `file_get_contents`:
+```php
+$file = yield $MadelineProto->file_get_contents('https://url');
+```
+
+You can use this library to asynchronously download files from the web.  
+
+* I created a custom async API to asynchronously construct objects:  
+This allows you to create multiple instances of MadelineProto **asynchronously**, because each instantiation will be done asynchronously.  
+
+```php
+$com = new \danog\MadelineProto\CombinedAPI('combined_session.madeline', ['bot.madeline' => $settings, 'user.madeline' => $settings, 'user2.madeline' => $settings]);
+$com->async(true);
+$com->loop(function () use ($com) {
+    $res = [];
+    foreach (['bot.madeline', 'user.madeline', 'user2.madeline'] as $session) {
+        $res []= $com->instances[$session]->start();
+    }
+    yield $com->all($res);
+    yield $com->setEventHandler('\EventHandler');
+}
+$com->loop();
+```
+
+Internally, the combined event handler does `new \danog\MadelineProto\API`, but it isn't blocking:  
+this means that later, when I combine all the async `start()`s into one array and yield it using the [async combinator function](https://docs.madelineproto.xyz/docs/ASYNC.html#combining-async-operations), initialization of sessions is done in parallel, and not one after the other.  
 
 
-* modify amphp
-* phpdoc
-* custom HTTP client with DoH
+* I wrapped amphp's helper functions, and created some more:  
+
+The `all` function you saw above is one of the many combinator functions that can be used to execute multiple async operations simultaneously and wait for the result of all of them.  
+Each method has different error handling techniques, see the [amphp docs](https://amphp.org/amp/promises/combinators).  
+Note that if you just take the result of these methods without yielding it, you can use it as a normal promise/generator.  
+
+**Note**: this is **not** the recommended method to make multiple method calls on the same instance of MadelineProto; use this only for non-API methods like `start()`; for API methods, use [multiple async](https://docs.madelineproto.xyz/docs/ASYNC.html#multiple-async).  
+
+```
+$promise1 = $MadelineProto->messages->sendMessage(...);
+$promise2 = $MadelineProto->messages->sendMessage(...);
+// $promise3 = ...;
+
+// Equivalent to Amp\Promise\all(), but works with generators, too
+$results = yield $MadelineProto->all([$promise1, $promise2, $generator3]);
+
+// Equivalent to Amp\Promise\first(), but works with generators, too
+$results = yield $MadelineProto->first([$promise1, $promise2, $generator3]);
+
+// Equivalent to Amp\Promise\any(), but works with generators, too
+$results = yield $MadelineProto->any([$promise1, $promise2, $generator3]);
+
+// Equivalent to Amp\Promise\some(), but works with generators, too
+$results = yield $MadelineProto->some([$promise1, $promise2, $generator3]);
+```
+
+* Handling timeouts
+
+These methods can be used to wait for a certain amount of time for a result, and then throw an `Amp\TimeoutException` or simply continue execution if no result was obtained.  
+
+```
+// Waits for the result for 2 seconds and then throws an \Amp\TimeoutException
+$result = yield $MadelineProto->timeout($promise, 2)
+
+// Waits for the result for 2 seconds, returns the result or null (which is the result of sleep())
+$result = yield $MadelineProto->first([$promise, $MadelineProto->sleep(2)]);
+```
+
+
+* Async forking (does async green thread forking)
+
+Useful if you need to start a process in the background and you want throwed exceptions to surface up.  
+These exceptions will exit the event loop, turning off the script unless you wrap `$MadelineProto->loop()` with a try-catch.  
+Use it when you do not need the result of a method (see [ignored async](https://docs.madelineproto.xyz/docs/ASYNC.html#ignored-async)), but you want eventual errors to crash the script.  
+Otherwise, just use the method without yield.  
+
+```php
+// Exceptions will surface out of the event loop()
+$MadelineProto->callFork($MadelineProto->messages->sendMessage([...]));
+// Exceptions will be ignored
+$MadelineProto->messages->sendMessage([...]);
+
+// Like the first one, but the call will be deferred to the next event loop tick
+$MadelineProto->callForkDefer($MadelineProto->messages->sendMessage([...]));
+```
+
+Ignoring exceptions is usually not good practice, so it's best to wrap the method you're calling in a closure with a try-catch with some error handling code inside of it, calling it right after that and passing it to callFork:
+
+```php
+$MadelineProto->callFork((function () use ($MadelineProto) {
+    try {
+        $MadelineProto->messages->sendMessage([...])
+    } catch (\Exception $e) {
+        // Handle by logging and stuff
+    }
+})());
+```
+
+* I also created some wrapper functions to work asynchronously with console/browser output
+
+Async sleep:
+```php
+yield $MadelineProto->sleep(3);
+```
+
+Async readline:
+```php
+$res = yield $MadelineProto->readLine('Optional prompt');
+```
+
+* Logging in MadelineProto is now completely asynchronous and easier:
+```php
+$MadelineProto->logger("Message");
+```
+
+No need to yield here, because the logging must be done in background.  
+
 * Simultaneous method calls
-* improved callfork
-* new logging
-* async construct
-* async readline
-* async filegetco
-* async echo
+```php
+yield $MadelineProto->messages->sendMessage([
+    'multiple' => true,
+    ['peer' => '@danogentili', 'message' => 'hi'],
+    ['peer' => '@apony', 'message' => 'hi']
+]);
+```
 
-Things to expect in the next releases:
-ton
-video calls
-group calls
-native calls
-DNS over HTTPS
-optional max_id and min_id
-async iterators
-#phase1
+This is the preferred way of combining multiple method calls: this way, the MadelineProto async WriteLoop will combine **all method calls in one container**, making everything **WAY faster**.  
+The result of this will be an array of results, whose type is determined by the original return type of the method (see [API docs](https://docs.madelineproto.xyz/API_docs)).  
 
-telegram passport
-get sponsor of proxies
-docs for get mime funcs
-docs for HTML parser
-Method name changes
-#MadelineProtoForNode async
-lua async
-improved get_pwr_chat
-gzip
-no defer logs
-startedLoop docs
-arrayaccess on promises
-web files
-no error setting, madelineproto does that for you
+
+The order of method calls can be guaranteed (server-side, not by MadelineProto) by using [call queues](https://docs.madelineproto.xyz/docs/USING_METHODS.html#queues).  
+
+* Exceptions:  
+
+**NOTE**: Due to the async nature of MadelineProto 4.0, sometimes the exception that is thrown and logged may not be the actual exception that caused the crash of the script.  
+To let me properly debug the issue, when reporting issues you also have to provide [**full logs**](https://docs.madelineproto.xyz/docs/LOGGING.html).  
+
+* Finally, [async loops](https://docs.madelineproto.xyz/docs/ASYNC.html#async-loop-apis).  
+
+MadelineProto provides some very useful async loop APIs, for executing operations periodically or on demand.  
+
+They are the perfect solution for implementing **async cron** loops, signal threads and much more!  
+I'll just link you all to the [documentation](https://docs.madelineproto.xyz/docs/ASYNC.html#async-loop-apis): it has full examples for each and every async API (you can also check out the [code](https://github.com/danog/MadelineProto/tree/master/src/danog/MadelineProto/Loop), it's full of PHPDOC comments).  
+
+***
+
+Writing MadelineProto async, I **really enjoyed** working with the AMPHP framework: it is **very fast**, has [multiple packages](https://amphp.org/packages) to work asynchronously with HTTP requests, websockets, databases (MySQL, redis, postgres, DNS, sockets and [much more](https://github.com/amphp/))!  
+
+I chose AMPHP instead of the more famous ReactPHP due to its **speed**, **rich set of libraries** and **extreme ease of use**.  
+
+Working with its devs is also nice; I already contributed to the amphp's libraries with some improvements and bugfixes (I will soon also implement a DNS over HTTPS client for AMPHP, to implement in [MadelineProto's artax](https://docs.madelineproto.xyz/docs/ASYNC.html#madelineproto-artax-http-client)), and I invite you to do the same!  
+
+Even if you can't contribute to AMPHP, you can still use it: as I mentioned above, there are MANY libraries to work asynchronously with files, databases, DNS, HTTP; there's even an async windows registry client, used by the DNS client to fetch default DNS servers on windows!  
+
+When you use MadelineProto async, you **have** to also use an amphp async database client, **artax** instead of curl and guzzle, and so on: otherwise, the speed of MadelineProto async may be reduced by blocking behaviour of your code.  
+
+*** 
+
+In case you missed it, [quick reminder that MadelineProto now supports MTProxy](https://docs.madelineproto.xyz/docs/PROXY.html)!  
+
+*** 
+
+MadelineProto started as a hobby project, back when I knew nothing about cryptography, telegram's APIs, async or programming standards:
+
+before, MadelineProto was created piece by piece as a single monolothic class composed of multiple traits; 
+now, MadelineProto is composed of **multiple modular APIs** that are **well-structured**, **heavily commented**, **wrappable**, **extendable** in any possible and immaginable way.  
+
+I am really happy with how MadelineProto async turned out.  
+I had an absolute blast working on this update, and implementing async really opened a **whole sea** of possible innovations and features I can implement in MadelineProto now:
+
+* Async file upload by url (1.5gb)
+* Get direct download url of any file (1.5gb)
+* TON (this is actually going to be a lot of fun)
+* group calls (the php-libtgvoip APIs are actually ready, I just need to wrap them in php-libtgvoip)
+* video calls (~)
+* native calls:
+With MadelineProto async, I can finally properly implement **native async phone calls in PHP**:  
+this will allow handling **phone calls on webhosts**!
+I already have some code I created a year ago for this backed up in a private gitlab repo :)
+* async iterators:
+I've been thinking of using AMPHP's [async iterator API](https://amphp.org/amp/iterators/) (after some modding obviously) to create async iterators for easily iterating over the messages of a group, and for doing other operations that would normally require using offsets:  
+
+```php
+foreach ($MadelineProto->getMessages('@group') as $message) {
+
+}
+```
+
+This shouldn't be too hard to implement, and with a proper (maybe separate OOP) API, it's going to be fun to make and use.  
+
+* `snake_case` => `CamelCase` conversion for all API methods:  
+Previously, MadelineProto's custom API methods (`get_info`, `download_to_dir`) used `snake_case`, which contrasted with the Telegram API methods (`sendMessage`), and is against PHP coding standards.  
+Soon, I plan to update MadelineProto's docs to only use `CamelCase` for method names.  
+
+The old method name will still be available after that; right now, you can already use both naming conventions for **all** MadelineProto methods:  
+
+```php
+$MadelineProto->get_pwr_chat('user'); // OK!
+$MadelineProto->getPwrChat('user'); // OK!
+```
+
+However, I recommend you now use the `CamelCase` version of methods.  
+
+* ArrayAccess on promises (to be able to do `yield $method()['result']` instead of `(yield $method)['result']`)
+* An `openChat` method, inspired by tdlib, to enable fetching updates from groups **you aren't a member of**
+* Add support for Telegram passport in 2FA and write some wrapper APIs
+* Write some simplified APIs for takeout (can be implemented using async iterators)
+* #MadelineProtoForNode async and lua async (the second can already be done now, the first is also pretty easy now that async is here :)))))
+* DNS over HTTPS everywhere
+* Parallelize some methods like the download method, or getPwrChat (upload is already fully parallelized)
+* Get sponsor of MTProxies
+* Optional max_id and min_id params in methods
+* #phase1 🇮🇷🇷🇺
+
+
+***
+
+To use MadelineProto 4.0 w/ async, you have to load the **latest version** of MadelineProto from the **master** branch by loading it through composer (`dev-master`) or with madeline.php:  
+```php
+<?php
+
+if (!file_exists('madeline.php')) {
+    copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+}
+define('MADELINE_BRANCH', '');
+include 'madeline.php';
+```
+
+In a few weeks I will set MadelineProto 4.0 **as default** with `madeline.php`: in the meantime, I **do not provide support** for the old version.  
+
+***
+
+
+
+* Write some docs for the useful get mime funcs
+* Figure out web file proxying (might be interesting)
+* Re-enable gzip in the write loop
+* no defer logs
+* startedLoop docs
 
 tell about restart
 tell about madeline.php loading in the same dire
+
+remind about using the define

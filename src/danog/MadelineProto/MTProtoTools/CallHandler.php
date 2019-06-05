@@ -111,6 +111,9 @@ trait CallHandler
         }
 
         if (is_array($args)) {
+            if (isset($args['multiple'])) {
+                $aargs['multiple'] = true;
+            }
             if (isset($args['message']) && is_string($args['message']) && mb_strlen($args['message'], 'UTF-8') > $this->config['message_length_max']) {
                 $args = yield $this->split_to_chunks_async($args);
                 $promises = [];
@@ -121,6 +124,10 @@ trait CallHandler
                 $new_aargs = $aargs;
                 $new_aargs['postpone'] = true;
                 unset($new_aargs['multiple']);
+
+                if (isset($args['multiple'])) {
+                    unset($args['multiple']);
+                }
                 foreach ($args as $single_args) {
                     $promises[] = $this->method_call_async_write($method, $single_args, $new_aargs);
                 }
