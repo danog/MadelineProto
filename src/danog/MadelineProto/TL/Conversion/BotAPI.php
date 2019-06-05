@@ -619,8 +619,8 @@ trait BotAPI
         }
         $total = 0;
         foreach ($multiple_args as $args) {
-            if (count($args['entities']) > 100) {
-                $total += count($args['entities']) - 100;
+            if (count($args['entities']) > $max_entity_length) {
+                $total += count($args['entities']) - $max_entity_length;
             }
             $c = 0;
             foreach ($args['entities'] as $entity) {
@@ -628,7 +628,7 @@ trait BotAPI
                     $c += strlen($entity['url']);
                 }
             }
-            if ($c >= 8110) {
+            if ($c >= $max_entity_size) {
                 $this->logger->logger('Entity size limit possibly exceeded, you may get an error indicating that the entities are too long. Reduce the number of entities and/or size of the URLs used.', Logger::FATAL_ERROR);
             }
         }
@@ -657,25 +657,39 @@ trait BotAPI
 
     public function html_fixtags($text)
     {
+        $diff = 0;
         preg_match_all('#(.*?)(<(a|b|\bstrong\b|\bem\b|i|\bcode\b|\bpre\b)[^>]*>)(.*?)(<\s*/\s*\3>)#is', $text, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
         if ($matches) {
             foreach ($matches as $match) {
                 if (trim($match[1][0]) != '') {
-                    $temp = substr($text, 0, $match[1][1]);
-                    $temp .= htmlentities($match[1][0]);
-                    $temp .= substr($text, $match[1][1] + strlen($match[1][0]));
+                    $mod = htmlentities($match[1][0]);
+
+                    $temp = substr($text, 0, $match[1][1] + $diff);
+                    $temp .= $mod;
+                    $temp .= substr($text, $match[1][1] + $diff + strlen($match[1][0]));
+
+                    $diff += strlen($mod) - strlen($match[1][0]);
+
                     $text = $temp;
                 }
-                $temp = substr($text, 0, $match[4][1]);
-                $temp .= htmlentities($match[4][0]);
-                $temp .= substr($text, $match[4][1] + strlen($match[4][0]));
+                $mod = htmlentities($match[4][0]);
+
+                $temp = substr($text, 0, $match[4][1] + $diff);
+                $temp .= $mod;
+                $temp .= substr($text, $match[4][1] + $diff + strlen($match[4][0]));
+
+                $diff += strlen($mod) - strlen($match[4][0]);
                 $text = $temp;
             }
+            $diff = 0;
             preg_match_all('#<a\s*href=("|\')(.+?)("|\')\s*>#is', $text, $matches, PREG_OFFSET_CAPTURE);
             foreach ($matches[2] as $match) {
-                $temp = substr($text, 0, $match[1]);
-                $temp .= htmlentities($match[0]);
-                $temp .= substr($text, $match[1] + strlen($match[0]));
+                $mod = htmlentities($match[0]);
+                $temp = substr($text, 0, $match[1] + $diff);
+                $temp .= $mod;
+                $temp .= substr($text, $match[1] + $diff + strlen($match[0]));
+
+                $diff += strlen($mod) - strlen($match[0]);
                 $text = $temp;
             }
 
