@@ -158,6 +158,7 @@ $file = yield $MadelineProto->file_get_contents('https://url');
 
 You can use this library to asynchronously download files from the web.  
 
+* ALL internal MadelineProto methods were converted to async automatically using [an automatic script](https://github.com/danog/MadelineProto/blob/master/asyncify.php): with some changes and conversion to use [php-parser](https://github.com/nikic/PHP-Parser), it can be used to automatically asyncify **any** script (will implement in a future version of MadelineProto).  
 * I created a custom async API to asynchronously construct objects:  
 This allows you to create multiple instances of MadelineProto **asynchronously**, because each instantiation will be done asynchronously.  
 
