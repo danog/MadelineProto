@@ -75,11 +75,12 @@ class FeedLoop extends ResumableSignalLoop
                 yield $this->parse($updates);
                 $updates = null;
             }
-            if ($this->parsedUpdates) {
-                foreach ($this->parsedUpdates as $update) {
+            while ($this->parsedUpdates) {
+                $parsedUpdates = $this->parsedUpdates;
+                $this->parsedUpdates = [];
+                foreach ($parsedUpdates as $update) {
                     yield $API->save_update_async($update);
                 }
-                $this->parsedUpdates = [];
                 $this->API->signalUpdate();
             }
         }

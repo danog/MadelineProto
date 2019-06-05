@@ -141,7 +141,6 @@ If your code still relies on the **old synchronous behaviour**, __don't worry__,
 However, old synchronous behaviour is deprecated, and I **highly recommend** you switch to async, due to the **huge performance** and **parallelism benefits**.  
 
 ***
-
 To implement async, I wrote loads of new async APIs in MadelineProto, as you may have seen above.  
 I used the **awesome** [amphp](https://amphp.org) async framework as base, on which to build the new MadelineProto APIs.  
 I heavily modified amphp coroutines and wrapped [all of the AMPHP event loop methods](https://docs.madelineproto.xyz/docs/ASYNC.html#madelineproto-and-amphp-async-apis) to add native support for yielding generators.  
@@ -394,3 +393,6 @@ tell about restart
 tell about madeline.php loading in the same dire
 
 remind about using the define
+
+fix trimming newlines in beginning
+weird splitting mmm ```
