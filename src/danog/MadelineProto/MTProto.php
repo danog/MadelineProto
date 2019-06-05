@@ -906,7 +906,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function startUpdateSystem($anyway = false)
     {
-        if ($this->asyncInitPromise || !$anyway) {
+        if ($this->asyncInitPromise && !$anyway) {
             $this->logger("Not starting update system");
             return;
         }
