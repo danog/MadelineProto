@@ -12,7 +12,7 @@
         "php": ">=7.1.0",
         "danog/primemodule": "^1.0.3",
         "danog/magicalserializer": "^1.0",
-        "danog/phpseclib": "dev-master#27370df as 2.0.15",
+        "danog/phpseclib": "master",
         "vlucas/phpdotenv": "^3",
         "erusev/parsedown": "^1.6",
         "rollbar/rollbar": "dev-master",
