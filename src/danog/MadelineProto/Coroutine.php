@@ -41,7 +41,7 @@ use Amp\Success;
  * value is sent into the generator, while a failure reason is thrown into the generator. Using a coroutine,
  * asynchronous code can be written without callbacks and be structured like synchronous code.
  */
-final class Coroutine implements Promise
+final class Coroutine implements Promise, \ArrayAccess
 {
     use Internal\Placeholder;
     /** @var \Generator */
@@ -180,5 +180,30 @@ final class Coroutine implements Promise
             }
         };
         $yielded->onResolve($this->onResolve);
+    }
+
+    public function offsetExists($offset): bool
+    {
+        throw new Exception('Not supported!');
+    }
+    public function offsetGet($offset)
+    {
+        return Tools::call((function () use ($offset) {
+            return (yield $this)[$offset];
+        })());
+    }
+    public function offsetSet($offset, $value)
+    {
+        return Tools::call((function () use ($offset, $value) {
+            $result = yield $this;
+            return $result[$offset] = value;
+        })());
+    }
+    public function offsetUnset($offset)
+    {
+        return Tools::call((function () use ($offset) {
+            $result = yield $this;
+            unset($result[$offset]);
+        })());
     }
 }

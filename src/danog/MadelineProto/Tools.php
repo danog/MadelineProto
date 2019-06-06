@@ -38,7 +38,7 @@ use function Amp\ByteStream\getOutputBufferStream;
  */
 trait Tools
 {
-    public function gen_vector_hash($ints)
+    public static function gen_vector_hash($ints)
     {
         //sort($ints, SORT_NUMERIC);
         if (\danog\MadelineProto\Magic::$bigint) {
@@ -46,7 +46,7 @@ trait Tools
             foreach ($ints as $int) {
                 $hash = $hash->multiply(\danog\MadelineProto\Magic::$twozerotwosixone)->add(\danog\MadelineProto\Magic::$zeroeight)->add(new \phpseclib\Math\BigInteger($int))->divide(\danog\MadelineProto\Magic::$zeroeight)[1];
             }
-            $hash = $this->unpack_signed_int(strrev(str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
+            $hash = self::unpack_signed_int(strrev(str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
         } else {
             $hash = 0;
             foreach ($ints as $int) {
@@ -57,7 +57,7 @@ trait Tools
         return $hash;
     }
 
-    public function random_int($modulus = false)
+    public static function random_int($modulus = false)
     {
         if ($modulus === false) {
             $modulus = PHP_INT_MAX;
@@ -77,15 +77,15 @@ trait Tools
         }
 
         if (Magic::$bigint) {
-            $number = $this->unpack_signed_int($this->random(4));
+            $number = self::unpack_signed_int(self::random(4));
         } else {
-            $number = $this->unpack_signed_long($this->random(8));
+            $number = self::unpack_signed_long(self::random(8));
         }
 
         return ($number & PHP_INT_MAX) % $modulus;
     }
 
-    public function random($length)
+    public static function random($length)
     {
         return $length === 0 ? '' : \phpseclib\Crypt\Random::string($length);
     }
@@ -94,14 +94,14 @@ trait Tools
      * posmod(numeric,numeric) : numeric
      * Works just like the % (modulus) operator, only returns always a postive number.
      */
-    public function posmod($a, $b)
+    public static function posmod($a, $b)
     {
         $resto = $a % $b;
 
         return $resto < 0 ? $resto + abs($b) : $resto;
     }
 
-    public function unpack_signed_int($value)
+    public static function unpack_signed_int($value)
     {
         if (strlen($value) !== 4) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_4']);
@@ -110,7 +110,7 @@ trait Tools
         return unpack('l', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 
-    public function unpack_signed_long($value)
+    public static function unpack_signed_long($value)
     {
         if (strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
@@ -119,7 +119,7 @@ trait Tools
         return unpack('q', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 
-    public function pack_signed_int($value)
+    public static function pack_signed_int($value)
     {
         if ($value > 2147483647) {
             throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_2147483647'], $value));
@@ -132,7 +132,7 @@ trait Tools
         return \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($res) : $res;
     }
 
-    public function pack_signed_long($value)
+    public static function pack_signed_long($value)
     {
         if ($value > 9223372036854775807) {
             throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_9223372036854775807'], $value));
@@ -140,12 +140,12 @@ trait Tools
         if ($value < -9.223372036854776E+18) {
             throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_9223372036854775808'], $value));
         }
-        $res = \danog\MadelineProto\Magic::$bigint ? $this->pack_signed_int($value)."\0\0\0\0" : (\danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value));
+        $res = \danog\MadelineProto\Magic::$bigint ? self::pack_signed_int($value)."\0\0\0\0" : (\danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value));
 
         return $res;
     }
 
-    public function pack_unsigned_int($value)
+    public static function pack_unsigned_int($value)
     {
         if ($value > 4294967295) {
             throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_4294967296'], $value));
@@ -157,7 +157,7 @@ trait Tools
         return pack('V', $value);
     }
 
-    public function pack_double($value)
+    public static function pack_double($value)
     {
         $res = pack('d', $value);
         if (strlen($res) !== 8) {
@@ -167,7 +167,7 @@ trait Tools
         return \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($res) : $res;
     }
 
-    public function unpack_double($value)
+    public static function unpack_double($value)
     {
         if (strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
@@ -176,7 +176,7 @@ trait Tools
         return unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 
-    public function wait($promise)
+    public static function wait($promise)
     {
         if ($promise instanceof \Generator) {
             $promise = new Coroutine($promise);
@@ -209,48 +209,48 @@ trait Tools
         return $value;
     }
 
-    public function all($promises)
+    public static function all($promises)
     {
         foreach ($promises as &$promise) {
-            $promise = $this->call($promise);
+            $promise = self::call($promise);
         }
 
         return all($promises);
     }
 
-    public function any($promises)
+    public static function any($promises)
     {
         foreach ($promises as &$promise) {
-            $promise = $this->call($promise);
+            $promise = self::call($promise);
         }
 
         return any($promises);
     }
 
-    public function some($promises)
+    public static function some($promises)
     {
         foreach ($promises as &$promise) {
-            $promise = $this->call($promise);
+            $promise = self::call($promise);
         }
 
         return some($promises);
     }
 
-    public function first($promises)
+    public static function first($promises)
     {
         foreach ($promises as &$promise) {
-            $promise = $this->call($promise);
+            $promise = self::call($promise);
         }
 
         return first($promises);
     }
 
-    public function timeout($promise, $timeout)
+    public static function timeout($promise, $timeout)
     {
-        return timeout($this->call($promise), $timeout);
+        return timeout(self::call($promise), $timeout);
     }
 
-    public function call($promise)
+    public static function call($promise)
     {
         if ($promise instanceof \Generator) {
             $promise = new Coroutine($promise);
@@ -261,7 +261,7 @@ trait Tools
         return $promise;
     }
 
-    public function callFork($promise, $actual = null, $file = '')
+    public static function callFork($promise, $actual = null, $file = '')
     {
         if ($actual) {
             $promise = $actual;
@@ -281,7 +281,7 @@ trait Tools
         if ($promise instanceof Promise) {
             $promise->onResolve(function ($e, $res) use ($file) {
                 if ($e) {
-                    $this->rethrow($e, $file);
+                    self::rethrow($e, $file);
                 }
             });
         }
@@ -289,39 +289,40 @@ trait Tools
         return $promise;
     }
 
-    public function callForkDefer($promise)
+    public static function callForkDefer($promise)
     {
-        Loop::defer([$this, 'callFork'], $promise);
+        Loop::defer([__CLASS__, 'callFork'], $promise);
     }
 
-    public function rethrow($e, $file = '')
+    public static function rethrow($e, $file = '')
     {
-        $logger = isset($this->logger) ? $this->logger : Logger::$default;
+        $zis = isset($this) ? $this : null;
+        $logger = isset($zis->logger) ? $zis->logger : Logger::$default;
         if ($file) {
             $file = " started @ $file";
         }
         $logger->logger("Got the following exception within a forked strand$file, trying to rethrow");
         if ($e->getMessage() === "Cannot get return value of a generator that hasn't returned") {
             $logger->logger("Well you know, this might actually not be the actual exception, scroll up in the logs to see the actual exception");
-            if (!isset($this->destructing)) Promise\rethrow(new Failure($e));
+            if (!isset($zis->destructing)) Promise\rethrow(new Failure($e));
         } else {
             $logger->logger($e);
             Promise\rethrow(new Failure($e));
         }
     }
 
-    public function after($a, $b)
+    public static function after($a, $b)
     {
-        $a = $this->call($a());
+        $a = self::call($a());
         $deferred = new Deferred();
-        $a->onResolve(function ($e, $res) use ($b, $deferred) {
+        $a->onResolve(static function ($e, $res) use ($b, $deferred) {
             if ($e) {
-                return $this->rethrow($e);
+                return self::rethrow($e);
             }
-            $b = $this->call($b());
+            $b = self::call($b());
             $b->onResolve(static function ($e, $res) use ($deferred) {
                 if ($e) {
-                    return $this->rethrow($e);
+                    return self::rethrow($e);
                 }
                 $deferred->resolve($res);
             });
@@ -330,15 +331,15 @@ trait Tools
         return $deferred->promise();
     }
 
-    public function sleep($time)
+    public static function sleep($time)
     {
         return new \Amp\Delayed($time * 1000);
     }
-    public function readLine($prompt = '')
+    public static function readLine($prompt = '')
     {
-        return $this->call($this->readLineAsync($prompt));
+        return self::call(self::readLineAsync($prompt));
     }
-    public function readLineAsync($prompt = '')
+    public static function readLineAsync($prompt = '')
     {
         $stdin = getStdin();
         $stdout = getStdout();
@@ -355,11 +356,11 @@ trait Tools
         return array_shift($lines);
     }
 
-    public function echo($string)
+    public static function echo($string)
     {
         return getOutputBufferStream()->write($string);
     }
-    public function is_array_or_alike($var)
+    public static function is_array_or_alike($var)
     {
         return is_array($var) ||
             ($var instanceof ArrayAccess &&
