@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Loop\Update;
 use Amp\Loop;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\Exception;
 
 /**
  * Update loop.
@@ -83,6 +84,13 @@ class UpdateLoop extends ResumableSignalLoop
                         $difference = yield $this->API->method_call_async_read('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $this->API->datacenter->curdc]);
                     } catch (RPCErrorException $e) {
                         if (in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN'])) {
+                            $feeder->signal(true);
+                            $API->logger->logger("Channel private, exiting $this");
+
+                            return true;
+                        }
+                    } catch (Exception $e) {
+                        if (in_array($e->getMessage(), ['This peer is not present in the internal peer database'])) {
                             $feeder->signal(true);
                             $API->logger->logger("Channel private, exiting $this");
 
