@@ -38,6 +38,7 @@ class PasswordCalculator
     private $srp_B;
     private $srp_BForHash;
     private $srp_id;
+    public $logger;
 
     // This is needed do not remove this
     public function __construct($logger) { $this->logger = $logger; }

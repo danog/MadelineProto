@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\Wrappers;
 
 use Amp\Promise;
+use danog\MadelineProto\Shutdown;
 
 /**
  * Manages logging in and out.
@@ -63,7 +64,7 @@ trait Loop
             }
             $this->logger->logger($needs_restart ? 'Will self-restart' : 'Will not self-restart');
 
-            $backtrace = debug_backtrace(0);
+            $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             $lockfile = dirname(end($backtrace)['file']).'/bot.lock';
             unset($backtrace);
             $try_locking = true;
@@ -91,15 +92,17 @@ trait Loop
                 }
             }
 
-            register_shutdown_function(function () use ($lock, $needs_restart) {
+            Shutdown::addCallback(static function () use ($lock) {
                 flock($lock, LOCK_UN);
                 fclose($lock);
-                if ($needs_restart) {
+            });
+            if ($needs_restart) {
+                Shutdown::addCallback(static function () {
                     $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
                     fwrite($a, $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n");
                     $this->logger->logger('Self-restarted');
-                }
-            });
+                }, 'restarter');
+            }
 
             $this->closeConnection('Bot was started');
         }

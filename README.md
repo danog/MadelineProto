@@ -98,6 +98,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
   * [Composer from scratch](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-scratch)
   * [Composer from existing project](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-existing-project)
 * [Handling updates (new messages)](https://docs.madelineproto.xyz/docs/UPDATES.html)
+  * [Self-restart on webhosts](https://docs.madelineproto.xyz/docs/UPDATES.html#self-restart-on-webhosts)
   * [Async Event driven](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven)
   * [Multi-account: Async Combined Event driven update handling](https://docs.madelineproto.xyz/docs/UPDATES.html#async-combined-event-driven)
   * [Async Callback](https://docs.madelineproto.xyz/docs/UPDATES.html#async-callback)

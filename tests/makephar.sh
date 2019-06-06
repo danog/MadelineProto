@@ -40,6 +40,7 @@ echo '{
 }' > composer.json
 composer clearcache
 composer update
+cp -a $madelinePath/src vendor/danog/madelineproto/
 cd ..
 
 cp -a phar7 phar5
