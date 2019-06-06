@@ -12,7 +12,7 @@
         "php": ">=7.1.0",
         "danog/primemodule": "^1.0.3",
         "danog/magicalserializer": "^1.0",
-        "phpseclib/phpseclib": "dev-master#27370df as 2.0.15",
+        "danog/phpseclib": "dev-master#27370df as 2.0.15",
         "vlucas/phpdotenv": "^3",
         "erusev/parsedown": "^1.6",
         "rollbar/rollbar": "dev-master",
@@ -28,6 +28,20 @@
         "amphp/uri": "^0.1.4",
         "amphp/byte-stream": "1.6.0"
     },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "danog/phpseclib",
+                "version":"master",
+                "source": {
+                    "url": "https://github.com/danog/phpseclib.git",
+                    "type": "git",
+                    "reference":"master"
+                }
+            }
+        }
+    ],
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1",
         "ennexa/amp-update-cache": "dev-master",
