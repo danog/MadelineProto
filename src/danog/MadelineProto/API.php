@@ -207,7 +207,7 @@ class API extends APIFactory
 
     public function APIFactory()
     {
-        if ($this->API) {
+        if ($this->API && !$this->API->asyncInitPromise) {
             foreach ($this->API->get_method_namespaces() as $namespace) {
                 $this->{$namespace} = new APIFactory($namespace, $this->API, $this->async);
             }
