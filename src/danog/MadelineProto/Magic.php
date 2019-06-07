@@ -130,6 +130,9 @@ class Magic
                 self::$can_getcwd = true;
             } catch (\danog\MadelineProto\Exception $e) {
             }
+            if (function_exists('\pcntl_async_signals')) {
+                pcntl_async_signals(true);
+            }
             self::$inited = true;
         }
     }

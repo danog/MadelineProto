@@ -169,6 +169,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!extension_loaded('xml')) {
             throw new Exception(['extension', 'xml']);
         }
+        if (!extension_loaded('fileinfo')) {
+            throw new Exception(['extension', 'fileinfo']);
+        }
         if (!extension_loaded('json')) {
             throw new Exception(['extension', 'json']);
         }
@@ -278,6 +281,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         if (!extension_loaded('xml')) {
             throw new Exception(['extension', 'xml']);
+        }
+        if (!extension_loaded('fileinfo')) {
+            throw new Exception(['extension', 'fileinfo']);
         }
         if (!extension_loaded('mbstring')) {
             throw new Exception(['extension', 'mbstring']);

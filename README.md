@@ -65,6 +65,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
       * [Async in callback handler](https://docs.madelineproto.xyz/docs/ASYNC.html#async-in-callback-handler)
       * [Wrapped async](https://docs.madelineproto.xyz/docs/ASYNC.html#wrapped-async)
       * [Multiple async](https://docs.madelineproto.xyz/docs/ASYNC.html#multiple-async)
+      * [ArrayAccess async](https://docs.madelineproto.xyz/docs/ASYNC.html#arrayaccess-async)
       * [Ignored async](https://docs.madelineproto.xyz/docs/ASYNC.html#ignored-async)
       * [Blocking async](https://docs.madelineproto.xyz/docs/ASYNC.html#blocking-async)
     * [MadelineProto and AMPHP async APIs](https://docs.madelineproto.xyz/docs/ASYNC.html#madelineproto-and-amphp-async-apis)

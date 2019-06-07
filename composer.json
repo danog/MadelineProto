@@ -19,6 +19,7 @@
         "ext-mbstring": "*",
         "ext-json": "*",
         "ext-xml": "*",
+        "ext-fileinfo": "*",
         "amphp/amp": "^2.0",
         "amphp/socket": "^0.10.11",
         "amphp/websocket": "dev-master",

@@ -228,20 +228,11 @@ class CombinedAPI
         if (is_callable($max_forks)) {
             return $this->wait($max_forks());
         }
-        if (php_sapi_name() !== 'cli') {
-            try {
-                set_time_limit(-1);
-            } catch (\danog\MadelineProto\Exception $e) {
-                register_shutdown_function(function () {
-                    \danog\MadelineProto\Logger::log(['Restarting script...']);
-                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
-                    fwrite($a, $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n");
-                });
-            }
-        }
 
         $loops = [];
         foreach ($this->instances as $path => $instance) {
+            $this->wait($instance->initAsync());
+            $this->wait($instance->API->initAsync());
             if ($instance->API->authorized !== MTProto::LOGGED_IN) {
                 continue;
             }
