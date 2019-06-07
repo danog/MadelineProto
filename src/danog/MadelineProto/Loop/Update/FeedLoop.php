@@ -220,6 +220,7 @@ class FeedLoop extends ResumableSignalLoop
 
                     $this->API->logger->logger("Not enough data: for message update $log, getting difference...", \danog\MadelineProto\Logger::VERBOSE);
                     $update = ['_' => 'updateChannelTooLong'];
+                    if ($channelId && !yield $this->API->peer_isset_async($this->API->to_supergroup($channelId))) $channelId = false;
                 }
                 break;
             default:

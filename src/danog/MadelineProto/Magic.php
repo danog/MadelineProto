@@ -132,8 +132,10 @@ class Magic
             } catch (\danog\MadelineProto\Exception $e) {
             }
             // Even an empty handler is enough to catch ctrl+c
-            Loop::onSignal(SIGINT, static function () { die(); });
-            Loop::onSignal(SIGTERM, static function () { die(); });
+            if (defined('SIGINT')) {
+                Loop::onSignal(SIGINT, static function () { die(); });
+                Loop::onSignal(SIGTERM, static function () { die(); });
+            }
             self::$inited = true;
         }
     }
