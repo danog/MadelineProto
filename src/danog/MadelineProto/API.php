@@ -173,8 +173,12 @@ class API extends APIFactory
         if ($this->asyncInitPromise) {
             $this->init();
         }
-        $this->API->logger('Shutting down MadelineProto (normally or due to an exception, idk)');
-        $this->API->destructing = true;
+        if ($this->API) {
+            $this->API->logger('Shutting down MadelineProto (normally or due to an exception, idk)');
+            $this->API->destructing = true;
+        } else {
+            Logger::log('Shutting down MadelineProto (normally or due to an exception, idk)');
+        }
         $this->destructing = true;
         $this->wait($this->serialize());
         //restore_error_handler();

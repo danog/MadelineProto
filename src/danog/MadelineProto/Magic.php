@@ -20,6 +20,7 @@
 namespace danog\MadelineProto;
 
 use function Amp\Promise\wait;
+use Amp\Loop;
 
 class Magic
 {
@@ -130,9 +131,9 @@ class Magic
                 self::$can_getcwd = true;
             } catch (\danog\MadelineProto\Exception $e) {
             }
-            if (function_exists('\pcntl_async_signals')) {
-                pcntl_async_signals(true);
-            }
+            // Even an empty handler is enough to catch ctrl+c
+            Loop::onSignal(SIGINT, static function () { die(); });
+            Loop::onSignal(SIGTERM, static function () { die(); });
             self::$inited = true;
         }
     }
