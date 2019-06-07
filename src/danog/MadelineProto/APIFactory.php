@@ -160,6 +160,10 @@ class APIFactory extends AsyncConstruct
         if (Magic::is_fork() && !Magic::$processed_fork) {
             throw new Exception('Forking not supported, use async logic, instead: https://docs.madelineproto.xyz/docs/ASYNC.html');
         }
+        if ($this->API->asyncInitPromise) {
+            yield $this->API->initAsync();
+            $this->API->logger->logger('Finished init asynchronously');
+        }
         if (isset($this->session) && !is_null($this->session) && time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
             Logger::log("Didn't serialize in a while, doing that now...");
             $this->serialize($this->session);

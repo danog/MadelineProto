@@ -308,8 +308,9 @@ trait ResponseHandler
         if (isset($request['promise']) && is_object($request['promise'])) {
             Loop::defer(function () use (&$request, $data) {
                 if (isset($request['promise'])) {
-                    $request['promise']->fail($data);
+                    $promise = $request['promise'];
                     unset($request['promise']);
+                    $promise->fail($data);
                 } else {
                     $this->logger->logger('Rejecting: already got response for '.(isset($request['_']) ? $request['_'] : '-'));
                     $this->logger->logger("Rejecting: $data");
@@ -572,8 +573,9 @@ trait ResponseHandler
                     $response = yield $this->MTProto_to_botAPI_async($response);
                 }
                 if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise'])) { // This should not happen but happens, should debug
-                    $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']->resolve($response);
+                    $promise = $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise'];
                     unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']);
+                    $promise->resolve($response);
                 }
             }
         )());

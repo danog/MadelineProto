@@ -53,7 +53,8 @@ class WriteLoop extends ResumableSignalLoop
 
         $please_wait = false;
         while (true) {
-            if (empty($connection->pending_outgoing) || $please_wait) {
+            while (empty($connection->pending_outgoing) || $please_wait) {
+                $please_wait = false;
                 $API->logger->logger("Waiting in $this", Logger::ULTRA_VERBOSE);
                 if (yield $this->waitSignal($this->pause())) {
                     return;
@@ -94,12 +95,10 @@ class WriteLoop extends ResumableSignalLoop
                 }
                 $skipped_all = false;
 
-                $body = $message['serialized_body'];
-
                 $API->logger->logger("Sending {$message['_']} as unencrypted message to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $connection->generate_message_id();
-                $length = strlen($body);
+                $length = strlen($message['serialized_body']);
 
                 $pad_length = -$length & 15;
                 $pad_length += 16 * $this->random_int($modulus = 16);
@@ -107,7 +106,7 @@ class WriteLoop extends ResumableSignalLoop
                 $pad = $this->random($pad_length);
                 $buffer = yield $connection->stream->getWriteBuffer(8 + 8 + 4 + $pad_length + $length);
 
-                yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int($length).$body.$pad);
+                yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int($length).$message['serialized_body'].$pad);
 
                 //var_dump("plain ".bin2hex($message_id));
                 $connection->http_req_count++;
@@ -184,14 +183,18 @@ class WriteLoop extends ResumableSignalLoop
                     $skipped = true;
                     continue;
                 }
-
-                $body = $message['serialized_body'];
+                $body_length = strlen($message['serialized_body']);
+                $actual_length = $body_length + 32;
+                if ($total_length && $total_length + $actual_length > 32760 || $count >= 1020) {
+                    $API->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::NOTICE);
+                    break;
+                }
 
                 $message_id = isset($message['msg_id']) ? $message['msg_id'] : $connection->generate_message_id($datacenter);
 
                 $API->logger->logger("Sending {$message['_']} as encrypted message to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
-                $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $body, 'seqno' => $connection->generate_out_seq_no($message['content_related'])];
+                $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $message['serialized_body'], 'seqno' => $connection->generate_out_seq_no($message['content_related'])];
 
                 if (isset($message['method']) && $message['method'] && $message['_'] !== 'http_wait') {
                     if ((!isset($connection->temp_auth_key['connection_inited']) || $connection->temp_auth_key['connection_inited'] === false) && $message['_'] !== 'auth.bindTempAuthKey') {
@@ -241,25 +244,22 @@ class WriteLoop extends ResumableSignalLoop
                     }
                 }
                 $body_length = strlen($MTmessage['body']);
-                if ($total_length && $total_length + $body_length + 32 > 655360) {
+                $actual_length = $body_length + 32;
+                if ($total_length && $total_length + $actual_length > 32760) {
                     $API->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::NOTICE);
                     break;
                 }
                 $count++;
-                $total_length += $body_length + 32;
+                $total_length += $actual_length;
 
                 $MTmessage['bytes'] = $body_length;
                 $messages[] = $MTmessage;
                 $keys[$k] = $message_id;
-
-                if ($total_length && $total_length + 32 > 655360) {
-                    $API->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::NOTICE);
-                    break;
-                }
             }
+            $MTmessage = null;
 
-            if (count($messages) > 1) {
-                $API->logger->logger("Wrapping in msg_container as encrypted message for DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            if ($count > 1) {
+                $API->logger->logger("Wrapping in msg_container ($count messages of total size $total_length) as encrypted message for DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 $message_id = $connection->generate_message_id($datacenter);
                 $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msg_container', 'container' => array_values($keys), 'content_related' => false, 'method' => false, 'unencrypted' => false];
@@ -272,7 +272,7 @@ class WriteLoop extends ResumableSignalLoop
 
                 $message_data_length = strlen($message_data);
                 $seq_no = $connection->generate_out_seq_no(false);
-            } elseif (count($messages)) {
+            } elseif ($count) {
                 $message = $messages[0];
                 $message_data = $message['body'];
                 $message_data_length = $message['bytes'];

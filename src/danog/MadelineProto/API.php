@@ -48,6 +48,11 @@ class API extends APIFactory
     public function __construct_async($params, $settings, $deferred)
     {
         if (is_string($params)) {
+            if (!\danog\MadelineProto\Logger::$default) {
+                if (!isset($settings['logger']['logger_param'])) $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
+                if (!isset($settings['logger']['logger'])) $settings['logger']['logger'] = php_sapi_name() === 'cli' ? 3 : 2;
+                \danog\MadelineProto\Logger::constructor($settings['logger']['logger'], $settings['logger']['logger_param'], '', isset($settings['logger']['logger_level']) ? $settings['logger']['logger_level'] : Logger::VERBOSE, isset($settings['logger']['max_size']) ? $settings['logger']['max_size'] : 100 * 1024 * 1024);
+            }
             $realpaths = Serialization::realpaths($params);
             $this->session = $realpaths['file'];
 
@@ -85,7 +90,6 @@ class API extends APIFactory
                     if (defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
                         throw $e;
                     }
-
                     class_exists('\\Volatile');
                     $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                     foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
@@ -96,6 +100,9 @@ class API extends APIFactory
                         $tounserialize = str_replace('phpseclib\\Math\\BigInteger', 'phpseclib\\Math\\BigIntegor', $tounserialize);
                     }
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
+                } catch (\Throwable $e) {
+                    Logger::log((string) $e, Logger::ERROR);
+                    throw $e;
                 }
                 if ($unserialized instanceof \danog\PlaceHolder) {
                     $unserialized = \danog\Serialization::unserialize($tounserialize);

@@ -507,6 +507,7 @@ trait PeerHandler
                 $res['type'] = $constructor['megagroup'] ? 'supergroup' : 'channel';
                 break;
             case 'channelForbidden':
+                throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
                 throw new \danog\MadelineProto\RPCErrorException('CHAT_FORBIDDEN');
             default:
                 throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($constructor, true));

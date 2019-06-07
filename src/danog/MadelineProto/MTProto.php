@@ -924,13 +924,14 @@ class MTProto extends AsyncConstruct implements TLCallback
             if (!isset($this->updaters[$channelId])) {
                 $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
             }
-            if ($this->feeders[$channelId]->start()) {
+            if ($this->feeders[$channelId]->start() && isset($this->feeders[$channelId])) {
                 $this->feeders[$channelId]->resume();
             }
-            if ($this->updaters[$channelId]->start()) {
+            if ($this->updaters[$channelId]->start() && isset($this->updaters[$channelId])) {
                 $this->updaters[$channelId]->resume();
             }
         }
+        foreach ($this->datacenter->sockets as $datacenter) { $datacenter->writer->resume(); }
         if ($this->seqUpdater->start()) {
             $this->seqUpdater->resume();
         }
