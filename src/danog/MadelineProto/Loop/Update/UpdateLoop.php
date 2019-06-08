@@ -93,17 +93,17 @@ class UpdateLoop extends ResumableSignalLoop
 
                             return true;
                         }
+                        throw $e;
                     } catch (Exception $e) {
                         if (in_array($e->getMessage(), ['This peer is not present in the internal peer database'])) {
                             $feeder->signal(true);
-                            //$API->getChannelStates()->remove($this->channelId);
+                            $API->getChannelStates()->remove($this->channelId);
                             unset($API->updaters[$this->channelId]);
                             unset($API->feeders[$this->channelId]);
                             $API->logger->logger("Channel private, exiting $this");
 
                             return true;
                         }
-
                         throw $e;
                     }
                     if (isset($difference['timeout'])) {

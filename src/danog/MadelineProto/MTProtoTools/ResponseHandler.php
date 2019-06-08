@@ -296,6 +296,7 @@ trait ResponseHandler
                     break;
             }
         }
+        if ($this->datacenter->sockets[$datacenter]->pending_outgoing) 
         $this->datacenter->sockets[$datacenter]->writer->resume();
 
         //$this->n--;
@@ -359,6 +360,7 @@ trait ResponseHandler
                     }
                     switch ($response['error_code']) {
                         case 500:
+                        case -500:
                             if ($response['error_message'] === 'MSG_WAIT_FAILED') {
                                 $this->datacenter->sockets[$datacenter]->call_queue[$request['queue']] = [];
                                 $this->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
