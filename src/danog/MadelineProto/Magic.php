@@ -58,6 +58,8 @@ class Magic
 
     public static function class_exists()
     {
+        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
+        //set_exception_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
         if (!self::$inited) {
             self::$has_thread = class_exists('\\Thread') && method_exists('\\Thread', 'getCurrentThread');
             self::$BIG_ENDIAN = pack('L', 1) === pack('N', 1);
@@ -133,8 +135,9 @@ class Magic
             }
             // Even an empty handler is enough to catch ctrl+c
             if (defined('SIGINT')) {
-                Loop::onSignal(SIGINT, static function () { die(); });
-                Loop::onSignal(SIGTERM, static function () { die(); });
+                if (function_exists('pcntl_async_signals')) pcntl_async_signals(true);
+                Loop::onSignal(SIGINT, static function () { Logger::log('Got sigint', Logger::FATAL_ERROR); die(); });
+                Loop::onSignal(SIGTERM, static function () { Logger::log('Got sigterm', Logger::FATAL_ERROR); die(); });
             }
             self::$inited = true;
         }

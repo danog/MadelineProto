@@ -233,9 +233,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         return ['supportUser', 'referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'dh_config', 'chats', 'last_stored', 'qres', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
     }
 
-    public function logger(...$params)
+    public function logger($param, $level = Logger::NOTICE, $file = null)
     {
-        return $this->logger->logger(...$params);
+        if ($file === null) $file = basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
+
+        return $this->logger->logger($param, $level, $file);
     }
     public function isAltervista()
     {
@@ -460,9 +462,26 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->phoneConfigWatcherId) {
             Loop::cancel($this->phoneConfigWatcherId);
         }
-        if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread())) {
-            return;
+        $channelIds = [];
+        foreach ($this->channels_state->get() as $state) {
+            $channelIds []= $state->getChannel();
         }
+        sort($channelIds);
+        foreach ($channelIds as $channelId) {
+            if (isset($this->feeders[$channelId])) {
+                $this->feeders[$channelId]->signal(true);
+            }
+            if (!isset($this->updaters[$channelId])) {
+                $this->updaters[$channelId]->signal(true);
+            }
+        }
+        if (isset($this->seqUpdater)) {
+            $this->seqUpdater->signal(true);
+        }
+        foreach ($this->datacenter->sockets as $datacenter) {
+            $datacenter->disconnect();
+        }
+        $this->logger("Successfully destroyed MadelineProto");
     }
 
     public function serialize()

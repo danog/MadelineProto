@@ -220,11 +220,11 @@ class FeedLoop extends ResumableSignalLoop
 
                     $this->API->logger->logger("Not enough data: for message update $log, getting difference...", \danog\MadelineProto\Logger::VERBOSE);
                     $update = ['_' => 'updateChannelTooLong'];
-                    if ($channelId && !yield $this->API->peer_isset_async($this->API->to_supergroup($channelId))) $channelId = false;
+                    if ($channelId && $to) $channelId = false;
                 }
                 break;
             default:
-                if ($channelId !== false && !yield $this->API->peer_isset_async($this->API->to_supergroup($channelId))) {
+                if ($channelId && !yield $this->API->peer_isset_async($this->API->to_supergroup($channelId))) {
                     $this->API->logger->logger('Skipping update, I do not have the channel id '.$channelId, \danog\MadelineProto\Logger::ERROR);
 
                     return;
@@ -232,7 +232,11 @@ class FeedLoop extends ResumableSignalLoop
                 break;
         }
         if ($channelId !== $this->channelId) {
-            return yield $this->API->feeders[$channelId]->feedSingle($update);
+            if (isset($this->API->feeders[$channelId])) {
+                return yield $this->API->feeders[$channelId]->feedSingle($update);
+            } else if ($this->channelId) {
+                return yield $this->API->feeders[false]->feedSingle($update);
+            }
         }
 
         $this->API->logger->logger('Was fed an update of type '.$update['_']." in $this...", \danog\MadelineProto\Logger::VERBOSE);

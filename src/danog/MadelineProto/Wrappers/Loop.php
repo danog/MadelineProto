@@ -51,6 +51,7 @@ trait Loop
 
             return false;
         }
+        $this->logger->logger('Starting event loop');
         if (!is_callable($this->loop_callback) || (is_array($this->loop_callback) && $this->loop_callback[1] === 'onLoop' && !method_exists(...$this->loop_callback))) {
             $this->loop_callback = null;
         }

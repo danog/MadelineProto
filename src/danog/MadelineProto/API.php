@@ -36,7 +36,6 @@ class API extends APIFactory
     public function __magic_construct($params = [], $settings = [])
     {
         Magic::class_exists();
-        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         $deferred = new Deferred();
         $this->asyncAPIPromise = $deferred->promise();
         $this->asyncAPIPromise->onResolve(function () {
@@ -131,6 +130,7 @@ class API extends APIFactory
                 if (isset($unserialized->API)) {
                     $this->API = $unserialized->API;
                     $this->APIFactory();
+                    $unserialized->donotlog = true;
                     $deferred->resolve();
                     yield $this->API->initAsync();
                     $this->APIFactory();
@@ -187,14 +187,16 @@ class API extends APIFactory
         if ($this->asyncInitPromise) {
             $this->init();
         }
-        if ($this->API) {
-            $this->API->logger('Shutting down MadelineProto (normally or due to an exception, idk)');
-            $this->API->destructing = true;
-        } else {
-            Logger::log('Shutting down MadelineProto (normally or due to an exception, idk)');
+        if (!isset($this->donotlog)) {
+            if ($this->API) {
+                $this->API->logger('Shutting down MadelineProto (normally or due to an exception, idk)');
+                $this->API->destructing = true;
+            } else {
+                Logger::log('Shutting down MadelineProto (normally or due to an exception, idk)');
+            }
+            $this->destructing = true;
+            $this->wait($this->serialize());
         }
-        $this->destructing = true;
-        $this->wait($this->serialize());
         //restore_error_handler();
     }
 

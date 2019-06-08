@@ -86,4 +86,14 @@ class Exception extends \Exception
 
         throw new self($errstr, $errno, null, $errfile, $errline);
     }
+
+    /**
+     * ExceptionErrorHandler.
+     *
+     * Error handler
+     */
+    public static function ExceptionHandler($exception)
+    {
+        Logger::log($exception, Logger::FATAL_ERROR);
+    }
 }

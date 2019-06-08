@@ -166,8 +166,8 @@ class Logger
                     $param = Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
                     if ($this->stdout->write($param) instanceof Failure) {
                         switch ($this->mode) {
-                            case 3: echo "(closed) $param"; break;
-                            case 2: file_put_contents($this->optional, "(closed) $param", FILE_APPEND); break;
+                            case 3: echo $param; break;
+                            case 2: file_put_contents($this->optional, $param, FILE_APPEND); break;
                         }
                     }
                     break;
