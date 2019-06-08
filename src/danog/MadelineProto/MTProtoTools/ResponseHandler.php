@@ -107,6 +107,7 @@ trait ResponseHandler
                     $only_updates = false;
 
                     $this->handle_response($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content'][$msg_id_type], $current_msg_id, $datacenter);
+                    unset($msg_id_type);
                     break;
 
                 case 'new_session_created':
