@@ -43,14 +43,28 @@ class API extends APIFactory
             $this->asyncAPIPromise = null;
         });
         $this->setInitPromise($this->__construct_async($params, $settings, $deferred));
+        foreach (get_object_vars(new APIFactory('', $this, $this->async)) as $key => $var) {
+            if (in_array($key, ['namespace', 'API', 'lua', 'async', 'asyncAPIPromise', 'methods', 'asyncInitPromise'])) {
+                continue;
+            }
+            if (is_null($this->{$key})) {
+                $this->{$key} = new APIFactory($key, $this->API, $this->async);
+            }
+        }
     }
 
     public function __construct_async($params, $settings, $deferred)
     {
         if (is_string($params)) {
             if (!\danog\MadelineProto\Logger::$default) {
-                if (!isset($settings['logger']['logger_param'])) $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
-                if (!isset($settings['logger']['logger'])) $settings['logger']['logger'] = php_sapi_name() === 'cli' ? 3 : 2;
+                if (!isset($settings['logger']['logger_param'])) {
+                    $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
+                }
+
+                if (!isset($settings['logger']['logger'])) {
+                    $settings['logger']['logger'] = php_sapi_name() === 'cli' ? 3 : 2;
+                }
+
                 \danog\MadelineProto\Logger::constructor($settings['logger']['logger'], $settings['logger']['logger_param'], '', isset($settings['logger']['logger_level']) ? $settings['logger']['logger_level'] : Logger::VERBOSE, isset($settings['logger']['max_size']) ? $settings['logger']['max_size'] : 100 * 1024 * 1024);
             }
             $realpaths = Serialization::realpaths($params);

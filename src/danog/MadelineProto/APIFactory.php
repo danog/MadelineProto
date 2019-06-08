@@ -123,10 +123,10 @@ class APIFactory extends AsyncConstruct
 
     protected $methods = [];
 
-    public function __construct($namespace, $API, &$async)
+    public function __construct($namespace, &$API, &$async)
     {
         $this->namespace = $namespace.'.';
-        $this->API = $API;
+        $this->API = &$API;
         $this->async = &$async;
     }
 
