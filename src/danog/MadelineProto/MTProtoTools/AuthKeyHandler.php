@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\Exception;
+use Amp\Artax\Request;
 
 /**
  * Manages the creation of the authorization key.
