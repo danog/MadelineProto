@@ -19,8 +19,12 @@
 
 namespace danog\MadelineProto;
 
-use function Amp\Promise\wait;
+use Amp\DoH\DoHConfig;
+use Amp\DoH\Nameserver;
+use Amp\DoH\Rfc8484StubResolver;
 use Amp\Loop;
+use function Amp\Dns\resolver;
+use function Amp\Promise\wait;
 
 class Magic
 {
@@ -135,10 +139,18 @@ class Magic
             }
             // Even an empty handler is enough to catch ctrl+c
             if (defined('SIGINT')) {
-                if (function_exists('pcntl_async_signals')) pcntl_async_signals(true);
-                Loop::onSignal(SIGINT, static function () { Logger::log('Got sigint', Logger::FATAL_ERROR); die(); });
-                Loop::onSignal(SIGTERM, static function () { Logger::log('Got sigterm', Logger::FATAL_ERROR); die(); });
+                //if (function_exists('pcntl_async_signals')) pcntl_async_signals(true);
+                Loop::onSignal(SIGINT, static function () {Logger::log('Got sigint', Logger::FATAL_ERROR);die();});
+                Loop::onSignal(SIGTERM, static function () {Logger::log('Got sigterm', Logger::FATAL_ERROR);die();});
             }
+            $DohConfig = new DoHConfig(
+                [
+                    new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
+                    new Nameserver('https://google.com/resolve', Nameserver::GOOGLE_JSON, ["Host" => "dns.google.com"]),
+                ]
+            );
+            resolver(new Rfc8484StubResolver($DohConfig));
+
             self::$inited = true;
         }
     }

@@ -9,7 +9,7 @@
         "krakjoe/pthreads-polyfill": "*"
     },
     "require": {
-        "php": ">=7.1.0",
+        "php": ">=7.0.0",
         "danog/primemodule": "^1.0.3",
         "danog/magicalserializer": "^1.0",
         "phpseclib/phpseclib": "dev-master#27370df as 2.0.15",
@@ -21,13 +21,15 @@
         "ext-xml": "*",
         "ext-fileinfo": "*",
         "amphp/amp": "^2.0",
-        "amphp/socket": "^0.10.11",
         "amphp/websocket": "dev-master",
         "amphp/websocket-client": "dev-master",
-        "amphp/artax": "^3.0",
-        "amphp/file": "^0.3.5",
+        "amphp/socket": "^0.10",
+        "amphp/dns": "dev-master#aa1892bdf13b787d759df6f2523e8027a434d927 as v0.9.x-dev",
+        "amphp/artax": "dev-master",
+        "amphp/file": "^0.3",
         "amphp/uri": "^0.1.4",
-        "amphp/byte-stream": "1.6.0"
+        "amphp/byte-stream": "^1.6",
+        "danog/dns-over-https": "^0.1"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1",
@@ -37,12 +39,10 @@
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)"
     },
-    "authors": [
-        {
-            "name": "Daniil Gentili",
-            "email": "daniil@daniil.it"
-        }
-    ],
+    "authors": [{
+        "name": "Daniil Gentili",
+        "email": "daniil@daniil.it"
+    }],
     "autoload": {
         "psr-0": {
             "danog\\MadelineProto\\": "src/"
@@ -51,5 +51,15 @@
             "src/BigIntegor.php",
             "src/YieldReturnValue.php"
         ]
-    }
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/danog/phpseclib"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/danog/dns"
+        }
+    ]
 }
