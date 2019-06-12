@@ -97,7 +97,8 @@ class DataCenter
             [
                 new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
                 new Nameserver('https://google.com/resolve', Nameserver::GOOGLE_JSON, ["Host" => "dns.google.com"]),
-            ]
+            ],
+            $this->HTTPClient
         );
         $this->DoHClient = new Rfc8484StubResolver($DoHConfig);
     }
