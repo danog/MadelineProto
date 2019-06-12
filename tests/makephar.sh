@@ -16,7 +16,8 @@ echo '{
     "name": "danog/madelineprototests",
     "minimum-stability":"dev",
     "require": {
-        "danog/madelineproto": "dev-master"
+        "danog/madelineproto": "dev-master",
+        "amphp/dns": "dev-master#aa1892bd as 0.9"
     },
     "repositories": [
         {
