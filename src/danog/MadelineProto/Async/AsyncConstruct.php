@@ -48,8 +48,11 @@ class AsyncConstruct
 
     public function setInitPromise($promise)
     {
-        $this->asyncInitPromise = $this->call($promise);
-        $this->asyncInitPromise->onResolve(function () {
+        $this->asyncInitPromise = $this->callFork($promise);
+        $this->asyncInitPromise->onResolve(function ($error, $result) {
+            if ($error) {
+                throw $error;
+            }
             $this->asyncInitPromise = null;
         });
     }

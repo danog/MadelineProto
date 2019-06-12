@@ -19,10 +19,14 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Artax\Client;
 use Amp\Artax\Cookie\ArrayCookieJar;
 use Amp\Artax\DefaultClient;
 use Amp\Artax\HttpSocketPool;
 use Amp\CancellationToken;
+use Amp\Dns\Resolver;
+use Amp\DoH\DoHConfig;
+use Amp\DoH\Rfc8484StubResolver;
 use Amp\Socket\ClientConnectContext;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -39,6 +43,18 @@ use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
 use danog\MadelineProto\TL\Conversion\Exception;
+use Amp\DoH\Nameserver;
+use function Amp\call;
+use Amp\Promise;
+use Amp\Socket\ClientTlsContext;
+use Amp\Deferred;
+use Amp\NullCancellationToken;
+use function Amp\Socket\Internal\parseUri;
+use Amp\Dns\Record;
+use Amp\Socket\ConnectException;
+use Amp\Loop;
+use Amp\TimeoutException;
+use Amp\Socket\ClientSocket;
 
 /**
  * Manages datacenters.
@@ -53,6 +69,7 @@ class DataCenter
     private $dclist = [];
     private $settings = [];
     private $HTTPClient;
+    private $DoHClient;
 
     public function __sleep()
     {
@@ -75,6 +92,197 @@ class DataCenter
             }
         }
         $this->HTTPClient = new DefaultClient(new ArrayCookieJar(), new HttpSocketPool(new ProxySocketPool($this)));
+
+        $DoHConfig = new DoHConfig(
+            [
+                new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
+                new Nameserver('https://google.com/resolve', Nameserver::GOOGLE_JSON, ["Host" => "dns.google.com"]),
+            ]
+        );
+        $this->DoHClient = new Rfc8484StubResolver($DoHConfig);
+    }
+
+    /**
+     * Asynchronously establish an encrypted TCP connection (non-blocking).
+     *
+     * Note: Once resolved the socket stream will already be set to non-blocking mode.
+     *
+     * @param string               $uricall
+     * @param ClientConnectContext $socketContext
+     * @param ClientTlsContext     $tlsContext
+     * @param CancellationToken    $token
+     *
+     * @return Promise<ClientSocket>
+     */
+    public function cryptoConnect(
+        string $uri,
+        ClientConnectContext $socketContext = null,
+        ClientTlsContext $tlsContext = null,
+        CancellationToken $token = null
+    ): Promise {
+        return call(function () use ($uri, $socketContext, $tlsContext, $token) {
+            $tlsContext = $tlsContext ?? new ClientTlsContext;
+
+            if ($tlsContext->getPeerName() === null) {
+                $tlsContext = $tlsContext->withPeerName(\parse_url($uri, PHP_URL_HOST));
+            }
+
+            /** @var ClientSocket $socket */
+            $socket = yield $this->socketConnect($uri, $socketContext, $token);
+
+            $promise = $socket->enableCrypto($tlsContext);
+
+            if ($token) {
+                $deferred = new Deferred;
+                $id = $token->subscribe([$deferred, "fail"]);
+
+                $promise->onResolve(function ($exception) use ($id, $token, $deferred) {
+                    if ($token->isRequested()) {
+                        return;
+                    }
+
+                    $token->unsubscribe($id);
+
+                    if ($exception) {
+                        $deferred->fail($exception);
+                        return;
+                    }
+
+                    $deferred->resolve();
+                });
+
+                $promise = $deferred->promise();
+            }
+
+            try {
+                yield $promise;
+            } catch (\Throwable $exception) {
+                $socket->close();
+                throw $exception;
+            }
+
+            return $socket;
+        });
+    }
+    /**
+     * Asynchronously establish a socket connection to the specified URI.
+     *
+     * @param string                 $uri URI in scheme://host:port format. TCP is assumed if no scheme is present.
+     * @param ClientConnectContext   $socketContext Socket connect context to use when connecting.
+     * @param CancellationToken|null $token
+     *
+     * @return Promise<\Amp\Socket\ClientSocket>
+     */
+    public function socketConnect(string $uri, ClientConnectContext $socketContext = null, CancellationToken $token = null): Promise
+    {
+        return call(function () use ($uri, $socketContext, $token) {
+            $socketContext = $socketContext ?? new ClientConnectContext;
+            $token = $token ?? new NullCancellationToken;
+            $attempt = 0;
+            $uris = [];
+            $failures = [];
+
+            list($scheme, $host, $port) = parseUri($uri);
+
+            if ($host[0] === '[') {
+                $host = substr($host, 1, -1);
+            }
+
+            if ($port === 0 || @\inet_pton($host)) {
+                // Host is already an IP address or file path.
+                $uris = [$uri];
+            } else {
+                // Host is not an IP address, so resolve the domain name.
+                $records = yield $this->DoHClient->resolve($host, $socketContext->getDnsTypeRestriction());
+
+                // Usually the faster response should be preferred, but we don't have a reliable way of determining IPv6
+                // support, so we always prefer IPv4 here.
+                \usort($records, function (Record $a, Record $b) {
+                    return $a->getType() - $b->getType();
+                });
+
+                foreach ($records as $record) {
+                    /** @var Record $record */
+                    if ($record->getType() === Record::AAAA) {
+                        $uris[] = \sprintf("%s://[%s]:%d", $scheme, $record->getValue(), $port);
+                    } else {
+                        $uris[] = \sprintf("%s://%s:%d", $scheme, $record->getValue(), $port);
+                    }
+                }
+            }
+
+            $flags = \STREAM_CLIENT_CONNECT | \STREAM_CLIENT_ASYNC_CONNECT;
+            $timeout = $socketContext->getConnectTimeout();
+
+            foreach ($uris as $builtUri) {
+                try {
+                    $context = \stream_context_create($socketContext->toStreamContextArray());
+
+                    if (!$socket = @\stream_socket_client($builtUri, $errno, $errstr, null, $flags, $context)) {
+                        throw new ConnectException(\sprintf(
+                            "Connection to %s failed: [Error #%d] %s%s",
+                            $uri,
+                            $errno,
+                            $errstr,
+                            $failures ? "; previous attempts: ".\implode($failures) : ""
+                        ), $errno);
+                    }
+
+                    \stream_set_blocking($socket, false);
+
+                    $deferred = new Deferred;
+                    $watcher = Loop::onWritable($socket, [$deferred, 'resolve']);
+                    $id = $token->subscribe([$deferred, 'fail']);
+
+                    try {
+                        yield Promise\timeout($deferred->promise(), $timeout);
+                    } catch (TimeoutException $e) {
+                        throw new ConnectException(\sprintf(
+                            "Connecting to %s failed: timeout exceeded (%d ms)%s",
+                            $uri,
+                            $timeout,
+                            $failures ? "; previous attempts: ".\implode($failures) : ""
+                        ), 110); // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno
+                    } finally {
+                        Loop::cancel($watcher);
+                        $token->unsubscribe($id);
+                    }
+
+                    // The following hack looks like the only way to detect connection refused errors with PHP's stream sockets.
+                    if (\stream_socket_get_name($socket, true) === false) {
+                        \fclose($socket);
+                        throw new ConnectException(\sprintf(
+                            "Connection to %s refused%s",
+                            $uri,
+                            $failures ? "; previous attempts: ".\implode($failures) : ""
+                        ), 111); // See ECONNREFUSED in http://www.virtsync.com/c-error-codes-include-errno
+                    }
+                } catch (ConnectException $e) {
+                    // Includes only error codes used in this file, as error codes on other OS families might be different.
+                    // In fact, this might show a confusing error message on OS families that return 110 or 111 by itself.
+                    $knownReasons = [
+                        110 => "connection timeout",
+                        111 => "connection refused",
+                    ];
+
+                    $code = $e->getCode();
+                    $reason = $knownReasons[$code] ?? ("Error #".$code);
+
+                    if (++$attempt === $socketContext->getMaxAttempts()) {
+                        break;
+                    }
+
+                    $failures[] = "{$uri} ({$reason})";
+
+                    continue; // Could not connect to host, try next host in the list.
+                }
+
+                return new ClientSocket($socket);
+            }
+
+            // This is reached if either all URIs failed or the maximum number of attempts is reached.
+            throw $e;
+        });
     }
 
     public function rawConnectAsync(string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null): \Generator
@@ -293,6 +501,9 @@ class DataCenter
                         ->setIpv6($ipv6 === 'ipv6');
 
                     foreach ($combo as $stream) {
+                        if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
+                            $stream[1] = [[$this, 'socketConnect'], [$this, 'cryptoConnect']];
+                        }
                         $ctx->addStream(...$stream);
                     }
                     $ctxs[] = $ctx;
@@ -350,6 +561,9 @@ class DataCenter
                         ->setIpv6($ipv6 === 'ipv6');
 
                     foreach ($combo as $stream) {
+                        if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
+                            $stream[1] = [[$this, 'socketConnect'], [$this, 'cryptoConnect']];
+                        }
                         $ctx->addStream(...$stream);
                     }
                     $ctxs[] = $ctx;
@@ -375,11 +589,20 @@ class DataCenter
     /**
      * Get Artax async HTTP client.
      *
-     * @return \Amp\Artax\DefaultClient
+     * @return \Amp\Artax\Client
      */
-    public function getHTTPClient()
+    public function getHTTPClient(): Client
     {
         return $this->HTTPClient;
+    }
+    /**
+     * Get DNS over HTTPS async DNS client.
+     *
+     * @return \Amp\Dns\Resolver
+     */
+    public function getDNSClient(): Resolver
+    {
+        return $this->DoHClient;
     }
 
     public function fileGetContents($url): \Generator

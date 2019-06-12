@@ -24,6 +24,7 @@ use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\RawStreamInterface;
 use function Amp\Socket\connect;
 use function Amp\Socket\cryptoConnect;
+use danog\MadelineProto\Stream\ProxyStreamInterface;
 
 /**
  * Default stream wrapper.
@@ -32,11 +33,13 @@ use function Amp\Socket\cryptoConnect;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class DefaultStream extends Socket implements RawStreamInterface
+class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInterface
 {
     use RawStream;
     private $stream;
-
+    private $connector = 'Amp\\Socket\\connect';
+    private $cryptoConnector = 'Amp\\Socket\\cryptoConnect';
+    
     public function __construct()
     {
     }
@@ -54,9 +57,11 @@ class DefaultStream extends Socket implements RawStreamInterface
     public function connectAsync(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
     {
         if ($ctx->isSecure()) {
-            $this->stream = yield cryptoConnect($ctx->getStringUri(), $ctx->getSocketContext(), null, $ctx->getCancellationToken());
+            $connector = $this->cryptoConnector;
+            $this->stream = yield $connector($ctx->getStringUri(), $ctx->getSocketContext(), null, $ctx->getCancellationToken());
         } else {
-            $this->stream = yield connect($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
+            $connector = $this->connector;
+            $this->stream = yield $connector($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
         }
         yield $this->stream->write($header);
     }
@@ -117,6 +122,13 @@ class DefaultStream extends Socket implements RawStreamInterface
         return $this->stream;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtra($extra)
+    {
+        list($this->connector, $this->cryptoConnector) = $extra;
+    }
     public static function getName(): string
     {
         return __CLASS__;

@@ -140,8 +140,15 @@ class Magic
             // Even an empty handler is enough to catch ctrl+c
             if (defined('SIGINT')) {
                 //if (function_exists('pcntl_async_signals')) pcntl_async_signals(true);
-                Loop::onSignal(SIGINT, static function () {Logger::log('Got sigint', Logger::FATAL_ERROR);die();});
-                Loop::onSignal(SIGTERM, static function () {Logger::log('Got sigterm', Logger::FATAL_ERROR);die();});
+                Loop::onSignal(SIGINT, static function () {
+                    Logger::log('Got sigint', Logger::FATAL_ERROR); 
+                    die();
+                });
+                Loop::onSignal(SIGTERM, static function () {
+                    Logger::log('Got sigterm', Logger::FATAL_ERROR);
+                    Loop::stop();
+                    die();
+                });
             }
             $DohConfig = new DoHConfig(
                 [

@@ -160,6 +160,9 @@ class APIFactory extends AsyncConstruct
         if (Magic::is_fork() && !Magic::$processed_fork) {
             throw new Exception('Forking not supported, use async logic, instead: https://docs.madelineproto.xyz/docs/ASYNC.html');
         }
+        if (!$this->API) {
+            throw new Exception('API did not init!');
+        }
         if ($this->API->asyncInitPromise) {
             yield $this->API->initAsync();
             $this->API->logger->logger('Finished init asynchronously');

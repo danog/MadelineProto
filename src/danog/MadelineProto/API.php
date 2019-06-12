@@ -104,14 +104,21 @@ class API extends APIFactory
                         throw $e;
                     }
                     class_exists('\\Volatile');
-                    $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                     foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
                         class_exists('\\danog\\MadelineProto\\'.$class);
                     }
-                    Logger::log((string) $e, Logger::ERROR);
+                    $changed = false;
+                    if (strpos($tounserialize, 'O:26:"danog\\MadelineProto\\Button":') !== false) {
+                        $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
+                        $changed = true;
+                    }
                     if (strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
                         $tounserialize = str_replace('phpseclib\\Math\\BigInteger', 'phpseclib\\Math\\BigIntegor', $tounserialize);
+                        $changed = true;
                     }
+
+                    Logger::log((string) $e, Logger::ERROR);
+                    if (!$changed) throw $e;
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
                 } catch (\Throwable $e) {
                     Logger::log((string) $e, Logger::ERROR);
@@ -176,7 +183,7 @@ class API extends APIFactory
 
     public function __wakeup()
     {
-        $this->APIFactory();
+        //$this->APIFactory();
     }
 
     public function __destruct()
