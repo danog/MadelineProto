@@ -819,7 +819,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function setup_logger()
     {
-        if (isset($this->settings['logger']['rollbar_token']) && $this->settings['logger']['rollbar_token'] !== '') {
+        if (isset($this->settings['logger']['rollbar_token']) && $this->settings['logger']['rollbar_token'] !== '' && class_exists('\\Rollbar\\Rollbar')) {
             @\Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => isset($this->settings['logger']['rollbar_token']) && !in_array($this->settings['logger']['rollbar_token'], ['f9fff6689aea4905b58eec73f66c791d', '300afd7ccef346ea84d0c185ae831718', '11a8c2fe4c474328b40a28193f8d63f5', 'beef2d426496462ba34dcaad33d44a14']) || $this->settings['pwr']['pwr'] ? $this->settings['logger']['rollbar_token'] : 'c07d9b2f73c2461297b0beaef6c1662f'], false, false);
         } else {
             Exception::$rollbar = false;

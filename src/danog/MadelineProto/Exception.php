@@ -67,7 +67,7 @@ class Exception extends \Exception
         if (strpos($message, 'pg_query') !== false || strpos($message, 'Undefined variable: ') !== false || strpos($message, 'socket_write') !== false || strpos($message, 'socket_read') !== false || strpos($message, 'Received request to switch to DC ') !== false || strpos($message, "Couldn't get response") !== false || strpos($message, 'Re-executing query...') !== false || strpos($message, "Couldn't find peer by provided") !== false || strpos($message, 'id.pwrtelegram.xyz') !== false || strpos($message, 'Please update ') !== false || strpos($message, 'posix_isatty') !== false) {
             return;
         }
-        if (self::$rollbar) {
+        if (self::$rollbar && class_exists('\\Rollbar\\Rollbar')) {
             \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, debug_backtrace(0));
         }
     }

@@ -191,7 +191,7 @@ class RPCErrorException extends \Exception
         if ($this->rpc !== $message) {
             $this->fetched = true;
         }
-        if (!self::$rollbar) {
+        if (!self::$rollbar || !class_exists('\\Rollbar\\Rollbar')) {
             return;
         }
         if (in_array($this->rpc, ['CHANNEL_PRIVATE', -404, -429, 'USERNAME_NOT_OCCUPIED', 'ACCESS_TOKEN_INVALID', 'AUTH_KEY_UNREGISTERED', 'SESSION_PASSWORD_NEEDED', 'PHONE_NUMBER_UNOCCUPIED', 'PEER_ID_INVALID', 'CHAT_ID_INVALID', 'USERNAME_INVALID', 'CHAT_WRITE_FORBIDDEN', 'CHAT_ADMIN_REQUIRED', 'PEER_FLOOD'])) {
