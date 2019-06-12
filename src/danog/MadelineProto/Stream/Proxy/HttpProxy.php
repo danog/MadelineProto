@@ -53,8 +53,11 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         $address = $uri->getHost();
         $port = $uri->getPort();
 
-        if (strlen(inet_pton($address)) === 16) {
-            $address = '['.$address.']';
+        try {
+            if (strlen(inet_pton($address) === 16)) {
+                $address = '['.$address.']';
+            }
+        } catch (\danog\MadelineProto\Exception $e) {
         }
 
         yield $this->stream->write("CONNECT $address:$port HTTP/1.1\r\nHost: $address:$port\r\nAccept: */*\r\n".$this->getProxyAuthHeader()."Connection: keep-Alive\r\n\r\n");
@@ -121,11 +124,11 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             $length = (int) $headers['content-length'];
             $read = yield $buffer->bufferRead($length);
         }
-        \danog\MadelineProto\Logger::log('Connected to '.$address.':'.$port.' via http');
 
         if ($secure && method_exists($this->getSocket(), 'enableCrypto')) {
             yield $this->getSocket()->enableCrypto((new ClientTlsContext())->withPeerName($uri->getHost()));
         }
+        \danog\MadelineProto\Logger::log('Connected to '.$address.':'.$port.' via http');
 
         if (strlen($header)) {
             yield (yield $this->stream->getWriteBuffer(strlen($header)))->bufferWrite($header);
