@@ -152,7 +152,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public $phoneConfigWatcherId;
     public $feeders = [];
     public $updaters = [];
-    private $destructing = false; // Avoid problems with exceptions thrown by forked strands, see tools
+    public $destructing = false; // Avoid problems with exceptions thrown by forked strands, see tools
     public function __magic_construct($settings = [])
     {
         $this->setInitPromise($this->__construct_async($settings));
