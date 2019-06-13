@@ -539,6 +539,12 @@ class ReferenceDatabase implements TLCallback
                 return $location['file_reference'];
             }
 
+            if (!$this->refresh) {
+                $this->API->logger->logger("Using null file reference for location of type $locationType object {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
+                return 0;
+            }
+
             throw new \danog\MadelineProto\Exception("Could not find file reference for location of type $locationType object {$location['_']}");
         }
         $this->API->logger->logger("Getting file reference for location of type $locationType object {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
