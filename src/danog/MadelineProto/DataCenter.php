@@ -55,6 +55,7 @@ use Amp\Socket\ConnectException;
 use Amp\Loop;
 use Amp\TimeoutException;
 use Amp\Socket\ClientSocket;
+use Amp\Dns\Rfc1035StubResolver;
 
 /**
  * Manages datacenters.
@@ -100,7 +101,7 @@ class DataCenter
             ],
             $this->HTTPClient
         );
-        $this->DoHClient = new Rfc8484StubResolver($DoHConfig);
+        $this->DoHClient = Magic::$altervista ? new Rfc1035StubResolver() : new Rfc8484StubResolver($DoHConfig);
     }
 
     /**
