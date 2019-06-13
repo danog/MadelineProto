@@ -237,7 +237,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         if ($file === null) $file = basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
 
-        return $this->logger->logger($param, $level, $file);
+        return isset($this->logger) ? $this->logger->logger($param, $level, $file) : Logger::$default->logger($param, $level, $file);
     }
     public function isAltervista()
     {
