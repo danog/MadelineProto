@@ -33,6 +33,7 @@ class API extends APIFactory
     public $my_telegram_org_wrapper;
     public $asyncAPIPromise;
     private $oldInstance = false;
+    private $destructing = false;
 
     public function __magic_construct($params = [], $settings = [])
     {

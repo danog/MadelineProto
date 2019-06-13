@@ -281,7 +281,11 @@ trait Tools
         if ($promise instanceof Promise) {
             $promise->onResolve(function ($e, $res) use ($file) {
                 if ($e) {
-                    self::rethrow($e, $file);
+                    if (isset($this)) {
+                        $this->rethrow($e, $file);
+                    } else {
+                        self::rethrow($e, $file);
+                    }
                 }
             });
         }
@@ -304,7 +308,7 @@ trait Tools
         $logger->logger("Got the following exception within a forked strand$file, trying to rethrow");
         if ($e->getMessage() === "Cannot get return value of a generator that hasn't returned") {
             $logger->logger("Well you know, this might actually not be the actual exception, scroll up in the logs to see the actual exception");
-            if (!isset($zis->destructing)) Promise\rethrow(new Failure($e));
+            if (!$zis || !$zis->destructing) Promise\rethrow(new Failure($e));
         } else {
             $logger->logger($e);
             Promise\rethrow(new Failure($e));
@@ -317,12 +321,22 @@ trait Tools
         $deferred = new Deferred();
         $a->onResolve(static function ($e, $res) use ($b, $deferred) {
             if ($e) {
-                return self::rethrow($e);
+                if (isset($this)) {
+                    $this->rethrow($e, $file);
+                } else {
+                    self::rethrow($e, $file);
+                }
+                return;
             }
             $b = self::call($b());
             $b->onResolve(static function ($e, $res) use ($deferred) {
                 if ($e) {
-                    return self::rethrow($e);
+                    if (isset($this)) {
+                        $this->rethrow($e, $file);
+                    } else {
+                        self::rethrow($e, $file);
+                    }
+                    return;
                 }
                 $deferred->resolve($res);
             });
