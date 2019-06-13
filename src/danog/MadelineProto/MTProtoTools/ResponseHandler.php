@@ -370,7 +370,7 @@ trait ResponseHandler
                             }
                             $this->got_response_for_outgoing_message_id($request_id, $datacenter);
 
-                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
 
                             return;
                         case 303:
@@ -420,7 +420,7 @@ trait ResponseHandler
                                     $this->callFork((function () use ($datacenter, &$request, &$response) {
                                         yield $this->init_authorization_async();
 
-                                        $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                        $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
                                     })());
 
                                     return;
@@ -432,7 +432,7 @@ trait ResponseHandler
                                         $this->callFork((function () use ($datacenter, &$request, &$response) {
                                             yield $this->init_authorization_async();
 
-                                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
                                         })());
 
                                         return;
@@ -467,7 +467,7 @@ trait ResponseHandler
                                         $this->callFork((function () use ($datacenter, &$request, &$response) {
                                             yield $this->init_authorization_async();
 
-                                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
                                         })());
 
                                         return;
@@ -492,7 +492,7 @@ trait ResponseHandler
                             }
                             $this->got_response_for_outgoing_message_id($request_id, $datacenter);
 
-                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
 
                             return;
                         case 420:
@@ -511,7 +511,7 @@ trait ResponseHandler
                         default:
                             $this->got_response_for_outgoing_message_id($request_id, $datacenter);
 
-                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code']));
+                            $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
 
                             return;
                     }
@@ -544,7 +544,7 @@ trait ResponseHandler
                             return;
                     }
                     $this->got_response_for_outgoing_message_id($request_id, $datacenter);
-                    $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code']));
+                    $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
 
                     return;
             }

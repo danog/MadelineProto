@@ -235,11 +235,13 @@ trait PeerHandler
                 case 'peerUser':
                     return $id['user_id'];
                 case 'chat':
+                case 'chatForbidden':
                 case 'chatFull':
                     return -$id['id'];
                 case 'inputPeerChat':
                 case 'peerChat':
                     return -$id['chat_id'];
+                case 'channelForbidden':
                 case 'channel':
                 case 'channelFull':
                     return $this->to_supergroup($id['id']);
@@ -302,9 +304,6 @@ trait PeerHandler
                 case 'updateEditChannelMessage':
                 case 'updateNewEncryptedMessage':
                     return $this->get_id($id['message']);
-                case 'chatForbidden':
-                case 'channelForbidden':
-                    throw new \danog\MadelineProto\RPCErrorException('CHAT_FORBIDDEN');
                 default:
                     throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($id, true));
             }
@@ -508,7 +507,6 @@ trait PeerHandler
                 break;
             case 'channelForbidden':
                 throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
-                throw new \danog\MadelineProto\RPCErrorException('CHAT_FORBIDDEN');
             default:
                 throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($constructor, true));
         }
