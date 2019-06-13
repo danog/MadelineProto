@@ -157,7 +157,16 @@ class Magic
                 ]
             );
             resolver(new Rfc8484StubResolver($DohConfig));
-
+            if (php_sapi_name() !== 'cli') {
+                try {
+                    error_reporting(E_ALL);
+                    ini_set('log_errors', 1);
+                    ini_set('error_log', Magic::$script_cwd.'/MadelineProto.log');
+                    error_log('Enabled PHP logging');
+                } catch (\danog\MadelineProto\Exception $e) {
+                    //$this->logger->logger('Could not enable PHP logging');
+                }
+            }
             self::$inited = true;
         }
     }

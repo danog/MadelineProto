@@ -254,6 +254,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->datacenter->getHTTPClient();
     }
 
+    public function getDNSClient()
+    {
+        return $this->datacenter->getDNSClient();
+    }
+
     public function fileGetContents($url): \Generator
     {
         return $this->datacenter->fileGetContents($url);

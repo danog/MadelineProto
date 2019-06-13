@@ -32,6 +32,7 @@ class API extends APIFactory
     public $getting_api_id = false;
     public $my_telegram_org_wrapper;
     public $asyncAPIPromise;
+    private $oldInstance = false;
 
     public function __magic_construct($params = [], $settings = [])
     {
@@ -137,7 +138,7 @@ class API extends APIFactory
                 if (isset($unserialized->API)) {
                     $this->API = $unserialized->API;
                     $this->APIFactory();
-                    $unserialized->donotlog = true;
+                    $unserialized->oldInstance = true;
                     $deferred->resolve();
                     yield $this->API->initAsync();
                     $this->APIFactory();
@@ -151,6 +152,15 @@ class API extends APIFactory
                 }
             }
             $params = $settings;
+        }
+        if (!\danog\MadelineProto\Logger::$default) {
+            if (!isset($settings['logger']['logger_param'])) {
+                $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
+            }
+            if (!isset($settings['logger']['logger'])) {
+                $settings['logger']['logger'] = php_sapi_name() === 'cli' ? 3 : 2;
+            }
+            \danog\MadelineProto\Logger::constructor($settings['logger']['logger'], $settings['logger']['logger_param'], '', isset($settings['logger']['logger_level']) ? $settings['logger']['logger_level'] : Logger::VERBOSE, isset($settings['logger']['max_size']) ? $settings['logger']['max_size'] : 100 * 1024 * 1024);
         }
         if (!isset($params['app_info']['api_id']) || !$params['app_info']['api_id']) {
             $app = yield $this->api_start_async($params);
@@ -194,7 +204,7 @@ class API extends APIFactory
         if ($this->asyncInitPromise) {
             $this->init();
         }
-        if (!isset($this->donotlog)) {
+        if (!$this->oldInstance) {
             if ($this->API) {
                 $this->API->logger('Shutting down MadelineProto (normally or due to an exception, idk)');
                 $this->API->destructing = true;
