@@ -47,7 +47,7 @@ class UpdateLoop extends ResumableSignalLoop
         $API = $this->API;
         $feeder = $this->feeder = $API->feeders[$this->channelId];
 
-        while (!$API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
+        while (!$API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
             if (yield $this->waitSignal($this->pause())) {
                 $API->logger->logger("Exiting $this due to signal");
 
@@ -59,7 +59,7 @@ class UpdateLoop extends ResumableSignalLoop
         $timeout = $API->settings['updates']['getdifference_interval'];
         $first = true;
         while (true) {
-            while (!$API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
+            while (!$API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
                 if (yield $this->waitSignal($this->pause())) {
                     $API->logger->logger("Exiting $this due to signal");
 
@@ -204,21 +204,6 @@ class UpdateLoop extends ResumableSignalLoop
     public function setLimit($toPts)
     {
         $this->toPts = $toPts;
-    }
-
-    public function has_all_auth()
-    {
-        if ($this->API->isInitingAuthorization()) {
-            return false;
-        }
-
-        foreach ($this->API->datacenter->sockets as $dc) {
-            if (!$dc->authorized || $dc->temp_auth_key === null) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public function __toString(): string

@@ -66,17 +66,17 @@ trait Loop
             $this->logger->logger($needs_restart ? 'Will self-restart' : 'Will not self-restart');
 
             $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-            $lockfile = dirname(end($backtrace)['file']).'/bot.lock';
+            $lockfile = dirname(end($backtrace)['file']).'/bot'.$this->authorization['user']['id'].'.lock';
             unset($backtrace);
             $try_locking = true;
             if (!file_exists($lockfile)) {
                 touch($lockfile);
-                $lock = fopen('bot.lock', 'r+');
+                $lock = fopen($lockfile, 'r+');
             } elseif (isset($GLOBALS['lock'])) {
                 $try_locking = false;
                 $lock = $GLOBALS['lock'];
             } else {
-                $lock = fopen('bot.lock', 'r+');
+                $lock = fopen($lockfile, 'r+');
             }
             if ($try_locking) {
                 $try = 1;

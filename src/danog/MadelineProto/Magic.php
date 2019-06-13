@@ -144,11 +144,11 @@ class Magic
                     Logger::log('Got sigint', Logger::FATAL_ERROR); 
                     die();
                 });
-                Loop::onSignal(SIGTERM, static function () {
+                /*Loop::onSignal(SIGTERM, static function () {
                     Logger::log('Got sigterm', Logger::FATAL_ERROR);
                     Loop::stop();
                     die();
-                });
+                });*/
             }
             $DohConfig = new DoHConfig(
                 [

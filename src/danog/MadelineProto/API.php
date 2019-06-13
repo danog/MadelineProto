@@ -120,7 +120,10 @@ class API extends APIFactory
                     }
 
                     Logger::log((string) $e, Logger::ERROR);
-                    if (!$changed) throw $e;
+                    if (!$changed) {
+                        throw $e;
+                    }
+
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
                 } catch (\Throwable $e) {
                     Logger::log((string) $e, Logger::ERROR);

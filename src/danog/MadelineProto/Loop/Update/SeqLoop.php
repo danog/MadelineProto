@@ -46,7 +46,7 @@ class SeqLoop extends ResumableSignalLoop
             return false;
         }
 
-        while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
+        while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
             if (yield $this->waitSignal($this->pause())) {
                 return;
             }
@@ -54,7 +54,7 @@ class SeqLoop extends ResumableSignalLoop
         $this->state = yield $API->load_update_state_async();
 
         while (true) {
-            while (!$this->API->settings['updates']['handle_updates'] || !$this->has_all_auth()) {
+            while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
                 if (yield $this->waitSignal($this->pause())) {
                     return;
                 }
@@ -134,20 +134,6 @@ class SeqLoop extends ResumableSignalLoop
         $this->pendingWakeups += $wakeups;
     }
 
-    public function has_all_auth()
-    {
-        if ($this->API->isInitingAuthorization()) {
-            return false;
-        }
-
-        foreach ($this->API->datacenter->sockets as $dc) {
-            if (!$dc->authorized || $dc->temp_auth_key === null) {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     public function __toString(): string
     {

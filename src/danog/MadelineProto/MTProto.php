@@ -264,6 +264,20 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->datacenter->fileGetContents($url);
     }
     
+    public function hasAllAuth()
+    {
+        if ($this->isInitingAuthorization()) {
+            return false;
+        }
+
+        foreach ($this->datacenter->sockets as $dc) {
+            if (!$dc->authorized || $dc->temp_auth_key === null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
     public function __wakeup()
     {
         $backtrace = debug_backtrace(0, 3);
@@ -883,11 +897,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function is_http($datacenter)
     {
         return in_array($this->datacenter->sockets[$datacenter]->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
-    }
-
-    public function close_and_reopen($datacenter)
-    {
-        $this->wait($this->datacenter->sockets[$datacenter]->reconnect());
     }
 
     // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
