@@ -38,7 +38,8 @@ trait Login
         $this->secret_chats = [];
         $this->chats = [];
         $this->users = [];
-        $this->state = [];
+        $this->channels_state = null;
+        $this->got_state = false;
         $this->tos = ['expires' => 0, 'accepted' => true];
         yield $this->method_call_async_read('auth.logOut', [], ['datacenter' => $this->datacenter->curdc]);
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['logout_ok'], \danog\MadelineProto\Logger::NOTICE);

@@ -409,13 +409,15 @@ trait ResponseHandler
                                         $this->logger->logger("Telegram's flood prevention system suspended this account.", \danog\MadelineProto\Logger::ERROR);
                                         $this->logger->logger('To continue, manual verification is required.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $phone = isset($this->authorization['user']['phone']) ? '+'.$this->authorization['user']['phone'] : 'you are currently using';
-                                        $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number '.$phone.', and quickly describe what will you do with this phone number.', \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number '.$phone.', and shortly describe what will you do with this phone number.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger('Then login again.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger('If you intentionally deleted this account, ignore this message.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                     }
 
                                     $this->authorized = self::NOT_LOGGED_IN;
                                     $this->authorization = null;
+                                    $this->got_state = false;
+                                    $this->channels_state = false;
 
                                     $this->callFork((function () use ($datacenter, &$request, &$response) {
                                         yield $this->init_authorization_async();
@@ -463,6 +465,8 @@ trait ResponseHandler
 
                                         $this->authorized = self::NOT_LOGGED_IN;
                                         $this->authorization = null;
+                                        $this->got_state = false;
+                                        $this->channels_state = false;
 
                                         $this->callFork((function () use ($datacenter, &$request, &$response) {
                                             yield $this->init_authorization_async();
