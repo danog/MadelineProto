@@ -239,7 +239,7 @@ class API extends APIFactory
 
     public function my_get_self()
     {
-        return $this->API->authorization['user'];
+        return isset($this->API) && isset($this->API->authorization['user']) ? $this->API->authorization['user'] : false;
     }
 
     public function APIFactory()
