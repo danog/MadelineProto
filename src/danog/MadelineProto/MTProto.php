@@ -30,7 +30,6 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\TL\TLCallback;
-use function Amp\ByteStream\getOutputBufferStream;
 
 /**
  * Manages all of the mtproto stuff.
@@ -143,10 +142,8 @@ class MTProto extends AsyncConstruct implements TLCallback
     private $msg_ids = [];
     private $v = 0;
     private $dialog_params = ['_' => 'MadelineProto.dialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
-    public $run_workers = false;
     public $setdem = false;
     public $storage = [];
-    private $postpone_updates = false;
     private $supportUser = 0;
     public $referenceDatabase;
     public $phoneConfigWatcherId;
@@ -235,7 +232,9 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function logger($param, $level = Logger::NOTICE, $file = null)
     {
-        if ($file === null) $file = basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
+        if ($file === null) {
+            $file = basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
+        }
 
         return isset($this->logger) ? $this->logger->logger($param, $level, $file) : Logger::$default->logger($param, $level, $file);
     }
@@ -263,7 +262,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         return $this->datacenter->fileGetContents($url);
     }
-    
+
     public function hasAllAuth()
     {
         if ($this->isInitingAuthorization()) {
@@ -347,7 +346,6 @@ class MTProto extends AsyncConstruct implements TLCallback
             unset($this->updates_state);
         }
 
-        $this->postpone_updates = false;
         if ($this->event_handler && class_exists($this->event_handler) && is_subclass_of($this->event_handler, '\danog\MadelineProto\EventHandler')) {
             $this->setEventHandler($this->event_handler);
         }
@@ -483,7 +481,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         $channelIds = [];
         foreach ($this->channels_state->get() as $state) {
-            $channelIds []= $state->getChannel();
+            $channelIds[] = $state->getChannel();
         }
         sort($channelIds);
         foreach ($channelIds as $channelId) {
@@ -934,7 +932,48 @@ class MTProto extends AsyncConstruct implements TLCallback
 
         yield $this->get_phone_config_async();
     }
+    public function resetSession()
+    {
+        if (isset($this->seqUpdater)) {
+            $this->seqUpdater->signal(true);
+            unset($this->seqUpdater);
+        }
+        $channelIds = [];
+        foreach ($this->channels_state->get() as $state) {
+            $channelIds[] = $state->getChannel();
+        }
+        sort($channelIds);
+        foreach ($channelIds as $channelId) {
+            if (isset($this->feeders[$channelId])) {
+                $this->feeders[$channelId]->signal(true);
+                unset($this->feeders[$channelId]);
+            }
+            if (!isset($this->updaters[$channelId])) {
+                $this->updaters[$channelId]->signal(true);
+                unset($this->updaters[$channelId]);
+            }
+        }
+        foreach ($this->datacenter->sockets as $socket) {
+            $socket->authorized = false;
+        }
 
+        $this->channels_state = new CombinedUpdatesState();
+        $this->got_state = false;
+        $this->msg_ids = [];
+        $this->authorized = self::NOT_LOGGED_IN;
+        $this->authorized_dc = -1;
+        $this->authorization = null;
+        $this->updates = [];
+        $this->secret_chats = [];
+        $this->chats = [];
+        $this->users = [];
+        $this->tos = ['expires' => 0, 'accepted' => true];
+        $this->referenceDatabase = new ReferenceDatabase($this);
+        $this->dialog_params = ['_' => 'MadelineProto.dialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
+        $this->full_chats = [];
+
+
+    }
     public function resetUpdateSystem()
     {
         foreach ($this->channels_state->get() as $state) {
@@ -957,7 +996,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         $channelIds = [];
         foreach ($this->channels_state->get() as $state) {
-            $channelIds []= $state->getChannel();
+            $channelIds[] = $state->getChannel();
         }
         sort($channelIds);
         foreach ($channelIds as $channelId) {
@@ -974,7 +1013,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $this->updaters[$channelId]->resume();
             }
         }
-        foreach ($this->datacenter->sockets as $datacenter) { $datacenter->writer->resume(); }
+        foreach ($this->datacenter->sockets as $datacenter) {$datacenter->writer->resume();}
         if ($this->seqUpdater->start()) {
             $this->seqUpdater->resume();
         }

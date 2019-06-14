@@ -414,10 +414,7 @@ trait ResponseHandler
                                         $this->logger->logger('If you intentionally deleted this account, ignore this message.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                     }
 
-                                    $this->authorized = self::NOT_LOGGED_IN;
-                                    $this->authorization = null;
-                                    $this->got_state = false;
-                                    $this->channels_state = false;
+                                    $this->resetSession();
 
                                     $this->callFork((function () use ($datacenter, &$request, &$response) {
                                         yield $this->init_authorization_async();
@@ -463,10 +460,7 @@ trait ResponseHandler
                                         $this->logger->logger('Then login again.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger('If you intentionally deleted this account, ignore this message.', \danog\MadelineProto\Logger::FATAL_ERROR);
 
-                                        $this->authorized = self::NOT_LOGGED_IN;
-                                        $this->authorization = null;
-                                        $this->got_state = false;
-                                        $this->channels_state = false;
+                                        $this->resetSession();
 
                                         $this->callFork((function () use ($datacenter, &$request, &$response) {
                                             yield $this->init_authorization_async();

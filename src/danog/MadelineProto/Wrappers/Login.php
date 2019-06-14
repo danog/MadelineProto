@@ -28,20 +28,8 @@ trait Login
 {
     public function logout_async()
     {
-        foreach ($this->datacenter->sockets as $socket) {
-            $socket->authorized = false;
-        }
-        $this->authorized = self::NOT_LOGGED_IN;
-        $this->authorized_dc = -1;
-        $this->authorization = null;
-        $this->updates = [];
-        $this->secret_chats = [];
-        $this->chats = [];
-        $this->users = [];
-        $this->channels_state = null;
-        $this->got_state = false;
-        $this->tos = ['expires' => 0, 'accepted' => true];
         yield $this->method_call_async_read('auth.logOut', [], ['datacenter' => $this->datacenter->curdc]);
+        $this->resetSession();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['logout_ok'], \danog\MadelineProto\Logger::NOTICE);
         $this->startUpdateSystem();
 
