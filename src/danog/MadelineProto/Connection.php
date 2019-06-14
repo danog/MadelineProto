@@ -215,7 +215,7 @@ class Connection
         $this->disconnect();
         yield $this->API->datacenter->dcConnectAsync($this->ctx->getDc());
         if ($this->API->hasAllAuth() && !$this->hasPendingCalls()) {
-            yield $this->API->method_call_async_read('ping', ['ping_id' => $this->random_int()], ['datacenter' => $this->datacenter]);
+            $this->callFork($this->API->method_call_async_read('ping', ['ping_id' => $this->random_int()], ['datacenter' => $this->datacenter]));
         }
     }
 
