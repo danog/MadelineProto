@@ -56,7 +56,6 @@ php makephar.php $HOME/phar5 "madeline$branch.phar" $TRAVIS_COMMIT
 
 export TRAVIS_PHAR="madeline$branch.phar"
 export TEST_SECRET_CHAT=test
-export MTPROTO_SETTINGS='{"app_info":{"api_id":25628,"api_hash":"1fe17cda7d355166cdaa71f04122873c"}}'
 export TEST_USERNAME=danogentili
 export TEST_DESTINATION_GROUPS='["@pwrtelegramgroupita"]'
 
