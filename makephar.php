@@ -26,7 +26,8 @@ $p->addFromString('.git/refs/heads/master', $argv[3]);
 $p->setStub('<?php
 $backtrace = debug_backtrace();
 if (!isset($backtrace[0]["file"]) || !in_array(basename($backtrace[0]["file"]), ["madeline.php", "phar.php", "testing.php"])) {
-    die("madeline.phar cannot be required manually: use the automatic loader, instead: https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple".PHP_EOL);
+    echo("madeline.phar cannot be required manually: use the automatic loader, instead: https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple".PHP_EOL);
+    die(1);
 }
 if (isset($backtrace[1]["file"])) {
     @chdir(dirname($backtrace[1]["file"]));
