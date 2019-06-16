@@ -30,11 +30,10 @@ class RSA
     public function load($rsa_key)
     {
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_init'], Logger::ULTRA_VERBOSE);
-        $key = new \phpseclib\Crypt\RSA();
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['loading_key'], Logger::ULTRA_VERBOSE);
-        $key->load($rsa_key);
-        $this->n = \phpseclib\Common\Functions\Objects::getVar($key, 'modulus');
-        $this->e = \phpseclib\Common\Functions\Objects::getVar($key, 'exponent');
+        $key = \phpseclib\Crypt\RSA::load($rsa_key);
+        $this->n = self::getVar($key, 'modulus');
+        $this->e = self::getVar($key, 'exponent');
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['computing_fingerprint'], Logger::ULTRA_VERBOSE);
         $this->fp = substr(sha1((yield $this->serialize_object_async(['type' => 'bytes'], $this->n->toBytes(), 'key')).(yield $this->serialize_object_async(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
 
@@ -51,5 +50,20 @@ class RSA
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_encrypting'], Logger::VERBOSE);
 
         return (new \phpseclib\Math\BigInteger($data, 256))->powMod($this->e, $this->n)->toBytes();
+    }
+    /**
+     * Accesses a private variable from an object
+     *
+     * @param object $obj
+     * @param string $var
+     * @return mixed
+     * @access public
+     */
+    public static function getVar($obj, $var)
+    {
+        $reflection = new \ReflectionClass(get_class($obj));
+        $prop = $reflection->getProperty($var);
+        $prop->setAccessible(true);
+        return $prop->getValue($obj);
     }
 }

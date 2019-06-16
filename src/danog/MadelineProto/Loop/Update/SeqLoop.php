@@ -98,7 +98,7 @@ class SeqLoop extends ResumableSignalLoop
                 $this->API->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
                 yield $this->pause(1.0);
                 if (!$this->incomingUpdates) {
-                    yield $this->updaters[false]->resume();
+                    yield $this->API->updaters[false]->resume();
                 }
                 $this->incomingUpdates = array_merge($this->incomingUpdates, [$update], $updates);
 

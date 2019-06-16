@@ -160,7 +160,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         \danog\MadelineProto\Magic::class_exists();
         // Parse settings
         $this->parse_settings($settings);
-        if (!defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 6) {
+        if (!defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 7) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
         }
         if (!extension_loaded('xml')) {

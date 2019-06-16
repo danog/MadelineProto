@@ -45,15 +45,6 @@ trait Crypt
         return [$aes_key, $aes_iv];
     }
 
-    public function ige_encrypt($message, $key, $iv)
-    {
-        $cipher = new \phpseclib\Crypt\AES('ige');
-        $cipher->setKey($key);
-        $cipher->setIV($iv);
-
-        return @$cipher->encrypt($message);
-    }
-
     public function ctr_encrypt($message, $key, $iv)
     {
         $cipher = new \phpseclib\Crypt\AES('ctr');
@@ -63,6 +54,14 @@ trait Crypt
         return @$cipher->encrypt($message);
     }
 
+    public function ige_encrypt($message, $key, $iv)
+    {
+        $cipher = new \phpseclib\Crypt\AES('ige');
+        $cipher->setKey($key);
+        $cipher->setIV($iv);
+
+        return @$cipher->encrypt($message);
+    }
     public function ige_decrypt($message, $key, $iv)
     {
         $cipher = new \phpseclib\Crypt\AES('ige');

@@ -53,6 +53,13 @@ class Logger
     const ERROR = 1;
     const FATAL_ERROR = 0;
 
+
+    const NO_LOGGER = 0;
+    const DEFAULT_LOGGER = 1;
+    const FILE_LOGGER = 2;
+    const ECHO_LOGGER = 3;
+    const CALLABLE_LOGGER = 4;
+
     /*
      * Constructor function
      * Accepts various logger modes:

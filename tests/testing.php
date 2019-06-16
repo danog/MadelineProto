@@ -16,8 +16,12 @@ If not, see <http://www.gnu.org/licenses/>.
  */
 if (!file_exists(__DIR__.'/../vendor/autoload.php')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
-    if (!file_exists('madeline.php')) {
-        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if ($phar = getenv('TRAVIS_PHAR')) {
+        include $phar;
+    } else {
+        if (!file_exists('madeline.php')) {
+            copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+        }
     }
     include 'madeline.php';
 } else {
@@ -44,6 +48,15 @@ $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 echo 'Loading MadelineProto...'.PHP_EOL;
 $MadelineProto = new \danog\MadelineProto\API(getcwd().'/testing.madeline', $settings);
 
+/*
+ * If a BOT_TOKEN is defined in .env, use it to login, else prompt for login info
+ */
+if (getenv('BOT_TOKEN') == '') {
+    $MadelineProto->start();
+} else {
+    $MadelineProto->bot_login(getenv('BOT_TOKEN'));
+}
+
 try {
     $MadelineProto->get_self();
 } catch (\danog\MadelineProto\Exception $e) {
@@ -51,15 +64,6 @@ try {
         $MadelineProto->accept_tos();
     }
 }
-    /*
-     * If a BOT_TOKEN is defined in .env, use it to login, else prompt for login info
-     */
-    if (getenv('BOT_TOKEN') == '') {
-        $MadelineProto->start();
-    } else {
-        $MadelineProto->bot_login(getenv('BOT_TOKEN'));
-    }
-
 //var_dump(count($MadelineProto->get_pwr_chat('@madelineproto')['participants']));
 
 /*
@@ -80,7 +84,7 @@ $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sem
 /*
  * Try making a phone call
  */
-if (stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
+if (!getenv('TRAVIS_COMMIT') && stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
     $controller = $MadelineProto->request_call(getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
     while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
         $MadelineProto->get_updates();
@@ -94,7 +98,7 @@ if (stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
 /*
  * Try receiving a phone call
  */
-if (stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== false) {
+if (!getenv('TRAVIS_COMMIT') && stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== false) {
     $howmany = readline('How many calls would you like me to handle? ');
     $offset = 0;
     while ($howmany > 0) {
@@ -116,7 +120,7 @@ if (stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== 
 /*
  * Secret chat usage
  */
-if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
+if (!getenv('TRAVIS_COMMIT') && stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
     /**
      * Request a secret chat.
      */
@@ -134,12 +138,12 @@ if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y')
      * Send a markdown-formatted text message with expiration after 10 seconds.
      */
     $sentMessage = $MadelineProto->messages->sendEncrypted([
-        'peer'    => $secret_chat_id,
+        'peer' => $secret_chat_id,
         'message' => [
-            '_'          => 'decryptedMessage',
-            'media'      => ['_' => 'decryptedMessageMediaEmpty'], // No media
-            'ttl'        => 10, // This message self-destructs 10 seconds after reception
-            'message'    => '```'.$message.'```', // Code Markdown
+            '_' => 'decryptedMessage',
+            'media' => ['_' => 'decryptedMessageMediaEmpty'], // No media
+            'ttl' => 10, // This message self-destructs 10 seconds after reception
+            'message' => '```'.$message.'```', // Code Markdown
             'parse_mode' => 'Markdown',
         ],
     ]);
@@ -152,21 +156,21 @@ if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y')
 
     // Photo uploaded as document, secret chat
     $secret_media['document_photo'] = [
-        'peer'    => $secret_chat_id,
-        'file'    => 'tests/faust.jpg', // The file to send
+        'peer' => $secret_chat_id,
+        'file' => 'tests/faust.jpg', // The file to send
         'message' => [
-            '_'       => 'decryptedMessage',
-            'ttl'     => 0, // This message does not self-destruct
+            '_' => 'decryptedMessage',
+            'ttl' => 0, // This message does not self-destruct
             'message' => '', // No text message, only media
-            'media'   => [
-                '_'          => 'decryptedMessageMediaDocument',
-                'thumb'      => file_get_contents('tests/faust.preview.jpg'), // The thumbnail must be generated manually, it must be in jpg format, 90x90
-                'thumb_w'    => 90,
-                'thumb_h'    => 90,
-                'mime_type'  => mime_content_type('tests/faust.jpg'), // The file's mime type
-                'caption'    => 'This file was uploaded using @MadelineProto', // The caption
-                'file_name'  => 'faust.jpg', // The file's name
-                'size'       => filesize('tests/faust.jpg'), // The file's size
+            'media' => [
+                '_' => 'decryptedMessageMediaDocument',
+                'thumb' => file_get_contents('tests/faust.preview.jpg'), // The thumbnail must be generated manually, it must be in jpg format, 90x90
+                'thumb_w' => 90,
+                'thumb_h' => 90,
+                'mime_type' => mime_content_type('tests/faust.jpg'), // The file's mime type
+                'caption' => 'This file was uploaded using @MadelineProto', // The caption
+                'file_name' => 'faust.jpg', // The file's name
+                'size' => filesize('tests/faust.jpg'), // The file's size
                 'attributes' => [
                     ['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914], // Image's resolution
                 ],
@@ -176,21 +180,21 @@ if (stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y')
 
     // Photo, secret chat
     $secret_media['photo'] = [
-        'peer'    => $secret_chat_id,
-        'file'    => 'tests/faust.jpg',
+        'peer' => $secret_chat_id,
+        'file' => 'tests/faust.jpg',
         'message' => [
-            '_'       => 'decryptedMessage',
-            'ttl'     => 0,
+            '_' => 'decryptedMessage',
+            'ttl' => 0,
             'message' => '',
-            'media'   => [
-                '_'       => 'decryptedMessageMediaPhoto',
-                'thumb'   => file_get_contents('tests/faust.preview.jpg'),
+            'media' => [
+                '_' => 'decryptedMessageMediaPhoto',
+                'thumb' => file_get_contents('tests/faust.preview.jpg'),
                 'thumb_w' => 90,
                 'thumb_h' => 90,
                 'caption' => 'This file was uploaded using @MadelineProto',
-                'size'    => filesize('tests/faust.jpg'),
-                'w'       => 1280,
-                'h'       => 914,
+                'size' => filesize('tests/faust.jpg'),
+                'w' => 1280,
+                'h' => 914,
             ],
         ],
     ];
