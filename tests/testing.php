@@ -22,8 +22,8 @@ if (!file_exists(__DIR__.'/../vendor/autoload.php')) {
         if (!file_exists('madeline.php')) {
             copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
         }
+        include 'madeline.php';
     }
-    include 'madeline.php';
 } else {
     require_once 'vendor/autoload.php';
 }
