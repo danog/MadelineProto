@@ -479,6 +479,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->phoneConfigWatcherId) {
             Loop::cancel($this->phoneConfigWatcherId);
         }
+        if (isset($this->seqUpdater)) {
+            $this->seqUpdater->signal(true);
+        }
         $channelIds = [];
         foreach ($this->channels_state->get() as $state) {
             $channelIds[] = $state->getChannel();
@@ -491,9 +494,6 @@ class MTProto extends AsyncConstruct implements TLCallback
             if (!isset($this->updaters[$channelId])) {
                 $this->updaters[$channelId]->signal(true);
             }
-        }
-        if (isset($this->seqUpdater)) {
-            $this->seqUpdater->signal(true);
         }
         foreach ($this->datacenter->sockets as $datacenter) {
             $datacenter->disconnect();

@@ -351,7 +351,7 @@ trait Tools
     }
     public static function readLine($prompt = '')
     {
-        return self::call(self::readLineAsync($prompt));
+        return self::call(Tools::readLineAsync($prompt));
     }
     public static function readLineAsync($prompt = '')
     {
@@ -366,7 +366,6 @@ trait Tools
             $lines[count($lines) - 1] .= array_shift($chunk);
             $lines = array_merge($lines, $chunk);
         }
-
         return array_shift($lines);
     }
 

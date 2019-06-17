@@ -57,9 +57,19 @@ php makephar.php $HOME/phar5 "madeline$branch.phar" $TRAVIS_COMMIT
 export TRAVIS_PHAR="madeline$branch.phar"
 export TEST_SECRET_CHAT=test
 export TEST_USERNAME=danogentili
-export TEST_DESTINATION_GROUPS='["@pwrtelegramgroupita"]'
+export TEST_DESTINATION_GROUPS='["@danogentili"]'
 
-tests/testing.php
+tests/testing.php <<EOF
+m
+$API_ID
+$API_HASH
+b
+$BOT_TOKEN
+n
+n
+n
+
+EOF
 
 eval "$(ssh-agent -s)"
 echo -e "$private_key" > madeline_rsa

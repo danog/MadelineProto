@@ -49,14 +49,7 @@ $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 echo 'Loading MadelineProto...'.PHP_EOL;
 $MadelineProto = new \danog\MadelineProto\API(getcwd().'/testing.madeline', $settings);
 
-/*
- * If a BOT_TOKEN is defined in .env, use it to login, else prompt for login info
- */
-if (getenv('BOT_TOKEN') == '') {
-    $MadelineProto->start();
-} else {
-    $MadelineProto->bot_login(getenv('BOT_TOKEN'));
-}
+$MadelineProto->start();
 
 try {
     $MadelineProto->get_self();
