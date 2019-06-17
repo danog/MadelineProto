@@ -103,7 +103,7 @@ trait CallHandler
             $this->wrapper->serialize($this->wrapper->session);
         }
         if (isset($aargs['file']) && $aargs['file'] && isset($this->datacenter->sockets[$aargs['datacenter'].'_media'])) {
-            \danog\MadelineProto\Logger::log('Using media DC');
+            $this->logger->logger('Using media DC');
             $aargs['datacenter'] .= '_media';
         }
         if (in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) {
