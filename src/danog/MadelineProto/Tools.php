@@ -305,7 +305,7 @@ trait Tools
         if ($file) {
             $file = " started @ $file";
         }
-        $logger->logger("Got the following exception within a forked strand$file, trying to rethrow");
+        if ($logger) $logger->logger("Got the following exception within a forked strand$file, trying to rethrow");
         if ($e->getMessage() === "Cannot get return value of a generator that hasn't returned") {
             $logger->logger("Well you know, this might actually not be the actual exception, scroll up in the logs to see the actual exception");
             if (!$zis || !$zis->destructing) Promise\rethrow(new Failure($e));

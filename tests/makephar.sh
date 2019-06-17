@@ -88,7 +88,7 @@ echo "$TRAVIS_COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
 
 [ -d JSON.sh ] || git clone https://github.com/dominictarr/JSON.sh
 for chat_id in $destinations;do
-	ID=$(curl -s https://api.telegram.org/bot$token/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$TRAVIS_BRANCH</b>
+	ID=$(curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$TRAVIS_BRANCH</b>
 <a href=\"https://github.com/danog/MadelineProto/commit/$TRAVIS_COMMIT\">$TRAVIS_COMMIT_MESSAGE</a>
 
 $TRAVIS_COMMIT_MESSAGE" -F parse_mode="HTML" -F chat_id=$chat_id | JSON.sh/JSON.sh -s | egrep '\["result","message_id"\]' | cut -f 2 | cut -d '"' -f 2)
