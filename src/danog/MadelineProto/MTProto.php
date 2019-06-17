@@ -994,6 +994,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!isset($this->seqUpdater)) {
             $this->seqUpdater = new SeqLoop($this);
         }
+        $this->channels_state->get(false);
         $channelIds = [];
         foreach ($this->channels_state->get() as $state) {
             $channelIds[] = $state->getChannel();
