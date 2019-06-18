@@ -117,7 +117,7 @@ git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
 cp "../madeline$php$branch.phar" .
 cp ../phar.php ../mtproxyd .
-echo -n $TRAVIS_COMMIT > release$branch
+echo -n $TRAVIS_COMMIT > release$php$branch
 git add -A
 git commit -am "Release $TRAVIS_BRANCH - $TRAVIS_COMMIT_MESSAGE"
 git push origin master
@@ -127,7 +127,7 @@ echo "$TRAVIS_COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
 [ -d JSON.sh ] || git clone https://github.com/dominictarr/JSON.sh
 for chat_id in $destinations;do
 	ID=$(curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$TRAVIS_BRANCH</b>
-<a href=\"https://github.com/danog/MadelineProto/commit/$TRAVIS_COMMIT\">$TRAVIS_COMMIT_MESSAGE ($PHP_MAJOR_VERSION.$PHP_MINOR_VERSION)</a>
+<a href=\"https://github.com/danog/MadelineProto/commit/$TRAVIS_COMMIT\">$TRAVIS_COMMIT_MESSAGE (PHP $PHP_MAJOR_VERSION.$PHP_MINOR_VERSION)</a>
 
 $TRAVIS_COMMIT_MESSAGE" -F parse_mode="HTML" -F chat_id=$chat_id | JSON.sh/JSON.sh -s | egrep '\["result","message_id"\]' | cut -f 2 | cut -d '"' -f 2)
 
