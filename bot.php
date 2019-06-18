@@ -16,8 +16,6 @@ set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelinePro
  * Various ways to load MadelineProto
  */
 if (!file_exists(__DIR__.'/vendor/autoload.php')) {
-    echo 'You did not run composer update, using madeline.php'.PHP_EOL;
-    define('MADELINE_BRANCH', '');
     if (!file_exists('madeline.php')) {
         copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
@@ -41,10 +39,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         }
 
         $res = json_encode($update, JSON_PRETTY_PRINT);
-        if ($res == '') {
-            $res = var_export($update, true);
-        }
-        //yield $this->sleep(3);
+
         try {
             yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']); //'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
             if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
@@ -52,10 +47,10 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                 //yield $this->download_to_dir($update, '/tmp')
             }
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            \danog\MadelineProto\Logger::log((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
+            $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
         } catch (\danog\MadelineProto\Exception $e) {
             if (stripos($e->getMessage(), 'invalid constructor given') === false) {
-                \danog\MadelineProto\Logger::log((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
+                $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
             }
             //$this->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
         }

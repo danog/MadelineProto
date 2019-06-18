@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Stream;
 use Amp\CancellationToken;
 use Amp\Socket\ClientConnectContext;
 use Amp\Uri\Uri;
+use danog\MadelineProto\Stream\Transport\DefaultStream;
 
 /**
  * Connection context class.
@@ -360,7 +361,7 @@ class ConnectionContext
                 $string .= ' => ';
             }
             $string .= preg_replace('/.*\\\\/', '', $stream[0]);
-            if ($stream[1]) {
+            if ($stream[1] && $stream[0] !== DefaultStream::getName()) {
                 $string .= ' ('.json_encode($stream[1]).')';
             }
         }
