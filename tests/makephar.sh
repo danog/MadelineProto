@@ -88,7 +88,8 @@ cd ..
 
 find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
 
-[ "$TRAVIS_BRANCH" != "master" ] && branch="-$TRAVIS_BRANCH" || branch=""
+#[ "$TRAVIS_BRANCH" != "master" ] && branch="-$TRAVIS_BRANCH" || branch=""
+branch="-$TRAVIS_BRANCH"
 cd $madelinePath
 php makephar.php $HOME/phar5 "madeline$php$branch.phar" $TRAVIS_COMMIT
 

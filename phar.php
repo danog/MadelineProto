@@ -49,15 +49,22 @@ function ___install_madeline()
     $phar_template = 'https://phar.madelineproto.xyz/madeline%s.phar?v=new';
 
     // Version definition
-    $release_branch = defined('MADELINE_BRANCH') ? '-'.MADELINE_BRANCH : '';
+    $custom_branch = defined('MADELINE_BRANCH') ? MADELINE_BRANCH : null;
+    if ($custom_branch === '') { // If the constant is an empty string, default to the latest alpha build
+        $custom_branch = 'master';
+    } else if ($custom_branch === null) { // If the constant is not defined, default to the latest stable build
+        $custom_branch = '';
+    }
+
+    $release_branch = "-$custom_branch";
     if ($release_branch === '-') {
         $release_branch = '';
     }
     $release_fallback_branch = '';
-    if (isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], '000webhost.io')) {
-        $release_branch = '-deprecated';
-        $release_fallback_branch = '-deprecated';
-    }
+    /*if (isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], '000webhost.io')) {
+    $release_branch = '-deprecated';
+    $release_fallback_branch = '-deprecated';
+    }*/
 
     if (PHP_MAJOR_VERSION <= 5) {
         $release_branch = '5'.$release_branch;
