@@ -5,13 +5,11 @@ php:
 - '7.0'
 - '5.6'
 
-addons:
-  apt:
-    packages:
-    - php7.3
-
 before_install:
 - echo "phar.readonly = 0" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- sudo add-apt-repository ppa:ondrej/php -y
+- sudo apt-get update -q
+- sudo apt-get install php7.3-cli php7.3-json php7.3-mbstring php7.3-curl php7.3-xml php7.3-json -y
 
 script:
 - tests/makephar.sh
