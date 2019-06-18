@@ -54,12 +54,17 @@ function ___install_madeline()
         $release_branch = '';
     }
     $release_fallback_branch = '';
+    if (isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], '000webhost.io')) {
+        $release_branch = '-deprecated';
+        $release_fallback_branch = '-deprecated';
+    }
 
     if (PHP_MAJOR_VERSION <= 5) {
         $release_branch = '5'.$release_branch;
         $release_fallback_branch = '5'.$release_fallback_branch;
     } elseif (PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION === 0) {
-        $release_branch = '';
+        $release_branch = '70'.$release_branch;
+        $release_fallback_branch = '70'.$release_fallback_branch;
     }
 
     // Checking if defined branch/default branch builds can be downloaded
