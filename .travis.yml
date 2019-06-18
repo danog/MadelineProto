@@ -8,7 +8,7 @@ php:
 addons:
   apt:
     packages:
-    - libzip-dev
+    - php7.3
 
 before_install:
 - echo "phar.readonly = 0" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini

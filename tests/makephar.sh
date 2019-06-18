@@ -63,9 +63,9 @@ cd ..
     #cmake -DCMAKE_INSTALL_PREFIX=$HOME/.phpenv/versions/7.3.6 .
     #make -j11
     #make install
-    phpenv install 7.3.6
+    #phpenv install 7.3.6
 
-    ~/.phpenv/versions/7.3.6/bin/php $php7to5 convert --copy-all phar7 phar5 >/dev/null
+    php7.3 $php7to5 convert --copy-all phar7 phar5 >/dev/null
 
     sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
     echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
