@@ -4,6 +4,11 @@ php:
 - '7.0'
 - '5.6'
 
+addons:
+  apt:
+    packages:
+    - libzip-dev
+
 before_install:
 - echo "phar.readonly = 0" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
