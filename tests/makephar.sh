@@ -57,11 +57,15 @@ cp -a $madelinePath/src vendor/danog/madelineproto/
 cd ..
 
 [ $PHP_MAJOR_VERSION -eq 5 ] && {
-    $php7to5 convert --copy-all phar7 phar5 >/dev/null
+    phpenv install 7.3.6
+
+    ~/.phpenv/versions/7.3.6/bin/php $php7to5 convert --copy-all phar7 phar5 >/dev/null
     sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
     echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
     cp $madelinePath/tests/random.php vendor/paragonie/random_compat/lib/random.php
-
+    
+    php -v
+    
     php=5
 }
 [ $PHP_MAJOR_VERSION -eq 7 ] && {
