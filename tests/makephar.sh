@@ -72,7 +72,7 @@ cd ..
     cp $madelinePath/tests/random.php phar5/vendor/paragonie/random_compat/lib/random.php
     cp phar5/vendor/danog/madelineproto/src/danog/MadelineProto/Coroutine.php phar5/vendor/amphp/amp/lib/Coroutine.php
     sed 's/namespace danog\\MadelineProto;/namespace Amp;/g' -i phar5/vendor/amphp/amp/lib/Coroutine.php
-    sed 's/public function echo/public function echo_/g' -i phar5/vendor/danog/madelineproto/src/danog/MadelineProto/Tools.php
+    sed 's/public static function echo/public static function echo_/g' -i phar5/vendor/danog/madelineproto/src/danog/MadelineProto/Tools.php
     php -v
     
     php=5
