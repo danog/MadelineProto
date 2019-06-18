@@ -57,7 +57,7 @@ cp -a $madelinePath/src vendor/danog/madelineproto/
 cd ..
 
 [ $PHP_MAJOR_VERSION -eq 5 ] && {
-    git clone https://github.com/php-build/php-build $(phpenv root)/plugins/php-build
+    #git clone https://github.com/php-build/php-build $(phpenv root)/plugins/php-build
     #git clone -b rel-1-5-1 https://github.com/nih-at/libzip.git
     #cd libzip
     #cmake -DCMAKE_INSTALL_PREFIX=$HOME/.phpenv/versions/7.3.6 .
@@ -69,7 +69,7 @@ cd ..
 
     sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
     echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
-    cp $madelinePath/tests/random.php vendor/paragonie/random_compat/lib/random.php
+    cp $madelinePath/tests/random.php phar5/vendor/paragonie/random_compat/lib/random.php
     cp phar5/vendor/danog/madelineproto/src/danog/MadelineProto/Coroutine.php phar5/vendor/amphp/amp/lib/Coroutine.php
     sed 's/namespace danog\\MadelineProto;/namespace Amp;/g' -i phar5/vendor/amphp/amp/lib/Coroutine.php
     php -v
@@ -126,7 +126,7 @@ echo "$TRAVIS_COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
 [ -d JSON.sh ] || git clone https://github.com/dominictarr/JSON.sh
 for chat_id in $destinations;do
 	ID=$(curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$TRAVIS_BRANCH</b>
-<a href=\"https://github.com/danog/MadelineProto/commit/$TRAVIS_COMMIT\">$TRAVIS_COMMIT_MESSAGE</a>
+<a href=\"https://github.com/danog/MadelineProto/commit/$TRAVIS_COMMIT\">$TRAVIS_COMMIT_MESSAGE ($PHP_MAJOR_VERSION.$PHP_MINOR_VERSION)</a>
 
 $TRAVIS_COMMIT_MESSAGE" -F parse_mode="HTML" -F chat_id=$chat_id | JSON.sh/JSON.sh -s | egrep '\["result","message_id"\]' | cut -f 2 | cut -d '"' -f 2)
 
