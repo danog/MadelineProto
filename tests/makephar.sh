@@ -1,9 +1,17 @@
 #!/bin/bash -e
 
 # Configure
+PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
+PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
+
+# Download converters
 composer global require spatie/7to5 dev-master#80de80c7ebb0dd0805a79e939b0426883ffd9403
 [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
 [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
+
+composer global require danog/7to70
+[ -f $HOME/.composer/vendor/bin/php7to70 ] && php7to70=$HOME/.composer/vendor/bin/php7to70
+[ -f $HOME/.config/composer/vendor/bin/php7to70 ] && php7to70=$HOME/.config/composer/vendor/bin/php7to70
 
 # Clean up
 rm -rf phar7 phar5 MadelineProtoPhar
@@ -46,17 +54,30 @@ composer update
 cp -a $madelinePath/src vendor/danog/madelineproto/
 cd ..
 
-cp -a phar7 phar5
-#$php7to5 convert --copy-all phar7 phar5 >/dev/null
+[ $PHP_MAJOR_VERSION -eq 5 ] && {
+    $php7to5 convert --copy-all phar7 phar5 >/dev/null
+    sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
+    echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
+    cp $madelinePath/tests/random.php vendor/paragonie/random_compat/lib/random.php
+
+    php=5
+}
+[ $PHP_MAJOR_VERSION -eq 7 ] && {
+    [ $PHP_MINOR_VERSION -eq 0 ] && {
+        $php7to70 convert --copy-all phar7 phar5 >/dev/null
+        php=70
+    } || {
+        cp -a phar7 phar5
+    }
+}
+
 find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
-#sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
-#echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
 
 [ "$TRAVIS_BRANCH" != "master" ] && branch="-$TRAVIS_BRANCH" || branch=""
 cd $madelinePath
-php makephar.php $HOME/phar5 "madeline$branch.phar" $TRAVIS_COMMIT
+php makephar.php $HOME/phar5 "madeline$php$branch.phar" $TRAVIS_COMMIT
 
-export TRAVIS_PHAR="madeline$branch.phar"
+export TRAVIS_PHAR="madeline$php$branch.phar"
 export TEST_SECRET_CHAT=test
 export TEST_USERNAME=danogentili
 export TEST_DESTINATION_GROUPS='["@danogentili"]'
@@ -79,7 +100,7 @@ chmod 600 madeline_rsa
 ssh-add madeline_rsa
 git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
-cp "../madeline$branch.phar" .
+cp "../madeline$php$branch.phar" .
 cp ../phar.php ../mtproxyd .
 echo -n $TRAVIS_COMMIT > release$branch
 git add -A
