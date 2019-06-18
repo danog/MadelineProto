@@ -57,7 +57,7 @@ cp -a $madelinePath/src vendor/danog/madelineproto/
 cd ..
 
 [ $PHP_MAJOR_VERSION -eq 5 ] && {
-    #git clone https://github.com/php-build/php-build $(phpenv root)/plugins/php-build
+    git clone https://github.com/php-build/php-build $(phpenv root)/plugins/php-build
     #git clone -b rel-1-5-1 https://github.com/nih-at/libzip.git
     #cd libzip
     #cmake -DCMAKE_INSTALL_PREFIX=$HOME/.phpenv/versions/7.3.6 .
