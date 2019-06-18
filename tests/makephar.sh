@@ -49,6 +49,8 @@ echo '{
         }
     ]
 }' > composer.json
+composer config platform.php "7.4"
+[ $PHP_MAJOR_VERSION -eq 5 ] && composer require dstuecken/php7ify
 composer clearcache
 composer update
 cp -a $madelinePath/src vendor/danog/madelineproto/
