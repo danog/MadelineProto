@@ -44,7 +44,7 @@ function ___install_madeline()
         }
     }
 
-    // MadelineProto update
+    // Template strings for madelineProto update URLs
     $release_template = 'https://phar.madelineproto.xyz/release%s?v=new';
     $phar_template = 'https://phar.madelineproto.xyz/madeline%s.phar?v=new';
 
@@ -53,21 +53,21 @@ function ___install_madeline()
     if ($release_branch === '-') {
         $release_branch = '';
     }
-    $release_default_branch = '';
+    $release_fallback_branch = '';
 
     if (PHP_MAJOR_VERSION <= 5) {
         $release_branch = '5'.$release_branch;
-        $release_default_branch = '5';
-    } elseif (PHP_MINOR_VERSION >= 3) {
+        $release_fallback_branch = '5'.$release_fallback_branch;
+    } elseif (PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION === 0) {
         $release_branch = '';
     }
 
     // Checking if defined branch/default branch builds can be downloaded
     if (!($release = @file_get_contents(sprintf($release_template, $release_branch)))) {
-        if (!($release = @file_get_contents(sprintf($release_template, $release_default_branch)))) {
+        if (!($release = @file_get_contents(sprintf($release_template, $release_fallback_branch)))) {
             return;
         }
-        $release_branch = $release_default_branch;
+        $release_branch = $release_fallback_branch;
     }
 
     if (!file_exists('madeline.phar') || !file_exists('madeline.phar.version') || file_get_contents('madeline.phar.version') !== $release) {

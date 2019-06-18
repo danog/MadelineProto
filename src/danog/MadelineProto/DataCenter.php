@@ -42,7 +42,6 @@ use danog\MadelineProto\Stream\Proxy\SocksProxy;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
-use danog\MadelineProto\TL\Conversion\Exception;
 use Amp\DoH\Nameserver;
 use function Amp\call;
 use Amp\Promise;

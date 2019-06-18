@@ -1,17 +1,19 @@
 #!/bin/bash -e
 
-#composer global require spatie/7to5 dev-master#7b3e0f4254aadd81cf1a7ef2ddad68d5fcdadcc1
-
+# Configure
+composer global require spatie/7to5 dev-master#80de80c7ebb0dd0805a79e939b0426883ffd9403
 [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
 [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
 
-
+# Clean up
 rm -rf phar7 phar5 MadelineProtoPhar
 madelinePath=$PWD
 cd
 rm -rf phar7 phar5 MadelineProtoPhar
 mkdir phar7
 cd phar7
+
+# Install
 echo '{
     "name": "danog/madelineprototests",
     "minimum-stability":"dev",

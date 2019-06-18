@@ -310,7 +310,7 @@ trait Tools
             $logger->logger("Well you know, this might actually not be the actual exception, scroll up in the logs to see the actual exception");
             if (!$zis || !$zis->destructing) Promise\rethrow(new Failure($e));
         } else {
-            $logger->logger($e);
+            if ($logger) $logger->logger($e);
             Promise\rethrow(new Failure($e));
         }
     }

@@ -115,3 +115,4 @@ madeline.php
 .phpunit.result.cache
 .vscode/*
 .vscode
+custom.md

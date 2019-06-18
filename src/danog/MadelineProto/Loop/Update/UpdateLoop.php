@@ -121,8 +121,8 @@ class UpdateLoop extends ResumableSignalLoop
                                 $API->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested ".$state->pts().', using '.($state->pts() + 1), \danog\MadelineProto\Logger::VERBOSE);
                                 $difference['pts'] = $request_pts + 1;
                             }
-                            $state->update($difference);
                             $result += yield $feeder->feed($difference['other_updates']);
+                            $state->update($difference);
 
                             $feeder->saveMessages($difference['new_messages']);
                             if (!$difference['final']) {
@@ -160,8 +160,8 @@ class UpdateLoop extends ResumableSignalLoop
                             }
                             $result += yield $feeder->feed($difference['other_updates']);
                             $result += yield $feeder->feed($difference['new_encrypted_messages']);
-                            $feeder->saveMessages($difference['new_messages']);
                             $state->update($difference['state']);
+                            $feeder->saveMessages($difference['new_messages']);
                             unset($difference);
                             break 2;
                         case 'updates.differenceSlice':
@@ -170,8 +170,8 @@ class UpdateLoop extends ResumableSignalLoop
                             }
                             $result += yield $feeder->feed($difference['other_updates']);
                             $result += yield $feeder->feed($difference['new_encrypted_messages']);
-                            $feeder->saveMessages($difference['new_messages']);
                             $state->update($difference['intermediate_state']);
+                            $feeder->saveMessages($difference['new_messages']);
                             if ($difference['intermediate_state']['pts'] >= $toPts) {
                                 unset($difference);
                                 break 2;
