@@ -49,7 +49,7 @@ function ___install_madeline()
     $phar_template = 'https://phar.madelineproto.xyz/madeline%s.phar?v=new';
 
     // Version definition
-    $release_branch = defined('MADELINE_BRANCH') ? '-'.MADELINE_BRANCH : '-old';
+    $release_branch = defined('MADELINE_BRANCH') ? '-'.MADELINE_BRANCH : '';
     if ($release_branch === '-') {
         $release_branch = '';
     }
