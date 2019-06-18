@@ -58,6 +58,11 @@ cd ..
 
 [ $PHP_MAJOR_VERSION -eq 5 ] && {
     git clone https://github.com/php-build/php-build $(phpenv root)/plugins/php-build
+    git clone -b rel-1-5-1 https://github.com/nih-at/libzip.git
+    cd libzip
+    cmake -DCMAKE_INSTALL_PREFIX=/home/derick/.phpenv/versions/7.3.6 .
+    make -j11
+    make install
     phpenv install 7.3.6
 
     ~/.phpenv/versions/7.3.6/bin/php $php7to5 convert --copy-all phar7 phar5 >/dev/null
