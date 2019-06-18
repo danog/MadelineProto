@@ -57,6 +57,7 @@ cp -a $madelinePath/src vendor/danog/madelineproto/
 cd ..
 
 [ $PHP_MAJOR_VERSION -eq 5 ] && {
+    git clone https://github.com/php-build/php-build $(phpenv root)/plugins/php-build
     phpenv install 7.3.6
 
     ~/.phpenv/versions/7.3.6/bin/php $php7to5 convert --copy-all phar7 phar5 >/dev/null
