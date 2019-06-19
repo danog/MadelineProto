@@ -89,7 +89,7 @@ cd ..
 find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
 
 # Make sure conversion worked
-for f in $(find . -type f -name '*.php'); do php -l $f | grep -v 'No syntax errors';done
+for f in $(find . -type f -name '*.php'); do php -l $f;done
 
 #[ "$TRAVIS_BRANCH" != "master" ] && branch="-$TRAVIS_BRANCH" || branch=""
 branch="-$TRAVIS_BRANCH"
