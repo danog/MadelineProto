@@ -4,15 +4,6 @@
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 
-# Download converters
-composer global require spatie/7to5 dev-master#e03b18903c45b01546c2984cc3c54e4750c71e3a
-[ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
-[ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
-
-composer global require danog/7to70
-[ -f $HOME/.composer/vendor/bin/php7to70 ] && php7to70=$HOME/.composer/vendor/bin/php7to70
-[ -f $HOME/.config/composer/vendor/bin/php7to70 ] && php7to70=$HOME/.config/composer/vendor/bin/php7to70
-
 # Clean up
 rm -rf phar7 phar5 MadelineProtoPhar
 madelinePath=$PWD
@@ -57,13 +48,9 @@ cp -a $madelinePath/src vendor/danog/madelineproto/
 cd ..
 
 [ $PHP_MAJOR_VERSION -eq 5 ] && {
-    #git clone https://github.com/php-build/php-build $(phpenv root)/plugins/php-build
-    #git clone -b rel-1-5-1 https://github.com/nih-at/libzip.git
-    #cd libzip
-    #cmake -DCMAKE_INSTALL_PREFIX=$HOME/.phpenv/versions/7.3.6 .
-    #make -j11
-    #make install
-    #phpenv install 7.3.6
+    composer global require spatie/7to5 dev-master#fdb11a2
+    [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
+    [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
 
     php7.3 $php7to5 convert --copy-all phar7 phar5 >/dev/null
 
@@ -79,7 +66,12 @@ cd ..
 }
 [ $PHP_MAJOR_VERSION -eq 7 ] && {
     [ $PHP_MINOR_VERSION -eq 0 ] && {
+        composer global require danog/7to70
+        [ -f $HOME/.composer/vendor/bin/php7to70 ] && php7to70=$HOME/.composer/vendor/bin/php7to70
+        [ -f $HOME/.config/composer/vendor/bin/php7to70 ] && php7to70=$HOME/.config/composer/vendor/bin/php7to70
+
         $php7to70 convert --copy-all phar7 phar5 >/dev/null
+
         php=70
     } || {
         cp -a phar7 phar5
