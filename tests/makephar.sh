@@ -5,7 +5,7 @@ PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 
 # Download converters
-composer global require spatie/7to5 dev-master#80de80c7ebb0dd0805a79e939b0426883ffd9403
+composer global require spatie/7to5 dev-master#e03b18903c45b01546c2984cc3c54e4750c71e3a
 [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
 [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
 
@@ -87,6 +87,9 @@ cd ..
 }
 
 find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
+
+# Make sure conversion worked
+for f in $(find . -type f -name '*.php'); do php -l $f | grep -v 'No syntax errors';done
 
 #[ "$TRAVIS_BRANCH" != "master" ] && branch="-$TRAVIS_BRANCH" || branch=""
 branch="-$TRAVIS_BRANCH"

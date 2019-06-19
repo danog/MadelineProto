@@ -900,6 +900,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
     public function connect_to_all_dcs_async(): \Generator
     {
+        $this->channels_state->get(false);
         foreach ($this->channels_state->get() as $state) {
             $channelId = $state->getChannel();
             if (!isset($this->feeders[$channelId])) {
