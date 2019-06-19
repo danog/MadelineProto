@@ -100,7 +100,7 @@ class DataCenter
             ],
             $this->HTTPClient
         );
-        $this->DoHClient = Magic::$altervista ? new Rfc1035StubResolver() : new Rfc8484StubResolver($DoHConfig);
+        $this->DoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($DoHConfig);
     }
 
     /**
