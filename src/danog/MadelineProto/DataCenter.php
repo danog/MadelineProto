@@ -108,6 +108,7 @@ class DataCenter
      *
      * Note: Once resolved the socket stream will already be set to non-blocking mode.
      *
+     * @param bool                 $ipv6
      * @param string               $uricall
      * @param ClientConnectContext $socketContext
      * @param ClientTlsContext     $tlsContext
@@ -116,12 +117,13 @@ class DataCenter
      * @return Promise<ClientSocket>
      */
     public function cryptoConnect(
+        bool $ipv6,
         string $uri,
         ClientConnectContext $socketContext = null,
         ClientTlsContext $tlsContext = null,
         CancellationToken $token = null
     ): Promise {
-        return call(function () use ($uri, $socketContext, $tlsContext, $token) {
+        return call(function () use ($ipv6, $uri, $socketContext, $tlsContext, $token) {
             $tlsContext = $tlsContext ?? new ClientTlsContext;
 
             if ($tlsContext->getPeerName() === null) {
@@ -129,7 +131,7 @@ class DataCenter
             }
 
             /** @var ClientSocket $socket */
-            $socket = yield $this->socketConnect($uri, $socketContext, $token);
+            $socket = yield $this->socketConnect($ipv6, $uri, $socketContext, $token);
 
             $promise = $socket->enableCrypto($tlsContext);
 
@@ -168,15 +170,16 @@ class DataCenter
     /**
      * Asynchronously establish a socket connection to the specified URI.
      *
+     * @param bool                   $ipv6 Whether to use IPv6
      * @param string                 $uri URI in scheme://host:port format. TCP is assumed if no scheme is present.
      * @param ClientConnectContext   $socketContext Socket connect context to use when connecting.
      * @param CancellationToken|null $token
      *
      * @return Promise<\Amp\Socket\ClientSocket>
      */
-    public function socketConnect(string $uri, ClientConnectContext $socketContext = null, CancellationToken $token = null): Promise
+    public function socketConnect(bool $ipv6, string $uri, ClientConnectContext $socketContext = null, CancellationToken $token = null): Promise
     {
-        return call(function () use ($uri, $socketContext, $token) {
+        return call(function () use ($ipv6, $uri, $socketContext, $token) {
             $socketContext = $socketContext ?? new ClientConnectContext;
             $token = $token ?? new NullCancellationToken;
             $attempt = 0;
@@ -196,11 +199,12 @@ class DataCenter
                 // Host is not an IP address, so resolve the domain name.
                 $records = yield $this->DoHClient->resolve($host, $socketContext->getDnsTypeRestriction());
 
-                // Usually the faster response should be preferred, but we don't have a reliable way of determining IPv6
-                // support, so we always prefer IPv4 here.
                 \usort($records, function (Record $a, Record $b) {
                     return $a->getType() - $b->getType();
                 });
+                if ($ipv6) {
+                    $records = array_reverse($records);
+                }
 
                 foreach ($records as $record) {
                     /** @var Record $record */
