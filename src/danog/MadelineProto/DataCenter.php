@@ -507,7 +507,24 @@ class DataCenter
 
                     foreach ($combo as $stream) {
                         if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
-                            $stream[1] = [[$this, 'socketConnect'], [$this, 'cryptoConnect']];
+                            $isIpv6 = $ipv6 === 'ipv6';
+                            $stream[1] = [
+                                function (
+                                    string $uri,
+                                    ClientConnectContext $socketContext = null,
+                                    CancellationToken $token = null
+                                ) use ($isIpv6): Promise {
+                                    return $this->socketConnect($isIpv6, $uri, $socketContext, $token);
+                                },
+                                function (
+                                    string $uri,
+                                    ClientConnectContext $socketContext = null,
+                                    ClientTlsContext $tlsContext = null,
+                                    CancellationToken $token = null
+                                ) use ($isIpv6): Promise {
+                                    return $this->cryptoConnect($isIpv6, $uri, $socketContext, $tlsContext, $token);
+                                }
+                            ];
                         }
                         $ctx->addStream(...$stream);
                     }
@@ -567,7 +584,24 @@ class DataCenter
 
                     foreach ($combo as $stream) {
                         if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
-                            $stream[1] = [[$this, 'socketConnect'], [$this, 'cryptoConnect']];
+                            $isIpv6 = $ipv6 === 'ipv6';
+                            $stream[1] = [
+                                function (
+                                    string $uri,
+                                    ClientConnectContext $socketContext = null,
+                                    CancellationToken $token = null
+                                ) use ($isIpv6): Promise {
+                                    return $this->socketConnect($isIpv6, $uri, $socketContext, $token);
+                                },
+                                function (
+                                    string $uri,
+                                    ClientConnectContext $socketContext = null,
+                                    ClientTlsContext $tlsContext = null,
+                                    CancellationToken $token = null
+                                ) use ($isIpv6): Promise {
+                                    return $this->cryptoConnect($isIpv6, $uri, $socketContext, $tlsContext, $token);
+                                }
+                            ];
                         }
                         $ctx->addStream(...$stream);
                     }
