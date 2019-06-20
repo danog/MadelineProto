@@ -507,18 +507,17 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->wrapper->serialize($this->wrapper->session);
         }
     }
-
-    public function parse_settings($settings)
+    public static function getSettings($settings, $previousSettings = [])
     {
-        if (isset($this->settings['connection_settings']['default_dc'])) {
-            $settings['connection_settings']['default_dc'] = $this->settings['connection_settings']['default_dc'];
+        if (isset($previousSettings['connection_settings']['default_dc'])) {
+            $settings['connection_settings']['default_dc'] = $previousSettings['connection_settings']['default_dc'];
         }
         if (!isset($settings['app_info']['api_id']) || !$settings['app_info']['api_id']) {
-            if (isset($this->settings['app_info']['api_id']) && $this->settings['app_info']['api_id']) {
-                $settings['app_info']['api_id'] = $this->settings['app_info']['api_id'];
-                $settings['app_info']['api_hash'] = $this->settings['app_info']['api_hash'];
+            if (isset($previousSettings['app_info']['api_id']) && $previousSettings['app_info']['api_id']) {
+                $settings['app_info']['api_id'] = $previousSettings['app_info']['api_id'];
+                $settings['app_info']['api_hash'] = $previousSettings['app_info']['api_hash'];
             } else {
-                throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
+                $settings['app_info'] = null;
             }
         }
         // Detect device model
@@ -795,10 +794,6 @@ class MTProto extends AsyncConstruct implements TLCallback
             // Need info ?
             'requests' => true,
         ]];
-
-        if (!is_array($settings)) {
-            $settings = [];
-        }
         $settings = array_replace_recursive($default_settings, $settings);
         if (isset(Lang::$lang[$settings['app_info']['lang_code']])) {
             Lang::$current_lang = &Lang::$lang[$settings['app_info']['lang_code']];
@@ -826,6 +821,14 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $settings['logger']['logger_level'] = 0;
                 break;
         }
+        return $settings;
+    }
+    public function parse_settings($settings)
+    {
+        $settings = self::getSettings($settings, $this->settings);
+        if ($this->settings['app_info'] === null) {
+            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
+        }
         $this->settings = $settings;
         if (!$this->settings['updates']['handle_updates']) {
             $this->updates = [];
@@ -836,34 +839,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function setup_logger()
     {
-        if (isset($this->settings['logger']['rollbar_token']) && $this->settings['logger']['rollbar_token'] !== '' && class_exists('\\Rollbar\\Rollbar')) {
-            @\Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => isset($this->settings['logger']['rollbar_token']) && !in_array($this->settings['logger']['rollbar_token'], ['f9fff6689aea4905b58eec73f66c791d', '300afd7ccef346ea84d0c185ae831718', '11a8c2fe4c474328b40a28193f8d63f5', 'beef2d426496462ba34dcaad33d44a14']) || $this->settings['pwr']['pwr'] ? $this->settings['logger']['rollbar_token'] : 'c07d9b2f73c2461297b0beaef6c1662f'], false, false);
-        } else {
-            Exception::$rollbar = false;
-            RPCErrorException::$rollbar = false;
-        }
-
-        if (php_sapi_name() !== 'cli') {
-            if (isset($this->settings['logger']['logger_param']) && basename($this->settings['logger']['logger_param']) === 'MadelineProto.log') {
-                $this->settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
-            }
-        }
-
-        $this->logger = new \danog\MadelineProto\Logger($this->settings['logger']['logger'], isset($this->settings['logger']['logger_param']) ? $this->settings['logger']['logger_param'] : '', isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE, isset($this->settings['logger']['max_size']) ? $this->settings['logger']['max_size'] : 100 * 1024 * 1024);
-        if (!\danog\MadelineProto\Logger::$default) {
-            \danog\MadelineProto\Logger::constructor($this->settings['logger']['logger'], $this->settings['logger']['logger_param'], isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '', isset($this->settings['logger']['logger_level']) ? $this->settings['logger']['logger_level'] : Logger::VERBOSE, isset($this->settings['logger']['max_size']) ? $this->settings['logger']['max_size'] : 100 * 1024 * 1024);
-        }
-
-        if (php_sapi_name() !== 'cli') {
-            try {
-                error_reporting(E_ALL);
-                ini_set('log_errors', 1);
-                ini_set('error_log', Magic::$script_cwd.'/MadelineProto.log');
-                error_log('Enabled PHP logging');
-            } catch (\danog\MadelineProto\Exception $e) {
-                $this->logger->logger('Could not enable PHP logging');
-            }
-        }
+        $this->logger = Logger::getLoggerFromSettings($this->settings, isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '');
     }
 
     public function reset_session($de = true, $auth_key = false)

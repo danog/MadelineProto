@@ -31,10 +31,10 @@ class Logger
 {
     use Tools;
 
-    const foreground = ['default' => 39, 'black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'magenta' => 35, 'cyan' => 36, 'light_gray' => 37, 'dark_gray' => 90, 'light_red' => 91, 'light_green' => 92, 'light_yellow' => 93, 'light_blue' => 94, 'light_magenta' => 95, 'light_cyan' => 96, 'white' => 97];
-    const background = ['default' => 49, 'black' => 40, 'red' => 41, 'magenta' => 45, 'yellow' => 43, 'green' => 42, 'blue' => 44, 'cyan' => 46, 'light_gray' => 47, 'dark_gray' => 100, 'light_red' => 101, 'light_green' => 102, 'light_yellow' => 103, 'light_blue' => 104, 'light_magenta' => 105, 'light_cyan' => 106, 'white' => 107];
-    const set = ['bold' => 1, 'dim' => 2, 'underlined' => 3, 'blink' => 4, 'reverse' => 5, 'hidden' => 6];
-    const reset = ['all' => 0, 'bold' => 21, 'dim' => 22, 'underlined' => 24, 'blink' => 25, 'reverse' => 26, 'hidden' => 28];
+    const FOREGROUND = ['default' => 39, 'black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'magenta' => 35, 'cyan' => 36, 'light_gray' => 37, 'dark_gray' => 90, 'light_red' => 91, 'light_green' => 92, 'light_yellow' => 93, 'light_blue' => 94, 'light_magenta' => 95, 'light_cyan' => 96, 'white' => 97];
+    const BACKGROUND = ['default' => 49, 'black' => 40, 'red' => 41, 'magenta' => 45, 'yellow' => 43, 'green' => 42, 'blue' => 44, 'cyan' => 46, 'light_gray' => 47, 'dark_gray' => 100, 'light_red' => 101, 'light_green' => 102, 'light_yellow' => 103, 'light_blue' => 104, 'light_magenta' => 105, 'light_cyan' => 106, 'white' => 107];
+    const SET = ['bold' => 1, 'dim' => 2, 'underlined' => 3, 'blink' => 4, 'reverse' => 5, 'hidden' => 6];
+    const RESET = ['all' => 0, 'bold' => 21, 'dim' => 22, 'underlined' => 24, 'blink' => 25, 'reverse' => 26, 'hidden' => 28];
 
     public $mode = 0;
     public $optional = null;
@@ -60,21 +60,72 @@ class Logger
     const ECHO_LOGGER = 3;
     const CALLABLE_LOGGER = 4;
 
-    /*
-     * Constructor function
-     * Accepts various logger modes:
-     * 0 - No logger
-     * 1 - Log to the default logger destination
-     * 2 - Log to file defined in second parameter
-     * 3 - Echo logs
-     * 4 - Call callable provided in logger_param. logger_param must accept two parameters: array $message, int $level
-     *     $message is an array containing the messages the log, $level, is the logging level
+    /**
+     * Construct global logger
+     *
+     * @param [type] $mode
+     * @param [type] $optional
+     * @param string $prefix
+     * @param [type] $level
+     * @param [type] $max_size
+     * @return void
      */
     public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE, $max_size = 100 * 1024 * 1024)
     {
         self::$default = new self($mode, $optional, $prefix, $level, $max_size);
     }
+    /**
+     * Construct global static logger from MadelineProto settings
+     *
+     * @param array $settings
+     * @return void
+     */
+    public static function constructorFromSettings(array $settings) {
+        if (!self::$default) {
+            // The getLogger function will automatically init the static logger, but we'll do it again anyway
+            self::$default = self::getLoggerFromSettings(MTProto::getSettings($settings));
+        }
+    }
+    /**
+     * Get logger from MadelineProto settings
+     *
+     * @param array $settings
+     * @param string $prefix Optional prefix
+     * @return self
+     */
+    public static function getLoggerFromSettings(array $settings, string $prefix = ''): self
+    {
+        if (isset($settings['logger']['rollbar_token']) && $settings['logger']['rollbar_token'] !== '' && class_exists('\\Rollbar\\Rollbar')) {
+            @\Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => isset($settings['logger']['rollbar_token']) && !in_array($settings['logger']['rollbar_token'], ['f9fff6689aea4905b58eec73f66c791d', '300afd7ccef346ea84d0c185ae831718', '11a8c2fe4c474328b40a28193f8d63f5', 'beef2d426496462ba34dcaad33d44a14']) || $settings['pwr']['pwr'] ? $settings['logger']['rollbar_token'] : 'c07d9b2f73c2461297b0beaef6c1662f'], false, false);
+        } else {
+            Exception::$rollbar = false;
+            RPCErrorException::$rollbar = false;
+        }
 
+        if (php_sapi_name() !== 'cli') {
+            if (isset($settings['logger']['logger_param']) && basename($settings['logger']['logger_param']) === 'MadelineProto.log') {
+                $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
+            }
+        }
+
+        $logger = new self($settings['logger']['logger'], isset($settings['logger']['logger_param']) ? $settings['logger']['logger_param'] : '', $prefix, isset($settings['logger']['logger_level']) ? $settings['logger']['logger_level'] : Logger::VERBOSE, isset($settings['logger']['max_size']) ? $settings['logger']['max_size'] : 100 * 1024 * 1024);
+        if (!self::$default) {
+            self::$default = $logger;
+        }
+
+        if (php_sapi_name() !== 'cli') {
+            try {
+                error_reporting(E_ALL);
+                ini_set('log_errors', 1);
+                ini_set('error_log', Magic::$script_cwd.'/MadelineProto.log');
+                error_log('Enabled PHP logging');
+            } catch (\danog\MadelineProto\Exception $e) {
+                $logger->logger('Could not enable PHP logging');
+            }
+        }
+
+        return $logger;
+    }
     public function __construct($mode, $optional = null, $prefix = '', $level = self::NOTICE, $max_size = 100 * 1024 * 1024)
     {
         if ($mode === null) {
@@ -97,12 +148,12 @@ class Logger
             unlink($this->optional);
         }
 
-        $this->colors[self::ULTRA_VERBOSE] = implode(';', [self::foreground['light_gray'], self::set['dim']]);
-        $this->colors[self::VERBOSE] = implode(';', [self::foreground['green'], self::set['bold']]);
-        $this->colors[self::NOTICE] = implode(';', [self::foreground['yellow'], self::set['bold']]);
-        $this->colors[self::WARNING] = implode(';', [self::foreground['white'], self::set['dim'], self::background['red']]);
-        $this->colors[self::ERROR] = implode(';', [self::foreground['white'], self::set['bold'], self::background['red']]);
-        $this->colors[self::FATAL_ERROR] = implode(';', [self::foreground['red'], self::set['bold'], self::background['light_gray']]);
+        $this->colors[self::ULTRA_VERBOSE] = implode(';', [self::FOREGROUND['light_gray'], self::SET['dim']]);
+        $this->colors[self::VERBOSE] = implode(';', [self::FOREGROUND['green'], self::SET['bold']]);
+        $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
+        $this->colors[self::WARNING] = implode(';', [self::FOREGROUND['white'], self::SET['dim'], self::BACKGROUND['red']]);
+        $this->colors[self::ERROR] = implode(';', [self::FOREGROUND['white'], self::SET['bold'], self::BACKGROUND['red']]);
+        $this->colors[self::FATAL_ERROR] = implode(';', [self::FOREGROUND['red'], self::SET['bold'], self::BACKGROUND['light_gray']]);
         $this->newline = PHP_EOL;
 
         if ($this->mode === 3) {
@@ -138,14 +189,14 @@ class Logger
         }
         if (!self::$printed) {
             self::$printed = true;
-            $this->colors[self::NOTICE] = implode(';', [self::foreground['light_gray'], self::set['bold'], self::background['blue']]);
+            $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
 
             $this->logger('MadelineProto');
             $this->logger('Copyright (C) 2016-2019 Daniil Gentili');
             $this->logger('Licensed under AGPLv3');
             $this->logger('https://github.com/danog/MadelineProto');
 
-            $this->colors[self::NOTICE] = implode(';', [self::foreground['yellow'], self::set['bold']]);
+            $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
         }
         if ($this->mode === 4) {
             return call_user_func_array($this->optional, [$param, $level]);

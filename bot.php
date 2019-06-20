@@ -1,5 +1,7 @@
 #!/usr/bin/env php
 <?php
+use danog\MadelineProto\Stream\Proxy\SocksProxy;
+
 /*
 Copyright 2016-2019 Daniil Gentili
 (https://daniil.it)
@@ -9,7 +11,7 @@ MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY
 See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelineProto/'));
 
 /*
@@ -56,7 +58,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         }
     }
 }
-$settings = ['logger' => ['logger_level' => 5], 'connection_settings' => ['all' => ['protocol' => 'tcp_abridged']]];
+$settings = ['logger' => ['logger_level' => 5], 'connection_settings' => ['all' => ['protocol' => 'tcp_abridged', 'proxy' => SocksProxy::getName(), 'proxy_extra' => ['address' => '1.pwrtelegram.xyz', 'port' => 1080]]]];
 
 $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
 $MadelineProto->async(true);

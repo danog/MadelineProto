@@ -32,7 +32,7 @@ class MyTelegramOrgWrapper
     private $token;
     private $number;
     private $creation_hash;
-    private $settings;
+    private $settings = [];
     private $async = true;
     const MY_TELEGRAM_URL = 'https://my.telegram.org';
 
@@ -43,42 +43,18 @@ class MyTelegramOrgWrapper
 
     public function __construct($settings = [])
     {
-        if (!isset($settings['all'])) {
-            $settings['connection_settings'] = ['all' => [
-                // These settings will be applied on every datacenter that hasn't a custom settings subarray...
-                'protocol' => Magic::$altervista ? 'http' : 'tcp_abridged',
-                // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, obfuscated2, udp (unsupported)
-                'test_mode' => false,
-                // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
-                'ipv6' => \danog\MadelineProto\Magic::$ipv6,
-                // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
-                'timeout' => 2,
-                // timeout for sockets
-                'proxy' => Magic::$altervista ? '\\HttpProxy' : '\\Socket',
-                // The proxy class to use
-                'proxy_extra' => Magic::$altervista ? ['address' => 'localhost', 'port' => 80] : [],
-                // Extra parameters to pass to the proxy class using setExtra
-                'obfuscated' => false,
-                'transport'  => 'tcp',
-                'pfs'        => extension_loaded('gmp'),
-            ],
-            ];
-        }
-        $this->settings = $settings;
+        $this->settings = MTProto::getSettings($settings, $this->settings);
         $this->__wakeup();
     }
 
     public function __wakeup()
     {
         $this->datacenter = new DataCenter(
-            new class($this->settings) {
+            new class($this->settings)
+            {
                 public function __construct($settings)
                 {
-                    $this->logger = new Logger(
-                        isset($settings['logger']['logger']) ? $settings['logger']['logger'] : php_sapi_name() === 'cli' ? 3 : 2,
-                        isset($settings['logger']['logger_param']) ? $settings['logger']['logger_param'] : Magic::$script_cwd.'/MadelineProto.log',
-                        isset($settings['logger']['logger_level']) ? $settings['logger']['logger_level'] : Logger::VERBOSE,
-                        isset($settings['logger']['max_size']) ? $settings['logger']['max_size'] : 100 * 1024 * 1024);
+                    $this->logger = Logger::getLoggerFromSettings($settings);
                 }
             },
             [],

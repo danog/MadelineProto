@@ -57,17 +57,8 @@ class API extends APIFactory
     public function __construct_async($params, $settings, $deferred)
     {
         if (is_string($params)) {
-            if (!\danog\MadelineProto\Logger::$default) {
-                if (!isset($settings['logger']['logger_param'])) {
-                    $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
-                }
+            Logger::constructorFromSettings($settings);
 
-                if (!isset($settings['logger']['logger'])) {
-                    $settings['logger']['logger'] = php_sapi_name() === 'cli' ? 3 : 2;
-                }
-
-                \danog\MadelineProto\Logger::constructor($settings['logger']['logger'], $settings['logger']['logger_param'], '', isset($settings['logger']['logger_level']) ? $settings['logger']['logger_level'] : Logger::VERBOSE, isset($settings['logger']['max_size']) ? $settings['logger']['max_size'] : 100 * 1024 * 1024);
-            }
             $realpaths = Serialization::realpaths($params);
             $this->session = $realpaths['file'];
 
@@ -157,15 +148,8 @@ class API extends APIFactory
             }
             $params = $settings;
         }
-        if (!\danog\MadelineProto\Logger::$default) {
-            if (!isset($settings['logger']['logger_param'])) {
-                $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
-            }
-            if (!isset($settings['logger']['logger'])) {
-                $settings['logger']['logger'] = php_sapi_name() === 'cli' ? 3 : 2;
-            }
-            \danog\MadelineProto\Logger::constructor($settings['logger']['logger'], $settings['logger']['logger_param'], '', isset($settings['logger']['logger_level']) ? $settings['logger']['logger_level'] : Logger::VERBOSE, isset($settings['logger']['max_size']) ? $settings['logger']['max_size'] : 100 * 1024 * 1024);
-        }
+        Logger::constructorFromSettings($settings);
+
         if (!isset($params['app_info']['api_id']) || !$params['app_info']['api_id']) {
             $app = yield $this->api_start_async($params);
             $params['app_info']['api_id'] = $app['api_id'];

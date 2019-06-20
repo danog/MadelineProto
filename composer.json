@@ -49,6 +49,7 @@
         "files": [
             "src/BigIntegor.php",
             "src/YieldReturnValue.php",
+            "src/ReflectionGenerator.php",
             "src/polyfill.php"
         ]
     },
