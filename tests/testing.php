@@ -48,7 +48,7 @@ $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
  */
 echo 'Loading MadelineProto...'.PHP_EOL;
 $MadelineProto = new \danog\MadelineProto\API(getcwd().'/testing.madeline', $settings);
-
+$MadelineProto->fileGetContents('https://google.com');
 $MadelineProto->start();
 
 try {
