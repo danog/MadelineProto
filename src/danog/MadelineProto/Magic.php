@@ -25,6 +25,8 @@ use Amp\DoH\Rfc8484StubResolver;
 use Amp\Loop;
 use function Amp\Dns\resolver;
 use function Amp\Promise\wait;
+use function Amp\ByteStream\getStdin;
+use function Amp\ByteStream\getInputBufferStream;
 
 class Magic
 {
@@ -143,6 +145,8 @@ class Magic
             if (defined('SIGINT')) {
                 //if (function_exists('pcntl_async_signals')) pcntl_async_signals(true);
                 Loop::onSignal(SIGINT, static function () {
+                    getStdin()->unreference();
+                    getInputBufferStream()->unreference();
                     Logger::log('Got sigint', Logger::FATAL_ERROR); 
                     die();
                 });

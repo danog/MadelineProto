@@ -165,7 +165,7 @@ class UpdateLoop extends ResumableSignalLoop
                             unset($difference);
                             break 2;
                         case 'updates.differenceSlice':
-                            $state->qts($difference['state']['qts']);
+                            $state->qts($difference['intermediate_state']['qts']);
                             foreach ($difference['new_encrypted_messages'] as &$encrypted) {
                                 $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
                             }

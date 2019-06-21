@@ -342,6 +342,7 @@ class API extends APIFactory
                 flock($realpaths['lockfile'], LOCK_UN);
                 fclose($realpaths['lockfile']);
             }
+            \danog\MadelineProto\Logger::log('Done serializing');
 
             return $wrote;
         })());

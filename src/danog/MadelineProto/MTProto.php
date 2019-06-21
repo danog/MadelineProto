@@ -30,6 +30,8 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\TL\TLCallback;
+use function Amp\ByteStream\getStdin;
+use function Amp\ByteStream\getInputBufferStream;
 
 /**
  * Manages all of the mtproto stuff.
