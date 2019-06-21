@@ -229,23 +229,25 @@ trait UpdateHandler
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
-            $cur_state = yield $this->load_update_state_async();
-            if ($cur_state->qts() === -1) {
-                $cur_state->qts($update['qts']);
-            }
-            if ($update['qts'] < $cur_state->qts()) {
-                $this->logger->logger('Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
+            if (isset($update['qts'])) {
+                $cur_state = yield $this->load_update_state_async();
+                if ($cur_state->qts() === -1) {
+                    $cur_state->qts($update['qts']);
+                }
+                if ($update['qts'] < $cur_state->qts()) {
+                    $this->logger->logger('Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
 
-                return false;
-            }
-            if ($update['qts'] > $cur_state->qts() + 1) {
-                $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
-                $this->updaters[false]->resumeDefer();
+                    return false;
+                }
+                if ($update['qts'] > $cur_state->qts() + 1) {
+                    $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
+                    $this->updaters[false]->resumeDefer();
 
-                return false;
+                    return false;
+                }
+                $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
+                yield $this->method_call_async_read('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             }
-            $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
-            yield $this->method_call_async_read('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             yield $this->handle_encrypted_update_async($update);
 
             return;
