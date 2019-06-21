@@ -58,7 +58,6 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
 
 * [Async](https://docs.madelineproto.xyz/docs/ASYNC.html)
   * [Usage](https://docs.madelineproto.xyz/docs/ASYNC.html#usage)
-    * [Loading the latest version of MadelineProto](https://docs.madelineproto.xyz/docs/ASYNC.html#loading-the-latest-version-of-madelineproto)
     * [Enabling the MadelineProto async API](https://docs.madelineproto.xyz/docs/ASYNC.html#enabling-the-madelineproto-async-api)
     * [Using the MadelineProto async API](https://docs.madelineproto.xyz/docs/ASYNC.html#using-the-madelineproto-async-api)
       * [Async in event handler](https://docs.madelineproto.xyz/docs/ASYNC.html#async-in-event-handler)
@@ -83,7 +82,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
         * [ResumableSignalLoop](https://docs.madelineproto.xyz/docs/ASYNC.html#resumablesignalloop)
         * [GenericLoop](https://docs.madelineproto.xyz/docs/ASYNC.html#genericloop)
 * [Creating a client](https://docs.madelineproto.xyz/docs/CREATING_A_CLIENT.html)
-* [Logging in](https://docs.madelineproto.xyz/docs/LOGIN.html)
+* [Login](https://docs.madelineproto.xyz/docs/LOGIN.html)
   * [Getting permission to use the telegram API](https://docs.madelineproto.xyz/docs/LOGIN.html#getting-permission-to-use-the-telegram-api)
   * [Automatic](https://docs.madelineproto.xyz/docs/LOGIN.html#automatic-now-fully-async)
   * [Manual (user)](https://docs.madelineproto.xyz/docs/LOGIN.html#manual-user)
