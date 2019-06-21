@@ -553,7 +553,7 @@ trait ResponseHandler
         }
 
         if (!isset($request['promise'])) {
-            $this->logger->logger('Response: already got response for '.(isset($request['_']) ? $request['_'] : '-').' with message ID '.$this->unpack_signed_long($request_id));
+            $this->logger->logger('Response: already got response for '.(isset($request['_']) ? $request['_'] : '-').' with message ID '.$request_id);
 
             return;
         }
