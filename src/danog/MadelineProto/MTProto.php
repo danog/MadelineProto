@@ -509,6 +509,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     public static function getSettings($settings, $previousSettings = [])
     {
+        Magic::class_exists();
         if (isset($previousSettings['connection_settings']['default_dc'])) {
             $settings['connection_settings']['default_dc'] = $previousSettings['connection_settings']['default_dc'];
         }
