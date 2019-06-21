@@ -24,6 +24,7 @@ use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
+use Amp\ByteStream\StreamException;
 
 /**
  * Socket write loop.
@@ -64,7 +65,7 @@ class WriteLoop extends ResumableSignalLoop
 
             try {
                 $please_wait = yield $this->{$connection->temp_auth_key === null ? 'unencryptedWriteLoopAsync' : 'encryptedWriteLoopAsync'}();
-            } catch (\Amp\ByteStream\StreamException $e) {
+            } catch (StreamException $e) {
                 if (isset($connection->old)) {
                     return;
                 }

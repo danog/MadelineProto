@@ -12,3 +12,6 @@ if (!function_exists('is_iterable')) {
         return is_array($var) || $var instanceof Traversable;
     }
 }
+if (!function_exists('error_clear_last')) {
+    function error_clear_last() {}
+}

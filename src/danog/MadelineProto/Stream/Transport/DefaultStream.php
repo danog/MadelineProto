@@ -25,6 +25,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
 use function Amp\Socket\connect;
 use function Amp\Socket\cryptoConnect;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
+use Amp\ByteStream\ClosedException;
 
 /**
  * Default stream wrapper.
@@ -83,6 +84,9 @@ class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInt
      */
     public function write(string $data): Promise
     {
+        if (!$this->stream) {
+            throw new ClosedException("MadelineProto stream was disconnected");
+        }
         return $this->stream->write($data);
     }
 
