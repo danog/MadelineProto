@@ -119,14 +119,14 @@ cd MadelineProtoPhar
 cp "../madeline$php$branch.phar" .
 cp ../phar.php ../mtproxyd .
 echo -n $TRAVIS_COMMIT > release$php$branch
-git add -A
-git commit -am "Release $TRAVIS_BRANCH - $TRAVIS_COMMIT_MESSAGE"
 
 echo "$TRAVIS_COMMIT_MESSAGE" | grep -i "subrelease" && {
     cp release$php$branch release$php
     cp madeline$php$branch.phar madeline$php.phar
 }
 
+git add -A
+git commit -am "Release $TRAVIS_BRANCH - $TRAVIS_COMMIT_MESSAGE"
 git push origin master
 cd ..
 echo "$TRAVIS_COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
