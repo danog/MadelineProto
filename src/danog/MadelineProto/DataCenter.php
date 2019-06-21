@@ -24,10 +24,21 @@ use Amp\Artax\Cookie\ArrayCookieJar;
 use Amp\Artax\DefaultClient;
 use Amp\Artax\HttpSocketPool;
 use Amp\CancellationToken;
+use Amp\Deferred;
+use Amp\Dns\Record;
 use Amp\Dns\Resolver;
+use Amp\Dns\Rfc1035StubResolver;
 use Amp\DoH\DoHConfig;
+use Amp\DoH\Nameserver;
 use Amp\DoH\Rfc8484StubResolver;
+use Amp\Loop;
+use Amp\NullCancellationToken;
+use Amp\Promise;
 use Amp\Socket\ClientConnectContext;
+use Amp\Socket\ClientSocket;
+use Amp\Socket\ClientTlsContext;
+use Amp\Socket\ConnectException;
+use Amp\TimeoutException;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
@@ -42,19 +53,8 @@ use danog\MadelineProto\Stream\Proxy\SocksProxy;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
-use Amp\DoH\Nameserver;
 use function Amp\call;
-use Amp\Promise;
-use Amp\Socket\ClientTlsContext;
-use Amp\Deferred;
-use Amp\NullCancellationToken;
 use function Amp\Socket\Internal\parseUri;
-use Amp\Dns\Record;
-use Amp\Socket\ConnectException;
-use Amp\Loop;
-use Amp\TimeoutException;
-use Amp\Socket\ClientSocket;
-use Amp\Dns\Rfc1035StubResolver;
 
 /**
  * Manages datacenters.
@@ -70,6 +70,7 @@ class DataCenter
     private $settings = [];
     private $HTTPClient;
     private $DoHClient;
+    private $NonProxiedDoHClient;
 
     public function __sleep()
     {
@@ -91,16 +92,33 @@ class DataCenter
                 unset($this->sockets[$key]);
             }
         }
-        $this->HTTPClient = new DefaultClient(new ArrayCookieJar(), new HttpSocketPool(new ProxySocketPool($this)));
+        $this->HTTPClient = new DefaultClient(new ArrayCookieJar(), new HttpSocketPool(new ProxySocketPool([$this, 'rawConnectAsync'])));
 
+        $DoHHTTPClient = new DefaultClient(
+            new ArrayCookieJar(), 
+            new HttpSocketPool(
+                new ProxySocketPool(
+                    function (string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null) {
+                        return $this->rawConnectAsync($uri, $token, $ctx, true);
+                    }
+                )
+            )
+        );
         $DoHConfig = new DoHConfig(
             [
                 new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
                 new Nameserver('https://google.com/resolve', Nameserver::GOOGLE_JSON, ["Host" => "dns.google.com"]),
             ],
-            $this->HTTPClient
+            $DoHHTTPClient
+        );
+        $NonProxiedDoHConfig = new DoHConfig(
+            [
+                new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
+                new Nameserver('https://google.com/resolve', Nameserver::GOOGLE_JSON, ["Host" => "dns.google.com"]),
+            ],
         );
         $this->DoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($DoHConfig);
+        $this->NonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($NonProxiedDoHConfig);
     }
 
     /**
@@ -108,7 +126,7 @@ class DataCenter
      *
      * Note: Once resolved the socket stream will already be set to non-blocking mode.
      *
-     * @param bool                 $ipv6
+     * @param ConnectionContext    $ctx
      * @param string               $uricall
      * @param ClientConnectContext $socketContext
      * @param ClientTlsContext     $tlsContext
@@ -117,13 +135,13 @@ class DataCenter
      * @return Promise<ClientSocket>
      */
     public function cryptoConnect(
-        bool $ipv6,
+        ConnectionContext $ctx,
         string $uri,
         ClientConnectContext $socketContext = null,
         ClientTlsContext $tlsContext = null,
         CancellationToken $token = null
     ): Promise {
-        return call(function () use ($ipv6, $uri, $socketContext, $tlsContext, $token) {
+        return call(function () use ($ctx, $uri, $socketContext, $tlsContext, $token) {
             $tlsContext = $tlsContext ?? new ClientTlsContext;
 
             if ($tlsContext->getPeerName() === null) {
@@ -131,7 +149,7 @@ class DataCenter
             }
 
             /** @var ClientSocket $socket */
-            $socket = yield $this->socketConnect($ipv6, $uri, $socketContext, $token);
+            $socket = yield $this->socketConnect($ctx, $uri, $socketContext, $token);
 
             $promise = $socket->enableCrypto($tlsContext);
 
@@ -170,16 +188,16 @@ class DataCenter
     /**
      * Asynchronously establish a socket connection to the specified URI.
      *
-     * @param bool                   $ipv6 Whether to use IPv6
+     * @param ConnectionContext                   $ctx Connection context
      * @param string                 $uri URI in scheme://host:port format. TCP is assumed if no scheme is present.
      * @param ClientConnectContext   $socketContext Socket connect context to use when connecting.
      * @param CancellationToken|null $token
      *
      * @return Promise<\Amp\Socket\ClientSocket>
      */
-    public function socketConnect(bool $ipv6, string $uri, ClientConnectContext $socketContext = null, CancellationToken $token = null): Promise
+    public function socketConnect(ConnectionContext $ctx, string $uri, ClientConnectContext $socketContext = null, CancellationToken $token = null): Promise
     {
-        return call(function () use ($ipv6, $uri, $socketContext, $token) {
+        return call(function () use ($ctx, $uri, $socketContext, $token) {
             $socketContext = $socketContext ?? new ClientConnectContext;
             $token = $token ?? new NullCancellationToken;
             $attempt = 0;
@@ -197,12 +215,37 @@ class DataCenter
                 $uris = [$uri];
             } else {
                 // Host is not an IP address, so resolve the domain name.
-                $records = yield $this->DoHClient->resolve($host, $socketContext->getDnsTypeRestriction());
-
+                // When we're connecting to a host, we may need to resolve the domain name, first.
+                // The resolution is usually done using DNS over HTTPS.
+                //
+                // The DNS over HTTPS resolver needs to resolve the domain name of the DOH server:
+                // this is handled internally by the DNS over HTTPS client,
+                // by redirecting the resolution request to the plain DNS client.
+                //
+                // However, if the DoH connection is proxied with a proxy that has a domain name itself,
+                // we cannot resolve it with the DoH resolver, since this will cause an infinite loop
+                //
+                // resolve host.com => (DoH resolver) => resolve dohserver.com => (simple resolver) => OK
+                //
+                //                                     |> resolve dohserver.com => (simple resolver) => OK
+                // resolve host.com => (DoH resolver) =|
+                //                                     |> resolve proxy.com => (non-proxied resolver) => OK
+                //
+                //
+                // This means that we must detect if the domain name we're trying to resolve is a proxy domain name.
+                //
+                // Here, we simply check if the connection URI has changed since we first set it:
+                // this would indicate that a proxy class has changed the connection URI to the proxy URI.
+                //
+                if ($ctx->isDns()) {
+                    $records = yield $this->NonProxiedDoHClient->resolve($host, $socketContext->getDnsTypeRestriction());
+                } else {
+                    $records = yield $this->DoHClient->resolve($host, $socketContext->getDnsTypeRestriction());
+                }
                 \usort($records, function (Record $a, Record $b) {
                     return $a->getType() - $b->getType();
                 });
-                if ($ipv6) {
+                if ($ctx->getIpv6()) {
                     $records = array_reverse($records);
                 }
 
@@ -290,7 +333,7 @@ class DataCenter
         });
     }
 
-    public function rawConnectAsync(string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null): \Generator
+    public function rawConnectAsync(string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null, $fromDns = false): \Generator
     {
         $ctxs = $this->generateContexts(0, $uri, $ctx);
         if (empty($ctxs)) {
@@ -299,6 +342,7 @@ class DataCenter
         foreach ($ctxs as $ctx) {
             /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
             try {
+                $ctx->setIsDns($fromDns);
                 $ctx->setCancellationToken($token);
                 $result = yield $ctx->getStream();
                 $this->API->logger->logger('OK!', \danog\MadelineProto\Logger::WARNING);
@@ -308,9 +352,9 @@ class DataCenter
                 if (defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
                     throw $e;
                 }
-                $this->API->logger->logger('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Connection failed: '.$e, \danog\MadelineProto\Logger::ERROR);
             } catch (\Exception $e) {
-                $this->API->logger->logger('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Connection failed: '.$e, \danog\MadelineProto\Logger::ERROR);
             }
         }
 
@@ -498,6 +542,7 @@ class DataCenter
             $ipv6 = [$this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4', $this->settings[$dc_config_number]['ipv6'] ? 'ipv4' : 'ipv6'];
 
             foreach ($ipv6 as $ipv6) {
+                // This is only for non-MTProto connections
                 if (!$dc_number) {
                     /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
                     $ctx = (new ConnectionContext())
@@ -507,23 +552,22 @@ class DataCenter
 
                     foreach ($combo as $stream) {
                         if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
-                            $isIpv6 = $ipv6 === 'ipv6';
                             $stream[1] = [
                                 function (
                                     string $uri,
                                     ClientConnectContext $socketContext = null,
                                     CancellationToken $token = null
-                                ) use ($isIpv6): Promise {
-                                    return $this->socketConnect($isIpv6, $uri, $socketContext, $token);
+                                ) use ($ctx): Promise {
+                                    return $this->socketConnect($ctx, $uri, $socketContext, $token);
                                 },
                                 function (
                                     string $uri,
                                     ClientConnectContext $socketContext = null,
                                     ClientTlsContext $tlsContext = null,
                                     CancellationToken $token = null
-                                ) use ($isIpv6): Promise {
-                                    return $this->cryptoConnect($isIpv6, $uri, $socketContext, $tlsContext, $token);
-                                }
+                                ) use ($ctx): Promise {
+                                    return $this->cryptoConnect($ctx, $uri, $socketContext, $tlsContext, $token);
+                                },
                             ];
                         }
                         $ctx->addStream(...$stream);
@@ -531,6 +575,8 @@ class DataCenter
                     $ctxs[] = $ctx;
                     continue;
                 }
+
+                // This is only for MTProto connections
                 if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
                     continue;
                 }
@@ -584,23 +630,22 @@ class DataCenter
 
                     foreach ($combo as $stream) {
                         if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
-                            $isIpv6 = $ipv6 === 'ipv6';
                             $stream[1] = [
                                 function (
                                     string $uri,
                                     ClientConnectContext $socketContext = null,
                                     CancellationToken $token = null
-                                ) use ($isIpv6): Promise {
-                                    return $this->socketConnect($isIpv6, $uri, $socketContext, $token);
+                                ) use ($ctx): Promise {
+                                    return $this->socketConnect($ctx, $uri, $socketContext, $token);
                                 },
                                 function (
                                     string $uri,
                                     ClientConnectContext $socketContext = null,
                                     ClientTlsContext $tlsContext = null,
                                     CancellationToken $token = null
-                                ) use ($isIpv6): Promise {
-                                    return $this->cryptoConnect($isIpv6, $uri, $socketContext, $tlsContext, $token);
-                                }
+                                ) use ($ctx): Promise {
+                                    return $this->cryptoConnect($ctx, $uri, $socketContext, $tlsContext, $token);
+                                },
                             ];
                         }
                         $ctx->addStream(...$stream);

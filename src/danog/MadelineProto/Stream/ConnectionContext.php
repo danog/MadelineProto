@@ -52,6 +52,12 @@ class ConnectionContext
      */
     private $uri;
     /**
+     * Whether this connection context will be used by the DNS client
+     *
+     * @var bool
+     */
+    private $isDns = false;
+    /**
      * Socket context.
      *
      * @var \Amp\Socket\ClientConnectionContext
@@ -122,7 +128,7 @@ class ConnectionContext
     public function setUri($uri): self
     {
         $this->uri = $uri instanceof Uri ? $uri : new Uri($uri);
-
+        
         return $this;
     }
 
@@ -169,7 +175,15 @@ class ConnectionContext
     {
         return $this->cancellationToken;
     }
-
+    /**
+     * Return a clone of the current connection context
+     *
+     * @return self
+     */
+    public function getCtx(): self
+    {
+        return clone $this;
+    }
     /**
      * Set the secure boolean.
      *
@@ -194,6 +208,26 @@ class ConnectionContext
         return $this->test;
     }
 
+    /**
+     * Whether this connection context will only be used by the DNS client
+     *
+     * @return bool
+     */
+    public function isDns(): bool
+    {
+        return $this->isDns;
+    }
+    /**
+     * Whether this connection context will only be used by the DNS client
+     *
+     * @param boolean $isDns
+     * @return self
+     */
+    public function setIsDns(bool $isDns): self
+    {
+        $this->isDns = $isDns;
+        return $this;
+    }
     /**
      * Set the secure boolean.
      *
@@ -282,16 +316,6 @@ class ConnectionContext
     public function getIpv6(): bool
     {
         return $this->ipv6;
-    }
-
-    /**
-     * Set the ipv6 boolean.
-     *
-     * @return self
-     */
-    public function getCtx(): self
-    {
-        return clone $this;
     }
 
     /**

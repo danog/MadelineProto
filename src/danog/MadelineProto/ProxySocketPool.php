@@ -31,13 +31,13 @@ class ProxySocketPool implements SocketPool
     private $pendingCount = [];
     private $idleTimeout;
     private $socketContext;
-    private $dataCenter;
+    private $connectCallback;
 
-    public function __construct(DataCenter $dataCenter, int $idleTimeout = 10000, ClientConnectContext $socketContext = null)
+    public function __construct(callable $connectCallback, int $idleTimeout = 10000, ClientConnectContext $socketContext = null)
     {
         $this->idleTimeout = $idleTimeout;
         $this->socketContext = $socketContext ?? new ClientConnectContext();
-        $this->dataCenter = $dataCenter;
+        $this->connectCallback = $connectCallback;
     }
 
     /**
@@ -129,7 +129,7 @@ class ProxySocketPool implements SocketPool
 
             try {
                 /** @var ClientSocket $rawSocket */
-                $rawSocket = yield $this->call($this->dataCenter->rawConnectAsync($uri, $token, $this->socketContext));
+                $rawSocket = yield $this->call(($this->connectCallback)($uri, $token, $this->socketContext));
             } finally {
                 if (--$this->pendingCount[$uri] === 0) {
                     unset($this->pendingCount[$uri]);

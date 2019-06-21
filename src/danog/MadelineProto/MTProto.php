@@ -826,7 +826,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function parse_settings($settings)
     {
         $settings = self::getSettings($settings, $this->settings);
-        if ($this->settings['app_info'] === null) {
+        if ($settings['app_info'] === null) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
         }
         $this->settings = $settings;
