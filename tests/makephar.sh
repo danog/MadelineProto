@@ -64,6 +64,7 @@ cd ..
     cp phar5/vendor/danog/madelineproto/src/danog/MadelineProto/Coroutine.php phar5/vendor/amphp/amp/lib/Coroutine.php
     sed 's/namespace danog\\MadelineProto;/namespace Amp;/g' -i phar5/vendor/amphp/amp/lib/Coroutine.php
     sed 's/public static function echo/public static function echo_/g' -i phar5/vendor/danog/madelineproto/src/danog/MadelineProto/Tools.php
+    find phar5/vendor/amphp -type f -name '*.php' -exec sed "s/extension_loaded[(]'zlib'[)]/false/g" -i {} +
     php -v
     
     php=5

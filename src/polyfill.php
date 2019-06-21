@@ -13,5 +13,7 @@ if (!function_exists('is_iterable')) {
     }
 }
 if (!function_exists('error_clear_last')) {
-    function error_clear_last() {}
+    function error_clear_last() {
+        @trigger_error("");
+    }
 }
