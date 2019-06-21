@@ -49,6 +49,9 @@ class MyTelegramOrgWrapper
 
     public function __wakeup()
     {
+        if ($this->settings === null) {
+            $this->settings = [];
+        }
         $this->datacenter = new DataCenter(
             new class($this->settings)
             {
