@@ -19,9 +19,9 @@
 namespace danog\MadelineProto\Loop\Update;
 
 use Amp\Loop;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\Exception;
 
 /**
  * Update loop.
@@ -148,13 +148,13 @@ class UpdateLoop extends ResumableSignalLoop
 
                     $difference = yield $API->method_call_async_read('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $API->settings['connection_settings']['default_dc']]);
                     $API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-
                     switch ($difference['_']) {
                         case 'updates.differenceEmpty':
                             $state->update($difference);
                             unset($difference);
                             break 2;
                         case 'updates.difference':
+                            $state->qts($difference['state']['qts']);
                             foreach ($difference['new_encrypted_messages'] as &$encrypted) {
                                 $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
                             }
@@ -165,6 +165,7 @@ class UpdateLoop extends ResumableSignalLoop
                             unset($difference);
                             break 2;
                         case 'updates.differenceSlice':
+                            $state->qts($difference['state']['qts']);
                             foreach ($difference['new_encrypted_messages'] as &$encrypted) {
                                 $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
                             }

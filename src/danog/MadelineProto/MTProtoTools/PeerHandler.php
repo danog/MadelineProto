@@ -302,7 +302,6 @@ trait PeerHandler
                 case 'updateNewChannelMessage':
                 case 'updateEditMessage':
                 case 'updateEditChannelMessage':
-                case 'updateNewEncryptedMessage':
                     return $this->get_id($id['message']);
                 default:
                     throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($id, true));
@@ -341,6 +340,8 @@ trait PeerHandler
                 case 'updateEncryptedChatTyping':
                 case 'updateEncryptedMessagesRead':
                     return $this->get_secret_chat($id['chat_id']);
+                case 'updateNewEncryptedMessage':
+                    $id = $id['message'];
                 case 'encryptedMessage':
                 case 'encryptedMessageService':
                     $id = $id['chat_id'];

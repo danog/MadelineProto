@@ -224,12 +224,12 @@ trait TL
                 throw new Exception('Invalid callback object provided!');
             }
             $new = [
-                TLCallback::METHOD_BEFORE_CALLBACK         => $object->getMethodBeforeCallbacks(),
-                TLCallback::METHOD_CALLBACK                => $object->getMethodCallbacks(),
-                TLCallback::CONSTRUCTOR_BEFORE_CALLBACK    => $object->getConstructorBeforeCallbacks(),
-                TLCallback::CONSTRUCTOR_CALLBACK           => $object->getConstructorCallbacks(),
+                TLCallback::METHOD_BEFORE_CALLBACK => $object->getMethodBeforeCallbacks(),
+                TLCallback::METHOD_CALLBACK => $object->getMethodCallbacks(),
+                TLCallback::CONSTRUCTOR_BEFORE_CALLBACK => $object->getConstructorBeforeCallbacks(),
+                TLCallback::CONSTRUCTOR_CALLBACK => $object->getConstructorCallbacks(),
                 TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK => $object->getConstructorSerializeCallbacks(),
-                TLCallback::TYPE_MISMATCH_CALLBACK         => $object->getTypeMismatchCallbacks(),
+                TLCallback::TYPE_MISMATCH_CALLBACK => $object->getTypeMismatchCallbacks(),
             ];
             foreach ($new as $type => $values) {
                 foreach ($values as $match => $callback) {
@@ -449,7 +449,7 @@ trait TL
                 $method = 'messages.importChatInvite';
                 $arguments['hash'] = $matches[2];
             }
-        } elseif ($method === 'messages.sendMessage' && isset($arguments['peer']['_']) && $arguments['peer']['_'] === 'inputEncryptedChat') {
+        } elseif ($method === 'messages.sendMessage' && isset($arguments['peer']['_']) && in_array($arguments['peer']['_'], ['inputEncryptedChat', 'updateEncryption', 'updateEncryptedChatTyping', 'updateEncryptedMessagesRead', 'updateNewEncryptedMessage', 'encryptedMessage', 'encryptedMessageService'])) {
             $method = 'messages.sendEncrypted';
             $arguments = ['peer' => $arguments['peer'], 'message' => $arguments];
             if (!isset($arguments['message']['_'])) {

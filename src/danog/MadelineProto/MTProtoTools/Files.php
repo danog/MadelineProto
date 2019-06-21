@@ -120,9 +120,9 @@ trait Files
         }
 
         $result = yield all($promises);
-        foreach ($result as $key => $result) {
+        foreach ($result as $kkey => $result) {
             if (!$result) {
-                throw new \danog\MadelineProto\Exception('Upload of part '.$key.' failed');
+                throw new \danog\MadelineProto\Exception('Upload of part '.$kkey.' failed');
             }
         }
 
