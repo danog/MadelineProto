@@ -230,7 +230,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function __sleep()
     {
         if ($this->settings['serialization']['cleanup_before_serialization']) {
-            $this->cleaunp();
+            $this->cleanup();
         }
         return ['supportUser', 'referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'dh_config', 'chats', 'last_stored', 'qres', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
     }
@@ -238,7 +238,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Cleanup memory and session file.
      */
-    private function cleaunp()
+    private function cleanup()
     {
         $this->referenceDatabase = new ReferenceDatabase($this);
         $this->construct_TL($this->settings['tl_schema']['src'], [$this, $this->referenceDatabase]);
