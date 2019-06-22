@@ -73,7 +73,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     /*
     const V = 71;
      */
-    const V = 123;
+    const V = 124;
     const RELEASE = '4.0';
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -229,7 +229,20 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function __sleep()
     {
+        if ($this->settings['serialization']['cleanup_before_serialization']) {
+            $this->cleanup();
+        }
         return ['supportUser', 'referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'dh_config', 'chats', 'last_stored', 'qres', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
+    }
+
+    /**
+     * Cleanup memory and session file.
+     */
+    private function cleanup()
+    {
+        $this->referenceDatabase = new ReferenceDatabase($this);
+        $this->construct_TL($this->settings['tl_schema']['src'], [$this, $this->referenceDatabase]);
+        return $this;
     }
 
     public function logger($param, $level = Logger::NOTICE, $file = null)
@@ -778,7 +791,10 @@ class MTProto extends AsyncConstruct implements TLCallback
             'callback' => 'get_updates_update_handler',
             // Update callback
             'run_callback' => true,
-        ], 'secret_chats' => ['accept_chats' => true], 'serialization' => ['serialization_interval' => 30], 'threading' => [
+        ], 'secret_chats' => ['accept_chats' => true], 'serialization' => [
+            'serialization_interval' => 30,
+            'cleanup_before_serialization' => false,
+        ], 'threading' => [
             'allow_threading' => false,
             // Should I use threading, if it is enabled?
             'handler_workers' => 10,
