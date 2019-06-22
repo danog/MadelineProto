@@ -212,7 +212,11 @@ class UpdatesState
      */
     public function checkPts($update)
     {
-        return $update['pts'] - ($this->pts + $update['pts_count']);
+        if(!isset($update['pts_count'])){
+            return 0;
+        }else{
+            return $update['pts'] - ($this->pts + $update['pts_count']);
+        }
     }
 
     /**
