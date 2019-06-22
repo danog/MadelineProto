@@ -101,6 +101,7 @@ class FeedLoop extends ResumableSignalLoop
                 continue;
             }
             if (isset($update['pts'])) {
+                $update['pts_count'] = !isset($update['pts_count']) ?: 1;
                 $logger = function ($msg) use ($update) {
                     $pts_count = $update['pts_count'];
                     $double = isset($update['message']['id']) ? $update['message']['id'] * 2 : '-';
