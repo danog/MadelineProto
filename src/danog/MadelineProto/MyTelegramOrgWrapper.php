@@ -52,6 +52,7 @@ class MyTelegramOrgWrapper
         if ($this->settings === null) {
             $this->settings = [];
         }
+        $this->settings = MTProto::getSettings($this->settings);
         $this->datacenter = new DataCenter(
             new class($this->settings)
             {
