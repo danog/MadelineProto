@@ -230,7 +230,7 @@ class FeedLoop extends ResumableSignalLoop
                 if ($channelId && !yield $this->API->peer_isset_async($this->API->to_supergroup($channelId))) {
                     $this->API->logger->logger('Skipping update, I do not have the channel id '.$channelId, \danog\MadelineProto\Logger::ERROR);
 
-                    return;
+                    return false;
                 }
                 break;
         }
