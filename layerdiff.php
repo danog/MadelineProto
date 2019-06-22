@@ -89,12 +89,12 @@ foreach (['methods', 'constructors'] as $type) {
 
             $url = getUrl($name, $type);
             foreach ($final_new_args as $name => $ttype) {
-                if (!isset($final_old_args[$name])) {
+                if (!isset($final_old_args[$name]) && $name !== 'flags') {
                     $res .= "Added $name param to $url\n";
                 }
             }
             foreach ($final_old_args as $name => $ttype) {
-                if (!isset($final_new_args[$name])) {
+                if (!isset($final_new_args[$name]) && $name !== 'flags') {
                     $res .= "Removed $name param from $url\n";
                 }
             }

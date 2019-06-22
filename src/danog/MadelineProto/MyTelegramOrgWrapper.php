@@ -19,6 +19,7 @@
 namespace danog\MadelineProto;
 
 use Amp\Artax\Request;
+use Amp\Artax\Cookie\ArrayCookieJar;
 
 /**
  * Wrapper for my.telegram.org.
@@ -29,16 +30,16 @@ class MyTelegramOrgWrapper
 
     private $logged = false;
     private $hash = '';
-    private $token;
     private $number;
     private $creation_hash;
     private $settings = [];
     private $async = true;
+    private $jar;
     const MY_TELEGRAM_URL = 'https://my.telegram.org';
 
     public function __sleep()
     {
-        return ['logged', 'hash', 'token', 'number', 'creation_hash', 'settings', 'async'];
+        return ['logged', 'hash', 'number', 'creation_hash', 'settings', 'async', 'jar'];
     }
 
     public function __construct($settings = [])
@@ -52,6 +53,9 @@ class MyTelegramOrgWrapper
         if ($this->settings === null) {
             $this->settings = [];
         }
+        if (!$this->jar) {
+            $this->jar = new ArrayCookieJar;
+        }
         $this->settings = MTProto::getSettings($this->settings);
         $this->datacenter = new DataCenter(
             new class($this->settings)
@@ -62,7 +66,8 @@ class MyTelegramOrgWrapper
                 }
             },
             [],
-            $this->settings['connection_settings']
+            $this->settings['connection_settings'],
+            $this->jar
         );
     }
 
@@ -94,7 +99,8 @@ class MyTelegramOrgWrapper
         $request = $request->withHeader('user-agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
         $response = yield $this->datacenter->getHTTPClient()->request($request);
         $result = yield $response->getBody();
-
+        
+        
         switch ($result) {
             case 'true':
                 //Logger::log(['Login OK'], Logger::VERBOSE);
@@ -102,8 +108,6 @@ class MyTelegramOrgWrapper
             default:
                 throw new Exception($result);
         }
-
-        $this->token = explode(';', explode('stel_token=', $response->getHeader('Set-Cookie'))[1])[0];
 
         return $this->logged = true;
     }
@@ -126,13 +130,16 @@ class MyTelegramOrgWrapper
 
         $title = explode('</title>', explode('<title>', $result)[1])[0];
         switch ($title) {
-            case 'App configuration':return true;
+            case 'App configuration':
+                return true;
             case 'Create new application':
                 $this->creation_hash = explode('"/>', explode('<input type="hidden" name="hash" value="', $result)[1])[0];
 
                 return false;
         }
 
+        $this->logged = false;
+        
         throw new Exception($title);
     }
 
@@ -169,7 +176,7 @@ class MyTelegramOrgWrapper
         if (yield $this->has_app_async()) {
             throw new Exception('The app was already created!');
         }
-
+        
         $request = new Request(self::MY_TELEGRAM_URL.'/apps/create', 'POST');
         $request = $request->withHeaders($this->getHeaders('app'));
         $request = $request->withBody(http_build_query(['hash' => $this->creation_hash, 'app_title' => $settings['app_title'], 'app_shortname' => $settings['app_shortname'], 'app_url' => $settings['app_url'], 'app_platform' => $settings['app_platform'], 'app_desc' => $settings['app_desc']]));
@@ -177,7 +184,7 @@ class MyTelegramOrgWrapper
         $result = yield $response->getBody();
 
         if ($result) {
-            throw new Exception($result);
+            throw new Exception(html_entity_decode($result));
         }
 
         $request = new Request(self::MY_TELEGRAM_URL.'/apps');

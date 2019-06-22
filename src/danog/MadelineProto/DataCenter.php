@@ -55,6 +55,7 @@ use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
 use function Amp\call;
 use function Amp\Socket\Internal\parseUri;
+use Amp\Artax\Cookie\CookieJar;
 
 /**
  * Manages datacenters.
@@ -71,13 +72,14 @@ class DataCenter
     private $HTTPClient;
     private $DoHClient;
     private $NonProxiedDoHClient;
+    private $CookieJar;
 
     public function __sleep()
     {
         return ['sockets', 'curdc', 'dclist', 'settings'];
     }
 
-    public function __magic_construct($API, $dclist, $settings)
+    public function __magic_construct($API, $dclist, $settings, CookieJar $jar = null)
     {
         $this->API = $API;
         $this->dclist = $dclist;
@@ -92,10 +94,11 @@ class DataCenter
                 unset($this->sockets[$key]);
             }
         }
-        $this->HTTPClient = new DefaultClient(new ArrayCookieJar(), new HttpSocketPool(new ProxySocketPool([$this, 'rawConnectAsync'])));
+        $this->CookieJar = $jar ?? new ArrayCookieJar;
+        $this->HTTPClient = new DefaultClient($this->CookieJar, new HttpSocketPool(new ProxySocketPool([$this, 'rawConnectAsync'])));
 
         $DoHHTTPClient = new DefaultClient(
-            new ArrayCookieJar(), 
+            $this->CookieJar, 
             new HttpSocketPool(
                 new ProxySocketPool(
                     function (string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null) {
@@ -678,6 +681,16 @@ class DataCenter
     public function getHTTPClient(): Client
     {
         return $this->HTTPClient;
+    }
+
+    /**
+     * Get Artax async HTTP client.
+     *
+     * @return \Amp\Artax\CookieJar
+     */
+    public function getCookieJar(): CookieJar
+    {
+        return $this->CookieJar;
     }
     /**
      * Get DNS over HTTPS async DNS client.
