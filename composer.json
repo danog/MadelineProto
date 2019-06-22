@@ -20,14 +20,14 @@
         "ext-xml": "*",
         "ext-fileinfo": "*",
         "amphp/amp": "^2.0",
-        "amphp/websocket": "dev-master",
-        "amphp/websocket-client": "dev-master",
+        "amphp/websocket": "dev-master as 1",
+        "amphp/websocket-client": "dev-master as 1",
         "amphp/socket": "^0.10",
+        "amphp/dns": "dev-master#aa1892bdf13b787d759df6f2523e8027a434d927 as v0.9.x-dev",
         "amphp/artax": "dev-master as 3.0.99",
         "amphp/file": "^0.3",
         "amphp/uri": "^0.1.4",
         "amphp/byte-stream": "^1.6",
-        "amphp/dns": "dev-master as v0.9.x-dev",
         "danog/dns-over-https": "^0.1"
     },
     "require-dev": {
@@ -35,7 +35,6 @@
         "ennexa/amp-update-cache": "dev-master",
         "phpunit/phpunit": "^8"
     },
-    "minimum-stability": "dev",
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)"
     },
@@ -50,6 +49,7 @@
         "files": [
             "src/BigIntegor.php",
             "src/YieldReturnValue.php",
+            "src/ReflectionGenerator.php",
             "src/polyfill.php"
         ]
     },
