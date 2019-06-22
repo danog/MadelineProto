@@ -46,7 +46,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']); //'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
             if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
                 yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
-                //yield $this->download_to_dir($update, '/tmp')
+                //yield $this->download_to_dir($update, '/tmp');
             }
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);

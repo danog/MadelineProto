@@ -73,7 +73,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     /*
     const V = 71;
      */
-    const V = 122;
+    const V = 123;
     const RELEASE = '4.0';
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -718,12 +718,12 @@ class MTProto extends AsyncConstruct implements TLCallback
             'lang_pack' => $lang_pack,
         ], 'tl_schema' => [
             // TL scheme files
-            'layer' => 97,
+            'layer' => 100,
             // layer version
             'src' => [
                 'mtproto' => __DIR__.'/TL_mtproto_v1.tl',
                 // mtproto TL scheme
-                'telegram' => __DIR__.'/TL_telegram_v97.tl',
+                'telegram' => __DIR__.'/TL_telegram_v100.tl',
                 // telegram TL scheme
                 'secret' => __DIR__.'/TL_secret.tl',
                 // secret chats TL scheme

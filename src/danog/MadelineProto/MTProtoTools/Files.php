@@ -164,7 +164,15 @@ trait Files
                     throw new \danog\MadelineProto\Exception('No access hash');
                 }
                 $res['Photo'] = $media['photo'];
-                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['photo']['id'], 'access_hash' => $media['photo']['access_hash'], 'file_reference' => yield $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $media['photo'])];
+                $res['InputPhoto'] = [
+                    '_' => 'inputPhoto',
+                    'id' => $media['photo']['id'],
+                    'access_hash' => $media['photo']['access_hash'],
+                    'file_reference' => yield $this->referenceDatabase->getReference(
+                        ReferenceDatabase::PHOTO_LOCATION,
+                        $media['photo']
+                    ),
+                ];
                 $res['InputMedia'] = ['_' => 'inputMediaPhoto', 'id' => $res['InputPhoto']];
                 if (isset($media['ttl_seconds'])) {
                     $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
@@ -175,7 +183,15 @@ trait Files
                     throw new \danog\MadelineProto\Exception('No access hash');
                 }
                 $res['Document'] = $media['document'];
-                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['document']['id'], 'access_hash' => $media['document']['access_hash'], 'file_reference' => yield $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $media['document'])];
+                $res['InputDocument'] = [
+                    '_' => 'inputDocument',
+                    'id' => $media['document']['id'],
+                    'access_hash' => $media['document']['access_hash'],
+                    'file_reference' => yield $this->referenceDatabase->getReference(
+                        ReferenceDatabase::DOCUMENT_LOCATION,
+                        $media['document']
+                    ),
+                ];
                 $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
                 if (isset($media['ttl_seconds'])) {
                     $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
@@ -188,7 +204,15 @@ trait Files
                 if (!isset($media['access_hash'])) {
                     throw new \danog\MadelineProto\Exception('No access hash');
                 }
-                $res['InputDocument'] = ['_' => 'inputDocument', 'id' => $media['id'], 'access_hash' => $media['access_hash'], 'file_reference' => yield $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $media)];
+                $res['InputDocument'] = [
+                    '_' => 'inputDocument',
+                    'id' => $media['id'],
+                    'access_hash' => $media['access_hash'],
+                    'file_reference' => yield $this->referenceDatabase->getReference(
+                        ReferenceDatabase::DOCUMENT_LOCATION,
+                        $media
+                    ),
+                ];
                 $res['InputMedia'] = ['_' => 'inputMediaDocument', 'id' => $res['InputDocument']];
                 $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $media];
                 break;
@@ -196,7 +220,15 @@ trait Files
                 if (!isset($media['access_hash'])) {
                     throw new \danog\MadelineProto\Exception('No access hash');
                 }
-                $res['InputPhoto'] = ['_' => 'inputPhoto', 'id' => $media['id'], 'access_hash' => $media['access_hash'], 'file_reference' => yield $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $media)];
+                $res['InputPhoto'] = [
+                    '_' => 'inputPhoto',
+                    'id' => $media['id'],
+                    'access_hash' => $media['access_hash'],
+                    'file_reference' => yield $this->referenceDatabase->getReference(
+                        ReferenceDatabase::PHOTO_LOCATION,
+                        $media
+                    ),
+                ];
                 $res['InputMedia'] = ['_' => 'inputMediaPhoto', 'id' => $res['InputPhoto']];
                 $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $media];
                 break;
@@ -302,29 +334,68 @@ trait Files
                 return $res;
             // Wallpapers
             case 'wallPaper':
-                $photo = end($message_media['sizes']);
-
-                return array_merge($res, yield $this->get_download_info_async($photo));
+                return $this->get_download_info_async($res['document']);
             // Photos
             case 'photo':
             case 'messageMediaPhoto':
                 if ($message_media['_'] == 'photo') {
-                    $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $message_media, 'ttl_seconds' => 0];
-                    $photo = end($message_media['sizes']);
-                } else {
-                    $res['MessageMedia'] = $message_media;
-                    $photo = end($message_media['photo']['sizes']);
+                    $message_media = ['_' => 'messageMediaPhoto', 'photo' => $message_media, 'ttl_seconds' => 0];
                 }
+                $res['MessageMedia'] = $message_media;
+                $message_media = $message_media['photo'];
+                $size = end($message_media['sizes']);
 
-                return array_merge($res, yield $this->get_download_info_async($photo));
+                $res = array_merge($res, yield $this->get_download_info_async($size));
+
+                $res['InputFileLocation'] = [
+                    '_' => 'inputPhotoFileLocation',
+                    'thumb_size' => $res['thumb_size'] ?? 'x',
+                    'dc_id' => $message_media['dc_id'],
+                    'access_hash' => $message_media['access_hash'],
+                    'id' => $message_media['id'],
+                    'file_reference' => yield $this->referenceDatabase->getReference(
+                        ReferenceDatabase::PHOTO_LOCATION,
+                        $message_media
+                    ),
+                ];
+
+                return $res;
+            case 'user':
+            case 'folder':
+            case 'channel':
+            case 'chat':
+            case 'updateUserPhoto':
+                $res = yield $this->get_download_info_async($message_media['photo']);
+
+                $res['InputFileLocation'] = [
+                    '_' => 'inputPeerPhotoFileLocation',
+                    'big' => true,
+                    'dc_id' => $res['InputFileLocation']['dc_id'],
+                    'peer' => (yield $this->get_info_async($message_media))['InputPeer'],
+                    'volume_id' => $res['InputFileLocation']['volume_id'],
+                    'local_id' => $res['InputFileLocation']['local_id'],
+                    // The peer field will be added later
+                ];
+                return $res;
 
             case 'userProfilePhoto':
             case 'chatPhoto':
-                return array_merge($res, yield $this->get_download_info_async($message_media['photo_big']));
+                $size = $message_media['photo_big'];
+
+                $res = yield $this->get_download_info_async($size);
+                $res['InputFileLocation']['dc_id'] = $message_media['dc_id'];
+                return $res;
+            case 'photoStrippedSize':
+                $res['size'] = strlen($message_media['bytes']);
+                $res['data'] = $message_media['bytes'];
+                $res['thumb_size'] = 'JPG';
+                return $res;
 
             case 'photoCachedSize':
                 $res['size'] = strlen($message_media['bytes']);
                 $res['data'] = $message_media['bytes'];
+                //$res['thumb_size'] = $res['data'];
+                $res['thumb_size'] = $message_media['type'];
 
                 if ($message_media['location']['_'] === 'fileLocationUnavailable') {
                     $res['name'] = $message_media['volume_id'].'_'.$message_media['local_id'];
@@ -336,7 +407,12 @@ trait Files
 
                 return $res;
             case 'photoSize':
+                $size = $res['size'];
                 $res = yield $this->get_download_info_async($message_media['location']);
+
+                $res['thumb_size'] = $message_media['type'];
+                //$res['thumb_size'] = $size;
+
                 if (isset($message_media['size'])) {
                     $res['size'] = $message_media['size'];
                 }
@@ -347,9 +423,30 @@ trait Files
                 throw new \danog\MadelineProto\Exception('File location unavailable');
             case 'fileLocation':
                 $res['name'] = $message_media['volume_id'].'_'.$message_media['local_id'];
-                $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['volume_id'], 'local_id' => $message_media['local_id'], 'secret' => $message_media['secret'], 'dc_id' => $message_media['dc_id'], 'file_reference' => yield $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION_LOCATION, $message_media)];
+                $res['InputFileLocation'] = [
+                    '_' => 'inputFileLocation',
+                    'volume_id' => $message_media['volume_id'],
+                    'local_id' => $message_media['local_id'],
+                    'secret' => $message_media['secret'],
+                    'dc_id' => $message_media['dc_id'],
+                    'file_reference' => yield $this->referenceDatabase->getReference(
+                        ReferenceDatabase::PHOTO_LOCATION_LOCATION,
+                        $message_media
+                    ),
+                ];
                 $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], '.jpg');
                 $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
+
+                return $res;
+            case 'fileLocationToBeDeprecated':
+                $res['name'] = $message_media['volume_id'].'_'.$message_media['local_id'];
+                $res['ext'] = '.jpg';
+                $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
+                $res['InputFileLocation'] = [
+                    '_' => 'inputFileLocationTemp', // Will be overwritten
+                    'volume_id' => $message_media['volume_id'],
+                    'local_id' => $message_media['local_id'],
+                ];
 
                 return $res;
 
@@ -380,7 +477,19 @@ trait Files
                         $res['name'] .= ' - '.$audio['performer'];
                     }
                 }
-                $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => isset($message_media['document']['version']) ? $message_media['document']['version'] : 0, 'dc_id' => $message_media['document']['dc_id'], 'file_reference' => yield $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION_LOCATION, $message_media['document'])];
+
+                $res['InputFileLocation'] = [
+                    '_' => 'inputDocumentFileLocation',
+                    'id' => $message_media['document']['id'],
+                    'access_hash' => $message_media['document']['access_hash'],
+                    'version' => isset($message_media['document']['version']) ? $message_media['document']['version'] : 0,
+                    'dc_id' => $message_media['document']['dc_id'],
+                    'file_reference' => yield $this->referenceDatabase->getReference(
+                        ReferenceDatabase::DOCUMENT_LOCATION,
+                        $message_media['document']
+                    ),
+                ];
+
                 if (!isset($res['ext'])) {
                     $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime($message_media['document']['mime_type']));
                 }
@@ -426,7 +535,12 @@ trait Files
         $stream = fopen($file, 'r+b');
         $size = fstat($stream)['size'];
         $this->logger->logger('Waiting for lock of file to download...');
-        flock($stream, LOCK_EX);
+        do {
+            $res = flock($stream, LOCK_EX|LOCK_NB);
+            if (!$res) {
+                yield $this->sleep(0.1);
+            }
+        } while (!$res);
 
         try {
             yield $this->download_to_stream_async($message_media, $stream, $cb, $size, -1);

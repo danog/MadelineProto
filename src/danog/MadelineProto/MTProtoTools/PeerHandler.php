@@ -56,11 +56,11 @@ trait PeerHandler
     {
         if (!isset($user['access_hash'])) {
             /*if (isset($this->chats[$user['id']]['access_hash']) && $this->chats[$user['id']]['access_hash']) {
-                $this->logger->logger("No access hash with user {$user['id']}, using backup");
-                $user['access_hash'] = $this->chats[$user['id']]['access_hash'];
+            $this->logger->logger("No access hash with user {$user['id']}, using backup");
+            $user['access_hash'] = $this->chats[$user['id']]['access_hash'];
             } else {
-                $this->logger->logger("No access hash with user {$user['id']}, not trying to fetch it");
-                $user['access_hash'] = 0;
+            $this->logger->logger("No access hash with user {$user['id']}, not trying to fetch it");
+            $user['access_hash'] = 0;
             }*/
             if (!isset($this->caching_simple[$user['id']]) && !(isset($user['username']) && isset($this->caching_simple_username[$user['username']]))) {
                 $this->logger->logger("No access hash with user {$user['id']}, trying to fetch by ID...");
@@ -206,6 +206,16 @@ trait PeerHandler
         return true;
     }
 
+    public function get_folder_id($id)
+    {
+        if (!is_array($id)) {
+            return null;
+        }
+        if (!isset($id['folder_id'])) {
+            return null;
+        }
+        return $id['folder_id'];
+    }
     public function get_id($id)
     {
         if (is_array($id)) {
@@ -222,7 +232,18 @@ trait PeerHandler
                 case 'dialog':
                 case 'help.proxyDataPromo':
                 case 'updateChatDefaultBannedRights':
+                case 'folderPeer':
+                case 'inputFolderPeer':
                     return $this->get_id($id['peer']);
+
+                case 'inputUserFromMessage':
+                case 'inputPeerUserFromMessage':
+                    return $id['user_id'];
+
+                case 'inputChannelFromMessage':
+                case 'inputPeerChannelFromMessage':
+                    return $this->to_supergroup($id['channel_id']);
+
                 case 'inputUserSelf':
                 case 'inputPeerSelf':
                     return $this->authorization['user']['id'];
@@ -352,6 +373,7 @@ trait PeerHandler
                     return $this->secret_chats[$id];
             }
         }
+        $folder_id = $this->get_folder_id($id);
         $try_id = $this->get_id($id);
         if ($try_id !== false) {
             $id = $try_id;
@@ -385,7 +407,7 @@ trait PeerHandler
             }
             if (isset($this->chats[$id])) {
                 try {
-                    return $this->gen_all($this->chats[$id]);
+                    return $this->gen_all($this->chats[$id], $folder_id);
                 } catch (\danog\MadelineProto\Exception $e) {
                     if ($e->getMessage() === 'This peer is not present in the internal peer database') {
                         unset($this->chats[$id]);
@@ -444,7 +466,7 @@ trait PeerHandler
         }
         foreach ($this->chats as $chat) {
             if (isset($chat['username']) && strtolower($chat['username']) === $id) {
-                return $this->gen_all($chat);
+                return $this->gen_all($chat, $folder_id);
             }
         }
         if ($recursive) {
@@ -456,7 +478,7 @@ trait PeerHandler
         throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
     }
 
-    public function gen_all($constructor)
+    public function gen_all($constructor, $folder_id = null)
     {
         $res = [$this->constructors->find_by_predicate($constructor['_'])['type'] => $constructor];
         switch ($constructor['_']) {
@@ -511,7 +533,10 @@ trait PeerHandler
             default:
                 throw new \danog\MadelineProto\Exception('Invalid constructor given '.var_export($constructor, true));
         }
-
+        if ($folder_id) {
+            $res['FolderPeer'] = ['_' => 'folderPeer', 'peer' => $res['Peer'], 'folder_id' => $folder_id];
+            $res['InputFolderPeer'] = ['_' => 'inputFolderPeer', 'peer' => $res['InputPeer'], 'folder_id' => $folder_id];
+        }
         return $res;
     }
 

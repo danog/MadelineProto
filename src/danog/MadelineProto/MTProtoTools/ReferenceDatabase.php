@@ -33,9 +33,9 @@ class ReferenceDatabase implements TLCallback
     const DOCUMENT_LOCATION = 0;
     // Reference from a photo
     const PHOTO_LOCATION = 1;
-    // Reference from a location (can only be photo location)
+    // Reference from a photo location (can only be photo location)
     const PHOTO_LOCATION_LOCATION = 2;
-    // Reference from a location (can only be document location)
+    // DEPRECATED: Reference from a location (can only be document location)
     const DOCUMENT_LOCATION_LOCATION = 0;
 
     // Peer + photo ID
@@ -58,8 +58,9 @@ class ReferenceDatabase implements TLCallback
     const WALLPAPER_ORIGIN = 9;
 
     const LOCATION_CONTEXT = [
-        'inputFileLocation'         => self::PHOTO_LOCATION_LOCATION,
-        'inputDocumentFileLocation' => self::DOCUMENT_LOCATION_LOCATION,
+        //'inputFileLocation'         => self::PHOTO_LOCATION_LOCATION, // DEPRECATED
+        'inputDocumentFileLocation' => self::DOCUMENT_LOCATION,
+        'inputPhotoFileLocation'    => self::PHOTO_LOCATION,
         'inputPhoto'                => self::PHOTO_LOCATION,
         'inputDocument'             => self::DOCUMENT_LOCATION,
     ];
@@ -122,6 +123,11 @@ class ReferenceDatabase implements TLCallback
 
     public function init()
     {
+        foreach ($this->db as $key => $value) {
+            if ($key[0] === "0") { // Unsetting deprecated DOCUMENT_LOCATION_LOCATION
+                unset($this->db[$key]);
+            }
+        }
     }
 
     public function getMethodCallbacks(): array
@@ -560,7 +566,6 @@ class ReferenceDatabase implements TLCallback
     {
         switch ($locationType) {
             case self::DOCUMENT_LOCATION:
-            case self::DOCUMENT_LOCATION_LOCATION:
             case self::PHOTO_LOCATION:
                 return $locationType.(is_int($location['id']) ? $this->pack_signed_long($location['id']) : $location['id']);
             case self::PHOTO_LOCATION_LOCATION:

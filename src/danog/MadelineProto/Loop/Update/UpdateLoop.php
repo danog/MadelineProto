@@ -136,6 +136,9 @@ class UpdateLoop extends ResumableSignalLoop
                             unset($difference);
                             break 2;
                         case 'updates.channelDifferenceTooLong':
+                            if (isset($difference['dialog']['pts'])) {
+                                $difference['pts'] = $difference['dialog']['pts'];
+                            }
                             $state->update($difference);
                             $feeder->saveMessages($difference['messages']);
                             unset($difference);
