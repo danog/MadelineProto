@@ -257,7 +257,10 @@ trait Files
 
         return yield $this->gen_all_file_async($constructor, $regenerate);
     }
-
+    public function get_propic_info_async($data)
+    {
+        return yield $this->get_download_info_async($this->chats[(yield $this->get_info_async($data))['bot_api_id']]);
+    }
     public function get_download_info_async($message_media)
     {
         if (is_string($message_media)) {

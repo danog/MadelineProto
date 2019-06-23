@@ -63,6 +63,9 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      */
     public function read(): Promise
     {
+        if (!$this->stream) {
+            throw new ClosedException("MadelineProto stream was disconnected");
+        }
         return $this->stream->read();
     }
 
@@ -75,6 +78,9 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      */
     public function write(string $data): Promise
     {
+        if (!$this->stream) {
+            throw new ClosedException("MadelineProto stream was disconnected");
+        }
         return $this->stream->write($data);
     }
 
@@ -104,6 +110,9 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      */
     public function getReadBuffer(&$length): Promise
     {
+        if (!$this->stream) {
+            throw new ClosedException("MadelineProto stream was disconnected");
+        }
         $size = fstat($this->memory_stream)['size'];
         $offset = ftell($this->memory_stream);
         $length = $size - $offset;
@@ -146,6 +155,9 @@ class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInt
      */
     public function bufferRead(int $length): Promise
     {
+        if (!$this->stream) {
+            throw new ClosedException("MadelineProto stream was disconnected");
+        }
         $size = fstat($this->memory_stream)['size'];
         $offset = ftell($this->memory_stream);
         $buffer_length = $size - $offset;
