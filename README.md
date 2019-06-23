@@ -134,6 +134,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
   * [Reusing uploaded files](https://docs.madelineproto.xyz/docs/FILES.html#reusing-uploaded-files)
   * [Downloading files](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)
     * [Extracting download info](https://docs.madelineproto.xyz/docs/FILES.html#extracting-download-info)
+    * [Downloading profile pictures](https://docs.madelineproto.xyz/docs/FILES.html#downloading-profile-pictures)
     * [Download to directory](https://docs.madelineproto.xyz/docs/FILES.html#download-to-directory)
     * [Download to file](https://docs.madelineproto.xyz/docs/FILES.html#download-to-file)
     * [Download to browser (streaming)](https://docs.madelineproto.xyz/docs/FILES.html#download-to-browser-with-streams)
@@ -172,6 +173,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * [Upload or download files up to 1.5 GB](https://docs.madelineproto.xyz/docs/FILES.html)
     * [Make a phone call and play a song](https://docs.madelineproto.xyz/docs/CALLS.html)
     * [Create a secret chat bot](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_acceptUrlAuth.html" name="messages_acceptUrlAuth">Accept URL authorization: messages.acceptUrlAuth</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_acceptAuthorization.html" name="account_acceptAuthorization">Accept telegram passport authorization: account.acceptAuthorization</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help_acceptTermsOfService.html" name="help_acceptTermsOfService">Accept telegram's TOS: help.acceptTermsOfService</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_installStickerSet.html" name="messages_installStickerSet">Add a sticker set: messages.installStickerSet</a>  
@@ -221,6 +223,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_deleteMessages.html" name="channels_deleteMessages">Delete channel/supergroup messages: channels.deleteMessages</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_deleteHistory.html" name="messages_deleteHistory">Delete chat history: messages.deleteHistory</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_deleteByPhones.html" name="contacts_deleteByPhones">Delete contacts by phones: contacts.deleteByPhones</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/folders_deleteFolder.html" name="folders_deleteFolder">Delete folder: folders.deleteFolder</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_deleteMessages.html" name="messages_deleteMessages">Delete messages: messages.deleteMessages</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_deleteContacts.html" name="contacts_deleteContacts">Delete multiple contacts: contacts.deleteContacts</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/photos_deletePhotos.html" name="photos_deletePhotos">Delete profile photos: photos.deletePhotos</a>  
@@ -235,6 +238,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_editChatAdmin.html" name="messages_editChatAdmin">Edit admin permissions: messages.editChatAdmin</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_editChatAbout.html" name="messages_editChatAbout">Edit chat info: messages.editChatAbout</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_editChatDefaultBannedRights.html" name="messages_editChatDefaultBannedRights">Edit default rights of chat: messages.editChatDefaultBannedRights</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/folders_editPeerFolders.html" name="folders_editPeerFolders">Edit folder: folders.editPeerFolders</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_editChatPhoto.html" name="messages_editChatPhoto">Edit the photo of a normal chat (not supergroup): messages.editChatPhoto</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_editPhoto.html" name="channels_editPhoto">Edit the photo of a supergroup/channel: channels.editPhoto</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_editChatTitle.html" name="messages_editChatTitle">Edit the title of a normal chat (not supergroup): messages.editChatTitle</a>  
@@ -266,6 +270,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone_getCallConfig.html" name="phone_getCallConfig">Get call configuration: phone.getCallConfig</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_getMessages.html" name="channels_getMessages">Get channel/supergroup messages: channels.getMessages</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_getParticipants.html" name="channels_getParticipants">Get channel/supergroup participants (you should use `$MadelineProto->get_pwr_chat($id)` instead): channels.getParticipants</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_getBroadcastsForDiscussion.html" name="channels_getBroadcastsForDiscussion">Get channels for discussion: channels.getBroadcastsForDiscussion</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getCommonChats.html" name="messages_getCommonChats">Get chats in common with a user: messages.getCommonChats</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_getContactIDs.html" name="contacts_getContactIDs">Get contacts by IDs: contacts.getContactIDs</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help_getDeepLinkInfo.html" name="help_getDeepLinkInfo">Get deep link info: help.getDeepLinkInfo</a>  
@@ -274,9 +279,11 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getDocumentByHash.html" name="messages_getDocumentByHash">Get document by SHA256 hash: messages.getDocumentByHash</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getEmojiURL.html" name="messages_getEmojiURL">Get emoji URL: messages.getEmojiURL</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getEmojiKeywordsDifference.html" name="messages_getEmojiKeywordsDifference">Get emoji keyword difference: messages.getEmojiKeywordsDifference</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getEmojiKeywordsLanguages.html" name="messages_getEmojiKeywordsLanguages">Get emoji keyword languages: messages.getEmojiKeywordsLanguages</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getEmojiKeywords.html" name="messages_getEmojiKeywords">Get emoji keywords: messages.getEmojiKeywords</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getFavedStickers.html" name="messages_getFavedStickers">Get favorite stickers: messages.getFavedStickers</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getFeaturedStickers.html" name="messages_getFeaturedStickers">Get featured stickers: messages.getFeaturedStickers</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_getGroupsForDiscussion.html" name="channels_getGroupsForDiscussion">Get groups for discussion: channels.getGroupsForDiscussion</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getInlineGameHighScores.html" name="messages_getInlineGameHighScores">Get high scores of a game sent in an inline message: messages.getInlineGameHighScores</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getGameHighScores.html" name="messages_getGameHighScores">Get high scores of a game: messages.getGameHighScores</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_getParticipant.html" name="channels_getParticipant">Get info about a certain channel/supergroup participant: channels.getParticipant</a>  
@@ -313,6 +320,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_getSaved.html" name="contacts_getSaved">Get saved contacts: contacts.getSaved</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getSavedGifs.html" name="messages_getSavedGifs">Get saved gifs: messages.getSavedGifs</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments_getSavedInfo.html" name="payments_getSavedInfo">Get saved payments info: payments.getSavedInfo</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getSearchCounters.html" name="messages_getSearchCounters">Get search counter: messages.getSearchCounters</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_getSecureValue.html" name="account_getSecureValue">Get secure value for telegram passport: account.getSecureValue</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help_getConfig.html" name="help_getConfig">Get server configuration: help.getConfig</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getStatsURL.html" name="messages_getStatsURL">Get stats URL: messages.getStatsURL</a>  
@@ -370,6 +378,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_reportSpam.html" name="messages_reportSpam">Report a peer for spam: messages.reportSpam</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_reportEncryptedSpam.html" name="messages_reportEncryptedSpam">Report for spam a secret chat: messages.reportEncryptedSpam</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_reportPeer.html" name="account_reportPeer">Report for spam: account.reportPeer</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_requestUrlAuth.html" name="messages_requestUrlAuth">Request URL authorization: messages.requestUrlAuth</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_resendPasswordEmail.html" name="account_resendPasswordEmail">Resend password recovery email: account.resendPasswordEmail</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth_resendCode.html" name="auth_resendCode">Resend the SMS verification code: auth.resendCode</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_resetNotifySettings.html" name="account_resetNotifySettings">Reset all notification settings: account.resetNotifySettings</a>  
@@ -406,6 +415,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots_answerWebhookJSONQuery.html" name="bots_answerWebhookJSONQuery">Send webhook request via bot API: bots.answerWebhookJSONQuery</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_setAccountTTL.html" name="account_setAccountTTL">Set account TTL: account.setAccountTTL</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_setContactSignUpNotification.html" name="account_setContactSignUpNotification">Set contact sign up notification: account.setContactSignUpNotification</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_setDiscussionGroup.html" name="channels_setDiscussionGroup">Set discussion group of channel: channels.setDiscussionGroup</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone_setCallRating.html" name="phone_setCallRating">Set phone call rating: phone.setCallRating</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_setPrivacy.html" name="account_setPrivacy">Set privacy settings: account.setPrivacy</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/users_setSecureValueErrors.html" name="users_setSecureValueErrors">Set secure value error for telegram passport: users.setSecureValueErrors</a>  

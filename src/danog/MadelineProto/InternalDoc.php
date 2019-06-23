@@ -788,6 +788,8 @@ interface contacts
      *               boolean bots_pm,
      *               boolean bots_inline,
      *               boolean phone_calls,
+     *               boolean forward_users,
+     *               boolean forward_chats,
      *               boolean groups,
      *               boolean channels,
      *               int offset,
@@ -843,6 +845,7 @@ interface messages
     /**
      * @param array params [
      *               boolean exclude_pinned,
+     *               int folder_id,
      *               int offset_date,
      *               int offset_id,
      *               InputPeer offset_peer,
@@ -1344,7 +1347,7 @@ interface messages
     /**
      * @param array params [
      *               string q,
-     *               int offset_date,
+     *               int offset_rate,
      *               InputPeer offset_peer,
      *               int offset_id,
      *               int limit,
@@ -1707,6 +1710,7 @@ interface messages
     /**
      * @param array params [
      *               boolean force,
+     *               int folder_id,
      *               InputDialogPeer order,
      *              ]
      *
@@ -1715,9 +1719,13 @@ interface messages
     public function reorderPinnedDialogs(array $params);
 
     /**
+     * @param array params [
+     *               int folder_id,
+     *              ]
+     *
      * @return messages_PeerDialogs
      */
-    public function getPinnedDialogs();
+    public function getPinnedDialogs(array $params);
 
     /**
      * @param array params [
@@ -1967,12 +1975,54 @@ interface messages
 
     /**
      * @param array params [
+     *               string lang_codes,
+     *              ]
+     *
+     * @return Vector_of_EmojiLanguage
+     */
+    public function getEmojiKeywordsLanguages(array $params);
+
+    /**
+     * @param array params [
      *               string lang_code,
      *              ]
      *
      * @return EmojiURL
      */
     public function getEmojiURL(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               MessagesFilter filters,
+     *              ]
+     *
+     * @return Vector_of_messages_SearchCounter
+     */
+    public function getSearchCounters(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               int msg_id,
+     *               int button_id,
+     *              ]
+     *
+     * @return UrlAuthResult
+     */
+    public function requestUrlAuth(array $params);
+
+    /**
+     * @param array params [
+     *               boolean write_allowed,
+     *               InputPeer peer,
+     *               int msg_id,
+     *               int button_id,
+     *              ]
+     *
+     * @return UrlAuthResult
+     */
+    public function acceptUrlAuth(array $params);
 }
 
 interface updates
@@ -2574,6 +2624,26 @@ interface channels
      * @return messages_Chats
      */
     public function getLeftChannels(array $params);
+
+    /**
+     * @return messages_Chats
+     */
+    public function getGroupsForDiscussion();
+
+    /**
+     * @return messages_Chats
+     */
+    public function getBroadcastsForDiscussion();
+
+    /**
+     * @param array params [
+     *               InputChannel broadcast,
+     *               InputChannel group,
+     *              ]
+     *
+     * @return bool
+     */
+    public function setDiscussionGroup(array $params);
 }
 
 interface bots
@@ -2712,6 +2782,7 @@ interface phone
 
     /**
      * @param array params [
+     *               boolean video,
      *               InputUser user_id,
      *               bytes g_a_hash,
      *               PhoneCallProtocol protocol,
@@ -2755,6 +2826,7 @@ interface phone
 
     /**
      * @param array params [
+     *               boolean video,
      *               InputPhoneCall peer,
      *               int duration,
      *               PhoneCallDiscardReason reason,
@@ -2840,4 +2912,25 @@ interface langpack
      * @return LangPackLanguage
      */
     public function getLanguage(array $params);
+}
+
+interface folders
+{
+    /**
+     * @param array params [
+     *               InputFolderPeer folder_peers,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function editPeerFolders(array $params);
+
+    /**
+     * @param array params [
+     *               int folder_id,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function deleteFolder(array $params);
 }

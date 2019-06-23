@@ -606,7 +606,35 @@ trait Files
             }
 
             try {
-                $res = $cdn ? yield $this->method_call_async_read('upload.getCdnFile', ['file_token' => $message_media['file_token'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'file' => true, 'datacenter' => $datacenter]) : yield $this->method_call_async_read('upload.getFile', ['location' => $message_media['InputFileLocation'], 'offset' => $offset, 'limit' => $part_size], ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]);
+                $res = $cdn ? 
+                            yield $this->method_call_async_read(
+                                'upload.getCdnFile', 
+                                [
+                                    'file_token' => $message_media['file_token'], 
+                                    'offset' => $offset, 
+                                    'limit' => $part_size
+                                ], 
+                                [
+                                    'heavy' => true, 
+                                    'file' => true,
+                                    'FloodWaitLimit' => 0, 
+                                    'datacenter' => $datacenter
+                                ]
+                            ) : 
+                            yield $this->method_call_async_read(
+                                'upload.getFile', 
+                                [
+                                    'location' => $message_media['InputFileLocation'], 
+                                    'offset' => $offset, 
+                                    'limit' => $part_size
+                                ], 
+                                [
+                                    'heavy' => true,
+                                    'file' => true, 
+                                    'FloodWaitLimit' => 0, 
+                                    'datacenter' => &$datacenter
+                                ]
+                            );
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
                     if (isset($message_media['MessageMedia']) && !$this->authorization['user']['bot'] && $this->settings['download']['report_broken_media']) {
