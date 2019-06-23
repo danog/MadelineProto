@@ -410,12 +410,10 @@ trait Files
 
                 return $res;
             case 'photoSize':
-                $size = $res['size'];
                 $res = yield $this->get_download_info_async($message_media['location']);
 
                 $res['thumb_size'] = $message_media['type'];
                 //$res['thumb_size'] = $size;
-
                 if (isset($message_media['size'])) {
                     $res['size'] = $message_media['size'];
                 }
