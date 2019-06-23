@@ -73,7 +73,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     /*
     const V = 71;
      */
-    const V = 124;
+    const V = 125;
     const RELEASE = '4.0';
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -801,9 +801,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         ], 'upload' => [
             'allow_automatic_upload' => true,
             'part_size' => 512 * 1024,
+            'parallel_chunks' => 20
         ], 'download' => [
             'report_broken_media' => true,
             'part_size' => 1024 * 1024,
+            'parallel_chunks' => 20
         ], 'pwr' => [
             'pwr' => false,
             // Need info ?

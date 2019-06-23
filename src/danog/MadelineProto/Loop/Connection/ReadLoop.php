@@ -26,6 +26,7 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Tools;
 use Amp\ByteStream\StreamException;
+use Amp\ByteStream\PendingReadError;
 
 /**
  * Socket read loop.
@@ -57,7 +58,7 @@ class ReadLoop extends SignalLoop
         while (true) {
             try {
                 $error = yield $this->waitSignal($this->readMessage());
-            } catch (NothingInTheSocketException|StreamException $e) {
+            } catch (NothingInTheSocketException|StreamException|PendingReadError $e) {
                 if (isset($connection->old)) {
                     return;
                 }
@@ -65,10 +66,6 @@ class ReadLoop extends SignalLoop
                 $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
                 yield $connection->reconnect();
                 continue;
-            } catch (ClosedException $e) {
-                $API->logger->logger($e->getMessage(), Logger::FATAL_ERROR);
-
-                throw $e;
             }
 
             if (is_int($error)) {

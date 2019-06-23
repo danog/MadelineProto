@@ -61,10 +61,10 @@ function ___install_madeline()
         $release_branch = '';
     }
     $release_fallback_branch = '';
-    if (isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], '000webhost.io') && $custom_branch === null) {
+    /*if (isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], '000webhost.io') && $custom_branch === null) {
         $release_branch = '-deprecated';
         $release_fallback_branch = '-deprecated';
-    }
+    }*/
 
     if (PHP_MAJOR_VERSION <= 5) {
         $release_branch = '5'.$release_branch;
