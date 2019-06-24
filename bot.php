@@ -44,6 +44,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
 
         try {
             yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']); //'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
+            yield $this->messages->sendMessage(['peer' => $update, 'message' => "<blockquote>owo uwu</blockquote>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']); //'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
             if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
                 yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
                 //yield $this->download_to_dir($update, '/tmp');
