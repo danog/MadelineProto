@@ -298,6 +298,7 @@ trait Files
             private $done = [];
             private $pending = [];
             public $nextRead;
+            public $size;
             public function write(string $data, int $offset)
             {
                 if (isset($this->pending[$offset])) {
@@ -325,11 +326,14 @@ trait Files
                 }
                 $this->pending[$offset] = new Deferred;
                 $res = $this->pending[$offset]->promise();
-
+                if ($offset + $size >= $this->size) {
+                    $this->nextRead->resolve(true);
+                }
                 return $res;
             }
         };
         $bridge->nextRead = new Deferred;
+        $bridge->size = $size;
         $reader = [$bridge, 'read'];
         $writer = [$bridge, 'write'];
         yield $this->all([

@@ -187,7 +187,7 @@ class WriteLoop extends ResumableSignalLoop
                 $body_length = strlen($message['serialized_body']);
                 $actual_length = $body_length + 32;
                 if ($total_length && $total_length + $actual_length > 32760 || $count >= 1020) {
-                    $API->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::NOTICE);
+                    $API->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     break;
                 }
 
@@ -248,7 +248,7 @@ class WriteLoop extends ResumableSignalLoop
                 $body_length = strlen($MTmessage['body']);
                 $actual_length = $body_length + 32;
                 if ($total_length && $total_length + $actual_length > 32760) {
-                    $API->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::NOTICE);
+                    $API->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     break;
                 }
                 $count++;
