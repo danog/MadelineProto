@@ -55,7 +55,9 @@ class CheckLoop extends ResumableSignalLoop
             }
 
             if ($connection->hasPendingCalls()) {
-                $last_recv = $connection->get_max_id(true);
+                $last_msgid = $connection->get_max_id(true);
+                $last_chunk = $connection->getLastChunk();
+
                 if ($connection->temp_auth_key !== null) {
                     $full_message_ids = $connection->getPendingCalls(); //array_values($connection->new_outgoing);
                     foreach (array_chunk($full_message_ids, 8192) as $message_ids) {
@@ -139,7 +141,7 @@ class CheckLoop extends ResumableSignalLoop
                     return;
                 }
 
-                if ($connection->get_max_id(true) === $last_recv) {
+                if ($connection->get_max_id(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {
                     $API->logger->logger("We did not receive a response for $timeout seconds: reconnecting and exiting check loop on DC $datacenter");
                     $this->exitedLoop();
                     yield $connection->reconnect();

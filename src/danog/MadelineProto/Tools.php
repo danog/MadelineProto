@@ -360,6 +360,14 @@ trait Tools
     {
         return self::call(self::flockAsync($file, $operation, $polling));
     }
+    public static function noCache(int $status, string $message)
+    {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Cache-Control: post-check=0, pre-check=0', false);
+        header('Pragma: no-cache');
+        http_response_code($status);
+        return self::echo($message);
+    }
     public static function flockAsync(string $file, int $operation, $polling)
     {
         if (!yield exists($file)) {

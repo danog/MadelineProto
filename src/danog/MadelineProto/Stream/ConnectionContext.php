@@ -22,6 +22,7 @@ use Amp\CancellationToken;
 use Amp\Socket\ClientConnectContext;
 use Amp\Uri\Uri;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
+use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 
 /**
  * Connection context class.
@@ -363,6 +364,23 @@ class ConnectionContext
         return $obj;
     }
 
+
+    /**
+     * Get the inputClientProxy proxy MTProto object
+     *
+     * @return array
+     */
+    public function getInputClientProxy(): ?array
+    {
+        foreach ($this->nextStreams as $couple) {
+            list($streamName, $extra) = $couple;
+            if ($streamName === ObfuscatedStream::getName() && isset($extra['address'])) {
+                $extra['_'] = 'inputClientProxy';
+                return $extra;
+            }
+        }
+        return null;
+    }
     /**
      * Get a description "name" of the context.
      *

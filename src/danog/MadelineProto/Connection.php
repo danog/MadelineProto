@@ -78,6 +78,7 @@ class Connection
     public $ack_queue = [];
     public $i = [];
     public $last_recv = 0;
+    private $last_chunk = 0;
     public $last_http_wait = 0;
 
     public $datacenter;
@@ -276,7 +277,19 @@ class Connection
     {
         return __CLASS__;
     }
-
+    public function haveRead()
+    {
+        $this->last_chunk = microtime(true);
+    }
+    /**
+     * Get the receive date of the latest chunk of data from the socket
+     *
+     * @return void
+     */
+    public function getLastChunk()
+    {
+        return $this->last_chunk;
+    }
     /**
      * Sleep function.
      *

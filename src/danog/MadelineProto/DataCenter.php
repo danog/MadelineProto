@@ -21,6 +21,7 @@ namespace danog\MadelineProto;
 
 use Amp\Artax\Client;
 use Amp\Artax\Cookie\ArrayCookieJar;
+use Amp\Artax\Cookie\CookieJar;
 use Amp\Artax\DefaultClient;
 use Amp\Artax\HttpSocketPool;
 use Amp\CancellationToken;
@@ -38,6 +39,7 @@ use Amp\Socket\ClientConnectContext;
 use Amp\Socket\ClientSocket;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectException;
+use Amp\Socket\Socket;
 use Amp\TimeoutException;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -55,7 +57,6 @@ use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
 use function Amp\call;
 use function Amp\Socket\Internal\parseUri;
-use Amp\Artax\Cookie\CookieJar;
 
 /**
  * Manages datacenters.
@@ -98,7 +99,7 @@ class DataCenter
         $this->HTTPClient = new DefaultClient($this->CookieJar, new HttpSocketPool(new ProxySocketPool([$this, 'rawConnectAsync'])));
 
         $DoHHTTPClient = new DefaultClient(
-            $this->CookieJar, 
+            $this->CookieJar,
             new HttpSocketPool(
                 new ProxySocketPool(
                     function (string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null) {
@@ -327,8 +328,34 @@ class DataCenter
 
                     continue; // Could not connect to host, try next host in the list.
                 }
+                if ($dc = $ctx->getDc()) {
+                    $callback = [$this->sockets[$dc], 'haveRead'];
+                    $socket = new class($socket) extends ClientSocket
+                    {
+                        private $callback;
+                        public function setReadCallback($callback)
+                        {
+                            $this->callback = $callback;
+                        }
 
-                return new ClientSocket($socket);
+                        /** @inheritdoc */
+                        public function read(): Promise
+                        {
+                            $promise = parent::read();
+                            $promise->onResolve(function ($e, $res) {
+                                if ($res) {
+                                    ($this->callback)();
+                                }
+                            });
+                            return $promise;
+                        }
+                    };
+                    $socket->setReadCallback($callback);
+                } else {
+                    $socket = new ClientSocket($socket);
+                }
+
+                return $socket;
             }
 
             // This is reached if either all URIs failed or the maximum number of attempts is reached.

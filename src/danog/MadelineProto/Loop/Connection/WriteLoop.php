@@ -215,6 +215,7 @@ class WriteLoop extends ResumableSignalLoop
                                         'system_lang_code' => $API->settings['app_info']['lang_code'],
                                         'lang_code'        => $API->settings['app_info']['lang_code'],
                                         'lang_pack'        => $API->settings['app_info']['lang_pack'],
+                                        'proxy'            => $connection->getCtx()->getInputClientProxy(),
                                         'query'            => $MTmessage['body'],
                                     ]
                                 ),

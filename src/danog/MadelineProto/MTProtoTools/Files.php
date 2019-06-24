@@ -22,6 +22,9 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\ByteStream\OutputStream;
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\ByteStream\StreamException;
+use Amp\File\StatCache;
+use Amp\Promise;
+use Amp\Success;
 use danog\MadelineProto\Async\AsyncParameters;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
@@ -30,9 +33,6 @@ use danog\MadelineProto\RPCErrorException;
 use function Amp\File\open;
 use function Amp\File\stat;
 use function Amp\Promise\all;
-use Amp\Deferred;
-use Amp\Success;
-use Amp\File\StatCache;
 
 /**
  * Manages upload and download of files.
@@ -517,7 +517,102 @@ trait Files
                 throw new \danog\MadelineProto\Exception('Invalid constructor provided: '.$message_media['_']);
         }
     }
+    /*
+    public function download_to_browser_single_async($message_media, $cb = null)
+    {
+    if (php_sapi_name() === 'cli') {
+    throw new Exception('Cannot download file to browser from command line: start this script from a browser');
+    }
+    if (headers_sent()) {
+    throw new Exception('Headers already sent, cannot stream file to browser!');
+    }
 
+    if (is_object($message_media) && $message_media instanceof FileCallbackInterface) {
+    $cb = $message_media;
+    $message_media = $message_media->getFile();
+    }
+
+    $message_media = yield $this->get_download_info_async($message_media);
+
+    $servefile = $_SERVER['REQUEST_METHOD'] !== 'HEAD';
+
+    if (isset($_SERVER['HTTP_RANGE'])) {
+    $range = explode('=', $_SERVER['HTTP_RANGE'], 2);
+    if (count($range) == 1) {
+    $range[1] = '';
+    }
+    list($size_unit, $range_orig) = $range;
+    if ($size_unit == 'bytes') {
+    //multiple ranges could be specified at the same time, but for simplicity only serve the first range
+    //http://tools.ietf.org/id/draft-ietf-http-range-retrieval-00.txt
+    $list = explode(',', $range_orig, 2);
+    if (count($list) == 1) {
+    $list[1] = '';
+    }
+    list($range, $extra_ranges) = $list;
+    } else {
+    $range = '';
+    return Tools::noCache(416, '<html><body><h1>416 Requested Range Not Satisfiable.</h1><br><p>Could not use selected range.</p></body></html>');
+    }
+    } else {
+    $range = '';
+    }
+    $listseek = explode('-', $range, 2);
+    if (count($listseek) == 1) {
+    $listseek[1] = '';
+    }
+    list($seek_start, $seek_end) = $listseek;
+
+    $seek_end = empty($seek_end) ? ($message_media['size'] - 1) : min(abs(intval($seek_end)), $message_media['size'] - 1);
+
+    if (!empty($seek_start) && $seek_end < abs(intval($seek_start))) {
+    return Tools::noCache(416, '<html><body><h1>416 Requested Range Not Satisfiable.</h1><br><p>Could not use selected range.</p></body></html>');
+    }
+    $seek_start = empty($seek_start) ? 0 : abs(intval($seek_start));
+    if ($servefile) {
+    if ($seek_start > 0 || $seek_end < $select['file_size'] - 1) {
+    header('HTTP/1.1 206 Partial Content');
+    header('Content-Range: bytes '.$seek_start.'-'.$seek_end.'/'.$select['file_size']);
+    header('Content-Length: '.($seek_end - $seek_start + 1));
+    } else {
+    header('Content-Length: '.$select['file_size']);
+    }
+    header('Content-Type: '.$select['mime']);
+    header('Cache-Control: max-age=31556926;');
+    header('Content-Transfer-Encoding: Binary');
+    header('Accept-Ranges: bytes');
+    //header('Content-disposition: attachment: filename="'.basename($select['file_path']).'"');
+    $MadelineProto->download_to_stream($select['file_id'], fopen('php://output', 'w'), function ($percent) {
+    flush();
+    ob_flush();
+    \danog\MadelineProto\Logger::log('Download status: '.$percent.'%');
+    }, $seek_start, $seek_end + 1);
+    //analytics(true, $file_path, $MadelineProto->get_self()['id'], $dbuser, $dbpassword);
+    $MadelineProto->API->getting_state = false;
+    $MadelineProto->API->store_db([], true);
+    $MadelineProto->API->reset_session();
+    } else {
+    if ($seek_start > 0 || $seek_end < $select['file_size'] - 1) {
+    header('HTTP/1.1 206 Partial Content');
+    header('Content-Range: bytes '.$seek_start.'-'.$seek_end.'/'.$select['file_size']);
+    header('Content-Length: '.($seek_end - $seek_start + 1));
+    } else {
+    header('Content-Length: '.$select['file_size']);
+    }
+    header('Content-Type: '.$select['mime']);
+    header('Cache-Control: max-age=31556926;');
+    header('Content-Transfer-Encoding: Binary');
+    header('Accept-Ranges: bytes');
+    analytics(true, $file_path, null, $dbuser, $dbpassword);
+    //header('Content-disposition: attachment: filename="'.basename($select['file_path']).'"');
+    }
+
+    header('Content-Length: '.$info['size']);
+    header('Content-Type: '.$info['mime']);
+    }*/
+    public function extract_photosize($photo)
+    {
+    }
     public function download_to_dir_async($message_media, $dir, $cb = null)
     {
         if (is_object($dir) && $dir instanceof FileCallbackInterface) {
@@ -561,7 +656,6 @@ trait Files
 
         return $file;
     }
-
     public function download_to_stream_async($message_media, $stream, $cb = null, $offset = 0, $end = -1)
     {
         $message_media = yield $this->get_download_info_async($message_media);
@@ -592,6 +686,25 @@ trait Files
             } catch (StreamException $e) {
             }
         }
+        $callable = static function (string $payload, int $offset) use ($stream, $seekable) {
+            if ($seekable) {
+                while ($stream->tell() !== $offset) {
+                    yield $stream->seek($offset);
+                }
+            }
+            return yield $stream->write($payload);
+        };
+
+        return yield $this->download_to_callable_async($message_media, $callable, $cb, $seekable, $offset, $end);
+    }
+    public function download_to_callable_async($message_media, $callable, $cb = null, $parallelize = true, $offset = 0, $end = -1)
+    {
+        $message_media = yield $this->get_download_info_async($message_media);
+
+        if (is_object($callable) && $callable instanceof FileCallbackInterface) {
+            $cb = $callable;
+            $callable = $callable->getFile();
+        }
 
         if ($end === -1 && isset($message_media['size'])) {
             $end = $message_media['size'];
@@ -617,7 +730,6 @@ trait Files
             $ige->enableContinuousBuffer();
         }
 
-
         if ($offset === $end) {
             $cb(100);
             return true;
@@ -629,8 +741,9 @@ trait Files
         $breakOut = false;
         for ($x = $offset - $start_at; $x < $probable_end; $x += $part_size) {
             $end_at = $part_size;
-            if ($end !== -1 && $x + $part_size >= $end) {
-                $end_at = $end % $part_size;
+            
+            if ($end !== -1 && $x + $part_size > $end) {
+                $end_at = ($x + $part_size) - $end;
                 $breakOut = true;
             }
 
@@ -655,15 +768,15 @@ trait Files
         $cb = function () use ($cb, $count) {
             static $cur = 0;
             $cur++;
-            $this->callFork($cb($cur*100/$count));
+            $this->callFork($cb($cur * 100 / $count));
         };
-        
+
         $cdn = false;
 
         $params[0]['previous_promise'] = new Success(true);
 
         $start = microtime(true);
-        $size = yield $this->download_part($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, array_shift($params), $stream, $seekable);
+        $size = yield $this->download_part($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, array_shift($params), $callable, $parallelize);
 
         if ($params) {
             $previous_promise = new Success(true);
@@ -671,20 +784,20 @@ trait Files
             $promises = [];
             foreach ($params as $key => $param) {
                 $param['previous_promise'] = $previous_promise;
-                $previous_promise = $this->call($this->download_part($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $stream, $seekable));
+                $previous_promise = $this->call($this->download_part($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $parallelize));
                 $previous_promise->onResolve(static function ($e, $res) use (&$size) {
                     if ($res) {
                         $size += $res;
                     }
                 });
-                $promises []= $previous_promise;
+                $promises[] = $previous_promise;
 
                 if (!($key % $parallel_chunks)) { // 20 mb at a time, for a typical bandwidth of 1gbps
                     yield $this->all($promises);
                     $promises = [];
 
                     $time = microtime(true) - $start;
-                    $speed = (int) (($size*8)/$time)/1000000;
+                    $speed = (int) (($size * 8) / $time) / 1000000;
                     $this->logger->logger("Partial download time: $time");
                     $this->logger->logger("Partial download speed: $speed mbps");
                 }
@@ -694,7 +807,7 @@ trait Files
             }
         }
         $time = microtime(true) - $start;
-        $speed = (int) (($size*8)/$time)/1000000;
+        $speed = (int) (($size * 8) / $time) / 1000000;
         $this->logger->logger("Total download time: $time");
         $this->logger->logger("Total download speed: $speed mbps");
 
@@ -705,7 +818,7 @@ trait Files
         return true;
     }
 
-    private function download_part(&$message_media, &$cdn, &$datacenter, &$old_dc, &$ige, $cb, $offset, $stream, $seekable, $postpone = false)
+    private function download_part(&$message_media, &$cdn, &$datacenter, &$old_dc, &$ige, $cb, $offset, $callable, $seekable, $postpone = false)
     {
         static $method = [
             false => 'upload.getFile', // non-cdn
@@ -714,14 +827,14 @@ trait Files
         do {
             if (!$cdn) {
                 $basic_param = [
-                    'location' => $message_media['InputFileLocation']
+                    'location' => $message_media['InputFileLocation'],
                 ];
             } else {
                 $basic_param = [
-                    'file_token' => $message_media['file_token']
+                    'file_token' => $message_media['file_token'],
                 ];
             }
-    
+
             try {
                 $res = yield $this->method_call_async_read(
                     $method[$cdn],
@@ -731,7 +844,7 @@ trait Files
                         'file' => true,
                         'FloodWaitLimit' => 0,
                         'datacenter' => &$datacenter,
-                        'postpone' => $postpone
+                        'postpone' => $postpone,
                     ]
                 );
             } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -790,11 +903,11 @@ trait Files
             if ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
                 $datacenter = 0;
             }
-            while ($cdn === false && 
-                    $res['type']['_'] === 'storage.fileUnknown' && 
-                    $res['bytes'] === '' && 
-                    isset($this->datacenter->sockets[++$datacenter])
-             ) {
+            while ($cdn === false &&
+                $res['type']['_'] === 'storage.fileUnknown' &&
+                $res['bytes'] === '' &&
+                isset($this->datacenter->sockets[++$datacenter])
+            ) {
                 $res = yield $this->method_call_async_read('upload.getFile', $basic_param + $offset, ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => $datacenter]);
             }
 
@@ -807,17 +920,15 @@ trait Files
                 $res['bytes'] = $ige->decrypt($res['bytes']);
             }
             if ($offset['part_start_at'] || $offset['part_end_at'] !== $offset['limit']) {
-                $res['bytes'] = substr($res['bytes'], $offset['part_start_at'], $offset['part_end_at']- $offset['part_start_at']);
+                $res['bytes'] = substr($res['bytes'], $offset['part_start_at'], $offset['part_end_at'] - $offset['part_start_at']);
             }
-            
+
             if (!$seekable) {
                 yield $offset['previous_promise']->promise();
-            } else {
-                yield $stream->seek($offset['offset'] + $offset['part_start_at']);
             }
-            yield $stream->write($res['bytes']);
+            $res = yield $callable((string) $res['bytes'], $offset['offset'] + $offset['part_start_at']);
             $cb();
-            return strlen($res['bytes']);
+            return $res;
         } while (true);
     }
 
