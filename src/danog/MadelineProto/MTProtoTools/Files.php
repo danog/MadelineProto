@@ -49,8 +49,6 @@ trait Files
             $file = $file->getFile();
         }
 
-        $t = microtime(true);
-
         $file = \danog\MadelineProto\Absolute::absolute($file);
         if (!file_exists($file)) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['file_not_exist']);
@@ -71,18 +69,31 @@ trait Files
                 $this->logger->logger('Upload status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
             };
         }
-        $part_size = $this->settings['upload']['part_size'];
-        $part_total_num = (int) ceil($file_size / $part_size);
-        $part_num = 0;
-        $method = $file_size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
-        $constructor = 'input'.($encrypted === true ? 'Encrypted' : '').($file_size > 10 * 1024 * 1024 ? 'FileBig' : 'File').($encrypted === true ? 'Uploaded' : '');
-        $file_id = $this->random(8);
+
         $f = fopen($file, 'r');
 
         $seekable = stream_get_meta_data($f)['seekable'];
         if ($seekable) {
             fseek($f, 0);
         }
+    }
+    public function upload_from_callable($callable, $size, $file_name = '', $cb = null, $encrypted = false)
+    {
+        if (is_object($callable) && $callable instanceof FileCallbackInterface) {
+            $cb = $callable;
+            $callable = $callable->getFile();
+        }
+        if (!is_callable($callable)) {
+            throw new Exception('Invalid callable provided');
+        }
+
+        $part_size = $this->settings['upload']['part_size'];
+        $part_total_num = (int) ceil($size / $part_size);
+        $part_num = 0;
+        $method = $size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
+        $constructor = 'input'.($encrypted === true ? 'Encrypted' : '').($size > 10 * 1024 * 1024 ? 'FileBig' : 'File').($encrypted === true ? 'Uploaded' : '');
+        $file_id = $this->random(8);
+
         $ige = null;
         if ($encrypted === true) {
             $key = $this->random(32);
@@ -93,6 +104,7 @@ trait Files
             $ige->setIV($iv);
             $ige->setKey($key);
             $ige->enableContinuousBuffer();
+            $parallelize = false;
         }
         $ctx = hash_init('md5');
         $promises = [];
@@ -706,6 +718,10 @@ trait Files
             $callable = $callable->getFile();
         }
 
+        if (!is_callable($callable)) {
+            throw new Exception('Wrong callable provided');
+        }
+
         if ($end === -1 && isset($message_media['size'])) {
             $end = $message_media['size'];
         }
@@ -728,6 +744,7 @@ trait Files
             $ige->setIV($message_media['iv']);
             $ige->setKey($message_media['key']);
             $ige->enableContinuousBuffer();
+            $parallelize = false;
         }
 
         if ($offset === $end) {
@@ -741,7 +758,7 @@ trait Files
         $breakOut = false;
         for ($x = $offset - $start_at; $x < $probable_end; $x += $part_size) {
             $end_at = $part_size;
-            
+
             if ($end !== -1 && $x + $part_size > $end) {
                 $end_at = ($x + $part_size) - $end;
                 $breakOut = true;
