@@ -58,7 +58,7 @@ trait Files
                 return yield $this->upload_from_url_async($file);
             }
         } else if (is_array($file)) {
-            return yield $this->upload_from_tgfile($file, $cb, $encrypted);
+            return yield $this->upload_from_tgfile_async($file, $cb, $encrypted);
         }
 
         $file = \danog\MadelineProto\Absolute::absolute($file);
@@ -226,7 +226,7 @@ trait Files
                 ),
                 ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]
             );
-            $read_deferred->onResolve(static function ($e, $res) use ($cb) {
+            $read_deferred->promise()->onResolve(static function ($e, $res) use ($cb) {
                 if ($res) {
                     $cb();
                 }
@@ -291,10 +291,13 @@ trait Files
         $size = $media['size'];
         $mime = $media['mime'];
 
+        $chunk_size = $this->settings['upload']['part_size'];
+
         $bridge = new class
         {
             private $done = [];
             private $pending = [];
+            public $nextRead;
             public function write(string $data, int $offset)
             {
                 if (isset($this->pending[$offset])) {
@@ -304,9 +307,14 @@ trait Files
                 } else {
                     $this->done[$offset] = $data;
                 }
+                return $this->nextRead->promise();
             }
             public function read(int $offset, int $size)
             {
+                $nextRead = $this->nextRead;
+                $this->nextRead = new Deferred;
+                $nextRead->resolve(true);
+
                 if (isset($this->done[$offset])) {
                     if (strlen($this->done[$offset]) > $size) {
                         throw new Exception('Wrong size!');
@@ -316,14 +324,17 @@ trait Files
                     return $result;
                 }
                 $this->pending[$offset] = new Deferred;
-                return $this->pending[$offset]->promise();
+                $res = $this->pending[$offset]->promise();
+
+                return $res;
             }
         };
+        $bridge->nextRead = new Deferred;
         $reader = [$bridge, 'read'];
         $writer = [$bridge, 'write'];
         yield $this->all([
-            $this->download_to_callable_async($media, $writer, $cb),
             $this->upload_from_callable_async($reader, $size, $mime, '', $cb, false, $encrypted),
+            $this->download_to_callable_async($media, $writer, null, false, 0, -1, $chunk_size)
         ]);
     }
 
@@ -505,13 +516,13 @@ trait Files
                         $res['name'] .= ' - '.$audio['performer'];
                     }
                 }
-                if (!isset($res['ext'])) {
-                    $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime(isset($res['mime']) ? $res['mime'] : 'image/jpeg'));
+                if (!isset($res['ext']) || $res['ext'] === '') {
+                    $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime($res['mime'] ?? 'image/jpeg'));
                 }
-                if (!isset($res['mime'])) {
+                if (!isset($res['mime']) || $res['mime'] === '') {
                     $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
                 }
-                if (!isset($res['name'])) {
+                if (!isset($res['name']) || $res['name'] === '') {
                     $res['name'] = $message_media['file']['access_hash'];
                 }
 
@@ -672,10 +683,10 @@ trait Files
                     ),
                 ];
 
-                if (!isset($res['ext'])) {
+                if (!isset($res['ext']) || $res['ext'] === '') {
                     $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime($message_media['document']['mime_type']));
                 }
-                if (!isset($res['name'])) {
+                if (!isset($res['name']) || $res['name'] === '') {
                     $res['name'] = $message_media['document']['access_hash'];
                 }
                 if (isset($message_media['document']['size'])) {
@@ -863,7 +874,7 @@ trait Files
 
         return yield $this->download_to_callable_async($message_media, $callable, $cb, $seekable, $offset, $end);
     }
-    public function download_to_callable_async($message_media, $callable, $cb = null, $parallelize = true, $offset = 0, $end = -1)
+    public function download_to_callable_async($message_media, $callable, $cb = null, $parallelize = true, $offset = 0, $end = -1, int $part_size = null)
     {
         $message_media = yield $this->get_download_info_async($message_media);
 
@@ -885,7 +896,7 @@ trait Files
             $end = $message_media['size'];
         }
 
-        $part_size = $this->settings['download']['part_size'];
+        $part_size = $part_size ?? $this->settings['download']['part_size'];
         $parallel_chunks = $this->settings['download']['parallel_chunks'] ? $this->settings['download']['parallel_chunks'] : 3000;
 
         $datacenter = isset($message_media['InputFileLocation']['dc_id']) ? $message_media['InputFileLocation']['dc_id'] : $this->settings['connection_settings']['default_dc'];
@@ -966,6 +977,7 @@ trait Files
                         $size += $res;
                     }
                 });
+
                 $promises[] = $previous_promise;
 
                 if (!($key % $parallel_chunks)) { // 20 mb at a time, for a typical bandwidth of 1gbps
@@ -1100,7 +1112,7 @@ trait Files
             }
 
             if (!$seekable) {
-                yield $offset['previous_promise']->promise();
+                yield $offset['previous_promise'];
             }
             $res = yield $callable((string) $res['bytes'], $offset['offset'] + $offset['part_start_at']);
             $cb();

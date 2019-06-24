@@ -463,7 +463,13 @@ trait TL
             }
         } elseif ($method === 'messages.sendEncryptedFile') {
             if (isset($arguments['file'])) {
-                if (!is_array($arguments['file']) && $this->settings['upload']['allow_automatic_upload']) {
+                if (
+                    (
+                        !is_array($arguments['file']) ||
+                        !(isset($arguments['file']['_']) && $this->constructors->find_by_predicate($arguments['file']['_']) === 'InputEncryptedFile')
+                    ) && 
+                    $this->settings['upload']['allow_automatic_upload']
+                ) {
                     $arguments['file'] = yield $this->upload_encrypted_async($arguments['file']);
                 }
                 if (isset($arguments['file']['key'])) {
@@ -602,7 +608,16 @@ trait TL
                 });
             }
 
-            if (!is_array($arguments[$current_argument['name']]) && $current_argument['type'] === 'InputFile' && $this->settings['upload']['allow_automatic_upload']) {
+            if ($current_argument['type'] === 'InputFile'
+                && (
+                    !is_array($arguments[$current_argument['name']])
+                    || !(
+                        isset($arguments[$current_argument['name']]['_'])
+                        && $this->constructors->find_by_predicate($arguments[$current_argument['name']]['_']) === 'InputFile'
+                    )
+                )
+                && $this->settings['upload']['allow_automatic_upload']
+            ) {
                 $arguments[$current_argument['name']] = yield $this->upload_async($arguments[$current_argument['name']]);
             }
 
