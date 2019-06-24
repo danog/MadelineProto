@@ -47,7 +47,7 @@ class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInt
 
     public function enableCrypto(ClientTlsContext $tlsContext = null): \Amp\Promise
     {
-        return $this->enableCrypto($tlsContext);
+        return $this->stream->enableCrypto($tlsContext);
     }
 
     public function getStream()
