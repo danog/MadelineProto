@@ -14,7 +14,7 @@
         "danog/magicalserializer": "^1.0",
         "phpseclib/phpseclib": "dev-master#5e7d39153270dfd19d585504b0a29ac65a62adf9 as 2.0.15",
         "vlucas/phpdotenv": "^3",
-        "erusev/parsedown": "^1.6",
+        "erusev/parsedown": "^1.7",
         "ext-mbstring": "*",
         "ext-json": "*",
         "ext-xml": "*",

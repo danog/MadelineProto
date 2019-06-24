@@ -50,6 +50,7 @@ function getUrl($constructor, $type)
 {
     $changed = str_replace('.', '_', $constructor);
 
+    return "[$constructor](https://github.com/danog/MadelineProtoDocs/blob/geochats/docs/API_docs/$type/$changed.md)";
     return "[$constructor](https://docs.madelineproto.xyz/API_docs/$type/$changed.html)";
 }
 $old = getTL($argv[1]);

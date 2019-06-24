@@ -688,7 +688,7 @@ trait BotAPI
     public function html_fixtags($text)
     {
         $diff = 0;
-        preg_match_all('#(.*?)(<(u|s|a|b|\bstrong\b|\bblockquote\b|\bstrike\b|\bdel\b|\bem\b|i|\bcode\b|\bpre\b)[^>]*>)(.*?)(<\s*/\s*\3>)#is', $text, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
+        preg_match_all('#(.*?)(<(\bu\b|\bs\b|\ba\b|\bb\b|\bstrong\b|\bblockquote\b|\bstrike\b|\bdel\b|\bem\b|i|\bcode\b|\bpre\b)[^>]*>)(.*?)([<]\s*/\s*\3[>])#is', $text, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
         if ($matches) {
             foreach ($matches as $match) {
                 if (trim($match[1][0]) != '') {
