@@ -713,16 +713,7 @@ interface contacts
      *               InputUser id,
      *              ]
      *
-     * @return contacts_Link
-     */
-    public function deleteContact(array $params);
-
-    /**
-     * @param array params [
-     *               InputUser id,
-     *              ]
-     *
-     * @return bool
+     * @return Updates
      */
     public function deleteContacts(array $params);
 
@@ -829,6 +820,37 @@ interface contacts
      * @return bool
      */
     public function toggleTopPeers(array $params);
+
+    /**
+     * @param array params [
+     *               boolean add_phone_privacy_exception,
+     *               InputUser id,
+     *               string first_name,
+     *               string last_name,
+     *               string phone,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function addContact(array $params);
+
+    /**
+     * @param array params [
+     *               InputUser id,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function acceptContact(array $params);
+
+    /**
+     * @param array params [
+     *               InputGeoPoint geo_point,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function getLocated(array $params);
 }
 
 interface messages
@@ -1001,15 +1023,6 @@ interface messages
      * @return bool
      */
     public function reportSpam(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
-     *
-     * @return bool
-     */
-    public function hideReportSpam(array $params);
 
     /**
      * @param array params [
@@ -1346,6 +1359,7 @@ interface messages
 
     /**
      * @param array params [
+     *               int folder_id,
      *               string q,
      *               int offset_rate,
      *               InputPeer offset_peer,
@@ -2023,6 +2037,15 @@ interface messages
      * @return UrlAuthResult
      */
     public function acceptUrlAuth(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *              ]
+     *
+     * @return bool
+     */
+    public function hidePeerSettingsBar(array $params);
 }
 
 interface updates
@@ -2430,6 +2453,8 @@ interface channels
      *               boolean megagroup,
      *               string title,
      *               string about,
+     *               InputGeoPoint geo_point,
+     *               string address,
      *              ]
      *
      * @return Updates
@@ -2546,9 +2571,14 @@ interface channels
     public function toggleSignatures(array $params);
 
     /**
+     * @param array params [
+     *               boolean by_location,
+     *               boolean check_limit,
+     *              ]
+     *
      * @return messages_Chats
      */
-    public function getAdminedPublicChannels();
+    public function getAdminedPublicChannels(array $params);
 
     /**
      * @param array params [
@@ -2631,11 +2661,6 @@ interface channels
     public function getGroupsForDiscussion();
 
     /**
-     * @return messages_Chats
-     */
-    public function getBroadcastsForDiscussion();
-
-    /**
      * @param array params [
      *               InputChannel broadcast,
      *               InputChannel group,
@@ -2644,6 +2669,28 @@ interface channels
      * @return bool
      */
     public function setDiscussionGroup(array $params);
+
+    /**
+     * @param array params [
+     *               InputChannel channel,
+     *               InputUser user_id,
+     *               InputCheckPasswordSRP password,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function editCreator(array $params);
+
+    /**
+     * @param array params [
+     *               InputChannel channel,
+     *               InputGeoPoint geo_point,
+     *               string address,
+     *              ]
+     *
+     * @return bool
+     */
+    public function editLocation(array $params);
 }
 
 interface bots

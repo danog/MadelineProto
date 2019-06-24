@@ -270,8 +270,13 @@ The following tags are currently supported:
 <strong>bold</strong>
 <em>italic</em>
 <i>italic</i>
+<u>underline</u>
+<s>strikethrough</s>
+<del>strikethrough</del>
+<strike>strikethrough</strike>
 <code>inline fixed-width code</code>
 <pre>pre-formatted fixed-width code block</pre>
+<blockquote>pre-formatted fixed-width code block</blockquote>
 <a href="https://github.com">URL</a>
 <a href="mention:@danogentili">Mention by username</a>
 <a href="mention:186785362">Mention by user id</a>
