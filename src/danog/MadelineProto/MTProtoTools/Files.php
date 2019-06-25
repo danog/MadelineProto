@@ -21,6 +21,7 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\ByteStream\InputStream;
 use Amp\ByteStream\OutputStream;
+use Amp\ByteStream\ResourceInputStream;
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\ByteStream\StreamException;
 use Amp\Deferred;
@@ -41,6 +42,7 @@ use function Amp\File\open;
 use function Amp\File\stat;
 use function Amp\File\touch;
 use function Amp\Promise\all;
+use Amp\File\BlockingHandle;
 
 /**
  * Manages upload and download of files.
@@ -98,13 +100,23 @@ trait Files
         }
         $mime = trim(explode(';', $response->getHeader('content-type') ?? 'application/octet-stream')[0]);
         $size = $response->getHeader('content-length') ?? $size;
+
+        $stream = $response->getBody();
         if (!$size) {
-            throw new Exception('Wrong size');
+            $body = $stream;
+            $stream = new BlockingHandle(fopen('php://temp', 'r+b'), 'php://temp', 'r+b');
+
+            while (null !== $chunk = yield $body->read()) {
+                yield $stream->write($chunk);
+            }
+            $size = $stream->tell();
+            if (!$size) {
+                throw new Exception('Wrong size!');
+            }
+            yield $stream->seek(0);
         }
 
-        $body = $response->getBody();
-
-        return yield $this->upload_from_stream_async($body, $size, $mime, $file_name, $cb, $encrypted);
+        return yield $this->upload_from_stream_async($stream, $size, $mime, $file_name, $cb, $encrypted);
     }
     public function upload_from_stream_async($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false)
     {
