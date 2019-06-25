@@ -34,7 +34,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\Stream\Common\BufferedRawStream;
+use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
 use function Amp\File\exists;
@@ -43,6 +43,7 @@ use function Amp\File\stat;
 use function Amp\File\touch;
 use function Amp\Promise\all;
 use Amp\File\BlockingHandle;
+use Amp\Artax\Client;
 
 /**
  * Manages upload and download of files.
@@ -94,7 +95,7 @@ trait Files
             $url = $url->getFile();
         }
         /** @var $response \Amp\Artax\Response */
-        $response = yield $this->datacenter->getHTTPClient()->request($url);
+        $response = yield $this->datacenter->getHTTPClient()->request($url, [Client::OP_MAX_BODY_BYTES => 512 * 1024 * 3000, Client::OP_TRANSFER_TIMEOUT => 10*1000*3600]);
         if (200 !== $status = $response->getStatus()) {
             throw new Exception("Wrong status code: $status ".$response->getReason());
         }
@@ -103,6 +104,8 @@ trait Files
 
         $stream = $response->getBody();
         if (!$size) {
+            $this->logger->logger("No content length for $url, caching first");
+
             $body = $stream;
             $stream = new BlockingHandle(fopen('php://temp', 'r+b'), 'php://temp', 'r+b');
 
@@ -141,7 +144,9 @@ trait Files
             }
         }
 
-        if ($stream instanceof Handle || $stream instanceof BufferedRawStream) {
+        $created = false;
+
+        if ($stream instanceof Handle) {
             $callable = static function (int $offset, int $size) use ($stream, $seekable) {
                 if ($seekable) {
                     while ($stream->tell() !== $offset) {
@@ -151,18 +156,30 @@ trait Files
                 return yield $stream->read($size);
             };
         } else {
-            $ctx = (new ConnectionContext)
-                ->addStream(PremadeStream::getName(), $stream)
-                ->addStream(BufferedRawStream::getName());
-
-            $stream = yield $ctx->getStream();
-
+            if (!$stream instanceof BufferedRawStream) {
+                $ctx = (new ConnectionContext)
+                    ->addStream(PremadeStream::getName(), $stream)
+                    ->addStream(SimpleBufferedRawStream::getName());
+                $stream = yield $ctx->getStream();
+                $created = true;
+            }
             $callable = static function (int $offset, int $size) use ($stream) {
-                return yield $stream->read($size);
+                $reader = yield $stream->getReadBuffer($l);
+                try {
+                    return yield $reader->bufferRead($size);
+                } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
+                    $reader = yield $stream->getReadBuffer($size);
+                    return yield $reader->bufferRead($size);
+                }
             };
+            $seekable = false;
         }
 
-        return yield $this->upload_from_callable_async($callable, $size, $mime, $file_name, $cb, $seekable, $encrypted);
+        $res = yield $this->upload_from_callable_async($callable, $size, $mime, $file_name, $cb, $seekable, $encrypted);
+        if ($created) {
+            $stream->disconnect();
+        }
+        return $res;
     }
     public function upload_from_callable_async($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $refetchable = true, bool $encrypted = false)
     {

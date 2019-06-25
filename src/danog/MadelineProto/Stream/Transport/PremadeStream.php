@@ -95,7 +95,9 @@ class PremadeStream extends Socket implements RawStreamInterface, ProxyStreamInt
     {
         try {
             if ($this->stream) {
-                $this->stream->close();
+                if (method_exists($this->stream, 'close')) {
+                    $this->stream->close();
+                }
                 $this->stream = null;
             }
         } catch (\Throwable $e) {
