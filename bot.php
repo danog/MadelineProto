@@ -50,7 +50,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                     'peer' => '@danogentili',
                     'media' => [
                         '_' => 'inputMediaUploadedDocument',
-                        'file' => $update,
+                        'file' => 'https://google.com',
                         'attributes' => [
                             ['_' => 'documentAttributeFilename', 'file_name' => 'document.txt']
                         ]

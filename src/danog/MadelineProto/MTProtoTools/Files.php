@@ -93,8 +93,8 @@ trait Files
         }
         /** @var $response \Amp\Artax\Response */
         $response = yield $this->datacenter->getHTTPClient()->request($url);
-        if (200 !== $status = $response->getStatusCode) {
-            throw new Exception("Wrong status code: $status");
+        if (200 !== $status = $response->getStatus()) {
+            throw new Exception("Wrong status code: $status ".$response->getReason());
         }
         $mime = trim(explode(';', $response->getHeader('content-type') ?? 'application/octet-stream')[0]);
         $size = $response->getHeader('content-length') ?? $size;
@@ -295,6 +295,7 @@ trait Files
         $chunk_size = $this->settings['upload']['part_size'];
 
         $bridge = new class
+
         {
             private $done = [];
             private $pending = [];
@@ -346,7 +347,7 @@ trait Files
         $read = $this->upload_from_callable_async($reader, $size, $mime, '', $cb, false, $encrypted);
         $write = $this->download_to_callable_async($media, $writer, null, true, 0, -1, $chunk_size);
 
-        list($res, ) = yield $this->all([$read, $write]);
+        list($res) = yield $this->all([$read, $write]);
 
         return $res;
     }
