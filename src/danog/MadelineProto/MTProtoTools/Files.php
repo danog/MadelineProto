@@ -153,7 +153,7 @@ trait Files
         } else {
             $ctx = (new ConnectionContext)
                 ->addStream(PremadeStream::getName(), $stream)
-                ->addStream(BufferedRawStream);
+                ->addStream(BufferedRawStream::getName());
 
             $stream = yield $ctx->getStream();
 
