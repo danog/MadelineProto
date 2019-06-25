@@ -312,7 +312,15 @@ trait ResponseHandler
                 if (isset($request['promise'])) {
                     $promise = $request['promise'];
                     unset($request['promise']);
-                    $promise->fail($data);
+                    try {
+                        $promise->fail($data);
+                    } catch (\Error $e) {
+                        if (strpos($e->getMessage(), "Promise has already been resolved") !== 0) {
+                            throw $e;
+                        }
+                        $this->logger->logger("Got promise already resolved error", \danog\MadelineProto\Logger::FATAL_ERROR);
+                    }
+
                 } else {
                     $this->logger->logger('Rejecting: already got response for '.(isset($request['_']) ? $request['_'] : '-'));
                     $this->logger->logger("Rejecting: $data");
@@ -576,7 +584,14 @@ trait ResponseHandler
                 if (isset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise'])) { // This should not happen but happens, should debug
                     $promise = $this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise'];
                     unset($this->datacenter->sockets[$datacenter]->outgoing_messages[$request_id]['promise']);
-                    $promise->resolve($response);
+                    try {
+                        $promise->resolve($response);
+                    } catch (\Error $e) {
+                        if (strpos($e->getMessage(), "Promise has already been resolved") !== 0) {
+                            throw $e;
+                        }
+                        $this->logger->logger("Got promise already resolved error", \danog\MadelineProto\Logger::FATAL_ERROR);
+                    }
                 }
             }
         )());
