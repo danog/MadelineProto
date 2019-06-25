@@ -213,6 +213,7 @@ trait Files
                         $fetched = true;
 
                         $bytes = yield $callable($part_num * $part_size, $part_size);
+
                         if (!$already_fetched) {
                             hash_update($ctx, $bytes);
                         }
@@ -246,8 +247,8 @@ trait Files
 
                 $time = microtime(true) - $start;
                 $speed = (int) (($size * 8) / $time) / 1000000;
-                $this->logger->logger("Partial download time: $time");
-                $this->logger->logger("Partial download speed: $speed mbps");
+                $this->logger->logger("Partial upload time: $time");
+                $this->logger->logger("Partial upload speed: $speed mbps");
             }
         }
 
@@ -259,8 +260,8 @@ trait Files
         }
         $time = microtime(true) - $start;
         $speed = (int) (($size * 8) / $time) / 1000000;
-        $this->logger->logger("Total download time: $time");
-        $this->logger->logger("Total download speed: $speed mbps");
+        $this->logger->logger("Total upload time: $time");
+        $this->logger->logger("Total upload speed: $speed mbps");
 
         $constructor = ['_' => $constructor, 'id' => $file_id, 'parts' => $part_total_num, 'name' => $file_name, 'mime_type' => $mime];
         if ($encrypted === true) {
@@ -299,22 +300,16 @@ trait Files
             private $pending = [];
             public $nextRead;
             public $size;
-            public function write(string $data, int $offset)
-            {
-                if (isset($this->pending[$offset])) {
-                    $promise = $this->pending[$offset];
-                    unset($this->pending[$offset]);
-                    $promise->resolve($data);
-                } else {
-                    $this->done[$offset] = $data;
-                }
-                return $this->nextRead->promise();
-            }
+            public $part_size;
+
             public function read(int $offset, int $size)
             {
                 $nextRead = $this->nextRead;
                 $this->nextRead = new Deferred;
-                $nextRead->resolve(true);
+
+                if ($nextRead) {
+                    $nextRead->resolve(true);
+                }
 
                 if (isset($this->done[$offset])) {
                     if (strlen($this->done[$offset]) > $size) {
@@ -325,21 +320,35 @@ trait Files
                     return $result;
                 }
                 $this->pending[$offset] = new Deferred;
-                $res = $this->pending[$offset]->promise();
-                if ($offset + $size >= $this->size) {
-                    $this->nextRead->resolve(true);
+                return $this->pending[$offset]->promise();
+            }
+            public function write(string $data, int $offset)
+            {
+                if (isset($this->pending[$offset])) {
+                    $promise = $this->pending[$offset];
+                    unset($this->pending[$offset]);
+                    $promise->resolve($data);
+                } else {
+                    $this->done[$offset] = $data;
                 }
-                return $res;
+                $length = strlen($data);
+                if ($offset + $length === $this->size || $length < $this->part_size) {
+                    return;
+                }
+                return $this->nextRead->promise();
             }
         };
-        $bridge->nextRead = new Deferred;
         $bridge->size = $size;
+        $bridge->part_size = $chunk_size;
         $reader = [$bridge, 'read'];
         $writer = [$bridge, 'write'];
-        yield $this->all([
-            $this->upload_from_callable_async($reader, $size, $mime, '', $cb, false, $encrypted),
-            $this->download_to_callable_async($media, $writer, null, false, 0, -1, $chunk_size)
-        ]);
+
+        $read = $this->upload_from_callable_async($reader, $size, $mime, '', $cb, false, $encrypted);
+        $write = $this->download_to_callable_async($media, $writer, null, true, 0, -1, $chunk_size);
+
+        list($res, ) = yield $this->all([$read, $write]);
+
+        return $res;
     }
 
     public function gen_all_file_async($media)
@@ -934,7 +943,7 @@ trait Files
             $end_at = $part_size;
 
             if ($end !== -1 && $x + $part_size > $end) {
-                $end_at = ($x + $part_size) - $end;
+                $end_at = $end % $part_size;
                 $breakOut = true;
             }
 
@@ -956,6 +965,7 @@ trait Files
             return true;
         }
         $count = count($params);
+
         $cb = function () use ($cb, $count) {
             static $cur = 0;
             $cur++;
