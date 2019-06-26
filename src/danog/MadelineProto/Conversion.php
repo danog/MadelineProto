@@ -74,7 +74,7 @@ class Conversion
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         if (!extension_loaded('sqlite3')) {
-            throw new Exception(['extension', 'sqlite3']);
+            throw Exception::extension('sqlite3');
         }
         if (!isset(pathinfo($session)['extension'])) {
             $session .= '.session';

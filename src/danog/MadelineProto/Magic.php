@@ -23,10 +23,10 @@ use Amp\DoH\DoHConfig;
 use Amp\DoH\Nameserver;
 use Amp\DoH\Rfc8484StubResolver;
 use Amp\Loop;
+use function Amp\ByteStream\getInputBufferStream;
+use function Amp\ByteStream\getStdin;
 use function Amp\Dns\resolver;
 use function Amp\Promise\wait;
-use function Amp\ByteStream\getStdin;
-use function Amp\ByteStream\getInputBufferStream;
 
 class Magic
 {
@@ -68,6 +68,14 @@ class Magic
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         //set_exception_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
         if (!self::$inited) {
+            if (!defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 7) {
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
+            }
+            foreach (['intl', 'xml', 'fileinfo', 'json', 'mbstring'] as $extension) {
+                if (!extension_loaded($extension)) {
+                    throw Exception::extension($extension);
+                }
+            }
             self::$has_thread = class_exists('\\Thread') && method_exists('\\Thread', 'getCurrentThread');
             self::$BIG_ENDIAN = pack('L', 1) === pack('N', 1);
             self::$bigint = PHP_INT_SIZE < 8;
@@ -147,14 +155,14 @@ class Magic
                 Loop::onSignal(SIGINT, static function () {
                     getStdin()->unreference();
                     getInputBufferStream()->unreference();
-                    Logger::log('Got sigint', Logger::FATAL_ERROR); 
+                    Logger::log('Got sigint', Logger::FATAL_ERROR);
                     die();
                 });
                 /*Loop::onSignal(SIGTERM, static function () {
-                    Logger::log('Got sigterm', Logger::FATAL_ERROR);
-                    Loop::stop();
-                    die();
-                });*/
+            Logger::log('Got sigterm', Logger::FATAL_ERROR);
+            Loop::stop();
+            die();
+            });*/
             }
             if (!self::$altervista && !self::$zerowebhost) {
                 $DohConfig = new DoHConfig(

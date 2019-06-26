@@ -536,9 +536,6 @@ trait BotAPI
             $arguments['message'] = trim($this->html_fixtags($arguments['message']));
 
             $dom = new \DOMDocument();
-            if (!extension_loaded('mbstring')) {
-                throw new \danog\MadelineProto\Exception(['extension', 'mbstring']);
-            }
             $dom->loadHTML(mb_convert_encoding($arguments['message'], 'HTML-ENTITIES', 'UTF-8'));
             if (!isset($arguments['entities'])) {
                 $arguments['entities'] = [];
