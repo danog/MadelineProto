@@ -27,6 +27,7 @@ use function Amp\Socket\connect;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Amp\ByteStream\ClosedException;
 
 /**
  * Buffered raw stream.

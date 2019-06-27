@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto;
 
+// This code was written a few years ago: it is garbage, and has to be rewritten
 class DocsBuilder
 {
     use \danog\MadelineProto\TL\TL;
