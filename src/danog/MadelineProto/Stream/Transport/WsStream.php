@@ -84,6 +84,7 @@ class WsStream implements RawStreamInterface
                 break;
             }
         }
+
         if (!$this->stream) {
             throw new ConnectionException('Failed to read response from server');
         }
