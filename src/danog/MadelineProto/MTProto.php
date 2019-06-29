@@ -133,6 +133,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public $authorized = 0;
     public $authorized_dc = -1;
     private $rsa_keys = [];
+    private $cdn_rsa_keys = [];
     private $dh_config = ['version' => 0];
     public $chats = [];
     public $channel_participants = [];
@@ -180,6 +181,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         // Load rsa keys
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);
+        $this->rsa_keys = [];
         foreach ($this->settings['authorization']['rsa_keys'] as $key) {
             $key = yield (new RSA())->load($key);
             $this->rsa_keys[$key->fp] = $key;
@@ -1016,7 +1018,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         try {
             foreach ((yield $this->method_call_async_read('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
                 $tempkey = new \danog\MadelineProto\RSA($curkey['public_key']);
-                $this->rsa_keys[$tempkey->fp] = $tempkey;
+                $this->cdn_rsa_keys[$tempkey->fp] = $tempkey;
             }
         } catch (\danog\MadelineProto\TL\Exception $e) {
             $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::FATAL_ERROR);

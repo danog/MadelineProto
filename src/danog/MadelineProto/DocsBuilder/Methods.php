@@ -23,9 +23,21 @@ trait Methods
 {
     public function mk_methods()
     {
-        $bots = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?bot'), true)['result'];
-        $errors = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?all'), true);
-        $errors['result'] = array_merge_recursive(...$errors['result']);
+        static $bots;
+        if (!$bots) $bots = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?bot'), true)['result'];
+        static $errors;
+        if (!$errors) $errors = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?all'), true);
+        $new = ['result' => []];
+        foreach ($errors['result'] as $code => $suberrors) {
+            foreach ($suberrors as $method => $suberrors) {
+                if (!isset($new[$method])) {
+                    $new[$method] = [];
+                }
+                foreach ($suberrors as $error) {
+                    $new['result'][$method][] = [$error, $code];
+                }
+            }
+        }
         foreach (glob('methods/'.$this->any) as $unlink) {
             unlink($unlink);
         }
@@ -76,11 +88,12 @@ trait Methods
             $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md)<a name="'.$method.'"></a>  
 
 ';
+/*
             if (!isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']]) && isset($this->td_descriptions['methods'][$data['method']])) {
                 $this->human_docs_methods[$this->td_descriptions['methods'][$data['method']]['description'].': '.$data['method']] = '* <a href="'.$method.'.html" name="'.$method.'">'.$this->td_descriptions['methods'][$data['method']]['description'].': '.$data['method'].'</a>  
 
 ';
-            }
+            }*/
             $params = '';
             $lua_params = '';
             $pwr_params = '';
@@ -192,11 +205,12 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 
 ';
+/*
             if (isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']])) {
                 $header .= '**'.\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']]."**\n\n\n\n\n";
                 file_put_contents('methods/'.$method.'.md', $header);
                 continue;
-            }
+            }*/
             if ($this->td) {
                 $header .= 'YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
@@ -293,14 +307,15 @@ You can also use normal markdown, note that to create mentions you must use the 
 MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
 ';
                 }
-                if (isset($errors['result'][$data['method']])) {
-                    $example .= '### Errors this method can return:
+                if (isset($new['result'][$data['method']])) {
+                    $example .= '### Errors
 
-| Error    | Description   |
-|----------|---------------|
+| Code | Type     | Description   |
+|------|----------|---------------|
 ';
-                    foreach ($errors['result'][$data['method']] as $error) {
-                        $example .= '|'.$error.'|'.$errors['human_result'][$error][0].'|'."\n";
+                    foreach ($new['result'][$data['method']] as $error) {
+                        [$error, $code] = $error;
+                        $example .= "|$code|$error|".$errors['human_result'][$error][0].'|'."\n";
                     }
                     $example .= "\n\n";
                 }

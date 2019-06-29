@@ -24,6 +24,9 @@ namespace danog\MadelineProto\Stream\MTProtoTools;
  */
 trait MsgIdHandler
 {
+    public $max_incoming_id;
+    public $max_outgoing_id;
+
     public function check_message_id($new_message_id, $aargs)
     {
         if (!is_object($new_message_id)) {

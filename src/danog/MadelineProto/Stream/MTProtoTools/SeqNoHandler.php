@@ -26,6 +26,11 @@ trait SeqNoHandler
 {
     use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
 
+    public $session_out_seq_no = 0;
+    public $session_in_seq_no = 0;
+
+    public $session_id;
+
     public function generate_out_seq_no($content_related)
     {
         $in = $content_related ? 1 : 0;
