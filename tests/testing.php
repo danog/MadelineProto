@@ -1,5 +1,7 @@
 #!/usr/bin/env php
 <?php
+use danog\MadelineProto\RPCErrorException;
+
 /*
 Copyright 2016-2019 Daniil Gentili
 (https://daniil.it)
@@ -43,6 +45,7 @@ if (getenv('TEST_SECRET_CHAT') == '') {
 echo 'Loading settings...'.PHP_EOL;
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
+
 /*
  * Load MadelineProto
  */
@@ -58,6 +61,7 @@ try {
         $MadelineProto->accept_tos();
     }
 }
+
 //var_dump(count($MadelineProto->get_pwr_chat('@madelineproto')['participants']));
 
 /*
@@ -78,7 +82,7 @@ $message = (getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sem
 /*
  * Try making a phone call
  */
-if (!getenv('TRAVIS_COMMIT') && stripos($MadelineProto->readline('Do you want to make a call? (y/n): '), 'y') !== false) {
+if (!getenv('TRAVIS_COMMIT') && stripos(readline('Do you want to make a call? (y/n): '), 'y') !== false) {
     $controller = $MadelineProto->request_call(getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
     while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
         $MadelineProto->get_updates();
@@ -92,8 +96,8 @@ if (!getenv('TRAVIS_COMMIT') && stripos($MadelineProto->readline('Do you want to
 /*
  * Try receiving a phone call
  */
-if (!getenv('TRAVIS_COMMIT') && stripos($MadelineProto->readline('Do you want to handle incoming calls? (y/n): '), 'y') !== false) {
-    $howmany = $MadelineProto->readline('How many calls would you like me to handle? ');
+if (!getenv('TRAVIS_COMMIT') && stripos(readline('Do you want to handle incoming calls? (y/n): '), 'y') !== false) {
+    $howmany = readline('How many calls would you like me to handle? ');
     $offset = 0;
     while ($howmany > 0) {
         $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
@@ -114,7 +118,7 @@ if (!getenv('TRAVIS_COMMIT') && stripos($MadelineProto->readline('Do you want to
 /*
  * Secret chat usage
  */
-if (!getenv('TRAVIS_COMMIT') && stripos($MadelineProto->readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
+if (!getenv('TRAVIS_COMMIT') && stripos(readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
     /**
      * Request a secret chat.
      */

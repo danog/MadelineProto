@@ -205,7 +205,7 @@ trait Login
     /**
      * Update the 2FA password
      *
-     * The params can contain password, new_password, email and hint params.
+     * The params array can contain password, new_password, email and hint params.
      * 
      * @param array $params The params
      * @return void

@@ -25,21 +25,86 @@ class RPCErrorException extends \Exception
     private $fetched = false;
     public static $rollbar = true;
 
-    public function getMess()
+    public static $descriptions = [
+        'RPC_MCGET_FAIL' => 'Telegram is having internal issues, please try again later.',
+        'RPC_CALL_FAIL' => 'Telegram is having internal issues, please try again later.',
+        'USER_PRIVACY_RESTRICTED' => "The user's privacy settings do not allow you to do this",
+        'CHANNEL_PRIVATE' => "You haven't joined this channel/supergroup",
+        'USER_IS_BOT' => "Bots can't send messages to other bots",
+        'BOT_METHOD_INVALID' => 'This method cannot be run by a bot',
+        'PHONE_CODE_EXPIRED' => 'The phone code you provided has expired, this may happen if it was sent to any chat on telegram (if the code is sent through a telegram chat (not the official account) to avoid it append or prepend to the code some chars)',
+        'USERNAME_INVALID' => 'The provided username is not valid',
+        'ACCESS_TOKEN_INVALID' => 'The provided token is not valid',
+        'ACTIVE_USER_REQUIRED' => 'The method is only available to already activated users',
+        'FIRSTNAME_INVALID' => 'The first name is invalid',
+        'LASTNAME_INVALID' => 'The last name is invalid',
+        'PHONE_NUMBER_INVALID' => 'The phone number is invalid',
+        'PHONE_CODE_HASH_EMPTY' => 'phone_code_hash is missing',
+        'PHONE_CODE_EMPTY' => 'phone_code is missing',
+        'PHONE_CODE_EXPIRED' => 'The confirmation code has expired',
+        'API_ID_INVALID' => 'The api_id/api_hash combination is invalid',
+        'PHONE_NUMBER_OCCUPIED' => 'The phone number is already in use',
+        'PHONE_NUMBER_UNOCCUPIED' => 'The phone number is not yet being used',
+        'USERS_TOO_FEW' => 'Not enough users (to create a chat, for example)',
+        'USERS_TOO_MUCH' => 'The maximum number of users has been exceeded (to create a chat, for example)',
+        'TYPE_CONSTRUCTOR_INVALID' => 'The type constructor is invalid',
+        'FILE_PART_INVALID' => 'The file part number is invalid',
+        'FILE_PARTS_INVALID' => 'The number of file parts is invalid',
+        'MD5_CHECKSUM_INVALID' => 'The MD5 checksums do not match',
+        'PHOTO_INVALID_DIMENSIONS' => 'The photo dimensions are invalid',
+        'FIELD_NAME_INVALID' => 'The field with the name FIELD_NAME is invalid',
+        'FIELD_NAME_EMPTY' => 'The field with the name FIELD_NAME is missing',
+        'MSG_WAIT_FAILED' => 'A waiting call returned an error',
+        'USERNAME_NOT_OCCUPIED' => 'The provided username is not occupied',
+        'PHONE_NUMBER_BANNED' => 'The provided phone number is banned from telegram',
+        'AUTH_KEY_UNREGISTERED' => 'The authorization key has expired',
+        'INVITE_HASH_EXPIRED' => 'The invite link has expired',
+        'USER_DEACTIVATED' => 'The user was deactivated',
+        'USER_ALREADY_PARTICIPANT' => 'The user is already in the group',
+        'MESSAGE_ID_INVALID' => 'The provided message id is invalid',
+        'PEER_ID_INVALID' => 'The provided peer id is invalid',
+        'CHAT_ID_INVALID' => 'The provided chat id is invalid',
+        'MESSAGE_DELETE_FORBIDDEN' => "You can't delete one of the messages you tried to delete, most likely because it is a service message.",
+        'CHAT_ADMIN_REQUIRED' => 'You must be an admin in this chat to do this',
+        -429 => 'Too many requests',
+        'PEER_FLOOD' => "You are spamreported, you can't do this",
+    ];
+    public static $errorMethodMap = [];
+
+    private $caller = '';
+    public static function localizeMessage($method, $code, $error)
     {
-        if ($this->fetched === false) {
-            $res = json_decode(@file_get_contents('https://rpc.pwrtelegram.xyz/?method='.$additional[0].'&code='.$code.'&error='.$this->rpc), true);
+        if (!$method || !$code || !$error) {
+            return $error;
+        }
+
+        $error = preg_replace('/\d+$/', "X", $error);
+
+        $description = self::$descriptions[$error] ?? '';
+        
+        
+        if (!isset(self::$errorMethodMap[$code][$method][$error])
+            || !isset(self::$descriptions[$error])
+            || $code === 500
+        ) {
+            $res = json_decode(@file_get_contents('https://rpc.pwrtelegram.xyz/?method='.$this->caller.'&code='.$this->code.'&error='.$this->rpc), true);
             if (isset($res['ok']) && $res['ok']) {
-                $this->message = $res['result'];
+                $description = $res['result'];
+
+                self::$descriptions[$error] = $description;
+                self::$errorMethodMap[$code][$method][$error] = $error;
             }
         }
 
-        return $this->message;
+        if (!$description) {
+            return $error;
+        }
+        return $description;
     }
 
     public function __toString()
     {
-        $result = sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], $this->getMess()." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, \danog\MadelineProto\Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
+        $result = sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], self::localizeMessage($this->caller, $this->code, $this->message)." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, \danog\MadelineProto\Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
         if (php_sapi_name() !== 'cli') {
             $result = str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
         }
@@ -50,146 +115,18 @@ class RPCErrorException extends \Exception
     public function __construct($message = null, $code = 0, $caller = '', Exception $previous = null)
     {
         $this->rpc = $message;
-        switch ($message) {
-            case 'RPC_MCGET_FAIL':
-            case 'RPC_CALL_FAIL':
-                $message = 'Telegram is having internal issues, please try again later.';
-                break;
-            case 'USER_PRIVACY_RESTRICTED':
-                $message = "The user's privacy settings do not allow you to do this";
-                break;
-            case 'CHANNEL_PRIVATE':
-                $message = "You haven't joined this channel/supergroup";
-                break;
-            case 'FLOOD_WAIT_666':
-                $message = 'Spooky af m8';
-                break;
-            case 'USER_IS_BOT':
-                $message = "Bots can't send messages to other bots";
-                break;
-            case 'BOT_METHOD_INVALID':
-                $message = 'This method cannot be run by a bot';
-                break;
-            case 'PHONE_CODE_EXPIRED':
-                $message = 'The phone code you provided has expired, this may happen if it was sent to any chat on telegram (if the code is sent through a telegram chat (not the official account) to avoid it append or prepend to the code some chars)';
-                break;
-            case 'USERNAME_INVALID':
-                $message = 'The provided username is not valid';
-                break;
-            case 'ACCESS_TOKEN_INVALID':
-                $message = 'The provided token is not valid';
-                break;
-            case 'ACTIVE_USER_REQUIRED':
-                $message = 'The method is only available to already activated users';
-                break;
-            case 'FIRSTNAME_INVALID':
-                $message = 'The first name is invalid';
-                break;
-            case 'LASTNAME_INVALID':
-                $message = 'The last name is invalid';
-                break;
-            case 'PHONE_NUMBER_INVALID':
-                $message = 'The phone number is invalid';
-                break;
-            case 'PHONE_CODE_HASH_EMPTY':
-                $message = 'phone_code_hash is missing';
-                break;
-            case 'PHONE_CODE_EMPTY':
-                $message = 'phone_code is missing';
-                break;
-            case 'PHONE_CODE_EXPIRED':
-                $message = 'The confirmation code has expired';
-                break;
-            case 'API_ID_INVALID':
-                $message = 'The api_id/api_hash combination is invalid';
-                break;
-            case 'PHONE_NUMBER_OCCUPIED':
-                $message = 'The phone number is already in use';
-                break;
-            case 'PHONE_NUMBER_UNOCCUPIED':
-                $message = 'The phone number is not yet being used';
-                break;
-            case 'USERS_TOO_FEW':
-                $message = 'Not enough users (to create a chat, for example)';
-                break;
-            case 'USERS_TOO_MUCH':
-                $message = 'The maximum number of users has been exceeded (to create a chat, for example)';
-                break;
-            case 'TYPE_CONSTRUCTOR_INVALID':
-                $message = 'The type constructor is invalid';
-                break;
-            case 'FILE_PART_INVALID':
-                $message = 'The file part number is invalid';
-                break;
-            case 'FILE_PARTS_INVALID':
-                $message = 'The number of file parts is invalid';
-                break;
-            case 'MD5_CHECKSUM_INVALID':
-                $message = 'The MD5 checksums do not match';
-                break;
-            case 'PHOTO_INVALID_DIMENSIONS':
-                $message = 'The photo dimensions are invalid';
-                break;
-            case 'FIELD_NAME_INVALID':
-                $message = 'The field with the name FIELD_NAME is invalid';
-                break;
-            case 'FIELD_NAME_EMPTY':
-                $message = 'The field with the name FIELD_NAME is missing';
-                break;
-            case 'MSG_WAIT_FAILED':
-                $message = 'A waiting call returned an error';
-                break;
-            case 'USERNAME_NOT_OCCUPIED':
-                $message = 'The provided username is not occupied';
-                break;
-            case 'PHONE_NUMBER_BANNED':
-                $message = 'The provided phone number is banned from telegram';
-                break;
-            case 'AUTH_KEY_UNREGISTERED':
-                $message = 'The authorization key has expired';
-                break;
-            case 'INVITE_HASH_EXPIRED':
-                $message = 'The invite link has expired';
-                break;
-            case 'USER_DEACTIVATED':
-                $message = 'The user was deactivated';
-                break;
-            case 'USER_ALREADY_PARTICIPANT':
-                $message = 'The user is already in the group';
-                break;
-            case 'MESSAGE_ID_INVALID':
-                $message = 'The provided message id is invalid';
-                break;
-            case 'PEER_ID_INVALID':
-                $message = 'The provided peer id is invalid';
-                break;
-            case 'CHAT_ID_INVALID':
-                $message = 'The provided chat id is invalid';
-                break;
-            case 'MESSAGE_DELETE_FORBIDDEN':
-                $message = "You can't delete one of the messages you tried to delete, most likely because it is a service message.";
-                break;
-            case 'CHAT_ADMIN_REQUIRED':
-                $message = 'You must be an admin in this chat to do this';
-                break;
-            case -429:
-            case 'PEER_FLOOD':
-                $message = 'Too many requests';
-                break;
-        }
         parent::__construct($message, $code, $previous);
         $this->prettify_tl($caller);
+        $this->caller = $caller;
+
         $additional = [];
         foreach ($this->getTrace() as $level) {
             if (isset($level['function']) && $level['function'] === 'method_call') {
                 $this->line = $level['line'];
                 $this->file = $level['file'];
                 $additional = $level['args'];
-                break;
+
             }
-        }
-        if ($this->rpc !== $message) {
-            $this->fetched = true;
         }
         if (!self::$rollbar || !class_exists('\\Rollbar\\Rollbar')) {
             return;

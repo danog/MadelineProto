@@ -175,6 +175,12 @@ class Magic
                     //$this->logger->logger('Could not enable PHP logging');
                 }
             }
+
+            $res = json_decode(@file_get_contents('https://rpc.pwrtelegram.xyz/?allv3'), true);
+            if (isset($res['ok']) && $res['ok']) {
+                RPCErrorException::$errorMethodMap = $res['result'];
+                RPCErrorException::$descriptions += $res['human_result'];
+            }
             self::$inited = true;
         }
     }

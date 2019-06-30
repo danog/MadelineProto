@@ -25,24 +25,77 @@ use danog\MadelineProto\Tools;
 use phpseclib\Math\BigInteger;
 
 /**
- * Manages password calculation.
+ * Manages SRP password calculation
+ *
+ * @author Daniil Gentili <daniil@daniil.it>
+ * @link   https://docs.madelineproto.xyz MadelineProto documentation
  */
 class PasswordCalculator
 {
     use AuthKeyHandler;
     use Tools;
+    
+    /**
+     * The algorithm to use for calculating the hash of new passwords (a PasswordKdfAlgo object)
+     *
+     * @var array
+     */
     private $new_algo;
+    /**
+     * A secure random string that can be used to compute the password
+     *
+     * @var string
+     */
     private $secure_random = '';
 
+    /**
+     * The algorithm to use for calculatuing the hash of the current password (a PasswordKdfAlgo object)
+     *
+     * @var array
+     */
     private $current_algo;
+
+    /**
+     * SRP b parameter
+     *
+     * @var BigInteger
+     */
     private $srp_B;
+    /**
+     * SRP b parameter for hashing
+     *
+     * @var BigInteger
+     */
     private $srp_BForHash;
+    /**
+     * SRP ID
+     *
+     * @var [type]
+     */
     private $srp_id;
+    /**
+     * Logger
+     *
+     * @var \danog\MadelineProto\Logger
+     */
     public $logger;
 
-    // This is needed do not remove this
-    public function __construct($logger) { $this->logger = $logger; }
+    /**
+     * Initialize logger
+     *
+     * @param \danog\MadelineProto\Logger $logger
+     */
+    public function __construct($logger)
+    {
+        $this->logger = $logger;
+    }
 
+    /**
+     * Popupate 2FA configuration
+     *
+     * @param array $object 2FA configuration object obtained using account.getPassword
+     * @return void
+     */
     public function addInfo(array $object)
     {
         if ($object['_'] !== 'account.password') {
@@ -101,16 +154,39 @@ class PasswordCalculator
         $this->secure_random = $object['secure_random'];
     }
 
+    /**
+     * Create a random string (eventually prefixed by the specified string)
+     *
+     * @param string $prefix Prefix
+     * @return string Salt
+     */
     public function createSalt(string $prefix = ''): string
     {
         return $prefix.$this->random(32);
     }
 
+    /**
+     * Hash specified data using the salt with SHA256
+     * 
+     * The result will be the SHA256 hash of the salt concatenated with the data concatenated with the salt
+     *
+     * @param string $data Data to hash
+     * @param string $salt Salt
+     * @return string Hash
+     */
     public function hashSha256(string $data, string $salt): string
     {
         return hash('sha256', $salt.$data.$salt, true);
     }
 
+    /**
+     * Hashes the specified password
+     *
+     * @param string $password Password
+     * @param string $client_salt Client salt
+     * @param string $server_salt Server salt
+     * @return string Resulting hash
+     */
     public function hashPassword(string $password, string $client_salt, string $server_salt): string
     {
         $buf = $this->hashSha256($password, $client_salt);
@@ -120,9 +196,15 @@ class PasswordCalculator
         return $this->hashSha256($hash, $server_salt);
     }
 
+    /**
+     * Get the InputCheckPassword object for checking the validity of a password using account.checkPassword
+     *
+     * @param string $password The password
+     * @return array InputCheckPassword object
+     */
     public function getCheckPassword(string $password): array
     {
-        if ($password === '') {
+        if ($password === '' || !$this->current_algo) {
             return ['_' => 'inputCheckPasswordEmpty'];
         }
         $client_salt = $this->current_algo['salt1'];
@@ -166,9 +248,20 @@ class PasswordCalculator
         return ['_' => 'inputCheckPasswordSRP', 'srp_id' => $id, 'A' => $AForHash, 'M1' => $M1];
     }
 
+    /**
+     * Get parameters to be passed to the account.updatePasswordSettings to update/set a 2FA password
+     *
+     * The input params array can contain password, new_password, email and hint params.
+     * 
+     * @param  array $params Input params
+     * @return array account.updatePasswordSettings parameters
+     */
     public function getPassword(array $params): array
     {
-        $return = ['password' => $this->getCheckPassword(isset($params['password']) ? $params['password'] : ''), 'new_settings' => ['_' => 'account.passwordInputSettings', 'new_algo' => ['_' => 'passwordKdfAlgoUnknown'], 'new_password_hash' => '', 'hint' => '']];
+        $oldPassword = $this->getCheckPassword($params['password'] ?? '');
+
+        $return = ['password' => $oldPassword, 'new_settings' => ['_' => 'account.passwordInputSettings', 'new_algo' => ['_' => 'passwordKdfAlgoUnknown'], 'new_password_hash' => '', 'hint' => '']];
+        
         $new_settings = &$return['new_settings'];
 
         if (isset($params['new_password']) && $params['new_password'] !== '') {
@@ -183,11 +276,11 @@ class PasswordCalculator
             $vForHash = str_pad($v->toBytes(), 256, chr(0), \STR_PAD_LEFT);
 
             $new_settings['new_algo'] = [
-                '_'     => 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow',
+                '_' => 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow',
                 'salt1' => $client_salt,
                 'salt2' => $server_salt,
-                'g'     => (int) $g->toString(),
-                'p'     => $pForHash,
+                'g' => (int) $g->toString(),
+                'p' => $pForHash,
             ];
             $new_settings['new_password_hash'] = $vForHash;
             $new_settings['hint'] = $params['hint'];
