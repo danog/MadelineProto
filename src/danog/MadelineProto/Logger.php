@@ -101,7 +101,9 @@ class Logger
             Exception::$rollbar = false;
             RPCErrorException::$rollbar = false;
         }
-
+        if (!isset($settings['logger']['logger_param']) && isset($settings['logger']['param'])) {
+            $settings['logger']['logger_param'] = $settings['logger']['param'];
+        }
         if (php_sapi_name() !== 'cli') {
             if (isset($settings['logger']['logger_param']) && basename($settings['logger']['logger_param']) === 'MadelineProto.log') {
                 $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';

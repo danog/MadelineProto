@@ -213,6 +213,7 @@ class PasswordCalculator
         $gForHash = $this->current_algo['gForHash'];
         $p = $this->current_algo['p'];
         $pForHash = $this->current_algo['pForHash'];
+        
         $B = $this->srp_B;
         $BForHash = $this->srp_BForHash;
         $id = $this->srp_id;
