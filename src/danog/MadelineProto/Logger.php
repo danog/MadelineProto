@@ -181,6 +181,8 @@ class Logger
     {
         if (!is_null(self::$default)) {
             self::$default->logger($param, $level, basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php'));
+        } else {
+            echo $param.PHP_EOL;
         }
     }
 

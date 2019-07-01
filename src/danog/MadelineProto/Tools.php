@@ -191,6 +191,7 @@ trait Tools
             try {
                 Loop::run(function () use (&$resolved, &$value, &$exception, $promise) {
                     $promise->onResolve(function ($e, $v) use (&$resolved, &$value, &$exception) {
+
                         Loop::stop();
                         $resolved = true;
                         $exception = $e;
@@ -329,7 +330,7 @@ trait Tools
                 return;
             }
             $b = self::call($b());
-            $b->onResolve(static function ($e, $res) use ($deferred) {
+            $b->onResolve(function ($e, $res) use ($deferred) {
                 if ($e) {
                     if (isset($this)) {
                         $this->rethrow($e, $file);

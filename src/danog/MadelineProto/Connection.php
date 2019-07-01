@@ -215,7 +215,13 @@ class Connection
         $this->disconnect();
         yield $this->API->datacenter->dcConnectAsync($this->ctx->getDc());
         if ($this->API->hasAllAuth() && !$this->hasPendingCalls()) {
-            $this->callFork($this->API->method_call_async_read('ping', ['ping_id' => $this->random_int()], ['datacenter' => $this->datacenter]));
+            $this->callFork((function () {
+                try {
+                    $this->API->method_call_async_read('ping', ['ping_id' => $this->random_int()], ['datacenter' => $this->datacenter]);
+                } catch (\Throwable $e) {
+                    $this->API->logger("Got an error while pinging on reconnect: $e", Logger::FATAL_ERROR);
+                }
+            })());
         }
     }
 

@@ -66,7 +66,7 @@ class Magic
     public static function class_exists()
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        //set_exception_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
+        set_exception_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
         if (!self::$inited) {
             self::$has_thread = class_exists('\\Thread') && method_exists('\\Thread', 'getCurrentThread');
             self::$BIG_ENDIAN = pack('L', 1) === pack('N', 1);

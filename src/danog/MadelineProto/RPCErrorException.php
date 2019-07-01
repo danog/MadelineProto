@@ -87,7 +87,7 @@ class RPCErrorException extends \Exception
             || !isset(self::$descriptions[$error])
             || $code === 500
         ) {
-            $res = json_decode(@file_get_contents('https://rpc.pwrtelegram.xyz/?method='.$this->caller.'&code='.$this->code.'&error='.$this->rpc), true);
+            $res = json_decode(@file_get_contents('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error), true);
             if (isset($res['ok']) && $res['ok']) {
                 $description = $res['result'];
 

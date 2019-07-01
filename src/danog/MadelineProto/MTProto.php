@@ -302,7 +302,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function __wakeup_async($backtrace)
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        set_exception_handler(['\\danog\\MadelineProto\\Serialization', 'serialize_all']);
         $this->setup_logger();
         if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread())) {
             return;
