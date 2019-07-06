@@ -27,8 +27,6 @@ use danog\MadelineProto\Loop\Impl\SignalLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Tools;
-use Amp\ByteStream\StreamException;
-use Amp\ByteStream\PendingReadError;
 
 /**
  * Socket read loop.
