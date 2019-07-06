@@ -41,6 +41,7 @@ use function Amp\File\exists;
 use function Amp\File\open;
 use function Amp\File\stat;
 use function Amp\File\touch;
+use danog\MadelineProto\Tools;
 use function Amp\Promise\all;
 use Amp\File\BlockingHandle;
 use Amp\Artax\Client;
@@ -566,7 +567,7 @@ trait Files
                     $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
                 }
                 if (!isset($res['name']) || $res['name'] === '') {
-                    $res['name'] = $message_media['file']['access_hash'];
+                    $res['name'] = Tools::unpack_signed_long_string($message_media['file']['access_hash']);
                 }
 
                 return $res;
@@ -636,7 +637,7 @@ trait Files
                 $res['thumb_size'] = $message_media['type'];
 
                 if ($message_media['location']['_'] === 'fileLocationUnavailable') {
-                    $res['name'] = $message_media['volume_id'].'_'.$message_media['local_id'];
+                    $res['name'] = Tools::unpack_signed_long_string($message_media['volume_id']).'_'.$message_media['local_id'];
                     $res['mime'] = $this->get_mime_from_buffer($res['data']);
                     $res['ext'] = $this->get_extension_from_mime($res['mime']);
                 } else {
@@ -658,7 +659,7 @@ trait Files
             case 'fileLocationUnavailable':
                 throw new \danog\MadelineProto\Exception('File location unavailable');
             case 'fileLocation':
-                $res['name'] = $message_media['volume_id'].'_'.$message_media['local_id'];
+                $res['name'] = Tools::unpack_signed_long_string($message_media['volume_id']).'_'.$message_media['local_id'];
                 $res['InputFileLocation'] = [
                     '_' => 'inputFileLocation',
                     'volume_id' => $message_media['volume_id'],
@@ -675,7 +676,7 @@ trait Files
 
                 return $res;
             case 'fileLocationToBeDeprecated':
-                $res['name'] = $message_media['volume_id'].'_'.$message_media['local_id'];
+                $res['name'] = Tools::unpack_signed_long_string($message_media['volume_id']).'_'.$message_media['local_id'];
                 $res['ext'] = '.jpg';
                 $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
                 $res['InputFileLocation'] = [
@@ -730,7 +731,7 @@ trait Files
                     $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime($message_media['document']['mime_type']));
                 }
                 if (!isset($res['name']) || $res['name'] === '') {
-                    $res['name'] = $message_media['document']['access_hash'];
+                    $res['name'] = Tools::unpack_signed_long_string($message_media['document']['access_hash']);
                 }
                 if (isset($message_media['document']['size'])) {
                     $res['size'] = $message_media['document']['size'];

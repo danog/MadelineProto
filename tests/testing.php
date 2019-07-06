@@ -37,7 +37,7 @@ if (file_exists('.env')) {
     $dotenv->load();
 }
 if (getenv('TEST_SECRET_CHAT') == '') {
-    echo('TEST_SECRET_CHAT is not defined in .env, please define it (copy .env.example).'.PHP_EOL);
+    echo ('TEST_SECRET_CHAT is not defined in .env, please define it (copy .env.example).'.PHP_EOL);
     die(1);
 }
 echo 'Loading settings...'.PHP_EOL;

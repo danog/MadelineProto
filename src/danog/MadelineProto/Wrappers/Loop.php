@@ -68,6 +68,9 @@ trait Loop
             } catch (\danog\MadelineProto\Exception $e) {
                 $needs_restart = true;
             }
+            if (isset($_REQUEST['MadelineSelfRestart'])) {
+                $this->logger->logger("Self-restarted, restart token ".$_REQUEST['MadelineSelfRestart']);
+            }
             $this->logger->logger($needs_restart ? 'Will self-restart' : 'Will not self-restart');
 
             $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -105,9 +108,31 @@ trait Loop
             if ($needs_restart) {
                 $logger = &$this->logger;
                 Shutdown::addCallback(static function () use (&$logger) {
-                    $a = fsockopen((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'], $_SERVER['SERVER_PORT']);
-                    fwrite($a, $_SERVER['REQUEST_METHOD'].' '.$_SERVER['REQUEST_URI'].' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n");
-                    $logger->logger('Self-restarted');
+                    $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
+                    $port = $_SERVER['SERVER_PORT'];
+
+                    $uri = $_SERVER['REQUEST_URI'];
+
+                    $params = $_GET;
+                    $params['MadelineSelfRestart'] = $this->random_int();
+
+                    list($url, $query) = explode($uri, '?', 2);
+                    $query = http_build_query($params);
+                    $uri = implode('?', [$url, $query]);
+
+                    $payload = $_SERVER['REQUEST_METHOD'].' '.$uri.' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n";
+
+                    $logger->logger("Connecting to $address:$port");
+                    $a = fsockopen($address, $port);
+
+                    $logger->logger("Sending self-restart payload");
+                    $logger->logger($payload);
+                    fwrite($a, $payload);
+
+                    $logger->logger("Payload sent with token {$params['MadelineSelfRestart']}, waiting for self-restart");
+
+                    sleep(10);
+                    fclose($a);
                 }, 'restarter');
             }
 
@@ -164,5 +189,8 @@ trait Loop
         ob_end_flush();
         flush();
         $GLOBALS['exited'] = true;
+        if (function_exists('fastcgi_finish_request')) {
+            \fastcgi_finish_request();
+        }
     }
 }

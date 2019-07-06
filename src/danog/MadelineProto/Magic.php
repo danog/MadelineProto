@@ -66,7 +66,7 @@ class Magic
     public static function class_exists()
     {
         set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        //set_exception_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
+        set_exception_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
         if (!self::$inited) {
             if (!defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 7) {
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
@@ -182,6 +182,12 @@ class Magic
                 } catch (\danog\MadelineProto\Exception $e) {
                     //$this->logger->logger('Could not enable PHP logging');
                 }
+            }
+
+            $res = json_decode(@file_get_contents('https://rpc.pwrtelegram.xyz/?allv3'), true);
+            if (isset($res['ok']) && $res['ok']) {
+                RPCErrorException::$errorMethodMap = $res['result'];
+                RPCErrorException::$descriptions += $res['human_result'];
             }
             self::$inited = true;
         }

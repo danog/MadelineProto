@@ -18,6 +18,8 @@
 
 namespace danog\MadelineProto\Loop\Connection;
 
+use Amp\ByteStream\PendingReadError;
+use Amp\ByteStream\StreamException;
 use Amp\Loop;
 use Amp\Websocket\ClosedException;
 use danog\MadelineProto\Logger;
@@ -58,7 +60,7 @@ class ReadLoop extends SignalLoop
         while (true) {
             try {
                 $error = yield $this->waitSignal($this->readMessage());
-            } catch (NothingInTheSocketException|StreamException|PendingReadError $e) {
+            } catch (NothingInTheSocketException | StreamException | PendingReadError | \Error $e) {
                 if (isset($connection->old)) {
                     return;
                 }

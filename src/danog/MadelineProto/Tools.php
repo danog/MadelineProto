@@ -23,6 +23,9 @@ use Amp\Failure;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
+use function Amp\ByteStream\getOutputBufferStream;
+use function Amp\ByteStream\getStdin;
+use function Amp\ByteStream\getStdout;
 use function Amp\Promise\all;
 use function Amp\Promise\any;
 use function Amp\Promise\first;
@@ -35,6 +38,7 @@ use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\File\exists;
 use function Amp\File\touch;
 use Amp\File\StatCache;
+use phpseclib\Math\BigInteger;
 
 /**
  * Some tools.
@@ -122,6 +126,16 @@ trait Tools
         return unpack('q', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
     }
 
+    public static function unpack_signed_long_string($value)
+    {
+        if (strlen($value) !== 8) {
+            throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
+        }
+
+        $big = new BigInteger($value, -256);
+        return (string) $big;
+    }
+
     public static function pack_signed_int($value)
     {
         if ($value > 2147483647) {
@@ -194,6 +208,7 @@ trait Tools
             try {
                 Loop::run(function () use (&$resolved, &$value, &$exception, $promise) {
                     $promise->onResolve(function ($e, $v) use (&$resolved, &$value, &$exception) {
+
                         Loop::stop();
                         $resolved = true;
                         $exception = $e;
@@ -308,12 +323,21 @@ trait Tools
         if ($file) {
             $file = " started @ $file";
         }
-        if ($logger) $logger->logger("Got the following exception within a forked strand$file, trying to rethrow");
+        if ($logger) {
+            $logger->logger("Got the following exception within a forked strand$file, trying to rethrow");
+        }
+
         if ($e->getMessage() === "Cannot get return value of a generator that hasn't returned") {
             $logger->logger("Well you know, this might actually not be the actual exception, scroll up in the logs to see the actual exception");
-            if (!$zis || !$zis->destructing) Promise\rethrow(new Failure($e));
+            if (!$zis || !$zis->destructing) {
+                Promise\rethrow(new Failure($e));
+            }
+
         } else {
-            if ($logger) $logger->logger($e);
+            if ($logger) {
+                $logger->logger($e);
+            }
+
             Promise\rethrow(new Failure($e));
         }
     }
@@ -332,7 +356,7 @@ trait Tools
                 return;
             }
             $b = self::call($b());
-            $b->onResolve(static function ($e, $res) use ($deferred) {
+            $b->onResolve(function ($e, $res) use ($deferred) {
                 if ($e) {
                     if (isset($this)) {
                         $this->rethrow($e, $file);
@@ -415,8 +439,7 @@ trait Tools
         return array_shift($lines);
     }
 
-    public static function echo($string)
-    {
+    public static function echo ($string) {
         return getOutputBufferStream()->write($string);
     }
     public static function is_array_or_alike($var)

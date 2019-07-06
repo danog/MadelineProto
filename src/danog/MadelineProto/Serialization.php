@@ -24,11 +24,6 @@ namespace danog\MadelineProto;
  */
 class Serialization
 {
-    public static function serialize_all($exception)
-    {
-        echo $exception.PHP_EOL;
-    }
-
     public static function realpaths($file)
     {
         $file = Absolute::absolute($file);

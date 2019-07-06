@@ -471,18 +471,10 @@ class DataCenter
                     }
                     break;
                 case 'wss':
-                    if ($this->settings[$dc_config_number]['obfuscated']) {
-                        $default = [[DefaultStream::getName(), []], [WssStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
-                    } else {
-                        $default = [[DefaultStream::getName(), []], [WssStream::getName(), []], [BufferedRawStream::getName(), []], end($default)];
-                    }
+                    $default = [[DefaultStream::getName(), []], [WssStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
                     break;
                 case 'ws':
-                    if ($this->settings[$dc_config_number]['obfuscated']) {
-                        $default = [[DefaultStream::getName(), []], [WsStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
-                    } else {
-                        $default = [[DefaultStream::getName(), []], [WsStream::getName(), []], [BufferedRawStream::getName(), []], end($default)];
-                    }
+                    $default = [[DefaultStream::getName(), []], [WsStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
                     break;
             }
         }

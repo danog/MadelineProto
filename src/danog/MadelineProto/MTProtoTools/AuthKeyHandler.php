@@ -391,6 +391,8 @@ trait AuthKeyHandler
                 $req_pq = $req_pq === 'req_pq_multi' ? 'req_pq' : 'req_pq_multi';
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 $this->logger->logger('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
+            } catch (\Throwable $e) {
+                $this->logger->logger('An exception occurred while generating the authorization key: '.$e.PHP_EOL.' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
             }
         }
         if (strpos($datacenter, 'cdn') === false) {

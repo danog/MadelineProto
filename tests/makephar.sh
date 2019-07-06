@@ -52,7 +52,7 @@ cd ..
     sudo apt-get update -q
     sudo apt-get install php7.3-cli php7.3-json php7.3-mbstring php7.3-curl php7.3-xml php7.3-json -y
 
-    composer global require spatie/7to5 dev-master#5c65f68
+    composer global require spatie/7to5 dev-master#d4be6d0
     [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
     [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
 

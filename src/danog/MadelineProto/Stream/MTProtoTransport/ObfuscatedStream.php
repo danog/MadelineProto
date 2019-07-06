@@ -194,6 +194,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
                 $extra['secret'] = substr($extra['secret'], 1, 16);
             }
         }
+
         $this->extra = $extra;
     }
 
