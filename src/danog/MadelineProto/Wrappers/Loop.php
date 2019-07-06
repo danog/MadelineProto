@@ -182,7 +182,7 @@ trait Loop
         header('Connection: close');
         ignore_user_abort(true);
         ob_start();
-        echo '<html><body><h1>'.$message.'</h1></body</html>';
+        echo '<html><body><h1>'.$message.'</h1></body></html>';
         $size = ob_get_length();
         header("Content-Length: $size");
         header('Content-Type: text/html');
