@@ -23,6 +23,7 @@ use danog\MadelineProto\Async\AsyncParameters;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\Tools;
 use function Amp\Promise\all;
 
 /**
@@ -331,7 +332,7 @@ trait Files
                     $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
                 }
                 if (!isset($res['name'])) {
-                    $res['name'] = $message_media['file']['access_hash'];
+                    $res['name'] = Tools::unpack_signed_long_string($message_media['file']['access_hash']);
                 }
 
                 return $res;
@@ -401,7 +402,7 @@ trait Files
                 $res['thumb_size'] = $message_media['type'];
 
                 if ($message_media['location']['_'] === 'fileLocationUnavailable') {
-                    $res['name'] = $message_media['volume_id'].'_'.$message_media['local_id'];
+                    $res['name'] = Tools::unpack_signed_long_string($message_media['volume_id']).'_'.$message_media['local_id'];
                     $res['mime'] = $this->get_mime_from_buffer($res['data']);
                     $res['ext'] = $this->get_extension_from_mime($res['mime']);
                 } else {
@@ -423,7 +424,7 @@ trait Files
             case 'fileLocationUnavailable':
                 throw new \danog\MadelineProto\Exception('File location unavailable');
             case 'fileLocation':
-                $res['name'] = $message_media['volume_id'].'_'.$message_media['local_id'];
+                $res['name'] = Tools::unpack_signed_long_string($message_media['volume_id']).'_'.$message_media['local_id'];
                 $res['InputFileLocation'] = [
                     '_' => 'inputFileLocation',
                     'volume_id' => $message_media['volume_id'],
@@ -440,7 +441,7 @@ trait Files
 
                 return $res;
             case 'fileLocationToBeDeprecated':
-                $res['name'] = $message_media['volume_id'].'_'.$message_media['local_id'];
+                $res['name'] = Tools::unpack_signed_long_string($message_media['volume_id']).'_'.$message_media['local_id'];
                 $res['ext'] = '.jpg';
                 $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
                 $res['InputFileLocation'] = [
@@ -495,7 +496,7 @@ trait Files
                     $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime($message_media['document']['mime_type']));
                 }
                 if (!isset($res['name'])) {
-                    $res['name'] = $message_media['document']['access_hash'];
+                    $res['name'] = Tools::unpack_signed_long_string($message_media['document']['access_hash']);
                 }
                 if (isset($message_media['document']['size'])) {
                     $res['size'] = $message_media['document']['size'];
@@ -537,7 +538,7 @@ trait Files
         $size = fstat($stream)['size'];
         $this->logger->logger('Waiting for lock of file to download...');
         do {
-            $res = flock($stream, LOCK_EX|LOCK_NB);
+            $res = flock($stream, LOCK_EX | LOCK_NB);
             if (!$res) {
                 yield $this->sleep(0.1);
             }
@@ -606,35 +607,35 @@ trait Files
             }
 
             try {
-                $res = $cdn ? 
-                            yield $this->method_call_async_read(
-                                'upload.getCdnFile', 
-                                [
-                                    'file_token' => $message_media['file_token'], 
-                                    'offset' => $offset, 
-                                    'limit' => $part_size
-                                ], 
-                                [
-                                    'heavy' => true, 
-                                    'file' => true,
-                                    'FloodWaitLimit' => 0, 
-                                    'datacenter' => $datacenter
-                                ]
-                            ) : 
-                            yield $this->method_call_async_read(
-                                'upload.getFile', 
-                                [
-                                    'location' => $message_media['InputFileLocation'], 
-                                    'offset' => $offset, 
-                                    'limit' => $part_size
-                                ], 
-                                [
-                                    'heavy' => true,
-                                    'file' => true, 
-                                    'FloodWaitLimit' => 0, 
-                                    'datacenter' => &$datacenter
-                                ]
-                            );
+                $res = $cdn ?
+                yield $this->method_call_async_read(
+                    'upload.getCdnFile',
+                    [
+                        'file_token' => $message_media['file_token'],
+                        'offset' => $offset,
+                        'limit' => $part_size,
+                    ],
+                    [
+                        'heavy' => true,
+                        'file' => true,
+                        'FloodWaitLimit' => 0,
+                        'datacenter' => $datacenter,
+                    ]
+                ) :
+                yield $this->method_call_async_read(
+                    'upload.getFile',
+                    [
+                        'location' => $message_media['InputFileLocation'],
+                        'offset' => $offset,
+                        'limit' => $part_size,
+                    ],
+                    [
+                        'heavy' => true,
+                        'file' => true,
+                        'FloodWaitLimit' => 0,
+                        'datacenter' => &$datacenter,
+                    ]
+                );
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if (strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
                     if (isset($message_media['MessageMedia']) && !$this->authorization['user']['bot'] && $this->settings['download']['report_broken_media']) {

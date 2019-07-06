@@ -39,7 +39,6 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') {
             return;
         }
-
         $res = json_encode($update, JSON_PRETTY_PRINT);
 
         try {
