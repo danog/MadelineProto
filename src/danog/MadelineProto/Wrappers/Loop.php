@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Wrappers;
 
 use Amp\Promise;
 use danog\MadelineProto\Shutdown;
+use danog\MadelineProto\Tools;
 
 /**
  * Manages logging in and out.
@@ -114,7 +115,7 @@ trait Loop
                     $uri = $_SERVER['REQUEST_URI'];
 
                     $params = $_GET;
-                    $params['MadelineSelfRestart'] = $this->random_int();
+                    $params['MadelineSelfRestart'] = Tools::random_int();
 
                     list($url, $query) = explode($uri, '?', 2);
                     $query = http_build_query($params);
