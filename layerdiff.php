@@ -76,7 +76,7 @@ foreach (['methods', 'constructors'] as $type) {
     foreach ($new[$type]->by_id as $constructor) {
         $name = $constructor[$key];
         $constructor['id'] = $new[$type]->$finder($name)['id'];
-        if ($old[$type]->$finder($name) && $old[$type]->$finder($name)['id'] !== $constructor['id']) {
+        if ($old[$type]->$finder($name)) {
             $new_args = $constructor['params'];
             $old_args = $old[$type]->$finder($name)['params'];
             $final_new_args = [];

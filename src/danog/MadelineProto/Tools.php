@@ -122,6 +122,9 @@ trait Tools
 
     public static function unpack_signed_long_string($value)
     {
+        if (is_int($value)) {
+            return (string) $value;
+        }
         if (strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
