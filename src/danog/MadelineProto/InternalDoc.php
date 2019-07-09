@@ -154,6 +154,7 @@ interface account
 {
     /**
      * @param array params [
+     *               boolean no_muted,
      *               int token_type,
      *               string token,
      *               Bool app_sandbox,

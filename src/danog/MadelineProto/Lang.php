@@ -5135,6 +5135,7 @@ class Lang
     'object_peerLocated_param_peer_type_Peer' => 'Peer',
     'object_peerLocated_param_expires_type_int' => 'Expiry date',
     'object_peerLocated_param_distance_type_int' => 'Distance',
+    'method_account.registerDevice_param_no_muted_type_true' => 'Idk yet',
   ),
 );
 
@@ -10111,5 +10112,6 @@ class Lang
   'object_peerLocated_param_peer_type_Peer' => 'Peer',
   'object_peerLocated_param_expires_type_int' => 'Expiry date',
   'object_peerLocated_param_distance_type_int' => 'Distance',
+  'method_account.registerDevice_param_no_muted_type_true' => 'Idk yet',
 );
 }
