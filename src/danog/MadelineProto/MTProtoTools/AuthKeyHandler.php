@@ -472,7 +472,7 @@ trait AuthKeyHandler
 
             return $this->dh_config;
         }
-        $dh_config['p'] = new \phpseclib\Math\BigInteger($dh_config['p'], 256);
+        $dh_config['p'] = new \phpseclib\Math\BigInteger((string) $dh_config['p'], 256);
         $dh_config['g'] = new \phpseclib\Math\BigInteger($dh_config['g']);
         $this->check_p_g($dh_config['p'], $dh_config['g']);
 
