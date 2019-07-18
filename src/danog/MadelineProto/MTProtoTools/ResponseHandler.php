@@ -605,7 +605,6 @@ trait ResponseHandler
         if ($actual_updates) {
             $updates = $actual_updates;
         }
-
         $this->logger->logger('Parsing updates ('.$updates['_'].') received via the socket...', \danog\MadelineProto\Logger::VERBOSE);
         switch ($updates['_']) {
             case 'updates':

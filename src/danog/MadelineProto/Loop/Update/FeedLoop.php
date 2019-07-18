@@ -134,7 +134,6 @@ class FeedLoop extends ResumableSignalLoop
 
                 $this->state->pts($update['pts']);
             }
-
             $this->save($update);
         }
     }

@@ -129,7 +129,7 @@ trait Tools
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
 
-        $big = new BigInteger((string) $value, -256);
+        $big = new BigInteger($value, -256);
         return (string) $big;
     }
 

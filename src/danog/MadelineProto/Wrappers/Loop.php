@@ -165,11 +165,6 @@ trait Loop
                 $callback = $this->loop_callback;
                 $callback();
             }
-            array_walk($this->calls, function ($controller, $id) {
-                if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                    $controller->discard();
-                }
-            });
             yield $this->waitUpdate();
         }
     }

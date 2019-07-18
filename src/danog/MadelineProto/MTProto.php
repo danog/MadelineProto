@@ -24,6 +24,7 @@ use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
+use danog\MadelineProto\Loop\Generic\PeriodicLoop;
 use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
@@ -149,6 +150,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     private $supportUser = 0;
     public $referenceDatabase;
     public $phoneConfigWatcherId;
+    private $callCheckerLoop;
     public $feeders = [];
     public $updaters = [];
     public $destructing = false; // Avoid problems with exceptions thrown by forked strands, see tools
@@ -208,6 +210,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_translation'], Logger::ULTRA_VERBOSE);
         $this->construct_TL($this->settings['tl_schema']['src'], [$this, $this->referenceDatabase]);
         yield $this->connect_to_all_dcs_async();
+        $this->startLoops();
         $this->datacenter->curdc = 2;
         if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
             try {
@@ -291,6 +294,20 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
 
         return true;
+    }
+    public function startLoops()
+    {
+        if (!$this->callCheckerLoop) {
+            $this->callCheckerLoop = new PeriodicLoop($this, [$this, 'checkCalls'], 'call check', 10);
+        }
+        $this->callCheckerLoop->start();
+    }
+    public function stopLoops()
+    {
+        if ($this->callCheckerLoop) {
+            $this->callCheckerLoop->signal(true);;
+            $this->callCheckerLoop = null;
+        }
     }
     public function __wakeup()
     {
@@ -469,6 +486,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $controller->setMadeline($this);
             }
         }
+        $this->startLoops();
         if (yield $this->get_self_async()) {
             $this->authorized = self::LOGGED_IN;
         }
@@ -490,6 +508,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function __destruct()
     {
+        $this->stopLoops();
         if ($this->phoneConfigWatcherId) {
             Loop::cancel($this->phoneConfigWatcherId);
         }
@@ -1142,6 +1161,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             array_fill_keys(['InputFileLocation'], [$this, 'get_download_info_async'])
         );
     }
+
 
     public function __debugInfo()
     {
