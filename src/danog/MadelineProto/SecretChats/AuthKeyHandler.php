@@ -41,7 +41,7 @@ trait AuthKeyHandler
         $dh_config = yield $this->get_dh_config_async();
         $this->logger->logger('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
         $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
-        $params['g_a'] = new \phpseclib\Math\BigInteger($params['g_a'], 256);
+        $params['g_a'] = new \phpseclib\Math\BigInteger((string) $params['g_a'], 256);
         $this->check_G($params['g_a'], $dh_config['p']);
         $key = ['auth_key' => str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
         //$this->logger->logger($key);
@@ -87,7 +87,7 @@ trait AuthKeyHandler
             return false;
         }
         $dh_config = yield $this->get_dh_config_async();
-        $params['g_a_or_b'] = new \phpseclib\Math\BigInteger($params['g_a_or_b'], 256);
+        $params['g_a_or_b'] = new \phpseclib\Math\BigInteger((string) $params['g_a_or_b'], 256);
         $this->check_G($params['g_a_or_b'], $dh_config['p']);
         $key = ['auth_key' => str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
         unset($this->temp_requested_secret_chats[$params['id']]);
@@ -139,10 +139,10 @@ trait AuthKeyHandler
             $my_exchange_id = new \phpseclib\Math\BigInteger($this->secret_chats[$chat]['rekeying'][1], -256);
             $other_exchange_id = new \phpseclib\Math\BigInteger($params['exchange_id'], -256);
             //$this->logger->logger($my, $params);
-            if ($my_exchange_id > $other_exchange_id) {
+            if ($my_exchange_id->compare($other_exchange_id) > 0) {
                 return;
             }
-            if ($my_exchange_id === $other_exchange_id) {
+            if ($my_exchange_id->compare($other_exchange_id) === 0) {
                 $this->secret_chats[$chat]['rekeying'] = [0];
 
                 return;
@@ -152,7 +152,7 @@ trait AuthKeyHandler
         $dh_config = yield $this->get_dh_config_async();
         $this->logger->logger('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
         $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
-        $params['g_a'] = new \phpseclib\Math\BigInteger($params['g_a'], 256);
+        $params['g_a'] = new \phpseclib\Math\BigInteger((string) $params['g_a'], 256);
         $this->check_G($params['g_a'], $dh_config['p']);
         $key = ['auth_key' => str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
         $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
@@ -175,7 +175,7 @@ trait AuthKeyHandler
         }
         $this->logger->logger('Committing rekeying of secret chat '.$chat.'...', \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = yield $this->get_dh_config_async();
-        $params['g_b'] = new \phpseclib\Math\BigInteger($params['g_b'], 256);
+        $params['g_b'] = new \phpseclib\Math\BigInteger((string) $params['g_b'], 256);
         $this->check_G($params['g_b'], $dh_config['p']);
         $key = ['auth_key' => str_pad($params['g_b']->powMod($this->temp_rekeyed_secret_chats[$params['exchange_id']], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
         $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);

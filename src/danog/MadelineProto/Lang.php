@@ -208,7 +208,7 @@ class Lang
     'loading_key' => 'Loading key...',
     'computing_fingerprint' => 'Computing fingerprint...',
     'rsa_encrypting' => 'Encrypting with rsa key...',
-    'rpc_tg_error' => 'Telegram ha ritornato un errore RPC: %s (%s), causato da %s:%s%sTL trace:',
+    'rpc_tg_error' => 'Telegram returned an RPC error: %s (%s), caused by %s:%s%sTL trace:',
     'v_error' => '506c656173652075706461746520746f20746865206c61746573742076657273696f6e206f66204d6164656c696e6550726f746f2e',
     'v_tgerror' => '506c6561736520757064617465207068702d6c69627467766f6970',
     'no_mode_specified' => 'No mode was specified!',

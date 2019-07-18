@@ -113,6 +113,7 @@ $index = '';
 $files = glob('docs/docs/docs/*md');
 foreach ($files as $file) {
     $base = basename($file, '.md');
+    if ($base === 'UPDATES_INTERNAL') continue;
     $key = array_search($base, $order);
     if ($key !== false) {
         $orderedfiles[$key] = $file;

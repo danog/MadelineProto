@@ -123,7 +123,7 @@ trait AuthKeyHandler
         }
         $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['call_confirming'], $this->calls[$params['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = yield $this->get_dh_config_async();
-        $params['g_b'] = new \phpseclib\Math\BigInteger($params['g_b'], 256);
+        $params['g_b'] = new \phpseclib\Math\BigInteger((string) $params['g_b'], 256);
         $this->check_G($params['g_b'], $dh_config['p']);
         $key = str_pad($params['g_b']->powMod($this->calls[$params['id']]->storage['a'], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT);
         $res = (yield $this->method_call_async_read('phone.confirmCall', ['key_fingerprint' => substr(sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->calls[$params['id']]->storage['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => \danog\MadelineProto\VoIP::getConnectionMaxLayer()]], ['datacenter' => $this->datacenter->curdc]))['phone_call'];
@@ -158,7 +158,7 @@ trait AuthKeyHandler
         if (hash('sha256', $params['g_a_or_b'], true) != $this->calls[$params['id']]->storage['g_a_hash']) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['invalid_g_a']);
         }
-        $params['g_a_or_b'] = new \phpseclib\Math\BigInteger($params['g_a_or_b'], 256);
+        $params['g_a_or_b'] = new \phpseclib\Math\BigInteger((string) $params['g_a_or_b'], 256);
         $this->check_G($params['g_a_or_b'], $dh_config['p']);
         $key = str_pad($params['g_a_or_b']->powMod($this->calls[$params['id']]->storage['b'], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT);
         if (substr(sha1($key, true), -8) != $params['key_fingerprint']) {

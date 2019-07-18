@@ -305,7 +305,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function stopLoops()
     {
         if ($this->callCheckerLoop) {
-            $this->callCheckerLoop->signal(true);;
+            $this->callCheckerLoop->signal(true);
             $this->callCheckerLoop = null;
         }
     }
