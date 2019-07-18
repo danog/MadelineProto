@@ -49,11 +49,6 @@ trait AuthKeyHandler
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw new \danog\MadelineProto\Exception(['extension', 'libtgvoip']);
         }
-        array_walk($this->calls, function ($controller, $id) {
-            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                $controller->discard();
-            }
-        });
         $user = yield $this->get_info_async($user);
         if (!isset($user['InputUser']) || $user['InputUser']['_'] === 'inputUserSelf') {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
@@ -81,11 +76,6 @@ trait AuthKeyHandler
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw new \danog\MadelineProto\Exception();
         }
-        array_walk($this->calls, function ($controller, $id) {
-            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                $controller->discard();
-            }
-        });
         if ($this->call_status($call['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED) {
             $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_1'], $call['id']));
 
@@ -126,11 +116,6 @@ trait AuthKeyHandler
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw new \danog\MadelineProto\Exception(['extension', 'libtgvoip']);
         }
-        array_walk($this->calls, function ($controller, $id) {
-            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                $controller->discard();
-            }
-        });
         if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_REQUESTED) {
             $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_2'], $params['id']));
 
@@ -138,7 +123,7 @@ trait AuthKeyHandler
         }
         $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['call_confirming'], $this->calls[$params['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = yield $this->get_dh_config_async();
-        $params['g_b'] = new \phpseclib\Math\BigInteger((string) $params['g_b'], 256);
+        $params['g_b'] = new \phpseclib\Math\BigInteger($params['g_b'], 256);
         $this->check_G($params['g_b'], $dh_config['p']);
         $key = str_pad($params['g_b']->powMod($this->calls[$params['id']]->storage['a'], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT);
         $res = (yield $this->method_call_async_read('phone.confirmCall', ['key_fingerprint' => substr(sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->calls[$params['id']]->storage['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => \danog\MadelineProto\VoIP::getConnectionMaxLayer()]], ['datacenter' => $this->datacenter->curdc]))['phone_call'];
@@ -163,11 +148,6 @@ trait AuthKeyHandler
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw new \danog\MadelineProto\Exception(['extension', 'libtgvoip']);
         }
-        array_walk($this->calls, function ($controller, $id) {
-            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                $controller->discard();
-            }
-        });
         if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED || !isset($this->calls[$params['id']]->storage['b'])) {
             $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_3'], $params['id']));
 
@@ -178,7 +158,7 @@ trait AuthKeyHandler
         if (hash('sha256', $params['g_a_or_b'], true) != $this->calls[$params['id']]->storage['g_a_hash']) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['invalid_g_a']);
         }
-        $params['g_a_or_b'] = new \phpseclib\Math\BigInteger((string) $params['g_a_or_b'], 256);
+        $params['g_a_or_b'] = new \phpseclib\Math\BigInteger($params['g_a_or_b'], 256);
         $this->check_G($params['g_a_or_b'], $dh_config['p']);
         $key = str_pad($params['g_a_or_b']->powMod($this->calls[$params['id']]->storage['b'], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT);
         if (substr(sha1($key, true), -8) != $params['key_fingerprint']) {
@@ -204,11 +184,6 @@ trait AuthKeyHandler
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw new \danog\MadelineProto\Exception(['extension', 'libtgvoip']);
         }
-        array_walk($this->calls, function ($controller, $id) {
-            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                $controller->discard();
-            }
-        });
         if (isset($this->calls[$id])) {
             return $this->calls[$id]->getCallState();
         }
@@ -221,11 +196,6 @@ trait AuthKeyHandler
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw new \danog\MadelineProto\Exception(['extension', 'libtgvoip']);
         }
-        array_walk($this->calls, function ($controller, $id) {
-            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                $controller->discard();
-            }
-        });
 
         return $this->calls[$call];
     }
@@ -262,6 +232,9 @@ trait AuthKeyHandler
             in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->get_updates_update_handler($update) : $this->settings['updates']['callback']($update);
         }
         unset($this->calls[$call['id']]);
+    }
+    public function checkCalls()
+    {
         array_walk($this->calls, function ($controller, $id) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 $controller->discard();

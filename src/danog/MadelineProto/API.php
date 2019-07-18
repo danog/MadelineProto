@@ -137,10 +137,10 @@ class API extends APIFactory
                     $deferred->resolve();
                     yield $this->API->initAsync();
                     $this->APIFactory();
-                    \danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
+                    //\danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
                     $this->asyncInitPromise = null;
-                    $pong = yield $this->ping(['ping_id' => 3], ['async' => true]);
-                    \danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
+                    //$pong = yield $this->ping(['ping_id' => 3], ['async' => true]);
+                    //\danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
                     \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
 
                     return;
@@ -162,9 +162,9 @@ class API extends APIFactory
         yield $this->API->initAsync();
         $this->APIFactory();
         $this->asyncInitPromise = null;
-        \danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
-        $pong = yield $this->ping(['ping_id' => 3], ['async' => true]);
-        \danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
+        //\danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
+        //$pong = yield $this->ping(['ping_id' => 3], ['async' => true]);
+        //\danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 

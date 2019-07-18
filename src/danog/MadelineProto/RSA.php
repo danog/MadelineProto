@@ -49,7 +49,7 @@ class RSA
     {
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_encrypting'], Logger::VERBOSE);
 
-        return (new \phpseclib\Math\BigInteger((string) $data, 256))->powMod($this->e, $this->n)->toBytes();
+        return (new \phpseclib\Math\BigInteger($data, 256))->powMod($this->e, $this->n)->toBytes();
     }
     /**
      * Accesses a private variable from an object

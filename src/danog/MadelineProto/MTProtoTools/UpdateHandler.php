@@ -63,11 +63,6 @@ trait UpdateHandler
         if (!$this->settings['updates']['run_callback']) {
             $this->settings['updates']['run_callback'] = true;
         }
-        array_walk($this->calls, function ($controller, $id) {
-            if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-                $controller->discard();
-            }
-        });
 
         $params = array_merge(self::DEFAULT_GETUPDATES_PARAMS, $params);
 

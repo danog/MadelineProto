@@ -83,7 +83,7 @@ trait AuthKeyHandler
                  * ***********************************************************************
                  * Compute p and q
                  */
-                $pq = new \phpseclib\Math\BigInteger((string) $pq_bytes, 256);
+                $pq = new \phpseclib\Math\BigInteger($pq_bytes, 256);
                 $q = new \phpseclib\Math\BigInteger(0);
                 $p = new \phpseclib\Math\BigInteger(\danog\PrimeModule::auto_single($pq->__toString()));
                 if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
@@ -256,8 +256,8 @@ trait AuthKeyHandler
                     throw new \danog\MadelineProto\SecurityException('wrong server nonce');
                 }
                 $g = new \phpseclib\Math\BigInteger($server_DH_inner_data['g']);
-                $g_a = new \phpseclib\Math\BigInteger((string) $server_DH_inner_data['g_a'], 256);
-                $dh_prime = new \phpseclib\Math\BigInteger((string) $server_DH_inner_data['dh_prime'], 256);
+                $g_a = new \phpseclib\Math\BigInteger($server_DH_inner_data['g_a'], 256);
+                $dh_prime = new \phpseclib\Math\BigInteger($server_DH_inner_data['dh_prime'], 256);
                 /*
                  * ***********************************************************************
                  * Time delta
