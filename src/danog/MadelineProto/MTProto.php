@@ -988,12 +988,30 @@ class MTProto extends AsyncConstruct implements TLCallback
 
 
     }
-    public function resetUpdateSystem()
+    public function resetUpdateState()
     {
-        foreach ($this->channels_state->get() as $state) {
-            $channelId = $state->getChannel();
-            $this->channels_state->__construct([$channelId => new UpdatesState()]);
+        if (isset($this->seqUpdater)) {
+            $this->seqUpdater->signal(true);
         }
+        $channelIds = [];
+        $newStates = [];
+        foreach ($this->channels_state->get() as $state) {
+            $channelIds[] = $state->getChannel();
+            $channelId = $state->getChannel();
+            $pts = $state->pts();
+            $pts = $channelId ? max(1, $pts-1000000) : ($pts > 4000000 ? $pts-1000000 : max(1, $pts-1000000));
+            $newStates[$channelId] = new UpdatesState(['pts' => $pts], $channelId);
+        }
+        sort($channelIds);
+        foreach ($channelIds as $channelId) {
+            if (isset($this->feeders[$channelId])) {
+                $this->feeders[$channelId]->signal(true);
+            }
+            if (!isset($this->updaters[$channelId])) {
+                $this->updaters[$channelId]->signal(true);
+            }
+        }
+        $this->channels_state->__construct($newStates);
         $this->startUpdateSystem();
     }
 

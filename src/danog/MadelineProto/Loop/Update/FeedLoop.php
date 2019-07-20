@@ -123,7 +123,7 @@ class FeedLoop extends ResumableSignalLoop
                     $this->incomingUpdates = [];
                     continue;
                 }
-                if (isset($update['message']['id'], $update['message']['to_id']) && !in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage'])) {
+                if (isset($update['message']['id'], $update['message']['to_id']) && !in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage', 'updateMessageID'])) {
                     if (!$this->API->check_msg_id($update['message'])) {
                         $logger('MSGID duplicate');
 

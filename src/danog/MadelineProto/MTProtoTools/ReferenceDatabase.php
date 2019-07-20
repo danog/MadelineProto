@@ -382,6 +382,7 @@ class ReferenceDatabase implements TLCallback
                 $count = 0;
                 foreach ($res['photos'] as $photo) {
                     $origin['max_id'] = $photo['id'];
+                    $dc_id = $photo['dc_id'];
 
                     $location = $this->serializeLocation(self::PHOTO_LOCATION, $photo);
                     if (isset($cache[$location])) {
@@ -395,6 +396,7 @@ class ReferenceDatabase implements TLCallback
                     if (isset($photo['sizes'])) {
                         foreach ($photo['sizes'] as $size) {
                             if (isset($size['location'])) {
+                                $size['location']['dc_id'] = $dc_id;
                                 $location = $this->serializeLocation(self::PHOTO_LOCATION_LOCATION, $size['location']);
                                 if (isset($cache[$location])) {
                                     $reference = $cache[$location];
