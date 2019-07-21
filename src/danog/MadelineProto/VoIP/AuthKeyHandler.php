@@ -126,7 +126,24 @@ trait AuthKeyHandler
         $params['g_b'] = new \phpseclib\Math\BigInteger((string) $params['g_b'], 256);
         $this->check_G($params['g_b'], $dh_config['p']);
         $key = str_pad($params['g_b']->powMod($this->calls[$params['id']]->storage['a'], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT);
-        $res = (yield $this->method_call_async_read('phone.confirmCall', ['key_fingerprint' => substr(sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->calls[$params['id']]->storage['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => \danog\MadelineProto\VoIP::getConnectionMaxLayer()]], ['datacenter' => $this->datacenter->curdc]))['phone_call'];
+        try {
+            $res = yield $this->method_call_async_read('phone.confirmCall', ['key_fingerprint' => substr(sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->calls[$params['id']]->storage['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => \danog\MadelineProto\VoIP::getConnectionMaxLayer()]], ['datacenter' => $this->datacenter->curdc])['phone_call'];
+        } catch (\danog\MadelineProto\RPCErrorException $e) {
+            if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
+                $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['call_already_accepted'], $call['id']));
+
+                return true;
+            }
+            if ($e->rpc === 'CALL_ALREADY_DECLINED') {
+                $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['call_already_declined']);
+                yield $this->discard_call_async($call['id'], 'phoneCallDiscardReasonHangup');
+
+                return false;
+            }
+
+            throw $e;
+        }
+
         $visualization = [];
         $length = new \phpseclib\Math\BigInteger(count(\danog\MadelineProto\Magic::$emojis));
         foreach (str_split(hash('sha256', $key.str_pad($this->calls[$params['id']]->storage['g_a'], 256, chr(0), \STR_PAD_LEFT), true), 8) as $number) {
@@ -171,7 +188,6 @@ trait AuthKeyHandler
             $visualization[] = \danog\MadelineProto\Magic::$emojis[(int) (new \phpseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
         }
         $this->calls[$params['id']]->setVisualization($visualization);
-        var_dump($params);
         $this->calls[$params['id']]->configuration['endpoints'] = array_merge($params['connections'], $this->calls[$params['id']]->configuration['endpoints']);
         $this->calls[$params['id']]->configuration = array_merge(['recv_timeout' => $this->config['call_receive_timeout_ms'] / 1000, 'init_timeout' => $this->config['call_connect_timeout_ms'] / 1000, 'data_saving' => \danog\MadelineProto\VoIP::DATA_SAVING_NEVER, 'enable_NS' => true, 'enable_AEC' => true, 'enable_AGC' => true, 'auth_key' => $key, 'auth_key_id' => substr(sha1($key, true), -8), 'call_id' => substr(hash('sha256', $key, true), -16), 'network_type' => \danog\MadelineProto\VoIP::NET_TYPE_ETHERNET], $this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
