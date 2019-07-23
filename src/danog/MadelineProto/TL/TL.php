@@ -576,7 +576,7 @@ trait TL
                     $serialized .= pack('@4');
                     continue;
                 }
-                if (in_array($current_argument['type'], ['bytes', 'string', 'Vector t'])) {
+                if (in_array($current_argument['type'], ['bytes', 'string'])) {
                     $serialized .= pack('@4');
                     continue;
                 }
@@ -588,10 +588,30 @@ trait TL
                     $serialized .= $id['id'];
                     continue;
                 }
-
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['params_missing'], $current_argument['name']);
+                switch ($current_argument['type']) {
+                    case 'Vector t':
+                    case 'vector':
+                        $arguments[$current_argument['name']] = [];
+                        break;
+                    /*
+                    case 'long':
+                        $serialized .= $this->random(8);
+                        continue 2;
+                    case 'int':
+                        $serialized .= $this->random(4);
+                        continue 2;
+                    case 'string':
+                    case 'bytes':
+                        $arguments[$current_argument['name']] = '';
+                        break;
+                    case 'Bool':
+                        $arguments[$current_argument['name']] = false;
+                        break;
+                    default:
+                        $arguments[$current_argument['name']] = ['_' => $this->constructors->find_by_type($current_argument['type'])['predicate']];
+                        break;*/
+                }
             }
-
             if (in_array($current_argument['type'], ['DataJSON', '%DataJSON'])) {
                 $arguments[$current_argument['name']] = ['_' => 'dataJSON', 'data' => json_encode($arguments[$current_argument['name']])];
             }
