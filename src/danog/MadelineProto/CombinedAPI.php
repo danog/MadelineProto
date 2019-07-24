@@ -164,7 +164,10 @@ class CombinedAPI
     public $event_handler;
     private $event_handler_instance;
     private $event_handler_methods = [];
-
+    public function getEventHandler()
+    {
+        return $this->event_handler_instance;
+    }
     public function setEventHandler($event_handler)
     {
         if (!class_exists($event_handler) || !is_subclass_of($event_handler, '\danog\MadelineProto\CombinedEventHandler')) {
