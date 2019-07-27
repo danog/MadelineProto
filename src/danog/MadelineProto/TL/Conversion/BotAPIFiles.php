@@ -76,7 +76,7 @@ trait BotAPIFiles
         $photoSize['location']['access_hash'] = $photo['access_hash'] ?? 0;
         $photoSize['location']['id'] = $photo['id'] ?? 0;
         $photoSize['location']['secret'] = $photo['location']['secret'] ?? 0;
-        $photoSize['location']['dc_id'] = $photo['dc_id'];
+        $photoSize['location']['dc_id'] = $photo['dc_id'] ?? 0;
         $photoSize['location']['_'] = $thumbnail ? 'bot_thumbnail' : 'bot_photo';
         $data = (yield $this->serialize_object_async(['type' => 'File'], $photoSize['location'], 'File')).chr(2);
 
