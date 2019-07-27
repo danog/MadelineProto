@@ -23,8 +23,8 @@ trait Methods
 {
     public function mk_methods()
     {
-        $bots = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?bot'), true)['result'];
-        $errors = json_decode(file_get_contents('https://rpc.pwrtelegram.xyz/?all'), true);
+        $bots = json_decode(file_get_contents('https://rpc.madelineproto.xyz/bot.json'), true)['result'];
+        $errors = json_decode(file_get_contents('https://rpc.madelineproto.xyz/v1.json'), true);
         $errors['result'] = array_merge_recursive(...$errors['result']);
         foreach (glob('methods/'.$this->any) as $unlink) {
             unlink($unlink);

@@ -176,7 +176,7 @@ class Magic
                 }
             }
 
-            $res = json_decode(@file_get_contents('https://rpc.pwrtelegram.xyz/?allv3'), true);
+            $res = json_decode(@file_get_contents('https://rpc.madelineproto.xyz/v3.json'), true);
             if (isset($res['ok']) && $res['ok']) {
                 RPCErrorException::$errorMethodMap = $res['result'];
                 RPCErrorException::$descriptions += $res['human_result'];
