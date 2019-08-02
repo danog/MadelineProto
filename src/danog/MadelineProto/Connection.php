@@ -178,7 +178,7 @@ class Connection
         $message['send_promise'] = $deferred;
         $this->pending_outgoing[$this->pending_outgoing_key++] = $message;
         $this->pending_outgoing_key %= self::PENDING_MAX;
-        if ($flush) {
+        if ($flush && isset($this->writer)) {
             $this->writer->resume();
         }
 
