@@ -102,7 +102,7 @@ class PasswordCalculator
             throw new Exception('Wrong constructor');
         }
         if ($object['has_secure_values']) {
-            throw new Exception('Cannot parse secure values');
+            //throw new Exception('Cannot parse secure values');
         }
         if ($object['has_password']) {
             switch ($object['current_algo']['_']) {
