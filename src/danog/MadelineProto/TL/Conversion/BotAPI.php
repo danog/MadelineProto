@@ -493,10 +493,6 @@ trait BotAPI
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
                     }
                     $entities[] = ['_' => 'inputMessageEntityMentionName', 'offset' => $offset, 'length' => $length, 'user_id' => $mention['InputUser']];
-                } else if (strpos('mailto:', $href) === 0) {
-                    $entities[] = ['_' => 'messageEntityEmail', 'offset' => $offset, 'length' => $length];
-                } else if (strpos('tel:', $href) === 0) {
-                    $entities[] = ['_' => 'messageEntityPhone', 'offset' => $offset, 'length' => $length];
                 } elseif (preg_match('|buttonurl:(.*)|', $href)) {
                     if (!isset($entities['buttons'])) {
                         $entities['buttons'] = [];
