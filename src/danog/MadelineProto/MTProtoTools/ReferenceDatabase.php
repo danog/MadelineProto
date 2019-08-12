@@ -364,7 +364,7 @@ class ReferenceDatabase implements TLCallback
         $body = $data['body'];
         switch ($data['_']) {
             case 'photos.updateProfilePhoto':
-                $origin['max_id'] = $res['photo_id'];
+                $origin['max_id'] = $res['photo_id'] ?? 0;
                 $origin['offset'] = -1;
                 $origin['limit'] = 1;
                 $origin['user_id'] = $this->API->authorization['user']['id'];
