@@ -25,7 +25,6 @@ interface auth
      * @param array params [
      *               string phone_number,
      *               string phone_code_hash,
-     *               string phone_code,
      *               string first_name,
      *               string last_name,
      *              ]
@@ -2139,6 +2138,7 @@ interface upload
 
     /**
      * @param array params [
+     *               boolean precise,
      *               InputFileLocation location,
      *               int offset,
      *               int limit,
@@ -2467,6 +2467,7 @@ interface channels
      *               InputChannel channel,
      *               InputUser user_id,
      *               ChatAdminRights admin_rights,
+     *               string rank,
      *              ]
      *
      * @return Updates
@@ -2692,6 +2693,16 @@ interface channels
      * @return bool
      */
     public function editLocation(array $params);
+
+    /**
+     * @param array params [
+     *               InputChannel channel,
+     *               int seconds,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function toggleSlowMode(array $params);
 }
 
 interface bots

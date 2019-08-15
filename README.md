@@ -432,6 +432,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_initTakeoutSession.html" name="account_initTakeoutSession">Start account exporting session: account.initTakeoutSession</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_unregisterDevice.html" name="account_unregisterDevice">Stop sending PUSH notifications to app: account.unregisterDevice</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_toggleSignatures.html" name="channels_toggleSignatures">Toggle channel signatures: channels.toggleSignatures</a>  
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_toggleSlowMode.html" name="channels_toggleSlowMode">Toggle slow mode: channels.toggleSlowMode</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_toggleTopPeers.html" name="contacts_toggleTopPeers">Toggle top peers: contacts.toggleTopPeers</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_unblock.html" name="contacts_unblock">Unblock a user: contacts.unblock</a>  
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_updateStatus.html" name="account_updateStatus">Update online status: account.updateStatus</a>  

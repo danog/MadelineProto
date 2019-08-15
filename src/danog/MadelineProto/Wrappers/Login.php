@@ -107,6 +107,14 @@ trait Login
 
             throw $e;
         }
+        if ($authorization['_'] === 'auth.authorizationSignUpRequired') {
+            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_need_signup'], \danog\MadelineProto\Logger::NOTICE);
+            $this->authorized = self::WAITING_SIGNUP;
+            $this->authorization['phone_code'] = $code;
+
+            $authorization['_'] = 'account.needSignup';
+            return $authorization;
+        }
         $this->authorized = self::LOGGED_IN;
         $this->authorization = $authorization;
         $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
