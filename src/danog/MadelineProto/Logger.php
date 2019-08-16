@@ -105,7 +105,7 @@ class Logger
             $settings['logger']['logger_param'] = $settings['logger']['param'];
         }
         if (php_sapi_name() !== 'cli') {
-            if (isset($settings['logger']['logger_param']) && basename($settings['logger']['logger_param']) === 'MadelineProto.log') {
+            if (isset($settings['logger']['logger_param']) && $settings['logger']['logger_param'] === 'MadelineProto.log') {
                 $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
             }
         }
@@ -119,7 +119,7 @@ class Logger
             try {
                 error_reporting(E_ALL);
                 ini_set('log_errors', 1);
-                ini_set('error_log', Magic::$script_cwd.'/MadelineProto.log');
+                ini_set('error_log', $settings['logger']['logger_param']);
                 error_log('Enabled PHP logging');
             } catch (\danog\MadelineProto\Exception $e) {
                 $logger->logger('Could not enable PHP logging');
