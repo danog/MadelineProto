@@ -13,10 +13,11 @@ echo '{
     "name": "danog/madelineprototests",
     "minimum-stability":"dev",
     "require": {
-        "danog/madelineproto": "dev-alpha",
-        "amphp/dns": "dev-master#861cc857b1ba6e02e8a7439c30403682785fce96 as 0.9.9",
-        "amphp/file": "dev-master#5a69fca406ac5fd220de0aa68c887bc8046eb93c as 0.3.3",
-        "amphp/uri": "dev-master#f3195b163275383909ded7770a11d8eb865cbc86 as 0.1.3"
+        "danog/madelineproto": "dev-master",
+        "amphp/dns": "dev-master#aa1892bd as 0.9",
+        "amphp/socket": "0.10.12 as 1",
+        "amphp/websocket": "dev-master#db2da8c5b3ed22eae37da5ffa10ab3ea8de19342 as 1",
+        "amphp/websocket-client": "dev-master#aff808025637bd705672338b4904ad03a4dbdc04 as 1"
     },
     "repositories": [
         {

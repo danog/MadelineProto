@@ -19,6 +19,7 @@ echo '{
     "require": {
         "danog/madelineproto": "dev-master",
         "amphp/dns": "dev-master#aa1892bd as 0.9",
+        "amphp/socket": "0.10.12 as 1",
         "amphp/websocket": "dev-master#db2da8c5b3ed22eae37da5ffa10ab3ea8de19342 as 1",
         "amphp/websocket-client": "dev-master#aff808025637bd705672338b4904ad03a4dbdc04 as 1"
     },
