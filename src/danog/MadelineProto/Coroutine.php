@@ -196,6 +196,9 @@ final class Coroutine implements Promise, \ArrayAccess
     {
         return Tools::call((function () use ($offset, $value) {
             $result = yield $this;
+            if ($offset === null) {
+                return $result[] = $value;
+            }
             return $result[$offset] = $value;
         })());
     }

@@ -358,6 +358,7 @@ trait PeerHandler
             switch ($id['_']) {
                 case 'updateEncryption':
                     return $this->get_secret_chat($id['chat']['id']);
+                case 'inputEncryptedChat':
                 case 'updateEncryptedChatTyping':
                 case 'updateEncryptedMessagesRead':
                     return $this->get_secret_chat($id['chat_id']);
