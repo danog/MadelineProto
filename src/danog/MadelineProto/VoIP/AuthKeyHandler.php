@@ -47,7 +47,7 @@ trait AuthKeyHandler
     public function request_call_async($user)
     {
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw new \danog\MadelineProto\Exception(['extension', 'libtgvoip']);
+            throw \danog\MadelineProto\Exception::extension('libtgvoip');
         }
         $user = yield $this->get_info_async($user);
         if (!isset($user['InputUser']) || $user['InputUser']['_'] === 'inputUserSelf') {
@@ -114,7 +114,7 @@ trait AuthKeyHandler
     public function confirm_call_async($params)
     {
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw new \danog\MadelineProto\Exception(['extension', 'libtgvoip']);
+            throw \danog\MadelineProto\Exception::extension('libtgvoip');
         }
         if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_REQUESTED) {
             $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_2'], $params['id']));
@@ -163,7 +163,7 @@ trait AuthKeyHandler
     public function complete_call_async($params)
     {
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw new \danog\MadelineProto\Exception(['extension', 'libtgvoip']);
+            throw \danog\MadelineProto\Exception::extension('libtgvoip');
         }
         if ($this->call_status($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED || !isset($this->calls[$params['id']]->storage['b'])) {
             $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_3'], $params['id']));
@@ -198,7 +198,7 @@ trait AuthKeyHandler
     public function call_status($id)
     {
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw new \danog\MadelineProto\Exception(['extension', 'libtgvoip']);
+            throw \danog\MadelineProto\Exception::extension('libtgvoip');
         }
         if (isset($this->calls[$id])) {
             return $this->calls[$id]->getCallState();
@@ -210,7 +210,7 @@ trait AuthKeyHandler
     public function get_call($call)
     {
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw new \danog\MadelineProto\Exception(['extension', 'libtgvoip']);
+            throw \danog\MadelineProto\Exception::extension('libtgvoip');
         }
 
         return $this->calls[$call];
@@ -219,7 +219,7 @@ trait AuthKeyHandler
     public function discard_call_async($call, $reason, $rating = [], $need_debug = true)
     {
         if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
-            throw new \danog\MadelineProto\Exception(['extension', 'libtgvoip']);
+            throw \danog\MadelineProto\Exception::extension('libtgvoip');
         }
         if (!isset($this->calls[$call['id']])) {
             return;

@@ -20,6 +20,10 @@
 namespace danog\MadelineProto;
 
 use Amp\Deferred;
+use function Amp\File\put;
+use function Amp\File\rename;
+use function Amp\File\get;
+use function Amp\File\exists;
 
 class API extends APIFactory
 {
@@ -62,21 +66,15 @@ class API extends APIFactory
             $realpaths = Serialization::realpaths($params);
             $this->session = $realpaths['file'];
 
-            if (file_exists($realpaths['file'])) {
-                if (!file_exists($realpaths['lockfile'])) {
-                    touch($realpaths['lockfile']);
-                    clearstatcache();
-                }
-                $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'r');
-                \danog\MadelineProto\Logger::log('Waiting for shared lock of serialization lockfile...');
-                flock($realpaths['lockfile'], LOCK_SH);
-                \danog\MadelineProto\Logger::log('Shared lock acquired, deserializing...');
+            if (yield exists($realpaths['file'])) {
+                Logger::log('Waiting for shared lock of serialization lockfile...');
+                $unlock = yield Tools::flock($realpaths['lockfile'], LOCK_SH);
+                Logger::log('Shared lock acquired, deserializing...');
 
                 try {
-                    $tounserialize = file_get_contents($realpaths['file']);
+                    $tounserialize = yield get($realpaths['file']);
                 } finally {
-                    flock($realpaths['lockfile'], LOCK_UN);
-                    fclose($realpaths['lockfile']);
+                    $unlock();
                 }
                 \danog\MadelineProto\Magic::class_exists();
 
@@ -142,7 +140,6 @@ class API extends APIFactory
                     //$pong = yield $this->ping(['ping_id' => 3], ['async' => true]);
                     //\danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
                     \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
-
                     return;
                 }
             }
@@ -158,7 +155,7 @@ class API extends APIFactory
         $this->API = new MTProto($params);
         $this->APIFactory();
         $deferred->resolve();
-        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['apifactory_start'], Logger::VERBOSE);
+        Logger::log(\danog\MadelineProto\Lang::$current_lang['apifactory_start'], Logger::VERBOSE);
         yield $this->API->initAsync();
         $this->APIFactory();
         $this->asyncInitPromise = null;
@@ -312,14 +309,11 @@ class API extends APIFactory
             }
             $this->serialized = time();
             $realpaths = Serialization::realpaths($filename);
-            if (!file_exists($realpaths['lockfile'])) {
-                touch($realpaths['lockfile']);
-                clearstatcache();
-            }
-            $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'w');
-            \danog\MadelineProto\Logger::log('Waiting for exclusive lock of serialization lockfile...');
-            flock($realpaths['lockfile'], LOCK_EX);
-            \danog\MadelineProto\Logger::log('Lock acquired, serializing');
+            Logger::log('Waiting for exclusive lock of serialization lockfile...');
+            
+            $unlock = yield Tools::flock($realpaths['lockfile'], LOCK_EX);
+            
+            Logger::log('Lock acquired, serializing');
 
             try {
                 if (!$this->getting_api_id) {
@@ -332,17 +326,16 @@ class API extends APIFactory
                         $this->API->settings['logger']['logger_param'] = [$this->API, 'noop'];
                     }
                 }
-                $wrote = file_put_contents($realpaths['tempfile'], serialize($this));
-                rename($realpaths['tempfile'], $realpaths['file']);
+                $wrote = yield put($realpaths['tempfile'], serialize($this));
+                yield rename($realpaths['tempfile'], $realpaths['file']);
             } finally {
                 if (!$this->getting_api_id) {
                     $this->API->settings['updates']['callback'] = $update_closure;
                     $this->API->settings['logger']['logger_param'] = $logger_closure;
                 }
-                flock($realpaths['lockfile'], LOCK_UN);
-                fclose($realpaths['lockfile']);
+                $unlock();
             }
-            \danog\MadelineProto\Logger::log('Done serializing');
+            Logger::log('Done serializing');
 
             return $wrote;
         })());

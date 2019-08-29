@@ -23,7 +23,6 @@ use Amp\Failure;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
-use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;
 use function Amp\ByteStream\getStdout;
 use function Amp\Promise\all;
@@ -32,6 +31,10 @@ use function Amp\Promise\first;
 use function Amp\Promise\some;
 use function Amp\Promise\timeout;
 use function Amp\Promise\wait;
+use function Amp\ByteStream\getOutputBufferStream;
+use function Amp\File\exists;
+use function Amp\File\touch;
+use Amp\File\StatCache;
 use phpseclib\Math\BigInteger;
 
 /**
@@ -368,7 +371,50 @@ trait Tools
 
         return $deferred->promise();
     }
+    /**
+     * Asynchronously lock a file
+     * Resolves with a callbable that MUST eventually be called in order to release the lock
+     *
+     * @param string $file File to lock
+     * @param integer $operation Locking mode (see flock)
+     * @param numeric $polling   Polling interval for lock
+     * @return Promise
+     */
+    public static function flock(string $file, int $operation, $polling = 0.1): Promise
+    {
+        return self::call(self::flockAsync($file, $operation, $polling));
+    }
+    public static function noCache(int $status, string $message)
+    {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Cache-Control: post-check=0, pre-check=0', false);
+        header('Pragma: no-cache');
+        http_response_code($status);
+        return self::echo($message);
+    }
+    public static function flockAsync(string $file, int $operation, $polling)
+    {
+        if (!yield exists($file)) {
+            yield touch($file);
+            StatCache::clear($file);
+        }
+        $operation |= LOCK_NB;
+        $res = fopen($file, 'c');
+        do {
+            $result = flock($res, $operation);
+            if (!$result) {
+                yield self::sleep($polling);
+            }
+        } while (!$result);
 
+        return static function () use (&$res) {
+            if ($res) {
+                flock($res, LOCK_UN);
+                fclose($res);
+                $res = null;
+            }
+        };
+    }
     public static function sleep($time)
     {
         return new \Amp\Delayed($time * 1000);

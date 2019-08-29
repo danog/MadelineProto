@@ -35,7 +35,8 @@ trait AuthKeyHandler
 
     public function create_auth_key_async($expires_in, $datacenter): \Generator
     {
-        $req_pq = strpos($datacenter, 'cdn') ? 'req_pq' : 'req_pq_multi';
+        $cdn = strpos($datacenter, 'cdn');
+        $req_pq = $cdn ? 'req_pq' : 'req_pq_multi';
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['req_pq'], \danog\MadelineProto\Logger::VERBOSE);
@@ -69,7 +70,7 @@ trait AuthKeyHandler
                  * ***********************************************************************
                  * Find our key in the server_public_key_fingerprints vector
                  */
-                foreach ($this->rsa_keys as $curkey) {
+                foreach ($cdn ? array_merge($this->cdn_rsa_keys, $this->rsa_keys) : $this->rsa_keys as $curkey) {
                     if (in_array($curkey->fp, $ResPQ['server_public_key_fingerprints'])) {
                         $key = $curkey;
                     }

@@ -22,6 +22,8 @@ use Amp\CancellationToken;
 use Amp\Socket\ClientConnectContext;
 use Amp\Uri\Uri;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
+use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
+use danog\MadelineProto\Exception;
 
 /**
  * Connection context class.
@@ -217,6 +219,7 @@ class ConnectionContext
     {
         return $this->isDns;
     }
+    
     /**
      * Whether this connection context will only be used by the DNS client
      *
@@ -261,6 +264,10 @@ class ConnectionContext
      */
     public function setDc($dc): self
     {
+        $int = intval($dc);
+        if (!(1 <= $int && $int <= 1000)) {
+            throw new Exception("Invalid DC id provided: $dc");
+        }
         $this->dc = $dc;
 
         return $this;
@@ -363,6 +370,23 @@ class ConnectionContext
         return $obj;
     }
 
+
+    /**
+     * Get the inputClientProxy proxy MTProto object
+     *
+     * @return array
+     */
+    public function getInputClientProxy(): ?array
+    {
+        foreach ($this->nextStreams as $couple) {
+            list($streamName, $extra) = $couple;
+            if ($streamName === ObfuscatedStream::getName() && isset($extra['address'])) {
+                $extra['_'] = 'inputClientProxy';
+                return $extra;
+            }
+        }
+        return null;
+    }
     /**
      * Get a description "name" of the context.
      *

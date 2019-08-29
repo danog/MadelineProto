@@ -1,6 +1,6 @@
 <?php
 /**
- * Default stream wrapper.
+ * Premade stream wrapper.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -26,20 +26,19 @@ use function Amp\Socket\connect;
 use function Amp\Socket\cryptoConnect;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use Amp\ByteStream\ClosedException;
+use danog\MadelineProto\Stream\ConnectionContext;
 
 /**
- * Default stream wrapper.
+ * Premade stream wrapper.
  *
  * Manages reading data in chunks
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInterface
+class PremadeStream extends Socket implements RawStreamInterface, ProxyStreamInterface
 {
     use RawStream;
     private $stream;
-    private $connector = 'Amp\\Socket\\connect';
-    private $cryptoConnector = 'Amp\\Socket\\cryptoConnect';
     
     public function __construct()
     {
@@ -55,14 +54,11 @@ class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInt
         return $this->stream;
     }
 
-    public function connectAsync(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
+    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        if ($ctx->isSecure()) {
-            $this->stream = yield ($this->cryptoConnector)($ctx->getStringUri(), $ctx->getSocketContext(), null, $ctx->getCancellationToken());
-        } else {
-            $this->stream = yield ($this->connector)($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
+        if ($header !== '') {
+            yield $this->stream->write($header);
         }
-        yield $this->stream->write($header);
     }
 
     /**
@@ -99,7 +95,9 @@ class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInt
     {
         try {
             if ($this->stream) {
-                $this->stream->close();
+                if (method_exists($this->stream, 'close')) {
+                    $this->stream->close();
+                }
                 $this->stream = null;
             }
         } catch (\Throwable $e) {
@@ -129,7 +127,7 @@ class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInt
      */
     public function setExtra($extra)
     {
-        list($this->connector, $this->cryptoConnector) = $extra;
+        $this->stream = $extra;
     }
     public static function getName(): string
     {

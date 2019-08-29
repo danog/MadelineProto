@@ -31,8 +31,6 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\TL\TLCallback;
-use function Amp\ByteStream\getStdin;
-use function Amp\ByteStream\getInputBufferStream;
 
 /**
  * Manages all of the mtproto stuff.
@@ -136,6 +134,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public $authorized = 0;
     public $authorized_dc = -1;
     private $rsa_keys = [];
+    private $cdn_rsa_keys = [];
     private $dh_config = ['version' => 0];
     public $chats = [];
     public $channel_participants = [];
@@ -164,21 +163,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         \danog\MadelineProto\Magic::class_exists();
         // Parse settings
         $this->parse_settings($settings);
-        if (!defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 7) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
-        }
-        if (!extension_loaded('xml')) {
-            throw new Exception(['extension', 'xml']);
-        }
-        if (!extension_loaded('fileinfo')) {
-            throw new Exception(['extension', 'fileinfo']);
-        }
-        if (!extension_loaded('json')) {
-            throw new Exception(['extension', 'json']);
-        }
-        if (!extension_loaded('mbstring')) {
-            throw new Exception(['extension', 'mbstring']);
-        }
         // Connect to servers
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
         if (!($this->channels_state instanceof CombinedUpdatesState)) {
@@ -199,6 +183,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         // Load rsa keys
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);
+        $this->rsa_keys = [];
         foreach ($this->settings['authorization']['rsa_keys'] as $key) {
             $key = yield (new RSA())->load($key);
             $this->rsa_keys[$key->fp] = $key;
@@ -327,22 +312,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (isset($this->settings['app_info']['lang_code']) && isset(Lang::$lang[$this->settings['app_info']['lang_code']])) {
             Lang::$current_lang = &Lang::$lang[$this->settings['app_info']['lang_code']];
         }
-        if (!defined('\\phpseclib\\Crypt\\AES::MODE_IGE')) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
-        }
-        if (!extension_loaded('xml')) {
-            throw new Exception(['extension', 'xml']);
-        }
-        if (!extension_loaded('fileinfo')) {
-            throw new Exception(['extension', 'fileinfo']);
-        }
-        if (!extension_loaded('mbstring')) {
-            throw new Exception(['extension', 'mbstring']);
-        }
-        if (!extension_loaded('json')) {
-            throw new Exception(['extension', 'json']);
-        }
-
         if (!isset($this->referenceDatabase)) {
             $this->referenceDatabase = new ReferenceDatabase($this);
         }
@@ -471,9 +440,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
 
         /*if (!$this->settings['updates']['handle_old_updates']) {
-            $this->channels_state = new CombinedUpdatesState();
-            $this->msg_ids = [];
-            $this->got_state = false;
+        $this->channels_state = new CombinedUpdatesState();
+        $this->msg_ids = [];
+        $this->got_state = false;
         }*/
         yield $this->connect_to_all_dcs_async();
         foreach ($this->calls as $id => $controller) {
@@ -819,9 +788,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         ], 'upload' => [
             'allow_automatic_upload' => true,
             'part_size' => 512 * 1024,
+            'parallel_chunks' => 20,
         ], 'download' => [
             'report_broken_media' => true,
             'part_size' => 1024 * 1024,
+            'parallel_chunks' => 20,
         ], 'pwr' => [
             'pwr' => false,
             // Need info ?
@@ -986,7 +957,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->dialog_params = ['_' => 'MadelineProto.dialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
         $this->full_chats = [];
 
-
     }
     public function resetUpdateState()
     {
@@ -1082,7 +1052,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         try {
             foreach ((yield $this->method_call_async_read('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
                 $tempkey = new \danog\MadelineProto\RSA($curkey['public_key']);
-                $this->rsa_keys[$tempkey->fp] = $tempkey;
+                $this->cdn_rsa_keys[$tempkey->fp] = $tempkey;
             }
         } catch (\danog\MadelineProto\TL\Exception $e) {
             $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::FATAL_ERROR);

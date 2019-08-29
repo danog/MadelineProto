@@ -24,6 +24,9 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use function Amp\Socket\connect;
+use danog\MadelineProto\Stream\BufferedStreamInterface;
+use danog\MadelineProto\Stream\BufferInterface;
+use danog\MadelineProto\Stream\RawStreamInterface;
 use Amp\ByteStream\ClosedException;
 
 /**
@@ -31,7 +34,7 @@ use Amp\ByteStream\ClosedException;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class BufferedRawStream implements \danog\MadelineProto\Stream\BufferedStreamInterface, \danog\MadelineProto\Stream\BufferInterface, \danog\MadelineProto\Stream\RawStreamInterface
+class BufferedRawStream implements BufferedStreamInterface, BufferInterface, RawStreamInterface
 {
     use RawStream;
 

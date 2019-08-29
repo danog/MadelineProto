@@ -175,12 +175,13 @@ trait Loop
             return;
         }
         $this->logger->logger($message);
+        $buffer = @ob_get_contents();
         @ob_end_clean();
         header('Connection: close');
         ignore_user_abort(true);
-        ob_start();
-        echo '<html><body><h1>'.$message.'</h1></body</html>';
-        $size = ob_get_length();
+        $buffer .= '<html><body><h1>'.htmlentities($message).'</h1></body></html>';
+        echo $buffer;
+        $size = max(ob_get_length(), strlen($buffer));
         header("Content-Length: $size");
         header('Content-Type: text/html');
         ob_end_flush();

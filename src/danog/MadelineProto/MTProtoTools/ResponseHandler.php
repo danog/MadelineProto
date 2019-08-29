@@ -376,6 +376,10 @@ trait ResponseHandler
 
                                 return;
                             }
+                            if (in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'RPC_CALL_FAIL', 'RPC_MCGET_FAIL', 'no workers running'])) {
+                                Loop::delay(1 * 1000, [$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                                return;
+                            }
                             $this->got_response_for_outgoing_message_id($request_id, $datacenter);
 
                             $this->handle_reject($datacenter, $request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));

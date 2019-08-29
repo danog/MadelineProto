@@ -159,6 +159,9 @@ class FeedLoop extends ResumableSignalLoop
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
                 $channelId = isset($update['message']['to_id']['channel_id']) ? $update['message']['to_id']['channel_id'] : false;
+                if (!$channelId) {
+                    return false;
+                }
                 break;
             case 'updateChannelWebPage':
             case 'updateDeleteChannelMessages':

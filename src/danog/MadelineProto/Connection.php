@@ -20,7 +20,6 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ClosedException;
 use Amp\Deferred;
-use Amp\Promise;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
 use danog\MadelineProto\Loop\Connection\ReadLoop;
@@ -42,6 +41,7 @@ class Connection
     use Crypt;
     use MsgIdHandler;
     use SeqNoHandler;
+    
     use \danog\Serializable;
     use Tools;
 
@@ -55,39 +55,23 @@ class Connection
 
     public $stream;
 
-    public $time_delta = 0;
     public $type = 0;
     public $peer_tag;
+    
     public $temp_auth_key;
     public $auth_key;
-    public $session_id;
-    public $session_out_seq_no = 0;
-    public $session_in_seq_no = 0;
-    public $incoming_messages = [];
-    public $outgoing_messages = [];
-    public $new_incoming = [];
-    public $new_outgoing = [];
+
+
     public $pending_outgoing = [];
     public $pending_outgoing_key = 0;
-    public $pending_outgoing_unencrypted = [];
-    public $pending_outgoing_unencrypted_key = 0;
-    public $max_incoming_id;
-    public $max_outgoing_id;
+
     public $authorized = false;
-    public $call_queue = [];
-    public $ack_queue = [];
-    public $i = [];
-    public $last_recv = 0;
-    public $last_http_wait = 0;
 
     public $datacenter;
     public $API;
-    public $resumeWriterDeferred;
-    public $ctx;
-    public $pendingCheckWatcherId;
 
-    public $http_req_count = 0;
-    public $http_res_count = 0;
+    public $ctx;
+
 
     public function getCtx()
     {
@@ -293,15 +277,5 @@ class Connection
     public function __sleep()
     {
         return ['peer_tag', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'max_incoming_id', 'max_outgoing_id', 'authorized', 'ack_queue'];
-    }
-
-    public function __wakeup()
-    {
-        $this->time_delta = 0;
-        $this->pending_outgoing = [];
-        $this->new_outgoing = [];
-        $this->new_incoming = [];
-        $this->outgoing_messages = [];
-        $this->incoming_messages = [];
     }
 }
