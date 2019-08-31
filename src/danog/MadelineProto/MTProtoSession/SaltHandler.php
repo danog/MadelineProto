@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Session module.
+ * SaltHandler module.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -16,32 +17,24 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\MTProtoTools;
-
-use danog\MadelineProto\Logger;
+namespace danog\MadelineProto\MTProtoSession;
 
 /**
- * Manages MTProto session-specific data
+ * Manages message ids.
  */
-abstract class Session
+trait SaltHandler
 {
-    use AckHandler;
-    use MsgIdHandler;
-    use ResponseHandler;
-    use SaltHandler;
-    use SeqNoHandler;
+    public function add_salts($salts)
+    {
+        foreach ($salts as $salt) {
+            $this->add_salt($salt['valid_since'], $salt['valid_until'], $salt['salt']);
+        }
+    }
 
-    public $incoming_messages = [];
-    public $outgoing_messages = [];
-    public $new_incoming = [];
-    public $new_outgoing = [];
-
-    public $pending_outgoing = [];
-    public $pending_outgoing_key = 0;
-
-    public $time_delta = 0;
-
-    public $call_queue = [];
-    public $ack_queue = [];
-
+    public function add_salt($valid_since, $valid_until, $salt)
+    {
+        if (!isset($this->temp_auth_key['salts'][$salt])) {
+            $this->temp_auth_key['salts'][$salt] = ['valid_since' => $valid_since, 'valid_until' => $valid_until];
+        }
+    }
 }

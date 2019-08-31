@@ -88,6 +88,13 @@ class Connection extends Session
     protected $API;
 
     /**
+     * DC ID
+     *
+     * @var string
+     */
+    protected $datacenter;
+
+    /**
      * Whether the socket is reading data.
      *
      * @var boolean

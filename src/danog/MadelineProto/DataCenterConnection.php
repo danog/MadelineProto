@@ -155,7 +155,8 @@ class DataCenterConnection
 
         $this->connections = [];
         for ($x = 0; $x < $count; $x++) {
-            $this->connections[$x] = yield $ctx->getStream();
+            $this->connections[$x] = new Connection();
+            yield $this->connections[$x]->connect(yield $ctx->getStream());
             $ctx = $this->ctx->getCtx();
         }
     }

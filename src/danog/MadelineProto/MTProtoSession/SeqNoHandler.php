@@ -17,7 +17,7 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\MTProtoTools;
+namespace danog\MadelineProto\MTProtoSession;
 
 /**
  * Manages sequence number.
