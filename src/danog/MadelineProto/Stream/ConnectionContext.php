@@ -48,6 +48,12 @@ class ConnectionContext
      */
     private $test = false;
     /**
+     * Whether to use media servers.
+     *
+     * @var bool
+     */
+    private $media = false;
+    /**
      * The connection URI.
      *
      * @var \Amp\Uri\Uri
@@ -95,6 +101,13 @@ class ConnectionContext
      * @var int
      */
     private $key = 0;
+
+    /**
+     * Read callback
+     *
+     * @var callable
+     */
+    private $readCallback;
 
     /**
      * Set the socket context.
@@ -187,9 +200,9 @@ class ConnectionContext
         return clone $this;
     }
     /**
-     * Set the secure boolean.
+     * Set the test boolean.
      *
-     * @param bool $secure
+     * @param bool $test
      *
      * @return self
      */
@@ -201,13 +214,22 @@ class ConnectionContext
     }
 
     /**
-     * Whether to use TLS with socket connections.
+     * Whether this is a test connection
      *
      * @return bool
      */
     public function isTest(): bool
     {
         return $this->test;
+    }
+    /**
+     * Whether this is a media connection
+     *
+     * @return bool
+     */
+    public function isMedia(): bool
+    {
+        return $this->media;
     }
 
     /**
@@ -269,6 +291,7 @@ class ConnectionContext
             throw new Exception("Invalid DC id provided: $dc");
         }
         $this->dc = $dc;
+        $this->media = strpos($dc, '_media') !== false;
 
         return $this;
     }
@@ -294,7 +317,7 @@ class ConnectionContext
         if ($this->test) {
             $dc += 10000;
         }
-        if (strpos($this->dc, '_media')) {
+        if ($this->media) {
             $dc = -$dc;
         }
 
@@ -339,6 +362,38 @@ class ConnectionContext
         $this->key = count($this->nextStreams) - 1;
 
         return $this;
+    }
+
+    /**
+     * Set read callback, called every time the socket reads at least a byte
+     *
+     * @param callback $callable Read callback
+     * 
+     * @return void
+     */
+    public function setReadCallback($callable)
+    {
+        $this->readCallback = $callable;
+    }
+
+    /**
+     * Check if a read callback is present
+     *
+     * @return boolean
+     */
+    public function hasReadCallback(): bool
+    {
+        return $this->readCallback !== null;
+    }
+
+    /**
+     * Get read callback
+     *
+     * @return callable
+     */
+    public function getReadCallback()
+    {
+        return $this->readCallback;
     }
 
     /**

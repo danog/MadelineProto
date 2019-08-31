@@ -18,42 +18,30 @@
 
 namespace danog\MadelineProto\Stream\MTProtoTools;
 
+use danog\MadelineProto\Logger;
+
 /**
  * Manages MTProto session-specific data
  */
-class Session
+abstract class Session
 {
+    use AckHandler;
     use MsgIdHandler;
+    use ResponseHandler;
     use SaltHandler;
     use SeqNoHandler;
+
     public $incoming_messages = [];
     public $outgoing_messages = [];
     public $new_incoming = [];
     public $new_outgoing = [];
 
-    public $http_req_count = 0;
-    public $http_res_count = 0;
-
-    public $last_http_wait = 0;
-    private $last_chunk = 0;
+    public $pending_outgoing = [];
+    public $pending_outgoing_key = 0;
 
     public $time_delta = 0;
 
     public $call_queue = [];
     public $ack_queue = [];
 
-    
-    public function haveRead()
-    {
-        $this->last_chunk = microtime(true);
-    }
-    /**
-     * Get the receive date of the latest chunk of data from the socket
-     *
-     * @return void
-     */
-    public function getLastChunk()
-    {
-        return $this->last_chunk;
-    }
 }

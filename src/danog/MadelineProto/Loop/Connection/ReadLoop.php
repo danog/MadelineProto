@@ -38,14 +38,25 @@ class ReadLoop extends SignalLoop
     use Tools;
     use Crypt;
 
+    /**
+     * Connection instance
+     *
+     * @var \danog\Madelineproto\Connection
+     */
     protected $connection;
+    /**
+     * DC ID
+     *
+     * @var string
+     */
     protected $datacenter;
 
-    public function __construct($API, $datacenter)
+    public function __construct(Connection $connection)
     {
-        $this->API = $API;
-        $this->datacenter = $datacenter;
-        $this->connection = $API->datacenter->sockets[$datacenter];
+        $this->connection = $connection;
+        $this->API = $connection->getExtra();
+        $ctx = $connection->getCtx();
+        $this->datacenter = $ctx->getDc();
     }
 
     public function loop()
@@ -99,7 +110,7 @@ class ReadLoop extends SignalLoop
                 return;
             }
 
-            $connection->http_res_count++;
+            $connection->httpReceived();
 
             Loop::defer([$API, 'handle_messages'], $datacenter);
 
@@ -214,7 +225,7 @@ class ReadLoop extends SignalLoop
         $connection->incoming_messages[$message_id]['content'] = $deserialized;
         $connection->incoming_messages[$message_id]['response'] = -1;
         $connection->new_incoming[$message_id] = $message_id;
-        $connection->last_http_wait = 0;
+        //$connection->last_http_wait = 0;
 
         $API->logger->logger('Received payload from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 

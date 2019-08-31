@@ -80,6 +80,21 @@ class DataCenter
         return ['sockets', 'curdc', 'dclist', 'settings'];
     }
 
+    public function __wakeup()
+    {
+        foreach ($this->sockets as &$socket) {
+            if ($socket instanceof Connection) {
+                $new = new DataCenterConnection;
+                if ($socket->temp_auth_key) {
+                    $new->setAuthKey($socket->temp_auth_key, true);
+                }
+                if ($socket->auth_key) {
+                    $new->setAuthKey($socket->auth_key, false);
+                }
+                $new->authorized($socket->authorized);
+            }
+        }
+    }
     public function __magic_construct($API, $dclist, $settings, CookieJar $jar = null)
     {
         $this->API = $API;
@@ -328,8 +343,7 @@ class DataCenter
 
                     continue; // Could not connect to host, try next host in the list.
                 }
-                if ($dc = $ctx->getDc()) {
-                    $callback = [$this->sockets[$dc], 'haveRead'];
+                if ($ctx->hasReadCallback()) {
                     $socket = new class($socket) extends ClientSocket
                     {
                         private $callback;
@@ -350,7 +364,7 @@ class DataCenter
                             return $promise;
                         }
                     };
-                    $socket->setReadCallback($callback);
+                    $socket->setReadCallback($ctx->getReadCallback());
                 } else {
                     $socket = new ClientSocket($socket);
                 }

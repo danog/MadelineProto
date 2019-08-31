@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SeqNoHandler module.
+ * SaltHandler module.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -17,19 +17,24 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\MTProtoTools;
-
-use danog\MadelineProto\MTProto;
+namespace danog\MadelineProto\Stream\MTProtoTools;
 
 /**
- * Manages sequence number.
+ * Manages message ids.
  */
-trait SeqNoHandler
+trait SaltHandler
 {
-    public function content_related($method)
+    public function add_salts($salts)
     {
-        $method = is_array($method) && isset($method['_']) ? $method['_'] : $method;
+        foreach ($salts as $salt) {
+            $this->add_salt($salt['valid_since'], $salt['valid_until'], $salt['salt']);
+        }
+    }
 
-        return is_string($method) ? !in_array($method, MTProto::NOT_CONTENT_RELATED) : true;
+    public function add_salt($valid_since, $valid_until, $salt)
+    {
+        if (!isset($this->temp_auth_key['salts'][$salt])) {
+            $this->temp_auth_key['salts'][$salt] = ['valid_since' => $valid_since, 'valid_until' => $valid_until];
+        }
     }
 }

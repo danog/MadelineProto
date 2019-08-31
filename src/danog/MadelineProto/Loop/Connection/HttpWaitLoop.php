@@ -18,6 +18,7 @@
 
 namespace danog\MadelineProto\Loop\Connection;
 
+use danog\MadelineProto\Connection;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
@@ -29,14 +30,25 @@ use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
  */
 class HttpWaitLoop extends ResumableSignalLoop
 {
+    /**
+     * Connection instance
+     *
+     * @var \danog\Madelineproto\Connection
+     */
     protected $connection;
+    /**
+     * DC ID
+     *
+     * @var string
+     */
     protected $datacenter;
 
-    public function __construct($API, $datacenter)
+    public function __construct(Connection $connection)
     {
-        $this->API = $API;
-        $this->datacenter = $datacenter;
-        $this->connection = $API->datacenter->sockets[$datacenter];
+        $this->connection = $connection;
+        $this->API = $connection->getExtra();
+        $ctx = $connection->getCtx();
+        $this->datacenter = $ctx->getDc();
     }
 
     public function loop()
@@ -62,11 +74,11 @@ class HttpWaitLoop extends ResumableSignalLoop
                     return;
                 }
             }
-            $API->logger->logger("DC $datacenter: request {$connection->http_req_count}, response {$connection->http_res_count}");
-            if ($connection->http_req_count === $connection->http_res_count && (!empty($connection->pending_outgoing) || (!empty($connection->new_outgoing) && !$connection->hasPendingCalls()))) {
+            $API->logger->logger("DC $datacenter: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
+            if ($connection->countHttpSent() === $connection->countHttpReceived() && (!empty($connection->pending_outgoing) || (!empty($connection->new_outgoing) && !$connection->hasPendingCalls()))) {
                 yield $connection->sendMessage(['_' => 'http_wait', 'body' => ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'content_related' => true, 'unencrypted' => false, 'method' => false]);
             }
-            $API->logger->logger("DC $datacenter: request {$connection->http_req_count}, response {$connection->http_res_count}");
+            $API->logger->logger("DC $datacenter: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
         }
     }
 

@@ -72,7 +72,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     /*
     const V = 71;
      */
-    const V = 128;
+    const V = 129;
     const RELEASE = '4.0';
     const NOT_LOGGED_IN = 0;
     const WAITING_CODE = 1;
@@ -704,6 +704,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 'transport' => 'tcp',
                 'pfs' => extension_loaded('gmp'),
             ],
+            'media_socket_count' => 5,
             'default_dc' => 2,
         ], 'app_info' => [
             // obtained in https://my.telegram.org
@@ -1097,6 +1098,12 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->logger->logger('Got new DC options, reconnecting');
         yield $this->connect_to_all_dcs_async();
         $this->datacenter->curdc = $curdc;
+    }
+    public function content_related($method)
+    {
+        $method = is_array($method) && isset($method['_']) ? $method['_'] : $method;
+
+        return is_string($method) ? !in_array($method, MTProto::NOT_CONTENT_RELATED) : true;
     }
 
     public function get_self_async()

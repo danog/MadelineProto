@@ -36,14 +36,25 @@ class WriteLoop extends ResumableSignalLoop
     use Crypt;
     use Tools;
 
+    /**
+     * Connection instance
+     *
+     * @var \danog\Madelineproto\Connection
+     */
     protected $connection;
+    /**
+     * DC ID
+     *
+     * @var string
+     */
     protected $datacenter;
 
-    public function __construct($API, $datacenter)
+    public function __construct(Connection $connection)
     {
-        $this->API = $API;
-        $this->datacenter = $datacenter;
-        $this->connection = $API->datacenter->sockets[$datacenter];
+        $this->connection = $connection;
+        $this->API = $connection->getExtra();
+        $ctx = $connection->getCtx();
+        $this->datacenter = $ctx->getDc();
     }
 
     public function loop(): \Generator
@@ -110,7 +121,7 @@ class WriteLoop extends ResumableSignalLoop
                 yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.$this->pack_unsigned_int($length).$message['serialized_body'].$pad);
 
                 //var_dump("plain ".bin2hex($message_id));
-                $connection->http_req_count++;
+                $connection->httpSent();
                 $connection->outgoing_messages[$message_id] = $message;
                 $connection->outgoing_messages[$message_id]['sent'] = time();
                 $connection->outgoing_messages[$message_id]['tries'] = 0;
@@ -303,7 +314,7 @@ class WriteLoop extends ResumableSignalLoop
             $t = microtime(true);
             yield $buffer->bufferWrite($message);
 
-            $connection->http_req_count++;
+            $connection->httpSent();
 
             $API->logger->logger("Sent encrypted payload to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
@@ -313,11 +324,11 @@ class WriteLoop extends ResumableSignalLoop
                 $connection->ack_queue = [];
             }
 
-            if ($has_http_wait) {
+            /*if ($has_http_wait) {
                 $connection->last_http_wait = $sent;
             } elseif (Magic::$altervista) {
                 $connection->last_http_wait = PHP_INT_MAX;
-            }
+            }*/
 
             foreach ($keys as $key => $message_id) {
                 $connection->outgoing_messages[$message_id] = &$connection->pending_outgoing[$key];

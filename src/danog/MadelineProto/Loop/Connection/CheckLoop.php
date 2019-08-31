@@ -20,6 +20,7 @@ namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\Deferred;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use danog\MadelineProto\MTProto;
 
 /**
  * RPC call status check loop.
@@ -28,14 +29,25 @@ use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
  */
 class CheckLoop extends ResumableSignalLoop
 {
+    /**
+     * Connection instance
+     *
+     * @var \danog\Madelineproto\Connection
+     */
     protected $connection;
+    /**
+     * DC ID
+     *
+     * @var string
+     */
     protected $datacenter;
 
-    public function __construct($API, $datacenter)
+    public function __construct(Connection $connection)
     {
-        $this->API = $API;
-        $this->datacenter = $datacenter;
-        $this->connection = $API->datacenter->sockets[$datacenter];
+        $this->connection = $connection;
+        $this->API = $connection->getExtra();
+        $ctx = $connection->getCtx();
+        $this->datacenter = $ctx->getDc();
     }
 
     public function loop()
@@ -90,7 +102,7 @@ class CheckLoop extends ResumableSignalLoop
                                         case 2:
                                         case 3:
                                             if ($connection->outgoing_messages[$message_id]['_'] === 'msgs_state_req') {
-                                                $API->got_response_for_outgoing_message_id($message_id, $datacenter);
+                                                $connection->got_response_for_outgoing_message_id($message_id);
                                                 break;
                                             }
                                             $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.($message_id).' not received by server, resending...', \danog\MadelineProto\Logger::ERROR);

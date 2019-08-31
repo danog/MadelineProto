@@ -35,6 +35,11 @@ abstract class Loop implements LoopInterface
 
     private $count = 0;
 
+    /**
+     * MTProto instance
+     *
+     * @var \danog\MadelineProto\MTProto
+     */
     public $API;
 
     public function __construct($API)

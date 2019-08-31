@@ -24,10 +24,8 @@ use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
 use danog\MadelineProto\Loop\Connection\ReadLoop;
 use danog\MadelineProto\Loop\Connection\WriteLoop;
-use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\MTProtoTools\MsgIdHandler;
-use danog\MadelineProto\Stream\MTProtoTools\SeqNoHandler;
+use danog\MadelineProto\Stream\MTProtoTools\Session;
 
 /**
  * Connection class.
@@ -36,44 +34,176 @@ use danog\MadelineProto\Stream\MTProtoTools\SeqNoHandler;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class Connection
+class Connection extends Session
 {
-    use Crypt;
-    use MsgIdHandler;
-    use SeqNoHandler;
-    
     use \danog\Serializable;
     use Tools;
 
-    const API_ENDPOINT = 0;
-    const VOIP_UDP_REFLECTOR_ENDPOINT = 1;
-    const VOIP_TCP_REFLECTOR_ENDPOINT = 2;
-    const VOIP_UDP_P2P_ENDPOINT = 3;
-    const VOIP_UDP_LAN_ENDPOINT = 4;
-
     const PENDING_MAX = 2000000000;
 
-    public $stream;
+    /**
+     * The actual socket
+     *
+     * @var Stream
+     */
+    private $stream;
+    /**
+     * Connection context
+     *
+     * @var Connection context
+     */
+    private $ctx;
 
-    public $type = 0;
-    public $peer_tag;
-    
-    public $temp_auth_key;
-    public $auth_key;
+    /**
+     * HTTP request count
+     *
+     * @var integer
+     */
+    private $httpReqCount = 0;
+    /**
+     * HTTP response count
+     *
+     * @var integer
+     */
+    private $httpResCount = 0;
+
+    /**
+     * Date of last chunk received
+     *
+     * @var integer
+     */
+    private $lastChunk = 0;
+
+    /**
+     * Logger instance.
+     *
+     * @var Logger
+     */
+    protected $logger;
+    /**
+     * Main instance.
+     *
+     * @var MTProto
+     */
+    protected $API;
+
+    /**
+     * Whether the socket is reading data.
+     *
+     * @var boolean
+     */
+    private $reading = false;
+    /**
+     * Whether the socket is writing data.
+     *
+     * @var boolean
+     */
+    private $writing = false;
+
+    /**
+     * Check if the socket is writing stuff.
+     *
+     * @return boolean
+     */
+    public function isWriting(): bool
+    {
+        return $this->writing;
+    }
+    /**
+     * Check if the socket is reading stuff.
+     *
+     * @return boolean
+     */
+    public function isReading(): bool
+    {
+        return $this->reading;
+    }
+    /**
+     * Set writing boolean
+     *
+     * @param boolean $writing
+     * 
+     * @return void
+     */
+    public function writing(bool $writing)
+    {
+        $this->writing = $writing;
+    }
+    /**
+     * Set reading boolean
+     *
+     * @param boolean $reading
+     * 
+     * @return void
+     */
+    public function reading(bool $reading)
+    {
+        $this->reading = $reading;
+    }
+
+    /**
+     * Tell the class that we have read a chunk of data from the socket
+     *
+     * @return void
+     */
+    public function haveRead()
+    {
+        $this->lastChunk = \microtime(true);
+    }
+    /**
+     * Get the receive date of the latest chunk of data from the socket.
+     *
+     * @return void
+     */
+    public function getLastChunk()
+    {
+        return $this->lastChunk;
+    }
+
+    /**
+     * Indicate a received HTTP response
+     *
+     * @return void
+     */
+    public function httpReceived()
+    {
+        $this->httpResCount++;
+    }
+    /**
+     * Count received HTTP responses
+     *
+     * @return integer
+     */
+    public function countHttpReceived(): int
+    {
+        return $this->httpResCount;
+    }
+    /**
+     * Indicate a sent HTTP request
+     *
+     * @return void
+     */
+    public function httpSent()
+    {
+        $this->httpReqCount++;
+    }
+    /**
+     * Count sent HTTP requests
+     *
+     * @return integer
+     */
+    public function countHttpSent(): int
+    {
+        return $this->httpReqCount;
+    }
 
 
-    public $pending_outgoing = [];
-    public $pending_outgoing_key = 0;
-
-    public $authorized = false;
-
-    public $datacenter;
-    public $API;
-
-    public $ctx;
-
-
-    public function getCtx()
+    /**
+     * Get connection context
+     *
+     * @return ConnectionContext
+     */
+    public function getCtx(): ConnectionContext
     {
         return $this->ctx;
     }
@@ -93,6 +223,8 @@ class Connection
     {
         $this->API->logger->logger("Trying connection via $ctx", \danog\MadelineProto\Logger::WARNING);
 
+        $ctx->setReadCallback([$this, 'haveRead']);
+
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
         $this->stream = yield $ctx->getStream();
@@ -101,16 +233,16 @@ class Connection
         }
 
         if (!isset($this->writer)) {
-            $this->writer = new WriteLoop($this->API, $this->datacenter);
+            $this->writer = new WriteLoop($this);
         }
         if (!isset($this->reader)) {
-            $this->reader = new ReadLoop($this->API, $this->datacenter);
+            $this->reader = new ReadLoop($this);
         }
         if (!isset($this->checker)) {
-            $this->checker = new CheckLoop($this->API, $this->datacenter);
+            $this->checker = new CheckLoop($this);
         }
         if (!isset($this->waiter)) {
-            $this->waiter = new HttpWaitLoop($this->API, $this->datacenter);
+            $this->waiter = new HttpWaitLoop($this);
         }
         foreach ($this->new_outgoing as $message_id) {
             if ($this->outgoing_messages[$message_id]['unencrypted']) {
@@ -118,12 +250,11 @@ class Connection
                 \Amp\Loop::defer(function () use ($promise) {
                     $promise->fail(new Exception('Restart because we were reconnected'));
                 });
-                unset($this->new_outgoing[$message_id]);
-                unset($this->outgoing_messages[$message_id]);
+                unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
             }
         }
-        $this->http_req_count = 0;
-        $this->http_res_count = 0;
+        $this->httpReqCount = 0;
+        $this->httpResCount = 0;
 
         $this->writer->start();
         $this->reader->start();
@@ -138,7 +269,7 @@ class Connection
         $deferred = new Deferred();
 
         if (!isset($message['serialized_body'])) {
-            $body = is_object($message['body']) ? yield $message['body'] : $message['body'];
+            $body = \is_object($message['body']) ? yield $message['body'] : $message['body'];
 
             $refresh_next = isset($message['refresh_next']) && $message['refresh_next'];
             //$refresh_next = true;
@@ -169,11 +300,28 @@ class Connection
         return $deferred->promise();
     }
 
-    public function setExtra($extra)
+    /**
+     * Connect main instance.
+     *
+     * @param MTProto $extra
+     *
+     * @return void
+     */
+    public function setExtra(MTProto $extra)
     {
         $this->API = $extra;
+        $this->logger = $extra->logger;
     }
 
+    /**
+     * Get main instance
+     *
+     * @return MTProto
+     */
+    public function getExtra(): MTProto
+    {
+        return $this->API;
+    }
     public function disconnect()
     {
         $this->API->logger->logger("Disconnecting from DC {$this->datacenter}");
@@ -220,7 +368,7 @@ class Connection
 
         foreach ($this->new_outgoing as $message_id) {
             if (isset($this->outgoing_messages[$message_id]['sent'])
-                && $this->outgoing_messages[$message_id]['sent'] + $timeout < time()
+                && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time()
                 && ($this->temp_auth_key === null) === $this->outgoing_messages[$message_id]['unencrypted']
                 && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
             ) {
@@ -247,7 +395,7 @@ class Connection
         $result = [];
         foreach ($this->new_outgoing as $message_id) {
             if (isset($this->outgoing_messages[$message_id]['sent'])
-                && $this->outgoing_messages[$message_id]['sent'] + $timeout < time()
+                && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time()
                 && ($this->temp_auth_key === null) === $this->outgoing_messages[$message_id]['unencrypted']
                 && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
             ) {

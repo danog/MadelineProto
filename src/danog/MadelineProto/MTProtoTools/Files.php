@@ -266,7 +266,7 @@ trait Files
             $part_num++;
             $promises[] = $read_deferred->promise();
 
-            if (!($part_num % $parallel_chunks)) { // 20 mb at a time, for a typical bandwidth of 1gbps (run the code in this if every second)
+            if (!($part_num % $parallel_chunks)) { // 20 mb at a time, for a typical bandwidth of 1gbps (run the code in this every second)
                 $result = yield $this->all($promises);
                 foreach ($result as $kkey => $result) {
                     if (!$result) {
