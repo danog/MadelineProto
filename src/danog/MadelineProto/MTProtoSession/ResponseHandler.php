@@ -385,7 +385,6 @@ trait ResponseHandler
 
                             return;
                         case 303:
-                            $old_datacenter = $datacenter;
                             $this->API->datacenter->curdc = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
 
                             if (isset($request['file']) && $request['file'] && isset($this->API->datacenter->sockets[$datacenter.'_media'])) {
@@ -396,8 +395,8 @@ trait ResponseHandler
                             if (isset($request['user_related']) && $request['user_related']) {
                                 $this->settings['connection_settings']['default_dc'] = $this->API->authorized_dc = $this->API->datacenter->curdc;
                             }
-                            Loop::defer([$this->API, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter, 'old_datacenter' => $old_datacenter]);
-                            //$this->API->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'old_datacenter' => $old_datacenter, 'postpone' => true]);
+                            Loop::defer([$this->API, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                            //$this->API->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
 
                             return;
                         case 401:

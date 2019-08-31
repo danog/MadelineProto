@@ -740,6 +740,27 @@ class DataCenter
         return yield (yield $this->getHTTPClient()->request($url))->getBody();
     }
 
+    /**
+     * Get Connection instance
+     *
+     * @param string $dc
+     * @return Connection
+     */
+    public function getConnection(string $dc): Connection
+    {
+        return $this->sockets[$dc]->getConnection();
+    }
+    /**
+     * Check if a DC is present
+     *
+     * @param string $dc DC ID
+     * 
+     * @return boolean
+     */
+    public function has(string $dc): bool
+    {
+        return isset($this->sockets[$dc]);
+    }
     public function get_dcs($all = true)
     {
         $test = $this->settings['all']['test_mode'] ? 'test' : 'main';

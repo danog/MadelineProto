@@ -28,6 +28,7 @@ abstract class Session
     use ResponseHandler;
     use SaltHandler;
     use SeqNoHandler;
+    use CallHandler;
 
     public $incoming_messages = [];
     public $outgoing_messages = [];
@@ -41,4 +42,6 @@ abstract class Session
 
     public $call_queue = [];
     public $ack_queue = [];
+
+
 }

@@ -20,6 +20,7 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ClosedException;
 use Amp\Deferred;
+use Amp\Promise;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
 use danog\MadelineProto\Loop\Connection\ReadLoop;
@@ -42,33 +43,57 @@ class Connection extends Session
     const PENDING_MAX = 2000000000;
 
     /**
-     * The actual socket
+     * Writer loop.
+     *
+     * @var \danog\MadelineProto\Loop\Connection\WriteLoop
+     */
+    protected $writer;
+    /**
+     * Reader loop.
+     *
+     * @var \danog\MadelineProto\Loop\Connection\ReadLoop
+     */
+    protected $reader;
+    /**
+     * Checker loop.
+     *
+     * @var \danog\MadelineProto\Loop\Connection\CheckLoop
+     */
+    protected $checker;
+    /**
+     * Waiter loop.
+     *
+     * @var \danog\MadelineProto\Loop\Connection\HttpWaitLoop
+     */
+    protected $waiter;
+    /**
+     * The actual socket.
      *
      * @var Stream
      */
     private $stream;
     /**
-     * Connection context
+     * Connection context.
      *
-     * @var Connection context
+     * @var ConnectionContext
      */
     private $ctx;
 
     /**
-     * HTTP request count
+     * HTTP request count.
      *
      * @var integer
      */
     private $httpReqCount = 0;
     /**
-     * HTTP response count
+     * HTTP response count.
      *
      * @var integer
      */
     private $httpResCount = 0;
 
     /**
-     * Date of last chunk received
+     * Date of last chunk received.
      *
      * @var integer
      */
@@ -86,9 +111,15 @@ class Connection extends Session
      * @var MTProto
      */
     protected $API;
+    /**
+     * Shared connection instance.
+     *
+     * @var DataCenterConnection
+     */
+    protected $shared;
 
     /**
-     * DC ID
+     * DC ID.
      *
      * @var string
      */
@@ -106,6 +137,19 @@ class Connection extends Session
      * @var boolean
      */
     private $writing = false;
+
+    /**
+     * Writing callback.
+     *
+     * @var callable
+     */
+    private $writingCallback;
+    /**
+     * Reading callback.
+     *
+     * @var callable
+     */
+    private $readingCallback;
 
     /**
      * Check if the socket is writing stuff.
@@ -126,30 +170,32 @@ class Connection extends Session
         return $this->reading;
     }
     /**
-     * Set writing boolean
+     * Set writing boolean.
      *
      * @param boolean $writing
-     * 
+     *
      * @return void
      */
     public function writing(bool $writing)
     {
         $this->writing = $writing;
+        ($this->writingCallback)($writing);
     }
     /**
-     * Set reading boolean
+     * Set reading boolean.
      *
      * @param boolean $reading
-     * 
+     *
      * @return void
      */
     public function reading(bool $reading)
     {
         $this->reading = $reading;
+        ($this->readingCallback)($writing);
     }
 
     /**
-     * Tell the class that we have read a chunk of data from the socket
+     * Tell the class that we have read a chunk of data from the socket.
      *
      * @return void
      */
@@ -168,7 +214,7 @@ class Connection extends Session
     }
 
     /**
-     * Indicate a received HTTP response
+     * Indicate a received HTTP response.
      *
      * @return void
      */
@@ -177,7 +223,7 @@ class Connection extends Session
         $this->httpResCount++;
     }
     /**
-     * Count received HTTP responses
+     * Count received HTTP responses.
      *
      * @return integer
      */
@@ -186,7 +232,7 @@ class Connection extends Session
         return $this->httpResCount;
     }
     /**
-     * Indicate a sent HTTP request
+     * Indicate a sent HTTP request.
      *
      * @return void
      */
@@ -195,7 +241,7 @@ class Connection extends Session
         $this->httpReqCount++;
     }
     /**
-     * Count sent HTTP requests
+     * Count sent HTTP requests.
      *
      * @return integer
      */
@@ -206,7 +252,7 @@ class Connection extends Session
 
 
     /**
-     * Get connection context
+     * Get connection context.
      *
      * @return ConnectionContext
      */
@@ -271,7 +317,41 @@ class Connection extends Session
         $this->waiter->start();
     }
 
-    public function sendMessage($message, $flush = true)
+    /**
+     * Send an MTProto message.
+     *
+     * Structure of message array:
+     * [
+     *     // only in outgoing messages
+     *     'body' => deserialized body, (optional if container)
+     *     'serialized_body' => 'serialized body', (optional if container)
+     *     'content_related' => bool,
+     *     '_' => 'predicate',
+     *     'promise' => deferred promise that gets resolved when a response to the message is received (optional),
+     *     'send_promise' => deferred promise that gets resolved when the message is sent (optional),
+     *     'file' => bool (optional),
+     *     'type' => 'type' (optional),
+     *     'queue' => queue ID (optional),
+     *     'container' => [message ids] (optional),
+     *
+     *     // only in incoming messages
+     *     'content' => deserialized body,
+     *     'seq_no' => number (optional),
+     *     'from_container' => bool (optional),
+     *
+     *     // can be present in both
+     *     'response' => message id (optional),
+     *     'msg_id' => message id (optional),
+     *     'sent' => timestamp,
+     *     'tries' => number
+     * ]
+     *
+     * @param array   $message The message to send
+     * @param boolean $flush   Whether to flush the message right away
+     * 
+     * @return Promise
+     */
+    public function sendMessage(array $message, bool $flush = true): Promise
     {
         $deferred = new Deferred();
 
@@ -314,14 +394,17 @@ class Connection extends Session
      *
      * @return void
      */
-    public function setExtra(MTProto $extra)
+    public function setExtra(DataCenterConnection $extra, $readingCallback, $writingCallback)
     {
-        $this->API = $extra;
-        $this->logger = $extra->logger;
+        $this->shared = $extra;
+        $this->readingCallback = $readingCallback;
+        $this->writingCallback = $writingCallback;
+        $this->API = $extra->getExtra();
+        $this->logger = $this->API->logger;
     }
 
     /**
-     * Get main instance
+     * Get main instance.
      *
      * @return MTProto
      */
@@ -329,6 +412,12 @@ class Connection extends Session
     {
         return $this->API;
     }
+
+    /**
+     * Disconnect from DC
+     *
+     * @return void
+     */
     public function disconnect()
     {
         $this->API->logger->logger("Disconnecting from DC {$this->datacenter}");
@@ -347,7 +436,12 @@ class Connection extends Session
         }
         $this->API->logger->logger("Disconnected from DC {$this->datacenter}");
     }
-
+    
+    /**
+     * Reconnect to DC
+     *
+     * @return \Generator
+     */
     public function reconnect(): \Generator
     {
         $this->API->logger->logger("Reconnecting DC {$this->datacenter}");
@@ -364,59 +458,11 @@ class Connection extends Session
         }
     }
 
-    public function hasPendingCalls()
-    {
-        $API = $this->API;
-        $datacenter = $this->datacenter;
-
-        $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
-        $timeout = $API->settings['connection_settings'][$dc_config_number]['timeout'];
-        $pfs = $API->settings['connection_settings'][$dc_config_number]['pfs'];
-
-        foreach ($this->new_outgoing as $message_id) {
-            if (isset($this->outgoing_messages[$message_id]['sent'])
-                && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time()
-                && ($this->temp_auth_key === null) === $this->outgoing_messages[$message_id]['unencrypted']
-                && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
-            ) {
-                if ($pfs && !isset($this->temp_auth_key['bound']) && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
-                    continue;
-                }
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function getPendingCalls()
-    {
-        $API = $this->API;
-        $datacenter = $this->datacenter;
-
-        $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
-        $timeout = $API->settings['connection_settings'][$dc_config_number]['timeout'];
-        $pfs = $API->settings['connection_settings'][$dc_config_number]['pfs'];
-
-        $result = [];
-        foreach ($this->new_outgoing as $message_id) {
-            if (isset($this->outgoing_messages[$message_id]['sent'])
-                && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time()
-                && ($this->temp_auth_key === null) === $this->outgoing_messages[$message_id]['unencrypted']
-                && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
-            ) {
-                if ($pfs && !isset($this->temp_auth_key['bound']) && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
-                    continue;
-                }
-
-                $result[] = $message_id;
-            }
-        }
-
-        return $result;
-    }
-
+    /**
+     * Get name
+     *
+     * @return string
+     */
     public function getName(): string
     {
         return __CLASS__;

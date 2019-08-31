@@ -78,4 +78,71 @@ trait AckHandler
 
         return true;
     }
+
+
+
+
+    /**
+     * Check if there are some pending calls
+     *
+     * @return boolean
+     */
+    public function hasPendingCalls()
+    {
+        $API = $this->API;
+        $datacenter = $this->datacenter;
+
+        $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
+        $timeout = $API->settings['connection_settings'][$dc_config_number]['timeout'];
+        $pfs = $API->settings['connection_settings'][$dc_config_number]['pfs'];
+
+        foreach ($this->new_outgoing as $message_id) {
+            if (isset($this->outgoing_messages[$message_id]['sent'])
+                && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time()
+                && ($this->temp_auth_key === null) === $this->outgoing_messages[$message_id]['unencrypted']
+                && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
+            ) {
+                if ($pfs && !isset($this->temp_auth_key['bound']) && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+                    continue;
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get all pending calls
+     *
+     * @return void
+     */
+    public function getPendingCalls()
+    {
+        $API = $this->API;
+        $datacenter = $this->datacenter;
+
+        $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
+        $timeout = $API->settings['connection_settings'][$dc_config_number]['timeout'];
+        $pfs = $API->settings['connection_settings'][$dc_config_number]['pfs'];
+
+        $result = [];
+        foreach ($this->new_outgoing as $message_id) {
+            if (isset($this->outgoing_messages[$message_id]['sent'])
+                && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time()
+                && ($this->temp_auth_key === null) === $this->outgoing_messages[$message_id]['unencrypted']
+                && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
+            ) {
+                if ($pfs && !isset($this->temp_auth_key['bound']) && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+                    continue;
+                }
+
+                $result[] = $message_id;
+            }
+        }
+
+        return $result;
+    }
+
 }

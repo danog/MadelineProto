@@ -106,7 +106,7 @@ class CheckLoop extends ResumableSignalLoop
                                                 break;
                                             }
                                             $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.($message_id).' not received by server, resending...', \danog\MadelineProto\Logger::ERROR);
-                                            $API->method_recall('watcherId', ['message_id' => $message_id, 'datacenter' => $datacenter, 'postpone' => true]);
+                                            $connection->method_recall('watcherId', ['message_id' => $message_id, 'postpone' => true]);
                                             break;
                                         case 4:
                                             if ($chr & 32) {
@@ -144,7 +144,7 @@ class CheckLoop extends ResumableSignalLoop
                             && $connection->outgoing_messages[$message_id]['unencrypted']
                         ) {
                             $API->logger->logger('Still missing '.$connection->outgoing_messages[$message_id]['_'].' with message id '.($message_id)." on DC $datacenter, resending", \danog\MadelineProto\Logger::ERROR);
-                            $API->method_recall('', ['message_id' => $message_id, 'datacenter' => $datacenter, 'postpone' => true]);
+                            $connection->method_recall('', ['message_id' => $message_id, 'postpone' => true]);
                         }
                     }
                     $connection->writer->resume();

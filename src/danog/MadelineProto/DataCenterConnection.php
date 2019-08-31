@@ -18,6 +18,7 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Promise;
 use danog\MadelineProto\Stream\ConnectionContext;
 
 class DataCenterConnection
@@ -43,33 +44,53 @@ class DataCenterConnection
     private $authorized = false;
 
     /**
-     * Connections open to a certain DC
+     * Connections open to a certain DC.
      *
      * @var array
      */
     private $connections = [];
+    /**
+     * Connection weights
+     *
+     * @var array
+     */
+    private $availableConnections = [];
 
     /**
-     * Main API instance
+     * Main API instance.
      *
      * @var \danog\MadelineProto\MTProto
      */
     private $API;
 
     /**
-     * Connection context
+     * Connection context.
      *
      * @var ConnectionContext
      */
     private $ctx;
 
     /**
-     * DC ID
+     * DC ID.
      *
      * @var string
      */
     private $datacenter;
-    
+
+    /**
+     * Index for round robin.
+     *
+     * @var integer
+     */
+    private $index = 0;
+
+    /**
+     * Loop to keep weights at sane value
+     *
+     * @var \danog\MadelineProto\Loop\Generic\PeriodicLoop
+     */
+    private $robinLoop;
+
     /**
      * Get auth key.
      *
@@ -127,7 +148,7 @@ class DataCenterConnection
     }
 
     /**
-     * Get connection context
+     * Get connection context.
      *
      * @return ConnectionContext
      */
@@ -145,50 +166,126 @@ class DataCenterConnection
      */
     public function connect(ConnectionContext $ctx): \Generator
     {
-        $this->API->logger->logger("Trying connection via $ctx", \danog\MadelineProto\Logger::WARNING);
+        $this->API->logger->logger("Trying shared connection via $ctx", \danog\MadelineProto\Logger::WARNING);
 
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
         $media = $ctx->isMedia();
 
+
         $count = $media ? $this->API->settings['connection_settings']['media_socket_count'] : 1;
 
+        if ($count > 1) {
+            if (!$this->robinLoop) {
+                $this->robinLoop = new PeriodicLoop($this, [$this, 'even'], "Robin loop DC {$this->datacenter}", 10);
+            }
+            $this->robinLoop->start();
+        }
+
+        $incRead = $media ? 5 : 1;
+
         $this->connections = [];
+        $this->availableConnections = [];
         for ($x = 0; $x < $count; $x++) {
+            $this->availableConnections[$x] = 0;
             $this->connections[$x] = new Connection();
+            $this->connections[$x]->setExtra(
+                $this,
+                function (bool $reading) use ($x, $incRead) {
+                    $this->availableConnections[$x] += $reading ? -$incRead : $incRead;
+                },
+                function (bool $writing) use ($x) {
+                    $this->availableConnections[$x] += $writing ? -10 : 10;
+                }
+            );
             yield $this->connections[$x]->connect(yield $ctx->getStream());
             $ctx = $this->ctx->getCtx();
         }
     }
 
-    public function sendMessage($message, $flush = true)
-    {
-    }
-
-    public function setExtra(API $API)
-    {
-        $this->API = $API;
-    }
-
+    /**
+     * Close all connections to DC
+     *
+     * @return void
+     */
     public function disconnect()
     {
-        $this->API->logger->logger("Disconnecting from DC {$this->datacenter}");
+        $this->API->logger->logger("Disconnecting from shared DC {$this->datacenter}");
+        if ($this->robinLoop) {
+            $this->robinLoop->signal(true);
+            $this->robinLoop = null;
+        }
         foreach ($this->connections as $connection) {
             $connection->disconnect();
         }
         $this->connections = [];
+        $this->availableConnections = [];
     }
 
+    /**
+     * Reconnect to DC
+     *
+     * @return \Generator
+     */
     public function reconnect(): \Generator
     {
-        $this->API->logger->logger("Reconnecting DC {$this->datacenter}");
-        foreach ($this->connections as $connection) {
-            yield $connection->reconnect();
-        }
+        $this->API->logger->logger("Reconnecting shared DC {$this->datacenter}");
         $this->disconnect();
-        yield $this->API->datacenter->dcConnectAsync($this->ctx->getDc());
+        yield $this->connect($this->ctx);
     }
 
+    /**
+     * Get best socket in round robin.
+     *
+     * @return Connection
+     */
+    public function getConnection(): Connection
+    {
+        if (count($this->availableConnections) === 1) {
+            return $this->connections[0];
+        }
+        max($this->availableConnections);
+        $key = key($this->availableConnections);
+        // Decrease to implement round robin
+        $this->availableConnections[$key]--;
+        return $this->connections[$key];
+    }
+
+    /**
+     * Even out round robin values
+     *
+     * @return void
+     */
+    public function even()
+    {
+        if (\min($this->availableConnections) < 1000) {
+            foreach ($this->availableConnections as &$value) {
+                $value += 1000;
+            }
+        }
+    }
+
+    /**
+     * Set main instance
+     *
+     * @param MTProto $API Main instance
+     * 
+     * @return void
+     */
+    public function setExtra(MTProto $API)
+    {
+        $this->API = $API;
+    }
+
+    /**
+     * Get main instance
+     *
+     * @return MTProto
+     */
+    public function getExtra(): MTProto
+    {
+        return $this->API;
+    }
     /**
      * Sleep function.
      *
