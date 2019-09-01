@@ -41,6 +41,7 @@ use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectException;
 use Amp\Socket\Socket;
 use Amp\TimeoutException;
+use danog\MadelineProto\AuthKey\AuthKey;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
@@ -65,14 +66,59 @@ class DataCenter
 {
     use \danog\MadelineProto\Tools;
     use \danog\Serializable;
+    /**
+     * All socket connections to DCs.
+     *
+     * @var array<string, DataCenterConnection>
+     */
     public $sockets = [];
+    /**
+     * Current DC ID.
+     *
+     * @var string
+     */
     public $curdc = 0;
+    /**
+     * Main instance.
+     *
+     * @var MTProto
+     */
     private $API;
+    /**
+     * DC list.
+     *
+     * @var array
+     */
     private $dclist = [];
+    /**
+     * Settings.
+     *
+     * @var array
+     */
     private $settings = [];
+    /**
+     * HTTP client.
+     *
+     * @var \Amp\Artax\Client
+     */
     private $HTTPClient;
+    /**
+     * DNS over HTTPS client.
+     *
+     * @var \Amp\DoH\Rfc8484StubResolver
+     */
     private $DoHClient;
+    /**
+     * Non-proxied DNS over HTTPS client.
+     *
+     * @var \Amp\DoH\Rfc8484StubResolver
+     */
     private $NonProxiedDoHClient;
+    /**
+     * Cookie jar.
+     *
+     * @var \Amp\Artax\Cookie\CookieJar
+     */
     private $CookieJar;
 
     public function __sleep()
@@ -86,10 +132,10 @@ class DataCenter
             if ($socket instanceof Connection) {
                 $new = new DataCenterConnection;
                 if ($socket->temp_auth_key) {
-                    $new->setAuthKey($socket->temp_auth_key, true);
+                    $new->setAuthKey(new AuthKey($socket->temp_auth_key), true);
                 }
                 if ($socket->auth_key) {
-                    $new->setAuthKey($socket->auth_key, false);
+                    $new->setAuthKey(new AuthKey($socket->auth_key), false);
                 }
                 $new->authorized($socket->authorized);
             }
@@ -101,8 +147,8 @@ class DataCenter
         $this->dclist = $dclist;
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
-            if ($socket instanceof Connection && !strpos($key, '_bk')) {
-                $this->API->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
+            if ($socket instanceof Connection && !\strpos($key, '_bk')) {
+                $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
                 $socket->old = true;
                 $socket->setExtra($this->API);
                 $socket->disconnect();
@@ -226,7 +272,7 @@ class DataCenter
             list($scheme, $host, $port) = parseUri($uri);
 
             if ($host[0] === '[') {
-                $host = substr($host, 1, -1);
+                $host = \substr($host, 1, -1);
             }
 
             if ($port === 0 || @\inet_pton($host)) {
@@ -265,7 +311,7 @@ class DataCenter
                     return $a->getType() - $b->getType();
                 });
                 if ($ctx->getIpv6()) {
-                    $records = array_reverse($records);
+                    $records = \array_reverse($records);
                 }
 
                 foreach ($records as $record) {
@@ -344,8 +390,7 @@ class DataCenter
                     continue; // Could not connect to host, try next host in the list.
                 }
                 if ($ctx->hasReadCallback()) {
-                    $socket = new class($socket) extends ClientSocket
-                    {
+                    $socket = new class($socket) extends ClientSocket {
                         private $callback;
                         public function setReadCallback($callback)
                         {
@@ -393,7 +438,7 @@ class DataCenter
 
                 return $result->getSocket();
             } catch (\Throwable $e) {
-                if (defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
+                if (\defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
                     throw $e;
                 }
                 $this->API->logger->logger('Connection failed: '.$e, \danog\MadelineProto\Logger::ERROR);
@@ -420,7 +465,7 @@ class DataCenter
                     $this->sockets[$dc_number]->setExtra($this->API);
                     yield $this->sockets[$dc_number]->connect($ctx);
                 } else {
-                    $this->sockets[$dc_number] = new Connection();
+                    $this->sockets[$dc_number] = new DataCenterConnection();
                     $this->sockets[$dc_number]->setExtra($this->API);
                     yield $this->sockets[$dc_number]->connect($ctx);
                 }
@@ -428,7 +473,7 @@ class DataCenter
 
                 return true;
             } catch (\Throwable $e) {
-                if (defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
+                if (\defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
                     throw $e;
                 }
                 $this->API->logger->logger('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
@@ -459,6 +504,7 @@ class DataCenter
             case 'obfuscated2':
                 $this->settings[$dc_config_number]['protocol'] = 'tcp_intermediate_padded';
                 $this->settings[$dc_config_number]['obfuscated'] = true;
+                // no break
             case 'tcp_intermediate_padded':
                 $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [IntermediatePaddedStream::getName(), []]];
                 break;
@@ -474,21 +520,21 @@ class DataCenter
             default:
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
         }
-        if ($this->settings[$dc_config_number]['obfuscated'] && !in_array($default[2][0], [HttpsStream::getName(), HttpStream::getName()])) {
-            $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
+        if ($this->settings[$dc_config_number]['obfuscated'] && !\in_array($default[2][0], [HttpsStream::getName(), HttpStream::getName()])) {
+            $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], \end($default)];
         }
-        if ($this->settings[$dc_config_number]['transport'] && !in_array($default[2][0], [HttpsStream::getName(), HttpStream::getName()])) {
+        if ($this->settings[$dc_config_number]['transport'] && !\in_array($default[2][0], [HttpsStream::getName(), HttpStream::getName()])) {
             switch ($this->settings[$dc_config_number]['transport']) {
                 case 'tcp':
                     if ($this->settings[$dc_config_number]['obfuscated']) {
-                        $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
+                        $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], \end($default)];
                     }
                     break;
                 case 'wss':
-                    $default = [[DefaultStream::getName(), []], [WssStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
+                    $default = [[DefaultStream::getName(), []], [WssStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], \end($default)];
                     break;
                 case 'ws':
-                    $default = [[DefaultStream::getName(), []], [WsStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], end($default)];
+                    $default = [[DefaultStream::getName(), []], [WsStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], \end($default)];
                     break;
             }
         }
@@ -503,7 +549,7 @@ class DataCenter
                 $combos[] = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), $extra], [IntermediatePaddedStream::getName(), []]];
             }
 
-            if (is_iterable($this->settings[$dc_config_number]['proxy'])) {
+            if (\is_iterable($this->settings[$dc_config_number]['proxy'])) {
                 $proxies = $this->settings[$dc_config_number]['proxy'];
                 $proxy_extras = $this->settings[$dc_config_number]['proxy_extra'];
             } else {
@@ -531,37 +577,37 @@ class DataCenter
                     continue;
                 }
                 $extra = $proxy_extras[$key];
-                if (!isset(class_implements($proxy)['danog\\MadelineProto\\Stream\\StreamInterface'])) {
+                if (!isset(\class_implements($proxy)['danog\\MadelineProto\\Stream\\StreamInterface'])) {
                     throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
                 }
-                if ($proxy === ObfuscatedStream::getName() && in_array(strlen($extra['secret']), [17, 34])) {
+                if ($proxy === ObfuscatedStream::getName() && \in_array(\strlen($extra['secret']), [17, 34])) {
                     $combos[] = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [$proxy, $extra], [IntermediatePaddedStream::getName(), []]];
                 }
                 foreach ($combos as $k => $orig) {
                     $combo = [];
                     if ($proxy === ObfuscatedStream::getName()) {
                         $combo = $orig;
-                        if ($combo[count($combo) - 2][0] === ObfuscatedStream::getName()) {
-                            $combo[count($combo) - 2][1] = $extra;
+                        if ($combo[\count($combo) - 2][0] === ObfuscatedStream::getName()) {
+                            $combo[\count($combo) - 2][1] = $extra;
                         } else {
-                            $mtproto = end($combo);
-                            $combo[count($combo) - 1] = [$proxy, $extra];
+                            $mtproto = \end($combo);
+                            $combo[\count($combo) - 1] = [$proxy, $extra];
                             $combo[] = $mtproto;
                         }
                     } else {
                         if ($orig[1][0] === BufferedRawStream::getName()) {
-                            list($first, $second) = [array_slice($orig, 0, 2), array_slice($orig, 2)];
+                            list($first, $second) = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
                             $first[] = [$proxy, $extra];
-                            $combo = array_merge($first, $second);
-                        } elseif (in_array($orig[1][0], [WsStream::getName(), WssStream::getName()])) {
-                            list($first, $second) = [array_slice($orig, 0, 1), array_slice($orig, 1)];
+                            $combo = \array_merge($first, $second);
+                        } elseif (\in_array($orig[1][0], [WsStream::getName(), WssStream::getName()])) {
+                            list($first, $second) = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
                             $first[] = [BufferedRawStream::getName(), []];
                             $first[] = [$proxy, $extra];
-                            $combo = array_merge($first, $second);
+                            $combo = \array_merge($first, $second);
                         }
                     }
 
-                    array_unshift($combos, $combo);
+                    \array_unshift($combos, $combo);
                     //unset($combos[$k]);
                 }
             }
@@ -569,7 +615,7 @@ class DataCenter
             if ($dc_number) {
                 $combos[] = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [HttpsStream::getName(), []]];
             }
-            $combos = array_unique($combos, SORT_REGULAR);
+            $combos = \array_unique($combos, SORT_REGULAR);
         }
         /* @var $context \Amp\ClientConnectContext */
         $context = $context ?? (new ClientConnectContext())->withMaxAttempts(1)->withConnectTimeout(1000 * $this->settings[$dc_config_number]['timeout']);
@@ -620,12 +666,12 @@ class DataCenter
                 $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
                 $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
 
-                foreach (array_unique([$port, 443, 80, 88, 5222]) as $port) {
-                    $stream = end($combo)[0];
+                foreach (\array_unique([$port, 443, 80, 88, 5222]) as $port) {
+                    $stream = \end($combo)[0];
 
                     if ($stream === HttpsStream::getName()) {
-                        $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
-                        if (strpos($dc_number, '_media') !== false) {
+                        $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\D+/', '', $dc_number)];
+                        if (\strpos($dc_number, '_media') !== false) {
                             $subdomain .= '-1';
                         }
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
@@ -638,16 +684,16 @@ class DataCenter
                     }
 
                     if ($combo[1][0] === WssStream::getName()) {
-                        $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
-                        if (strpos($dc_number, '_media') !== false) {
+                        $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\D+/', '', $dc_number)];
+                        if (\strpos($dc_number, '_media') !== false) {
                             $subdomain .= '-1';
                         }
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
 
                         $uri = 'tcp://'.$subdomain.'.'.'web.telegram.org'.':'.$port.'/'.$path;
                     } elseif ($combo[1][0] === WsStream::getName()) {
-                        $subdomain = $this->dclist['ssl_subdomains'][preg_replace('/\D+/', '', $dc_number)];
-                        if (strpos($dc_number, '_media') !== false) {
+                        $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\D+/', '', $dc_number)];
+                        if (\strpos($dc_number, '_media') !== false) {
                             $subdomain .= '-1';
                         }
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
@@ -692,14 +738,14 @@ class DataCenter
         }
 
         if (isset($this->dclist[$test][$ipv6][$dc_number.'_bk']['ip_address'])) {
-            $ctxs = array_merge($ctxs, $this->generateContexts($dc_number.'_bk'));
+            $ctxs = \array_merge($ctxs, $this->generateContexts($dc_number.'_bk'));
         }
 
         if (empty($ctxs)) {
             unset($this->sockets[$dc_number]);
 
             $this->API->logger->logger("No info for DC $dc_number", \danog\MadelineProto\Logger::ERROR);
-        } elseif (defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
+        } elseif (\defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
             return [$ctxs[0]];
         }
 
@@ -741,9 +787,10 @@ class DataCenter
     }
 
     /**
-     * Get Connection instance
+     * Get Connection instance.
      *
-     * @param string $dc
+     * @param string $dc DC ID
+     *
      * @return Connection
      */
     public function getConnection(string $dc): Connection
@@ -751,10 +798,30 @@ class DataCenter
         return $this->sockets[$dc]->getConnection();
     }
     /**
-     * Check if a DC is present
+     * Get DataCenterConnection instance.
      *
      * @param string $dc DC ID
-     * 
+     *
+     * @return DataCenterConnection
+     */
+    public function getDataCenterConnection(string $dc): DataCenterConnection
+    {
+        return $this->sockets[$dc];
+    }
+    /**
+     * Get all DataCenterConnection instances.
+     *
+     * @return array<string, DataCenterConnection>
+     */
+    public function getDataCenterConnections(): array
+    {
+        return $this->sockets;
+    }
+    /**
+     * Check if a DC is present.
+     *
+     * @param string $dc DC ID
+     *
      * @return boolean
      */
     public function has(string $dc): bool
@@ -766,6 +833,6 @@ class DataCenter
         $test = $this->settings['all']['test_mode'] ? 'test' : 'main';
         $ipv6 = $this->settings['all']['ipv6'] ? 'ipv6' : 'ipv4';
 
-        return $all ? array_keys((array) $this->dclist[$test][$ipv6]) : array_keys((array) $this->sockets);
+        return $all ? \array_keys((array) $this->dclist[$test][$ipv6]) : \array_keys((array) $this->sockets);
     }
 }

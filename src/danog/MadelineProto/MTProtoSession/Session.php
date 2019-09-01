@@ -43,5 +43,17 @@ abstract class Session
     public $call_queue = [];
     public $ack_queue = [];
 
-
+    /**
+     * Reset MTProto session
+     *
+     * @return void
+     */
+    public function resetSession()
+    {
+        $this->session_id = $this->random(8);
+        $this->session_in_seq_no = 0;
+        $this->session_out_seq_no = 0;
+        $this->max_incoming_id = null;
+        $this->max_outgoing_id = null;
+    }
 }

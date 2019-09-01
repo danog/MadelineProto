@@ -22,6 +22,7 @@ use Amp\ByteStream\PendingReadError;
 use Amp\ByteStream\StreamException;
 use Amp\Loop;
 use Amp\Websocket\ClosedException;
+use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\SignalLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
@@ -39,13 +40,13 @@ class ReadLoop extends SignalLoop
     use Crypt;
 
     /**
-     * Connection instance
+     * Connection instance.
      *
      * @var \danog\Madelineproto\Connection
      */
     protected $connection;
     /**
-     * DC ID
+     * DC ID.
      *
      * @var string
      */
@@ -79,7 +80,7 @@ class ReadLoop extends SignalLoop
                 continue;
             }
 
-            if (is_int($error)) {
+            if (\is_int($error)) {
                 $this->exitedLoop();
 
                 if ($error === -404) {
@@ -135,8 +136,8 @@ class ReadLoop extends SignalLoop
             $buffer = yield $connection->stream->getReadBuffer($payload_length);
         } catch (ClosedException $e) {
             $API->logger->logger($e->getReason());
-            if (strpos($e->getReason(), '       ') === 0) {
-                $payload = -substr($e->getReason(), 7);
+            if (\strpos($e->getReason(), '       ') === 0) {
+                $payload = -\substr($e->getReason(), 7);
                 $API->logger->logger("Received $payload from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 return $payload;
@@ -155,10 +156,10 @@ class ReadLoop extends SignalLoop
 
         if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
             $message_id = yield $buffer->bufferRead(8);
-            if (!in_array($message_id, [1, 0])) {
+            if (!\in_array($message_id, [1, 0])) {
                 $connection->check_message_id($message_id, ['outgoing' => false, 'container' => false]);
             }
-            $message_length = unpack('V', yield $buffer->bufferRead(4))[1];
+            $message_length = \unpack('V', yield $buffer->bufferRead(4))[1];
             $message_data = yield $buffer->bufferRead($message_length);
             $left = $payload_length - $message_length - 4 - 8 - 8;
             if ($left) {
@@ -174,9 +175,9 @@ class ReadLoop extends SignalLoop
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $connection->temp_auth_key['auth_key'], false);
             $encrypted_data = yield $buffer->bufferRead($payload_length - 24);
 
-            $protocol_padding = strlen($encrypted_data) % 16;
+            $protocol_padding = \strlen($encrypted_data) % 16;
             if ($protocol_padding) {
-                $encrypted_data = substr($encrypted_data, 0, -$protocol_padding);
+                $encrypted_data = \substr($encrypted_data, 0, -$protocol_padding);
             }
             $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
             /*
@@ -185,22 +186,22 @@ class ReadLoop extends SignalLoop
             $API->logger->logger('WARNING: Server salt mismatch (my server salt '.$connection->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').', \danog\MadelineProto\Logger::WARNING);
             }
              */
-            $session_id = substr($decrypted_data, 8, 8);
+            $session_id = \substr($decrypted_data, 8, 8);
             if ($session_id != $connection->session_id) {
                 throw new \danog\MadelineProto\Exception('Session id mismatch.');
             }
-            $message_id = substr($decrypted_data, 16, 8);
+            $message_id = \substr($decrypted_data, 16, 8);
             $connection->check_message_id($message_id, ['outgoing' => false, 'container' => false]);
-            $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
+            $seq_no = \unpack('V', \substr($decrypted_data, 24, 4))[1];
 
-            $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
-            if ($message_data_length > strlen($decrypted_data)) {
+            $message_data_length = \unpack('V', \substr($decrypted_data, 28, 4))[1];
+            if ($message_data_length > \strlen($decrypted_data)) {
                 throw new \danog\MadelineProto\SecurityException('message_data_length is too big');
             }
-            if (strlen($decrypted_data) - 32 - $message_data_length < 12) {
+            if (\strlen($decrypted_data) - 32 - $message_data_length < 12) {
                 throw new \danog\MadelineProto\SecurityException('padding is too small');
             }
-            if (strlen($decrypted_data) - 32 - $message_data_length > 1024) {
+            if (\strlen($decrypted_data) - 32 - $message_data_length > 1024) {
                 throw new \danog\MadelineProto\SecurityException('padding is too big');
             }
             if ($message_data_length < 0) {
@@ -209,8 +210,8 @@ class ReadLoop extends SignalLoop
             if ($message_data_length % 4 != 0) {
                 throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
             }
-            $message_data = substr($decrypted_data, 32, $message_data_length);
-            if ($message_key != substr(hash('sha256', substr($connection->temp_auth_key['auth_key'], 96, 32).$decrypted_data, true), 8, 16)) {
+            $message_data = \substr($decrypted_data, 32, $message_data_length);
+            if ($message_key != \substr(\hash('sha256', \substr($connection->temp_auth_key['auth_key'], 96, 32).$decrypted_data, true), 8, 16)) {
                 throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
             }
             $connection->incoming_messages[$message_id] = ['seq_no' => $seq_no];

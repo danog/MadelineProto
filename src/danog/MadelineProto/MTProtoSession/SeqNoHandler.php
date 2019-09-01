@@ -24,8 +24,6 @@ namespace danog\MadelineProto\MTProtoSession;
  */
 trait SeqNoHandler
 {
-    use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
-
     public $session_out_seq_no = 0;
     public $session_in_seq_no = 0;
 
@@ -58,4 +56,12 @@ trait SeqNoHandler
         //$this->API->logger->logger("IN: $value + $in = ".$this->session_in_seq_no);
         return $value * 2 + $in;
     }
+
+    public function content_related($method)
+    {
+        $method = \is_array($method) && isset($method['_']) ? $method['_'] : $method;
+
+        return \is_string($method) ? !\in_array($method, MTProto::NOT_CONTENT_RELATED) : true;
+    }
+
 }

@@ -19,8 +19,8 @@
 namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\Deferred;
+use danog\MadelineProto\Connection;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
-use danog\MadelineProto\MTProto;
 
 /**
  * RPC call status check loop.
@@ -30,13 +30,13 @@ use danog\MadelineProto\MTProto;
 class CheckLoop extends ResumableSignalLoop
 {
     /**
-     * Connection instance
+     * Connection instance.
      *
      * @var \danog\Madelineproto\Connection
      */
     protected $connection;
     /**
-     * DC ID
+     * DC ID.
      *
      * @var string
      */
@@ -72,7 +72,7 @@ class CheckLoop extends ResumableSignalLoop
 
                 if ($connection->temp_auth_key !== null) {
                     $full_message_ids = $connection->getPendingCalls(); //array_values($connection->new_outgoing);
-                    foreach (array_chunk($full_message_ids, 8192) as $message_ids) {
+                    foreach (\array_chunk($full_message_ids, 8192) as $message_ids) {
                         $deferred = new Deferred();
                         $deferred->promise()->onResolve(
                             function ($e, $result) use ($message_ids, $API, $connection, $datacenter) {
@@ -83,7 +83,7 @@ class CheckLoop extends ResumableSignalLoop
                                     return;
                                 }
                                 $reply = [];
-                                foreach (str_split($result['info']) as $key => $chr) {
+                                foreach (\str_split($result['info']) as $key => $chr) {
                                     $message_id = $message_ids[$key];
                                     if (!isset($connection->outgoing_messages[$message_id])) {
                                         $API->logger->logger('Already got response for and forgot about message ID '.($message_id));
@@ -93,7 +93,7 @@ class CheckLoop extends ResumableSignalLoop
                                         $API->logger->logger('Already got response for '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.($message_id));
                                         continue;
                                     }
-                                    $chr = ord($chr);
+                                    $chr = \ord($chr);
                                     switch ($chr & 7) {
                                         case 0:
                                             $API->logger->logger('Wrong message status 0 for '.$connection->outgoing_messages[$message_id]['_'], \danog\MadelineProto\Logger::FATAL_ERROR);
@@ -140,7 +140,7 @@ class CheckLoop extends ResumableSignalLoop
                 } else {
                     foreach ($connection->new_outgoing as $message_id) {
                         if (isset($connection->outgoing_messages[$message_id]['sent'])
-                            && $connection->outgoing_messages[$message_id]['sent'] + $timeout < time()
+                            && $connection->outgoing_messages[$message_id]['sent'] + $timeout < \time()
                             && $connection->outgoing_messages[$message_id]['unencrypted']
                         ) {
                             $API->logger->logger('Still missing '.$connection->outgoing_messages[$message_id]['_'].' with message id '.($message_id)." on DC $datacenter, resending", \danog\MadelineProto\Logger::ERROR);

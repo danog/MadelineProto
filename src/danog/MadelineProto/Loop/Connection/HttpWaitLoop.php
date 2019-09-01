@@ -31,13 +31,13 @@ use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 class HttpWaitLoop extends ResumableSignalLoop
 {
     /**
-     * Connection instance
+     * Connection instance.
      *
      * @var \danog\Madelineproto\Connection
      */
     protected $connection;
     /**
-     * DC ID
+     * DC ID.
      *
      * @var string
      */
@@ -57,7 +57,7 @@ class HttpWaitLoop extends ResumableSignalLoop
         $datacenter = $this->datacenter;
         $connection = $this->connection;
 
-        if (!in_array($connection->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()])) {
+        if (!\in_array($connection->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()])) {
             return;
         }
 
@@ -66,7 +66,7 @@ class HttpWaitLoop extends ResumableSignalLoop
             if (yield $this->waitSignal($this->pause())) {
                 return;
             }
-            if (!in_array($connection->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()])) {
+            if (!\in_array($connection->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()])) {
                 return;
             }
             while ($connection->temp_auth_key === null) {

@@ -38,18 +38,21 @@ trait CallHandler
      *
      * @return void
      */
-    public function method_recall(string $watcherId, $args)
+    public function method_recall(string $watcherId, array $args)
     {
         $message_id = $args['message_id'];
         $postpone = $args['postpone'] ?? false;
         $datacenter = $args['datacenter'] ?? false;
+        if ($datacenter === $this->datacenter) {
+            $datacenter = false;
+        }
 
         $message_ids = $this->outgoing_messages[$message_id]['container'] ?? [$message_id];
 
         foreach ($message_ids as $message_id) {
             if (isset($this->outgoing_messages[$message_id]['body'])) {
                 if ($datacenter) {
-                    $res = $this->API->datacenter->sockets[$datacenter]->sendMessage($this->outgoing_messages[$message_id], false);
+                    $res = $this->API->datacenter->getDataCenterConnection($datacenter)->sendMessage($this->outgoing_messages[$message_id], false);
                 } else {
                     $res = $this->sendMessage($this->outgoing_messages[$message_id], false);
                 }
@@ -62,25 +65,11 @@ trait CallHandler
         }
         if (!$postpone) {
             if ($datacenter) {
-                $this->API->datacenter->sockets[$datacenter]->writer->resume();
+                $this->API->datacenter->getDataCenterConnection($datacenter)->flush();
             } else {
-                $this->writer->resume();
+                $this->flush();
             }
         }
-    }
-
-    /**
-     * Synchronous wrapper for method_call.
-     *
-     * @param string $method Method name
-     * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
-     *
-     * @return array
-     */
-    public function method_call(string $method, $args = [], array $aargs = ['msg_id' => null])
-    {
-        return $this->wait($this->method_call_async_read($method, $args, $aargs));
     }
 
     /**
@@ -236,6 +225,7 @@ trait CallHandler
             $message['promise'] = $aargs['promise'];
         }
 
-        return $this->sendMessage($message, isset($aargs['postpone']) ? !$aargs['postpone'] : true);
+        $aargs['postpone'] = $aargs['postpone'] ?? false;
+        return $this->sendMessage($message, !$aargs['postpone']);
     }
 }

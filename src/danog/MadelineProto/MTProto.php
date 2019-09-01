@@ -38,13 +38,10 @@ use danog\MadelineProto\TL\TLCallback;
 class MTProto extends AsyncConstruct implements TLCallback
 {
     use \danog\Serializable;
-    use \danog\MadelineProto\MTProtoTools\AckHandler;
     use \danog\MadelineProto\MTProtoTools\AuthKeyHandler;
     use \danog\MadelineProto\MTProtoTools\CallHandler;
     use \danog\MadelineProto\MTProtoTools\Crypt;
     use \danog\MadelineProto\MTProtoTools\PeerHandler;
-    use \danog\MadelineProto\MTProtoTools\ResponseHandler;
-    use \danog\MadelineProto\MTProtoTools\SeqNoHandler;
     use \danog\MadelineProto\MTProtoTools\UpdateHandler;
     use \danog\MadelineProto\MTProtoTools\Files;
     use \danog\MadelineProto\SecretChats\AuthKeyHandler;
@@ -72,16 +69,91 @@ class MTProto extends AsyncConstruct implements TLCallback
     /*
     const V = 71;
      */
+    /**
+     * Internal version of MadelineProto.
+     *
+     * Increased every time the default settings array or something big changes
+     *
+     * @var int
+     */
     const V = 129;
-    const RELEASE = '4.0';
+    /**
+     * String release version.
+     *
+     * @var string
+     */
+    const RELEASE = '5.0';
+    /**
+     * We're not logged in.
+     *
+     * @var int
+     */
     const NOT_LOGGED_IN = 0;
+    /**
+     * We're waiting for the login code.
+     *
+     * @var int
+     */
     const WAITING_CODE = 1;
+    /**
+     * We're waiting for parameters to sign up.
+     *
+     * @var int
+     */
     const WAITING_SIGNUP = -1;
+    /**
+     * We're waiting for the 2FA password.
+     *
+     * @var int
+     */
     const WAITING_PASSWORD = 2;
+    /**
+     * We're logged in.
+     *
+     * @var int
+     */
     const LOGGED_IN = 3;
+    /**
+     * Disallowed methods.
+     *
+     * @var array
+     */
     const DISALLOWED_METHODS = ['account.updatePasswordSettings' => 'You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)', 'account.getPasswordSettings' => 'You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)', 'messages.receivedQueue' => 'You cannot use this method directly', 'messages.getDhConfig' => 'You cannot use this method directly, instead use $MadelineProto->get_dh_config();', 'auth.bindTempAuthKey' => 'You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info', 'auth.exportAuthorization' => 'You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.importAuthorization' => 'You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.logOut' => 'You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info)', 'auth.importBotAuthorization' => 'You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.sendCode' => 'You cannot use this method directly, use the phone_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signIn' => 'You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.checkPassword' => 'You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signUp' => 'You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)', 'users.getFullUser' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'channels.getFullChannel' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.getFullChat' => 'You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'contacts.resolveUsername' => 'You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.acceptEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.discardEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.requestEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'phone.requestCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.acceptCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.confirmCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.discardCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'updates.getChannelDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getState' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'upload.getCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getCdnFileHashes' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.reuploadCdnFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFile' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveBigFilePart' => 'You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info'];
-    const BAD_MSG_ERROR_CODES = [16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the â€œcorrectâ€ msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)', 17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)', 18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)', 19 => 'container msg_id is the same as msg_id of a previously received message (this must never happen)', 20 => 'message too old, and it cannot be verified whether the server has received a message with this msg_id or not', 32 => 'msg_seqno too low (the server has already received a message with a lower msg_id but with either a higher or an equal and odd seqno)', 33 => 'msg_seqno too high (similarly, there is a message with a higher msg_id but with either a lower or an equal and odd seqno)', 34 => 'an even msg_seqno expected (irrelevant message), but odd received', 35 => 'odd msg_seqno expected (relevant message), but even received', 48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)', 64 => 'invalid container.'];
-    const MSGS_INFO_FLAGS = [1 => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)', 2 => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)', 3 => 'message not received (msg_id too high; however, the other party has certainly not received it yet)', 4 => 'message received (note that this response is also at the same time a receipt acknowledgment)', 8 => ' and message already acknowledged', 16 => ' and message not requiring acknowledgment', 32 => ' and RPC query contained in message being processed or processing already complete', 64 => ' and content-related response to message already generated', 128 => ' and other party knows for a fact that message is already received'];
+    /**
+     * Bad message error codes.
+     *
+     * @var array
+     */
+    const BAD_MSG_ERROR_CODES = [
+        16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the â€œcorrectâ€ msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)',
+        17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)',
+        18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)',
+        19 => 'container msg_id is the same as msg_id of a previously received message (this must never happen)',
+        20 => 'message too old, and it cannot be verified whether the server has received a message with this msg_id or not',
+        32 => 'msg_seqno too low (the server has already received a message with a lower msg_id but with either a higher or an equal and odd seqno)',
+        33 => 'msg_seqno too high (similarly, there is a message with a higher msg_id but with either a lower or an equal and odd seqno)',
+        34 => 'an even msg_seqno expected (irrelevant message), but odd received',
+        35 => 'odd msg_seqno expected (relevant message), but even received',
+        48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)',
+        64 => 'invalid container'
+    ];
+
+    /**
+     * Localized message info flags
+     * 
+     * @var array
+     */
+    const MSGS_INFO_FLAGS = [
+        1 => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)',
+        2 => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)',
+        3 => 'message not received (msg_id too high; however, the other party has certainly not received it yet)',
+        4 => 'message received (note that this response is also at the same time a receipt acknowledgment)', 
+        8 => ' and message already acknowledged',
+        16 => ' and message not requiring acknowledgment',
+        32 => ' and RPC query contained in message being processed or processing already complete',
+        64 => ' and content-related response to message already generated', 
+        128 => ' and other party knows for a fact that message is already received'
+    ];
     const REQUESTED = 0;
     const ACCEPTED = 1;
     const CONFIRMED = 2;
@@ -124,20 +196,91 @@ class MTProto extends AsyncConstruct implements TLCallback
     ];
     const DEFAULT_GETUPDATES_PARAMS = ['offset' => 0, 'limit' => null, 'timeout' => 0];
 
+    /**
+     * Instance of wrapper API.
+     *
+     * @var API|null
+     */
     public $wrapper;
+    /**
+     * PWRTelegram webhook URL.
+     *
+     * @var boolean|string
+     */
     public $hook_url = false;
+    /**
+     * Settings array.
+     *
+     * @var array
+     */
     public $settings = [];
+    /**
+     * Config array.
+     *
+     * @var array
+     */
     private $config = ['expires' => -1];
+    /**
+     * TOS info.
+     *
+     * @var array
+     */
     private $tos = ['expires' => 0, 'accepted' => true];
+    /**
+     * Whether we're initing authorization.
+     *
+     * @var boolean
+     */
     private $initing_authorization = false;
+    /**
+     * Authorization info (User).
+     *
+     * @var [type]
+     */
     public $authorization = null;
-    public $authorized = 0;
+    /**
+     * Whether we're authorized.
+     *
+     * @var integer
+     */
+    public $authorized = self::NOT_LOGGED_IN;
+    /**
+     * Main authorized DC ID.
+     *
+     * @var integer
+     */
     public $authorized_dc = -1;
+    /**
+     * RSA keys.
+     *
+     * @var array<RSA>
+     */
     private $rsa_keys = [];
+    /**
+     * CDN RSA keys.
+     *
+     * @var array
+     */
     private $cdn_rsa_keys = [];
+    /**
+     * Diffie-hellman config.
+     *
+     * @var array
+     */
     private $dh_config = ['version' => 0];
+    /**
+     * Internal peer database.
+     *
+     * @var array
+     */
     public $chats = [];
+    /**
+     * Cached parameters for fetching channel participants.
+     *
+     * @var array
+     */
     public $channel_participants = [];
+
     public $last_stored = 0;
     public $qres = [];
     public $full_chats = [];
@@ -154,6 +297,14 @@ class MTProto extends AsyncConstruct implements TLCallback
     public $feeders = [];
     public $updaters = [];
     public $destructing = false; // Avoid problems with exceptions thrown by forked strands, see tools
+
+    /**
+     * DataCenter instance.
+     *
+     * @var DataCenter
+     */
+    public $datacenter;
+
     public function __magic_construct($settings = [])
     {
         $this->setInitPromise($this->__construct_async($settings));
@@ -198,7 +349,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         yield $this->connect_to_all_dcs_async();
         $this->startLoops();
         $this->datacenter->curdc = 2;
-        if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->sockets[$this->datacenter->curdc]->temp_auth_key !== null) {
+        if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->hasAuthKey()) {
             try {
                 $nearest_dc = yield $this->method_call_async_read('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
                 $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
@@ -266,6 +417,15 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         return $this->datacenter->fileGetContents($url);
     }
+    /**
+     * Get all datacenter connections.
+     *
+     * @return array<string, DataCenterConnection>
+     */
+    public function getDataCenterConnections(): array
+    {
+        return $this->datacenter->getDataCenterConnections();
+    }
 
     public function hasAllAuth()
     {
@@ -273,8 +433,8 @@ class MTProto extends AsyncConstruct implements TLCallback
             return false;
         }
 
-        foreach ($this->datacenter->sockets as $dc) {
-            if (!$dc->authorized || $dc->temp_auth_key === null) {
+        foreach ($this->datacenter->getDataCenterConnections() as $dc) {
+            if (!$dc->isAuthorized() || $dc->hasAuthKey() === null) {
                 return false;
             }
         }
@@ -367,7 +527,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->setEventHandler($this->event_handler);
         }
         $force = false;
-        $this->reset_session();
+        $this->resetSession();
         if (isset($backtrace[2]['function'], $backtrace[2]['class'], $backtrace[2]['args']) && $backtrace[2]['class'] === 'danog\\MadelineProto\\API' && $backtrace[2]['function'] === '__construct_async') {
             if (\count($backtrace[2]['args']) >= 2) {
                 $this->parse_settings(\array_replace_recursive($this->settings, $backtrace[2]['args'][1]));
@@ -380,9 +540,9 @@ class MTProto extends AsyncConstruct implements TLCallback
 
         if (!isset($this->v) || $this->v !== self::V) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['serialization_ofd'], Logger::WARNING);
-            foreach ($this->datacenter->sockets as $dc_id => $socket) {
-                if ($this->authorized === self::LOGGED_IN && \strpos($dc_id, '_') === false && $socket->auth_key !== null && $socket->temp_auth_key !== null) {
-                    $socket->authorized = true;
+            foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
+                if ($this->authorized === self::LOGGED_IN && \strpos($dc_id, '_') === false && $socket->hasAuthKey(true) && $socket->hasAuthKey(false)) {
+                    $socket->authorized(true);
                 }
             }
             $settings = $this->settings;
@@ -441,7 +601,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             if ($settings['app_info']['api_id'] === 6) {
                 unset($settings['app_info']);
             }
-            $this->reset_session(true, true);
+            $this->resetSession(true, true);
             $this->config = ['expires' => -1];
             $this->dh_config = ['version' => 0];
             yield $this->__construct_async($settings);
@@ -514,7 +674,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $this->updaters[$channelId]->signal(true);
             }
         }
-        foreach ($this->datacenter->sockets as $datacenter) {
+        foreach ($this->datacenter->getDataCenterConnections() as $datacenter) {
             $datacenter->disconnect();
         }
         $this->logger("Successfully destroyed MadelineProto");
@@ -868,35 +1028,32 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->logger = Logger::getLoggerFromSettings($this->settings, isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '');
     }
 
-    public function reset_session($de = true, $auth_key = false)
+    /**
+     * Reset all MTProto sessions.
+     *
+     * @param boolean $de       Whether to reset the session ID
+     * @param boolean $auth_key Whether to reset the auth key
+     *
+     * @return void
+     */
+    public function resetSession(bool $de = true, bool $auth_key = false)
     {
         if (!\is_object($this->datacenter)) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['session_corrupted']);
         }
-        foreach ($this->datacenter->sockets as $id => $socket) {
+        foreach ($this->datacenter->getDataCenterConnections() as $id => $socket) {
             if ($de) {
-                //$this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['reset_session_seqno'], $id), Logger::VERBOSE);
-                $socket->session_id = $this->random(8);
-                $socket->session_in_seq_no = 0;
-                $socket->session_out_seq_no = 0;
-                $socket->max_incoming_id = null;
-                $socket->max_outgoing_id = null;
+                $socket->resetSession();
             }
             if ($auth_key) {
-                $socket->temp_auth_key = null;
+                $socket->setAuthKey(null);
             }
-            /*
-        $socket->incoming_messages = [];
-        $socket->outgoing_messages = [];
-        $socket->new_outgoing = [];
-        $socket->new_incoming = [];
-         */
         }
     }
 
     public function is_http($datacenter)
     {
-        return \in_array($this->datacenter->sockets[$datacenter]->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
+        return \in_array($this->datacenter->getDataCenterConection($datacenter)->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
     }
 
     // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
@@ -956,8 +1113,8 @@ class MTProto extends AsyncConstruct implements TLCallback
                 unset($this->updaters[$channelId]);
             }
         }
-        foreach ($this->datacenter->sockets as $socket) {
-            $socket->authorized = false;
+        foreach ($this->datacenter->getDataCenterConnections() as $socket) {
+            $socket->authorized(false);
         }
 
         $this->channels_state = new CombinedUpdatesState();
@@ -1033,8 +1190,8 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $this->updaters[$channelId]->resume();
             }
         }
-        foreach ($this->datacenter->sockets as $datacenter) {
-            $datacenter->writer->resume();
+        foreach ($this->datacenter->getDataCenterConnections() as $datacenter) {
+            $datacenter->flush();
         }
         if ($this->seqUpdater->start()) {
             $this->seqUpdater->resume();
@@ -1043,7 +1200,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function get_phone_config_async($watcherId = null)
     {
-        if ($this->authorized === self::LOGGED_IN && \class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal') && !$this->authorization['user']['bot'] && $this->datacenter->sockets[$this->settings['connection_settings']['default_dc']]->temp_auth_key !== null) {
+        if ($this->authorized === self::LOGGED_IN && \class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal') && !$this->authorization['user']['bot'] && $this->datacenter->getDataCenterConnection($this->settings['connection_settings']['default_dc'])->hasAuthKey()) {
             $this->logger->logger('Fetching phone config...');
             VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]));
         } else {
@@ -1116,12 +1273,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->logger->logger('Got new DC options, reconnecting');
         yield $this->connect_to_all_dcs_async();
         $this->datacenter->curdc = $curdc;
-    }
-    public function content_related($method)
-    {
-        $method = \is_array($method) && isset($method['_']) ? $method['_'] : $method;
-
-        return \is_string($method) ? !\in_array($method, MTProto::NOT_CONTENT_RELATED) : true;
     }
 
     public function get_self_async()

@@ -118,7 +118,7 @@ trait ResponseHandler
                     $this->ack_incoming_message_id($current_msg_id);
 
                     // Acknowledge that I received the server's response
-                    if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->API->datacenter->sockets[$this->API->datacenter->curdc]->temp_auth_key !== null && isset($this->updaters[false])) {
+                    if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->curdc)->hasAuthKey() && isset($this->updaters[false])) {
                         $this->updaters[false]->resumeDefer();
                     }
 
@@ -387,7 +387,7 @@ trait ResponseHandler
                         case 303:
                             $this->API->datacenter->curdc = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
 
-                            if (isset($request['file']) && $request['file'] && isset($this->API->datacenter->sockets[$datacenter.'_media'])) {
+                            if (isset($request['file']) && $request['file'] && $this->API->datacenter->has($datacenter.'_media')) {
                                 \danog\MadelineProto\Logger::log('Using media DC');
                                 $datacenter .= '_media';
                             }
@@ -407,11 +407,11 @@ trait ResponseHandler
                                     $this->got_response_for_outgoing_message_id($request_id);
 
                                     $this->logger->logger($response['error_message'], \danog\MadelineProto\Logger::FATAL_ERROR);
-                                    foreach ($this->API->datacenter->sockets as $socket) {
-                                        $socket->temp_auth_key = null;
-                                        $socket->session_id = null;
-                                        $socket->auth_key = null;
-                                        $socket->authorized = false;
+                                    foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
+                                        $socket->authKey(null, true);
+                                        $socket->authKey(null, false);
+                                        $socket->authorized(false);
+                                        $socket->resetSession();
                                     }
 
                                     if ($response['error_message'] === 'USER_DEACTIVATED') {
@@ -457,11 +457,12 @@ trait ResponseHandler
                                         $this->got_response_for_outgoing_message_id($request_id);
 
                                         $this->logger->logger('Permanent auth key was main authorized key, logging out...', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        foreach ($this->API->datacenter->sockets as $socket) {
-                                            $socket->temp_auth_key = null;
-                                            $socket->auth_key = null;
-                                            $socket->authorized = false;
+                                        foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
+                                            $socket->authKey(null, true);
+                                            $socket->authKey(null, false);
+                                            $socket->authorized(false);
                                         }
+
                                         $this->logger->logger('!!!!!!! WARNING !!!!!!!', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger("Telegram's flood prevention system suspended this account.", \danog\MadelineProto\Logger::ERROR);
                                         $this->logger->logger('To continue, manual verification is required.', \danog\MadelineProto\Logger::FATAL_ERROR);
@@ -542,7 +543,7 @@ trait ResponseHandler
                         case 17:
                             $this->time_delta = (int) (new \phpseclib\Math\BigInteger(\strrev($response_id), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(\time()))->toString();
                             $this->logger->logger('Set time delta to '.$this->time_delta, \danog\MadelineProto\Logger::WARNING);
-                            $this->reset_session();
+                            $this->API->resetSession();
                             $this->temp_auth_key = null;
                             $this->callFork((function () use ($request_id) {
                                 yield $this->API->init_authorization_async();

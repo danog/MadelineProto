@@ -18,21 +18,22 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Promise;
+use danog\MadelineProto\AuthKey\AuthKey;
 use danog\MadelineProto\Stream\ConnectionContext;
+use JsonSerializable;
 
-class DataCenterConnection
+class DataCenterConnection implements JsonSerializable
 {
     /**
      * Temporary auth key.
      *
-     * @var array
+     * @var AuthKey
      */
     private $tempAuthKey;
     /**
      * Permanent auth key.
      *
-     * @var array
+     * @var AuthKey
      */
     private $authKey;
 
@@ -46,13 +47,13 @@ class DataCenterConnection
     /**
      * Connections open to a certain DC.
      *
-     * @var array
+     * @var array<string, Connection>
      */
     private $connections = [];
     /**
-     * Connection weights
+     * Connection weights.
      *
-     * @var array
+     * @var array<string, int>
      */
     private $availableConnections = [];
 
@@ -85,7 +86,7 @@ class DataCenterConnection
     private $index = 0;
 
     /**
-     * Loop to keep weights at sane value
+     * Loop to keep weights at sane value.
      *
      * @var \danog\MadelineProto\Loop\Generic\PeriodicLoop
      */
@@ -96,9 +97,9 @@ class DataCenterConnection
      *
      * @param boolean $temp Whether to fetch the temporary auth key
      *
-     * @return array
+     * @return AuthKey
      */
-    public function getAuthKey(bool $temp = true): array
+    public function getAuthKey(bool $temp = true): AuthKey
     {
         return $this->{$temp ? 'tempAuthKey' : 'authKey'};
     }
@@ -116,11 +117,12 @@ class DataCenterConnection
     /**
      * Set auth key.
      *
-     * @param boolean $temp Whether to fetch the temporary auth key
+     * @param AuthKey|null $key  The auth key
+     * @param boolean      $temp Whether to set the temporary auth key
      *
      * @return void
      */
-    public function setAuthKey(array $key, bool $temp = true)
+    public function setAuthKey(?AuthKey $key, bool $temp = true)
     {
         $this->{$temp ? 'tempAuthKey' : 'authKey'} = $key;
     }
@@ -147,6 +149,28 @@ class DataCenterConnection
         $this->authorized = $authorized;
     }
 
+    /**
+     * Reset MTProto sessions.
+     *
+     * @return void
+     */
+    public function resetSession()
+    {
+        foreach ($this->connections as $socket) {
+            $socket->resetSession();
+        }
+    }
+    /**
+     * Flush all pending packets.
+     *
+     * @return void
+     */
+    public function flush()
+    {
+        foreach ($this->connections as $socket) {
+            $socket->flush();
+        }
+    }
     /**
      * Get connection context.
      *
@@ -198,13 +222,13 @@ class DataCenterConnection
                     $this->availableConnections[$x] += $writing ? -10 : 10;
                 }
             );
-            yield $this->connections[$x]->connect(yield $ctx->getStream());
+            yield $this->connections[$x]->connect($ctx);
             $ctx = $this->ctx->getCtx();
         }
     }
 
     /**
-     * Close all connections to DC
+     * Close all connections to DC.
      *
      * @return void
      */
@@ -223,7 +247,7 @@ class DataCenterConnection
     }
 
     /**
-     * Reconnect to DC
+     * Reconnect to DC.
      *
      * @return \Generator
      */
@@ -241,18 +265,18 @@ class DataCenterConnection
      */
     public function getConnection(): Connection
     {
-        if (count($this->availableConnections) === 1) {
+        if (\count($this->availableConnections) === 1) {
             return $this->connections[0];
         }
-        max($this->availableConnections);
-        $key = key($this->availableConnections);
+        \max($this->availableConnections);
+        $key = \key($this->availableConnections);
         // Decrease to implement round robin
         $this->availableConnections[$key]--;
         return $this->connections[$key];
     }
 
     /**
-     * Even out round robin values
+     * Even out round robin values.
      *
      * @return void
      */
@@ -266,10 +290,10 @@ class DataCenterConnection
     }
 
     /**
-     * Set main instance
+     * Set main instance.
      *
      * @param MTProto $API Main instance
-     * 
+     *
      * @return void
      */
     public function setExtra(MTProto $API)
@@ -278,13 +302,26 @@ class DataCenterConnection
     }
 
     /**
-     * Get main instance
+     * Get main instance.
      *
      * @return MTProto
      */
     public function getExtra(): MTProto
     {
         return $this->API;
+    }
+    /**
+     * JSON serialize function.
+     *
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'authKey' => $this->authKey,
+            'tempAuthKey' => $this->tempAuthKey,
+            'authorized' => $this->authorized,
+        ];
     }
     /**
      * Sleep function.

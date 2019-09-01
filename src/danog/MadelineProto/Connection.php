@@ -25,8 +25,8 @@ use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
 use danog\MadelineProto\Loop\Connection\ReadLoop;
 use danog\MadelineProto\Loop\Connection\WriteLoop;
+use danog\MadelineProto\MTProtoSession\Session;
 use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\MTProtoTools\Session;
 
 /**
  * Connection class.
@@ -349,9 +349,9 @@ class Connection extends Session
      * @param array   $message The message to send
      * @param boolean $flush   Whether to flush the message right away
      * 
-     * @return Promise
+     * @return \Generator
      */
-    public function sendMessage(array $message, bool $flush = true): Promise
+    public function sendMessage(array $message, bool $flush = true): \Generator
     {
         $deferred = new Deferred();
 
@@ -387,6 +387,15 @@ class Connection extends Session
         return $deferred->promise();
     }
 
+    /**
+     * Flush pending packets
+     *
+     * @return void
+     */
+    public function flush()
+    {
+        $this->writer->resume();
+    }
     /**
      * Connect main instance.
      *
