@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use danog\MadelineProto\AuthKey\PermAuthKey;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 
 /**
@@ -26,6 +27,12 @@ use danog\MadelineProto\MTProtoTools\PasswordCalculator;
  */
 trait Login
 {
+    /**
+     * Datacenter instance.
+     *
+     * @var \danog\MadelineProto\DataCenter
+     */
+    public $datacenter;
     public function logout_async()
     {
         yield $this->method_call_async_read('auth.logOut', [], ['datacenter' => $this->datacenter->curdc]);
@@ -46,7 +53,7 @@ trait Login
         $this->authorization = yield $this->method_call_async_read('auth.importBotAuthorization', ['bot_auth_token' => $token, 'api_id' => $this->settings['app_info']['api_id'], 'api_hash' => $this->settings['app_info']['api_hash']], ['datacenter' => $this->datacenter->curdc]);
         $this->authorized = self::LOGGED_IN;
         $this->authorized_dc = $this->datacenter->curdc;
-        $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
+        $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
         $this->updates = [];
         $this->updates_key = 0;
         yield $this->init_authorization_async();
@@ -117,7 +124,7 @@ trait Login
         }
         $this->authorized = self::LOGGED_IN;
         $this->authorization = $authorization;
-        $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
+        $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
         yield $this->init_authorization_async();
         yield $this->get_phone_config_async();
         $this->startUpdateSystem();
@@ -135,20 +142,16 @@ trait Login
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_auth_key'], \danog\MadelineProto\Logger::NOTICE);
         list($dc_id, $auth_key) = $authorization;
-        if (!is_array($auth_key)) {
-            $auth_key = ['auth_key' => $auth_key, 'id' => substr(sha1($auth_key, true), -8), 'server_salt' => ''];
+        if (!\is_array($auth_key)) {
+            $auth_key = ['auth_key' => $auth_key];
         }
+        $auth_key = new PermAuthKey($auth_key);
+
         $this->authorized_dc = $dc_id;
-        $this->datacenter->sockets[$dc_id]->session_id = $this->random(8);
-        $this->datacenter->sockets[$dc_id]->session_in_seq_no = 0;
-        $this->datacenter->sockets[$dc_id]->session_out_seq_no = 0;
-        $this->datacenter->sockets[$dc_id]->auth_key = $auth_key;
-        $this->datacenter->sockets[$dc_id]->temp_auth_key = null;
-        $this->datacenter->sockets[$dc_id]->incoming_messages = [];
-        $this->datacenter->sockets[$dc_id]->outgoing_messages = [];
-        $this->datacenter->sockets[$dc_id]->new_outgoing = [];
-        $this->datacenter->sockets[$dc_id]->new_incoming = [];
-        $this->datacenter->sockets[$dc_id]->authorized = true;
+        $dataCenterConnection = $this->datacenter->getDataCenterConnection($dc_id);
+        $dataCenterConnection->resetSession();
+        $dataCenterConnection->setPermAuthKey($auth_key);
+        $dataCenterConnection->authorized(true);
         $this->authorized = self::LOGGED_IN;
         yield $this->init_authorization_async();
         yield $this->get_phone_config_async();
@@ -168,7 +171,7 @@ trait Login
         yield $this->get_self_async();
         $this->authorized_dc = $this->datacenter->curdc;
 
-        return [$this->datacenter->curdc, $this->datacenter->sockets[$this->datacenter->curdc]->auth_key['auth_key']];
+        return [$this->datacenter->curdc, $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->getPermAuthKey()->getAuthKey()];
     }
 
     public function complete_signup_async($first_name, $last_name)
@@ -180,7 +183,7 @@ trait Login
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['signing_up'], \danog\MadelineProto\Logger::NOTICE);
         $this->authorization = yield $this->method_call_async_read('auth.signUp', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => $this->authorization['phone_code'], 'first_name' => $first_name, 'last_name' => $last_name], ['datacenter' => $this->datacenter->curdc]);
         $this->authorized = self::LOGGED_IN;
-        $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
+        $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
         yield $this->init_authorization_async();
         yield $this->get_phone_config_async();
 
@@ -201,7 +204,7 @@ trait Login
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_user'], \danog\MadelineProto\Logger::NOTICE);
         $this->authorization = yield $this->method_call_async_read('auth.checkPassword', ['password' => $hasher->getCheckPassword($password)], ['datacenter' => $this->datacenter->curdc]);
         $this->authorized = self::LOGGED_IN;
-        $this->datacenter->sockets[$this->datacenter->curdc]->authorized = true;
+        $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
         yield $this->init_authorization_async();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
         yield $this->get_phone_config_async();
@@ -211,10 +214,10 @@ trait Login
     }
 
     /**
-     * Update the 2FA password
+     * Update the 2FA password.
      *
      * The params array can contain password, new_password, email and hint params.
-     * 
+     *
      * @param array $params The params
      * @return void
      */

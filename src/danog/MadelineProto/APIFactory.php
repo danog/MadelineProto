@@ -177,8 +177,8 @@ class APIFactory extends AsyncConstruct
             Logger::log("Didn't serialize in a while, doing that now...");
             $this->serialize($this->session);
         }
-        if ($this->API->setdem) {
-            $this->API->setdem = false;
+        if ($this->API->flushSettings) {
+            $this->API->flushSettings = false;
             $this->API->__construct($this->API->settings);
             yield $this->API->initAsync();
         }
@@ -207,7 +207,7 @@ class APIFactory extends AsyncConstruct
             $this->wait($this->asyncAPIPromise);
         }
         if ($name === 'settings') {
-            $this->API->setdem = true;
+            $this->API->flushSettings = true;
 
             return $this->API->settings;
         }

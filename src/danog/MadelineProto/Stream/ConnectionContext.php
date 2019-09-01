@@ -54,6 +54,12 @@ class ConnectionContext
      */
     private $media = false;
     /**
+     * Whether to use CDN servers.
+     *
+     * @var bool
+     */
+    private $cdn = false;
+    /**
      * The connection URI.
      *
      * @var \Amp\Uri\Uri
@@ -233,6 +239,16 @@ class ConnectionContext
     }
 
     /**
+     * Whether this is a CDN connection
+     *
+     * @return bool
+     */
+    public function isCDN(): bool
+    {
+        return $this->cdn;
+    }
+
+    /**
      * Whether this connection context will only be used by the DNS client
      *
      * @return bool
@@ -292,6 +308,7 @@ class ConnectionContext
         }
         $this->dc = $dc;
         $this->media = strpos($dc, '_media') !== false;
+        $this->cdn = strpos($dc, '_cdn') !== false;
 
         return $this;
     }

@@ -1,6 +1,6 @@
 <?php
 /**
- * MTProto Auth key
+ * MTProto Auth key.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -21,81 +21,63 @@ namespace danog\MadelineProto\AuthKey;
 use JsonSerializable;
 
 /**
- * MTProto auth key
+ * MTProto auth key.
  */
-class AuthKey implements JsonSerializable
+abstract class AuthKey extends JsonSerializable
 {
     /**
-     * Auth key
+     * Auth key.
      *
      * @var string
      */
-    private $authKey;
+    protected $authKey;
     /**
-     * Auth key ID
+     * Auth key ID.
      *
      * @var string
      */
-    private $id;
+    protected $id;
     /**
-     * Server salt
+     * Server salt.
      *
      * @var string
      */
-    private $serverSalt;
-    /**
-     * Whether the auth key is bound
-     *
-     * @var boolean
-     */
-    private $bound = false;
-    /**
-     * Whether the connection is inited for this auth key
-     *
-     * @var boolean
-     */
-    private $inited = false;
+    protected $serverSalt;
 
     /**
-     * Constructor function 
+     * Constructor function.
      *
      * @param array $old Old auth key array
      */
     public function __construct(array $old = [])
     {
         if (isset($old['auth_key'])) {
-            if (strlen($old['auth_key']) !== 2048/8 && strpos($old['authkey'], 'pony') === 0) {
-                $old['auth_key'] = base64_decode(substr($old['auth_key'], 4));
+            if (\strlen($old['auth_key']) !== 2048/8 && \strpos($old['authkey'], 'pony') === 0) {
+                $old['auth_key'] = \base64_decode(\substr($old['auth_key'], 4));
             }
             $this->setAuthKey($old['auth_key']);
         }
         if (isset($old['server_salt'])) {
             $this->setServerSalt($old['server_salt']);
         }
-        if (isset($old['bound'])) {
-            $this->bind($old['bound']);
-        }
-        if (isset($old['connection_inited'])) {
-            $this->init($old['connection_inited']);
-        }
     }
 
 
     /**
-     * Set auth key
+     * Set auth key.
      *
      * @param string $authKey Authorization key
-     * 
+     *
      * @return void
      */
     public function setAuthKey(string $authKey)
     {
         $this->authKey = $authKey;
-        $this->id = substr(sha1($authKey, true), -8);
+        $this->id = \substr(\sha1($authKey, true), -8);
     }
 
     /**
-     * Check if auth key is present
+     * Check if auth key is present.
      *
      * @return boolean
      */
@@ -105,7 +87,7 @@ class AuthKey implements JsonSerializable
     }
 
     /**
-     * Get auth key
+     * Get auth key.
      *
      * @return string
      */
@@ -115,7 +97,7 @@ class AuthKey implements JsonSerializable
     }
 
     /**
-     * Get auth key ID
+     * Get auth key ID.
      *
      * @return string
      */
@@ -125,10 +107,10 @@ class AuthKey implements JsonSerializable
     }
 
     /**
-     * Set server salt
+     * Set server salt.
      *
      * @param string $salt Server salt
-     * 
+     *
      * @return void
      */
     public function setServerSalt(string $salt)
@@ -137,7 +119,7 @@ class AuthKey implements JsonSerializable
     }
 
     /**
-     * Get server salt
+     * Get server salt.
      *
      * @return string
      */
@@ -147,7 +129,7 @@ class AuthKey implements JsonSerializable
     }
 
     /**
-     * Check if has server salt
+     * Check if has server salt.
      *
      * @return boolean
      */
@@ -157,61 +139,18 @@ class AuthKey implements JsonSerializable
     }
 
     /**
-     * Bind auth key
-     *
-     * @param boolean $bound Bind or unbind
-     * 
-     * @return void
-     */
-    public function bind(bool $bound = true)
-    {
-        $this->bound = $bound;
-    }
-
-    /**
-     * Check if auth key is bound
+     * Check if we are logged in.
      *
      * @return boolean
      */
-    public function isBound(): bool
-    {
-        return $this->bound;
-    }
-    
+    abstract public function isAuthorized(): bool;
+
     /**
-     * Init or deinit connection for auth key
+     * Set the authorized boolean.
      *
-     * @param boolean $init Init or deinit
-     * 
+     * @param boolean $authorized Whether we are authorized
+     *
      * @return void
      */
-    public function init(bool $init = true)
-    {
-        $this->inited = $init;
-    }
-    /**
-     * Check if connection is inited for auth key
-     *
-     * @return boolean
-     */
-    public function isInited(): bool
-    {
-        return $this->inited;
-    }
-
-
-    /**
-     * JSON serialization function
-     *
-     * @return array
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'auth_key' => 'pony'.base64_encode($this->authKey),
-            'server_salt' => $this->serverSalt,
-            'bound' => $this->bound,
-            'connection_inited' => $this->inited
-        ];
-    }
+    abstract public function authorized(bool $authorized);
 }

@@ -114,11 +114,11 @@ trait ResponseHandler
                     $this->check_in_seq_no($current_msg_id);
                     $only_updates = false;
 
-                    $this->temp_auth_key['server_salt'] = $this->incoming_messages[$current_msg_id]['content']['server_salt'];
+                    $this->shared->getTempAuthKey()->setServerSalt($this->incoming_messages[$current_msg_id]['content']['server_salt']);
                     $this->ack_incoming_message_id($current_msg_id);
 
                     // Acknowledge that I received the server's response
-                    if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->curdc)->hasAuthKey() && isset($this->updaters[false])) {
+                    if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->curdc)->hasTempAuthKey() && isset($this->updaters[false])) {
                         $this->updaters[false]->resumeDefer();
                     }
 
@@ -344,8 +344,8 @@ trait ResponseHandler
         if (isset($response['_'])) {
             switch ($response['_']) {
                 case 'rpc_error':
-                    if (isset($request['method']) && $request['method'] && $request['_'] !== 'auth.bindTempAuthKey' && $this->temp_auth_key !== null && (!isset($this->temp_auth_key['connection_inited']) || $this->temp_auth_key['connection_inited'] === false)) {
-                        $this->temp_auth_key['connection_inited'] = true;
+                    if (isset($request['method']) && $request['method'] && $request['_'] !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
+                        $this->shared->getTempAuthKey()->init(true);
                     }
 
                     if (\in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_OUTDATED', 'PERSISTENT_TIMESTAMP_INVALID'])) {
@@ -447,9 +447,8 @@ trait ResponseHandler
                                         return;
                                     }
                                     $this->session_id = null;
-                                    $this->temp_auth_key = null;
-                                    $this->auth_key = null;
-                                    $this->authorized = false;
+                                    $this->shared->setTempAuthKey(null);
+                                    $this->shared->setPermAuthKey(null);
 
                                     $this->logger->logger('Auth key not registered, resetting temporary and permanent auth keys...', \danog\MadelineProto\Logger::ERROR);
 
@@ -491,7 +490,7 @@ trait ResponseHandler
                                 case 'AUTH_KEY_PERM_EMPTY':
                                     $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', \danog\MadelineProto\Logger::ERROR);
 
-                                    $this->temp_auth_key = null;
+                                    $this->shared->setTempAuthKey(null);
                                     $this->callFork((function () use ($request_id) {
                                         yield $this->API->init_authorization_async();
                                         $this->method_recall('', ['message_id' => $request_id, ]);
@@ -535,7 +534,7 @@ trait ResponseHandler
                     $this->logger->logger('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$response['error_code']], \danog\MadelineProto\Logger::WARNING);
                     switch ($response['error_code']) {
                         case 48:
-                            $this->temp_auth_key['server_salt'] = $response['new_server_salt'];
+                            $this->getTempAuthKey()->setServerSalt($response['new_server_salt']);
                             $this->method_recall('', ['message_id' => $request_id, 'postpone' => true]);
 
                             return;
@@ -543,8 +542,8 @@ trait ResponseHandler
                         case 17:
                             $this->time_delta = (int) (new \phpseclib\Math\BigInteger(\strrev($response_id), 256))->bitwise_rightShift(32)->subtract(new \phpseclib\Math\BigInteger(\time()))->toString();
                             $this->logger->logger('Set time delta to '.$this->time_delta, \danog\MadelineProto\Logger::WARNING);
-                            $this->API->resetSession();
-                            $this->temp_auth_key = null;
+                            $this->API->resetMTProtoSession();
+                            $this->shared->setTempAuthKey(null);
                             $this->callFork((function () use ($request_id) {
                                 yield $this->API->init_authorization_async();
                                 $this->method_recall('', ['message_id' => $request_id, ]);
@@ -559,8 +558,8 @@ trait ResponseHandler
             }
         }
 
-        if (isset($request['method']) && $request['method'] && $request['_'] !== 'auth.bindTempAuthKey' && $this->temp_auth_key !== null && (!isset($this->temp_auth_key['connection_inited']) || $this->temp_auth_key['connection_inited'] === false)) {
-            $this->temp_auth_key['connection_inited'] = true;
+        if (isset($request['method']) && $request['method'] && $request['_'] !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
+            $this->shared->getTempAuthKey()->init(true);
         }
 
         if (!isset($request['promise'])) {

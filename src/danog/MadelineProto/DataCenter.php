@@ -42,6 +42,8 @@ use Amp\Socket\ConnectException;
 use Amp\Socket\Socket;
 use Amp\TimeoutException;
 use danog\MadelineProto\AuthKey\AuthKey;
+use danog\MadelineProto\AuthKey\PermAuthKey;
+use danog\MadelineProto\AuthKey\TempAuthKey;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
@@ -128,16 +130,54 @@ class DataCenter
 
     public function __wakeup()
     {
-        foreach ($this->sockets as &$socket) {
+        $array = [];
+        foreach ($this->sockets as $id => $socket) {
             if ($socket instanceof Connection) {
-                $new = new DataCenterConnection;
                 if ($socket->temp_auth_key) {
-                    $new->setAuthKey(new AuthKey($socket->temp_auth_key), true);
+                    $array[$id]['tempAuthKey'] = $socket->temp_auth_key;
                 }
                 if ($socket->auth_key) {
-                    $new->setAuthKey(new AuthKey($socket->auth_key), false);
+                    $array[$id]['authKey'] = $socket->auth_key;
+                    $array[$id]['authKey']['authorized'] = $socket->authorized;
                 }
-                $new->authorized($socket->authorized);
+            }
+        }
+        $this->setDataCenterConnections($array);
+    }
+
+    /**
+     * Set auth key information from saved auth array
+     *
+     * @param array $saved Saved auth array
+     * 
+     * @return void
+     */
+    public function setDataCenterConnections(array $saved)
+    {
+        foreach ($saved as $id => $data) {
+            $connection = $this->sockets[$id] = new DataCenterConnection;
+            if (isset($data['authKey'])) {
+                $connection->setPermAuthKey(new PermAuthKey($data['authKey']));
+            }
+            if (isset($data['linked'])) {
+                continue;
+            }
+            if (isset($data['tempAuthKey'])) {
+                $connection->setTempAuthKey(new TempAuthKey($data['tempAuthKey']));
+                if ($data['tempAuthKey']['bound'] ?? false && $connection->hasPermAuthKey()) {
+                    $connection->bind();
+                }
+            }
+            unset($saved[$id]);
+        }
+        foreach ($saved as $id => $data) {
+            $connection = $this->sockets[$id];
+            $connection->link($data['linked']);
+            if (isset($data['tempAuthKey'])) {
+                $connection->setTempAuthKey(new TempAuthKey($data['tempAuthKey']));
+                if ($data['tempAuthKey']['bound'] ?? false && $connection->hasPermAuthKey()) {
+                    $connection->bind();
+                }
             }
         }
     }
@@ -786,6 +826,17 @@ class DataCenter
         return yield (yield $this->getHTTPClient()->request($url))->getBody();
     }
 
+    /**
+     * Get Connection instance for authorization
+     *
+     * @param string $dc DC ID
+     *
+     * @return Connection
+     */
+    public function getAuthConnection(string $dc): Connection
+    {
+        return $this->sockets[$dc]->getAuthConnection();
+    }
     /**
      * Get Connection instance.
      *

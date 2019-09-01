@@ -19,6 +19,8 @@
 namespace danog\MadelineProto;
 
 use danog\MadelineProto\AuthKey\AuthKey;
+use danog\MadelineProto\AuthKey\PermAuthKey;
+use danog\MadelineProto\AuthKey\TempAuthKey;
 use danog\MadelineProto\Stream\ConnectionContext;
 use JsonSerializable;
 
@@ -27,22 +29,15 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Temporary auth key.
      *
-     * @var AuthKey
+     * @var TempAuthKey|null
      */
     private $tempAuthKey;
     /**
      * Permanent auth key.
      *
-     * @var AuthKey
+     * @var PermAuthKey|null
      */
     private $authKey;
-
-    /**
-     * Whether this auth key is authorized (as in logged in).
-     *
-     * @var boolean
-     */
-    private $authorized = false;
 
     /**
      * Connections open to a certain DC.
@@ -79,11 +74,11 @@ class DataCenterConnection implements JsonSerializable
     private $datacenter;
 
     /**
-     * Index for round robin.
+     * Linked DC ID.
      *
-     * @var integer
+     * @var string
      */
-    private $index = 0;
+    private $linked;
 
     /**
      * Loop to keep weights at sane value.
@@ -106,19 +101,19 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Check if auth key is present.
      *
-     * @param boolean $temp Whether to fetch the temporary auth key
+     * @param boolean|null $temp Whether to fetch the temporary auth key
      *
      * @return bool
      */
     public function hasAuthKey(bool $temp = true): bool
     {
-        return $this->{$temp ? 'tempAuthKey' : 'authKey'} !== null;
+        return $this->{$temp ? 'tempAuthKey' : 'authKey'} !== null && $this->{$temp ? 'tempAuthKey' : 'authKey'}->hasAuthKey();
     }
     /**
      * Set auth key.
      *
      * @param AuthKey|null $key  The auth key
-     * @param boolean      $temp Whether to set the temporary auth key
+     * @param boolean|null $temp Whether to set the temporary auth key
      *
      * @return void
      */
@@ -128,13 +123,86 @@ class DataCenterConnection implements JsonSerializable
     }
 
     /**
+     * Get temporary authorization key.
+     *
+     * @return AuthKey
+     */
+    public function getTempAuthKey(): TempAuthKey
+    {
+        return $this->getAuthKey(true);
+    }
+    /**
+     * Get permanent authorization key.
+     *
+     * @return AuthKey
+     */
+    public function getPermAuthKey(): PermAuthKey
+    {
+        return $this->getAuthKey(false);
+    }
+
+    /**
+     * Check if has temporary authorization key.
+     *
+     * @return boolean
+     */
+    public function hasTempAuthKey(): bool
+    {
+        return $this->hasAuthKey(true);
+    }
+
+    /**
+     * Check if has permanent authorization key.
+     *
+     * @return boolean
+     */
+    public function hasPermAuthKey(): bool
+    {
+        return $this->hasAuthKey(false);
+    }
+
+    /**
+     * Set temporary authorization key.
+     *
+     * @param TempAuthKey|null $key Auth key
+     *
+     * @return void
+     */
+    public function setTempAuthKey(?TempAuthKey $key)
+    {
+        return $this->setAuthKey($key, true);
+    }
+    /**
+     * Set permanent authorization key.
+     *
+     * @param PermAuthKey|null $key Auth key
+     *
+     * @return void
+     */
+    public function setPermAuthKey(?PermAuthKey $key)
+    {
+        return $this->setAuthKey($key, false);
+    }
+
+    /**
+     * Bind temporary and permanent auth keys.
+     *
+     * @param bool $pfs Whether to bind using PFS
+     *
+     * @return void
+     */
+    public function bind(bool $pfs = true)
+    {
+        $this->tempAuthKey->bind($this->authKey, $pfs);
+    }
+    /**
      * Check if we are logged in.
      *
      * @return boolean
      */
     public function isAuthorized(): bool
     {
-        return $this->authorized;
+        return $this->hasTempAuthKey() ? $this->getTempAuthKey()->isAuthorized() : false;
     }
 
     /**
@@ -146,7 +214,20 @@ class DataCenterConnection implements JsonSerializable
      */
     public function authorized(bool $authorized)
     {
-        $this->authorized = $authorized;
+        $this->getTempAuthKey()->authorized($authorized);
+    }
+
+    /**
+     * Link permanent authorization info of main DC to media DC.
+     *
+     * @param string $dc Main DC ID
+     *
+     * @return void
+     */
+    public function link(string $dc)
+    {
+        $this->linked = $dc;
+        $this->authKey = &$this->API->datacenter->getDataCenterConnection($dc)->authKey;
     }
 
     /**
@@ -171,6 +252,7 @@ class DataCenterConnection implements JsonSerializable
             $socket->flush();
         }
     }
+
     /**
      * Get connection context.
      *
@@ -195,7 +277,6 @@ class DataCenterConnection implements JsonSerializable
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
         $media = $ctx->isMedia();
-
 
         $count = $media ? $this->API->settings['connection_settings']['media_socket_count'] : 1;
 
@@ -259,6 +340,16 @@ class DataCenterConnection implements JsonSerializable
     }
 
     /**
+     * Get connection for authorization.
+     *
+     * @return Connection
+     */
+    public function getAuthConnection(): Connection
+    {
+        return $this->connections[0];
+    }
+
+    /**
      * Get best socket in round robin.
      *
      * @return Connection
@@ -317,10 +408,14 @@ class DataCenterConnection implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return [
+        return $this->linked ?
+        [
+            'linked' => $this->linked,
+            'tempAuthKey' => $this->tempAuthKey
+        ] :
+        [
             'authKey' => $this->authKey,
-            'tempAuthKey' => $this->tempAuthKey,
-            'authorized' => $this->authorized,
+            'tempAuthKey' => $this->tempAuthKey
         ];
     }
     /**
@@ -332,6 +427,6 @@ class DataCenterConnection implements JsonSerializable
      */
     public function __sleep()
     {
-        return ['authKey', 'tempAuthKey', 'authorized'];
+        return $this->linked ? ['linked', 'tempAuthKey'] : ['linked', 'authKey', 'tempAuthKey'];
     }
 }

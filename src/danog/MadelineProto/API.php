@@ -297,8 +297,8 @@ class API extends APIFactory
             if ($filename == '') {
                 throw new \danog\MadelineProto\Exception('Empty filename');
             }
-            if (isset($this->API->setdem) && $this->API->setdem) {
-                $this->API->setdem = false;
+            if (isset($this->API->flushSettings) && $this->API->flushSettings) {
+                $this->API->flushSettings = false;
                 $this->API->__construct($this->API->settings);
             }
             if ($this->API === null && !$this->getting_api_id) {

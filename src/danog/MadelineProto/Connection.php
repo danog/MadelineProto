@@ -262,13 +262,9 @@ class Connection extends Session
     }
 
     /**
-     * Connect function.
+     * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
      *
-     * Connects to a telegram DC using the specified protocol, proxy and connection parameters
-     *
-     * @param string $proxy Proxy class name
-     *
-     * @internal
+     * @param ConnectionContext $ctx Connection context
      *
      * @return \Amp\Promise
      */
@@ -348,7 +344,7 @@ class Connection extends Session
      *
      * @param array   $message The message to send
      * @param boolean $flush   Whether to flush the message right away
-     * 
+     *
      * @return \Generator
      */
     public function sendMessage(array $message, bool $flush = true): \Generator
@@ -388,7 +384,7 @@ class Connection extends Session
     }
 
     /**
-     * Flush pending packets
+     * Flush pending packets.
      *
      * @return void
      */
@@ -399,7 +395,9 @@ class Connection extends Session
     /**
      * Connect main instance.
      *
-     * @param MTProto $extra
+     * @param DataCenterConnection $extra           Extra
+     * @param callable             $readingCallback Read callback
+     * @param callable             $writingCallback Write callback
      *
      * @return void
      */
@@ -423,7 +421,7 @@ class Connection extends Session
     }
 
     /**
-     * Disconnect from DC
+     * Disconnect from DC.
      *
      * @return void
      */
@@ -445,9 +443,9 @@ class Connection extends Session
         }
         $this->API->logger->logger("Disconnected from DC {$this->datacenter}");
     }
-    
+
     /**
-     * Reconnect to DC
+     * Reconnect to DC.
      *
      * @return \Generator
      */
@@ -468,7 +466,7 @@ class Connection extends Session
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */

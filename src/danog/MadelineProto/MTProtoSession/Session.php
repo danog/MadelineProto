@@ -26,7 +26,6 @@ abstract class Session
     use AckHandler;
     use MsgIdHandler;
     use ResponseHandler;
-    use SaltHandler;
     use SeqNoHandler;
     use CallHandler;
 
@@ -44,7 +43,7 @@ abstract class Session
     public $ack_queue = [];
 
     /**
-     * Reset MTProto session
+     * Reset MTProto session.
      *
      * @return void
      */

@@ -173,7 +173,7 @@ trait CallHandler
 
                 return yield all($promises);
             }
-            $args = yield $this->botAPI_to_MTProto_async($args);
+            $args = yield $this->API->botAPI_to_MTProto_async($args);
             if (isset($args['ping_id']) && \is_int($args['ping_id'])) {
                 $args['ping_id'] = $this->pack_signed_long($args['ping_id']);
             }
@@ -188,7 +188,7 @@ trait CallHandler
                 'content_related' => $this->content_related($method),
                 'promise' => $deferred,
                 'method' => true,
-                'unencrypted' => $this->shared->hasAuthKey() && \strpos($method, '.') === false
+                'unencrypted' => !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false
             ]
         );
 
@@ -220,7 +220,7 @@ trait CallHandler
      */
     public function object_call_async(string $object, $args = [], array $aargs = ['msg_id' => null]): Promise
     {
-        $message = ['_' => $object, 'body' => $args, 'content_related' => $this->content_related($object), 'unencrypted' => $this->shared->hasAuthKey(), 'method' => false];
+        $message = ['_' => $object, 'body' => $args, 'content_related' => $this->content_related($object), 'unencrypted' => !$this->shared->hasTempAuthKey(), 'method' => false];
         if (isset($aargs['promise'])) {
             $message['promise'] = $aargs['promise'];
         }

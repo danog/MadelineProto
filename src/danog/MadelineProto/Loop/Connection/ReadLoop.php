@@ -113,7 +113,7 @@ class ReadLoop extends SignalLoop
 
             $connection->httpReceived();
 
-            Loop::defer([$API, 'handle_messages'], $datacenter);
+            Loop::defer([$connection, 'handle_messages']);
 
             if ($this->API->is_http($datacenter)) {
                 Loop::defer([$connection->waiter, 'resume']);
