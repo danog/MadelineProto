@@ -63,7 +63,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         }
     }
 }
-$settings = ['logger' => ['logger_level' => 5]];
+$settings = ['logger' => ['logger_level' => 5], 'serialization' => ['serialization_interval' => 30, 'cleanup_before_serialization' => true]];
 
 $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
 $MadelineProto->async(true);
