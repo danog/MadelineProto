@@ -879,6 +879,26 @@ class DataCenter
     {
         return isset($this->sockets[$dc]);
     }
+
+
+    /**
+     * Check if connected to datacenter using HTTP
+     *
+     * @param string $datacenter DC ID
+     * 
+     * @return boolean
+     */
+    public function isHttp(string $datacenter)
+    {
+        return $this->sockets[$datacenter]->isHttp();
+    }
+
+    /**
+     * Get all DCs
+     *
+     * @param boolean $all
+     * @return void
+     */
     public function get_dcs($all = true)
     {
         $test = $this->settings['all']['test_mode'] ? 'test' : 'main';

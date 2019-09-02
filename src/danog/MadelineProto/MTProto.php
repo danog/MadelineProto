@@ -1147,9 +1147,16 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
     }
 
-    public function is_http($datacenter)
+    /**
+     * Check if connected to datacenter using HTTP
+     *
+     * @param string $datacenter DC ID
+     * 
+     * @return boolean
+     */
+    public function isHttp(string $datacenter)
     {
-        return \in_array($this->datacenter->getDataCenterConection($datacenter)->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
+        return $this->datacenter->isHttp($datacenter);
     }
 
     // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info

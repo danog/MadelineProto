@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use danog\MadelineProto\MTProto;
+
 /**
  * Manages sequence number.
  */

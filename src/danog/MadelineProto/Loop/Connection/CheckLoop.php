@@ -32,7 +32,7 @@ class CheckLoop extends ResumableSignalLoop
     /**
      * Connection instance.
      *
-     * @var \danog\Madelineproto\Connection
+     * @var \danog\MadelineProto\Connection
      */
     protected $connection;
     /**
@@ -42,12 +42,18 @@ class CheckLoop extends ResumableSignalLoop
      */
     protected $datacenter;
 
+    /**
+     * DataCenterConnection instance.
+     *
+     * @var \danog\MadelineProto\DataCenterConnection
+     */
+    protected $datacenterConnection;
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
         $this->API = $connection->getExtra();
-        $ctx = $connection->getCtx();
-        $this->datacenter = $ctx->getDc();
+        $this->datacenter = $connection->getDatacenterID();
+        $this->datacenterConnection = $connection->getShared();
     }
 
     public function loop()
@@ -55,10 +61,9 @@ class CheckLoop extends ResumableSignalLoop
         $API = $this->API;
         $datacenter = $this->datacenter;
         $connection = $this->connection;
+        $shared = $this->datacenterConnection;
 
-        $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
-
-        $timeout = $API->settings['connection_settings'][$dc_config_number]['timeout'];
+        $timeout = $shared->getSettings()['timeout'];
         while (true) {
             while (empty($connection->new_outgoing)) {
                 if (yield $this->waitSignal($this->pause())) {
@@ -70,7 +75,7 @@ class CheckLoop extends ResumableSignalLoop
                 $last_msgid = $connection->get_max_id(true);
                 $last_chunk = $connection->getLastChunk();
 
-                if ($connection->temp_auth_key !== null) {
+                if ($shared->hasTempAuthKey()) {
                     $full_message_ids = $connection->getPendingCalls(); //array_values($connection->new_outgoing);
                     foreach (\array_chunk($full_message_ids, 8192) as $message_ids) {
                         $deferred = new Deferred();
@@ -124,7 +129,7 @@ class CheckLoop extends ResumableSignalLoop
                                     }
                                 }
                                 if ($reply) {
-                                    $this->callFork($API->object_call_async('msg_resend_ans_req', ['msg_ids' => $reply], ['datacenter' => $datacenter, 'postpone' => true]));
+                                    $this->callFork($connection->object_call_async('msg_resend_ans_req', ['msg_ids' => $reply], ['postpone' => true]));
                                 }
                                 $connection->writer->resume();
                             }
@@ -135,7 +140,7 @@ class CheckLoop extends ResumableSignalLoop
                             $list .= $connection->outgoing_messages[$message_id]['_'].', ';
                         }
                         $API->logger->logger("Still missing $list on DC $datacenter, sending state request", \danog\MadelineProto\Logger::ERROR);
-                        yield $API->object_call_async('msgs_state_req', ['msg_ids' => $message_ids], ['datacenter' => $datacenter, 'promise' => $deferred]);
+                        yield $connection->object_call_async('msgs_state_req', ['msg_ids' => $message_ids], ['promise' => $deferred]);
                     }
                 } else {
                     foreach ($connection->new_outgoing as $message_id) {

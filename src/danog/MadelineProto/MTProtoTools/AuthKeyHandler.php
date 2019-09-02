@@ -714,7 +714,6 @@ trait AuthKeyHandler
             $cdn = \strpos($id, 'cdn');
             $media = \strpos($id, 'media');
             if (!$socket->hasTempAuthKey() || !$socket->hasPermAuthKey()) {
-                $dc_config_number = isset($this->settings['connection_settings'][$id]) ? $id : 'all';
                 if (!$socket->hasPermAuthKey() && !$cdn && !$media) {
                     $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
                     $socket->setPermAuthKey(yield $this->create_auth_key_async(-1, $id));
@@ -723,7 +722,7 @@ trait AuthKeyHandler
                 if ($media) {
                     $socket->link(\intval($id));
                 }
-                if ($this->settings['connection_settings'][$dc_config_number]['pfs']) {
+                if ($this->datacenter->getDataCenterConnection($id)->getSettings()['pfs']) {
                     if (!$cdn) {
                         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
 

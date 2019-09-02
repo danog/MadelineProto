@@ -71,7 +71,7 @@ class Connection extends Session
      *
      * @var Stream
      */
-    private $stream;
+    public $stream;
     /**
      * Connection context.
      *
@@ -126,30 +126,18 @@ class Connection extends Session
     protected $datacenter;
 
     /**
-     * Whether the socket is reading data.
+     * Connection ID
      *
-     * @var boolean
+     * @var int
      */
-    private $reading = false;
-    /**
-     * Whether the socket is writing data.
-     *
-     * @var boolean
-     */
-    private $writing = false;
+    private $id = 0;
 
     /**
-     * Writing callback.
+     * DC ID and connection ID concatenated
      *
-     * @var callable
+     * @var 
      */
-    private $writingCallback;
-    /**
-     * Reading callback.
-     *
-     * @var callable
-     */
-    private $readingCallback;
+    private $datacenterId = '';
 
     /**
      * Check if the socket is writing stuff.
@@ -178,8 +166,7 @@ class Connection extends Session
      */
     public function writing(bool $writing)
     {
-        $this->writing = $writing;
-        ($this->writingCallback)($writing);
+        $this->shared->writing($writing, $this->id);
     }
     /**
      * Set reading boolean.
@@ -190,8 +177,7 @@ class Connection extends Session
      */
     public function reading(bool $reading)
     {
-        $this->reading = $reading;
-        ($this->readingCallback)($writing);
+        $this->shared->reading($reading, $this->id);
     }
 
     /**
@@ -250,6 +236,25 @@ class Connection extends Session
         return $this->httpReqCount;
     }
 
+    /**
+     * Get connection ID
+     *
+     * @return integer
+     */
+    public function getID(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Get datacenter concatenated with connection ID
+     *
+     * @return string
+     */
+    public function getDatacenterID(): string
+    {
+        return $this->datacenterId;
+    }
 
     /**
      * Get connection context.
@@ -276,6 +281,7 @@ class Connection extends Session
 
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
+        $this->datacenterId = $this->datacenter.'.'.$this->id;
         $this->stream = yield $ctx->getStream();
         if (isset($this->old)) {
             unset($this->old);
@@ -395,17 +401,15 @@ class Connection extends Session
     /**
      * Connect main instance.
      *
-     * @param DataCenterConnection $extra           Extra
-     * @param callable             $readingCallback Read callback
-     * @param callable             $writingCallback Write callback
+     * @param DataCenterConnection $extra Shared instance
+     * @param int                  $id    Connection ID
      *
      * @return void
      */
-    public function setExtra(DataCenterConnection $extra, $readingCallback, $writingCallback)
+    public function setExtra(DataCenterConnection $extra, int $id)
     {
         $this->shared = $extra;
-        $this->readingCallback = $readingCallback;
-        $this->writingCallback = $writingCallback;
+        $this->id = $id;
         $this->API = $extra->getExtra();
         $this->logger = $this->API->logger;
     }
@@ -421,13 +425,23 @@ class Connection extends Session
     }
 
     /**
+     * Get shared connection instance.
+     *
+     * @return DataCenterConnection
+     */
+    public function getShared(): DataCenterConnection
+    {
+        return $this->shared;
+    }
+
+    /**
      * Disconnect from DC.
      *
      * @return void
      */
     public function disconnect()
     {
-        $this->API->logger->logger("Disconnecting from DC {$this->datacenter}");
+        $this->API->logger->logger("Disconnecting from DC {$this->datacenterId}");
         $this->old = true;
         foreach (['reader', 'writer', 'checker', 'waiter', 'updater'] as $loop) {
             if (isset($this->{$loop}) && $this->{$loop}) {
@@ -441,7 +455,7 @@ class Connection extends Session
                 $this->API->logger->logger($e);
             }
         }
-        $this->API->logger->logger("Disconnected from DC {$this->datacenter}");
+        $this->API->logger->logger("Disconnected from DC {$this->datacenterId}");
     }
 
     /**
@@ -451,7 +465,7 @@ class Connection extends Session
      */
     public function reconnect(): \Generator
     {
-        $this->API->logger->logger("Reconnecting DC {$this->datacenter}");
+        $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect();
         yield $this->API->datacenter->dcConnectAsync($this->ctx->getDc());
         if ($this->API->hasAllAuth() && !$this->hasPendingCalls()) {
@@ -473,17 +487,5 @@ class Connection extends Session
     public function getName(): string
     {
         return __CLASS__;
-    }
-
-    /**
-     * Sleep function.
-     *
-     * @internal
-     *
-     * @return array
-     */
-    public function __sleep()
-    {
-        return ['peer_tag', 'temp_auth_key', 'auth_key', 'session_id', 'session_out_seq_no', 'session_in_seq_no', 'max_incoming_id', 'max_outgoing_id', 'authorized', 'ack_queue'];
     }
 }

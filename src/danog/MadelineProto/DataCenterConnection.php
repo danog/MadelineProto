@@ -22,6 +22,8 @@ use danog\MadelineProto\AuthKey\AuthKey;
 use danog\MadelineProto\AuthKey\PermAuthKey;
 use danog\MadelineProto\AuthKey\TempAuthKey;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use JsonSerializable;
 
 class DataCenterConnection implements JsonSerializable
@@ -86,6 +88,19 @@ class DataCenterConnection implements JsonSerializable
      * @var \danog\MadelineProto\Loop\Generic\PeriodicLoop
      */
     private $robinLoop;
+
+    /**
+     * Decrement roundrobin weight by this value if busy reading.
+     *
+     * @var integer
+     */
+    private $decRead = 1;
+    /**
+     * Decrement roundrobin weight by this value if busy writing.
+     *
+     * @var integer
+     */
+    private $decWrite = 10;
 
     /**
      * Get auth key.
@@ -294,15 +309,7 @@ class DataCenterConnection implements JsonSerializable
         for ($x = 0; $x < $count; $x++) {
             $this->availableConnections[$x] = 0;
             $this->connections[$x] = new Connection();
-            $this->connections[$x]->setExtra(
-                $this,
-                function (bool $reading) use ($x, $incRead) {
-                    $this->availableConnections[$x] += $reading ? -$incRead : $incRead;
-                },
-                function (bool $writing) use ($x) {
-                    $this->availableConnections[$x] += $writing ? -10 : 10;
-                }
-            );
+            $this->connections[$x]->setExtra($this, $x);
             yield $this->connections[$x]->connect($ctx);
             $ctx = $this->ctx->getCtx();
         }
@@ -381,6 +388,32 @@ class DataCenterConnection implements JsonSerializable
     }
 
     /**
+     * Indicate that one of the sockets is busy reading.
+     *
+     * @param boolean $reading Whether we're busy reading
+     * @param int     $x       Connection ID
+     *
+     * @return void
+     */
+    public function reading(bool $reading, int $x)
+    {
+        $this->availableConnections[$x] += $reading ? -$this->decRead : $this->decRead;
+    }
+    /**
+     * Indicate that one of the sockets is busy writing.
+     *
+     * @param boolean $writing Whether we're busy writing
+     * @param int     $x       Connection ID
+     *
+     * @return void
+     */
+    public function writing(bool $writing, int $x)
+    {
+        $this->availableConnections[$x] += $writing ? -$this->decWrite : $this->decWrite;
+    }
+
+
+    /**
      * Set main instance.
      *
      * @param MTProto $API Main instance
@@ -401,6 +434,28 @@ class DataCenterConnection implements JsonSerializable
     {
         return $this->API;
     }
+
+    /**
+     * Check if is an HTTP connection.
+     *
+     * @return boolean
+     */
+    public function isHttp()
+    {
+        return \in_array($this->ctx->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
+    }
+
+    /**
+     * Get DC-specific settings
+     *
+     * @return array
+     */
+    public function getSettings(): array
+    {
+        $dc_config_number = isset($this->API->settings['connection_settings'][$this->datacenter]) ? $this->datacenter : 'all';
+        return $this->API->settings['connection_settings'][$dc_config_number];
+    }
+
     /**
      * JSON serialize function.
      *

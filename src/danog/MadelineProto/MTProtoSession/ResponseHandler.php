@@ -257,7 +257,7 @@ trait ResponseHandler
                     $this->check_in_seq_no($current_msg_id);
                     $this->ack_incoming_message_id($current_msg_id);
                     // Acknowledge that I received the server's response
-                    $response_type = $this->constructors->find_by_predicate($this->incoming_messages[$current_msg_id]['content']['_'])['type'];
+                    $response_type = $this->API->constructors->find_by_predicate($this->incoming_messages[$current_msg_id]['content']['_'])['type'];
 
                     switch ($response_type) {
                         case 'Updates':
@@ -568,7 +568,7 @@ trait ResponseHandler
             return;
         }
         $botAPI = isset($request['botAPI']) && $request['botAPI'];
-        if (isset($response['_']) && \strpos($this->datacenter, 'cdn') === false && $this->constructors->find_by_predicate($response['_'])['type'] === 'Updates') {
+        if (isset($response['_']) && \strpos($this->datacenter, 'cdn') === false && $this->API->constructors->find_by_predicate($response['_'])['type'] === 'Updates') {
             $response['request'] = $request;
             $this->callForkDefer($this->API->handle_updates_async($response));
         }

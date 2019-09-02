@@ -42,9 +42,15 @@ class ReadLoop extends SignalLoop
     /**
      * Connection instance.
      *
-     * @var \danog\Madelineproto\Connection
+     * @var \danog\MadelineProto\Connection
      */
     protected $connection;
+    /**
+     * DataCenterConnection instance.
+     *
+     * @var \danog\MadelineProto\DataCenterConnection
+     */
+    protected $datacenterConnection;
     /**
      * DC ID.
      *
@@ -57,7 +63,8 @@ class ReadLoop extends SignalLoop
         $this->connection = $connection;
         $this->API = $connection->getExtra();
         $ctx = $connection->getCtx();
-        $this->datacenter = $ctx->getDc();
+        $this->datacenter = $connection->getDatacenterID();
+        $this->datacenterConnection = $connection->getShared();
     }
 
     public function loop()
@@ -65,8 +72,8 @@ class ReadLoop extends SignalLoop
         $API = $this->API;
         $datacenter = $this->datacenter;
         $connection = $this->connection;
+        $shared = $this->datacenterConnection;
 
-        //$timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
         while (true) {
             try {
                 $error = yield $this->waitSignal($this->readMessage());
@@ -84,14 +91,14 @@ class ReadLoop extends SignalLoop
                 $this->exitedLoop();
 
                 if ($error === -404) {
-                    if ($connection->temp_auth_key !== null) {
+                    if ($shared->getTemp) {
                         $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", \danog\MadelineProto\Logger::WARNING);
-                        $connection->temp_auth_key = null;
+                        $shared->setTempAuthKey(null);
                         $connection->session_id = null;
                         foreach ($connection->new_outgoing as $message_id) {
                             $connection->outgoing_messages[$message_id]['sent'] = 0;
                         }
-                        yield $connection->reconnect();
+                        yield $shared->reconnect();
                         yield $API->init_authorization_async();
                     } else {
                         yield $connection->reconnect();
@@ -115,7 +122,7 @@ class ReadLoop extends SignalLoop
 
             Loop::defer([$connection, 'handle_messages']);
 
-            if ($this->API->is_http($datacenter)) {
+            if ($shared->isHttp()) {
                 Loop::defer([$connection->waiter, 'resume']);
             }
         }
@@ -126,6 +133,8 @@ class ReadLoop extends SignalLoop
         $API = $this->API;
         $datacenter = $this->datacenter;
         $connection = $this->connection;
+        $shared = $this->datacenterConnection;
+
         if (isset($this->connection->old)) {
             $API->logger->logger('Not reading because connection is old');
 
@@ -152,84 +161,89 @@ class ReadLoop extends SignalLoop
 
             return $payload;
         }
-        $auth_key_id = yield $buffer->bufferRead(8);
 
-        if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
-            $message_id = yield $buffer->bufferRead(8);
-            if (!\in_array($message_id, [1, 0])) {
-                $connection->check_message_id($message_id, ['outgoing' => false, 'container' => false]);
-            }
-            $message_length = \unpack('V', yield $buffer->bufferRead(4))[1];
-            $message_data = yield $buffer->bufferRead($message_length);
-            $left = $payload_length - $message_length - 4 - 8 - 8;
-            if ($left) {
-                $API->logger->logger('Padded unencrypted message', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                if ($left < (-$message_length & 15)) {
-                    $API->logger->logger('Protocol padded unencrypted message', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $connection->reading(true);
+        try {
+            $auth_key_id = yield $buffer->bufferRead(8);
+
+            if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
+                $message_id = yield $buffer->bufferRead(8);
+                if (!\in_array($message_id, [1, 0])) {
+                    $connection->check_message_id($message_id, ['outgoing' => false, 'container' => false]);
                 }
-                yield $buffer->bufferRead($left);
-            }
-            $connection->incoming_messages[$message_id] = [];
-        } elseif ($auth_key_id === $connection->temp_auth_key['id']) {
-            $message_key = yield $buffer->bufferRead(16);
-            list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $connection->temp_auth_key['auth_key'], false);
-            $encrypted_data = yield $buffer->bufferRead($payload_length - 24);
+                $message_length = \unpack('V', yield $buffer->bufferRead(4))[1];
+                $message_data = yield $buffer->bufferRead($message_length);
+                $left = $payload_length - $message_length - 4 - 8 - 8;
+                if ($left) {
+                    $API->logger->logger('Padded unencrypted message', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    if ($left < (-$message_length & 15)) {
+                        $API->logger->logger('Protocol padded unencrypted message', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    }
+                    yield $buffer->bufferRead($left);
+                }
+                $connection->incoming_messages[$message_id] = [];
+            } elseif ($auth_key_id === $shared->getTempAuthKey()->getID()) {
+                $message_key = yield $buffer->bufferRead(16);
+                list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $shared->getTempAuthKey()->getAuthKey(), false);
+                $encrypted_data = yield $buffer->bufferRead($payload_length - 24);
 
-            $protocol_padding = \strlen($encrypted_data) % 16;
-            if ($protocol_padding) {
-                $encrypted_data = \substr($encrypted_data, 0, -$protocol_padding);
-            }
-            $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
-            /*
-            $server_salt = substr($decrypted_data, 0, 8);
-            if ($server_salt != $connection->temp_auth_key['server_salt']) {
-            $API->logger->logger('WARNING: Server salt mismatch (my server salt '.$connection->temp_auth_key['server_salt'].' is not equal to server server salt '.$server_salt.').', \danog\MadelineProto\Logger::WARNING);
-            }
-             */
-            $session_id = \substr($decrypted_data, 8, 8);
-            if ($session_id != $connection->session_id) {
-                throw new \danog\MadelineProto\Exception('Session id mismatch.');
-            }
-            $message_id = \substr($decrypted_data, 16, 8);
-            $connection->check_message_id($message_id, ['outgoing' => false, 'container' => false]);
-            $seq_no = \unpack('V', \substr($decrypted_data, 24, 4))[1];
+                $protocol_padding = \strlen($encrypted_data) % 16;
+                if ($protocol_padding) {
+                    $encrypted_data = \substr($encrypted_data, 0, -$protocol_padding);
+                }
+                $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
+                /*
+                $server_salt = substr($decrypted_data, 0, 8);
+                if ($server_salt != $shared->getTempAuthKey()->getServerSalt()) {
+                $API->logger->logger('WARNING: Server salt mismatch (my server salt '.$shared->getTempAuthKey()->getServerSalt().' is not equal to server server salt '.$server_salt.').', \danog\MadelineProto\Logger::WARNING);
+                }
+                 */
+                $session_id = \substr($decrypted_data, 8, 8);
+                if ($session_id != $connection->session_id) {
+                    throw new \danog\MadelineProto\Exception('Session id mismatch.');
+                }
+                $message_id = \substr($decrypted_data, 16, 8);
+                $connection->check_message_id($message_id, ['outgoing' => false, 'container' => false]);
+                $seq_no = \unpack('V', \substr($decrypted_data, 24, 4))[1];
 
-            $message_data_length = \unpack('V', \substr($decrypted_data, 28, 4))[1];
-            if ($message_data_length > \strlen($decrypted_data)) {
-                throw new \danog\MadelineProto\SecurityException('message_data_length is too big');
-            }
-            if (\strlen($decrypted_data) - 32 - $message_data_length < 12) {
-                throw new \danog\MadelineProto\SecurityException('padding is too small');
-            }
-            if (\strlen($decrypted_data) - 32 - $message_data_length > 1024) {
-                throw new \danog\MadelineProto\SecurityException('padding is too big');
-            }
-            if ($message_data_length < 0) {
-                throw new \danog\MadelineProto\SecurityException('message_data_length not positive');
-            }
-            if ($message_data_length % 4 != 0) {
-                throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
-            }
-            $message_data = \substr($decrypted_data, 32, $message_data_length);
-            if ($message_key != \substr(\hash('sha256', \substr($connection->temp_auth_key['auth_key'], 96, 32).$decrypted_data, true), 8, 16)) {
-                throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
-            }
-            $connection->incoming_messages[$message_id] = ['seq_no' => $seq_no];
-        } else {
-            $API->logger->logger('Got unknown auth_key id', \danog\MadelineProto\Logger::ERROR);
+                $message_data_length = \unpack('V', \substr($decrypted_data, 28, 4))[1];
+                if ($message_data_length > \strlen($decrypted_data)) {
+                    throw new \danog\MadelineProto\SecurityException('message_data_length is too big');
+                }
+                if (\strlen($decrypted_data) - 32 - $message_data_length < 12) {
+                    throw new \danog\MadelineProto\SecurityException('padding is too small');
+                }
+                if (\strlen($decrypted_data) - 32 - $message_data_length > 1024) {
+                    throw new \danog\MadelineProto\SecurityException('padding is too big');
+                }
+                if ($message_data_length < 0) {
+                    throw new \danog\MadelineProto\SecurityException('message_data_length not positive');
+                }
+                if ($message_data_length % 4 != 0) {
+                    throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
+                }
+                $message_data = \substr($decrypted_data, 32, $message_data_length);
+                if ($message_key != \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
+                    throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
+                }
+                $connection->incoming_messages[$message_id] = ['seq_no' => $seq_no];
+            } else {
+                $API->logger->logger('Got unknown auth_key id', \danog\MadelineProto\Logger::ERROR);
 
-            return -404;
+                return -404;
+            }
+            $deserialized = $API->deserialize($message_data, ['type' => '', 'connection' => $connection]);
+            $API->referenceDatabase->reset();
+
+            $connection->incoming_messages[$message_id]['content'] = $deserialized;
+            $connection->incoming_messages[$message_id]['response'] = -1;
+            $connection->new_incoming[$message_id] = $message_id;
+            //$connection->last_http_wait = 0;
+
+            $API->logger->logger('Received payload from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        } finally {
+            $connection->reading(false);
         }
-        $deserialized = $API->deserialize($message_data, ['type' => '', 'datacenter' => $datacenter]);
-        $API->referenceDatabase->reset();
-
-        $connection->incoming_messages[$message_id]['content'] = $deserialized;
-        $connection->incoming_messages[$message_id]['response'] = -1;
-        $connection->new_incoming[$message_id] = $message_id;
-        //$connection->last_http_wait = 0;
-
-        $API->logger->logger('Received payload from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-
         return true;
     }
 

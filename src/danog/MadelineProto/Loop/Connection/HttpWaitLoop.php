@@ -33,7 +33,7 @@ class HttpWaitLoop extends ResumableSignalLoop
     /**
      * Connection instance.
      *
-     * @var \danog\Madelineproto\Connection
+     * @var \danog\MadelineProto\Connection
      */
     protected $connection;
     /**
@@ -43,12 +43,20 @@ class HttpWaitLoop extends ResumableSignalLoop
      */
     protected $datacenter;
 
+    /**
+     * DataCenterConnection instance.
+     *
+     * @var \danog\MadelineProto\DataCenterConnection
+     */
+    protected $datacenterConnection;
+
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
         $this->API = $connection->getExtra();
         $ctx = $connection->getCtx();
-        $this->datacenter = $ctx->getDc();
+        $this->datacenter = $connection->getDatacenterID();
+        $this->datacenterConnection = $connection->getShared();
     }
 
     public function loop()
@@ -56,12 +64,12 @@ class HttpWaitLoop extends ResumableSignalLoop
         $API = $this->API;
         $datacenter = $this->datacenter;
         $connection = $this->connection;
+        $shared = $this->datacenterConnection;
 
-        if (!\in_array($connection->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()])) {
+        if (!$shared->isHttp()) {
             return;
         }
 
-        $timeout = $API->settings['connection_settings'][isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all']['timeout'];
         while (true) {
             if (yield $this->waitSignal($this->pause())) {
                 return;
@@ -69,7 +77,7 @@ class HttpWaitLoop extends ResumableSignalLoop
             if (!\in_array($connection->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()])) {
                 return;
             }
-            while ($connection->temp_auth_key === null) {
+            while (!$shared->hasTempAuthKey()) {
                 if (yield $this->waitSignal($this->pause())) {
                     return;
                 }

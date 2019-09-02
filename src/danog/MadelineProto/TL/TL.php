@@ -744,7 +744,7 @@ trait TL
                 }
                 switch ($constructorData['predicate']) {
                     case 'gzip_packed':
-                        return $this->deserialize(gzdecode($this->deserialize($stream, ['type' => 'bytes', 'datacenter' => $type['datacenter']])), ['type' => '', 'datacenter' => $type['datacenter']]);
+                        return $this->deserialize(gzdecode($this->deserialize($stream, ['type' => 'bytes', 'connection' => $type['connection']])), ['type' => '', 'connection' => $type['connection']]);
                     case 'Vector t':
                     case 'vector':
                         break;
@@ -786,10 +786,10 @@ trait TL
                 $type['subtype'] = '';
             }
 
-            return $this->deserialize(gzdecode($this->deserialize($stream, ['type' => 'bytes'])), ['type' => '', 'datacenter' => $type['datacenter'], 'subtype' => $type['subtype']]);
+            return $this->deserialize(gzdecode($this->deserialize($stream, ['type' => 'bytes'])), ['type' => '', 'connection' => $type['connection'], 'subtype' => $type['subtype']]);
         }
         if ($constructorData['type'] === 'Vector t') {
-            $constructorData['datacenter'] = $type['datacenter'];
+            $constructorData['connection'] = $type['connection'];
             $constructorData['subtype'] = isset($type['subtype']) ? $type['subtype'] : '';
             $constructorData['type'] = 'vector';
 
@@ -835,18 +835,18 @@ trait TL
                 $arg['type'] = 'string';
             }
             if ($x['_'] === 'rpc_result' && $arg['name'] === 'result') {
-                if (isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'])
-                    && isset($this->tl_callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']])
+                if (isset($type['connection']->outgoing_messages[$x['req_msg_id']]['_'])
+                    && isset($this->tl_callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']])
                 ) {
-                    foreach ($this->tl_callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {
-                        $callback($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']);
+                    foreach ($this->tl_callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {
+                        $callback($type['connection']->outgoing_messages[$x['req_msg_id']]['_']);
                     }
                 }
 
-                if (isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type'])
-                    && stripos($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type'], '<') !== false
+                if (isset($type['connection']->outgoing_messages[$x['req_msg_id']]['type'])
+                    && stripos($type['connection']->outgoing_messages[$x['req_msg_id']]['type'], '<') !== false
                 ) {
-                    $arg['subtype'] = str_replace(['Vector<', '>'], '', $this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['type']);
+                    $arg['subtype'] = str_replace(['Vector<', '>'], '', $type['connection']->outgoing_messages[$x['req_msg_id']]['type']);
                 }
             }
             if (isset($type['datacenter'])) {
@@ -888,11 +888,11 @@ trait TL
                 $this->callFork($callback($x));
             }
         } elseif ($x['_'] === 'rpc_result'
-            && isset($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_'])
-            && isset($this->tl_callbacks[TLCallback::METHOD_CALLBACK][$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']])
+            && isset($type['connection']->outgoing_messages[$x['req_msg_id']]['_'])
+            && isset($this->tl_callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']])
         ) {
-            foreach ($this->tl_callbacks[TLCallback::METHOD_CALLBACK][$this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {
-                $callback($this->datacenter->sockets[$type['datacenter']]->outgoing_messages[$x['req_msg_id']], $x['result']);
+            foreach ($this->tl_callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {
+                $callback($type['connection']->outgoing_messages[$x['req_msg_id']], $x['result']);
             }
         }
 

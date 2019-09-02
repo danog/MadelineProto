@@ -24,7 +24,7 @@ namespace danog\MadelineProto\MTProtoSession;
  */
 trait AckHandler
 {
-    public function ack_outgoing_message_id($message_id)
+    public function ack_outgoing_message_id($message_id): bool
     {
         // The server acknowledges that it received my message
         if (!isset($this->outgoing_messages[$message_id])) {
@@ -43,7 +43,7 @@ trait AckHandler
         return true;
     }
 
-    public function got_response_for_outgoing_message_id($message_id)
+    public function got_response_for_outgoing_message_id($message_id): bool
     {
         // The server acknowledges that it received my message
         if (!isset($this->outgoing_messages[$message_id])) {
@@ -64,7 +64,7 @@ trait AckHandler
         return true;
     }
 
-    public function ack_incoming_message_id($message_id)
+    public function ack_incoming_message_id($message_id): bool
     {
         // I let the server know that I received its message
         if (!isset($this->incoming_messages[$message_id])) {
@@ -83,26 +83,23 @@ trait AckHandler
 
 
     /**
-     * Check if there are some pending calls
+     * Check if there are some pending calls.
      *
      * @return boolean
      */
-    public function hasPendingCalls()
+    public function hasPendingCalls(): bool
     {
-        $API = $this->API;
-        $datacenter = $this->datacenter;
-
-        $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
-        $timeout = $API->settings['connection_settings'][$dc_config_number]['timeout'];
-        $pfs = $API->settings['connection_settings'][$dc_config_number]['pfs'];
+        $settings = $this->shared->getSettings();
+        $timeout = $settings['timeout'];
+        $pfs = $settings['pfs'];
 
         foreach ($this->new_outgoing as $message_id) {
             if (isset($this->outgoing_messages[$message_id]['sent'])
                 && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time()
-                && ($this->temp_auth_key === null) === $this->outgoing_messages[$message_id]['unencrypted']
+                && $this->shared->hasTempAuthKey() === !$this->outgoing_messages[$message_id]['unencrypted']
                 && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
             ) {
-                if ($pfs && !isset($this->temp_auth_key['bound']) && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+                if ($pfs && !$this->shared->getTempAuthKey()->bound() && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
                     continue;
                 }
 
@@ -114,27 +111,24 @@ trait AckHandler
     }
 
     /**
-     * Get all pending calls
+     * Get all pending calls.
      *
-     * @return void
+     * @return array
      */
-    public function getPendingCalls()
+    public function getPendingCalls(): array
     {
-        $API = $this->API;
-        $datacenter = $this->datacenter;
-
-        $dc_config_number = isset($API->settings['connection_settings'][$datacenter]) ? $datacenter : 'all';
-        $timeout = $API->settings['connection_settings'][$dc_config_number]['timeout'];
-        $pfs = $API->settings['connection_settings'][$dc_config_number]['pfs'];
+        $settings = $this->shared->getSettings();
+        $timeout = $settings['timeout'];
+        $pfs = $settings['pfs'];
 
         $result = [];
         foreach ($this->new_outgoing as $message_id) {
             if (isset($this->outgoing_messages[$message_id]['sent'])
                 && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time()
-                && ($this->temp_auth_key === null) === $this->outgoing_messages[$message_id]['unencrypted']
+                && $this->shared->hasTempAuthKey() === !$this->outgoing_messages[$message_id]['unencrypted']
                 && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
             ) {
-                if ($pfs && !isset($this->temp_auth_key['bound']) && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+                if ($pfs && !$this->shared->getTempAuthKey()->bound() && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
                     continue;
                 }
 
@@ -144,5 +138,4 @@ trait AckHandler
 
         return $result;
     }
-
 }

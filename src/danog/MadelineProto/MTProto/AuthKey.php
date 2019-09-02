@@ -16,14 +16,14 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\AuthKey;
+namespace danog\MadelineProto\MTProto;
 
 use JsonSerializable;
 
 /**
  * MTProto auth key.
  */
-abstract class AuthKey extends JsonSerializable
+abstract class AuthKey implements JsonSerializable
 {
     /**
      * Auth key.

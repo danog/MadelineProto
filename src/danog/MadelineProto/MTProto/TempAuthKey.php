@@ -16,7 +16,7 @@
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\AuthKey;
+namespace danog\MadelineProto\MTProto;
 
 use JsonSerializable;
 
