@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use danog\MadelineProto\Tools;
+
 use function Amp\ByteStream\getStdout;
 
 /**
@@ -32,7 +34,7 @@ trait ApiStart
             $stdout = getStdout();
             yield $stdout->write('You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a)
 Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id'.PHP_EOL);
-            if (\strpos(yield $this->readLine('Your choice (m/a): '), 'm') !== false) {
+            if (\strpos(yield Tools::readLine('Your choice (m/a): '), 'm') !== false) {
                 yield $stdout->write('1) Login to my.telegram.org
 2) Go to API development tools
 3) App title: your app\'s name, can be anything
@@ -41,19 +43,19 @@ Note that you can also provide the API parameters directly in the code using the
     Platform: anything
     Description: Describe your app here
 4) Click on create application'.PHP_EOL);
-                $app['api_id'] = yield $this->readLine('5) Enter your API ID: ');
-                $app['api_hash'] = yield $this->readLine('6) Enter your API hash: ');
+                $app['api_id'] = yield Tools::readLine('5) Enter your API ID: ');
+                $app['api_hash'] = yield Tools::readLine('6) Enter your API hash: ');
 
                 return $app;
             }
             $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($settings);
-            yield $this->my_telegram_org_wrapper->login_async(yield $this->readLine('Enter a phone number that is already registered on Telegram: '));
-            yield $this->my_telegram_org_wrapper->complete_login_async(yield $this->readLine('Enter the verification code you received in telegram: '));
+            yield $this->my_telegram_org_wrapper->login_async(yield Tools::readLine('Enter a phone number that is already registered on Telegram: '));
+            yield $this->my_telegram_org_wrapper->complete_login_async(yield Tools::readLine('Enter the verification code you received in telegram: '));
             if (!yield $this->my_telegram_org_wrapper->has_app_async()) {
-                $app_title = yield $this->readLine('Enter the app\'s name, can be anything: ');
-                $short_name = yield $this->readLine('Enter the app\'s short name, can be anything: ');
-                $url = yield $this->readLine('Enter the app/website\'s URL, or t.me/yourusername: ');
-                $description = yield $this->readLine('Describe your app: ');
+                $app_title = yield Tools::readLine('Enter the app\'s name, can be anything: ');
+                $short_name = yield Tools::readLine('Enter the app\'s short name, can be anything: ');
+                $url = yield Tools::readLine('Enter the app/website\'s URL, or t.me/yourusername: ');
+                $description = yield Tools::readLine('Describe your app: ');
                 $app = yield $this->my_telegram_org_wrapper->create_app_async(['app_title' => $app_title, 'app_shortname' => $short_name, 'app_url' => $url, 'app_platform' => 'web', 'app_desc' => $description]);
             } else {
                 $app = yield $this->my_telegram_org_wrapper->get_app_async();

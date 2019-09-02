@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use danog\MadelineProto\Tools;
+
 /**
  * Manages simple logging in and out.
  */
@@ -30,16 +32,16 @@ trait Start
             return yield $this->get_self_async();
         }
         if (PHP_SAPI === 'cli') {
-            if (\strpos(yield $this->readLine('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
-                yield $this->bot_login_async(yield $this->readLine('Enter your bot token: '));
+            if (\strpos(yield Tools::readLine('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
+                yield $this->bot_login_async(yield Tools::readLine('Enter your bot token: '));
             } else {
-                yield $this->phone_login_async(yield $this->readLine('Enter your phone number: '));
-                $authorization = yield $this->complete_phone_login_async(yield $this->readLine('Enter the phone code: '));
+                yield $this->phone_login_async(yield Tools::readLine('Enter your phone number: '));
+                $authorization = yield $this->complete_phone_login_async(yield Tools::readLine('Enter the phone code: '));
                 if ($authorization['_'] === 'account.password') {
-                    $authorization = yield $this->complete_2fa_login_async(yield $this->readLine('Please enter your password (hint '.$authorization['hint'].'): '));
+                    $authorization = yield $this->complete_2fa_login_async(yield Tools::readLine('Please enter your password (hint '.$authorization['hint'].'): '));
                 }
                 if ($authorization['_'] === 'account.needSignup') {
-                    $authorization = yield $this->complete_signup_async(yield $this->readLine('Please enter your first name: '), yield $this->readLine('Please enter your last name (can be empty): '));
+                    $authorization = yield $this->complete_signup_async(yield Tools::readLine('Please enter your first name: '), yield Tools::readLine('Please enter your last name (can be empty): '));
                 }
             }
             $this->serialize();
