@@ -33,6 +33,7 @@ use Amp\DoH\DoHConfig;
 use Amp\DoH\Nameserver;
 use Amp\DoH\Rfc8484StubResolver;
 use Amp\Loop;
+use Amp\MultiReasonException;
 use Amp\NullCancellationToken;
 use Amp\Promise;
 use Amp\Socket\ClientConnectContext;
@@ -481,8 +482,11 @@ class DataCenter
                     throw $e;
                 }
                 $this->API->logger->logger('Connection failed: '.$e, \danog\MadelineProto\Logger::ERROR);
-            } catch (\Exception $e) {
-                $this->API->logger->logger('Connection failed: '.$e, \danog\MadelineProto\Logger::ERROR);
+                if ($e instanceof MultiReasonException) {
+                    foreach ($e->getReasons() as $reason) {
+                        $this->API->logger->logger('Multireason: '.$reason, \danog\MadelineProto\Logger::ERROR);
+                    }
+                }
             }
         }
 
