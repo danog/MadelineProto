@@ -80,7 +80,7 @@ trait Files
         $mime = $this->get_mime_from_file($file);
 
         try {
-            return yield $this->upload_from_stream_async($stream, $size, $stream, $mime, $cb, $encrypted);
+            return yield $this->upload_from_stream_async($stream, $size, $mime, $file_name, $cb, $encrypted);
         } finally {
             yield $stream->close();
         }

@@ -50,6 +50,7 @@ echo 'Loading MadelineProto...'.PHP_EOL;
 $MadelineProto = new \danog\MadelineProto\API(\getcwd().'/testing.madeline', $settings);
 $MadelineProto->fileGetContents('https://google.com');
 $MadelineProto->start();
+$MadelineProto->async(false);
 
 try {
     $MadelineProto->get_self();
@@ -58,14 +59,6 @@ try {
         $MadelineProto->accept_tos();
     }
 }
-
-  $inputMediaUploadedPhoto1 = ['_' => 'inputMediaUploadedPhoto','file' => '1.jpg'];
-  $inputMediaUploadedPhoto2 = ['_' => 'inputMediaUploadedPhoto','file' => '2.jpg'];
-  $inputMediaUploadedPhoto3 = ['_' => 'inputMediaUploadedPhoto','file' => '3.jpg'];
-  $inputSingleMedia1 = ['_' => 'inputSingleMedia', 'media' => $inputMediaUploadedPhoto1, 'message' => 'str'];
-  $inputSingleMedia2 = ['_' => 'inputSingleMedia', 'media' => $inputMediaUploadedPhoto2, 'message' => 'str'];
-  $inputSingleMedia3 = ['_' => 'inputSingleMedia', 'media' => $inputMediaUploadedPhoto3, 'message' => 'str'];
-  $Updates = $this->messages->sendMultiMedia(['peer' => 'danogentili','multi_media' => [$inputSingleMedia3, $inputSingleMedia2,$inputSingleMedia1]]);
 
 //var_dump(count($MadelineProto->get_pwr_chat('@madelineproto')['participants']));
 

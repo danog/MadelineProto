@@ -197,7 +197,7 @@ class API extends APIFactory
                 Logger::log('Shutting down MadelineProto (normally or due to an exception, idk)');
             }
             $this->destructing = true;
-            $this->wait($this->serialize());
+            Tools::wait($this->serialize());
         }
         //restore_error_handler();
     }
@@ -285,7 +285,7 @@ class API extends APIFactory
 
     public function serialize($filename = null)
     {
-        return $this->callFork((function () use ($filename) {
+        return Tools::callFork((function () use ($filename) {
             if ($filename === null) {
                 $filename = $this->session;
             }

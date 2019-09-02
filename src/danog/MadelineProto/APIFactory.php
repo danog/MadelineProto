@@ -120,7 +120,6 @@ class APIFactory extends AsyncConstruct
      */
     public $auth;
 
-    use Tools;
     public $namespace = '';
     public $API;
     public $lua = false;
@@ -138,17 +137,18 @@ class APIFactory extends AsyncConstruct
 
     public function __call($name, $arguments)
     {
-        $yielded = $this->call($this->__call_async($name, $arguments));
+        $yielded = Tools::call($this->__call_async($name, $arguments));
         $async = $this->lua === false && (\is_array(\end($arguments)) && isset(\end($arguments)['async']) ? \end($arguments)['async'] : ($this->async && $name !== 'loop'));
+
         if ($async) {
             return $yielded;
         }
         if (!$this->lua) {
-            return $this->wait($yielded);
+            return Tools::wait($yielded);
         }
 
         try {
-            $yielded = $this->wait($yielded);
+            $yielded = Tools::wait($yielded);
             Lua::convert_objects($yielded);
 
             return $yielded;
@@ -203,7 +203,7 @@ class APIFactory extends AsyncConstruct
     public function &__get($name)
     {
         if ($this->asyncAPIPromise) {
-            $this->wait($this->asyncAPIPromise);
+            Tools::wait($this->asyncAPIPromise);
         }
         if ($name === 'settings') {
             $this->API->flushSettings = true;
@@ -220,7 +220,7 @@ class APIFactory extends AsyncConstruct
     public function __set($name, $value)
     {
         if ($this->asyncAPIPromise) {
-            $this->wait($this->asyncAPIPromise);
+            Tools::wait($this->asyncAPIPromise);
         }
         if ($name === 'settings') {
             if ($this->API->asyncInitPromise) {
@@ -236,7 +236,7 @@ class APIFactory extends AsyncConstruct
     public function __isset($name)
     {
         if ($this->asyncAPIPromise) {
-            $this->wait($this->asyncAPIPromise);
+            Tools::wait($this->asyncAPIPromise);
         }
 
         return isset($this->API->storage[$name]);
@@ -245,7 +245,7 @@ class APIFactory extends AsyncConstruct
     public function __unset($name)
     {
         if ($this->asyncAPIPromise) {
-            $this->wait($this->asyncAPIPromise);
+            Tools::wait($this->asyncAPIPromise);
         }
         unset($this->API->storage[$name]);
     }

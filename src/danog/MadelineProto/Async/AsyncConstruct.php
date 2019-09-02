@@ -29,13 +29,12 @@ use danog\MadelineProto\Tools;
  */
 class AsyncConstruct
 {
-    use Tools;
     public $asyncInitPromise;
 
     public function init()
     {
         if ($this->asyncInitPromise) {
-            $this->wait($this->asyncInitPromise);
+            Tools::wait($this->asyncInitPromise);
         }
     }
 
@@ -48,7 +47,7 @@ class AsyncConstruct
 
     public function setInitPromise($promise)
     {
-        $this->asyncInitPromise = $this->callFork($promise);
+        $this->asyncInitPromise = Tools::callFork($promise);
         $this->asyncInitPromise->onResolve(function ($error, $result) {
             if ($error) {
                 throw $error;
