@@ -691,6 +691,9 @@ class MTProto extends AsyncConstruct implements TLCallback
                 }
             }
             foreach ($settings['connection_settings'] as $key => &$connection) {
+                if (\in_array($key, ['default_dc', 'media_socket_count', 'robin_period'])) {
+                    continue;
+                }
                 if (!\is_array($connection)) {
                     unset($settings['connection_settings'][$key]);
                     continue;
