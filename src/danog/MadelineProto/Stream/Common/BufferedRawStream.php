@@ -18,16 +18,16 @@
 
 namespace danog\MadelineProto\Stream\Common;
 
+use Amp\ByteStream\ClosedException;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\RawStream;
-use danog\MadelineProto\Stream\ConnectionContext;
-use function Amp\Socket\connect;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
+use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use Amp\ByteStream\ClosedException;
+use function Amp\Socket\connect;
 
 /**
  * Buffered raw stream.
@@ -55,7 +55,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $this->stream = yield $ctx->getStream($header);
-        $this->memory_stream = fopen('php://memory', 'r+');
+        $this->memory_stream = \fopen('php://memory', 'r+');
 
         return true;
     }
@@ -96,7 +96,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     public function disconnect()
     {
         if ($this->memory_stream) {
-            fclose($this->memory_stream);
+            \fclose($this->memory_stream);
             $this->memory_stream = null;
         }
         if ($this->stream) {
@@ -117,16 +117,16 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
         }
-        $size = fstat($this->memory_stream)['size'];
-        $offset = ftell($this->memory_stream);
+        $size = \fstat($this->memory_stream)['size'];
+        $offset = \ftell($this->memory_stream);
         $length = $size - $offset;
         if ($length === 0 || $size > self::MAX_SIZE) {
-            $new_memory_stream = fopen('php://memory', 'r+');
+            $new_memory_stream = \fopen('php://memory', 'r+');
             if ($length) {
-                fwrite($new_memory_stream, fread($this->memory_stream, $length));
-                fseek($new_memory_stream, 0);
+                \fwrite($new_memory_stream, \fread($this->memory_stream, $length));
+                \fseek($new_memory_stream, 0);
             }
-            fclose($this->memory_stream);
+            \fclose($this->memory_stream);
             $this->memory_stream = $new_memory_stream;
         }
 
@@ -142,9 +142,9 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
-        if (strlen($append)) {
+        if (\strlen($append)) {
             $this->append = $append;
-            $this->append_after = $length - strlen($append);
+            $this->append_after = $length - \strlen($append);
         }
 
         return new \Amp\Success($this);
@@ -162,11 +162,11 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         if (!$this->stream) {
             throw new ClosedException("MadelineProto stream was disconnected");
         }
-        $size = fstat($this->memory_stream)['size'];
-        $offset = ftell($this->memory_stream);
+        $size = \fstat($this->memory_stream)['size'];
+        $offset = \ftell($this->memory_stream);
         $buffer_length = $size - $offset;
         if ($buffer_length >= $length) {
-            return new Success(fread($this->memory_stream, $length));
+            return new Success(\fread($this->memory_stream, $length));
         }
 
         return $this->call($this->bufferReadAsync($length));
@@ -181,11 +181,11 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      */
     public function bufferReadAsync(int $length): \Generator
     {
-        $size = fstat($this->memory_stream)['size'];
-        $offset = ftell($this->memory_stream);
+        $size = \fstat($this->memory_stream)['size'];
+        $offset = \ftell($this->memory_stream);
         $buffer_length = $size - $offset;
         if ($buffer_length < $length && $buffer_length) {
-            fseek($this->memory_stream, $offset + $buffer_length);
+            \fseek($this->memory_stream, $offset + $buffer_length);
         }
 
         while ($buffer_length < $length) {
@@ -195,12 +195,12 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
 
                 throw new \danog\MadelineProto\NothingInTheSocketException();
             }
-            fwrite($this->memory_stream, $chunk);
-            $buffer_length += strlen($chunk);
+            \fwrite($this->memory_stream, $chunk);
+            $buffer_length += \strlen($chunk);
         }
-        fseek($this->memory_stream, $offset);
+        \fseek($this->memory_stream, $offset);
 
-        return fread($this->memory_stream, $length);
+        return \fread($this->memory_stream, $length);
     }
 
     /**
@@ -213,7 +213,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     public function bufferWrite(string $data): Promise
     {
         if ($this->append_after) {
-            $this->append_after -= strlen($data);
+            $this->append_after -= \strlen($data);
             if ($this->append_after === 0) {
                 $data .= $this->append;
                 $this->append = '';

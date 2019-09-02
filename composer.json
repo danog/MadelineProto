@@ -33,7 +33,8 @@
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1",
         "ennexa/amp-update-cache": "dev-master",
-        "phpunit/phpunit": "^8"
+        "phpunit/phpunit": "^8",
+        "amphp/php-cs-fixer-config": "dev-master"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)"
@@ -62,5 +63,14 @@
             "type": "git",
             "url": "https://github.com/danog/dns"
         }
-    ]
+    ],
+    "scripts": {
+        "check": [
+            "@cs",
+            "@test"
+        ],
+        "cs": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff --dry-run",
+        "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff",
+        "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text"
+    }
 }

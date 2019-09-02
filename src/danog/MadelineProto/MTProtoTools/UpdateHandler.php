@@ -36,13 +36,13 @@ trait UpdateHandler
     public function pwr_update_handler($update)
     {
         if (isset($this->settings['pwr']['update_handler'])) {
-            if (is_array($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'][0] === false) {
+            if (\is_array($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'][0] === false) {
                 $this->settings['pwr']['update_handler'] = $this->settings['pwr']['update_handler'][1];
             }
-            if (is_string($this->settings['pwr']['update_handler'])) {
+            if (\is_string($this->settings['pwr']['update_handler'])) {
                 return $this->{$this->settings['pwr']['update_handler']}($update);
             }
-            in_array($this->settings['pwr']['update_handler'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->get_updates_update_handler($update) : $this->settings['pwr']['update_handler']($update);
+            \in_array($this->settings['pwr']['update_handler'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->get_updates_update_handler($update) : $this->settings['pwr']['update_handler']($update);
         }
     }
 
@@ -64,7 +64,7 @@ trait UpdateHandler
             $this->settings['updates']['run_callback'] = true;
         }
 
-        $params = array_merge(self::DEFAULT_GETUPDATES_PARAMS, $params);
+        $params = \array_merge(self::DEFAULT_GETUPDATES_PARAMS, $params);
 
         if (empty($this->updates)) {
             $this->update_deferred = new Deferred();
@@ -79,13 +79,13 @@ trait UpdateHandler
         }
 
         if ($params['offset'] < 0) {
-            $params['offset'] = array_reverse(array_keys((array) $this->updates))[abs($params['offset']) - 1];
+            $params['offset'] = \array_reverse(\array_keys((array) $this->updates))[\abs($params['offset']) - 1];
         }
         $updates = [];
         foreach ($this->updates as $key => $value) {
             if ($params['offset'] > $key) {
                 unset($this->updates[$key]);
-            } elseif ($params['limit'] === null || count($updates) < $params['limit']) {
+            } elseif ($params['limit'] === null || \count($updates) < $params['limit']) {
                 $updates[] = ['update_id' => $key, 'update' => $value];
             }
         }
@@ -256,7 +256,7 @@ trait UpdateHandler
             $this->config['expires'] = 0;
             yield $this->get_config_async();
         }
-        if (in_array($update['_'], ['updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'])) {
+        if (\in_array($update['_'], ['updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'])) {
             $id = $this->get_id($update);
             $this->full_chats[$id]['last_update'] = 0;
             yield $this->get_full_info_async($id);
@@ -268,7 +268,7 @@ trait UpdateHandler
             return;
         }
         if ($update['_'] === 'updatePhoneCall') {
-            if (!class_exists('\\danog\\MadelineProto\\VoIP')) {
+            if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
                 $this->logger->logger('The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.', \danog\MadelineProto\Logger::WARNING);
 
                 return;
@@ -335,7 +335,7 @@ trait UpdateHandler
         if ($update['_'] === 'updateEncryption') {
             switch ($update['chat']['_']) {
                 case 'encryptedChatRequested':
-                    if ($this->settings['secret_chats']['accept_chats'] === false || is_array($this->settings['secret_chats']['accept_chats']) && !in_array($update['chat']['admin_id'], $this->settings['secret_chats']['accept_chats'])) {
+                    if ($this->settings['secret_chats']['accept_chats'] === false || \is_array($this->settings['secret_chats']['accept_chats']) && !\in_array($update['chat']['admin_id'], $this->settings['secret_chats']['accept_chats'])) {
                         return;
                     }
                     $this->logger->logger('Accepting secret chat '.$update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
@@ -383,7 +383,7 @@ trait UpdateHandler
 
     public function pwr_webhook($update)
     {
-        $payload = json_encode($update);
+        $payload = \json_encode($update);
         //$this->logger->logger($update, $payload, json_last_error());
         if ($payload === '') {
             $this->logger->logger('EMPTY UPDATE');
@@ -396,8 +396,8 @@ trait UpdateHandler
             $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody();
 
             $this->logger->logger('Result of webhook query is '.$result, \danog\MadelineProto\Logger::NOTICE);
-            $result = json_decode($result, true);
-            if (is_array($result) && isset($result['method']) && $result['method'] != '' && is_string($result['method'])) {
+            $result = \json_decode($result, true);
+            if (\is_array($result) && isset($result['method']) && $result['method'] != '' && \is_string($result['method'])) {
                 try {
                     $this->logger->logger('Reverse webhook command returned', yield $this->method_call_async_read($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
                 } catch (\Throwable $e) {

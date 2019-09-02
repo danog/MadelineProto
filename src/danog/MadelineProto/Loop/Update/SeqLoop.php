@@ -72,8 +72,8 @@ class SeqLoop extends ResumableSignalLoop
                 $updates = null;
             }
             while ($this->pendingWakeups) {
-                reset($this->pendingWakeups);
-                $channelId = key($this->pendingWakeups);
+                \reset($this->pendingWakeups);
+                $channelId = \key($this->pendingWakeups);
                 unset($this->pendingWakeups[$channelId]);
                 $this->API->feeders[$channelId]->resume();
             }
@@ -82,10 +82,10 @@ class SeqLoop extends ResumableSignalLoop
 
     public function parse($updates)
     {
-        reset($updates);
+        \reset($updates);
         while ($updates) {
             $options = [];
-            $key = key($updates);
+            $key = \key($updates);
             $update = $updates[$key];
             unset($updates[$key]);
 
@@ -100,7 +100,7 @@ class SeqLoop extends ResumableSignalLoop
                 if (!$this->incomingUpdates) {
                     yield $this->API->updaters[false]->resume();
                 }
-                $this->incomingUpdates = array_merge($this->incomingUpdates, [$update], $updates);
+                $this->incomingUpdates = \array_merge($this->incomingUpdates, [$update], $updates);
 
                 continue;
             }

@@ -21,7 +21,7 @@ trait Extension
 {
     public function get_mime_from_extension($extension, $default)
     {
-        $ext = ltrim($extension, '.');
+        $ext = \ltrim($extension, '.');
         if (isset(self::ALL_MIMES[$ext])) {
             return self::ALL_MIMES[$ext][0];
         }
@@ -32,7 +32,7 @@ trait Extension
     public function get_extension_from_mime($mime)
     {
         foreach (self::ALL_MIMES as $key => $value) {
-            if (array_search($mime, $value) !== false) {
+            if (\array_search($mime, $value) !== false) {
                 return '.'.$key;
             }
         }

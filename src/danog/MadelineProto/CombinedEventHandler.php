@@ -33,7 +33,7 @@ abstract class CombinedEventHandler
 
     final public function __sleep()
     {
-        $keys = method_exists($this, '__magic_sleep') ? $this->__magic_sleep() : get_object_vars($this);
+        $keys = \method_exists($this, '__magic_sleep') ? $this->__magic_sleep() : \get_object_vars($this);
         unset($keys['CombinedAPI']);
         if (isset($this->CombinedAPI) && $this->CombinedAPI instanceof CombinedAPI) {
             foreach ($this->CombinedAPI->instance_paths as $path) {
@@ -47,7 +47,7 @@ abstract class CombinedEventHandler
             }
         }
 
-        return array_keys($keys);
+        return \array_keys($keys);
     }
 
     final public function referenceInstance($path)

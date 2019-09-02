@@ -57,9 +57,8 @@ trait SeqNoHandler
                     yield $this->discard_secret_chat_async($chat_id);
 
                     throw new \danog\MadelineProto\SecurityException('out_seq_no hole: should be '.$C.', is '.($message['decrypted_message']['out_seq_no'] - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2);
-                } else {
-                    $C++;
                 }
+                $C++;
             }
         }
         //$this->logger->logger($C, $seqno);

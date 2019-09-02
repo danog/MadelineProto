@@ -23,22 +23,22 @@ trait TD
 {
     public function tdcli_to_td(&$params, $key = null)
     {
-        if (!is_array($params)) {
+        if (!\is_array($params)) {
             return $params;
         }
         if (!isset($params['ID'])) {
-            array_walk($params, [$this, 'tdcli_to_td']);
+            \array_walk($params, [$this, 'tdcli_to_td']);
 
             return $params;
         }
         foreach ($params as $key => $value) {
             $value = $this->tdcli_to_td($value);
-            if (preg_match('/_$/', $key)) {
-                $params[preg_replace('/_$/', '', $key)] = $value;
+            if (\preg_match('/_$/', $key)) {
+                $params[\preg_replace('/_$/', '', $key)] = $value;
                 unset($params[$key]);
             }
         }
-        $params['_'] = lcfirst($params['ID']);
+        $params['_'] = \lcfirst($params['ID']);
         unset($params['ID']);
 
         return $params;
@@ -48,8 +48,8 @@ trait TD
     {
         $newparams = ['_' => self::REVERSE[$params['_']]];
         foreach (self::TD_PARAMS_CONVERSION[$newparams['_']] as $td => $mtproto) {
-            if (is_array($mtproto)) {
-                switch (end($mtproto)) {
+            if (\is_array($mtproto)) {
+                switch (\end($mtproto)) {
                     case 'choose_message_content':
                         switch ($params[$td]['_']) {
                             case 'inputMessageText':
@@ -57,7 +57,7 @@ trait TD
                                 if (isset($params['disable_web_page_preview'])) {
                                     $newparams['no_webpage'] = $params[$td]['disable_web_page_preview'];
                                 }
-                                $newparams = array_merge($params[$td], $newparams);
+                                $newparams = \array_merge($params[$td], $newparams);
                                 break;
                             default:
                                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['non_text_conversion']);
@@ -65,7 +65,7 @@ trait TD
                         break;
                     default:
                         $newparams[$mtproto[0]] = isset($params[$td]) ? $params[$td] : null;
-                        if (is_array($newparams[$mtproto[0]])) {
+                        if (\is_array($newparams[$mtproto[0]])) {
                             $newparams[$mtproto[0]] = yield $this->mtproto_to_td_async($newparams[$mtproto[0]]);
                         }
                 }
@@ -82,23 +82,23 @@ trait TD
 
     public function mtproto_to_td_async(&$params)
     {
-        if (!is_array($params)) {
+        if (!\is_array($params)) {
             return $params;
         }
         if (!isset($params['_'])) {
-            array_walk($params, [$this, 'mtproto_to_td']);
+            \array_walk($params, [$this, 'mtproto_to_td']);
 
             return $params;
         }
         $newparams = ['_' => $params['_']];
-        if (in_array($params['_'], self::TD_IGNORE)) {
+        if (\in_array($params['_'], self::TD_IGNORE)) {
             return $params;
         }
         foreach (self::TD_PARAMS_CONVERSION[$params['_']] as $td => $mtproto) {
-            if (is_string($mtproto)) {
+            if (\is_string($mtproto)) {
                 $newparams[$td] = $mtproto;
             } else {
-                switch (end($mtproto)) {
+                switch (\end($mtproto)) {
                     case 'choose_chat_id_from_botapi':
                         $newparams[$td] = (yield $this->get_info_async($params[$mtproto[0]]))['bot_api_id'] == $this->authorization['user']['id'] ? $params['from_id'] : yield $this->get_info_async($params[$mtproto[0]])['bot_api_id'];
                         break;
@@ -132,7 +132,7 @@ trait TD
                         $newparams[$td] = isset($params['ttl']) ? $params['ttl'] : 0;
                         break;
                     case 'choose_ttl_expires_in':
-                        $newparams[$td] = $newparams['ttl'] - microtime(true);
+                        $newparams[$td] = $newparams['ttl'] - \microtime(true);
                         break;
                     case 'choose_message_content':
                         if ($params['message'] !== '') {
@@ -153,7 +153,7 @@ trait TD
                         } else {
                             $newparams[$td] = isset($params[$mtproto[0]]) ? $params[$mtproto[0]] : null;
                         }
-                        if (is_array($newparams[$td])) {
+                        if (\is_array($newparams[$td])) {
                             $newparams[$td] = yield $this->mtproto_to_td_async($newparams[$td]);
                         }
                 }
@@ -165,15 +165,15 @@ trait TD
 
     public function td_to_tdcli($params)
     {
-        if (!is_array($params)) {
+        if (!\is_array($params)) {
             return $params;
         }
         $newparams = [];
         foreach ($params as $key => $value) {
             if ($key === '_') {
-                $newparams['ID'] = ucfirst($value);
+                $newparams['ID'] = \ucfirst($value);
             } else {
-                if (!is_numeric($key) && !preg_match('/_^/', $key)) {
+                if (!\is_numeric($key) && !\preg_match('/_^/', $key)) {
                     $key = $key.'_';
                 }
                 $newparams[$key] = $this->td_to_tdcli($value);

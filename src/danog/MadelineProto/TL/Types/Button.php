@@ -41,7 +41,7 @@ class Button implements \JsonSerializable, \ArrayAccess
 
     public function click($donotwait = false, $params = [])
     {
-        if (is_array($donotwait)) {
+        if (\is_array($donotwait)) {
             $async = $donotwait;
         } else {
             $async = $params;

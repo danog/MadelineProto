@@ -20,22 +20,21 @@ namespace danog\MadelineProto;
 
 use Amp\Deferred;
 use Amp\Failure;
+use Amp\File\StatCache;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
+use phpseclib\Math\BigInteger;
+use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;
 use function Amp\ByteStream\getStdout;
+use function Amp\File\exists;
 use function Amp\Promise\all;
 use function Amp\Promise\any;
 use function Amp\Promise\first;
 use function Amp\Promise\some;
 use function Amp\Promise\timeout;
 use function Amp\Promise\wait;
-use function Amp\ByteStream\getOutputBufferStream;
-use function Amp\File\exists;
-use function Amp\File\touch;
-use Amp\File\StatCache;
-use phpseclib\Math\BigInteger;
 
 /**
  * Some tools.
@@ -50,7 +49,7 @@ trait Tools
             foreach ($ints as $int) {
                 $hash = $hash->multiply(\danog\MadelineProto\Magic::$twozerotwosixone)->add(\danog\MadelineProto\Magic::$zeroeight)->add(new \phpseclib\Math\BigInteger($int))->divide(\danog\MadelineProto\Magic::$zeroeight)[1];
             }
-            $hash = self::unpack_signed_int(strrev(str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
+            $hash = self::unpack_signed_int(\strrev(\str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
         } else {
             $hash = 0;
             foreach ($ints as $int) {
@@ -102,33 +101,33 @@ trait Tools
     {
         $resto = $a % $b;
 
-        return $resto < 0 ? $resto + abs($b) : $resto;
+        return $resto < 0 ? $resto + \abs($b) : $resto;
     }
 
     public static function unpack_signed_int($value)
     {
-        if (strlen($value) !== 4) {
+        if (\strlen($value) !== 4) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_4']);
         }
 
-        return unpack('l', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
+        return \unpack('l', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
 
     public static function unpack_signed_long($value)
     {
-        if (strlen($value) !== 8) {
+        if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
 
-        return unpack('q', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
+        return \unpack('q', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
 
     public static function unpack_signed_long_string($value)
     {
-        if (is_int($value)) {
+        if (\is_int($value)) {
             return (string) $value;
         }
-        if (strlen($value) !== 8) {
+        if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
 
@@ -139,25 +138,25 @@ trait Tools
     public static function pack_signed_int($value)
     {
         if ($value > 2147483647) {
-            throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_2147483647'], $value));
+            throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_2147483647'], $value));
         }
         if ($value < -2147483648) {
-            throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_2147483648'], $value));
+            throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_2147483648'], $value));
         }
-        $res = pack('l', $value);
+        $res = \pack('l', $value);
 
-        return \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($res) : $res;
+        return \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($res) : $res;
     }
 
     public static function pack_signed_long($value)
     {
         if ($value > 9223372036854775807) {
-            throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_9223372036854775807'], $value));
+            throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_9223372036854775807'], $value));
         }
         if ($value < -9.223372036854776E+18) {
-            throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_9223372036854775808'], $value));
+            throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_9223372036854775808'], $value));
         }
-        $res = \danog\MadelineProto\Magic::$bigint ? self::pack_signed_int($value)."\0\0\0\0" : (\danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev(pack('q', $value)) : pack('q', $value));
+        $res = \danog\MadelineProto\Magic::$bigint ? self::pack_signed_int($value)."\0\0\0\0" : (\danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev(\pack('q', $value)) : \pack('q', $value));
 
         return $res;
     }
@@ -165,32 +164,32 @@ trait Tools
     public static function pack_unsigned_int($value)
     {
         if ($value > 4294967295) {
-            throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_4294967296'], $value));
+            throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_4294967296'], $value));
         }
         if ($value < 0) {
-            throw new TL\Exception(sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_0'], $value));
+            throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_0'], $value));
         }
 
-        return pack('V', $value);
+        return \pack('V', $value);
     }
 
     public static function pack_double($value)
     {
-        $res = pack('d', $value);
-        if (strlen($res) !== 8) {
+        $res = \pack('d', $value);
+        if (\strlen($res) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['encode_double_error']);
         }
 
-        return \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($res) : $res;
+        return \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($res) : $res;
     }
 
     public static function unpack_double($value)
     {
-        if (strlen($value) !== 8) {
+        if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
 
-        return unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? strrev($value) : $value)[1];
+        return \unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
 
     public static function wait($promise)
@@ -208,7 +207,6 @@ trait Tools
             try {
                 Loop::run(function () use (&$resolved, &$value, &$exception, $promise) {
                     $promise->onResolve(function ($e, $v) use (&$resolved, &$value, &$exception) {
-
                         Loop::stop();
                         $resolved = true;
                         $exception = $e;
@@ -284,10 +282,10 @@ trait Tools
         if ($actual) {
             $promise = $actual;
         } else {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+            $trace = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
             $file = '';
             if (isset($trace['file'])) {
-                $file .= basename($trace['file'], '.php');
+                $file .= \basename($trace['file'], '.php');
             }
             if (isset($trace['line'])) {
                 $file .= ":{$trace['line']}";
@@ -332,7 +330,6 @@ trait Tools
             if (!$zis || !$zis->destructing) {
                 Promise\rethrow(new Failure($e));
             }
-
         } else {
             if ($logger) {
                 $logger->logger($e);
@@ -373,7 +370,7 @@ trait Tools
     }
     /**
      * Asynchronously lock a file
-     * Resolves with a callbable that MUST eventually be called in order to release the lock
+     * Resolves with a callbable that MUST eventually be called in order to release the lock.
      *
      * @param string $file File to lock
      * @param integer $operation Locking mode (see flock)
@@ -386,22 +383,22 @@ trait Tools
     }
     public static function noCache(int $status, string $message)
     {
-        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-        header('Cache-Control: post-check=0, pre-check=0', false);
-        header('Pragma: no-cache');
-        http_response_code($status);
+        \header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        \header('Cache-Control: post-check=0, pre-check=0', false);
+        \header('Pragma: no-cache');
+        \http_response_code($status);
         return self::echo($message);
     }
     public static function flockAsync(string $file, int $operation, $polling)
     {
         if (!yield exists($file)) {
-            yield touch($file);
+            yield \touch($file);
             StatCache::clear($file);
         }
         $operation |= LOCK_NB;
-        $res = fopen($file, 'c');
+        $res = \fopen($file, 'c');
         do {
-            $result = flock($res, $operation);
+            $result = \flock($res, $operation);
             if (!$result) {
                 yield self::sleep($polling);
             }
@@ -409,8 +406,8 @@ trait Tools
 
         return static function () use (&$res) {
             if ($res) {
-                flock($res, LOCK_UN);
-                fclose($res);
+                \flock($res, LOCK_UN);
+                \fclose($res);
                 $res = null;
             }
         };
@@ -431,20 +428,21 @@ trait Tools
             yield $stdout->write($prompt);
         }
         static $lines = [''];
-        while (count($lines) < 2 && ($chunk = yield $stdin->read()) !== null) {
-            $chunk = explode("\n", str_replace(["\r", "\n\n"], "\n", $chunk));
-            $lines[count($lines) - 1] .= array_shift($chunk);
-            $lines = array_merge($lines, $chunk);
+        while (\count($lines) < 2 && ($chunk = yield $stdin->read()) !== null) {
+            $chunk = \explode("\n", \str_replace(["\r", "\n\n"], "\n", $chunk));
+            $lines[\count($lines) - 1] .= \array_shift($chunk);
+            $lines = \array_merge($lines, $chunk);
         }
-        return array_shift($lines);
+        return \array_shift($lines);
     }
 
-    public static function echo ($string) {
+    public static function echo($string)
+    {
         return getOutputBufferStream()->write($string);
     }
     public static function is_array_or_alike($var)
     {
-        return is_array($var) ||
+        return \is_array($var) ||
             ($var instanceof ArrayAccess &&
             $var instanceof Traversable &&
             $var instanceof Countable);

@@ -20,10 +20,10 @@
 namespace danog\MadelineProto;
 
 use Amp\Deferred;
-use function Amp\File\put;
-use function Amp\File\rename;
-use function Amp\File\get;
 use function Amp\File\exists;
+use function Amp\File\get;
+use function Amp\File\put;
+use function Amp\File\rename as renameAsync;
 
 class API extends APIFactory
 {
@@ -48,11 +48,11 @@ class API extends APIFactory
             $this->asyncAPIPromise = null;
         });
         $this->setInitPromise($this->__construct_async($params, $settings, $deferred));
-        foreach (get_object_vars(new APIFactory('', $this, $this->async)) as $key => $var) {
-            if (in_array($key, ['namespace', 'API', 'lua', 'async', 'asyncAPIPromise', 'methods', 'asyncInitPromise'])) {
+        foreach (\get_object_vars(new APIFactory('', $this, $this->async)) as $key => $var) {
+            if (\in_array($key, ['namespace', 'API', 'lua', 'async', 'asyncAPIPromise', 'methods', 'asyncInitPromise'])) {
                 continue;
             }
-            if (is_null($this->{$key})) {
+            if (\is_null($this->{$key})) {
                 $this->{$key} = new APIFactory($key, $this->API, $this->async);
             }
         }
@@ -60,7 +60,7 @@ class API extends APIFactory
 
     public function __construct_async($params, $settings, $deferred)
     {
-        if (is_string($params)) {
+        if (\is_string($params)) {
             Logger::constructorFromSettings($settings);
 
             $realpaths = Serialization::realpaths($params);
@@ -79,32 +79,32 @@ class API extends APIFactory
                 \danog\MadelineProto\Magic::class_exists();
 
                 try {
-                    $unserialized = unserialize($tounserialize);
+                    $unserialized = \unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Bug74586Exception $e) {
-                    class_exists('\\Volatile');
-                    $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
+                    \class_exists('\\Volatile');
+                    $tounserialize = \str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                     foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                        class_exists('\\danog\\MadelineProto\\'.$class);
+                        \class_exists('\\danog\\MadelineProto\\'.$class);
                     }
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Exception $e) {
                     if ($e->getFile() === 'MadelineProto' && $e->getLine() === 1) {
                         throw $e;
                     }
-                    if (defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
+                    if (\defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
                         throw $e;
                     }
-                    class_exists('\\Volatile');
+                    \class_exists('\\Volatile');
                     foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                        class_exists('\\danog\\MadelineProto\\'.$class);
+                        \class_exists('\\danog\\MadelineProto\\'.$class);
                     }
                     $changed = false;
-                    if (strpos($tounserialize, 'O:26:"danog\\MadelineProto\\Button":') !== false) {
-                        $tounserialize = str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
+                    if (\strpos($tounserialize, 'O:26:"danog\\MadelineProto\\Button":') !== false) {
+                        $tounserialize = \str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                         $changed = true;
                     }
-                    if (strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
-                        $tounserialize = str_replace('phpseclib\\Math\\BigInteger', 'phpseclib\\Math\\BigIntegor', $tounserialize);
+                    if (\strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
+                        $tounserialize = \str_replace('phpseclib\\Math\\BigInteger', 'phpseclib\\Math\\BigIntegor', $tounserialize);
                         $changed = true;
                     }
 
@@ -170,7 +170,7 @@ class API extends APIFactory
         $this->async = $async;
 
         if ($this->API) {
-            if ($this->API->event_handler && class_exists($this->API->event_handler) && is_subclass_of($this->API->event_handler, '\danog\MadelineProto\EventHandler')) {
+            if ($this->API->event_handler && \class_exists($this->API->event_handler) && \is_subclass_of($this->API->event_handler, '\danog\MadelineProto\EventHandler')) {
                 $this->API->setEventHandler($this->API->event_handler);
             }
         }
@@ -183,7 +183,7 @@ class API extends APIFactory
 
     public function __destruct()
     {
-        if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread()) || Magic::is_fork()) {
+        if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread()) || Magic::is_fork()) {
             return;
         }
         if ($this->asyncInitPromise) {
@@ -209,13 +209,13 @@ class API extends APIFactory
 
     private function from_camel_case($input)
     {
-        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
+        \preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
         $ret = $matches[0];
         foreach ($ret as &$match) {
-            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+            $match = $match == \strtoupper($match) ? \strtolower($match) : \lcfirst($match);
         }
 
-        return implode('_', $ret);
+        return \implode('_', $ret);
     }
 
     public function my_get_self()
@@ -229,15 +229,15 @@ class API extends APIFactory
             foreach ($this->API->get_method_namespaces() as $namespace) {
                 $this->{$namespace} = new APIFactory($namespace, $this->API, $this->async);
             }
-            $methods = get_class_methods($this->API);
+            $methods = \get_class_methods($this->API);
             foreach ($methods as $method) {
                 if ($method == 'method_call_async_read') {
-                    unset($methods[array_search('method_call', $methods)]);
-                } elseif (stripos($method, 'async') !== false) {
-                    if (strpos($method, '_async') !== false) {
-                        unset($methods[array_search(str_ireplace('_async', '', $method), $methods)]);
+                    unset($methods[\array_search('method_call', $methods)]);
+                } elseif (\stripos($method, 'async') !== false) {
+                    if (\strpos($method, '_async') !== false) {
+                        unset($methods[\array_search(\str_ireplace('_async', '', $method), $methods)]);
                     } else {
-                        unset($methods[array_search(str_ireplace('async', '', $method), $methods)]);
+                        unset($methods[\array_search(\str_ireplace('async', '', $method), $methods)]);
                     }
                 }
             }
@@ -247,24 +247,24 @@ class API extends APIFactory
 
                 if ($method == 'method_call_async_read') {
                     $method = 'method_call';
-                } elseif (stripos($method, 'async') !== false) {
-                    if (strpos($method, '_async') !== false) {
-                        $method = str_ireplace('_async', '', $method);
+                } elseif (\stripos($method, 'async') !== false) {
+                    if (\strpos($method, '_async') !== false) {
+                        $method = \str_ireplace('_async', '', $method);
                     } else {
-                        $method = str_ireplace('async', '', $method);
+                        $method = \str_ireplace('async', '', $method);
                     }
                 }
                 $actual_method = $actual_method === 'get_self_async' ? [$this, 'my_get_self'] : [$this->API, $actual_method];
-                $this->methods[strtolower($method)] = $actual_method;
-                if (strpos($method, '_') !== false) {
-                    $this->methods[strtolower(str_replace('_', '', $method))] = $actual_method;
+                $this->methods[\strtolower($method)] = $actual_method;
+                if (\strpos($method, '_') !== false) {
+                    $this->methods[\strtolower(\str_replace('_', '', $method))] = $actual_method;
                 } else {
-                    $this->methods[strtolower($this->from_camel_case($method))] = $actual_method;
+                    $this->methods[\strtolower($this->from_camel_case($method))] = $actual_method;
                 }
             }
 
             $this->API->wrapper = $this;
-            if ($this->API->event_handler && class_exists($this->API->event_handler) && is_subclass_of($this->API->event_handler, '\danog\MadelineProto\EventHandler')) {
+            if ($this->API->event_handler && \class_exists($this->API->event_handler) && \is_subclass_of($this->API->event_handler, '\danog\MadelineProto\EventHandler')) {
                 $this->API->setEventHandler($this->API->event_handler);
             }
         }
@@ -280,7 +280,7 @@ class API extends APIFactory
             $methods[] = $method['method'];
         }
 
-        return array_merge($methods, get_class_methods($this->API));
+        return \array_merge($methods, \get_class_methods($this->API));
     }
 
     public function serialize($filename = null)
@@ -307,12 +307,12 @@ class API extends APIFactory
             if ($this->API && $this->API->asyncInitPromise) {
                 yield $this->API->initAsync();
             }
-            $this->serialized = time();
+            $this->serialized = \time();
             $realpaths = Serialization::realpaths($filename);
             Logger::log('Waiting for exclusive lock of serialization lockfile...');
-            
+
             $unlock = yield Tools::flock($realpaths['lockfile'], LOCK_EX);
-            
+
             Logger::log('Lock acquired, serializing');
 
             try {
@@ -326,8 +326,8 @@ class API extends APIFactory
                         $this->API->settings['logger']['logger_param'] = [$this->API, 'noop'];
                     }
                 }
-                $wrote = yield put($realpaths['tempfile'], serialize($this));
-                yield rename($realpaths['tempfile'], $realpaths['file']);
+                $wrote = yield put($realpaths['tempfile'], \serialize($this));
+                yield renameAsync($realpaths['tempfile'], $realpaths['file']);
             } finally {
                 if (!$this->getting_api_id) {
                     $this->API->settings['updates']['callback'] = $update_closure;

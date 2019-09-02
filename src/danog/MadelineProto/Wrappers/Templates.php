@@ -70,7 +70,7 @@ trait Templates
 
     public function web_echo_template($message, $form)
     {
-        return sprintf($this->web_template, $form, $message);
+        return \sprintf($this->web_template, $form, $message);
     }
 
     public function get_web_template()

@@ -18,14 +18,12 @@
 
 namespace danog\MadelineProto\Stream\Transport;
 
+use Amp\ByteStream\ClosedException;
 use Amp\Promise;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Stream\Async\RawStream;
-use danog\MadelineProto\Stream\RawStreamInterface;
-use function Amp\Socket\connect;
-use function Amp\Socket\cryptoConnect;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
-use Amp\ByteStream\ClosedException;
+use danog\MadelineProto\Stream\RawStreamInterface;
 
 /**
  * Default stream wrapper.
@@ -40,7 +38,7 @@ class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInt
     private $stream;
     private $connector = 'Amp\\Socket\\connect';
     private $cryptoConnector = 'Amp\\Socket\\cryptoConnect';
-    
+
     public function __construct()
     {
     }

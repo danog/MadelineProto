@@ -132,31 +132,31 @@ class ReferenceDatabase implements TLCallback
 
     public function getMethodCallbacks(): array
     {
-        return array_fill_keys(array_keys(self::METHOD_CONTEXT), [[$this, 'addOriginMethod']]);
+        return \array_fill_keys(\array_keys(self::METHOD_CONTEXT), [[$this, 'addOriginMethod']]);
     }
 
     public function getMethodBeforeCallbacks(): array
     {
-        return array_fill_keys(array_keys(self::METHOD_CONTEXT), [[$this, 'addOriginMethodContext']]);
+        return \array_fill_keys(\array_keys(self::METHOD_CONTEXT), [[$this, 'addOriginMethodContext']]);
     }
 
     public function getConstructorCallbacks(): array
     {
-        return array_merge(
-            array_fill_keys(['document', 'photo', 'fileLocation'], [[$this, 'addReference']]),
-            array_fill_keys(array_keys(self::CONSTRUCTOR_CONTEXT), [[$this, 'addOrigin']]),
+        return \array_merge(
+            \array_fill_keys(['document', 'photo', 'fileLocation'], [[$this, 'addReference']]),
+            \array_fill_keys(\array_keys(self::CONSTRUCTOR_CONTEXT), [[$this, 'addOrigin']]),
             ['document' => [[$this, 'addReference'], [$this, 'addOrigin']]]
         );
     }
 
     public function getConstructorBeforeCallbacks(): array
     {
-        return array_fill_keys(array_keys(self::CONSTRUCTOR_CONTEXT), [[$this, 'addOriginContext']]);
+        return \array_fill_keys(\array_keys(self::CONSTRUCTOR_CONTEXT), [[$this, 'addOriginContext']]);
     }
 
     public function getConstructorSerializeCallbacks(): array
     {
-        return array_fill_keys(array_keys(self::LOCATION_CONTEXT), [$this, 'populateReference']);
+        return \array_fill_keys(\array_keys(self::LOCATION_CONTEXT), [$this, 'populateReference']);
     }
 
     public function getTypeMismatchCallbacks(): array
@@ -167,7 +167,7 @@ class ReferenceDatabase implements TLCallback
     public function reset()
     {
         if ($this->cacheContexts) {
-            $this->API->logger->logger('Found '.count($this->cacheContexts).' pending contexts', \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger('Found '.\count($this->cacheContexts).' pending contexts', \danog\MadelineProto\Logger::ERROR);
             $this->cacheContexts = [];
         }
         if ($this->cache) {
@@ -182,7 +182,7 @@ class ReferenceDatabase implements TLCallback
             $this->API->logger->logger('Trying to add reference out of context, report the following message to @danogentili!', \danog\MadelineProto\Logger::ERROR);
             $frames = [];
             $previous = '';
-            foreach (debug_backtrace(0) as $k => $frame) {
+            foreach (\debug_backtrace(0) as $k => $frame) {
                 if (isset($frame['function']) && $frame['function'] === 'deserialize') {
                     if (isset($frame['args'][1]['subtype'])) {
                         if ($frame['args'][1]['subtype'] === $previous) {
@@ -205,8 +205,8 @@ class ReferenceDatabase implements TLCallback
                     }
                 }
             }
-            $frames = array_reverse($frames);
-            $tl_trace = array_shift($frames);
+            $frames = \array_reverse($frames);
+            $tl_trace = \array_shift($frames);
             foreach ($frames as $frame) {
                 $tl_trace .= "['".$frame."']";
             }
@@ -219,7 +219,7 @@ class ReferenceDatabase implements TLCallback
 
             return false;
         }
-        $key = count($this->cacheContexts) - 1;
+        $key = \count($this->cacheContexts) - 1;
         switch ($location['_']) {
             case 'document':
                 $locationType = self::DOCUMENT_LOCATION;
@@ -254,11 +254,11 @@ class ReferenceDatabase implements TLCallback
 
     public function addOrigin(array $data = [])
     {
-        $key = count($this->cacheContexts) - 1;
+        $key = \count($this->cacheContexts) - 1;
         if ($key === -1) {
             throw new \danog\MadelineProto\Exception('Trying to add origin with no origin context set');
         }
-        $originType = array_pop($this->cacheContexts);
+        $originType = \array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
             $this->API->logger->logger("Removing origin context $originType for {$data['_']}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
@@ -311,7 +311,7 @@ class ReferenceDatabase implements TLCallback
                     }
                 }
                 if (!isset($origin['stickerset'])) {
-                    $key = count($this->cacheContexts) - 1;
+                    $key = \count($this->cacheContexts) - 1;
                     if (!isset($this->cache[$key])) {
                         $this->cache[$key] = [];
                     }
@@ -319,7 +319,7 @@ class ReferenceDatabase implements TLCallback
                     foreach ($cache as $location => $reference) {
                         $this->cache[$key][$location] = $reference;
                     }
-                    $this->API->logger->logger("Skipped origin $originType ({$data['_']}) for ".count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $this->API->logger->logger("Skipped origin $originType ({$data['_']}) for ".\count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                     return;
                 }
@@ -333,7 +333,7 @@ class ReferenceDatabase implements TLCallback
         foreach ($cache as $location => $reference) {
             $this->storeReference($location, $reference, $originType, $origin);
         }
-        $this->API->logger->logger("Added origin $originType ({$data['_']}) to ".count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Added origin $originType ({$data['_']}) to ".\count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
     }
 
     public function addOriginMethodContext(string $type)
@@ -348,11 +348,11 @@ class ReferenceDatabase implements TLCallback
 
     public function addOriginMethod(array $data, array $res)
     {
-        $key = count($this->cacheContexts) - 1;
+        $key = \count($this->cacheContexts) - 1;
         if ($key === -1) {
             throw new \danog\MadelineProto\Exception('Trying to add origin with no origin context set');
         }
-        $originType = array_pop($this->cacheContexts);
+        $originType = \array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
             $this->API->logger->logger("Removing origin context $originType for {$data['_']}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
@@ -420,7 +420,7 @@ class ReferenceDatabase implements TLCallback
         foreach ($cache as $location => $reference) {
             $this->storeReference($location, $reference, $originType, $origin);
         }
-        $this->API->logger->logger("Added origin $originType ({$data['_']}) to ".count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Added origin $originType ({$data['_']}) to ".\count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
     }
 
     public function storeReference(string $location, string $reference, int $originType, array $origin)
@@ -435,7 +435,7 @@ class ReferenceDatabase implements TLCallback
             $this->refreshed[$location] = true;
         }
 
-        $key = count($this->cacheContexts) - 1;
+        $key = \count($this->cacheContexts) - 1;
         if ($key >= 0) {
             $this->cache[$key][$location] = $reference;
         }
@@ -472,7 +472,7 @@ class ReferenceDatabase implements TLCallback
             return $this->db[$location]['reference'];
         }
 
-        ksort($this->db[$location]['origins']);
+        \ksort($this->db[$location]['origins']);
         $count = 0;
 
         foreach ($this->db[$location]['origins'] as $originType => &$origin) {
@@ -481,7 +481,7 @@ class ReferenceDatabase implements TLCallback
             switch ($originType) {
                 // Peer + msg ID
                 case self::MESSAGE_ORIGIN:
-                    if (is_array($origin['peer'])) {
+                    if (\is_array($origin['peer'])) {
                         $origin['peer'] = $this->API->get_id($origin['peer']);
                     }
                     if ($origin['peer'] < 0) {
@@ -569,10 +569,10 @@ class ReferenceDatabase implements TLCallback
         switch ($locationType) {
             case self::DOCUMENT_LOCATION:
             case self::PHOTO_LOCATION:
-                return $locationType.(is_int($location['id']) ? $this->pack_signed_long($location['id']) : $location['id']);
+                return $locationType.(\is_int($location['id']) ? $this->pack_signed_long($location['id']) : $location['id']);
             case self::PHOTO_LOCATION_LOCATION:
                 $dc_id = $this->pack_signed_int($location['dc_id']);
-                $volume_id = is_int($location['volume_id']) ? $this->pack_signed_long($location['volume_id']) : $location['volume_id'];
+                $volume_id = \is_int($location['volume_id']) ? $this->pack_signed_long($location['volume_id']) : $location['volume_id'];
                 $local_id = $this->pack_signed_int($location['local_id']);
 
                 return $locationType.$dc_id.$volume_id.$local_id;
@@ -581,6 +581,6 @@ class ReferenceDatabase implements TLCallback
 
     public function __debugInfo()
     {
-        return ['ReferenceDatabase instance '.spl_object_hash($this)];
+        return ['ReferenceDatabase instance '.\spl_object_hash($this)];
     }
 }

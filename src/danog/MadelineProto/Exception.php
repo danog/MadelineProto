@@ -39,18 +39,18 @@ class Exception extends \Exception
             $this->line = $line;
         }
         parent::__construct($message, $code, $previous);
-        if (strpos($message, 'socket_accept') === false) {
-            \danog\MadelineProto\Logger::log($message.' in '.basename($this->file).':'.$this->line, \danog\MadelineProto\Logger::FATAL_ERROR);
+        if (\strpos($message, 'socket_accept') === false) {
+            \danog\MadelineProto\Logger::log($message.' in '.\basename($this->file).':'.$this->line, \danog\MadelineProto\Logger::FATAL_ERROR);
         }
-        
-        if (in_array($message, ['The session is corrupted!', 'Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response", 'Chat forbidden', 'The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.', 'File does not exist', 'Please install this fork of phpseclib: https://github.com/danog/phpseclib'])) {
+
+        if (\in_array($message, ['The session is corrupted!', 'Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response", 'Chat forbidden', 'The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.', 'File does not exist', 'Please install this fork of phpseclib: https://github.com/danog/phpseclib'])) {
             return;
         }
-        if (strpos($message, 'pg_query') !== false || strpos($message, 'Undefined variable: ') !== false || strpos($message, 'socket_write') !== false || strpos($message, 'socket_read') !== false || strpos($message, 'Received request to switch to DC ') !== false || strpos($message, "Couldn't get response") !== false || strpos($message, 'Re-executing query...') !== false || strpos($message, "Couldn't find peer by provided") !== false || strpos($message, 'id.pwrtelegram.xyz') !== false || strpos($message, 'Please update ') !== false || strpos($message, 'posix_isatty') !== false) {
+        if (\strpos($message, 'pg_query') !== false || \strpos($message, 'Undefined variable: ') !== false || \strpos($message, 'socket_write') !== false || \strpos($message, 'socket_read') !== false || \strpos($message, 'Received request to switch to DC ') !== false || \strpos($message, "Couldn't get response") !== false || \strpos($message, 'Re-executing query...') !== false || \strpos($message, "Couldn't find peer by provided") !== false || \strpos($message, 'id.pwrtelegram.xyz') !== false || \strpos($message, 'Please update ') !== false || \strpos($message, 'posix_isatty') !== false) {
             return;
         }
-        if (self::$rollbar && class_exists('\\Rollbar\\Rollbar')) {
-            \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, debug_backtrace(0));
+        if (self::$rollbar && \class_exists('\\Rollbar\\Rollbar')) {
+            \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, \debug_backtrace(0));
         }
     }
 
@@ -63,7 +63,7 @@ class Exception extends \Exception
             $additional = 'Follow the instructions @ https://prime.madelineproto.xyz to install it.';
         }
         $message = 'MadelineProto requires the '.$extensionName.' extension to run. '.$additional;
-        if (php_sapi_name() !== 'cli') {
+        if (PHP_SAPI !== 'cli') {
             echo $message.'<br>';
         }
         $file = 'MadelineProto';
@@ -78,7 +78,7 @@ class Exception extends \Exception
     public static function ExceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null)
     {
         // If error is suppressed with @, don't throw an exception
-        if (error_reporting() === 0 || strpos($errstr, 'headers already sent') || ($errfile && strpos($errfile, 'vendor/amphp') !== false)) {
+        if (\error_reporting() === 0 || \strpos($errstr, 'headers already sent') || ($errfile && \strpos($errfile, 'vendor/amphp') !== false)) {
             return false;
         }
 

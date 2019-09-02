@@ -41,7 +41,7 @@ trait DialogHandler
 
     public function get_full_dialogs_async($force = true)
     {
-        if ($force || !isset($this->dialog_params['offset_date']) || is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || is_null($this->dialog_params['count'])) {
+        if ($force || !isset($this->dialog_params['offset_date']) || \is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || \is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || \is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || \is_null($this->dialog_params['count'])) {
             $this->dialog_params = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];
         }
         if (!isset($this->dialog_params['hash'])) {
@@ -57,8 +57,8 @@ trait DialogHandler
             $last_peer = 0;
             $last_date = 0;
             $last_id = 0;
-            $res['messages'] = array_reverse($res['messages']);
-            foreach (array_reverse($res['dialogs']) as $dialog) {
+            $res['messages'] = \array_reverse($res['messages']);
+            foreach (\array_reverse($res['dialogs']) as $dialog) {
                 $id = $this->get_id($dialog['peer']);
                 if (!isset($dialogs[$id])) {
                     $dialogs[$id] = $dialog;
@@ -82,7 +82,7 @@ trait DialogHandler
                 $this->dialog_params['offset_date'] = $last_date;
                 $this->dialog_params['offset_peer'] = $last_peer;
                 $this->dialog_params['offset_id'] = $last_id;
-                $this->dialog_params['count'] = count($dialogs);
+                $this->dialog_params['count'] = \count($dialogs);
             } else {
                 break;
             }

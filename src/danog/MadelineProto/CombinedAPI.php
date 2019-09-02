@@ -36,7 +36,7 @@ class CombinedAPI
 
     public function __magic_construct($session, $paths = [])
     {
-        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
+        \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         \danog\MadelineProto\Magic::class_exists();
 
         $realpaths = Serialization::realpaths($session);
@@ -46,23 +46,23 @@ class CombinedAPI
             $this->addInstance($path, $settings);
         }
 
-        if (file_exists($realpaths['file'])) {
-            if (!file_exists($realpaths['lockfile'])) {
-                touch($realpaths['lockfile']);
-                clearstatcache();
+        if (\file_exists($realpaths['file'])) {
+            if (!\file_exists($realpaths['lockfile'])) {
+                \touch($realpaths['lockfile']);
+                \clearstatcache();
             }
-            $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'r');
+            $realpaths['lockfile'] = \fopen($realpaths['lockfile'], 'r');
             \danog\MadelineProto\Logger::log('Waiting for shared lock of serialization lockfile...');
-            flock($realpaths['lockfile'], LOCK_SH);
+            \flock($realpaths['lockfile'], LOCK_SH);
             \danog\MadelineProto\Logger::log('Shared lock acquired, deserializing...');
 
             try {
-                $tounserialize = file_get_contents($realpaths['file']);
+                $tounserialize = \file_get_contents($realpaths['file']);
             } finally {
-                flock($realpaths['lockfile'], LOCK_UN);
-                fclose($realpaths['lockfile']);
+                \flock($realpaths['lockfile'], LOCK_UN);
+                \fclose($realpaths['lockfile']);
             }
-            $deserialized = unserialize($tounserialize);
+            $deserialized = \unserialize($tounserialize);
 
             /*foreach ($deserialized['instance_paths'] as $path) {
             $this->addInstance($path, isset($paths[$path]) ? $paths[$path] : []);
@@ -118,7 +118,7 @@ class CombinedAPI
 
     public function __destruct()
     {
-        if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread()) || Magic::is_fork()) {
+        if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread()) || Magic::is_fork()) {
             return;
         }
 
@@ -131,7 +131,7 @@ class CombinedAPI
         $instance->serialize();
         }*/
 
-        if (is_null($this->session)) {
+        if (\is_null($this->session)) {
             return;
         }
         if ($filename === '') {
@@ -139,24 +139,24 @@ class CombinedAPI
         }
         Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
         $realpaths = Serialization::realpaths($filename);
-        if (!file_exists($realpaths['lockfile'])) {
-            touch($realpaths['lockfile']);
-            clearstatcache();
+        if (!\file_exists($realpaths['lockfile'])) {
+            \touch($realpaths['lockfile']);
+            \clearstatcache();
         }
-        $realpaths['lockfile'] = fopen($realpaths['lockfile'], 'w');
+        $realpaths['lockfile'] = \fopen($realpaths['lockfile'], 'w');
         \danog\MadelineProto\Logger::log('Waiting for exclusive lock of serialization lockfile...');
-        flock($realpaths['lockfile'], LOCK_EX);
+        \flock($realpaths['lockfile'], LOCK_EX);
         \danog\MadelineProto\Logger::log('Lock acquired, serializing');
 
         try {
-            $wrote = file_put_contents($realpaths['tempfile'], serialize(['event_handler' => $this->event_handler, 'event_handler_instance' => $this->event_handler_instance, 'instance_paths' => $this->instance_paths]));
-            rename($realpaths['tempfile'], $realpaths['file']);
+            $wrote = \file_put_contents($realpaths['tempfile'], \serialize(['event_handler' => $this->event_handler, 'event_handler_instance' => $this->event_handler_instance, 'instance_paths' => $this->instance_paths]));
+            \rename($realpaths['tempfile'], $realpaths['file']);
         } finally {
-            flock($realpaths['lockfile'], LOCK_UN);
-            fclose($realpaths['lockfile']);
+            \flock($realpaths['lockfile'], LOCK_UN);
+            \fclose($realpaths['lockfile']);
         }
 
-        $this->serialized = time();
+        $this->serialized = \time();
 
         return $wrote;
     }
@@ -170,7 +170,7 @@ class CombinedAPI
     }
     public function setEventHandler($event_handler)
     {
-        if (!class_exists($event_handler) || !is_subclass_of($event_handler, '\danog\MadelineProto\CombinedEventHandler')) {
+        if (!\class_exists($event_handler) || !\is_subclass_of($event_handler, '\danog\MadelineProto\CombinedEventHandler')) {
             throw new \danog\MadelineProto\Exception('Wrong event handler was defined');
         }
 
@@ -188,13 +188,13 @@ class CombinedAPI
             if ($method === 'onLoop') {
                 $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
             } elseif ($method === 'onAny') {
-                foreach (end($this->instances)->API->constructors->by_id as $constructor) {
+                foreach (\end($this->instances)->API->constructors->by_id as $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($this->event_handler_methods[$constructor['predicate']])) {
                         $this->event_handler_methods[$constructor['predicate']] = [$this->event_handler_instance, 'onAny'];
                     }
                 }
             } else {
-                $method_name = lcfirst(substr($method, 2));
+                $method_name = \lcfirst(\substr($method, 2));
                 $this->event_handler_methods[$method_name] = [$this->event_handler_instance, $method];
             }
         }
@@ -228,7 +228,7 @@ class CombinedAPI
 
     public function loop($max_forks = 0)
     {
-        if (is_callable($max_forks)) {
+        if (\is_callable($max_forks)) {
             return $this->wait($max_forks());
         }
 

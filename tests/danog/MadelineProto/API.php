@@ -11,7 +11,7 @@ final class APITest extends TestCase
      */
     public function testCanUseProtocol($transport, $obfuscated, $protocol, $test_mode, $ipv6): void
     {
-        $ping = ['ping_id' => random_int(PHP_INT_MIN, PHP_INT_MAX)];
+        $ping = ['ping_id' => \random_int(PHP_INT_MIN, PHP_INT_MAX)];
         $MadelineProto = new \danog\MadelineProto\API(
             [
                 'app_info' => [

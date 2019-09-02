@@ -34,7 +34,7 @@ class Handler extends \danog\MadelineProto\Connection
 
     public function __magic_construct($socket, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
-        \danog\MadelineProto\Magic::$pid = getmypid();
+        \danog\MadelineProto\Magic::$pid = \getmypid();
         $this->sock = $socket;
         $this->sock->setBlocking(true);
         $this->must_open = false;
@@ -47,7 +47,7 @@ class Handler extends \danog\MadelineProto\Connection
 
     public function __destruct()
     {
-        echo 'Closing socket in fork '.getmypid().PHP_EOL;
+        echo 'Closing socket in fork '.\getmypid().PHP_EOL;
         unset($this->sock);
         $this->destruct_madeline();
     }
@@ -71,31 +71,31 @@ class Handler extends \danog\MadelineProto\Connection
 
         $first_byte = $this->sock->read(1);
 
-        if ($first_byte === chr(239)) {
+        if ($first_byte === \chr(239)) {
             $this->protocol = 'tcp_abridged';
         } else {
             $first_byte .= $this->sock->read(3);
-            if ($first_byte === str_repeat(chr(238), 4)) {
+            if ($first_byte === \str_repeat(\chr(238), 4)) {
                 $this->protocol = 'tcp_intermediate';
             } else {
                 $this->protocol = 'tcp_full';
 
-                $packet_length = unpack('V', $first_byte)[1];
+                $packet_length = \unpack('V', $first_byte)[1];
                 $packet = $this->read($packet_length - 4);
-                if (strrev(hash('crc32b', $first_byte.substr($packet, 0, -4), true)) !== substr($packet, -4)) {
+                if (\strrev(\hash('crc32b', $first_byte.\substr($packet, 0, -4), true)) !== \substr($packet, -4)) {
                     throw new Exception('CRC32 was not correct!');
                 }
                 $this->in_seq_no++;
-                $in_seq_no = unpack('V', substr($packet, 0, 4))[1];
+                $in_seq_no = \unpack('V', \substr($packet, 0, 4))[1];
                 if ($in_seq_no != $this->in_seq_no) {
                     throw new Exception('Incoming seq_no mismatch');
                 }
 
-                $buffer = substr($packet, 4, $packet_length - 12);
+                $buffer = \substr($packet, 4, $packet_length - 12);
             }
         }
         while (true) {
-            pcntl_signal_dispatch();
+            \pcntl_signal_dispatch();
             $request_id = 0;
 
             try {
@@ -103,12 +103,12 @@ class Handler extends \danog\MadelineProto\Connection
                     $message = $buffer;
                     $buffer = '';
                 } else {
-                    $time = time();
+                    $time = \time();
                     $message = $this->read_message();
                 }
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
                 echo $e;
-                if (time() - $time < 2) {
+                if (\time() - $time < 2) {
                     $this->sock = null;
                 }
                 continue;
@@ -139,17 +139,17 @@ class Handler extends \danog\MadelineProto\Connection
 
     public function on_request($request_id, $method, $args)
     {
-        if (count($method) === 0 || count($method) > 2) {
+        if (\count($method) === 0 || \count($method) > 2) {
             throw new \danog\MadelineProto\Exception('Invalid method called');
         }
 
-        array_walk($args, [$this, 'walker']);
+        \array_walk($args, [$this, 'walker']);
 
         if ($method[0] === '__construct') {
-            if (count($args) === 1 && is_array($args[0])) {
+            if (\count($args) === 1 && \is_array($args[0])) {
                 $args[0]['logger'] = ['logger' => 4, 'logger_param' => [$this, 'logger']];
                 $args[0]['updates']['callback'] = [$this, 'update_handler'];
-            } elseif (count($args) === 2 && is_array($args[1])) {
+            } elseif (\count($args) === 2 && \is_array($args[1])) {
                 $args[1]['logger'] = ['logger' => 4, 'logger_param' => [$this, 'logger']];
                 $args[1]['updates']['callback'] = [$this, 'update_handler'];
             }
@@ -165,42 +165,41 @@ class Handler extends \danog\MadelineProto\Connection
             throw new \danog\MadelineProto\Exception('__construct was not called');
         }
 
-        if (count($method) === 1) {
+        if (\count($method) === 1) {
             return $this->madeline->{$method[0]}(...$args);
         }
-        if (count($method) === 2) {
+        if (\count($method) === 2) {
             return $this->madeline->{$method[0]}->{$method[1]}(...$args);
         }
     }
 
     private function walker(&$arg)
     {
-        if (is_array($arg)) {
+        if (\is_array($arg)) {
             if (isset($arg['_'])) {
-                if ($arg['_'] === 'fileCallback' && isset($arg['callback']) && isset($arg['file']) && !method_exists($this, $arg['callback']['callback'])) {
+                if ($arg['_'] === 'fileCallback' && isset($arg['callback']) && isset($arg['file']) && !\method_exists($this, $arg['callback']['callback'])) {
                     if (isset($arg['file']['_']) && $arg['file']['_'] === 'stream') {
-                        $arg['file'] = fopen('madelineSocket://', 'r+b', false, Stream::getContext($this, $arg['file']['stream_id']));
+                        $arg['file'] = \fopen('madelineSocket://', 'r+b', false, Stream::getContext($this, $arg['file']['stream_id']));
                     }
                     $arg = new \danog\MadelineProto\FileCallback($arg['file'], [$this, $arg['callback']['callback']]);
 
                     return;
-                } elseif ($arg['_'] === 'callback' && isset($arg['callback']) && !method_exists($this, $arg['callback'])) {
+                } elseif ($arg['_'] === 'callback' && isset($arg['callback']) && !\method_exists($this, $arg['callback'])) {
                     $arg = [$this, $arg['callback']];
 
                     return;
                 } elseif ($arg['_'] === 'stream' && isset($arg['stream_id'])) {
-                    $arg = fopen('madelineSocket://', 'r+b', false, Stream::getContext($this, $arg['stream_id']));
+                    $arg = \fopen('madelineSocket://', 'r+b', false, Stream::getContext($this, $arg['stream_id']));
 
                     return;
                 } elseif ($arg['_'] === 'bytes' && isset($arg['bytes'])) {
-                    $arg = base64_decode($args['bytes']);
+                    $arg = \base64_decode($args['bytes']);
 
                     return;
-                } else {
-                    array_walk($arg, [$this, 'walker']);
                 }
+                \array_walk($arg, [$this, 'walker']);
             } else {
-                array_walk($arg, [$this, 'walker']);
+                \array_walk($arg, [$this, 'walker']);
             }
         }
     }
@@ -226,15 +225,15 @@ class Handler extends \danog\MadelineProto\Connection
         $exception['code'] = $e->getCode();
         $exception['trace'] = ['_' => 'socketTLTrace', 'frames' => []];
         $tl = false;
-        foreach (array_reverse($e->getTrace()) as $k => $frame) {
+        foreach (\array_reverse($e->getTrace()) as $k => $frame) {
             $tl_frame = ['_' => 'socketTLFrame'];
-            if (isset($frame['function']) && in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
+            if (isset($frame['function']) && \in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
                 if ($frame['args'][2] !== '') {
                     $tl_frame['tl_param'] = (string) $frame['args'][2];
                     $tl = true;
                 }
             } else {
-                if (isset($frame['function']) && ($frame['function'] === 'handle_rpc_error' && $k === count($this->getTrace()) - 1) || $frame['function'] === 'unserialize') {
+                if (isset($frame['function']) && ($frame['function'] === 'handle_rpc_error' && $k === \count($this->getTrace()) - 1) || $frame['function'] === 'unserialize') {
                     continue;
                 }
                 if (isset($frame['file'])) {
@@ -245,7 +244,7 @@ class Handler extends \danog\MadelineProto\Connection
                     $tl_frame['function'] = $frame['function'];
                 }
                 if (isset($frame['args'])) {
-                    $args = json_encode($frame['args']);
+                    $args = \json_encode($frame['args']);
                     if ($args !== false) {
                         $tl_frame['args'] = $args;
                     }
@@ -275,7 +274,7 @@ class Handler extends \danog\MadelineProto\Connection
             try {
                 $this->logging = true;
 
-                $message = ['_' => 'socketMessageLog', 'data' => $message, 'level' => $level, 'thread' => \danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread()), 'process' => \danog\MadelineProto\Magic::is_fork(), 'file' => basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'], '.php')];
+                $message = ['_' => 'socketMessageLog', 'data' => $message, 'level' => $level, 'thread' => \danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread()), 'process' => \danog\MadelineProto\Magic::is_fork(), 'file' => \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'], '.php')];
 
                 $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], $message, 'log'));
             } finally {

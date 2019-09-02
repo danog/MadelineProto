@@ -61,7 +61,7 @@ class WsStream implements RawStreamInterface
 
         $this->compressionFactory = new Rfc7692CompressionFactory();
 
-        $handshake = new Handshake(str_replace('tcp://', $ctx->isSecure() ? 'ws://' : 'wss://', $ctx->getStringUri()));
+        $handshake = new Handshake(\str_replace('tcp://', $ctx->isSecure() ? 'ws://' : 'wss://', $ctx->getStringUri()));
 
         $key = generateKey();
         yield $stream->write($this->generateRequest($handshake, $key));

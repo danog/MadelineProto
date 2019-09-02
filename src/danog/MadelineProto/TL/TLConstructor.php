@@ -45,7 +45,7 @@ class TLConstructor
         if ($scheme_type === 'secret') {
             $this->by_id[$json_dict['id']]['layer'] = $json_dict['layer'];
             $this->layers[$json_dict['layer']] = $json_dict['layer'];
-            ksort($this->layers);
+            \ksort($this->layers);
         } else {
             $json_dict['layer'] = '';
         }

@@ -45,7 +45,7 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      */
     public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = yield $ctx->getStream(str_repeat(chr(238), 4).$header);
+        $this->stream = yield $ctx->getStream(\str_repeat(\chr(238), 4).$header);
     }
 
     /**
@@ -68,7 +68,7 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     public function getWriteBufferAsync(int $length, string $append = ''): \Generator
     {
         $buffer = yield $this->stream->getWriteBuffer($length + 4, $append);
-        yield $buffer->bufferWrite(pack('V', $length));
+        yield $buffer->bufferWrite(\pack('V', $length));
 
         return $buffer;
     }
@@ -83,7 +83,7 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     public function getReadBufferAsync(&$length): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
-        $length = unpack('V', yield $buffer->bufferRead(4))[1];
+        $length = \unpack('V', yield $buffer->bufferRead(4))[1];
 
         return $buffer;
     }

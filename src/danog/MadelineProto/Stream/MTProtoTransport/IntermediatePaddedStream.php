@@ -45,7 +45,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      */
     public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = yield $ctx->getStream(str_repeat(chr(221), 4).$header);
+        $this->stream = yield $ctx->getStream(\str_repeat(\chr(221), 4).$header);
     }
 
     /**
@@ -69,7 +69,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     {
         $padding_length = $this->random_int($modulus = 16);
         $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.$this->random($padding_length));
-        yield $buffer->bufferWrite(pack('V', $padding_length + $length));
+        yield $buffer->bufferWrite(\pack('V', $padding_length + $length));
 
         return $buffer;
     }
@@ -84,7 +84,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     public function getReadBufferAsync(&$length): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
-        $length = unpack('V', yield $buffer->bufferRead(4))[1];
+        $length = \unpack('V', yield $buffer->bufferRead(4))[1];
 
         return $buffer;
     }

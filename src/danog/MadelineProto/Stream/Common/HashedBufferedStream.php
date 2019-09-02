@@ -52,7 +52,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      */
     public function startReadHash()
     {
-        $this->read_hash = hash_init($this->hash_name);
+        $this->read_hash = \hash_init($this->hash_name);
     }
 
     /**
@@ -74,9 +74,9 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      */
     public function getReadHash(): string
     {
-        $hash = hash_final($this->read_hash, true);
+        $hash = \hash_final($this->read_hash, true);
         if ($this->rev) {
-            $hash = strrev($hash);
+            $hash = \strrev($hash);
         }
         $this->read_hash = null;
         $this->read_check_after = 0;
@@ -102,7 +102,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      */
     public function startWriteHash()
     {
-        $this->write_hash = hash_init($this->hash_name);
+        $this->write_hash = \hash_init($this->hash_name);
     }
 
     /**
@@ -124,9 +124,9 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      */
     public function getWriteHash(): string
     {
-        $hash = hash_final($this->write_hash, true);
+        $hash = \hash_final($this->write_hash, true);
         if ($this->rev) {
-            $hash = strrev($hash);
+            $hash = \strrev($hash);
         }
         $this->write_hash = null;
         $this->write_check_after = 0;
@@ -161,16 +161,16 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
                 throw new \danog\MadelineProto\Exception('Tried to read too much out of frame data');
             }
             $data = yield $this->read_buffer->bufferRead($length);
-            hash_update($this->read_hash, $data);
+            \hash_update($this->read_hash, $data);
             $hash = $this->getReadHash();
-            if ($hash !== yield $this->read_buffer->bufferRead(strlen($hash))) {
+            if ($hash !== yield $this->read_buffer->bufferRead(\strlen($hash))) {
                 throw new \danog\MadelineProto\Exception('Hash mismatch');
             }
 
             return $data;
         }
         $data = yield $this->read_buffer->bufferRead($length);
-        hash_update($this->read_hash, $data);
+        \hash_update($this->read_hash, $data);
         if ($this->read_check_after) {
             $this->read_check_pos += $length;
         }
@@ -187,10 +187,10 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      */
     public function setExtra($hash)
     {
-        $rev = strpos($hash, '_rev');
+        $rev = \strpos($hash, '_rev');
         $this->rev = false;
         if ($rev !== false) {
-            $hash = substr($hash, 0, $rev);
+            $hash = \substr($hash, 0, $rev);
             $this->rev = true;
         }
         $this->hash_name = $hash;
@@ -292,12 +292,12 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
             return $this->write_buffer->bufferWrite($length);
         }
 
-        $length = strlen($data);
+        $length = \strlen($data);
         if ($this->write_check_after && $length + $this->write_check_pos >= $this->write_check_after) {
             if ($length + $this->write_check_pos > $this->write_check_after) {
                 throw new \danog\MadelineProto\Exception('Too much out of frame data was sent, cannot check hash');
             }
-            hash_update($this->write_hash, $data);
+            \hash_update($this->write_hash, $data);
 
             return $this->write_buffer->bufferWrite($data.$this->getWriteHash());
         }
@@ -305,7 +305,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
             $this->write_check_pos += $length;
         }
         if ($this->write_hash) {
-            hash_update($this->write_hash, $data);
+            \hash_update($this->write_hash, $data);
         }
 
         return $this->write_buffer->bufferWrite($data);

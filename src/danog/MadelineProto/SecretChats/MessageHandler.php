@@ -27,14 +27,14 @@ trait MessageHandler
     public function encrypt_secret_message_async($chat_id, $message)
     {
         if (!isset($this->secret_chats[$chat_id])) {
-            $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $chat_id));
+            $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $chat_id));
 
             return false;
         }
         $message['random_id'] = $this->random(8);
         $this->secret_chats[$chat_id]['ttr']--;
         if ($this->secret_chats[$chat_id]['layer'] > 8) {
-            if (($this->secret_chats[$chat_id]['ttr'] <= 0 || time() - $this->secret_chats[$chat_id]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$chat_id]['rekeying'][0] === 0) {
+            if (($this->secret_chats[$chat_id]['ttr'] <= 0 || \time() - $this->secret_chats[$chat_id]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$chat_id]['rekeying'][0] === 0) {
                 yield $this->rekey_async($chat_id);
             }
             $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->secret_chats[$chat_id]['layer'], 'in_seq_no' => $this->generate_secret_in_seq_no($chat_id), 'out_seq_no' => $this->generate_secret_out_seq_no($chat_id), 'message' => $message];
@@ -42,19 +42,19 @@ trait MessageHandler
         }
         $this->secret_chats[$chat_id]['outgoing'][$this->secret_chats[$chat_id]['out_seq_no']] = $message;
         $message = yield $this->serialize_object_async(['type' => $constructor = $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer'], $message, $constructor, $this->secret_chats[$chat_id]['layer']);
-        $message = $this->pack_unsigned_int(strlen($message)).$message;
+        $message = $this->pack_unsigned_int(\strlen($message)).$message;
         if ($this->secret_chats[$chat_id]['mtproto'] === 2) {
-            $padding = $this->posmod(-strlen($message), 16);
+            $padding = $this->posmod(-\strlen($message), 16);
             if ($padding < 12) {
                 $padding += 16;
             }
             $message .= $this->random($padding);
-            $message_key = substr(hash('sha256', substr($this->secret_chats[$chat_id]['key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 0 : 8), 32).$message, true), 8, 16);
+            $message_key = \substr(\hash('sha256', \substr($this->secret_chats[$chat_id]['key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 0 : 8), 32).$message, true), 8, 16);
             list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], $this->secret_chats[$chat_id]['admin']);
         } else {
-            $message_key = substr(sha1($message, true), -16);
+            $message_key = \substr(\sha1($message, true), -16);
             list($aes_key, $aes_iv) = $this->old_aes_calculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], true);
-            $message .= $this->random($this->posmod(-strlen($message), 16));
+            $message .= $this->random($this->posmod(-\strlen($message), 16));
         }
         $message = $this->secret_chats[$chat_id]['key']['fingerprint'].$message_key.$this->ige_encrypt($message, $aes_key, $aes_iv);
 
@@ -64,11 +64,11 @@ trait MessageHandler
     public function handle_encrypted_update_async($message, $test = false)
     {
         if (!isset($this->secret_chats[$message['message']['chat_id']])) {
-            $this->logger->logger(sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $message['message']['chat_id']));
+            $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $message['message']['chat_id']));
 
             return false;
         }
-        $auth_key_id = substr($message['message']['bytes'], 0, 8);
+        $auth_key_id = \substr($message['message']['bytes'], 0, 8);
         $old = false;
         if ($auth_key_id !== $this->secret_chats[$message['message']['chat_id']]['key']['fingerprint']) {
             if (isset($this->secret_chats[$message['message']['chat_id']]['old_key']['fingerprint'])) {
@@ -84,8 +84,8 @@ trait MessageHandler
                 throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['fingerprint_mismatch']);
             }
         }
-        $message_key = substr($message['message']['bytes'], 8, 16);
-        $encrypted_data = substr($message['message']['bytes'], 24);
+        $message_key = \substr($message['message']['bytes'], 8, 16);
+        $encrypted_data = \substr($message['message']['bytes'], 24);
         if ($this->secret_chats[$message['message']['chat_id']]['mtproto'] === 2) {
             $this->logger->logger('Trying MTProto v2 decryption for chat '.$message['message']['chat_id'].'...', \danog\MadelineProto\Logger::NOTICE);
 
@@ -113,7 +113,7 @@ trait MessageHandler
         }
         $deserialized = $this->deserialize($message_data, ['type' => '']);
         $this->secret_chats[$message['message']['chat_id']]['ttr']--;
-        if (($this->secret_chats[$message['message']['chat_id']]['ttr'] <= 0 || time() - $this->secret_chats[$message['message']['chat_id']]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$message['message']['chat_id']]['rekeying'][0] === 0) {
+        if (($this->secret_chats[$message['message']['chat_id']]['ttr'] <= 0 || \time() - $this->secret_chats[$message['message']['chat_id']]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$message['message']['chat_id']]['rekeying'][0] === 0) {
             yield $this->rekey_async($message['message']['chat_id']);
         }
         unset($message['message']['bytes']);
@@ -126,18 +126,18 @@ trait MessageHandler
     {
         list($aes_key, $aes_iv) = $this->old_aes_calculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], true);
         $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
-        $message_data_length = unpack('V', substr($decrypted_data, 0, 4))[1];
-        $message_data = substr($decrypted_data, 4, $message_data_length);
-        if ($message_data_length > strlen($decrypted_data)) {
+        $message_data_length = \unpack('V', \substr($decrypted_data, 0, 4))[1];
+        $message_data = \substr($decrypted_data, 4, $message_data_length);
+        if ($message_data_length > \strlen($decrypted_data)) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['msg_data_length_too_big']);
         }
-        if ($message_key != substr(sha1(substr($decrypted_data, 0, 4 + $message_data_length), true), -16)) {
+        if ($message_key != \substr(\sha1(\substr($decrypted_data, 0, 4 + $message_data_length), true), -16)) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['msg_key_mismatch']);
         }
-        if (strlen($decrypted_data) - 4 - $message_data_length > 15) {
+        if (\strlen($decrypted_data) - 4 - $message_data_length > 15) {
             throw new \danog\MadelineProto\SecurityException('difference between message_data_length and the length of the remaining decrypted buffer is too big');
         }
-        if (strlen($decrypted_data) % 16 != 0) {
+        if (\strlen($decrypted_data) % 16 != 0) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['length_not_divisible_16']);
         }
 
@@ -148,21 +148,21 @@ trait MessageHandler
     {
         list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], !$this->secret_chats[$chat_id]['admin']);
         $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
-        $message_data_length = unpack('V', substr($decrypted_data, 0, 4))[1];
-        $message_data = substr($decrypted_data, 4, $message_data_length);
-        if ($message_data_length > strlen($decrypted_data)) {
+        $message_data_length = \unpack('V', \substr($decrypted_data, 0, 4))[1];
+        $message_data = \substr($decrypted_data, 4, $message_data_length);
+        if ($message_data_length > \strlen($decrypted_data)) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['msg_data_length_too_big']);
         }
-        if ($message_key != substr(hash('sha256', substr($this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 8 : 0), 32).$decrypted_data, true), 8, 16)) {
+        if ($message_key != \substr(\hash('sha256', \substr($this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 8 : 0), 32).$decrypted_data, true), 8, 16)) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['msg_key_mismatch']);
         }
-        if (strlen($decrypted_data) - 4 - $message_data_length < 12) {
+        if (\strlen($decrypted_data) - 4 - $message_data_length < 12) {
             throw new \danog\MadelineProto\SecurityException('padding is too small');
         }
-        if (strlen($decrypted_data) - 4 - $message_data_length > 1024) {
+        if (\strlen($decrypted_data) - 4 - $message_data_length > 1024) {
             throw new \danog\MadelineProto\SecurityException('padding is too big');
         }
-        if (strlen($decrypted_data) % 16 != 0) {
+        if (\strlen($decrypted_data) % 16 != 0) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['length_not_divisible_16']);
         }
 

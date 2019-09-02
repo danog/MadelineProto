@@ -11,10 +11,10 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-if (!file_exists(__DIR__.'/../vendor/autoload.php')) {
+if (!\file_exists(__DIR__.'/../vendor/autoload.php')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
-    if (!file_exists('madeline.php')) {
-        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if (!\file_exists('madeline.php')) {
+        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
 } else {
@@ -33,15 +33,15 @@ try {
 }
 function base64url_decode($data)
 {
-    return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
+    return \base64_decode(\str_pad(\strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT));
 }
 function rle_decode($string)
 {
     $base256 = '';
     $last = '';
-    foreach (str_split($string) as $cur) {
-        if ($last === chr(0)) {
-            $base256 .= str_repeat($last, ord($cur));
+    foreach (\str_split($string) as $cur) {
+        if ($last === \chr(0)) {
+            $base256 .= \str_repeat($last, \ord($cur));
             $last = '';
         } else {
             $base256 .= $last;
@@ -63,12 +63,12 @@ function foreach_offset_length($string)
     }
     $string = str_replace($a, $b, $string);*/
     $res = [];
-    $strlen = strlen($string);
-    for ($offset = 0; $offset < strlen($string); $offset++) {
+    $strlen = \strlen($string);
+    for ($offset = 0; $offset < \strlen($string); $offset++) {
         //        for ($length = $strlen - $offset; $length > 0; $length--) {
         foreach (['i' => 4, 'q' => 8] as $c => $length) {
-            $s = substr($string, $offset, $length);
-            if (strlen($s) === $length) {
+            $s = \substr($string, $offset, $length);
+            if (\strlen($s) === $length) {
                 $number = \danog\PHP\Struct::unpack('<'.$c, $s)[0];
                 //$number = ord($s);
                 $res[] = ['number' => $number, 'offset' => $offset, 'length' => $length];
@@ -82,7 +82,7 @@ function foreach_offset_length($string)
 $res = ['offset' => 0, 'files' => []];
 function getfiles($token, &$params)
 {
-    foreach (json_decode(file_get_contents('https://api.telegram.org/bot'.$token.'/getupdates?offset='.$params['offset']), true)['result'] as $update) {
+    foreach (\json_decode(\file_get_contents('https://api.telegram.org/bot'.$token.'/getupdates?offset='.$params['offset']), true)['result'] as $update) {
         $params['offset'] = $update['update_id'] + 1;
         if (isset($update['message']['audio'])) {
             $params['files'][$update['message']['message_id']] = $update['message']['audio']['file_id'];
@@ -100,7 +100,7 @@ function getfiles($token, &$params)
             $params['files'][$update['message']['message_id']] = $update['message']['voice']['file_id'];
         }
         if (isset($update['message']['photo'])) {
-            $params['files'][$update['message']['message_id']] = end($update['message']['photo'])['file_id'];
+            $params['files'][$update['message']['message_id']] = \end($update['message']['photo'])['file_id'];
         }
     }
 }
@@ -108,9 +108,9 @@ function recurse($array, $prefix = '')
 {
     $res = [];
     foreach ($array as $k => $v) {
-        if (is_array($v)) {
-            $res = array_merge(recurse($v, $prefix.$k.'->'), $res);
-        } elseif (is_int($v)) {
+        if (\is_array($v)) {
+            $res = \array_merge(recurse($v, $prefix.$k.'->'), $res);
+        } elseif (\is_int($v)) {
             $res[$prefix.$k] = $v;
         }
     }
@@ -135,17 +135,17 @@ while (true) {
                         $bot_api_id_b256 = base64url_decode($bot_api_id);
                         $bot_api_id_rledecoded = rle_decode($bot_api_id_b256);
                         $message .= PHP_EOL.PHP_EOL;
-                        for ($x = 0; $x < strlen($bot_api_id_rledecoded) - 3; $x++) {
-                            $message .= 'Bytes '.$x.'-'.($x + 4).': '.\danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, $x, 4))[0].PHP_EOL;
+                        for ($x = 0; $x < \strlen($bot_api_id_rledecoded) - 3; $x++) {
+                            $message .= 'Bytes '.$x.'-'.($x + 4).': '.\danog\PHP\Struct::unpack('<i', \substr($bot_api_id_rledecoded, $x, 4))[0].PHP_EOL;
                         }
                         $message .= PHP_EOL.PHP_EOL.
-                            'First 4 bytes: '.ord($bot_api_id_rledecoded[0]).' '.ord($bot_api_id_rledecoded[1]).' '.ord($bot_api_id_rledecoded[2]).' '.ord($bot_api_id_rledecoded[3]).PHP_EOL.
-                            'First 4 bytes (single integer): '.(\danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, 0, 4))[0]).PHP_EOL.
-                            'bytes 8-16: '.(\danog\PHP\Struct::unpack('<q', substr($bot_api_id_rledecoded, 8, 8))[0]).PHP_EOL.
-                            'bytes 16-24: '.(\danog\PHP\Struct::unpack('<q', substr($bot_api_id_rledecoded, 16, 8))[0]).PHP_EOL.
-                            'Last byte: '.ord(substr($bot_api_id_rledecoded, -1)).PHP_EOL.
-                            'Total length: '.strlen($bot_api_id_b256).PHP_EOL.
-                            'Total length (rledecoded): '.strlen($bot_api_id_rledecoded).PHP_EOL.
+                            'First 4 bytes: '.\ord($bot_api_id_rledecoded[0]).' '.\ord($bot_api_id_rledecoded[1]).' '.\ord($bot_api_id_rledecoded[2]).' '.\ord($bot_api_id_rledecoded[3]).PHP_EOL.
+                            'First 4 bytes (single integer): '.(\danog\PHP\Struct::unpack('<i', \substr($bot_api_id_rledecoded, 0, 4))[0]).PHP_EOL.
+                            'bytes 8-16: '.(\danog\PHP\Struct::unpack('<q', \substr($bot_api_id_rledecoded, 8, 8))[0]).PHP_EOL.
+                            'bytes 16-24: '.(\danog\PHP\Struct::unpack('<q', \substr($bot_api_id_rledecoded, 16, 8))[0]).PHP_EOL.
+                            'Last byte: '.\ord(\substr($bot_api_id_rledecoded, -1)).PHP_EOL.
+                            'Total length: '.\strlen($bot_api_id_b256).PHP_EOL.
+                            'Total length (rledecoded): '.\strlen($bot_api_id_rledecoded).PHP_EOL.
                              PHP_EOL.'<b>param (value): start-end (length)</b>'.PHP_EOL.PHP_EOL;
                         $bot_api = foreach_offset_length($bot_api_id_rledecoded);
                         //$mtproto = $MadelineProto->get_download_info($update['update']['message']['media'])['InputFileLocation'];
@@ -177,16 +177,16 @@ while (true) {
                                 }
                             }
                         }
-                        ksort($m);
+                        \ksort($m);
                         foreach ($m as $key => $bn) {
                             $message .= $bn;
                         }
                         foreach ($mtproto as $key => $n) {
                             $message .= $key.' ('.$n.'): not found'.PHP_EOL;
                         }
-                        $message .= PHP_EOL.PHP_EOL.'File number: '.\danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, 8, 4))[0];
+                        $message .= PHP_EOL.PHP_EOL.'File number: '.\danog\PHP\Struct::unpack('<i', \substr($bot_api_id_rledecoded, 8, 4))[0];
                         if ($update['update']['message']['from_id'] === 101374607) {
-                            $message = \danog\PHP\Struct::unpack('<i', substr($bot_api_id_rledecoded, 8, 4))[0];
+                            $message = \danog\PHP\Struct::unpack('<i', \substr($bot_api_id_rledecoded, 8, 4))[0];
                         }
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => $message, 'reply_to_msg_id' => $update['update']['message']['id'], 'parse_mode' => 'markdown']);
                     }
@@ -198,7 +198,7 @@ while (true) {
 
                 try {
                     if (isset($update['update']['message']['media']) && $update['update']['message']['media'] == 'messageMediaPhoto' && $update['update']['message']['media'] == 'messageMediaDocument') {
-                        $time = time();
+                        $time = \time();
                         //                        $file = $MadelineProto->download_to_dir($update['update']['message']['media'], '/tmp');
 //                        $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => 'Downloaded to '.$file.' in '.(time() - $time).' seconds', 'reply_to_msg_id' => $update['update']['message']['id'], 'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
                     }

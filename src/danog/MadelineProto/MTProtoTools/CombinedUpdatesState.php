@@ -29,11 +29,11 @@ class CombinedUpdatesState
     public function __construct($init = [])
     {
         $this->states[false] = new UpdatesState();
-        if (!is_array($init)) {
+        if (!\is_array($init)) {
             return;
         }
         foreach ($init as $channel => $state) {
-            if (is_array($state)) {
+            if (\is_array($state)) {
                 $state = new UpdatesState($state, $channel);
             }
             $this->states[$channel] = $state;

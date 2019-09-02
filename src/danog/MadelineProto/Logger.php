@@ -61,7 +61,7 @@ class Logger
     const CALLABLE_LOGGER = 4;
 
     /**
-     * Construct global logger
+     * Construct global logger.
      *
      * @param [type] $mode
      * @param [type] $optional
@@ -75,19 +75,20 @@ class Logger
         self::$default = new self($mode, $optional, $prefix, $level, $max_size);
     }
     /**
-     * Construct global static logger from MadelineProto settings
+     * Construct global static logger from MadelineProto settings.
      *
      * @param array $settings
      * @return void
      */
-    public static function constructorFromSettings(array $settings) {
+    public static function constructorFromSettings(array $settings)
+    {
         if (!self::$default) {
             // The getLogger function will automatically init the static logger, but we'll do it again anyway
             self::$default = self::getLoggerFromSettings(MTProto::getSettings($settings));
         }
     }
     /**
-     * Get logger from MadelineProto settings
+     * Get logger from MadelineProto settings.
      *
      * @param array $settings
      * @param string $prefix Optional prefix
@@ -95,8 +96,8 @@ class Logger
      */
     public static function getLoggerFromSettings(array $settings, string $prefix = ''): self
     {
-        if (isset($settings['logger']['rollbar_token']) && $settings['logger']['rollbar_token'] !== '' && class_exists('\\Rollbar\\Rollbar')) {
-            @\Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => isset($settings['logger']['rollbar_token']) && !in_array($settings['logger']['rollbar_token'], ['f9fff6689aea4905b58eec73f66c791d', '300afd7ccef346ea84d0c185ae831718', '11a8c2fe4c474328b40a28193f8d63f5', 'beef2d426496462ba34dcaad33d44a14']) || $settings['pwr']['pwr'] ? $settings['logger']['rollbar_token'] : 'c07d9b2f73c2461297b0beaef6c1662f'], false, false);
+        if (isset($settings['logger']['rollbar_token']) && $settings['logger']['rollbar_token'] !== '' && \class_exists('\\Rollbar\\Rollbar')) {
+            @\Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => isset($settings['logger']['rollbar_token']) && !\in_array($settings['logger']['rollbar_token'], ['f9fff6689aea4905b58eec73f66c791d', '300afd7ccef346ea84d0c185ae831718', '11a8c2fe4c474328b40a28193f8d63f5', 'beef2d426496462ba34dcaad33d44a14']) || $settings['pwr']['pwr'] ? $settings['logger']['rollbar_token'] : 'c07d9b2f73c2461297b0beaef6c1662f'], false, false);
         } else {
             Exception::$rollbar = false;
             RPCErrorException::$rollbar = false;
@@ -104,8 +105,8 @@ class Logger
         if (!isset($settings['logger']['logger_param']) && isset($settings['logger']['param'])) {
             $settings['logger']['logger_param'] = $settings['logger']['param'];
         }
-        if (php_sapi_name() !== 'cli') {
-            if (isset($settings['logger']['logger_param']) && basename($settings['logger']['logger_param']) === 'MadelineProto.log') {
+        if (PHP_SAPI !== 'cli') {
+            if (isset($settings['logger']['logger_param']) && \basename($settings['logger']['logger_param']) === 'MadelineProto.log') {
                 $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
             }
         }
@@ -115,12 +116,12 @@ class Logger
             self::$default = $logger;
         }
 
-        if (php_sapi_name() !== 'cli') {
+        if (PHP_SAPI !== 'cli') {
             try {
-                error_reporting(E_ALL);
-                ini_set('log_errors', 1);
-                ini_set('error_log', Magic::$script_cwd.'/MadelineProto.log');
-                error_log('Enabled PHP logging');
+                \error_reporting(E_ALL);
+                \ini_set('log_errors', 1);
+                \ini_set('error_log', Magic::$script_cwd.'/MadelineProto.log');
+                \error_log('Enabled PHP logging');
             } catch (\danog\MadelineProto\Exception $e) {
                 $logger->logger('Could not enable PHP logging');
             }
@@ -138,39 +139,39 @@ class Logger
         $this->prefix = $prefix === '' ? '' : ', '.$prefix;
         $this->level = $level;
 
-        if ($this->mode === 2 && !file_exists(pathinfo($this->optional, PATHINFO_DIRNAME))) {
+        if ($this->mode === 2 && !\file_exists(\pathinfo($this->optional, PATHINFO_DIRNAME))) {
             $this->optional = Magic::$script_cwd.'/MadelineProto.log';
         }
 
-        if ($this->mode === 2 && !preg_match('/\.log$/', $this->optional)) {
+        if ($this->mode === 2 && !\preg_match('/\.log$/', $this->optional)) {
             $this->optional .= '.log';
         }
 
-        if ($mode === 2 && $max_size !== -1 && file_exists($this->optional) && filesize($this->optional) > $max_size) {
-            unlink($this->optional);
+        if ($mode === 2 && $max_size !== -1 && \file_exists($this->optional) && \filesize($this->optional) > $max_size) {
+            \unlink($this->optional);
         }
 
-        $this->colors[self::ULTRA_VERBOSE] = implode(';', [self::FOREGROUND['light_gray'], self::SET['dim']]);
-        $this->colors[self::VERBOSE] = implode(';', [self::FOREGROUND['green'], self::SET['bold']]);
-        $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
-        $this->colors[self::WARNING] = implode(';', [self::FOREGROUND['white'], self::SET['dim'], self::BACKGROUND['red']]);
-        $this->colors[self::ERROR] = implode(';', [self::FOREGROUND['white'], self::SET['bold'], self::BACKGROUND['red']]);
-        $this->colors[self::FATAL_ERROR] = implode(';', [self::FOREGROUND['red'], self::SET['bold'], self::BACKGROUND['light_gray']]);
+        $this->colors[self::ULTRA_VERBOSE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['dim']]);
+        $this->colors[self::VERBOSE] = \implode(';', [self::FOREGROUND['green'], self::SET['bold']]);
+        $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
+        $this->colors[self::WARNING] = \implode(';', [self::FOREGROUND['white'], self::SET['dim'], self::BACKGROUND['red']]);
+        $this->colors[self::ERROR] = \implode(';', [self::FOREGROUND['white'], self::SET['bold'], self::BACKGROUND['red']]);
+        $this->colors[self::FATAL_ERROR] = \implode(';', [self::FOREGROUND['red'], self::SET['bold'], self::BACKGROUND['light_gray']]);
         $this->newline = PHP_EOL;
 
         if ($this->mode === 3) {
             $this->stdout = getStdout();
-            if (php_sapi_name() !== 'cli') {
+            if (PHP_SAPI !== 'cli') {
                 $this->newline = '<br>'.$this->newline;
             }
         } elseif ($this->mode === 2) {
-            $this->stdout = new ResourceOutputStream(fopen($this->optional, 'a+'));
+            $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a+'));
         } elseif ($this->mode === 1) {
-            $result = @ini_get('error_log');
+            $result = @\ini_get('error_log');
             if ($result === 'syslog') {
                 $this->stdout = getStderr();
             } elseif ($result) {
-                $this->stdout = new ResourceOutputStream(fopen($result, 'a+'));
+                $this->stdout = new ResourceOutputStream(\fopen($result, 'a+'));
             } else {
                 $this->stdout = getStderr();
             }
@@ -179,8 +180,8 @@ class Logger
 
     public static function log($param, $level = self::NOTICE)
     {
-        if (!is_null(self::$default)) {
-            self::$default->logger($param, $level, basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php'));
+        if (!\is_null(self::$default)) {
+            self::$default->logger($param, $level, \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php'));
         } else {
             echo $param.PHP_EOL;
         }
@@ -193,35 +194,35 @@ class Logger
         }
         if (!self::$printed) {
             self::$printed = true;
-            $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
+            $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
 
             $this->logger('MadelineProto');
             $this->logger('Copyright (C) 2016-2019 Daniil Gentili');
             $this->logger('Licensed under AGPLv3');
             $this->logger('https://github.com/danog/MadelineProto');
 
-            $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
+            $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
         }
         if ($this->mode === 4) {
-            return call_user_func_array($this->optional, [$param, $level]);
+            return \call_user_func_array($this->optional, [$param, $level]);
         }
         $prefix = $this->prefix;
-        if (\danog\MadelineProto\Magic::$has_thread && is_object(\Thread::getCurrentThread())) {
+        if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread())) {
             $prefix .= ' (t)';
         }
         if ($param instanceof \Throwable) {
             $param = (string) $param;
-        } elseif (!is_string($param)) {
-            $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        } elseif (!\is_string($param)) {
+            $param = \json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
         if ($file === null) {
-            $file = basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
+            $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
-        $param = str_pad($file.$prefix.': ', 16 + strlen($prefix))."\t".$param;
+        $param = \str_pad($file.$prefix.': ', 16 + \strlen($prefix))."\t".$param;
         switch ($this->mode) {
                 case 1:
                     if ($this->stdout->write($param.$this->newline) instanceof Failure) {
-                        error_log($param);
+                        \error_log($param);
                     }
                     break;
                 default:
@@ -229,7 +230,7 @@ class Logger
                     if ($this->stdout->write($param) instanceof Failure) {
                         switch ($this->mode) {
                             case 3: echo $param; break;
-                            case 2: file_put_contents($this->optional, $param, FILE_APPEND); break;
+                            case 2: \file_put_contents($this->optional, $param, FILE_APPEND); break;
                         }
                     }
                     break;

@@ -47,7 +47,7 @@ trait ResponseHandler
                         return;
                     case 'decryptedMessageActionNotifyLayer':
                         $this->secret_chats[$update['message']['chat_id']]['layer'] = $update['message']['decrypted_message']['action']['layer'];
-                        if ($update['message']['decrypted_message']['action']['layer'] >= 17 && time() - $this->secret_chats[$update['message']['chat_id']]['created'] > 15) {
+                        if ($update['message']['decrypted_message']['action']['layer'] >= 17 && \time() - $this->secret_chats[$update['message']['chat_id']]['created'] > 15) {
                             yield $this->notify_layer_async($update['message']['chat_id']);
                         }
                         if ($update['message']['decrypted_message']['action']['layer'] >= 73) {
@@ -90,7 +90,7 @@ trait ResponseHandler
                     $this->secret_chats[$update['message']['chat_id']]['in_seq_no']++;
                     if ($update['message']['decrypted_message']['layer'] >= 17) {
                         $this->secret_chats[$update['message']['chat_id']]['layer'] = $update['message']['decrypted_message']['layer'];
-                        if ($update['message']['decrypted_message']['layer'] >= 17 && time() - $this->secret_chats[$update['message']['chat_id']]['created'] > 15) {
+                        if ($update['message']['decrypted_message']['layer'] >= 17 && \time() - $this->secret_chats[$update['message']['chat_id']]['created'] > 15) {
                             yield $this->notify_layer_async($update['message']['chat_id']);
                         }
                     }
@@ -99,7 +99,7 @@ trait ResponseHandler
                 }
                 break;
             default:
-                throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['unrecognized_dec_msg'].var_export($update, true));
+                throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['unrecognized_dec_msg'].\var_export($update, true));
                 break;
         }
     }

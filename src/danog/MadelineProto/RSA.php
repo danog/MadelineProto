@@ -35,7 +35,7 @@ class RSA
         $this->n = self::getVar($key, 'modulus');
         $this->e = self::getVar($key, 'exponent');
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['computing_fingerprint'], Logger::ULTRA_VERBOSE);
-        $this->fp = substr(sha1((yield $this->serialize_object_async(['type' => 'bytes'], $this->n->toBytes(), 'key')).(yield $this->serialize_object_async(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
+        $this->fp = \substr(\sha1((yield $this->serialize_object_async(['type' => 'bytes'], $this->n->toBytes(), 'key')).(yield $this->serialize_object_async(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
 
         return $this;
     }
@@ -52,7 +52,7 @@ class RSA
         return (new \phpseclib\Math\BigInteger((string) $data, 256))->powMod($this->e, $this->n)->toBytes();
     }
     /**
-     * Accesses a private variable from an object
+     * Accesses a private variable from an object.
      *
      * @param object $obj
      * @param string $var
@@ -61,7 +61,7 @@ class RSA
      */
     public static function getVar($obj, $var)
     {
-        $reflection = new \ReflectionClass(get_class($obj));
+        $reflection = new \ReflectionClass(\get_class($obj));
         $prop = $reflection->getProperty($var);
         $prop->setAccessible(true);
         return $prop->getValue($obj);

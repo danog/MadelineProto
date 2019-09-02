@@ -18,12 +18,6 @@
 
 namespace danog\MadelineProto\Stream\Common;
 
-use Amp\Promise;
-use Amp\Success;
-use danog\MadelineProto\Exception;
-use danog\MadelineProto\Stream\Async\RawStream;
-use danog\MadelineProto\Stream\ConnectionContext;
-use function Amp\Socket\connect;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
@@ -44,25 +38,25 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
      */
     public function bufferReadAsync(int $length): \Generator
     {
-        $size = fstat($this->memory_stream)['size'];
-        $offset = ftell($this->memory_stream);
+        $size = \fstat($this->memory_stream)['size'];
+        $offset = \ftell($this->memory_stream);
         $buffer_length = $size - $offset;
         if ($buffer_length < $length && $buffer_length) {
-            fseek($this->memory_stream, $offset + $buffer_length);
+            \fseek($this->memory_stream, $offset + $buffer_length);
         }
 
         while ($buffer_length < $length) {
             $chunk = yield $this->read();
             if ($chunk === null) {
-                fseek($this->memory_stream, $offset);
+                \fseek($this->memory_stream, $offset);
                 break;
             }
-            fwrite($this->memory_stream, $chunk);
-            $buffer_length += strlen($chunk);
+            \fwrite($this->memory_stream, $chunk);
+            $buffer_length += \strlen($chunk);
         }
-        fseek($this->memory_stream, $offset);
+        \fseek($this->memory_stream, $offset);
 
-        return fread($this->memory_stream, $length);
+        return \fread($this->memory_stream, $length);
     }
 
     /**

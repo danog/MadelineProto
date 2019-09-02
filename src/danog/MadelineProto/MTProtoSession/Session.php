@@ -56,7 +56,7 @@ abstract class Session
         $this->max_outgoing_id = null;
     }
     /**
-     * Create MTProto session if needed
+     * Create MTProto session if needed.
      *
      * @return void
      */

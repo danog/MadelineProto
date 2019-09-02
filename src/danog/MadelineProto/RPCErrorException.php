@@ -78,16 +78,16 @@ class RPCErrorException extends \Exception
             return $error;
         }
 
-        $error = preg_replace('/\d+$/', "X", $error);
+        $error = \preg_replace('/\d+$/', "X", $error);
 
         $description = self::$descriptions[$error] ?? '';
-        
-        
+
+
         if (!isset(self::$errorMethodMap[$code][$method][$error])
             || !isset(self::$descriptions[$error])
             || $code === 500
         ) {
-            $res = json_decode(@file_get_contents('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error, false, stream_context_create(['http'=>['timeout' => 3]])), true);
+            $res = \json_decode(@\file_get_contents('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error, false, \stream_context_create(['http'=>['timeout' => 3]])), true);
             if (isset($res['ok']) && $res['ok'] && isset($res['result'])) {
                 $description = $res['result'];
 
@@ -104,9 +104,9 @@ class RPCErrorException extends \Exception
 
     public function __toString()
     {
-        $result = sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], self::localizeMessage($this->caller, $this->code, $this->message)." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, \danog\MadelineProto\Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
-        if (php_sapi_name() !== 'cli') {
-            $result = str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
+        $result = \sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], self::localizeMessage($this->caller, $this->code, $this->message)." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, \danog\MadelineProto\Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
+        if (PHP_SAPI !== 'cli') {
+            $result = \str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
         }
 
         return $result;
@@ -125,16 +125,15 @@ class RPCErrorException extends \Exception
                 $this->line = $level['line'];
                 $this->file = $level['file'];
                 $additional = $level['args'];
-
             }
         }
-        if (!self::$rollbar || !class_exists(\Rollbar\Rollbar::class)) {
+        if (!self::$rollbar || !\class_exists(\Rollbar\Rollbar::class)) {
             return;
         }
-        if (in_array($this->rpc, ['CHANNEL_PRIVATE', -404, -429, 'USERNAME_NOT_OCCUPIED', 'ACCESS_TOKEN_INVALID', 'AUTH_KEY_UNREGISTERED', 'SESSION_PASSWORD_NEEDED', 'PHONE_NUMBER_UNOCCUPIED', 'PEER_ID_INVALID', 'CHAT_ID_INVALID', 'USERNAME_INVALID', 'CHAT_WRITE_FORBIDDEN', 'CHAT_ADMIN_REQUIRED', 'PEER_FLOOD'])) {
+        if (\in_array($this->rpc, ['CHANNEL_PRIVATE', -404, -429, 'USERNAME_NOT_OCCUPIED', 'ACCESS_TOKEN_INVALID', 'AUTH_KEY_UNREGISTERED', 'SESSION_PASSWORD_NEEDED', 'PHONE_NUMBER_UNOCCUPIED', 'PEER_ID_INVALID', 'CHAT_ID_INVALID', 'USERNAME_INVALID', 'CHAT_WRITE_FORBIDDEN', 'CHAT_ADMIN_REQUIRED', 'PEER_FLOOD'])) {
             return;
         }
-        if (strpos($this->rpc, 'FLOOD_WAIT_') !== false) {
+        if (\strpos($this->rpc, 'FLOOD_WAIT_') !== false) {
             return;
         }
         $message === 'Telegram is having internal issues, please try again later.' ? \Rollbar\Rollbar::log(\Rollbar\Payload\Level::critical(), $message) : \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, $additional);

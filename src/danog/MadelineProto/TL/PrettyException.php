@@ -31,12 +31,12 @@ trait PrettyException
     public function prettify_tl($init = '')
     {
         $eol = PHP_EOL;
-        if (php_sapi_name() !== 'cli') {
+        if (PHP_SAPI !== 'cli') {
             $eol = '<br>'.PHP_EOL;
         }
         $tl = false;
-        foreach (array_reverse($this->getTrace()) as $k => $frame) {
-            if (isset($frame['function']) && in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
+        foreach (\array_reverse($this->getTrace()) as $k => $frame) {
+            if (isset($frame['function']) && \in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
                 if ($frame['args'][2] !== '') {
                     $this->tl_trace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:  \t".$frame['args'][2];
                     $tl = true;
@@ -45,18 +45,18 @@ trait PrettyException
                 if ($tl) {
                     $this->tl_trace .= $eol;
                 }
-                if (isset($frame['function']) && ($frame['function'] === 'handle_rpc_error' && $k === count($this->getTrace()) - 1) || $frame['function'] === 'unserialize') {
+                if (isset($frame['function']) && ($frame['function'] === 'handle_rpc_error' && $k === \count($this->getTrace()) - 1) || $frame['function'] === 'unserialize') {
                     continue;
                 }
-                $this->tl_trace .= isset($frame['file']) ? str_pad(basename($frame['file']).'('.$frame['line'].'):', 20)."\t" : '';
+                $this->tl_trace .= isset($frame['file']) ? \str_pad(\basename($frame['file']).'('.$frame['line'].'):', 20)."\t" : '';
                 $this->tl_trace .= isset($frame['function']) ? $frame['function'].'(' : '';
-                $this->tl_trace .= isset($frame['args']) ? substr(json_encode($frame['args']), 1, -1) : '';
+                $this->tl_trace .= isset($frame['args']) ? \substr(\json_encode($frame['args']), 1, -1) : '';
                 $this->tl_trace .= ')';
                 $this->tl_trace .= $eol;
                 $tl = false;
             }
         }
         $this->tl_trace .= $init !== '' ? "['".$init."']" : '';
-        $this->tl_trace = implode($eol, array_reverse(explode($eol, $this->tl_trace)));
+        $this->tl_trace = \implode($eol, \array_reverse(\explode($eol, $this->tl_trace)));
     }
 }

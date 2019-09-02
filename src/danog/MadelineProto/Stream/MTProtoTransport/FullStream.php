@@ -79,7 +79,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
         $this->stream->checkWriteHash($length + 8);
         $buffer = yield $this->stream->getWriteBuffer($length + 12, $append);
         $this->out_seq_no++;
-        $buffer->bufferWrite(pack('VV', $length + 12, $this->out_seq_no));
+        $buffer->bufferWrite(\pack('VV', $length + 12, $this->out_seq_no));
 
         return $buffer;
     }
@@ -95,11 +95,11 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
     {
         $this->stream->startReadHash();
         $buffer = yield $this->stream->getReadBuffer($l);
-        $read_length = unpack('V', yield $buffer->bufferRead(4))[1];
+        $read_length = \unpack('V', yield $buffer->bufferRead(4))[1];
         $length = $read_length - 12;
         $this->stream->checkReadHash($read_length - 8);
         $this->in_seq_no++;
-        $in_seq_no = unpack('V', yield $buffer->bufferRead(4))[1];
+        $in_seq_no = \unpack('V', yield $buffer->bufferRead(4))[1];
         if ($in_seq_no != $this->in_seq_no) {
             throw new Exception('Incoming seq_no mismatch');
         }

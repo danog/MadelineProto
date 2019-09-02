@@ -1,6 +1,6 @@
 <?php
 
-if (!class_exists('ReflectionGenerator')) {
+if (!\class_exists('ReflectionGenerator')) {
     class ReflectionGenerator
     {
         private $generator;

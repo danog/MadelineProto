@@ -30,7 +30,7 @@ trait Events
 
     public function setEventHandler($event_handler)
     {
-        if (!class_exists($event_handler) || !is_subclass_of($event_handler, '\danog\MadelineProto\EventHandler')) {
+        if (!\class_exists($event_handler) || !\is_subclass_of($event_handler, '\danog\MadelineProto\EventHandler')) {
             throw new \danog\MadelineProto\Exception('Wrong event handler was defined');
         }
 
@@ -53,7 +53,7 @@ trait Events
                     }
                 }
             } else {
-                $method_name = lcfirst(substr($method, 2));
+                $method_name = \lcfirst(\substr($method, 2));
                 $this->event_handler_methods[$method_name] = [$this->event_handler_instance, $method];
             }
         }

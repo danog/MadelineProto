@@ -31,7 +31,7 @@ class DocsBuilder
     public function __construct($logger, $settings)
     {
         $this->logger = $logger;
-        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
+        \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         $this->construct_TL($settings['tl_schema']);
         if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) {
             $this->constructors = $this->td_constructors;
@@ -39,10 +39,10 @@ class DocsBuilder
             $this->td = true;
         }
         $this->settings = $settings;
-        if (!file_exists($this->settings['output_dir'])) {
-            mkdir($this->settings['output_dir']);
+        if (!\file_exists($this->settings['output_dir'])) {
+            \mkdir($this->settings['output_dir']);
         }
-        chdir($this->settings['output_dir']);
+        \chdir($this->settings['output_dir']);
         $this->index = $settings['readme'] ? 'README.md' : 'index.md';
     }
 
@@ -51,18 +51,18 @@ class DocsBuilder
 
     public function end($what)
     {
-        return end($what);
+        return \end($what);
     }
 
     public function escape($hwat)
     {
-        return str_replace('_', '\\_', $hwat);
+        return \str_replace('_', '\\_', $hwat);
     }
 
     public function mk_docs()
     {
         \danog\MadelineProto\Logger::log('Generating documentation index...', \danog\MadelineProto\Logger::NOTICE);
-        file_put_contents($this->index, '---
+        \file_put_contents($this->index, '---
 title: '.$this->settings['title'].'
 description: '.$this->settings['description'].'
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -79,37 +79,37 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 [Types](types/)');
         $this->mk_methodS();
         $this->mk_constructors();
-        foreach (glob('types/*') as $unlink) {
-            unlink($unlink);
+        foreach (\glob('types/*') as $unlink) {
+            \unlink($unlink);
         }
-        if (file_exists('types')) {
-            rmdir('types');
+        if (\file_exists('types')) {
+            \rmdir('types');
         }
-        mkdir('types');
-        ksort($this->types);
+        \mkdir('types');
+        \ksort($this->types);
         $index = '';
         \danog\MadelineProto\Logger::log('Generating types documentation...', \danog\MadelineProto\Logger::NOTICE);
         $last_namespace = '';
         foreach ($this->types as $otype => $keys) {
-            $new_namespace = preg_replace('/_.*/', '', $otype);
+            $new_namespace = \preg_replace('/_.*/', '', $otype);
             //$br = $new_namespace != $last_namespace ? '***<br><br>' : '';
-            $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $otype);
-            $type = preg_replace('/.*_of_/', '', $type);
-            $index .= '['.str_replace('_', '\\_', $type).']('.$type.'.md)<a name="'.$type.'"></a>  
+            $type = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $otype);
+            $type = \preg_replace('/.*_of_/', '', $type);
+            $index .= '['.\str_replace('_', '\\_', $type).']('.$type.'.md)<a name="'.$type.'"></a>  
 
 ';
             $constructors = '';
             foreach ($keys['constructors'] as $data) {
-                $predicate = str_replace('.', '_', $data['predicate']).(isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '');
-                $md_predicate = str_replace('_', '\\_', $predicate);
+                $predicate = \str_replace('.', '_', $data['predicate']).(isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '');
+                $md_predicate = \str_replace('_', '\\_', $predicate);
                 $constructors .= '['.$md_predicate.'](../constructors/'.$predicate.'.md)  
 
 ';
             }
             $methods = '';
             foreach ($keys['methods'] as $data) {
-                $name = str_replace('.', '_', $data['method']);
-                $md_name = str_replace('_', '->', $name);
+                $name = \str_replace('.', '_', $data['method']);
+                $md_name = \str_replace('_', '->', $name);
                 $methods .= '[$MadelineProto->'.$md_name.'](../methods/'.$name.'.md)  
 
 ';
@@ -120,7 +120,7 @@ title: '.$type.'
 description: constructors and methods of type '.$type.'
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
-# Type: '.str_replace('_', '\\_', $type).'  
+# Type: '.\str_replace('_', '\\_', $type).'  
 [Back to types index](index.md)
 
 
@@ -128,7 +128,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ';
             $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype].PHP_EOL.PHP_EOL : '';
             if (!isset($this->settings['td'])) {
-                if (in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'InputPeer', 'NotifyPeer', 'InputNotifyPeer'])) {
+                if (\in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'InputPeer', 'NotifyPeer', 'InputNotifyPeer'])) {
                     $header .= 'You can directly provide the [Update](Update.md) or [Message](Message.md) object here, MadelineProto will automatically extract the destination chat id.
 
 The following syntaxes can also be used:
@@ -152,7 +152,7 @@ $'.$type." = 'https://t.me/danogentili'; // t.me URLs
 
 A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputDialogPeer](InputDialogPeer.md), an [InputNotifyPeer](InputNotifyPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), an [DialogPeer](DialogPeer.md), [NotifyPeer](NotifyPeer.md), or a [Chat](Chat.md) object can also be used.\n\n\n";
                 }
-                if (in_array($type, ['InputEncryptedChat'])) {
+                if (\in_array($type, ['InputEncryptedChat'])) {
                     $header .= 'You can directly provide the [Update](Update.md) or [EncryptedMessage](EncryptedMessage.md) object here, MadelineProto will automatically extract the destination chat id.
 
 The following syntax can also be used:
@@ -164,7 +164,7 @@ $'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can
 
 ';
                 }
-                if (in_array($type, ['InputFile', 'InputEncryptedFile'])) {
+                if (\in_array($type, ['InputFile', 'InputEncryptedFile'])) {
                     $header .= 'The following syntax can also be used:
 
 ```
@@ -174,22 +174,22 @@ $'.$type.' = \'filename.mp4\'; // The file path can also be used
 
 ';
                 }
-                if (in_array($type, ['InputPhoto'])) {
+                if (\in_array($type, ['InputPhoto'])) {
                     $header .= 'You can also provide a [MessageMedia](MessageMedia.md), [Message](Message.md), [Update](Update.md), [Photo](Photo.md) here, MadelineProto will automatically convert it to the right type.
 
 ';
                 }
-                if (in_array($type, ['InputDocument'])) {
+                if (\in_array($type, ['InputDocument'])) {
                     $header .= 'You can also provide a [MessageMedia](MessageMedia.md), [Message](Message.md), [Update](Update.md), [Document](Document.md) here, MadelineProto will automatically convert it to the right type.
 
 ';
                 }
-                if (in_array($type, ['InputMedia'])) {
+                if (\in_array($type, ['InputMedia'])) {
                     $header .= 'You can also provide a [MessageMedia](MessageMedia.md), [Message](Message.md), [Update](Update.md), [Document](Document.md), [Photo](Photo.md), [InputDocument](InputDocument.md), [InputPhoto](InputPhoto.md) here, MadelineProto will automatically convert it to the right type.
 
 ';
                 }
-                if (in_array($type, ['InputMessage'])) {
+                if (\in_array($type, ['InputMessage'])) {
                     $header .= 'The following syntax can also be used:
 
 ```
@@ -199,7 +199,7 @@ $'.$type.' = 142; // Numeric message ID
 
 ';
                 }
-                if (in_array($type, ['KeyboardButton'])) {
+                if (\in_array($type, ['KeyboardButton'])) {
                     $header .= 'Clicking these buttons:
 
 To click these buttons simply run the `click` method:  
@@ -235,7 +235,7 @@ You can also access the properties of the constructor as a normal array, for exa
 
 ';
             if (!isset($this->settings['td'])) {
-                if (in_array($type, ['PhoneCall'])) {
+                if (\in_array($type, ['PhoneCall'])) {
                     $methods = '';
                     $constructors = '';
                     $header .= 'This is an object of type `\\danog\\MadelineProto\\VoIP`.
@@ -418,14 +418,14 @@ After modifying it, you must always parse the new configuration with a call to `
 ';
                 }
             }
-            if (file_exists('types/'.$type.'.md')) {
+            if (\file_exists('types/'.$type.'.md')) {
                 \danog\MadelineProto\Logger::log($type);
             }
-            file_put_contents('types/'.$type.'.md', $header.$constructors.$methods);
+            \file_put_contents('types/'.$type.'.md', $header.$constructors.$methods);
             $last_namespace = $new_namespace;
         }
         \danog\MadelineProto\Logger::log('Generating types index...', \danog\MadelineProto\Logger::NOTICE);
-        file_put_contents('types/'.$this->index, '---
+        \file_put_contents('types/'.$this->index, '---
 title: Types
 description: List of types
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -436,7 +436,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 '.$index);
         \danog\MadelineProto\Logger::log('Generating additional types...', \danog\MadelineProto\Logger::NOTICE);
-        file_put_contents('types/string.md', '---
+        \file_put_contents('types/string.md', '---
 title: string
 description: A UTF8 string of variable length
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -446,7 +446,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 A UTF8 string of variable length. The total length in bytes of the string must not be bigger than 16777215.
 ');
-        file_put_contents('types/bytes.md', '---
+        \file_put_contents('types/bytes.md', '---
 title: bytes
 description: A string of variable length
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -464,7 +464,7 @@ When JSON-serialized, turns into an array of the following format:
 ];
 ```
 ');
-        file_put_contents('types/int.md', '---
+        \file_put_contents('types/int.md', '---
 title: integer
 description: A 32 bit signed integer ranging from -2147483648 to 2147483647
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -474,7 +474,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 A 32 bit signed integer ranging from `-2147483648` to `2147483647`.
 ');
-        file_put_contents('types/int53.md', '---
+        \file_put_contents('types/int53.md', '---
 title: integer
 description: A 53 bit signed integer
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -484,7 +484,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 A 53 bit signed integer.
 ');
-        file_put_contents('types/long.md', '---
+        \file_put_contents('types/long.md', '---
 title: long
 description: A 32 bit signed integer ranging from -9223372036854775808 to 9223372036854775807
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -494,7 +494,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 A 64 bit signed integer ranging from `-9223372036854775808` to `9223372036854775807`.
 ');
-        file_put_contents('types/int128.md', '---
+        \file_put_contents('types/int128.md', '---
 title: int128
 description: A 128 bit signed integer
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -504,7 +504,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 A 128 bit signed integer represented in little-endian base256 (`string`) format.
 ');
-        file_put_contents('types/int256.md', '---
+        \file_put_contents('types/int256.md', '---
 title: int256
 description: A 256 bit signed integer
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -514,7 +514,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 A 256 bit signed integer represented in little-endian base256 (`string`) format.
 ');
-        file_put_contents('types/int512.md', '---
+        \file_put_contents('types/int512.md', '---
 title: int512
 description: A 512 bit signed integer
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -524,7 +524,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 A 512 bit signed integer represented in little-endian base256 (`string`) format.
 ');
-        file_put_contents('types/double.md', '---
+        \file_put_contents('types/double.md', '---
 title: double
 description: A double precision floating point number
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -534,7 +534,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 A double precision floating point number, single precision can also be used (float).
 ');
-        file_put_contents('types/!X.md', '---
+        \file_put_contents('types/!X.md', '---
 title: !X
 description: Represents a TL serialized payload
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -544,7 +544,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 Represents a TL serialized payload.
 ');
-        file_put_contents('types/X.md', '---
+        \file_put_contents('types/X.md', '---
 title: X
 description: Represents a TL serialized payload
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -554,7 +554,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 Represents a TL serialized payload.
 ');
-        file_put_contents('constructors/boolFalse.md', '---
+        \file_put_contents('constructors/boolFalse.md', '---
 title: boolFalse
 description: Represents a boolean with value equal to false
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -564,7 +564,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
         Represents a boolean with value equal to `false`.
 ');
-        file_put_contents('constructors/boolTrue.md', '---
+        \file_put_contents('constructors/boolTrue.md', '---
 title: boolTrue
 description: Represents a boolean with value equal to true
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -574,7 +574,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 Represents a boolean with value equal to `true`.
 ');
-        file_put_contents('constructors/null.md', '---
+        \file_put_contents('constructors/null.md', '---
 title: null
 description: Represents a null value
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -584,7 +584,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 Represents a `null` value.
 ');
-        file_put_contents('types/Bool.md', '---
+        \file_put_contents('types/Bool.md', '---
 title: Bool
 description: Represents a boolean.
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -594,7 +594,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 Represents a boolean.
 ');
-        file_put_contents('types/DataJSON.md', '---
+        \file_put_contents('types/DataJSON.md', '---
 title: DataJSON
 description: Any json-encodable data
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -638,7 +638,7 @@ class Lang
     {
         if (!isset(\danog\MadelineProto\Lang::$lang['en'][$key])) {
             \danog\MadelineProto\Lang::$lang['en'][$key] = '';
-            file_put_contents(__DIR__.'/Lang.php', sprintf($this->template, var_export(\danog\MadelineProto\Lang::$lang, true), var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
+            \file_put_contents(__DIR__.'/Lang.php', \sprintf($this->template, \var_export(\danog\MadelineProto\Lang::$lang, true), \var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
         }
     }
 }

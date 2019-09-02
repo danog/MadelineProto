@@ -92,7 +92,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     public function getWriteBufferAsync(int $length, string $append = ''): \Generator
     {
         $headers = 'POST '.$this->uri->getPath()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length.$this->header."\r\n\r\n";
-        $buffer = yield $this->stream->getWriteBuffer(strlen($headers) + $length, $append);
+        $buffer = yield $this->stream->getWriteBuffer(\strlen($headers) + $length, $append);
         yield $buffer->bufferWrite($headers);
 
         return $buffer;
@@ -122,27 +122,27 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
             }
             $was_crlf = $piece === "\r\n";
         }
-        $headers = explode("\r\n", $headers);
+        $headers = \explode("\r\n", $headers);
 
-        list($protocol, $code, $description) = explode(' ', $headers[0], 3);
-        list($protocol, $protocol_version) = explode('/', $protocol);
+        list($protocol, $code, $description) = \explode(' ', $headers[0], 3);
+        list($protocol, $protocol_version) = \explode('/', $protocol);
         if ($protocol !== 'HTTP') {
             throw new \danog\MadelineProto\Exception('Wrong protocol');
         }
         $code = (int) $code;
         unset($headers[0]);
-        if (array_pop($headers).array_pop($headers) !== '') {
+        if (\array_pop($headers).\array_pop($headers) !== '') {
             throw new \danog\MadelineProto\Exception('Wrong last header');
         }
         foreach ($headers as $key => $current_header) {
             unset($headers[$key]);
-            $current_header = explode(':', $current_header, 2);
-            $headers[strtolower($current_header[0])] = trim($current_header[1]);
+            $current_header = \explode(':', $current_header, 2);
+            $headers[\strtolower($current_header[0])] = \trim($current_header[1]);
         }
 
         $close = $protocol === 'HTTP/1.0';
         if (isset($headers['connection'])) {
-            $close = strtolower($headers['connection']) === 'close';
+            $close = \strtolower($headers['connection']) === 'close';
         }
 
         if ($code !== 200) {

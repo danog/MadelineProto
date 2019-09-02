@@ -65,31 +65,31 @@ class Magic
 
     public static function class_exists()
     {
-        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        set_exception_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
+        \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
+        \set_exception_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
         if (!self::$inited) {
-            if (!defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 7) {
+            if (!\defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 7) {
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
             }
             foreach (['intl', 'xml', 'fileinfo', 'json', 'mbstring'] as $extension) {
-                if (!extension_loaded($extension)) {
+                if (!\extension_loaded($extension)) {
                     throw Exception::extension($extension);
                 }
             }
-            self::$has_thread = class_exists('\\Thread') && method_exists('\\Thread', 'getCurrentThread');
-            self::$BIG_ENDIAN = pack('L', 1) === pack('N', 1);
+            self::$has_thread = \class_exists('\\Thread') && \method_exists('\\Thread', 'getCurrentThread');
+            self::$BIG_ENDIAN = \pack('L', 1) === \pack('N', 1);
             self::$bigint = PHP_INT_SIZE < 8;
-            self::$ipv6 = (bool) strlen(@file_get_contents('http://v6.ipv6-test.com/api/myip.php', false, stream_context_create(['http' => ['timeout' => 1]]))) > 0;
-            preg_match('/const V = (\\d+);/', @file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
+            self::$ipv6 = (bool) \strlen(@\file_get_contents('http://v6.ipv6-test.com/api/myip.php', false, \stream_context_create(['http' => ['timeout' => 1]]))) > 0;
+            \preg_match('/const V = (\\d+);/', @\file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
             if (isset($matches[1]) && \danog\MadelineProto\MTProto::V < (int) $matches[1]) {
-                throw new \danog\MadelineProto\Exception(hex2bin(\danog\MadelineProto\Lang::$current_lang['v_error']), 0, null, 'MadelineProto', 1);
+                throw new \danog\MadelineProto\Exception(\hex2bin(\danog\MadelineProto\Lang::$current_lang['v_error']), 0, null, 'MadelineProto', 1);
             }
-            if (class_exists('\\danog\\MadelineProto\\VoIP')) {
-                if (!defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || !in_array(\danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION, ['1.3.0'])) {
-                    throw new \danog\MadelineProto\Exception(hex2bin(\danog\MadelineProto\Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);
+            if (\class_exists('\\danog\\MadelineProto\\VoIP')) {
+                if (!\defined('\\danog\\MadelineProto\\VoIP::PHP_LIBTGVOIP_VERSION') || !\in_array(\danog\MadelineProto\VoIP::PHP_LIBTGVOIP_VERSION, ['1.3.0'])) {
+                    throw new \danog\MadelineProto\Exception(\hex2bin(\danog\MadelineProto\Lang::$current_lang['v_tgerror']), 0, null, 'MadelineProto', 1);
                 }
             }
-            self::$emojis = json_decode(self::JSON_EMOJIS);
+            self::$emojis = \json_decode(self::JSON_EMOJIS);
             self::$zero = new \phpseclib\Math\BigInteger(0);
             self::$one = new \phpseclib\Math\BigInteger(1);
             self::$two = new \phpseclib\Math\BigInteger(2);
@@ -102,27 +102,27 @@ class Magic
             self::$zeroeight = new \phpseclib\Math\BigInteger('2147483648');
 
             try {
-                self::$isatty = defined('STDOUT') && function_exists('posix_isatty') && posix_isatty(STDOUT);
+                self::$isatty = \defined('STDOUT') && \function_exists('posix_isatty') && \posix_isatty(STDOUT);
             } catch (\danog\MadelineProto\Exception $e) {
             }
-            self::$altervista = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
-            self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
+            self::$altervista = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
+            self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
             self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
-            self::$revision = @file_get_contents(__DIR__.'/../../../.git/refs/heads/master');
+            self::$revision = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/master');
             if (self::$revision) {
-                self::$revision = trim(self::$revision);
-                $latest = @file_get_contents('https://phar.madelineproto.xyz/release');
+                self::$revision = \trim(self::$revision);
+                $latest = @\file_get_contents('https://phar.madelineproto.xyz/release');
                 if ($latest) {
-                    $latest = self::$revision === trim($latest) ? '' : ' (AN UPDATE IS REQUIRED)';
+                    $latest = self::$revision === \trim($latest) ? '' : ' (AN UPDATE IS REQUIRED)';
                 }
                 self::$revision = 'Revision: '.self::$revision.$latest;
             }
             self::$can_parallel = false;
-            if (php_sapi_name() === 'cli' && !(class_exists('\\Phar') && \Phar::running())) {
+            if (PHP_SAPI === 'cli' && !(\class_exists('\\Phar') && \Phar::running())) {
                 try {
-                    $back = debug_backtrace(0);
-                    define('AMP_WORKER', 1);
-                    $promise = \Amp\File\get(end($back)['file']);
+                    $back = \debug_backtrace(0);
+                    \define('AMP_WORKER', 1);
+                    $promise = \Amp\File\get(\end($back)['file']);
                     do {
                         try {
                             if (wait($promise)) {
@@ -138,19 +138,19 @@ class Magic
                 } catch (\Throwable $e) {
                 }
             }
-            if (!self::$can_parallel && !defined('AMP_WORKER') || true) {
+            if (!self::$can_parallel && !\defined('AMP_WORKER') || true) {
                 //define('AMP_WORKER', 1);
             }
-            $backtrace = debug_backtrace(0);
-            self::$script_cwd = self::$cwd = dirname(end($backtrace)['file']);
+            $backtrace = \debug_backtrace(0);
+            self::$script_cwd = self::$cwd = \dirname(\end($backtrace)['file']);
 
             try {
-                self::$cwd = getcwd();
+                self::$cwd = \getcwd();
                 self::$can_getcwd = true;
             } catch (\danog\MadelineProto\Exception $e) {
             }
             // Even an empty handler is enough to catch ctrl+c
-            if (defined('SIGINT')) {
+            if (\defined('SIGINT')) {
                 //if (function_exists('pcntl_async_signals')) pcntl_async_signals(true);
                 Loop::onSignal(SIGINT, static function () {
                     getStdin()->unreference();
@@ -173,18 +173,18 @@ class Magic
                 );
                 resolver(new Rfc8484StubResolver($DohConfig));
             }
-            if (php_sapi_name() !== 'cli') {
+            if (PHP_SAPI !== 'cli') {
                 try {
-                    error_reporting(E_ALL);
-                    ini_set('log_errors', 1);
-                    ini_set('error_log', Magic::$script_cwd.'/MadelineProto.log');
-                    error_log('Enabled PHP logging');
+                    \error_reporting(E_ALL);
+                    \ini_set('log_errors', 1);
+                    \ini_set('error_log', Magic::$script_cwd.'/MadelineProto.log');
+                    \error_log('Enabled PHP logging');
                 } catch (\danog\MadelineProto\Exception $e) {
                     //$this->logger->logger('Could not enable PHP logging');
                 }
             }
 
-            $res = json_decode(@file_get_contents('https://rpc.madelineproto.xyz/v3.json'), true);
+            $res = \json_decode(@\file_get_contents('https://rpc.madelineproto.xyz/v3.json'), true);
             if (isset($res['ok']) && $res['ok']) {
                 RPCErrorException::$errorMethodMap = $res['result'];
                 RPCErrorException::$descriptions += $res['human_result'];
@@ -204,10 +204,10 @@ class Magic
 
         try {
             if (self::$pid === null) {
-                self::$pid = getmypid();
+                self::$pid = \getmypid();
             }
 
-            return self::$is_fork = self::$pid !== getmypid();
+            return self::$is_fork = self::$pid !== \getmypid();
         } catch (\danog\MadelineProto\Exception $e) {
             return self::$can_getmypid = false;
         }
@@ -215,6 +215,6 @@ class Magic
 
     public static function getcwd()
     {
-        return self::$can_getcwd ? getcwd() : self::$cwd;
+        return self::$can_getcwd ? \getcwd() : self::$cwd;
     }
 }

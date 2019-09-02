@@ -126,16 +126,16 @@ class Connection extends Session
     protected $datacenter;
 
     /**
-     * Connection ID
+     * Connection ID.
      *
      * @var int
      */
     private $id = 0;
 
     /**
-     * DC ID and connection ID concatenated
+     * DC ID and connection ID concatenated.
      *
-     * @var 
+     * @var
      */
     private $datacenterId = '';
 
@@ -237,7 +237,7 @@ class Connection extends Session
     }
 
     /**
-     * Get connection ID
+     * Get connection ID.
      *
      * @return integer
      */
@@ -247,7 +247,7 @@ class Connection extends Session
     }
 
     /**
-     * Get datacenter concatenated with connection ID
+     * Get datacenter concatenated with connection ID.
      *
      * @return string
      */
@@ -277,7 +277,7 @@ class Connection extends Session
     }
 
     /**
-     * Check if is a media connection
+     * Check if is a media connection.
      *
      * @return boolean
      */
@@ -287,7 +287,7 @@ class Connection extends Session
     }
 
     /**
-     * Check if is a CDN connection
+     * Check if is a CDN connection.
      *
      * @return boolean
      */

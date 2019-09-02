@@ -36,7 +36,7 @@ abstract class Loop implements LoopInterface
     private $count = 0;
 
     /**
-     * MTProto instance
+     * MTProto instance.
      *
      * @var \danog\MadelineProto\MTProto
      */

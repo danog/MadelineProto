@@ -24,9 +24,13 @@ trait Methods
     public function mk_methods()
     {
         static $bots;
-        if (!$bots) $bots = json_decode(file_get_contents('https://rpc.madelineproto.xyz/bot.json'), true)['result'];
+        if (!$bots) {
+            $bots = \json_decode(\file_get_contents('https://rpc.madelineproto.xyz/bot.json'), true)['result'];
+        }
         static $errors;
-        if (!$errors) $errors = json_decode(file_get_contents('https://rpc.madelineproto.xyz/v1.json'), true);
+        if (!$errors) {
+            $errors = \json_decode(\file_get_contents('https://rpc.madelineproto.xyz/v1.json'), true);
+        }
         $new = ['result' => []];
         foreach ($errors['result'] as $code => $suberrors) {
             foreach ($suberrors as $method => $suberrors) {
@@ -38,30 +42,30 @@ trait Methods
                 }
             }
         }
-        foreach (glob('methods/'.$this->any) as $unlink) {
-            unlink($unlink);
+        foreach (\glob('methods/'.$this->any) as $unlink) {
+            \unlink($unlink);
         }
-        if (file_exists('methods')) {
-            rmdir('methods');
+        if (\file_exists('methods')) {
+            \rmdir('methods');
         }
-        mkdir('methods');
+        \mkdir('methods');
         $this->docs_methods = [];
         $this->human_docs_methods = [];
         $this->logger->logger('Generating methods documentation...', \danog\MadelineProto\Logger::NOTICE);
         foreach ($this->methods->by_id as $id => $data) {
-            $method = str_replace('.', '_', $data['method']);
-            $php_method = str_replace('.', '->', $data['method']);
-            $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
-            $php_type = preg_replace('/.*_of_/', '', $type);
+            $method = \str_replace('.', '_', $data['method']);
+            $php_method = \str_replace('.', '->', $data['method']);
+            $type = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
+            $php_type = \preg_replace('/.*_of_/', '', $type);
             if (!isset($this->types[$php_type])) {
                 $this->types[$php_type] = ['methods' => [], 'constructors' => []];
             }
-            if (!in_array($data, $this->types[$php_type]['methods'])) {
+            if (!\in_array($data, $this->types[$php_type]['methods'])) {
                 $this->types[$php_type]['methods'][] = $data;
             }
             $params = '';
             foreach ($data['params'] as $param) {
-                if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
+                if (\in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
                 }
                 if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage' && !isset($this->settings['td'])) {
@@ -72,8 +76,8 @@ trait Methods
                     $param['type'] = 'InputPeer';
                 }
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
-                $type_or_bare_type = ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
-                $param[$type_or_subtype] = str_replace(['.', 'true', 'false'], ['_', 'Bool', 'Bool'], $param[$type_or_subtype]);
+                $type_or_bare_type = \ctype_upper($this->end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
+                $param[$type_or_subtype] = \str_replace(['.', 'true', 'false'], ['_', 'Bool', 'Bool'], $param[$type_or_subtype]);
                 $param[$type_or_subtype] = '['.$this->escape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $params .= "'".$param['name']."' => ".(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
@@ -85,15 +89,15 @@ trait Methods
                 }
             }
             $md_method = '['.$php_method.']('.$method.'.md)';
-            $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md)<a name="'.$method.'"></a>  
+            $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.\str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md)<a name="'.$method.'"></a>  
 
 ';
-/*
-            if (!isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']]) && isset($this->td_descriptions['methods'][$data['method']])) {
-                $this->human_docs_methods[$this->td_descriptions['methods'][$data['method']]['description'].': '.$data['method']] = '* <a href="'.$method.'.html" name="'.$method.'">'.$this->td_descriptions['methods'][$data['method']]['description'].': '.$data['method'].'</a>  
-
-';
-            }*/
+            /*
+                        if (!isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']]) && isset($this->td_descriptions['methods'][$data['method']])) {
+                            $this->human_docs_methods[$this->td_descriptions['methods'][$data['method']]['description'].': '.$data['method']] = '* <a href="'.$method.'.html" name="'.$method.'">'.$this->td_descriptions['methods'][$data['method']]['description'].': '.$data['method'].'</a>
+            
+            ';
+                        }*/
             $params = '';
             $lua_params = '';
             $pwr_params = '';
@@ -114,7 +118,7 @@ trait Methods
             $hasreplymarkup = false;
             $hasmessage = false;
             foreach ($data['params'] as $param) {
-                if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
+                if (\in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
                 }
                 if ($param['name'] === 'data' && $type === 'messages_SentEncryptedMessage' && !isset($this->settings['td'])) {
@@ -129,32 +133,32 @@ trait Methods
                     $param['type'] = 'Vector t';
                     $param['subtype'] = 'int';
                 }
-                $ptype = str_replace('.', '_', $param[$type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type']);
+                $ptype = \str_replace('.', '_', $param[$type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type']);
                 switch ($ptype) {
                     case 'true':
                     case 'false':
                         $ptype = 'Bool';
                 }
                 $human_ptype = $ptype;
-                if (in_array($ptype, ['InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
                 }
-                if (in_array($ptype, ['InputMedia', 'InputPhoto', 'InputDocument']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputMedia', 'InputPhoto', 'InputDocument']) && !isset($this->settings['td'])) {
                     $human_ptype = 'MessageMedia, Update, Message or '.$ptype;
                 }
-                if (in_array($ptype, ['InputMessage']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputMessage']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Message ID or '.$ptype;
                 }
-                if (in_array($ptype, ['InputEncryptedChat']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputEncryptedChat']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Secret chat ID, Update, EncryptedMessage or '.$ptype;
                 }
-                if (in_array($ptype, ['InputFile']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputFile']) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                if (in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $type_or_bare_type = ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
+                $type_or_bare_type = \ctype_upper($this->end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
                 if (!isset($this->td_descriptions['methods'][$data['method']]['params'][$param['name']])) {
                     $this->add_to_lang('method_'.$data['method'].'_param_'.$param['name'].'_type_'.$param['type']);
                     if (isset($this->td_descriptions['methods'][$data['method']]['description'])) {
@@ -163,14 +167,14 @@ trait Methods
                 }
 
                 if (isset($this->td_descriptions['methods'][$data['method']])) {
-                    $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->td_descriptions['methods'][$data['method']]['params'][$param['name']].' | '.(isset($param['pow']) || (($id = $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty')) && $id['type'] === $param['type']) || (($id = $this->constructors->find_by_predicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type']) ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->td_descriptions['methods'][$data['method']]['params'][$param['name']].' | '.(isset($param['pow']) || (($id = $this->constructors->find_by_predicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type']) || (($id = $this->constructors->find_by_predicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type']) ? 'Optional' : 'Yes').'|';
                 } else {
-                    $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || (($id = $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty')) && $id['type'] === $param['type']) || (($id = $this->constructors->find_by_predicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type']) ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || (($id = $this->constructors->find_by_predicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type']) || (($id = $this->constructors->find_by_predicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type']) ? 'Optional' : 'Yes').'|';
                 }
                 $table .= PHP_EOL;
-                $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
-                $ppptype = in_array($ptype, ['string']) ? '"'.$ptype.'"' : $ptype;
-                $ppptype = in_array($ptype, ['bytes']) ? '{"_": "bytes", "bytes":"base64 encoded '.$ptype.'"}' : $ppptype;
+                $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
+                $ppptype = \in_array($ptype, ['string']) ? '"'.$ptype.'"' : $ptype;
+                $ppptype = \in_array($ptype, ['bytes']) ? '{"_": "bytes", "bytes":"base64 encoded '.$ptype.'"}' : $ppptype;
 
                 $params .= "'".$param['name']."' => ";
                 $params .= (isset($param['subtype']) ? '['.$pptype.', '.$pptype.']' : $pptype).', ';
@@ -200,17 +204,17 @@ title: '.$data['method'].'
 description: '.$description.'
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
-# Method: '.str_replace('_', '\\_', $data['method']).'  
+# Method: '.\str_replace('_', '\\_', $data['method']).'  
 [Back to methods index](index.md)
 
 
 ';
-/*
-            if (isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']])) {
-                $header .= '**'.\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']]."**\n\n\n\n\n";
-                file_put_contents('methods/'.$method.'.md', $header);
-                continue;
-            }*/
+            /*
+                        if (isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']])) {
+                            $header .= '**'.\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']]."**\n\n\n\n\n";
+                            file_put_contents('methods/'.$method.'.md', $header);
+                            continue;
+                        }*/
             if ($this->td) {
                 $header .= 'YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 
@@ -221,14 +225,14 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
             $table .= '
 
 ';
-            $return = '### Return type: ['.str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md)
+            $return = '### Return type: ['.\str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md)
 
 ';
-            $bot = !in_array($data['method'], $bots);
+            $bot = !\in_array($data['method'], $bots);
             $example = '';
             if (!isset($this->settings['td'])) {
                 $example .= '### Can bots use this method: **'.($bot ? 'YES' : 'NO')."**\n\n\n";
-                $example .= str_replace('[]', '', '### MadelineProto Example ([now async for huge speed and parallelism!](https://docs.madelineproto.xyz/docs/ASYNC.html)):
+                $example .= \str_replace('[]', '', '### MadelineProto Example ([now async for huge speed and parallelism!](https://docs.madelineproto.xyz/docs/ASYNC.html)):
 
 
 ```php
@@ -263,7 +267,7 @@ You can provide bot API reply_markup objects here.
                     $example .= '
 ## Return value 
 
-If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of ['.str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md) will be returned instead.
+If the length of the provided message is bigger than 4096, the message will be split in chunks and the method will be called multiple times, with the same parameters (except for the message), and an array of ['.\str_replace('_', '\\_', $type).'](../types/'.$php_type.'.md) will be returned instead.
 
 
 ';
@@ -320,21 +324,21 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
                     $example .= "\n\n";
                 }
             }
-            file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
+            \file_put_contents('methods/'.$method.'.md', $header.$table.$return.$example);
         }
         $this->logger->logger('Generating methods index...', \danog\MadelineProto\Logger::NOTICE);
-        ksort($this->docs_methods);
-        ksort($this->human_docs_methods);
+        \ksort($this->docs_methods);
+        \ksort($this->human_docs_methods);
         $last_namespace = '';
         foreach ($this->docs_methods as $method => &$value) {
-            $new_namespace = preg_replace('/_.*/', '', $method);
+            $new_namespace = \preg_replace('/_.*/', '', $method);
             $br = $new_namespace != $last_namespace ? '***
 <br><br>
 ' : '';
             $value = $br.$value;
             $last_namespace = $new_namespace;
         }
-        file_put_contents('methods/api_'.$this->index, '---
+        \file_put_contents('methods/api_'.$this->index, '---
 title: Methods
 description: List of methods
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -370,9 +374,9 @@ $MadelineProto->[request_call](https://docs.madelineproto.xyz/request_call.html)
 
 $MadelineProto->[request_secret_chat](https://docs.madelineproto.xyz/request_secret_chat.html)($id);
 
-'.implode('', $this->docs_methods));
+'.\implode('', $this->docs_methods));
 
-        file_put_contents('methods/'.$this->index, '---
+        \file_put_contents('methods/'.$this->index, '---
 title: Methods
 description: What do you want to do?
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -404,6 +408,6 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 * [Create a secret chat bot](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
 
-'.implode('', $this->human_docs_methods));
+'.\implode('', $this->human_docs_methods));
     }
 }

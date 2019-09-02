@@ -139,7 +139,7 @@ class APIFactory extends AsyncConstruct
     public function __call($name, $arguments)
     {
         $yielded = $this->call($this->__call_async($name, $arguments));
-        $async = $this->lua === false && (is_array(end($arguments)) && isset(end($arguments)['async']) ? end($arguments)['async'] : ($this->async && $name !== 'loop'));
+        $async = $this->lua === false && (\is_array(\end($arguments)) && isset(\end($arguments)['async']) ? \end($arguments)['async'] : ($this->async && $name !== 'loop'));
         if ($async) {
             return $yielded;
         }
@@ -173,7 +173,7 @@ class APIFactory extends AsyncConstruct
             yield $this->API->initAsync();
             $this->API->logger->logger('Finished init asynchronously');
         }
-        if (isset($this->session) && !is_null($this->session) && time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
+        if (isset($this->session) && !\is_null($this->session) && \time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
             Logger::log("Didn't serialize in a while, doing that now...");
             $this->serialize($this->session);
         }
@@ -187,18 +187,17 @@ class APIFactory extends AsyncConstruct
             $this->API->logger->logger('Finished init asynchronously');
         }
 
-        $lower_name = strtolower($name);
+        $lower_name = \strtolower($name);
         if ($this->namespace !== '' || !isset($this->methods[$lower_name])) {
             $name = $this->namespace.$name;
-            $aargs = isset($arguments[1]) && is_array($arguments[1]) ? $arguments[1] : [];
+            $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
             $aargs['apifactory'] = true;
             $aargs['datacenter'] = $this->API->datacenter->curdc;
-            $args = isset($arguments[0]) && is_array($arguments[0]) ? $arguments[0] : [];
+            $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
 
             return yield $this->API->method_call_async_read($name, $args, $aargs);
-        } else {
-            return yield $this->methods[$lower_name](...$arguments);
         }
+        return yield $this->methods[$lower_name](...$arguments);
     }
 
     public function &__get($name)
@@ -228,7 +227,7 @@ class APIFactory extends AsyncConstruct
                 $this->API->init();
             }
 
-            return $this->API->__construct(array_replace_recursive($this->API->settings, $value));
+            return $this->API->__construct(\array_replace_recursive($this->API->settings, $value));
         }
 
         return $this->API->storage[$name] = $value;

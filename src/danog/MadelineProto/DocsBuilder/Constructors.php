@@ -23,13 +23,13 @@ trait Constructors
 {
     public function mk_constructors()
     {
-        foreach (glob('constructors/'.$this->any) as $unlink) {
-            unlink($unlink);
+        foreach (\glob('constructors/'.$this->any) as $unlink) {
+            \unlink($unlink);
         }
-        if (file_exists('constructors')) {
-            rmdir('constructors');
+        if (\file_exists('constructors')) {
+            \rmdir('constructors');
         }
-        mkdir('constructors');
+        \mkdir('constructors');
         $this->docs_constructors = [];
         $this->logger->logger('Generating constructors documentation...', \danog\MadelineProto\Logger::NOTICE);
         $got = [];
@@ -44,19 +44,19 @@ trait Constructors
                             $type = $this->constructors->find_by_type(str_replace('%', '', $type))['predicate'];
                         }*/
             $layer = isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '';
-            $type = str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
-            $php_type = preg_replace('/.*_of_/', '', $type);
-            $constructor = str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['predicate']);
-            $php_constructor = preg_replace('/.*_of_/', '', $constructor);
+            $type = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
+            $php_type = \preg_replace('/.*_of_/', '', $type);
+            $constructor = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['predicate']);
+            $php_constructor = \preg_replace('/.*_of_/', '', $constructor);
             if (!isset($this->types[$php_type])) {
                 $this->types[$php_type] = ['constructors' => [], 'methods' => []];
             }
-            if (!in_array($data, $this->types[$php_type]['constructors'])) {
+            if (!\in_array($data, $this->types[$php_type]['constructors'])) {
                 $this->types[$php_type]['constructors'][] = $data;
             }
             $params = '';
             foreach ($data['params'] as $param) {
-                if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
+                if (\in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
                 }
                 if ($type === 'EncryptedMessage' && $param['name'] === 'bytes' && !isset($this->settings['td'])) {
@@ -64,19 +64,19 @@ trait Constructors
                     $param['type'] = 'DecryptedMessage';
                 }
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
-                $type_or_bare_type = ctype_upper($this->end(explode('.', $param[$type_or_subtype]))[0]) || in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512']) ? 'types' : 'constructors';
-                $param[$type_or_subtype] = str_replace(['.', 'true', 'false'], ['_', 'Bool', 'Bool'], $param[$type_or_subtype]);
-                if (preg_match('/%/', $param[$type_or_subtype])) {
-                    $param[$type_or_subtype] = $this->constructors->find_by_type(str_replace('%', '', $param[$type_or_subtype]))['predicate'];
+                $type_or_bare_type = \ctype_upper($this->end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512']) ? 'types' : 'constructors';
+                $param[$type_or_subtype] = \str_replace(['.', 'true', 'false'], ['_', 'Bool', 'Bool'], $param[$type_or_subtype]);
+                if (\preg_match('/%/', $param[$type_or_subtype])) {
+                    $param[$type_or_subtype] = $this->constructors->find_by_type(\str_replace('%', '', $param[$type_or_subtype]))['predicate'];
                 }
-                if (substr($param[$type_or_subtype], -1) === '>') {
-                    $param[$type_or_subtype] = substr($param[$type_or_subtype], 0, -1);
+                if (\substr($param[$type_or_subtype], -1) === '>') {
+                    $param[$type_or_subtype] = \substr($param[$type_or_subtype], 0, -1);
                 }
                 $params .= "'".$param['name']."' => ";
                 $param[$type_or_subtype] = '['.$this->escape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $params .= (isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
-            $md_constructor = str_replace('_', '\\_', $constructor.$layer);
+            $md_constructor = \str_replace('_', '\\_', $constructor.$layer);
             $this->docs_constructors[$constructor] = '[$'.$md_constructor.'](../constructors/'.$php_constructor.$layer.'.md) = \\['.$params.'\\];<a name="'.$constructor.$layer.'"></a>  
 
 ';
@@ -105,30 +105,30 @@ trait Constructors
             $hasreplymarkup = false;
             $hasentities = false;
             foreach ($data['params'] as $param) {
-                if (in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
+                if (\in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
                 }
                 if ($type === 'EncryptedMessage' && $param['name'] === 'bytes' && !isset($this->settings['td'])) {
                     $param['name'] = 'decrypted_message';
                     $param['type'] = 'DecryptedMessage';
                 }
-                if ($type === 'DecryptedMessageMedia' && in_array($param['name'], ['key', 'iv'])) {
+                if ($type === 'DecryptedMessageMedia' && \in_array($param['name'], ['key', 'iv'])) {
                     unset(\danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']]);
                     continue;
                 }
-                $ptype = str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
+                $ptype = \str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
                 //$type_or_bare_type = 'types';
                 /*if (isset($param['subtype'])) {
                       if ($param['type'] === 'vector') {
                           $type_or_bare_type = 'constructors';
                       }
                   }*/
-                if (preg_match('/%/', $ptype)) {
-                    $ptype = $this->constructors->find_by_type(str_replace('%', '', $ptype))['predicate'];
+                if (\preg_match('/%/', $ptype)) {
+                    $ptype = $this->constructors->find_by_type(\str_replace('%', '', $ptype))['predicate'];
                 }
-                $type_or_bare_type = (ctype_upper($this->end(explode('_', $ptype))[0]) || in_array($ptype, ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'])) && $ptype !== 'MTmessage' ? 'types' : 'constructors';
-                if (substr($ptype, -1) === '>') {
-                    $ptype = substr($ptype, 0, -1);
+                $type_or_bare_type = (\ctype_upper($this->end(\explode('_', $ptype))[0]) || \in_array($ptype, ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'])) && $ptype !== 'MTmessage' ? 'types' : 'constructors';
+                if (\substr($ptype, -1) === '>') {
+                    $ptype = \substr($ptype, 0, -1);
                 }
                 switch ($ptype) {
                     case 'true':
@@ -136,25 +136,25 @@ trait Constructors
                         $ptype = 'Bool';
                 }
                 $human_ptype = $ptype;
-                if (strpos($type, 'Input') === 0 && in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'InputPeer']) && !isset($this->settings['td'])) {
+                if (\strpos($type, 'Input') === 0 && \in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'InputPeer']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
                 }
-                if (strpos($type, 'Input') === 0 && in_array($ptype, ['InputMedia', 'InputDocument', 'InputPhoto']) && !isset($this->settings['td'])) {
+                if (\strpos($type, 'Input') === 0 && \in_array($ptype, ['InputMedia', 'InputDocument', 'InputPhoto']) && !isset($this->settings['td'])) {
                     $human_ptype = 'MessageMedia, Message, Update or '.$ptype;
                 }
-                if (in_array($ptype, ['InputMessage']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputMessage']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Message ID or '.$ptype;
                 }
-                if (in_array($ptype, ['InputEncryptedChat']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputEncryptedChat']) && !isset($this->settings['td'])) {
                     $human_ptype = 'Secret chat ID, Update, EncryptedMessage or '.$ptype;
                 }
-                if (in_array($ptype, ['InputFile']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputFile']) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                if (in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $table .= '|'.str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(lcfirst($param['type']).'Empty') || ($data['type'] === 'InputMedia' && $param['name'] === 'mime_type') || ($data['type'] === 'DocumentAttribute' && in_array($param['name'], ['w', 'h', 'duration'])) ? 'Optional' : 'Yes').'|';
+                $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(\lcfirst($param['type']).'Empty') || ($data['type'] === 'InputMedia' && $param['name'] === 'mime_type') || ($data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration'])) ? 'Optional' : 'Yes').'|';
 
                 if (!isset($this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']])) {
                     $this->add_to_lang('object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']);
@@ -166,9 +166,9 @@ trait Constructors
                     $table .= $this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']].'|';
                 }
                 $table .= PHP_EOL;
-                $pptype = in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
-                $ppptype = in_array($ptype, ['string']) ? '"'.$ptype.'"' : $ptype;
-                $ppptype = in_array($ptype, ['bytes']) ? '{"_": "bytes", "bytes":"base64 encoded '.$ptype.'"}' : $ppptype;
+                $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
+                $ppptype = \in_array($ptype, ['string']) ? '"'.$ptype.'"' : $ptype;
+                $ppptype = \in_array($ptype, ['bytes']) ? '{"_": "bytes", "bytes":"base64 encoded '.$ptype.'"}' : $ppptype;
                 $params .= ", '".$param['name']."' => ";
                 $params .= isset($param['subtype']) ? '['.$pptype.', '.$pptype.']' : $pptype;
                 $lua_params .= ', '.$param['name'].'=';
@@ -187,7 +187,7 @@ title: '.$data['predicate'].'
 description: '.$description.'
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
-# Constructor: '.str_replace('_', '\\_', $data['predicate'].$layer).'  
+# Constructor: '.\str_replace('_', '\\_', $data['predicate'].$layer).'  
 [Back to constructors index](index.md)
 
 
@@ -200,7 +200,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
             if (isset($this->td_descriptions['constructors'][$data['predicate']])) {
                 $header .= $this->td_descriptions['constructors'][$data['predicate']]['description'].PHP_EOL.PHP_EOL;
             }
-            $type = '### Type: ['.str_replace('_', '\\_', $php_type).'](../types/'.$php_type.'.md)
+            $type = '### Type: ['.\str_replace('_', '\\_', $php_type).'](../types/'.$php_type.'.md)
 
 
 ';
@@ -266,19 +266,19 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
 ';
                 }
             }
-            file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
+            \file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
         }
         $this->logger->logger('Generating constructors index...', \danog\MadelineProto\Logger::NOTICE);
-        ksort($this->docs_constructors);
+        \ksort($this->docs_constructors);
         $last_namespace = '';
         foreach ($this->docs_constructors as $constructor => &$value) {
-            $new_namespace = preg_replace('/_.*/', '', $constructor);
+            $new_namespace = \preg_replace('/_.*/', '', $constructor);
             $br = $new_namespace != $last_namespace ? '***
 <br><br>' : '';
             $value = $br.$value;
             $last_namespace = $new_namespace;
         }
-        file_put_contents('constructors/'.$this->index, '---
+        \file_put_contents('constructors/'.$this->index, '---
 title: Constructors
 description: List of constructors
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -286,6 +286,6 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 # Constructors  
 [Back to API documentation index](..)
 
-'.implode('', $this->docs_constructors));
+'.\implode('', $this->docs_constructors));
     }
 }

@@ -84,10 +84,10 @@ class UpdateLoop extends ResumableSignalLoop
                     try {
                         $difference = yield $API->method_call_async_read('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $API->datacenter->curdc, 'postpone' => $first]);
                     } catch (RPCErrorException $e) {
-                        if (in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN'])) {
+                        if (\in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN'])) {
                             $feeder->signal(true);
-                            unset($API->updaters[$this->channelId]);
-                            unset($API->feeders[$this->channelId]);
+                            unset($API->updaters[$this->channelId], $API->feeders[$this->channelId]);
+
                             $API->getChannelStates()->remove($this->channelId);
                             $API->logger->logger("Channel private, exiting $this");
 
@@ -95,11 +95,11 @@ class UpdateLoop extends ResumableSignalLoop
                         }
                         throw $e;
                     } catch (Exception $e) {
-                        if (in_array($e->getMessage(), ['This peer is not present in the internal peer database'])) {
+                        if (\in_array($e->getMessage(), ['This peer is not present in the internal peer database'])) {
                             $feeder->signal(true);
                             $API->getChannelStates()->remove($this->channelId);
-                            unset($API->updaters[$this->channelId]);
-                            unset($API->feeders[$this->channelId]);
+                            unset($API->updaters[$this->channelId], $API->feeders[$this->channelId]);
+
                             $API->logger->logger("Channel private, exiting $this");
 
                             return true;
@@ -144,7 +144,7 @@ class UpdateLoop extends ResumableSignalLoop
                             unset($difference);
                             break;
                         default:
-                            throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
+                            throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.\var_export($difference, true));
                     }
                 } else {
                     $API->logger->logger('Resumed and fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
@@ -187,7 +187,7 @@ class UpdateLoop extends ResumableSignalLoop
                             unset($difference);
                             break;
                         default:
-                            throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.var_export($difference, true));
+                            throw new \danog\MadelineProto\Exception('Unrecognized update difference received: '.\var_export($difference, true));
                     }
                 }
             }

@@ -61,35 +61,35 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
 
         do {
             $random = $this->random(64);
-        } while (in_array(substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', str_repeat(chr(238), 4), str_repeat(chr(221), 4)]) || $random[0] === chr(0xef) || substr($random, 4, 4) === "\0\0\0\0");
+        } while (\in_array(\substr($random, 0, 4), ['PVrG', 'GET ', 'POST', 'HEAD', \str_repeat(\chr(238), 4), \str_repeat(\chr(221), 4)]) || $random[0] === \chr(0xef) || \substr($random, 4, 4) === "\0\0\0\0");
 
-        if (strlen($header) === 1) {
-            $header = str_repeat($header, 4);
+        if (\strlen($header) === 1) {
+            $header = \str_repeat($header, 4);
         }
-        $random = substr_replace($random, $header.substr($random, 56 + strlen($header)), 56);
-        $random = substr_replace($random, pack('s', $ctx->getIntDc()).substr($random, 60 + 2), 60);
+        $random = \substr_replace($random, $header.\substr($random, 56 + \strlen($header)), 56);
+        $random = \substr_replace($random, \pack('s', $ctx->getIntDc()).\substr($random, 60 + 2), 60);
 
-        $reversed = strrev($random);
+        $reversed = \strrev($random);
 
-        $key = substr($random, 8, 32);
-        $keyRev = substr($reversed, 8, 32);
+        $key = \substr($random, 8, 32);
+        $keyRev = \substr($reversed, 8, 32);
 
         if (isset($this->extra['secret'])) {
-            $key = hash('sha256', $key.$this->extra['secret'], true);
-            $keyRev = hash('sha256', $keyRev.$this->extra['secret'], true);
+            $key = \hash('sha256', $key.$this->extra['secret'], true);
+            $keyRev = \hash('sha256', $keyRev.$this->extra['secret'], true);
         }
 
         $this->encrypt = new \phpseclib\Crypt\AES('ctr');
         $this->encrypt->enableContinuousBuffer();
         $this->encrypt->setKey($key);
-        $this->encrypt->setIV(substr($random, 40, 16));
+        $this->encrypt->setIV(\substr($random, 40, 16));
 
         $this->decrypt = new \phpseclib\Crypt\AES('ctr');
         $this->decrypt->enableContinuousBuffer();
         $this->decrypt->setKey($keyRev);
-        $this->decrypt->setIV(substr($reversed, 40, 16));
+        $this->decrypt->setIV(\substr($reversed, 40, 16));
 
-        $random = substr_replace($random, substr(@$this->encrypt->encrypt($random), 56, 8), 56, 8);
+        $random = \substr_replace($random, \substr(@$this->encrypt->encrypt($random), 56, 8), 56, 8);
 
         $this->stream = yield $ctx->getStream($random);
     }
@@ -114,9 +114,9 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
     public function getWriteBufferAsync(int $length, string $append = ''): \Generator
     {
         $this->write_buffer = yield $this->stream->getWriteBuffer($length);
-        if (strlen($append)) {
+        if (\strlen($append)) {
             $this->append = $append;
-            $this->append_after = $length - strlen($append);
+            $this->append_after = $length - \strlen($append);
         }
 
         return $this;
@@ -162,7 +162,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
     public function bufferWrite(string $data): Promise
     {
         if ($this->append_after) {
-            $this->append_after -= strlen($data);
+            $this->append_after -= \strlen($data);
             if ($this->append_after === 0) {
                 $data .= $this->append;
                 $this->append = '';
@@ -187,11 +187,11 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
     public function setExtra($extra)
     {
         if (isset($extra['secret'])) {
-            if (strlen($extra['secret']) > 17) {
-                $extra['secret'] = hex2bin($extra['secret']);
+            if (\strlen($extra['secret']) > 17) {
+                $extra['secret'] = \hex2bin($extra['secret']);
             }
-            if (strlen($extra['secret']) == 17) {
-                $extra['secret'] = substr($extra['secret'], 1, 16);
+            if (\strlen($extra['secret']) == 17) {
+                $extra['secret'] = \substr($extra['secret'], 1, 16);
             }
         }
 

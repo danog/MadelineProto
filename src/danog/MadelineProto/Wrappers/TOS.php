@@ -27,7 +27,7 @@ trait TOS
     public function check_tos_async()
     {
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
-            if ($this->tos['expires'] < time()) {
+            if ($this->tos['expires'] < \time()) {
                 $this->logger->logger('Fetching TOS...');
                 $this->tos = yield $this->method_call_async_read('help.getTermsOfServiceUpdate', [], ['datacenter' => $this->datacenter->curdc]);
                 $this->tos['accepted'] = $this->tos['_'] === 'help.termsOfServiceUpdateEmpty';

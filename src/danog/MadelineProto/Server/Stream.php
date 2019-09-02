@@ -32,18 +32,18 @@ class Stream
     public static function getContext($handler, $stream_id)
     {
         if (!self::$_isRegistered) {
-            stream_wrapper_register(self::WRAPPER_NAME, get_class());
+            \stream_wrapper_register(self::WRAPPER_NAME, __CLASS__);
             self::$_isRegistered = true;
         }
 
-        return stream_context_create([self::WRAPPER_NAME => ['handler' => $handler, 'stream_id' => $stream_id]]);
+        return \stream_context_create([self::WRAPPER_NAME => ['handler' => $handler, 'stream_id' => $stream_id]]);
     }
 
     public function stream_open($path, $mode, $options, &$opened_path)
     {
-        $opt = stream_context_get_options($this->context);
+        $opt = \stream_context_get_options($this->context);
 
-        if (!is_array($opt[self::WRAPPER_NAME]) ||
+        if (!\is_array($opt[self::WRAPPER_NAME]) ||
         !isset($opt[self::WRAPPER_NAME]['handler']) ||
         !($opt[self::WRAPPER_NAME]['handler'] instanceof Handler) ||
         !isset($opt[self::WRAPPER_NAME]['stream_id'])) {

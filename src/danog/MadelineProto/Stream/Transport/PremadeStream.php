@@ -18,15 +18,13 @@
 
 namespace danog\MadelineProto\Stream\Transport;
 
+use Amp\ByteStream\ClosedException;
 use Amp\Promise;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Stream\Async\RawStream;
-use danog\MadelineProto\Stream\RawStreamInterface;
-use function Amp\Socket\connect;
-use function Amp\Socket\cryptoConnect;
-use danog\MadelineProto\Stream\ProxyStreamInterface;
-use Amp\ByteStream\ClosedException;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\ProxyStreamInterface;
+use danog\MadelineProto\Stream\RawStreamInterface;
 
 /**
  * Premade stream wrapper.
@@ -39,7 +37,7 @@ class PremadeStream extends Socket implements RawStreamInterface, ProxyStreamInt
 {
     use RawStream;
     private $stream;
-    
+
     public function __construct()
     {
     }
@@ -95,7 +93,7 @@ class PremadeStream extends Socket implements RawStreamInterface, ProxyStreamInt
     {
         try {
             if ($this->stream) {
-                if (method_exists($this->stream, 'close')) {
+                if (\method_exists($this->stream, 'close')) {
                     $this->stream->close();
                 }
                 $this->stream = null;

@@ -24,11 +24,11 @@ trait TLParams
     public function parse_params($key, $mtproto = false)
     {
         foreach ($this->by_id[$key]['params'] as $kkey => $param) {
-            if (preg_match('/(\w*)\.(\d*)\?(.*)/', $param['type'], $matches)) {
-                $param['pow'] = pow(2, $matches[2]);
+            if (\preg_match('/(\w*)\.(\d*)\?(.*)/', $param['type'], $matches)) {
+                $param['pow'] = \pow(2, $matches[2]);
                 $param['type'] = $matches[3];
             }
-            if (preg_match('/^(v|V)ector\<(.*)\>$/', $param['type'], $matches)) {
+            if (\preg_match('/^(v|V)ector\<(.*)\>$/', $param['type'], $matches)) {
                 $param['type'] = $matches[1] === 'v' ? 'vector' : 'Vector t';
                 $param['subtype'] = $matches[2];
                 $param['subtype'] = ($mtproto && $param['subtype'] === 'Message' ? 'MT' : '').$param['subtype'];

@@ -28,8 +28,6 @@ use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
-use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
-use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\TL\TLCallback;
 
 /**
@@ -1160,10 +1158,10 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Check if connected to datacenter using HTTP
+     * Check if connected to datacenter using HTTP.
      *
      * @param string $datacenter DC ID
-     * 
+     *
      * @return boolean
      */
     public function isHttp(string $datacenter)

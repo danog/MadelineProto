@@ -32,7 +32,7 @@ class DataCenterConnection implements JsonSerializable
     const READ_WEIGHT = 1;
     const READ_WEIGHT_MEDIA = 5;
     const WRITE_WEIGHT = 10;
-    
+
     /**
      * Temporary auth key.
      *
@@ -266,7 +266,7 @@ class DataCenterConnection implements JsonSerializable
         }
     }
     /**
-     * Create MTProto sessions if needed
+     * Create MTProto sessions if needed.
      *
      * @return void
      */
@@ -329,7 +329,7 @@ class DataCenterConnection implements JsonSerializable
         if ($id === -1 || !isset($this->connections[$id])) {
             $this->connections = [];
             $this->availableConnections = [];
-    
+
             yield $this->connectMore($count);
         } else {
             yield $this->connections[$id]->connect($ctx);
@@ -337,16 +337,16 @@ class DataCenterConnection implements JsonSerializable
     }
 
     /**
-     * Connect to the DC using count more sockets
+     * Connect to the DC using count more sockets.
      *
      * @param integer $count Number of sockets to open
-     * 
+     *
      * @return void
      */
     private function connectMore(int $count)
     {
         $ctx = $this->ctx->getCtx();
-        $count += $previousCount = count($this->connections);
+        $count += $previousCount = \count($this->connections);
         for ($x = $previousCount; $x < $count; $x++) {
             $this->availableConnections[$x] = 0;
             $this->connections[$x] = new Connection();
@@ -408,7 +408,7 @@ class DataCenterConnection implements JsonSerializable
             return $this->connections[0];
         }
         $max = \max($this->availableConnections);
-        $key = array_search($max, $this->availableConnections);
+        $key = \array_search($max, $this->availableConnections);
 
         // Decrease to implement round robin
         $this->availableConnections[$key]--;

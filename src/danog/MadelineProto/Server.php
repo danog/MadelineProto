@@ -30,25 +30,25 @@ class Server
 
     public function __construct($settings)
     {
-        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
+        \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         \danog\MadelineProto\Logger::constructor(3);
 
-        if (!extension_loaded('sockets')) {
+        if (!\extension_loaded('sockets')) {
             throw new Exception(['extension', 'sockets']);
         }
 
-        if (!extension_loaded('pcntl')) {
+        if (!\extension_loaded('pcntl')) {
             throw new Exception(['extension', 'pcntl']);
         }
         $this->settings = $settings;
-        $this->mypid = getmypid();
+        $this->mypid = \getmypid();
     }
 
     public function start()
     {
-        pcntl_signal(SIGTERM, [$this, 'sig_handler']);
-        pcntl_signal(SIGINT, [$this, 'sig_handler']);
-        pcntl_signal(SIGCHLD, [$this, 'sig_handler']);
+        \pcntl_signal(SIGTERM, [$this, 'sig_handler']);
+        \pcntl_signal(SIGINT, [$this, 'sig_handler']);
+        \pcntl_signal(SIGCHLD, [$this, 'sig_handler']);
 
         $this->sock = new \Socket($this->settings['type'], SOCK_STREAM, $this->settings['protocol']);
         $this->sock->bind($this->settings['address'], $this->settings['port']);
@@ -60,7 +60,7 @@ class Server
         $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
         \danog\MadelineProto\Logger::log('Server started! Listening on '.$this->settings['address'].':'.$this->settings['port']);
         while (true) {
-            pcntl_signal_dispatch();
+            \pcntl_signal_dispatch();
 
             try {
                 if ($sock = $this->sock->accept()) {
@@ -73,7 +73,7 @@ class Server
 
     private function handle($socket)
     {
-        $pid = pcntl_fork();
+        $pid = \pcntl_fork();
         if ($pid == -1) {
             die('could not fork');
         } elseif ($pid) {
@@ -86,12 +86,12 @@ class Server
 
     public function __destruct()
     {
-        if ($this->mypid === getmypid()) {
+        if ($this->mypid === \getmypid()) {
             \danog\MadelineProto\Logger::log('Shutting main process '.$this->mypid.' down');
             unset($this->sock);
             foreach ($this->pids as $pid) {
                 \danog\MadelineProto\Logger::log("Waiting for $pid");
-                pcntl_wait($pid);
+                \pcntl_wait($pid);
             }
             \danog\MadelineProto\Logger::log('Done, closing main process');
 
@@ -107,7 +107,7 @@ class Server
                 exit();
 
             case SIGCHLD:
-                pcntl_waitpid(-1, $status);
+                \pcntl_waitpid(-1, $status);
                 break;
         }
     }

@@ -33,7 +33,7 @@ class FeedLoop extends ResumableSignalLoop
     private $parsedUpdates = [];
     private $channelId;
     /**
-     * Update loop
+     * Update loop.
      *
      * @var UpdateLoop
      */
@@ -94,9 +94,9 @@ class FeedLoop extends ResumableSignalLoop
 
     public function parse($updates)
     {
-        reset($updates);
+        \reset($updates);
         while ($updates) {
-            $key = key($updates);
+            $key = \key($updates);
             $update = $updates[$key];
             unset($updates[$key]);
             if ($update['_'] === 'updateChannelTooLong') {
@@ -124,11 +124,11 @@ class FeedLoop extends ResumableSignalLoop
                     $logger('PTS hole');
                     $this->updater->setLimit($this->state->pts() + $result);
                     yield $this->updater->resume();
-                    $updates = array_merge($this->incomingUpdates, $updates);
+                    $updates = \array_merge($this->incomingUpdates, $updates);
                     $this->incomingUpdates = [];
                     continue;
                 }
-                if (isset($update['message']['id'], $update['message']['to_id']) && !in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage', 'updateMessageID'])) {
+                if (isset($update['message']['id'], $update['message']['to_id']) && !\in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage', 'updateMessageID'])) {
                     if (!$this->API->check_msg_id($update['message'])) {
                         $logger('MSGID duplicate');
 
@@ -214,7 +214,7 @@ class FeedLoop extends ResumableSignalLoop
                     }
 
                     if ($to) {
-                        $log .= 'to_id '.json_encode($update['message']['to_id']).', ';
+                        $log .= 'to_id '.\json_encode($update['message']['to_id']).', ';
                     }
 
                     if ($via_bot) {
@@ -222,7 +222,7 @@ class FeedLoop extends ResumableSignalLoop
                     }
 
                     if ($entities) {
-                        $log .= 'entities '.json_encode($update['message']['entities']).', ';
+                        $log .= 'entities '.\json_encode($update['message']['entities']).', ';
                     }
 
                     $this->API->logger->logger("Not enough data: for message update $log, getting difference...", \danog\MadelineProto\Logger::VERBOSE);
@@ -230,7 +230,6 @@ class FeedLoop extends ResumableSignalLoop
                     if ($channelId && $to) {
                         $channelId = false;
                     }
-
                 }
                 break;
             default:
@@ -244,7 +243,7 @@ class FeedLoop extends ResumableSignalLoop
         if ($channelId !== $this->channelId) {
             if (isset($this->API->feeders[$channelId])) {
                 return yield $this->API->feeders[$channelId]->feedSingle($update);
-            } else if ($this->channelId) {
+            } elseif ($this->channelId) {
                 return yield $this->API->feeders[false]->feedSingle($update);
             }
         }

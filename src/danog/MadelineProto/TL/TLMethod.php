@@ -37,7 +37,7 @@ class TLMethod
     {
         $this->by_id[$json_dict['id']] = ['method' => $json_dict['method'], 'type' => $json_dict['type'], 'params' => $json_dict['params']];
         $this->by_method[$json_dict['method']] = $json_dict['id'];
-        $namespace = explode('.', $json_dict['method']);
+        $namespace = \explode('.', $json_dict['method']);
         if (isset($namespace[1])) {
             $this->method_namespace[] = [$namespace[0] => $namespace[1]];
         }

@@ -39,17 +39,16 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
 
     public function pause($time = null): Promise
     {
-        if (!is_null($time)) {
+        if (!\is_null($time)) {
             if ($time <= 0) {
                 return new Success(0);
-            } else {
-                $resume = microtime(true) + $time;
-                if ($this->resumeWatcher) {
-                    Loop::cancel($this->resumeWatcher);
-                    $this->resumeWatcher = null;
-                }
-                $this->resumeWatcher = Loop::delay($time * 1000, [$this, 'resume'], $resume);
             }
+            $resume = \microtime(true) + $time;
+            if ($this->resumeWatcher) {
+                Loop::cancel($this->resumeWatcher);
+                $this->resumeWatcher = null;
+            }
+            $this->resumeWatcher = Loop::delay($time * 1000, [$this, 'resume'], $resume);
         }
         $this->resume = new Deferred();
 

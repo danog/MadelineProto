@@ -24,26 +24,26 @@ namespace danog\MadelineProto;
 class Shutdown
 {
     /**
-     * Callbacks to call on shutdown
+     * Callbacks to call on shutdown.
      *
      * @var array<callable>
      */
     private static $callbacks = [];
     /**
-     * Whether the main shutdown was registered
+     * Whether the main shutdown was registered.
      *
      * @var boolean
      */
     private static $registered = false;
     /**
-     * Incremental ID for new callback
+     * Incremental ID for new callback.
      *
      * @var integer
      */
     private static $id = 0;
     /**
-     * Function to be called on shutdown
-     * 
+     * Function to be called on shutdown.
+     *
      * @return void
      */
     public static function shutdown()
@@ -53,11 +53,11 @@ class Shutdown
         }
     }
     /**
-     * Add a callback for script shutdown
-     * 
+     * Add a callback for script shutdown.
+     *
      * @param callable $callback The callback to set
      * @param null|string $id The optional callback ID
-     * 
+     *
      * @return The callback ID
      */
     public static function addCallback($callback, $id = null)
@@ -67,16 +67,16 @@ class Shutdown
         }
         self::$callbacks[$id] = $callback;
         if (!self::$registered) {
-            register_shutdown_function([__CLASS__, 'shutdown']);
+            \register_shutdown_function([__CLASS__, 'shutdown']);
             self::$registered = true;
         }
         return $id;
     }
     /**
-     * Remove a callback from the script shutdown callable list
-     * 
+     * Remove a callback from the script shutdown callable list.
+     *
      * @param null|string $id The optional callback ID
-     * 
+     *
      * @return bool true if the callback was removed correctly, false otherwise
      */
     public static function removeCallback($id)

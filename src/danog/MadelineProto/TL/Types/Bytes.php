@@ -41,6 +41,6 @@ class Bytes implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        return ['_' => 'bytes', 'bytes' => base64_encode($this->bytes)];
+        return ['_' => 'bytes', 'bytes' => \base64_encode($this->bytes)];
     }
 }

@@ -19,9 +19,6 @@
 
 namespace danog\MadelineProto\Wrappers;
 
-use function Amp\ByteStream\getStdin;
-use function Amp\ByteStream\getStdout;
-
 /**
  * Manages simple logging in and out.
  */
@@ -32,8 +29,8 @@ trait Start
         if ($this->authorized === self::LOGGED_IN) {
             return yield $this->get_self_async();
         }
-        if (php_sapi_name() === 'cli') {
-            if (strpos(yield $this->readLine('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
+        if (PHP_SAPI === 'cli') {
+            if (\strpos(yield $this->readLine('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
                 yield $this->bot_login_async(yield $this->readLine('Enter your bot token: '));
             } else {
                 yield $this->phone_login_async(yield $this->readLine('Enter your phone number: '));
@@ -48,41 +45,40 @@ trait Start
             $this->serialize();
 
             return yield $this->get_self_async();
-        } else {
-            if ($this->authorized === self::NOT_LOGGED_IN) {
-                if (isset($_POST['phone_number'])) {
-                    yield $this->web_phone_login_async();
-                } elseif (isset($_POST['token'])) {
-                    yield $this->web_bot_login_async();
-                } else {
-                    yield $this->web_echo_async();
-                }
-            } elseif ($this->authorized === self::WAITING_CODE) {
-                if (isset($_POST['phone_code'])) {
-                    yield $this->web_complete_phone_login_async();
-                } else {
-                    yield $this->web_echo_async("You didn't provide a phone code!");
-                }
-            } elseif ($this->authorized === self::WAITING_PASSWORD) {
-                if (isset($_POST['password'])) {
-                    yield $this->web_complete_2fa_login_async();
-                } else {
-                    yield $this->web_echo_async("You didn't provide the password!");
-                }
-            } elseif ($this->authorized === self::WAITING_SIGNUP) {
-                if (isset($_POST['first_name'])) {
-                    yield $this->web_complete_signup_async();
-                } else {
-                    yield $this->web_echo_async("You didn't provide the first name!");
-                }
-            }
-            if ($this->authorized === self::LOGGED_IN) {
-                $this->serialize();
-
-                return yield $this->get_self_async();
-            }
-            exit;
         }
+        if ($this->authorized === self::NOT_LOGGED_IN) {
+            if (isset($_POST['phone_number'])) {
+                yield $this->web_phone_login_async();
+            } elseif (isset($_POST['token'])) {
+                yield $this->web_bot_login_async();
+            } else {
+                yield $this->web_echo_async();
+            }
+        } elseif ($this->authorized === self::WAITING_CODE) {
+            if (isset($_POST['phone_code'])) {
+                yield $this->web_complete_phone_login_async();
+            } else {
+                yield $this->web_echo_async("You didn't provide a phone code!");
+            }
+        } elseif ($this->authorized === self::WAITING_PASSWORD) {
+            if (isset($_POST['password'])) {
+                yield $this->web_complete_2fa_login_async();
+            } else {
+                yield $this->web_echo_async("You didn't provide the password!");
+            }
+        } elseif ($this->authorized === self::WAITING_SIGNUP) {
+            if (isset($_POST['first_name'])) {
+                yield $this->web_complete_signup_async();
+            } else {
+                yield $this->web_echo_async("You didn't provide the first name!");
+            }
+        }
+        if ($this->authorized === self::LOGGED_IN) {
+            $this->serialize();
+
+            return yield $this->get_self_async();
+        }
+        exit;
     }
 
     public function web_phone_login_async()

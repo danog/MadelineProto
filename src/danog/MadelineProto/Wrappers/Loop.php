@@ -37,7 +37,7 @@ trait Loop
 
     public function loop_async($max_forks = 0)
     {
-        if (is_callable($max_forks)) {
+        if (\is_callable($max_forks)) {
             $this->logger->logger('Running async callable');
 
             return yield $max_forks();
@@ -52,20 +52,20 @@ trait Loop
 
             return false;
         }
-        if (in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler'])) {
+        if (\in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler'])) {
             $this->logger->logger('Getupdates event handler is enabled, exiting from loop', \danog\MadelineProto\Logger::FATAL_ERROR);
 
             return false;
         }
         $this->logger->logger('Starting event loop');
-        if (!is_callable($this->loop_callback) || (is_array($this->loop_callback) && $this->loop_callback[1] === 'onLoop' && !method_exists(...$this->loop_callback))) {
+        if (!\is_callable($this->loop_callback) || (\is_array($this->loop_callback) && $this->loop_callback[1] === 'onLoop' && !\method_exists(...$this->loop_callback))) {
             $this->loop_callback = null;
         }
-        if (php_sapi_name() !== 'cli') {
+        if (PHP_SAPI !== 'cli') {
             $needs_restart = true;
 
             try {
-                set_time_limit(-1);
+                \set_time_limit(-1);
             } catch (\danog\MadelineProto\Exception $e) {
                 $needs_restart = true;
             }
@@ -74,37 +74,37 @@ trait Loop
             }
             $this->logger->logger($needs_restart ? 'Will self-restart' : 'Will not self-restart');
 
-            $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-            $lockfile = dirname(end($backtrace)['file']).'/bot'.$this->authorization['user']['id'].'.lock';
+            $backtrace = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            $lockfile = \dirname(\end($backtrace)['file']).'/bot'.$this->authorization['user']['id'].'.lock';
             unset($backtrace);
             $try_locking = true;
-            if (!file_exists($lockfile)) {
-                touch($lockfile);
-                $lock = fopen($lockfile, 'r+');
+            if (!\file_exists($lockfile)) {
+                \touch($lockfile);
+                $lock = \fopen($lockfile, 'r+');
             } elseif (isset($GLOBALS['lock'])) {
                 $try_locking = false;
                 $lock = $GLOBALS['lock'];
             } else {
-                $lock = fopen($lockfile, 'r+');
+                $lock = \fopen($lockfile, 'r+');
             }
             if ($try_locking) {
                 $try = 1;
                 $locked = false;
                 while (!$locked) {
-                    $locked = flock($lock, LOCK_EX | LOCK_NB);
+                    $locked = \flock($lock, LOCK_EX | LOCK_NB);
                     if (!$locked) {
                         $this->closeConnection('Bot is already running');
                         if ($try++ >= 30) {
                             exit;
                         }
-                        sleep(1);
+                        \sleep(1);
                     }
                 }
             }
 
             Shutdown::addCallback(static function () use ($lock) {
-                flock($lock, LOCK_UN);
-                fclose($lock);
+                \flock($lock, LOCK_UN);
+                \fclose($lock);
             });
             if ($needs_restart) {
                 $logger = &$this->logger;
@@ -117,24 +117,24 @@ trait Loop
                     $params = $_GET;
                     $params['MadelineSelfRestart'] = Tools::random_int();
 
-                    $url = explode($uri, '?', 2)[0] ?? '';
+                    $url = \explode($uri, '?', 2)[0] ?? '';
 
-                    $query = http_build_query($params);
-                    $uri = implode('?', [$url, $query]);
+                    $query = \http_build_query($params);
+                    $uri = \implode('?', [$url, $query]);
 
                     $payload = $_SERVER['REQUEST_METHOD'].' '.$uri.' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n";
 
                     $logger->logger("Connecting to $address:$port");
-                    $a = fsockopen($address, $port);
+                    $a = \fsockopen($address, $port);
 
                     $logger->logger("Sending self-restart payload");
                     $logger->logger($payload);
-                    fwrite($a, $payload);
+                    \fwrite($a, $payload);
 
                     $logger->logger("Payload sent with token {$params['MadelineSelfRestart']}, waiting for self-restart");
 
-                    sleep(10);
-                    fclose($a);
+                    \sleep(10);
+                    \fclose($a);
                 }, 'restarter');
             }
 
@@ -155,7 +155,7 @@ trait Loop
             $this->updates = [];
             foreach ($updates as $update) {
                 $r = $this->settings['updates']['callback']($update);
-                if (is_object($r)) {
+                if (\is_object($r)) {
                     $this->callFork($r);
                 }
             }
@@ -171,23 +171,23 @@ trait Loop
 
     public function closeConnection($message = 'OK!')
     {
-        if (php_sapi_name() === 'cli' || isset($GLOBALS['exited']) || headers_sent()) {
+        if (PHP_SAPI === 'cli' || isset($GLOBALS['exited']) || \headers_sent()) {
             return;
         }
         $this->logger->logger($message);
-        $buffer = @ob_get_contents();
-        @ob_end_clean();
-        header('Connection: close');
-        ignore_user_abort(true);
-        $buffer .= '<html><body><h1>'.htmlentities($message).'</h1></body></html>';
+        $buffer = @\ob_get_contents();
+        @\ob_end_clean();
+        \header('Connection: close');
+        \ignore_user_abort(true);
+        $buffer .= '<html><body><h1>'.\htmlentities($message).'</h1></body></html>';
         echo $buffer;
-        $size = max(ob_get_length(), strlen($buffer));
-        header("Content-Length: $size");
-        header('Content-Type: text/html');
-        ob_end_flush();
-        flush();
+        $size = \max(\ob_get_length(), \strlen($buffer));
+        \header("Content-Length: $size");
+        \header('Content-Type: text/html');
+        \ob_end_flush();
+        \flush();
         $GLOBALS['exited'] = true;
-        if (function_exists('fastcgi_finish_request')) {
+        if (\function_exists('fastcgi_finish_request')) {
             \fastcgi_finish_request();
         }
     }

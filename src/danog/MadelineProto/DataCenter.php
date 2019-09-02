@@ -41,7 +41,6 @@ use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectException;
 use Amp\Socket\Socket;
 use Amp\TimeoutException;
-use danog\MadelineProto\MTProto\AuthKey;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
@@ -146,10 +145,10 @@ class DataCenter
     }
 
     /**
-     * Set auth key information from saved auth array
+     * Set auth key information from saved auth array.
      *
      * @param array $saved Saved auth array
-     * 
+     *
      * @return void
      */
     public function setDataCenterConnections(array $saved)
@@ -827,7 +826,7 @@ class DataCenter
     }
 
     /**
-     * Get Connection instance for authorization
+     * Get Connection instance for authorization.
      *
      * @param string $dc DC ID
      *
@@ -882,10 +881,10 @@ class DataCenter
 
 
     /**
-     * Check if connected to datacenter using HTTP
+     * Check if connected to datacenter using HTTP.
      *
      * @param string $datacenter DC ID
-     * 
+     *
      * @return boolean
      */
     public function isHttp(string $datacenter)
@@ -894,7 +893,7 @@ class DataCenter
     }
 
     /**
-     * Get all DCs
+     * Get all DCs.
      *
      * @param boolean $all
      * @return void

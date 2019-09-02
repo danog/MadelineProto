@@ -11,10 +11,10 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-if (!file_exists(__DIR__.'/../vendor/autoload.php')) {
+if (!\file_exists(__DIR__.'/../vendor/autoload.php')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
-    if (!file_exists('madeline.php')) {
-        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if (!\file_exists('madeline.php')) {
+        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
 } else {
@@ -28,11 +28,11 @@ try {
     $MadelineProto = new \danog\MadelineProto\API('MadelineProto_bot.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
-    $authorization = $MadelineProto->bot_login(readline('Enter a bot token: '));
+    $authorization = $MadelineProto->bot_login(\readline('Enter a bot token: '));
     \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
 }
 
-if (file_exists('token.php') && $MadelineProto === false) {
+if (\file_exists('token.php') && $MadelineProto === false) {
     include_once 'token.php';
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login($MadelineProto_token);
@@ -82,7 +82,7 @@ while (true) {
                 }
 
                 try {
-                    if (isset($update['update']['message']['message']) && preg_match('|/start|', $update['update']['message']['message'])) {
+                    if (isset($update['update']['message']['message']) && \preg_match('|/start|', $update['update']['message']['message'])) {
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => $start, 'reply_to_msg_id' => $update['update']['message']['id'], 'parse_mode' => 'markdown', 'reply_markup' => $reply_markup]);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -95,7 +95,7 @@ while (true) {
                 }
 
                 try {
-                    if (preg_match('|/start|', $update['update']['message']['message'])) {
+                    if (\preg_match('|/start|', $update['update']['message']['message'])) {
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['to_id'], 'message' => $start, 'reply_to_msg_id' => $update['update']['message']['id'],  'parse_mode' => 'markdown', 'reply_markup' => $reply_markup]);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -111,18 +111,18 @@ while (true) {
                         $MadelineProto->messages->setInlineBotResults(['query_id' => $update['update']['query_id'], 'results' => [], 'cache_time' => 0, 'switch_pm' => $sswitch]);
                     } else {
                         $toset = ['query_id' => $update['update']['query_id'], 'results' => [], 'cache_time' => 0, 'private' => true];
-                        $rows = explode("\n", $update['update']['query']);
-                        $text = array_shift($rows);
+                        $rows = \explode("\n", $update['update']['query']);
+                        $text = \array_shift($rows);
                         if (empty($rows)) {
                             $MadelineProto->messages->setInlineBotResults(['query_id' => $update['update']['query_id'], 'results' => [], 'cache_time' => 0, 'switch_pm' => $sswitch]);
                         } else {
-                            array_walk($rows, function (&$value, $key) {
-                                $value = explode('|', $value);
-                                array_walk($value, function (&$value, $key) {
-                                    $value = ['text' => trim($value), 'url' => 'https://yayponies.eu'];
+                            \array_walk($rows, function (&$value, $key) {
+                                $value = \explode('|', $value);
+                                \array_walk($value, function (&$value, $key) {
+                                    $value = ['text' => \trim($value), 'url' => 'https://yayponies.eu'];
                                 });
                             });
-                            $toset['results'] = [['_' => 'inputBotInlineResult', 'id' => (string) random_int(0, pow(2, 31) - 1), 'type' => 'article', 'title' => $text, 'description' => 'Your keyboard', 'send_message' => ['_' => 'inputBotInlineMessageText', 'message' => $text, 'reply_markup' => ['inline_keyboard' => $rows]]]];
+                            $toset['results'] = [['_' => 'inputBotInlineResult', 'id' => (string) \random_int(0, \pow(2, 31) - 1), 'type' => 'article', 'title' => $text, 'description' => 'Your keyboard', 'send_message' => ['_' => 'inputBotInlineMessageText', 'message' => $text, 'reply_markup' => ['inline_keyboard' => $rows]]]];
                             $MadelineProto->messages->setInlineBotResults($toset);
                         }
                     }

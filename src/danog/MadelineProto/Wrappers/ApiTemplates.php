@@ -40,7 +40,7 @@ trait ApiTemplates
 
     public function web_api_echo_template($message, $form)
     {
-        return sprintf($this->web_api_template, $message, $form);
+        return \sprintf($this->web_api_template, $message, $form);
     }
 
     public function get_web_api_template()
@@ -117,7 +117,8 @@ trait ApiTemplates
             <input type="radio" name="app_platform" value="other"> Other (specify in description)
           </label>
           <br><br>Enter the app description, can be anything: <br><textarea name="app_desc" required></textarea><br><br>
-                    '));
+                    '
+                ));
             }
         }
     }

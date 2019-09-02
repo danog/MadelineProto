@@ -28,7 +28,7 @@ class Lua
 
     public function __magic_construct($script, $MadelineProto)
     {
-        if (!file_exists($script)) {
+        if (!\file_exists($script)) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['script_not_exist']);
         }
         $this->MadelineProto = $MadelineProto;
@@ -51,12 +51,12 @@ class Lua
         $this->Lua->registerCallback('tdcli_function', [$this, 'tdcli_function']);
         $this->Lua->registerCallback('madeline_function', [$this, 'madeline_function']);
         $this->Lua->registerCallback('var_dump', 'var_dump');
-        foreach (get_class_methods($this->MadelineProto->API) as $method) {
+        foreach (\get_class_methods($this->MadelineProto->API) as $method) {
             $this->Lua->registerCallback($method, [$this->MadelineProto, $method]);
         }
         $methods = [];
         foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
-            $namespace = key($pair);
+            $namespace = \key($pair);
             $method = $pair[$namespace];
             if ($namespace === 'upload') {
                 continue;
@@ -64,7 +64,7 @@ class Lua
             $methods[$namespace][$method] = [$this->MadelineProto->{$namespace}, $method];
         }
         foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
-            $namespace = key($pair);
+            $namespace = \key($pair);
             $method = $pair[$namespace];
             if ($namespace === 'upload') {
                 continue;
@@ -73,7 +73,7 @@ class Lua
         }
         $this->MadelineProto->lua = true;
         foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
-            $namespace = key($pair);
+            $namespace = \key($pair);
             $this->MadelineProto->{$namespace}->lua = true;
         }
     }
@@ -85,7 +85,7 @@ class Lua
             return 0;
         }
         $result = $this->MadelineProto->API->method_call($params['_'], $params, ['datacenter' => $this->MadelineProto->API->datacenter->curdc]);
-        if (is_callable($cb)) {
+        if (\is_callable($cb)) {
             $cb($this->MadelineProto->mtproto_to_td($result), $cb_extra);
         }
 
@@ -95,7 +95,7 @@ class Lua
     public function madeline_function($params, $cb = null, $cb_extra = null)
     {
         $result = $this->MadelineProto->API->method_call($params['_'], $params, ['datacenter' => $this->MadelineProto->API->datacenter->curdc]);
-        if (is_callable($cb)) {
+        if (\is_callable($cb)) {
             $cb($result, $cb_extra);
         }
         self::convert_objects($result);
@@ -110,13 +110,13 @@ class Lua
 
     private function convert_array($array)
     {
-        if (!is_array($array)) {
+        if (!\is_array($array)) {
             return $array;
         }
         if ($this->is_seqential($array)) {
-            return array_flip(array_map(function ($el) {
+            return \array_flip(\array_map(function ($el) {
                 return $el + 1;
-            }, array_flip($array)));
+            }, \array_flip($array)));
         }
     }
 
@@ -126,7 +126,7 @@ class Lua
             return false;
         }
 
-        return isset($arr[0]) && array_keys($arr) === range(0, count($arr) - 1);
+        return isset($arr[0]) && \array_keys($arr) === \range(0, \count($arr) - 1);
     }
 
     public function __get($name)
@@ -168,10 +168,10 @@ class Lua
 
     public static function convert_objects(&$data)
     {
-        array_walk_recursive($data, function (&$value, $key) {
-            if (is_object($value) && !$value instanceof \phpseclib\Math\BigInteger) {
+        \array_walk_recursive($data, function (&$value, $key) {
+            if (\is_object($value) && !$value instanceof \phpseclib\Math\BigInteger) {
                 $newval = [];
-                foreach (get_class_methods($value) as $name) {
+                foreach (\get_class_methods($value) as $name) {
                     $newval[$name] = [$value, $name];
                 }
                 foreach ($value as $key => $name) {

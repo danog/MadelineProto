@@ -43,12 +43,12 @@ trait AuthKeyHandler
         $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
         $params['g_a'] = new \phpseclib\Math\BigInteger((string) $params['g_a'], 256);
         $this->check_G($params['g_a'], $dh_config['p']);
-        $key = ['auth_key' => str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
+        $key = ['auth_key' => \str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, \chr(0), \STR_PAD_LEFT)];
         //$this->logger->logger($key);
-        $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
-        $key['visualization_orig'] = substr(sha1($key['auth_key'], true), 16);
-        $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
-        $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => false, 'user_id' => $params['admin_id'], 'InputEncryptedChat' => ['_' => 'inputEncryptedChat', 'chat_id' => $params['id'], 'access_hash' => $params['access_hash']], 'in_seq_no_x' => 1, 'out_seq_no_x' => 0, 'in_seq_no' => 0, 'out_seq_no' => 0, 'layer' => 8, 'ttl' => 0, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0], 'key_x' => 'from server', 'mtproto' => 1];
+        $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
+        $key['visualization_orig'] = \substr(\sha1($key['auth_key'], true), 16);
+        $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
+        $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => false, 'user_id' => $params['admin_id'], 'InputEncryptedChat' => ['_' => 'inputEncryptedChat', 'chat_id' => $params['id'], 'access_hash' => $params['access_hash']], 'in_seq_no_x' => 1, 'out_seq_no_x' => 0, 'in_seq_no' => 0, 'out_seq_no' => 0, 'layer' => 8, 'ttl' => 0, 'ttr' => 100, 'updated' => \time(), 'incoming' => [], 'outgoing' => [], 'created' => \time(), 'rekeying' => [0], 'key_x' => 'from server', 'mtproto' => 1];
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->check_G($g_b, $dh_config['p']);
         yield $this->method_call_async_read('messages.acceptEncryption', ['peer' => $params['id'], 'g_b' => $g_b->toBytes(), 'key_fingerprint' => $key['fingerprint']], ['datacenter' => $this->datacenter->curdc]);
@@ -89,18 +89,18 @@ trait AuthKeyHandler
         $dh_config = yield $this->get_dh_config_async();
         $params['g_a_or_b'] = new \phpseclib\Math\BigInteger((string) $params['g_a_or_b'], 256);
         $this->check_G($params['g_a_or_b'], $dh_config['p']);
-        $key = ['auth_key' => str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
+        $key = ['auth_key' => \str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, \chr(0), \STR_PAD_LEFT)];
         unset($this->temp_requested_secret_chats[$params['id']]);
-        $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
+        $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
         //$this->logger->logger($key);
         if ($key['fingerprint'] !== $params['key_fingerprint']) {
             yield $this->discard_secret_chat_async($params['id']);
 
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
-        $key['visualization_orig'] = substr(sha1($key['auth_key'], true), 16);
-        $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
-        $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputEncryptedChat' => ['chat_id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputEncryptedChat'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'in_seq_no' => 0, 'out_seq_no' => 0, 'layer' => 8, 'ttl' => 0, 'ttr' => 100, 'updated' => time(), 'incoming' => [], 'outgoing' => [], 'created' => time(), 'rekeying' => [0], 'key_x' => 'to server', 'mtproto' => 1];
+        $key['visualization_orig'] = \substr(\sha1($key['auth_key'], true), 16);
+        $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
+        $this->secret_chats[$params['id']] = ['key' => $key, 'admin' => true, 'user_id' => $params['participant_id'], 'InputEncryptedChat' => ['chat_id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputEncryptedChat'], 'in_seq_no_x' => 0, 'out_seq_no_x' => 1, 'in_seq_no' => 0, 'out_seq_no' => 0, 'layer' => 8, 'ttl' => 0, 'ttr' => 100, 'updated' => \time(), 'incoming' => [], 'outgoing' => [], 'created' => \time(), 'rekeying' => [0], 'key_x' => 'to server', 'mtproto' => 1];
         yield $this->notify_layer_async($params['id']);
         $this->logger->logger('Secret chat '.$params['id'].' completed successfully!', \danog\MadelineProto\Logger::NOTICE);
     }
@@ -154,10 +154,10 @@ trait AuthKeyHandler
         $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
         $params['g_a'] = new \phpseclib\Math\BigInteger((string) $params['g_a'], 256);
         $this->check_G($params['g_a'], $dh_config['p']);
-        $key = ['auth_key' => str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
-        $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
+        $key = ['auth_key' => \str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, \chr(0), \STR_PAD_LEFT)];
+        $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
         $key['visualization_orig'] = $this->secret_chats[$chat]['key']['visualization_orig'];
-        $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
+        $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
         $this->temp_rekeyed_secret_chats[$params['exchange_id']] = $key;
         $this->secret_chats[$chat]['rekeying'] = [2, $params['exchange_id']];
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
@@ -177,10 +177,10 @@ trait AuthKeyHandler
         $dh_config = yield $this->get_dh_config_async();
         $params['g_b'] = new \phpseclib\Math\BigInteger((string) $params['g_b'], 256);
         $this->check_G($params['g_b'], $dh_config['p']);
-        $key = ['auth_key' => str_pad($params['g_b']->powMod($this->temp_rekeyed_secret_chats[$params['exchange_id']], $dh_config['p'])->toBytes(), 256, chr(0), \STR_PAD_LEFT)];
-        $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
+        $key = ['auth_key' => \str_pad($params['g_b']->powMod($this->temp_rekeyed_secret_chats[$params['exchange_id']], $dh_config['p'])->toBytes(), 256, \chr(0), \STR_PAD_LEFT)];
+        $key['fingerprint'] = \substr(\sha1($key['auth_key'], true), -8);
         $key['visualization_orig'] = $this->secret_chats[$chat]['key']['visualization_orig'];
-        $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
+        $key['visualization_46'] = \substr(\hash('sha256', $key['auth_key'], true), 20);
         if ($key['fingerprint'] !== $params['key_fingerprint']) {
             yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]], ['datacenter' => $this->datacenter->curdc]);
 
@@ -192,7 +192,7 @@ trait AuthKeyHandler
         $this->secret_chats[$chat]['old_key'] = $this->secret_chats[$chat]['key'];
         $this->secret_chats[$chat]['key'] = $key;
         $this->secret_chats[$chat]['ttr'] = 100;
-        $this->secret_chats[$chat]['updated'] = time();
+        $this->secret_chats[$chat]['updated'] = \time();
         $this->updaters[false]->resume();
     }
 
@@ -211,7 +211,7 @@ trait AuthKeyHandler
         $this->secret_chats[$chat]['old_key'] = $this->secret_chats[$chat]['key'];
         $this->secret_chats[$chat]['key'] = $this->temp_rekeyed_secret_chats[$chat];
         $this->secret_chats[$chat]['ttr'] = 100;
-        $this->secret_chats[$chat]['updated'] = time();
+        $this->secret_chats[$chat]['updated'] = \time();
         unset($this->temp_rekeyed_secret_chats[$params['exchange_id']]);
         yield $this->method_call_async_read('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionNoop']]], ['datacenter' => $this->datacenter->curdc]);
         $this->logger->logger('Secret chat '.$chat.' rekeyed successfully!', \danog\MadelineProto\Logger::VERBOSE);
@@ -233,7 +233,7 @@ trait AuthKeyHandler
 
     public function get_secret_chat($chat)
     {
-        return $this->secret_chats[is_array($chat) ? $chat['chat_id'] : $chat];
+        return $this->secret_chats[\is_array($chat) ? $chat['chat_id'] : $chat];
     }
 
     public function discard_secret_chat_async($chat)

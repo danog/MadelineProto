@@ -26,8 +26,8 @@ class Proxy extends \danog\MadelineProto\Connection
 {
     public function __magic_construct($socket, $extra, $ip, $port, $protocol, $timeout, $ipv6)
     {
-        \danog\MadelineProto\Logger::log('Got connection '.getmypid().'!');
-        \danog\MadelineProto\Magic::$pid = getmypid();
+        \danog\MadelineProto\Logger::log('Got connection '.\getmypid().'!');
+        \danog\MadelineProto\Magic::$pid = \getmypid();
         \danog\MadelineProto\Lang::$current_lang = [];
         $this->sock = $socket;
         $this->sock->setBlocking(true);
@@ -43,7 +43,7 @@ class Proxy extends \danog\MadelineProto\Connection
 
     public function __destruct()
     {
-        \danog\MadelineProto\Logger::log('Closing fork '.getmypid().'!');
+        \danog\MadelineProto\Logger::log('Closing fork '.\getmypid().'!');
         unset($this->sock);
     }
 
@@ -52,27 +52,27 @@ class Proxy extends \danog\MadelineProto\Connection
         $this->protocol = 'obfuscated2';
         $random = $this->sock->read(64);
 
-        $reversed = strrev(substr($random, 8, 48));
-        $key = substr($random, 8, 32);
-        $keyRev = substr($reversed, 0, 32);
+        $reversed = \strrev(\substr($random, 8, 48));
+        $key = \substr($random, 8, 32);
+        $keyRev = \substr($reversed, 0, 32);
         if (isset($this->extra['secret'])) {
-            $key = hash('sha256', $key.$this->extra['secret'], true);
-            $keyRev = hash('sha256', $keyRev.$this->extra['secret'], true);
+            $key = \hash('sha256', $key.$this->extra['secret'], true);
+            $keyRev = \hash('sha256', $keyRev.$this->extra['secret'], true);
         }
 
         $this->obfuscated = ['encryption' => new \phpseclib\Crypt\AES('ctr'), 'decryption' => new \phpseclib\Crypt\AES('ctr')];
         $this->obfuscated['encryption']->enableContinuousBuffer();
         $this->obfuscated['decryption']->enableContinuousBuffer();
         $this->obfuscated['decryption']->setKey($key);
-        $this->obfuscated['decryption']->setIV(substr($random, 40, 16));
+        $this->obfuscated['decryption']->setIV(\substr($random, 40, 16));
         $this->obfuscated['encryption']->setKey($keyRev);
-        $this->obfuscated['encryption']->setIV(substr($reversed, 32, 16));
-        $random = substr_replace($random, substr(@$this->obfuscated['decryption']->encrypt($random), 56, 8), 56, 8);
+        $this->obfuscated['encryption']->setIV(\substr($reversed, 32, 16));
+        $random = \substr_replace($random, \substr(@$this->obfuscated['decryption']->encrypt($random), 56, 8), 56, 8);
 
-        if (substr($random, 56, 4) !== str_repeat(chr(0xef), 4)) {
+        if (\substr($random, 56, 4) !== \str_repeat(\chr(0xef), 4)) {
             throw new \danog\MadelineProto\Exception('Wrong protocol version');
         }
-        $dc = abs(unpack('s', substr($random, 60, 2))[1]);
+        $dc = \abs(\unpack('s', \substr($random, 60, 2))[1]);
 
         $socket = $this->extra['madeline'][$dc];
         $socket->__construct($socket->proxy, $socket->extra, $socket->ip, $socket->port, $socket->protocol, $timeout = $this->extra['timeout'], $socket->ipv6);
@@ -82,7 +82,7 @@ class Proxy extends \danog\MadelineProto\Connection
         $write = [];
         $except = [];
         while (true) {
-            pcntl_signal_dispatch();
+            \pcntl_signal_dispatch();
 
             try {
                 $read = [$this->getSocket(), $socket->getSocket()];

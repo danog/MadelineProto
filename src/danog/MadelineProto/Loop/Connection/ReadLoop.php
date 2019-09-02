@@ -109,7 +109,7 @@ class ReadLoop extends SignalLoop
                 } elseif ($error === 0) {
                     $API->logger->logger("Got NOOP from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
                     yield $connection->reconnect();
-                } else if ($error === -429) {
+                } elseif ($error === -429) {
                     $API->logger->logger("Got -429 from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
                     Loop::delay(1*1000, [$connection, 'reconnect']);
                 } else {

@@ -11,10 +11,10 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-if (!file_exists(__DIR__.'/../vendor/autoload.php')) {
+if (!\file_exists(__DIR__.'/../vendor/autoload.php')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
-    if (!file_exists('madeline.php')) {
-        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if (!\file_exists('madeline.php')) {
+        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
 } else {
@@ -36,7 +36,7 @@ try {
 } catch (\danog\MadelineProto\Exception $e) {
     \danog\MadelineProto\Logger::log($e->getMessage());
 }
-if (file_exists('token.php') && $MadelineProto === false) {
+if (\file_exists('token.php') && $MadelineProto === false) {
     include_once 'token.php';
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login($pipes_token);
@@ -44,11 +44,11 @@ if (file_exists('token.php') && $MadelineProto === false) {
 }
 if ($uMadelineProto === false) {
     echo 'Loading MadelineProto...'.PHP_EOL;
-    $uMadelineProto = new \danog\MadelineProto\API(array_merge($settings, ['updates' => ['handle_updates' => false]]));
-    $sentCode = $uMadelineProto->phone_login(readline());
+    $uMadelineProto = new \danog\MadelineProto\API(\array_merge($settings, ['updates' => ['handle_updates' => false]]));
+    $sentCode = $uMadelineProto->phone_login(\readline());
     \danog\MadelineProto\Logger::log($sentCode, \danog\MadelineProto\Logger::NOTICE);
     echo 'Enter the code you received: ';
-    $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
+    $code = \fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
     $authorization = $uMadelineProto->complete_phone_login($code);
     \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
     if ($authorization['_'] === 'account.noPassword') {
@@ -56,14 +56,14 @@ if ($uMadelineProto === false) {
     }
     if ($authorization['_'] === 'account.password') {
         \danog\MadelineProto\Logger::log('2FA is enabled', \danog\MadelineProto\Logger::NOTICE);
-        $authorization = $uMadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
+        $authorization = $uMadelineProto->complete_2fa_login(\readline('Please enter your password (hint '.$authorization['hint'].'): '));
     }
     echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
     echo 'Wrote '.\danog\MadelineProto\Serialization::serialize('session.madeline', $uMadelineProto).' bytes'.PHP_EOL;
 }
 function inputify(&$stuff)
 {
-    $stuff['_'] = 'input'.ucfirst($stuff['_']);
+    $stuff['_'] = 'input'.\ucfirst($stuff['_']);
 
     return $stuff;
 }
@@ -127,7 +127,7 @@ while (true) {
                 }
 
                 try {
-                    if (preg_match('|/start|', $update['update']['message']['message'])) {
+                    if (\preg_match('|/start|', $update['update']['message']['message'])) {
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['from_id'], 'message' => $start, 'reply_to_msg_id' => $update['update']['message']['id']]);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -140,7 +140,7 @@ while (true) {
                 }
 
                 try {
-                    if (preg_match('|/start|', $update['update']['message']['message'])) {
+                    if (\preg_match('|/start|', $update['update']['message']['message'])) {
                         $MadelineProto->messages->sendMessage(['peer' => $update['update']['message']['to_id'], 'message' => $start, 'reply_to_msg_id' => $update['update']['message']['id']]);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -156,19 +156,19 @@ while (true) {
                         $MadelineProto->messages->setInlineBotResults(['query_id' => $update['update']['query_id'], 'results' => [], 'cache_time' => 0, 'switch_pm' => $sswitch]);
                     } else {
                         $toset = ['query_id' => $update['update']['query_id'], 'results' => [], 'cache_time' => 0, 'private' => true];
-                        if (preg_match('|\$\s*$|', $update['update']['query'])) {
-                            $exploded = explode('|', preg_replace('/\$\s*$/', '', $update['update']['query']));
-                            array_walk($exploded, function (&$value, $key) {
-                                $value = preg_replace(['/^\s+/', '/\s+$/'], '', $value);
+                        if (\preg_match('|\$\s*$|', $update['update']['query'])) {
+                            $exploded = \explode('|', \preg_replace('/\$\s*$/', '', $update['update']['query']));
+                            \array_walk($exploded, function (&$value, $key) {
+                                $value = \preg_replace(['/^\s+/', '/\s+$/'], '', $value);
                             });
-                            $query = array_shift($exploded);
+                            $query = \array_shift($exploded);
                             foreach ($exploded as $current => $botq) {
-                                $bot = preg_replace('|:.*|', '', $botq);
+                                $bot = \preg_replace('|:.*|', '', $botq);
                                 if ($bot === '' || $uMadelineProto->get_info($bot)['bot_api_id'] === $MadelineProto->API->authorization['user']['id']) {
                                     $toset['switch_pm'] = $sswitch;
                                     break;
                                 }
-                                $select = preg_replace('|'.$bot.':|', '', $botq);
+                                $select = \preg_replace('|'.$bot.':|', '', $botq);
                                 $results = $uMadelineProto->messages->getInlineBotResults(['bot' => $bot, 'peer' => $update['update']['user_id'], 'query' => $query, 'offset' => $offset]);
                                 if (isset($results['switch_pm'])) {
                                     $toset['switch_pm'] = $results['switch_pm'];
@@ -176,13 +176,13 @@ while (true) {
                                 }
                                 $toset['gallery'] = $results['gallery'];
                                 $toset['results'] = [];
-                                if (is_numeric($select)) {
+                                if (\is_numeric($select)) {
                                     $toset['results'][0] = $results['results'][$select - 1];
                                 } elseif ($select === '') {
                                     $toset['results'] = $results['results'];
                                 } else {
                                     foreach ($results['results'] as $result) {
-                                        if (isset($result['send_message']['message']) && preg_match('|'.$select.'|', $result['send_message']['message'])) {
+                                        if (isset($result['send_message']['message']) && \preg_match('|'.$select.'|', $result['send_message']['message'])) {
                                             $toset['results'][0] = $result;
                                         }
                                     }
@@ -190,7 +190,7 @@ while (true) {
                                 if (!isset($toset['results'][0])) {
                                     $toset['results'] = $results['results'];
                                 }
-                                if (count($exploded) - 1 === $current || !isset($toset['results'][0]['send_message']['message'])) {
+                                if (\count($exploded) - 1 === $current || !isset($toset['results'][0]['send_message']['message'])) {
                                     break;
                                 }
                                 $query = $toset['results'][0]['send_message']['message'];
@@ -199,7 +199,7 @@ while (true) {
                         if (empty($toset['results'])) {
                             $toset['switch_pm'] = $sswitch;
                         } else {
-                            array_walk($toset['results'], 'translate');
+                            \array_walk($toset['results'], 'translate');
                         }
                         $MadelineProto->messages->setInlineBotResults($toset);
                     }
