@@ -785,7 +785,6 @@ trait TL
             if (!isset($type['subtype'])) {
                 $type['subtype'] = '';
             }
-
             return $this->deserialize(gzdecode($this->deserialize($stream, ['type' => 'bytes'])), ['type' => '', 'connection' => $type['connection'], 'subtype' => $type['subtype']]);
         }
         if ($constructorData['type'] === 'Vector t') {
@@ -849,8 +848,8 @@ trait TL
                     $arg['subtype'] = str_replace(['Vector<', '>'], '', $type['connection']->outgoing_messages[$x['req_msg_id']]['type']);
                 }
             }
-            if (isset($type['datacenter'])) {
-                $arg['datacenter'] = $type['datacenter'];
+            if (isset($type['connection'])) {
+                $arg['connection'] = $type['connection'];
             }
             $x[$arg['name']] = $this->deserialize($stream, $arg);
             if ($arg['name'] === 'random_bytes') {

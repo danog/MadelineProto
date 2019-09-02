@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\Loop;
+use danog\MadelineProto\MTProto;
 
 /**
  * Manages responses.
@@ -118,8 +119,8 @@ trait ResponseHandler
                     $this->ack_incoming_message_id($current_msg_id);
 
                     // Acknowledge that I received the server's response
-                    if ($this->authorized === self::LOGGED_IN && !$this->initing_authorization && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->curdc)->hasTempAuthKey() && isset($this->updaters[false])) {
-                        $this->updaters[false]->resumeDefer();
+                    if ($this->API->authorized === MTProto::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->curdc)->hasTempAuthKey() && isset($this->API->updaters[false])) {
+                        $this->API->updaters[false]->resumeDefer();
                     }
 
                     unset($this->incoming_messages[$current_msg_id]['content']);
@@ -190,7 +191,7 @@ trait ResponseHandler
                          *$this->got_response_for_outgoing_message_id($msg_id);
                          *}
                          */
-                        foreach (self::MSGS_INFO_FLAGS as $flag => $description) {
+                        foreach (MTProto::MSGS_INFO_FLAGS as $flag => $description) {
                             if (($info & $flag) !== 0) {
                                 $status .= $description;
                             }
@@ -263,7 +264,7 @@ trait ResponseHandler
                         case 'Updates':
                             unset($this->new_incoming[$current_msg_id]);
 
-                            if (\strpos($this->datacenter, 'cdn') === false) {
+                            if (!$this->isCdn()) {
                                 $this->callForkDefer($this->API->handle_updates_async($this->incoming_messages[$current_msg_id]['content']));
                             }
 
@@ -408,9 +409,9 @@ trait ResponseHandler
 
                                     $this->logger->logger($response['error_message'], \danog\MadelineProto\Logger::FATAL_ERROR);
                                     foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
-                                        $socket->authKey(null, true);
-                                        $socket->authKey(null, false);
                                         $socket->authorized(false);
+                                        $socket->setTempAuthKey(null);
+                                        $socket->setPermAuthKey(null);
                                         $socket->resetSession();
                                     }
 
@@ -435,7 +436,7 @@ trait ResponseHandler
                                     return;
                                 case 'AUTH_KEY_UNREGISTERED':
                                 case 'AUTH_KEY_INVALID':
-                                    if ($this->authorized !== self::LOGGED_IN) {
+                                    if ($this->API->authorized !== MTProto::LOGGED_IN) {
                                         $this->got_response_for_outgoing_message_id($request_id);
 
                                         $this->callFork((function () use (&$request, &$response) {
@@ -452,14 +453,14 @@ trait ResponseHandler
 
                                     $this->logger->logger('Auth key not registered, resetting temporary and permanent auth keys...', \danog\MadelineProto\Logger::ERROR);
 
-                                    if ($this->API->authorized_dc === $this->datacenter && $this->authorized === self::LOGGED_IN) {
+                                    if ($this->API->authorized_dc === $this->datacenter && $this->API->authorized === MTProto::LOGGED_IN) {
                                         $this->got_response_for_outgoing_message_id($request_id);
 
                                         $this->logger->logger('Permanent auth key was main authorized key, logging out...', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
-                                            $socket->authKey(null, true);
-                                            $socket->authKey(null, false);
                                             $socket->authorized(false);
+                                            $socket->setTempAuthKey(null);
+                                            $socket->setPermAuthKey(null);
                                         }
 
                                         $this->logger->logger('!!!!!!! WARNING !!!!!!!', \danog\MadelineProto\Logger::FATAL_ERROR);
@@ -531,7 +532,7 @@ trait ResponseHandler
                     break;
                 case 'bad_server_salt':
                 case 'bad_msg_notification':
-                    $this->logger->logger('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$response['error_code']], \danog\MadelineProto\Logger::WARNING);
+                    $this->logger->logger('Received bad_msg_notification: '.MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], \danog\MadelineProto\Logger::WARNING);
                     switch ($response['error_code']) {
                         case 48:
                             $this->getTempAuthKey()->setServerSalt($response['new_server_salt']);
@@ -552,7 +553,7 @@ trait ResponseHandler
                             return;
                     }
                     $this->got_response_for_outgoing_message_id($request_id);
-                    $this->handle_reject($request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.self::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
+                    $this->handle_reject($request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
 
                     return;
             }
@@ -568,7 +569,7 @@ trait ResponseHandler
             return;
         }
         $botAPI = isset($request['botAPI']) && $request['botAPI'];
-        if (isset($response['_']) && \strpos($this->datacenter, 'cdn') === false && $this->API->constructors->find_by_predicate($response['_'])['type'] === 'Updates') {
+        if (isset($response['_']) && !$this->isCdn() && $this->API->constructors->find_by_predicate($response['_'])['type'] === 'Updates') {
             $response['request'] = $request;
             $this->callForkDefer($this->API->handle_updates_async($response));
         }

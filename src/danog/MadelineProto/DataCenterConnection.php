@@ -18,9 +18,10 @@
 
 namespace danog\MadelineProto;
 
-use danog\MadelineProto\AuthKey\AuthKey;
-use danog\MadelineProto\AuthKey\PermAuthKey;
-use danog\MadelineProto\AuthKey\TempAuthKey;
+use danog\MadelineProto\Loop\Generic\PeriodicLoop;
+use danog\MadelineProto\MTProto\AuthKey;
+use danog\MadelineProto\MTProto\PermAuthKey;
+use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
@@ -229,7 +230,11 @@ class DataCenterConnection implements JsonSerializable
      */
     public function authorized(bool $authorized)
     {
-        $this->getTempAuthKey()->authorized($authorized);
+        if ($authorized) {
+            $this->getTempAuthKey()->authorized($authorized);
+        } else if ($this->hasTempAuthKey()) {
+            $this->getTempAuthKey()->authorized($authorized);
+        }
     }
 
     /**
@@ -297,7 +302,7 @@ class DataCenterConnection implements JsonSerializable
 
         if ($count > 1) {
             if (!$this->robinLoop) {
-                $this->robinLoop = new PeriodicLoop($this, [$this, 'even'], "Robin loop DC {$this->datacenter}", 10);
+                $this->robinLoop = new PeriodicLoop($this->API, [$this, 'even'], "Robin loop DC {$this->datacenter}", 10);
             }
             $this->robinLoop->start();
         }
@@ -363,7 +368,7 @@ class DataCenterConnection implements JsonSerializable
      */
     public function getConnection(): Connection
     {
-        if (\count($this->availableConnections) === 1) {
+        if (\count($this->availableConnections) <= 1) {
             return $this->connections[0];
         }
         \max($this->availableConnections);
@@ -440,9 +445,29 @@ class DataCenterConnection implements JsonSerializable
      *
      * @return boolean
      */
-    public function isHttp()
+    public function isHttp(): bool
     {
         return \in_array($this->ctx->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
+    }
+
+    /**
+     * Check if is a media connection
+     *
+     * @return boolean
+     */
+    public function isMedia(): bool
+    {
+        return $this->ctx->isMedia();
+    }
+
+    /**
+     * Check if is a CDN connection
+     *
+     * @return boolean
+     */
+    public function isCDN(): bool
+    {
+        return $this->ctx->isCDN();
     }
 
     /**

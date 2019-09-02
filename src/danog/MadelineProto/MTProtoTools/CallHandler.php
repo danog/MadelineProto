@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Promise;
+
 /**
  * Manages method and object calls.
  */

@@ -19,7 +19,7 @@
 
 namespace danog\MadelineProto\Wrappers;
 
-use danog\MadelineProto\AuthKey\PermAuthKey;
+use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 
 /**

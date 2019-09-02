@@ -267,6 +267,36 @@ class Connection extends Session
     }
 
     /**
+     * Check if is an HTTP connection.
+     *
+     * @return boolean
+     */
+    public function isHttp(): bool
+    {
+        return \in_array($this->ctx->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
+    }
+
+    /**
+     * Check if is a media connection
+     *
+     * @return boolean
+     */
+    public function isMedia(): bool
+    {
+        return $this->ctx->isMedia();
+    }
+
+    /**
+     * Check if is a CDN connection
+     *
+     * @return boolean
+     */
+    public function isCDN(): bool
+    {
+        return $this->ctx->isCDN();
+    }
+
+    /**
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
      *
      * @param ConnectionContext $ctx Connection context

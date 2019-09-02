@@ -19,6 +19,7 @@
 namespace danog\MadelineProto\Loop\Generic;
 
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use danog\MadelineProto\MTProto;
 
 /**
  * Periodic loop.
@@ -30,14 +31,16 @@ class PeriodicLoop extends ResumableSignalLoop
     private $callback;
     private $name;
     private $timeout;
-    
+
     /**
      * Constructor.
      *
-     *
      * @param \danog\MadelineProto\MTProto $API      Instance of MTProto class
+     * @param callable                     $callback Callback to call
+     * @param string                       $name     Loop name
+     * @param int                          $timeout  Loop timeout
      */
-    public function __construct($API, $callback, $name, $timeout)
+    public function __construct(MTProto $API, $callback, string $name, $timeout)
     {
         $this->API = $API;
         $this->callback = $callback;

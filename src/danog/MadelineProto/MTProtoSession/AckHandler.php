@@ -99,7 +99,7 @@ trait AckHandler
                 && $this->shared->hasTempAuthKey() === !$this->outgoing_messages[$message_id]['unencrypted']
                 && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
             ) {
-                if ($pfs && !$this->shared->getTempAuthKey()->bound() && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+                if ($pfs && !$this->shared->getTempAuthKey()->isBound() && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
                     continue;
                 }
 
@@ -128,7 +128,7 @@ trait AckHandler
                 && $this->shared->hasTempAuthKey() === !$this->outgoing_messages[$message_id]['unencrypted']
                 && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
             ) {
-                if ($pfs && !$this->shared->getTempAuthKey()->bound() && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+                if ($pfs && !$this->shared->getTempAuthKey()->isBound() && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
                     continue;
                 }
 

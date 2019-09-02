@@ -20,9 +20,9 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Artax\Request;
-use danog\MadelineProto\AuthKey\AuthKey;
-use danog\MadelineProto\AuthKey\PermAuthKey;
-use danog\MadelineProto\AuthKey\TempAuthKey;
+use danog\MadelineProto\MTProto\AuthKey;
+use danog\MadelineProto\MTProto\PermAuthKey;
+use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\DataCenterConnection;
 use phpseclib\Math\BigInteger;
 
@@ -64,9 +64,9 @@ trait AuthKeyHandler
      */
     public function create_auth_key_async(int $expires_in, string $datacenter): \Generator
     {
-        $cdn = \strpos($datacenter, 'cdn');
-        $req_pq = $cdn ? 'req_pq' : 'req_pq_multi';
         $connection = $this->datacenter->getAuthConnection($datacenter);
+        $cdn = $connection->isCDN();
+        $req_pq = $cdn ? 'req_pq' : 'req_pq_multi';
 
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
@@ -430,7 +430,7 @@ trait AuthKeyHandler
                 $this->logger->logger('An exception occurred while generating the authorization key: '.$e.PHP_EOL.' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
             }
         }
-        if (\strpos($datacenter, 'cdn') === false) {
+        if (!$cdn) {
             throw new \danog\MadelineProto\SecurityException('Auth Failed');
         }
     }
@@ -653,7 +653,7 @@ trait AuthKeyHandler
             $dcs = [];
             $postpone = [];
             foreach ($this->datacenter->getDataCenterConnections() as $id => $socket) {
-                if (\strpos($id, 'media') !== false) {
+                if ($socket->isMedia()) {
                     $oid = \intval($id);
                     if (isset($dcs[$oid])) {
                         $postpone[$id] = $socket;
@@ -711,13 +711,13 @@ trait AuthKeyHandler
                 $connection->session_in_seq_no = 0;
                 $connection->session_out_seq_no = 0;
             }
-            $cdn = \strpos($id, 'cdn');
-            $media = \strpos($id, 'media');
+            $cdn = $socket->isCDN();
+            $media = $socket->isMedia();
             if (!$socket->hasTempAuthKey() || !$socket->hasPermAuthKey()) {
                 if (!$socket->hasPermAuthKey() && !$cdn && !$media) {
                     $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
                     $socket->setPermAuthKey(yield $this->create_auth_key_async(-1, $id));
-                    $socket->authorized(false);
+                    //$socket->authorized(false);
                 }
                 if ($media) {
                     $socket->link(\intval($id));
@@ -778,7 +778,7 @@ trait AuthKeyHandler
                 if ($this->authorized_dc !== -1 && $authorized_dc_id !== $this->authorized_dc) {
                     continue;
                 }
-                if ($authorized_socket->hasTempAuthKey() && $authorized_socket->hasPermAuthKey() && $authorized_socket->isAuthorized() && $this->authorized === self::LOGGED_IN && !$socket->isAuthorized() && \strpos($authorized_dc_id, 'cdn') === false) {
+                if ($authorized_socket->hasTempAuthKey() && $authorized_socket->hasPermAuthKey() && $authorized_socket->isAuthorized() && $this->authorized === self::LOGGED_IN && !$socket->isAuthorized() && !$authorized_socket->isCDN()) {
                     try {
                         $this->logger->logger('Trying to copy authorization from dc '.$authorized_dc_id.' to dc '.$id);
                         $exported_authorization = yield $this->method_call_async_read('auth.exportAuthorization', ['dc_id' => \preg_replace('|_.*|', '', $id)], ['datacenter' => $authorized_dc_id]);

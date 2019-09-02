@@ -149,7 +149,7 @@ trait CallHandler
             if (isset($args['multiple'])) {
                 $aargs['multiple'] = true;
             }
-            if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > $this->API->config['message_length_max'] && \mb_strlen((yield $this->parse_mode_async($args))['message'], 'UTF-8') > $this->API->config['message_length_max']) {
+            if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > (yield $this->API->get_config_async())['message_length_max'] && \mb_strlen((yield $this->parse_mode_async($args))['message'], 'UTF-8') > (yield $this->API->get_config_async())['message_length_max']) {
                 $args = yield $this->split_to_chunks_async($args);
                 $promises = [];
                 $aargs['queue'] = $method;
