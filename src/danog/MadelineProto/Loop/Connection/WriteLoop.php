@@ -202,7 +202,7 @@ class WriteLoop extends ResumableSignalLoop
                     unset($connection->pending_outgoing[$k]);
                     continue;
                 }
-                if ($shared->getSettings()['pfs'] && !$shared->getTempAuthKey()->isBound() && !$shared->getCtx()->isCDN() && !\in_array($message['_'], ['http_wait', 'auth.bindTempAuthKey']) && $message['method']) {
+                if ($shared->getSettings()['pfs'] && !$shared->getTempAuthKey()->isBound() && !$connection->isCDN() && !\in_array($message['_'], ['http_wait', 'auth.bindTempAuthKey']) && $message['method']) {
                     $API->logger->logger("Skipping {$message['_']} due to unbound keys in DC {$datacenter}");
                     $skipped = true;
                     continue;
@@ -232,8 +232,8 @@ class WriteLoop extends ResumableSignalLoop
                                     [
                                         'api_id'           => $API->settings['app_info']['api_id'],
                                         'api_hash'         => $API->settings['app_info']['api_hash'],
-                                        'device_model'     => !$connection->getCtx()->isCDN() ? $API->settings['app_info']['device_model'] : 'n/a',
-                                        'system_version'   => !$connection->getCtx()->isCDN() ? $API->settings['app_info']['system_version'] : 'n/a',
+                                        'device_model'     => !$connection->isCDN() ? $API->settings['app_info']['device_model'] : 'n/a',
+                                        'system_version'   => !$connection->isCDN() ? $API->settings['app_info']['system_version'] : 'n/a',
                                         'app_version'      => $API->settings['app_info']['app_version'],
                                         'system_lang_code' => $API->settings['app_info']['lang_code'],
                                         'lang_code'        => $API->settings['app_info']['lang_code'],

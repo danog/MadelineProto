@@ -32,6 +32,11 @@ class FeedLoop extends ResumableSignalLoop
     private $incomingUpdates = [];
     private $parsedUpdates = [];
     private $channelId;
+    /**
+     * Update loop
+     *
+     * @var UpdateLoop
+     */
     private $updater;
 
     public function __construct($API, $channelId = false)

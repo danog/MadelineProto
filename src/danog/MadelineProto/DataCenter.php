@@ -137,8 +137,8 @@ class DataCenter
                     $array[$id]['tempAuthKey'] = $socket->temp_auth_key;
                 }
                 if ($socket->auth_key) {
-                    $array[$id]['authKey'] = $socket->auth_key;
-                    $array[$id]['authKey']['authorized'] = $socket->authorized;
+                    $array[$id]['permAuthKey'] = $socket->auth_key;
+                    $array[$id]['permAuthKey']['authorized'] = $socket->authorized;
                 }
             }
         }
@@ -156,15 +156,15 @@ class DataCenter
     {
         foreach ($saved as $id => $data) {
             $connection = $this->sockets[$id] = new DataCenterConnection;
-            if (isset($data['authKey'])) {
-                $connection->setPermAuthKey(new PermAuthKey($data['authKey']));
+            if (isset($data['permAuthKey'])) {
+                $connection->setPermAuthKey(new PermAuthKey($data['permAuthKey']));
             }
             if (isset($data['linked'])) {
                 continue;
             }
             if (isset($data['tempAuthKey'])) {
                 $connection->setTempAuthKey(new TempAuthKey($data['tempAuthKey']));
-                if ($data['tempAuthKey']['bound'] ?? false && $connection->hasPermAuthKey()) {
+                if (($data['tempAuthKey']['bound'] ?? false) && $connection->hasPermAuthKey()) {
                     $connection->bind();
                 }
             }
@@ -175,7 +175,7 @@ class DataCenter
             $connection->link($data['linked']);
             if (isset($data['tempAuthKey'])) {
                 $connection->setTempAuthKey(new TempAuthKey($data['tempAuthKey']));
-                if ($data['tempAuthKey']['bound'] ?? false && $connection->hasPermAuthKey()) {
+                if (($data['tempAuthKey']['bound'] ?? false) && $connection->hasPermAuthKey()) {
                     $connection->bind();
                 }
             }
@@ -187,7 +187,7 @@ class DataCenter
         $this->dclist = $dclist;
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
-            if ($socket instanceof Connection && !\strpos($key, '_bk')) {
+            if ($socket instanceof DataCenterConnection && !\strpos($key, '_bk')) {
                 $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
                 $socket->old = true;
                 $socket->setExtra($this->API);
@@ -490,7 +490,7 @@ class DataCenter
         throw new \danog\MadelineProto\Exception("Could not connect to URI $uri");
     }
 
-    public function dcConnectAsync($dc_number): \Generator
+    public function dcConnectAsync(string $dc_number, int $id = -1): \Generator
     {
         if (isset($this->sockets[$dc_number]) && !isset($this->sockets[$dc_number]->old)) {
             return false;
@@ -503,7 +503,7 @@ class DataCenter
             try {
                 if (isset($this->sockets[$dc_number]->old)) {
                     $this->sockets[$dc_number]->setExtra($this->API);
-                    yield $this->sockets[$dc_number]->connect($ctx);
+                    yield $this->sockets[$dc_number]->connect($ctx, $id);
                 } else {
                     $this->sockets[$dc_number] = new DataCenterConnection();
                     $this->sockets[$dc_number]->setExtra($this->API);

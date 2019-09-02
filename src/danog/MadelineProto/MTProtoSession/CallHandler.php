@@ -52,7 +52,7 @@ trait CallHandler
         foreach ($message_ids as $message_id) {
             if (isset($this->outgoing_messages[$message_id]['body'])) {
                 if ($datacenter) {
-                    $res = $this->API->datacenter->getDataCenterConnection($datacenter)->sendMessage($this->outgoing_messages[$message_id], false);
+                    $res = $this->API->datacenter->getConnection($datacenter)->sendMessage($this->outgoing_messages[$message_id], false);
                 } else {
                     $res = $this->sendMessage($this->outgoing_messages[$message_id], false);
                 }
@@ -137,7 +137,7 @@ trait CallHandler
         ) {
             return yield $this->API->datacenter->getConnection($args['id']['dc_id'])->method_call_async_write_generator($method, $args, $aargs);
         }
-        if ($aargs['file'] ?? false && !$this->getCtx()->isMedia() && $this->API->datacenter->has($this->datacenter.'_media')) {
+        if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has($this->datacenter.'_media')) {
             $this->logger->logger('Using media DC');
             return yield $this->API->datacenter->getConnection($this->datacenter.'_media')->method_call_async_write_generator($method, $args, $aargs);
         }
@@ -218,7 +218,7 @@ trait CallHandler
      *
      * @return Promise
      */
-    public function object_call_async(string $object, $args = [], array $aargs = ['msg_id' => null]): Promise
+    public function object_call_async(string $object, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
         $message = ['_' => $object, 'body' => $args, 'content_related' => $this->content_related($object), 'unencrypted' => !$this->shared->hasTempAuthKey(), 'method' => false];
         if (isset($aargs['promise'])) {

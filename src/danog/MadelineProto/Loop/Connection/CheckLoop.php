@@ -131,7 +131,7 @@ class CheckLoop extends ResumableSignalLoop
                                 if ($reply) {
                                     $this->callFork($connection->object_call_async('msg_resend_ans_req', ['msg_ids' => $reply], ['postpone' => true]));
                                 }
-                                $connection->writer->resume();
+                                $connection->flush();
                             }
                         );
                         $list = '';
@@ -152,7 +152,7 @@ class CheckLoop extends ResumableSignalLoop
                             $connection->method_recall('', ['message_id' => $message_id, 'postpone' => true]);
                         }
                     }
-                    $connection->writer->resume();
+                    $connection->flush();
                 }
                 if (yield $this->waitSignal($this->pause($timeout))) {
                     return;

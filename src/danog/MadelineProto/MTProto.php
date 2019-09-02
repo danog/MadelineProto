@@ -66,6 +66,14 @@ class MTProto extends AsyncConstruct implements TLCallback
     use \danog\MadelineProto\Wrappers\Templates;
     use \danog\MadelineProto\Wrappers\TOS;
 
+
+    /**
+     * Old internal version of MadelineProto.
+     *
+     * DO NOT REMOVE THIS COMMENTED OUT CONSTANT
+     *
+     * @var int
+     */
     /*
     const V = 71;
      */
@@ -76,7 +84,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 129;
+    const V = 130;
     /**
      * String release version.
      *
@@ -977,7 +985,11 @@ class MTProto extends AsyncConstruct implements TLCallback
                 'transport' => 'tcp',
                 'pfs' => \extension_loaded('gmp'),
             ],
-            'media_socket_count' => 5,
+            'media_socket_count' => [
+                'min' => 5,
+                'max' => 10
+            ],
+            'robin_period' => 10,
             'default_dc' => 2,
         ], 'app_info' => [
             // obtained in https://my.telegram.org

@@ -29,6 +29,10 @@ use JsonSerializable;
 
 class DataCenterConnection implements JsonSerializable
 {
+    const READ_WEIGHT = 1;
+    const READ_WEIGHT_MEDIA = 5;
+    const WRITE_WEIGHT = 10;
+    
     /**
      * Temporary auth key.
      *
@@ -40,7 +44,7 @@ class DataCenterConnection implements JsonSerializable
      *
      * @var PermAuthKey|null
      */
-    private $authKey;
+    private $permAuthKey;
 
     /**
      * Connections open to a certain DC.
@@ -112,7 +116,7 @@ class DataCenterConnection implements JsonSerializable
      */
     public function getAuthKey(bool $temp = true): AuthKey
     {
-        return $this->{$temp ? 'tempAuthKey' : 'authKey'};
+        return $this->{$temp ? 'tempAuthKey' : 'permAuthKey'};
     }
     /**
      * Check if auth key is present.
@@ -123,7 +127,7 @@ class DataCenterConnection implements JsonSerializable
      */
     public function hasAuthKey(bool $temp = true): bool
     {
-        return $this->{$temp ? 'tempAuthKey' : 'authKey'} !== null && $this->{$temp ? 'tempAuthKey' : 'authKey'}->hasAuthKey();
+        return $this->{$temp ? 'tempAuthKey' : 'permAuthKey'} !== null && $this->{$temp ? 'tempAuthKey' : 'permAuthKey'}->hasAuthKey();
     }
     /**
      * Set auth key.
@@ -135,7 +139,7 @@ class DataCenterConnection implements JsonSerializable
      */
     public function setAuthKey(?AuthKey $key, bool $temp = true)
     {
-        $this->{$temp ? 'tempAuthKey' : 'authKey'} = $key;
+        $this->{$temp ? 'tempAuthKey' : 'permAuthKey'} = $key;
     }
 
     /**
@@ -209,7 +213,7 @@ class DataCenterConnection implements JsonSerializable
      */
     public function bind(bool $pfs = true)
     {
-        $this->tempAuthKey->bind($this->authKey, $pfs);
+        $this->tempAuthKey->bind($this->permAuthKey, $pfs);
     }
     /**
      * Check if we are logged in.
@@ -232,7 +236,7 @@ class DataCenterConnection implements JsonSerializable
     {
         if ($authorized) {
             $this->getTempAuthKey()->authorized($authorized);
-        } else if ($this->hasTempAuthKey()) {
+        } elseif ($this->hasTempAuthKey()) {
             $this->getTempAuthKey()->authorized($authorized);
         }
     }
@@ -247,7 +251,7 @@ class DataCenterConnection implements JsonSerializable
     public function link(string $dc)
     {
         $this->linked = $dc;
-        $this->authKey = &$this->API->datacenter->getDataCenterConnection($dc)->authKey;
+        $this->permAuthKey = &$this->API->datacenter->getDataCenterConnection($dc)->permAuthKey;
     }
 
     /**
@@ -259,6 +263,17 @@ class DataCenterConnection implements JsonSerializable
     {
         foreach ($this->connections as $socket) {
             $socket->resetSession();
+        }
+    }
+    /**
+     * Create MTProto sessions if needed
+     *
+     * @return void
+     */
+    public function createSession()
+    {
+        foreach ($this->connections as $socket) {
+            $socket->createSession();
         }
     }
     /**
@@ -287,31 +302,52 @@ class DataCenterConnection implements JsonSerializable
      * Connect function.
      *
      * @param ConnectionContext $ctx Connection context
+     * @param int               $id  Optional connection ID to reconnect
      *
      * @return \Generator
      */
-    public function connect(ConnectionContext $ctx): \Generator
+    public function connect(ConnectionContext $ctx, int $id = -1): \Generator
     {
         $this->API->logger->logger("Trying shared connection via $ctx", \danog\MadelineProto\Logger::WARNING);
 
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
-        $media = $ctx->isMedia();
+        $media = $ctx->isMedia() || $ctx->isCDN();
 
-        $count = $media ? $this->API->settings['connection_settings']['media_socket_count'] : 1;
+        $count = $media ? $this->API->settings['connection_settings']['media_socket_count']['min'] : 1;
 
         if ($count > 1) {
             if (!$this->robinLoop) {
-                $this->robinLoop = new PeriodicLoop($this->API, [$this, 'even'], "Robin loop DC {$this->datacenter}", 10);
+                $this->robinLoop = new PeriodicLoop($this->API, [$this, 'even'], "robin loop DC {$this->datacenter}", $this->API->settings['connection_settings']['robin_period']);
             }
             $this->robinLoop->start();
         }
 
-        $incRead = $media ? 5 : 1;
+        $this->decRead = $media ? self::READ_WEIGHT_MEDIA : self::READ_WEIGHT;
+        $this->decWrite = self::WRITE_WEIGHT;
 
-        $this->connections = [];
-        $this->availableConnections = [];
-        for ($x = 0; $x < $count; $x++) {
+        if ($id === -1 || !isset($this->connections[$id])) {
+            $this->connections = [];
+            $this->availableConnections = [];
+    
+            yield $this->connectMore($count);
+        } else {
+            yield $this->connections[$id]->connect($ctx);
+        }
+    }
+
+    /**
+     * Connect to the DC using count more sockets
+     *
+     * @param integer $count Number of sockets to open
+     * 
+     * @return void
+     */
+    private function connectMore(int $count)
+    {
+        $ctx = $this->ctx->getCtx();
+        $count += $previousCount = count($this->connections);
+        for ($x = $previousCount; $x < $count; $x++) {
             $this->availableConnections[$x] = 0;
             $this->connections[$x] = new Connection();
             $this->connections[$x]->setExtra($this, $x);
@@ -371,8 +407,9 @@ class DataCenterConnection implements JsonSerializable
         if (\count($this->availableConnections) <= 1) {
             return $this->connections[0];
         }
-        \max($this->availableConnections);
-        $key = \key($this->availableConnections);
+        $max = \max($this->availableConnections);
+        $key = array_search($max, $this->availableConnections);
+
         // Decrease to implement round robin
         $this->availableConnections[$key]--;
         return $this->connections[$key];
@@ -385,9 +422,14 @@ class DataCenterConnection implements JsonSerializable
      */
     public function even()
     {
-        if (\min($this->availableConnections) < 1000) {
-            foreach ($this->availableConnections as &$value) {
-                $value += 1000;
+        if (\min($this->availableConnections) < 100) {
+            $max = $this->isMedia() || $this->isCDN() ? $this->API->settings['connection_settings']['media_socket_count']['max'] : 1;
+            if (\count($this->availableConnections) < $max) {
+                $this->connectMore(2);
+            } else {
+                foreach ($this->availableConnections as &$value) {
+                    $value += 1000;
+                }
             }
         }
     }
@@ -451,7 +493,7 @@ class DataCenterConnection implements JsonSerializable
     }
 
     /**
-     * Check if is a media connection
+     * Check if is a media connection.
      *
      * @return boolean
      */
@@ -461,7 +503,7 @@ class DataCenterConnection implements JsonSerializable
     }
 
     /**
-     * Check if is a CDN connection
+     * Check if is a CDN connection.
      *
      * @return boolean
      */
@@ -471,7 +513,7 @@ class DataCenterConnection implements JsonSerializable
     }
 
     /**
-     * Get DC-specific settings
+     * Get DC-specific settings.
      *
      * @return array
      */
@@ -494,7 +536,7 @@ class DataCenterConnection implements JsonSerializable
             'tempAuthKey' => $this->tempAuthKey
         ] :
         [
-            'authKey' => $this->authKey,
+            'permAuthKey' => $this->permAuthKey,
             'tempAuthKey' => $this->tempAuthKey
         ];
     }
@@ -507,6 +549,6 @@ class DataCenterConnection implements JsonSerializable
      */
     public function __sleep()
     {
-        return $this->linked ? ['linked', 'tempAuthKey'] : ['linked', 'authKey', 'tempAuthKey'];
+        return $this->linked ? ['linked', 'tempAuthKey'] : ['permAuthKey', 'tempAuthKey'];
     }
 }

@@ -20,10 +20,10 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Artax\Request;
+use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\MTProto\AuthKey;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
-use danog\MadelineProto\DataCenterConnection;
 use phpseclib\Math\BigInteger;
 
 /**
@@ -706,13 +706,11 @@ trait AuthKeyHandler
         $connection = $socket->getAuthConnection();
 
         try {
-            if ($connection->session_id === null) {
-                $connection->session_id = $this->random(8);
-                $connection->session_in_seq_no = 0;
-                $connection->session_out_seq_no = 0;
-            }
+            $socket->createSession();
+
             $cdn = $socket->isCDN();
             $media = $socket->isMedia();
+
             if (!$socket->hasTempAuthKey() || !$socket->hasPermAuthKey()) {
                 if (!$socket->hasPermAuthKey() && !$cdn && !$media) {
                     $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
@@ -733,7 +731,7 @@ trait AuthKeyHandler
                         $socket->setTempAuthKey(yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
                         yield $this->bind_temp_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
 
-                        $config = yield $this->method_call_async_read('help.getConfig', [], ['datacenter' => $id]);
+                        $config = yield $connection->method_call_async_read('help.getConfig', []);
 
                         yield $this->sync_authorization_async($id);
                         yield $this->get_config_async($config);
@@ -744,7 +742,7 @@ trait AuthKeyHandler
                 } else {
                     if (!$cdn) {
                         $socket->bind(false);
-                        $config = yield $this->method_call_async_read('help.getConfig', [], ['datacenter' => $id]);
+                        $config = yield $connection->method_call_async_read('help.getConfig', []);
                         yield $this->sync_authorization_async($id);
                         yield $this->get_config_async($config);
                     } elseif (!$socket->hasTempAuthKey()) {

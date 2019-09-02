@@ -91,7 +91,7 @@ class ReadLoop extends SignalLoop
                 $this->exitedLoop();
 
                 if ($error === -404) {
-                    if ($shared->getTemp) {
+                    if ($shared->hasTempAuthKey()) {
                         $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", \danog\MadelineProto\Logger::WARNING);
                         $shared->setTempAuthKey(null);
                         $connection->session_id = null;
@@ -104,11 +104,14 @@ class ReadLoop extends SignalLoop
                         yield $connection->reconnect();
                     }
                 } elseif ($error === -1) {
-                    yield $connection->reconnect();
                     $API->logger->logger("WARNING: Got quick ack from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
-                } elseif ($error === 0) {
                     yield $connection->reconnect();
+                } elseif ($error === 0) {
                     $API->logger->logger("Got NOOP from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
+                    yield $connection->reconnect();
+                } else if ($error === -429) {
+                    $API->logger->logger("Got -429 from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
+                    Loop::delay(1*1000, [$connection, 'reconnect']);
                 } else {
                     yield $connection->reconnect();
 

@@ -497,7 +497,7 @@ class Connection extends Session
     {
         $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect();
-        yield $this->API->datacenter->dcConnectAsync($this->ctx->getDc());
+        yield $this->API->datacenter->dcConnectAsync($this->ctx->getDc(), $this->id);
         if ($this->API->hasAllAuth() && !$this->hasPendingCalls()) {
             /*$this->callFork((function () {
                 try {
