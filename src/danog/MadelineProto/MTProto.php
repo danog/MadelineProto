@@ -484,7 +484,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     private function cleanup()
     {
         $this->referenceDatabase = new ReferenceDatabase($this);
-        $this->construct_TL($this->settings['tl_schema']['src'], [$this, $this->referenceDatabase]);
+        $this->update_callbacks([$this, $this->referenceDatabase]);
         return $this;
     }
 
