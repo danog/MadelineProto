@@ -213,6 +213,9 @@ class DataCenterConnection implements JsonSerializable
      */
     public function bind(bool $pfs = true)
     {
+        if (!$pfs && !$this->tempAuthKey) {
+            $this->tempAuthKey = new TempAuthKey();
+        }
         $this->tempAuthKey->bind($this->permAuthKey, $pfs);
     }
     /**
@@ -326,12 +329,10 @@ class DataCenterConnection implements JsonSerializable
         $this->decRead = $media ? self::READ_WEIGHT_MEDIA : self::READ_WEIGHT;
         $this->decWrite = self::WRITE_WEIGHT;
 
-        if ($id === -1 || !isset($this->connections[$id])) {
-            $this->connections = [];
-            $this->availableConnections = [];
-
+        if ($id === -1) {
             yield $this->connectMore($count);
         } else {
+            $this->availableConnections[$id] = 0;
             yield $this->connections[$id]->connect($ctx);
         }
     }

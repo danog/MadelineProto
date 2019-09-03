@@ -23,6 +23,8 @@ use Amp\Deferred;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Async\Parameters;
+use danog\MadelineProto\Tools;
+
 use function Amp\Promise\all;
 
 /**
@@ -149,7 +151,7 @@ trait CallHandler
             if (isset($args['multiple'])) {
                 $aargs['multiple'] = true;
             }
-            if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > (yield $this->API->get_config_async())['message_length_max'] && \mb_strlen((yield $this->parse_mode_async($args))['message'], 'UTF-8') > (yield $this->API->get_config_async())['message_length_max']) {
+            if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > (yield $this->API->get_config_async())['message_length_max'] && \mb_strlen((yield $this->API->parse_mode_async($args))['message'], 'UTF-8') > (yield $this->API->get_config_async())['message_length_max']) {
                 $args = yield $this->split_to_chunks_async($args);
                 $promises = [];
                 $aargs['queue'] = $method;
@@ -175,7 +177,7 @@ trait CallHandler
             }
             $args = yield $this->API->botAPI_to_MTProto_async($args);
             if (isset($args['ping_id']) && \is_int($args['ping_id'])) {
-                $args['ping_id'] = $this->pack_signed_long($args['ping_id']);
+                $args['ping_id'] = Tools::pack_signed_long($args['ping_id']);
             }
         }
 

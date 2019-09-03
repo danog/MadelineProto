@@ -394,7 +394,7 @@ trait ResponseHandler
                             }
 
                             if (isset($request['user_related']) && $request['user_related']) {
-                                $this->settings['connection_settings']['default_dc'] = $this->API->authorized_dc = $this->API->datacenter->curdc;
+                                $this->API->settings['connection_settings']['default_dc'] = $this->API->authorized_dc = $this->API->datacenter->curdc;
                             }
                             Loop::defer([$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
                             //$this->API->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
@@ -409,7 +409,6 @@ trait ResponseHandler
 
                                     $this->logger->logger($response['error_message'], \danog\MadelineProto\Logger::FATAL_ERROR);
                                     foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
-                                        $socket->authorized(false);
                                         $socket->setTempAuthKey(null);
                                         $socket->setPermAuthKey(null);
                                         $socket->resetSession();
@@ -458,7 +457,6 @@ trait ResponseHandler
 
                                         $this->logger->logger('Permanent auth key was main authorized key, logging out...', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
-                                            $socket->authorized(false);
                                             $socket->setTempAuthKey(null);
                                             $socket->setPermAuthKey(null);
                                         }
@@ -506,7 +504,7 @@ trait ResponseHandler
                             return;
                         case 420:
                             $seconds = \preg_replace('/[^0-9]+/', '', $response['error_message']);
-                            $limit = isset($request['FloodWaitLimit']) ? $request['FloodWaitLimit'] : $this->settings['flood_timeout']['wait_if_lt'];
+                            $limit = isset($request['FloodWaitLimit']) ? $request['FloodWaitLimit'] : $this->API->settings['flood_timeout']['wait_if_lt'];
                             if (\is_numeric($seconds) && $seconds < $limit) {
                                 //$this->got_response_for_outgoing_message_id($request_id);
 
@@ -535,7 +533,7 @@ trait ResponseHandler
                     $this->logger->logger('Received bad_msg_notification: '.MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], \danog\MadelineProto\Logger::WARNING);
                     switch ($response['error_code']) {
                         case 48:
-                            $this->getTempAuthKey()->setServerSalt($response['new_server_salt']);
+                            $this->shared->getTempAuthKey()->setServerSalt($response['new_server_salt']);
                             $this->method_recall('', ['message_id' => $request_id, 'postpone' => true]);
 
                             return;
