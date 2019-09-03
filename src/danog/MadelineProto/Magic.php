@@ -161,11 +161,11 @@ class Magic
                 //if (function_exists('pcntl_async_signals')) pcntl_async_signals(true);
                 Loop::unreference(Loop::onSignal(SIGINT, static function () {
                     Logger::log('Got sigint', Logger::FATAL_ERROR);
-                    Magic::shutdown();
+                    Magic::shutdown(1);
                 }));
                 Loop::unreference(Loop::onSignal(SIGTERM, static function () {
                     Logger::log('Got sigterm', Logger::FATAL_ERROR);
-                    Magic::shutdown();
+                    Magic::shutdown(1);
                 }));
             }
             if (!self::$altervista && !self::$zerowebhost) {
@@ -225,13 +225,15 @@ class Magic
     /**
      * Shutdown system.
      *
+     * @param int $code Exit code
+     *
      * @return void
      */
-    public static function shutdown()
+    public static function shutdown(int $code = 0)
     {
         self::$signaled = true;
         getStdin()->unreference();
         getInputBufferStream()->unreference();
-        die();
+        die($code);
     }
 }
