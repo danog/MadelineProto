@@ -93,5 +93,6 @@ class Exception extends \Exception
     public static function ExceptionHandler($exception)
     {
         Logger::log($exception, Logger::FATAL_ERROR);
+        Magic::shutdown();
     }
 }

@@ -14,6 +14,8 @@ If not, see <http://www.gnu.org/licenses/>.
 /**
  * Various ways to load MadelineProto.
  */
+
+
 if (!\file_exists(__DIR__.'/../vendor/autoload.php')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
     if ($phar = \getenv('TRAVIS_PHAR')) {
