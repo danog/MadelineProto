@@ -27,12 +27,6 @@ use danog\MadelineProto\MTProtoTools\PasswordCalculator;
  */
 trait Login
 {
-    /**
-     * Datacenter instance.
-     *
-     * @var \danog\MadelineProto\DataCenter
-     */
-    public $datacenter;
     public function logout_async()
     {
         yield $this->method_call_async_read('auth.logOut', [], ['datacenter' => $this->datacenter->curdc]);

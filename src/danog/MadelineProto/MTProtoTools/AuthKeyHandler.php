@@ -48,13 +48,6 @@ trait AuthKeyHandler
     private $pending_auth = false;
 
     /**
-     * DataCenter instance.
-     *
-     * @var \danog\MadelineProto\DataCenter
-     */
-    public $datacenter;
-
-    /**
      * Create authorization key.
      *
      * @param int    $expires_in Expiry date of auth key, -1 for permanent auth key
