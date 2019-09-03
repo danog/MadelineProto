@@ -96,7 +96,7 @@ class Logger
      */
     public static function getLoggerFromSettings(array $settings, string $prefix = ''): self
     {
-        if (isset($settings['logger']['rollbar_token']) && $settings['logger']['rollbar_token'] !== '' && \class_exists('\\Rollbar\\Rollbar')) {
+        if (isset($settings['logger']['rollbar_token']) && $settings['logger']['rollbar_token'] !== '' && \class_exists(\Rollbar\Rollbar::class)) {
             @\Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => isset($settings['logger']['rollbar_token']) && !\in_array($settings['logger']['rollbar_token'], ['f9fff6689aea4905b58eec73f66c791d', '300afd7ccef346ea84d0c185ae831718', '11a8c2fe4c474328b40a28193f8d63f5', 'beef2d426496462ba34dcaad33d44a14']) || $settings['pwr']['pwr'] ? $settings['logger']['rollbar_token'] : 'c07d9b2f73c2461297b0beaef6c1662f'], false, false);
         } else {
             Exception::$rollbar = false;
@@ -105,10 +105,8 @@ class Logger
         if (!isset($settings['logger']['logger_param']) && isset($settings['logger']['param'])) {
             $settings['logger']['logger_param'] = $settings['logger']['param'];
         }
-        if (PHP_SAPI !== 'cli') {
-            if (isset($settings['logger']['logger_param']) && \basename($settings['logger']['logger_param']) === 'MadelineProto.log') {
-                $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
-            }
+        if (PHP_SAPI !== 'cli' && isset($settings['logger']['logger_param']) && $settings['logger']['logger_param'] === 'MadelineProto.log') {
+            $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
         }
 
         $logger = new self($settings['logger']['logger'], isset($settings['logger']['logger_param']) ? $settings['logger']['logger_param'] : '', $prefix, isset($settings['logger']['logger_level']) ? $settings['logger']['logger_level'] : Logger::VERBOSE, isset($settings['logger']['max_size']) ? $settings['logger']['max_size'] : 100 * 1024 * 1024);
@@ -120,7 +118,7 @@ class Logger
             try {
                 \error_reporting(E_ALL);
                 \ini_set('log_errors', 1);
-                \ini_set('error_log', Magic::$script_cwd.'/MadelineProto.log');
+                \ini_set('error_log', $settings['logger']['logger'] === self::FILE_LOGGER ? $settings['logger']['logger_param'] : Magic::$script_cwd.'/MadelineProto.log');
                 \error_log('Enabled PHP logging');
             } catch (\danog\MadelineProto\Exception $e) {
                 $logger->logger('Could not enable PHP logging');
