@@ -305,7 +305,7 @@ class Connection extends Session
      */
     public function connect(ConnectionContext $ctx): \Generator
     {
-        $this->API->logger->logger("Trying connection via $ctx", \danog\MadelineProto\Logger::WARNING);
+        $this->API->logger->logger("Trying connection ({$this->id}) via $ctx", \danog\MadelineProto\Logger::WARNING);
 
         $ctx->setReadCallback([$this, 'haveRead']);
 

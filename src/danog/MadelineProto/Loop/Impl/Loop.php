@@ -68,7 +68,7 @@ abstract class Loop implements LoopInterface
             yield $this->loop();
         } finally {
             $this->exitedLoop();
-            $this->API->logger->logger("Exited $this", Logger::ULTRA_VERBOSE);
+            $this->API->logger->logger("Physically exited $this", Logger::ULTRA_VERBOSE);
             //return null;
         }
     }
@@ -76,6 +76,7 @@ abstract class Loop implements LoopInterface
     public function exitedLoop()
     {
         if ($this->count) {
+            $this->API->logger->logger("Exited $this", Logger::ULTRA_VERBOSE);
             $this->count--;
         }
     }

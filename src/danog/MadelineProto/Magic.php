@@ -23,6 +23,10 @@ use Amp\DoH\DoHConfig;
 use Amp\DoH\Nameserver;
 use Amp\DoH\Rfc8484StubResolver;
 use Amp\Loop;
+use Amp\Loop\Driver;
+use ReflectionClass;
+use ReflectionObject;
+
 use function Amp\ByteStream\getInputBufferStream;
 use function Amp\ByteStream\getStdin;
 use function Amp\Dns\resolver;
@@ -234,6 +238,17 @@ class Magic
         self::$signaled = true;
         getStdin()->unreference();
         getInputBufferStream()->unreference();
+        if ($code !== 0) {
+            $driver = Loop::get();
+
+            $reflectionClass = new ReflectionClass(Driver::class);
+            $reflectionProperty = $reflectionClass->getProperty('watchers');
+            $reflectionProperty->setAccessible(true);
+            foreach (array_keys($reflectionProperty->getValue($driver)) as $key) {
+                $driver->unreference($key);
+            }
+        }
+        Loop::stop();
         die($code);
     }
 }

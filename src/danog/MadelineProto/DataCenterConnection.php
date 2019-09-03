@@ -330,6 +330,9 @@ class DataCenterConnection implements JsonSerializable
         $this->decWrite = self::WRITE_WEIGHT;
 
         if ($id === -1) {
+            if ($this->connections) {
+                $this->disconnect();
+            }
             yield $this->connectMore($count);
         } else {
             $this->availableConnections[$id] = 0;
@@ -423,7 +426,12 @@ class DataCenterConnection implements JsonSerializable
      */
     public function even()
     {
-        if (\min($this->availableConnections) < 100) {
+        $min = \min($this->availableConnections);
+        if ($min < 50) {
+            foreach ($this->availableConnections as &$count) {
+                $count += 50;
+            }
+        } else if ($min < 100) {
             $max = $this->isMedia() || $this->isCDN() ? $this->API->settings['connection_settings']['media_socket_count']['max'] : 1;
             if (\count($this->availableConnections) < $max) {
                 $this->connectMore(2);
