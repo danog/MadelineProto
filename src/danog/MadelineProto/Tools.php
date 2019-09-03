@@ -216,7 +216,7 @@ trait Tools
             } catch (\Throwable $throwable) {
                 throw new \Error('Loop exceptionally stopped without resolving the promise', 0, $throwable);
             }
-        } while (!$resolved);
+        } while (!$resolved && !Magic::$signaled);
 
         if ($exception) {
             throw $exception;
