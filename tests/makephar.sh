@@ -120,6 +120,14 @@ chmod 600 madeline_rsa
 ssh-add madeline_rsa
 git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
+
+[ "$php" == "70" ] && {
+    while [ "$(cat release$branch)" != "$TRAVIS_COMMIT" ]; do sleep 1; git pull; done
+}
+[ "$php" == "5" ] && {
+    while [ "$(cat release70$branch)" != "$TRAVIS_COMMIT" ]; do sleep 1; git pull; done
+}
+
 cp "../madeline$php$branch.phar" .
 cp ../phar.php ../mtproxyd .
 echo -n $TRAVIS_COMMIT > release$php$branch
@@ -131,7 +139,8 @@ echo "$TRAVIS_COMMIT_MESSAGE" | grep -i "subrelease" && {
 
 git add -A
 git commit -am "Release $TRAVIS_BRANCH - $TRAVIS_COMMIT_MESSAGE"
-until git push origin master; do git pull origin master; done
+git push origin master
+
 
 cd ..
 echo "$TRAVIS_COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
