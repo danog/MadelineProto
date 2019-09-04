@@ -40,8 +40,6 @@ class Connection extends Session
     use \danog\Serializable;
     use Tools;
 
-    const PENDING_MAX = 2000000000;
-
     /**
      * Writer loop.
      *
@@ -305,7 +303,7 @@ class Connection extends Session
      */
     public function connect(ConnectionContext $ctx): \Generator
     {
-        $this->API->logger->logger("Trying connection ({$this->id}) via $ctx", \danog\MadelineProto\Logger::WARNING);
+        //$this->API->logger->logger("Trying connection ({$this->id}) via $ctx", \danog\MadelineProto\Logger::WARNING);
 
         $ctx->setReadCallback([$this, 'haveRead']);
 
@@ -411,7 +409,6 @@ class Connection extends Session
 
         $message['send_promise'] = $deferred;
         $this->pending_outgoing[$this->pending_outgoing_key++] = $message;
-        $this->pending_outgoing_key %= self::PENDING_MAX;
         if ($flush && isset($this->writer)) {
             $this->writer->resume();
         }
@@ -471,7 +468,7 @@ class Connection extends Session
      */
     public function disconnect()
     {
-        $this->API->logger->logger("Disconnecting from DC {$this->datacenterId}");
+        //$this->API->logger->logger("Disconnecting from DC {$this->datacenterId}");
         $this->old = true;
         foreach (['reader', 'writer', 'checker', 'waiter', 'updater'] as $loop) {
             if (isset($this->{$loop}) && $this->{$loop}) {
@@ -485,7 +482,7 @@ class Connection extends Session
                 $this->API->logger->logger($e);
             }
         }
-        $this->API->logger->logger("Disconnected from DC {$this->datacenterId}");
+        //$this->API->logger->logger("Disconnected from DC {$this->datacenterId}");
     }
 
     /**
@@ -495,7 +492,7 @@ class Connection extends Session
      */
     public function reconnect(): \Generator
     {
-        $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
+        //$this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect();
         yield $this->API->datacenter->dcConnectAsync($this->ctx->getDc(), $this->id);
         if ($this->API->hasAllAuth() && !$this->hasPendingCalls()) {

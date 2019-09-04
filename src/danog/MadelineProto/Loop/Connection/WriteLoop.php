@@ -170,7 +170,6 @@ class WriteLoop extends ResumableSignalLoop
             if (\count($to_ack = $connection->ack_queue)) {
                 foreach (\array_chunk($connection->ack_queue, 8192) as $acks) {
                     $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'msgs_ack', 'serialized_body' => yield $this->API->serialize_object_async(['type' => 'msgs_ack'], ['msg_ids' => $acks], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false, 'method' => false];
-                    $connection->pending_outgoing_key %= Connection::PENDING_MAX;
                 }
             }
 
@@ -186,7 +185,6 @@ class WriteLoop extends ResumableSignalLoop
             }
             if ($shared->isHttp() && !$has_http_wait) {
                 $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => yield $this->API->serialize_object_async(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
-                $connection->pending_outgoing_key %= Connection::PENDING_MAX;
                 $has_http_wait = true;
             }
 
@@ -202,7 +200,7 @@ class WriteLoop extends ResumableSignalLoop
                     unset($connection->pending_outgoing[$k]);
                     continue;
                 }
-                if ($shared->getSettings()['pfs'] && !$shared->getTempAuthKey()->isBound() && !$connection->isCDN() && !\in_array($message['_'], ['http_wait', 'auth.bindTempAuthKey']) && $message['method']) {
+                if ($shared->getSettings()['pfs'] && !$shared->isBound() && !$connection->isCDN() && !\in_array($message['_'], ['http_wait', 'auth.bindTempAuthKey']) && $message['method']) {
                     $API->logger->logger("Skipping {$message['_']} due to unbound keys in DC {$datacenter}");
                     $skipped = true;
                     continue;
@@ -291,7 +289,6 @@ class WriteLoop extends ResumableSignalLoop
 
                 //var_dumP("container ".bin2hex($message_id));
                 $keys[$connection->pending_outgoing_key++] = $message_id;
-                $connection->pending_outgoing_key %= Connection::PENDING_MAX;
 
                 $message_data = yield $API->serialize_object_async(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'container');
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 <?php
-use danog\MadelineProto\Stream\Proxy\SocksProxy;
+
 
 /*
 Copyright 2016-2019 Daniil Gentili
@@ -12,14 +12,14 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
  */
-set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelineProto/'));
+\set_include_path(\get_include_path().':'.\realpath(\dirname(__FILE__).'/MadelineProto/'));
 
 /*
  * Various ways to load MadelineProto
  */
-if (!file_exists(__DIR__.'/vendor/autoload.php')) {
-    if (!file_exists('madeline.php')) {
-        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+if (!\file_exists(__DIR__.'/vendor/autoload.php')) {
+    if (!\file_exists('madeline.php')) {
+        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
 } else {
@@ -39,10 +39,10 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') {
             return;
         }
-        $res = json_encode($update, JSON_PRETTY_PRINT);
+        $res = \json_encode($update, JSON_PRETTY_PRINT);
 
         try {
-            yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']); //'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
+            yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
             if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
                 yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
                 /*    '_' => 'inputMediaUploadedDocument',
@@ -56,7 +56,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
         } catch (\danog\MadelineProto\Exception $e) {
-            if (stripos($e->getMessage(), 'invalid constructor given') === false) {
+            if (\stripos($e->getMessage(), 'invalid constructor given') === false) {
                 $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
             }
             //$this->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
@@ -71,4 +71,5 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     yield $MadelineProto->start();
     yield $MadelineProto->setEventHandler('\EventHandler');
 });
+
 $MadelineProto->loop();

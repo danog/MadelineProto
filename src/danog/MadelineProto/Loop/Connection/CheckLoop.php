@@ -19,8 +19,10 @@
 namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\Deferred;
+use Amp\Loop;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use danog\MadelineProto\Tools;
 
 /**
  * RPC call status check loop.
@@ -160,8 +162,8 @@ class CheckLoop extends ResumableSignalLoop
 
                 if ($connection->get_max_id(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {
                     $API->logger->logger("We did not receive a response for $timeout seconds: reconnecting and exiting check loop on DC $datacenter");
-                    $this->exitedLoop();
-                    yield $connection->reconnect();
+                    //$this->exitedLoop();
+                    Tools::callForkDefer($connection->reconnect());
 
                     return;
                 }

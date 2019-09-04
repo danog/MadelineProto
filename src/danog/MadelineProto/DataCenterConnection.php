@@ -108,6 +108,12 @@ class DataCenterConnection implements JsonSerializable
     private $decWrite = 10;
 
     /**
+     * Backed up messages
+     *
+     * @var array
+     */
+    private $backup = [];
+    /**
      * Get auth key.
      *
      * @param boolean $temp Whether to fetch the temporary auth key
@@ -219,6 +225,15 @@ class DataCenterConnection implements JsonSerializable
         $this->tempAuthKey->bind($this->permAuthKey, $pfs);
     }
     /**
+     * Check if auth keys are bound.
+     *
+     * @return boolean
+     */
+    public function isBound(): bool
+    {
+        return $this->tempAuthKey ? $this->tempAuthKey->isBound() : false;
+    }
+    /**
      * Check if we are logged in.
      *
      * @return boolean
@@ -311,7 +326,7 @@ class DataCenterConnection implements JsonSerializable
      */
     public function connect(ConnectionContext $ctx, int $id = -1): \Generator
     {
-        $this->API->logger->logger("Trying shared connection via $ctx", \danog\MadelineProto\Logger::WARNING);
+        $this->API->logger->logger("Trying shared connection via $ctx");
 
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
@@ -331,9 +346,11 @@ class DataCenterConnection implements JsonSerializable
 
         if ($id === -1) {
             if ($this->connections) {
-                $this->disconnect();
+                $this->API->logger("Already connected!", Logger::WARNING);
+                return;
             }
             yield $this->connectMore($count);
+            yield $this->restoreBackup();
         } else {
             $this->availableConnections[$id] = 0;
             yield $this->connections[$id]->connect($ctx);
@@ -372,9 +389,14 @@ class DataCenterConnection implements JsonSerializable
             $this->robinLoop->signal(true);
             $this->robinLoop = null;
         }
+        $before = count($this->backup);
         foreach ($this->connections as $connection) {
+            $this->backup = \array_merge($this->backup, $connection->backupSession());
             $connection->disconnect();
         }
+        $count = count($this->backup) - $before;
+        $this->API->logger->logger("Backed up $count messages from DC {$this->datacenter}");
+
         $this->connections = [];
         $this->availableConnections = [];
     }
@@ -391,6 +413,22 @@ class DataCenterConnection implements JsonSerializable
         yield $this->connect($this->ctx);
     }
 
+    /**
+     * Restore backed up messages
+     *
+     * @return void
+     */
+    public function restoreBackup()
+    {
+        $backup = $this->backup;
+        $this->backup = [];
+        $count = count($backup);
+        $this->API->logger->logger("Restoring $count messages to DC {$this->datacenter}");
+        foreach ($backup as $message) {
+            Tools::callFork($this->getConnection()->sendMessage($message, false));
+        }
+        $this->flush();
+    }
     /**
      * Get connection for authorization.
      *
@@ -431,7 +469,7 @@ class DataCenterConnection implements JsonSerializable
             foreach ($this->availableConnections as &$count) {
                 $count += 50;
             }
-        } else if ($min < 100) {
+        } elseif ($min < 100) {
             $max = $this->isMedia() || $this->isCDN() ? $this->API->settings['connection_settings']['media_socket_count']['max'] : 1;
             if (\count($this->availableConnections) < $max) {
                 $this->connectMore(2);

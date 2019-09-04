@@ -712,6 +712,9 @@ trait AuthKeyHandler
                 }
                 if ($media) {
                     $socket->link(\intval($id));
+                    if ($socket->hasTempAuthKey()) {
+                        return;
+                    }
                 }
                 if ($this->datacenter->getDataCenterConnection($id)->getSettings()['pfs']) {
                     if (!$cdn) {

@@ -88,35 +88,38 @@ class ReadLoop extends SignalLoop
             }
 
             if (\is_int($error)) {
-                $this->exitedLoop();
+                //$this->exitedLoop();
 
-                if ($error === -404) {
-                    if ($shared->hasTempAuthKey()) {
-                        $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", \danog\MadelineProto\Logger::WARNING);
-                        $shared->setTempAuthKey(null);
-                        $connection->session_id = null;
-                        foreach ($connection->new_outgoing as $message_id) {
-                            $connection->outgoing_messages[$message_id]['sent'] = 0;
+                Tools::callForkDefer((function () use ($error, $shared, $connection, $datacenter, $API) {
+                    if ($error === -404) {
+                        if ($shared->hasTempAuthKey()) {
+                            $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", \danog\MadelineProto\Logger::WARNING);
+                            $shared->setTempAuthKey(null);
+                            $shared->resetSession();
+                            foreach ($connection->new_outgoing as $message_id) {
+                                $connection->outgoing_messages[$message_id]['sent'] = 0;
+                            }
+                            yield $shared->reconnect();
+                            yield $API->init_authorization_async();
+                        } else {
+                            yield $connection->reconnect();
                         }
-                        yield $shared->reconnect();
-                        yield $API->init_authorization_async();
+                    } elseif ($error === -1) {
+                        $API->logger->logger("WARNING: Got quick ack from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
+                        yield $connection->reconnect();
+                    } elseif ($error === 0) {
+                        $API->logger->logger("Got NOOP from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
+                        yield $connection->reconnect();
+                    } elseif ($error === -429) {
+                        $API->logger->logger("Got -429 from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
+                        yield Tools::sleep(1);
+                        yield $connection->reconnect();
                     } else {
                         yield $connection->reconnect();
-                    }
-                } elseif ($error === -1) {
-                    $API->logger->logger("WARNING: Got quick ack from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
-                    yield $connection->reconnect();
-                } elseif ($error === 0) {
-                    $API->logger->logger("Got NOOP from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
-                    yield $connection->reconnect();
-                } elseif ($error === -429) {
-                    $API->logger->logger("Got -429 from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
-                    Loop::delay(1*1000, [$connection, 'reconnect']);
-                } else {
-                    yield $connection->reconnect();
 
-                    throw new \danog\MadelineProto\RPCErrorException($error, $error);
-                }
+                        throw new \danog\MadelineProto\RPCErrorException($error, $error);
+                    }
+                })());
 
                 return;
             }

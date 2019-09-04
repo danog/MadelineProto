@@ -35,7 +35,7 @@ abstract class Session
     public $new_outgoing = [];
 
     public $pending_outgoing = [];
-    public $pending_outgoing_key = 0;
+    public $pending_outgoing_key = 'a';
 
     public $time_delta = 0;
 
@@ -67,5 +67,19 @@ abstract class Session
             $this->session_in_seq_no = 0;
             $this->session_out_seq_no = 0;
         }
+    }
+
+    /**
+     * Backup eventual unsent messages before session deletion
+     *
+     * @return array
+     */
+    public function backupSession(): array
+    {
+        $pending = array_values($this->pending_outgoing);
+        foreach ($this->new_outgoing as $id) {
+            $pending[] = $this->outgoing_messages[$id];
+        }
+        return $pending;
     }
 }

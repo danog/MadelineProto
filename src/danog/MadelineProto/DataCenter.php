@@ -188,7 +188,7 @@ class DataCenter
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
             if ($socket instanceof DataCenterConnection && !\strpos($key, '_bk')) {
-                $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
+                //$this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
                 $socket->old = true;
                 $socket->setExtra($this->API);
                 $socket->disconnect();
