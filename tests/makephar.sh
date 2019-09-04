@@ -71,7 +71,6 @@ cd ..
     php -v
     
     php=5
-    others="70? ?"
 }
 [ $PHP_MAJOR_VERSION -eq 7 ] && {
     [ $PHP_MINOR_VERSION -eq 0 ] && {
@@ -82,10 +81,8 @@ cd ..
         $php7to70 convert --copy-all phar7 phar5 >/dev/null
 
         php=70
-        others="5? ?"
     } || {
         cp -a phar7 phar5
-        others="5? 70?"
     }
 }
 
@@ -131,6 +128,10 @@ echo "$TRAVIS_COMMIT_MESSAGE" | grep -i "subrelease" && {
     cp release$php$branch release$php
     cp madeline$php$branch.phar madeline$php.phar
 }
+while [ "$(cat release$branch)" != "$TRAVIS_COMMIT" ]; sleep 1; git pull;done
+while [ "$(cat release70$branch)" != "$TRAVIS_COMMIT" ]; sleep 1; git pull;done
+while [ "$(cat release5$branch)" != "$TRAVIS_COMMIT" ]; sleep 1; git pull;done
+
 
 git add -A
 git commit -am "Release $TRAVIS_BRANCH - $TRAVIS_COMMIT_MESSAGE"
