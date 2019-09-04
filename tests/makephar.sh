@@ -71,6 +71,7 @@ cd ..
     php -v
     
     php=5
+    others="70? ?"
 }
 [ $PHP_MAJOR_VERSION -eq 7 ] && {
     [ $PHP_MINOR_VERSION -eq 0 ] && {
@@ -81,8 +82,10 @@ cd ..
         $php7to70 convert --copy-all phar7 phar5 >/dev/null
 
         php=70
+        others="5? ?"
     } || {
         cp -a phar7 phar5
+        others="5? 70?"
     }
 }
 
@@ -100,6 +103,7 @@ export TRAVIS_PHAR="madeline$php$branch.phar"
 export TEST_SECRET_CHAT=test
 export TEST_USERNAME=danogentili
 export TEST_DESTINATION_GROUPS='["@danogentili"]'
+export MTPROTO_SETTINGS='{"logger":{"logger_level":5}}'
 
 tests/testing.php <<EOF
 m
