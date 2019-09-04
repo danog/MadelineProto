@@ -128,14 +128,11 @@ echo "$TRAVIS_COMMIT_MESSAGE" | grep -i "subrelease" && {
     cp release$php$branch release$php
     cp madeline$php$branch.phar madeline$php.phar
 }
-while [ "$(cat release$branch)" != "$TRAVIS_COMMIT" ]; do sleep 1; git pull;done
-while [ "$(cat release70$branch)" != "$TRAVIS_COMMIT" ]; do sleep 1; git pull;done
-while [ "$(cat release5$branch)" != "$TRAVIS_COMMIT" ]; do sleep 1; git pull;done
-
 
 git add -A
 git commit -am "Release $TRAVIS_BRANCH - $TRAVIS_COMMIT_MESSAGE"
-git push origin master
+until git push origin master; do git pull origin master; done
+
 cd ..
 echo "$TRAVIS_COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
 
