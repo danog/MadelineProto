@@ -128,9 +128,9 @@ echo "$TRAVIS_COMMIT_MESSAGE" | grep -i "subrelease" && {
     cp release$php$branch release$php
     cp madeline$php$branch.phar madeline$php.phar
 }
-while [ "$(cat release$branch)" != "$TRAVIS_COMMIT" ]; sleep 1; git pull;done
-while [ "$(cat release70$branch)" != "$TRAVIS_COMMIT" ]; sleep 1; git pull;done
-while [ "$(cat release5$branch)" != "$TRAVIS_COMMIT" ]; sleep 1; git pull;done
+while [ "$(cat release$branch)" != "$TRAVIS_COMMIT" ]; do sleep 1; git pull;done
+while [ "$(cat release70$branch)" != "$TRAVIS_COMMIT" ]; do sleep 1; git pull;done
+while [ "$(cat release5$branch)" != "$TRAVIS_COMMIT" ]; do sleep 1; git pull;done
 
 
 git add -A

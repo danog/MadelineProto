@@ -802,7 +802,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $settings['app_info']['api_id'] = $previousSettings['app_info']['api_id'];
                 $settings['app_info']['api_hash'] = $previousSettings['app_info']['api_hash'];
             } else {
-                $settings['app_info'] = null;
+                $settings['app_info'] = [];
             }
         }
         // Detect device model
@@ -811,7 +811,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         } catch (\danog\MadelineProto\Exception $e) {
             $device_model = 'Web server';
         }
-        if ($settings['app_info']['api_id'] === 6) {
+        if (($settings['app_info']['api_id'] ?? 0) === 6) {
             // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
             // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
             // This makes usage of all MTProto libraries very difficult, at least for new users.
@@ -834,7 +834,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         } catch (\danog\MadelineProto\Exception $e) {
             $system_version = PHP_VERSION;
         }
-        if ($settings['app_info']['api_id'] === 6) {
+        if (($settings['app_info']['api_id'] ?? 0) === 6) {
             // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
             // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
             // This makes usage of all MTProto libraries very difficult, at least for new users.
@@ -865,7 +865,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         // Detect language pack
         $lang_pack = '';
-        if ($settings['app_info']['api_id'] === 6) {
+        if (($settings['app_info']['api_id'] ?? 0) === 6) {
             // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
             // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
             // This makes usage of all MTProto libraries very difficult, at least for new users.
@@ -885,7 +885,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         // Detect app version
         $app_version = self::RELEASE.' ('.self::V.', '.Magic::$revision.')';
-        if ($settings['app_info']['api_id'] === 6) {
+        if (($settings['app_info']['api_id'] ?? 0) === 6) {
             // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
             // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
             // This makes usage of all MTProto libraries very difficult, at least for new users.
