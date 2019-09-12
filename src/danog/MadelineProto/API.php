@@ -197,7 +197,7 @@ class API extends APIFactory
                 Logger::log('Shutting down MadelineProto (normally or due to an exception, idk)');
             }
             $this->destructing = true;
-            Tools::wait($this->serialize());
+            Tools::wait($this->serialize(), true);
         }
         //restore_error_handler();
     }
@@ -292,7 +292,7 @@ class API extends APIFactory
             if (empty($filename)) {
                 return;
             }
-            Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
+            //Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
 
             if ($filename == '') {
                 throw new \danog\MadelineProto\Exception('Empty filename');
@@ -309,11 +309,11 @@ class API extends APIFactory
             }
             $this->serialized = \time();
             $realpaths = Serialization::realpaths($filename);
-            Logger::log('Waiting for exclusive lock of serialization lockfile...');
+            //Logger::log('Waiting for exclusive lock of serialization lockfile...');
 
             $unlock = yield Tools::flock($realpaths['lockfile'], LOCK_EX);
 
-            Logger::log('Lock acquired, serializing');
+            //Logger::log('Lock acquired, serializing');
 
             try {
                 if (!$this->getting_api_id) {
@@ -335,7 +335,7 @@ class API extends APIFactory
                 }
                 $unlock();
             }
-            Logger::log('Done serializing');
+            //Logger::log('Done serializing');
 
             return $wrote;
         })());

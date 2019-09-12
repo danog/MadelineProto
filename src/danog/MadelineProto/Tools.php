@@ -194,7 +194,7 @@ trait Tools
         return \unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
 
-    public static function wait($promise)
+    public static function wait($promise, $ignoreSignal = false)
     {
         if ($promise instanceof \Generator) {
             $promise = new Coroutine($promise);
@@ -218,7 +218,7 @@ trait Tools
             } catch (\Throwable $throwable) {
                 throw new \Error('Loop exceptionally stopped without resolving the promise', 0, $throwable);
             }
-        } while (!$resolved && !Magic::$signaled);
+        } while (!$resolved && !(Magic::$signaled && !$ignoreSignal));
 
         if ($exception) {
             throw $exception;

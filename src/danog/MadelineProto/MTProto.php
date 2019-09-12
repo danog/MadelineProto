@@ -547,7 +547,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function serialize()
     {
         if ($this->wrapper instanceof API && isset($this->wrapper->session) && !\is_null($this->wrapper->session) && !$this->asyncInitPromise) {
-            $this->logger->logger("Didn't serialize in a while, doing that now...");
+            //$this->logger->logger("Didn't serialize in a while, doing that now...");
             $this->wrapper->serialize($this->wrapper->session);
         }
     }

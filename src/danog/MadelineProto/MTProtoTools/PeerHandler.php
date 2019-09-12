@@ -169,6 +169,9 @@ trait PeerHandler
             if ($e->rpc === 'CHANNEL_PRIVATE') {
                 return true;
             }
+            if ($e->rpc === 'CHANNEL_INVALID') {
+                return true;
+            }
 
             return false;
         }
