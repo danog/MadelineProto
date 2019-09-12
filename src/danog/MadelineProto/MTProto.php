@@ -653,6 +653,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['serialization_ofd'], Logger::WARNING);
             foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
                 if ($this->authorized === self::LOGGED_IN && \strpos($dc_id, '_') === false && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
+                    $socket->bind();
                     $socket->authorized(true);
                 }
             }
