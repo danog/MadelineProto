@@ -214,6 +214,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_getContactSignUpNotification.html" name="account_getContactSignUpNotification">Contact signup notification setting value: account.getContactSignUpNotification</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_migrateChat.html" name="messages_migrateChat">Convert chat to supergroup: messages.migrateChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_createChat.html" name="messages_createChat">Create a chat (not supergroup): messages.createChat</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_createTheme.html" name="account_createTheme">Create a theme: account.createTheme</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_createChannel.html" name="channels_createChannel">Create channel/supergroup: channels.createChannel</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers_createStickerSet.html" name="stickers_createStickerSet">Create stickerset: stickers.createStickerSet</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_resetAuthorization.html" name="account_resetAuthorization">Delete a certain session: account.resetAuthorization</a>
@@ -342,6 +343,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_exportMessageLink.html" name="channels_exportMessageLink">Get the link of a message in a channel: channels.exportMessageLink</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/photos_getUserPhotos.html" name="photos_getUserPhotos">Get the profile photos of a user: photos.getUserPhotos</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getPeerSettings.html" name="messages_getPeerSettings">Get the settings of  apeer: messages.getPeerSettings</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_getTheme.html" name="account_getTheme">Get theme information: account.getTheme</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getUnreadMentions.html" name="messages_getUnreadMentions">Get unread mentions: messages.getUnreadMentions</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help_getTermsOfServiceUpdate.html" name="help_getTermsOfServiceUpdate">Get updated TOS: help.getTermsOfServiceUpdate</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help_getUserInfo.html" name="help_getUserInfo">Get user info: help.getUserInfo</a>
@@ -353,6 +355,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_hidePeerSettingsBar.html" name="messages_hidePeerSettingsBar">Hide peer settings bar: messages.hidePeerSettingsBar</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_importChatInvite.html" name="messages_importChatInvite">Import chat invite: messages.importChatInvite</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/initConnection.html" name="initConnection">Initializes connection and save information on the user's device and application.: initConnection</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_installTheme.html" name="account_installTheme">Install theme: account.installTheme</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_installWallPaper.html" name="account_installWallPaper">Install wallpaper: account.installWallPaper</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth_cancelCode.html" name="auth_cancelCode">Invalidate sent phone code: auth.cancelCode</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/invokeWithTakeout.html" name="invokeWithTakeout">Invoke method from takeout session: invokeWithTakeout</a>

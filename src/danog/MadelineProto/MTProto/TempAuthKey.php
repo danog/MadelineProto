@@ -172,7 +172,7 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     }
 
     /**
-     * Sleep function
+     * Sleep function.
      *
      * @return array
      */

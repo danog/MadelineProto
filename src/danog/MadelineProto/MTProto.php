@@ -82,7 +82,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 130;
+    const V = 131;
     /**
      * String release version.
      *
@@ -1005,12 +1005,12 @@ class MTProto extends AsyncConstruct implements TLCallback
             'lang_pack' => $lang_pack,
         ], 'tl_schema' => [
             // TL scheme files
-            'layer' => 104,
+            'layer' => 105,
             // layer version
             'src' => [
                 'mtproto' => __DIR__.'/TL_mtproto_v1.tl',
                 // mtproto TL scheme
-                'telegram' => __DIR__.'/TL_telegram_v104.tl',
+                'telegram' => __DIR__.'/TL_telegram_v105.tl',
                 // telegram TL scheme
                 'secret' => __DIR__.'/TL_secret.tl',
                 // secret chats TL scheme

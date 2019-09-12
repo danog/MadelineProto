@@ -641,6 +641,84 @@ interface account
      * @return bool
      */
     public function saveAutoDownloadSettings(array $params);
+
+    /**
+     * @param array params [
+     *               InputFile file,
+     *               InputFile thumb,
+     *               string file_name,
+     *               string mime_type,
+     *              ]
+     *
+     * @return Document
+     */
+    public function uploadTheme(array $params);
+
+    /**
+     * @param array params [
+     *               string slug,
+     *               string title,
+     *               InputDocument document,
+     *              ]
+     *
+     * @return Theme
+     */
+    public function createTheme(array $params);
+
+    /**
+     * @param array params [
+     *               string format,
+     *               InputTheme theme,
+     *               string slug,
+     *               string title,
+     *               InputDocument document,
+     *              ]
+     *
+     * @return Theme
+     */
+    public function updateTheme(array $params);
+
+    /**
+     * @param array params [
+     *               InputTheme theme,
+     *               Bool unsave,
+     *              ]
+     *
+     * @return bool
+     */
+    public function saveTheme(array $params);
+
+    /**
+     * @param array params [
+     *               boolean dark,
+     *               string format,
+     *               InputTheme theme,
+     *              ]
+     *
+     * @return bool
+     */
+    public function installTheme(array $params);
+
+    /**
+     * @param array params [
+     *               string format,
+     *               InputTheme theme,
+     *               long document_id,
+     *              ]
+     *
+     * @return Theme
+     */
+    public function getTheme(array $params);
+
+    /**
+     * @param array params [
+     *               string format,
+     *               int hash,
+     *              ]
+     *
+     * @return account_Themes
+     */
+    public function getThemes(array $params);
 }
 
 interface users
@@ -977,6 +1055,7 @@ interface messages
      *               string message,
      *               ReplyMarkup reply_markup,
      *               MessageEntity entities,
+     *               int schedule_date,
      *              ]
      *
      * @return Updates
@@ -994,6 +1073,7 @@ interface messages
      *               string message,
      *               ReplyMarkup reply_markup,
      *               MessageEntity entities,
+     *               int schedule_date,
      *              ]
      *
      * @return Updates
@@ -1009,6 +1089,7 @@ interface messages
      *               InputPeer from_peer,
      *               int id,
      *               InputPeer to_peer,
+     *               int schedule_date,
      *              ]
      *
      * @return Updates
@@ -1459,6 +1540,7 @@ interface messages
      *               int reply_to_msg_id,
      *               long query_id,
      *               string id,
+     *               int schedule_date,
      *              ]
      *
      * @return Updates
@@ -1484,6 +1566,7 @@ interface messages
      *               InputMedia media,
      *               ReplyMarkup reply_markup,
      *               MessageEntity entities,
+     *               int schedule_date,
      *              ]
      *
      * @return Updates
@@ -1844,6 +1927,7 @@ interface messages
      *               InputPeer peer,
      *               int reply_to_msg_id,
      *               InputSingleMedia multi_media,
+     *               int schedule_date,
      *              ]
      *
      * @return Updates
@@ -2046,6 +2130,46 @@ interface messages
      * @return bool
      */
     public function hidePeerSettingsBar(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               int hash,
+     *              ]
+     *
+     * @return messages_Messages
+     */
+    public function getScheduledHistory(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               int id,
+     *              ]
+     *
+     * @return messages_Messages
+     */
+    public function getScheduledMessages(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               int id,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function sendScheduledMessages(array $params);
+
+    /**
+     * @param array params [
+     *               InputPeer peer,
+     *               int id,
+     *              ]
+     *
+     * @return Updates
+     */
+    public function deleteScheduledMessages(array $params);
 }
 
 interface updates

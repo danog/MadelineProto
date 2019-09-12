@@ -451,23 +451,23 @@ trait Tools
     }
 
     /**
-     * Custom backtrace for working with generators
+     * Custom backtrace for working with generators.
      *
      * @param boolean $ignoreArgs Whether to ignore method arguments
      * @param array   $trace      Trace to work with
-     * 
+     *
      * @return array
      */
     public static function backtrace(bool $ignoreArgs = false, array $trace = []): array
     {
-        return iterator_to_array(self::backtraceGenerator($ignoreArgs, $trace));
+        return \iterator_to_array(self::backtraceGenerator($ignoreArgs, $trace));
     }
     /**
-     * Custom backtrace for working with generators
+     * Custom backtrace for working with generators.
      *
      * @param boolean $ignoreArgs Whether to ignore method arguments
      * @param array   $trace      Trace to work with
-     * 
+     *
      * @return \Generator
      */
     public static function backtraceGenerator(bool $ignoreArgs = false, array $trace = []): \Generator
@@ -477,8 +477,8 @@ trait Tools
             $flags |= DEBUG_BACKTRACE_IGNORE_ARGS;
         }
         if (!$trace) {
-            $trace = debug_backtrace($flags);
-            array_shift($trace);
+            $trace = \debug_backtrace($flags);
+            \array_shift($trace);
         }
 
         foreach ($trace as $frame) {
