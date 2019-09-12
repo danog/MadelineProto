@@ -25,7 +25,6 @@ use Amp\DoH\Rfc8484StubResolver;
 use Amp\Loop;
 use Amp\Loop\Driver;
 use ReflectionClass;
-use ReflectionObject;
 
 use function Amp\ByteStream\getInputBufferStream;
 use function Amp\ByteStream\getStdin;
@@ -244,7 +243,7 @@ class Magic
             $reflectionClass = new ReflectionClass(Driver::class);
             $reflectionProperty = $reflectionClass->getProperty('watchers');
             $reflectionProperty->setAccessible(true);
-            foreach (array_keys($reflectionProperty->getValue($driver)) as $key) {
+            foreach (\array_keys($reflectionProperty->getValue($driver)) as $key) {
                 $driver->unreference($key);
             }
         }

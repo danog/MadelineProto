@@ -636,6 +636,7 @@ trait AuthKeyHandler
     public function init_authorization_async(): \Generator
     {
         if ($this->pending_auth) {
+            $this->logger("Pending auth, not initing auth");
             return;
         }
         $initing = $this->initing_authorization;

@@ -153,7 +153,7 @@ class ReadLoop extends SignalLoop
             $API->logger->logger($e->getReason());
             if (\strpos($e->getReason(), '       ') === 0) {
                 $payload = -\substr($e->getReason(), 7);
-                $API->logger->logger("Received $payload from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $API->logger->logger("Received $payload from DC ".$datacenter, \danog\MadelineProto\Logger::ERROR);
 
                 return $payload;
             }

@@ -70,13 +70,13 @@ abstract class Session
     }
 
     /**
-     * Backup eventual unsent messages before session deletion
+     * Backup eventual unsent messages before session deletion.
      *
      * @return array
      */
     public function backupSession(): array
     {
-        $pending = array_values($this->pending_outgoing);
+        $pending = \array_values($this->pending_outgoing);
         foreach ($this->new_outgoing as $id) {
             $pending[] = $this->outgoing_messages[$id];
         }

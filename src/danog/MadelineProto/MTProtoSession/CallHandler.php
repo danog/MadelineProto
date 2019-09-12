@@ -62,7 +62,7 @@ trait CallHandler
                 $this->ack_outgoing_message_id($message_id);
                 $this->got_response_for_outgoing_message_id($message_id);
             } else {
-                $this->logger->logger('Could not resend '.isset($this->outgoing_messages[$message_id]['_']) ? $this->outgoing_messages[$message_id]['_'] : $message_id);
+                $this->logger->logger('Could not resend '.(isset($this->outgoing_messages[$message_id]['_']) ? $this->outgoing_messages[$message_id]['_'] : $message_id));
             }
         }
         if (!$postpone) {

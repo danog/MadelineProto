@@ -108,7 +108,7 @@ class DataCenterConnection implements JsonSerializable
     private $decWrite = 10;
 
     /**
-     * Backed up messages
+     * Backed up messages.
      *
      * @var array
      */
@@ -389,13 +389,19 @@ class DataCenterConnection implements JsonSerializable
             $this->robinLoop->signal(true);
             $this->robinLoop = null;
         }
-        $before = count($this->backup);
+        $before = \count($this->backup);
+        $list = '';
         foreach ($this->connections as $connection) {
-            $this->backup = \array_merge($this->backup, $connection->backupSession());
+            $backup = $connection->backupSession();
+            foreach ($backup as $message) {
+                $list .= $message['_'] ?? '-';
+                $list .= ', ';
+            }
+            $this->backup = \array_merge($this->backup, $backup);
             $connection->disconnect();
         }
-        $count = count($this->backup) - $before;
-        $this->API->logger->logger("Backed up $count messages from DC {$this->datacenter}");
+        $count = \count($this->backup) - $before;
+        $this->API->logger->logger("Backed up $count (added {$list}to $before existing messages) from DC {$this->datacenter}");
 
         $this->connections = [];
         $this->availableConnections = [];
@@ -414,7 +420,7 @@ class DataCenterConnection implements JsonSerializable
     }
 
     /**
-     * Restore backed up messages
+     * Restore backed up messages.
      *
      * @return void
      */
@@ -422,7 +428,7 @@ class DataCenterConnection implements JsonSerializable
     {
         $backup = $this->backup;
         $this->backup = [];
-        $count = count($backup);
+        $count = \count($backup);
         $this->API->logger->logger("Restoring $count messages to DC {$this->datacenter}");
         foreach ($backup as $message) {
             Tools::callFork($this->getConnection()->sendMessage($message, false));

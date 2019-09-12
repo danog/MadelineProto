@@ -78,4 +78,18 @@ class PermAuthKey extends AuthKey
             'authorized' => $this->authorized
         ];
     }
+    /**
+     * Sleep function.
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return [
+            'authKey',
+            'id',
+            'serverSalt',
+            'authorized'
+        ];
+    }
 }

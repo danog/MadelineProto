@@ -170,4 +170,21 @@ class TempAuthKey extends AuthKey implements JsonSerializable
             'connection_inited' => $this->inited
         ];
     }
+
+    /**
+     * Sleep function
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return [
+            'authKey',
+            'id',
+            'serverSalt',
+            'bound',
+            'expires',
+            'inited'
+        ];
+    }
 }
