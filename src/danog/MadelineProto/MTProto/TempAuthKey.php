@@ -57,7 +57,7 @@ class TempAuthKey extends AuthKey implements JsonSerializable
         if (isset($old['expires'])) {
             $this->expires($old['expires']);
         }
-        if (isset($old['connection_inited'])) {
+        if (isset($old['connection_inited']) && $old['connection_inited']) {
             $this->init($old['connection_inited']);
         }
     }
