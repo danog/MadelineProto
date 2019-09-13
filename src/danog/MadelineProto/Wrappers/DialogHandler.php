@@ -57,7 +57,7 @@ trait DialogHandler
             $last_peer = 0;
             $last_date = 0;
             $last_id = 0;
-            $res['messages'] = \array_reverse($res['messages']);
+            $res['messages'] = \array_reverse($res['messages'] ?? []);
             foreach (\array_reverse($res['dialogs']) as $dialog) {
                 $id = $this->get_id($dialog['peer']);
                 if (!isset($dialogs[$id])) {
