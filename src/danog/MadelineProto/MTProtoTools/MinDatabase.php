@@ -242,7 +242,8 @@ class MinDatabase implements TLCallback
             $new['_'] .= 'FromMessage';
             $new['peer'] = (yield $this->API->get_info_async($new['peer']))['InputPeer'];
             if ($new['peer']['min']) {
-                throw new Exception('Peer not found in internal min peer database');
+                $this->API->logger->logger("Don't have origin peer subinfo with min peer $id, this may fail");
+                return $object;
             }
             return $new;
         } else {
