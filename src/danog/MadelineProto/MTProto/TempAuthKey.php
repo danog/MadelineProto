@@ -80,7 +80,7 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      */
     public function isInited(): bool
     {
-        return $this->inited;
+        return $this->inited or false;
     }
 
     /**
