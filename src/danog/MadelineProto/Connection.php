@@ -310,7 +310,7 @@ class Connection extends Session
 
         $ctx->setReadCallback([$this, 'haveRead']);
         $this->stream = yield $ctx->getStream();
-        
+
         if (isset($this->old)) {
             unset($this->old);
         }

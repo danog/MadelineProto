@@ -74,12 +74,23 @@ class WriteLoop extends ResumableSignalLoop
         $please_wait = false;
         while (true) {
             while (empty($connection->pending_outgoing) || $please_wait) {
+                if (isset($connection->old)) {
+                    $API->logger->logger('Not writing because connection is old');
+                    return;
+                }
+
                 $please_wait = false;
                 $API->logger->logger("Waiting in $this", Logger::ULTRA_VERBOSE);
                 if (yield $this->waitSignal($this->pause())) {
+                    $API->logger->logger("Exiting $this", Logger::ULTRA_VERBOSE);
                     return;
                 }
                 $API->logger->logger("Done waiting in $this", Logger::ULTRA_VERBOSE);
+
+                if (isset($connection->old)) {
+                    $API->logger->logger('Not writing because connection is old');
+                    return;
+                }
             }
 
             $connection->writing(true);
@@ -89,9 +100,11 @@ class WriteLoop extends ResumableSignalLoop
                 if (isset($connection->old)) {
                     return;
                 }
-                $API->logger($e);
-                $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
-                Tools::callForkDefer($connection->reconnect());
+                Tools::callForkDefer((function () use ($API, $connection, $datacenter, $e) {
+                    $API->logger->logger($e);
+                    $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
+                    yield $connection->reconnect();
+                })());
                 return;
             } finally {
                 $connection->writing(false);

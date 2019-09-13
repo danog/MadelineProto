@@ -495,19 +495,26 @@ class DataCenter
 
     public function dcConnectAsync(string $dc_number, int $id = -1): \Generator
     {
-        if (isset($this->sockets[$dc_number]) && !isset($this->sockets[$dc_number]->old)) {
+        $old = isset($this->sockets[$dc_number]) && (
+            isset($this->sockets[$dc_number]->old) ||
+            ($id !== -1 && isset($this->sockets[$dc_number]->getConnection($id)->old))
+        );
+        if (isset($this->sockets[$dc_number]) && !$old) {
             return false;
         }
         $ctxs = $this->generateContexts($dc_number);
+
         if (empty($ctxs)) {
             return false;
         }
         foreach ($ctxs as $ctx) {
             try {
-                if (isset($this->sockets[$dc_number]->old)) {
+                if ($old) {
+                    $this->API->logger->logger("Reconnecting to DC $dc_number ($id) from existing", \danog\MadelineProto\Logger::WARNING);
                     $this->sockets[$dc_number]->setExtra($this->API);
                     yield $this->sockets[$dc_number]->connect($ctx, $id);
                 } else {
+                    $this->API->logger->logger("Connecting to DC $dc_number from scratch", \danog\MadelineProto\Logger::WARNING);
                     $this->sockets[$dc_number] = new DataCenterConnection();
                     $this->sockets[$dc_number]->setExtra($this->API);
                     yield $this->sockets[$dc_number]->connect($ctx);

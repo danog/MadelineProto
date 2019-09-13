@@ -450,8 +450,11 @@ class DataCenterConnection implements JsonSerializable
      *
      * @return Connection
      */
-    public function getConnection(): Connection
+    public function getConnection(int $id = -1): Connection
     {
+        if ($id >= 0) {
+            return $this->connections[$id];
+        }
         if (\count($this->availableConnections) <= 1) {
             return $this->connections[0];
         }

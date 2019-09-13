@@ -62,7 +62,6 @@ class ReadLoop extends SignalLoop
     {
         $this->connection = $connection;
         $this->API = $connection->getExtra();
-        $ctx = $connection->getCtx();
         $this->datacenter = $connection->getDatacenterID();
         $this->datacenterConnection = $connection->getShared();
     }
@@ -81,9 +80,11 @@ class ReadLoop extends SignalLoop
                 if (isset($connection->old)) {
                     return;
                 }
-                $API->logger->logger($e);
-                $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
-                Tools::callForkDefer($connection->reconnect());
+                Tools::callForkDefer((function () use ($API, $connection, $datacenter, $e) {
+                    $API->logger->logger($e);
+                    $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
+                    yield $connection->reconnect();
+                })());
                 return;
             }
 
