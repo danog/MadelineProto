@@ -231,6 +231,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_deleteMessages.html" name="messages_deleteMessages">Delete messages: messages.deleteMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_deleteContacts.html" name="contacts_deleteContacts">Delete multiple contacts: contacts.deleteContacts</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/photos_deletePhotos.html" name="photos_deletePhotos">Delete profile photos: photos.deletePhotos</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_deleteScheduledMessages.html" name="messages_deleteScheduledMessages">Delete scheduled messages: messages.deleteScheduledMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_deleteSecureValue.html" name="account_deleteSecureValue">Delete secure telegram passport value: account.deleteSecureValue</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_deleteHistory.html" name="channels_deleteHistory">Delete the history of a supergroup/channel: channels.deleteHistory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_deleteAccount.html" name="account_deleteAccount">Delete this account: account.deleteAccount</a>
@@ -299,6 +300,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/users_getUsers.html" name="users_getUsers">Get info about users: users.getUsers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help_getSupport.html" name="help_getSupport">Get info of support user: help.getSupport</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help_getProxyData.html" name="help_getProxyData">Get information about the current proxy: help.getProxyData</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_getThemes.html" name="account_getThemes">Get installed themes: account.getThemes</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help_getInviteText.html" name="help_getInviteText">Get invitation text: help.getInviteText</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/langpack_getStrings.html" name="langpack_getStrings">Get language pack strings: langpack.getStrings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/langpack_getDifference.html" name="langpack_getDifference">Get language pack updates: langpack.getDifference</a>
@@ -327,6 +329,8 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_getSaved.html" name="contacts_getSaved">Get saved contacts: contacts.getSaved</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getSavedGifs.html" name="messages_getSavedGifs">Get saved gifs: messages.getSavedGifs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments_getSavedInfo.html" name="payments_getSavedInfo">Get saved payments info: payments.getSavedInfo</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getScheduledHistory.html" name="messages_getScheduledHistory">Get scheduled history: messages.getScheduledHistory</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getScheduledMessages.html" name="messages_getScheduledMessages">Get scheduled messages: messages.getScheduledMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getSearchCounters.html" name="messages_getSearchCounters">Get search counter: messages.getSearchCounters</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_getSecureValue.html" name="account_getSecureValue">Get secure value for telegram passport: account.getSecureValue</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help_getConfig.html" name="help_getConfig">Get server configuration: help.getConfig</a>
@@ -419,6 +423,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_sendInlineBotResult.html" name="messages_sendInlineBotResult">Send inline bot result obtained with messages.getInlineBotResults to the chat: messages.sendInlineBotResult</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_sendEncrypted.html" name="messages_sendEncrypted">Send message to secret chat: messages.sendEncrypted</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_sendVerifyPhoneCode.html" name="account_sendVerifyPhoneCode">Send phone verification code: account.sendVerifyPhoneCode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_sendScheduledMessages.html" name="messages_sendScheduledMessages">Send scheduled messages: messages.sendScheduledMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_sendScreenshotNotification.html" name="messages_sendScreenshotNotification">Send screenshot notification: messages.sendScreenshotNotification</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_setEncryptedTyping.html" name="messages_setEncryptedTyping">Send typing notification to secret chat: messages.setEncryptedTyping</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_sendVote.html" name="messages_sendVote">Send vote: messages.sendVote</a>
@@ -444,10 +449,12 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_updatePinnedMessage.html" name="messages_updatePinnedMessage">Update pinned message: messages.updatePinnedMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_updateProfile.html" name="account_updateProfile">Update profile info: account.updateProfile</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_updateUsername.html" name="channels_updateUsername">Update the username of a supergroup/channel: channels.updateUsername</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_updateTheme.html" name="account_updateTheme">Update theme: account.updateTheme</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_updateUsername.html" name="account_updateUsername">Update this user's username: account.updateUsername</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_uploadMedia.html" name="messages_uploadMedia">Upload a file without sending it to anyone: messages.uploadMedia</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_uploadEncryptedFile.html" name="messages_uploadEncryptedFile">Upload a secret chat file without sending it to anyone: messages.uploadEncryptedFile</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/photos_uploadProfilePhoto.html" name="photos_uploadProfilePhoto">Upload profile photo: photos.uploadProfilePhoto</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_uploadTheme.html" name="account_uploadTheme">Upload theme: account.uploadTheme</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_uploadWallPaper.html" name="account_uploadWallPaper">Upload wallpaper: account.uploadWallPaper</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth_sendCode.html" name="auth_sendCode">Use phone_login instead: auth.sendCode</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth_recoverPassword.html" name="auth_recoverPassword">Use the code that was emailed to you after running $MadelineProto->auth->requestPasswordRecovery to login to your account: auth.recoverPassword</a>
