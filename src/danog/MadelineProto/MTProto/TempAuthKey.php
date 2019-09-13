@@ -192,7 +192,7 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      *
      * @return array
      */
-    public function __sleep()
+    public function __wakeup()
     {
         $this->inited = (bool) $this->inited;
     }
