@@ -303,14 +303,14 @@ class Connection extends Session
      */
     public function connect(ConnectionContext $ctx): \Generator
     {
-        //$this->API->logger->logger("Trying connection ({$this->id}) via $ctx", \danog\MadelineProto\Logger::WARNING);
-
-        $ctx->setReadCallback([$this, 'haveRead']);
-
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
         $this->datacenterId = $this->datacenter.'.'.$this->id;
+        $this->API->logger->logger("Connecting to DC {$this->datacenterId}", \danog\MadelineProto\Logger::WARNING);
+
+        $ctx->setReadCallback([$this, 'haveRead']);
         $this->stream = yield $ctx->getStream();
+        
         if (isset($this->old)) {
             unset($this->old);
         }
@@ -470,7 +470,7 @@ class Connection extends Session
      */
     public function disconnect()
     {
-        //$this->API->logger->logger("Disconnecting from DC {$this->datacenterId}");
+        $this->API->logger->logger("Disconnecting from DC {$this->datacenterId}");
         $this->old = true;
         foreach (['reader', 'writer', 'checker', 'waiter', 'updater'] as $loop) {
             if (isset($this->{$loop}) && $this->{$loop}) {
@@ -484,7 +484,7 @@ class Connection extends Session
                 $this->API->logger->logger($e);
             }
         }
-        //$this->API->logger->logger("Disconnected from DC {$this->datacenterId}");
+        $this->API->logger->logger("Disconnected from DC {$this->datacenterId}");
     }
 
     /**
@@ -494,7 +494,7 @@ class Connection extends Session
      */
     public function reconnect(): \Generator
     {
-        //$this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
+        $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect();
         yield $this->API->datacenter->dcConnectAsync($this->ctx->getDc(), $this->id);
         if ($this->API->hasAllAuth() && !$this->hasPendingCalls()) {

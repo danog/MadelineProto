@@ -326,7 +326,7 @@ class DataCenterConnection implements JsonSerializable
      */
     public function connect(ConnectionContext $ctx, int $id = -1): \Generator
     {
-        $this->API->logger->logger("Trying shared connection via $ctx");
+        $this->API->logger->logger("Trying shared connection via $ctx ($id)");
 
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
