@@ -83,8 +83,8 @@ class ReadLoop extends SignalLoop
                 }
                 $API->logger->logger($e);
                 $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
-                yield $connection->reconnect();
-                continue;
+                Tools::callForkDefer($connection->reconnect());
+                return;
             }
 
             if (\is_int($error)) {
@@ -206,10 +206,9 @@ class ReadLoop extends SignalLoop
                  */
                 $session_id = \substr($decrypted_data, 8, 8);
                 if ($session_id != $connection->session_id) {
+                    $API->logger->logger("Session ID mismatch", Logger::FATAL_ERROR);
                     $connection->resetSession();
-                    Tools::callForkDefer($connection->reconnect());
-                    return;
-                    throw new \danog\MadelineProto\Exception('Session id mismatch');
+                    throw new NothingInTheSocketException();
                 }
                 $message_id = \substr($decrypted_data, 16, 8);
                 $connection->check_message_id($message_id, ['outgoing' => false, 'container' => false]);

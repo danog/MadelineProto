@@ -91,8 +91,8 @@ class WriteLoop extends ResumableSignalLoop
                 }
                 $API->logger($e);
                 $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
-                yield $connection->reconnect();
-                continue;
+                Tools::callForkDefer($connection->reconnect());
+                return;
             } finally {
                 $connection->writing(false);
             }
