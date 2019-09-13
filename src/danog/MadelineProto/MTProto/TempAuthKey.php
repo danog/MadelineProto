@@ -95,7 +95,7 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     {
         $this->bound = $bound;
         if (!$pfs) {
-            foreach (['authKey', 'id', 'inited', 'serverSalt'] as $key) {
+            foreach (['authKey', 'id', 'serverSalt'] as $key) {
                 $this->{$key} = &$bound->{$key};
             }
         }
@@ -186,5 +186,14 @@ class TempAuthKey extends AuthKey implements JsonSerializable
             'expires',
             'inited'
         ];
+    }
+    /**
+     * Wakeup function.
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        $this->inited = (bool) $this->inited;
     }
 }
