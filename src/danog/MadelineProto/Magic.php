@@ -235,7 +235,9 @@ class Magic
     public static function shutdown(int $code = 0)
     {
         self::$signaled = true;
-        if (defined(STDIN::class)) getStdin()->unreference();
+        if (\defined(STDIN::class)) {
+            getStdin()->unreference();
+        }
         getInputBufferStream()->unreference();
         if ($code !== 0) {
             $driver = Loop::get();

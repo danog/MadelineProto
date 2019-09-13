@@ -423,7 +423,9 @@ class Connection extends Session
      */
     public function flush()
     {
-        $this->writer->resume();
+        if (isset($this->writer)) {
+            $this->writer->resume();
+        }
     }
     /**
      * Connect main instance.

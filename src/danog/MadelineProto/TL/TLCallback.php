@@ -18,24 +18,78 @@
 
 namespace danog\MadelineProto\TL;
 
+/**
+ * Interface for managing TL serialization callbacks.
+ */
 interface TLCallback
 {
+    /**
+     *
+     *
+     * @var int
+     */
     const METHOD_CALLBACK = 0;
     const METHOD_BEFORE_CALLBACK = 1;
     const CONSTRUCTOR_CALLBACK = 2;
     const CONSTRUCTOR_BEFORE_CALLBACK = 3;
     const CONSTRUCTOR_SERIALIZE_CALLBACK = 4;
+    /**
+     * Called if objects of the specified type cannot be serialized.
+     *
+     * @var int
+     */
     const TYPE_MISMATCH_CALLBACK = 5;
 
+    /**
+     * Called after serialization of method.
+     *
+     * Pass the method name and arguments
+     *
+     * @var array
+     */
     public function getMethodCallbacks(): array;
 
+    /**
+     * Called right before serialization of method starts.
+     *
+     * Pass the method name
+     *
+     * @var array
+     */
     public function getMethodBeforeCallbacks(): array;
 
+    /**
+     * Called right after deserialization of object, passing the final object.
+     *
+     * @var array
+     */
     public function getConstructorCallbacks(): array;
 
+    /**
+     * Called right before deserialization of object.
+     *
+     * Pass only the constructor name
+     *
+     * @var array
+     */
     public function getConstructorBeforeCallbacks(): array;
 
+    /**
+     * Called right before serialization of constructor.
+     *
+     * Passed the object, will return a modified version.
+     *
+     * @var array
+     */
     public function getConstructorSerializeCallbacks(): array;
 
+    /**
+     * Called if objects of the specified type cannot be serialized.
+     *
+     * Passed the unserializable object,
+     * will try to convert it to an object of the proper type.
+     *
+     * @var array
+     */
     public function getTypeMismatchCallbacks(): array;
 }

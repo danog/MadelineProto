@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Tools;
 
@@ -105,7 +106,7 @@ class ReferenceDatabase implements TLCallback
     private $refresh = false;
     private $refreshCount = 0;
 
-    public function __construct($API)
+    public function __construct(MTProto $API)
     {
         $this->API = $API;
         $this->init();

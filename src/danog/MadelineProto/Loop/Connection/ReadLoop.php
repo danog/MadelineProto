@@ -206,7 +206,10 @@ class ReadLoop extends SignalLoop
                  */
                 $session_id = \substr($decrypted_data, 8, 8);
                 if ($session_id != $connection->session_id) {
-                    throw new \danog\MadelineProto\Exception('Session id mismatch.');
+                    $connection->resetSession();
+                    Tools::callForkDefer($connection->reconnect());
+                    return;
+                    throw new \danog\MadelineProto\Exception('Session id mismatch');
                 }
                 $message_id = \substr($decrypted_data, 16, 8);
                 $connection->check_message_id($message_id, ['outgoing' => false, 'container' => false]);

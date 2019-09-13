@@ -26,6 +26,7 @@ use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
+use danog\MadelineProto\MTProtoTools\MinDatabase;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\TL\TLCallback;
@@ -82,7 +83,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 131;
+    const V = 132;
     /**
      * String release version.
      *
@@ -348,6 +349,12 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public $referenceDatabase;
     /**
+     * min database.
+     *
+     * @var \danog\MadelineProto\MTProtoTools\MinDatabase
+     */
+    public $minDatabase;
+    /**
      * Phone config loop.
      *
      * @var \danog\MadelineProto\Loop\Update\PeriodicLoop
@@ -433,6 +440,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!isset($this->referenceDatabase)) {
             $this->referenceDatabase = new ReferenceDatabase($this);
         }
+        if (!isset($this->minDatabase)) {
+            $this->minDatabase = new MinDatabase($this);
+        }
         // Load rsa keys
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);
         $this->rsa_keys = [];
@@ -445,7 +455,11 @@ class MTProto extends AsyncConstruct implements TLCallback
          * Define some needed numbers for BigInteger
          */
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_translation'], Logger::ULTRA_VERBOSE);
-        $this->construct_TL($this->settings['tl_schema']['src'], [$this, $this->referenceDatabase]);
+        $callbacks = [$this, $this->referenceDatabase];
+        if (!($this->authorization['user']['bot'] ?? false)) {
+            $callbacks []= $this->minDatabase;
+        }
+        $this->construct_TL($this->settings['tl_schema']['src'], $callbacks);
         yield $this->connect_to_all_dcs_async();
         $this->startLoops();
         $this->datacenter->curdc = 2;
@@ -472,7 +486,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->settings['serialization']['cleanup_before_serialization']) {
             $this->cleanup();
         }
-        return ['supportUser', 'referenceDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'dh_config', 'chats', 'last_stored', 'qres', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
+        return ['supportUser', 'referenceDatabase', 'minDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'dh_config', 'chats', 'last_stored', 'qres', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
     }
 
 
@@ -484,7 +498,11 @@ class MTProto extends AsyncConstruct implements TLCallback
     private function cleanup()
     {
         $this->referenceDatabase = new ReferenceDatabase($this);
-        $this->update_callbacks([$this, $this->referenceDatabase]);
+        $callbacks = [$this, $this->referenceDatabase];
+        if (!($this->authorization['user']['bot'] ?? false)) {
+            $callbacks []= $this->minDatabase;
+        }
+        $this->update_callbacks($callbacks);
         return $this;
     }
 
@@ -603,7 +621,14 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!isset($this->referenceDatabase)) {
             $this->referenceDatabase = new ReferenceDatabase($this);
         }
-        $this->update_callbacks([$this, $this->referenceDatabase]);
+        if (!isset($this->minDatabase)) {
+            $this->minDatabase = new MinDatabase($this);
+        }
+        $callbacks = [$this, $this->referenceDatabase];
+        if (!($this->authorization['user']['bot'] ?? false)) {
+            $callbacks []= $this->minDatabase;
+        }
+        $this->update_callbacks($callbacks);
 
         $this->settings['connection_settings']['all']['ipv6'] = \danog\MadelineProto\Magic::$ipv6;
         /*if (isset($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'] === $this->settings['updates']['callback']) {
@@ -1243,6 +1268,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->users = [];
         $this->tos = ['expires' => 0, 'accepted' => true];
         $this->referenceDatabase = new ReferenceDatabase($this);
+        $this->minDatabase = new MinDatabase($this);
         $this->dialog_params = ['_' => 'MadelineProto.dialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
         $this->full_chats = [];
     }

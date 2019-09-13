@@ -79,12 +79,12 @@ trait PeerHandler
         }
         switch ($user['_']) {
             case 'user':
-                if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
+                if (!isset($this->chats[$user['id']]) || ($this->chats[$user['id']] !== $user && !$user['min'])) {
                     $this->logger->logger("Updated user {$user['id']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     $this->chats[$user['id']] = $user;
                     $this->cache_pwr_chat($user['id'], false, true);
                 }
-                // no break
+                break;
             case 'userEmpty':
                 break;
             default:
@@ -127,7 +127,7 @@ trait PeerHandler
 
                     return;
                 }
-                if (!isset($this->chats[$bot_api_id]) || $this->chats[$bot_api_id] !== $chat) {
+                if (!isset($this->chats[$bot_api_id]) || ($this->chats[$bot_api_id] !== $chat && !$chat['min'])) {
                     $this->logger->logger("Updated chat $bot_api_id", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                     $this->chats[$bot_api_id] = $chat;
@@ -167,9 +167,6 @@ trait PeerHandler
                 return true;
             }
             if ($e->rpc === 'CHANNEL_PRIVATE') {
-                return true;
-            }
-            if ($e->rpc === 'CHANNEL_INVALID') {
                 return true;
             }
 
@@ -259,7 +256,11 @@ trait PeerHandler
                 case 'inputPeerUser':
                 case 'inputUser':
                 case 'peerUser':
+                case 'messageEntityMentionName':
+                case 'messageActionChatDeleteUser':
                     return $id['user_id'];
+                case 'messageActionChatDeleteUser':
+                    return $id['inviter_id'];
                 case 'chat':
                 case 'chatForbidden':
                 case 'chatFull':
@@ -494,8 +495,8 @@ trait PeerHandler
                     $res['InputPeer'] = ['_' => 'inputPeerSelf'];
                     $res['InputUser'] = ['_' => 'inputUserSelf'];
                 } elseif (isset($constructor['access_hash'])) {
-                    $res['InputPeer'] = ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
-                    $res['InputUser'] = ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                    $res['InputPeer'] = ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min']];
+                    $res['InputUser'] = ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min']];
                 } else {
                     throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
                 }
@@ -524,13 +525,13 @@ trait PeerHandler
                 if (!isset($constructor['access_hash'])) {
                     throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
                 }
-                $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min']];
                 $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
                 $res['DialogPeer'] = ['_' => 'dialogPeer', 'peer' => $res['Peer']];
                 $res['NotifyPeer'] = ['_' => 'notifyPeer', 'peer' => $res['Peer']];
                 $res['InputDialogPeer'] = ['_' => 'inputDialogPeer', 'peer' => $res['InputPeer']];
                 $res['InputNotifyPeer'] = ['_' => 'inputNotifyPeer', 'peer' => $res['InputPeer']];
-                $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash']];
+                $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min']];
                 $res['channel_id'] = $constructor['id'];
                 $res['bot_api_id'] = $this->to_supergroup($constructor['id']);
                 $res['type'] = $constructor['megagroup'] ? 'supergroup' : 'channel';

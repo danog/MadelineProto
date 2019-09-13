@@ -43,6 +43,9 @@ trait Login
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_logged_in'], \danog\MadelineProto\Logger::NOTICE);
             yield $this->logout_async();
         }
+        $callbacks = [$this, $this->referenceDatabase];
+        $this->update_callbacks($callbacks);
+
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_bot'], \danog\MadelineProto\Logger::NOTICE);
         $this->authorization = yield $this->method_call_async_read('auth.importBotAuthorization', ['bot_auth_token' => $token, 'api_id' => $this->settings['app_info']['api_id'], 'api_hash' => $this->settings['app_info']['api_hash']], ['datacenter' => $this->datacenter->curdc]);
         $this->authorized = self::LOGGED_IN;
@@ -151,6 +154,12 @@ trait Login
         yield $this->get_phone_config_async();
 
         $res = yield $this->get_self_async();
+
+        $callbacks = [$this, $this->referenceDatabase];
+        if (!($this->authorization['user']['bot'] ?? false)) {
+            $callbacks []= $this->minDatabase;
+        }
+        $this->update_callbacks($callbacks);
 
         $this->startUpdateSystem();
 

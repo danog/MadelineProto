@@ -1,6 +1,6 @@
 <?php
 /**
- * Lang module
+ * Lang module.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,9 +19,9 @@ namespace danog\MadelineProto;
 
 class Lang
 {
-    public static $lang = array (
-  'it' => 
-  array (
+    public static $lang = [
+  'it' =>
+  [
     'phpseclib_fork' => 'Per favore installa questo fork di phpseclib: https://github.com/danog/phpseclib',
     'inst_dc' => 'Istanziamento dei DataCenter...',
     'load_rsa' => 'Caricamento delle chiavi RSA...',
@@ -161,9 +161,9 @@ class Lang
     'done' => 'Fatto!',
     'cdn_reupload' => 'Il file non è disponibile sul nostro CDN, richiedo la copia!',
     'stored_on_cdn' => 'Il file è scaricabile tramite CDN!',
-  ),
-  'en' => 
-  array (
+  ],
+  'en' =>
+  [
     'req_pq' => 'Requesting pq...',
     'done' => 'Done!',
     'cdn_reupload' => 'File is not stored on CDN, requesting reupload!',
@@ -5243,11 +5243,11 @@ class Lang
     'object_account.themes_param_themes_type_Vector t' => 'Themes',
     'method_account.installTheme_param_dark_type_true' => 'Whether to install the dark version',
     'method_account.getThemes' => 'Get installed themes',
-  ),
-);
+  ],
+];
 
     // THIS WILL BE OVERWRITTEN BY $lang["en"]
-    public static $current_lang = array (
+    public static $current_lang = [
   'req_pq' => 'Requesting pq...',
   'done' => 'Done!',
   'cdn_reupload' => 'File is not stored on CDN, requesting reupload!',
@@ -10327,5 +10327,5 @@ class Lang
   'object_account.themes_param_themes_type_Vector t' => 'Themes',
   'method_account.installTheme_param_dark_type_true' => 'Whether to install the dark version',
   'method_account.getThemes' => 'Get installed themes',
-);
+];
 }

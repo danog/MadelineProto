@@ -44,6 +44,8 @@ class AnnotationsBuilder
      * Open file of class APIFactory
      * Insert properties
      * save the file with new content.
+     *
+     * @return void
      */
     private function setProperties()
     {
