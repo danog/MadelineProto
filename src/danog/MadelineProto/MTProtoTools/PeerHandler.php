@@ -127,7 +127,7 @@ trait PeerHandler
 
                     return;
                 }
-                if (!isset($this->chats[$bot_api_id]) || ($this->chats[$bot_api_id] !== $chat && !$chat['min'])) {
+                if (!isset($this->chats[$bot_api_id]) || ($this->chats[$bot_api_id] !== $chat && !($chat['min'] ?? false))) {
                     $this->logger->logger("Updated chat $bot_api_id", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                     $this->chats[$bot_api_id] = $chat;
