@@ -374,12 +374,14 @@ if (!class_exists('\\danog\\MadelineProto\\VoIPServerConfig')) {
     ]
 );
 $MadelineProto = new \danog\MadelineProto\API('session.madeline', ['secret_chats' => ['accept_chats' => false], 'logger' => ['logger' => 3, 'logger_level' => 5, 'logger_param' => getcwd().'/MadelineProto.log'], 'updates' => ['getdifference_interval' => 10], 'serialization' => ['serialization_interval' => 30, 'cleanup_before_serialization' => true], 'flood_timeout' => ['wait_if_lt' => 86400]]);
-$MadelineProto->start();
 foreach (['calls', 'programmed_call', 'my_users'] as $key) {
     if (isset($MadelineProto->API->storage[$key])) {
         unset($MadelineProto->API->storage[$key]);
     }
 }
-
-$MadelineProto->setEventHandler('\EventHandler');
+$MadelineProto->async(true);
+$MadelineProto->loop(function () use ($MadelineProto) {
+    yield $MadelineProto->start();
+    yield $MadelineProto->setEventHandler('\EventHandler');
+});
 $MadelineProto->loop();

@@ -245,6 +245,8 @@ class MinDatabase implements TLCallback
                 throw new Exception('Peer not found in internal min peer database');
             }
             return $new;
+        } else {
+            $this->API->logger->logger("Don't have origin info with min peer $id, this may fail");
         }
 
         return $object;
