@@ -80,16 +80,13 @@ trait PeerHandler
 
                     if (($user['min'] ?? false) && isset($this->chats[$user['id']]) && !($this->chats[$user['id']]['min'] ?? false)) {
                         $this->logger->logger("{$user['id']} is min, filling missing fields", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                        $newuser = $this->chats[$user['id']];
-                        foreach (['title', 'username', 'photo', 'banned_rights', 'megagroup', 'verified'] as $field) {
-                            if (isset($user[$field])) {
-                                $newuser[$field] = $user[$field];
-                            }
+                        if (isset($this->chats[$user['id']]['access_hash'])) {
+                            $user['min'] = false;
+                            $user['access_hash'] = $this->chats[$user['id']]['access_hash'];
                         }
-                        $user = $newuser;
                     }
 
-                    $this->users[$user['id']] = $user;
+                    $this->chats[$user['id']] = $user;
                     $this->cache_pwr_chat($user['id'], false, true);
                 }
                 break;
@@ -140,10 +137,13 @@ trait PeerHandler
 
                     if (($chat['min'] ?? false) && isset($this->chats[$bot_api_id]) && !($this->chats[$bot_api_id]['min'] ?? false)) {
                         $this->logger->logger("$bot_api_id is min, filling missing fields", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                        if (isset($this->chats[$bot_api_id]['access_hash'])) {
-                            $chat['min'] = false;
-                            $chat['access_hash'] = $this->chats[$bot_api_id]['access_hash'];
+                        $newchat = $this->chats[$bot_api_id];
+                        foreach (['title', 'username', 'photo', 'banned_rights', 'megagroup', 'verified'] as $field) {
+                            if (isset($chat[$field])) {
+                                $newchat[$field] = $chat[$field];
+                            }
                         }
+                        $chat = $newchat;
                     }
 
                     $this->chats[$bot_api_id] = $chat;
@@ -409,6 +409,7 @@ trait PeerHandler
         if (\is_numeric($id)) {
             if (!isset($this->chats[$id])) {
                 try {
+                    $this->logger->logger("Try fetching $id with access hash 0");
                     $this->caching_simple[$id] = true;
                     if ($id < 0) {
                         if ($this->is_supergroup($id)) {

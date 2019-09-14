@@ -138,6 +138,7 @@ class MinDatabase implements TLCallback
     public function addPeer(array $location)
     {
         if (!$this->cache) {
+            return;
             $this->API->logger->logger('Trying to add peer out of context, report the following message to @danogentili!', \danog\MadelineProto\Logger::ERROR);
             $frames = [];
             $previous = '';
