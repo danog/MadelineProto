@@ -291,7 +291,8 @@ trait ResponseHandler
                                 $this->logger->logger('No', \danog\MadelineProto\Logger::VERBOSE);
                             }
 
-                            throw new \danog\MadelineProto\ResponseException('Dunno how to handle '.PHP_EOL.\var_export($this->incoming_messages[$current_msg_id]['content'], true));
+                            $this->logger->logger('Dunno how to handle '.PHP_EOL.\var_export($this->incoming_messages[$current_msg_id]['content'], true), \danog\MadelineProto\Logger::FATAL_ERROR);
+                            unset($this->new_incoming[$current_msg_id]);
                             break;
                     }
                     break;
