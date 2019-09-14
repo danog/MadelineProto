@@ -529,7 +529,7 @@ trait PeerHandler
                     }
                 }
 
-                return $this->gen_all($chat, $folder_id);
+                return $this->gen_all($this->chats[$bot_api_id], $folder_id);
             }
         }
         if ($recursive) {
