@@ -33,6 +33,7 @@ use Amp\Failure;
 use Amp\Internal;
 use Amp\Promise;
 use Amp\Success;
+use ReflectionGenerator;
 
 /**
  * Creates a promise from a generator function yielding promises.
@@ -208,5 +209,17 @@ final class Coroutine implements Promise, \ArrayAccess
             $result = yield $this;
             unset($result[$offset]);
         })());
+    }
+
+    /**
+     * Get stacktrace from when the generator was started
+     *
+     * @param integer $options Backtrace options
+     * 
+     * @return array
+     */
+    public function getTrace(int $options = \DEBUG_BACKTRACE_PROVIDE_OBJECT): array
+    {
+        return (new ReflectionGenerator($this->generator))->getTrace($options);
     }
 }

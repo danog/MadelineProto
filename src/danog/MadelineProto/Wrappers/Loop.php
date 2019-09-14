@@ -175,19 +175,19 @@ trait Loop
             return;
         }
         $this->logger->logger($message);
-        $buffer = @\ob_get_contents();
-        @\ob_end_clean();
-        \header('Connection: close');
-        \ignore_user_abort(true);
+
+        $buffer = @\ob_get_clean() ?: '';
         $buffer .= '<html><body><h1>'.\htmlentities($message).'</h1></body></html>';
-        echo $buffer;
-        $size = \max(\ob_get_length(), \strlen($buffer));
-        \header("Content-Length: $size");
+
+        \ignore_user_abort(true);
+        \header('Connection: close');
         \header('Content-Type: text/html');
-        \ob_end_flush();
+
+        echo $buffer;
         \flush();
+
         $GLOBALS['exited'] = true;
-        if (\function_exists('fastcgi_finish_request')) {
+        if (\function_exists(\fastcgi_finish_request::class)) {
             \fastcgi_finish_request();
         }
     }

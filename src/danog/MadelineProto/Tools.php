@@ -482,9 +482,8 @@ trait Tools
         }
 
         foreach ($trace as $frame) {
-            if (isset($frame['object']) && $frame['object'] instanceof \Generator) {
-                $reflection = new ReflectionGenerator($frame['object']);
-                yield from self::backtrace($ignoreArgs, $reflection->getTrace($flags));
+            if (isset($frame['object']) && $frame['object'] instanceof Coroutine) {
+                yield from self::backtrace($ignoreArgs, $frame['object']->getTrace($flags));
                 return;
             }
             //var_dump(get_class($frame['object'] ?? new class {}));

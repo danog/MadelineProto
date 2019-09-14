@@ -32,6 +32,11 @@ class API extends APIFactory
     use \danog\MadelineProto\Wrappers\ApiTemplates;
     public $session;
     public $serialized = 0;
+    /**
+     * Instance of MadelineProto
+     *
+     * @var MTProto
+     */
     public $API;
     public $getting_api_id = false;
     public $my_telegram_org_wrapper;

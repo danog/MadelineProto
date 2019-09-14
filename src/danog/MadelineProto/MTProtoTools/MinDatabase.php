@@ -19,7 +19,6 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Tools;
@@ -246,13 +245,24 @@ class MinDatabase implements TLCallback
                 return $object;
             }
             return $new;
-        } else {
-            $this->API->logger->logger("Don't have origin info with min peer $id, this may fail");
         }
+        $this->API->logger->logger("Don't have origin info with min peer $id, this may fail");
+
 
         return $object;
     }
 
+    /**
+     * Check if location info is available for peer.
+     *
+     * @param float|int $id Peer ID
+     *
+     * @return boolean
+     */
+    public function hasPeer($id): bool
+    {
+        return isset($this->db[$id]);
+    }
     public function __debugInfo()
     {
         return ['MinDatabase instance '.\spl_object_hash($this)];

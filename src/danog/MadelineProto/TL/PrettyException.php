@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\TL;
 
+use danog\MadelineProto\Tools;
+
 trait PrettyException
 {
     public $tl_trace;
