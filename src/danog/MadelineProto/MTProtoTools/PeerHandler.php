@@ -54,15 +54,12 @@ trait PeerHandler
 
     public function add_user($user)
     {
-        if (!isset($user['access_hash'])) {
-            /*if (isset($this->chats[$user['id']]['access_hash']) && $this->chats[$user['id']]['access_hash']) {
-            $this->logger->logger("No access hash with user {$user['id']}, using backup");
-            $user['access_hash'] = $this->chats[$user['id']]['access_hash'];
-            } else {
-            $this->logger->logger("No access hash with user {$user['id']}, not trying to fetch it");
-            $user['access_hash'] = 0;
-            }*/
-            if (!isset($this->caching_simple[$user['id']]) && !(isset($user['username']) && isset($this->caching_simple_username[$user['username']]))) {
+        if (!isset($user['access_hash']) && !($user['min'] ?? false)) {
+            if (isset($this->chats[$user['id']]['access_hash']) && $this->chats[$user['id']]['access_hash']) {
+                $this->logger->logger("No access hash with user {$user['id']}, using backup");
+                $user['access_hash'] = $this->chats[$user['id']]['access_hash'];
+
+            } else if (!isset($this->caching_simple[$user['id']]) && !(isset($user['username']) && isset($this->caching_simple_username[$user['username']]))) {
                 $this->logger->logger("No access hash with user {$user['id']}, trying to fetch by ID...");
                 if (isset($user['username']) && !isset($this->caching_simple_username[$user['username']])) {
                     $this->caching_possible_username[$user['id']] = $user['username'];
@@ -81,7 +78,19 @@ trait PeerHandler
             case 'user':
                 if (!isset($this->chats[$user['id']]) || $this->chats[$user['id']] !== $user) {
                     $this->logger->logger("Updated user {$user['id']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                    $this->chats[$user['id']] = $user;
+
+                    if (($user['min'] ?? false) && isset($this->chats[$user['id']]) && !($this->chats[$user['id']]['min'] ?? false)) {
+                        $this->logger->logger("{$user['id']} is min, filling missing fields", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                        $newuser = $this->chats[$user['id']];
+                        foreach (['title', 'username', 'photo', 'banned_rights', 'megagroup', 'verified'] as $field) {
+                            if (isset($user[$field])) {
+                                $newuser[$field] = $user[$field];
+                            }
+                        }
+                        $user = $newuser;
+                    }
+
+                    $this->users[$user['id']] = $user;
                     $this->cache_pwr_chat($user['id'], false, true);
                 }
                 break;
@@ -129,6 +138,17 @@ trait PeerHandler
                 }
                 if (!isset($this->chats[$bot_api_id]) || $this->chats[$bot_api_id] !== $chat) {
                     $this->logger->logger("Updated chat $bot_api_id", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+
+                    if (($chat['min'] ?? false) && isset($this->chats[$bot_api_id]) && !($this->chats[$bot_api_id]['min'] ?? false)) {
+                        $this->logger->logger("$bot_api_id is min, filling missing fields", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                        $newchat = $this->chats[$bot_api_id];
+                        foreach (['title', 'username', 'photo', 'banned_rights', 'megagroup', 'verified'] as $field) {
+                            if (isset($chat[$field])) {
+                                $newchat[$field] = $chat[$field];
+                            }
+                        }
+                        $chat = $newchat;
+                    }
 
                     $this->chats[$bot_api_id] = $chat;
 
@@ -415,13 +435,13 @@ trait PeerHandler
                 }
             }
             if (isset($this->chats[$id])) {
-                if ($this->chats[$id]['min'] ?? false && $this->minDatabase->hasPeer($id)) {
+                if (($this->chats[$id]['min'] ?? false) && $this->minDatabase->hasPeer($id)) {
                     $this->logger->logger("Only have min peer for $id in database, trying to fetch full info");
                     try {
                         if ($id < 0) {
-                            yield $this->method_call_async_read('channels.getChannels', ['id' => [$this->from_supergroup($id)]], ['datacenter' => $this->datacenter->curdc]);
+                            yield $this->method_call_async_read('channels.getChannels', ['id' => [$this->gen_all($this->chats[$id], $folder_id)['InputChannel']]], ['datacenter' => $this->datacenter->curdc]);
                         } else {
-                            yield $this->method_call_async_read('users.getUsers', ['id' => [$id]], ['datacenter' => $this->datacenter->curdc]);
+                            yield $this->method_call_async_read('users.getUsers', ['id' => [$this->gen_all($this->chats[$id], $folder_id)['InputUser']]], ['datacenter' => $this->datacenter->curdc]);
                         }
                     } catch (\danog\MadelineProto\Exception $e) {
                         $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
@@ -487,19 +507,20 @@ trait PeerHandler
 
             return yield $this->get_info_async($this->supportUser);
         }
-        foreach ($this->chats as $chat) {
+        foreach ($this->chats as $bot_api_id => $chat) {
             if (isset($chat['username']) && \strtolower($chat['username']) === $id) {
-                if ($this->chats[$id]['min'] ?? false) {
-                    if ($id < 0) {
-                        if ($this->is_supergroup($id)) {
-                            yield $this->method_call_async_read('channels.getChannels', ['id' => [['access_hash' => 0, 'channel_id' => $this->from_supergroup($id), '_' => 'inputChannel']]], ['datacenter' => $this->datacenter->curdc]);
+                    $this->logger->logger("Only have min peer for $bot_api_id in database, trying to fetch full info");
+                    try {
+                        if ($bot_api_id < 0) {
+                            yield $this->method_call_async_read('channels.getChannels', ['id' => [$this->gen_all($this->chats[$bot_api_id], $folder_id)['InputChannel']]], ['datacenter' => $this->datacenter->curdc]);
                         } else {
-                            yield $this->method_call_async_read('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);
+                            yield $this->method_call_async_read('users.getUsers', ['id' => [$this->gen_all($this->chats[$bot_api_id], $folder_id)['InputUser']]], ['datacenter' => $this->datacenter->curdc]);
                         }
-                    } else {
-                        yield $this->method_call_async_read('users.getUsers', ['id' => [['access_hash' => 0, 'user_id' => $id, '_' => 'inputUser']]], ['datacenter' => $this->datacenter->curdc]);
+                    } catch (\danog\MadelineProto\Exception $e) {
+                        $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                        $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                     }
-                }
 
                 return $this->gen_all($chat, $folder_id);
             }

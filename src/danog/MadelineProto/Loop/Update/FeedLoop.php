@@ -266,7 +266,9 @@ class FeedLoop extends ResumableSignalLoop
 
                 continue;
             }
-            $this->API->logger->logger('Getdiff fed me message of type '.$message['_']." in $this...", \danog\MadelineProto\Logger::VERBOSE);
+            if ($message['_'] !== 'messageEmpty') {
+                $this->API->logger->logger('Getdiff fed me message of type '.$message['_']." in $this...", \danog\MadelineProto\Logger::VERBOSE);
+            }
 
             $this->parsedUpdates[] = ['_' => $this->channelId === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
         }

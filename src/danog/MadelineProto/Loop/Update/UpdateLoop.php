@@ -191,10 +191,13 @@ class UpdateLoop extends ResumableSignalLoop
                     }
                 }
             }
+            $API->logger->logger("Finished parsing updates in $this, now resuming feeders");
             foreach ($result as $channelId => $boh) {
                 $API->feeders[$channelId]->resumeDefer();
             }
+            $API->logger->logger("Finished resuming feeders in $this, signaling updates");
             $API->signalUpdate();
+            $API->logger->logger("Finished signaling updates in $this, pausing");
             $first = false;
 
             if (yield $this->waitSignal($this->pause($timeout))) {

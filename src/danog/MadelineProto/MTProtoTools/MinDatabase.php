@@ -87,6 +87,11 @@ class MinDatabase implements TLCallback
 
     public function init()
     {
+        foreach ($this->db as $id => $origin) {
+            if ($origin['peer'] === $id) {
+                unset($this->db[$id]);
+            }
+        }
     }
 
     public function getMethodCallbacks(): array
@@ -225,6 +230,7 @@ class MinDatabase implements TLCallback
                 throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$data['_']}");
         }
         foreach ($cache as $id) {
+            if ($origin['peer'] === $id) continue;
             $this->db[$id] = $origin;
         }
         $this->API->logger->logger("Added origin ({$data['_']}) to ".\count($cache).' peer locations', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
