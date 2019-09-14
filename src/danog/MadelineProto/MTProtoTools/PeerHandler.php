@@ -140,13 +140,10 @@ trait PeerHandler
 
                     if (($chat['min'] ?? false) && isset($this->chats[$bot_api_id]) && !($this->chats[$bot_api_id]['min'] ?? false)) {
                         $this->logger->logger("$bot_api_id is min, filling missing fields", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                        $newchat = $this->chats[$bot_api_id];
-                        foreach (['title', 'username', 'photo', 'banned_rights', 'megagroup', 'verified'] as $field) {
-                            if (isset($chat[$field])) {
-                                $newchat[$field] = $chat[$field];
-                            }
+                        if (isset($this->chats[$bot_api_id]['access_hash'])) {
+                            $chat['min'] = false;
+                            $chat['access_hash'] = $this->chats[$bot_api_id]['access_hash'];
                         }
-                        $chat = $newchat;
                     }
 
                     $this->chats[$bot_api_id] = $chat;
