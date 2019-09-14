@@ -30,6 +30,8 @@ trait PeerHandler
     public $caching_simple_username = [];
     public $caching_possible_username = [];
 
+    public $caching_full_info = [];
+
     public function to_supergroup($id)
     {
         return -($id + \pow(10, (int) \floor(\log($id, 10) + 3)));
@@ -432,7 +434,8 @@ trait PeerHandler
                 }
             }
             if (isset($this->chats[$id])) {
-                if (($this->chats[$id]['min'] ?? false) && $this->minDatabase->hasPeer($id)) {
+                if (($this->chats[$id]['min'] ?? false) && $this->minDatabase->hasPeer($id) && !isset($this->caching_full_info[$id])) {
+                    $this->caching_full_info[$id] = true;
                     $this->logger->logger("Only have min peer for $id in database, trying to fetch full info");
                     try {
                         if ($id < 0) {
@@ -444,6 +447,8 @@ trait PeerHandler
                         $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                         $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                    } finally {
+                        unset($this->caching_full_info[$id]);
                     }
                 }
 
@@ -506,7 +511,8 @@ trait PeerHandler
         }
         foreach ($this->chats as $bot_api_id => $chat) {
             if (isset($chat['username']) && \strtolower($chat['username']) === $id) {
-                if ($chat['min'] ?? false) {
+                if ($chat['min'] ?? false && !isset($this->caching_full_info[$bot_api_id])) {
+                    $this->caching_full_info[$bot_api_id] = true;
                     $this->logger->logger("Only have min peer for $bot_api_id in database, trying to fetch full info");
                     try {
                         if ($bot_api_id < 0) {
@@ -518,6 +524,8 @@ trait PeerHandler
                         $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                         $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                    } finally {
+                        unset($this->caching_full_info[$bot_api_id]);
                     }
                 }
 

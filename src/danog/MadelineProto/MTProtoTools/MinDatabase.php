@@ -88,7 +88,7 @@ class MinDatabase implements TLCallback
     public function init()
     {
         foreach ($this->db as $id => $origin) {
-            if ($origin['peer'] === $id) {
+            if (!isset($origin['peer']) || $origin['peer'] === $id) {
                 unset($this->db[$id]);
             }
         }
