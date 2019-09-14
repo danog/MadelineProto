@@ -25,7 +25,6 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use phpseclib\Math\BigInteger;
-use ReflectionGenerator;
 
 use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;

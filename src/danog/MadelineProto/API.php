@@ -33,7 +33,7 @@ class API extends APIFactory
     public $session;
     public $serialized = 0;
     /**
-     * Instance of MadelineProto
+     * Instance of MadelineProto.
      *
      * @var MTProto
      */

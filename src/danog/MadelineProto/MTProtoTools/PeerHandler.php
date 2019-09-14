@@ -58,8 +58,7 @@ trait PeerHandler
             if (isset($this->chats[$user['id']]['access_hash']) && $this->chats[$user['id']]['access_hash']) {
                 $this->logger->logger("No access hash with user {$user['id']}, using backup");
                 $user['access_hash'] = $this->chats[$user['id']]['access_hash'];
-
-            } else if (!isset($this->caching_simple[$user['id']]) && !(isset($user['username']) && isset($this->caching_simple_username[$user['username']]))) {
+            } elseif (!isset($this->caching_simple[$user['id']]) && !(isset($user['username']) && isset($this->caching_simple_username[$user['username']]))) {
                 $this->logger->logger("No access hash with user {$user['id']}, trying to fetch by ID...");
                 if (isset($user['username']) && !isset($this->caching_simple_username[$user['username']])) {
                     $this->caching_possible_username[$user['id']] = $user['username'];
@@ -509,6 +508,7 @@ trait PeerHandler
         }
         foreach ($this->chats as $bot_api_id => $chat) {
             if (isset($chat['username']) && \strtolower($chat['username']) === $id) {
+                if ($chat['min'] ?? false) {
                     $this->logger->logger("Only have min peer for $bot_api_id in database, trying to fetch full info");
                     try {
                         if ($bot_api_id < 0) {
@@ -521,6 +521,7 @@ trait PeerHandler
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                         $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
                     }
+                }
 
                 return $this->gen_all($chat, $folder_id);
             }

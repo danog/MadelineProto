@@ -212,10 +212,10 @@ final class Coroutine implements Promise, \ArrayAccess
     }
 
     /**
-     * Get stacktrace from when the generator was started
+     * Get stacktrace from when the generator was started.
      *
      * @param integer $options Backtrace options
-     * 
+     *
      * @return array
      */
     public function getTrace(int $options = \DEBUG_BACKTRACE_PROVIDE_OBJECT): array
