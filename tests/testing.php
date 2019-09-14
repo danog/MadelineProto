@@ -241,7 +241,7 @@ $media['voice'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/mosconi
 // Document
 $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/60', 'mime_type' => 'magic/magic', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
 
-$message = 'yay';
+$message = 'yay '.\PHP_VERSION_ID;
 $mention = $MadelineProto->get_info(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id
 
