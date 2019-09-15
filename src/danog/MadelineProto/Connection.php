@@ -428,6 +428,17 @@ class Connection extends Session
         }
     }
     /**
+     * Resume HttpWaiter
+     *
+     * @return void
+     */
+    public function pingHttpWaiter()
+    {
+        if (isset($this->waiter)) {
+            $this->waiter->resume();
+        }
+    }
+    /**
      * Connect main instance.
      *
      * @param DataCenterConnection $extra Shared instance

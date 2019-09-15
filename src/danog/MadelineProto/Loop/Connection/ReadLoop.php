@@ -130,7 +130,7 @@ class ReadLoop extends SignalLoop
             Loop::defer([$connection, 'handle_messages']);
 
             if ($shared->isHttp()) {
-                Loop::defer([$connection->waiter, 'resume']);
+                Loop::defer([$connection, 'pingHttpWaiter']);
             }
         }
     }
