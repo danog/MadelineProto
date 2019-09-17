@@ -30,6 +30,7 @@ use Amp\Websocket\Rfc6455Client;
 use Amp\Websocket\Rfc7692CompressionFactory;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\RawStreamInterface;
 use function Amp\Websocket\generateKey;
 use function Amp\Websocket\validateAcceptForKey;
 

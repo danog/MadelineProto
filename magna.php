@@ -56,10 +56,12 @@ class MessageLoop extends ResumableSignalLoop
         $logger = &$MadelineProto->logger;
 
         while (true) {
-            $result = yield $this->waitSignal($this->pause($this->timeout));
-            if ($result) {
-                $logger->logger("Got signal in $this, exiting");
-                return;
+            while (!isset($this->call->mId)) {
+                $result = yield $this->waitSignal($this->pause($this->timeout));
+                if ($result) {
+                    $logger->logger("Got signal in $this, exiting");
+                    return;
+                }
             }
 
             try {
