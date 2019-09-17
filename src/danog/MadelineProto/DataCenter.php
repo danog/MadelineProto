@@ -192,7 +192,7 @@ class DataCenter
      *
      * @return void
      */
-    public function __magic_construct(MTProto $API, array $dclist, array $settings, bool $reconnectAll = true, CookieJar $jar = null)
+    public function __magic_construct($API, array $dclist, array $settings, bool $reconnectAll = true, CookieJar $jar = null)
     {
         $this->API = $API;
 

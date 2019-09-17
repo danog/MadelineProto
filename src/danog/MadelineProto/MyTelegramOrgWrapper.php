@@ -66,6 +66,7 @@ class MyTelegramOrgWrapper
             },
             [],
             $this->settings['connection_settings'],
+            true,
             $this->jar
         );
     }
