@@ -189,7 +189,7 @@ class DataCenter
         foreach ($this->sockets as $key => $socket) {
             if ($socket instanceof DataCenterConnection && !\strpos($key, '_bk')) {
                 //$this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
-                $socket->old = true;
+                $socket->needReconnect(true);
                 $socket->setExtra($this->API);
                 $socket->disconnect();
             } else {
@@ -496,8 +496,8 @@ class DataCenter
     public function dcConnectAsync(string $dc_number, int $id = -1): \Generator
     {
         $old = isset($this->sockets[$dc_number]) && (
-            isset($this->sockets[$dc_number]->old) ||
-            ($id !== -1 && isset($this->sockets[$dc_number]->getConnection($id)->old))
+            $this->sockets[$dc_number]->shouldReconnect() ||
+            ($id !== -1 && $this->sockets[$dc_number]->hasConnection($id) && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect())
         );
         if (isset($this->sockets[$dc_number]) && !$old) {
             return false;
@@ -901,6 +901,18 @@ class DataCenter
     public function isHttp(string $datacenter)
     {
         return $this->sockets[$datacenter]->isHttp();
+    }
+
+    /**
+     * Check if connected to datacenter directly using IP address.
+     *
+     * @param string $datacenter DC ID
+     *
+     * @return boolean
+     */
+    public function byIPAddress(string $datacenter): bool
+    {
+        return $this->sockets[$datacenter]->byIPAddress();
     }
 
     /**

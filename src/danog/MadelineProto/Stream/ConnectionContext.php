@@ -424,6 +424,23 @@ class ConnectionContext
     }
 
     /**
+     * Check if has stream within stream chain.
+     *
+     * @param string $stream Stream name
+     *
+     * @return boolean
+     */
+    public function hasStreamName(string $stream): bool
+    {
+        foreach ($this->nextStreams as list($name)) {
+            if ($name === $stream) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get a stream from the stream chain.
      *
      * @internal Generator func

@@ -560,7 +560,7 @@ trait AuthKeyHandler
                 $encrypted_message = $datacenterConnection->getPermAuthKey()->getID().$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
                 $res = yield $connection->method_call_async_read('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], ['msg_id' => $message_id]);
                 if ($res === true) {
-                    $this->logger->logger('Successfully binded temporary and permanent authorization keys, DC '.$datacenter, \danog\MadelineProto\Logger::NOTICE);
+                    $this->logger->logger('Bound temporary and permanent authorization keys, DC '.$datacenter, \danog\MadelineProto\Logger::NOTICE);
                     $datacenterConnection->bind();
                     $datacenterConnection->flush();
 
@@ -705,7 +705,7 @@ trait AuthKeyHandler
             $cdn = $socket->isCDN();
             $media = $socket->isMedia();
 
-            if (!$socket->hasTempAuthKey() || !$socket->hasPermAuthKey()) {
+            if (!$socket->hasTempAuthKey() || !$socket->hasPermAuthKey() || !$socket->isBound()) {
                 if (!$socket->hasPermAuthKey() && !$cdn && !$media) {
                     $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
                     $socket->setPermAuthKey(yield $this->create_auth_key_async(-1, $id));
@@ -728,10 +728,9 @@ trait AuthKeyHandler
                         $socket->setTempAuthKey(yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
                         yield $this->bind_temp_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
 
-                        $config = yield $connection->method_call_async_read('help.getConfig', []);
+                        $this->config = yield $connection->method_call_async_read('help.getConfig', []);
 
                         yield $this->sync_authorization_async($id);
-                        yield $this->get_config_async($config);
                     } elseif (!$socket->hasTempAuthKey()) {
                         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
                         $socket->setTempAuthKey(yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
@@ -739,9 +738,8 @@ trait AuthKeyHandler
                 } else {
                     if (!$cdn) {
                         $socket->bind(false);
-                        $config = yield $connection->method_call_async_read('help.getConfig', []);
+                        $this->config = yield $connection->method_call_async_read('help.getConfig', []);
                         yield $this->sync_authorization_async($id);
-                        yield $this->get_config_async($config);
                     } elseif (!$socket->hasTempAuthKey()) {
                         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
                         $socket->setTempAuthKey(yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));

@@ -23,10 +23,15 @@ use Amp\Deferred;
 use Amp\Promise;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
+use danog\MadelineProto\Loop\Connection\PingLoop;
 use danog\MadelineProto\Loop\Connection\ReadLoop;
 use danog\MadelineProto\Loop\Connection\WriteLoop;
 use danog\MadelineProto\MTProtoSession\Session;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use danog\MadelineProto\Stream\Transport\WssStream;
+use danog\MadelineProto\Stream\Transport\WsStream;
 
 /**
  * Connection class.
@@ -64,6 +69,12 @@ class Connection extends Session
      * @var \danog\MadelineProto\Loop\Connection\HttpWaitLoop
      */
     protected $waiter;
+    /**
+     * Ping loop.
+     *
+     * @var \danog\MadelineProto\Loop\Connection\PingLoop
+     */
+    protected $pinger;
     /**
      * The actual socket.
      *
@@ -138,6 +149,32 @@ class Connection extends Session
     private $datacenterId = '';
 
     /**
+     * Whether this socket has to be reconnected.
+     *
+     * @var boolean
+     */
+    private $needsReconnect = false;
+    /**
+     * Indicate if this socket needs to be reconnected.
+     *
+     * @param boolean $needsReconnect Whether the socket has to be reconnected
+     *
+     * @return void
+     */
+    public function needReconnect(bool $needsReconnect)
+    {
+        $this->needsReconnect = $needsReconnect;
+    }
+    /**
+     * Whether this sockets needs to be reconnected.
+     *
+     * @return boolean
+     */
+    public function shouldReconnect(): bool
+    {
+        return $this->needsReconnect;
+    }
+    /**
      * Check if the socket is writing stuff.
      *
      * @return boolean
@@ -190,9 +227,9 @@ class Connection extends Session
     /**
      * Get the receive date of the latest chunk of data from the socket.
      *
-     * @return void
+     * @return int
      */
-    public function getLastChunk()
+    public function getLastChunk(): int
     {
         return $this->lastChunk;
     }
@@ -311,9 +348,11 @@ class Connection extends Session
         $ctx->setReadCallback([$this, 'haveRead']);
         $this->stream = yield $ctx->getStream();
 
-        if (isset($this->old)) {
-            unset($this->old);
+        if ($this->needsReconnect) {
+            $this->needsReconnect = false;
         }
+        $this->httpReqCount = 0;
+        $this->httpResCount = 0;
 
         if (!isset($this->writer)) {
             $this->writer = new WriteLoop($this);
@@ -327,6 +366,9 @@ class Connection extends Session
         if (!isset($this->waiter)) {
             $this->waiter = new HttpWaitLoop($this);
         }
+        if (!isset($this->pinger) && ($this->ctx->hasStreamName(WssStream::getName()) || $this->ctx->hasStreamName(WsStream::getName()))) {
+            $this->pinger = new PingLoop($this);
+        }
         foreach ($this->new_outgoing as $message_id) {
             if ($this->outgoing_messages[$message_id]['unencrypted']) {
                 $promise = $this->outgoing_messages[$message_id]['promise'];
@@ -336,8 +378,6 @@ class Connection extends Session
                 unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
             }
         }
-        $this->httpReqCount = 0;
-        $this->httpResCount = 0;
 
         $this->writer->start();
         $this->reader->start();
@@ -345,6 +385,9 @@ class Connection extends Session
             $this->checker->resume();
         }
         $this->waiter->start();
+        if ($this->pinger) {
+            $this->pinger->start();
+        }
     }
 
     /**
@@ -428,7 +471,7 @@ class Connection extends Session
         }
     }
     /**
-     * Resume HttpWaiter
+     * Resume HttpWaiter.
      *
      * @return void
      */
@@ -436,6 +479,9 @@ class Connection extends Session
     {
         if (isset($this->waiter)) {
             $this->waiter->resume();
+        }
+        if (isset($this->pinger)) {
+            $this->pinger->resume();
         }
     }
     /**
@@ -482,8 +528,8 @@ class Connection extends Session
     public function disconnect()
     {
         $this->API->logger->logger("Disconnecting from DC {$this->datacenterId}");
-        $this->old = true;
-        foreach (['reader', 'writer', 'checker', 'waiter', 'updater'] as $loop) {
+        $this->needsReconnect = true;
+        foreach (['reader', 'writer', 'checker', 'waiter', 'updater', 'pinger'] as $loop) {
             if (isset($this->{$loop}) && $this->{$loop}) {
                 $this->{$loop}->signal($loop === 'reader' ? new NothingInTheSocketException() : true);
             }

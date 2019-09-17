@@ -20,8 +20,6 @@ namespace danog\MadelineProto\Loop\Connection;
 
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
-use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
-use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 
 /**
  * HttpWait loop.
@@ -54,7 +52,6 @@ class HttpWaitLoop extends ResumableSignalLoop
     {
         $this->connection = $connection;
         $this->API = $connection->getExtra();
-        $ctx = $connection->getCtx();
         $this->datacenter = $connection->getDatacenterID();
         $this->datacenterConnection = $connection->getShared();
     }
@@ -74,7 +71,7 @@ class HttpWaitLoop extends ResumableSignalLoop
             if (yield $this->waitSignal($this->pause())) {
                 return;
             }
-            if (!\in_array($connection->getCtx()->getStreamName(), [HttpStream::getName(), HttpsStream::getName()])) {
+            if (!$connection->isHttp()) {
                 return;
             }
             while (!$shared->hasTempAuthKey()) {

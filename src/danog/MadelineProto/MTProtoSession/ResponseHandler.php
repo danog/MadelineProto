@@ -346,7 +346,7 @@ trait ResponseHandler
         if (isset($response['_'])) {
             switch ($response['_']) {
                 case 'rpc_error':
-                    if (isset($request['method']) && $request['method'] && $request['_'] !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
+                    if (($request['method'] ?? false) && $request['_'] !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
                         $this->shared->getTempAuthKey()->init(true);
                     }
 
@@ -558,7 +558,7 @@ trait ResponseHandler
             }
         }
 
-        if (isset($request['method']) && $request['method'] && $request['_'] !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
+        if (($request['method'] ?? false) && $request['_'] !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
             $this->shared->getTempAuthKey()->init(true);
         }
 

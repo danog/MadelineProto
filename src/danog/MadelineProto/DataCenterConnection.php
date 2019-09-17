@@ -25,6 +25,7 @@ use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use danog\MadelineProto\Stream\Transport\WssStream;
 use JsonSerializable;
 
 class DataCenterConnection implements JsonSerializable
@@ -113,6 +114,33 @@ class DataCenterConnection implements JsonSerializable
      * @var array
      */
     private $backup = [];
+
+    /**
+     * Whether this socket has to be reconnected.
+     *
+     * @var boolean
+     */
+    private $needsReconnect = false;
+    /**
+     * Indicate if this socket needs to be reconnected.
+     *
+     * @param boolean $needsReconnect Whether the socket has to be reconnected
+     *
+     * @return void
+     */
+    public function needReconnect(bool $needsReconnect)
+    {
+        $this->needsReconnect = $needsReconnect;
+    }
+    /**
+     * Whether this sockets needs to be reconnected.
+     *
+     * @return boolean
+     */
+    public function shouldReconnect(): bool
+    {
+        return $this->needsReconnect;
+    }
     /**
      * Get auth key.
      *
@@ -446,7 +474,20 @@ class DataCenterConnection implements JsonSerializable
     }
 
     /**
+     * Check if any connection is available.
+     *
+     * @param integer $id Connection ID
+     *
+     * @return boolean
+     */
+    public function hasConnection(int $id = -1): bool
+    {
+        return $id < 0 ? \count($this->connections) : isset($this->connections[$id]);
+    }
+    /**
      * Get best socket in round robin.
+     *
+     * @param integer $id Connection ID, for manual fetching
      *
      * @return Connection
      */
@@ -546,6 +587,16 @@ class DataCenterConnection implements JsonSerializable
     public function isHttp(): bool
     {
         return \in_array($this->ctx->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
+    }
+
+    /**
+     * Check if is connected directly by IP address.
+     *
+     * @return boolean
+     */
+    public function byIPAddress(): bool
+    {
+        return !$this->ctx->hasStreamName(WssStream::getName()) && !$this->ctx->hasStreamName(HttpsStream::getName());
     }
 
     /**

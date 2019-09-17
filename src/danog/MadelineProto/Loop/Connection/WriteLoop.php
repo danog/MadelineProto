@@ -22,7 +22,6 @@ use Amp\ByteStream\StreamException;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
-use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
 
@@ -74,7 +73,7 @@ class WriteLoop extends ResumableSignalLoop
         $please_wait = false;
         while (true) {
             while (empty($connection->pending_outgoing) || $please_wait) {
-                if (isset($connection->old)) {
+                if ($connection->shouldReconnect()) {
                     $API->logger->logger('Not writing because connection is old');
                     return;
                 }
@@ -87,7 +86,7 @@ class WriteLoop extends ResumableSignalLoop
                 }
                 $API->logger->logger("Done waiting in $this", Logger::ULTRA_VERBOSE);
 
-                if (isset($connection->old)) {
+                if ($connection->shouldReconnect()) {
                     $API->logger->logger('Not writing because connection is old');
                     return;
                 }
@@ -97,7 +96,7 @@ class WriteLoop extends ResumableSignalLoop
             try {
                 $please_wait = yield $this->{$shared->hasTempAuthKey() ? 'encryptedWriteLoopAsync' : 'unencryptedWriteLoopAsync'}();
             } catch (StreamException $e) {
-                if (isset($connection->old)) {
+                if ($connection->shouldReconnect()) {
                     return;
                 }
                 Tools::callForkDefer((function () use ($API, $connection, $datacenter, $e) {
@@ -180,16 +179,19 @@ class WriteLoop extends ResumableSignalLoop
             if ($shared->isHttp() && empty($connection->pending_outgoing)) {
                 return;
             }
+            $temporary_keys = [];
             if (\count($to_ack = $connection->ack_queue)) {
                 foreach (\array_chunk($connection->ack_queue, 8192) as $acks) {
-                    $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'msgs_ack', 'serialized_body' => yield $this->API->serialize_object_async(['type' => 'msgs_ack'], ['msg_ids' => $acks], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false, 'method' => false];
+                    $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msgs_ack', 'serialized_body' => yield $this->API->serialize_object_async(['type' => 'msgs_ack'], ['msg_ids' => $acks], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false, 'method' => false];
+                    $temporary_keys[$connection->pending_outgoing_key] = true;
+                    $API->logger->logger("Adding msgs_ack {$connection->pending_outgoing_key}", Logger::ULTRA_VERBOSE);
+                    $connection->pending_outgoing_key++;
                 }
             }
 
             $has_http_wait = false;
             $messages = [];
             $keys = [];
-
             foreach ($connection->pending_outgoing as $message) {
                 if ($message['_'] === 'http_wait') {
                     $has_http_wait = true;
@@ -197,14 +199,17 @@ class WriteLoop extends ResumableSignalLoop
                 }
             }
             if ($shared->isHttp() && !$has_http_wait) {
-                $connection->pending_outgoing[$connection->pending_outgoing_key++] = ['_' => 'http_wait', 'serialized_body' => yield $this->API->serialize_object_async(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
-                $has_http_wait = true;
+                $API->logger->logger("Adding http_wait {$connection->pending_outgoing_key}", Logger::ULTRA_VERBOSE);
+                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'http_wait', 'serialized_body' => yield $this->API->serialize_object_async(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
+                $temporary_keys[$connection->pending_outgoing_key] = true;
+                $connection->pending_outgoing_key++;
             }
 
             $total_length = 0;
             $count = 0;
             \ksort($connection->pending_outgoing);
             $skipped = false;
+            $inited = false;
             foreach ($connection->pending_outgoing as $k => $message) {
                 if ($message['unencrypted']) {
                     continue;
@@ -232,7 +237,8 @@ class WriteLoop extends ResumableSignalLoop
                 $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $message['serialized_body'], 'seqno' => $connection->generate_out_seq_no($message['content_related'])];
 
                 if (isset($message['method']) && $message['method'] && $message['_'] !== 'http_wait') {
-                    if (!$shared->getTempAuthKey()->isInited() && $message['_'] !== 'auth.bindTempAuthKey') {
+                    if (!$shared->getTempAuthKey()->isInited() && $message['_'] !== 'auth.bindTempAuthKey' && !$inited) {
+                        $inited = true;
                         $API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $message['_']), \danog\MadelineProto\Logger::NOTICE);
                         $MTmessage['body'] = yield $API->serialize_method_async(
                             'invokeWithLayer',
@@ -292,6 +298,14 @@ class WriteLoop extends ResumableSignalLoop
                 $messages[] = $MTmessage;
                 $keys[$k] = $message_id;
             }
+            if ($shared->isHttp() && $skipped && $count === \count($temporary_keys)) {
+                foreach ($temporary_keys as $key => $true) {
+                    $API->logger->logger("Removing temporary {$connection->pending_outgoing[$key]['_']} by $key", Logger::ULTRA_VERBOSE);
+                    unset($connection->pending_outgoing[$key]);
+                    $count--;
+                }
+            }
+
             $MTmessage = null;
 
             if ($count > 1) {
@@ -346,12 +360,6 @@ class WriteLoop extends ResumableSignalLoop
                 $connection->ack_queue = [];
             }
 
-            /*if ($has_http_wait) {
-                $connection->last_http_wait = $sent;
-            } elseif (Magic::$altervista) {
-                $connection->last_http_wait = PHP_INT_MAX;
-            }*/
-
             foreach ($keys as $key => $message_id) {
                 $connection->outgoing_messages[$message_id] = &$connection->pending_outgoing[$key];
 
@@ -371,7 +379,9 @@ class WriteLoop extends ResumableSignalLoop
             //if (!empty($connection->pending_outgoing)) $connection->select();
         } while (!empty($connection->pending_outgoing) && !$skipped);
 
-        $connection->pending_outgoing_key = 0;
+        if (empty($connection->pending_outgoing)) {
+            $connection->pending_outgoing_key = 'a';
+        }
 
         return $skipped;
     }

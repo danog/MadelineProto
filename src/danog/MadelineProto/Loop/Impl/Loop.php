@@ -54,7 +54,6 @@ abstract class Loop implements LoopInterface
 
             return false;
         }
-
         return $this->callFork($this->loopImpl());
     }
 

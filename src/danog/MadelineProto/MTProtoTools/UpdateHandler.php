@@ -263,7 +263,8 @@ trait UpdateHandler
         }
         if ($update['_'] === 'updateDcOptions') {
             $this->logger->logger('Got new dc options', \danog\MadelineProto\Logger::VERBOSE);
-            yield $this->parse_dc_options_async($update['dc_options']);
+            $this->config['dc_options'] = $update['dc_options'];
+            yield $this->parse_config_async();
 
             return;
         }

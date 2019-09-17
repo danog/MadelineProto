@@ -20,7 +20,7 @@
 namespace danog\MadelineProto\Wrappers;
 
 /**
- * Manages logging in and out.
+ * Manages terms of service.
  */
 trait TOS
 {

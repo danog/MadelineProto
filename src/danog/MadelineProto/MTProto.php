@@ -355,11 +355,23 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public $minDatabase;
     /**
+     * TOS check loop.
+     *
+     * @var \danog\MadelineProto\Loop\Update\PeriodicLoop
+     */
+    public $checkTosLoop;
+    /**
      * Phone config loop.
      *
      * @var \danog\MadelineProto\Loop\Update\PeriodicLoop
      */
     public $phoneConfigLoop;
+    /**
+     * Config loop.
+     *
+     * @var \danog\MadelineProto\Loop\Update\PeriodicLoop
+     */
+    public $configLoop;
     /**
      * Call checker loop.
      *
@@ -578,12 +590,20 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->serializeLoop = new PeriodicLoop($this, [$this, 'serialize'], 'serialize', $this->settings['serialization']['serialization_interval']);
         }
         if (!$this->phoneConfigLoop) {
-            $this->phoneConfigLoop = new PeriodicLoop($this, [$this, 'get_phone_config_async'], 'phone config', 24 * 3600 * 1000);
+            $this->phoneConfigLoop = new PeriodicLoop($this, [$this, 'get_phone_config_async'], 'phone config', 24 * 3600);
+        }
+        if (!$this->checkTosLoop) {
+            $this->checkTosLoop = new PeriodicLoop($this, [$this, 'check_tos_async'], 'TOS', 24 * 3600);
+        }
+        if (!$this->configLoop) {
+            $this->configLoop = new PeriodicLoop($this, [$this, 'get_config_async'], 'config', 24 * 3600);
         }
 
         $this->callCheckerLoop->start();
         $this->serializeLoop->start();
         $this->phoneConfigLoop->start();
+        $this->configLoop->start();
+        $this->checkTosLoop->start();
     }
     public function stopLoops()
     {
@@ -598,6 +618,14 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->phoneConfigLoop) {
             $this->phoneConfigLoop->signal(true);
             $this->phoneConfigLoop = null;
+        }
+        if ($this->configLoop) {
+            $this->configLoop->signal(true);
+            $this->configLoop = null;
+        }
+        if ($this->checkTosLoop) {
+            $this->checkTosLoop->signal(true);
+            $this->checkTosLoop = null;
         }
     }
     public function __wakeup()
@@ -1222,12 +1250,14 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         yield $this->all($dcs);
         yield $this->init_authorization_async();
+        yield $this->parse_config_async();
         $dcs = [];
         foreach ($this->datacenter->get_dcs(false) as $new_dc) {
             $dcs[] = $this->datacenter->dcConnectAsync($new_dc);
         }
         yield $this->all($dcs);
         yield $this->init_authorization_async();
+        yield $this->parse_config_async();
 
         yield $this->get_phone_config_async();
     }
@@ -1340,7 +1370,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function get_phone_config_async($watcherId = null)
     {
-        if ($this->authorized === self::LOGGED_IN && \class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal') && !$this->authorization['user']['bot'] && $this->datacenter->getDataCenterConnection($this->settings['connection_settings']['default_dc'])->hasTempAuthKey()) {
+        if ($this->authorized === self::LOGGED_IN && \class_exists(VoIPServerConfigInternal::class) && !$this->authorization['user']['bot'] && $this->datacenter->getDataCenterConnection($this->settings['connection_settings']['default_dc'])->hasTempAuthKey()) {
             $this->logger->logger('Fetching phone config...');
             VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]));
         } else {
@@ -1348,16 +1378,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
     }
 
-    public function get_config_async($config = [], $options = [])
-    {
-        if ($this->config['expires'] > \time()) {
-            return $this->config;
-        }
-        $this->config = empty($config) ? yield $this->method_call_async_read('help.getConfig', $config, empty($options) ? ['datacenter' => $this->settings['connection_settings']['default_dc']] : $options) : $config;
-        yield $this->parse_config_async();
-
-        return $this->config;
-    }
 
     public function get_cdn_config_async($datacenter)
     {
@@ -1375,6 +1395,17 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
     }
 
+    public function get_config_async($config = [], $options = [])
+    {
+        if ($this->config['expires'] > \time()) {
+            return $this->config;
+        }
+        $this->config = empty($config) ? yield $this->method_call_async_read('help.getConfig', $config, empty($options) ? ['datacenter' => $this->settings['connection_settings']['default_dc']] : $options) : $config;
+        yield $this->parse_config_async();
+
+        return $this->config;
+    }
+
     public function parse_config_async()
     {
         if (isset($this->config['dc_options'])) {
@@ -1387,7 +1418,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function parse_dc_options_async($dc_options)
     {
-        unset($this->settings[$this->config['test_mode']]);
+        $changed = [];
         foreach ($dc_options as $dc) {
             $test = $this->config['test_mode'] ? 'test' : 'main';
             $id = $dc['id'];
@@ -1405,13 +1436,35 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
             unset($dc['cdn'], $dc['media_only'], $dc['id'], $dc['ipv6']);
 
-
-
+            if ($dc !== $this->settings['connection'][$test][$ipv6][$id] ?? []) {
+                $changed[$id] = true;
+            }
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
         $curdc = $this->datacenter->curdc;
-        $this->logger->logger('Got new DC options, reconnecting');
-        yield $this->connect_to_all_dcs_async();
+        if ($changed) {
+            $this->logger->logger('Got new DC options, reconnecting');
+            foreach ($this->datacenter->sockets as $key => $socket) {
+                if ($socket instanceof DataCenterConnection && isset($changed[$key]) && $socket->byIPAddress()) {
+                    //$this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
+                    $socket->shouldReconnect(true);
+                    $socket->disconnect();
+                    unset($changed[$key]);
+                }
+            }
+            $dcs = [];
+            foreach ($this->datacenter->get_dcs() as $new_dc) {
+                $dcs[] = $this->datacenter->dcConnectAsync($new_dc);
+            }
+            yield $this->all($dcs);
+            yield $this->init_authorization_async();
+            $dcs = [];
+            foreach ($this->datacenter->get_dcs(false) as $new_dc) {
+                $dcs[] = $this->datacenter->dcConnectAsync($new_dc);
+            }
+            yield $this->all($dcs);
+            yield $this->init_authorization_async();
+        }
         $this->datacenter->curdc = $curdc;
     }
 

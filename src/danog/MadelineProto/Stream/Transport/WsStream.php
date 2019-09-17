@@ -28,9 +28,11 @@ use Amp\Websocket\Client\Internal\ClientSocket;
 use Amp\Websocket\Client\Rfc6455Connection;
 use Amp\Websocket\Rfc6455Client;
 use Amp\Websocket\Rfc7692CompressionFactory;
+use danog\MadelineProto\API;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\RawStreamInterface;
+use danog\MadelineProto\Stream\RawProxyStreamInterface;
 use function Amp\Websocket\generateKey;
 use function Amp\Websocket\validateAcceptForKey;
 
@@ -39,11 +41,27 @@ use function Amp\Websocket\validateAcceptForKey;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class WsStream implements RawStreamInterface
+class WsStream implements RawProxyStreamInterface
 {
     use RawStream;
 
+    /**
+     * API instance.
+     *
+     * @var MTProto
+     */
+    private $API;
+    /**
+     * Websocket stream.
+     *
+     * @var Rfc6455Connection
+     */
     private $stream;
+    /**
+     * Websocket message.
+     *
+     * @var Message
+     */
     private $message;
 
     /**
@@ -209,6 +227,16 @@ class WsStream implements RawStreamInterface
         return null;
     }
 
+    /**
+     * Set API instance.
+     *
+     * @param MTProto $extra
+     * @return void
+     */
+    public function setExtra($extra)
+    {
+        $this->API = $extra;
+    }
     /**
      * {@inheritdoc}
      *

@@ -77,7 +77,7 @@ class ReadLoop extends SignalLoop
             try {
                 $error = yield $this->waitSignal($this->readMessage());
             } catch (NothingInTheSocketException | StreamException | PendingReadError | \Error $e) {
-                if (isset($connection->old)) {
+                if ($connection->shouldReconnect()) {
                     return;
                 }
                 Tools::callForkDefer((function () use ($API, $connection, $datacenter, $e) {
@@ -142,7 +142,7 @@ class ReadLoop extends SignalLoop
         $connection = $this->connection;
         $shared = $this->datacenterConnection;
 
-        if (isset($this->connection->old)) {
+        if ($connection->shouldReconnect()) {
             $API->logger->logger('Not reading because connection is old');
 
             throw new NothingInTheSocketException();
