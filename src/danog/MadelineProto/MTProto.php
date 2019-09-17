@@ -1436,7 +1436,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
             unset($dc['cdn'], $dc['media_only'], $dc['id'], $dc['ipv6']);
 
-            if ($dc !== $this->settings['connection'][$test][$ipv6][$id] ?? []) {
+            if ($dc !== ($this->settings['connection'][$test][$ipv6][$id] ?? [])) {
                 $changed[$id] = true;
             }
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
