@@ -181,49 +181,80 @@ class DataCenter
             }
         }
     }
-    public function __magic_construct($API, $dclist, $settings, CookieJar $jar = null)
+    /**
+     * Constructor function.
+     *
+     * @param MTProto $API          Main MTProto instance
+     * @param array $dclist         DC IP list
+     * @param array $settings       Settings
+     * @param boolean $reconnectAll Whether to reconnect to all DCs or just to changed ones
+     * @param CookieJar $jar        Cookie jar
+     *
+     * @return void
+     */
+    public function __magic_construct(MTProto $API, array $dclist, array $settings, bool $reconnectAll = true, CookieJar $jar = null)
     {
         $this->API = $API;
+
+        $changed = [];
+        $changedSettings = $this->settings !== $settings;
+        if (!$reconnectAll) {
+            $changed = [];
+            $test = ($API->get_cached_config()['test_mode'] ?? false) ? 'test' : 'main';
+            foreach ($dclist[$test] as $ipv6 => $dcs) {
+                foreach ($dcs as $id => $dc) {
+                    if ($dc !== ($this->dclist[$test][$ipv6][$id] ?? [])) {
+                        $changed[$id] = true;
+                    }
+                }
+            }
+        }
+
         $this->dclist = $dclist;
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
             if ($socket instanceof DataCenterConnection && !\strpos($key, '_bk')) {
                 //$this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
-                $socket->needReconnect(true);
-                $socket->setExtra($this->API);
-                $socket->disconnect();
+                if ($reconnectAll || isset($changed[$id])) {
+                    $socket->needReconnect(true);
+                    $socket->setExtra($this->API);
+                    $socket->disconnect();
+                }
             } else {
                 unset($this->sockets[$key]);
             }
         }
-        $this->CookieJar = $jar ?? new ArrayCookieJar;
-        $this->HTTPClient = new DefaultClient($this->CookieJar, new HttpSocketPool(new ProxySocketPool([$this, 'rawConnectAsync'])));
 
-        $DoHHTTPClient = new DefaultClient(
-            $this->CookieJar,
-            new HttpSocketPool(
+        if ($reconnectAll || $changedSettings || !$this->CookieJar) {
+            $this->CookieJar = $jar ?? new ArrayCookieJar;
+            $this->HTTPClient = new DefaultClient($this->CookieJar, new HttpSocketPool(new ProxySocketPool([$this, 'rawConnectAsync'])));
+
+            $DoHHTTPClient = new DefaultClient(
+                $this->CookieJar,
+                new HttpSocketPool(
                 new ProxySocketPool(
                     function (string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null) {
                         return $this->rawConnectAsync($uri, $token, $ctx, true);
                     }
                 )
             )
-        );
-        $DoHConfig = new DoHConfig(
-            [
+            );
+            $DoHConfig = new DoHConfig(
+                [
                 new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
                 new Nameserver('https://google.com/resolve', Nameserver::GOOGLE_JSON, ["Host" => "dns.google.com"]),
             ],
-            $DoHHTTPClient
-        );
-        $NonProxiedDoHConfig = new DoHConfig(
-            [
+                $DoHHTTPClient
+            );
+            $NonProxiedDoHConfig = new DoHConfig(
+                [
                 new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
                 new Nameserver('https://google.com/resolve', Nameserver::GOOGLE_JSON, ["Host" => "dns.google.com"]),
             ]
-        );
-        $this->DoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($DoHConfig);
-        $this->NonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($NonProxiedDoHConfig);
+            );
+            $this->DoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($DoHConfig);
+            $this->NonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($NonProxiedDoHConfig);
+        }
     }
 
     /**
@@ -500,6 +531,7 @@ class DataCenter
             ($id !== -1 && $this->sockets[$dc_number]->hasConnection($id) && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect())
         );
         if (isset($this->sockets[$dc_number]) && !$old) {
+            $this->API->logger("Not reconnecting to DC $dc_number ($id)");
             return false;
         }
         $ctxs = $this->generateContexts($dc_number);
@@ -916,12 +948,13 @@ class DataCenter
     }
 
     /**
-     * Get all DCs.
+     * Get all DC IDs.
      *
-     * @param boolean $all
-     * @return void
+     * @param boolean $all Whether to get all possible DC IDs, or only connected ones
+     *
+     * @return array
      */
-    public function get_dcs($all = true)
+    public function get_dcs($all = true): array
     {
         $test = $this->settings['all']['test_mode'] ? 'test' : 'main';
         $ipv6 = $this->settings['all']['ipv6'] ? 'ipv6' : 'ipv4';

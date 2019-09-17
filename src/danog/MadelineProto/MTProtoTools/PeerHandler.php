@@ -833,6 +833,9 @@ trait PeerHandler
                 if (isset($participant['date'])) {
                     $newres['date'] = $participant['date'];
                 }
+                if (isset($participant['rank'])) {
+                    $newres['rank'] = $participant['rank'];
+                }
                 switch ($participant['_']) {
                     case 'channelParticipantSelf':
                         $newres['role'] = 'user';

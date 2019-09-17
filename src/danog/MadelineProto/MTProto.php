@@ -1227,7 +1227,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
-    public function connect_to_all_dcs_async(): \Generator
+    public function connect_to_all_dcs_async(bool $reconnectAll = true): \Generator
     {
         $this->channels_state->get(false);
         foreach ($this->channels_state->get() as $state) {
@@ -1243,7 +1243,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->seqUpdater = new SeqLoop($this);
         }
 
-        $this->datacenter->__construct($this, $this->settings['connection'], $this->settings['connection_settings']);
+        $this->datacenter->__construct($this, $this->settings['connection'], $this->settings['connection_settings'], $reconnectAll);
         $dcs = [];
         foreach ($this->datacenter->get_dcs() as $new_dc) {
             $dcs[] = $this->datacenter->dcConnectAsync($new_dc);
@@ -1395,6 +1395,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
     }
 
+    public function get_cached_config()
+    {
+        return $this->config;
+    }
+
     public function get_config_async($config = [], $options = [])
     {
         if ($this->config['expires'] > \time()) {
@@ -1409,8 +1414,9 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function parse_config_async()
     {
         if (isset($this->config['dc_options'])) {
-            yield $this->parse_dc_options_async($this->config['dc_options']);
+            $options = $this->config['dc_options'];
             unset($this->config['dc_options']);
+            yield $this->parse_dc_options_async($options);
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['config_updated'], Logger::NOTICE);
         $this->logger->logger($this->config, Logger::NOTICE);
@@ -1418,7 +1424,6 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public function parse_dc_options_async($dc_options)
     {
-        $changed = [];
         foreach ($dc_options as $dc) {
             $test = $this->config['test_mode'] ? 'test' : 'main';
             $id = $dc['id'];
@@ -1436,34 +1441,12 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
             unset($dc['cdn'], $dc['media_only'], $dc['id'], $dc['ipv6']);
 
-            if ($dc !== ($this->settings['connection'][$test][$ipv6][$id] ?? [])) {
-                $changed[$id] = true;
-            }
             $this->settings['connection'][$test][$ipv6][$id] = $dc;
         }
         $curdc = $this->datacenter->curdc;
-        if ($changed) {
+        if (!$this->datacenter->has($curdc) || $this->datacenter->getDataCenterConnection($curdc)->byIPAddress()) {
             $this->logger->logger('Got new DC options, reconnecting');
-            foreach ($this->datacenter->sockets as $key => $socket) {
-                if ($socket instanceof DataCenterConnection && isset($changed[$key]) && $socket->byIPAddress()) {
-                    //$this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
-                    $socket->shouldReconnect(true);
-                    $socket->disconnect();
-                    unset($changed[$key]);
-                }
-            }
-            $dcs = [];
-            foreach ($this->datacenter->get_dcs() as $new_dc) {
-                $dcs[] = $this->datacenter->dcConnectAsync($new_dc);
-            }
-            yield $this->all($dcs);
-            yield $this->init_authorization_async();
-            $dcs = [];
-            foreach ($this->datacenter->get_dcs(false) as $new_dc) {
-                $dcs[] = $this->datacenter->dcConnectAsync($new_dc);
-            }
-            yield $this->all($dcs);
-            yield $this->init_authorization_async();
+            yield $this->connect_to_all_dcs_async(false);
         }
         $this->datacenter->curdc = $curdc;
     }

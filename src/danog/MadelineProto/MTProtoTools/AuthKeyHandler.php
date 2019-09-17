@@ -639,6 +639,7 @@ trait AuthKeyHandler
             $this->logger("Pending auth, not initing auth");
             return;
         }
+        $this->logger("Initing authorization...");
         $initing = $this->initing_authorization;
 
         $this->initing_authorization = true;
@@ -696,6 +697,7 @@ trait AuthKeyHandler
      */
     public function init_authorization_socket_async(string $id, DataCenterConnection $socket): \Generator
     {
+        $this->logger("Initing authorization DC $id...");
         $this->init_auth_dcs[$id] = true;
         $connection = $socket->getAuthConnection();
 
@@ -749,6 +751,7 @@ trait AuthKeyHandler
                 yield $this->sync_authorization_async($id);
             }
         } finally {
+            $this->logger("Done initing authorization DC $id");
             unset($this->init_auth_dcs[$id]);
         }
     }
