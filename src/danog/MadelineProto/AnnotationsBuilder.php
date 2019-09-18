@@ -74,6 +74,7 @@ class AnnotationsBuilder
     {
         \danog\MadelineProto\Logger::log('Creating internal classes...', \danog\MadelineProto\Logger::NOTICE);
         $handle = \fopen(\dirname(__FILE__).'/InternalDoc.php', 'w');
+        $internalDoc = [];
         foreach ($this->methods->by_id as $id => $data) {
             if (!\strpos($data['method'], '.')) {
                 continue;
@@ -82,28 +83,133 @@ class AnnotationsBuilder
             if (!\in_array($namespace, $this->get_method_namespaces())) {
                 continue;
             }
-            $type = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
+            $internalDoc[$namespace][$method]['title'] = Lang::$current_lang["method_{$data['method']}"] ?? '';
+
+            $type = \str_ireplace(['vector<', '>'], ['_of_', '[]'], $data['type']);
             foreach ($data['params'] as $param) {
-                if (\in_array($param['name'], ['flags', 'random_id'])) {
+                if (\in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
                 }
+                if ($param['name'] === 'data' && $type === 'messages.SentEncryptedMessage') {
+                    $param['name'] = 'message';
+                    $param['type'] = 'DecryptedMessage';
+                }
+                if ($param['name'] === 'chat_id' && $data['method'] !== 'messages.discardEncryption') {
+                    $param['type'] = 'InputPeer';
+                }
+                if ($param['name'] === 'hash' && $param['type'] === 'int') {
+                    $param['pow'] = 'hi';
+                    $param['type'] = 'Vector t';
+                    $param['subtype'] = 'int';
+                }
+
                 $stype = 'type';
                 if (isset($param['subtype'])) {
                     $stype = 'subtype';
                 }
+
                 $ptype = \str_replace('.', '_', $param[$stype]);
                 switch ($ptype) {
                     case 'true':
                     case 'false':
                         $ptype = 'boolean';
                 }
-                $internalDoc[$namespace][$method]['attr'][$param['name']] = $ptype;
+                $ptype = $stype === 'type' ? $ptype : "[$ptype]";
+                $opt = ($param['pow'] ?? false) ? 'Optional: ' : '';
+                $internalDoc[$namespace][$method]['attr'][$param['name']] = [
+                    'type' => $ptype,
+                    'description' => $opt.Lang::$current_lang["method_{$data['method']}_param_{$param['name']}_type_{$param['type']}"]
+                ];
             }
             if ($type === 'Bool') {
                 $type = \strtolower($type);
             }
             $internalDoc[$namespace][$method]['return'] = $type;
         }
+        $class = new \ReflectionClass(MTProto::class);
+        $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
+        foreach ($methods as $method) {
+            $name = $method->getName();
+            if ($method == 'method_call_async_read') {
+                unset($methods[\array_search('method_call', $methods)]);
+            } elseif (\stripos($name, 'async') !== false) {
+                if (\strpos($name, '_async') !== false) {
+                    unset($methods[\array_search(\str_ireplace('_async', '', $method), $methods)]);
+                } else {
+                    unset($methods[\array_search(\str_ireplace('async', '', $method), $methods)]);
+                }
+            }
+        }
+        foreach ($methods as $method) {
+            $name = $method->getName();
+            $originalName = $name;
+
+            if ($name == 'method_call_async_read') {
+                $name = 'method_call';
+            } elseif (\stripos($name, 'async') !== false) {
+                if (\strpos($name, '_async') !== false) {
+                    $name = \str_ireplace('_async', '', $name);
+                } else {
+                    $name = \str_ireplace('async', '', $name);
+                }
+            }
+            $name = \strpos($name, '__') === 0 ? $name : Tools::from_snake_case($name);
+
+            $doc = 'public function ';
+            $doc .= $name;
+
+            $doc .= '(';
+            $paramList = '';
+            foreach ($method->getParameters() as $param) {
+                if ($param->allowsNull()) {
+                    //$doc .= '?';
+                }
+                if ($type = $param->getType()) {
+                    if ($type->allowsNull()) {
+                        $doc .= '?';
+                    }
+                    $doc .= $type->getName();
+                    $doc .= ' ';
+                }
+                if ($param->isVariadic()) {
+                    $doc .= '...';
+                }
+                if ($param->isPassedByReference()) {
+                    $doc .= '&';
+                }
+                $doc .= '$';
+                $doc .= $param->getName();
+                if ($param->isOptional() && !$param->isVariadic()) {
+                    $doc .= ' = ';
+                    if ($param->isDefaultValueConstant()) {
+                        $doc .= str_replace(['NULL', 'self'], ['null', 'MTProto'], $param->getDefaultValueConstantName());
+                    } else {
+                        $doc .= str_replace('NULL', 'null', var_export($param->getDefaultValue(), true));
+                    }
+                }
+                $doc .= ', ';
+
+
+                $paramList .= '$'.$param->getName().', ';
+            }
+            $doc = \rtrim($doc, ', ');
+            $paramList = \rtrim($paramList, ', ');
+            $doc .= ")";
+            if ($type = $method->getReturnType()) {
+                $doc .= ': ';
+                if ($type->allowsNull()) {
+                    $doc .= '?';
+                }
+                $doc .= $type->getName();
+            }
+            $doc .= "\n{\n";
+            $doc .= "    return \$this->__call('$originalName', [$paramList]);\n";
+            $doc .= "}\n";
+
+            $internalDoc['InternalDoc'][$name]['method'] = $method->getDocComment() ?? '';
+            $internalDoc['InternalDoc'][$name]['method'] .= "\n    ".\implode("\n    ", \explode("\n", $doc));
+        }
+
         \fwrite($handle, "<?php\n");
         \fwrite($handle, "/**\n");
         \fwrite($handle, " * This file is automatic generated by build_docs.php file\n");
@@ -112,22 +218,42 @@ class AnnotationsBuilder
         \fwrite($handle, " */\n\n");
         \fwrite($handle, "namespace danog\\MadelineProto;\n");
         foreach ($internalDoc as $namespace => $methods) {
-            \fwrite($handle, "\ninterface {$namespace}\n{");
+            if ($namespace === 'InternalDoc') {
+                \fwrite($handle, "\nclass {$namespace} extends APIFactory\n{\n");
+            } else {
+                \fwrite($handle, "\ninterface {$namespace}\n{");
+            }
             foreach ($methods as $method => $properties) {
+                if (isset($properties['method'])) {
+                    \fwrite($handle, $properties['method']);
+                    continue;
+                }
                 \fwrite($handle, "\n    /**\n");
+                \fwrite($handle, "     * {$properties['title']}\n");
+                \fwrite($handle, "     *\n");
                 if (isset($properties['attr'])) {
-                    \fwrite($handle, "     * @param array params [\n");
-                    foreach ($properties['attr'] as $name => $type) {
-                        \fwrite($handle, "     *               {$type} {$name},\n");
+                    \fwrite($handle, "     * Parameters: \n");
+                    $longest = [0, 0, 0];
+                    foreach ($properties['attr'] as $name => $param) {
+                        $longest[0] = \max($longest[0], \strlen($param['type']));
+                        $longest[1] = \max($longest[1], \strlen($name));
+                        $longest[2] = \max($longest[2], \strlen($param['description']));
                     }
-                    \fwrite($handle, "     *              ]\n");
+                    foreach ($properties['attr'] as $name => $param) {
+                        $param['type'] = \str_pad('`'.$param['type'].'`', $longest[0]+2);
+                        $name = \str_pad('**'.$name.'**', $longest[1]+4);
+                        $param['description'] = \str_pad($param['description'], $longest[2]);
+                        \fwrite($handle, "     * * {$param['type']} {$name} - {$param['description']}\n");
+                    }
+                    \fwrite($handle, "     * \n");
+                    \fwrite($handle, "     * @param array \$params Parameters\n");
                     \fwrite($handle, "     *\n");
                 }
                 \fwrite($handle, "     * @return {$properties['return']}\n");
                 \fwrite($handle, "     */\n");
                 \fwrite($handle, "    public function {$method}(");
                 if (isset($properties['attr'])) {
-                    \fwrite($handle, 'array $params');
+                    \fwrite($handle, '$params');
                 }
                 \fwrite($handle, ");\n");
             }

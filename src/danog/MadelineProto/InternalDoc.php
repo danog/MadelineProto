@@ -10,3110 +10,5359 @@ namespace danog\MadelineProto;
 interface auth
 {
     /**
-     * @param array params [
-     *               string phone_number,
-     *               int api_id,
-     *               string api_hash,
-     *               CodeSettings settings,
-     *              ]
+     * Use phone_login instead
      *
-     * @return auth_SentCode
+     * Parameters: 
+     * * `string`       **phone_number** - Use phone_login instead                                                                                                   
+     * * `int`          **api_id**       - Use phone_login instead                                                                                                   
+     * * `string`       **api_hash**     - Use phone_login instead                                                                                                   
+     * * `CodeSettings` **settings**     - You cannot use this method directly, use the phone_login method instead (see https://docs.madelineproto.xyz for more info)
+     * 
+     * @param array $params Parameters
+     *
+     * @return auth.SentCode
      */
-    public function sendCode(array $params);
+    public function sendCode($params);
 
     /**
-     * @param array params [
-     *               string phone_number,
-     *               string phone_code_hash,
-     *               string first_name,
-     *               string last_name,
-     *              ]
+     * You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
      *
-     * @return auth_Authorization
+     * Parameters: 
+     * * `string` **phone_number**    - You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_code_hash** - You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **first_name**      - You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **last_name**       - You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
+     * 
+     * @param array $params Parameters
+     *
+     * @return auth.Authorization
      */
-    public function signUp(array $params);
+    public function signUp($params);
 
     /**
-     * @param array params [
-     *               string phone_number,
-     *               string phone_code_hash,
-     *               string phone_code,
-     *              ]
+     * You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)
      *
-     * @return auth_Authorization
+     * Parameters: 
+     * * `string` **phone_number**    - You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_code_hash** - You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_code**      - You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)
+     * 
+     * @param array $params Parameters
+     *
+     * @return auth.Authorization
      */
-    public function signIn(array $params);
+    public function signIn($params);
 
     /**
+     * You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info)
+     *
      * @return bool
      */
     public function logOut();
 
     /**
+     * Delete all logged-in sessions.
+     *
      * @return bool
      */
     public function resetAuthorizations();
 
     /**
-     * @param array params [
-     *               int dc_id,
-     *              ]
+     * You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
      *
-     * @return auth_ExportedAuthorization
+     * Parameters: 
+     * * `int` **dc_id** - You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * 
+     * @param array $params Parameters
+     *
+     * @return auth.ExportedAuthorization
      */
-    public function exportAuthorization(array $params);
+    public function exportAuthorization($params);
 
     /**
-     * @param array params [
-     *               int id,
-     *               bytes bytes,
-     *              ]
+     * You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
      *
-     * @return auth_Authorization
+     * Parameters: 
+     * * `int`   **id**    - You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * * `bytes` **bytes** - You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * 
+     * @param array $params Parameters
+     *
+     * @return auth.Authorization
      */
-    public function importAuthorization(array $params);
+    public function importAuthorization($params);
 
     /**
-     * @param array params [
-     *               long perm_auth_key_id,
-     *               long nonce,
-     *               int expires_at,
-     *               bytes encrypted_message,
-     *              ]
+     * You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
+     *
+     * Parameters: 
+     * * `long`  **perm_auth_key_id**  - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
+     * * `long`  **nonce**             - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
+     * * `int`   **expires_at**        - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
+     * * `bytes` **encrypted_message** - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function bindTempAuthKey(array $params);
+    public function bindTempAuthKey($params);
 
     /**
-     * @param array params [
-     *               int api_id,
-     *               string api_hash,
-     *               string bot_auth_token,
-     *              ]
+     * You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)
      *
-     * @return auth_Authorization
-     */
-    public function importBotAuthorization(array $params);
-
-    /**
-     * @param array params [
-     *               InputCheckPasswordSRP password,
-     *              ]
+     * Parameters: 
+     * * `int`    **api_id**         - You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **api_hash**       - You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **bot_auth_token** - You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)
+     * 
+     * @param array $params Parameters
      *
-     * @return auth_Authorization
+     * @return auth.Authorization
      */
-    public function checkPassword(array $params);
+    public function importBotAuthorization($params);
 
     /**
-     * @return auth_PasswordRecovery
+     * You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)
+     *
+     * Parameters: 
+     * * `InputCheckPasswordSRP` **password** - You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)
+     * 
+     * @param array $params Parameters
+     *
+     * @return auth.Authorization
+     */
+    public function checkPassword($params);
+
+    /**
+     * Send an email to recover the 2FA password
+     *
+     * @return auth.PasswordRecovery
      */
     public function requestPasswordRecovery();
 
     /**
-     * @param array params [
-     *               string code,
-     *              ]
+     * Use the code that was emailed to you after running $MadelineProto->auth->requestPasswordRecovery to login to your account
      *
-     * @return auth_Authorization
+     * Parameters: 
+     * * `string` **code** - The code that was emailed to you
+     * 
+     * @param array $params Parameters
+     *
+     * @return auth.Authorization
      */
-    public function recoverPassword(array $params);
+    public function recoverPassword($params);
 
     /**
-     * @param array params [
-     *               string phone_number,
-     *               string phone_code_hash,
-     *              ]
+     * Resend the SMS verification code
      *
-     * @return auth_SentCode
+     * Parameters: 
+     * * `string` **phone_number**    - The phone number   
+     * * `string` **phone_code_hash** - The phone code hash
+     * 
+     * @param array $params Parameters
+     *
+     * @return auth.SentCode
      */
-    public function resendCode(array $params);
+    public function resendCode($params);
 
     /**
-     * @param array params [
-     *               string phone_number,
-     *               string phone_code_hash,
-     *              ]
+     * Invalidate sent phone code
+     *
+     * Parameters: 
+     * * `string` **phone_number**    - Phone number   
+     * * `string` **phone_code_hash** - Phone code hash
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function cancelCode(array $params);
+    public function cancelCode($params);
 
     /**
-     * @param array params [
-     *               long except_auth_keys,
-     *              ]
+     * Delete all temporary authorization keys except the ones provided
+     *
+     * Parameters: 
+     * * `[long]` **except_auth_keys** - The temporary authorization keys to keep
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function dropTempAuthKeys(array $params);
+    public function dropTempAuthKeys($params);
 }
 
 interface account
 {
     /**
-     * @param array params [
-     *               boolean no_muted,
-     *               int token_type,
-     *               string token,
-     *               Bool app_sandbox,
-     *               bytes secret,
-     *               int other_uids,
-     *              ]
+     * Register device for push notifications
+     *
+     * Parameters: 
+     * * `boolean` **no_muted**    - Optional: Idk yet                                                                                                                                                            
+     * * `int`     **token_type**  - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone, 6 - Blackberry, and other, see source code of official apps for more info
+     * * `string`  **token**       - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info 
+     * * `Bool`    **app_sandbox** - Should the app run in a sandbox?                                                                                                                                             
+     * * `bytes`   **secret**      - Secret                                                                                                                                                                       
+     * * `[int]`   **other_uids**  - Other UIDs                                                                                                                                                                   
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function registerDevice(array $params);
+    public function registerDevice($params);
 
     /**
-     * @param array params [
-     *               int token_type,
-     *               string token,
-     *               int other_uids,
-     *              ]
+     * Stop sending PUSH notifications to app
+     *
+     * Parameters: 
+     * * `int`    **token_type** - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info
+     * * `string` **token**      - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info
+     * * `[int]`  **other_uids** - Other UIDs                                                                                                                                                                  
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function unregisterDevice(array $params);
+    public function unregisterDevice($params);
 
     /**
-     * @param array params [
-     *               InputNotifyPeer peer,
-     *               InputPeerNotifySettings settings,
-     *              ]
+     * Change notification settings
+     *
+     * Parameters: 
+     * * `InputNotifyPeer`         **peer**     - The peers to which the notification settings should be applied
+     * * `InputPeerNotifySettings` **settings** - Notification settings                                         
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function updateNotifySettings(array $params);
+    public function updateNotifySettings($params);
 
     /**
-     * @param array params [
-     *               InputNotifyPeer peer,
-     *              ]
+     * Get notification settings
+     *
+     * Parameters: 
+     * * `InputNotifyPeer` **peer** - Notification source 
+     * 
+     * @param array $params Parameters
      *
      * @return PeerNotifySettings
      */
-    public function getNotifySettings(array $params);
+    public function getNotifySettings($params);
 
     /**
+     * Reset all notification settings
+     *
      * @return bool
      */
     public function resetNotifySettings();
 
     /**
-     * @param array params [
-     *               string first_name,
-     *               string last_name,
-     *               string about,
-     *              ]
+     * Update profile info
+     *
+     * Parameters: 
+     * * `string` **first_name** - Optional: The first name     
+     * * `string` **last_name**  - Optional: The last name      
+     * * `string` **about**      - Optional: The bio/about field
+     * 
+     * @param array $params Parameters
      *
      * @return User
      */
-    public function updateProfile(array $params);
+    public function updateProfile($params);
 
     /**
-     * @param array params [
-     *               Bool offline,
-     *              ]
+     * Update online status
+     *
+     * Parameters: 
+     * * `Bool` **offline** - True to set the status to offline
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function updateStatus(array $params);
+    public function updateStatus($params);
 
     /**
-     * @param array params [
-     *               int hash,
-     *              ]
+     * Returns a list of available wallpapers.
      *
-     * @return account_WallPapers
-     */
-    public function getWallPapers(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               ReportReason reason,
-     *              ]
+     * Parameters: 
+     * * `[int]` **hash** - Optional: IDs of previously fetched wallpapers
+     * 
+     * @param array $params Parameters
      *
-     * @return bool
+     * @return account.WallPapers
      */
-    public function reportPeer(array $params);
+    public function getWallPapers($params);
 
     /**
-     * @param array params [
-     *               string username,
-     *              ]
+     * Report for spam
+     *
+     * Parameters: 
+     * * `InputPeer`    **peer**   - The peer to report             
+     * * `ReportReason` **reason** - Why are you reporting this peer
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function checkUsername(array $params);
+    public function reportPeer($params);
 
     /**
-     * @param array params [
-     *               string username,
-     *              ]
+     * Check if this username is available
+     *
+     * Parameters: 
+     * * `string` **username** - The username to check
+     * 
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function checkUsername($params);
+
+    /**
+     * Update this user's username
+     *
+     * Parameters: 
+     * * `string` **username** - The new username
+     * 
+     * @param array $params Parameters
      *
      * @return User
      */
-    public function updateUsername(array $params);
+    public function updateUsername($params);
 
     /**
-     * @param array params [
-     *               InputPrivacyKey key,
-     *              ]
+     * Get privacy settings
      *
-     * @return account_PrivacyRules
-     */
-    public function getPrivacy(array $params);
-
-    /**
-     * @param array params [
-     *               InputPrivacyKey key,
-     *               InputPrivacyRule rules,
-     *              ]
+     * Parameters: 
+     * * `InputPrivacyKey` **key** - Privacy setting key
+     * 
+     * @param array $params Parameters
      *
-     * @return account_PrivacyRules
+     * @return account.PrivacyRules
      */
-    public function setPrivacy(array $params);
+    public function getPrivacy($params);
 
     /**
-     * @param array params [
-     *               string reason,
-     *              ]
+     * Set privacy settings
+     *
+     * Parameters: 
+     * * `InputPrivacyKey`    **key**   - Privacy setting 
+     * * `[InputPrivacyRule]` **rules** - Privacy settings
+     * 
+     * @param array $params Parameters
+     *
+     * @return account.PrivacyRules
+     */
+    public function setPrivacy($params);
+
+    /**
+     * Delete this account
+     *
+     * Parameters: 
+     * * `string` **reason** - Why are you going away? :(
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function deleteAccount(array $params);
+    public function deleteAccount($params);
 
     /**
+     * Get account TTL
+     *
      * @return AccountDaysTTL
      */
     public function getAccountTTL();
 
     /**
-     * @param array params [
-     *               AccountDaysTTL ttl,
-     *              ]
+     * Set account TTL
+     *
+     * Parameters: 
+     * * `AccountDaysTTL` **ttl** - Time To Live of account
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function setAccountTTL(array $params);
+    public function setAccountTTL($params);
 
     /**
-     * @param array params [
-     *               string phone_number,
-     *               CodeSettings settings,
-     *              ]
+     * Change the phone number
      *
-     * @return auth_SentCode
+     * Parameters: 
+     * * `string`       **phone_number** - New phone number
+     * * `CodeSettings` **settings**     - Code settings   
+     * 
+     * @param array $params Parameters
+     *
+     * @return auth.SentCode
      */
-    public function sendChangePhoneCode(array $params);
+    public function sendChangePhoneCode($params);
 
     /**
-     * @param array params [
-     *               string phone_number,
-     *               string phone_code_hash,
-     *               string phone_code,
-     *              ]
+     * Change the phone number associated to this account
+     *
+     * Parameters: 
+     * * `string` **phone_number**    - Phone number                                           
+     * * `string` **phone_code_hash** - Phone code hash returned by account.sendChangePhoneCode
+     * * `string` **phone_code**      - The phone code sent by account.sendChangePhoneCode     
+     * 
+     * @param array $params Parameters
      *
      * @return User
      */
-    public function changePhone(array $params);
+    public function changePhone($params);
 
     /**
-     * @param array params [
-     *               int period,
-     *              ]
+     * Disable all notifications for a certain period
+     *
+     * Parameters: 
+     * * `int` **period** - For how long should notifications be disabled
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function updateDeviceLocked(array $params);
+    public function updateDeviceLocked($params);
 
     /**
-     * @return account_Authorizations
+     * Get all logged-in authorizations
+     *
+     * @return account.Authorizations
      */
     public function getAuthorizations();
 
     /**
-     * @param array params [
-     *               long hash,
-     *              ]
+     * Delete a certain session
+     *
+     * Parameters: 
+     * * `long` **hash** - The session hash, obtained from $MadelineProto->account->getAuthorizations
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function resetAuthorization(array $params);
+    public function resetAuthorization($params);
 
     /**
-     * @return account_Password
+     * Get the current password
+     *
+     * @return account.Password
      */
     public function getPassword();
 
     /**
-     * @param array params [
-     *               InputCheckPasswordSRP password,
-     *              ]
+     * Get the current 2FA settings
      *
-     * @return account_PasswordSettings
+     * Parameters: 
+     * * `InputCheckPasswordSRP` **password** - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
+     * 
+     * @param array $params Parameters
+     *
+     * @return account.PasswordSettings
      */
-    public function getPasswordSettings(array $params);
+    public function getPasswordSettings($params);
 
     /**
-     * @param array params [
-     *               InputCheckPasswordSRP password,
-     *               account_PasswordInputSettings new_settings,
-     *              ]
+     * You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
      *
-     * @return bool
-     */
-    public function updatePasswordSettings(array $params);
-
-    /**
-     * @param array params [
-     *               string hash,
-     *               CodeSettings settings,
-     *              ]
-     *
-     * @return auth_SentCode
-     */
-    public function sendConfirmPhoneCode(array $params);
-
-    /**
-     * @param array params [
-     *               string phone_code_hash,
-     *               string phone_code,
-     *              ]
+     * Parameters: 
+     * * `InputCheckPasswordSRP`         **password**     - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
+     * * `account_PasswordInputSettings` **new_settings** - New 2FA settings                                                                                                                        
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function confirmPhone(array $params);
+    public function updatePasswordSettings($params);
 
     /**
-     * @param array params [
-     *               InputCheckPasswordSRP password,
-     *               int period,
-     *              ]
+     * Send confirmation phone code
      *
-     * @return account_TmpPassword
+     * Parameters: 
+     * * `string`       **hash**     - The hash     
+     * * `CodeSettings` **settings** - Code settings
+     * 
+     * @param array $params Parameters
+     *
+     * @return auth.SentCode
      */
-    public function getTmpPassword(array $params);
+    public function sendConfirmPhoneCode($params);
 
     /**
-     * @return account_WebAuthorizations
+     * Confirm this phone number is associated to this account, obtain phone_code_hash from sendConfirmPhoneCode
+     *
+     * Parameters: 
+     * * `string` **phone_code_hash** - Obtain phone_code_hash from sendConfirmPhoneCode
+     * * `string` **phone_code**      - The code sent by sendConfirmPhoneCode           
+     * 
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function confirmPhone($params);
+
+    /**
+     * Get temporary password for buying products through bots
+     *
+     * Parameters: 
+     * * `InputCheckPasswordSRP` **password** - Password           
+     * * `int`                   **period**   - The validity period
+     * 
+     * @param array $params Parameters
+     *
+     * @return account.TmpPassword
+     */
+    public function getTmpPassword($params);
+
+    /**
+     * Get telegram web login authorizations
+     *
+     * @return account.WebAuthorizations
      */
     public function getWebAuthorizations();
 
     /**
-     * @param array params [
-     *               long hash,
-     *              ]
+     * Delete a certain telegram web login authorization
+     *
+     * Parameters: 
+     * * `long` **hash** - The authorization's hash
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function resetWebAuthorization(array $params);
+    public function resetWebAuthorization($params);
 
     /**
+     * Reset all telegram web login authorizations
+     *
      * @return bool
      */
     public function resetWebAuthorizations();
 
     /**
-     * @return Vector_of_SecureValue
+     * Get all secure telegram passport values
+     *
+     * @return _of_SecureValue[]
      */
     public function getAllSecureValues();
 
     /**
-     * @param array params [
-     *               SecureValueType types,
-     *              ]
+     * Get secure value for telegram passport
      *
-     * @return Vector_of_SecureValue
+     * Parameters: 
+     * * `[SecureValueType]` **types** - Get telegram passport secure parameters
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_SecureValue[]
      */
-    public function getSecureValue(array $params);
+    public function getSecureValue($params);
 
     /**
-     * @param array params [
-     *               InputSecureValue value,
-     *               long secure_secret_id,
-     *              ]
+     * Save telegram passport secure value
+     *
+     * Parameters: 
+     * * `InputSecureValue` **value**            - Encrypted value
+     * * `long`             **secure_secret_id** - Secret         
+     * 
+     * @param array $params Parameters
      *
      * @return SecureValue
      */
-    public function saveSecureValue(array $params);
+    public function saveSecureValue($params);
 
     /**
-     * @param array params [
-     *               SecureValueType types,
-     *              ]
+     * Delete secure telegram passport value
+     *
+     * Parameters: 
+     * * `[SecureValueType]` **types** - The values to delete
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function deleteSecureValue(array $params);
+    public function deleteSecureValue($params);
 
     /**
-     * @param array params [
-     *               int bot_id,
-     *               string scope,
-     *               string public_key,
-     *              ]
+     * Bots only: get telegram passport authorization form
      *
-     * @return account_AuthorizationForm
-     */
-    public function getAuthorizationForm(array $params);
-
-    /**
-     * @param array params [
-     *               int bot_id,
-     *               string scope,
-     *               string public_key,
-     *               SecureValueHash value_hashes,
-     *               SecureCredentialsEncrypted credentials,
-     *              ]
+     * Parameters: 
+     * * `int`    **bot_id**     - Bot ID          
+     * * `string` **scope**      - Scope           
+     * * `string` **public_key** - Bot's public key
+     * 
+     * @param array $params Parameters
      *
-     * @return bool
+     * @return account.AuthorizationForm
      */
-    public function acceptAuthorization(array $params);
+    public function getAuthorizationForm($params);
 
     /**
-     * @param array params [
-     *               string phone_number,
-     *               CodeSettings settings,
-     *              ]
+     * Accept telegram passport authorization
      *
-     * @return auth_SentCode
-     */
-    public function sendVerifyPhoneCode(array $params);
-
-    /**
-     * @param array params [
-     *               string phone_number,
-     *               string phone_code_hash,
-     *               string phone_code,
-     *              ]
+     * Parameters: 
+     * * `int`                        **bot_id**       - Bot ID                             
+     * * `string`                     **scope**        - Scope                              
+     * * `string`                     **public_key**   - The bot's RSA public key           
+     * * `[SecureValueHash]`          **value_hashes** - Hashes of the encrypted credentials
+     * * `SecureCredentialsEncrypted` **credentials**  - Encrypted secure credentials       
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function verifyPhone(array $params);
+    public function acceptAuthorization($params);
 
     /**
-     * @param array params [
-     *               string email,
-     *              ]
+     * Send phone verification code
      *
-     * @return account_SentEmailCode
-     */
-    public function sendVerifyEmailCode(array $params);
-
-    /**
-     * @param array params [
-     *               string email,
-     *               string code,
-     *              ]
+     * Parameters: 
+     * * `string`       **phone_number** - The phone number
+     * * `CodeSettings` **settings**     - Code settings   
+     * 
+     * @param array $params Parameters
      *
-     * @return bool
+     * @return auth.SentCode
      */
-    public function verifyEmail(array $params);
+    public function sendVerifyPhoneCode($params);
 
     /**
-     * @param array params [
-     *               boolean contacts,
-     *               boolean message_users,
-     *               boolean message_chats,
-     *               boolean message_megagroups,
-     *               boolean message_channels,
-     *               boolean files,
-     *               int file_max_size,
-     *              ]
+     * Verify phone number
      *
-     * @return account_Takeout
-     */
-    public function initTakeoutSession(array $params);
-
-    /**
-     * @param array params [
-     *               boolean success,
-     *              ]
+     * Parameters: 
+     * * `string` **phone_number**    - The phone number                                           
+     * * `string` **phone_code_hash** - The phone code hash returned by account.sendVerifyPhoneCode
+     * * `string` **phone_code**      - The phone code type returned by account.sendVerifyPhoneCode
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function finishTakeoutSession(array $params);
+    public function verifyPhone($params);
 
     /**
-     * @param array params [
-     *               string code,
-     *              ]
+     * Send email verification code
+     *
+     * Parameters: 
+     * * `string` **email** - Email
+     * 
+     * @param array $params Parameters
+     *
+     * @return account.SentEmailCode
+     */
+    public function sendVerifyEmailCode($params);
+
+    /**
+     * Verify email address
+     *
+     * Parameters: 
+     * * `string` **email** - The email address
+     * * `string` **code**  - The received code
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function confirmPasswordEmail(array $params);
+    public function verifyEmail($params);
 
     /**
+     * Start account exporting session
+     *
+     * Parameters: 
+     * * `boolean` **contacts**           - Optional: Export contacts?                        
+     * * `boolean` **message_users**      - Optional: Export users?                           
+     * * `boolean` **message_chats**      - Optional: Export chats?                           
+     * * `boolean` **message_megagroups** - Optional: Export supergroups?                     
+     * * `boolean` **message_channels**   - Optional: Export channel messages?                
+     * * `boolean` **files**              - Optional: Export files?                           
+     * * `int`     **file_max_size**      - Optional: Export only files smaller than this size
+     * 
+     * @param array $params Parameters
+     *
+     * @return account.Takeout
+     */
+    public function initTakeoutSession($params);
+
+    /**
+     * Finish account exporting session
+     *
+     * Parameters: 
+     * * `boolean` **success** - Optional: Did the data export succeed?
+     * 
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function finishTakeoutSession($params);
+
+    /**
+     * Confirm password recovery using email
+     *
+     * Parameters: 
+     * * `string` **code** - Code
+     * 
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function confirmPasswordEmail($params);
+
+    /**
+     * Resend password recovery email
+     *
      * @return bool
      */
     public function resendPasswordEmail();
 
     /**
+     * Cancel password recovery email
+     *
      * @return bool
      */
     public function cancelPasswordEmail();
 
     /**
+     * Contact signup notification setting value
+     *
      * @return bool
      */
     public function getContactSignUpNotification();
 
     /**
-     * @param array params [
-     *               Bool silent,
-     *              ]
+     * Set contact sign up notification
+     *
+     * Parameters: 
+     * * `Bool` **silent** - Silent?
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function setContactSignUpNotification(array $params);
+    public function setContactSignUpNotification($params);
 
     /**
-     * @param array params [
-     *               boolean compare_sound,
-     *               InputNotifyPeer peer,
-     *              ]
+     * Get notification exceptions
+     *
+     * Parameters: 
+     * * `boolean`         **compare_sound** - Optional: Compare sound?
+     * * `InputNotifyPeer` **peer**          - Optional: Peer          
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function getNotifyExceptions(array $params);
+    public function getNotifyExceptions($params);
 
     /**
-     * @param array params [
-     *               InputWallPaper wallpaper,
-     *              ]
+     * Get wallpaper info
+     *
+     * Parameters: 
+     * * `InputWallPaper` **wallpaper** - Wallpaper
+     * 
+     * @param array $params Parameters
      *
      * @return WallPaper
      */
-    public function getWallPaper(array $params);
+    public function getWallPaper($params);
 
     /**
-     * @param array params [
-     *               InputFile file,
-     *               string mime_type,
-     *               WallPaperSettings settings,
-     *              ]
+     * Upload wallpaper
+     *
+     * Parameters: 
+     * * `InputFile`         **file**      - Image             
+     * * `string`            **mime_type** - Mime type         
+     * * `WallPaperSettings` **settings**  - Wallpaper settings
+     * 
+     * @param array $params Parameters
      *
      * @return WallPaper
      */
-    public function uploadWallPaper(array $params);
+    public function uploadWallPaper($params);
 
     /**
-     * @param array params [
-     *               InputWallPaper wallpaper,
-     *               Bool unsave,
-     *               WallPaperSettings settings,
-     *              ]
+     * Save wallpaper
+     *
+     * Parameters: 
+     * * `InputWallPaper`    **wallpaper** - The wallpaper to save 
+     * * `Bool`              **unsave**    - Delete saved wallpaper
+     * * `WallPaperSettings` **settings**  - The wallpaper to save 
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function saveWallPaper(array $params);
+    public function saveWallPaper($params);
 
     /**
-     * @param array params [
-     *               InputWallPaper wallpaper,
-     *               WallPaperSettings settings,
-     *              ]
+     * Install wallpaper
+     *
+     * Parameters: 
+     * * `InputWallPaper`    **wallpaper** - Wallpaper to install
+     * * `WallPaperSettings` **settings**  - Wallpaper settings  
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function installWallPaper(array $params);
+    public function installWallPaper($params);
 
     /**
+     * Reset wallpapers
+     *
      * @return bool
      */
     public function resetWallPapers();
 
     /**
-     * @return account_AutoDownloadSettings
+     * Get autodownload settings
+     *
+     * @return account.AutoDownloadSettings
      */
     public function getAutoDownloadSettings();
 
     /**
-     * @param array params [
-     *               boolean low,
-     *               boolean high,
-     *               AutoDownloadSettings settings,
-     *              ]
+     * Save autodownload settings
+     *
+     * Parameters: 
+     * * `boolean`              **low**      - Optional: Low preset 
+     * * `boolean`              **high**     - Optional: High preset
+     * * `AutoDownloadSettings` **settings** - Autodownload settings
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function saveAutoDownloadSettings(array $params);
+    public function saveAutoDownloadSettings($params);
 
     /**
-     * @param array params [
-     *               InputFile file,
-     *               InputFile thumb,
-     *               string file_name,
-     *               string mime_type,
-     *              ]
+     * Upload theme
+     *
+     * Parameters: 
+     * * `InputFile` **file**      - File           
+     * * `InputFile` **thumb**     - Optional: Thumb
+     * * `string`    **file_name** - File name      
+     * * `string`    **mime_type** - Mime type      
+     * 
+     * @param array $params Parameters
      *
      * @return Document
      */
-    public function uploadTheme(array $params);
+    public function uploadTheme($params);
 
     /**
-     * @param array params [
-     *               string slug,
-     *               string title,
-     *               InputDocument document,
-     *              ]
+     * Create a theme
+     *
+     * Parameters: 
+     * * `string`        **slug**     - Unique theme ID
+     * * `string`        **title**    - Theme name     
+     * * `InputDocument` **document** - Theme file     
+     * 
+     * @param array $params Parameters
      *
      * @return Theme
      */
-    public function createTheme(array $params);
+    public function createTheme($params);
 
     /**
-     * @param array params [
-     *               string format,
-     *               InputTheme theme,
-     *               string slug,
-     *               string title,
-     *               InputDocument document,
-     *              ]
+     * Update theme
+     *
+     * Parameters: 
+     * * `string`        **format**   - Theme format, a string that identifies the theming engines supported by the client
+     * * `InputTheme`    **theme**    - Theme to update                                                                   
+     * * `string`        **slug**     - Optional: Unique theme ID                                                         
+     * * `string`        **title**    - Optional: Theme name                                                              
+     * * `InputDocument` **document** - Optional: Theme file                                                              
+     * 
+     * @param array $params Parameters
      *
      * @return Theme
      */
-    public function updateTheme(array $params);
+    public function updateTheme($params);
 
     /**
-     * @param array params [
-     *               InputTheme theme,
-     *               Bool unsave,
-     *              ]
+     * Save theme
+     *
+     * Parameters: 
+     * * `InputTheme` **theme**  - Theme to save
+     * * `Bool`       **unsave** - Unsave       
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function saveTheme(array $params);
+    public function saveTheme($params);
 
     /**
-     * @param array params [
-     *               boolean dark,
-     *               string format,
-     *               InputTheme theme,
-     *              ]
+     * Install theme
+     *
+     * Parameters: 
+     * * `boolean`    **dark**   - Optional: Whether to install the dark version
+     * * `string`     **format** - Optional: Format                             
+     * * `InputTheme` **theme**  - Optional: Theme to install                   
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function installTheme(array $params);
+    public function installTheme($params);
 
     /**
-     * @param array params [
-     *               string format,
-     *               InputTheme theme,
-     *               long document_id,
-     *              ]
+     * Get theme information
+     *
+     * Parameters: 
+     * * `string`     **format**      - Theme format, a string that identifies the theming engines supported by the client
+     * * `InputTheme` **theme**       - Theme                                                                             
+     * * `long`       **document_id** - Document ID                                                                       
+     * 
+     * @param array $params Parameters
      *
      * @return Theme
      */
-    public function getTheme(array $params);
+    public function getTheme($params);
 
     /**
-     * @param array params [
-     *               string format,
-     *               int hash,
-     *              ]
+     * Get installed themes
      *
-     * @return account_Themes
+     * Parameters: 
+     * * `string` **format** - Theme format, a string that identifies the theming engines supported by the client
+     * * `[int]`  **hash**   - Optional: Hash for pagination                                                     
+     * 
+     * @param array $params Parameters
+     *
+     * @return account.Themes
      */
-    public function getThemes(array $params);
+    public function getThemes($params);
 }
 
 interface users
 {
     /**
-     * @param array params [
-     *               InputUser id,
-     *              ]
+     * Get info about users
      *
-     * @return Vector_of_User
+     * Parameters: 
+     * * `[InputUser]` **id** - The ids of the users
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_User[]
      */
-    public function getUsers(array $params);
+    public function getUsers($params);
 
     /**
-     * @param array params [
-     *               InputUser id,
-     *              ]
+     * You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     *
+     * Parameters: 
+     * * `InputUser` **id** - You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     * 
+     * @param array $params Parameters
      *
      * @return UserFull
      */
-    public function getFullUser(array $params);
+    public function getFullUser($params);
 
     /**
-     * @param array params [
-     *               InputUser id,
-     *               SecureValueError errors,
-     *              ]
+     * Set secure value error for telegram passport
+     *
+     * Parameters: 
+     * * `InputUser`          **id**     - The user ID
+     * * `[SecureValueError]` **errors** - The errors 
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function setSecureValueErrors(array $params);
+    public function setSecureValueErrors($params);
 }
 
 interface contacts
 {
     /**
-     * @param array params [
-     *               int hash,
-     *              ]
+     * Get contacts by IDs
      *
-     * @return Vector_of_int
+     * Parameters: 
+     * * `[int]` **hash** - Optional: Previously fetched IDs
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_int[]
      */
-    public function getContactIDs(array $params);
+    public function getContactIDs($params);
 
     /**
-     * @return Vector_of_ContactStatus
+     * Get online status of all users
+     *
+     * @return _of_ContactStatus[]
      */
     public function getStatuses();
 
     /**
-     * @param array params [
-     *               int hash,
-     *              ]
+     * Get all contacts
      *
-     * @return contacts_Contacts
+     * Parameters: 
+     * * `[int]` **hash** - Optional: User IDs of previously cached contacts
+     * 
+     * @param array $params Parameters
+     *
+     * @return contacts.Contacts
      */
-    public function getContacts(array $params);
+    public function getContacts($params);
 
     /**
-     * @param array params [
-     *               InputContact contacts,
-     *              ]
+     * Add phone number as contact
      *
-     * @return contacts_ImportedContacts
+     * Parameters: 
+     * * `[InputContact]` **contacts** - The numbers to import
+     * 
+     * @param array $params Parameters
+     *
+     * @return contacts.ImportedContacts
      */
-    public function importContacts(array $params);
+    public function importContacts($params);
 
     /**
-     * @param array params [
-     *               InputUser id,
-     *              ]
+     * Delete multiple contacts
+     *
+     * Parameters: 
+     * * `[InputUser]` **id** - The contacts to delete
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function deleteContacts(array $params);
+    public function deleteContacts($params);
 
     /**
-     * @param array params [
-     *               string phones,
-     *              ]
+     * Delete contacts by phones
+     *
+     * Parameters: 
+     * * `[string]` **phones** - Phones
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function deleteByPhones(array $params);
+    public function deleteByPhones($params);
 
     /**
-     * @param array params [
-     *               InputUser id,
-     *              ]
+     * Block a user
+     *
+     * Parameters: 
+     * * `InputUser` **id** - The user to block
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function block(array $params);
+    public function block($params);
 
     /**
-     * @param array params [
-     *               InputUser id,
-     *              ]
+     * Unblock a user
+     *
+     * Parameters: 
+     * * `InputUser` **id** - The user to unblock
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function unblock(array $params);
+    public function unblock($params);
 
     /**
-     * @param array params [
-     *               int offset,
-     *               int limit,
-     *              ]
+     * Get blocked users
      *
-     * @return contacts_Blocked
-     */
-    public function getBlocked(array $params);
-
-    /**
-     * @param array params [
-     *               string q,
-     *               int limit,
-     *              ]
+     * Parameters: 
+     * * `int` **offset** - Initially 0, then set to the number of blocked contacts previously fetched
+     * * `int` **limit**  - How many blocked contacts to fetch                                        
+     * 
+     * @param array $params Parameters
      *
-     * @return contacts_Found
+     * @return contacts.Blocked
      */
-    public function search(array $params);
+    public function getBlocked($params);
 
     /**
-     * @param array params [
-     *               string username,
-     *              ]
+     * Search contacts
      *
-     * @return contacts_ResolvedPeer
-     */
-    public function resolveUsername(array $params);
-
-    /**
-     * @param array params [
-     *               boolean correspondents,
-     *               boolean bots_pm,
-     *               boolean bots_inline,
-     *               boolean phone_calls,
-     *               boolean forward_users,
-     *               boolean forward_chats,
-     *               boolean groups,
-     *               boolean channels,
-     *               int offset,
-     *               int limit,
-     *               int hash,
-     *              ]
+     * Parameters: 
+     * * `string` **q**     - The search query                   
+     * * `int`    **limit** - How many results should be returned
+     * 
+     * @param array $params Parameters
      *
-     * @return contacts_TopPeers
+     * @return contacts.Found
      */
-    public function getTopPeers(array $params);
+    public function search($params);
 
     /**
-     * @param array params [
-     *               TopPeerCategory category,
-     *               InputPeer peer,
-     *              ]
+     * You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     *
+     * Parameters: 
+     * * `string` **username** - You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     * 
+     * @param array $params Parameters
+     *
+     * @return contacts.ResolvedPeer
+     */
+    public function resolveUsername($params);
+
+    /**
+     * Get most used chats
+     *
+     * Parameters: 
+     * * `boolean` **correspondents** - Optional: Fetch users?                                                   
+     * * `boolean` **bots_pm**        - Optional: Fetch bots?                                                    
+     * * `boolean` **bots_inline**    - Optional: Fetch inline bots?                                             
+     * * `boolean` **phone_calls**    - Optional: Fetch phone calls?                                             
+     * * `boolean` **forward_users**  - Optional: Forward users?                                                 
+     * * `boolean` **forward_chats**  - Optional: Forward chats?                                                 
+     * * `boolean` **groups**         - Optional: Fetch groups?                                                  
+     * * `boolean` **channels**       - Optional: Fetch channels and supergroups?                                
+     * * `int`     **offset**         - Initially 0, then `$offset += $contacts_TopPeers['categories']['count'];`
+     * * `int`     **limit**          - How many results to fetch                                                
+     * * `[int]`   **hash**           - Optional: Peer IDs of previously cached peers                            
+     * 
+     * @param array $params Parameters
+     *
+     * @return contacts.TopPeers
+     */
+    public function getTopPeers($params);
+
+    /**
+     * Reset top peer rating for a certain category/peer
+     *
+     * Parameters: 
+     * * `TopPeerCategory` **category** - The category 
+     * * `InputPeer`       **peer**     - The peer     
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function resetTopPeerRating(array $params);
+    public function resetTopPeerRating($params);
 
     /**
+     * Reset saved contacts
+     *
      * @return bool
      */
     public function resetSaved();
 
     /**
-     * @return Vector_of_SavedContact
+     * Get saved contacts
+     *
+     * @return _of_SavedContact[]
      */
     public function getSaved();
 
     /**
-     * @param array params [
-     *               Bool enabled,
-     *              ]
+     * Toggle top peers
+     *
+     * Parameters: 
+     * * `Bool` **enabled** - Enable or disable top peer
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function toggleTopPeers(array $params);
+    public function toggleTopPeers($params);
 
     /**
-     * @param array params [
-     *               boolean add_phone_privacy_exception,
-     *               InputUser id,
-     *               string first_name,
-     *               string last_name,
-     *               string phone,
-     *              ]
+     * Add contact
+     *
+     * Parameters: 
+     * * `boolean`   **add_phone_privacy_exception** - Optional: Phone privacy exception?
+     * * `InputUser` **id**                          - ID                                
+     * * `string`    **first_name**                  - First name                        
+     * * `string`    **last_name**                   - Last name                         
+     * * `string`    **phone**                       - Phone number                      
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function addContact(array $params);
+    public function addContact($params);
 
     /**
-     * @param array params [
-     *               InputUser id,
-     *              ]
+     * Accept contact
+     *
+     * Parameters: 
+     * * `InputUser` **id** - ID
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function acceptContact(array $params);
+    public function acceptContact($params);
 
     /**
-     * @param array params [
-     *               InputGeoPoint geo_point,
-     *              ]
+     * Get people nearby (geochats)
+     *
+     * Parameters: 
+     * * `InputGeoPoint` **geo_point** - Current location
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function getLocated(array $params);
+    public function getLocated($params);
 }
 
 interface messages
 {
     /**
-     * @param array params [
-     *               InputMessage id,
-     *              ]
+     * Get messages
      *
-     * @return messages_Messages
+     * Parameters: 
+     * * `[InputMessage]` **id** - The IDs of messages to fetch (only for users and normal groups)
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Messages
      */
-    public function getMessages(array $params);
+    public function getMessages($params);
 
     /**
-     * @param array params [
-     *               boolean exclude_pinned,
-     *               int folder_id,
-     *               int offset_date,
-     *               int offset_id,
-     *               InputPeer offset_peer,
-     *               int limit,
-     *               int hash,
-     *              ]
+     * Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html
      *
-     * @return messages_Dialogs
+     * Parameters: 
+     * * `boolean`   **exclude_pinned** - Optional: Do not fetch pinned chats        
+     * * `int`       **folder_id**      - Optional: Folder ID                        
+     * * `int`       **offset_date**    - End($res['messages'])['date'];             
+     * * `int`       **offset_id**      - End($res['messages'])['id'];               
+     * * `InputPeer` **offset_peer**    - End($res['dialogs'])['peer'];              
+     * * `int`       **limit**          - Number of dialogs to fetch                 
+     * * `[int]`     **hash**           - Optional: IDs of previously fetched dialogs
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Dialogs
      */
-    public function getDialogs(array $params);
+    public function getDialogs($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int offset_id,
-     *               int offset_date,
-     *               int add_offset,
-     *               int limit,
-     *               int max_id,
-     *               int min_id,
-     *               int hash,
-     *              ]
+     * Get previous messages of a group
      *
-     * @return messages_Messages
+     * Parameters: 
+     * * `InputPeer` **peer**        - The chat                                                    
+     * * `int`       **offset_id**   - The last fetched message ID, initially 0                    
+     * * `int`       **offset_date** - The date of the last previously fetched message, initially 0
+     * * `int`       **add_offset**  - Additional offset, can be 0                                 
+     * * `int`       **limit**       - Number of messages to fetch                                 
+     * * `int`       **max_id**      - Maximum message ID to fetch                                 
+     * * `int`       **min_id**      - Minumum message ID to fetch                                 
+     * * `[int]`     **hash**        - Optional: IDs of messages you already fetched               
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Messages
      */
-    public function getHistory(array $params);
+    public function getHistory($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               string q,
-     *               InputUser from_id,
-     *               MessagesFilter filter,
-     *               int min_date,
-     *               int max_date,
-     *               int offset_id,
-     *               int add_offset,
-     *               int limit,
-     *               int max_id,
-     *               int min_id,
-     *               int hash,
-     *              ]
+     * Search peers or messages
      *
-     * @return messages_Messages
+     * Parameters: 
+     * * `InputPeer`      **peer**       - Where to search                                  
+     * * `string`         **q**          - What to search                                   
+     * * `InputUser`      **from_id**    - Optional: Show only messages from a certain user?
+     * * `MessagesFilter` **filter**     - Message filter                                   
+     * * `int`            **min_date**   - Minumum date of results to fetch                 
+     * * `int`            **max_date**   - Maximum date of results to fetch                 
+     * * `int`            **offset_id**  - Message ID offset                                
+     * * `int`            **add_offset** - Additional offset, can be 0                      
+     * * `int`            **limit**      - Number of results to return                      
+     * * `int`            **max_id**     - Maximum message id to return                     
+     * * `int`            **min_id**     - Minumum message id to return                     
+     * * `[int]`          **hash**       - Optional: The IDs of messages you already fetched
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Messages
      */
-    public function search(array $params);
+    public function search($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int max_id,
-     *              ]
+     * Mark messages as read
      *
-     * @return messages_AffectedMessages
+     * Parameters: 
+     * * `InputPeer` **peer**   - Where to mark messages as read    
+     * * `int`       **max_id** - Maximum message ID to mark as read
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.AffectedMessages
      */
-    public function readHistory(array $params);
+    public function readHistory($params);
 
     /**
-     * @param array params [
-     *               boolean just_clear,
-     *               boolean revoke,
-     *               InputPeer peer,
-     *               int max_id,
-     *              ]
+     * Delete chat history
      *
-     * @return messages_AffectedHistory
+     * Parameters: 
+     * * `boolean`   **just_clear** - Optional: Only clear it from your side      
+     * * `boolean`   **revoke**     - Optional: Delete messages for the other user
+     * * `InputPeer` **peer**       - Where to clear it                           
+     * * `int`       **max_id**     - Maximum message id of messages to delete    
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.AffectedHistory
      */
-    public function deleteHistory(array $params);
+    public function deleteHistory($params);
 
     /**
-     * @param array params [
-     *               boolean revoke,
-     *               int id,
-     *              ]
+     * Delete messages
      *
-     * @return messages_AffectedMessages
+     * Parameters: 
+     * * `boolean` **revoke** - Optional: Delete the messages for everyone?                            
+     * * `[int]`   **id**     - IDs of messages to delete, use channels->deleteMessages for supergroups
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.AffectedMessages
      */
-    public function deleteMessages(array $params);
+    public function deleteMessages($params);
 
     /**
-     * @param array params [
-     *               int max_id,
-     *              ]
+     * Mark messages as read
      *
-     * @return Vector_of_ReceivedNotifyMessage
+     * Parameters: 
+     * * `int` **max_id** - Maximum message id of messages to mark as read
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_ReceivedNotifyMessage[]
      */
-    public function receivedMessages(array $params);
+    public function receivedMessages($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               SendMessageAction action,
-     *              ]
+     * Change typing status
      *
-     * @return bool
-     */
-    public function setTyping(array $params);
-
-    /**
-     * @param array params [
-     *               boolean no_webpage,
-     *               boolean silent,
-     *               boolean background,
-     *               boolean clear_draft,
-     *               InputPeer peer,
-     *               int reply_to_msg_id,
-     *               string message,
-     *               ReplyMarkup reply_markup,
-     *               MessageEntity entities,
-     *               int schedule_date,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function sendMessage(array $params);
-
-    /**
-     * @param array params [
-     *               boolean silent,
-     *               boolean background,
-     *               boolean clear_draft,
-     *               InputPeer peer,
-     *               int reply_to_msg_id,
-     *               InputMedia media,
-     *               string message,
-     *               ReplyMarkup reply_markup,
-     *               MessageEntity entities,
-     *               int schedule_date,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function sendMedia(array $params);
-
-    /**
-     * @param array params [
-     *               boolean silent,
-     *               boolean background,
-     *               boolean with_my_score,
-     *               boolean grouped,
-     *               InputPeer from_peer,
-     *               int id,
-     *               InputPeer to_peer,
-     *               int schedule_date,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function forwardMessages(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
+     * Parameters: 
+     * * `InputPeer`         **peer**   - Where to change typing status
+     * * `SendMessageAction` **action** - Typing status                
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function reportSpam(array $params);
+    public function setTyping($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
+     * Send a message
+     *
+     * Parameters: 
+     * * `boolean`         **no_webpage**      - Optional: Disable webpage preview?             
+     * * `boolean`         **silent**          - Optional: Disable notifications?               
+     * * `boolean`         **background**      - Optional: Disable background notifications?    
+     * * `boolean`         **clear_draft**     - Optional: Clear the message draft of this chat?
+     * * `InputPeer`       **peer**            - The chat where to send this message            
+     * * `int`             **reply_to_msg_id** - Optional: Reply to message by ID               
+     * * `string`          **message**         - The message to send                            
+     * * `ReplyMarkup`     **reply_markup**    - Optional: Keyboards to send                    
+     * * `[MessageEntity]` **entities**        - Optional: Entities to send (for styled text)   
+     * * `int`             **schedule_date**   - Optional: Schedule date                        
+     * 
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function sendMessage($params);
+
+    /**
+     * Send a media
+     *
+     * Parameters: 
+     * * `boolean`         **silent**          - Optional: Disable notifications?               
+     * * `boolean`         **background**      - Optional: Disable background notifications?    
+     * * `boolean`         **clear_draft**     - Optional: Clear the message draft of this chat?
+     * * `InputPeer`       **peer**            - Where to send the media                        
+     * * `int`             **reply_to_msg_id** - Optional: Reply to message by ID               
+     * * `InputMedia`      **media**           - The media to send                              
+     * * `string`          **message**         - The caption                                    
+     * * `ReplyMarkup`     **reply_markup**    - Optional: Keyboards to send                    
+     * * `[MessageEntity]` **entities**        - Optional: Entities for styled text             
+     * * `int`             **schedule_date**   - Optional: Schedule date                        
+     * 
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function sendMedia($params);
+
+    /**
+     * Forward messages
+     *
+     * Parameters: 
+     * * `boolean`   **silent**        - Optional: Disable notifications                        
+     * * `boolean`   **background**    - Optional: Disable background notifications             
+     * * `boolean`   **with_my_score** - Optional: If forwarding a game, forward your score, too
+     * * `boolean`   **grouped**       - Optional: Set to true if forwarding albums             
+     * * `InputPeer` **from_peer**     - From where to forward the messages                     
+     * * `[int]`     **id**            - The message IDs                                        
+     * * `InputPeer` **to_peer**       - Where to forward the messages                          
+     * * `int`       **schedule_date** - Optional: Schedule date                                
+     * 
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function forwardMessages($params);
+
+    /**
+     * Report a peer for spam
+     *
+     * Parameters: 
+     * * `InputPeer` **peer** - The peer to report
+     * 
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function reportSpam($params);
+
+    /**
+     * Get the settings of  apeer
+     *
+     * Parameters: 
+     * * `InputPeer` **peer** - The peer
+     * 
+     * @param array $params Parameters
      *
      * @return PeerSettings
      */
-    public function getPeerSettings(array $params);
+    public function getPeerSettings($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int id,
-     *               ReportReason reason,
-     *              ]
+     * Report a message
+     *
+     * Parameters: 
+     * * `InputPeer`    **peer**   - The user that sent the messages          
+     * * `[int]`        **id**     - The messages to report                   
+     * * `ReportReason` **reason** - The reason why you're sending this report
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function report(array $params);
+    public function report($params);
 
     /**
-     * @param array params [
-     *               int id,
-     *              ]
+     * Get info about chats
      *
-     * @return messages_Chats
-     */
-    public function getChats(array $params);
-
-    /**
-     * @param array params [
-     *               int chat_id,
-     *              ]
+     * Parameters: 
+     * * `[int]` **id** - The MTProto IDs of chats to fetch info about
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_ChatFull
+     * @return messages.Chats
      */
-    public function getFullChat(array $params);
+    public function getChats($params);
 
     /**
-     * @param array params [
-     *               int chat_id,
-     *               string title,
-     *              ]
+     * You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
      *
-     * @return Updates
-     */
-    public function editChatTitle(array $params);
-
-    /**
-     * @param array params [
-     *               int chat_id,
-     *               InputChatPhoto photo,
-     *              ]
+     * Parameters: 
+     * * `InputPeer` **chat_id** - You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     * 
+     * @param array $params Parameters
      *
-     * @return Updates
+     * @return messages.ChatFull
      */
-    public function editChatPhoto(array $params);
+    public function getFullChat($params);
 
     /**
-     * @param array params [
-     *               int chat_id,
-     *               InputUser user_id,
-     *               int fwd_limit,
-     *              ]
+     * Edit the title of a normal chat (not supergroup)
+     *
+     * Parameters: 
+     * * `InputPeer` **chat_id** - The ID of the chat
+     * * `string`    **title**   - The new title     
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function addChatUser(array $params);
+    public function editChatTitle($params);
 
     /**
-     * @param array params [
-     *               int chat_id,
-     *               InputUser user_id,
-     *              ]
+     * Edit the photo of a normal chat (not supergroup)
+     *
+     * Parameters: 
+     * * `InputPeer`      **chat_id** - The ID of the chat
+     * * `InputChatPhoto` **photo**   - The new phto      
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function deleteChatUser(array $params);
+    public function editChatPhoto($params);
 
     /**
-     * @param array params [
-     *               InputUser users,
-     *               string title,
-     *              ]
+     * Add a user to a normal chat (use channels->inviteToChannel for supergroups)
+     *
+     * Parameters: 
+     * * `InputPeer` **chat_id**   - The chat where to invite users          
+     * * `InputUser` **user_id**   - The user to invite                      
+     * * `int`       **fwd_limit** - Number of old messages the user will see
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function createChat(array $params);
+    public function addChatUser($params);
 
     /**
-     * @param array params [
-     *               int version,
-     *               int random_length,
-     *              ]
+     * Delete a user from a chat (not supergroup)
      *
-     * @return messages_DhConfig
+     * Parameters: 
+     * * `InputPeer` **chat_id** - The ID of the chat                             
+     * * `InputUser` **user_id** - The user to delete (pass @me to leave the chat)
+     * 
+     * @param array $params Parameters
+     *
+     * @return Updates
      */
-    public function getDhConfig(array $params);
+    public function deleteChatUser($params);
 
     /**
-     * @param array params [
-     *               InputUser user_id,
-     *               bytes g_a,
-     *              ]
+     * Create a chat (not supergroup)
+     *
+     * Parameters: 
+     * * `[InputUser]` **users** - The users to add to the chat
+     * * `string`      **title** - The new chat's title        
+     * 
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function createChat($params);
+
+    /**
+     * You cannot use this method directly, instead use $MadelineProto->get_dh_config();
+     *
+     * Parameters: 
+     * * `int` **version**       - You cannot use this method directly, instead use $MadelineProto->get_dh_config();
+     * * `int` **random_length** - You cannot use this method directly, instead use $MadelineProto->get_dh_config();
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.DhConfig
+     */
+    public function getDhConfig($params);
+
+    /**
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     *
+     * Parameters: 
+     * * `InputUser` **user_id** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * * `bytes`     **g_a**     - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * 
+     * @param array $params Parameters
      *
      * @return EncryptedChat
      */
-    public function requestEncryption(array $params);
+    public function requestEncryption($params);
 
     /**
-     * @param array params [
-     *               InputEncryptedChat peer,
-     *               bytes g_b,
-     *               long key_fingerprint,
-     *              ]
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     *
+     * Parameters: 
+     * * `InputEncryptedChat` **peer**            - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * * `bytes`              **g_b**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * * `long`               **key_fingerprint** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * 
+     * @param array $params Parameters
      *
      * @return EncryptedChat
      */
-    public function acceptEncryption(array $params);
+    public function acceptEncryption($params);
 
     /**
-     * @param array params [
-     *               int chat_id,
-     *              ]
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     *
+     * Parameters: 
+     * * `int` **chat_id** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function discardEncryption(array $params);
+    public function discardEncryption($params);
 
     /**
-     * @param array params [
-     *               InputEncryptedChat peer,
-     *               Bool typing,
-     *              ]
+     * Send typing notification to secret chat
+     *
+     * Parameters: 
+     * * `InputEncryptedChat` **peer**   - The secret chat where to send the notification             
+     * * `Bool`               **typing** - Set to true to enable the notification, false to disable it
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function setEncryptedTyping(array $params);
+    public function setEncryptedTyping($params);
 
     /**
-     * @param array params [
-     *               InputEncryptedChat peer,
-     *               int max_date,
-     *              ]
+     * Mark messages as read in secret chats
+     *
+     * Parameters: 
+     * * `InputEncryptedChat` **peer**     - The secret chat where to mark messages as read
+     * * `int`                **max_date** - Maximum date of messages to mark              
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function readEncryptedHistory(array $params);
+    public function readEncryptedHistory($params);
 
     /**
-     * @param array params [
-     *               InputEncryptedChat peer,
-     *               bytes data,
-     *              ]
+     * Send message to secret chat
      *
-     * @return messages_SentEncryptedMessage
-     */
-    public function sendEncrypted(array $params);
-
-    /**
-     * @param array params [
-     *               InputEncryptedChat peer,
-     *               bytes data,
-     *               InputEncryptedFile file,
-     *              ]
+     * Parameters: 
+     * * `InputEncryptedChat` **peer**    - The chat where to send the message
+     * * `DecryptedMessage`   **message** - The message to send               
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_SentEncryptedMessage
+     * @return messages.SentEncryptedMessage
      */
-    public function sendEncryptedFile(array $params);
+    public function sendEncrypted($params);
 
     /**
-     * @param array params [
-     *               InputEncryptedChat peer,
-     *               bytes data,
-     *              ]
+     * Send a file to a secret chat
      *
-     * @return messages_SentEncryptedMessage
-     */
-    public function sendEncryptedService(array $params);
-
-    /**
-     * @param array params [
-     *               int max_qts,
-     *              ]
+     * Parameters: 
+     * * `InputEncryptedChat` **peer**    - The chat where to send the file
+     * * `DecryptedMessage`   **message** - The message with the file      
+     * * `InputEncryptedFile` **file**    - The file (optional)            
+     * 
+     * @param array $params Parameters
      *
-     * @return Vector_of_long
+     * @return messages.SentEncryptedMessage
      */
-    public function receivedQueue(array $params);
+    public function sendEncryptedFile($params);
 
     /**
-     * @param array params [
-     *               InputEncryptedChat peer,
-     *              ]
+     * Send a service message to a secret chat
+     *
+     * Parameters: 
+     * * `InputEncryptedChat` **peer**    - The chat where to send the service message
+     * * `DecryptedMessage`   **message** - The service message                       
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.SentEncryptedMessage
+     */
+    public function sendEncryptedService($params);
+
+    /**
+     * You cannot use this method directly
+     *
+     * Parameters: 
+     * * `int` **max_qts** - You cannot use this method directly
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_long[]
+     */
+    public function receivedQueue($params);
+
+    /**
+     * Report for spam a secret chat
+     *
+     * Parameters: 
+     * * `InputEncryptedChat` **peer** - The chat to report
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function reportEncryptedSpam(array $params);
+    public function reportEncryptedSpam($params);
 
     /**
-     * @param array params [
-     *               int id,
-     *              ]
+     * Mark message as read
      *
-     * @return messages_AffectedMessages
-     */
-    public function readMessageContents(array $params);
-
-    /**
-     * @param array params [
-     *               string emoticon,
-     *               int hash,
-     *              ]
+     * Parameters: 
+     * * `[int]` **id** - The messages to mark as read (only users and normal chats, not supergroups)
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_Stickers
+     * @return messages.AffectedMessages
      */
-    public function getStickers(array $params);
+    public function readMessageContents($params);
 
     /**
-     * @param array params [
-     *               int hash,
-     *              ]
+     * Get stickers
      *
-     * @return messages_AllStickers
+     * Parameters: 
+     * * `string` **emoticon** - Search by emoji                                                    
+     * * `[int]`  **hash**     - Optional:  the hash parameter of the previous result of this method
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Stickers
      */
-    public function getAllStickers(array $params);
+    public function getStickers($params);
 
     /**
-     * @param array params [
-     *               string message,
-     *               MessageEntity entities,
-     *              ]
+     * Get all stickerpacks
+     *
+     * Parameters: 
+     * * `[int]` **hash** - Optional: The hash parameter of the previous result of this method
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.AllStickers
+     */
+    public function getAllStickers($params);
+
+    /**
+     * Get webpage preview
+     *
+     * Parameters: 
+     * * `string`          **message**  - Extract preview from this message 
+     * * `[MessageEntity]` **entities** - Optional: Entities for styled text
+     * 
+     * @param array $params Parameters
      *
      * @return MessageMedia
      */
-    public function getWebPagePreview(array $params);
+    public function getWebPagePreview($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
+     * Export chat invite 
+     *
+     * Parameters: 
+     * * `InputPeer` **peer** - Export invite only for this user
+     * 
+     * @param array $params Parameters
      *
      * @return ExportedChatInvite
      */
-    public function exportChatInvite(array $params);
+    public function exportChatInvite($params);
 
     /**
-     * @param array params [
-     *               string hash,
-     *              ]
+     * Check if an invitation link is valid
+     *
+     * Parameters: 
+     * * `string` **hash** - The invite link in t.me/joinchat/aflakf format
+     * 
+     * @param array $params Parameters
      *
      * @return ChatInvite
      */
-    public function checkChatInvite(array $params);
+    public function checkChatInvite($params);
 
     /**
-     * @param array params [
-     *               string hash,
-     *              ]
+     * Import chat invite
+     *
+     * Parameters: 
+     * * `string` **hash** - The invite link in t.me/joinchat/aflakf format
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function importChatInvite(array $params);
+    public function importChatInvite($params);
 
     /**
-     * @param array params [
-     *               InputStickerSet stickerset,
-     *              ]
+     * Get a stickerset
      *
-     * @return messages_StickerSet
-     */
-    public function getStickerSet(array $params);
-
-    /**
-     * @param array params [
-     *               InputStickerSet stickerset,
-     *               Bool archived,
-     *              ]
+     * Parameters: 
+     * * `InputStickerSet` **stickerset** - The stickerset to get
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_StickerSetInstallResult
+     * @return messages.StickerSet
      */
-    public function installStickerSet(array $params);
+    public function getStickerSet($params);
 
     /**
-     * @param array params [
-     *               InputStickerSet stickerset,
-     *              ]
+     * Add a sticker set
+     *
+     * Parameters: 
+     * * `InputStickerSet` **stickerset** - The sticker set to add
+     * * `Bool`            **archived**   - Archive this set?     
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.StickerSetInstallResult
+     */
+    public function installStickerSet($params);
+
+    /**
+     * Remove a sticker set
+     *
+     * Parameters: 
+     * * `InputStickerSet` **stickerset** - The sticker set to remove
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function uninstallStickerSet(array $params);
+    public function uninstallStickerSet($params);
 
     /**
-     * @param array params [
-     *               InputUser bot,
-     *               InputPeer peer,
-     *               string start_param,
-     *              ]
+     * Start a bot
+     *
+     * Parameters: 
+     * * `InputUser` **bot**         - The bot's ID or username                         
+     * * `InputPeer` **peer**        - Where to start the bot (@me or group ID/username)
+     * * `string`    **start_param** - The bot's start parameter                        
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function startBot(array $params);
+    public function startBot($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int id,
-     *               Bool increment,
-     *              ]
+     * Get and increase message views
      *
-     * @return Vector_of_int
+     * Parameters: 
+     * * `InputPeer` **peer**      - The chat where the message is located
+     * * `[int]`     **id**        - The IDs messages to get              
+     * * `Bool`      **increment** - Increase message views?              
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_int[]
      */
-    public function getMessagesViews(array $params);
+    public function getMessagesViews($params);
 
     /**
-     * @param array params [
-     *               int chat_id,
-     *               InputUser user_id,
-     *               Bool is_admin,
-     *              ]
+     * Edit admin permissions
+     *
+     * Parameters: 
+     * * `InputPeer` **chat_id**  - The chat ID (no supergroups)
+     * * `InputUser` **user_id**  - The user ID                 
+     * * `Bool`      **is_admin** - Should the user be admin?   
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function editChatAdmin(array $params);
+    public function editChatAdmin($params);
 
     /**
-     * @param array params [
-     *               int chat_id,
-     *              ]
+     * Convert chat to supergroup
+     *
+     * Parameters: 
+     * * `InputPeer` **chat_id** - The chat to convert
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function migrateChat(array $params);
+    public function migrateChat($params);
 
     /**
-     * @param array params [
-     *               int folder_id,
-     *               string q,
-     *               int offset_rate,
-     *               InputPeer offset_peer,
-     *               int offset_id,
-     *               int limit,
-     *              ]
+     * Global message search
      *
-     * @return messages_Messages
+     * Parameters: 
+     * * `int`       **folder_id**   - Optional: Folder ID            
+     * * `string`    **q**           - The query                      
+     * * `int`       **offset_rate** - Offset rate                    
+     * * `InputPeer` **offset_peer** - 0 or the peer offset           
+     * * `int`       **offset_id**   - 0 or the message ID offset     
+     * * `int`       **limit**       - The number of results to return
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Messages
      */
-    public function searchGlobal(array $params);
+    public function searchGlobal($params);
 
     /**
-     * @param array params [
-     *               boolean masks,
-     *               long order,
-     *              ]
+     * Reorder sticker sets
+     *
+     * Parameters: 
+     * * `boolean` **masks** - Optional: Reorder masks?
+     * * `[long]`  **order** - The order               
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function reorderStickerSets(array $params);
+    public function reorderStickerSets($params);
 
     /**
-     * @param array params [
-     *               bytes sha256,
-     *               int size,
-     *               string mime_type,
-     *              ]
+     * Get document by SHA256 hash
+     *
+     * Parameters: 
+     * * `bytes`  **sha256**    - `hash('sha256', $filename, true);`
+     * * `int`    **size**      - The file size                     
+     * * `string` **mime_type** - The mime type of the file         
+     * 
+     * @param array $params Parameters
      *
      * @return Document
      */
-    public function getDocumentByHash(array $params);
+    public function getDocumentByHash($params);
 
     /**
-     * @param array params [
-     *               string q,
-     *               int offset,
-     *              ]
+     * Search gifs
      *
-     * @return messages_FoundGifs
-     */
-    public function searchGifs(array $params);
-
-    /**
-     * @param array params [
-     *               int hash,
-     *              ]
+     * Parameters: 
+     * * `string` **q**      - The search query
+     * * `int`    **offset** - The offset      
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_SavedGifs
+     * @return messages.FoundGifs
      */
-    public function getSavedGifs(array $params);
+    public function searchGifs($params);
 
     /**
-     * @param array params [
-     *               InputDocument id,
-     *               Bool unsave,
-     *              ]
+     * Get saved gifs
      *
-     * @return bool
-     */
-    public function saveGif(array $params);
-
-    /**
-     * @param array params [
-     *               InputUser bot,
-     *               InputPeer peer,
-     *               InputGeoPoint geo_point,
-     *               string query,
-     *               string offset,
-     *              ]
+     * Parameters: 
+     * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_BotResults
+     * @return messages.SavedGifs
      */
-    public function getInlineBotResults(array $params);
+    public function getSavedGifs($params);
 
     /**
-     * @param array params [
-     *               boolean gallery,
-     *               boolean private,
-     *               long query_id,
-     *               InputBotInlineResult results,
-     *               int cache_time,
-     *               string next_offset,
-     *               InlineBotSwitchPM switch_pm,
-     *              ]
+     * Save a GIF
+     *
+     * Parameters: 
+     * * `InputDocument` **id**     - The GIF to save
+     * * `Bool`          **unsave** - Remove the gif?
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function setInlineBotResults(array $params);
+    public function saveGif($params);
 
     /**
-     * @param array params [
-     *               boolean silent,
-     *               boolean background,
-     *               boolean clear_draft,
-     *               boolean hide_via,
-     *               InputPeer peer,
-     *               int reply_to_msg_id,
-     *               long query_id,
-     *               string id,
-     *               int schedule_date,
-     *              ]
+     * Call inline bot
+     *
+     * Parameters: 
+     * * `InputUser`     **bot**       - The bot to call               
+     * * `InputPeer`     **peer**      - The chat where to call the bot
+     * * `InputGeoPoint` **geo_point** - Optional: The current location
+     * * `string`        **query**     - The query to send to the bot  
+     * * `string`        **offset**    - The offset to send to the bot 
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.BotResults
+     */
+    public function getInlineBotResults($params);
+
+    /**
+     * Bots only: set the results of an inline query
+     *
+     * Parameters: 
+     * * `boolean`                **gallery**     - Optional: Is this a gallery?                  
+     * * `boolean`                **private**     - Optional: Is this result private (not cached)?
+     * * `long`                   **query_id**    - Query ID                                      
+     * * `[InputBotInlineResult]` **results**     - Results                                       
+     * * `int`                    **cache_time**  - Cache time                                    
+     * * `string`                 **next_offset** - Optional: The next offset                     
+     * * `InlineBotSwitchPM`      **switch_pm**   - Optional: Switch to PM?                       
+     * 
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function setInlineBotResults($params);
+
+    /**
+     * Send inline bot result obtained with messages.getInlineBotResults to the chat
+     *
+     * Parameters: 
+     * * `boolean`   **silent**          - Optional: Disable notifications?           
+     * * `boolean`   **background**      - Optional: Disable background notifications?
+     * * `boolean`   **clear_draft**     - Optional: Clear the message draft?         
+     * * `boolean`   **hide_via**        - Optional: Hide "via @bot"                  
+     * * `InputPeer` **peer**            - Where to send the message                  
+     * * `int`       **reply_to_msg_id** - Optional: Reply to message by ID           
+     * * `long`      **query_id**        - The inline query ID                        
+     * * `string`    **id**              - The ID of one of the inline results        
+     * * `int`       **schedule_date**   - Optional: Schedule date                    
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function sendInlineBotResult(array $params);
+    public function sendInlineBotResult($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int id,
-     *              ]
+     * Check if about to edit a message or a media caption
      *
-     * @return messages_MessageEditData
+     * Parameters: 
+     * * `InputPeer` **peer** - The chat      
+     * * `int`       **id**   - The message ID
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.MessageEditData
      */
-    public function getMessageEditData(array $params);
+    public function getMessageEditData($params);
 
     /**
-     * @param array params [
-     *               boolean no_webpage,
-     *               InputPeer peer,
-     *               int id,
-     *               string message,
-     *               InputMedia media,
-     *               ReplyMarkup reply_markup,
-     *               MessageEntity entities,
-     *               int schedule_date,
-     *              ]
+     * Edit a message
+     *
+     * Parameters: 
+     * * `boolean`         **no_webpage**    - Optional: Disable webpage preview           
+     * * `InputPeer`       **peer**          - The chat                                    
+     * * `int`             **id**            - The message ID                              
+     * * `string`          **message**       - Optional: The new message                   
+     * * `InputMedia`      **media**         - Optional: The media to substitute           
+     * * `ReplyMarkup`     **reply_markup**  - Optional: The new keyboard                  
+     * * `[MessageEntity]` **entities**      - Optional: The new entities (for styled text)
+     * * `int`             **schedule_date** - Optional: Schedule date                     
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function editMessage(array $params);
+    public function editMessage($params);
 
     /**
-     * @param array params [
-     *               boolean no_webpage,
-     *               InputBotInlineMessageID id,
-     *               string message,
-     *               InputMedia media,
-     *               ReplyMarkup reply_markup,
-     *               MessageEntity entities,
-     *              ]
+     * Edit a sent inline message
+     *
+     * Parameters: 
+     * * `boolean`                 **no_webpage**   - Optional: Disable webpage preview           
+     * * `InputBotInlineMessageID` **id**           - The message ID                              
+     * * `string`                  **message**      - Optional: The new message                   
+     * * `InputMedia`              **media**        - Optional: The media to substitute           
+     * * `ReplyMarkup`             **reply_markup** - Optional: The new keyboard                  
+     * * `[MessageEntity]`         **entities**     - Optional: The new entities (for styled text)
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function editInlineBotMessage(array $params);
+    public function editInlineBotMessage($params);
 
     /**
-     * @param array params [
-     *               boolean game,
-     *               InputPeer peer,
-     *               int msg_id,
-     *               bytes data,
-     *              ]
+     * Get the callback answer of a bot (after clicking a button)
      *
-     * @return messages_BotCallbackAnswer
-     */
-    public function getBotCallbackAnswer(array $params);
-
-    /**
-     * @param array params [
-     *               boolean alert,
-     *               long query_id,
-     *               string message,
-     *               string url,
-     *               int cache_time,
-     *              ]
+     * Parameters: 
+     * * `boolean`   **game**   - Optional: Is this a game?            
+     * * `InputPeer` **peer**   - The chat                             
+     * * `int`       **msg_id** - The message ID                       
+     * * `bytes`     **data**   - Optional: The data to send to the bot
+     * 
+     * @param array $params Parameters
      *
-     * @return bool
+     * @return messages.BotCallbackAnswer
      */
-    public function setBotCallbackAnswer(array $params);
+    public function getBotCallbackAnswer($params);
 
     /**
-     * @param array params [
-     *               InputDialogPeer peers,
-     *              ]
+     * Bots only: set the callback answer (after a button was clicked)
      *
-     * @return messages_PeerDialogs
-     */
-    public function getPeerDialogs(array $params);
-
-    /**
-     * @param array params [
-     *               boolean no_webpage,
-     *               int reply_to_msg_id,
-     *               InputPeer peer,
-     *               string message,
-     *               MessageEntity entities,
-     *              ]
+     * Parameters: 
+     * * `boolean` **alert**      - Optional: Is this an alert?
+     * * `long`    **query_id**   - The query ID               
+     * * `string`  **message**    - Optional: The message      
+     * * `string`  **url**        - Optional: The URL          
+     * * `int`     **cache_time** - Cache time                 
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function saveDraft(array $params);
+    public function setBotCallbackAnswer($params);
 
     /**
+     * Get dialog info of peers
+     *
+     * Parameters: 
+     * * `[InputDialogPeer]` **peers** - The peers
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.PeerDialogs
+     */
+    public function getPeerDialogs($params);
+
+    /**
+     * Save a message draft
+     *
+     * Parameters: 
+     * * `boolean`         **no_webpage**      - Optional: Disable webpage preview       
+     * * `int`             **reply_to_msg_id** - Optional: Reply to message by ID        
+     * * `InputPeer`       **peer**            - The chat                                
+     * * `string`          **message**         - The message                             
+     * * `[MessageEntity]` **entities**        - Optional: The entities (for styled text)
+     * 
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function saveDraft($params);
+
+    /**
+     * Get all message drafts
+     *
      * @return Updates
      */
     public function getAllDrafts();
 
     /**
-     * @param array params [
-     *               int hash,
-     *              ]
+     * Get featured stickers
      *
-     * @return messages_FeaturedStickers
+     * Parameters: 
+     * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.FeaturedStickers
      */
-    public function getFeaturedStickers(array $params);
+    public function getFeaturedStickers($params);
 
     /**
-     * @param array params [
-     *               long id,
-     *              ]
+     * Mark new featured stickers as read
      *
-     * @return bool
-     */
-    public function readFeaturedStickers(array $params);
-
-    /**
-     * @param array params [
-     *               boolean attached,
-     *               int hash,
-     *              ]
-     *
-     * @return messages_RecentStickers
-     */
-    public function getRecentStickers(array $params);
-
-    /**
-     * @param array params [
-     *               boolean attached,
-     *               InputDocument id,
-     *               Bool unsave,
-     *              ]
+     * Parameters: 
+     * * `[long]` **id** - The stickers to mark as read
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function saveRecentSticker(array $params);
+    public function readFeaturedStickers($params);
 
     /**
-     * @param array params [
-     *               boolean attached,
-     *              ]
+     * Get recent stickers
+     *
+     * Parameters: 
+     * * `boolean` **attached** - Optional: Get stickers attached to image?                             
+     * * `[int]`   **hash**     - Optional: IDs the hash parameter of the previous result of this method
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.RecentStickers
+     */
+    public function getRecentStickers($params);
+
+    /**
+     * Add a sticker to recent stickers
+     *
+     * Parameters: 
+     * * `boolean`       **attached** - Optional: Get stickers attached to image?
+     * * `InputDocument` **id**       - The sticker                              
+     * * `Bool`          **unsave**   - Remove the sticker from recent stickers? 
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function clearRecentStickers(array $params);
+    public function saveRecentSticker($params);
 
     /**
-     * @param array params [
-     *               boolean masks,
-     *               long offset_id,
-     *               int limit,
-     *              ]
+     * Clear all recent stickers
      *
-     * @return messages_ArchivedStickers
-     */
-    public function getArchivedStickers(array $params);
-
-    /**
-     * @param array params [
-     *               int hash,
-     *              ]
+     * Parameters: 
+     * * `boolean` **attached** - Optional: Clear recent stickers attached to images?
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_AllStickers
+     * @return bool
      */
-    public function getMaskStickers(array $params);
+    public function clearRecentStickers($params);
 
     /**
-     * @param array params [
-     *               InputStickeredMedia media,
-     *              ]
+     * Get all archived stickers
      *
-     * @return Vector_of_StickerSetCovered
+     * Parameters: 
+     * * `boolean` **masks**     - Optional: Get masks?       
+     * * `long`    **offset_id** - Sticker ID offset          
+     * * `int`     **limit**     - Number of stickers to fetch
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.ArchivedStickers
      */
-    public function getAttachedStickers(array $params);
+    public function getArchivedStickers($params);
 
     /**
-     * @param array params [
-     *               boolean edit_message,
-     *               boolean force,
-     *               InputPeer peer,
-     *               int id,
-     *               InputUser user_id,
-     *               int score,
-     *              ]
+     * Get masks
+     *
+     * Parameters: 
+     * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.AllStickers
+     */
+    public function getMaskStickers($params);
+
+    /**
+     * Get stickers attachable to images
+     *
+     * Parameters: 
+     * * `InputStickeredMedia` **media** - The stickered media
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_StickerSetCovered[]
+     */
+    public function getAttachedStickers($params);
+
+    /**
+     * Set the game score
+     *
+     * Parameters: 
+     * * `boolean`   **edit_message** - Optional: Should the message with the game be edited?
+     * * `boolean`   **force**        - Optional: Force setting the game score               
+     * * `InputPeer` **peer**         - The chat where the game was sent                     
+     * * `int`       **id**           - The message ID                                       
+     * * `InputUser` **user_id**      - The user that set the score                          
+     * * `int`       **score**        - The score                                            
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function setGameScore(array $params);
+    public function setGameScore($params);
 
     /**
-     * @param array params [
-     *               boolean edit_message,
-     *               boolean force,
-     *               InputBotInlineMessageID id,
-     *               InputUser user_id,
-     *               int score,
-     *              ]
+     * Set the game score of an inline message
+     *
+     * Parameters: 
+     * * `boolean`                 **edit_message** - Optional: Should the message with the game be edited?
+     * * `boolean`                 **force**        - Optional: Force setting the game score               
+     * * `InputBotInlineMessageID` **id**           - The ID of the inline message                         
+     * * `InputUser`               **user_id**      - The user that set the score                          
+     * * `int`                     **score**        - The score                                            
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function setInlineGameScore(array $params);
+    public function setInlineGameScore($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int id,
-     *               InputUser user_id,
-     *              ]
+     * Get high scores of a game
      *
-     * @return messages_HighScores
-     */
-    public function getGameHighScores(array $params);
-
-    /**
-     * @param array params [
-     *               InputBotInlineMessageID id,
-     *               InputUser user_id,
-     *              ]
+     * Parameters: 
+     * * `InputPeer` **peer**    - The chat                         
+     * * `int`       **id**      - The message ID                   
+     * * `InputUser` **user_id** - The user that set the high scores
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_HighScores
+     * @return messages.HighScores
      */
-    public function getInlineGameHighScores(array $params);
+    public function getGameHighScores($params);
 
     /**
-     * @param array params [
-     *               InputUser user_id,
-     *               int max_id,
-     *               int limit,
-     *              ]
+     * Get high scores of a game sent in an inline message
      *
-     * @return messages_Chats
-     */
-    public function getCommonChats(array $params);
-
-    /**
-     * @param array params [
-     *               int except_ids,
-     *              ]
+     * Parameters: 
+     * * `InputBotInlineMessageID` **id**      - The inline message               
+     * * `InputUser`               **user_id** - The user that set the high scores
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_Chats
+     * @return messages.HighScores
      */
-    public function getAllChats(array $params);
+    public function getInlineGameHighScores($params);
 
     /**
-     * @param array params [
-     *               string url,
-     *               int hash,
-     *              ]
+     * Get chats in common with a user
+     *
+     * Parameters: 
+     * * `InputUser` **user_id** - The user                    
+     * * `int`       **max_id**  - The maximum chat ID to fetch
+     * * `int`       **limit**   - Number of results to fetch  
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Chats
+     */
+    public function getCommonChats($params);
+
+    /**
+     * Get all chats (not supergroups or channels)
+     *
+     * Parameters: 
+     * * `[int]` **except_ids** - Do not fetch these chats (MTProto id)
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Chats
+     */
+    public function getAllChats($params);
+
+    /**
+     * Get webpage preview
+     *
+     * Parameters: 
+     * * `string` **url**  - URL                                                                
+     * * `[int]`  **hash** - Optional:  the hash parameter of the previous result of this method
+     * 
+     * @param array $params Parameters
      *
      * @return WebPage
      */
-    public function getWebPage(array $params);
+    public function getWebPage($params);
 
     /**
-     * @param array params [
-     *               boolean pinned,
-     *               InputDialogPeer peer,
-     *              ]
+     * Pin or unpin dialog
+     *
+     * Parameters: 
+     * * `boolean`         **pinned** - Optional: Pin or unpin the dialog?
+     * * `InputDialogPeer` **peer**   - The dialog to pin                 
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function toggleDialogPin(array $params);
+    public function toggleDialogPin($params);
 
     /**
-     * @param array params [
-     *               boolean force,
-     *               int folder_id,
-     *               InputDialogPeer order,
-     *              ]
+     * Reorder pinned dialogs
+     *
+     * Parameters: 
+     * * `boolean`           **force**     - Optional: Force reordering
+     * * `int`               **folder_id** - Folder ID                 
+     * * `[InputDialogPeer]` **order**     - New order                 
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function reorderPinnedDialogs(array $params);
+    public function reorderPinnedDialogs($params);
 
     /**
-     * @param array params [
-     *               int folder_id,
-     *              ]
+     * Get pinned dialogs
      *
-     * @return messages_PeerDialogs
-     */
-    public function getPinnedDialogs(array $params);
-
-    /**
-     * @param array params [
-     *               long query_id,
-     *               string error,
-     *               ShippingOption shipping_options,
-     *              ]
+     * Parameters: 
+     * * `int` **folder_id** - Folder ID
+     * 
+     * @param array $params Parameters
      *
-     * @return bool
+     * @return messages.PeerDialogs
      */
-    public function setBotShippingResults(array $params);
+    public function getPinnedDialogs($params);
 
     /**
-     * @param array params [
-     *               boolean success,
-     *               long query_id,
-     *               string error,
-     *              ]
+     * Bots only: set shipping results
+     *
+     * Parameters: 
+     * * `long`             **query_id**         - Query ID                  
+     * * `string`           **error**            - Optional: Error           
+     * * `[ShippingOption]` **shipping_options** - Optional: Shipping options
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function setBotPrecheckoutResults(array $params);
+    public function setBotShippingResults($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               InputMedia media,
-     *              ]
+     * Bots only: set precheckout results
+     *
+     * Parameters: 
+     * * `boolean` **success**  - Optional: Success?
+     * * `long`    **query_id** - Query ID          
+     * * `string`  **error**    - Optional: Error   
+     * 
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function setBotPrecheckoutResults($params);
+
+    /**
+     * Upload a file without sending it to anyone
+     *
+     * Parameters: 
+     * * `InputPeer`  **peer**  - Nothing            
+     * * `InputMedia` **media** - The media to upload
+     * 
+     * @param array $params Parameters
      *
      * @return MessageMedia
      */
-    public function uploadMedia(array $params);
+    public function uploadMedia($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int reply_to_msg_id,
-     *              ]
+     * Send screenshot notification
+     *
+     * Parameters: 
+     * * `InputPeer` **peer**            - Where to send the notification
+     * * `int`       **reply_to_msg_id** - Reply to message by ID        
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function sendScreenshotNotification(array $params);
+    public function sendScreenshotNotification($params);
 
     /**
-     * @param array params [
-     *               int hash,
-     *              ]
+     * Get favorite stickers
      *
-     * @return messages_FavedStickers
+     * Parameters: 
+     * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.FavedStickers
      */
-    public function getFavedStickers(array $params);
+    public function getFavedStickers($params);
 
     /**
-     * @param array params [
-     *               InputDocument id,
-     *               Bool unfave,
-     *              ]
+     * Add a sticker to favorites
+     *
+     * Parameters: 
+     * * `InputDocument` **id**     - The sticker to add to favorites
+     * * `Bool`          **unfave** - Remove it from favorites?      
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function faveSticker(array $params);
+    public function faveSticker($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int offset_id,
-     *               int add_offset,
-     *               int limit,
-     *               int max_id,
-     *               int min_id,
-     *              ]
+     * Get unread mentions
      *
-     * @return messages_Messages
-     */
-    public function getUnreadMentions(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
+     * Parameters: 
+     * * `InputPeer` **peer**       - The chat where to get unread mentions
+     * * `int`       **offset_id**  - The offset                           
+     * * `int`       **add_offset** - The additional offset                
+     * * `int`       **limit**      - The number of results to fetch       
+     * * `int`       **max_id**     - The maximum message ID to fetch      
+     * * `int`       **min_id**     - The minumum message ID to fetch      
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_AffectedHistory
+     * @return messages.Messages
      */
-    public function readMentions(array $params);
+    public function getUnreadMentions($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int limit,
-     *               int hash,
-     *              ]
+     * Mark mentions as read
      *
-     * @return messages_Messages
+     * Parameters: 
+     * * `InputPeer` **peer** - The chat
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.AffectedHistory
      */
-    public function getRecentLocations(array $params);
+    public function readMentions($params);
 
     /**
-     * @param array params [
-     *               boolean silent,
-     *               boolean background,
-     *               boolean clear_draft,
-     *               InputPeer peer,
-     *               int reply_to_msg_id,
-     *               InputSingleMedia multi_media,
-     *               int schedule_date,
-     *              ]
+     * Get recent locations
+     *
+     * Parameters: 
+     * * `InputPeer` **peer**  - The chat where to search locations            
+     * * `int`       **limit** - Number of results to return                   
+     * * `[int]`     **hash**  - Optional: IDs of locations you already fetched
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Messages
+     */
+    public function getRecentLocations($params);
+
+    /**
+     * Send an album
+     *
+     * Parameters: 
+     * * `boolean`            **silent**          - Optional: Disable notifications?          
+     * * `boolean`            **background**      - Optional: Disable background notification?
+     * * `boolean`            **clear_draft**     - Optional: Clear draft?                    
+     * * `InputPeer`          **peer**            - Where to send the album                   
+     * * `int`                **reply_to_msg_id** - Optional: Reply to message by ID          
+     * * `[InputSingleMedia]` **multi_media**     - The album                                 
+     * * `int`                **schedule_date**   - Optional: Schedule date                   
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function sendMultiMedia(array $params);
+    public function sendMultiMedia($params);
 
     /**
-     * @param array params [
-     *               InputEncryptedChat peer,
-     *               InputEncryptedFile file,
-     *              ]
+     * Upload a secret chat file without sending it to anyone
+     *
+     * Parameters: 
+     * * `InputEncryptedChat` **peer** - The chat where to upload the media
+     * * `InputEncryptedFile` **file** - The file                          
+     * 
+     * @param array $params Parameters
      *
      * @return EncryptedFile
      */
-    public function uploadEncryptedFile(array $params);
+    public function uploadEncryptedFile($params);
 
     /**
-     * @param array params [
-     *               boolean exclude_featured,
-     *               string q,
-     *               int hash,
-     *              ]
+     * Find a sticker set
      *
-     * @return messages_FoundStickerSets
+     * Parameters: 
+     * * `boolean` **exclude_featured** - Optional: Exclude featured sticker sets from the search?
+     * * `string`  **q**                - The search query                                        
+     * * `[int]`   **hash**             - Optional: The IDs of stickersets you already fetched    
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.FoundStickerSets
      */
-    public function searchStickerSets(array $params);
+    public function searchStickerSets($params);
 
     /**
-     * @return Vector_of_MessageRange
+     * Get message ranges to fetch
+     *
+     * @return _of_MessageRange[]
      */
     public function getSplitRanges();
 
     /**
-     * @param array params [
-     *               boolean unread,
-     *               InputDialogPeer peer,
-     *              ]
+     * Mark dialog as unread 
+     *
+     * Parameters: 
+     * * `boolean`         **unread** - Optional: Should it be marked or unmarked as read
+     * * `InputDialogPeer` **peer**   - The dialog to mark as unread                     
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function markDialogUnread(array $params);
+    public function markDialogUnread($params);
 
     /**
-     * @return Vector_of_DialogPeer
+     * Get dialogs marked as unread manually
+     *
+     * @return _of_DialogPeer[]
      */
     public function getDialogUnreadMarks();
 
     /**
+     * Clear all drafts
+     *
      * @return bool
      */
     public function clearAllDrafts();
 
     /**
-     * @param array params [
-     *               boolean silent,
-     *               InputPeer peer,
-     *               int id,
-     *              ]
+     * Update pinned message
+     *
+     * Parameters: 
+     * * `boolean`   **silent** - Optional: Silent?
+     * * `InputPeer` **peer**   - Peer             
+     * * `int`       **id**     - Message ID       
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function updatePinnedMessage(array $params);
+    public function updatePinnedMessage($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int msg_id,
-     *               bytes options,
-     *              ]
+     * Send vote
+     *
+     * Parameters: 
+     * * `InputPeer` **peer**    - Peer      
+     * * `int`       **msg_id**  - Message ID
+     * * `[bytes]`   **options** - Options   
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function sendVote(array $params);
+    public function sendVote($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int msg_id,
-     *              ]
+     * Get poll results
+     *
+     * Parameters: 
+     * * `InputPeer` **peer**   - Peer      
+     * * `int`       **msg_id** - Message ID
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function getPollResults(array $params);
+    public function getPollResults($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
+     * Get online users
+     *
+     * Parameters: 
+     * * `InputPeer` **peer** - Peer
+     * 
+     * @param array $params Parameters
      *
      * @return ChatOnlines
      */
-    public function getOnlines(array $params);
+    public function getOnlines($params);
 
     /**
-     * @param array params [
-     *               boolean dark,
-     *               InputPeer peer,
-     *               string params,
-     *              ]
+     * Get stats URL
+     *
+     * Parameters: 
+     * * `boolean`   **dark**   - Optional: Dark?
+     * * `InputPeer` **peer**   - Peer           
+     * * `string`    **params** - Params         
+     * 
+     * @param array $params Parameters
      *
      * @return StatsURL
      */
-    public function getStatsURL(array $params);
+    public function getStatsURL($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               string about,
-     *              ]
+     * Edit chat info
+     *
+     * Parameters: 
+     * * `InputPeer` **peer**  - Chat
+     * * `string`    **about** - Info
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function editChatAbout(array $params);
+    public function editChatAbout($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               ChatBannedRights banned_rights,
-     *              ]
+     * Edit default rights of chat
+     *
+     * Parameters: 
+     * * `InputPeer`        **peer**          - Chat              
+     * * `ChatBannedRights` **banned_rights** - Global chat rights
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function editChatDefaultBannedRights(array $params);
+    public function editChatDefaultBannedRights($params);
 
     /**
-     * @param array params [
-     *               string lang_code,
-     *              ]
+     * Get emoji keywords
+     *
+     * Parameters: 
+     * * `string` **lang_code** - Language code
+     * 
+     * @param array $params Parameters
      *
      * @return EmojiKeywordsDifference
      */
-    public function getEmojiKeywords(array $params);
+    public function getEmojiKeywords($params);
 
     /**
-     * @param array params [
-     *               string lang_code,
-     *               int from_version,
-     *              ]
+     * Get emoji keyword difference
+     *
+     * Parameters: 
+     * * `string` **lang_code**    - Language code
+     * * `int`    **from_version** - From version 
+     * 
+     * @param array $params Parameters
      *
      * @return EmojiKeywordsDifference
      */
-    public function getEmojiKeywordsDifference(array $params);
+    public function getEmojiKeywordsDifference($params);
 
     /**
-     * @param array params [
-     *               string lang_codes,
-     *              ]
+     * Get emoji keyword languages
      *
-     * @return Vector_of_EmojiLanguage
+     * Parameters: 
+     * * `[string]` **lang_codes** - Language codes
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_EmojiLanguage[]
      */
-    public function getEmojiKeywordsLanguages(array $params);
+    public function getEmojiKeywordsLanguages($params);
 
     /**
-     * @param array params [
-     *               string lang_code,
-     *              ]
+     * Get emoji URL
+     *
+     * Parameters: 
+     * * `string` **lang_code** - Language code
+     * 
+     * @param array $params Parameters
      *
      * @return EmojiURL
      */
-    public function getEmojiURL(array $params);
+    public function getEmojiURL($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               MessagesFilter filters,
-     *              ]
+     * Get search counter
      *
-     * @return Vector_of_messages_SearchCounter
-     */
-    public function getSearchCounters(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int msg_id,
-     *               int button_id,
-     *              ]
+     * Parameters: 
+     * * `InputPeer`        **peer**    - Peer   
+     * * `[MessagesFilter]` **filters** - Filters
+     * 
+     * @param array $params Parameters
      *
-     * @return UrlAuthResult
+     * @return _of_messages.SearchCounter[]
      */
-    public function requestUrlAuth(array $params);
+    public function getSearchCounters($params);
 
     /**
-     * @param array params [
-     *               boolean write_allowed,
-     *               InputPeer peer,
-     *               int msg_id,
-     *               int button_id,
-     *              ]
+     * Request URL authorization
+     *
+     * Parameters: 
+     * * `InputPeer` **peer**      - Peer      
+     * * `int`       **msg_id**    - Message ID
+     * * `int`       **button_id** - Button ID 
+     * 
+     * @param array $params Parameters
      *
      * @return UrlAuthResult
      */
-    public function acceptUrlAuth(array $params);
+    public function requestUrlAuth($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *              ]
+     * Accept URL authorization
+     *
+     * Parameters: 
+     * * `boolean`   **write_allowed** - Optional: Write allowed?
+     * * `InputPeer` **peer**          - Peer                    
+     * * `int`       **msg_id**        - Message ID              
+     * * `int`       **button_id**     - Button ID               
+     * 
+     * @param array $params Parameters
+     *
+     * @return UrlAuthResult
+     */
+    public function acceptUrlAuth($params);
+
+    /**
+     * Hide peer settings bar
+     *
+     * Parameters: 
+     * * `InputPeer` **peer** - Peer
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function hidePeerSettingsBar(array $params);
+    public function hidePeerSettingsBar($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int hash,
-     *              ]
+     * Get scheduled history
      *
-     * @return messages_Messages
-     */
-    public function getScheduledHistory(array $params);
-
-    /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int id,
-     *              ]
+     * Parameters: 
+     * * `InputPeer` **peer** - Peer          
+     * * `[int]`     **hash** - Optional: Hash
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_Messages
+     * @return messages.Messages
      */
-    public function getScheduledMessages(array $params);
+    public function getScheduledHistory($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int id,
-     *              ]
+     * Get scheduled messages
+     *
+     * Parameters: 
+     * * `InputPeer` **peer** - Peer
+     * * `[int]`     **id**   - ID  
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Messages
+     */
+    public function getScheduledMessages($params);
+
+    /**
+     * Send scheduled messages
+     *
+     * Parameters: 
+     * * `InputPeer` **peer** - Peer
+     * * `[int]`     **id**   - ID  
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function sendScheduledMessages(array $params);
+    public function sendScheduledMessages($params);
 
     /**
-     * @param array params [
-     *               InputPeer peer,
-     *               int id,
-     *              ]
+     * Delete scheduled messages
+     *
+     * Parameters: 
+     * * `InputPeer` **peer** - Peer
+     * * `[int]`     **id**   - ID  
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function deleteScheduledMessages(array $params);
+    public function deleteScheduledMessages($params);
 }
 
 interface updates
 {
     /**
-     * @return updates_State
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     *
+     * @return updates.State
      */
     public function getState();
 
     /**
-     * @param array params [
-     *               int pts,
-     *               int pts_total_limit,
-     *               int date,
-     *               int qts,
-     *              ]
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
      *
-     * @return updates_Difference
+     * Parameters: 
+     * * `int` **pts**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
+     * * `int` **pts_total_limit** - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `int` **date**            - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
+     * * `int` **qts**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
+     * 
+     * @param array $params Parameters
+     *
+     * @return updates.Difference
      */
-    public function getDifference(array $params);
+    public function getDifference($params);
 
     /**
-     * @param array params [
-     *               boolean force,
-     *               InputChannel channel,
-     *               ChannelMessagesFilter filter,
-     *               int pts,
-     *               int limit,
-     *              ]
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
      *
-     * @return updates_ChannelDifference
+     * Parameters: 
+     * * `boolean`               **force**   - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `InputChannel`          **channel** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
+     * * `ChannelMessagesFilter` **filter**  - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
+     * * `int`                   **pts**     - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
+     * * `int`                   **limit**   - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
+     * 
+     * @param array $params Parameters
+     *
+     * @return updates.ChannelDifference
      */
-    public function getChannelDifference(array $params);
+    public function getChannelDifference($params);
 }
 
 interface photos
 {
     /**
-     * @param array params [
-     *               InputPhoto id,
-     *              ]
+     * Change the profile photo
+     *
+     * Parameters: 
+     * * `InputPhoto` **id** - The photo to use
+     * 
+     * @param array $params Parameters
      *
      * @return UserProfilePhoto
      */
-    public function updateProfilePhoto(array $params);
+    public function updateProfilePhoto($params);
 
     /**
-     * @param array params [
-     *               InputFile file,
-     *              ]
+     * Upload profile photo
      *
-     * @return photos_Photo
+     * Parameters: 
+     * * `InputFile` **file** - The photo
+     * 
+     * @param array $params Parameters
+     *
+     * @return photos.Photo
      */
-    public function uploadProfilePhoto(array $params);
+    public function uploadProfilePhoto($params);
 
     /**
-     * @param array params [
-     *               InputPhoto id,
-     *              ]
+     * Delete profile photos
      *
-     * @return Vector_of_long
+     * Parameters: 
+     * * `[InputPhoto]` **id** - The profile photos to delete
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_long[]
      */
-    public function deletePhotos(array $params);
+    public function deletePhotos($params);
 
     /**
-     * @param array params [
-     *               InputUser user_id,
-     *               int offset,
-     *               long max_id,
-     *               int limit,
-     *              ]
+     * Get the profile photos of a user
      *
-     * @return photos_Photos
+     * Parameters: 
+     * * `InputUser` **user_id** - The user                     
+     * * `int`       **offset**  - Offset                       
+     * * `long`      **max_id**  - Maximum ID of photo to return
+     * * `int`       **limit**   - Number of photos to return   
+     * 
+     * @param array $params Parameters
+     *
+     * @return photos.Photos
      */
-    public function getUserPhotos(array $params);
+    public function getUserPhotos($params);
 }
 
 interface upload
 {
     /**
-     * @param array params [
-     *               long file_id,
-     *               int file_part,
-     *               bytes bytes,
-     *              ]
+     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     *
+     * Parameters: 
+     * * `long`  **file_id**   - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **file_part** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **bytes**     - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function saveFilePart(array $params);
+    public function saveFilePart($params);
 
     /**
-     * @param array params [
-     *               boolean precise,
-     *               InputFileLocation location,
-     *               int offset,
-     *               int limit,
-     *              ]
+     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      *
-     * @return upload_File
+     * Parameters: 
+     * * `boolean`           **precise**  - Optional: You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `InputFileLocation` **location** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info          
+     * * `int`               **offset**   - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info          
+     * * `int`               **limit**    - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info          
+     * 
+     * @param array $params Parameters
+     *
+     * @return upload.File
      */
-    public function getFile(array $params);
+    public function getFile($params);
 
     /**
-     * @param array params [
-     *               long file_id,
-     *               int file_part,
-     *               int file_total_parts,
-     *               bytes bytes,
-     *              ]
+     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     *
+     * Parameters: 
+     * * `long`  **file_id**          - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **file_part**        - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **file_total_parts** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **bytes**            - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function saveBigFilePart(array $params);
+    public function saveBigFilePart($params);
 
     /**
-     * @param array params [
-     *               InputWebFileLocation location,
-     *               int offset,
-     *               int limit,
-     *              ]
+     * Download a file through telegram
      *
-     * @return upload_WebFile
+     * Parameters: 
+     * * `InputWebFileLocation` **location** - The file                    
+     * * `int`                  **offset**   - The offset in bytes         
+     * * `int`                  **limit**    - The number of bytes to fetch
+     * 
+     * @param array $params Parameters
+     *
+     * @return upload.WebFile
      */
-    public function getWebFile(array $params);
+    public function getWebFile($params);
 
     /**
-     * @param array params [
-     *               bytes file_token,
-     *               int offset,
-     *               int limit,
-     *              ]
+     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      *
-     * @return upload_CdnFile
+     * Parameters: 
+     * * `bytes` **file_token** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **offset**     - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **limit**      - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * 
+     * @param array $params Parameters
+     *
+     * @return upload.CdnFile
      */
-    public function getCdnFile(array $params);
+    public function getCdnFile($params);
 
     /**
-     * @param array params [
-     *               bytes file_token,
-     *               bytes request_token,
-     *              ]
+     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      *
-     * @return Vector_of_FileHash
+     * Parameters: 
+     * * `bytes` **file_token**    - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **request_token** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_FileHash[]
      */
-    public function reuploadCdnFile(array $params);
+    public function reuploadCdnFile($params);
 
     /**
-     * @param array params [
-     *               bytes file_token,
-     *               int offset,
-     *              ]
+     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      *
-     * @return Vector_of_FileHash
+     * Parameters: 
+     * * `bytes` **file_token** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **offset**     - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_FileHash[]
      */
-    public function getCdnFileHashes(array $params);
+    public function getCdnFileHashes($params);
 
     /**
-     * @param array params [
-     *               InputFileLocation location,
-     *               int offset,
-     *              ]
+     * Get file hashes
      *
-     * @return Vector_of_FileHash
+     * Parameters: 
+     * * `InputFileLocation` **location** - The file
+     * * `int`               **offset**   - Offset  
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_FileHash[]
      */
-    public function getFileHashes(array $params);
+    public function getFileHashes($params);
 }
 
 interface help
 {
     /**
+     * Get server configuration
+     *
      * @return Config
      */
     public function getConfig();
 
     /**
+     * Get nearest datacenter
+     *
      * @return NearestDc
      */
     public function getNearestDc();
 
     /**
-     * @param array params [
-     *               string source,
-     *              ]
+     * Get info about app updates
      *
-     * @return help_AppUpdate
+     * Parameters: 
+     * * `string` **source** - Source
+     * 
+     * @param array $params Parameters
+     *
+     * @return help.AppUpdate
      */
-    public function getAppUpdate(array $params);
+    public function getAppUpdate($params);
 
     /**
-     * @return help_InviteText
+     * Get invitation text
+     *
+     * @return help.InviteText
      */
     public function getInviteText();
 
     /**
-     * @return help_Support
+     * Get info of support user
+     *
+     * @return help.Support
      */
     public function getSupport();
 
     /**
-     * @param array params [
-     *               string prev_app_version,
-     *              ]
+     * Get the changelog of this app
+     *
+     * Parameters: 
+     * * `string` **prev_app_version** - Previous app version
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function getAppChangelog(array $params);
+    public function getAppChangelog($params);
 
     /**
-     * @param array params [
-     *               int pending_updates_count,
-     *               string message,
-     *              ]
+     * Set the update status of webhook
+     *
+     * Parameters: 
+     * * `int`    **pending_updates_count** - Pending update count
+     * * `string` **message**               - Message             
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function setBotUpdatesStatus(array $params);
+    public function setBotUpdatesStatus($params);
 
     /**
+     * Get CDN configuration
+     *
      * @return CdnConfig
      */
     public function getCdnConfig();
 
     /**
-     * @param array params [
-     *               string referer,
-     *              ]
+     * Get recent t.me URLs
      *
-     * @return help_RecentMeUrls
+     * Parameters: 
+     * * `string` **referer** - Referrer
+     * 
+     * @param array $params Parameters
+     *
+     * @return help.RecentMeUrls
      */
-    public function getRecentMeUrls(array $params);
+    public function getRecentMeUrls($params);
 
     /**
-     * @return help_ProxyData
+     * Get information about the current proxy
+     *
+     * @return help.ProxyData
      */
     public function getProxyData();
 
     /**
-     * @return help_TermsOfServiceUpdate
+     * Get updated TOS
+     *
+     * @return help.TermsOfServiceUpdate
      */
     public function getTermsOfServiceUpdate();
 
     /**
-     * @param array params [
-     *               DataJSON id,
-     *              ]
+     * Accept telegram's TOS
+     *
+     * Parameters: 
+     * * `DataJSON` **id** - TOS
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function acceptTermsOfService(array $params);
+    public function acceptTermsOfService($params);
 
     /**
-     * @param array params [
-     *               string path,
-     *              ]
+     * Get deep link info
      *
-     * @return help_DeepLinkInfo
+     * Parameters: 
+     * * `string` **path** - Deep link
+     * 
+     * @param array $params Parameters
+     *
+     * @return help.DeepLinkInfo
      */
-    public function getDeepLinkInfo(array $params);
+    public function getDeepLinkInfo($params);
 
     /**
+     * Get app config
+     *
      * @return JSONValue
      */
     public function getAppConfig();
 
     /**
-     * @param array params [
-     *               InputAppEvent events,
-     *              ]
+     * Log data for developer of this app
+     *
+     * Parameters: 
+     * * `[InputAppEvent]` **events** - Event list
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function saveAppLog(array $params);
+    public function saveAppLog($params);
 
     /**
-     * @param array params [
-     *               int hash,
-     *              ]
+     * Get passport config
      *
-     * @return help_PassportConfig
+     * Parameters: 
+     * * `[int]` **hash** - Optional: Hash
+     * 
+     * @param array $params Parameters
+     *
+     * @return help.PassportConfig
      */
-    public function getPassportConfig(array $params);
+    public function getPassportConfig($params);
 
     /**
-     * @return help_SupportName
+     * Get support name
+     *
+     * @return help.SupportName
      */
     public function getSupportName();
 
     /**
-     * @param array params [
-     *               InputUser user_id,
-     *              ]
+     * Get user info
      *
-     * @return help_UserInfo
+     * Parameters: 
+     * * `InputUser` **user_id** - User ID
+     * 
+     * @param array $params Parameters
+     *
+     * @return help.UserInfo
      */
-    public function getUserInfo(array $params);
+    public function getUserInfo($params);
 
     /**
-     * @param array params [
-     *               InputUser user_id,
-     *               string message,
-     *               MessageEntity entities,
-     *              ]
+     * Edit user info
      *
-     * @return help_UserInfo
+     * Parameters: 
+     * * `InputUser`       **user_id**  - User ID 
+     * * `string`          **message**  - Message 
+     * * `[MessageEntity]` **entities** - Entities
+     * 
+     * @param array $params Parameters
+     *
+     * @return help.UserInfo
      */
-    public function editUserInfo(array $params);
+    public function editUserInfo($params);
 }
 
 interface channels
 {
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *               int max_id,
-     *              ]
+     * Mark channel/supergroup history as read
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel/supergroup            
+     * * `int`          **max_id**  - Maximum message ID to mark as read
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function readHistory(array $params);
+    public function readHistory($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *               int id,
-     *              ]
+     * Delete channel/supergroup messages
      *
-     * @return messages_AffectedMessages
-     */
-    public function deleteMessages(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser user_id,
-     *              ]
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel/supergroup       
+     * * `[int]`        **id**      - The IDs of messages to delete
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_AffectedHistory
+     * @return messages.AffectedMessages
      */
-    public function deleteUserHistory(array $params);
+    public function deleteMessages($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser user_id,
-     *               int id,
-     *              ]
+     * Delete all messages of a user in a channel/supergroup
      *
-     * @return bool
-     */
-    public function reportSpam(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputMessage id,
-     *              ]
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel/supergroup
+     * * `InputUser`    **user_id** - The user              
+     * 
+     * @param array $params Parameters
      *
-     * @return messages_Messages
+     * @return messages.AffectedHistory
      */
-    public function getMessages(array $params);
+    public function deleteUserHistory($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *               ChannelParticipantsFilter filter,
-     *               int offset,
-     *               int limit,
-     *               int hash,
-     *              ]
+     * Report a message in a supergroup/channel for spam
      *
-     * @return channels_ChannelParticipants
-     */
-    public function getParticipants(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser user_id,
-     *              ]
-     *
-     * @return channels_ChannelParticipant
-     */
-    public function getParticipant(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel id,
-     *              ]
-     *
-     * @return messages_Chats
-     */
-    public function getChannels(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *              ]
-     *
-     * @return messages_ChatFull
-     */
-    public function getFullChannel(array $params);
-
-    /**
-     * @param array params [
-     *               boolean broadcast,
-     *               boolean megagroup,
-     *               string title,
-     *               string about,
-     *               InputGeoPoint geo_point,
-     *               string address,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function createChannel(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser user_id,
-     *               ChatAdminRights admin_rights,
-     *               string rank,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function editAdmin(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               string title,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function editTitle(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputChatPhoto photo,
-     *              ]
-     *
-     * @return Updates
-     */
-    public function editPhoto(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               string username,
-     *              ]
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel                    
+     * * `InputUser`    **user_id** - The user that sent the messages
+     * * `[int]`        **id**      - The IDs of messages to report  
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function checkUsername(array $params);
+    public function reportSpam($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *               string username,
-     *              ]
+     * Get channel/supergroup messages
+     *
+     * Parameters: 
+     * * `InputChannel`   **channel** - The channel/supergroup
+     * * `[InputMessage]` **id**      - The message IDs       
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Messages
+     */
+    public function getMessages($params);
+
+    /**
+     * Get channel/supergroup participants (you should use `$MadelineProto->get_pwr_chat($id)` instead)
+     *
+     * Parameters: 
+     * * `InputChannel`              **channel** - The channel                                     
+     * * `ChannelParticipantsFilter` **filter**  - Member filter                                   
+     * * `int`                       **offset**  - Offset                                          
+     * * `int`                       **limit**   - Limit                                           
+     * * `[int]`                     **hash**    - Optional: IDs of previously fetched participants
+     * 
+     * @param array $params Parameters
+     *
+     * @return channels.ChannelParticipants
+     */
+    public function getParticipants($params);
+
+    /**
+     * Get info about a certain channel/supergroup participant
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel/supergroup      
+     * * `InputUser`    **user_id** - The user to fetch info about
+     * 
+     * @param array $params Parameters
+     *
+     * @return channels.ChannelParticipant
+     */
+    public function getParticipant($params);
+
+    /**
+     * Get info about multiple channels/supergroups
+     *
+     * Parameters: 
+     * * `[InputChannel]` **id** - The channel/supergroup MTProto IDs
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Chats
+     */
+    public function getChannels($params);
+
+    /**
+     * You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.ChatFull
+     */
+    public function getFullChannel($params);
+
+    /**
+     * Create channel/supergroup
+     *
+     * Parameters: 
+     * * `boolean`       **broadcast** - Optional: Set this to true to create a channel   
+     * * `boolean`       **megagroup** - Optional: Set this to true to create a supergroup
+     * * `string`        **title**     - Supergroup/channel title                         
+     * * `string`        **about**     - About text                                       
+     * * `InputGeoPoint` **geo_point** - Optional: Geopoint (geochats)                    
+     * * `string`        **address**   - Optional: Physical address (geochats)            
+     * 
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function createChannel($params);
+
+    /**
+     * Edit admin permissions of a user in a channel/supergroup
+     *
+     * Parameters: 
+     * * `InputChannel`    **channel**      - The channel                    
+     * * `InputUser`       **user_id**      - The user                       
+     * * `ChatAdminRights` **admin_rights** - Admin rights                   
+     * * `string`          **rank**         - Admin rank, an arbitrary string
+     * 
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function editAdmin($params);
+
+    /**
+     * Edit the title of a supergroup/channel
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel                     
+     * * `string`       **title**   - The new channel/supergroup title
+     * 
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function editTitle($params);
+
+    /**
+     * Edit the photo of a supergroup/channel
+     *
+     * Parameters: 
+     * * `InputChannel`   **channel** - The channel  
+     * * `InputChatPhoto` **photo**   - The new photo
+     * 
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function editPhoto($params);
+
+    /**
+     * Check if this username is free and can be assigned to a channel/supergroup
+     *
+     * Parameters: 
+     * * `InputChannel` **channel**  - The channel/supergroup                      
+     * * `string`       **username** - The new username for this channel/supergroup
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function updateUsername(array $params);
+    public function checkUsername($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *              ]
+     * Update the username of a supergroup/channel
+     *
+     * Parameters: 
+     * * `InputChannel` **channel**  - The channel/supergroup
+     * * `string`       **username** - The new username      
+     * 
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function updateUsername($params);
+
+    /**
+     * Join a channel/supergroup
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel/supergroup to join
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function joinChannel(array $params);
+    public function joinChannel($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *              ]
+     * Leave a channel/supergroup
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel/supergroup to leave
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function leaveChannel(array $params);
+    public function leaveChannel($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser users,
-     *              ]
+     * Add users to channel/supergroup
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel/supergroup
+     * * `[InputUser]`  **users**   - The users to add      
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function inviteToChannel(array $params);
+    public function inviteToChannel($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *              ]
+     * Delete a channel/supergroup
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel/supergroup to delete
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function deleteChannel(array $params);
+    public function deleteChannel($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *               int id,
-     *               Bool grouped,
-     *              ]
+     * Get the link of a message in a channel
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel/supergroup
+     * * `int`          **id**      - The ID of the message 
+     * * `Bool`         **grouped** - Is this an album?     
+     * 
+     * @param array $params Parameters
      *
      * @return ExportedMessageLink
      */
-    public function exportMessageLink(array $params);
+    public function exportMessageLink($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *               Bool enabled,
-     *              ]
+     * Toggle channel signatures
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel/supergroup               
+     * * `Bool`         **enabled** - Enable or disable channel signatures?
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function toggleSignatures(array $params);
+    public function toggleSignatures($params);
 
     /**
-     * @param array params [
-     *               boolean by_location,
-     *               boolean check_limit,
-     *              ]
+     * Get all supergroups/channels where you're admin
      *
-     * @return messages_Chats
-     */
-    public function getAdminedPublicChannels(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser user_id,
-     *               ChatBannedRights banned_rights,
-     *              ]
+     * Parameters: 
+     * * `boolean` **by_location** - Optional: Get channels by location
+     * * `boolean` **check_limit** - Optional: Check limit             
+     * 
+     * @param array $params Parameters
      *
-     * @return Updates
+     * @return messages.Chats
      */
-    public function editBanned(array $params);
+    public function getAdminedPublicChannels($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *               string q,
-     *               ChannelAdminLogEventsFilter events_filter,
-     *               InputUser admins,
-     *               long max_id,
-     *               long min_id,
-     *               int limit,
-     *              ]
+     * Kick or ban a user from a channel/supergroup
      *
-     * @return channels_AdminLogResults
-     */
-    public function getAdminLog(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputStickerSet stickerset,
-     *              ]
-     *
-     * @return bool
-     */
-    public function setStickers(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               int id,
-     *              ]
-     *
-     * @return bool
-     */
-    public function readMessageContents(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               int max_id,
-     *              ]
-     *
-     * @return bool
-     */
-    public function deleteHistory(array $params);
-
-    /**
-     * @param array params [
-     *               InputChannel channel,
-     *               Bool enabled,
-     *              ]
+     * Parameters: 
+     * * `InputChannel`     **channel**       - The channel/supergroup
+     * * `InputUser`        **user_id**       - The user to kick/ban  
+     * * `ChatBannedRights` **banned_rights** - Banned rights         
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function togglePreHistoryHidden(array $params);
+    public function editBanned($params);
 
     /**
-     * @param array params [
-     *               int offset,
-     *              ]
+     * Get admin log of a channel/supergroup
      *
-     * @return messages_Chats
+     * Parameters: 
+     * * `InputChannel`                **channel**       - The channel/supergroup                        
+     * * `string`                      **q**             - Search query                                  
+     * * `ChannelAdminLogEventsFilter` **events_filter** - Optional: Event filter                        
+     * * `[InputUser]`                 **admins**        - Optional: Fetch only actions from these admins
+     * * `long`                        **max_id**        - Maximum message ID to fetch                   
+     * * `long`                        **min_id**        - Minimum message ID to fetch                   
+     * * `int`                         **limit**         - Number of results to fetch                    
+     * 
+     * @param array $params Parameters
+     *
+     * @return channels.AdminLogResults
      */
-    public function getLeftChannels(array $params);
+    public function getAdminLog($params);
 
     /**
-     * @return messages_Chats
+     * Set the supergroup/channel stickerpack
+     *
+     * Parameters: 
+     * * `InputChannel`    **channel**    - The channel/supergoup
+     * * `InputStickerSet` **stickerset** - The stickerset       
+     * 
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function setStickers($params);
+
+    /**
+     * Mark channel/supergroup messages as read
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel        
+     * * `[int]`        **id**      - List of message IDs
+     * 
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function readMessageContents($params);
+
+    /**
+     * Delete the history of a supergroup/channel
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel/supergroup      
+     * * `int`          **max_id**  - Maximum message ID to delete
+     * 
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function deleteHistory($params);
+
+    /**
+     * Enable or disable hidden history for new channel/supergroup users
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - The channel/supergroup                                           
+     * * `Bool`         **enabled** - Enable or disable hidden history for new channel/supergroup users
+     * 
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function togglePreHistoryHidden($params);
+
+    /**
+     * Get all channels you left
+     *
+     * Parameters: 
+     * * `int` **offset** - Offset
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.Chats
+     */
+    public function getLeftChannels($params);
+
+    /**
+     * Get groups for discussion
+     *
+     * @return messages.Chats
      */
     public function getGroupsForDiscussion();
 
     /**
-     * @param array params [
-     *               InputChannel broadcast,
-     *               InputChannel group,
-     *              ]
+     * Set discussion group of channel
+     *
+     * Parameters: 
+     * * `InputChannel` **broadcast** - The channel
+     * * `InputChannel` **group**     - The group  
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function setDiscussionGroup(array $params);
+    public function setDiscussionGroup($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputUser user_id,
-     *               InputCheckPasswordSRP password,
-     *              ]
+     * Edit creator of channel
+     *
+     * Parameters: 
+     * * `InputChannel`          **channel**  - Channel 
+     * * `InputUser`             **user_id**  - User ID 
+     * * `InputCheckPasswordSRP` **password** - Password
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function editCreator(array $params);
+    public function editCreator($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *               InputGeoPoint geo_point,
-     *               string address,
-     *              ]
+     * Edit location (geochats)
+     *
+     * Parameters: 
+     * * `InputChannel`  **channel**   - Channel                     
+     * * `InputGeoPoint` **geo_point** - Geo point                   
+     * * `string`        **address**   - Physical location (geochats)
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function editLocation(array $params);
+    public function editLocation($params);
 
     /**
-     * @param array params [
-     *               InputChannel channel,
-     *               int seconds,
-     *              ]
+     * Toggle slow mode
+     *
+     * Parameters: 
+     * * `InputChannel` **channel** - Supergroup                                                                                         
+     * * `int`          **seconds** - Users will only be able to send one message every `seconds` seconds, `0` to disable the limitation 
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function toggleSlowMode(array $params);
+    public function toggleSlowMode($params);
 }
 
 interface bots
 {
     /**
-     * @param array params [
-     *               string custom_method,
-     *               DataJSON params,
-     *              ]
+     * Send a custom request to the bot API
+     *
+     * Parameters: 
+     * * `string`   **custom_method** - The method to call
+     * * `DataJSON` **params**        - Method parameters 
+     * 
+     * @param array $params Parameters
      *
      * @return DataJSON
      */
-    public function sendCustomRequest(array $params);
+    public function sendCustomRequest($params);
 
     /**
-     * @param array params [
-     *               long query_id,
-     *               DataJSON data,
-     *              ]
+     * Send webhook request via bot API
+     *
+     * Parameters: 
+     * * `long`     **query_id** - The query ID  
+     * * `DataJSON` **data**     - The parameters
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function answerWebhookJSONQuery(array $params);
+    public function answerWebhookJSONQuery($params);
 }
 
 interface payments
 {
     /**
-     * @param array params [
-     *               int msg_id,
-     *              ]
+     * Get payment form
      *
-     * @return payments_PaymentForm
+     * Parameters: 
+     * * `int` **msg_id** - Message ID
+     * 
+     * @param array $params Parameters
+     *
+     * @return payments.PaymentForm
      */
-    public function getPaymentForm(array $params);
+    public function getPaymentForm($params);
 
     /**
-     * @param array params [
-     *               int msg_id,
-     *              ]
+     * Get payment receipt
      *
-     * @return payments_PaymentReceipt
+     * Parameters: 
+     * * `int` **msg_id** - The message ID
+     * 
+     * @param array $params Parameters
+     *
+     * @return payments.PaymentReceipt
      */
-    public function getPaymentReceipt(array $params);
+    public function getPaymentReceipt($params);
 
     /**
-     * @param array params [
-     *               boolean save,
-     *               int msg_id,
-     *               PaymentRequestedInfo info,
-     *              ]
+     * Validate requested payment info
      *
-     * @return payments_ValidatedRequestedInfo
+     * Parameters: 
+     * * `boolean`              **save**   - Optional: Save payment info?
+     * * `int`                  **msg_id** - The message ID              
+     * * `PaymentRequestedInfo` **info**   - The requested payment info  
+     * 
+     * @param array $params Parameters
+     *
+     * @return payments.ValidatedRequestedInfo
      */
-    public function validateRequestedInfo(array $params);
+    public function validateRequestedInfo($params);
 
     /**
-     * @param array params [
-     *               int msg_id,
-     *               string requested_info_id,
-     *               string shipping_option_id,
-     *               InputPaymentCredentials credentials,
-     *              ]
+     * Bots only: send payment form
      *
-     * @return payments_PaymentResult
+     * Parameters: 
+     * * `int`                     **msg_id**             - Message ID                    
+     * * `string`                  **requested_info_id**  - Optional: ID of requested info
+     * * `string`                  **shipping_option_id** - Optional: Shipping option ID  
+     * * `InputPaymentCredentials` **credentials**        - Payment credentials           
+     * 
+     * @param array $params Parameters
+     *
+     * @return payments.PaymentResult
      */
-    public function sendPaymentForm(array $params);
+    public function sendPaymentForm($params);
 
     /**
-     * @return payments_SavedInfo
+     * Get saved payments info
+     *
+     * @return payments.SavedInfo
      */
     public function getSavedInfo();
 
     /**
-     * @param array params [
-     *               boolean credentials,
-     *               boolean info,
-     *              ]
+     * Clear saved payments info
+     *
+     * Parameters: 
+     * * `boolean` **credentials** - Optional: Clear credentials? 
+     * * `boolean` **info**        - Optional: Clear payment info?
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function clearSavedInfo(array $params);
+    public function clearSavedInfo($params);
 }
 
 interface stickers
 {
     /**
-     * @param array params [
-     *               boolean masks,
-     *               InputUser user_id,
-     *               string title,
-     *               string short_name,
-     *               InputStickerSetItem stickers,
-     *              ]
+     * Create stickerset
      *
-     * @return messages_StickerSet
+     * Parameters: 
+     * * `boolean`               **masks**      - Optional: Masks?                         
+     * * `InputUser`             **user_id**    - The user ID associated to this stickerset
+     * * `string`                **title**      - The stickerset title                     
+     * * `string`                **short_name** - The stickerset short name                
+     * * `[InputStickerSetItem]` **stickers**   - The stickers to add                      
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.StickerSet
      */
-    public function createStickerSet(array $params);
+    public function createStickerSet($params);
 
     /**
-     * @param array params [
-     *               InputDocument sticker,
-     *              ]
+     * Remove sticker from stickerset
      *
-     * @return messages_StickerSet
+     * Parameters: 
+     * * `InputDocument` **sticker** - The sticker to remove
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.StickerSet
      */
-    public function removeStickerFromSet(array $params);
+    public function removeStickerFromSet($params);
 
     /**
-     * @param array params [
-     *               InputDocument sticker,
-     *               int position,
-     *              ]
+     * Change sticker position in photo
      *
-     * @return messages_StickerSet
+     * Parameters: 
+     * * `InputDocument` **sticker**  - The sticker 
+     * * `int`           **position** - New position
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.StickerSet
      */
-    public function changeStickerPosition(array $params);
+    public function changeStickerPosition($params);
 
     /**
-     * @param array params [
-     *               InputStickerSet stickerset,
-     *               InputStickerSetItem sticker,
-     *              ]
+     * Add sticker to stickerset
      *
-     * @return messages_StickerSet
+     * Parameters: 
+     * * `InputStickerSet`     **stickerset** - The stickerset
+     * * `InputStickerSetItem` **sticker**    - The sticker   
+     * 
+     * @param array $params Parameters
+     *
+     * @return messages.StickerSet
      */
-    public function addStickerToSet(array $params);
+    public function addStickerToSet($params);
 }
 
 interface phone
 {
     /**
+     * Get call configuration
+     *
      * @return DataJSON
      */
     public function getCallConfig();
 
     /**
-     * @param array params [
-     *               boolean video,
-     *               InputUser user_id,
-     *               bytes g_a_hash,
-     *               PhoneCallProtocol protocol,
-     *              ]
+     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
      *
-     * @return phone_PhoneCall
+     * Parameters: 
+     * * `boolean`           **video**    - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `InputUser`         **user_id**  - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
+     * * `bytes`             **g_a_hash** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
+     * * `PhoneCallProtocol` **protocol** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
+     * 
+     * @param array $params Parameters
+     *
+     * @return phone.PhoneCall
      */
-    public function requestCall(array $params);
+    public function requestCall($params);
 
     /**
-     * @param array params [
-     *               InputPhoneCall peer,
-     *               bytes g_b,
-     *               PhoneCallProtocol protocol,
-     *              ]
+     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
      *
-     * @return phone_PhoneCall
+     * Parameters: 
+     * * `InputPhoneCall`    **peer**     - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `bytes`             **g_b**      - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `PhoneCallProtocol` **protocol** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * 
+     * @param array $params Parameters
+     *
+     * @return phone.PhoneCall
      */
-    public function acceptCall(array $params);
+    public function acceptCall($params);
 
     /**
-     * @param array params [
-     *               InputPhoneCall peer,
-     *               bytes g_a,
-     *               long key_fingerprint,
-     *               PhoneCallProtocol protocol,
-     *              ]
+     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
      *
-     * @return phone_PhoneCall
+     * Parameters: 
+     * * `InputPhoneCall`    **peer**            - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `bytes`             **g_a**             - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `long`              **key_fingerprint** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `PhoneCallProtocol` **protocol**        - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * 
+     * @param array $params Parameters
+     *
+     * @return phone.PhoneCall
      */
-    public function confirmCall(array $params);
+    public function confirmCall($params);
 
     /**
-     * @param array params [
-     *               InputPhoneCall peer,
-     *              ]
+     * Notify server that you received a call (server will refuse all incoming calls until the current call is over)
+     *
+     * Parameters: 
+     * * `InputPhoneCall` **peer** - The phone call you received
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function receivedCall(array $params);
+    public function receivedCall($params);
 
     /**
-     * @param array params [
-     *               boolean video,
-     *               InputPhoneCall peer,
-     *               int duration,
-     *               PhoneCallDiscardReason reason,
-     *               long connection_id,
-     *              ]
+     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     *
+     * Parameters: 
+     * * `boolean`                **video**         - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `InputPhoneCall`         **peer**          - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
+     * * `int`                    **duration**      - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
+     * * `PhoneCallDiscardReason` **reason**        - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
+     * * `long`                   **connection_id** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function discardCall(array $params);
+    public function discardCall($params);
 
     /**
-     * @param array params [
-     *               boolean user_initiative,
-     *               InputPhoneCall peer,
-     *               int rating,
-     *               string comment,
-     *              ]
+     * Set phone call rating
+     *
+     * Parameters: 
+     * * `boolean`        **user_initiative** - Optional: User initiative
+     * * `InputPhoneCall` **peer**            - The phone call           
+     * * `int`            **rating**          - Rating (1-5 stars)       
+     * * `string`         **comment**         - An optional comment      
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function setCallRating(array $params);
+    public function setCallRating($params);
 
     /**
-     * @param array params [
-     *               InputPhoneCall peer,
-     *               DataJSON debug,
-     *              ]
+     * Save call debugging info
+     *
+     * Parameters: 
+     * * `InputPhoneCall` **peer**  - The call      
+     * * `DataJSON`       **debug** - Debugging info
+     * 
+     * @param array $params Parameters
      *
      * @return bool
      */
-    public function saveCallDebug(array $params);
+    public function saveCallDebug($params);
 }
 
 interface langpack
 {
     /**
-     * @param array params [
-     *               string lang_pack,
-     *               string lang_code,
-     *              ]
+     * Get language pack
+     *
+     * Parameters: 
+     * * `string` **lang_pack** - Lang pack    
+     * * `string` **lang_code** - Language code
+     * 
+     * @param array $params Parameters
      *
      * @return LangPackDifference
      */
-    public function getLangPack(array $params);
+    public function getLangPack($params);
 
     /**
-     * @param array params [
-     *               string lang_pack,
-     *               string lang_code,
-     *               string keys,
-     *              ]
+     * Get language pack strings
      *
-     * @return Vector_of_LangPackString
+     * Parameters: 
+     * * `string`   **lang_pack** - Lang pack    
+     * * `string`   **lang_code** - Language code
+     * * `[string]` **keys**      - Keys         
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_LangPackString[]
      */
-    public function getStrings(array $params);
+    public function getStrings($params);
 
     /**
-     * @param array params [
-     *               string lang_pack,
-     *               string lang_code,
-     *               int from_version,
-     *              ]
+     * Get language pack updates
+     *
+     * Parameters: 
+     * * `string` **lang_pack**    - Language pack   
+     * * `string` **lang_code**    - Lang code       
+     * * `int`    **from_version** - Previous version
+     * 
+     * @param array $params Parameters
      *
      * @return LangPackDifference
      */
-    public function getDifference(array $params);
+    public function getDifference($params);
 
     /**
-     * @param array params [
-     *               string lang_pack,
-     *              ]
+     * Get available languages
      *
-     * @return Vector_of_LangPackLanguage
+     * Parameters: 
+     * * `string` **lang_pack** - Lang pack
+     * 
+     * @param array $params Parameters
+     *
+     * @return _of_LangPackLanguage[]
      */
-    public function getLanguages(array $params);
+    public function getLanguages($params);
 
     /**
-     * @param array params [
-     *               string lang_pack,
-     *               string lang_code,
-     *              ]
+     * Get language
+     *
+     * Parameters: 
+     * * `string` **lang_pack** - Lang pack
+     * * `string` **lang_code** - Lang code
+     * 
+     * @param array $params Parameters
      *
      * @return LangPackLanguage
      */
-    public function getLanguage(array $params);
+    public function getLanguage($params);
 }
 
 interface folders
 {
     /**
-     * @param array params [
-     *               InputFolderPeer folder_peers,
-     *              ]
+     * Edit folder
+     *
+     * Parameters: 
+     * * `[InputFolderPeer]` **folder_peers** - New folder peers
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function editPeerFolders(array $params);
+    public function editPeerFolders($params);
 
     /**
-     * @param array params [
-     *               int folder_id,
-     *              ]
+     * Delete folder
+     *
+     * Parameters: 
+     * * `int` **folder_id** - Folder ID
+     * 
+     * @param array $params Parameters
      *
      * @return Updates
      */
-    public function deleteFolder(array $params);
+    public function deleteFolder($params);
 }
+
+class InternalDoc extends APIFactory
+{
+
+    public function __construct(...$params)
+    {
+        return $this->__call('__construct', [$params]);
+    }
+    
+    public function __sleep()
+    {
+        return $this->__call('__sleep', []);
+    }
+    
+    public function logger($param, $level = danog\MadelineProto\Logger::NOTICE, $file = null)
+    {
+        return $this->__call('logger', [$param, $level, $file]);
+    }
+    
+    public function isAltervista()
+    {
+        return $this->__call('isAltervista', []);
+    }
+    
+    public function isInitingAuthorization()
+    {
+        return $this->__call('isInitingAuthorization', []);
+    }
+    
+    public function getHTTPClient()
+    {
+        return $this->__call('getHTTPClient', []);
+    }
+    
+    public function getDNSClient()
+    {
+        return $this->__call('getDNSClient', []);
+    }
+    
+    public function fileGetContents($url): Generator
+    {
+        return $this->__call('fileGetContents', [$url]);
+    }
+    
+    public function a(callable $a, ?string $b = null, $c = null, $d = 2, $e = MTProto::METHOD_BEFORE_CALLBACK): ?string
+    {
+        return $this->__call('a', [$a, $b, $c, $d, $e]);
+    }
+    /**
+     * Get all datacenter connections.
+     *
+     * @return array<DataCenterConnection>
+     */
+    public function getDataCenterConnections(): array
+    {
+        return $this->__call('getDataCenterConnections', []);
+    }
+    
+    public function hasAllAuth()
+    {
+        return $this->__call('hasAllAuth', []);
+    }
+    
+    public function serialize()
+    {
+        return $this->__call('serialize', []);
+    }
+    
+    public function startLoops()
+    {
+        return $this->__call('startLoops', []);
+    }
+    
+    public function stopLoops()
+    {
+        return $this->__call('stopLoops', []);
+    }
+    
+    public function __wakeup($backtrace)
+    {
+        return $this->__call('__wakeup_async', [$backtrace]);
+    }
+    
+    public function __destruct()
+    {
+        return $this->__call('__destruct', []);
+    }
+    
+    public function getSettings($settings, $previousSettings = array (
+    ))
+    {
+        return $this->__call('getSettings', [$settings, $previousSettings]);
+    }
+    
+    public function parseSettings($settings)
+    {
+        return $this->__call('parse_settings', [$settings]);
+    }
+    
+    public function setupLogger()
+    {
+        return $this->__call('setup_logger', []);
+    }
+    /**
+     * Reset all MTProto sessions.
+     *
+     * @param boolean $de       Whether to reset the session ID
+     * @param boolean $auth_key Whether to reset the auth key
+     *
+     * @return void
+     */
+    public function resetMTProtoSession(bool $de = true, bool $auth_key = false)
+    {
+        return $this->__call('resetMTProtoSession', [$de, $auth_key]);
+    }
+    /**
+     * Check if connected to datacenter using HTTP.
+     *
+     * @param string $datacenter DC ID
+     *
+     * @return boolean
+     */
+    public function isHttp(string $datacenter)
+    {
+        return $this->__call('isHttp', [$datacenter]);
+    }
+    
+    public function connectToAllDcs(bool $reconnectAll = true): Generator
+    {
+        return $this->__call('connect_to_all_dcs_async', [$reconnectAll]);
+    }
+    
+    public function resetSession()
+    {
+        return $this->__call('resetSession', []);
+    }
+    
+    public function resetUpdateState()
+    {
+        return $this->__call('resetUpdateState', []);
+    }
+    
+    public function startUpdateSystem($anyway = false)
+    {
+        return $this->__call('startUpdateSystem', [$anyway]);
+    }
+    
+    public function getPhoneConfig($watcherId = null)
+    {
+        return $this->__call('get_phone_config_async', [$watcherId]);
+    }
+    
+    public function getCdnConfig($datacenter)
+    {
+        return $this->__call('get_cdn_config_async', [$datacenter]);
+    }
+    
+    public function getCachedConfig()
+    {
+        return $this->__call('get_cached_config', []);
+    }
+    
+    public function getConfig($config = array (
+    ), $options = array (
+    ))
+    {
+        return $this->__call('get_config_async', [$config, $options]);
+    }
+    
+    public function parseConfig()
+    {
+        return $this->__call('parse_config_async', []);
+    }
+    
+    public function parseDcOptions($dc_options)
+    {
+        return $this->__call('parse_dc_options_async', [$dc_options]);
+    }
+    
+    public function getSelf()
+    {
+        return $this->__call('get_self_async', []);
+    }
+    
+    public function getMethodCallbacks(): array
+    {
+        return $this->__call('getMethodCallbacks', []);
+    }
+    
+    public function getMethodBeforeCallbacks(): array
+    {
+        return $this->__call('getMethodBeforeCallbacks', []);
+    }
+    
+    public function getConstructorCallbacks(): array
+    {
+        return $this->__call('getConstructorCallbacks', []);
+    }
+    
+    public function getConstructorBeforeCallbacks(): array
+    {
+        return $this->__call('getConstructorBeforeCallbacks', []);
+    }
+    
+    public function getConstructorSerializeCallbacks(): array
+    {
+        return $this->__call('getConstructorSerializeCallbacks', []);
+    }
+    
+    public function getTypeMismatchCallbacks(): array
+    {
+        return $this->__call('getTypeMismatchCallbacks', []);
+    }
+    
+    public function __debugInfo()
+    {
+        return $this->__call('__debugInfo', []);
+    }
+    
+    public function init()
+    {
+        return $this->__call('initAsync', []);
+    }
+    
+    public function setInitPromise($promise)
+    {
+        return $this->__call('setInitPromise', [$promise]);
+    }
+    
+    public function fetchserializableobject($hash)
+    {
+        return $this->__call('fetchserializableobject', [$hash]);
+    }
+    /**
+     * Create authorization key.
+     *
+     * @param int    $expires_in Expiry date of auth key, -1 for permanent auth key
+     * @param string $datacenter DC ID
+     *
+     * @return \Generator<AuthKey>
+     */
+    public function createAuthKey(int $expires_in, string $datacenter): Generator
+    {
+        return $this->__call('create_auth_key_async', [$expires_in, $datacenter]);
+    }
+    /**
+     * Check validity of g_a parameters.
+     *
+     * @param BigInteger $g_a
+     * @param BigInteger $p
+     *
+     * @return bool
+     */
+    public function checkG(phpseclib\Math\BigInteger $g_a, phpseclib\Math\BigInteger $p): bool
+    {
+        return $this->__call('check_G', [$g_a, $p]);
+    }
+    /**
+     * Check validity of p and g parameters.
+     *
+     * @param BigInteger $p
+     * @param BigInteger $g
+     *
+     * @return boolean
+     */
+    public function checkPG(phpseclib\Math\BigInteger $p, phpseclib\Math\BigInteger $g): bool
+    {
+        return $this->__call('check_p_g', [$p, $g]);
+    }
+    /**
+     * Get diffie-hellman configuration.
+     *
+     * @return \Generator<array>
+     */
+    public function getDhConfig(): Generator
+    {
+        return $this->__call('get_dh_config_async', []);
+    }
+    /**
+     * Bind temporary and permanent auth keys.
+     *
+     * @param integer $expires_in Date of expiry for binding
+     * @param string  $datacenter DC ID
+     *
+     * @return \Generator<bool>
+     */
+    public function bindTempAuthKey(int $expires_in, string $datacenter): Generator
+    {
+        return $this->__call('bind_temp_auth_key_async', [$expires_in, $datacenter]);
+    }
+    /**
+     * Factorize number asynchronously using the wolfram API.
+     *
+     * @param string|integer $what Number to factorize
+     *
+     * @return \Generator<string|bool>
+     */
+    public function wolframSingle($what): Generator
+    {
+        return $this->__call('wolfram_single_async', [$what]);
+    }
+    /**
+     * Asynchronously create, bind and check auth keys for all DCs.
+     *
+     * @return \Generator
+     */
+    public function initAuthorization(): Generator
+    {
+        return $this->__call('init_authorization_async', []);
+    }
+    /**
+     * Init auth keys for single DC.
+     *
+     * @param string               $id     DC ID
+     * @param DataCenterConnection $socket DC object
+     *
+     * @return \Generator
+     */
+    public function initAuthorizationSocket(string $id, danog\MadelineProto\DataCenterConnection $socket): Generator
+    {
+        return $this->__call('init_authorization_socket_async', [$id, $socket]);
+    }
+    /**
+     * Sync authorization data between DCs.
+     *
+     * @param string $id DC ID
+     *
+     * @return \Generator
+     */
+    public function syncAuthorization(string $id): Generator
+    {
+        return $this->__call('sync_authorization_async', [$id]);
+    }
+    /**
+     * Call method and wait asynchronously for response.
+     *
+     * If the $aargs['noResponse'] is true, will not wait for a response.
+     *
+     * @param string $method Method name
+     * @param array  $args   Arguments
+     * @param array  $aargs  Additional arguments
+     *
+     * @return Promise
+     */
+    public function methodCall(string $method, $args = array (
+    ), array $aargs = array (
+      'msg_id' => null,
+    )): Amp\Promise
+    {
+        return $this->__call('method_call_async_read', [$method, $args, $aargs]);
+    }
+    /**
+     * Call method and make sure it is asynchronously sent.
+     *
+     * @param string $method Method name
+     * @param array  $args   Arguments
+     * @param array  $aargs  Additional arguments
+     *
+     * @return Promise
+     */
+    public function methodCallWrite(string $method, $args = array (
+    ), array $aargs = array (
+      'msg_id' => null,
+    )): Amp\Promise
+    {
+        return $this->__call('method_call_async_write', [$method, $args, $aargs]);
+    }
+    
+    public function aesCalculate($msg_key, $auth_key, $to_server = true)
+    {
+        return $this->__call('aes_calculate', [$msg_key, $auth_key, $to_server]);
+    }
+    
+    public function oldAesCalculate($msg_key, $auth_key, $to_server = true)
+    {
+        return $this->__call('old_aes_calculate', [$msg_key, $auth_key, $to_server]);
+    }
+    
+    public function ctrEncrypt($message, $key, $iv)
+    {
+        return $this->__call('ctr_encrypt', [$message, $key, $iv]);
+    }
+    
+    public function igeEncrypt($message, $key, $iv)
+    {
+        return $this->__call('ige_encrypt', [$message, $key, $iv]);
+    }
+    
+    public function igeDecrypt($message, $key, $iv)
+    {
+        return $this->__call('ige_decrypt', [$message, $key, $iv]);
+    }
+    
+    public function toSupergroup($id)
+    {
+        return $this->__call('to_supergroup', [$id]);
+    }
+    
+    public function fromSupergroup($id)
+    {
+        return $this->__call('from_supergroup', [$id]);
+    }
+    
+    public function isSupergroup($id)
+    {
+        return $this->__call('is_supergroup', [$id]);
+    }
+    
+    public function addSupport($support)
+    {
+        return $this->__call('add_support', [$support]);
+    }
+    
+    public function addUser($user)
+    {
+        return $this->__call('add_user', [$user]);
+    }
+    
+    public function addChat($chat)
+    {
+        return $this->__call('add_chat_async', [$chat]);
+    }
+    
+    public function cachePwrChat($id, $full_fetch, $send)
+    {
+        return $this->__call('cache_pwr_chat', [$id, $full_fetch, $send]);
+    }
+    
+    public function peerIsset($id)
+    {
+        return $this->__call('peer_isset_async', [$id]);
+    }
+    
+    public function entitiesPeerIsset($entities)
+    {
+        return $this->__call('entities_peer_isset_async', [$entities]);
+    }
+    
+    public function fwdPeerIsset($fwd)
+    {
+        return $this->__call('fwd_peer_isset_async', [$fwd]);
+    }
+    
+    public function getFolderId($id)
+    {
+        return $this->__call('get_folder_id', [$id]);
+    }
+    
+    public function getId($id)
+    {
+        return $this->__call('get_id', [$id]);
+    }
+    
+    public function getInfo($id, $recursive = true)
+    {
+        return $this->__call('get_info_async', [$id, $recursive]);
+    }
+    
+    public function genAll($constructor, $folder_id = null)
+    {
+        return $this->__call('gen_all', [$constructor, $folder_id]);
+    }
+    
+    public function fullChatLastUpdated($id)
+    {
+        return $this->__call('full_chat_last_updated', [$id]);
+    }
+    
+    public function getFullInfo($id)
+    {
+        return $this->__call('get_full_info_async', [$id]);
+    }
+    
+    public function getPwrChat($id, $fullfetch = true, $send = true)
+    {
+        return $this->__call('get_pwr_chat_async', [$id, $fullfetch, $send]);
+    }
+    
+    public function recurseAlphabetSearchParticipants($channel, $filter, $q, $total_count, &$res)
+    {
+        return $this->__call('recurse_alphabet_search_participants_async', [$channel, $filter, $q, $total_count, $res]);
+    }
+    
+    public function fetchParticipants($channel, $filter, $q, $total_count, &$res)
+    {
+        return $this->__call('fetch_participants_async', [$channel, $filter, $q, $total_count, $res]);
+    }
+    
+    public function fetchParticipantsCache($channel, $filter, $q, $offset, $limit)
+    {
+        return $this->__call('fetch_participants_cache', [$channel, $filter, $q, $offset, $limit]);
+    }
+    
+    public function storeParticipantsCache($gres, $channel, $filter, $q, $offset, $limit)
+    {
+        return $this->__call('store_participants_cache', [$gres, $channel, $filter, $q, $offset, $limit]);
+    }
+    
+    public function getParticipantsHash($channel, $filter, $q, $offset, $limit)
+    {
+        return $this->__call('get_participants_hash', [$channel, $filter, $q, $offset, $limit]);
+    }
+    
+    public function storeDb($res, $force = false)
+    {
+        return $this->__call('store_db', [$res, $force]);
+    }
+    
+    public function resolveUsername($username)
+    {
+        return $this->__call('resolve_username_async', [$username]);
+    }
+    
+    public function pwrUpdateHandler($update)
+    {
+        return $this->__call('pwr_update_handler', [$update]);
+    }
+    
+    public function getUpdatesUpdateHandler($update)
+    {
+        return $this->__call('get_updates_update_handler', [$update]);
+    }
+    
+    public function getUpdates($params = array (
+    ))
+    {
+        return $this->__call('get_updates_async', [$params]);
+    }
+    
+    public function waitUpdate()
+    {
+        return $this->__call('waitUpdate', []);
+    }
+    
+    public function signalUpdate()
+    {
+        return $this->__call('signalUpdate', []);
+    }
+    
+    public function checkMsgId($message)
+    {
+        return $this->__call('check_msg_id', [$message]);
+    }
+    
+    public function loadUpdateState()
+    {
+        return $this->__call('load_update_state_async', []);
+    }
+    
+    public function loadChannelState($channelId = null, $init = array (
+    ))
+    {
+        return $this->__call('loadChannelState', [$channelId, $init]);
+    }
+    
+    public function getChannelStates()
+    {
+        return $this->__call('getChannelStates', []);
+    }
+    
+    public function getUpdatesState()
+    {
+        return $this->__call('get_updates_state_async', []);
+    }
+    
+    public function handleUpdates($updates, $actual_updates = null)
+    {
+        return $this->__call('handle_updates_async', [$updates, $actual_updates]);
+    }
+    
+    public function saveUpdate($update)
+    {
+        return $this->__call('save_update_async', [$update]);
+    }
+    
+    public function pwrWebhook($update)
+    {
+        return $this->__call('pwr_webhook', [$update]);
+    }
+    
+    public function upload($file, $file_name = '', $cb = null, $encrypted = false)
+    {
+        return $this->__call('upload_async', [$file, $file_name, $cb, $encrypted]);
+    }
+    
+    public function uploadFromUrl($url, int $size = 0, string $file_name = '', $cb = null, bool $encrypted = false)
+    {
+        return $this->__call('upload_from_url_async', [$url, $size, $file_name, $cb, $encrypted]);
+    }
+    
+    public function uploadFromStream($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false)
+    {
+        return $this->__call('upload_from_stream_async', [$stream, $size, $mime, $file_name, $cb, $encrypted]);
+    }
+    
+    public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $refetchable = true, bool $encrypted = false)
+    {
+        return $this->__call('upload_from_callable_async', [$callable, $size, $mime, $file_name, $cb, $refetchable, $encrypted]);
+    }
+    
+    public function uploadEncrypted($file, $file_name = '', $cb = null)
+    {
+        return $this->__call('upload_encrypted_async', [$file, $file_name, $cb]);
+    }
+    
+    public function uploadFromTgfile($media, $cb = null, $encrypted = false)
+    {
+        return $this->__call('upload_from_tgfile_async', [$media, $cb, $encrypted]);
+    }
+    
+    public function genAllFile($media)
+    {
+        return $this->__call('gen_all_file_async', [$media]);
+    }
+    
+    public function getFileInfo($constructor)
+    {
+        return $this->__call('get_file_info_async', [$constructor]);
+    }
+    
+    public function getPropicInfo($data)
+    {
+        return $this->__call('get_propic_info_async', [$data]);
+    }
+    
+    public function getDownloadInfo($message_media)
+    {
+        return $this->__call('get_download_info_async', [$message_media]);
+    }
+    
+    public function extractPhotosize($photo)
+    {
+        return $this->__call('extract_photosize', [$photo]);
+    }
+    
+    public function downloadToDir($message_media, $dir, $cb = null)
+    {
+        return $this->__call('download_to_dir_async', [$message_media, $dir, $cb]);
+    }
+    
+    public function downloadToFile($message_media, $file, $cb = null)
+    {
+        return $this->__call('download_to_file_async', [$message_media, $file, $cb]);
+    }
+    
+    public function downloadToStream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
+    {
+        return $this->__call('download_to_stream_async', [$message_media, $stream, $cb, $offset, $end]);
+    }
+    
+    public function downloadToCallable($message_media, $callable, $cb = null, $parallelize = true, $offset = 0, $end = -1, ?int $part_size = null)
+    {
+        return $this->__call('download_to_callable_async', [$message_media, $callable, $cb, $parallelize, $offset, $end, $part_size]);
+    }
+    
+    public function acceptSecretChat($params)
+    {
+        return $this->__call('accept_secret_chat_async', [$params]);
+    }
+    
+    public function requestSecretChat($user)
+    {
+        return $this->__call('request_secret_chat_async', [$user]);
+    }
+    
+    public function completeSecretChat($params)
+    {
+        return $this->__call('complete_secret_chat_async', [$params]);
+    }
+    
+    public function notifyLayer($chat)
+    {
+        return $this->__call('notify_layer_async', [$chat]);
+    }
+    
+    public function rekey($chat)
+    {
+        return $this->__call('rekey_async', [$chat]);
+    }
+    
+    public function acceptRekey($chat, $params)
+    {
+        return $this->__call('accept_rekey_async', [$chat, $params]);
+    }
+    
+    public function commitRekey($chat, $params)
+    {
+        return $this->__call('commit_rekey_async', [$chat, $params]);
+    }
+    
+    public function completeRekey($chat, $params)
+    {
+        return $this->__call('complete_rekey_async', [$chat, $params]);
+    }
+    
+    public function secretChatStatus($chat)
+    {
+        return $this->__call('secret_chat_status', [$chat]);
+    }
+    
+    public function getSecretChat($chat)
+    {
+        return $this->__call('get_secret_chat', [$chat]);
+    }
+    
+    public function discardSecretChat($chat)
+    {
+        return $this->__call('discard_secret_chat_async', [$chat]);
+    }
+    
+    public function encryptSecretMessage($chat_id, $message)
+    {
+        return $this->__call('encrypt_secret_message_async', [$chat_id, $message]);
+    }
+    
+    public function handleEncryptedUpdate($message, $test = false)
+    {
+        return $this->__call('handle_encrypted_update_async', [$message, $test]);
+    }
+    
+    public function tryMtprotoV1Decrypt($message_key, $chat_id, $old, $encrypted_data)
+    {
+        return $this->__call('try_mtproto_v1_decrypt', [$message_key, $chat_id, $old, $encrypted_data]);
+    }
+    
+    public function tryMtprotoV2Decrypt($message_key, $chat_id, $old, $encrypted_data)
+    {
+        return $this->__call('try_mtproto_v2_decrypt', [$message_key, $chat_id, $old, $encrypted_data]);
+    }
+    
+    public function handleDecryptedUpdate($update)
+    {
+        return $this->__call('handle_decrypted_update_async', [$update]);
+    }
+    
+    public function checkSecretInSeqNo($chat_id, $seqno)
+    {
+        return $this->__call('check_secret_in_seq_no_async', [$chat_id, $seqno]);
+    }
+    
+    public function checkSecretOutSeqNo($chat_id, $seqno)
+    {
+        return $this->__call('check_secret_out_seq_no_async', [$chat_id, $seqno]);
+    }
+    
+    public function generateSecretInSeqNo($chat)
+    {
+        return $this->__call('generate_secret_in_seq_no', [$chat]);
+    }
+    
+    public function generateSecretOutSeqNo($chat)
+    {
+        return $this->__call('generate_secret_out_seq_no', [$chat]);
+    }
+    
+    public function constructTl($files, $objects = array (
+    ))
+    {
+        return $this->__call('construct_tl', [$files, $objects]);
+    }
+    
+    public function getMethodNamespaces()
+    {
+        return $this->__call('get_method_namespaces', []);
+    }
+    
+    public function getMethodsNamespaced()
+    {
+        return $this->__call('get_methods_namespaced', []);
+    }
+    
+    public function updateCallbacks($objects)
+    {
+        return $this->__call('update_callbacks', [$objects]);
+    }
+    
+    public function deserializeBool($id)
+    {
+        return $this->__call('deserialize_bool', [$id]);
+    }
+    
+    public function serializeObject($type, $object, $ctx, $layer = -1)
+    {
+        return $this->__call('serialize_object_async', [$type, $object, $ctx, $layer]);
+    }
+    
+    public function serializeMethod($method, $arguments)
+    {
+        return $this->__call('serialize_method_async', [$method, $arguments]);
+    }
+    
+    public function serializeParams($tl, $arguments, $ctx, $layer = -1)
+    {
+        return $this->__call('serialize_params_async', [$tl, $arguments, $ctx, $layer]);
+    }
+    
+    public function getLength($stream, $type = array (
+      'type' => '',
+    ))
+    {
+        return $this->__call('get_length', [$stream, $type]);
+    }
+    /**
+     * :type stream: io.BytesIO object.
+     */
+    public function deserialize($stream, $type = array (
+      'type' => '',
+    ))
+    {
+        return $this->__call('deserialize', [$stream, $type]);
+    }
+    
+    public function htmlEntityDecode($stuff)
+    {
+        return $this->__call('html_entity_decode', [$stuff]);
+    }
+    
+    public function mbStrlen($text)
+    {
+        return $this->__call('mb_strlen', [$text]);
+    }
+    
+    public function mbSubstr($text, $offset, $length = null)
+    {
+        return $this->__call('mb_substr', [$text, $offset, $length]);
+    }
+    
+    public function mbStrSplit($text, $length)
+    {
+        return $this->__call('mb_str_split', [$text, $length]);
+    }
+    
+    public function parseButtons($rows)
+    {
+        return $this->__call('parse_buttons', [$rows]);
+    }
+    
+    public function parseReplyMarkup($markup)
+    {
+        return $this->__call('parse_reply_markup', [$markup]);
+    }
+    
+    public function mTProtoToBotAPI($data, $sent_arguments = array (
+    ))
+    {
+        return $this->__call('MTProto_to_botAPI_async', [$data, $sent_arguments]);
+    }
+    
+    public function botAPIToMTProto($arguments)
+    {
+        return $this->__call('botAPI_to_MTProto_async', [$arguments]);
+    }
+    
+    public function parseNode($node, &$entities, &$new_message, &$offset)
+    {
+        return $this->__call('parse_node_async', [$node, $entities, $new_message, $offset]);
+    }
+    
+    public function parseMode($arguments)
+    {
+        return $this->__call('parse_mode_async', [$arguments]);
+    }
+    
+    public function splitToChunks($args)
+    {
+        return $this->__call('split_to_chunks_async', [$args]);
+    }
+    
+    public function multipleExplodeKeepDelimiters($delimiters, $string)
+    {
+        return $this->__call('multipleExplodeKeepDelimiters', [$delimiters, $string]);
+    }
+    
+    public function htmlFixtags($text)
+    {
+        return $this->__call('html_fixtags', [$text]);
+    }
+    
+    public function buildRows($button_list)
+    {
+        return $this->__call('build_rows', [$button_list]);
+    }
+    
+    public function base64urlDecode($data)
+    {
+        return $this->__call('base64url_decode', [$data]);
+    }
+    
+    public function base64urlEncode($data)
+    {
+        return $this->__call('base64url_encode', [$data]);
+    }
+    
+    public function rleDecode($string)
+    {
+        return $this->__call('rle_decode', [$string]);
+    }
+    
+    public function rleEncode($string)
+    {
+        return $this->__call('rle_encode', [$string]);
+    }
+    
+    public function photosizeToBotapi($photoSize, $photo, $thumbnail = false)
+    {
+        return $this->__call('photosize_to_botapi_async', [$photoSize, $photo, $thumbnail]);
+    }
+    
+    public function unpackFileId($file_id)
+    {
+        return $this->__call('unpack_file_id', [$file_id]);
+    }
+    
+    public function getMimeFromExtension($extension, $default)
+    {
+        return $this->__call('get_mime_from_extension', [$extension, $default]);
+    }
+    
+    public function getExtensionFromMime($mime)
+    {
+        return $this->__call('get_extension_from_mime', [$mime]);
+    }
+    
+    public function getExtensionFromLocation($location, $default)
+    {
+        return $this->__call('get_extension_from_location', [$location, $default]);
+    }
+    
+    public function getMimeFromFile($file)
+    {
+        return $this->__call('get_mime_from_file', [$file]);
+    }
+    
+    public function getMimeFromBuffer($buffer)
+    {
+        return $this->__call('get_mime_from_buffer', [$buffer]);
+    }
+    
+    public function tdcliToTd(&$params, $key = null)
+    {
+        return $this->__call('tdcli_to_td', [$params, $key]);
+    }
+    
+    public function tdToMtproto($params)
+    {
+        return $this->__call('td_to_mtproto_async', [$params]);
+    }
+    
+    public function mtprotoToTdcli($params)
+    {
+        return $this->__call('mtproto_to_tdcli_async', [$params]);
+    }
+    
+    public function mtprotoToTd(&$params)
+    {
+        return $this->__call('mtproto_to_td_async', [$params]);
+    }
+    
+    public function tdToTdcli($params)
+    {
+        return $this->__call('td_to_tdcli', [$params]);
+    }
+    
+    public function genVectorHash($ints)
+    {
+        return $this->__call('gen_vector_hash', [$ints]);
+    }
+    
+    public function randomInt($modulus = false)
+    {
+        return $this->__call('random_int', [$modulus]);
+    }
+    
+    public function random($length)
+    {
+        return $this->__call('random', [$length]);
+    }
+    /**
+     * posmod(numeric,numeric) : numeric
+     * Works just like the % (modulus) operator, only returns always a postive number.
+     */
+    public function posmod($a, $b)
+    {
+        return $this->__call('posmod', [$a, $b]);
+    }
+    
+    public function unpackSignedInt($value)
+    {
+        return $this->__call('unpack_signed_int', [$value]);
+    }
+    
+    public function unpackSignedLong($value)
+    {
+        return $this->__call('unpack_signed_long', [$value]);
+    }
+    
+    public function unpackSignedLongString($value)
+    {
+        return $this->__call('unpack_signed_long_string', [$value]);
+    }
+    
+    public function packSignedInt($value)
+    {
+        return $this->__call('pack_signed_int', [$value]);
+    }
+    
+    public function packSignedLong($value)
+    {
+        return $this->__call('pack_signed_long', [$value]);
+    }
+    
+    public function packUnsignedInt($value)
+    {
+        return $this->__call('pack_unsigned_int', [$value]);
+    }
+    
+    public function packDouble($value)
+    {
+        return $this->__call('pack_double', [$value]);
+    }
+    
+    public function unpackDouble($value)
+    {
+        return $this->__call('unpack_double', [$value]);
+    }
+    
+    public function wait($promise, $ignoreSignal = false)
+    {
+        return $this->__call('wait', [$promise, $ignoreSignal]);
+    }
+    
+    public function all($promises)
+    {
+        return $this->__call('all', [$promises]);
+    }
+    
+    public function any($promises)
+    {
+        return $this->__call('any', [$promises]);
+    }
+    
+    public function some($promises)
+    {
+        return $this->__call('some', [$promises]);
+    }
+    
+    public function first($promises)
+    {
+        return $this->__call('first', [$promises]);
+    }
+    
+    public function timeout($promise, $timeout)
+    {
+        return $this->__call('timeout', [$promise, $timeout]);
+    }
+    
+    public function call($promise)
+    {
+        return $this->__call('call', [$promise]);
+    }
+    
+    public function callFork($promise, $actual = null, $file = '')
+    {
+        return $this->__call('callFork', [$promise, $actual, $file]);
+    }
+    
+    public function callForkDefer($promise)
+    {
+        return $this->__call('callForkDefer', [$promise]);
+    }
+    
+    public function rethrow($e, $file = '')
+    {
+        return $this->__call('rethrow', [$e, $file]);
+    }
+    
+    public function after($a, $b)
+    {
+        return $this->__call('after', [$a, $b]);
+    }
+    
+    public function flock(string $file, int $operation, $polling)
+    {
+        return $this->__call('flockAsync', [$file, $operation, $polling]);
+    }
+    
+    public function noCache(int $status, string $message)
+    {
+        return $this->__call('noCache', [$status, $message]);
+    }
+    
+    public function sleep($time)
+    {
+        return $this->__call('sleep', [$time]);
+    }
+    
+    public function readLine($prompt = '')
+    {
+        return $this->__call('readLineAsync', [$prompt]);
+    }
+    
+    public function echo($string)
+    {
+        return $this->__call('echo', [$string]);
+    }
+    
+    public function isArrayOrAlike($var)
+    {
+        return $this->__call('is_array_or_alike', [$var]);
+    }
+    /**
+     * Convert to camelCase
+     *
+     * @param string $input
+     * 
+     * @return string
+     */
+    public function fromSnakeCase(string $input): string
+    {
+        return $this->__call('from_snake_case', [$input]);
+    }
+    /**
+     * Convert to snake_case
+     *
+     * @param string $input
+     * 
+     * @return string
+     */
+    public function fromCamelCase(string $input): string
+    {
+        return $this->__call('from_camel_case', [$input]);
+    }
+    
+    public function requestCall($user)
+    {
+        return $this->__call('request_call_async', [$user]);
+    }
+    
+    public function acceptCall($call)
+    {
+        return $this->__call('accept_call_async', [$call]);
+    }
+    
+    public function discardCall($call, $reason, $rating = array (
+    ), $need_debug = true)
+    {
+        return $this->__call('discard_call_async', [$call, $reason, $rating, $need_debug]);
+    }
+    
+    public function confirmCall($params)
+    {
+        return $this->__call('confirm_call_async', [$params]);
+    }
+    
+    public function completeCall($params)
+    {
+        return $this->__call('complete_call_async', [$params]);
+    }
+    
+    public function callStatus($id)
+    {
+        return $this->__call('call_status', [$id]);
+    }
+    
+    public function getCall($call)
+    {
+        return $this->__call('get_call', [$call]);
+    }
+    
+    public function checkCalls()
+    {
+        return $this->__call('checkCalls', []);
+    }
+    
+    public function getDialogs($force = true)
+    {
+        return $this->__call('get_dialogs_async', [$force]);
+    }
+    
+    public function getFullDialogs($force = true)
+    {
+        return $this->__call('get_full_dialogs_async', [$force]);
+    }
+    
+    public function setEventHandler($event_handler)
+    {
+        return $this->__call('setEventHandler', [$event_handler]);
+    }
+    
+    public function getEventHandler()
+    {
+        return $this->__call('getEventHandler', []);
+    }
+    
+    public function eventUpdateHandler($update)
+    {
+        return $this->__call('event_update_handler', [$update]);
+    }
+    
+    public function setWebhook($hook_url, $pem_path = null)
+    {
+        return $this->__call('setWebhook', [$hook_url, $pem_path]);
+    }
+    
+    public function setCallback($callback)
+    {
+        return $this->__call('setCallback', [$callback]);
+    }
+    
+    public function logout()
+    {
+        return $this->__call('logout_async', []);
+    }
+    
+    public function botLogin($token)
+    {
+        return $this->__call('bot_login_async', [$token]);
+    }
+    
+    public function phoneLogin($number, $sms_type = 5)
+    {
+        return $this->__call('phone_login_async', [$number, $sms_type]);
+    }
+    
+    public function completePhoneLogin($code)
+    {
+        return $this->__call('complete_phone_login_async', [$code]);
+    }
+    
+    public function importAuthorization($authorization)
+    {
+        return $this->__call('import_authorization_async', [$authorization]);
+    }
+    
+    public function exportAuthorization()
+    {
+        return $this->__call('export_authorization_async', []);
+    }
+    
+    public function completeSignup($first_name, $last_name)
+    {
+        return $this->__call('complete_signup_async', [$first_name, $last_name]);
+    }
+    
+    public function complete2faLogin($password)
+    {
+        return $this->__call('complete_2fa_login_async', [$password]);
+    }
+    /**
+     * Update the 2FA password.
+     *
+     * The params array can contain password, new_password, email and hint params.
+     *
+     * @param array $params The params
+     * @return void
+     */
+    public function update2fa(array $params)
+    {
+        return $this->__call('update_2fa_async', [$params]);
+    }
+    
+    public function setLoopCallback($callback)
+    {
+        return $this->__call('setLoopCallback', [$callback]);
+    }
+    
+    public function loop($max_forks = 0)
+    {
+        return $this->__call('loop_async', [$max_forks]);
+    }
+    
+    public function closeConnection($message = 'OK!')
+    {
+        return $this->__call('closeConnection', [$message]);
+    }
+    
+    public function setNoop()
+    {
+        return $this->__call('setNoop', []);
+    }
+    
+    public function noop()
+    {
+        return $this->__call('noop', []);
+    }
+    
+    public function start()
+    {
+        return $this->__call('start_async', []);
+    }
+    
+    public function webPhoneLogin()
+    {
+        return $this->__call('web_phone_login_async', []);
+    }
+    
+    public function webCompletePhoneLogin()
+    {
+        return $this->__call('web_complete_phone_login_async', []);
+    }
+    
+    public function webComplete2faLogin()
+    {
+        return $this->__call('web_complete_2fa_login_async', []);
+    }
+    
+    public function webCompleteSignup()
+    {
+        return $this->__call('web_complete_signup_async', []);
+    }
+    
+    public function webBotLogin()
+    {
+        return $this->__call('web_bot_login_async', []);
+    }
+    
+    public function webEcho($message = '')
+    {
+        return $this->__call('web_echo_async', [$message]);
+    }
+    
+    public function webEchoTemplate($message, $form)
+    {
+        return $this->__call('web_echo_template', [$message, $form]);
+    }
+    
+    public function getWebTemplate()
+    {
+        return $this->__call('get_web_template', []);
+    }
+    
+    public function setWebTemplate($template)
+    {
+        return $this->__call('set_web_template', [$template]);
+    }
+    
+    public function checkTos()
+    {
+        return $this->__call('check_tos_async', []);
+    }
+    
+    public function acceptTos()
+    {
+        return $this->__call('accept_tos_async', []);
+    }
+    
+    public function declineTos()
+    {
+        return $this->__call('decline_tos_async', []);
+    }
+    }

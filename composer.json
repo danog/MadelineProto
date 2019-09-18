@@ -31,7 +31,7 @@
         "danog/dns-over-https": "^0.1"
     },
     "require-dev": {
-        "phpdocumentor/reflection-docblock": "^3.1",
+        "phpdocumentor/reflection-docblock": "^4.3",
         "ennexa/amp-update-cache": "dev-master",
         "phpunit/phpunit": "^8",
         "amphp/php-cs-fixer-config": "dev-master"

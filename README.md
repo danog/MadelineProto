@@ -407,6 +407,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_saveAutoDownloadSettings.html" name="account_saveAutoDownloadSettings">Save autodownload settings: account.saveAutoDownloadSettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone_saveCallDebug.html" name="phone_saveCallDebug">Save call debugging info: phone.saveCallDebug</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_saveSecureValue.html" name="account_saveSecureValue">Save telegram passport secure value: account.saveSecureValue</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_saveTheme.html" name="account_saveTheme">Save theme: account.saveTheme</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_saveWallPaper.html" name="account_saveWallPaper">Save wallpaper: account.saveWallPaper</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_search.html" name="contacts_search">Search contacts: contacts.search</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_searchGifs.html" name="messages_searchGifs">Search gifs: messages.searchGifs</a>

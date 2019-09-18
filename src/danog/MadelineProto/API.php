@@ -25,7 +25,7 @@ use function Amp\File\get;
 use function Amp\File\put;
 use function Amp\File\rename as renameAsync;
 
-class API extends APIFactory
+class API extends InternalDoc
 {
     use \danog\Serializable;
     use \danog\MadelineProto\Wrappers\ApiStart;
@@ -212,16 +212,6 @@ class API extends APIFactory
         return ['API', 'web_api_template', 'getting_api_id', 'my_telegram_org_wrapper'];
     }
 
-    private function from_camel_case($input)
-    {
-        \preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
-        $ret = $matches[0];
-        foreach ($ret as &$match) {
-            $match = $match == \strtoupper($match) ? \strtolower($match) : \lcfirst($match);
-        }
-
-        return \implode('_', $ret);
-    }
 
     public function my_get_self()
     {
@@ -264,7 +254,7 @@ class API extends APIFactory
                 if (\strpos($method, '_') !== false) {
                     $this->methods[\strtolower(\str_replace('_', '', $method))] = $actual_method;
                 } else {
-                    $this->methods[\strtolower($this->from_camel_case($method))] = $actual_method;
+                    $this->methods[\strtolower(Tools::from_camel_case($method))] = $actual_method;
                 }
             }
 

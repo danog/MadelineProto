@@ -19,7 +19,7 @@
 
 namespace danog\MadelineProto;
 
-class EventHandler extends APIFactory
+class EventHandler extends InternalDoc
 {
     public function __construct($MadelineProto)
     {
