@@ -4021,37 +4021,37 @@ class InternalDoc extends APIFactory
 
     public function logger($param, $level = danog\MadelineProto\Logger::NOTICE, $file = null)
     {
-        return $this->__call('logger', [$param, $level, $file]);
+        return $this->__call(__FUNCTION__, [$param, $level, $file]);
     }
     
     public function isAltervista()
     {
-        return $this->__call('isAltervista', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function isInitingAuthorization()
     {
-        return $this->__call('isInitingAuthorization', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getHTTPClient()
     {
-        return $this->__call('getHTTPClient', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getDNSClient()
     {
-        return $this->__call('getDNSClient', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function fileGetContents($url): Generator
     {
-        return $this->__call('fileGetContents', [$url]);
+        return $this->__call(__FUNCTION__, [$url]);
     }
     
     public function a(callable $a, ?string $b = null, $c = null, $d = 2, $e = MTProto::METHOD_BEFORE_CALLBACK): ?string
     {
-        return $this->__call('a', [$a, $b, $c, $d, $e]);
+        return $this->__call(__FUNCTION__, [$a, $b, $c, $d, $e]);
     }
     /**
      * Get all datacenter connections.
@@ -4060,38 +4060,38 @@ class InternalDoc extends APIFactory
      */
     public function getDataCenterConnections(): array
     {
-        return $this->__call('getDataCenterConnections', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function hasAllAuth()
     {
-        return $this->__call('hasAllAuth', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function startLoops()
     {
-        return $this->__call('startLoops', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function stopLoops()
     {
-        return $this->__call('stopLoops', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getSettings($settings, $previousSettings = array (
     ))
     {
-        return $this->__call('getSettings', [$settings, $previousSettings]);
+        return $this->__call(__FUNCTION__, [$settings, $previousSettings]);
     }
     
     public function parseSettings($settings)
     {
-        return $this->__call('parse_settings', [$settings]);
+        return $this->__call(__FUNCTION__, [$settings]);
     }
     
     public function setupLogger()
     {
-        return $this->__call('setup_logger', []);
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Reset all MTProto sessions.
@@ -4103,7 +4103,7 @@ class InternalDoc extends APIFactory
      */
     public function resetMTProtoSession(bool $de = true, bool $auth_key = false)
     {
-        return $this->__call('resetMTProtoSession', [$de, $auth_key]);
+        return $this->__call(__FUNCTION__, [$de, $auth_key]);
     }
     /**
      * Check if connected to datacenter using HTTP.
@@ -4114,94 +4114,94 @@ class InternalDoc extends APIFactory
      */
     public function isHttp(string $datacenter)
     {
-        return $this->__call('isHttp', [$datacenter]);
+        return $this->__call(__FUNCTION__, [$datacenter]);
     }
     
     public function connectToAllDcs(bool $reconnectAll = true): Generator
     {
-        return $this->__call('connect_to_all_dcs_async', [$reconnectAll]);
+        return $this->__call(__FUNCTION__, [$reconnectAll]);
     }
     
     public function resetSession()
     {
-        return $this->__call('resetSession', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function resetUpdateState()
     {
-        return $this->__call('resetUpdateState', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function startUpdateSystem($anyway = false)
     {
-        return $this->__call('startUpdateSystem', [$anyway]);
+        return $this->__call(__FUNCTION__, [$anyway]);
     }
     
     public function getPhoneConfig($watcherId = null)
     {
-        return $this->__call('get_phone_config_async', [$watcherId]);
+        return $this->__call(__FUNCTION__, [$watcherId]);
     }
     
     public function getCdnConfig($datacenter)
     {
-        return $this->__call('get_cdn_config_async', [$datacenter]);
+        return $this->__call(__FUNCTION__, [$datacenter]);
     }
     
     public function getCachedConfig()
     {
-        return $this->__call('get_cached_config', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getConfig($config = array (
     ), $options = array (
     ))
     {
-        return $this->__call('get_config_async', [$config, $options]);
+        return $this->__call(__FUNCTION__, [$config, $options]);
     }
     
     public function parseConfig()
     {
-        return $this->__call('parse_config_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function parseDcOptions($dc_options)
     {
-        return $this->__call('parse_dc_options_async', [$dc_options]);
+        return $this->__call(__FUNCTION__, [$dc_options]);
     }
     
     public function getSelf()
     {
-        return $this->__call('get_self_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getMethodCallbacks(): array
     {
-        return $this->__call('getMethodCallbacks', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getMethodBeforeCallbacks(): array
     {
-        return $this->__call('getMethodBeforeCallbacks', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getConstructorCallbacks(): array
     {
-        return $this->__call('getConstructorCallbacks', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getConstructorBeforeCallbacks(): array
     {
-        return $this->__call('getConstructorBeforeCallbacks', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getConstructorSerializeCallbacks(): array
     {
-        return $this->__call('getConstructorSerializeCallbacks', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getTypeMismatchCallbacks(): array
     {
-        return $this->__call('getTypeMismatchCallbacks', []);
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Create authorization key.
@@ -4213,7 +4213,7 @@ class InternalDoc extends APIFactory
      */
     public function createAuthKey(int $expires_in, string $datacenter): Generator
     {
-        return $this->__call('create_auth_key_async', [$expires_in, $datacenter]);
+        return $this->__call(__FUNCTION__, [$expires_in, $datacenter]);
     }
     /**
      * Check validity of g_a parameters.
@@ -4225,7 +4225,7 @@ class InternalDoc extends APIFactory
      */
     public function checkG(\phpseclib\Math\BigInteger $g_a, \phpseclib\Math\BigInteger $p): bool
     {
-        return $this->__call('check_G', [$g_a, $p]);
+        return $this->__call(__FUNCTION__, [$g_a, $p]);
     }
     /**
      * Check validity of p and g parameters.
@@ -4237,7 +4237,7 @@ class InternalDoc extends APIFactory
      */
     public function checkPG(\phpseclib\Math\BigInteger $p, \phpseclib\Math\BigInteger $g): bool
     {
-        return $this->__call('check_p_g', [$p, $g]);
+        return $this->__call(__FUNCTION__, [$p, $g]);
     }
     /**
      * Get diffie-hellman configuration.
@@ -4246,7 +4246,7 @@ class InternalDoc extends APIFactory
      */
     public function getDhConfig(): Generator
     {
-        return $this->__call('get_dh_config_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Bind temporary and permanent auth keys.
@@ -4258,7 +4258,7 @@ class InternalDoc extends APIFactory
      */
     public function bindTempAuthKey(int $expires_in, string $datacenter): Generator
     {
-        return $this->__call('bind_temp_auth_key_async', [$expires_in, $datacenter]);
+        return $this->__call(__FUNCTION__, [$expires_in, $datacenter]);
     }
     /**
      * Factorize number asynchronously using the wolfram API.
@@ -4269,7 +4269,7 @@ class InternalDoc extends APIFactory
      */
     public function wolframSingle($what): Generator
     {
-        return $this->__call('wolfram_single_async', [$what]);
+        return $this->__call(__FUNCTION__, [$what]);
     }
     /**
      * Asynchronously create, bind and check auth keys for all DCs.
@@ -4278,7 +4278,7 @@ class InternalDoc extends APIFactory
      */
     public function initAuthorization(): Generator
     {
-        return $this->__call('init_authorization_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Init auth keys for single DC.
@@ -4290,7 +4290,7 @@ class InternalDoc extends APIFactory
      */
     public function initAuthorizationSocket(string $id, \danog\MadelineProto\DataCenterConnection $socket): Generator
     {
-        return $this->__call('init_authorization_socket_async', [$id, $socket]);
+        return $this->__call(__FUNCTION__, [$id, $socket]);
     }
     /**
      * Sync authorization data between DCs.
@@ -4301,7 +4301,7 @@ class InternalDoc extends APIFactory
      */
     public function syncAuthorization(string $id): Generator
     {
-        return $this->__call('sync_authorization_async', [$id]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     /**
      * Call method and wait asynchronously for response.
@@ -4319,7 +4319,7 @@ class InternalDoc extends APIFactory
       'msg_id' => null,
     )): Amp\Promise
     {
-        return $this->__call('method_call_async_read', [$method, $args, $aargs]);
+        return $this->__call(__FUNCTION__, [$method, $args, $aargs]);
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -4335,442 +4335,442 @@ class InternalDoc extends APIFactory
       'msg_id' => null,
     )): Amp\Promise
     {
-        return $this->__call('method_call_async_write', [$method, $args, $aargs]);
+        return $this->__call(__FUNCTION__, [$method, $args, $aargs]);
     }
     
     public function aesCalculate($msg_key, $auth_key, $to_server = true)
     {
-        return $this->__call('aes_calculate', [$msg_key, $auth_key, $to_server]);
+        return $this->__call(__FUNCTION__, [$msg_key, $auth_key, $to_server]);
     }
     
     public function oldAesCalculate($msg_key, $auth_key, $to_server = true)
     {
-        return $this->__call('old_aes_calculate', [$msg_key, $auth_key, $to_server]);
+        return $this->__call(__FUNCTION__, [$msg_key, $auth_key, $to_server]);
     }
     
     public function ctrEncrypt($message, $key, $iv)
     {
-        return $this->__call('ctr_encrypt', [$message, $key, $iv]);
+        return $this->__call(__FUNCTION__, [$message, $key, $iv]);
     }
     
     public function igeEncrypt($message, $key, $iv)
     {
-        return $this->__call('ige_encrypt', [$message, $key, $iv]);
+        return $this->__call(__FUNCTION__, [$message, $key, $iv]);
     }
     
     public function igeDecrypt($message, $key, $iv)
     {
-        return $this->__call('ige_decrypt', [$message, $key, $iv]);
+        return $this->__call(__FUNCTION__, [$message, $key, $iv]);
     }
     
     public function toSupergroup($id)
     {
-        return $this->__call('to_supergroup', [$id]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     
     public function fromSupergroup($id)
     {
-        return $this->__call('from_supergroup', [$id]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     
     public function isSupergroup($id)
     {
-        return $this->__call('is_supergroup', [$id]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     
     public function addSupport($support)
     {
-        return $this->__call('add_support', [$support]);
+        return $this->__call(__FUNCTION__, [$support]);
     }
     
     public function addUser($user)
     {
-        return $this->__call('add_user', [$user]);
+        return $this->__call(__FUNCTION__, [$user]);
     }
     
     public function addChat($chat)
     {
-        return $this->__call('add_chat_async', [$chat]);
+        return $this->__call(__FUNCTION__, [$chat]);
     }
     
     public function cachePwrChat($id, $full_fetch, $send)
     {
-        return $this->__call('cache_pwr_chat', [$id, $full_fetch, $send]);
+        return $this->__call(__FUNCTION__, [$id, $full_fetch, $send]);
     }
     
     public function peerIsset($id)
     {
-        return $this->__call('peer_isset_async', [$id]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     
     public function entitiesPeerIsset($entities)
     {
-        return $this->__call('entities_peer_isset_async', [$entities]);
+        return $this->__call(__FUNCTION__, [$entities]);
     }
     
     public function fwdPeerIsset($fwd)
     {
-        return $this->__call('fwd_peer_isset_async', [$fwd]);
+        return $this->__call(__FUNCTION__, [$fwd]);
     }
     
     public function getFolderId($id)
     {
-        return $this->__call('get_folder_id', [$id]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     
     public function getId($id)
     {
-        return $this->__call('get_id', [$id]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     
     public function getInfo($id, $recursive = true)
     {
-        return $this->__call('get_info_async', [$id, $recursive]);
+        return $this->__call(__FUNCTION__, [$id, $recursive]);
     }
     
     public function genAll($constructor, $folder_id = null)
     {
-        return $this->__call('gen_all', [$constructor, $folder_id]);
+        return $this->__call(__FUNCTION__, [$constructor, $folder_id]);
     }
     
     public function fullChatLastUpdated($id)
     {
-        return $this->__call('full_chat_last_updated', [$id]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     
     public function getFullInfo($id)
     {
-        return $this->__call('get_full_info_async', [$id]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     
     public function getPwrChat($id, $fullfetch = true, $send = true)
     {
-        return $this->__call('get_pwr_chat_async', [$id, $fullfetch, $send]);
+        return $this->__call(__FUNCTION__, [$id, $fullfetch, $send]);
     }
     
     public function recurseAlphabetSearchParticipants($channel, $filter, $q, $total_count, &$res)
     {
-        return $this->__call('recurse_alphabet_search_participants_async', [$channel, $filter, $q, $total_count, $res]);
+        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $total_count, $res]);
     }
     
     public function fetchParticipants($channel, $filter, $q, $total_count, &$res)
     {
-        return $this->__call('fetch_participants_async', [$channel, $filter, $q, $total_count, $res]);
+        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $total_count, $res]);
     }
     
     public function fetchParticipantsCache($channel, $filter, $q, $offset, $limit)
     {
-        return $this->__call('fetch_participants_cache', [$channel, $filter, $q, $offset, $limit]);
+        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $offset, $limit]);
     }
     
     public function storeParticipantsCache($gres, $channel, $filter, $q, $offset, $limit)
     {
-        return $this->__call('store_participants_cache', [$gres, $channel, $filter, $q, $offset, $limit]);
+        return $this->__call(__FUNCTION__, [$gres, $channel, $filter, $q, $offset, $limit]);
     }
     
     public function getParticipantsHash($channel, $filter, $q, $offset, $limit)
     {
-        return $this->__call('get_participants_hash', [$channel, $filter, $q, $offset, $limit]);
+        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $offset, $limit]);
     }
     
     public function storeDb($res, $force = false)
     {
-        return $this->__call('store_db', [$res, $force]);
+        return $this->__call(__FUNCTION__, [$res, $force]);
     }
     
     public function resolveUsername($username)
     {
-        return $this->__call('resolve_username_async', [$username]);
+        return $this->__call(__FUNCTION__, [$username]);
     }
     
     public function pwrUpdateHandler($update)
     {
-        return $this->__call('pwr_update_handler', [$update]);
+        return $this->__call(__FUNCTION__, [$update]);
     }
     
     public function getUpdatesUpdateHandler($update)
     {
-        return $this->__call('get_updates_update_handler', [$update]);
+        return $this->__call(__FUNCTION__, [$update]);
     }
     
     public function getUpdates($params = array (
     ))
     {
-        return $this->__call('get_updates_async', [$params]);
+        return $this->__call(__FUNCTION__, [$params]);
     }
     
     public function waitUpdate()
     {
-        return $this->__call('waitUpdate', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function signalUpdate()
     {
-        return $this->__call('signalUpdate', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function checkMsgId($message)
     {
-        return $this->__call('check_msg_id', [$message]);
+        return $this->__call(__FUNCTION__, [$message]);
     }
     
     public function loadUpdateState()
     {
-        return $this->__call('load_update_state_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function loadChannelState($channelId = null, $init = array (
     ))
     {
-        return $this->__call('loadChannelState', [$channelId, $init]);
+        return $this->__call(__FUNCTION__, [$channelId, $init]);
     }
     
     public function getChannelStates()
     {
-        return $this->__call('getChannelStates', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getUpdatesState()
     {
-        return $this->__call('get_updates_state_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function handleUpdates($updates, $actual_updates = null)
     {
-        return $this->__call('handle_updates_async', [$updates, $actual_updates]);
+        return $this->__call(__FUNCTION__, [$updates, $actual_updates]);
     }
     
     public function saveUpdate($update)
     {
-        return $this->__call('save_update_async', [$update]);
+        return $this->__call(__FUNCTION__, [$update]);
     }
     
     public function pwrWebhook($update)
     {
-        return $this->__call('pwr_webhook', [$update]);
+        return $this->__call(__FUNCTION__, [$update]);
     }
     
     public function upload($file, $file_name = '', $cb = null, $encrypted = false)
     {
-        return $this->__call('upload_async', [$file, $file_name, $cb, $encrypted]);
+        return $this->__call(__FUNCTION__, [$file, $file_name, $cb, $encrypted]);
     }
     
     public function uploadFromUrl($url, int $size = 0, string $file_name = '', $cb = null, bool $encrypted = false)
     {
-        return $this->__call('upload_from_url_async', [$url, $size, $file_name, $cb, $encrypted]);
+        return $this->__call(__FUNCTION__, [$url, $size, $file_name, $cb, $encrypted]);
     }
     
     public function uploadFromStream($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false)
     {
-        return $this->__call('upload_from_stream_async', [$stream, $size, $mime, $file_name, $cb, $encrypted]);
+        return $this->__call(__FUNCTION__, [$stream, $size, $mime, $file_name, $cb, $encrypted]);
     }
     
     public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $refetchable = true, bool $encrypted = false)
     {
-        return $this->__call('upload_from_callable_async', [$callable, $size, $mime, $file_name, $cb, $refetchable, $encrypted]);
+        return $this->__call(__FUNCTION__, [$callable, $size, $mime, $file_name, $cb, $refetchable, $encrypted]);
     }
     
     public function uploadEncrypted($file, $file_name = '', $cb = null)
     {
-        return $this->__call('upload_encrypted_async', [$file, $file_name, $cb]);
+        return $this->__call(__FUNCTION__, [$file, $file_name, $cb]);
     }
     
     public function uploadFromTgfile($media, $cb = null, $encrypted = false)
     {
-        return $this->__call('upload_from_tgfile_async', [$media, $cb, $encrypted]);
+        return $this->__call(__FUNCTION__, [$media, $cb, $encrypted]);
     }
     
     public function genAllFile($media)
     {
-        return $this->__call('gen_all_file_async', [$media]);
+        return $this->__call(__FUNCTION__, [$media]);
     }
     
     public function getFileInfo($constructor)
     {
-        return $this->__call('get_file_info_async', [$constructor]);
+        return $this->__call(__FUNCTION__, [$constructor]);
     }
     
     public function getPropicInfo($data)
     {
-        return $this->__call('get_propic_info_async', [$data]);
+        return $this->__call(__FUNCTION__, [$data]);
     }
     
     public function getDownloadInfo($message_media)
     {
-        return $this->__call('get_download_info_async', [$message_media]);
+        return $this->__call(__FUNCTION__, [$message_media]);
     }
     
     public function extractPhotosize($photo)
     {
-        return $this->__call('extract_photosize', [$photo]);
+        return $this->__call(__FUNCTION__, [$photo]);
     }
     
     public function downloadToDir($message_media, $dir, $cb = null)
     {
-        return $this->__call('download_to_dir_async', [$message_media, $dir, $cb]);
+        return $this->__call(__FUNCTION__, [$message_media, $dir, $cb]);
     }
     
     public function downloadToFile($message_media, $file, $cb = null)
     {
-        return $this->__call('download_to_file_async', [$message_media, $file, $cb]);
+        return $this->__call(__FUNCTION__, [$message_media, $file, $cb]);
     }
     
     public function downloadToStream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
     {
-        return $this->__call('download_to_stream_async', [$message_media, $stream, $cb, $offset, $end]);
+        return $this->__call(__FUNCTION__, [$message_media, $stream, $cb, $offset, $end]);
     }
     
     public function downloadToCallable($message_media, $callable, $cb = null, $parallelize = true, $offset = 0, $end = -1, ?int $part_size = null)
     {
-        return $this->__call('download_to_callable_async', [$message_media, $callable, $cb, $parallelize, $offset, $end, $part_size]);
+        return $this->__call(__FUNCTION__, [$message_media, $callable, $cb, $parallelize, $offset, $end, $part_size]);
     }
     
     public function acceptSecretChat($params)
     {
-        return $this->__call('accept_secret_chat_async', [$params]);
+        return $this->__call(__FUNCTION__, [$params]);
     }
     
     public function requestSecretChat($user)
     {
-        return $this->__call('request_secret_chat_async', [$user]);
+        return $this->__call(__FUNCTION__, [$user]);
     }
     
     public function completeSecretChat($params)
     {
-        return $this->__call('complete_secret_chat_async', [$params]);
+        return $this->__call(__FUNCTION__, [$params]);
     }
     
     public function notifyLayer($chat)
     {
-        return $this->__call('notify_layer_async', [$chat]);
+        return $this->__call(__FUNCTION__, [$chat]);
     }
     
     public function rekey($chat)
     {
-        return $this->__call('rekey_async', [$chat]);
+        return $this->__call(__FUNCTION__, [$chat]);
     }
     
     public function acceptRekey($chat, $params)
     {
-        return $this->__call('accept_rekey_async', [$chat, $params]);
+        return $this->__call(__FUNCTION__, [$chat, $params]);
     }
     
     public function commitRekey($chat, $params)
     {
-        return $this->__call('commit_rekey_async', [$chat, $params]);
+        return $this->__call(__FUNCTION__, [$chat, $params]);
     }
     
     public function completeRekey($chat, $params)
     {
-        return $this->__call('complete_rekey_async', [$chat, $params]);
+        return $this->__call(__FUNCTION__, [$chat, $params]);
     }
     
     public function secretChatStatus($chat)
     {
-        return $this->__call('secret_chat_status', [$chat]);
+        return $this->__call(__FUNCTION__, [$chat]);
     }
     
     public function getSecretChat($chat)
     {
-        return $this->__call('get_secret_chat', [$chat]);
+        return $this->__call(__FUNCTION__, [$chat]);
     }
     
     public function discardSecretChat($chat)
     {
-        return $this->__call('discard_secret_chat_async', [$chat]);
+        return $this->__call(__FUNCTION__, [$chat]);
     }
     
     public function encryptSecretMessage($chat_id, $message)
     {
-        return $this->__call('encrypt_secret_message_async', [$chat_id, $message]);
+        return $this->__call(__FUNCTION__, [$chat_id, $message]);
     }
     
     public function handleEncryptedUpdate($message, $test = false)
     {
-        return $this->__call('handle_encrypted_update_async', [$message, $test]);
+        return $this->__call(__FUNCTION__, [$message, $test]);
     }
     
     public function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data)
     {
-        return $this->__call('try_mtproto_v1_decrypt', [$message_key, $chat_id, $old, $encrypted_data]);
+        return $this->__call(__FUNCTION__, [$message_key, $chat_id, $old, $encrypted_data]);
     }
     
     public function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data)
     {
-        return $this->__call('try_mtproto_v2_decrypt', [$message_key, $chat_id, $old, $encrypted_data]);
+        return $this->__call(__FUNCTION__, [$message_key, $chat_id, $old, $encrypted_data]);
     }
     
     public function handleDecryptedUpdate($update)
     {
-        return $this->__call('handle_decrypted_update_async', [$update]);
+        return $this->__call(__FUNCTION__, [$update]);
     }
     
     public function checkSecretInSeqNo($chat_id, $seqno)
     {
-        return $this->__call('check_secret_in_seq_no_async', [$chat_id, $seqno]);
+        return $this->__call(__FUNCTION__, [$chat_id, $seqno]);
     }
     
     public function checkSecretOutSeqNo($chat_id, $seqno)
     {
-        return $this->__call('check_secret_out_seq_no_async', [$chat_id, $seqno]);
+        return $this->__call(__FUNCTION__, [$chat_id, $seqno]);
     }
     
     public function generateSecretInSeqNo($chat)
     {
-        return $this->__call('generate_secret_in_seq_no', [$chat]);
+        return $this->__call(__FUNCTION__, [$chat]);
     }
     
     public function generateSecretOutSeqNo($chat)
     {
-        return $this->__call('generate_secret_out_seq_no', [$chat]);
+        return $this->__call(__FUNCTION__, [$chat]);
     }
     
     public function constructTl($files, $objects = array (
     ))
     {
-        return $this->__call('construct_tl', [$files, $objects]);
+        return $this->__call(__FUNCTION__, [$files, $objects]);
     }
     
     public function getMethodNamespaces()
     {
-        return $this->__call('get_method_namespaces', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getMethodsNamespaced()
     {
-        return $this->__call('get_methods_namespaced', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function updateCallbacks($objects)
     {
-        return $this->__call('update_callbacks', [$objects]);
+        return $this->__call(__FUNCTION__, [$objects]);
     }
     
     public function deserializeBool($id)
     {
-        return $this->__call('deserialize_bool', [$id]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     
     public function serializeObject($type, $object, $ctx, $layer = -1)
     {
-        return $this->__call('serialize_object_async', [$type, $object, $ctx, $layer]);
+        return $this->__call(__FUNCTION__, [$type, $object, $ctx, $layer]);
     }
     
     public function serializeMethod($method, $arguments)
     {
-        return $this->__call('serialize_method_async', [$method, $arguments]);
+        return $this->__call(__FUNCTION__, [$method, $arguments]);
     }
     
     public function serializeParams($tl, $arguments, $ctx, $layer = -1)
     {
-        return $this->__call('serialize_params_async', [$tl, $arguments, $ctx, $layer]);
+        return $this->__call(__FUNCTION__, [$tl, $arguments, $ctx, $layer]);
     }
     
     public function getLength($stream, $type = array (
       'type' => '',
     ))
     {
-        return $this->__call('get_length', [$stream, $type]);
+        return $this->__call(__FUNCTION__, [$stream, $type]);
     }
     /**
      * :type stream: io.BytesIO object.
@@ -4779,173 +4779,173 @@ class InternalDoc extends APIFactory
       'type' => '',
     ))
     {
-        return $this->__call('deserialize', [$stream, $type]);
+        return $this->__call(__FUNCTION__, [$stream, $type]);
     }
     
     public function htmlEntityDecode($stuff)
     {
-        return $this->__call('html_entity_decode', [$stuff]);
+        return $this->__call(__FUNCTION__, [$stuff]);
     }
     
     public function mbStrlen($text)
     {
-        return $this->__call('mb_strlen', [$text]);
+        return $this->__call(__FUNCTION__, [$text]);
     }
     
     public function mbSubstr($text, $offset, $length = null)
     {
-        return $this->__call('mb_substr', [$text, $offset, $length]);
+        return $this->__call(__FUNCTION__, [$text, $offset, $length]);
     }
     
     public function mbStrSplit($text, $length)
     {
-        return $this->__call('mb_str_split', [$text, $length]);
+        return $this->__call(__FUNCTION__, [$text, $length]);
     }
     
     public function parseButtons($rows)
     {
-        return $this->__call('parse_buttons', [$rows]);
+        return $this->__call(__FUNCTION__, [$rows]);
     }
     
     public function parseReplyMarkup($markup)
     {
-        return $this->__call('parse_reply_markup', [$markup]);
+        return $this->__call(__FUNCTION__, [$markup]);
     }
     
     public function MTProtoToBotAPI($data, $sent_arguments = array (
     ))
     {
-        return $this->__call('MTProto_to_botAPI_async', [$data, $sent_arguments]);
+        return $this->__call(__FUNCTION__, [$data, $sent_arguments]);
     }
     
     public function botAPIToMTProto($arguments)
     {
-        return $this->__call('botAPI_to_MTProto_async', [$arguments]);
+        return $this->__call(__FUNCTION__, [$arguments]);
     }
     
     public function parseNode($node, &$entities, &$new_message, &$offset)
     {
-        return $this->__call('parse_node_async', [$node, $entities, $new_message, $offset]);
+        return $this->__call(__FUNCTION__, [$node, $entities, $new_message, $offset]);
     }
     
     public function parseMode($arguments)
     {
-        return $this->__call('parse_mode_async', [$arguments]);
+        return $this->__call(__FUNCTION__, [$arguments]);
     }
     
     public function splitToChunks($args)
     {
-        return $this->__call('split_to_chunks_async', [$args]);
+        return $this->__call(__FUNCTION__, [$args]);
     }
     
     public function multipleExplodeKeepDelimiters($delimiters, $string)
     {
-        return $this->__call('multipleExplodeKeepDelimiters', [$delimiters, $string]);
+        return $this->__call(__FUNCTION__, [$delimiters, $string]);
     }
     
     public function htmlFixtags($text)
     {
-        return $this->__call('html_fixtags', [$text]);
+        return $this->__call(__FUNCTION__, [$text]);
     }
     
     public function buildRows($button_list)
     {
-        return $this->__call('build_rows', [$button_list]);
+        return $this->__call(__FUNCTION__, [$button_list]);
     }
     
     public function base64urlDecode($data)
     {
-        return $this->__call('base64url_decode', [$data]);
+        return $this->__call(__FUNCTION__, [$data]);
     }
     
     public function base64urlEncode($data)
     {
-        return $this->__call('base64url_encode', [$data]);
+        return $this->__call(__FUNCTION__, [$data]);
     }
     
     public function rleDecode($string)
     {
-        return $this->__call('rle_decode', [$string]);
+        return $this->__call(__FUNCTION__, [$string]);
     }
     
     public function rleEncode($string)
     {
-        return $this->__call('rle_encode', [$string]);
+        return $this->__call(__FUNCTION__, [$string]);
     }
     
     public function photosizeToBotAPI($photoSize, $photo, $thumbnail = false)
     {
-        return $this->__call('photosize_to_botapi_async', [$photoSize, $photo, $thumbnail]);
+        return $this->__call(__FUNCTION__, [$photoSize, $photo, $thumbnail]);
     }
     
     public function unpackFileId($file_id)
     {
-        return $this->__call('unpack_file_id', [$file_id]);
+        return $this->__call(__FUNCTION__, [$file_id]);
     }
     
     public function getMimeFromExtension($extension, $default)
     {
-        return $this->__call('get_mime_from_extension', [$extension, $default]);
+        return $this->__call(__FUNCTION__, [$extension, $default]);
     }
     
     public function getExtensionFromMime($mime)
     {
-        return $this->__call('get_extension_from_mime', [$mime]);
+        return $this->__call(__FUNCTION__, [$mime]);
     }
     
     public function getExtensionFromLocation($location, $default)
     {
-        return $this->__call('get_extension_from_location', [$location, $default]);
+        return $this->__call(__FUNCTION__, [$location, $default]);
     }
     
     public function getMimeFromFile($file)
     {
-        return $this->__call('get_mime_from_file', [$file]);
+        return $this->__call(__FUNCTION__, [$file]);
     }
     
     public function getMimeFromBuffer($buffer)
     {
-        return $this->__call('get_mime_from_buffer', [$buffer]);
+        return $this->__call(__FUNCTION__, [$buffer]);
     }
     
     public function tdcliToTd(&$params, $key = null)
     {
-        return $this->__call('tdcli_to_td', [$params, $key]);
+        return $this->__call(__FUNCTION__, [$params, $key]);
     }
     
     public function tdToMTProto($params)
     {
-        return $this->__call('td_to_mtproto_async', [$params]);
+        return $this->__call(__FUNCTION__, [$params]);
     }
     
     public function MTProtoToTdcli($params)
     {
-        return $this->__call('mtproto_to_tdcli_async', [$params]);
+        return $this->__call(__FUNCTION__, [$params]);
     }
     
     public function MTProtoToTd(&$params)
     {
-        return $this->__call('mtproto_to_td_async', [$params]);
+        return $this->__call(__FUNCTION__, [$params]);
     }
     
     public function tdToTdcli($params)
     {
-        return $this->__call('td_to_tdcli', [$params]);
+        return $this->__call(__FUNCTION__, [$params]);
     }
     
     public function genVectorHash($ints)
     {
-        return $this->__call('gen_vector_hash', [$ints]);
+        return $this->__call(__FUNCTION__, [$ints]);
     }
     
     public function randomInt($modulus = false)
     {
-        return $this->__call('random_int', [$modulus]);
+        return $this->__call(__FUNCTION__, [$modulus]);
     }
     
     public function random($length)
     {
-        return $this->__call('random', [$length]);
+        return $this->__call(__FUNCTION__, [$length]);
     }
     /**
      * posmod(numeric,numeric) : numeric
@@ -4953,132 +4953,132 @@ class InternalDoc extends APIFactory
      */
     public function posmod($a, $b)
     {
-        return $this->__call('posmod', [$a, $b]);
+        return $this->__call(__FUNCTION__, [$a, $b]);
     }
     
     public function unpackSignedInt($value)
     {
-        return $this->__call('unpack_signed_int', [$value]);
+        return $this->__call(__FUNCTION__, [$value]);
     }
     
     public function unpackSignedLong($value)
     {
-        return $this->__call('unpack_signed_long', [$value]);
+        return $this->__call(__FUNCTION__, [$value]);
     }
     
     public function unpackSignedLongString($value)
     {
-        return $this->__call('unpack_signed_long_string', [$value]);
+        return $this->__call(__FUNCTION__, [$value]);
     }
     
     public function packSignedInt($value)
     {
-        return $this->__call('pack_signed_int', [$value]);
+        return $this->__call(__FUNCTION__, [$value]);
     }
     
     public function packSignedLong($value)
     {
-        return $this->__call('pack_signed_long', [$value]);
+        return $this->__call(__FUNCTION__, [$value]);
     }
     
     public function packUnsignedInt($value)
     {
-        return $this->__call('pack_unsigned_int', [$value]);
+        return $this->__call(__FUNCTION__, [$value]);
     }
     
     public function packDouble($value)
     {
-        return $this->__call('pack_double', [$value]);
+        return $this->__call(__FUNCTION__, [$value]);
     }
     
     public function unpackDouble($value)
     {
-        return $this->__call('unpack_double', [$value]);
+        return $this->__call(__FUNCTION__, [$value]);
     }
     
     public function wait($promise, $ignoreSignal = false)
     {
-        return $this->__call('wait', [$promise, $ignoreSignal]);
+        return $this->__call(__FUNCTION__, [$promise, $ignoreSignal]);
     }
     
     public function all($promises)
     {
-        return $this->__call('all', [$promises]);
+        return $this->__call(__FUNCTION__, [$promises]);
     }
     
     public function any($promises)
     {
-        return $this->__call('any', [$promises]);
+        return $this->__call(__FUNCTION__, [$promises]);
     }
     
     public function some($promises)
     {
-        return $this->__call('some', [$promises]);
+        return $this->__call(__FUNCTION__, [$promises]);
     }
     
     public function first($promises)
     {
-        return $this->__call('first', [$promises]);
+        return $this->__call(__FUNCTION__, [$promises]);
     }
     
     public function timeout($promise, $timeout)
     {
-        return $this->__call('timeout', [$promise, $timeout]);
+        return $this->__call(__FUNCTION__, [$promise, $timeout]);
     }
     
     public function call($promise)
     {
-        return $this->__call('call', [$promise]);
+        return $this->__call(__FUNCTION__, [$promise]);
     }
     
     public function callFork($promise, $actual = null, $file = '')
     {
-        return $this->__call('callFork', [$promise, $actual, $file]);
+        return $this->__call(__FUNCTION__, [$promise, $actual, $file]);
     }
     
     public function callForkDefer($promise)
     {
-        return $this->__call('callForkDefer', [$promise]);
+        return $this->__call(__FUNCTION__, [$promise]);
     }
     
     public function rethrow($e, $file = '')
     {
-        return $this->__call('rethrow', [$e, $file]);
+        return $this->__call(__FUNCTION__, [$e, $file]);
     }
     
     public function after($a, $b)
     {
-        return $this->__call('after', [$a, $b]);
+        return $this->__call(__FUNCTION__, [$a, $b]);
     }
     
     public function flock(string $file, int $operation, $polling)
     {
-        return $this->__call('flockAsync', [$file, $operation, $polling]);
+        return $this->__call(__FUNCTION__, [$file, $operation, $polling]);
     }
     
     public function noCache(int $status, string $message)
     {
-        return $this->__call('noCache', [$status, $message]);
+        return $this->__call(__FUNCTION__, [$status, $message]);
     }
     
     public function sleep($time)
     {
-        return $this->__call('sleep', [$time]);
+        return $this->__call(__FUNCTION__, [$time]);
     }
     
     public function readLine($prompt = '')
     {
-        return $this->__call('readLineAsync', [$prompt]);
+        return $this->__call(__FUNCTION__, [$prompt]);
     }
     
     public function echo($string)
     {
-        return $this->__call('echo', [$string]);
+        return $this->__call(__FUNCTION__, [$string]);
     }
     
     public function isArrayOrAlike($var)
     {
-        return $this->__call('is_array_or_alike', [$var]);
+        return $this->__call(__FUNCTION__, [$var]);
     }
     /**
      * Convert to camelCase.
@@ -5089,7 +5089,7 @@ class InternalDoc extends APIFactory
      */
     public function fromSnakeCase(string $input): string
     {
-        return $this->__call('from_snake_case', [$input]);
+        return $this->__call(__FUNCTION__, [$input]);
     }
     /**
      * Convert to snake_case.
@@ -5100,7 +5100,7 @@ class InternalDoc extends APIFactory
      */
     public function fromCamelCase(string $input): string
     {
-        return $this->__call('from_camel_case', [$input]);
+        return $this->__call(__FUNCTION__, [$input]);
     }
     /**
      * Create array
@@ -5111,123 +5111,123 @@ class InternalDoc extends APIFactory
      */
     public function arr(...$params): array
     {
-        return $this->__call('arr', Tools::arr(...$params));
+        return $this->__call(__FUNCTION__, Tools::arr(...$params));
     }
     
     public function requestCall($user)
     {
-        return $this->__call('request_call_async', [$user]);
+        return $this->__call(__FUNCTION__, [$user]);
     }
     
     public function acceptCall($call)
     {
-        return $this->__call('accept_call_async', [$call]);
+        return $this->__call(__FUNCTION__, [$call]);
     }
     
     public function discardCall($call, $reason, $rating = array (
     ), $need_debug = true)
     {
-        return $this->__call('discard_call_async', [$call, $reason, $rating, $need_debug]);
+        return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug]);
     }
     
     public function confirmCall($params)
     {
-        return $this->__call('confirm_call_async', [$params]);
+        return $this->__call(__FUNCTION__, [$params]);
     }
     
     public function completeCall($params)
     {
-        return $this->__call('complete_call_async', [$params]);
+        return $this->__call(__FUNCTION__, [$params]);
     }
     
     public function callStatus($id)
     {
-        return $this->__call('call_status', [$id]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     
     public function getCall($call)
     {
-        return $this->__call('get_call', [$call]);
+        return $this->__call(__FUNCTION__, [$call]);
     }
     
     public function checkCalls()
     {
-        return $this->__call('checkCalls', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function getDialogs($force = true)
     {
-        return $this->__call('get_dialogs_async', [$force]);
+        return $this->__call(__FUNCTION__, [$force]);
     }
     
     public function getFullDialogs($force = true)
     {
-        return $this->__call('get_full_dialogs_async', [$force]);
+        return $this->__call(__FUNCTION__, [$force]);
     }
     
     public function setEventHandler($event_handler)
     {
-        return $this->__call('setEventHandler', [$event_handler]);
+        return $this->__call(__FUNCTION__, [$event_handler]);
     }
     
     public function getEventHandler()
     {
-        return $this->__call('getEventHandler', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function eventUpdateHandler($update)
     {
-        return $this->__call('event_update_handler', [$update]);
+        return $this->__call(__FUNCTION__, [$update]);
     }
     
     public function setWebhook($hook_url, $pem_path = null)
     {
-        return $this->__call('setWebhook', [$hook_url, $pem_path]);
+        return $this->__call(__FUNCTION__, [$hook_url, $pem_path]);
     }
     
     public function setCallback($callback)
     {
-        return $this->__call('setCallback', [$callback]);
+        return $this->__call(__FUNCTION__, [$callback]);
     }
     
     public function logout()
     {
-        return $this->__call('logout_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function botLogin($token)
     {
-        return $this->__call('bot_login_async', [$token]);
+        return $this->__call(__FUNCTION__, [$token]);
     }
     
     public function phoneLogin($number, $sms_type = 5)
     {
-        return $this->__call('phone_login_async', [$number, $sms_type]);
+        return $this->__call(__FUNCTION__, [$number, $sms_type]);
     }
     
     public function completePhoneLogin($code)
     {
-        return $this->__call('complete_phone_login_async', [$code]);
+        return $this->__call(__FUNCTION__, [$code]);
     }
     
     public function importAuthorization($authorization)
     {
-        return $this->__call('import_authorization_async', [$authorization]);
+        return $this->__call(__FUNCTION__, [$authorization]);
     }
     
     public function exportAuthorization()
     {
-        return $this->__call('export_authorization_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function completeSignup($first_name, $last_name)
     {
-        return $this->__call('complete_signup_async', [$first_name, $last_name]);
+        return $this->__call(__FUNCTION__, [$first_name, $last_name]);
     }
     
     public function complete2faLogin($password)
     {
-        return $this->__call('complete_2fa_login_async', [$password]);
+        return $this->__call(__FUNCTION__, [$password]);
     }
     /**
      * Update the 2FA password.
@@ -5239,96 +5239,96 @@ class InternalDoc extends APIFactory
      */
     public function update2fa(array $params)
     {
-        return $this->__call('update_2fa_async', [$params]);
+        return $this->__call(__FUNCTION__, [$params]);
     }
     
     public function setLoopCallback($callback)
     {
-        return $this->__call('setLoopCallback', [$callback]);
+        return $this->__call(__FUNCTION__, [$callback]);
     }
     
     public function loop($max_forks = 0)
     {
-        return $this->__call('loop', [$max_forks]);
+        return $this->__call(__FUNCTION__, [$max_forks]);
     }
     
     public function closeConnection($message = 'OK!')
     {
-        return $this->__call('closeConnection', [$message]);
+        return $this->__call(__FUNCTION__, [$message]);
     }
     
     public function setNoop()
     {
-        return $this->__call('setNoop', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function noop()
     {
-        return $this->__call('noop', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function start()
     {
-        return $this->__call('start_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function webPhoneLogin()
     {
-        return $this->__call('web_phone_login_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function webCompletePhoneLogin()
     {
-        return $this->__call('web_complete_phone_login_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function webComplete2faLogin()
     {
-        return $this->__call('web_complete_2fa_login_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function webCompleteSignup()
     {
-        return $this->__call('web_complete_signup_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function webBotLogin()
     {
-        return $this->__call('web_bot_login_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function webEcho($message = '')
     {
-        return $this->__call('web_echo_async', [$message]);
+        return $this->__call(__FUNCTION__, [$message]);
     }
     
     public function webEchoTemplate($message, $form)
     {
-        return $this->__call('web_echo_template', [$message, $form]);
+        return $this->__call(__FUNCTION__, [$message, $form]);
     }
     
     public function getWebTemplate()
     {
-        return $this->__call('get_web_template', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function setWebTemplate($template)
     {
-        return $this->__call('set_web_template', [$template]);
+        return $this->__call(__FUNCTION__, [$template]);
     }
     
     public function checkTos()
     {
-        return $this->__call('check_tos_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function acceptTos()
     {
-        return $this->__call('accept_tos_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     
     public function declineTos()
     {
-        return $this->__call('decline_tos_async', []);
+        return $this->__call(__FUNCTION__, []);
     }
     }

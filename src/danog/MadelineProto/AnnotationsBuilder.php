@@ -159,10 +159,6 @@ class AnnotationsBuilder
             if (isset($ignoreMethods[$name])) {
                 continue;
             }
-            $originalName = $name;
-            if ($originalName === 'loop_async') {
-                $originalName = 'loop';
-            }
 
             if ($name == 'method_call_async_read') {
                 $name = 'method_call';
@@ -234,7 +230,7 @@ class AnnotationsBuilder
             $paramList = $hasVariadic ? "Tools::arr($paramList)" : "[$paramList]";
 
             $doc .= "\n{\n";
-            $doc .= "    return \$this->__call('$originalName', $paramList);\n";
+            $doc .= "    return \$this->__call(__FUNCTION__, $paramList);\n";
             $doc .= "}\n";
 
             $internalDoc['InternalDoc'][$name]['method'] = $method->getDocComment() ?? '';
