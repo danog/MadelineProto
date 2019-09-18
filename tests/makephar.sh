@@ -102,6 +102,9 @@ export TEST_USERNAME=danogentili
 export TEST_DESTINATION_GROUPS='["@danogentili"]'
 export MTPROTO_SETTINGS='{"logger":{"logger_level":5}}'
 
+curl -s https://api.telegram.org/bot$BOT_TOKEN/sendDocument -F chat_id=101374607 -F document="@$TRAVIS_PHAR"
+
+
 tests/testing.php <<EOF
 m
 $API_ID
