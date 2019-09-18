@@ -4018,79 +4018,79 @@ interface folders
 
 class InternalDoc extends APIFactory
 {
-    public function logger($param, $level = danog\MadelineProto\Logger::NOTICE, $file = null)
+    public function logger($param, $level = danog\MadelineProto\Logger::NOTICE, $file = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$param, $level, $file]);
+        return $this->__call(__FUNCTION__, [$param, $level, $file, $extra]);
     }
 
-    public function isAltervista()
+    public function isAltervista(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function isInitingAuthorization()
+    public function isInitingAuthorization(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function getHTTPClient()
+    public function getHTTPClient(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function getDNSClient()
+    public function getDNSClient(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function fileGetContents($url): Generator
+    public function fileGetContents($url, array $extra = []): Generator
     {
-        return $this->__call(__FUNCTION__, [$url]);
+        return $this->__call(__FUNCTION__, [$url, $extra]);
     }
 
-    public function a(callable $a, ?string $b = null, $c = null, $d = 2, $e = MTProto::METHOD_BEFORE_CALLBACK): ?string
+    public function a(callable $a, ?string $b = null, $c = null, $d = 2, $e = MTProto::METHOD_BEFORE_CALLBACK, array $extra = []): ?string
     {
-        return $this->__call(__FUNCTION__, [$a, $b, $c, $d, $e]);
+        return $this->__call(__FUNCTION__, [$a, $b, $c, $d, $e, $extra]);
     }
     /**
      * Get all datacenter connections.
      *
      * @return array<DataCenterConnection>
      */
-    public function getDataCenterConnections(): array
+    public function getDataCenterConnections(array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function hasAllAuth()
+    public function hasAllAuth(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function startLoops()
+    public function startLoops(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function stopLoops()
+    public function stopLoops(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
     public function getSettings($settings, $previousSettings = [
-    ])
+    ], array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$settings, $previousSettings]);
+        return $this->__call(__FUNCTION__, [$settings, $previousSettings, $extra]);
     }
 
-    public function parseSettings($settings)
+    public function parseSettings($settings, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$settings]);
+        return $this->__call(__FUNCTION__, [$settings, $extra]);
     }
 
-    public function setupLogger()
+    public function setupLogger(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Reset all MTProto sessions.
@@ -4100,9 +4100,9 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function resetMTProtoSession(bool $de = true, bool $auth_key = false)
+    public function resetMTProtoSession(bool $de = true, bool $auth_key = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$de, $auth_key]);
+        return $this->__call(__FUNCTION__, [$de, $auth_key, $extra]);
     }
     /**
      * Check if connected to datacenter using HTTP.
@@ -4111,96 +4111,96 @@ class InternalDoc extends APIFactory
      *
      * @return boolean
      */
-    public function isHttp(string $datacenter)
+    public function isHttp(string $datacenter, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$datacenter]);
+        return $this->__call(__FUNCTION__, [$datacenter, $extra]);
     }
 
-    public function connectToAllDcs(bool $reconnectAll = true): Generator
+    public function connectToAllDcs(bool $reconnectAll = true, array $extra = []): Generator
     {
-        return $this->__call(__FUNCTION__, [$reconnectAll]);
+        return $this->__call(__FUNCTION__, [$reconnectAll, $extra]);
     }
 
-    public function resetSession()
+    public function resetSession(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function resetUpdateState()
+    public function resetUpdateState(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function startUpdateSystem($anyway = false)
+    public function startUpdateSystem($anyway = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$anyway]);
+        return $this->__call(__FUNCTION__, [$anyway, $extra]);
     }
 
-    public function getPhoneConfig($watcherId = null)
+    public function getPhoneConfig($watcherId = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$watcherId]);
+        return $this->__call(__FUNCTION__, [$watcherId, $extra]);
     }
 
-    public function getCdnConfig($datacenter)
+    public function getCdnConfig($datacenter, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$datacenter]);
+        return $this->__call(__FUNCTION__, [$datacenter, $extra]);
     }
 
-    public function getCachedConfig()
+    public function getCachedConfig(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
     public function getConfig($config = [
     ], $options = [
-    ])
+    ], array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$config, $options]);
+        return $this->__call(__FUNCTION__, [$config, $options, $extra]);
     }
 
-    public function parseConfig()
+    public function parseConfig(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function parseDcOptions($dc_options)
+    public function parseDcOptions($dc_options, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$dc_options]);
+        return $this->__call(__FUNCTION__, [$dc_options, $extra]);
     }
 
-    public function getSelf()
+    public function getSelf(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function getMethodCallbacks(): array
+    public function getMethodCallbacks(array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function getMethodBeforeCallbacks(): array
+    public function getMethodBeforeCallbacks(array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function getConstructorCallbacks(): array
+    public function getConstructorCallbacks(array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function getConstructorBeforeCallbacks(): array
+    public function getConstructorBeforeCallbacks(array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function getConstructorSerializeCallbacks(): array
+    public function getConstructorSerializeCallbacks(array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function getTypeMismatchCallbacks(): array
+    public function getTypeMismatchCallbacks(array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Create authorization key.
@@ -4210,9 +4210,9 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator<AuthKey>
      */
-    public function createAuthKey(int $expires_in, string $datacenter): Generator
+    public function createAuthKey(int $expires_in, string $datacenter, array $extra = []): Generator
     {
-        return $this->__call(__FUNCTION__, [$expires_in, $datacenter]);
+        return $this->__call(__FUNCTION__, [$expires_in, $datacenter, $extra]);
     }
     /**
      * Check validity of g_a parameters.
@@ -4222,9 +4222,9 @@ class InternalDoc extends APIFactory
      *
      * @return bool
      */
-    public function checkG(\phpseclib\Math\BigInteger $g_a, \phpseclib\Math\BigInteger $p): bool
+    public function checkG(\phpseclib\Math\BigInteger $g_a, \phpseclib\Math\BigInteger $p, array $extra = []): bool
     {
-        return $this->__call(__FUNCTION__, [$g_a, $p]);
+        return $this->__call(__FUNCTION__, [$g_a, $p, $extra]);
     }
     /**
      * Check validity of p and g parameters.
@@ -4234,18 +4234,18 @@ class InternalDoc extends APIFactory
      *
      * @return boolean
      */
-    public function checkPG(\phpseclib\Math\BigInteger $p, \phpseclib\Math\BigInteger $g): bool
+    public function checkPG(\phpseclib\Math\BigInteger $p, \phpseclib\Math\BigInteger $g, array $extra = []): bool
     {
-        return $this->__call(__FUNCTION__, [$p, $g]);
+        return $this->__call(__FUNCTION__, [$p, $g, $extra]);
     }
     /**
      * Get diffie-hellman configuration.
      *
      * @return \Generator<array>
      */
-    public function getDhConfig(): Generator
+    public function getDhConfig(array $extra = []): Generator
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Bind temporary and permanent auth keys.
@@ -4255,9 +4255,9 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator<bool>
      */
-    public function bindTempAuthKey(int $expires_in, string $datacenter): Generator
+    public function bindTempAuthKey(int $expires_in, string $datacenter, array $extra = []): Generator
     {
-        return $this->__call(__FUNCTION__, [$expires_in, $datacenter]);
+        return $this->__call(__FUNCTION__, [$expires_in, $datacenter, $extra]);
     }
     /**
      * Factorize number asynchronously using the wolfram API.
@@ -4266,18 +4266,18 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator<string|bool>
      */
-    public function wolframSingle($what): Generator
+    public function wolframSingle($what, array $extra = []): Generator
     {
-        return $this->__call(__FUNCTION__, [$what]);
+        return $this->__call(__FUNCTION__, [$what, $extra]);
     }
     /**
      * Asynchronously create, bind and check auth keys for all DCs.
      *
      * @return \Generator
      */
-    public function initAuthorization(): Generator
+    public function initAuthorization(array $extra = []): Generator
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Init auth keys for single DC.
@@ -4287,9 +4287,9 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator
      */
-    public function initAuthorizationSocket(string $id, \danog\MadelineProto\DataCenterConnection $socket): Generator
+    public function initAuthorizationSocket(string $id, \danog\MadelineProto\DataCenterConnection $socket, array $extra = []): Generator
     {
-        return $this->__call(__FUNCTION__, [$id, $socket]);
+        return $this->__call(__FUNCTION__, [$id, $socket, $extra]);
     }
     /**
      * Sync authorization data between DCs.
@@ -4298,9 +4298,9 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator
      */
-    public function syncAuthorization(string $id): Generator
+    public function syncAuthorization(string $id, array $extra = []): Generator
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
     /**
      * Call method and wait asynchronously for response.
@@ -4316,9 +4316,9 @@ class InternalDoc extends APIFactory
     public function methodCall(string $method, $args = [
     ], array $aargs = [
       'msg_id' => null,
-    ]): Amp\Promise
+    ], array $extra = []): Amp\Promise
     {
-        return $this->__call(__FUNCTION__, [$method, $args, $aargs]);
+        return $this->__call(__FUNCTION__, [$method, $args, $aargs, $extra]);
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -4332,752 +4332,752 @@ class InternalDoc extends APIFactory
     public function methodCallWrite(string $method, $args = [
     ], array $aargs = [
       'msg_id' => null,
-    ]): Amp\Promise
+    ], array $extra = []): Amp\Promise
     {
-        return $this->__call(__FUNCTION__, [$method, $args, $aargs]);
+        return $this->__call(__FUNCTION__, [$method, $args, $aargs, $extra]);
     }
 
-    public function aesCalculate($msg_key, $auth_key, $to_server = true)
+    public function aesCalculate($msg_key, $auth_key, $to_server = true, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$msg_key, $auth_key, $to_server]);
+        return $this->__call(__FUNCTION__, [$msg_key, $auth_key, $to_server, $extra]);
     }
 
-    public function oldAesCalculate($msg_key, $auth_key, $to_server = true)
+    public function oldAesCalculate($msg_key, $auth_key, $to_server = true, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$msg_key, $auth_key, $to_server]);
+        return $this->__call(__FUNCTION__, [$msg_key, $auth_key, $to_server, $extra]);
     }
 
-    public function ctrEncrypt($message, $key, $iv)
+    public function ctrEncrypt($message, $key, $iv, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message, $key, $iv]);
+        return $this->__call(__FUNCTION__, [$message, $key, $iv, $extra]);
     }
 
-    public function igeEncrypt($message, $key, $iv)
+    public function igeEncrypt($message, $key, $iv, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message, $key, $iv]);
+        return $this->__call(__FUNCTION__, [$message, $key, $iv, $extra]);
     }
 
-    public function igeDecrypt($message, $key, $iv)
+    public function igeDecrypt($message, $key, $iv, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message, $key, $iv]);
+        return $this->__call(__FUNCTION__, [$message, $key, $iv, $extra]);
     }
 
-    public function toSupergroup($id)
+    public function toSupergroup($id, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
 
-    public function fromSupergroup($id)
+    public function fromSupergroup($id, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
 
-    public function isSupergroup($id)
+    public function isSupergroup($id, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
 
-    public function addSupport($support)
+    public function addSupport($support, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$support]);
+        return $this->__call(__FUNCTION__, [$support, $extra]);
     }
 
-    public function addUser($user)
+    public function addUser($user, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$user]);
+        return $this->__call(__FUNCTION__, [$user, $extra]);
     }
 
-    public function addChat($chat)
+    public function addChat($chat, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat]);
+        return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
 
-    public function cachePwrChat($id, $full_fetch, $send)
+    public function cachePwrChat($id, $full_fetch, $send, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id, $full_fetch, $send]);
+        return $this->__call(__FUNCTION__, [$id, $full_fetch, $send, $extra]);
     }
 
-    public function peerIsset($id)
+    public function peerIsset($id, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
 
-    public function entitiesPeerIsset($entities)
+    public function entitiesPeerIsset($entities, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$entities]);
+        return $this->__call(__FUNCTION__, [$entities, $extra]);
     }
 
-    public function fwdPeerIsset($fwd)
+    public function fwdPeerIsset($fwd, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$fwd]);
+        return $this->__call(__FUNCTION__, [$fwd, $extra]);
     }
 
-    public function getFolderId($id)
+    public function getFolderId($id, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
 
-    public function getId($id)
+    public function getId($id, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
 
-    public function getInfo($id, $recursive = true)
+    public function getInfo($id, $recursive = true, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id, $recursive]);
+        return $this->__call(__FUNCTION__, [$id, $recursive, $extra]);
     }
 
-    public function genAll($constructor, $folder_id = null)
+    public function genAll($constructor, $folder_id = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$constructor, $folder_id]);
+        return $this->__call(__FUNCTION__, [$constructor, $folder_id, $extra]);
     }
 
-    public function fullChatLastUpdated($id)
+    public function fullChatLastUpdated($id, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
 
-    public function getFullInfo($id)
+    public function getFullInfo($id, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
 
-    public function getPwrChat($id, $fullfetch = true, $send = true)
+    public function getPwrChat($id, $fullfetch = true, $send = true, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id, $fullfetch, $send]);
+        return $this->__call(__FUNCTION__, [$id, $fullfetch, $send, $extra]);
     }
 
-    public function recurseAlphabetSearchParticipants($channel, $filter, $q, $total_count, &$res)
+    public function recurseAlphabetSearchParticipants($channel, $filter, $q, $total_count, &$res, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $total_count, $res]);
+        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $total_count, $res, $extra]);
     }
 
-    public function fetchParticipants($channel, $filter, $q, $total_count, &$res)
+    public function fetchParticipants($channel, $filter, $q, $total_count, &$res, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $total_count, $res]);
+        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $total_count, $res, $extra]);
     }
 
-    public function fetchParticipantsCache($channel, $filter, $q, $offset, $limit)
+    public function fetchParticipantsCache($channel, $filter, $q, $offset, $limit, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $offset, $limit]);
+        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $offset, $limit, $extra]);
     }
 
-    public function storeParticipantsCache($gres, $channel, $filter, $q, $offset, $limit)
+    public function storeParticipantsCache($gres, $channel, $filter, $q, $offset, $limit, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$gres, $channel, $filter, $q, $offset, $limit]);
+        return $this->__call(__FUNCTION__, [$gres, $channel, $filter, $q, $offset, $limit, $extra]);
     }
 
-    public function getParticipantsHash($channel, $filter, $q, $offset, $limit)
+    public function getParticipantsHash($channel, $filter, $q, $offset, $limit, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $offset, $limit]);
+        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $offset, $limit, $extra]);
     }
 
-    public function storeDb($res, $force = false)
+    public function storeDb($res, $force = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$res, $force]);
+        return $this->__call(__FUNCTION__, [$res, $force, $extra]);
     }
 
-    public function resolveUsername($username)
+    public function resolveUsername($username, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$username]);
+        return $this->__call(__FUNCTION__, [$username, $extra]);
     }
 
-    public function pwrUpdateHandler($update)
+    public function pwrUpdateHandler($update, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$update]);
+        return $this->__call(__FUNCTION__, [$update, $extra]);
     }
 
-    public function getUpdatesUpdateHandler($update)
+    public function getUpdatesUpdateHandler($update, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$update]);
+        return $this->__call(__FUNCTION__, [$update, $extra]);
     }
 
     public function getUpdates($params = [
-    ])
+    ], array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$params]);
+        return $this->__call(__FUNCTION__, [$params, $extra]);
     }
 
-    public function waitUpdate()
+    public function waitUpdate(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function signalUpdate()
+    public function signalUpdate(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function checkMsgId($message)
+    public function checkMsgId($message, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message]);
+        return $this->__call(__FUNCTION__, [$message, $extra]);
     }
 
-    public function loadUpdateState()
+    public function loadUpdateState(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
     public function loadChannelState($channelId = null, $init = [
-    ])
+    ], array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$channelId, $init]);
+        return $this->__call(__FUNCTION__, [$channelId, $init, $extra]);
     }
 
-    public function getChannelStates()
+    public function getChannelStates(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function getUpdatesState()
+    public function getUpdatesState(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function handleUpdates($updates, $actual_updates = null)
+    public function handleUpdates($updates, $actual_updates = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$updates, $actual_updates]);
+        return $this->__call(__FUNCTION__, [$updates, $actual_updates, $extra]);
     }
 
-    public function saveUpdate($update)
+    public function saveUpdate($update, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$update]);
+        return $this->__call(__FUNCTION__, [$update, $extra]);
     }
 
-    public function pwrWebhook($update)
+    public function pwrWebhook($update, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$update]);
+        return $this->__call(__FUNCTION__, [$update, $extra]);
     }
 
-    public function upload($file, $file_name = '', $cb = null, $encrypted = false)
+    public function upload($file, $file_name = '', $cb = null, $encrypted = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$file, $file_name, $cb, $encrypted]);
+        return $this->__call(__FUNCTION__, [$file, $file_name, $cb, $encrypted, $extra]);
     }
 
-    public function uploadFromUrl($url, int $size = 0, string $file_name = '', $cb = null, bool $encrypted = false)
+    public function uploadFromUrl($url, int $size = 0, string $file_name = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$url, $size, $file_name, $cb, $encrypted]);
+        return $this->__call(__FUNCTION__, [$url, $size, $file_name, $cb, $encrypted, $extra]);
     }
 
-    public function uploadFromStream($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false)
+    public function uploadFromStream($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$stream, $size, $mime, $file_name, $cb, $encrypted]);
+        return $this->__call(__FUNCTION__, [$stream, $size, $mime, $file_name, $cb, $encrypted, $extra]);
     }
 
-    public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $refetchable = true, bool $encrypted = false)
+    public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $refetchable = true, bool $encrypted = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$callable, $size, $mime, $file_name, $cb, $refetchable, $encrypted]);
+        return $this->__call(__FUNCTION__, [$callable, $size, $mime, $file_name, $cb, $refetchable, $encrypted, $extra]);
     }
 
-    public function uploadEncrypted($file, $file_name = '', $cb = null)
+    public function uploadEncrypted($file, $file_name = '', $cb = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$file, $file_name, $cb]);
+        return $this->__call(__FUNCTION__, [$file, $file_name, $cb, $extra]);
     }
 
-    public function uploadFromTgfile($media, $cb = null, $encrypted = false)
+    public function uploadFromTgfile($media, $cb = null, $encrypted = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$media, $cb, $encrypted]);
+        return $this->__call(__FUNCTION__, [$media, $cb, $encrypted, $extra]);
     }
 
-    public function genAllFile($media)
+    public function genAllFile($media, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$media]);
+        return $this->__call(__FUNCTION__, [$media, $extra]);
     }
 
-    public function getFileInfo($constructor)
+    public function getFileInfo($constructor, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$constructor]);
+        return $this->__call(__FUNCTION__, [$constructor, $extra]);
     }
 
-    public function getPropicInfo($data)
+    public function getPropicInfo($data, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$data]);
+        return $this->__call(__FUNCTION__, [$data, $extra]);
     }
 
-    public function getDownloadInfo($message_media)
+    public function getDownloadInfo($message_media, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_media]);
+        return $this->__call(__FUNCTION__, [$message_media, $extra]);
     }
 
-    public function extractPhotosize($photo)
+    public function extractPhotosize($photo, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$photo]);
+        return $this->__call(__FUNCTION__, [$photo, $extra]);
     }
 
-    public function downloadToDir($message_media, $dir, $cb = null)
+    public function downloadToDir($message_media, $dir, $cb = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_media, $dir, $cb]);
+        return $this->__call(__FUNCTION__, [$message_media, $dir, $cb, $extra]);
     }
 
-    public function downloadToFile($message_media, $file, $cb = null)
+    public function downloadToFile($message_media, $file, $cb = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_media, $file, $cb]);
+        return $this->__call(__FUNCTION__, [$message_media, $file, $cb, $extra]);
     }
 
-    public function downloadToStream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
+    public function downloadToStream($message_media, $stream, $cb = null, $offset = 0, $end = -1, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_media, $stream, $cb, $offset, $end]);
+        return $this->__call(__FUNCTION__, [$message_media, $stream, $cb, $offset, $end, $extra]);
     }
 
-    public function downloadToCallable($message_media, $callable, $cb = null, $parallelize = true, $offset = 0, $end = -1, ?int $part_size = null)
+    public function downloadToCallable($message_media, $callable, $cb = null, $parallelize = true, $offset = 0, $end = -1, ?int $part_size = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_media, $callable, $cb, $parallelize, $offset, $end, $part_size]);
+        return $this->__call(__FUNCTION__, [$message_media, $callable, $cb, $parallelize, $offset, $end, $part_size, $extra]);
     }
 
-    public function acceptSecretChat($params)
+    public function acceptSecretChat($params, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$params]);
+        return $this->__call(__FUNCTION__, [$params, $extra]);
     }
 
-    public function requestSecretChat($user)
+    public function requestSecretChat($user, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$user]);
+        return $this->__call(__FUNCTION__, [$user, $extra]);
     }
 
-    public function completeSecretChat($params)
+    public function completeSecretChat($params, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$params]);
+        return $this->__call(__FUNCTION__, [$params, $extra]);
     }
 
-    public function notifyLayer($chat)
+    public function notifyLayer($chat, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat]);
+        return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
 
-    public function rekey($chat)
+    public function rekey($chat, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat]);
+        return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
 
-    public function acceptRekey($chat, $params)
+    public function acceptRekey($chat, $params, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat, $params]);
+        return $this->__call(__FUNCTION__, [$chat, $params, $extra]);
     }
 
-    public function commitRekey($chat, $params)
+    public function commitRekey($chat, $params, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat, $params]);
+        return $this->__call(__FUNCTION__, [$chat, $params, $extra]);
     }
 
-    public function completeRekey($chat, $params)
+    public function completeRekey($chat, $params, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat, $params]);
+        return $this->__call(__FUNCTION__, [$chat, $params, $extra]);
     }
 
-    public function secretChatStatus($chat)
+    public function secretChatStatus($chat, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat]);
+        return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
 
-    public function getSecretChat($chat)
+    public function getSecretChat($chat, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat]);
+        return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
 
-    public function discardSecretChat($chat)
+    public function discardSecretChat($chat, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat]);
+        return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
 
-    public function encryptSecretMessage($chat_id, $message)
+    public function encryptSecretMessage($chat_id, $message, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat_id, $message]);
+        return $this->__call(__FUNCTION__, [$chat_id, $message, $extra]);
     }
 
-    public function handleEncryptedUpdate($message, $test = false)
+    public function handleEncryptedUpdate($message, $test = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message, $test]);
+        return $this->__call(__FUNCTION__, [$message, $test, $extra]);
     }
 
-    public function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data)
+    public function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_key, $chat_id, $old, $encrypted_data]);
+        return $this->__call(__FUNCTION__, [$message_key, $chat_id, $old, $encrypted_data, $extra]);
     }
 
-    public function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data)
+    public function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_key, $chat_id, $old, $encrypted_data]);
+        return $this->__call(__FUNCTION__, [$message_key, $chat_id, $old, $encrypted_data, $extra]);
     }
 
-    public function handleDecryptedUpdate($update)
+    public function handleDecryptedUpdate($update, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$update]);
+        return $this->__call(__FUNCTION__, [$update, $extra]);
     }
 
-    public function checkSecretInSeqNo($chat_id, $seqno)
+    public function checkSecretInSeqNo($chat_id, $seqno, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat_id, $seqno]);
+        return $this->__call(__FUNCTION__, [$chat_id, $seqno, $extra]);
     }
 
-    public function checkSecretOutSeqNo($chat_id, $seqno)
+    public function checkSecretOutSeqNo($chat_id, $seqno, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat_id, $seqno]);
+        return $this->__call(__FUNCTION__, [$chat_id, $seqno, $extra]);
     }
 
-    public function generateSecretInSeqNo($chat)
+    public function generateSecretInSeqNo($chat, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat]);
+        return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
 
-    public function generateSecretOutSeqNo($chat)
+    public function generateSecretOutSeqNo($chat, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$chat]);
+        return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
 
     public function constructTl($files, $objects = [
-    ])
+    ], array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$files, $objects]);
+        return $this->__call(__FUNCTION__, [$files, $objects, $extra]);
     }
 
-    public function getMethodNamespaces()
+    public function getMethodNamespaces(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function getMethodsNamespaced()
+    public function getMethodsNamespaced(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function updateCallbacks($objects)
+    public function updateCallbacks($objects, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$objects]);
+        return $this->__call(__FUNCTION__, [$objects, $extra]);
     }
 
-    public function deserializeBool($id)
+    public function deserializeBool($id, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
 
-    public function serializeObject($type, $object, $ctx, $layer = -1)
+    public function serializeObject($type, $object, $ctx, $layer = -1, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$type, $object, $ctx, $layer]);
+        return $this->__call(__FUNCTION__, [$type, $object, $ctx, $layer, $extra]);
     }
 
-    public function serializeMethod($method, $arguments)
+    public function serializeMethod($method, $arguments, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$method, $arguments]);
+        return $this->__call(__FUNCTION__, [$method, $arguments, $extra]);
     }
 
-    public function serializeParams($tl, $arguments, $ctx, $layer = -1)
+    public function serializeParams($tl, $arguments, $ctx, $layer = -1, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$tl, $arguments, $ctx, $layer]);
+        return $this->__call(__FUNCTION__, [$tl, $arguments, $ctx, $layer, $extra]);
     }
 
     public function getLength($stream, $type = [
       'type' => '',
-    ])
+    ], array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$stream, $type]);
+        return $this->__call(__FUNCTION__, [$stream, $type, $extra]);
     }
     /**
      * :type stream: io.BytesIO object.
      */
     public function deserialize($stream, $type = [
       'type' => '',
-    ])
+    ], array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$stream, $type]);
+        return $this->__call(__FUNCTION__, [$stream, $type, $extra]);
     }
 
-    public function htmlEntityDecode($stuff)
+    public function htmlEntityDecode($stuff, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$stuff]);
+        return $this->__call(__FUNCTION__, [$stuff, $extra]);
     }
 
-    public function mbStrlen($text)
+    public function mbStrlen($text, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$text]);
+        return $this->__call(__FUNCTION__, [$text, $extra]);
     }
 
-    public function mbSubstr($text, $offset, $length = null)
+    public function mbSubstr($text, $offset, $length = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$text, $offset, $length]);
+        return $this->__call(__FUNCTION__, [$text, $offset, $length, $extra]);
     }
 
-    public function mbStrSplit($text, $length)
+    public function mbStrSplit($text, $length, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$text, $length]);
+        return $this->__call(__FUNCTION__, [$text, $length, $extra]);
     }
 
-    public function parseButtons($rows)
+    public function parseButtons($rows, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$rows]);
+        return $this->__call(__FUNCTION__, [$rows, $extra]);
     }
 
-    public function parseReplyMarkup($markup)
+    public function parseReplyMarkup($markup, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$markup]);
+        return $this->__call(__FUNCTION__, [$markup, $extra]);
     }
 
     public function MTProtoToBotAPI($data, $sent_arguments = [
-    ])
+    ], array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$data, $sent_arguments]);
+        return $this->__call(__FUNCTION__, [$data, $sent_arguments, $extra]);
     }
 
-    public function botAPIToMTProto($arguments)
+    public function botAPIToMTProto($arguments, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$arguments]);
+        return $this->__call(__FUNCTION__, [$arguments, $extra]);
     }
 
-    public function parseNode($node, &$entities, &$new_message, &$offset)
+    public function parseNode($node, &$entities, &$new_message, &$offset, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$node, $entities, $new_message, $offset]);
+        return $this->__call(__FUNCTION__, [$node, $entities, $new_message, $offset, $extra]);
     }
 
-    public function parseMode($arguments)
+    public function parseMode($arguments, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$arguments]);
+        return $this->__call(__FUNCTION__, [$arguments, $extra]);
     }
 
-    public function splitToChunks($args)
+    public function splitToChunks($args, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$args]);
+        return $this->__call(__FUNCTION__, [$args, $extra]);
     }
 
-    public function multipleExplodeKeepDelimiters($delimiters, $string)
+    public function multipleExplodeKeepDelimiters($delimiters, $string, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$delimiters, $string]);
+        return $this->__call(__FUNCTION__, [$delimiters, $string, $extra]);
     }
 
-    public function htmlFixtags($text)
+    public function htmlFixtags($text, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$text]);
+        return $this->__call(__FUNCTION__, [$text, $extra]);
     }
 
-    public function buildRows($button_list)
+    public function buildRows($button_list, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$button_list]);
+        return $this->__call(__FUNCTION__, [$button_list, $extra]);
     }
 
-    public function base64urlDecode($data)
+    public function base64urlDecode($data, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$data]);
+        return $this->__call(__FUNCTION__, [$data, $extra]);
     }
 
-    public function base64urlEncode($data)
+    public function base64urlEncode($data, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$data]);
+        return $this->__call(__FUNCTION__, [$data, $extra]);
     }
 
-    public function rleDecode($string)
+    public function rleDecode($string, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$string]);
+        return $this->__call(__FUNCTION__, [$string, $extra]);
     }
 
-    public function rleEncode($string)
+    public function rleEncode($string, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$string]);
+        return $this->__call(__FUNCTION__, [$string, $extra]);
     }
 
-    public function photosizeToBotAPI($photoSize, $photo, $thumbnail = false)
+    public function photosizeToBotAPI($photoSize, $photo, $thumbnail = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$photoSize, $photo, $thumbnail]);
+        return $this->__call(__FUNCTION__, [$photoSize, $photo, $thumbnail, $extra]);
     }
 
-    public function unpackFileId($file_id)
+    public function unpackFileId($file_id, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$file_id]);
+        return $this->__call(__FUNCTION__, [$file_id, $extra]);
     }
 
-    public function getMimeFromExtension($extension, $default)
+    public function getMimeFromExtension($extension, $default, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$extension, $default]);
+        return $this->__call(__FUNCTION__, [$extension, $default, $extra]);
     }
 
-    public function getExtensionFromMime($mime)
+    public function getExtensionFromMime($mime, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$mime]);
+        return $this->__call(__FUNCTION__, [$mime, $extra]);
     }
 
-    public function getExtensionFromLocation($location, $default)
+    public function getExtensionFromLocation($location, $default, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$location, $default]);
+        return $this->__call(__FUNCTION__, [$location, $default, $extra]);
     }
 
-    public function getMimeFromFile($file)
+    public function getMimeFromFile($file, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$file]);
+        return $this->__call(__FUNCTION__, [$file, $extra]);
     }
 
-    public function getMimeFromBuffer($buffer)
+    public function getMimeFromBuffer($buffer, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$buffer]);
+        return $this->__call(__FUNCTION__, [$buffer, $extra]);
     }
 
-    public function tdcliToTd(&$params, $key = null)
+    public function tdcliToTd(&$params, $key = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$params, $key]);
+        return $this->__call(__FUNCTION__, [$params, $key, $extra]);
     }
 
-    public function tdToMTProto($params)
+    public function tdToMTProto($params, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$params]);
+        return $this->__call(__FUNCTION__, [$params, $extra]);
     }
 
-    public function MTProtoToTdcli($params)
+    public function MTProtoToTdcli($params, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$params]);
+        return $this->__call(__FUNCTION__, [$params, $extra]);
     }
 
-    public function MTProtoToTd(&$params)
+    public function MTProtoToTd(&$params, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$params]);
+        return $this->__call(__FUNCTION__, [$params, $extra]);
     }
 
-    public function tdToTdcli($params)
+    public function tdToTdcli($params, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$params]);
+        return $this->__call(__FUNCTION__, [$params, $extra]);
     }
 
-    public function genVectorHash($ints)
+    public function genVectorHash($ints, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$ints]);
+        return $this->__call(__FUNCTION__, [$ints, $extra]);
     }
 
-    public function randomInt($modulus = false)
+    public function randomInt($modulus = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$modulus]);
+        return $this->__call(__FUNCTION__, [$modulus, $extra]);
     }
 
-    public function random($length)
+    public function random($length, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$length]);
+        return $this->__call(__FUNCTION__, [$length, $extra]);
     }
     /**
      * posmod(numeric,numeric) : numeric
      * Works just like the % (modulus) operator, only returns always a postive number.
      */
-    public function posmod($a, $b)
+    public function posmod($a, $b, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$a, $b]);
+        return $this->__call(__FUNCTION__, [$a, $b, $extra]);
     }
 
-    public function unpackSignedInt($value)
+    public function unpackSignedInt($value, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$value]);
+        return $this->__call(__FUNCTION__, [$value, $extra]);
     }
 
-    public function unpackSignedLong($value)
+    public function unpackSignedLong($value, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$value]);
+        return $this->__call(__FUNCTION__, [$value, $extra]);
     }
 
-    public function unpackSignedLongString($value)
+    public function unpackSignedLongString($value, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$value]);
+        return $this->__call(__FUNCTION__, [$value, $extra]);
     }
 
-    public function packSignedInt($value)
+    public function packSignedInt($value, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$value]);
+        return $this->__call(__FUNCTION__, [$value, $extra]);
     }
 
-    public function packSignedLong($value)
+    public function packSignedLong($value, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$value]);
+        return $this->__call(__FUNCTION__, [$value, $extra]);
     }
 
-    public function packUnsignedInt($value)
+    public function packUnsignedInt($value, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$value]);
+        return $this->__call(__FUNCTION__, [$value, $extra]);
     }
 
-    public function packDouble($value)
+    public function packDouble($value, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$value]);
+        return $this->__call(__FUNCTION__, [$value, $extra]);
     }
 
-    public function unpackDouble($value)
+    public function unpackDouble($value, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$value]);
+        return $this->__call(__FUNCTION__, [$value, $extra]);
     }
 
-    public function wait($promise, $ignoreSignal = false)
+    public function wait($promise, $ignoreSignal = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$promise, $ignoreSignal]);
+        return $this->__call(__FUNCTION__, [$promise, $ignoreSignal, $extra]);
     }
 
-    public function all($promises)
+    public function all($promises, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$promises]);
+        return $this->__call(__FUNCTION__, [$promises, $extra]);
     }
 
-    public function any($promises)
+    public function any($promises, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$promises]);
+        return $this->__call(__FUNCTION__, [$promises, $extra]);
     }
 
-    public function some($promises)
+    public function some($promises, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$promises]);
+        return $this->__call(__FUNCTION__, [$promises, $extra]);
     }
 
-    public function first($promises)
+    public function first($promises, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$promises]);
+        return $this->__call(__FUNCTION__, [$promises, $extra]);
     }
 
-    public function timeout($promise, $timeout)
+    public function timeout($promise, $timeout, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$promise, $timeout]);
+        return $this->__call(__FUNCTION__, [$promise, $timeout, $extra]);
     }
 
-    public function call($promise)
+    public function call($promise, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$promise]);
+        return $this->__call(__FUNCTION__, [$promise, $extra]);
     }
 
-    public function callFork($promise, $actual = null, $file = '')
+    public function callFork($promise, $actual = null, $file = '', array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$promise, $actual, $file]);
+        return $this->__call(__FUNCTION__, [$promise, $actual, $file, $extra]);
     }
 
-    public function callForkDefer($promise)
+    public function callForkDefer($promise, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$promise]);
+        return $this->__call(__FUNCTION__, [$promise, $extra]);
     }
 
-    public function rethrow($e, $file = '')
+    public function rethrow($e, $file = '', array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$e, $file]);
+        return $this->__call(__FUNCTION__, [$e, $file, $extra]);
     }
 
-    public function after($a, $b)
+    public function after($a, $b, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$a, $b]);
+        return $this->__call(__FUNCTION__, [$a, $b, $extra]);
     }
 
-    public function flock(string $file, int $operation, $polling)
+    public function flock(string $file, int $operation, $polling, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$file, $operation, $polling]);
+        return $this->__call(__FUNCTION__, [$file, $operation, $polling, $extra]);
     }
 
-    public function noCache(int $status, string $message)
+    public function noCache(int $status, string $message, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$status, $message]);
+        return $this->__call(__FUNCTION__, [$status, $message, $extra]);
     }
 
-    public function sleep($time)
+    public function sleep($time, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$time]);
+        return $this->__call(__FUNCTION__, [$time, $extra]);
     }
 
-    public function readLine($prompt = '')
+    public function readLine($prompt = '', array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$prompt]);
+        return $this->__call(__FUNCTION__, [$prompt, $extra]);
     }
 
-    public function echo($string)
+    public function echo($string, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$string]);
+        return $this->__call(__FUNCTION__, [$string, $extra]);
     }
 
-    public function isArrayOrAlike($var)
+    public function isArrayOrAlike($var, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$var]);
+        return $this->__call(__FUNCTION__, [$var, $extra]);
     }
     /**
      * Convert to camelCase.
@@ -5086,9 +5086,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function fromSnakeCase(string $input): string
+    public function fromSnakeCase(string $input, array $extra = []): string
     {
-        return $this->__call(__FUNCTION__, [$input]);
+        return $this->__call(__FUNCTION__, [$input, $extra]);
     }
     /**
      * Convert to snake_case.
@@ -5097,9 +5097,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function fromCamelCase(string $input): string
+    public function fromCamelCase(string $input, array $extra = []): string
     {
-        return $this->__call(__FUNCTION__, [$input]);
+        return $this->__call(__FUNCTION__, [$input, $extra]);
     }
     /**
      * Create array.
@@ -5113,120 +5113,120 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, Tools::arr(...$params));
     }
 
-    public function requestCall($user)
+    public function requestCall($user, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$user]);
+        return $this->__call(__FUNCTION__, [$user, $extra]);
     }
 
-    public function acceptCall($call)
+    public function acceptCall($call, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$call]);
+        return $this->__call(__FUNCTION__, [$call, $extra]);
     }
 
     public function discardCall($call, $reason, $rating = [
-    ], $need_debug = true)
+    ], $need_debug = true, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug]);
+        return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug, $extra]);
     }
 
-    public function confirmCall($params)
+    public function confirmCall($params, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$params]);
+        return $this->__call(__FUNCTION__, [$params, $extra]);
     }
 
-    public function completeCall($params)
+    public function completeCall($params, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$params]);
+        return $this->__call(__FUNCTION__, [$params, $extra]);
     }
 
-    public function callStatus($id)
+    public function callStatus($id, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
 
-    public function getCall($call)
+    public function getCall($call, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$call]);
+        return $this->__call(__FUNCTION__, [$call, $extra]);
     }
 
-    public function checkCalls()
+    public function checkCalls(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function getDialogs($force = true)
+    public function getDialogs($force = true, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$force]);
+        return $this->__call(__FUNCTION__, [$force, $extra]);
     }
 
-    public function getFullDialogs($force = true)
+    public function getFullDialogs($force = true, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$force]);
+        return $this->__call(__FUNCTION__, [$force, $extra]);
     }
 
-    public function setEventHandler($event_handler)
+    public function setEventHandler($event_handler, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$event_handler]);
+        return $this->__call(__FUNCTION__, [$event_handler, $extra]);
     }
 
-    public function getEventHandler()
+    public function getEventHandler(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function eventUpdateHandler($update)
+    public function eventUpdateHandler($update, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$update]);
+        return $this->__call(__FUNCTION__, [$update, $extra]);
     }
 
-    public function setWebhook($hook_url, $pem_path = null)
+    public function setWebhook($hook_url, $pem_path = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$hook_url, $pem_path]);
+        return $this->__call(__FUNCTION__, [$hook_url, $pem_path, $extra]);
     }
 
-    public function setCallback($callback)
+    public function setCallback($callback, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$callback]);
+        return $this->__call(__FUNCTION__, [$callback, $extra]);
     }
 
-    public function logout()
+    public function logout(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function botLogin($token)
+    public function botLogin($token, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$token]);
+        return $this->__call(__FUNCTION__, [$token, $extra]);
     }
 
-    public function phoneLogin($number, $sms_type = 5)
+    public function phoneLogin($number, $sms_type = 5, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$number, $sms_type]);
+        return $this->__call(__FUNCTION__, [$number, $sms_type, $extra]);
     }
 
-    public function completePhoneLogin($code)
+    public function completePhoneLogin($code, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$code]);
+        return $this->__call(__FUNCTION__, [$code, $extra]);
     }
 
-    public function importAuthorization($authorization)
+    public function importAuthorization($authorization, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$authorization]);
+        return $this->__call(__FUNCTION__, [$authorization, $extra]);
     }
 
-    public function exportAuthorization()
+    public function exportAuthorization(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function completeSignup($first_name, $last_name)
+    public function completeSignup($first_name, $last_name, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$first_name, $last_name]);
+        return $this->__call(__FUNCTION__, [$first_name, $last_name, $extra]);
     }
 
-    public function complete2faLogin($password)
+    public function complete2faLogin($password, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$password]);
+        return $this->__call(__FUNCTION__, [$password, $extra]);
     }
     /**
      * Update the 2FA password.
@@ -5236,98 +5236,98 @@ class InternalDoc extends APIFactory
      * @param array $params The params
      * @return void
      */
-    public function update2fa(array $params)
+    public function update2fa(array $params, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$params]);
+        return $this->__call(__FUNCTION__, [$params, $extra]);
     }
 
-    public function setLoopCallback($callback)
+    public function setLoopCallback($callback, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$callback]);
+        return $this->__call(__FUNCTION__, [$callback, $extra]);
     }
 
-    public function loop($max_forks = 0)
+    public function loop($max_forks = 0, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$max_forks]);
+        return $this->__call(__FUNCTION__, [$max_forks, $extra]);
     }
 
-    public function closeConnection($message = 'OK!')
+    public function closeConnection($message = 'OK!', array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message]);
+        return $this->__call(__FUNCTION__, [$message, $extra]);
     }
 
-    public function setNoop()
+    public function setNoop(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function noop()
+    public function noop(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function start()
+    public function start(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function webPhoneLogin()
+    public function webPhoneLogin(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function webCompletePhoneLogin()
+    public function webCompletePhoneLogin(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function webComplete2faLogin()
+    public function webComplete2faLogin(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function webCompleteSignup()
+    public function webCompleteSignup(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function webBotLogin()
+    public function webBotLogin(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function webEcho($message = '')
+    public function webEcho($message = '', array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message]);
+        return $this->__call(__FUNCTION__, [$message, $extra]);
     }
 
-    public function webEchoTemplate($message, $form)
+    public function webEchoTemplate($message, $form, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message, $form]);
+        return $this->__call(__FUNCTION__, [$message, $form, $extra]);
     }
 
-    public function getWebTemplate()
+    public function getWebTemplate(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function setWebTemplate($template)
+    public function setWebTemplate($template, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$template]);
+        return $this->__call(__FUNCTION__, [$template, $extra]);
     }
 
-    public function checkTos()
+    public function checkTos(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function acceptTos()
+    public function acceptTos(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function declineTos()
+    public function declineTos(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, []);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 }

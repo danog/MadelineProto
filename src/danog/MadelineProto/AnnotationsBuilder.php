@@ -217,6 +217,10 @@ class AnnotationsBuilder
                 }
                 $paramList .= '$'.$param->getName().', ';
             }
+            if (!$hasVariadic) {
+                $paramList .= '$extra, ';
+                $doc .= 'array $extra = []';
+            }
             $doc = \rtrim($doc, ', ');
             $paramList = \rtrim($paramList, ', ');
             $doc .= ")";
