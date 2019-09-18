@@ -552,7 +552,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     public function a(callable $a, ?string $b = null, $c = null, $d = 2, $e = self::METHOD_BEFORE_CALLBACK): ?string
     {
-
     }
     /**
      * Get all datacenter connections.

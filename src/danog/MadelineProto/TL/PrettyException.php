@@ -19,8 +19,6 @@
 
 namespace danog\MadelineProto\TL;
 
-use danog\MadelineProto\Tools;
-
 /**
  * Handle async stack traces.
  */

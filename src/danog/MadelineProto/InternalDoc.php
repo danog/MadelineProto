@@ -4019,16 +4019,6 @@ interface folders
 class InternalDoc extends APIFactory
 {
 
-    public function __construct(...$params)
-    {
-        return $this->__call('__construct', [$params]);
-    }
-    
-    public function __sleep()
-    {
-        return $this->__call('__sleep', []);
-    }
-    
     public function logger($param, $level = danog\MadelineProto\Logger::NOTICE, $file = null)
     {
         return $this->__call('logger', [$param, $level, $file]);
@@ -4078,11 +4068,6 @@ class InternalDoc extends APIFactory
         return $this->__call('hasAllAuth', []);
     }
     
-    public function serialize()
-    {
-        return $this->__call('serialize', []);
-    }
-    
     public function startLoops()
     {
         return $this->__call('startLoops', []);
@@ -4091,16 +4076,6 @@ class InternalDoc extends APIFactory
     public function stopLoops()
     {
         return $this->__call('stopLoops', []);
-    }
-    
-    public function __wakeup($backtrace)
-    {
-        return $this->__call('__wakeup_async', [$backtrace]);
-    }
-    
-    public function __destruct()
-    {
-        return $this->__call('__destruct', []);
     }
     
     public function getSettings($settings, $previousSettings = array (
@@ -4228,26 +4203,6 @@ class InternalDoc extends APIFactory
     {
         return $this->__call('getTypeMismatchCallbacks', []);
     }
-    
-    public function __debugInfo()
-    {
-        return $this->__call('__debugInfo', []);
-    }
-    
-    public function init()
-    {
-        return $this->__call('initAsync', []);
-    }
-    
-    public function setInitPromise($promise)
-    {
-        return $this->__call('setInitPromise', [$promise]);
-    }
-    
-    public function fetchserializableobject($hash)
-    {
-        return $this->__call('fetchserializableobject', [$hash]);
-    }
     /**
      * Create authorization key.
      *
@@ -4268,7 +4223,7 @@ class InternalDoc extends APIFactory
      *
      * @return bool
      */
-    public function checkG(phpseclib\Math\BigInteger $g_a, phpseclib\Math\BigInteger $p): bool
+    public function checkG(\phpseclib\Math\BigInteger $g_a, \phpseclib\Math\BigInteger $p): bool
     {
         return $this->__call('check_G', [$g_a, $p]);
     }
@@ -4280,7 +4235,7 @@ class InternalDoc extends APIFactory
      *
      * @return boolean
      */
-    public function checkPG(phpseclib\Math\BigInteger $p, phpseclib\Math\BigInteger $g): bool
+    public function checkPG(\phpseclib\Math\BigInteger $p, \phpseclib\Math\BigInteger $g): bool
     {
         return $this->__call('check_p_g', [$p, $g]);
     }
@@ -4333,7 +4288,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator
      */
-    public function initAuthorizationSocket(string $id, danog\MadelineProto\DataCenterConnection $socket): Generator
+    public function initAuthorizationSocket(string $id, \danog\MadelineProto\DataCenterConnection $socket): Generator
     {
         return $this->__call('init_authorization_socket_async', [$id, $socket]);
     }
@@ -4735,12 +4690,12 @@ class InternalDoc extends APIFactory
         return $this->__call('handle_encrypted_update_async', [$message, $test]);
     }
     
-    public function tryMtprotoV1Decrypt($message_key, $chat_id, $old, $encrypted_data)
+    public function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data)
     {
         return $this->__call('try_mtproto_v1_decrypt', [$message_key, $chat_id, $old, $encrypted_data]);
     }
     
-    public function tryMtprotoV2Decrypt($message_key, $chat_id, $old, $encrypted_data)
+    public function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data)
     {
         return $this->__call('try_mtproto_v2_decrypt', [$message_key, $chat_id, $old, $encrypted_data]);
     }
@@ -4857,7 +4812,7 @@ class InternalDoc extends APIFactory
         return $this->__call('parse_reply_markup', [$markup]);
     }
     
-    public function mTProtoToBotAPI($data, $sent_arguments = array (
+    public function MTProtoToBotAPI($data, $sent_arguments = array (
     ))
     {
         return $this->__call('MTProto_to_botAPI_async', [$data, $sent_arguments]);
@@ -4918,7 +4873,7 @@ class InternalDoc extends APIFactory
         return $this->__call('rle_encode', [$string]);
     }
     
-    public function photosizeToBotapi($photoSize, $photo, $thumbnail = false)
+    public function photosizeToBotAPI($photoSize, $photo, $thumbnail = false)
     {
         return $this->__call('photosize_to_botapi_async', [$photoSize, $photo, $thumbnail]);
     }
@@ -4958,17 +4913,17 @@ class InternalDoc extends APIFactory
         return $this->__call('tdcli_to_td', [$params, $key]);
     }
     
-    public function tdToMtproto($params)
+    public function tdToMTProto($params)
     {
         return $this->__call('td_to_mtproto_async', [$params]);
     }
     
-    public function mtprotoToTdcli($params)
+    public function MTProtoToTdcli($params)
     {
         return $this->__call('mtproto_to_tdcli_async', [$params]);
     }
     
-    public function mtprotoToTd(&$params)
+    public function MTProtoToTd(&$params)
     {
         return $this->__call('mtproto_to_td_async', [$params]);
     }
@@ -5126,10 +5081,10 @@ class InternalDoc extends APIFactory
         return $this->__call('is_array_or_alike', [$var]);
     }
     /**
-     * Convert to camelCase
+     * Convert to camelCase.
      *
      * @param string $input
-     * 
+     *
      * @return string
      */
     public function fromSnakeCase(string $input): string
@@ -5137,15 +5092,26 @@ class InternalDoc extends APIFactory
         return $this->__call('from_snake_case', [$input]);
     }
     /**
-     * Convert to snake_case
+     * Convert to snake_case.
      *
      * @param string $input
-     * 
+     *
      * @return string
      */
     public function fromCamelCase(string $input): string
     {
         return $this->__call('from_camel_case', [$input]);
+    }
+    /**
+     * Create array
+     *
+     * @param mixed ...$params Params
+     * 
+     * @return array
+     */
+    public function arr(...$params): array
+    {
+        return $this->__call('arr', Tools::arr(...$params));
     }
     
     public function requestCall($user)
@@ -5283,7 +5249,7 @@ class InternalDoc extends APIFactory
     
     public function loop($max_forks = 0)
     {
-        return $this->__call('loop_async', [$max_forks]);
+        return $this->__call('loop', [$max_forks]);
     }
     
     public function closeConnection($message = 'OK!')

@@ -74,6 +74,17 @@ class AnnotationsBuilder
     {
         \danog\MadelineProto\Logger::log('Creating internal classes...', \danog\MadelineProto\Logger::NOTICE);
         $handle = \fopen(\dirname(__FILE__).'/InternalDoc.php', 'w');
+        \fwrite($handle, "<?php namespace danog\\MadelineProto; class InternalDoc extends APIFactory {}");
+
+        $class = new \ReflectionClass(API::class);
+        $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
+        $ignoreMethods = [];
+        foreach ($methods as $method) {
+            $ignoreMethods[$method->getName()] = $method->getName();
+        }
+        \fclose($handle);
+        $handle = \fopen(\dirname(__FILE__).'/InternalDoc.php', 'w');
+
         $internalDoc = [];
         foreach ($this->methods->by_id as $id => $data) {
             if (!\strpos($data['method'], '.')) {
@@ -126,12 +137,15 @@ class AnnotationsBuilder
             }
             $internalDoc[$namespace][$method]['return'] = $type;
         }
+
         $class = new \ReflectionClass(MTProto::class);
         $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
-        foreach ($methods as $method) {
+        foreach ($methods as $key => $method) {
             $name = $method->getName();
             if ($method == 'method_call_async_read') {
                 unset($methods[\array_search('method_call', $methods)]);
+            } elseif (\strpos($name, '__') === 0) {
+                unset($methods[$key]);
             } elseif (\stripos($name, 'async') !== false) {
                 if (\strpos($name, '_async') !== false) {
                     unset($methods[\array_search(\str_ireplace('_async', '', $method), $methods)]);
@@ -142,7 +156,13 @@ class AnnotationsBuilder
         }
         foreach ($methods as $method) {
             $name = $method->getName();
+            if (isset($ignoreMethods[$name])) {
+                continue;
+            }
             $originalName = $name;
+            if ($originalName === 'loop_async') {
+                $originalName = 'loop';
+            }
 
             if ($name == 'method_call_async_read') {
                 $name = 'method_call';
@@ -153,13 +173,15 @@ class AnnotationsBuilder
                     $name = \str_ireplace('async', '', $name);
                 }
             }
-            $name = \strpos($name, '__') === 0 ? $name : Tools::from_snake_case($name);
+            $name = Tools::from_snake_case($name);
+            $name = \str_ireplace(['mtproto', 'api'], ['MTProto', 'API'], $name);
 
             $doc = 'public function ';
             $doc .= $name;
 
             $doc .= '(';
             $paramList = '';
+            $hasVariadic = false;
             foreach ($method->getParameters() as $param) {
                 if ($param->allowsNull()) {
                     //$doc .= '?';
@@ -167,6 +189,9 @@ class AnnotationsBuilder
                 if ($type = $param->getType()) {
                     if ($type->allowsNull()) {
                         $doc .= '?';
+                    }
+                    if (!$type->isBuiltin()) {
+                        $doc .= '\\';
                     }
                     $doc .= $type->getName();
                     $doc .= ' ';
@@ -182,14 +207,18 @@ class AnnotationsBuilder
                 if ($param->isOptional() && !$param->isVariadic()) {
                     $doc .= ' = ';
                     if ($param->isDefaultValueConstant()) {
-                        $doc .= str_replace(['NULL', 'self'], ['null', 'MTProto'], $param->getDefaultValueConstantName());
+                        $doc .= \str_replace(['NULL', 'self'], ['null', 'MTProto'], $param->getDefaultValueConstantName());
                     } else {
-                        $doc .= str_replace('NULL', 'null', var_export($param->getDefaultValue(), true));
+                        $doc .= \str_replace('NULL', 'null', \var_export($param->getDefaultValue(), true));
                     }
                 }
                 $doc .= ', ';
 
 
+                if ($param->isVariadic()) {
+                    $hasVariadic = true;
+                    $paramList .= '...';
+                }
                 $paramList .= '$'.$param->getName().', ';
             }
             $doc = \rtrim($doc, ', ');
@@ -202,8 +231,10 @@ class AnnotationsBuilder
                 }
                 $doc .= $type->getName();
             }
+            $paramList = $hasVariadic ? "Tools::arr($paramList)" : "[$paramList]";
+
             $doc .= "\n{\n";
-            $doc .= "    return \$this->__call('$originalName', [$paramList]);\n";
+            $doc .= "    return \$this->__call('$originalName', $paramList);\n";
             $doc .= "}\n";
 
             $internalDoc['InternalDoc'][$name]['method'] = $method->getDocComment() ?? '';

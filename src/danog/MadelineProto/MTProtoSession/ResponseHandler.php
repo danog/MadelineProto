@@ -21,7 +21,6 @@ namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\Loop;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\TL\PrettyException;
 
 /**
  * Manages responses.
@@ -309,11 +308,11 @@ trait ResponseHandler
     }
 
     /**
-     * Reject request with exception
+     * Reject request with exception.
      *
      * @param array      $request Request
      * @param \Throwable $data    Exception
-     * 
+     *
      * @return void
      */
     public function handle_reject(array &$request, \Throwable $data)

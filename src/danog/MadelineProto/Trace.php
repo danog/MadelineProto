@@ -20,24 +20,24 @@
 namespace danog\MadelineProto;
 
 /**
- * Represents a piece of a coroutine stack trace
+ * Represents a piece of a coroutine stack trace.
  */
 class Trace
 {
     /**
-     * Next piece of the stack trace
+     * Next piece of the stack trace.
      *
      * @var Trace
      */
     private $next;
     /**
-     * Current stack trace frames
+     * Current stack trace frames.
      *
      * @var array
      */
     private $frames = [];
     /**
-     * Create trace
+     * Create trace.
      *
      * @param array $frames Current frames
      * @param self  $next   Next trace
@@ -49,17 +49,17 @@ class Trace
     }
 
     /**
-     * Get stack trace
+     * Get stack trace.
      *
      * @return array
      */
     public function getTrace(): array
     {
-        return iterator_to_array($this->getTraceGenerator());
+        return \iterator_to_array($this->getTraceGenerator());
     }
 
     /**
-     * Get stack trace
+     * Get stack trace.
      *
      * @return \Generator
      */

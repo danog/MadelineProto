@@ -450,21 +450,21 @@ trait Tools
     }
 
     /**
-     * Convert to camelCase
+     * Convert to camelCase.
      *
      * @param string $input
-     * 
+     *
      * @return string
      */
     public static function from_snake_case(string $input): string
     {
-        return lcfirst(str_replace('_', '', ucwords($input, '_')));
+        return \lcfirst(\str_replace('_', '', \ucwords($input, '_')));
     }
     /**
-     * Convert to snake_case
+     * Convert to snake_case.
      *
      * @param string $input
-     * 
+     *
      * @return string
      */
     public static function from_camel_case(string $input): string
@@ -476,5 +476,17 @@ trait Tools
         }
 
         return \implode('_', $ret);
+    }
+
+    /**
+     * Create array
+     *
+     * @param mixed ...$params Params
+     * 
+     * @return array
+     */
+    public static function arr(...$params): array
+    {
+        return $params;
     }
 }

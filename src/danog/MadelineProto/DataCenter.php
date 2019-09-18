@@ -232,12 +232,12 @@ class DataCenter
             $DoHHTTPClient = new DefaultClient(
                 $this->CookieJar,
                 new HttpSocketPool(
-                new ProxySocketPool(
+                    new ProxySocketPool(
                     function (string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null) {
                         return $this->rawConnectAsync($uri, $token, $ctx, true);
                     }
                 )
-            )
+                )
             );
             $DoHConfig = new DoHConfig(
                 [
