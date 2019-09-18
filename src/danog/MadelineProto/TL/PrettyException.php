@@ -19,23 +19,77 @@
 
 namespace danog\MadelineProto\TL;
 
+use danog\MadelineProto\Tools;
+
+/**
+ * Handle async stack traces.
+ */
 trait PrettyException
 {
-    public $tl_trace;
+    /**
+     * TL trace.
+     *
+     * @var string
+     */
+    public $tl_trace = '';
 
-    public function getTLTrace()
+    /**
+     * Method name.
+     *
+     * @var string
+     */
+    private $method = '';
+
+    /**
+     * Whether the TL trace was updated.
+     *
+     * @var boolean
+     */
+    private $updated = false;
+    /**
+     * Update TL trace.
+     *
+     * @param array $trace
+     *
+     * @return void
+     */
+    public function updateTLTrace(array $trace)
+    {
+        if (!$this->updated) {
+            $this->updated = true;
+            $this->prettify_tl($this->method, $trace);
+        }
+    }
+    /**
+     * Get TL trace.
+     *
+     * @return string
+     */
+    public function getTLTrace(): string
     {
         return $this->tl_trace;
     }
 
-    public function prettify_tl($init = '')
+    /**
+     * Generate async trace.
+     *
+     * @param string $init  Method name
+     * @param array  $trace Async trace
+     *
+     * @return void
+     */
+    public function prettify_tl(string $init = '', array $trace = null)
     {
+        $this->method = $init;
+        $previous_trace = $this->tl_trace;
+        $this->tl_trace = '';
+
         $eol = PHP_EOL;
         if (PHP_SAPI !== 'cli') {
             $eol = '<br>'.PHP_EOL;
         }
         $tl = false;
-        foreach (\array_reverse($this->getTrace()) as $k => $frame) {
+        foreach (\array_reverse($trace ?? $this->getTrace()) as $k => $frame) {
             if (isset($frame['function']) && \in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
                 if ($frame['args'][2] !== '') {
                     $this->tl_trace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:  \t".$frame['args'][2];
@@ -58,5 +112,11 @@ trait PrettyException
         }
         $this->tl_trace .= $init !== '' ? "['".$init."']" : '';
         $this->tl_trace = \implode($eol, \array_reverse(\explode($eol, $this->tl_trace)));
+
+        if ($previous_trace) {
+            $this->tl_trace .= $eol.$eol;
+            $this->tl_trace .= "Previous TL trace$eol";
+            $this->tl_trace .= $previous_trace;
+        }
     }
 }

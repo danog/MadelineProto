@@ -21,6 +21,7 @@ namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\Loop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\TL\PrettyException;
 
 /**
  * Manages responses.
@@ -307,7 +308,15 @@ trait ResponseHandler
         return $only_updates;
     }
 
-    public function handle_reject(&$request, $data)
+    /**
+     * Reject request with exception
+     *
+     * @param array      $request Request
+     * @param \Throwable $data    Exception
+     * 
+     * @return void
+     */
+    public function handle_reject(array &$request, \Throwable $data)
     {
         if (isset($request['promise']) && \is_object($request['promise'])) {
             Loop::defer(function () use (&$request, $data) {
@@ -350,11 +359,14 @@ trait ResponseHandler
                         $this->shared->getTempAuthKey()->init(true);
                     }
 
-                    if (\in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_OUTDATED', 'PERSISTENT_TIMESTAMP_INVALID'])) {
+                    if (\in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_INVALID'])) {
                         $this->got_response_for_outgoing_message_id($request_id);
                         $this->handle_reject($request, new \danog\MadelineProto\PTSException($response['error_message']));
 
                         return;
+                    }
+                    if ($response['error_message'] === 'PERSISTENT_TIMESTAMP_OUTDATED') {
+                        $response['error_code'] = 500;
                     }
                     if (\strpos($response['error_message'], 'FILE_REFERENCE_') === 0) {
                         $this->logger->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
@@ -377,7 +389,7 @@ trait ResponseHandler
 
                                 return;
                             }
-                            if (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'RPC_CALL_FAIL', 'RPC_MCGET_FAIL', 'no workers running'])) {
+                            if (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'RPC_CALL_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running'])) {
                                 Loop::delay(1 * 1000, [$this, 'method_recall'], ['message_id' => $request_id, ]);
                                 return;
                             }

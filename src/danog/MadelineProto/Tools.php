@@ -448,46 +448,4 @@ trait Tools
             $var instanceof Traversable &&
             $var instanceof Countable);
     }
-
-    /**
-     * Custom backtrace for working with generators.
-     *
-     * @param boolean $ignoreArgs Whether to ignore method arguments
-     * @param array   $trace      Trace to work with
-     *
-     * @return array
-     */
-    public static function backtrace(bool $ignoreArgs = false, array $trace = []): array
-    {
-        return \iterator_to_array(self::backtraceGenerator($ignoreArgs, $trace));
-    }
-    /**
-     * Custom backtrace for working with generators.
-     *
-     * @param boolean $ignoreArgs Whether to ignore method arguments
-     * @param array   $trace      Trace to work with
-     *
-     * @return \Generator
-     */
-    public static function backtraceGenerator(bool $ignoreArgs = false, array $trace = []): \Generator
-    {
-        $flags = DEBUG_BACKTRACE_PROVIDE_OBJECT;
-        if ($ignoreArgs) {
-            $flags |= DEBUG_BACKTRACE_IGNORE_ARGS;
-        }
-        if (!$trace) {
-            $trace = \debug_backtrace($flags);
-            \array_shift($trace);
-        }
-
-        foreach ($trace as $frame) {
-            if (isset($frame['object']) && $frame['object'] instanceof Coroutine) {
-                yield from self::backtrace($ignoreArgs, $frame['object']->getTrace($flags));
-                return;
-            }
-            //var_dump(get_class($frame['object'] ?? new class {}));
-            unset($frame['object']);
-            yield $frame;
-        }
-    }
 }

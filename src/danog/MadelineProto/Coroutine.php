@@ -44,7 +44,9 @@ use ReflectionGenerator;
  */
 final class Coroutine implements Promise, \ArrayAccess
 {
-    use Internal\Placeholder;
+    use Internal\Placeholder {
+        fail as internalFail;
+    }
     /** @var \Generator */
     private $generator;
     /** @var callable(\Throwable|null $exception, mixed $value): void */
@@ -56,41 +58,20 @@ final class Coroutine implements Promise, \ArrayAccess
     /** @var mixed Promise success value when executing next coroutine step, null at all other times. */
     private $value;
 
-    private $frames = [];
+    /**
+     * Generator trace.
+     *
+     * @var Trace
+     */
+    private $trace;
 
     /**
      * @param \Generator $generator
      */
-    public function __construct(\Generator $generator)
+    public function __construct(\Generator $generator, Trace $trace = null)
     {
-        /*
-        $this->generator = new class($generator) {
-        private $s = '';
-        private $g;
-        private $trace;
-        public function __construct($g) {
-        $this->g = $g;
-        $this->s .= spl_object_hash($this).', ';
-        }
-        public function __call($a, $args) {
-        $this->s .= "$a, ";
-        try {
-        $res = $this->g->{$a}(...$args);
-        if (is_array($res) && isset($res['my_trace'])) {
-        $this->trace = $res;
-        $res = $this->g->{$a}(...$args);
-        }
-        return $res;
-        } catch (\Throwable $e) {
-        $this->s .= $e->getMessage();
-        $this->s .= ', ';
-        var_dump($this->s, $this->trace);
-        throw $e;
-        }
-        }
-        //public function __destruct() { var_dump($this->s); }
-        };*/
         $this->generator = $generator;
+        //$this->trace = $trace ?? new Trace(\debug_backtrace());
 
         try {
             $yielded = $this->generator->current();
@@ -111,6 +92,20 @@ final class Coroutine implements Promise, \ArrayAccess
                     return;
                 }
                 if ($yielded instanceof \Generator) {
+                    /*if ($this->generator->valid()) {
+                        $reflection = new ReflectionGenerator($this->generator);
+                        $trace = new Trace(
+                            [[
+                                'file' => $reflection->getExecutingFile(),
+                                'line' => $reflection->getExecutingLine(),
+                                'function' => $reflection->getFunction()->getName(),
+                            ]],
+                            $this->trace
+                        );
+                    } else {
+                        $trace = $this->trace;
+                    }
+                    $yielded = new self($yielded, $trace);*/
                     $yielded = new self($yielded);
                 } else {
                     $yielded = $this->generator->send($yielded);
@@ -183,6 +178,17 @@ final class Coroutine implements Promise, \ArrayAccess
         $yielded->onResolve($this->onResolve);
     }
 
+    /**
+     * @param \Throwable $reason Failure reason.
+     */
+    public function fail(\Throwable $reason)
+    {
+        //if (isset(\class_uses($reason)[TL\PrettyException::class])) {
+        //$reason->updateTLTrace($this->getTrace());
+        //}
+        $this->resolve(new Failure($reason));
+    }
+
     public function offsetExists($offset): bool
     {
         throw new Exception('Not supported!');
@@ -214,12 +220,10 @@ final class Coroutine implements Promise, \ArrayAccess
     /**
      * Get stacktrace from when the generator was started.
      *
-     * @param integer $options Backtrace options
-     *
      * @return array
      */
-    public function getTrace(int $options = \DEBUG_BACKTRACE_PROVIDE_OBJECT): array
+    public function getTrace(): array
     {
-        return (new ReflectionGenerator($this->generator))->getTrace($options);
+        return $this->trace->getTrace();
     }
 }

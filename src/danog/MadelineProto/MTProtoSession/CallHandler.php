@@ -93,9 +93,12 @@ trait CallHandler
                 $deferred->fail($e);
             } else {
                 if (\is_array($read_deferred)) {
-                    $read_deferred = \array_map(function ($value) {
-                        return $value->promise();
-                    }, $read_deferred);
+                    $read_deferred = \array_map(
+                        function ($value) {
+                            return $value->promise();
+                        },
+                        $read_deferred
+                    );
                     $deferred->resolve(all($read_deferred));
                 } else {
                     $deferred->resolve($read_deferred->promise());
