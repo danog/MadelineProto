@@ -4043,7 +4043,7 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function fileGetContents($url, array $extra = []): Generator
+    public function fileGetContents($url, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$url, $extra]);
     }
@@ -4116,7 +4116,7 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$datacenter, $extra]);
     }
 
-    public function connectToAllDcs(bool $reconnectAll = true, array $extra = []): Generator
+    public function connectToAllDcs(bool $reconnectAll = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$reconnectAll, $extra]);
     }
@@ -4210,7 +4210,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator<AuthKey>
      */
-    public function createAuthKey(int $expires_in, string $datacenter, array $extra = []): Generator
+    public function createAuthKey(int $expires_in, string $datacenter, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$expires_in, $datacenter, $extra]);
     }
@@ -4243,7 +4243,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator<array>
      */
-    public function getDhConfig(array $extra = []): Generator
+    public function getDhConfig(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -4255,7 +4255,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator<bool>
      */
-    public function bindTempAuthKey(int $expires_in, string $datacenter, array $extra = []): Generator
+    public function bindTempAuthKey(int $expires_in, string $datacenter, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$expires_in, $datacenter, $extra]);
     }
@@ -4266,7 +4266,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator<string|bool>
      */
-    public function wolframSingle($what, array $extra = []): Generator
+    public function wolframSingle($what, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$what, $extra]);
     }
@@ -4275,7 +4275,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator
      */
-    public function initAuthorization(array $extra = []): Generator
+    public function initAuthorization(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -4287,7 +4287,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator
      */
-    public function initAuthorizationSocket(string $id, \danog\MadelineProto\DataCenterConnection $socket, array $extra = []): Generator
+    public function initAuthorizationSocket(string $id, \danog\MadelineProto\DataCenterConnection $socket, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $socket, $extra]);
     }
@@ -4298,7 +4298,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator
      */
-    public function syncAuthorization(string $id, array $extra = []): Generator
+    public function syncAuthorization(string $id, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
@@ -4316,7 +4316,7 @@ class InternalDoc extends APIFactory
     public function methodCall(string $method, $args = [
     ], array $aargs = [
       'msg_id' => null,
-    ], array $extra = []): Amp\Promise
+    ], array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$method, $args, $aargs, $extra]);
     }
@@ -4332,7 +4332,7 @@ class InternalDoc extends APIFactory
     public function methodCallWrite(string $method, $args = [
     ], array $aargs = [
       'msg_id' => null,
-    ], array $extra = []): Amp\Promise
+    ], array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$method, $args, $aargs, $extra]);
     }

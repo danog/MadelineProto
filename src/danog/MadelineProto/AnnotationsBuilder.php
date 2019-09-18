@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Promise;
 use phpDocumentor\Reflection\DocBlockFactory;
 
 class AnnotationsBuilder
@@ -224,7 +225,7 @@ class AnnotationsBuilder
             $doc = \rtrim($doc, ', ');
             $paramList = \rtrim($paramList, ', ');
             $doc .= ")";
-            if ($type = $method->getReturnType()) {
+            if (($type = $method->getReturnType()) && !\in_array($type->getName(), [\Generator::class, Promise::class])) {
                 $doc .= ': ';
                 if ($type->allowsNull()) {
                     $doc .= '?';
