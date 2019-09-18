@@ -479,10 +479,10 @@ trait Tools
     }
 
     /**
-     * Create array
+     * Create array.
      *
      * @param mixed ...$params Params
-     * 
+     *
      * @return array
      */
     public static function arr(...$params): array

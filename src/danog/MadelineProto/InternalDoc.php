@@ -10,14 +10,14 @@ namespace danog\MadelineProto;
 interface auth
 {
     /**
-     * Use phone_login instead
+     * Use phone_login instead.
      *
-     * Parameters: 
-     * * `string`       **phone_number** - Use phone_login instead                                                                                                   
-     * * `int`          **api_id**       - Use phone_login instead                                                                                                   
-     * * `string`       **api_hash**     - Use phone_login instead                                                                                                   
+     * Parameters:
+     * * `string`       **phone_number** - Use phone_login instead
+     * * `int`          **api_id**       - Use phone_login instead
+     * * `string`       **api_hash**     - Use phone_login instead
      * * `CodeSettings` **settings**     - You cannot use this method directly, use the phone_login method instead (see https://docs.madelineproto.xyz for more info)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return auth.SentCode
@@ -25,14 +25,14 @@ interface auth
     public function sendCode($params);
 
     /**
-     * You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
+     * You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info).
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **phone_number**    - You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
      * * `string` **phone_code_hash** - You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
      * * `string` **first_name**      - You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
      * * `string` **last_name**       - You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return auth.Authorization
@@ -40,13 +40,13 @@ interface auth
     public function signUp($params);
 
     /**
-     * You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)
+     * You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info).
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **phone_number**    - You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)
      * * `string` **phone_code_hash** - You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)
      * * `string` **phone_code**      - You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return auth.Authorization
@@ -54,7 +54,7 @@ interface auth
     public function signIn($params);
 
     /**
-     * You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info)
+     * You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info).
      *
      * @return bool
      */
@@ -68,11 +68,11 @@ interface auth
     public function resetAuthorizations();
 
     /**
-     * You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html.
      *
-     * Parameters: 
+     * Parameters:
      * * `int` **dc_id** - You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
-     * 
+     *
      * @param array $params Parameters
      *
      * @return auth.ExportedAuthorization
@@ -80,12 +80,12 @@ interface auth
     public function exportAuthorization($params);
 
     /**
-     * You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html.
      *
-     * Parameters: 
+     * Parameters:
      * * `int`   **id**    - You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
      * * `bytes` **bytes** - You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
-     * 
+     *
      * @param array $params Parameters
      *
      * @return auth.Authorization
@@ -93,14 +93,14 @@ interface auth
     public function importAuthorization($params);
 
     /**
-     * You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
+     * You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info.
      *
-     * Parameters: 
+     * Parameters:
      * * `long`  **perm_auth_key_id**  - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
      * * `long`  **nonce**             - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
      * * `int`   **expires_at**        - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
      * * `bytes` **encrypted_message** - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -108,13 +108,13 @@ interface auth
     public function bindTempAuthKey($params);
 
     /**
-     * You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)
+     * You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info).
      *
-     * Parameters: 
+     * Parameters:
      * * `int`    **api_id**         - You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)
      * * `string` **api_hash**       - You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)
      * * `string` **bot_auth_token** - You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return auth.Authorization
@@ -122,11 +122,11 @@ interface auth
     public function importBotAuthorization($params);
 
     /**
-     * You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)
+     * You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info).
      *
-     * Parameters: 
+     * Parameters:
      * * `InputCheckPasswordSRP` **password** - You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return auth.Authorization
@@ -134,18 +134,18 @@ interface auth
     public function checkPassword($params);
 
     /**
-     * Send an email to recover the 2FA password
+     * Send an email to recover the 2FA password.
      *
      * @return auth.PasswordRecovery
      */
     public function requestPasswordRecovery();
 
     /**
-     * Use the code that was emailed to you after running $MadelineProto->auth->requestPasswordRecovery to login to your account
+     * Use the code that was emailed to you after running $MadelineProto->auth->requestPasswordRecovery to login to your account.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **code** - The code that was emailed to you
-     * 
+     *
      * @param array $params Parameters
      *
      * @return auth.Authorization
@@ -153,12 +153,12 @@ interface auth
     public function recoverPassword($params);
 
     /**
-     * Resend the SMS verification code
+     * Resend the SMS verification code.
      *
-     * Parameters: 
-     * * `string` **phone_number**    - The phone number   
+     * Parameters:
+     * * `string` **phone_number**    - The phone number
      * * `string` **phone_code_hash** - The phone code hash
-     * 
+     *
      * @param array $params Parameters
      *
      * @return auth.SentCode
@@ -166,12 +166,12 @@ interface auth
     public function resendCode($params);
 
     /**
-     * Invalidate sent phone code
+     * Invalidate sent phone code.
      *
-     * Parameters: 
-     * * `string` **phone_number**    - Phone number   
+     * Parameters:
+     * * `string` **phone_number**    - Phone number
      * * `string` **phone_code_hash** - Phone code hash
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -179,11 +179,11 @@ interface auth
     public function cancelCode($params);
 
     /**
-     * Delete all temporary authorization keys except the ones provided
+     * Delete all temporary authorization keys except the ones provided.
      *
-     * Parameters: 
+     * Parameters:
      * * `[long]` **except_auth_keys** - The temporary authorization keys to keep
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -194,16 +194,16 @@ interface auth
 interface account
 {
     /**
-     * Register device for push notifications
+     * Register device for push notifications.
      *
-     * Parameters: 
-     * * `boolean` **no_muted**    - Optional: Idk yet                                                                                                                                                            
+     * Parameters:
+     * * `boolean` **no_muted**    - Optional: Idk yet
      * * `int`     **token_type**  - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone, 6 - Blackberry, and other, see source code of official apps for more info
-     * * `string`  **token**       - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info 
-     * * `Bool`    **app_sandbox** - Should the app run in a sandbox?                                                                                                                                             
-     * * `bytes`   **secret**      - Secret                                                                                                                                                                       
-     * * `[int]`   **other_uids**  - Other UIDs                                                                                                                                                                   
-     * 
+     * * `string`  **token**       - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info
+     * * `Bool`    **app_sandbox** - Should the app run in a sandbox?
+     * * `bytes`   **secret**      - Secret
+     * * `[int]`   **other_uids**  - Other UIDs
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -211,13 +211,13 @@ interface account
     public function registerDevice($params);
 
     /**
-     * Stop sending PUSH notifications to app
+     * Stop sending PUSH notifications to app.
      *
-     * Parameters: 
+     * Parameters:
      * * `int`    **token_type** - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info
      * * `string` **token**      - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info
-     * * `[int]`  **other_uids** - Other UIDs                                                                                                                                                                  
-     * 
+     * * `[int]`  **other_uids** - Other UIDs
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -225,12 +225,12 @@ interface account
     public function unregisterDevice($params);
 
     /**
-     * Change notification settings
+     * Change notification settings.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputNotifyPeer`         **peer**     - The peers to which the notification settings should be applied
-     * * `InputPeerNotifySettings` **settings** - Notification settings                                         
-     * 
+     * * `InputPeerNotifySettings` **settings** - Notification settings
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -238,11 +238,11 @@ interface account
     public function updateNotifySettings($params);
 
     /**
-     * Get notification settings
+     * Get notification settings.
      *
-     * Parameters: 
-     * * `InputNotifyPeer` **peer** - Notification source 
-     * 
+     * Parameters:
+     * * `InputNotifyPeer` **peer** - Notification source
+     *
      * @param array $params Parameters
      *
      * @return PeerNotifySettings
@@ -250,20 +250,20 @@ interface account
     public function getNotifySettings($params);
 
     /**
-     * Reset all notification settings
+     * Reset all notification settings.
      *
      * @return bool
      */
     public function resetNotifySettings();
 
     /**
-     * Update profile info
+     * Update profile info.
      *
-     * Parameters: 
-     * * `string` **first_name** - Optional: The first name     
-     * * `string` **last_name**  - Optional: The last name      
+     * Parameters:
+     * * `string` **first_name** - Optional: The first name
+     * * `string` **last_name**  - Optional: The last name
      * * `string` **about**      - Optional: The bio/about field
-     * 
+     *
      * @param array $params Parameters
      *
      * @return User
@@ -271,11 +271,11 @@ interface account
     public function updateProfile($params);
 
     /**
-     * Update online status
+     * Update online status.
      *
-     * Parameters: 
+     * Parameters:
      * * `Bool` **offline** - True to set the status to offline
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -285,9 +285,9 @@ interface account
     /**
      * Returns a list of available wallpapers.
      *
-     * Parameters: 
+     * Parameters:
      * * `[int]` **hash** - Optional: IDs of previously fetched wallpapers
-     * 
+     *
      * @param array $params Parameters
      *
      * @return account.WallPapers
@@ -295,12 +295,12 @@ interface account
     public function getWallPapers($params);
 
     /**
-     * Report for spam
+     * Report for spam.
      *
-     * Parameters: 
-     * * `InputPeer`    **peer**   - The peer to report             
+     * Parameters:
+     * * `InputPeer`    **peer**   - The peer to report
      * * `ReportReason` **reason** - Why are you reporting this peer
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -308,11 +308,11 @@ interface account
     public function reportPeer($params);
 
     /**
-     * Check if this username is available
+     * Check if this username is available.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **username** - The username to check
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -320,11 +320,11 @@ interface account
     public function checkUsername($params);
 
     /**
-     * Update this user's username
+     * Update this user's username.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **username** - The new username
-     * 
+     *
      * @param array $params Parameters
      *
      * @return User
@@ -332,11 +332,11 @@ interface account
     public function updateUsername($params);
 
     /**
-     * Get privacy settings
+     * Get privacy settings.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPrivacyKey` **key** - Privacy setting key
-     * 
+     *
      * @param array $params Parameters
      *
      * @return account.PrivacyRules
@@ -344,12 +344,12 @@ interface account
     public function getPrivacy($params);
 
     /**
-     * Set privacy settings
+     * Set privacy settings.
      *
-     * Parameters: 
-     * * `InputPrivacyKey`    **key**   - Privacy setting 
+     * Parameters:
+     * * `InputPrivacyKey`    **key**   - Privacy setting
      * * `[InputPrivacyRule]` **rules** - Privacy settings
-     * 
+     *
      * @param array $params Parameters
      *
      * @return account.PrivacyRules
@@ -357,11 +357,11 @@ interface account
     public function setPrivacy($params);
 
     /**
-     * Delete this account
+     * Delete this account.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **reason** - Why are you going away? :(
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -369,18 +369,18 @@ interface account
     public function deleteAccount($params);
 
     /**
-     * Get account TTL
+     * Get account TTL.
      *
      * @return AccountDaysTTL
      */
     public function getAccountTTL();
 
     /**
-     * Set account TTL
+     * Set account TTL.
      *
-     * Parameters: 
+     * Parameters:
      * * `AccountDaysTTL` **ttl** - Time To Live of account
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -388,12 +388,12 @@ interface account
     public function setAccountTTL($params);
 
     /**
-     * Change the phone number
+     * Change the phone number.
      *
-     * Parameters: 
+     * Parameters:
      * * `string`       **phone_number** - New phone number
-     * * `CodeSettings` **settings**     - Code settings   
-     * 
+     * * `CodeSettings` **settings**     - Code settings
+     *
      * @param array $params Parameters
      *
      * @return auth.SentCode
@@ -401,13 +401,13 @@ interface account
     public function sendChangePhoneCode($params);
 
     /**
-     * Change the phone number associated to this account
+     * Change the phone number associated to this account.
      *
-     * Parameters: 
-     * * `string` **phone_number**    - Phone number                                           
+     * Parameters:
+     * * `string` **phone_number**    - Phone number
      * * `string` **phone_code_hash** - Phone code hash returned by account.sendChangePhoneCode
-     * * `string` **phone_code**      - The phone code sent by account.sendChangePhoneCode     
-     * 
+     * * `string` **phone_code**      - The phone code sent by account.sendChangePhoneCode
+     *
      * @param array $params Parameters
      *
      * @return User
@@ -415,11 +415,11 @@ interface account
     public function changePhone($params);
 
     /**
-     * Disable all notifications for a certain period
+     * Disable all notifications for a certain period.
      *
-     * Parameters: 
+     * Parameters:
      * * `int` **period** - For how long should notifications be disabled
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -427,18 +427,18 @@ interface account
     public function updateDeviceLocked($params);
 
     /**
-     * Get all logged-in authorizations
+     * Get all logged-in authorizations.
      *
      * @return account.Authorizations
      */
     public function getAuthorizations();
 
     /**
-     * Delete a certain session
+     * Delete a certain session.
      *
-     * Parameters: 
+     * Parameters:
      * * `long` **hash** - The session hash, obtained from $MadelineProto->account->getAuthorizations
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -446,18 +446,18 @@ interface account
     public function resetAuthorization($params);
 
     /**
-     * Get the current password
+     * Get the current password.
      *
      * @return account.Password
      */
     public function getPassword();
 
     /**
-     * Get the current 2FA settings
+     * Get the current 2FA settings.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputCheckPasswordSRP` **password** - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return account.PasswordSettings
@@ -465,12 +465,12 @@ interface account
     public function getPasswordSettings($params);
 
     /**
-     * You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
+     * You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info).
      *
-     * Parameters: 
+     * Parameters:
      * * `InputCheckPasswordSRP`         **password**     - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
-     * * `account_PasswordInputSettings` **new_settings** - New 2FA settings                                                                                                                        
-     * 
+     * * `account_PasswordInputSettings` **new_settings** - New 2FA settings
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -478,12 +478,12 @@ interface account
     public function updatePasswordSettings($params);
 
     /**
-     * Send confirmation phone code
+     * Send confirmation phone code.
      *
-     * Parameters: 
-     * * `string`       **hash**     - The hash     
+     * Parameters:
+     * * `string`       **hash**     - The hash
      * * `CodeSettings` **settings** - Code settings
-     * 
+     *
      * @param array $params Parameters
      *
      * @return auth.SentCode
@@ -491,12 +491,12 @@ interface account
     public function sendConfirmPhoneCode($params);
 
     /**
-     * Confirm this phone number is associated to this account, obtain phone_code_hash from sendConfirmPhoneCode
+     * Confirm this phone number is associated to this account, obtain phone_code_hash from sendConfirmPhoneCode.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **phone_code_hash** - Obtain phone_code_hash from sendConfirmPhoneCode
-     * * `string` **phone_code**      - The code sent by sendConfirmPhoneCode           
-     * 
+     * * `string` **phone_code**      - The code sent by sendConfirmPhoneCode
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -504,12 +504,12 @@ interface account
     public function confirmPhone($params);
 
     /**
-     * Get temporary password for buying products through bots
+     * Get temporary password for buying products through bots.
      *
-     * Parameters: 
-     * * `InputCheckPasswordSRP` **password** - Password           
+     * Parameters:
+     * * `InputCheckPasswordSRP` **password** - Password
      * * `int`                   **period**   - The validity period
-     * 
+     *
      * @param array $params Parameters
      *
      * @return account.TmpPassword
@@ -517,18 +517,18 @@ interface account
     public function getTmpPassword($params);
 
     /**
-     * Get telegram web login authorizations
+     * Get telegram web login authorizations.
      *
      * @return account.WebAuthorizations
      */
     public function getWebAuthorizations();
 
     /**
-     * Delete a certain telegram web login authorization
+     * Delete a certain telegram web login authorization.
      *
-     * Parameters: 
+     * Parameters:
      * * `long` **hash** - The authorization's hash
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -536,25 +536,25 @@ interface account
     public function resetWebAuthorization($params);
 
     /**
-     * Reset all telegram web login authorizations
+     * Reset all telegram web login authorizations.
      *
      * @return bool
      */
     public function resetWebAuthorizations();
 
     /**
-     * Get all secure telegram passport values
+     * Get all secure telegram passport values.
      *
      * @return _of_SecureValue[]
      */
     public function getAllSecureValues();
 
     /**
-     * Get secure value for telegram passport
+     * Get secure value for telegram passport.
      *
-     * Parameters: 
+     * Parameters:
      * * `[SecureValueType]` **types** - Get telegram passport secure parameters
-     * 
+     *
      * @param array $params Parameters
      *
      * @return _of_SecureValue[]
@@ -562,12 +562,12 @@ interface account
     public function getSecureValue($params);
 
     /**
-     * Save telegram passport secure value
+     * Save telegram passport secure value.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputSecureValue` **value**            - Encrypted value
-     * * `long`             **secure_secret_id** - Secret         
-     * 
+     * * `long`             **secure_secret_id** - Secret
+     *
      * @param array $params Parameters
      *
      * @return SecureValue
@@ -575,11 +575,11 @@ interface account
     public function saveSecureValue($params);
 
     /**
-     * Delete secure telegram passport value
+     * Delete secure telegram passport value.
      *
-     * Parameters: 
+     * Parameters:
      * * `[SecureValueType]` **types** - The values to delete
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -587,13 +587,13 @@ interface account
     public function deleteSecureValue($params);
 
     /**
-     * Bots only: get telegram passport authorization form
+     * Bots only: get telegram passport authorization form.
      *
-     * Parameters: 
-     * * `int`    **bot_id**     - Bot ID          
-     * * `string` **scope**      - Scope           
+     * Parameters:
+     * * `int`    **bot_id**     - Bot ID
+     * * `string` **scope**      - Scope
      * * `string` **public_key** - Bot's public key
-     * 
+     *
      * @param array $params Parameters
      *
      * @return account.AuthorizationForm
@@ -601,15 +601,15 @@ interface account
     public function getAuthorizationForm($params);
 
     /**
-     * Accept telegram passport authorization
+     * Accept telegram passport authorization.
      *
-     * Parameters: 
-     * * `int`                        **bot_id**       - Bot ID                             
-     * * `string`                     **scope**        - Scope                              
-     * * `string`                     **public_key**   - The bot's RSA public key           
+     * Parameters:
+     * * `int`                        **bot_id**       - Bot ID
+     * * `string`                     **scope**        - Scope
+     * * `string`                     **public_key**   - The bot's RSA public key
      * * `[SecureValueHash]`          **value_hashes** - Hashes of the encrypted credentials
-     * * `SecureCredentialsEncrypted` **credentials**  - Encrypted secure credentials       
-     * 
+     * * `SecureCredentialsEncrypted` **credentials**  - Encrypted secure credentials
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -617,12 +617,12 @@ interface account
     public function acceptAuthorization($params);
 
     /**
-     * Send phone verification code
+     * Send phone verification code.
      *
-     * Parameters: 
+     * Parameters:
      * * `string`       **phone_number** - The phone number
-     * * `CodeSettings` **settings**     - Code settings   
-     * 
+     * * `CodeSettings` **settings**     - Code settings
+     *
      * @param array $params Parameters
      *
      * @return auth.SentCode
@@ -630,13 +630,13 @@ interface account
     public function sendVerifyPhoneCode($params);
 
     /**
-     * Verify phone number
+     * Verify phone number.
      *
-     * Parameters: 
-     * * `string` **phone_number**    - The phone number                                           
+     * Parameters:
+     * * `string` **phone_number**    - The phone number
      * * `string` **phone_code_hash** - The phone code hash returned by account.sendVerifyPhoneCode
      * * `string` **phone_code**      - The phone code type returned by account.sendVerifyPhoneCode
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -644,11 +644,11 @@ interface account
     public function verifyPhone($params);
 
     /**
-     * Send email verification code
+     * Send email verification code.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **email** - Email
-     * 
+     *
      * @param array $params Parameters
      *
      * @return account.SentEmailCode
@@ -656,12 +656,12 @@ interface account
     public function sendVerifyEmailCode($params);
 
     /**
-     * Verify email address
+     * Verify email address.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **email** - The email address
      * * `string` **code**  - The received code
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -669,17 +669,17 @@ interface account
     public function verifyEmail($params);
 
     /**
-     * Start account exporting session
+     * Start account exporting session.
      *
-     * Parameters: 
-     * * `boolean` **contacts**           - Optional: Export contacts?                        
-     * * `boolean` **message_users**      - Optional: Export users?                           
-     * * `boolean` **message_chats**      - Optional: Export chats?                           
-     * * `boolean` **message_megagroups** - Optional: Export supergroups?                     
-     * * `boolean` **message_channels**   - Optional: Export channel messages?                
-     * * `boolean` **files**              - Optional: Export files?                           
+     * Parameters:
+     * * `boolean` **contacts**           - Optional: Export contacts?
+     * * `boolean` **message_users**      - Optional: Export users?
+     * * `boolean` **message_chats**      - Optional: Export chats?
+     * * `boolean` **message_megagroups** - Optional: Export supergroups?
+     * * `boolean` **message_channels**   - Optional: Export channel messages?
+     * * `boolean` **files**              - Optional: Export files?
      * * `int`     **file_max_size**      - Optional: Export only files smaller than this size
-     * 
+     *
      * @param array $params Parameters
      *
      * @return account.Takeout
@@ -687,11 +687,11 @@ interface account
     public function initTakeoutSession($params);
 
     /**
-     * Finish account exporting session
+     * Finish account exporting session.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean` **success** - Optional: Did the data export succeed?
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -699,11 +699,11 @@ interface account
     public function finishTakeoutSession($params);
 
     /**
-     * Confirm password recovery using email
+     * Confirm password recovery using email.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **code** - Code
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -711,32 +711,32 @@ interface account
     public function confirmPasswordEmail($params);
 
     /**
-     * Resend password recovery email
+     * Resend password recovery email.
      *
      * @return bool
      */
     public function resendPasswordEmail();
 
     /**
-     * Cancel password recovery email
+     * Cancel password recovery email.
      *
      * @return bool
      */
     public function cancelPasswordEmail();
 
     /**
-     * Contact signup notification setting value
+     * Contact signup notification setting value.
      *
      * @return bool
      */
     public function getContactSignUpNotification();
 
     /**
-     * Set contact sign up notification
+     * Set contact sign up notification.
      *
-     * Parameters: 
+     * Parameters:
      * * `Bool` **silent** - Silent?
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -744,12 +744,12 @@ interface account
     public function setContactSignUpNotification($params);
 
     /**
-     * Get notification exceptions
+     * Get notification exceptions.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`         **compare_sound** - Optional: Compare sound?
-     * * `InputNotifyPeer` **peer**          - Optional: Peer          
-     * 
+     * * `InputNotifyPeer` **peer**          - Optional: Peer
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -757,11 +757,11 @@ interface account
     public function getNotifyExceptions($params);
 
     /**
-     * Get wallpaper info
+     * Get wallpaper info.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputWallPaper` **wallpaper** - Wallpaper
-     * 
+     *
      * @param array $params Parameters
      *
      * @return WallPaper
@@ -769,13 +769,13 @@ interface account
     public function getWallPaper($params);
 
     /**
-     * Upload wallpaper
+     * Upload wallpaper.
      *
-     * Parameters: 
-     * * `InputFile`         **file**      - Image             
-     * * `string`            **mime_type** - Mime type         
+     * Parameters:
+     * * `InputFile`         **file**      - Image
+     * * `string`            **mime_type** - Mime type
      * * `WallPaperSettings` **settings**  - Wallpaper settings
-     * 
+     *
      * @param array $params Parameters
      *
      * @return WallPaper
@@ -783,13 +783,13 @@ interface account
     public function uploadWallPaper($params);
 
     /**
-     * Save wallpaper
+     * Save wallpaper.
      *
-     * Parameters: 
-     * * `InputWallPaper`    **wallpaper** - The wallpaper to save 
+     * Parameters:
+     * * `InputWallPaper`    **wallpaper** - The wallpaper to save
      * * `Bool`              **unsave**    - Delete saved wallpaper
-     * * `WallPaperSettings` **settings**  - The wallpaper to save 
-     * 
+     * * `WallPaperSettings` **settings**  - The wallpaper to save
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -797,12 +797,12 @@ interface account
     public function saveWallPaper($params);
 
     /**
-     * Install wallpaper
+     * Install wallpaper.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputWallPaper`    **wallpaper** - Wallpaper to install
-     * * `WallPaperSettings` **settings**  - Wallpaper settings  
-     * 
+     * * `WallPaperSettings` **settings**  - Wallpaper settings
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -810,27 +810,27 @@ interface account
     public function installWallPaper($params);
 
     /**
-     * Reset wallpapers
+     * Reset wallpapers.
      *
      * @return bool
      */
     public function resetWallPapers();
 
     /**
-     * Get autodownload settings
+     * Get autodownload settings.
      *
      * @return account.AutoDownloadSettings
      */
     public function getAutoDownloadSettings();
 
     /**
-     * Save autodownload settings
+     * Save autodownload settings.
      *
-     * Parameters: 
-     * * `boolean`              **low**      - Optional: Low preset 
+     * Parameters:
+     * * `boolean`              **low**      - Optional: Low preset
      * * `boolean`              **high**     - Optional: High preset
      * * `AutoDownloadSettings` **settings** - Autodownload settings
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -838,14 +838,14 @@ interface account
     public function saveAutoDownloadSettings($params);
 
     /**
-     * Upload theme
+     * Upload theme.
      *
-     * Parameters: 
-     * * `InputFile` **file**      - File           
+     * Parameters:
+     * * `InputFile` **file**      - File
      * * `InputFile` **thumb**     - Optional: Thumb
-     * * `string`    **file_name** - File name      
-     * * `string`    **mime_type** - Mime type      
-     * 
+     * * `string`    **file_name** - File name
+     * * `string`    **mime_type** - Mime type
+     *
      * @param array $params Parameters
      *
      * @return Document
@@ -853,13 +853,13 @@ interface account
     public function uploadTheme($params);
 
     /**
-     * Create a theme
+     * Create a theme.
      *
-     * Parameters: 
+     * Parameters:
      * * `string`        **slug**     - Unique theme ID
-     * * `string`        **title**    - Theme name     
-     * * `InputDocument` **document** - Theme file     
-     * 
+     * * `string`        **title**    - Theme name
+     * * `InputDocument` **document** - Theme file
+     *
      * @param array $params Parameters
      *
      * @return Theme
@@ -867,15 +867,15 @@ interface account
     public function createTheme($params);
 
     /**
-     * Update theme
+     * Update theme.
      *
-     * Parameters: 
+     * Parameters:
      * * `string`        **format**   - Theme format, a string that identifies the theming engines supported by the client
-     * * `InputTheme`    **theme**    - Theme to update                                                                   
-     * * `string`        **slug**     - Optional: Unique theme ID                                                         
-     * * `string`        **title**    - Optional: Theme name                                                              
-     * * `InputDocument` **document** - Optional: Theme file                                                              
-     * 
+     * * `InputTheme`    **theme**    - Theme to update
+     * * `string`        **slug**     - Optional: Unique theme ID
+     * * `string`        **title**    - Optional: Theme name
+     * * `InputDocument` **document** - Optional: Theme file
+     *
      * @param array $params Parameters
      *
      * @return Theme
@@ -883,12 +883,12 @@ interface account
     public function updateTheme($params);
 
     /**
-     * Save theme
+     * Save theme.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputTheme` **theme**  - Theme to save
-     * * `Bool`       **unsave** - Unsave       
-     * 
+     * * `Bool`       **unsave** - Unsave
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -896,13 +896,13 @@ interface account
     public function saveTheme($params);
 
     /**
-     * Install theme
+     * Install theme.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`    **dark**   - Optional: Whether to install the dark version
-     * * `string`     **format** - Optional: Format                             
-     * * `InputTheme` **theme**  - Optional: Theme to install                   
-     * 
+     * * `string`     **format** - Optional: Format
+     * * `InputTheme` **theme**  - Optional: Theme to install
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -910,13 +910,13 @@ interface account
     public function installTheme($params);
 
     /**
-     * Get theme information
+     * Get theme information.
      *
-     * Parameters: 
+     * Parameters:
      * * `string`     **format**      - Theme format, a string that identifies the theming engines supported by the client
-     * * `InputTheme` **theme**       - Theme                                                                             
-     * * `long`       **document_id** - Document ID                                                                       
-     * 
+     * * `InputTheme` **theme**       - Theme
+     * * `long`       **document_id** - Document ID
+     *
      * @param array $params Parameters
      *
      * @return Theme
@@ -924,12 +924,12 @@ interface account
     public function getTheme($params);
 
     /**
-     * Get installed themes
+     * Get installed themes.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **format** - Theme format, a string that identifies the theming engines supported by the client
-     * * `[int]`  **hash**   - Optional: Hash for pagination                                                     
-     * 
+     * * `[int]`  **hash**   - Optional: Hash for pagination
+     *
      * @param array $params Parameters
      *
      * @return account.Themes
@@ -940,11 +940,11 @@ interface account
 interface users
 {
     /**
-     * Get info about users
+     * Get info about users.
      *
-     * Parameters: 
+     * Parameters:
      * * `[InputUser]` **id** - The ids of the users
-     * 
+     *
      * @param array $params Parameters
      *
      * @return _of_User[]
@@ -952,11 +952,11 @@ interface users
     public function getUsers($params);
 
     /**
-     * You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     * You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info).
      *
-     * Parameters: 
+     * Parameters:
      * * `InputUser` **id** - You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return UserFull
@@ -964,12 +964,12 @@ interface users
     public function getFullUser($params);
 
     /**
-     * Set secure value error for telegram passport
+     * Set secure value error for telegram passport.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputUser`          **id**     - The user ID
-     * * `[SecureValueError]` **errors** - The errors 
-     * 
+     * * `[SecureValueError]` **errors** - The errors
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -980,11 +980,11 @@ interface users
 interface contacts
 {
     /**
-     * Get contacts by IDs
+     * Get contacts by IDs.
      *
-     * Parameters: 
+     * Parameters:
      * * `[int]` **hash** - Optional: Previously fetched IDs
-     * 
+     *
      * @param array $params Parameters
      *
      * @return _of_int[]
@@ -992,18 +992,18 @@ interface contacts
     public function getContactIDs($params);
 
     /**
-     * Get online status of all users
+     * Get online status of all users.
      *
      * @return _of_ContactStatus[]
      */
     public function getStatuses();
 
     /**
-     * Get all contacts
+     * Get all contacts.
      *
-     * Parameters: 
+     * Parameters:
      * * `[int]` **hash** - Optional: User IDs of previously cached contacts
-     * 
+     *
      * @param array $params Parameters
      *
      * @return contacts.Contacts
@@ -1011,11 +1011,11 @@ interface contacts
     public function getContacts($params);
 
     /**
-     * Add phone number as contact
+     * Add phone number as contact.
      *
-     * Parameters: 
+     * Parameters:
      * * `[InputContact]` **contacts** - The numbers to import
-     * 
+     *
      * @param array $params Parameters
      *
      * @return contacts.ImportedContacts
@@ -1023,11 +1023,11 @@ interface contacts
     public function importContacts($params);
 
     /**
-     * Delete multiple contacts
+     * Delete multiple contacts.
      *
-     * Parameters: 
+     * Parameters:
      * * `[InputUser]` **id** - The contacts to delete
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1035,11 +1035,11 @@ interface contacts
     public function deleteContacts($params);
 
     /**
-     * Delete contacts by phones
+     * Delete contacts by phones.
      *
-     * Parameters: 
+     * Parameters:
      * * `[string]` **phones** - Phones
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1047,11 +1047,11 @@ interface contacts
     public function deleteByPhones($params);
 
     /**
-     * Block a user
+     * Block a user.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputUser` **id** - The user to block
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1059,11 +1059,11 @@ interface contacts
     public function block($params);
 
     /**
-     * Unblock a user
+     * Unblock a user.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputUser` **id** - The user to unblock
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1071,12 +1071,12 @@ interface contacts
     public function unblock($params);
 
     /**
-     * Get blocked users
+     * Get blocked users.
      *
-     * Parameters: 
+     * Parameters:
      * * `int` **offset** - Initially 0, then set to the number of blocked contacts previously fetched
-     * * `int` **limit**  - How many blocked contacts to fetch                                        
-     * 
+     * * `int` **limit**  - How many blocked contacts to fetch
+     *
      * @param array $params Parameters
      *
      * @return contacts.Blocked
@@ -1084,12 +1084,12 @@ interface contacts
     public function getBlocked($params);
 
     /**
-     * Search contacts
+     * Search contacts.
      *
-     * Parameters: 
-     * * `string` **q**     - The search query                   
+     * Parameters:
+     * * `string` **q**     - The search query
      * * `int`    **limit** - How many results should be returned
-     * 
+     *
      * @param array $params Parameters
      *
      * @return contacts.Found
@@ -1097,11 +1097,11 @@ interface contacts
     public function search($params);
 
     /**
-     * You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     * You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info).
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **username** - You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return contacts.ResolvedPeer
@@ -1109,21 +1109,21 @@ interface contacts
     public function resolveUsername($params);
 
     /**
-     * Get most used chats
+     * Get most used chats.
      *
-     * Parameters: 
-     * * `boolean` **correspondents** - Optional: Fetch users?                                                   
-     * * `boolean` **bots_pm**        - Optional: Fetch bots?                                                    
-     * * `boolean` **bots_inline**    - Optional: Fetch inline bots?                                             
-     * * `boolean` **phone_calls**    - Optional: Fetch phone calls?                                             
-     * * `boolean` **forward_users**  - Optional: Forward users?                                                 
-     * * `boolean` **forward_chats**  - Optional: Forward chats?                                                 
-     * * `boolean` **groups**         - Optional: Fetch groups?                                                  
-     * * `boolean` **channels**       - Optional: Fetch channels and supergroups?                                
+     * Parameters:
+     * * `boolean` **correspondents** - Optional: Fetch users?
+     * * `boolean` **bots_pm**        - Optional: Fetch bots?
+     * * `boolean` **bots_inline**    - Optional: Fetch inline bots?
+     * * `boolean` **phone_calls**    - Optional: Fetch phone calls?
+     * * `boolean` **forward_users**  - Optional: Forward users?
+     * * `boolean` **forward_chats**  - Optional: Forward chats?
+     * * `boolean` **groups**         - Optional: Fetch groups?
+     * * `boolean` **channels**       - Optional: Fetch channels and supergroups?
      * * `int`     **offset**         - Initially 0, then `$offset += $contacts_TopPeers['categories']['count'];`
-     * * `int`     **limit**          - How many results to fetch                                                
-     * * `[int]`   **hash**           - Optional: Peer IDs of previously cached peers                            
-     * 
+     * * `int`     **limit**          - How many results to fetch
+     * * `[int]`   **hash**           - Optional: Peer IDs of previously cached peers
+     *
      * @param array $params Parameters
      *
      * @return contacts.TopPeers
@@ -1131,12 +1131,12 @@ interface contacts
     public function getTopPeers($params);
 
     /**
-     * Reset top peer rating for a certain category/peer
+     * Reset top peer rating for a certain category/peer.
      *
-     * Parameters: 
-     * * `TopPeerCategory` **category** - The category 
-     * * `InputPeer`       **peer**     - The peer     
-     * 
+     * Parameters:
+     * * `TopPeerCategory` **category** - The category
+     * * `InputPeer`       **peer**     - The peer
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1144,25 +1144,25 @@ interface contacts
     public function resetTopPeerRating($params);
 
     /**
-     * Reset saved contacts
+     * Reset saved contacts.
      *
      * @return bool
      */
     public function resetSaved();
 
     /**
-     * Get saved contacts
+     * Get saved contacts.
      *
      * @return _of_SavedContact[]
      */
     public function getSaved();
 
     /**
-     * Toggle top peers
+     * Toggle top peers.
      *
-     * Parameters: 
+     * Parameters:
      * * `Bool` **enabled** - Enable or disable top peer
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1170,15 +1170,15 @@ interface contacts
     public function toggleTopPeers($params);
 
     /**
-     * Add contact
+     * Add contact.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`   **add_phone_privacy_exception** - Optional: Phone privacy exception?
-     * * `InputUser` **id**                          - ID                                
-     * * `string`    **first_name**                  - First name                        
-     * * `string`    **last_name**                   - Last name                         
-     * * `string`    **phone**                       - Phone number                      
-     * 
+     * * `InputUser` **id**                          - ID
+     * * `string`    **first_name**                  - First name
+     * * `string`    **last_name**                   - Last name
+     * * `string`    **phone**                       - Phone number
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1186,11 +1186,11 @@ interface contacts
     public function addContact($params);
 
     /**
-     * Accept contact
+     * Accept contact.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputUser` **id** - ID
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1198,11 +1198,11 @@ interface contacts
     public function acceptContact($params);
 
     /**
-     * Get people nearby (geochats)
+     * Get people nearby (geochats).
      *
-     * Parameters: 
+     * Parameters:
      * * `InputGeoPoint` **geo_point** - Current location
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1213,11 +1213,11 @@ interface contacts
 interface messages
 {
     /**
-     * Get messages
+     * Get messages.
      *
-     * Parameters: 
+     * Parameters:
      * * `[InputMessage]` **id** - The IDs of messages to fetch (only for users and normal groups)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.Messages
@@ -1225,17 +1225,17 @@ interface messages
     public function getMessages($params);
 
     /**
-     * Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html
+     * Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html.
      *
-     * Parameters: 
-     * * `boolean`   **exclude_pinned** - Optional: Do not fetch pinned chats        
-     * * `int`       **folder_id**      - Optional: Folder ID                        
-     * * `int`       **offset_date**    - End($res['messages'])['date'];             
-     * * `int`       **offset_id**      - End($res['messages'])['id'];               
-     * * `InputPeer` **offset_peer**    - End($res['dialogs'])['peer'];              
-     * * `int`       **limit**          - Number of dialogs to fetch                 
+     * Parameters:
+     * * `boolean`   **exclude_pinned** - Optional: Do not fetch pinned chats
+     * * `int`       **folder_id**      - Optional: Folder ID
+     * * `int`       **offset_date**    - End($res['messages'])['date'];
+     * * `int`       **offset_id**      - End($res['messages'])['id'];
+     * * `InputPeer` **offset_peer**    - End($res['dialogs'])['peer'];
+     * * `int`       **limit**          - Number of dialogs to fetch
      * * `[int]`     **hash**           - Optional: IDs of previously fetched dialogs
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.Dialogs
@@ -1243,18 +1243,18 @@ interface messages
     public function getDialogs($params);
 
     /**
-     * Get previous messages of a group
+     * Get previous messages of a group.
      *
-     * Parameters: 
-     * * `InputPeer` **peer**        - The chat                                                    
-     * * `int`       **offset_id**   - The last fetched message ID, initially 0                    
+     * Parameters:
+     * * `InputPeer` **peer**        - The chat
+     * * `int`       **offset_id**   - The last fetched message ID, initially 0
      * * `int`       **offset_date** - The date of the last previously fetched message, initially 0
-     * * `int`       **add_offset**  - Additional offset, can be 0                                 
-     * * `int`       **limit**       - Number of messages to fetch                                 
-     * * `int`       **max_id**      - Maximum message ID to fetch                                 
-     * * `int`       **min_id**      - Minumum message ID to fetch                                 
-     * * `[int]`     **hash**        - Optional: IDs of messages you already fetched               
-     * 
+     * * `int`       **add_offset**  - Additional offset, can be 0
+     * * `int`       **limit**       - Number of messages to fetch
+     * * `int`       **max_id**      - Maximum message ID to fetch
+     * * `int`       **min_id**      - Minumum message ID to fetch
+     * * `[int]`     **hash**        - Optional: IDs of messages you already fetched
+     *
      * @param array $params Parameters
      *
      * @return messages.Messages
@@ -1262,22 +1262,22 @@ interface messages
     public function getHistory($params);
 
     /**
-     * Search peers or messages
+     * Search peers or messages.
      *
-     * Parameters: 
-     * * `InputPeer`      **peer**       - Where to search                                  
-     * * `string`         **q**          - What to search                                   
+     * Parameters:
+     * * `InputPeer`      **peer**       - Where to search
+     * * `string`         **q**          - What to search
      * * `InputUser`      **from_id**    - Optional: Show only messages from a certain user?
-     * * `MessagesFilter` **filter**     - Message filter                                   
-     * * `int`            **min_date**   - Minumum date of results to fetch                 
-     * * `int`            **max_date**   - Maximum date of results to fetch                 
-     * * `int`            **offset_id**  - Message ID offset                                
-     * * `int`            **add_offset** - Additional offset, can be 0                      
-     * * `int`            **limit**      - Number of results to return                      
-     * * `int`            **max_id**     - Maximum message id to return                     
-     * * `int`            **min_id**     - Minumum message id to return                     
+     * * `MessagesFilter` **filter**     - Message filter
+     * * `int`            **min_date**   - Minumum date of results to fetch
+     * * `int`            **max_date**   - Maximum date of results to fetch
+     * * `int`            **offset_id**  - Message ID offset
+     * * `int`            **add_offset** - Additional offset, can be 0
+     * * `int`            **limit**      - Number of results to return
+     * * `int`            **max_id**     - Maximum message id to return
+     * * `int`            **min_id**     - Minumum message id to return
      * * `[int]`          **hash**       - Optional: The IDs of messages you already fetched
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.Messages
@@ -1285,12 +1285,12 @@ interface messages
     public function search($params);
 
     /**
-     * Mark messages as read
+     * Mark messages as read.
      *
-     * Parameters: 
-     * * `InputPeer` **peer**   - Where to mark messages as read    
+     * Parameters:
+     * * `InputPeer` **peer**   - Where to mark messages as read
      * * `int`       **max_id** - Maximum message ID to mark as read
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.AffectedMessages
@@ -1298,14 +1298,14 @@ interface messages
     public function readHistory($params);
 
     /**
-     * Delete chat history
+     * Delete chat history.
      *
-     * Parameters: 
-     * * `boolean`   **just_clear** - Optional: Only clear it from your side      
+     * Parameters:
+     * * `boolean`   **just_clear** - Optional: Only clear it from your side
      * * `boolean`   **revoke**     - Optional: Delete messages for the other user
-     * * `InputPeer` **peer**       - Where to clear it                           
-     * * `int`       **max_id**     - Maximum message id of messages to delete    
-     * 
+     * * `InputPeer` **peer**       - Where to clear it
+     * * `int`       **max_id**     - Maximum message id of messages to delete
+     *
      * @param array $params Parameters
      *
      * @return messages.AffectedHistory
@@ -1313,12 +1313,12 @@ interface messages
     public function deleteHistory($params);
 
     /**
-     * Delete messages
+     * Delete messages.
      *
-     * Parameters: 
-     * * `boolean` **revoke** - Optional: Delete the messages for everyone?                            
+     * Parameters:
+     * * `boolean` **revoke** - Optional: Delete the messages for everyone?
      * * `[int]`   **id**     - IDs of messages to delete, use channels->deleteMessages for supergroups
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.AffectedMessages
@@ -1326,11 +1326,11 @@ interface messages
     public function deleteMessages($params);
 
     /**
-     * Mark messages as read
+     * Mark messages as read.
      *
-     * Parameters: 
+     * Parameters:
      * * `int` **max_id** - Maximum message id of messages to mark as read
-     * 
+     *
      * @param array $params Parameters
      *
      * @return _of_ReceivedNotifyMessage[]
@@ -1338,12 +1338,12 @@ interface messages
     public function receivedMessages($params);
 
     /**
-     * Change typing status
+     * Change typing status.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer`         **peer**   - Where to change typing status
-     * * `SendMessageAction` **action** - Typing status                
-     * 
+     * * `SendMessageAction` **action** - Typing status
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1351,20 +1351,20 @@ interface messages
     public function setTyping($params);
 
     /**
-     * Send a message
+     * Send a message.
      *
-     * Parameters: 
-     * * `boolean`         **no_webpage**      - Optional: Disable webpage preview?             
-     * * `boolean`         **silent**          - Optional: Disable notifications?               
-     * * `boolean`         **background**      - Optional: Disable background notifications?    
+     * Parameters:
+     * * `boolean`         **no_webpage**      - Optional: Disable webpage preview?
+     * * `boolean`         **silent**          - Optional: Disable notifications?
+     * * `boolean`         **background**      - Optional: Disable background notifications?
      * * `boolean`         **clear_draft**     - Optional: Clear the message draft of this chat?
-     * * `InputPeer`       **peer**            - The chat where to send this message            
-     * * `int`             **reply_to_msg_id** - Optional: Reply to message by ID               
-     * * `string`          **message**         - The message to send                            
-     * * `ReplyMarkup`     **reply_markup**    - Optional: Keyboards to send                    
-     * * `[MessageEntity]` **entities**        - Optional: Entities to send (for styled text)   
-     * * `int`             **schedule_date**   - Optional: Schedule date                        
-     * 
+     * * `InputPeer`       **peer**            - The chat where to send this message
+     * * `int`             **reply_to_msg_id** - Optional: Reply to message by ID
+     * * `string`          **message**         - The message to send
+     * * `ReplyMarkup`     **reply_markup**    - Optional: Keyboards to send
+     * * `[MessageEntity]` **entities**        - Optional: Entities to send (for styled text)
+     * * `int`             **schedule_date**   - Optional: Schedule date
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1372,20 +1372,20 @@ interface messages
     public function sendMessage($params);
 
     /**
-     * Send a media
+     * Send a media.
      *
-     * Parameters: 
-     * * `boolean`         **silent**          - Optional: Disable notifications?               
-     * * `boolean`         **background**      - Optional: Disable background notifications?    
+     * Parameters:
+     * * `boolean`         **silent**          - Optional: Disable notifications?
+     * * `boolean`         **background**      - Optional: Disable background notifications?
      * * `boolean`         **clear_draft**     - Optional: Clear the message draft of this chat?
-     * * `InputPeer`       **peer**            - Where to send the media                        
-     * * `int`             **reply_to_msg_id** - Optional: Reply to message by ID               
-     * * `InputMedia`      **media**           - The media to send                              
-     * * `string`          **message**         - The caption                                    
-     * * `ReplyMarkup`     **reply_markup**    - Optional: Keyboards to send                    
-     * * `[MessageEntity]` **entities**        - Optional: Entities for styled text             
-     * * `int`             **schedule_date**   - Optional: Schedule date                        
-     * 
+     * * `InputPeer`       **peer**            - Where to send the media
+     * * `int`             **reply_to_msg_id** - Optional: Reply to message by ID
+     * * `InputMedia`      **media**           - The media to send
+     * * `string`          **message**         - The caption
+     * * `ReplyMarkup`     **reply_markup**    - Optional: Keyboards to send
+     * * `[MessageEntity]` **entities**        - Optional: Entities for styled text
+     * * `int`             **schedule_date**   - Optional: Schedule date
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1393,18 +1393,18 @@ interface messages
     public function sendMedia($params);
 
     /**
-     * Forward messages
+     * Forward messages.
      *
-     * Parameters: 
-     * * `boolean`   **silent**        - Optional: Disable notifications                        
-     * * `boolean`   **background**    - Optional: Disable background notifications             
+     * Parameters:
+     * * `boolean`   **silent**        - Optional: Disable notifications
+     * * `boolean`   **background**    - Optional: Disable background notifications
      * * `boolean`   **with_my_score** - Optional: If forwarding a game, forward your score, too
-     * * `boolean`   **grouped**       - Optional: Set to true if forwarding albums             
-     * * `InputPeer` **from_peer**     - From where to forward the messages                     
-     * * `[int]`     **id**            - The message IDs                                        
-     * * `InputPeer` **to_peer**       - Where to forward the messages                          
-     * * `int`       **schedule_date** - Optional: Schedule date                                
-     * 
+     * * `boolean`   **grouped**       - Optional: Set to true if forwarding albums
+     * * `InputPeer` **from_peer**     - From where to forward the messages
+     * * `[int]`     **id**            - The message IDs
+     * * `InputPeer` **to_peer**       - Where to forward the messages
+     * * `int`       **schedule_date** - Optional: Schedule date
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1412,11 +1412,11 @@ interface messages
     public function forwardMessages($params);
 
     /**
-     * Report a peer for spam
+     * Report a peer for spam.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer** - The peer to report
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1424,11 +1424,11 @@ interface messages
     public function reportSpam($params);
 
     /**
-     * Get the settings of  apeer
+     * Get the settings of  apeer.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer** - The peer
-     * 
+     *
      * @param array $params Parameters
      *
      * @return PeerSettings
@@ -1436,13 +1436,13 @@ interface messages
     public function getPeerSettings($params);
 
     /**
-     * Report a message
+     * Report a message.
      *
-     * Parameters: 
-     * * `InputPeer`    **peer**   - The user that sent the messages          
-     * * `[int]`        **id**     - The messages to report                   
+     * Parameters:
+     * * `InputPeer`    **peer**   - The user that sent the messages
+     * * `[int]`        **id**     - The messages to report
      * * `ReportReason` **reason** - The reason why you're sending this report
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1450,11 +1450,11 @@ interface messages
     public function report($params);
 
     /**
-     * Get info about chats
+     * Get info about chats.
      *
-     * Parameters: 
+     * Parameters:
      * * `[int]` **id** - The MTProto IDs of chats to fetch info about
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.Chats
@@ -1462,11 +1462,11 @@ interface messages
     public function getChats($params);
 
     /**
-     * You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     * You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info).
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **chat_id** - You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.ChatFull
@@ -1474,12 +1474,12 @@ interface messages
     public function getFullChat($params);
 
     /**
-     * Edit the title of a normal chat (not supergroup)
+     * Edit the title of a normal chat (not supergroup).
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **chat_id** - The ID of the chat
-     * * `string`    **title**   - The new title     
-     * 
+     * * `string`    **title**   - The new title
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1487,12 +1487,12 @@ interface messages
     public function editChatTitle($params);
 
     /**
-     * Edit the photo of a normal chat (not supergroup)
+     * Edit the photo of a normal chat (not supergroup).
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer`      **chat_id** - The ID of the chat
-     * * `InputChatPhoto` **photo**   - The new phto      
-     * 
+     * * `InputChatPhoto` **photo**   - The new phto
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1500,13 +1500,13 @@ interface messages
     public function editChatPhoto($params);
 
     /**
-     * Add a user to a normal chat (use channels->inviteToChannel for supergroups)
+     * Add a user to a normal chat (use channels->inviteToChannel for supergroups).
      *
-     * Parameters: 
-     * * `InputPeer` **chat_id**   - The chat where to invite users          
-     * * `InputUser` **user_id**   - The user to invite                      
+     * Parameters:
+     * * `InputPeer` **chat_id**   - The chat where to invite users
+     * * `InputUser` **user_id**   - The user to invite
      * * `int`       **fwd_limit** - Number of old messages the user will see
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1514,12 +1514,12 @@ interface messages
     public function addChatUser($params);
 
     /**
-     * Delete a user from a chat (not supergroup)
+     * Delete a user from a chat (not supergroup).
      *
-     * Parameters: 
-     * * `InputPeer` **chat_id** - The ID of the chat                             
+     * Parameters:
+     * * `InputPeer` **chat_id** - The ID of the chat
      * * `InputUser` **user_id** - The user to delete (pass @me to leave the chat)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1527,12 +1527,12 @@ interface messages
     public function deleteChatUser($params);
 
     /**
-     * Create a chat (not supergroup)
+     * Create a chat (not supergroup).
      *
-     * Parameters: 
+     * Parameters:
      * * `[InputUser]` **users** - The users to add to the chat
-     * * `string`      **title** - The new chat's title        
-     * 
+     * * `string`      **title** - The new chat's title
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1540,12 +1540,12 @@ interface messages
     public function createChat($params);
 
     /**
-     * You cannot use this method directly, instead use $MadelineProto->get_dh_config();
+     * You cannot use this method directly, instead use $MadelineProto->get_dh_config();.
      *
-     * Parameters: 
+     * Parameters:
      * * `int` **version**       - You cannot use this method directly, instead use $MadelineProto->get_dh_config();
      * * `int` **random_length** - You cannot use this method directly, instead use $MadelineProto->get_dh_config();
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.DhConfig
@@ -1553,12 +1553,12 @@ interface messages
     public function getDhConfig($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputUser` **user_id** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
      * * `bytes`     **g_a**     - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
-     * 
+     *
      * @param array $params Parameters
      *
      * @return EncryptedChat
@@ -1566,13 +1566,13 @@ interface messages
     public function requestEncryption($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputEncryptedChat` **peer**            - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
      * * `bytes`              **g_b**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
      * * `long`               **key_fingerprint** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
-     * 
+     *
      * @param array $params Parameters
      *
      * @return EncryptedChat
@@ -1580,11 +1580,11 @@ interface messages
     public function acceptEncryption($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats.
      *
-     * Parameters: 
+     * Parameters:
      * * `int` **chat_id** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1592,12 +1592,12 @@ interface messages
     public function discardEncryption($params);
 
     /**
-     * Send typing notification to secret chat
+     * Send typing notification to secret chat.
      *
-     * Parameters: 
-     * * `InputEncryptedChat` **peer**   - The secret chat where to send the notification             
+     * Parameters:
+     * * `InputEncryptedChat` **peer**   - The secret chat where to send the notification
      * * `Bool`               **typing** - Set to true to enable the notification, false to disable it
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1605,12 +1605,12 @@ interface messages
     public function setEncryptedTyping($params);
 
     /**
-     * Mark messages as read in secret chats
+     * Mark messages as read in secret chats.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputEncryptedChat` **peer**     - The secret chat where to mark messages as read
-     * * `int`                **max_date** - Maximum date of messages to mark              
-     * 
+     * * `int`                **max_date** - Maximum date of messages to mark
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1618,12 +1618,12 @@ interface messages
     public function readEncryptedHistory($params);
 
     /**
-     * Send message to secret chat
+     * Send message to secret chat.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputEncryptedChat` **peer**    - The chat where to send the message
-     * * `DecryptedMessage`   **message** - The message to send               
-     * 
+     * * `DecryptedMessage`   **message** - The message to send
+     *
      * @param array $params Parameters
      *
      * @return messages.SentEncryptedMessage
@@ -1631,13 +1631,13 @@ interface messages
     public function sendEncrypted($params);
 
     /**
-     * Send a file to a secret chat
+     * Send a file to a secret chat.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputEncryptedChat` **peer**    - The chat where to send the file
-     * * `DecryptedMessage`   **message** - The message with the file      
-     * * `InputEncryptedFile` **file**    - The file (optional)            
-     * 
+     * * `DecryptedMessage`   **message** - The message with the file
+     * * `InputEncryptedFile` **file**    - The file (optional)
+     *
      * @param array $params Parameters
      *
      * @return messages.SentEncryptedMessage
@@ -1645,12 +1645,12 @@ interface messages
     public function sendEncryptedFile($params);
 
     /**
-     * Send a service message to a secret chat
+     * Send a service message to a secret chat.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputEncryptedChat` **peer**    - The chat where to send the service message
-     * * `DecryptedMessage`   **message** - The service message                       
-     * 
+     * * `DecryptedMessage`   **message** - The service message
+     *
      * @param array $params Parameters
      *
      * @return messages.SentEncryptedMessage
@@ -1658,11 +1658,11 @@ interface messages
     public function sendEncryptedService($params);
 
     /**
-     * You cannot use this method directly
+     * You cannot use this method directly.
      *
-     * Parameters: 
+     * Parameters:
      * * `int` **max_qts** - You cannot use this method directly
-     * 
+     *
      * @param array $params Parameters
      *
      * @return _of_long[]
@@ -1670,11 +1670,11 @@ interface messages
     public function receivedQueue($params);
 
     /**
-     * Report for spam a secret chat
+     * Report for spam a secret chat.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputEncryptedChat` **peer** - The chat to report
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1682,11 +1682,11 @@ interface messages
     public function reportEncryptedSpam($params);
 
     /**
-     * Mark message as read
+     * Mark message as read.
      *
-     * Parameters: 
+     * Parameters:
      * * `[int]` **id** - The messages to mark as read (only users and normal chats, not supergroups)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.AffectedMessages
@@ -1694,12 +1694,12 @@ interface messages
     public function readMessageContents($params);
 
     /**
-     * Get stickers
+     * Get stickers.
      *
-     * Parameters: 
-     * * `string` **emoticon** - Search by emoji                                                    
+     * Parameters:
+     * * `string` **emoticon** - Search by emoji
      * * `[int]`  **hash**     - Optional:  the hash parameter of the previous result of this method
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.Stickers
@@ -1707,11 +1707,11 @@ interface messages
     public function getStickers($params);
 
     /**
-     * Get all stickerpacks
+     * Get all stickerpacks.
      *
-     * Parameters: 
+     * Parameters:
      * * `[int]` **hash** - Optional: The hash parameter of the previous result of this method
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.AllStickers
@@ -1719,12 +1719,12 @@ interface messages
     public function getAllStickers($params);
 
     /**
-     * Get webpage preview
+     * Get webpage preview.
      *
-     * Parameters: 
-     * * `string`          **message**  - Extract preview from this message 
+     * Parameters:
+     * * `string`          **message**  - Extract preview from this message
      * * `[MessageEntity]` **entities** - Optional: Entities for styled text
-     * 
+     *
      * @param array $params Parameters
      *
      * @return MessageMedia
@@ -1732,11 +1732,11 @@ interface messages
     public function getWebPagePreview($params);
 
     /**
-     * Export chat invite 
+     * Export chat invite.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer** - Export invite only for this user
-     * 
+     *
      * @param array $params Parameters
      *
      * @return ExportedChatInvite
@@ -1744,11 +1744,11 @@ interface messages
     public function exportChatInvite($params);
 
     /**
-     * Check if an invitation link is valid
+     * Check if an invitation link is valid.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **hash** - The invite link in t.me/joinchat/aflakf format
-     * 
+     *
      * @param array $params Parameters
      *
      * @return ChatInvite
@@ -1756,11 +1756,11 @@ interface messages
     public function checkChatInvite($params);
 
     /**
-     * Import chat invite
+     * Import chat invite.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **hash** - The invite link in t.me/joinchat/aflakf format
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1768,11 +1768,11 @@ interface messages
     public function importChatInvite($params);
 
     /**
-     * Get a stickerset
+     * Get a stickerset.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputStickerSet` **stickerset** - The stickerset to get
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.StickerSet
@@ -1780,12 +1780,12 @@ interface messages
     public function getStickerSet($params);
 
     /**
-     * Add a sticker set
+     * Add a sticker set.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputStickerSet` **stickerset** - The sticker set to add
-     * * `Bool`            **archived**   - Archive this set?     
-     * 
+     * * `Bool`            **archived**   - Archive this set?
+     *
      * @param array $params Parameters
      *
      * @return messages.StickerSetInstallResult
@@ -1793,11 +1793,11 @@ interface messages
     public function installStickerSet($params);
 
     /**
-     * Remove a sticker set
+     * Remove a sticker set.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputStickerSet` **stickerset** - The sticker set to remove
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1805,13 +1805,13 @@ interface messages
     public function uninstallStickerSet($params);
 
     /**
-     * Start a bot
+     * Start a bot.
      *
-     * Parameters: 
-     * * `InputUser` **bot**         - The bot's ID or username                         
+     * Parameters:
+     * * `InputUser` **bot**         - The bot's ID or username
      * * `InputPeer` **peer**        - Where to start the bot (@me or group ID/username)
-     * * `string`    **start_param** - The bot's start parameter                        
-     * 
+     * * `string`    **start_param** - The bot's start parameter
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1819,13 +1819,13 @@ interface messages
     public function startBot($params);
 
     /**
-     * Get and increase message views
+     * Get and increase message views.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer**      - The chat where the message is located
-     * * `[int]`     **id**        - The IDs messages to get              
-     * * `Bool`      **increment** - Increase message views?              
-     * 
+     * * `[int]`     **id**        - The IDs messages to get
+     * * `Bool`      **increment** - Increase message views?
+     *
      * @param array $params Parameters
      *
      * @return _of_int[]
@@ -1833,13 +1833,13 @@ interface messages
     public function getMessagesViews($params);
 
     /**
-     * Edit admin permissions
+     * Edit admin permissions.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **chat_id**  - The chat ID (no supergroups)
-     * * `InputUser` **user_id**  - The user ID                 
-     * * `Bool`      **is_admin** - Should the user be admin?   
-     * 
+     * * `InputUser` **user_id**  - The user ID
+     * * `Bool`      **is_admin** - Should the user be admin?
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1847,11 +1847,11 @@ interface messages
     public function editChatAdmin($params);
 
     /**
-     * Convert chat to supergroup
+     * Convert chat to supergroup.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **chat_id** - The chat to convert
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1859,16 +1859,16 @@ interface messages
     public function migrateChat($params);
 
     /**
-     * Global message search
+     * Global message search.
      *
-     * Parameters: 
-     * * `int`       **folder_id**   - Optional: Folder ID            
-     * * `string`    **q**           - The query                      
-     * * `int`       **offset_rate** - Offset rate                    
-     * * `InputPeer` **offset_peer** - 0 or the peer offset           
-     * * `int`       **offset_id**   - 0 or the message ID offset     
+     * Parameters:
+     * * `int`       **folder_id**   - Optional: Folder ID
+     * * `string`    **q**           - The query
+     * * `int`       **offset_rate** - Offset rate
+     * * `InputPeer` **offset_peer** - 0 or the peer offset
+     * * `int`       **offset_id**   - 0 or the message ID offset
      * * `int`       **limit**       - The number of results to return
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.Messages
@@ -1876,12 +1876,12 @@ interface messages
     public function searchGlobal($params);
 
     /**
-     * Reorder sticker sets
+     * Reorder sticker sets.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean` **masks** - Optional: Reorder masks?
-     * * `[long]`  **order** - The order               
-     * 
+     * * `[long]`  **order** - The order
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1889,13 +1889,13 @@ interface messages
     public function reorderStickerSets($params);
 
     /**
-     * Get document by SHA256 hash
+     * Get document by SHA256 hash.
      *
-     * Parameters: 
+     * Parameters:
      * * `bytes`  **sha256**    - `hash('sha256', $filename, true);`
-     * * `int`    **size**      - The file size                     
-     * * `string` **mime_type** - The mime type of the file         
-     * 
+     * * `int`    **size**      - The file size
+     * * `string` **mime_type** - The mime type of the file
+     *
      * @param array $params Parameters
      *
      * @return Document
@@ -1903,12 +1903,12 @@ interface messages
     public function getDocumentByHash($params);
 
     /**
-     * Search gifs
+     * Search gifs.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **q**      - The search query
-     * * `int`    **offset** - The offset      
-     * 
+     * * `int`    **offset** - The offset
+     *
      * @param array $params Parameters
      *
      * @return messages.FoundGifs
@@ -1916,11 +1916,11 @@ interface messages
     public function searchGifs($params);
 
     /**
-     * Get saved gifs
+     * Get saved gifs.
      *
-     * Parameters: 
+     * Parameters:
      * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.SavedGifs
@@ -1928,12 +1928,12 @@ interface messages
     public function getSavedGifs($params);
 
     /**
-     * Save a GIF
+     * Save a GIF.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputDocument` **id**     - The GIF to save
      * * `Bool`          **unsave** - Remove the gif?
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1941,15 +1941,15 @@ interface messages
     public function saveGif($params);
 
     /**
-     * Call inline bot
+     * Call inline bot.
      *
-     * Parameters: 
-     * * `InputUser`     **bot**       - The bot to call               
+     * Parameters:
+     * * `InputUser`     **bot**       - The bot to call
      * * `InputPeer`     **peer**      - The chat where to call the bot
      * * `InputGeoPoint` **geo_point** - Optional: The current location
-     * * `string`        **query**     - The query to send to the bot  
-     * * `string`        **offset**    - The offset to send to the bot 
-     * 
+     * * `string`        **query**     - The query to send to the bot
+     * * `string`        **offset**    - The offset to send to the bot
+     *
      * @param array $params Parameters
      *
      * @return messages.BotResults
@@ -1957,17 +1957,17 @@ interface messages
     public function getInlineBotResults($params);
 
     /**
-     * Bots only: set the results of an inline query
+     * Bots only: set the results of an inline query.
      *
-     * Parameters: 
-     * * `boolean`                **gallery**     - Optional: Is this a gallery?                  
+     * Parameters:
+     * * `boolean`                **gallery**     - Optional: Is this a gallery?
      * * `boolean`                **private**     - Optional: Is this result private (not cached)?
-     * * `long`                   **query_id**    - Query ID                                      
-     * * `[InputBotInlineResult]` **results**     - Results                                       
-     * * `int`                    **cache_time**  - Cache time                                    
-     * * `string`                 **next_offset** - Optional: The next offset                     
-     * * `InlineBotSwitchPM`      **switch_pm**   - Optional: Switch to PM?                       
-     * 
+     * * `long`                   **query_id**    - Query ID
+     * * `[InputBotInlineResult]` **results**     - Results
+     * * `int`                    **cache_time**  - Cache time
+     * * `string`                 **next_offset** - Optional: The next offset
+     * * `InlineBotSwitchPM`      **switch_pm**   - Optional: Switch to PM?
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -1975,19 +1975,19 @@ interface messages
     public function setInlineBotResults($params);
 
     /**
-     * Send inline bot result obtained with messages.getInlineBotResults to the chat
+     * Send inline bot result obtained with messages.getInlineBotResults to the chat.
      *
-     * Parameters: 
-     * * `boolean`   **silent**          - Optional: Disable notifications?           
+     * Parameters:
+     * * `boolean`   **silent**          - Optional: Disable notifications?
      * * `boolean`   **background**      - Optional: Disable background notifications?
-     * * `boolean`   **clear_draft**     - Optional: Clear the message draft?         
-     * * `boolean`   **hide_via**        - Optional: Hide "via @bot"                  
-     * * `InputPeer` **peer**            - Where to send the message                  
-     * * `int`       **reply_to_msg_id** - Optional: Reply to message by ID           
-     * * `long`      **query_id**        - The inline query ID                        
-     * * `string`    **id**              - The ID of one of the inline results        
-     * * `int`       **schedule_date**   - Optional: Schedule date                    
-     * 
+     * * `boolean`   **clear_draft**     - Optional: Clear the message draft?
+     * * `boolean`   **hide_via**        - Optional: Hide "via @bot"
+     * * `InputPeer` **peer**            - Where to send the message
+     * * `int`       **reply_to_msg_id** - Optional: Reply to message by ID
+     * * `long`      **query_id**        - The inline query ID
+     * * `string`    **id**              - The ID of one of the inline results
+     * * `int`       **schedule_date**   - Optional: Schedule date
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -1995,12 +1995,12 @@ interface messages
     public function sendInlineBotResult($params);
 
     /**
-     * Check if about to edit a message or a media caption
+     * Check if about to edit a message or a media caption.
      *
-     * Parameters: 
-     * * `InputPeer` **peer** - The chat      
+     * Parameters:
+     * * `InputPeer` **peer** - The chat
      * * `int`       **id**   - The message ID
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.MessageEditData
@@ -2008,18 +2008,18 @@ interface messages
     public function getMessageEditData($params);
 
     /**
-     * Edit a message
+     * Edit a message.
      *
-     * Parameters: 
-     * * `boolean`         **no_webpage**    - Optional: Disable webpage preview           
-     * * `InputPeer`       **peer**          - The chat                                    
-     * * `int`             **id**            - The message ID                              
-     * * `string`          **message**       - Optional: The new message                   
-     * * `InputMedia`      **media**         - Optional: The media to substitute           
-     * * `ReplyMarkup`     **reply_markup**  - Optional: The new keyboard                  
+     * Parameters:
+     * * `boolean`         **no_webpage**    - Optional: Disable webpage preview
+     * * `InputPeer`       **peer**          - The chat
+     * * `int`             **id**            - The message ID
+     * * `string`          **message**       - Optional: The new message
+     * * `InputMedia`      **media**         - Optional: The media to substitute
+     * * `ReplyMarkup`     **reply_markup**  - Optional: The new keyboard
      * * `[MessageEntity]` **entities**      - Optional: The new entities (for styled text)
-     * * `int`             **schedule_date** - Optional: Schedule date                     
-     * 
+     * * `int`             **schedule_date** - Optional: Schedule date
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -2027,16 +2027,16 @@ interface messages
     public function editMessage($params);
 
     /**
-     * Edit a sent inline message
+     * Edit a sent inline message.
      *
-     * Parameters: 
-     * * `boolean`                 **no_webpage**   - Optional: Disable webpage preview           
-     * * `InputBotInlineMessageID` **id**           - The message ID                              
-     * * `string`                  **message**      - Optional: The new message                   
-     * * `InputMedia`              **media**        - Optional: The media to substitute           
-     * * `ReplyMarkup`             **reply_markup** - Optional: The new keyboard                  
+     * Parameters:
+     * * `boolean`                 **no_webpage**   - Optional: Disable webpage preview
+     * * `InputBotInlineMessageID` **id**           - The message ID
+     * * `string`                  **message**      - Optional: The new message
+     * * `InputMedia`              **media**        - Optional: The media to substitute
+     * * `ReplyMarkup`             **reply_markup** - Optional: The new keyboard
      * * `[MessageEntity]`         **entities**     - Optional: The new entities (for styled text)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2044,14 +2044,14 @@ interface messages
     public function editInlineBotMessage($params);
 
     /**
-     * Get the callback answer of a bot (after clicking a button)
+     * Get the callback answer of a bot (after clicking a button).
      *
-     * Parameters: 
-     * * `boolean`   **game**   - Optional: Is this a game?            
-     * * `InputPeer` **peer**   - The chat                             
-     * * `int`       **msg_id** - The message ID                       
+     * Parameters:
+     * * `boolean`   **game**   - Optional: Is this a game?
+     * * `InputPeer` **peer**   - The chat
+     * * `int`       **msg_id** - The message ID
      * * `bytes`     **data**   - Optional: The data to send to the bot
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.BotCallbackAnswer
@@ -2059,15 +2059,15 @@ interface messages
     public function getBotCallbackAnswer($params);
 
     /**
-     * Bots only: set the callback answer (after a button was clicked)
+     * Bots only: set the callback answer (after a button was clicked).
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean` **alert**      - Optional: Is this an alert?
-     * * `long`    **query_id**   - The query ID               
-     * * `string`  **message**    - Optional: The message      
-     * * `string`  **url**        - Optional: The URL          
-     * * `int`     **cache_time** - Cache time                 
-     * 
+     * * `long`    **query_id**   - The query ID
+     * * `string`  **message**    - Optional: The message
+     * * `string`  **url**        - Optional: The URL
+     * * `int`     **cache_time** - Cache time
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2075,11 +2075,11 @@ interface messages
     public function setBotCallbackAnswer($params);
 
     /**
-     * Get dialog info of peers
+     * Get dialog info of peers.
      *
-     * Parameters: 
+     * Parameters:
      * * `[InputDialogPeer]` **peers** - The peers
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.PeerDialogs
@@ -2087,15 +2087,15 @@ interface messages
     public function getPeerDialogs($params);
 
     /**
-     * Save a message draft
+     * Save a message draft.
      *
-     * Parameters: 
-     * * `boolean`         **no_webpage**      - Optional: Disable webpage preview       
-     * * `int`             **reply_to_msg_id** - Optional: Reply to message by ID        
-     * * `InputPeer`       **peer**            - The chat                                
-     * * `string`          **message**         - The message                             
+     * Parameters:
+     * * `boolean`         **no_webpage**      - Optional: Disable webpage preview
+     * * `int`             **reply_to_msg_id** - Optional: Reply to message by ID
+     * * `InputPeer`       **peer**            - The chat
+     * * `string`          **message**         - The message
      * * `[MessageEntity]` **entities**        - Optional: The entities (for styled text)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2103,18 +2103,18 @@ interface messages
     public function saveDraft($params);
 
     /**
-     * Get all message drafts
+     * Get all message drafts.
      *
      * @return Updates
      */
     public function getAllDrafts();
 
     /**
-     * Get featured stickers
+     * Get featured stickers.
      *
-     * Parameters: 
+     * Parameters:
      * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.FeaturedStickers
@@ -2122,11 +2122,11 @@ interface messages
     public function getFeaturedStickers($params);
 
     /**
-     * Mark new featured stickers as read
+     * Mark new featured stickers as read.
      *
-     * Parameters: 
+     * Parameters:
      * * `[long]` **id** - The stickers to mark as read
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2134,12 +2134,12 @@ interface messages
     public function readFeaturedStickers($params);
 
     /**
-     * Get recent stickers
+     * Get recent stickers.
      *
-     * Parameters: 
-     * * `boolean` **attached** - Optional: Get stickers attached to image?                             
+     * Parameters:
+     * * `boolean` **attached** - Optional: Get stickers attached to image?
      * * `[int]`   **hash**     - Optional: IDs the hash parameter of the previous result of this method
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.RecentStickers
@@ -2147,13 +2147,13 @@ interface messages
     public function getRecentStickers($params);
 
     /**
-     * Add a sticker to recent stickers
+     * Add a sticker to recent stickers.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`       **attached** - Optional: Get stickers attached to image?
-     * * `InputDocument` **id**       - The sticker                              
-     * * `Bool`          **unsave**   - Remove the sticker from recent stickers? 
-     * 
+     * * `InputDocument` **id**       - The sticker
+     * * `Bool`          **unsave**   - Remove the sticker from recent stickers?
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2161,11 +2161,11 @@ interface messages
     public function saveRecentSticker($params);
 
     /**
-     * Clear all recent stickers
+     * Clear all recent stickers.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean` **attached** - Optional: Clear recent stickers attached to images?
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2173,13 +2173,13 @@ interface messages
     public function clearRecentStickers($params);
 
     /**
-     * Get all archived stickers
+     * Get all archived stickers.
      *
-     * Parameters: 
-     * * `boolean` **masks**     - Optional: Get masks?       
-     * * `long`    **offset_id** - Sticker ID offset          
+     * Parameters:
+     * * `boolean` **masks**     - Optional: Get masks?
+     * * `long`    **offset_id** - Sticker ID offset
      * * `int`     **limit**     - Number of stickers to fetch
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.ArchivedStickers
@@ -2187,11 +2187,11 @@ interface messages
     public function getArchivedStickers($params);
 
     /**
-     * Get masks
+     * Get masks.
      *
-     * Parameters: 
+     * Parameters:
      * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.AllStickers
@@ -2199,11 +2199,11 @@ interface messages
     public function getMaskStickers($params);
 
     /**
-     * Get stickers attachable to images
+     * Get stickers attachable to images.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputStickeredMedia` **media** - The stickered media
-     * 
+     *
      * @param array $params Parameters
      *
      * @return _of_StickerSetCovered[]
@@ -2211,16 +2211,16 @@ interface messages
     public function getAttachedStickers($params);
 
     /**
-     * Set the game score
+     * Set the game score.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`   **edit_message** - Optional: Should the message with the game be edited?
-     * * `boolean`   **force**        - Optional: Force setting the game score               
-     * * `InputPeer` **peer**         - The chat where the game was sent                     
-     * * `int`       **id**           - The message ID                                       
-     * * `InputUser` **user_id**      - The user that set the score                          
-     * * `int`       **score**        - The score                                            
-     * 
+     * * `boolean`   **force**        - Optional: Force setting the game score
+     * * `InputPeer` **peer**         - The chat where the game was sent
+     * * `int`       **id**           - The message ID
+     * * `InputUser` **user_id**      - The user that set the score
+     * * `int`       **score**        - The score
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -2228,15 +2228,15 @@ interface messages
     public function setGameScore($params);
 
     /**
-     * Set the game score of an inline message
+     * Set the game score of an inline message.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`                 **edit_message** - Optional: Should the message with the game be edited?
-     * * `boolean`                 **force**        - Optional: Force setting the game score               
-     * * `InputBotInlineMessageID` **id**           - The ID of the inline message                         
-     * * `InputUser`               **user_id**      - The user that set the score                          
-     * * `int`                     **score**        - The score                                            
-     * 
+     * * `boolean`                 **force**        - Optional: Force setting the game score
+     * * `InputBotInlineMessageID` **id**           - The ID of the inline message
+     * * `InputUser`               **user_id**      - The user that set the score
+     * * `int`                     **score**        - The score
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2244,13 +2244,13 @@ interface messages
     public function setInlineGameScore($params);
 
     /**
-     * Get high scores of a game
+     * Get high scores of a game.
      *
-     * Parameters: 
-     * * `InputPeer` **peer**    - The chat                         
-     * * `int`       **id**      - The message ID                   
+     * Parameters:
+     * * `InputPeer` **peer**    - The chat
+     * * `int`       **id**      - The message ID
      * * `InputUser` **user_id** - The user that set the high scores
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.HighScores
@@ -2258,12 +2258,12 @@ interface messages
     public function getGameHighScores($params);
 
     /**
-     * Get high scores of a game sent in an inline message
+     * Get high scores of a game sent in an inline message.
      *
-     * Parameters: 
-     * * `InputBotInlineMessageID` **id**      - The inline message               
+     * Parameters:
+     * * `InputBotInlineMessageID` **id**      - The inline message
      * * `InputUser`               **user_id** - The user that set the high scores
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.HighScores
@@ -2271,13 +2271,13 @@ interface messages
     public function getInlineGameHighScores($params);
 
     /**
-     * Get chats in common with a user
+     * Get chats in common with a user.
      *
-     * Parameters: 
-     * * `InputUser` **user_id** - The user                    
+     * Parameters:
+     * * `InputUser` **user_id** - The user
      * * `int`       **max_id**  - The maximum chat ID to fetch
-     * * `int`       **limit**   - Number of results to fetch  
-     * 
+     * * `int`       **limit**   - Number of results to fetch
+     *
      * @param array $params Parameters
      *
      * @return messages.Chats
@@ -2285,11 +2285,11 @@ interface messages
     public function getCommonChats($params);
 
     /**
-     * Get all chats (not supergroups or channels)
+     * Get all chats (not supergroups or channels).
      *
-     * Parameters: 
+     * Parameters:
      * * `[int]` **except_ids** - Do not fetch these chats (MTProto id)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.Chats
@@ -2297,12 +2297,12 @@ interface messages
     public function getAllChats($params);
 
     /**
-     * Get webpage preview
+     * Get webpage preview.
      *
-     * Parameters: 
-     * * `string` **url**  - URL                                                                
+     * Parameters:
+     * * `string` **url**  - URL
      * * `[int]`  **hash** - Optional:  the hash parameter of the previous result of this method
-     * 
+     *
      * @param array $params Parameters
      *
      * @return WebPage
@@ -2310,12 +2310,12 @@ interface messages
     public function getWebPage($params);
 
     /**
-     * Pin or unpin dialog
+     * Pin or unpin dialog.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`         **pinned** - Optional: Pin or unpin the dialog?
-     * * `InputDialogPeer` **peer**   - The dialog to pin                 
-     * 
+     * * `InputDialogPeer` **peer**   - The dialog to pin
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2323,13 +2323,13 @@ interface messages
     public function toggleDialogPin($params);
 
     /**
-     * Reorder pinned dialogs
+     * Reorder pinned dialogs.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`           **force**     - Optional: Force reordering
-     * * `int`               **folder_id** - Folder ID                 
-     * * `[InputDialogPeer]` **order**     - New order                 
-     * 
+     * * `int`               **folder_id** - Folder ID
+     * * `[InputDialogPeer]` **order**     - New order
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2337,11 +2337,11 @@ interface messages
     public function reorderPinnedDialogs($params);
 
     /**
-     * Get pinned dialogs
+     * Get pinned dialogs.
      *
-     * Parameters: 
+     * Parameters:
      * * `int` **folder_id** - Folder ID
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.PeerDialogs
@@ -2349,13 +2349,13 @@ interface messages
     public function getPinnedDialogs($params);
 
     /**
-     * Bots only: set shipping results
+     * Bots only: set shipping results.
      *
-     * Parameters: 
-     * * `long`             **query_id**         - Query ID                  
-     * * `string`           **error**            - Optional: Error           
+     * Parameters:
+     * * `long`             **query_id**         - Query ID
+     * * `string`           **error**            - Optional: Error
      * * `[ShippingOption]` **shipping_options** - Optional: Shipping options
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2363,13 +2363,13 @@ interface messages
     public function setBotShippingResults($params);
 
     /**
-     * Bots only: set precheckout results
+     * Bots only: set precheckout results.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean` **success**  - Optional: Success?
-     * * `long`    **query_id** - Query ID          
-     * * `string`  **error**    - Optional: Error   
-     * 
+     * * `long`    **query_id** - Query ID
+     * * `string`  **error**    - Optional: Error
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2377,12 +2377,12 @@ interface messages
     public function setBotPrecheckoutResults($params);
 
     /**
-     * Upload a file without sending it to anyone
+     * Upload a file without sending it to anyone.
      *
-     * Parameters: 
-     * * `InputPeer`  **peer**  - Nothing            
+     * Parameters:
+     * * `InputPeer`  **peer**  - Nothing
      * * `InputMedia` **media** - The media to upload
-     * 
+     *
      * @param array $params Parameters
      *
      * @return MessageMedia
@@ -2390,12 +2390,12 @@ interface messages
     public function uploadMedia($params);
 
     /**
-     * Send screenshot notification
+     * Send screenshot notification.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer**            - Where to send the notification
-     * * `int`       **reply_to_msg_id** - Reply to message by ID        
-     * 
+     * * `int`       **reply_to_msg_id** - Reply to message by ID
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -2403,11 +2403,11 @@ interface messages
     public function sendScreenshotNotification($params);
 
     /**
-     * Get favorite stickers
+     * Get favorite stickers.
      *
-     * Parameters: 
+     * Parameters:
      * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.FavedStickers
@@ -2415,12 +2415,12 @@ interface messages
     public function getFavedStickers($params);
 
     /**
-     * Add a sticker to favorites
+     * Add a sticker to favorites.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputDocument` **id**     - The sticker to add to favorites
-     * * `Bool`          **unfave** - Remove it from favorites?      
-     * 
+     * * `Bool`          **unfave** - Remove it from favorites?
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2428,16 +2428,16 @@ interface messages
     public function faveSticker($params);
 
     /**
-     * Get unread mentions
+     * Get unread mentions.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer**       - The chat where to get unread mentions
-     * * `int`       **offset_id**  - The offset                           
-     * * `int`       **add_offset** - The additional offset                
-     * * `int`       **limit**      - The number of results to fetch       
-     * * `int`       **max_id**     - The maximum message ID to fetch      
-     * * `int`       **min_id**     - The minumum message ID to fetch      
-     * 
+     * * `int`       **offset_id**  - The offset
+     * * `int`       **add_offset** - The additional offset
+     * * `int`       **limit**      - The number of results to fetch
+     * * `int`       **max_id**     - The maximum message ID to fetch
+     * * `int`       **min_id**     - The minumum message ID to fetch
+     *
      * @param array $params Parameters
      *
      * @return messages.Messages
@@ -2445,11 +2445,11 @@ interface messages
     public function getUnreadMentions($params);
 
     /**
-     * Mark mentions as read
+     * Mark mentions as read.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer** - The chat
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.AffectedHistory
@@ -2457,13 +2457,13 @@ interface messages
     public function readMentions($params);
 
     /**
-     * Get recent locations
+     * Get recent locations.
      *
-     * Parameters: 
-     * * `InputPeer` **peer**  - The chat where to search locations            
-     * * `int`       **limit** - Number of results to return                   
+     * Parameters:
+     * * `InputPeer` **peer**  - The chat where to search locations
+     * * `int`       **limit** - Number of results to return
      * * `[int]`     **hash**  - Optional: IDs of locations you already fetched
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.Messages
@@ -2471,17 +2471,17 @@ interface messages
     public function getRecentLocations($params);
 
     /**
-     * Send an album
+     * Send an album.
      *
-     * Parameters: 
-     * * `boolean`            **silent**          - Optional: Disable notifications?          
+     * Parameters:
+     * * `boolean`            **silent**          - Optional: Disable notifications?
      * * `boolean`            **background**      - Optional: Disable background notification?
-     * * `boolean`            **clear_draft**     - Optional: Clear draft?                    
-     * * `InputPeer`          **peer**            - Where to send the album                   
-     * * `int`                **reply_to_msg_id** - Optional: Reply to message by ID          
-     * * `[InputSingleMedia]` **multi_media**     - The album                                 
-     * * `int`                **schedule_date**   - Optional: Schedule date                   
-     * 
+     * * `boolean`            **clear_draft**     - Optional: Clear draft?
+     * * `InputPeer`          **peer**            - Where to send the album
+     * * `int`                **reply_to_msg_id** - Optional: Reply to message by ID
+     * * `[InputSingleMedia]` **multi_media**     - The album
+     * * `int`                **schedule_date**   - Optional: Schedule date
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -2489,12 +2489,12 @@ interface messages
     public function sendMultiMedia($params);
 
     /**
-     * Upload a secret chat file without sending it to anyone
+     * Upload a secret chat file without sending it to anyone.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputEncryptedChat` **peer** - The chat where to upload the media
-     * * `InputEncryptedFile` **file** - The file                          
-     * 
+     * * `InputEncryptedFile` **file** - The file
+     *
      * @param array $params Parameters
      *
      * @return EncryptedFile
@@ -2502,13 +2502,13 @@ interface messages
     public function uploadEncryptedFile($params);
 
     /**
-     * Find a sticker set
+     * Find a sticker set.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean` **exclude_featured** - Optional: Exclude featured sticker sets from the search?
-     * * `string`  **q**                - The search query                                        
-     * * `[int]`   **hash**             - Optional: The IDs of stickersets you already fetched    
-     * 
+     * * `string`  **q**                - The search query
+     * * `[int]`   **hash**             - Optional: The IDs of stickersets you already fetched
+     *
      * @param array $params Parameters
      *
      * @return messages.FoundStickerSets
@@ -2516,19 +2516,19 @@ interface messages
     public function searchStickerSets($params);
 
     /**
-     * Get message ranges to fetch
+     * Get message ranges to fetch.
      *
      * @return _of_MessageRange[]
      */
     public function getSplitRanges();
 
     /**
-     * Mark dialog as unread 
+     * Mark dialog as unread.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`         **unread** - Optional: Should it be marked or unmarked as read
-     * * `InputDialogPeer` **peer**   - The dialog to mark as unread                     
-     * 
+     * * `InputDialogPeer` **peer**   - The dialog to mark as unread
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2536,27 +2536,27 @@ interface messages
     public function markDialogUnread($params);
 
     /**
-     * Get dialogs marked as unread manually
+     * Get dialogs marked as unread manually.
      *
      * @return _of_DialogPeer[]
      */
     public function getDialogUnreadMarks();
 
     /**
-     * Clear all drafts
+     * Clear all drafts.
      *
      * @return bool
      */
     public function clearAllDrafts();
 
     /**
-     * Update pinned message
+     * Update pinned message.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`   **silent** - Optional: Silent?
-     * * `InputPeer` **peer**   - Peer             
-     * * `int`       **id**     - Message ID       
-     * 
+     * * `InputPeer` **peer**   - Peer
+     * * `int`       **id**     - Message ID
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -2564,13 +2564,13 @@ interface messages
     public function updatePinnedMessage($params);
 
     /**
-     * Send vote
+     * Send vote.
      *
-     * Parameters: 
-     * * `InputPeer` **peer**    - Peer      
+     * Parameters:
+     * * `InputPeer` **peer**    - Peer
      * * `int`       **msg_id**  - Message ID
-     * * `[bytes]`   **options** - Options   
-     * 
+     * * `[bytes]`   **options** - Options
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -2578,12 +2578,12 @@ interface messages
     public function sendVote($params);
 
     /**
-     * Get poll results
+     * Get poll results.
      *
-     * Parameters: 
-     * * `InputPeer` **peer**   - Peer      
+     * Parameters:
+     * * `InputPeer` **peer**   - Peer
      * * `int`       **msg_id** - Message ID
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -2591,11 +2591,11 @@ interface messages
     public function getPollResults($params);
 
     /**
-     * Get online users
+     * Get online users.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer** - Peer
-     * 
+     *
      * @param array $params Parameters
      *
      * @return ChatOnlines
@@ -2603,13 +2603,13 @@ interface messages
     public function getOnlines($params);
 
     /**
-     * Get stats URL
+     * Get stats URL.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`   **dark**   - Optional: Dark?
-     * * `InputPeer` **peer**   - Peer           
-     * * `string`    **params** - Params         
-     * 
+     * * `InputPeer` **peer**   - Peer
+     * * `string`    **params** - Params
+     *
      * @param array $params Parameters
      *
      * @return StatsURL
@@ -2617,12 +2617,12 @@ interface messages
     public function getStatsURL($params);
 
     /**
-     * Edit chat info
+     * Edit chat info.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer**  - Chat
      * * `string`    **about** - Info
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2630,12 +2630,12 @@ interface messages
     public function editChatAbout($params);
 
     /**
-     * Edit default rights of chat
+     * Edit default rights of chat.
      *
-     * Parameters: 
-     * * `InputPeer`        **peer**          - Chat              
+     * Parameters:
+     * * `InputPeer`        **peer**          - Chat
      * * `ChatBannedRights` **banned_rights** - Global chat rights
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -2643,11 +2643,11 @@ interface messages
     public function editChatDefaultBannedRights($params);
 
     /**
-     * Get emoji keywords
+     * Get emoji keywords.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **lang_code** - Language code
-     * 
+     *
      * @param array $params Parameters
      *
      * @return EmojiKeywordsDifference
@@ -2655,12 +2655,12 @@ interface messages
     public function getEmojiKeywords($params);
 
     /**
-     * Get emoji keyword difference
+     * Get emoji keyword difference.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **lang_code**    - Language code
-     * * `int`    **from_version** - From version 
-     * 
+     * * `int`    **from_version** - From version
+     *
      * @param array $params Parameters
      *
      * @return EmojiKeywordsDifference
@@ -2668,11 +2668,11 @@ interface messages
     public function getEmojiKeywordsDifference($params);
 
     /**
-     * Get emoji keyword languages
+     * Get emoji keyword languages.
      *
-     * Parameters: 
+     * Parameters:
      * * `[string]` **lang_codes** - Language codes
-     * 
+     *
      * @param array $params Parameters
      *
      * @return _of_EmojiLanguage[]
@@ -2680,11 +2680,11 @@ interface messages
     public function getEmojiKeywordsLanguages($params);
 
     /**
-     * Get emoji URL
+     * Get emoji URL.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **lang_code** - Language code
-     * 
+     *
      * @param array $params Parameters
      *
      * @return EmojiURL
@@ -2692,12 +2692,12 @@ interface messages
     public function getEmojiURL($params);
 
     /**
-     * Get search counter
+     * Get search counter.
      *
-     * Parameters: 
-     * * `InputPeer`        **peer**    - Peer   
+     * Parameters:
+     * * `InputPeer`        **peer**    - Peer
      * * `[MessagesFilter]` **filters** - Filters
-     * 
+     *
      * @param array $params Parameters
      *
      * @return _of_messages.SearchCounter[]
@@ -2705,13 +2705,13 @@ interface messages
     public function getSearchCounters($params);
 
     /**
-     * Request URL authorization
+     * Request URL authorization.
      *
-     * Parameters: 
-     * * `InputPeer` **peer**      - Peer      
+     * Parameters:
+     * * `InputPeer` **peer**      - Peer
      * * `int`       **msg_id**    - Message ID
-     * * `int`       **button_id** - Button ID 
-     * 
+     * * `int`       **button_id** - Button ID
+     *
      * @param array $params Parameters
      *
      * @return UrlAuthResult
@@ -2719,14 +2719,14 @@ interface messages
     public function requestUrlAuth($params);
 
     /**
-     * Accept URL authorization
+     * Accept URL authorization.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`   **write_allowed** - Optional: Write allowed?
-     * * `InputPeer` **peer**          - Peer                    
-     * * `int`       **msg_id**        - Message ID              
-     * * `int`       **button_id**     - Button ID               
-     * 
+     * * `InputPeer` **peer**          - Peer
+     * * `int`       **msg_id**        - Message ID
+     * * `int`       **button_id**     - Button ID
+     *
      * @param array $params Parameters
      *
      * @return UrlAuthResult
@@ -2734,11 +2734,11 @@ interface messages
     public function acceptUrlAuth($params);
 
     /**
-     * Hide peer settings bar
+     * Hide peer settings bar.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer** - Peer
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2746,12 +2746,12 @@ interface messages
     public function hidePeerSettingsBar($params);
 
     /**
-     * Get scheduled history
+     * Get scheduled history.
      *
-     * Parameters: 
-     * * `InputPeer` **peer** - Peer          
+     * Parameters:
+     * * `InputPeer` **peer** - Peer
      * * `[int]`     **hash** - Optional: Hash
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.Messages
@@ -2759,12 +2759,12 @@ interface messages
     public function getScheduledHistory($params);
 
     /**
-     * Get scheduled messages
+     * Get scheduled messages.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer** - Peer
-     * * `[int]`     **id**   - ID  
-     * 
+     * * `[int]`     **id**   - ID
+     *
      * @param array $params Parameters
      *
      * @return messages.Messages
@@ -2772,12 +2772,12 @@ interface messages
     public function getScheduledMessages($params);
 
     /**
-     * Send scheduled messages
+     * Send scheduled messages.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer** - Peer
-     * * `[int]`     **id**   - ID  
-     * 
+     * * `[int]`     **id**   - ID
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -2785,12 +2785,12 @@ interface messages
     public function sendScheduledMessages($params);
 
     /**
-     * Delete scheduled messages
+     * Delete scheduled messages.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPeer` **peer** - Peer
-     * * `[int]`     **id**   - ID  
-     * 
+     * * `[int]`     **id**   - ID
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -2801,21 +2801,21 @@ interface messages
 interface updates
 {
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
      *
      * @return updates.State
      */
     public function getState();
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
      *
-     * Parameters: 
-     * * `int` **pts**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
+     * Parameters:
+     * * `int` **pts**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
      * * `int` **pts_total_limit** - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `int` **date**            - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
-     * * `int` **qts**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
-     * 
+     * * `int` **date**            - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `int` **qts**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     *
      * @param array $params Parameters
      *
      * @return updates.Difference
@@ -2823,15 +2823,15 @@ interface updates
     public function getDifference($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`               **force**   - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `InputChannel`          **channel** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
-     * * `ChannelMessagesFilter` **filter**  - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
-     * * `int`                   **pts**     - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
-     * * `int`                   **limit**   - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates          
-     * 
+     * * `InputChannel`          **channel** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `ChannelMessagesFilter` **filter**  - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `int`                   **pts**     - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `int`                   **limit**   - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     *
      * @param array $params Parameters
      *
      * @return updates.ChannelDifference
@@ -2842,11 +2842,11 @@ interface updates
 interface photos
 {
     /**
-     * Change the profile photo
+     * Change the profile photo.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPhoto` **id** - The photo to use
-     * 
+     *
      * @param array $params Parameters
      *
      * @return UserProfilePhoto
@@ -2854,11 +2854,11 @@ interface photos
     public function updateProfilePhoto($params);
 
     /**
-     * Upload profile photo
+     * Upload profile photo.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputFile` **file** - The photo
-     * 
+     *
      * @param array $params Parameters
      *
      * @return photos.Photo
@@ -2866,11 +2866,11 @@ interface photos
     public function uploadProfilePhoto($params);
 
     /**
-     * Delete profile photos
+     * Delete profile photos.
      *
-     * Parameters: 
+     * Parameters:
      * * `[InputPhoto]` **id** - The profile photos to delete
-     * 
+     *
      * @param array $params Parameters
      *
      * @return _of_long[]
@@ -2878,14 +2878,14 @@ interface photos
     public function deletePhotos($params);
 
     /**
-     * Get the profile photos of a user
+     * Get the profile photos of a user.
      *
-     * Parameters: 
-     * * `InputUser` **user_id** - The user                     
-     * * `int`       **offset**  - Offset                       
+     * Parameters:
+     * * `InputUser` **user_id** - The user
+     * * `int`       **offset**  - Offset
      * * `long`      **max_id**  - Maximum ID of photo to return
-     * * `int`       **limit**   - Number of photos to return   
-     * 
+     * * `int`       **limit**   - Number of photos to return
+     *
      * @param array $params Parameters
      *
      * @return photos.Photos
@@ -2896,13 +2896,13 @@ interface photos
 interface upload
 {
     /**
-     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info.
      *
-     * Parameters: 
+     * Parameters:
      * * `long`  **file_id**   - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      * * `int`   **file_part** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      * * `bytes` **bytes**     - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2910,14 +2910,14 @@ interface upload
     public function saveFilePart($params);
 
     /**
-     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`           **precise**  - Optional: You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `InputFileLocation` **location** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info          
-     * * `int`               **offset**   - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info          
-     * * `int`               **limit**    - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info          
-     * 
+     * * `InputFileLocation` **location** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`               **offset**   - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`               **limit**    - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     *
      * @param array $params Parameters
      *
      * @return upload.File
@@ -2925,14 +2925,14 @@ interface upload
     public function getFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info.
      *
-     * Parameters: 
+     * Parameters:
      * * `long`  **file_id**          - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      * * `int`   **file_part**        - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      * * `int`   **file_total_parts** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      * * `bytes` **bytes**            - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -2940,13 +2940,13 @@ interface upload
     public function saveBigFilePart($params);
 
     /**
-     * Download a file through telegram
+     * Download a file through telegram.
      *
-     * Parameters: 
-     * * `InputWebFileLocation` **location** - The file                    
-     * * `int`                  **offset**   - The offset in bytes         
+     * Parameters:
+     * * `InputWebFileLocation` **location** - The file
+     * * `int`                  **offset**   - The offset in bytes
      * * `int`                  **limit**    - The number of bytes to fetch
-     * 
+     *
      * @param array $params Parameters
      *
      * @return upload.WebFile
@@ -2954,13 +2954,13 @@ interface upload
     public function getWebFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info.
      *
-     * Parameters: 
+     * Parameters:
      * * `bytes` **file_token** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      * * `int`   **offset**     - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      * * `int`   **limit**      - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * 
+     *
      * @param array $params Parameters
      *
      * @return upload.CdnFile
@@ -2968,12 +2968,12 @@ interface upload
     public function getCdnFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info.
      *
-     * Parameters: 
+     * Parameters:
      * * `bytes` **file_token**    - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      * * `bytes` **request_token** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * 
+     *
      * @param array $params Parameters
      *
      * @return _of_FileHash[]
@@ -2981,12 +2981,12 @@ interface upload
     public function reuploadCdnFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info.
      *
-     * Parameters: 
+     * Parameters:
      * * `bytes` **file_token** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
      * * `int`   **offset**     - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * 
+     *
      * @param array $params Parameters
      *
      * @return _of_FileHash[]
@@ -2994,12 +2994,12 @@ interface upload
     public function getCdnFileHashes($params);
 
     /**
-     * Get file hashes
+     * Get file hashes.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputFileLocation` **location** - The file
-     * * `int`               **offset**   - Offset  
-     * 
+     * * `int`               **offset**   - Offset
+     *
      * @param array $params Parameters
      *
      * @return _of_FileHash[]
@@ -3010,25 +3010,25 @@ interface upload
 interface help
 {
     /**
-     * Get server configuration
+     * Get server configuration.
      *
      * @return Config
      */
     public function getConfig();
 
     /**
-     * Get nearest datacenter
+     * Get nearest datacenter.
      *
      * @return NearestDc
      */
     public function getNearestDc();
 
     /**
-     * Get info about app updates
+     * Get info about app updates.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **source** - Source
-     * 
+     *
      * @param array $params Parameters
      *
      * @return help.AppUpdate
@@ -3036,25 +3036,25 @@ interface help
     public function getAppUpdate($params);
 
     /**
-     * Get invitation text
+     * Get invitation text.
      *
      * @return help.InviteText
      */
     public function getInviteText();
 
     /**
-     * Get info of support user
+     * Get info of support user.
      *
      * @return help.Support
      */
     public function getSupport();
 
     /**
-     * Get the changelog of this app
+     * Get the changelog of this app.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **prev_app_version** - Previous app version
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3062,12 +3062,12 @@ interface help
     public function getAppChangelog($params);
 
     /**
-     * Set the update status of webhook
+     * Set the update status of webhook.
      *
-     * Parameters: 
+     * Parameters:
      * * `int`    **pending_updates_count** - Pending update count
-     * * `string` **message**               - Message             
-     * 
+     * * `string` **message**               - Message
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3075,18 +3075,18 @@ interface help
     public function setBotUpdatesStatus($params);
 
     /**
-     * Get CDN configuration
+     * Get CDN configuration.
      *
      * @return CdnConfig
      */
     public function getCdnConfig();
 
     /**
-     * Get recent t.me URLs
+     * Get recent t.me URLs.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **referer** - Referrer
-     * 
+     *
      * @param array $params Parameters
      *
      * @return help.RecentMeUrls
@@ -3094,25 +3094,25 @@ interface help
     public function getRecentMeUrls($params);
 
     /**
-     * Get information about the current proxy
+     * Get information about the current proxy.
      *
      * @return help.ProxyData
      */
     public function getProxyData();
 
     /**
-     * Get updated TOS
+     * Get updated TOS.
      *
      * @return help.TermsOfServiceUpdate
      */
     public function getTermsOfServiceUpdate();
 
     /**
-     * Accept telegram's TOS
+     * Accept telegram's TOS.
      *
-     * Parameters: 
+     * Parameters:
      * * `DataJSON` **id** - TOS
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3120,11 +3120,11 @@ interface help
     public function acceptTermsOfService($params);
 
     /**
-     * Get deep link info
+     * Get deep link info.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **path** - Deep link
-     * 
+     *
      * @param array $params Parameters
      *
      * @return help.DeepLinkInfo
@@ -3132,18 +3132,18 @@ interface help
     public function getDeepLinkInfo($params);
 
     /**
-     * Get app config
+     * Get app config.
      *
      * @return JSONValue
      */
     public function getAppConfig();
 
     /**
-     * Log data for developer of this app
+     * Log data for developer of this app.
      *
-     * Parameters: 
+     * Parameters:
      * * `[InputAppEvent]` **events** - Event list
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3151,11 +3151,11 @@ interface help
     public function saveAppLog($params);
 
     /**
-     * Get passport config
+     * Get passport config.
      *
-     * Parameters: 
+     * Parameters:
      * * `[int]` **hash** - Optional: Hash
-     * 
+     *
      * @param array $params Parameters
      *
      * @return help.PassportConfig
@@ -3163,18 +3163,18 @@ interface help
     public function getPassportConfig($params);
 
     /**
-     * Get support name
+     * Get support name.
      *
      * @return help.SupportName
      */
     public function getSupportName();
 
     /**
-     * Get user info
+     * Get user info.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputUser` **user_id** - User ID
-     * 
+     *
      * @param array $params Parameters
      *
      * @return help.UserInfo
@@ -3182,13 +3182,13 @@ interface help
     public function getUserInfo($params);
 
     /**
-     * Edit user info
+     * Edit user info.
      *
-     * Parameters: 
-     * * `InputUser`       **user_id**  - User ID 
-     * * `string`          **message**  - Message 
+     * Parameters:
+     * * `InputUser`       **user_id**  - User ID
+     * * `string`          **message**  - Message
      * * `[MessageEntity]` **entities** - Entities
-     * 
+     *
      * @param array $params Parameters
      *
      * @return help.UserInfo
@@ -3199,12 +3199,12 @@ interface help
 interface channels
 {
     /**
-     * Mark channel/supergroup history as read
+     * Mark channel/supergroup history as read.
      *
-     * Parameters: 
-     * * `InputChannel` **channel** - The channel/supergroup            
+     * Parameters:
+     * * `InputChannel` **channel** - The channel/supergroup
      * * `int`          **max_id**  - Maximum message ID to mark as read
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3212,12 +3212,12 @@ interface channels
     public function readHistory($params);
 
     /**
-     * Delete channel/supergroup messages
+     * Delete channel/supergroup messages.
      *
-     * Parameters: 
-     * * `InputChannel` **channel** - The channel/supergroup       
+     * Parameters:
+     * * `InputChannel` **channel** - The channel/supergroup
      * * `[int]`        **id**      - The IDs of messages to delete
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.AffectedMessages
@@ -3225,12 +3225,12 @@ interface channels
     public function deleteMessages($params);
 
     /**
-     * Delete all messages of a user in a channel/supergroup
+     * Delete all messages of a user in a channel/supergroup.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputChannel` **channel** - The channel/supergroup
-     * * `InputUser`    **user_id** - The user              
-     * 
+     * * `InputUser`    **user_id** - The user
+     *
      * @param array $params Parameters
      *
      * @return messages.AffectedHistory
@@ -3238,13 +3238,13 @@ interface channels
     public function deleteUserHistory($params);
 
     /**
-     * Report a message in a supergroup/channel for spam
+     * Report a message in a supergroup/channel for spam.
      *
-     * Parameters: 
-     * * `InputChannel` **channel** - The channel                    
+     * Parameters:
+     * * `InputChannel` **channel** - The channel
      * * `InputUser`    **user_id** - The user that sent the messages
-     * * `[int]`        **id**      - The IDs of messages to report  
-     * 
+     * * `[int]`        **id**      - The IDs of messages to report
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3252,12 +3252,12 @@ interface channels
     public function reportSpam($params);
 
     /**
-     * Get channel/supergroup messages
+     * Get channel/supergroup messages.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputChannel`   **channel** - The channel/supergroup
-     * * `[InputMessage]` **id**      - The message IDs       
-     * 
+     * * `[InputMessage]` **id**      - The message IDs
+     *
      * @param array $params Parameters
      *
      * @return messages.Messages
@@ -3265,15 +3265,15 @@ interface channels
     public function getMessages($params);
 
     /**
-     * Get channel/supergroup participants (you should use `$MadelineProto->get_pwr_chat($id)` instead)
+     * Get channel/supergroup participants (you should use `$MadelineProto->get_pwr_chat($id)` instead).
      *
-     * Parameters: 
-     * * `InputChannel`              **channel** - The channel                                     
-     * * `ChannelParticipantsFilter` **filter**  - Member filter                                   
-     * * `int`                       **offset**  - Offset                                          
-     * * `int`                       **limit**   - Limit                                           
+     * Parameters:
+     * * `InputChannel`              **channel** - The channel
+     * * `ChannelParticipantsFilter` **filter**  - Member filter
+     * * `int`                       **offset**  - Offset
+     * * `int`                       **limit**   - Limit
      * * `[int]`                     **hash**    - Optional: IDs of previously fetched participants
-     * 
+     *
      * @param array $params Parameters
      *
      * @return channels.ChannelParticipants
@@ -3281,12 +3281,12 @@ interface channels
     public function getParticipants($params);
 
     /**
-     * Get info about a certain channel/supergroup participant
+     * Get info about a certain channel/supergroup participant.
      *
-     * Parameters: 
-     * * `InputChannel` **channel** - The channel/supergroup      
+     * Parameters:
+     * * `InputChannel` **channel** - The channel/supergroup
      * * `InputUser`    **user_id** - The user to fetch info about
-     * 
+     *
      * @param array $params Parameters
      *
      * @return channels.ChannelParticipant
@@ -3294,11 +3294,11 @@ interface channels
     public function getParticipant($params);
 
     /**
-     * Get info about multiple channels/supergroups
+     * Get info about multiple channels/supergroups.
      *
-     * Parameters: 
+     * Parameters:
      * * `[InputChannel]` **id** - The channel/supergroup MTProto IDs
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.Chats
@@ -3306,11 +3306,11 @@ interface channels
     public function getChannels($params);
 
     /**
-     * You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     * You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info).
      *
-     * Parameters: 
+     * Parameters:
      * * `InputChannel` **channel** - You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.ChatFull
@@ -3318,16 +3318,16 @@ interface channels
     public function getFullChannel($params);
 
     /**
-     * Create channel/supergroup
+     * Create channel/supergroup.
      *
-     * Parameters: 
-     * * `boolean`       **broadcast** - Optional: Set this to true to create a channel   
+     * Parameters:
+     * * `boolean`       **broadcast** - Optional: Set this to true to create a channel
      * * `boolean`       **megagroup** - Optional: Set this to true to create a supergroup
-     * * `string`        **title**     - Supergroup/channel title                         
-     * * `string`        **about**     - About text                                       
-     * * `InputGeoPoint` **geo_point** - Optional: Geopoint (geochats)                    
-     * * `string`        **address**   - Optional: Physical address (geochats)            
-     * 
+     * * `string`        **title**     - Supergroup/channel title
+     * * `string`        **about**     - About text
+     * * `InputGeoPoint` **geo_point** - Optional: Geopoint (geochats)
+     * * `string`        **address**   - Optional: Physical address (geochats)
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3335,14 +3335,14 @@ interface channels
     public function createChannel($params);
 
     /**
-     * Edit admin permissions of a user in a channel/supergroup
+     * Edit admin permissions of a user in a channel/supergroup.
      *
-     * Parameters: 
-     * * `InputChannel`    **channel**      - The channel                    
-     * * `InputUser`       **user_id**      - The user                       
-     * * `ChatAdminRights` **admin_rights** - Admin rights                   
+     * Parameters:
+     * * `InputChannel`    **channel**      - The channel
+     * * `InputUser`       **user_id**      - The user
+     * * `ChatAdminRights` **admin_rights** - Admin rights
      * * `string`          **rank**         - Admin rank, an arbitrary string
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3350,12 +3350,12 @@ interface channels
     public function editAdmin($params);
 
     /**
-     * Edit the title of a supergroup/channel
+     * Edit the title of a supergroup/channel.
      *
-     * Parameters: 
-     * * `InputChannel` **channel** - The channel                     
+     * Parameters:
+     * * `InputChannel` **channel** - The channel
      * * `string`       **title**   - The new channel/supergroup title
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3363,12 +3363,12 @@ interface channels
     public function editTitle($params);
 
     /**
-     * Edit the photo of a supergroup/channel
+     * Edit the photo of a supergroup/channel.
      *
-     * Parameters: 
-     * * `InputChannel`   **channel** - The channel  
+     * Parameters:
+     * * `InputChannel`   **channel** - The channel
      * * `InputChatPhoto` **photo**   - The new photo
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3376,12 +3376,12 @@ interface channels
     public function editPhoto($params);
 
     /**
-     * Check if this username is free and can be assigned to a channel/supergroup
+     * Check if this username is free and can be assigned to a channel/supergroup.
      *
-     * Parameters: 
-     * * `InputChannel` **channel**  - The channel/supergroup                      
+     * Parameters:
+     * * `InputChannel` **channel**  - The channel/supergroup
      * * `string`       **username** - The new username for this channel/supergroup
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3389,12 +3389,12 @@ interface channels
     public function checkUsername($params);
 
     /**
-     * Update the username of a supergroup/channel
+     * Update the username of a supergroup/channel.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputChannel` **channel**  - The channel/supergroup
-     * * `string`       **username** - The new username      
-     * 
+     * * `string`       **username** - The new username
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3402,11 +3402,11 @@ interface channels
     public function updateUsername($params);
 
     /**
-     * Join a channel/supergroup
+     * Join a channel/supergroup.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputChannel` **channel** - The channel/supergroup to join
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3414,11 +3414,11 @@ interface channels
     public function joinChannel($params);
 
     /**
-     * Leave a channel/supergroup
+     * Leave a channel/supergroup.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputChannel` **channel** - The channel/supergroup to leave
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3426,12 +3426,12 @@ interface channels
     public function leaveChannel($params);
 
     /**
-     * Add users to channel/supergroup
+     * Add users to channel/supergroup.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputChannel` **channel** - The channel/supergroup
-     * * `[InputUser]`  **users**   - The users to add      
-     * 
+     * * `[InputUser]`  **users**   - The users to add
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3439,11 +3439,11 @@ interface channels
     public function inviteToChannel($params);
 
     /**
-     * Delete a channel/supergroup
+     * Delete a channel/supergroup.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputChannel` **channel** - The channel/supergroup to delete
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3451,13 +3451,13 @@ interface channels
     public function deleteChannel($params);
 
     /**
-     * Get the link of a message in a channel
+     * Get the link of a message in a channel.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputChannel` **channel** - The channel/supergroup
-     * * `int`          **id**      - The ID of the message 
-     * * `Bool`         **grouped** - Is this an album?     
-     * 
+     * * `int`          **id**      - The ID of the message
+     * * `Bool`         **grouped** - Is this an album?
+     *
      * @param array $params Parameters
      *
      * @return ExportedMessageLink
@@ -3465,12 +3465,12 @@ interface channels
     public function exportMessageLink($params);
 
     /**
-     * Toggle channel signatures
+     * Toggle channel signatures.
      *
-     * Parameters: 
-     * * `InputChannel` **channel** - The channel/supergroup               
+     * Parameters:
+     * * `InputChannel` **channel** - The channel/supergroup
      * * `Bool`         **enabled** - Enable or disable channel signatures?
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3478,12 +3478,12 @@ interface channels
     public function toggleSignatures($params);
 
     /**
-     * Get all supergroups/channels where you're admin
+     * Get all supergroups/channels where you're admin.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean` **by_location** - Optional: Get channels by location
-     * * `boolean` **check_limit** - Optional: Check limit             
-     * 
+     * * `boolean` **check_limit** - Optional: Check limit
+     *
      * @param array $params Parameters
      *
      * @return messages.Chats
@@ -3491,13 +3491,13 @@ interface channels
     public function getAdminedPublicChannels($params);
 
     /**
-     * Kick or ban a user from a channel/supergroup
+     * Kick or ban a user from a channel/supergroup.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputChannel`     **channel**       - The channel/supergroup
-     * * `InputUser`        **user_id**       - The user to kick/ban  
-     * * `ChatBannedRights` **banned_rights** - Banned rights         
-     * 
+     * * `InputUser`        **user_id**       - The user to kick/ban
+     * * `ChatBannedRights` **banned_rights** - Banned rights
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3505,17 +3505,17 @@ interface channels
     public function editBanned($params);
 
     /**
-     * Get admin log of a channel/supergroup
+     * Get admin log of a channel/supergroup.
      *
-     * Parameters: 
-     * * `InputChannel`                **channel**       - The channel/supergroup                        
-     * * `string`                      **q**             - Search query                                  
-     * * `ChannelAdminLogEventsFilter` **events_filter** - Optional: Event filter                        
+     * Parameters:
+     * * `InputChannel`                **channel**       - The channel/supergroup
+     * * `string`                      **q**             - Search query
+     * * `ChannelAdminLogEventsFilter` **events_filter** - Optional: Event filter
      * * `[InputUser]`                 **admins**        - Optional: Fetch only actions from these admins
-     * * `long`                        **max_id**        - Maximum message ID to fetch                   
-     * * `long`                        **min_id**        - Minimum message ID to fetch                   
-     * * `int`                         **limit**         - Number of results to fetch                    
-     * 
+     * * `long`                        **max_id**        - Maximum message ID to fetch
+     * * `long`                        **min_id**        - Minimum message ID to fetch
+     * * `int`                         **limit**         - Number of results to fetch
+     *
      * @param array $params Parameters
      *
      * @return channels.AdminLogResults
@@ -3523,12 +3523,12 @@ interface channels
     public function getAdminLog($params);
 
     /**
-     * Set the supergroup/channel stickerpack
+     * Set the supergroup/channel stickerpack.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputChannel`    **channel**    - The channel/supergoup
-     * * `InputStickerSet` **stickerset** - The stickerset       
-     * 
+     * * `InputStickerSet` **stickerset** - The stickerset
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3536,12 +3536,12 @@ interface channels
     public function setStickers($params);
 
     /**
-     * Mark channel/supergroup messages as read
+     * Mark channel/supergroup messages as read.
      *
-     * Parameters: 
-     * * `InputChannel` **channel** - The channel        
+     * Parameters:
+     * * `InputChannel` **channel** - The channel
      * * `[int]`        **id**      - List of message IDs
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3549,12 +3549,12 @@ interface channels
     public function readMessageContents($params);
 
     /**
-     * Delete the history of a supergroup/channel
+     * Delete the history of a supergroup/channel.
      *
-     * Parameters: 
-     * * `InputChannel` **channel** - The channel/supergroup      
+     * Parameters:
+     * * `InputChannel` **channel** - The channel/supergroup
      * * `int`          **max_id**  - Maximum message ID to delete
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3562,12 +3562,12 @@ interface channels
     public function deleteHistory($params);
 
     /**
-     * Enable or disable hidden history for new channel/supergroup users
+     * Enable or disable hidden history for new channel/supergroup users.
      *
-     * Parameters: 
-     * * `InputChannel` **channel** - The channel/supergroup                                           
+     * Parameters:
+     * * `InputChannel` **channel** - The channel/supergroup
      * * `Bool`         **enabled** - Enable or disable hidden history for new channel/supergroup users
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3575,11 +3575,11 @@ interface channels
     public function togglePreHistoryHidden($params);
 
     /**
-     * Get all channels you left
+     * Get all channels you left.
      *
-     * Parameters: 
+     * Parameters:
      * * `int` **offset** - Offset
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.Chats
@@ -3587,19 +3587,19 @@ interface channels
     public function getLeftChannels($params);
 
     /**
-     * Get groups for discussion
+     * Get groups for discussion.
      *
      * @return messages.Chats
      */
     public function getGroupsForDiscussion();
 
     /**
-     * Set discussion group of channel
+     * Set discussion group of channel.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputChannel` **broadcast** - The channel
-     * * `InputChannel` **group**     - The group  
-     * 
+     * * `InputChannel` **group**     - The group
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3607,13 +3607,13 @@ interface channels
     public function setDiscussionGroup($params);
 
     /**
-     * Edit creator of channel
+     * Edit creator of channel.
      *
-     * Parameters: 
-     * * `InputChannel`          **channel**  - Channel 
-     * * `InputUser`             **user_id**  - User ID 
+     * Parameters:
+     * * `InputChannel`          **channel**  - Channel
+     * * `InputUser`             **user_id**  - User ID
      * * `InputCheckPasswordSRP` **password** - Password
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3621,13 +3621,13 @@ interface channels
     public function editCreator($params);
 
     /**
-     * Edit location (geochats)
+     * Edit location (geochats).
      *
-     * Parameters: 
-     * * `InputChannel`  **channel**   - Channel                     
-     * * `InputGeoPoint` **geo_point** - Geo point                   
+     * Parameters:
+     * * `InputChannel`  **channel**   - Channel
+     * * `InputGeoPoint` **geo_point** - Geo point
      * * `string`        **address**   - Physical location (geochats)
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3635,12 +3635,12 @@ interface channels
     public function editLocation($params);
 
     /**
-     * Toggle slow mode
+     * Toggle slow mode.
      *
-     * Parameters: 
-     * * `InputChannel` **channel** - Supergroup                                                                                         
-     * * `int`          **seconds** - Users will only be able to send one message every `seconds` seconds, `0` to disable the limitation 
-     * 
+     * Parameters:
+     * * `InputChannel` **channel** - Supergroup
+     * * `int`          **seconds** - Users will only be able to send one message every `seconds` seconds, `0` to disable the limitation
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3651,12 +3651,12 @@ interface channels
 interface bots
 {
     /**
-     * Send a custom request to the bot API
+     * Send a custom request to the bot API.
      *
-     * Parameters: 
+     * Parameters:
      * * `string`   **custom_method** - The method to call
-     * * `DataJSON` **params**        - Method parameters 
-     * 
+     * * `DataJSON` **params**        - Method parameters
+     *
      * @param array $params Parameters
      *
      * @return DataJSON
@@ -3664,12 +3664,12 @@ interface bots
     public function sendCustomRequest($params);
 
     /**
-     * Send webhook request via bot API
+     * Send webhook request via bot API.
      *
-     * Parameters: 
-     * * `long`     **query_id** - The query ID  
+     * Parameters:
+     * * `long`     **query_id** - The query ID
      * * `DataJSON` **data**     - The parameters
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3680,11 +3680,11 @@ interface bots
 interface payments
 {
     /**
-     * Get payment form
+     * Get payment form.
      *
-     * Parameters: 
+     * Parameters:
      * * `int` **msg_id** - Message ID
-     * 
+     *
      * @param array $params Parameters
      *
      * @return payments.PaymentForm
@@ -3692,11 +3692,11 @@ interface payments
     public function getPaymentForm($params);
 
     /**
-     * Get payment receipt
+     * Get payment receipt.
      *
-     * Parameters: 
+     * Parameters:
      * * `int` **msg_id** - The message ID
-     * 
+     *
      * @param array $params Parameters
      *
      * @return payments.PaymentReceipt
@@ -3704,13 +3704,13 @@ interface payments
     public function getPaymentReceipt($params);
 
     /**
-     * Validate requested payment info
+     * Validate requested payment info.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`              **save**   - Optional: Save payment info?
-     * * `int`                  **msg_id** - The message ID              
-     * * `PaymentRequestedInfo` **info**   - The requested payment info  
-     * 
+     * * `int`                  **msg_id** - The message ID
+     * * `PaymentRequestedInfo` **info**   - The requested payment info
+     *
      * @param array $params Parameters
      *
      * @return payments.ValidatedRequestedInfo
@@ -3718,14 +3718,14 @@ interface payments
     public function validateRequestedInfo($params);
 
     /**
-     * Bots only: send payment form
+     * Bots only: send payment form.
      *
-     * Parameters: 
-     * * `int`                     **msg_id**             - Message ID                    
+     * Parameters:
+     * * `int`                     **msg_id**             - Message ID
      * * `string`                  **requested_info_id**  - Optional: ID of requested info
-     * * `string`                  **shipping_option_id** - Optional: Shipping option ID  
-     * * `InputPaymentCredentials` **credentials**        - Payment credentials           
-     * 
+     * * `string`                  **shipping_option_id** - Optional: Shipping option ID
+     * * `InputPaymentCredentials` **credentials**        - Payment credentials
+     *
      * @param array $params Parameters
      *
      * @return payments.PaymentResult
@@ -3733,19 +3733,19 @@ interface payments
     public function sendPaymentForm($params);
 
     /**
-     * Get saved payments info
+     * Get saved payments info.
      *
      * @return payments.SavedInfo
      */
     public function getSavedInfo();
 
     /**
-     * Clear saved payments info
+     * Clear saved payments info.
      *
-     * Parameters: 
-     * * `boolean` **credentials** - Optional: Clear credentials? 
+     * Parameters:
+     * * `boolean` **credentials** - Optional: Clear credentials?
      * * `boolean` **info**        - Optional: Clear payment info?
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3756,15 +3756,15 @@ interface payments
 interface stickers
 {
     /**
-     * Create stickerset
+     * Create stickerset.
      *
-     * Parameters: 
-     * * `boolean`               **masks**      - Optional: Masks?                         
+     * Parameters:
+     * * `boolean`               **masks**      - Optional: Masks?
      * * `InputUser`             **user_id**    - The user ID associated to this stickerset
-     * * `string`                **title**      - The stickerset title                     
-     * * `string`                **short_name** - The stickerset short name                
-     * * `[InputStickerSetItem]` **stickers**   - The stickers to add                      
-     * 
+     * * `string`                **title**      - The stickerset title
+     * * `string`                **short_name** - The stickerset short name
+     * * `[InputStickerSetItem]` **stickers**   - The stickers to add
+     *
      * @param array $params Parameters
      *
      * @return messages.StickerSet
@@ -3772,11 +3772,11 @@ interface stickers
     public function createStickerSet($params);
 
     /**
-     * Remove sticker from stickerset
+     * Remove sticker from stickerset.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputDocument` **sticker** - The sticker to remove
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.StickerSet
@@ -3784,12 +3784,12 @@ interface stickers
     public function removeStickerFromSet($params);
 
     /**
-     * Change sticker position in photo
+     * Change sticker position in photo.
      *
-     * Parameters: 
-     * * `InputDocument` **sticker**  - The sticker 
+     * Parameters:
+     * * `InputDocument` **sticker**  - The sticker
      * * `int`           **position** - New position
-     * 
+     *
      * @param array $params Parameters
      *
      * @return messages.StickerSet
@@ -3797,12 +3797,12 @@ interface stickers
     public function changeStickerPosition($params);
 
     /**
-     * Add sticker to stickerset
+     * Add sticker to stickerset.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputStickerSet`     **stickerset** - The stickerset
-     * * `InputStickerSetItem` **sticker**    - The sticker   
-     * 
+     * * `InputStickerSetItem` **sticker**    - The sticker
+     *
      * @param array $params Parameters
      *
      * @return messages.StickerSet
@@ -3813,21 +3813,21 @@ interface stickers
 interface phone
 {
     /**
-     * Get call configuration
+     * Get call configuration.
      *
      * @return DataJSON
      */
     public function getCallConfig();
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`           **video**    - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `InputUser`         **user_id**  - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
-     * * `bytes`             **g_a_hash** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
-     * * `PhoneCallProtocol` **protocol** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
-     * 
+     * * `InputUser`         **user_id**  - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `bytes`             **g_a_hash** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `PhoneCallProtocol` **protocol** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     *
      * @param array $params Parameters
      *
      * @return phone.PhoneCall
@@ -3835,13 +3835,13 @@ interface phone
     public function requestCall($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPhoneCall`    **peer**     - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
      * * `bytes`             **g_b**      - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
      * * `PhoneCallProtocol` **protocol** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * 
+     *
      * @param array $params Parameters
      *
      * @return phone.PhoneCall
@@ -3849,14 +3849,14 @@ interface phone
     public function acceptCall($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPhoneCall`    **peer**            - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
      * * `bytes`             **g_a**             - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
      * * `long`              **key_fingerprint** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
      * * `PhoneCallProtocol` **protocol**        - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * 
+     *
      * @param array $params Parameters
      *
      * @return phone.PhoneCall
@@ -3864,11 +3864,11 @@ interface phone
     public function confirmCall($params);
 
     /**
-     * Notify server that you received a call (server will refuse all incoming calls until the current call is over)
+     * Notify server that you received a call (server will refuse all incoming calls until the current call is over).
      *
-     * Parameters: 
+     * Parameters:
      * * `InputPhoneCall` **peer** - The phone call you received
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3876,15 +3876,15 @@ interface phone
     public function receivedCall($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`                **video**         - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `InputPhoneCall`         **peer**          - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
-     * * `int`                    **duration**      - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
-     * * `PhoneCallDiscardReason` **reason**        - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
-     * * `long`                   **connection_id** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls          
-     * 
+     * * `InputPhoneCall`         **peer**          - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `int`                    **duration**      - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `PhoneCallDiscardReason` **reason**        - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `long`                   **connection_id** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3892,14 +3892,14 @@ interface phone
     public function discardCall($params);
 
     /**
-     * Set phone call rating
+     * Set phone call rating.
      *
-     * Parameters: 
+     * Parameters:
      * * `boolean`        **user_initiative** - Optional: User initiative
-     * * `InputPhoneCall` **peer**            - The phone call           
-     * * `int`            **rating**          - Rating (1-5 stars)       
-     * * `string`         **comment**         - An optional comment      
-     * 
+     * * `InputPhoneCall` **peer**            - The phone call
+     * * `int`            **rating**          - Rating (1-5 stars)
+     * * `string`         **comment**         - An optional comment
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -3907,12 +3907,12 @@ interface phone
     public function setCallRating($params);
 
     /**
-     * Save call debugging info
+     * Save call debugging info.
      *
-     * Parameters: 
-     * * `InputPhoneCall` **peer**  - The call      
+     * Parameters:
+     * * `InputPhoneCall` **peer**  - The call
      * * `DataJSON`       **debug** - Debugging info
-     * 
+     *
      * @param array $params Parameters
      *
      * @return bool
@@ -3923,12 +3923,12 @@ interface phone
 interface langpack
 {
     /**
-     * Get language pack
+     * Get language pack.
      *
-     * Parameters: 
-     * * `string` **lang_pack** - Lang pack    
+     * Parameters:
+     * * `string` **lang_pack** - Lang pack
      * * `string` **lang_code** - Language code
-     * 
+     *
      * @param array $params Parameters
      *
      * @return LangPackDifference
@@ -3936,13 +3936,13 @@ interface langpack
     public function getLangPack($params);
 
     /**
-     * Get language pack strings
+     * Get language pack strings.
      *
-     * Parameters: 
-     * * `string`   **lang_pack** - Lang pack    
+     * Parameters:
+     * * `string`   **lang_pack** - Lang pack
      * * `string`   **lang_code** - Language code
-     * * `[string]` **keys**      - Keys         
-     * 
+     * * `[string]` **keys**      - Keys
+     *
      * @param array $params Parameters
      *
      * @return _of_LangPackString[]
@@ -3950,13 +3950,13 @@ interface langpack
     public function getStrings($params);
 
     /**
-     * Get language pack updates
+     * Get language pack updates.
      *
-     * Parameters: 
-     * * `string` **lang_pack**    - Language pack   
-     * * `string` **lang_code**    - Lang code       
+     * Parameters:
+     * * `string` **lang_pack**    - Language pack
+     * * `string` **lang_code**    - Lang code
      * * `int`    **from_version** - Previous version
-     * 
+     *
      * @param array $params Parameters
      *
      * @return LangPackDifference
@@ -3964,11 +3964,11 @@ interface langpack
     public function getDifference($params);
 
     /**
-     * Get available languages
+     * Get available languages.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **lang_pack** - Lang pack
-     * 
+     *
      * @param array $params Parameters
      *
      * @return _of_LangPackLanguage[]
@@ -3976,12 +3976,12 @@ interface langpack
     public function getLanguages($params);
 
     /**
-     * Get language
+     * Get language.
      *
-     * Parameters: 
+     * Parameters:
      * * `string` **lang_pack** - Lang pack
      * * `string` **lang_code** - Lang code
-     * 
+     *
      * @param array $params Parameters
      *
      * @return LangPackLanguage
@@ -3992,11 +3992,11 @@ interface langpack
 interface folders
 {
     /**
-     * Edit folder
+     * Edit folder.
      *
-     * Parameters: 
+     * Parameters:
      * * `[InputFolderPeer]` **folder_peers** - New folder peers
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -4004,11 +4004,11 @@ interface folders
     public function editPeerFolders($params);
 
     /**
-     * Delete folder
+     * Delete folder.
      *
-     * Parameters: 
+     * Parameters:
      * * `int` **folder_id** - Folder ID
-     * 
+     *
      * @param array $params Parameters
      *
      * @return Updates
@@ -4018,37 +4018,36 @@ interface folders
 
 class InternalDoc extends APIFactory
 {
-
     public function logger($param, $level = danog\MadelineProto\Logger::NOTICE, $file = null)
     {
         return $this->__call(__FUNCTION__, [$param, $level, $file]);
     }
-    
+
     public function isAltervista()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function isInitingAuthorization()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function getHTTPClient()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function getDNSClient()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function fileGetContents($url): Generator
     {
         return $this->__call(__FUNCTION__, [$url]);
     }
-    
+
     public function a(callable $a, ?string $b = null, $c = null, $d = 2, $e = MTProto::METHOD_BEFORE_CALLBACK): ?string
     {
         return $this->__call(__FUNCTION__, [$a, $b, $c, $d, $e]);
@@ -4062,33 +4061,33 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function hasAllAuth()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function startLoops()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function stopLoops()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
-    public function getSettings($settings, $previousSettings = array (
-    ))
+
+    public function getSettings($settings, $previousSettings = [
+    ])
     {
         return $this->__call(__FUNCTION__, [$settings, $previousSettings]);
     }
-    
+
     public function parseSettings($settings)
     {
         return $this->__call(__FUNCTION__, [$settings]);
     }
-    
+
     public function setupLogger()
     {
         return $this->__call(__FUNCTION__, []);
@@ -4116,89 +4115,89 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$datacenter]);
     }
-    
+
     public function connectToAllDcs(bool $reconnectAll = true): Generator
     {
         return $this->__call(__FUNCTION__, [$reconnectAll]);
     }
-    
+
     public function resetSession()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function resetUpdateState()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function startUpdateSystem($anyway = false)
     {
         return $this->__call(__FUNCTION__, [$anyway]);
     }
-    
+
     public function getPhoneConfig($watcherId = null)
     {
         return $this->__call(__FUNCTION__, [$watcherId]);
     }
-    
+
     public function getCdnConfig($datacenter)
     {
         return $this->__call(__FUNCTION__, [$datacenter]);
     }
-    
+
     public function getCachedConfig()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
-    public function getConfig($config = array (
-    ), $options = array (
-    ))
+
+    public function getConfig($config = [
+    ], $options = [
+    ])
     {
         return $this->__call(__FUNCTION__, [$config, $options]);
     }
-    
+
     public function parseConfig()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function parseDcOptions($dc_options)
     {
         return $this->__call(__FUNCTION__, [$dc_options]);
     }
-    
+
     public function getSelf()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function getMethodCallbacks(): array
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function getMethodBeforeCallbacks(): array
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function getConstructorCallbacks(): array
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function getConstructorBeforeCallbacks(): array
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function getConstructorSerializeCallbacks(): array
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function getTypeMismatchCallbacks(): array
     {
         return $this->__call(__FUNCTION__, []);
@@ -4314,10 +4313,10 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function methodCall(string $method, $args = array (
-    ), array $aargs = array (
+    public function methodCall(string $method, $args = [
+    ], array $aargs = [
       'msg_id' => null,
-    )): Amp\Promise
+    ]): Amp\Promise
     {
         return $this->__call(__FUNCTION__, [$method, $args, $aargs]);
     }
@@ -4330,619 +4329,619 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function methodCallWrite(string $method, $args = array (
-    ), array $aargs = array (
+    public function methodCallWrite(string $method, $args = [
+    ], array $aargs = [
       'msg_id' => null,
-    )): Amp\Promise
+    ]): Amp\Promise
     {
         return $this->__call(__FUNCTION__, [$method, $args, $aargs]);
     }
-    
+
     public function aesCalculate($msg_key, $auth_key, $to_server = true)
     {
         return $this->__call(__FUNCTION__, [$msg_key, $auth_key, $to_server]);
     }
-    
+
     public function oldAesCalculate($msg_key, $auth_key, $to_server = true)
     {
         return $this->__call(__FUNCTION__, [$msg_key, $auth_key, $to_server]);
     }
-    
+
     public function ctrEncrypt($message, $key, $iv)
     {
         return $this->__call(__FUNCTION__, [$message, $key, $iv]);
     }
-    
+
     public function igeEncrypt($message, $key, $iv)
     {
         return $this->__call(__FUNCTION__, [$message, $key, $iv]);
     }
-    
+
     public function igeDecrypt($message, $key, $iv)
     {
         return $this->__call(__FUNCTION__, [$message, $key, $iv]);
     }
-    
+
     public function toSupergroup($id)
     {
         return $this->__call(__FUNCTION__, [$id]);
     }
-    
+
     public function fromSupergroup($id)
     {
         return $this->__call(__FUNCTION__, [$id]);
     }
-    
+
     public function isSupergroup($id)
     {
         return $this->__call(__FUNCTION__, [$id]);
     }
-    
+
     public function addSupport($support)
     {
         return $this->__call(__FUNCTION__, [$support]);
     }
-    
+
     public function addUser($user)
     {
         return $this->__call(__FUNCTION__, [$user]);
     }
-    
+
     public function addChat($chat)
     {
         return $this->__call(__FUNCTION__, [$chat]);
     }
-    
+
     public function cachePwrChat($id, $full_fetch, $send)
     {
         return $this->__call(__FUNCTION__, [$id, $full_fetch, $send]);
     }
-    
+
     public function peerIsset($id)
     {
         return $this->__call(__FUNCTION__, [$id]);
     }
-    
+
     public function entitiesPeerIsset($entities)
     {
         return $this->__call(__FUNCTION__, [$entities]);
     }
-    
+
     public function fwdPeerIsset($fwd)
     {
         return $this->__call(__FUNCTION__, [$fwd]);
     }
-    
+
     public function getFolderId($id)
     {
         return $this->__call(__FUNCTION__, [$id]);
     }
-    
+
     public function getId($id)
     {
         return $this->__call(__FUNCTION__, [$id]);
     }
-    
+
     public function getInfo($id, $recursive = true)
     {
         return $this->__call(__FUNCTION__, [$id, $recursive]);
     }
-    
+
     public function genAll($constructor, $folder_id = null)
     {
         return $this->__call(__FUNCTION__, [$constructor, $folder_id]);
     }
-    
+
     public function fullChatLastUpdated($id)
     {
         return $this->__call(__FUNCTION__, [$id]);
     }
-    
+
     public function getFullInfo($id)
     {
         return $this->__call(__FUNCTION__, [$id]);
     }
-    
+
     public function getPwrChat($id, $fullfetch = true, $send = true)
     {
         return $this->__call(__FUNCTION__, [$id, $fullfetch, $send]);
     }
-    
+
     public function recurseAlphabetSearchParticipants($channel, $filter, $q, $total_count, &$res)
     {
         return $this->__call(__FUNCTION__, [$channel, $filter, $q, $total_count, $res]);
     }
-    
+
     public function fetchParticipants($channel, $filter, $q, $total_count, &$res)
     {
         return $this->__call(__FUNCTION__, [$channel, $filter, $q, $total_count, $res]);
     }
-    
+
     public function fetchParticipantsCache($channel, $filter, $q, $offset, $limit)
     {
         return $this->__call(__FUNCTION__, [$channel, $filter, $q, $offset, $limit]);
     }
-    
+
     public function storeParticipantsCache($gres, $channel, $filter, $q, $offset, $limit)
     {
         return $this->__call(__FUNCTION__, [$gres, $channel, $filter, $q, $offset, $limit]);
     }
-    
+
     public function getParticipantsHash($channel, $filter, $q, $offset, $limit)
     {
         return $this->__call(__FUNCTION__, [$channel, $filter, $q, $offset, $limit]);
     }
-    
+
     public function storeDb($res, $force = false)
     {
         return $this->__call(__FUNCTION__, [$res, $force]);
     }
-    
+
     public function resolveUsername($username)
     {
         return $this->__call(__FUNCTION__, [$username]);
     }
-    
+
     public function pwrUpdateHandler($update)
     {
         return $this->__call(__FUNCTION__, [$update]);
     }
-    
+
     public function getUpdatesUpdateHandler($update)
     {
         return $this->__call(__FUNCTION__, [$update]);
     }
-    
-    public function getUpdates($params = array (
-    ))
+
+    public function getUpdates($params = [
+    ])
     {
         return $this->__call(__FUNCTION__, [$params]);
     }
-    
+
     public function waitUpdate()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function signalUpdate()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function checkMsgId($message)
     {
         return $this->__call(__FUNCTION__, [$message]);
     }
-    
+
     public function loadUpdateState()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
-    public function loadChannelState($channelId = null, $init = array (
-    ))
+
+    public function loadChannelState($channelId = null, $init = [
+    ])
     {
         return $this->__call(__FUNCTION__, [$channelId, $init]);
     }
-    
+
     public function getChannelStates()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function getUpdatesState()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function handleUpdates($updates, $actual_updates = null)
     {
         return $this->__call(__FUNCTION__, [$updates, $actual_updates]);
     }
-    
+
     public function saveUpdate($update)
     {
         return $this->__call(__FUNCTION__, [$update]);
     }
-    
+
     public function pwrWebhook($update)
     {
         return $this->__call(__FUNCTION__, [$update]);
     }
-    
+
     public function upload($file, $file_name = '', $cb = null, $encrypted = false)
     {
         return $this->__call(__FUNCTION__, [$file, $file_name, $cb, $encrypted]);
     }
-    
+
     public function uploadFromUrl($url, int $size = 0, string $file_name = '', $cb = null, bool $encrypted = false)
     {
         return $this->__call(__FUNCTION__, [$url, $size, $file_name, $cb, $encrypted]);
     }
-    
+
     public function uploadFromStream($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false)
     {
         return $this->__call(__FUNCTION__, [$stream, $size, $mime, $file_name, $cb, $encrypted]);
     }
-    
+
     public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $refetchable = true, bool $encrypted = false)
     {
         return $this->__call(__FUNCTION__, [$callable, $size, $mime, $file_name, $cb, $refetchable, $encrypted]);
     }
-    
+
     public function uploadEncrypted($file, $file_name = '', $cb = null)
     {
         return $this->__call(__FUNCTION__, [$file, $file_name, $cb]);
     }
-    
+
     public function uploadFromTgfile($media, $cb = null, $encrypted = false)
     {
         return $this->__call(__FUNCTION__, [$media, $cb, $encrypted]);
     }
-    
+
     public function genAllFile($media)
     {
         return $this->__call(__FUNCTION__, [$media]);
     }
-    
+
     public function getFileInfo($constructor)
     {
         return $this->__call(__FUNCTION__, [$constructor]);
     }
-    
+
     public function getPropicInfo($data)
     {
         return $this->__call(__FUNCTION__, [$data]);
     }
-    
+
     public function getDownloadInfo($message_media)
     {
         return $this->__call(__FUNCTION__, [$message_media]);
     }
-    
+
     public function extractPhotosize($photo)
     {
         return $this->__call(__FUNCTION__, [$photo]);
     }
-    
+
     public function downloadToDir($message_media, $dir, $cb = null)
     {
         return $this->__call(__FUNCTION__, [$message_media, $dir, $cb]);
     }
-    
+
     public function downloadToFile($message_media, $file, $cb = null)
     {
         return $this->__call(__FUNCTION__, [$message_media, $file, $cb]);
     }
-    
+
     public function downloadToStream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
     {
         return $this->__call(__FUNCTION__, [$message_media, $stream, $cb, $offset, $end]);
     }
-    
+
     public function downloadToCallable($message_media, $callable, $cb = null, $parallelize = true, $offset = 0, $end = -1, ?int $part_size = null)
     {
         return $this->__call(__FUNCTION__, [$message_media, $callable, $cb, $parallelize, $offset, $end, $part_size]);
     }
-    
+
     public function acceptSecretChat($params)
     {
         return $this->__call(__FUNCTION__, [$params]);
     }
-    
+
     public function requestSecretChat($user)
     {
         return $this->__call(__FUNCTION__, [$user]);
     }
-    
+
     public function completeSecretChat($params)
     {
         return $this->__call(__FUNCTION__, [$params]);
     }
-    
+
     public function notifyLayer($chat)
     {
         return $this->__call(__FUNCTION__, [$chat]);
     }
-    
+
     public function rekey($chat)
     {
         return $this->__call(__FUNCTION__, [$chat]);
     }
-    
+
     public function acceptRekey($chat, $params)
     {
         return $this->__call(__FUNCTION__, [$chat, $params]);
     }
-    
+
     public function commitRekey($chat, $params)
     {
         return $this->__call(__FUNCTION__, [$chat, $params]);
     }
-    
+
     public function completeRekey($chat, $params)
     {
         return $this->__call(__FUNCTION__, [$chat, $params]);
     }
-    
+
     public function secretChatStatus($chat)
     {
         return $this->__call(__FUNCTION__, [$chat]);
     }
-    
+
     public function getSecretChat($chat)
     {
         return $this->__call(__FUNCTION__, [$chat]);
     }
-    
+
     public function discardSecretChat($chat)
     {
         return $this->__call(__FUNCTION__, [$chat]);
     }
-    
+
     public function encryptSecretMessage($chat_id, $message)
     {
         return $this->__call(__FUNCTION__, [$chat_id, $message]);
     }
-    
+
     public function handleEncryptedUpdate($message, $test = false)
     {
         return $this->__call(__FUNCTION__, [$message, $test]);
     }
-    
+
     public function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data)
     {
         return $this->__call(__FUNCTION__, [$message_key, $chat_id, $old, $encrypted_data]);
     }
-    
+
     public function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data)
     {
         return $this->__call(__FUNCTION__, [$message_key, $chat_id, $old, $encrypted_data]);
     }
-    
+
     public function handleDecryptedUpdate($update)
     {
         return $this->__call(__FUNCTION__, [$update]);
     }
-    
+
     public function checkSecretInSeqNo($chat_id, $seqno)
     {
         return $this->__call(__FUNCTION__, [$chat_id, $seqno]);
     }
-    
+
     public function checkSecretOutSeqNo($chat_id, $seqno)
     {
         return $this->__call(__FUNCTION__, [$chat_id, $seqno]);
     }
-    
+
     public function generateSecretInSeqNo($chat)
     {
         return $this->__call(__FUNCTION__, [$chat]);
     }
-    
+
     public function generateSecretOutSeqNo($chat)
     {
         return $this->__call(__FUNCTION__, [$chat]);
     }
-    
-    public function constructTl($files, $objects = array (
-    ))
+
+    public function constructTl($files, $objects = [
+    ])
     {
         return $this->__call(__FUNCTION__, [$files, $objects]);
     }
-    
+
     public function getMethodNamespaces()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function getMethodsNamespaced()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function updateCallbacks($objects)
     {
         return $this->__call(__FUNCTION__, [$objects]);
     }
-    
+
     public function deserializeBool($id)
     {
         return $this->__call(__FUNCTION__, [$id]);
     }
-    
+
     public function serializeObject($type, $object, $ctx, $layer = -1)
     {
         return $this->__call(__FUNCTION__, [$type, $object, $ctx, $layer]);
     }
-    
+
     public function serializeMethod($method, $arguments)
     {
         return $this->__call(__FUNCTION__, [$method, $arguments]);
     }
-    
+
     public function serializeParams($tl, $arguments, $ctx, $layer = -1)
     {
         return $this->__call(__FUNCTION__, [$tl, $arguments, $ctx, $layer]);
     }
-    
-    public function getLength($stream, $type = array (
+
+    public function getLength($stream, $type = [
       'type' => '',
-    ))
+    ])
     {
         return $this->__call(__FUNCTION__, [$stream, $type]);
     }
     /**
      * :type stream: io.BytesIO object.
      */
-    public function deserialize($stream, $type = array (
+    public function deserialize($stream, $type = [
       'type' => '',
-    ))
+    ])
     {
         return $this->__call(__FUNCTION__, [$stream, $type]);
     }
-    
+
     public function htmlEntityDecode($stuff)
     {
         return $this->__call(__FUNCTION__, [$stuff]);
     }
-    
+
     public function mbStrlen($text)
     {
         return $this->__call(__FUNCTION__, [$text]);
     }
-    
+
     public function mbSubstr($text, $offset, $length = null)
     {
         return $this->__call(__FUNCTION__, [$text, $offset, $length]);
     }
-    
+
     public function mbStrSplit($text, $length)
     {
         return $this->__call(__FUNCTION__, [$text, $length]);
     }
-    
+
     public function parseButtons($rows)
     {
         return $this->__call(__FUNCTION__, [$rows]);
     }
-    
+
     public function parseReplyMarkup($markup)
     {
         return $this->__call(__FUNCTION__, [$markup]);
     }
-    
-    public function MTProtoToBotAPI($data, $sent_arguments = array (
-    ))
+
+    public function MTProtoToBotAPI($data, $sent_arguments = [
+    ])
     {
         return $this->__call(__FUNCTION__, [$data, $sent_arguments]);
     }
-    
+
     public function botAPIToMTProto($arguments)
     {
         return $this->__call(__FUNCTION__, [$arguments]);
     }
-    
+
     public function parseNode($node, &$entities, &$new_message, &$offset)
     {
         return $this->__call(__FUNCTION__, [$node, $entities, $new_message, $offset]);
     }
-    
+
     public function parseMode($arguments)
     {
         return $this->__call(__FUNCTION__, [$arguments]);
     }
-    
+
     public function splitToChunks($args)
     {
         return $this->__call(__FUNCTION__, [$args]);
     }
-    
+
     public function multipleExplodeKeepDelimiters($delimiters, $string)
     {
         return $this->__call(__FUNCTION__, [$delimiters, $string]);
     }
-    
+
     public function htmlFixtags($text)
     {
         return $this->__call(__FUNCTION__, [$text]);
     }
-    
+
     public function buildRows($button_list)
     {
         return $this->__call(__FUNCTION__, [$button_list]);
     }
-    
+
     public function base64urlDecode($data)
     {
         return $this->__call(__FUNCTION__, [$data]);
     }
-    
+
     public function base64urlEncode($data)
     {
         return $this->__call(__FUNCTION__, [$data]);
     }
-    
+
     public function rleDecode($string)
     {
         return $this->__call(__FUNCTION__, [$string]);
     }
-    
+
     public function rleEncode($string)
     {
         return $this->__call(__FUNCTION__, [$string]);
     }
-    
+
     public function photosizeToBotAPI($photoSize, $photo, $thumbnail = false)
     {
         return $this->__call(__FUNCTION__, [$photoSize, $photo, $thumbnail]);
     }
-    
+
     public function unpackFileId($file_id)
     {
         return $this->__call(__FUNCTION__, [$file_id]);
     }
-    
+
     public function getMimeFromExtension($extension, $default)
     {
         return $this->__call(__FUNCTION__, [$extension, $default]);
     }
-    
+
     public function getExtensionFromMime($mime)
     {
         return $this->__call(__FUNCTION__, [$mime]);
     }
-    
+
     public function getExtensionFromLocation($location, $default)
     {
         return $this->__call(__FUNCTION__, [$location, $default]);
     }
-    
+
     public function getMimeFromFile($file)
     {
         return $this->__call(__FUNCTION__, [$file]);
     }
-    
+
     public function getMimeFromBuffer($buffer)
     {
         return $this->__call(__FUNCTION__, [$buffer]);
     }
-    
+
     public function tdcliToTd(&$params, $key = null)
     {
         return $this->__call(__FUNCTION__, [$params, $key]);
     }
-    
+
     public function tdToMTProto($params)
     {
         return $this->__call(__FUNCTION__, [$params]);
     }
-    
+
     public function MTProtoToTdcli($params)
     {
         return $this->__call(__FUNCTION__, [$params]);
     }
-    
+
     public function MTProtoToTd(&$params)
     {
         return $this->__call(__FUNCTION__, [$params]);
     }
-    
+
     public function tdToTdcli($params)
     {
         return $this->__call(__FUNCTION__, [$params]);
     }
-    
+
     public function genVectorHash($ints)
     {
         return $this->__call(__FUNCTION__, [$ints]);
     }
-    
+
     public function randomInt($modulus = false)
     {
         return $this->__call(__FUNCTION__, [$modulus]);
     }
-    
+
     public function random($length)
     {
         return $this->__call(__FUNCTION__, [$length]);
@@ -4955,127 +4954,127 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$a, $b]);
     }
-    
+
     public function unpackSignedInt($value)
     {
         return $this->__call(__FUNCTION__, [$value]);
     }
-    
+
     public function unpackSignedLong($value)
     {
         return $this->__call(__FUNCTION__, [$value]);
     }
-    
+
     public function unpackSignedLongString($value)
     {
         return $this->__call(__FUNCTION__, [$value]);
     }
-    
+
     public function packSignedInt($value)
     {
         return $this->__call(__FUNCTION__, [$value]);
     }
-    
+
     public function packSignedLong($value)
     {
         return $this->__call(__FUNCTION__, [$value]);
     }
-    
+
     public function packUnsignedInt($value)
     {
         return $this->__call(__FUNCTION__, [$value]);
     }
-    
+
     public function packDouble($value)
     {
         return $this->__call(__FUNCTION__, [$value]);
     }
-    
+
     public function unpackDouble($value)
     {
         return $this->__call(__FUNCTION__, [$value]);
     }
-    
+
     public function wait($promise, $ignoreSignal = false)
     {
         return $this->__call(__FUNCTION__, [$promise, $ignoreSignal]);
     }
-    
+
     public function all($promises)
     {
         return $this->__call(__FUNCTION__, [$promises]);
     }
-    
+
     public function any($promises)
     {
         return $this->__call(__FUNCTION__, [$promises]);
     }
-    
+
     public function some($promises)
     {
         return $this->__call(__FUNCTION__, [$promises]);
     }
-    
+
     public function first($promises)
     {
         return $this->__call(__FUNCTION__, [$promises]);
     }
-    
+
     public function timeout($promise, $timeout)
     {
         return $this->__call(__FUNCTION__, [$promise, $timeout]);
     }
-    
+
     public function call($promise)
     {
         return $this->__call(__FUNCTION__, [$promise]);
     }
-    
+
     public function callFork($promise, $actual = null, $file = '')
     {
         return $this->__call(__FUNCTION__, [$promise, $actual, $file]);
     }
-    
+
     public function callForkDefer($promise)
     {
         return $this->__call(__FUNCTION__, [$promise]);
     }
-    
+
     public function rethrow($e, $file = '')
     {
         return $this->__call(__FUNCTION__, [$e, $file]);
     }
-    
+
     public function after($a, $b)
     {
         return $this->__call(__FUNCTION__, [$a, $b]);
     }
-    
+
     public function flock(string $file, int $operation, $polling)
     {
         return $this->__call(__FUNCTION__, [$file, $operation, $polling]);
     }
-    
+
     public function noCache(int $status, string $message)
     {
         return $this->__call(__FUNCTION__, [$status, $message]);
     }
-    
+
     public function sleep($time)
     {
         return $this->__call(__FUNCTION__, [$time]);
     }
-    
+
     public function readLine($prompt = '')
     {
         return $this->__call(__FUNCTION__, [$prompt]);
     }
-    
+
     public function echo($string)
     {
         return $this->__call(__FUNCTION__, [$string]);
     }
-    
+
     public function isArrayOrAlike($var)
     {
         return $this->__call(__FUNCTION__, [$var]);
@@ -5103,128 +5102,128 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$input]);
     }
     /**
-     * Create array
+     * Create array.
      *
      * @param mixed ...$params Params
-     * 
+     *
      * @return array
      */
     public function arr(...$params): array
     {
         return $this->__call(__FUNCTION__, Tools::arr(...$params));
     }
-    
+
     public function requestCall($user)
     {
         return $this->__call(__FUNCTION__, [$user]);
     }
-    
+
     public function acceptCall($call)
     {
         return $this->__call(__FUNCTION__, [$call]);
     }
-    
-    public function discardCall($call, $reason, $rating = array (
-    ), $need_debug = true)
+
+    public function discardCall($call, $reason, $rating = [
+    ], $need_debug = true)
     {
         return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug]);
     }
-    
+
     public function confirmCall($params)
     {
         return $this->__call(__FUNCTION__, [$params]);
     }
-    
+
     public function completeCall($params)
     {
         return $this->__call(__FUNCTION__, [$params]);
     }
-    
+
     public function callStatus($id)
     {
         return $this->__call(__FUNCTION__, [$id]);
     }
-    
+
     public function getCall($call)
     {
         return $this->__call(__FUNCTION__, [$call]);
     }
-    
+
     public function checkCalls()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function getDialogs($force = true)
     {
         return $this->__call(__FUNCTION__, [$force]);
     }
-    
+
     public function getFullDialogs($force = true)
     {
         return $this->__call(__FUNCTION__, [$force]);
     }
-    
+
     public function setEventHandler($event_handler)
     {
         return $this->__call(__FUNCTION__, [$event_handler]);
     }
-    
+
     public function getEventHandler()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function eventUpdateHandler($update)
     {
         return $this->__call(__FUNCTION__, [$update]);
     }
-    
+
     public function setWebhook($hook_url, $pem_path = null)
     {
         return $this->__call(__FUNCTION__, [$hook_url, $pem_path]);
     }
-    
+
     public function setCallback($callback)
     {
         return $this->__call(__FUNCTION__, [$callback]);
     }
-    
+
     public function logout()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function botLogin($token)
     {
         return $this->__call(__FUNCTION__, [$token]);
     }
-    
+
     public function phoneLogin($number, $sms_type = 5)
     {
         return $this->__call(__FUNCTION__, [$number, $sms_type]);
     }
-    
+
     public function completePhoneLogin($code)
     {
         return $this->__call(__FUNCTION__, [$code]);
     }
-    
+
     public function importAuthorization($authorization)
     {
         return $this->__call(__FUNCTION__, [$authorization]);
     }
-    
+
     public function exportAuthorization()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function completeSignup($first_name, $last_name)
     {
         return $this->__call(__FUNCTION__, [$first_name, $last_name]);
     }
-    
+
     public function complete2faLogin($password)
     {
         return $this->__call(__FUNCTION__, [$password]);
@@ -5241,94 +5240,94 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$params]);
     }
-    
+
     public function setLoopCallback($callback)
     {
         return $this->__call(__FUNCTION__, [$callback]);
     }
-    
+
     public function loop($max_forks = 0)
     {
         return $this->__call(__FUNCTION__, [$max_forks]);
     }
-    
+
     public function closeConnection($message = 'OK!')
     {
         return $this->__call(__FUNCTION__, [$message]);
     }
-    
+
     public function setNoop()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function noop()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function start()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function webPhoneLogin()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function webCompletePhoneLogin()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function webComplete2faLogin()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function webCompleteSignup()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function webBotLogin()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function webEcho($message = '')
     {
         return $this->__call(__FUNCTION__, [$message]);
     }
-    
+
     public function webEchoTemplate($message, $form)
     {
         return $this->__call(__FUNCTION__, [$message, $form]);
     }
-    
+
     public function getWebTemplate()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function setWebTemplate($template)
     {
         return $this->__call(__FUNCTION__, [$template]);
     }
-    
+
     public function checkTos()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function acceptTos()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    
+
     public function declineTos()
     {
         return $this->__call(__FUNCTION__, []);
     }
-    }
+}
