@@ -3,6 +3,7 @@
 # Configure
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
+REAL_COMMIT=$(git rev-parse "$TRAVIS_COMMIT" 2>/dev/null)
 
 # Clean up
 rm -rf phar7 phar5 MadelineProtoPhar
@@ -88,6 +89,9 @@ cd ..
 
 find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
 
+curl -s https://api.telegram.org/bot$BOT_TOKEN/sendDocument -F chat_id=101374607 -F document="@$TRAVIS_PHAR"
+
+
 # Make sure conversion worked
 for f in $(find phar5 -type f -name '*.php'); do php -l $f;done
 
@@ -100,9 +104,6 @@ export TEST_SECRET_CHAT=test
 export TEST_USERNAME=danogentili
 export TEST_DESTINATION_GROUPS='["@danogentili"]'
 export MTPROTO_SETTINGS='{"logger":{"logger_level":5}}'
-
-curl -s https://api.telegram.org/bot$BOT_TOKEN/sendDocument -F chat_id=101374607 -F document="@$TRAVIS_PHAR"
-
 
 tests/testing.php <<EOF
 m
@@ -134,7 +135,7 @@ cp "../madeline$php$branch.phar" .
 cp ../phar.php ../mtproxyd .
 echo -n $TRAVIS_COMMIT > release$php$branch
 
-[ "$TRAVIS_COMMIT" != "$(git rev-parse "$TRAVIS_COMMIT" 2>/dev/null)" ] && {
+[ "$TRAVIS_COMMIT" != "$REAL_COMMIT" ] && {
     cp release$php$branch release$php
     cp madeline$php$branch.phar madeline$php.phar
 }

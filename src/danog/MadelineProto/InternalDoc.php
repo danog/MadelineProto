@@ -4018,7 +4018,7 @@ interface folders
 
 class InternalDoc extends APIFactory
 {
-    public function logger($param, $level = danog\MadelineProto\Logger::NOTICE, $file = null, array $extra = [])
+    public function logger($param, $level = \danog\MadelineProto\Logger::NOTICE, $file = null, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$param, $level, $file, $extra]);
     }
@@ -4048,7 +4048,7 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$url, $extra]);
     }
 
-    public function a(callable $a, ?string $b = null, $c = null, $d = 2, $e = MTProto::METHOD_BEFORE_CALLBACK, array $extra = []): ?string
+    public function a(callable $a, ?string $b = null, $c = null, $d = 2, $e = \danog\MadelineProto\MTProto::METHOD_BEFORE_CALLBACK, array $extra = []): ?string
     {
         return $this->__call(__FUNCTION__, [$a, $b, $c, $d, $e, $extra]);
     }

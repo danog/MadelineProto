@@ -204,7 +204,7 @@ class AnnotationsBuilder
                 if ($param->isOptional() && !$param->isVariadic()) {
                     $doc .= ' = ';
                     if ($param->isDefaultValueConstant()) {
-                        $doc .= \str_replace(['NULL', 'self'], ['null', 'MTProto'], $param->getDefaultValueConstantName());
+                        $doc .= '\\'.\str_replace(['NULL', 'self'], ['null', 'danog\\MadelineProto\\MTProto'], $param->getDefaultValueConstantName());
                     } else {
                         $doc .= \str_replace('NULL', 'null', \var_export($param->getDefaultValue(), true));
                     }

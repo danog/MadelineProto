@@ -223,11 +223,17 @@ final class Coroutine implements Promise, \ArrayAccess
             return (yield $this)->{$offset};
         })());
     }
-    public function __call($name, $arguments)
+
+    public function __call(string $name, array $arguments)
     {
-        return Tools::call((function () use ($name, $arguments) {
-            return (yield $this)->{$name}(...$arguments);
-        })());
+        $deferred = new Deferred;
+        $this->onResolve(static function ($e, $v) use ($deferred, $name, $arguments) {
+            if ($e) {
+                return $deferred->fail($e);
+            }
+            $deferred->resolve($v->{$name}(...$arguments));
+        });
+        return $deferred->promise();
     }
     /**
      * Get stacktrace from when the generator was started.
