@@ -203,14 +203,10 @@ final class Coroutine implements Promise, \ArrayAccess
      */
     public function offsetGet($offset)
     {
-        $deferred = new Deferred;
-        $this->onResolve(static function ($e, $v) use ($deferred, $offset) {
-            if ($e) {
-                return $deferred->fail($e);
-            }
-            $deferred->resolve($v[$offset]);
-        });
-        return $deferred->promise();
+        return Tools::call((function () use ($offset) {
+            $result = yield $this;
+            return $result[$offset];
+        })());
     }
     public function offsetSet($offset, $value)
     {
@@ -239,25 +235,17 @@ final class Coroutine implements Promise, \ArrayAccess
      */
     public function __get(string $offset)
     {
-        $deferred = new Deferred;
-        $this->onResolve(static function ($e, $v) use ($deferred, $offset) {
-            if ($e) {
-                return $deferred->fail($e);
-            }
-            $deferred->resolve($v->{$offset});
-        });
-        return $deferred->promise();
+        return Tools::call((function () use ($offset) {
+            $result = yield $this;
+            return $result->{$offset};
+        })());
     }
     public function __call(string $name, array $arguments)
     {
-        $deferred = new Deferred;
-        $this->onResolve(static function ($e, $v) use ($deferred, $name, $arguments) {
-            if ($e) {
-                return $deferred->fail($e);
-            }
-            $deferred->resolve($v->{$name}(...$arguments));
-        });
-        return $deferred->promise();
+        return Tools::call((function () use ($name, $arguments) {
+            $result = yield $this;
+            return $result->{$name}($arguments);
+        })());
     }
     /**
      * Get stacktrace from when the generator was started.
