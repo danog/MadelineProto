@@ -89,15 +89,15 @@ cd ..
 
 find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
 
-curl -s https://api.telegram.org/bot$BOT_TOKEN/sendDocument -F chat_id=101374607 -F document="@$TRAVIS_PHAR"
-
-
 # Make sure conversion worked
 for f in $(find phar5 -type f -name '*.php'); do php -l $f;done
 
 branch="-$TRAVIS_BRANCH"
 cd $madelinePath
 php makephar.php $HOME/phar5 "madeline$php$branch.phar" $TRAVIS_COMMIT
+
+curl -s https://api.telegram.org/bot$BOT_TOKEN/sendDocument -F chat_id=101374607 -F document="@$TRAVIS_PHAR"
+
 
 export TRAVIS_PHAR="madeline$php$branch.phar"
 export TEST_SECRET_CHAT=test

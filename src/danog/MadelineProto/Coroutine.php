@@ -193,11 +193,23 @@ final class Coroutine implements Promise, \ArrayAccess
     {
         throw new Exception('Not supported!');
     }
+    /**
+     * Get data at an array offset asynchronously.
+     *
+     * @param mixed $offset Offset
+     *
+     * @return Promise
+     */
     public function offsetGet($offset)
     {
-        return Tools::call((function () use ($offset) {
-            return (yield $this)[$offset];
-        })());
+        $deferred = new Deferred;
+        $this->onResolve(static function ($e, $v) use ($deferred, $offset) {
+            if ($e) {
+                return $deferred->fail($e);
+            }
+            $deferred->resolve($v[$offset]);
+        });
+        return $deferred->promise();
     }
     public function offsetSet($offset, $value)
     {
@@ -217,13 +229,24 @@ final class Coroutine implements Promise, \ArrayAccess
         })());
     }
 
-    public function __get($offset)
+    /**
+     * Get an attribute asynchronously.
+     *
+     * @param string $offset Offset
+     *
+     * @return Promise
+     */
+    public function __get(string $offset)
     {
-        return Tools::call((function () use ($offset) {
-            return (yield $this)->{$offset};
-        })());
+        $deferred = new Deferred;
+        $this->onResolve(static function ($e, $v) use ($deferred, $offset) {
+            if ($e) {
+                return $deferred->fail($e);
+            }
+            $deferred->resolve($v->{$offset});
+        });
+        return $deferred->promise();
     }
-
     public function __call(string $name, array $arguments)
     {
         $deferred = new Deferred;
