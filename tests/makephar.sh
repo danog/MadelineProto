@@ -91,7 +91,6 @@ find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
 # Make sure conversion worked
 for f in $(find phar5 -type f -name '*.php'); do php -l $f;done
 
-#[ "$TRAVIS_BRANCH" != "master" ] && branch="-$TRAVIS_BRANCH" || branch=""
 branch="-$TRAVIS_BRANCH"
 cd $madelinePath
 php makephar.php $HOME/phar5 "madeline$php$branch.phar" $TRAVIS_COMMIT
@@ -135,7 +134,7 @@ cp "../madeline$php$branch.phar" .
 cp ../phar.php ../mtproxyd .
 echo -n $TRAVIS_COMMIT > release$php$branch
 
-echo "$TRAVIS_COMMIT_MESSAGE" | grep -i "subrelease" && {
+[ "$TRAVIS_COMMIT" != "$(git rev-parse "$TRAVIS_COMMIT" 2>/dev/null)" ] && {
     cp release$php$branch release$php
     cp madeline$php$branch.phar madeline$php.phar
 }

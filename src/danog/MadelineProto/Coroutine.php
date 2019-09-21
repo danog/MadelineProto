@@ -217,6 +217,18 @@ final class Coroutine implements Promise, \ArrayAccess
         })());
     }
 
+    public function __get($offset)
+    {
+        return Tools::call((function () use ($offset) {
+            return (yield $this)->{$offset};
+        })());
+    }
+    public function __call($name, $arguments)
+    {
+        return Tools::call((function () use ($name, $arguments) {
+            return (yield $this)->{$name}(...$arguments);
+        })());
+    }
     /**
      * Get stacktrace from when the generator was started.
      *
