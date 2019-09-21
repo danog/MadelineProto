@@ -3,7 +3,9 @@
 # Configure
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
-REAL_COMMIT=$(git rev-parse "$TRAVIS_COMMIT" 2>/dev/null)
+
+IS_RELEASE=n
+git rev-parse "$TRAVIS_COMMIT" 2>/dev/null | grep "$TRAVIS_COMMIT" -q && IS_RELEASE=y
 
 # Clean up
 rm -rf phar7 phar5 MadelineProtoPhar
@@ -135,7 +137,7 @@ cp "../madeline$php$branch.phar" .
 cp ../phar.php ../mtproxyd .
 echo -n $TRAVIS_COMMIT > release$php$branch
 
-[ "$TRAVIS_COMMIT" != "$REAL_COMMIT" ] && {
+[ "$IS_RELEASE" == "y" ] && {
     cp release$php$branch release$php
     cp madeline$php$branch.phar madeline$php.phar
 }
