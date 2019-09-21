@@ -29,6 +29,7 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Deferred;
 use Amp\Failure;
 use Amp\Internal;
 use Amp\Promise;
