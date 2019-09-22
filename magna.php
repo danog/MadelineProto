@@ -63,9 +63,8 @@ class MessageLoop extends ResumableSignalLoop
                     return;
                 }
             }
-
             try {
-                yield $MadelineProto->messages->editMessage(['id' => $this->call->mId, 'peer' => $this->call->getOtherID(), 'message' => 'Total running calls: '.count($MadelineProto->getEventHandler()->calls).PHP_EOL.PHP_EOL.$this->call->getDebugString()]);
+                yield $MadelineProto->messages->editMessage(['id' => $this->call->mId, 'peer' => $this->call->getOtherID(), 'message' => 'Total running calls: '.count(yield $MadelineProto->getEventHandler()->calls).PHP_EOL.PHP_EOL.$this->call->getDebugString()]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 $MadelineProto->logger($e);
             }
@@ -151,6 +150,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
     private $statusLoops = [];
     private $programmed_call;
     private $my_users;
+    public $calls = [];
     public function configureCall($call)
     {
         include 'songs.php';
