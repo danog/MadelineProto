@@ -550,7 +550,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         return $this->datacenter->fileGetContents($url);
     }
-    public function a(callable $a, ?string $b = null, $c = null, $d = 2, $e = self::METHOD_BEFORE_CALLBACK): ?string
+    public function testing(callable $a, ?string $b = null, $c = null, $d = 2, $e = self::METHOD_BEFORE_CALLBACK): ?string
     {
     }
     /**

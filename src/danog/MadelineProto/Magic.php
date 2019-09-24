@@ -81,7 +81,7 @@ class Magic
             if (!\defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 7) {
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
             }
-            foreach (['intl', 'xml', 'fileinfo', 'json', 'mbstring'] as $extension) {
+            foreach (['xml', 'fileinfo', 'json', 'mbstring'] as $extension) {
                 if (!\extension_loaded($extension)) {
                     throw Exception::extension($extension);
                 }

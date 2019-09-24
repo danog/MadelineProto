@@ -4048,7 +4048,7 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$url, $extra]);
     }
 
-    public function a(callable $a, ?string $b = null, $c = null, $d = 2, $e = \danog\MadelineProto\MTProto::METHOD_BEFORE_CALLBACK, array $extra = []): ?string
+    public function testing(callable $a, ?string $b = null, $c = null, $d = 2, $e = \danog\MadelineProto\MTProto::METHOD_BEFORE_CALLBACK, array $extra = []): ?string
     {
         return $this->__call(__FUNCTION__, [$a, $b, $c, $d, $e, $extra]);
     }
