@@ -233,10 +233,10 @@ class DataCenter
                 $this->CookieJar,
                 new HttpSocketPool(
                     new ProxySocketPool(
-                    function (string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null) {
-                        return $this->rawConnectAsync($uri, $token, $ctx, true);
-                    }
-                )
+                        function (string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null) {
+                            return $this->rawConnectAsync($uri, $token, $ctx, true);
+                        }
+                    )
                 )
             );
             $DoHConfig = new DoHConfig(
@@ -528,7 +528,11 @@ class DataCenter
     {
         $old = isset($this->sockets[$dc_number]) && (
             $this->sockets[$dc_number]->shouldReconnect() ||
-            ($id !== -1 && $this->sockets[$dc_number]->hasConnection($id) && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect())
+            (
+                $id !== -1
+                && $this->sockets[$dc_number]->hasConnection($id)
+                && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect()
+            )
         );
         if (isset($this->sockets[$dc_number]) && !$old) {
             $this->API->logger("Not reconnecting to DC $dc_number ($id)");

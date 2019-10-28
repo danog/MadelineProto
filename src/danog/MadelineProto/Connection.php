@@ -523,9 +523,11 @@ class Connection extends Session
     /**
      * Disconnect from DC.
      *
+     * @param bool $temporary Whether the disconnection is temporary, triggered by the reconnect method
+     * 
      * @return void
      */
-    public function disconnect()
+    public function disconnect(bool $temporary = false)
     {
         $this->API->logger->logger("Disconnecting from DC {$this->datacenterId}");
         $this->needsReconnect = true;
@@ -541,7 +543,9 @@ class Connection extends Session
                 $this->API->logger->logger($e);
             }
         }
-        $this->shared->signalDisconnect($this->id);
+        if (!$temporary) {
+            $this->shared->signalDisconnect($this->id);
+        }
         $this->API->logger->logger("Disconnected from DC {$this->datacenterId}");
     }
 
@@ -553,17 +557,8 @@ class Connection extends Session
     public function reconnect(): \Generator
     {
         $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
-        $this->disconnect();
+        $this->disconnect(true);
         yield $this->API->datacenter->dcConnectAsync($this->ctx->getDc(), $this->id);
-        if ($this->API->hasAllAuth() && !$this->hasPendingCalls()) {
-            /*$this->callFork((function () {
-                try {
-                    $this->API->method_call_async_read('ping', ['ping_id' => $this->random_int()], ['datacenter' => $this->datacenter]);
-                } catch (\Throwable $e) {
-                    $this->API->logger("Got an error while pinging on reconnect: $e", Logger::FATAL_ERROR);
-                }
-            })());*/
-        }
     }
 
     /**

@@ -12,6 +12,9 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
  */
+
+use danog\MadelineProto\Stream\Proxy\SocksProxy;
+
 \set_include_path(\get_include_path().':'.\realpath(\dirname(__FILE__).'/MadelineProto/'));
 
 /*
@@ -63,7 +66,15 @@ class EventHandler extends \danog\MadelineProto\EventHandler
         }
     }
 }
-$settings = ['logger' => ['logger_level' => 5], 'serialization' => ['serialization_interval' => 30, 'cleanup_before_serialization' => true]];
+$settings = [
+    'logger' => [
+        'logger_level' => 5
+    ],
+    'serialization' => [
+        'serialization_interval' => 30,
+        'cleanup_before_serialization' => true
+    ],
+];
 
 $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
 $MadelineProto->async(true);
