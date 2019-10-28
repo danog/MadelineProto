@@ -541,6 +541,7 @@ class Connection extends Session
                 $this->API->logger->logger($e);
             }
         }
+        $this->shared->signalDisconnect($this->id);
         $this->API->logger->logger("Disconnected from DC {$this->datacenterId}");
     }
 

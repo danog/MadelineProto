@@ -555,7 +555,7 @@ class DataCenter
 
                 return true;
             } catch (\Throwable $e) {
-                if (\defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
+                if (\defined(\MADELINEPROTO_TEST::class) && MADELINEPROTO_TEST === 'pony') {
                     throw $e;
                 }
                 $this->API->logger->logger('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);

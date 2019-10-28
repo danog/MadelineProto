@@ -397,12 +397,35 @@ class DataCenterConnection implements JsonSerializable
         $ctx = $this->ctx->getCtx();
         $count += $previousCount = \count($this->connections);
         for ($x = $previousCount; $x < $count; $x++) {
+            $connection = new Connection();
+            $connection->setExtra($this, $x);
+            yield $connection->connect($ctx);
+
+            $this->connections[$x] = $connection;
             $this->availableConnections[$x] = 0;
-            $this->connections[$x] = new Connection();
-            $this->connections[$x]->setExtra($this, $x);
-            yield $this->connections[$x]->connect($ctx);
             $ctx = $this->ctx->getCtx();
         }
+    }
+
+    /**
+     * Signal that a connection ID disconnected.
+     *
+     * @param integer $id Connection ID
+     *
+     * @return void
+     */
+    public function signalDisconnect(int $id)
+    {
+        $backup = $this->connections[$id]->backupSession();
+        $list = '';
+        foreach ($backup as $message) {
+            $list .= $message['_'] ?? '-';
+            $list .= ', ';
+        }
+        $this->API->logger->logger("Backed up $list from DC {$this->datacenter}.$id");
+        $this->backup = \array_merge($this->backup, $backup);
+
+        unset($this->connections[$id], $this->availableConnections[$id]);
     }
 
     /**
@@ -418,18 +441,11 @@ class DataCenterConnection implements JsonSerializable
             $this->robinLoop = null;
         }
         $before = \count($this->backup);
-        $list = '';
         foreach ($this->connections as $connection) {
-            $backup = $connection->backupSession();
-            foreach ($backup as $message) {
-                $list .= $message['_'] ?? '-';
-                $list .= ', ';
-            }
-            $this->backup = \array_merge($this->backup, $backup);
             $connection->disconnect();
         }
         $count = \count($this->backup) - $before;
-        $this->API->logger->logger("Backed up $count (added {$list}to $before existing messages) from DC {$this->datacenter}");
+        $this->API->logger->logger("Backed up $count, added to $before existing messages) from DC {$this->datacenter}");
 
         $this->connections = [];
         $this->availableConnections = [];
