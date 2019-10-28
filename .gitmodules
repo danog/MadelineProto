@@ -1,6 +1,3 @@
 [submodule "docs"]
 	path = docs
 	url = https://github.com/danog/MadelineProtoDocs
-[submodule "userbots/magnaluna"]
-	path = userbots/magnaluna
-	url = https://github.com/danog/magnaluna

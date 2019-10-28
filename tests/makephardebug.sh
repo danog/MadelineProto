@@ -45,5 +45,5 @@ cp phar5/vendor/danog/madelineproto/src/danog/MadelineProto/Coroutine.php phar5/
 sed -i 's/namespace danog\\MadelineProto;//g' phar5/vendor/amphp/amp/lib/Coroutine.php
 
 
-php makephar.php phar5 madeline.phar $(cat .git/refs/heads/master)
+php tools/makephar.php phar5 madeline.phar $(cat .git/refs/heads/master)
 

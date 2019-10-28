@@ -11,14 +11,13 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
 */
 
-if (!\file_exists(__DIR__.'/../vendor/autoload.php')) {
-    echo 'You did not run composer update, using madeline.php'.PHP_EOL;
+if (\file_exists(__DIR__.'/vendor/autoload.php')) {
+    include 'vendor/autoload.php';
+} else {
     if (!\file_exists('madeline.php')) {
         \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
-} else {
-    require_once 'vendor/autoload.php';
 }
 
 $settings = [];

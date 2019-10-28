@@ -1,0 +1,52 @@
+#!/usr/bin/env php
+<?php
+$debug = false; // Set this to true to avoid automatic updates of this script
+/**
+ * MTProxy.
+ *
+ * Copyright 2016-2019 Daniil Gentili
+ * (https://daniil.it)
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2019 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ *
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ */
+
+
+
+
+echo "mtproxyd - Copyright by Daniil Gentili, licensed under AGPLv3\n\n";
+if (!isset($argv[2])) {
+    echo "Usage: ".$argv[0]." seed port\n\nseed is any string or word that will be used as seed to generate the proxy secret\nport is the port where to start listening for connections\n";
+    exit(1);
+}
+
+if (!\file_exists('madeline.php')) {
+    \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+}
+
+if (!$debug) {
+    $mtproxyd = \file_get_contents('https://phar.madelineproto.xyz/mtproxyd?v=new');
+    if ($mtproxyd) {
+        \file_put_contents($argv[0], $mtproxyd);
+    }
+}
+
+\define('MADELINE_BRANCH', 'deprecated');
+require_once 'madeline.php';
+
+$secret = \md5($argv[1]);
+echo "Secret is $secret\n";
+
+$MadelineProto = new \danog\MadelineProto\API('proxy.madeline');
+$MadelineProto->parse_dc_options($MadelineProto->help->getConfig()['dc_options']);
+$handler = new \danog\MadelineProto\Server(['type' => AF_INET, 'protocol' => 0, 'address' => '0.0.0.0', 'port' => $argv[2], 'handler' => '\danog\MadelineProto\Server\Proxy', 'extra' => ['madeline' => $MadelineProto->API->datacenter->sockets, 'secret' => \hex2bin($secret), 'timeout' => 10]]);
+$handler->start();

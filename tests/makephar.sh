@@ -96,7 +96,7 @@ for f in $(find phar5 -type f -name '*.php'); do php -l $f;done
 
 branch="-$TRAVIS_BRANCH"
 cd $madelinePath
-php makephar.php $HOME/phar5 "madeline$php$branch.phar" $TRAVIS_COMMIT
+php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" $TRAVIS_COMMIT
 
 curl -s https://api.telegram.org/bot$BOT_TOKEN/sendDocument -F chat_id=101374607 -F document="@$TRAVIS_PHAR"
 
@@ -134,7 +134,7 @@ cd MadelineProtoPhar
 }
 
 cp "../madeline$php$branch.phar" .
-cp ../phar.php ../mtproxyd .
+cp ../tools/phar.php ../examples/mtproxyd .
 echo -n $TRAVIS_COMMIT > release$php$branch
 
 [ "$IS_RELEASE" == "y" ] && {
