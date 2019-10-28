@@ -2,7 +2,7 @@
 
 function ___install_madeline()
 {
-    if (count(debug_backtrace(0)) === 1) {
+    if (\count(\debug_backtrace(0)) === 1) {
         die('You must include this file in another PHP script'.PHP_EOL);
     }
     $old = false;
@@ -17,7 +17,7 @@ function ___install_madeline()
     }
     if ($old) {
         $newline = PHP_EOL;
-        if (php_sapi_name() !== 'cli') {
+        if (PHP_SAPI !== 'cli') {
             $newline = '<br>'.$newline;
         }
         echo "**********************************************************************************$newline";
@@ -33,12 +33,12 @@ function ___install_madeline()
     }
 
     // MTProxy update
-    $file = debug_backtrace(0, 1)[0]['file'];
-    if (file_exists($file)) {
-        $contents = file_get_contents($file);
+    $file = \debug_backtrace(0, 1)[0]['file'];
+    if (\file_exists($file)) {
+        $contents = \file_get_contents($file);
 
-        if (strpos($contents, 'new \danog\MadelineProto\Server') && in_array($contents, [file_get_contents('https://github.com/danog/MadelineProtoPhar/raw/2270bd9a94d168a5e6731ffd7e61821ea244beff/mtproxyd'), file_get_contents('https://github.com/danog/MadelineProtoPhar/raw/7cabb718ec3ccb79e3c8e3d34f5bccbe3f63b0fd/mtproxyd')]) && ($mtproxyd = file_get_contents('https://phar.madelineproto.xyz/mtproxyd?v=new'))) {
-            file_put_contents($file, $mtproxyd);
+        if (\strpos($contents, 'new \danog\MadelineProto\Server') && \in_array($contents, [\file_get_contents('https://github.com/danog/MadelineProtoPhar/raw/2270bd9a94d168a5e6731ffd7e61821ea244beff/mtproxyd'), \file_get_contents('https://github.com/danog/MadelineProtoPhar/raw/7cabb718ec3ccb79e3c8e3d34f5bccbe3f63b0fd/mtproxyd')]) && ($mtproxyd = \file_get_contents('https://phar.madelineproto.xyz/mtproxyd?v=new'))) {
+            \file_put_contents($file, $mtproxyd);
 
             return;
         }
@@ -49,10 +49,10 @@ function ___install_madeline()
     $phar_template = 'https://phar.madelineproto.xyz/madeline%s.phar?v=new';
 
     // Version definition
-    $custom_branch = defined('MADELINE_BRANCH') ? MADELINE_BRANCH : null;
+    $custom_branch = \defined('MADELINE_BRANCH') ? MADELINE_BRANCH : null;
     if ($custom_branch === '') { // If the constant is an empty string, default to the latest alpha build
         $custom_branch = 'master';
-    } else if ($custom_branch === null) { // If the constant is not defined, default to the latest stable build
+    } elseif ($custom_branch === null) { // If the constant is not defined, default to the latest stable build
         $custom_branch = '';
     }
 
@@ -75,19 +75,19 @@ function ___install_madeline()
     }
 
     // Checking if defined branch/default branch builds can be downloaded
-    if (!($release = @file_get_contents(sprintf($release_template, $release_branch)))) {
-        if (!($release = @file_get_contents(sprintf($release_template, $release_fallback_branch)))) {
+    if (!($release = @\file_get_contents(\sprintf($release_template, $release_branch)))) {
+        if (!($release = @\file_get_contents(\sprintf($release_template, $release_fallback_branch)))) {
             return;
         }
         $release_branch = $release_fallback_branch;
     }
 
-    if (!file_exists('madeline.phar') || !file_exists('madeline.phar.version') || file_get_contents('madeline.phar.version') !== $release) {
-        $phar = file_get_contents(sprintf($phar_template, $release_branch));
+    if (!\file_exists('madeline.phar') || !\file_exists('madeline.phar.version') || \file_get_contents('madeline.phar.version') !== $release) {
+        $phar = \file_get_contents(\sprintf($phar_template, $release_branch));
 
         if ($phar) {
-            file_put_contents('madeline.phar', $phar);
-            file_put_contents('madeline.phar.version', $release);
+            \file_put_contents('madeline.phar', $phar);
+            \file_put_contents('madeline.phar.version', $release);
         }
     }
 }

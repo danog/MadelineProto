@@ -530,6 +530,9 @@ class DataCenterConnection implements JsonSerializable
      */
     public function even()
     {
+        if (!$this->availableConnections) {
+            return;
+        }
         $min = \min($this->availableConnections);
         if ($min < 50) {
             foreach ($this->availableConnections as &$count) {

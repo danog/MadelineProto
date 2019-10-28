@@ -5,7 +5,7 @@ $config->getFinder()
     ->in(__DIR__ . '/src')
     ->in(__DIR__ . '/tests')
     ->in(__DIR__ . '/userbots')
-    ->name(__DIR__ . '/*.php');
+    ->in(__DIR__);
 
 $cacheDir = getenv('TRAVIS') ? getenv('HOME') . '/.php-cs-fixer' : __DIR__;
 

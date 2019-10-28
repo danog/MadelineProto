@@ -19,17 +19,17 @@ try {
     $Lua = \danog\MadelineProto\Serialization::deserialize('td.madeline');
 } catch (\danog\MadelineProto\Exception $e) {
 }
-if (!is_object($Lua)) {
+if (!\is_object($Lua)) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
-    while (!in_array(($res = readline('Do you want to login as a user or as a bot (u/b)? ')), ['u', 'b'])) {
+    while (!\in_array(($res = \readline('Do you want to login as a user or as a bot (u/b)? ')), ['u', 'b'])) {
         echo 'Please write either u or b'.PHP_EOL;
     }
     switch ($res) {
         case 'u':
-            $sentCode = $MadelineProto->phone_login(readline('Enter your phone number: '));
+            $sentCode = $MadelineProto->phone_login(\readline('Enter your phone number: '));
             \danog\MadelineProto\Logger::log($sentCode, \danog\MadelineProto\Logger::NOTICE);
             echo 'Enter the code you received: ';
-            $code = fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
+            $code = \fgets(STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1);
             $authorization = $MadelineProto->complete_phone_login($code);
             \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
             if ($authorization['_'] === 'account.noPassword') {
@@ -37,17 +37,17 @@ if (!is_object($Lua)) {
             }
             if ($authorization['_'] === 'account.password') {
                 \danog\MadelineProto\Logger::log('2FA is enabled', \danog\MadelineProto\Logger::NOTICE);
-                $authorization = $MadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
+                $authorization = $MadelineProto->complete_2fa_login(\readline('Please enter your password (hint '.$authorization['hint'].'): '));
             }
             if ($authorization['_'] === 'account.needSignup') {
                 \danog\MadelineProto\Logger::log('Registering new user', \danog\MadelineProto\Logger::NOTICE);
-                $authorization = $MadelineProto->complete_signup(readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
+                $authorization = $MadelineProto->complete_signup(\readline('Please enter your first name: '), \readline('Please enter your last name (can be empty): '));
             }
             \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
             $Lua = new \danog\MadelineProto\Lua('madeline.lua', $MadelineProto);
             break;
         case 'b':
-            $authorization = $MadelineProto->bot_login(readline('Please enter a bot token: '));
+            $authorization = $MadelineProto->bot_login(\readline('Please enter a bot token: '));
             \danog\MadelineProto\Logger::log($authorization, \danog\MadelineProto\Logger::NOTICE);
             $Lua = new \danog\MadelineProto\Lua('madeline.lua', $MadelineProto);
             break;

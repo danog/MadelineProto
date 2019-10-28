@@ -524,7 +524,7 @@ class Connection extends Session
      * Disconnect from DC.
      *
      * @param bool $temporary Whether the disconnection is temporary, triggered by the reconnect method
-     * 
+     *
      * @return void
      */
     public function disconnect(bool $temporary = false)

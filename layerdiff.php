@@ -19,7 +19,7 @@ $param = 1;
 \danog\MadelineProto\Logger::constructor($param);
 $logger = \danog\MadelineProto\Logger::$default;
 
-set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
+\set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
 if ($argc !== 3) {
     die("Usage: {$argv[0]} layernumberold layernumbernew\n");
@@ -48,7 +48,7 @@ function getTL($layer)
 }
 function getUrl($constructor, $type)
 {
-    $changed = str_replace('.', '_', $constructor);
+    $changed = \str_replace('.', '_', $constructor);
 
     //return "[$constructor](https://github.com/danog/MadelineProtoDocs/blob/geochats/docs/API_docs/$type/$changed.md)";
     return "[$constructor](https://docs.madelineproto.xyz/API_docs/$type/$changed.html)";
@@ -62,7 +62,7 @@ foreach (['methods', 'constructors'] as $type) {
     $key = $type === 'methods' ? 'method' : 'predicate';
 
     // New constructors
-    $res .= "\n\nNew ".ucfirst($type)."\n";
+    $res .= "\n\nNew ".\ucfirst($type)."\n";
     foreach ($new[$type]->by_id as $constructor) {
         $name = $constructor[$key];
         if (!$old[$type]->$finder($name)) {
@@ -72,7 +72,7 @@ foreach (['methods', 'constructors'] as $type) {
     }
 
     // Changed constructors
-    $res .= "\n\nChanged ".ucfirst($type)."\n";
+    $res .= "\n\nChanged ".\ucfirst($type)."\n";
     foreach ($new[$type]->by_id as $constructor) {
         $name = $constructor[$key];
         $constructor['id'] = $new[$type]->$finder($name)['id'];
@@ -103,7 +103,7 @@ foreach (['methods', 'constructors'] as $type) {
     }
 
     // Deleted constructors
-    $res .= "\n\nDeleted ".ucfirst($type)."\n";
+    $res .= "\n\nDeleted ".\ucfirst($type)."\n";
     foreach ($old[$type]->by_id as $constructor) {
         $name = $constructor[$key];
         if (!$new[$type]->$finder($name)) {

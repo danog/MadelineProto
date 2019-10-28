@@ -10,15 +10,15 @@ See the GNU Affero General Public License for more details.
 You should have received a copy of the GNU General Public License along with MadelineProto.
 If not, see <http://www.gnu.org/licenses/>.
 */
-set_include_path(get_include_path().':'.realpath(dirname(__FILE__).'/MadelineProto/'));
+\set_include_path(\get_include_path().':'.\realpath(\dirname(__FILE__).'/MadelineProto/'));
 
 /*
  * Various ways to load MadelineProto
  */
-if (!file_exists(__DIR__.'/vendor/autoload.php')) {
+if (!\file_exists(__DIR__.'/vendor/autoload.php')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
-    if (!file_exists('madeline.php')) {
-        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    if (!\file_exists('madeline.php')) {
+        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
     include 'madeline.php';
 } else {
@@ -38,9 +38,9 @@ class EventHandler extends \danog\MadelineProto\CombinedEventHandler
             yield $MadelineProto->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
         }
 
-        $res = json_encode($update, JSON_PRETTY_PRINT);
+        $res = \json_encode($update, JSON_PRETTY_PRINT);
         if ($res == '') {
-            $res = var_export($update, true);
+            $res = \var_export($update, true);
         }
         yield $MadelineProto->sleep(3);
 

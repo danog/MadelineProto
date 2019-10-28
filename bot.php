@@ -13,7 +13,6 @@ You should have received a copy of the GNU General Public License along with Mad
 If not, see <http://www.gnu.org/licenses/>.
  */
 
-use danog\MadelineProto\Stream\Proxy\SocksProxy;
 
 \set_include_path(\get_include_path().':'.\realpath(\dirname(__FILE__).'/MadelineProto/'));
 
