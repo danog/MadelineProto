@@ -4,3 +4,6 @@
 [submodule "examples/magnaluna"]
 	path = examples/magnaluna
 	url = https://github.com/danog/magnaluna
+[submodule "examples/pipesbot"]
+	path = examples/pipesbot
+	url = https://github.com/danog/pipesbot
