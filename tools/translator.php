@@ -28,7 +28,7 @@ class Lang
     // THIS WILL BE OVERWRITTEN BY $lang["en"]
     public static $current_lang = %s;
 }';
-function from_camel_case($input)
+function fromCamelCase($input)
 {
     \preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
     $ret = $matches[0];
@@ -92,7 +92,7 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
                     $l = \str_replace('_', ' ', $param_name);
                 } else {
                     $l = \explode('.', $method_name);
-                    $l = from_camel_case(\end($l));
+                    $l = fromCamelCase(\end($l));
                 }
                 $l = \ucfirst(\strtolower($l));
                 if (\preg_match('/ empty$/', $l)) {

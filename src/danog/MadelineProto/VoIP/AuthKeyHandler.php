@@ -245,7 +245,7 @@ trait AuthKeyHandler
         if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict']) {
             $this->pwrUpdateHandler($update);
         } else {
-            \in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->getUpdatesUpdateHandler($update) : $this->settings['updates']['callback']($update);
+            \in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'getUpdatesUpdateHandler'], 'getUpdatesUpdateHandler']) ? $this->getUpdatesUpdateHandler($update) : $this->settings['updates']['callback']($update);
         }
         unset($this->calls[$call['id']]);
     }

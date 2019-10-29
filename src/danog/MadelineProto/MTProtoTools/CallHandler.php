@@ -27,7 +27,7 @@ use Amp\Promise;
 trait CallHandler
 {
     /**
-     * Synchronous wrapper for method_call.
+     * Synchronous wrapper for methodCall.
      *
      * @param string $method Method name
      * @param array  $args   Arguments

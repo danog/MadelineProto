@@ -82,7 +82,7 @@ trait ApiTemplates
                 yield $stdout->write($this->webAPIEchoTemplate('Do you want to enter the API id and the API hash manually or automatically?<br>Note that you can also provide it directly in the code using the <a href="https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id">settings</a>.<b>'.$message.'</b>', '<select name="type"><option value="automatic">Automatically</option><option value="manual">Manually</option></select>'));
             }
         } else {
-            if (!$this->my_telegram_org_wrapper->logged_in()) {
+            if (!$this->my_telegram_org_wrapper->loggedIn()) {
                 yield $stdout->write($this->webAPIEchoTemplate('Enter your code<br><b>'.$message.'</b>', '<input type="text" name="code" placeholder="Code" required/>'));
             } else {
                 yield $stdout->write($this->webAPIEchoTemplate(

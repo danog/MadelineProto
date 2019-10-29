@@ -104,7 +104,7 @@ class Handler extends \danog\MadelineProto\Connection
                     $buffer = '';
                 } else {
                     $time = \time();
-                    $message = $this->read_message();
+                    $message = $this->readMessage();
                 }
             } catch (\danog\MadelineProto\NothingInTheSocketException $e) {
                 echo $e;
@@ -148,10 +148,10 @@ class Handler extends \danog\MadelineProto\Connection
         if ($method[0] === '__construct') {
             if (\count($args) === 1 && \is_array($args[0])) {
                 $args[0]['logger'] = ['logger' => 4, 'logger_param' => [$this, 'logger']];
-                $args[0]['updates']['callback'] = [$this, 'update_handler'];
+                $args[0]['updates']['callback'] = [$this, 'updateHandler'];
             } elseif (\count($args) === 2 && \is_array($args[1])) {
                 $args[1]['logger'] = ['logger' => 4, 'logger_param' => [$this, 'logger']];
-                $args[1]['updates']['callback'] = [$this, 'update_handler'];
+                $args[1]['updates']['callback'] = [$this, 'updateHandler'];
             }
             $this->madeline = new \danog\MadelineProto\API(...$args);
 
@@ -227,7 +227,7 @@ class Handler extends \danog\MadelineProto\Connection
         $tl = false;
         foreach (\array_reverse($e->getTrace()) as $k => $frame) {
             $tl_frame = ['_' => 'socketTLFrame'];
-            if (isset($frame['function']) && \in_array($frame['function'], ['serialize_params', 'serialize_object'])) {
+            if (isset($frame['function']) && \in_array($frame['function'], ['serializeParams', 'serializeObject'])) {
                 if ($frame['args'][2] !== '') {
                     $tl_frame['tl_param'] = (string) $frame['args'][2];
                     $tl = true;
@@ -290,7 +290,7 @@ class Handler extends \danog\MadelineProto\Connection
         }
 
         try {
-            $this->send_message($message);
+            $this->sendMessage($message);
         } catch (\danog\MadelineProto\Exception $e) {
             $this->__destruct();
             die;

@@ -32,7 +32,7 @@ class Lua
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['script_not_exist']);
         }
         $this->MadelineProto = $MadelineProto;
-        $this->MadelineProto->settings['updates']['handle_updates'] = true;
+        $this->MadelineProto->settings['updates']['handleUpdates'] = true;
         $this->MadelineProto->API->datacenter->sockets[$this->MadelineProto->settings['connection_settings']['default_dc']]->startUpdateLoop();
 
         $this->script = $script;
@@ -48,8 +48,8 @@ class Lua
     {
         $this->Lua = new \Lua($this->script);
         $this->madelineproto_lua = 1;
-        $this->Lua->registerCallback('tdcli_function', [$this, 'tdcli_function']);
-        $this->Lua->registerCallback('madeline_function', [$this, 'madeline_function']);
+        $this->Lua->registerCallback('tdcliFunction', [$this, 'tdcliFunction']);
+        $this->Lua->registerCallback('madelineFunction', [$this, 'madelineFunction']);
         $this->Lua->registerCallback('var_dump', 'var_dump');
         foreach (\get_class_methods($this->MadelineProto->API) as $method) {
             $this->Lua->registerCallback($method, [$this->MadelineProto, $method]);

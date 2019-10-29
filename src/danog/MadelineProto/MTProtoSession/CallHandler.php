@@ -190,7 +190,7 @@ trait CallHandler
             [
                 '_' => $method,
                 'type' => $this->API->methods->findByMethod($method)['type'],
-                'content_related' => $this->contentRelated($method),
+                'contentRelated' => $this->contentRelated($method),
                 'promise' => $deferred,
                 'method' => true,
                 'unencrypted' => !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false
@@ -225,7 +225,7 @@ trait CallHandler
      */
     public function objectCall(string $object, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
-        $message = ['_' => $object, 'body' => $args, 'content_related' => $this->contentRelated($object), 'unencrypted' => !$this->shared->hasTempAuthKey(), 'method' => false];
+        $message = ['_' => $object, 'body' => $args, 'contentRelated' => $this->contentRelated($object), 'unencrypted' => !$this->shared->hasTempAuthKey(), 'method' => false];
         if (isset($aargs['promise'])) {
             $message['promise'] = $aargs['promise'];
         }

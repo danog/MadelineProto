@@ -10,13 +10,13 @@ namespace danog\MadelineProto;
 interface auth
 {
     /**
-     * Use phone_login instead.
+     * Use phoneLogin instead.
      *
      * Parameters:
-     * * `string`       **phone_number** - Use phone_login instead
-     * * `int`          **api_id**       - Use phone_login instead
-     * * `string`       **api_hash**     - Use phone_login instead
-     * * `CodeSettings` **settings**     - You cannot use this method directly, use the phone_login method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string`       **phone_number** - Use phoneLogin instead
+     * * `int`          **api_id**       - Use phoneLogin instead
+     * * `string`       **api_hash**     - Use phoneLogin instead
+     * * `CodeSettings` **settings**     - You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -25,13 +25,13 @@ interface auth
     public function sendCode($params);
 
     /**
-     * You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info).
+     * You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `string` **phone_number**    - You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **phone_code_hash** - You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **first_name**      - You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **last_name**       - You cannot use this method directly, use the complete_signup method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_number**    - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_code_hash** - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **first_name**      - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **last_name**       - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -40,12 +40,12 @@ interface auth
     public function signUp($params);
 
     /**
-     * You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info).
+     * You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `string` **phone_number**    - You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **phone_code_hash** - You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **phone_code**      - You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_number**    - You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_code_hash** - You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_code**      - You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -68,10 +68,10 @@ interface auth
     public function resetAuthorizations();
 
     /**
-     * You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html.
+     * You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html.
      *
      * Parameters:
-     * * `int` **dc_id** - You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * * `int` **dc_id** - You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
      *
      * @param array $params Parameters
      *
@@ -80,11 +80,11 @@ interface auth
     public function exportAuthorization($params);
 
     /**
-     * You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html.
+     * You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html.
      *
      * Parameters:
-     * * `int`   **id**    - You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
-     * * `bytes` **bytes** - You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * * `int`   **id**    - You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * * `bytes` **bytes** - You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
      *
      * @param array $params Parameters
      *
@@ -108,12 +108,12 @@ interface auth
     public function bindTempAuthKey($params);
 
     /**
-     * You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info).
+     * You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `int`    **api_id**         - You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **api_hash**       - You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **bot_auth_token** - You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info)
+     * * `int`    **api_id**         - You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **api_hash**       - You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **bot_auth_token** - You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -952,10 +952,10 @@ interface users
     public function getUsers($params);
 
     /**
-     * You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info).
+     * You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `InputUser` **id** - You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputUser` **id** - You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -1097,10 +1097,10 @@ interface contacts
     public function search($params);
 
     /**
-     * You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info).
+     * You cannot use this method directly, use the resolveUsername, getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `string` **username** - You cannot use this method directly, use the resolve_username, get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **username** - You cannot use this method directly, use the resolveUsername, getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -1225,7 +1225,7 @@ interface messages
     public function getMessages($params);
 
     /**
-     * Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html.
+     * Gets list of chats: you should use $MadelineProto->getDialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html.
      *
      * Parameters:
      * * `boolean`   **exclude_pinned** - Optional: Do not fetch pinned chats
@@ -1462,10 +1462,10 @@ interface messages
     public function getChats($params);
 
     /**
-     * You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info).
+     * You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `InputPeer` **chat_id** - You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputPeer` **chat_id** - You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -1540,11 +1540,11 @@ interface messages
     public function createChat($params);
 
     /**
-     * You cannot use this method directly, instead use $MadelineProto->get_dh_config();.
+     * You cannot use this method directly, instead use $MadelineProto->getDhConfig();.
      *
      * Parameters:
-     * * `int` **version**       - You cannot use this method directly, instead use $MadelineProto->get_dh_config();
-     * * `int` **random_length** - You cannot use this method directly, instead use $MadelineProto->get_dh_config();
+     * * `int` **version**       - You cannot use this method directly, instead use $MadelineProto->getDhConfig();
+     * * `int` **random_length** - You cannot use this method directly, instead use $MadelineProto->getDhConfig();
      *
      * @param array $params Parameters
      *
@@ -2896,12 +2896,12 @@ interface photos
 interface upload
 {
     /**
-     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info.
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `long`  **file_id**   - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **file_part** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `bytes` **bytes**     - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `long`  **file_id**   - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **file_part** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **bytes**     - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -2910,13 +2910,13 @@ interface upload
     public function saveFilePart($params);
 
     /**
-     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info.
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `boolean`           **precise**  - Optional: You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `InputFileLocation` **location** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`               **offset**   - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`               **limit**    - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `boolean`           **precise**  - Optional: You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `InputFileLocation` **location** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`               **offset**   - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`               **limit**    - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -2925,13 +2925,13 @@ interface upload
     public function getFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info.
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `long`  **file_id**          - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **file_part**        - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **file_total_parts** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `bytes` **bytes**            - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `long`  **file_id**          - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **file_part**        - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **file_total_parts** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **bytes**            - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -2954,12 +2954,12 @@ interface upload
     public function getWebFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info.
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `bytes` **file_token** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **offset**     - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **limit**      - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **file_token** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **offset**     - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **limit**      - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -2968,11 +2968,11 @@ interface upload
     public function getCdnFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info.
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `bytes` **file_token**    - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `bytes` **request_token** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **file_token**    - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **request_token** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -2981,11 +2981,11 @@ interface upload
     public function reuploadCdnFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info.
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `bytes` **file_token** - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **offset**     - You cannot use this method directly, use the upload, download_to_stream, download_to_file, download_to_dir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **file_token** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **offset**     - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -3265,7 +3265,7 @@ interface channels
     public function getMessages($params);
 
     /**
-     * Get channel/supergroup participants (you should use `$MadelineProto->get_pwr_chat($id)` instead).
+     * Get channel/supergroup participants (you should use `$MadelineProto->getPwrChat($id)` instead).
      *
      * Parameters:
      * * `InputChannel`              **channel** - The channel
@@ -3306,10 +3306,10 @@ interface channels
     public function getChannels($params);
 
     /**
-     * You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info).
+     * You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `InputChannel` **channel** - You cannot use this method directly, use the get_pwr_chat, get_info, get_full_info methods instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputChannel` **channel** - You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -4303,7 +4303,7 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
     /**
-     * Synchronous wrapper for method_call.
+     * Synchronous wrapper for methodCall.
      *
      * @param string $method Method name
      * @param array  $args   Arguments

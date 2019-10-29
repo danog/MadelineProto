@@ -63,7 +63,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                         ['_' => 'documentAttributeFilename', 'file_name' => 'document.txt']
                     ]
                 ],]);*/
-                //yield $this->download_to_dir($update, '/tmp');
+                //yield $this->downloadToDir($update, '/tmp');
             }
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);

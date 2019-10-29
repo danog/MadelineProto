@@ -158,7 +158,7 @@ A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputDia
 The following syntax can also be used:
 
 ```
-$'.$type.' = -147286699; // Numeric chat id returned by request_secret_chat, can be positive or negative
+$'.$type.' = -147286699; // Numeric chat id returned by requestSecretChat, can be positive or negative
 ```
 
 
@@ -215,7 +215,7 @@ $result = $'.$type.'->click();
 
 * [Updates](Updates.md) - If the button is a keyboardButton, the message will be sent to the chat, in reply to the message with the keyboard
 
-* [messages_BotCallbackAnswer](messages_BotCallbackAnswer.md) - If the button is a keyboardButtonCallback or a keyboardButtonGame the button will be pressed and the result will be returned
+* [messages.BotCallbackAnswer](messages.BotCallbackAnswer.md) - If the button is a keyboardButtonCallback or a keyboardButtonGame the button will be pressed and the result will be returned
 
 * `false` - If the button is an unsupported button, like keyboardButtonRequestPhone, keyboardButtonRequestGeoLocation, keyboardButtonSwitchInlinekeyboardButtonBuy; you will have to parse data from these buttons manually
 

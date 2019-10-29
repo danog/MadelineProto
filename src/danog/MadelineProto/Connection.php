@@ -398,7 +398,7 @@ class Connection extends Session
      *     // only in outgoing messages
      *     'body' => deserialized body, (optional if container)
      *     'serialized_body' => 'serialized body', (optional if container)
-     *     'content_related' => bool,
+     *     'contentRelated' => bool,
      *     '_' => 'predicate',
      *     'promise' => deferred promise that gets resolved when a response to the message is received (optional),
      *     'send_promise' => deferred promise that gets resolved when the message is sent (optional),
@@ -431,10 +431,10 @@ class Connection extends Session
         if (!isset($message['serialized_body'])) {
             $body = \is_object($message['body']) ? yield $message['body'] : $message['body'];
 
-            $refresh_next = isset($message['refresh_next']) && $message['refresh_next'];
-            //$refresh_next = true;
+            $refreshNext = isset($message['refreshNext']) && $message['refreshNext'];
+            //$refreshNext = true;
 
-            if ($refresh_next) {
+            if ($refreshNext) {
                 $this->API->referenceDatabase->refreshNext(true);
             }
 
@@ -443,7 +443,7 @@ class Connection extends Session
             } else {
                 $body = yield $this->API->serializeObject(['type' => $message['_']], $body, $message['_']);
             }
-            if ($refresh_next) {
+            if ($refreshNext) {
                 $this->API->referenceDatabase->refreshNext(false);
             }
             $message['serialized_body'] = $body;

@@ -433,7 +433,7 @@ class DataCenter
                     }
 
                     // The following hack looks like the only way to detect connection refused errors with PHP's stream sockets.
-                    if (\stream_socket_get_name($socket, true) === false) {
+                    if (\stream_socket_getName($socket, true) === false) {
                         \fclose($socket);
                         throw new ConnectException(\sprintf(
                             "Connection to %s refused%s",

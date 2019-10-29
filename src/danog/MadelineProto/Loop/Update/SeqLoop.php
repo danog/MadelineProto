@@ -42,11 +42,11 @@ class SeqLoop extends ResumableSignalLoop
         $API = $this->API;
         $this->feeder = $API->feeders[false];
 
-        if (!$this->API->settings['updates']['handle_updates']) {
+        if (!$this->API->settings['updates']['handleUpdates']) {
             return false;
         }
 
-        while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
+        while (!$this->API->settings['updates']['handleUpdates'] || !$API->hasAllAuth()) {
             if (yield $this->waitSignal($this->pause())) {
                 return;
             }
@@ -54,7 +54,7 @@ class SeqLoop extends ResumableSignalLoop
         $this->state = yield $API->loadUpdateState();
 
         while (true) {
-            while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
+            while (!$this->API->settings['updates']['handleUpdates'] || !$API->hasAllAuth()) {
                 if (yield $this->waitSignal($this->pause())) {
                     return;
                 }
@@ -62,7 +62,7 @@ class SeqLoop extends ResumableSignalLoop
             if (yield $this->waitSignal($this->pause())) {
                 return;
             }
-            if (!$this->API->settings['updates']['handle_updates']) {
+            if (!$this->API->settings['updates']['handleUpdates']) {
                 return;
             }
             while ($this->incomingUpdates) {

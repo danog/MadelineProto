@@ -143,8 +143,8 @@ class AnnotationsBuilder
         $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
         foreach ($methods as $key => $method) {
             $name = $method->getName();
-            if ($method == 'method_call_async_read') {
-                unset($methods[\array_search('method_call', $methods)]);
+            if ($method == 'methodCallAsyncRead') {
+                unset($methods[\array_search('methodCall', $methods)]);
             } elseif (\strpos($name, '__') === 0) {
                 unset($methods[$key]);
             } elseif (\stripos($name, 'async') !== false) {
@@ -161,8 +161,8 @@ class AnnotationsBuilder
                 continue;
             }
 
-            if ($name == 'method_call_async_read') {
-                $name = 'method_call';
+            if ($name == 'methodCallAsyncRead') {
+                $name = 'methodCall';
             } elseif (\stripos($name, 'async') !== false) {
                 if (\strpos($name, '_async') !== false) {
                     $name = \str_ireplace('_async', '', $name);

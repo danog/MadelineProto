@@ -47,7 +47,7 @@ class UpdateLoop extends ResumableSignalLoop
         $API = $this->API;
         $feeder = $this->feeder = $API->feeders[$this->channelId];
 
-        while (!$API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
+        while (!$API->settings['updates']['handleUpdates'] || !$API->hasAllAuth()) {
             if (yield $this->waitSignal($this->pause())) {
                 $API->logger->logger("Exiting $this due to signal");
 
@@ -59,7 +59,7 @@ class UpdateLoop extends ResumableSignalLoop
         $timeout = $API->settings['updates']['getdifference_interval'];
         $first = true;
         while (true) {
-            while (!$API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
+            while (!$API->settings['updates']['handleUpdates'] || !$API->hasAllAuth()) {
                 if (yield $this->waitSignal($this->pause())) {
                     $API->logger->logger("Exiting $this due to signal");
 

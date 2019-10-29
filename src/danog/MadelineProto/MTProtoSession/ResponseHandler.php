@@ -370,7 +370,7 @@ trait ResponseHandler
                     if (\strpos($response['error_message'], 'FILE_REFERENCE_') === 0) {
                         $this->logger->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
 
-                        $request['refresh_references'] = true;
+                        $request['refreshReferences'] = true;
                         if (isset($request['serialized_body'])) {
                             unset($request['serialized_body']);
                         }
@@ -389,7 +389,7 @@ trait ResponseHandler
                                 return;
                             }
                             if (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'RPC_CALL_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running'])) {
-                                Loop::delay(1 * 1000, [$this, 'method_recall'], ['message_id' => $request_id, ]);
+                                Loop::delay(1 * 1000, [$this, 'methodRecall'], ['message_id' => $request_id, ]);
                                 return;
                             }
                             $this->gotResponseForOutgoingMessageId($request_id);
@@ -408,7 +408,7 @@ trait ResponseHandler
                             if (isset($request['user_related']) && $request['user_related']) {
                                 $this->API->settings['connection_settings']['default_dc'] = $this->API->authorized_dc = $this->API->datacenter->curdc;
                             }
-                            Loop::defer([$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
+                            Loop::defer([$this, 'methodRecall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
                             //$this->API->methodRecall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
 
                             return;
@@ -522,7 +522,7 @@ trait ResponseHandler
 
                                 $this->logger->logger('Flood, waiting '.$seconds.' seconds before repeating async call...', \danog\MadelineProto\Logger::NOTICE);
                                 $request['sent'] += $seconds;
-                                Loop::delay($seconds * 1000, [$this, 'method_recall'], ['message_id' => $request_id, ]);
+                                Loop::delay($seconds * 1000, [$this, 'methodRecall'], ['message_id' => $request_id, ]);
 
                                 return;
                             }

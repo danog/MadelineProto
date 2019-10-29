@@ -35,8 +35,8 @@ trait TOS
 
             if (!$this->tos['accepted']) {
                 $this->logger->logger('Telegram has updated their Terms Of Service', \danog\MadelineProto\Logger::ERROR);
-                $this->logger->logger('Accept the TOS before proceeding by calling $MadelineProto->accept_tos().', \danog\MadelineProto\Logger::ERROR);
-                $this->logger->logger('You can also decline the TOS by calling $MadelineProto->decline_tos().', \danog\MadelineProto\Logger::ERROR);
+                $this->logger->logger('Accept the TOS before proceeding by calling $MadelineProto->acceptTos().', \danog\MadelineProto\Logger::ERROR);
+                $this->logger->logger('You can also decline the TOS by calling $MadelineProto->declineTos().', \danog\MadelineProto\Logger::ERROR);
                 $this->logger->logger('By declining the TOS, the currently logged in account will be PERMANENTLY DELETED.', \danog\MadelineProto\Logger::FATAL_ERROR);
                 $this->logger->logger('Read the following TOS very carefully: ', \danog\MadelineProto\Logger::ERROR);
                 $this->logger->logger($this->tos);

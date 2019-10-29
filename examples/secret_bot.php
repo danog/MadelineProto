@@ -41,7 +41,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
     {
         try {
             if (isset($update['message']['decrypted_message']['media'])) {
-                \danog\MadelineProto\Logger::log($this->download_to_dir($update, '.'));
+                \danog\MadelineProto\Logger::log($this->downloadToDir($update, '.'));
             }
             if (isset($this->sent[$update['message']['chat_id']])) {
                 return;

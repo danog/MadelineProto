@@ -53,7 +53,7 @@ trait Methods
         $this->human_docs_methods = [];
         $this->logger->logger('Generating methods documentation...', \danog\MadelineProto\Logger::NOTICE);
         foreach ($this->methods->by_id as $id => $data) {
-            $method = \str_replace('.', '_', $data['method']);
+            $method = $data['method'];
             $php_method = \str_replace('.', '->', $data['method']);
             $type = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
             $php_type = \preg_replace('/.*_of_/', '', $type);
@@ -77,7 +77,7 @@ trait Methods
                 }
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
                 $type_or_bare_type = \ctype_upper($this->end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
-                $param[$type_or_subtype] = \str_replace(['.', 'true', 'false'], ['_', 'Bool', 'Bool'], $param[$type_or_subtype]);
+                $param[$type_or_subtype] = \str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
                 $param[$type_or_subtype] = '['.$this->escape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $params .= "'".$param['name']."' => ".(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
@@ -134,7 +134,7 @@ trait Methods
                     $param['type'] = 'Vector t';
                     $param['subtype'] = 'int';
                 }
-                $ptype = \str_replace('.', '_', $param[$type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type']);
+                $ptype = $param[$type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type'];
                 switch ($ptype) {
                     case 'true':
                     case 'false':
@@ -194,9 +194,9 @@ trait Methods
                     $table .= '|parse\\_mode| [string](../types/string.md) | Whether to parse HTML or Markdown markup in the message| Optional |
 ';
                     $params .= "'parse_mode' => 'string', ";
-                    $lua_params .= "parse_mode='string', ";
-                    $json_params .= '"parse_mode": "string"';
-                    $pwr_params = "parse_mode - string\n";
+                    $lua_params .= "parseMode='string', ";
+                    $json_params .= '"parseMode": "string"';
+                    $pwr_params = "parseMode - string\n";
                 }
             }
             $description = isset($this->td_descriptions['methods'][$data['method']]) ? $this->td_descriptions['methods'][$data['method']]['description'] : $data['method'].' parameters, return type and example';
@@ -275,11 +275,11 @@ If the length of the provided message is bigger than 4096, the message will be s
                 }
                 if ($hasentities) {
                     $example .= '
-## Usage of parse_mode:
+## Usage of parseMode:
 
-Set parse_mode to html to enable HTML parsing of the message.  
+Set parseMode to html to enable HTML parsing of the message.  
 
-Set parse_mode to Markdown to enable markown AND html parsing of the message.  
+Set parseMode to Markdown to enable markown AND html parsing of the message.  
 
 The following tags are currently supported:
 
@@ -351,29 +351,29 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 $MadelineProto->[logout](https://docs.madelineproto.xyz/logout.html)();
 
-$MadelineProto->[phone_login](https://docs.madelineproto.xyz/phone_login.html)($number);
+$MadelineProto->[phoneLogin](https://docs.madelineproto.xyz/phoneLogin.html)($number);
 
-$MadelineProto->[complete_phone_login](https://docs.madelineproto.xyz/complete_phone_login.html)($code);
+$MadelineProto->[completePhoneLogin](https://docs.madelineproto.xyz/completePhoneLogin.html)($code);
 
 $MadelineProto->[complete_2FA_login](https://docs.madelineproto.xyz/complete_2FA_login.html)($password);
 
-$MadelineProto->[bot_login](https://docs.madelineproto.xyz/bot_login.html)($token);
+$MadelineProto->[botLogin](https://docs.madelineproto.xyz/botLogin.html)($token);
 
 
-$MadelineProto->[get_dialogs](https://docs.madelineproto.xyz/get_dialogs.html)();
+$MadelineProto->[getDialogs](https://docs.madelineproto.xyz/getDialogs.html)();
 
-$MadelineProto->[get_pwr_chat](https://docs.madelineproto.xyz/get_pwr_chat.html)($id);
+$MadelineProto->[getPwrChat](https://docs.madelineproto.xyz/getPwrChat.html)($id);
 
-$MadelineProto->[get_info](https://docs.madelineproto.xyz/get_info.html)($id);
+$MadelineProto->[getInfo](https://docs.madelineproto.xyz/getInfo.html)($id);
 
-$MadelineProto->[get_full_info](https://docs.madelineproto.xyz/get_full_info.html)($id);
+$MadelineProto->[getFullInfo](https://docs.madelineproto.xyz/getFullInfo.html)($id);
 
-$MadelineProto->[get_self](https://docs.madelineproto.xyz/get_self.html)();
+$MadelineProto->[getSelf](https://docs.madelineproto.xyz/getSelf.html)();
 
 
-$MadelineProto->[request_call](https://docs.madelineproto.xyz/request_call.html)($id);
+$MadelineProto->[requestCall](https://docs.madelineproto.xyz/requestCall.html)($id);
 
-$MadelineProto->[request_secret_chat](https://docs.madelineproto.xyz/request_secret_chat.html)($id);
+$MadelineProto->[requestSecretChat](https://docs.madelineproto.xyz/requestSecretChat.html)($id);
 
 '.\implode('', $this->docs_methods));
 
@@ -395,13 +395,13 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 * [Get all chats, broadcast a message to all chats](https://docs.madelineproto.xyz/docs/DIALOGS.html)
 
-* [Get the full participant list of a channel/group/supergroup](https://docs.madelineproto.xyz/get_pwr_chat.html)
+* [Get the full participant list of a channel/group/supergroup](https://docs.madelineproto.xyz/getPwrChat.html)
 
-* [Get full info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/get_full_info.html)
+* [Get full info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/getFullInfo.html)
 
-* [Get info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/get_info.html)
+* [Get info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/getInfo.html)
 
-* [Get info about the currently logged-in user](https://docs.madelineproto.xyz/get_self.html)
+* [Get info about the currently logged-in user](https://docs.madelineproto.xyz/getSelf.html)
 
 * [Upload or download files up to 1.5 GB](https://docs.madelineproto.xyz/docs/FILES.html)
 

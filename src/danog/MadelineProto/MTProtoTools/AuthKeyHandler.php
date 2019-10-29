@@ -550,7 +550,7 @@ trait AuthKeyHandler
                 $temp_auth_key_id = $datacenterConnection->getTempAuthKey()->getID();
                 $perm_auth_key_id = $datacenterConnection->getPermAuthKey()->getID();
                 $temp_session_id = $connection->session_id;
-                $message_data = yield $this->serializeObject(['type' => 'bind_auth_key_inner'], ['nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bind_temp_auth_key_inner');
+                $message_data = yield $this->serializeObject(['type' => 'bind_auth_key_inner'], ['nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bindTempAuthKey_inner');
                 $message_id = $connection->generateMessageId();
                 $seq_no = 0;
                 $encrypted_data = $this->random(16).$message_id.\pack('VV', $seq_no, \strlen($message_data)).$message_data;

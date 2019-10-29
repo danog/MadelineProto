@@ -27,7 +27,7 @@ trait TD
             return $params;
         }
         if (!isset($params['ID'])) {
-            \array_walk($params, [$this, 'tdcli_to_td']);
+            \array_walk($params, [$this, 'tdcliToTd']);
 
             return $params;
         }

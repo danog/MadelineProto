@@ -28,9 +28,9 @@ trait Webhook
     {
         $this->pem_path = $pem_path;
         $this->hook_url = $hook_url;
-        $this->settings['updates']['callback'] = [$this, 'pwr_webhook'];
+        $this->settings['updates']['callback'] = [$this, 'pwrWebhook'];
         $this->settings['updates']['run_callback'] = true;
-        $this->settings['updates']['handle_updates'] = true;
+        $this->settings['updates']['handleUpdates'] = true;
         $this->startUpdateSystem();
     }
 }

@@ -807,15 +807,15 @@ trait Files
     header('Content-Transfer-Encoding: Binary');
     header('Accept-Ranges: bytes');
     //header('Content-disposition: attachment: filename="'.basename($select['file_path']).'"');
-    $MadelineProto->download_to_stream($select['file_id'], fopen('php://output', 'w'), function ($percent) {
+    $MadelineProto->downloadToStream($select['file_id'], fopen('php://output', 'w'), function ($percent) {
     flush();
     ob_flush();
     \danog\MadelineProto\Logger::log('Download status: '.$percent.'%');
     }, $seek_start, $seek_end + 1);
-    //analytics(true, $file_path, $MadelineProto->get_self()['id'], $dbuser, $dbpassword);
+    //analytics(true, $file_path, $MadelineProto->getSelf()['id'], $dbuser, $dbpassword);
     $MadelineProto->API->getting_state = false;
     $MadelineProto->API->storeDb([], true);
-    $MadelineProto->API->reset_session();
+    $MadelineProto->API->resetSession();
     } else {
     if ($seek_start > 0 || $seek_end < $select['file_size'] - 1) {
     header('HTTP/1.1 206 Partial Content');

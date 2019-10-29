@@ -38,7 +38,7 @@ class Magic
     public static $BIG_ENDIAN = false;
     public static $bigint = true;
     public static $isatty = false;
-    public static $is_fork = false;
+    public static $isFork = false;
     public static $can_getmypid = true;
     public static $can_parallel = false;
     public static $can_getcwd = false;
@@ -76,7 +76,7 @@ class Magic
     public static function classExists()
     {
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        \set_exception_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
+        \set_exceptionHandler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
         if (!self::$inited) {
             if (!\defined('\\phpseclib\\Crypt\\Common\\SymmetricKey::MODE_IGE') || \phpseclib\Crypt\Common\SymmetricKey::MODE_IGE !== 7) {
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['phpseclib_fork']);
@@ -202,7 +202,7 @@ class Magic
 
     public static function isFork()
     {
-        if (self::$is_fork) {
+        if (self::$isFork) {
             return true;
         }
         if (!self::$can_getmypid) {
@@ -214,7 +214,7 @@ class Magic
                 self::$pid = \getmypid();
             }
 
-            return self::$is_fork = self::$pid !== \getmypid();
+            return self::$isFork = self::$pid !== \getmypid();
         } catch (\danog\MadelineProto\Exception $e) {
             return self::$can_getmypid = false;
         }

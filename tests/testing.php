@@ -55,14 +55,14 @@ $MadelineProto->start();
 $MadelineProto->async(false);
 
 try {
-    $MadelineProto->get_self();
+    $MadelineProto->getSelf();
 } catch (\danog\MadelineProto\Exception $e) {
     if ($e->getMessage() === 'TOS action required, check the logs') {
-        $MadelineProto->accept_tos();
+        $MadelineProto->acceptTos();
     }
 }
 
-//var_dump(count($MadelineProto->get_pwr_chat('@madelineproto')['participants']));
+//var_dump(count($MadelineProto->getPwrChat('@madelineproto')['participants']));
 
 /*
  * Test logging
@@ -83,13 +83,13 @@ $message = (\getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare se
  * Try making a phone call
  */
 if (!\getenv('TRAVIS_COMMIT') && \stripos($MadelineProto->readline('Do you want to make a call? (y/n): '), 'y') !== false) {
-    $controller = $MadelineProto->request_call(\getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
+    $controller = $MadelineProto->requestCall(\getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
     while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
-        $MadelineProto->get_updates();
+        $MadelineProto->getUpdates();
     }
     \danog\MadelineProto\Logger::log($controller->configuration);
     while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-        $MadelineProto->get_updates();
+        $MadelineProto->getUpdates();
     }
 }
 
@@ -100,7 +100,7 @@ if (!\getenv('TRAVIS_COMMIT') && \stripos($MadelineProto->readline('Do you want 
     $howmany = $MadelineProto->readline('How many calls would you like me to handle? ');
     $offset = 0;
     while ($howmany > 0) {
-        $updates = $MadelineProto->get_updates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+        $updates = $MadelineProto->getUpdates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
         foreach ($updates as $update) {
             \danog\MadelineProto\Logger::log($update);
             $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
@@ -122,14 +122,14 @@ if (!\getenv('TRAVIS_COMMIT') && \stripos($MadelineProto->readline('Do you want 
     /**
      * Request a secret chat.
      */
-    $secret_chat_id = $MadelineProto->request_secret_chat(\getenv('TEST_SECRET_CHAT'));
+    $secret_chat_id = $MadelineProto->requestSecretChat(\getenv('TEST_SECRET_CHAT'));
     echo 'Waiting for '.\getenv('TEST_SECRET_CHAT').' (secret chat id '.$secret_chat_id.') to accept the secret chat...'.PHP_EOL;
 
     /*
      * Wait until the other party accepts it
      */
-    while ($MadelineProto->secret_chat_status($secret_chat_id) !== 2) {
-        $MadelineProto->get_updates();
+    while ($MadelineProto->secretChatStatus($secret_chat_id) !== 2) {
+        $MadelineProto->getUpdates();
     }
 
     /**
@@ -219,7 +219,7 @@ if (!\getenv('TRAVIS_COMMIT') && \stripos($MadelineProto->readline('Do you want 
     }
 }
 
-$mention = $MadelineProto->get_info(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
+$mention = $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id
 $media = [];
 
@@ -242,7 +242,7 @@ $media['voice'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/mosconi
 $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/60', 'mime_type' => 'magic/magic', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
 
 $message = 'yay '.\PHP_VERSION_ID;
-$mention = $MadelineProto->get_info(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
+$mention = $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
 $mention = $mention['user_id']; // Selects only the numeric user id
 
 /*

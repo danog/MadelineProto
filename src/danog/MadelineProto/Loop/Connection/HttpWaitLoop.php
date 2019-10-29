@@ -81,7 +81,7 @@ class HttpWaitLoop extends ResumableSignalLoop
             }
             $API->logger->logger("DC $datacenter: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
             if ($connection->countHttpSent() === $connection->countHttpReceived() && (!empty($connection->pending_outgoing) || (!empty($connection->new_outgoing) && !$connection->hasPendingCalls()))) {
-                yield $connection->sendMessage(['_' => 'http_wait', 'body' => ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'content_related' => true, 'unencrypted' => false, 'method' => false]);
+                yield $connection->sendMessage(['_' => 'http_wait', 'body' => ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'contentRelated' => true, 'unencrypted' => false, 'method' => false]);
             }
             $API->logger->logger("DC $datacenter: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
         }

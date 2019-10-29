@@ -121,7 +121,7 @@ class RPCErrorException extends \Exception
 
         $additional = [];
         foreach ($this->getTrace() as $level) {
-            if (isset($level['function']) && $level['function'] === 'method_call') {
+            if (isset($level['function']) && $level['function'] === 'methodCall') {
                 $this->line = $level['line'];
                 $this->file = $level['file'];
                 $additional = $level['args'];

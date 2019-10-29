@@ -46,9 +46,9 @@ class Server
 
     public function start()
     {
-        \pcntl_signal(SIGTERM, [$this, 'sig_handler']);
-        \pcntl_signal(SIGINT, [$this, 'sig_handler']);
-        \pcntl_signal(SIGCHLD, [$this, 'sig_handler']);
+        \pcntl_signal(SIGTERM, [$this, 'sigHandler']);
+        \pcntl_signal(SIGINT, [$this, 'sigHandler']);
+        \pcntl_signal(SIGCHLD, [$this, 'sigHandler']);
 
         $this->sock = new \Socket($this->settings['type'], SOCK_STREAM, $this->settings['protocol']);
         $this->sock->bind($this->settings['address'], $this->settings['port']);

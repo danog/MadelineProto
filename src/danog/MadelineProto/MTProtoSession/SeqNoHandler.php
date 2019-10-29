@@ -31,9 +31,9 @@ trait SeqNoHandler
 
     public $session_id;
 
-    public function generateOutSeqNo($content_related)
+    public function generateOutSeqNo($contentRelated)
     {
-        $in = $content_related ? 1 : 0;
+        $in = $contentRelated ? 1 : 0;
         $value = $this->session_out_seq_no;
         $this->session_out_seq_no += $in;
         //$this->API->logger->logger("OUT: $value + $in = ".$this->session_out_seq_no);
@@ -50,9 +50,9 @@ trait SeqNoHandler
         }
     }
 
-    public function generateInSeqNo($content_related)
+    public function generateInSeqNo($contentRelated)
     {
-        $in = $content_related ? 1 : 0;
+        $in = $contentRelated ? 1 : 0;
         $value = $this->session_in_seq_no;
         $this->session_in_seq_no += $in;
         //$this->API->logger->logger("IN: $value + $in = ".$this->session_in_seq_no);

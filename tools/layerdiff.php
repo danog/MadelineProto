@@ -58,7 +58,7 @@ $new = getTL($argv[2]);
 $res = '';
 
 foreach (['methods', 'constructors'] as $type) {
-    $finder = $type === 'methods' ? 'find_by_method' : 'find_by_predicate';
+    $finder = $type === 'methods' ? 'findByMethod' : 'findByPredicate';
     $key = $type === 'methods' ? 'method' : 'predicate';
 
     // New constructors

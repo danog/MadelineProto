@@ -226,8 +226,8 @@ class API extends InternalDoc
             }
             $methods = \get_class_methods($this->API);
             foreach ($methods as $method) {
-                if ($method == 'method_call_async_read') {
-                    unset($methods[\array_search('method_call', $methods)]);
+                if ($method == 'methodCallAsyncRead') {
+                    unset($methods[\array_search('methodCall', $methods)]);
                 } elseif (\stripos($method, 'async') !== false) {
                     if (\strpos($method, '_async') !== false) {
                         unset($methods[\array_search(\str_ireplace('_async', '', $method), $methods)]);
@@ -240,8 +240,8 @@ class API extends InternalDoc
             foreach ($methods as $method) {
                 $actual_method = $method;
 
-                if ($method == 'method_call_async_read') {
-                    $method = 'method_call';
+                if ($method == 'methodCallAsyncRead') {
+                    $method = 'methodCall';
                 } elseif (\stripos($method, 'async') !== false) {
                     if (\strpos($method, '_async') !== false) {
                         $method = \str_ireplace('_async', '', $method);
@@ -249,7 +249,7 @@ class API extends InternalDoc
                         $method = \str_ireplace('async', '', $method);
                     }
                 }
-                $actual_method = $actual_method === 'get_self_async' ? [$this, 'my_get_self'] : [$this->API, $actual_method];
+                $actual_method = $actual_method === 'getSelf' ? [$this, 'myGetSelf'] : [$this->API, $actual_method];
                 $this->methods[\strtolower($method)] = $actual_method;
                 if (\strpos($method, '_') !== false) {
                     $this->methods[\strtolower(\str_replace('_', '', $method))] = $actual_method;

@@ -182,7 +182,7 @@ class WriteLoop extends ResumableSignalLoop
             $temporary_keys = [];
             if (\count($to_ack = $connection->ack_queue)) {
                 foreach (\array_chunk($connection->ack_queue, 8192) as $acks) {
-                    $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msgs_ack', 'serialized_body' => yield $this->API->serializeObject(['type' => 'msgs_ack'], ['msg_ids' => $acks], 'msgs_ack'), 'content_related' => false, 'unencrypted' => false, 'method' => false];
+                    $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msgs_ack', 'serialized_body' => yield $this->API->serializeObject(['type' => 'msgs_ack'], ['msg_ids' => $acks], 'msgs_ack'), 'contentRelated' => false, 'unencrypted' => false, 'method' => false];
                     $temporary_keys[$connection->pending_outgoing_key] = true;
                     $API->logger->logger("Adding msgs_ack {$connection->pending_outgoing_key}", Logger::ULTRA_VERBOSE);
                     $connection->pending_outgoing_key++;
@@ -200,7 +200,7 @@ class WriteLoop extends ResumableSignalLoop
             }
             if ($shared->isHttp() && !$has_http_wait) {
                 $API->logger->logger("Adding http_wait {$connection->pending_outgoing_key}", Logger::ULTRA_VERBOSE);
-                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'http_wait', 'serialized_body' => yield $this->API->serializeObject(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'content_related' => true, 'unencrypted' => false, 'method' => true];
+                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'http_wait', 'serialized_body' => yield $this->API->serializeObject(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'contentRelated' => true, 'unencrypted' => false, 'method' => true];
                 $temporary_keys[$connection->pending_outgoing_key] = true;
                 $connection->pending_outgoing_key++;
             }
@@ -234,7 +234,7 @@ class WriteLoop extends ResumableSignalLoop
 
                 $API->logger->logger("Sending {$message['_']} as encrypted message to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
-                $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $message['serialized_body'], 'seqno' => $connection->generateOutSeqNo($message['content_related'])];
+                $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $message['serialized_body'], 'seqno' => $connection->generateOutSeqNo($message['contentRelated'])];
 
                 if (isset($message['method']) && $message['method'] && $message['_'] !== 'http_wait') {
                     if (!$shared->getTempAuthKey()->isInited() && $message['_'] !== 'auth.bindTempAuthKey' && !$inited) {
@@ -312,7 +312,7 @@ class WriteLoop extends ResumableSignalLoop
                 $API->logger->logger("Wrapping in msg_container ($count messages of total size $total_length) as encrypted message for DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 $message_id = $connection->generateMessageId();
-                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msg_container', 'container' => \array_values($keys), 'content_related' => false, 'method' => false, 'unencrypted' => false];
+                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msg_container', 'container' => \array_values($keys), 'contentRelated' => false, 'method' => false, 'unencrypted' => false];
 
                 //var_dumP("container ".bin2hex($message_id));
                 $keys[$connection->pending_outgoing_key++] = $message_id;

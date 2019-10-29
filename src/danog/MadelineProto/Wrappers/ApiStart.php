@@ -76,7 +76,7 @@ Note that you can also provide the API parameters directly in the code using the
             } else {
                 yield $this->webAPIEcho();
             }
-        } elseif (!$this->my_telegram_org_wrapper->logged_in()) {
+        } elseif (!$this->my_telegram_org_wrapper->loggedIn()) {
             if (isset($_POST['code'])) {
                 yield $this->webAPICompleteLogin();
                 if (yield $this->my_telegram_org_wrapper->hasApp()) {

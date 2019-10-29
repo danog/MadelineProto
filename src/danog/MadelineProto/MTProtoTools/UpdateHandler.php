@@ -35,20 +35,20 @@ trait UpdateHandler
 
     public function pwrUpdateHandler($update)
     {
-        if (isset($this->settings['pwr']['update_handler'])) {
-            if (\is_array($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'][0] === false) {
-                $this->settings['pwr']['update_handler'] = $this->settings['pwr']['update_handler'][1];
+        if (isset($this->settings['pwr']['updateHandler'])) {
+            if (\is_array($this->settings['pwr']['updateHandler']) && $this->settings['pwr']['updateHandler'][0] === false) {
+                $this->settings['pwr']['updateHandler'] = $this->settings['pwr']['updateHandler'][1];
             }
-            if (\is_string($this->settings['pwr']['update_handler'])) {
-                return $this->{$this->settings['pwr']['update_handler']}($update);
+            if (\is_string($this->settings['pwr']['updateHandler'])) {
+                return $this->{$this->settings['pwr']['updateHandler']}($update);
             }
-            \in_array($this->settings['pwr']['update_handler'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->getUpdatesUpdateHandler($update) : $this->settings['pwr']['update_handler']($update);
+            \in_array($this->settings['pwr']['updateHandler'], [['danog\\MadelineProto\\API', 'getUpdatesUpdateHandler'], 'getUpdatesUpdateHandler']) ? $this->getUpdatesUpdateHandler($update) : $this->settings['pwr']['updateHandler']($update);
         }
     }
 
     public function getUpdatesUpdateHandler($update)
     {
-        if (!$this->settings['updates']['handle_updates']) {
+        if (!$this->settings['updates']['handleUpdates']) {
             return;
         }
         $this->updates[$this->updates_key++] = $update;
@@ -56,8 +56,8 @@ trait UpdateHandler
 
     public function getUpdates($params = [])
     {
-        if (!$this->settings['updates']['handle_updates']) {
-            $this->settings['updates']['handle_updates'] = true;
+        if (!$this->settings['updates']['handleUpdates']) {
+            $this->settings['updates']['handleUpdates'] = true;
             $this->startUpdateSystem();
         }
         if (!$this->settings['updates']['run_callback']) {
@@ -173,7 +173,7 @@ trait UpdateHandler
 
     public function handleUpdates($updates, $actual_updates = null)
     {
-        if (!$this->settings['updates']['handle_updates']) {
+        if (!$this->settings['updates']['handleUpdates']) {
             return;
         }
         if ($actual_updates) {
@@ -365,7 +365,7 @@ trait UpdateHandler
         //if ($update['_'] === 'updateServiceNotification' && strpos($update['type'], 'AUTH_KEY_DROP_') === 0) {
 
         //}
-        if (!$this->settings['updates']['handle_updates']) {
+        if (!$this->settings['updates']['handleUpdates']) {
             return;
         }
         if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') {
@@ -375,7 +375,7 @@ trait UpdateHandler
             $update['message']['out'] = true;
         }
         //$this->logger->logger('Saving an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-        if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict'] && isset($this->settings['pwr']['update_handler'])) {
+        if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict'] && isset($this->settings['pwr']['updateHandler'])) {
             $this->pwrUpdateHandler($update);
         } elseif ($this->settings['updates']['run_callback']) {
             $this->getUpdatesUpdateHandler($update);

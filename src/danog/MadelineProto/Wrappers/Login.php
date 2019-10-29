@@ -40,7 +40,7 @@ trait Login
     public function botLogin($token)
     {
         if ($this->authorized === self::LOGGED_IN) {
-            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_logged_in'], \danog\MadelineProto\Logger::NOTICE);
+            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
             yield $this->logout();
         }
         $callbacks = [$this, $this->referenceDatabase];
@@ -64,7 +64,7 @@ trait Login
     public function phoneLogin($number, $sms_type = 5)
     {
         if ($this->authorized === self::LOGGED_IN) {
-            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_logged_in'], \danog\MadelineProto\Logger::NOTICE);
+            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
             yield $this->logout();
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_code_sending'], \danog\MadelineProto\Logger::NOTICE);
@@ -134,7 +134,7 @@ trait Login
     public function importAuthorization($authorization)
     {
         if ($this->authorized === self::LOGGED_IN) {
-            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_logged_in'], \danog\MadelineProto\Logger::NOTICE);
+            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
             yield $this->logout();
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_auth_key'], \danog\MadelineProto\Logger::NOTICE);
@@ -169,7 +169,7 @@ trait Login
     public function exportAuthorization()
     {
         if ($this->authorized !== self::LOGGED_IN) {
-            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['not_logged_in']);
+            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['not_loggedIn']);
         }
         yield $this->getSelf();
         $this->authorized_dc = $this->datacenter->curdc;

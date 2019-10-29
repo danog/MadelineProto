@@ -29,7 +29,7 @@ $MadelineProto->async(true);
 $MadelineProto->loop(function () use ($MadelineProto) {
     yield $MadelineProto->start();
 
-    $me = yield $MadelineProto->get_self();
+    $me = yield $MadelineProto->getSelf();
 
     $MadelineProto->logger($me);
 
@@ -168,10 +168,10 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * [Login](https://docs.madelineproto.xyz/docs/LOGIN.html)
     * [Change 2FA password](https://docs.madelineproto.xyz/update_2fa.html)
     * [Get all chats, broadcast a message to all chats](https://docs.madelineproto.xyz/docs/DIALOGS.html)
-    * [Get the full participant list of a channel/group/supergroup](https://docs.madelineproto.xyz/get_pwr_chat.html)
-    * [Get full info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/get_full_info.html)
-    * [Get info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/get_info.html)
-    * [Get info about the currently logged-in user](https://docs.madelineproto.xyz/get_self.html)
+    * [Get the full participant list of a channel/group/supergroup](https://docs.madelineproto.xyz/getPwrChat.html)
+    * [Get full info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/getFullInfo.html)
+    * [Get info about a user/chat/supergroup/channel](https://docs.madelineproto.xyz/getInfo.html)
+    * [Get info about the currently logged-in user](https://docs.madelineproto.xyz/getSelf.html)
     * [Upload or download files up to 1.5 GB](https://docs.madelineproto.xyz/docs/FILES.html)
     * [Make a phone call and play a song](https://docs.madelineproto.xyz/docs/CALLS.html)
     * [Create a secret chat bot](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
@@ -276,7 +276,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_getBlocked.html" name="contacts_getBlocked">Get blocked users: contacts.getBlocked</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone_getCallConfig.html" name="phone_getCallConfig">Get call configuration: phone.getCallConfig</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_getMessages.html" name="channels_getMessages">Get channel/supergroup messages: channels.getMessages</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_getParticipants.html" name="channels_getParticipants">Get channel/supergroup participants (you should use `$MadelineProto->get_pwr_chat($id)` instead): channels.getParticipants</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels_getParticipants.html" name="channels_getParticipants">Get channel/supergroup participants (you should use `$MadelineProto->getPwrChat($id)` instead): channels.getParticipants</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getCommonChats.html" name="messages_getCommonChats">Get chats in common with a user: messages.getCommonChats</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts_getContactIDs.html" name="contacts_getContactIDs">Get contacts by IDs: contacts.getContactIDs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help_getDeepLinkInfo.html" name="help_getDeepLinkInfo">Get deep link info: help.getDeepLinkInfo</a>
@@ -354,7 +354,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_getWallPaper.html" name="account_getWallPaper">Get wallpaper info: account.getWallPaper</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getWebPage.html" name="messages_getWebPage">Get webpage preview: messages.getWebPage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getWebPagePreview.html" name="messages_getWebPagePreview">Get webpage preview: messages.getWebPagePreview</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getDialogs.html" name="messages_getDialogs">Gets list of chats: you should use $MadelineProto->get_dialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html: messages.getDialogs</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getDialogs.html" name="messages_getDialogs">Gets list of chats: you should use $MadelineProto->getDialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html: messages.getDialogs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_searchGlobal.html" name="messages_searchGlobal">Global message search: messages.searchGlobal</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_hidePeerSettingsBar.html" name="messages_hidePeerSettingsBar">Hide peer settings bar: messages.hidePeerSettingsBar</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_importChatInvite.html" name="messages_importChatInvite">Import chat invite: messages.importChatInvite</a>
@@ -463,7 +463,7 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_verifyEmail.html" name="account_verifyEmail">Verify email address: account.verifyEmail</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account_verifyPhone.html" name="account_verifyPhone">Verify phone number: account.verifyPhone</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth_bindTempAuthKey.html" name="auth_bindTempAuthKey">You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info: auth.bindTempAuthKey</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getDhConfig.html" name="messages_getDhConfig">You cannot use this method directly, instead use $MadelineProto->get_dh_config();: messages.getDhConfig</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_getDhConfig.html" name="messages_getDhConfig">You cannot use this method directly, instead use $MadelineProto->getDhConfig();: messages.getDhConfig</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_acceptEncryption.html" name="messages_acceptEncryption">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats: messages.acceptEncryption</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_discardEncryption.html" name="messages_discardEncryption">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats: messages.discardEncryption</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages_requestEncryption.html" name="messages_requestEncryption">You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats: messages.requestEncryption</a>
@@ -474,8 +474,8 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone_confirmCall.html" name="phone_confirmCall">You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls: phone.confirmCall</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone_discardCall.html" name="phone_discardCall">You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls: phone.discardCall</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone_requestCall.html" name="phone_requestCall">You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls: phone.requestCall</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth_exportAuthorization.html" name="auth_exportAuthorization">You cannot use this method directly, use $MadelineProto->export_authorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html: auth.exportAuthorization</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth_importAuthorization.html" name="auth_importAuthorization">You cannot use this method directly, use $MadelineProto->import_authorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html: auth.importAuthorization</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth_exportAuthorization.html" name="auth_exportAuthorization">You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html: auth.exportAuthorization</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth_importAuthorization.html" name="auth_importAuthorization">You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html: auth.importAuthorization</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth_importBotAuthorization.html" name="auth_importBotAuthorization">You cannot use this method directly, use the bot_login method instead (see https://docs.madelineproto.xyz for more info): auth.importBotAuthorization</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth_checkPassword.html" name="auth_checkPassword">You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info): auth.checkPassword</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth_signIn.html" name="auth_signIn">You cannot use this method directly, use the complete_phone_login method instead (see https://docs.madelineproto.xyz for more info): auth.signIn</a>
