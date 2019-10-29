@@ -42,7 +42,7 @@ class Handler extends \danog\MadelineProto\Connection
         $this->sock->setOption(\SOL_SOCKET, \SO_RCVTIMEO, $timeout);
         $this->sock->setOption(\SOL_SOCKET, \SO_SNDTIMEO, $timeout);
         $this->logger = new \danog\MadelineProto\Logger(3);
-        $this->construct_TL(['socket' => __DIR__.'/../TL_socket.tl']);
+        $this->constructTL(['socket' => __DIR__.'/../TL_socket.tl']);
     }
 
     public function __destruct()

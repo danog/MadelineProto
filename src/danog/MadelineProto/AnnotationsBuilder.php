@@ -30,7 +30,7 @@ class AnnotationsBuilder
     public function __construct($logger, $settings)
     {
         $this->logger = $logger;
-        $this->construct_TL($settings['tl_schema']);
+        $this->constructTL($settings['tl_schema']);
         $this->settings = $settings;
     }
 

@@ -4303,6 +4303,22 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
     /**
+     * Synchronous wrapper for method_call.
+     *
+     * @param string $method Method name
+     * @param array  $args   Arguments
+     * @param array  $aargs  Additional arguments
+     *
+     * @return array
+     */
+    public function methodCall(string $method, $args = [
+    ], array $aargs = [
+      'msg_id' => null,
+    ], array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$method, $args, $aargs, $extra]);
+    }
+    /**
      * Call method and wait asynchronously for response.
      *
      * If the $aargs['noResponse'] is true, will not wait for a response.
@@ -4313,7 +4329,7 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function methodCall(string $method, $args = [
+    public function methodCallRead(string $method, $args = [
     ], array $aargs = [
       'msg_id' => null,
     ], array $extra = [])
@@ -5049,8 +5065,16 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$a, $b, $extra]);
     }
-
-    public function flock(string $file, int $operation, $polling, array $extra = [])
+    /**
+     * Asynchronously lock a file
+     * Resolves with a callbable that MUST eventually be called in order to release the lock.
+     *
+     * @param string $file File to lock
+     * @param integer $operation Locking mode (see flock)
+     * @param numeric $polling   Polling interval for lock
+     * @return Promise
+     */
+    public function flock(string $file, int $operation, $polling = 0.1, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$file, $operation, $polling, $extra]);
     }
@@ -5060,12 +5084,22 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$status, $message, $extra]);
     }
 
+    public function flockGenerator(string $file, int $operation, $polling, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$file, $operation, $polling, $extra]);
+    }
+
     public function sleep($time, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$time, $extra]);
     }
 
     public function readLine($prompt = '', array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$prompt, $extra]);
+    }
+
+    public function readLineGenerator($prompt = '', array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$prompt, $extra]);
     }

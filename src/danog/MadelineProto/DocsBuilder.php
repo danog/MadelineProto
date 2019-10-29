@@ -32,7 +32,7 @@ class DocsBuilder
     {
         $this->logger = $logger;
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        $this->construct_TL($settings['tl_schema']);
+        $this->constructTL($settings['tl_schema']);
         if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) {
             $this->constructors = $this->td_constructors;
             $this->methods = $this->td_methods;
@@ -77,7 +77,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 [Constructors](constructors/)
 
 [Types](types/)');
-        $this->mk_methodS();
+        $this->mkmethodS();
         $this->mkConstructors();
         foreach (\glob('types/*') as $unlink) {
             \unlink($unlink);

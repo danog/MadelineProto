@@ -13,7 +13,7 @@ foreach ($classes as $class) {
     $class = new \ReflectionClass($class);
     $methods = \array_merge($class->getMethods(), $methods);
 }
-$methods = array_unique($methods);
+$methods = \array_unique($methods);
 
 function ssort($a, $b)
 {
@@ -31,14 +31,16 @@ foreach ($methods as $methodObj) {
     }
     $new = Tools::from_snake_case($method);
     $new = \str_ireplace(['mtproto', 'api'], ['MTProto', 'API'], $new);
-    if (!in_array($method, ['discard_call_async', 'accept_call_async', 'request_call_async'])) $new = preg_replace('/async$/i', '', $new);
+    if (!\in_array($method, ['discard_call_async', 'accept_call_async', 'request_call_async'])) {
+        $new = \preg_replace('/async$/i', '', $new);
+    }
 
-    if (method_exists((string) $methodObj->getDeclaringClass(), preg_replace('/async$/i', '', $method))) {
-        var_dump("Skipping $method => $new");
+    if (\method_exists((string) $methodObj->getDeclaringClass(), \preg_replace('/async$/i', '', $method))) {
+        \var_dump("Skipping $method => $new");
         continue;
     }
 
-    if (!function_exists($method)) {
+    if (!\function_exists($method)) {
         $find[] = "$method(";
         $replace[] = "$new(";
         continue;

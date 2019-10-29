@@ -471,7 +471,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks []= $this->minDatabase;
         }
-        $this->construct_TL($this->settings['tl_schema']['src'], $callbacks);
+        $this->constructTL($this->settings['tl_schema']['src'], $callbacks);
         yield $this->connectToAllDcs();
         $this->startLoops();
         $this->datacenter->curdc = 2;

@@ -11,9 +11,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+\chdir($d=__DIR__.'/..');
+
 require 'vendor/autoload.php';
 
 $param = 1;
+\danog\MadelineProto\Magic::classExists();
 \danog\MadelineProto\Logger::constructor($param);
 $logger = \danog\MadelineProto\Logger::$default;
 
@@ -30,37 +33,37 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 $docs = [
 /*    [
-        'tl_schema'   => ['td' => __DIR__.'/src/danog/MadelineProto/TL_td.tl'],
+        'tl_schema'   => ['td' => "$d/src/danog/MadelineProto/TL_td.tl"],
         'title'       => 'MadelineProto API documentation (td-lib)',
         'description' => 'MadelineProto API documentation (td-lib)',
-        'output_dir'  => __DIR__.'/docs/docs/TD_docs',
+        'output_dir'  => "$d/docs/docs/TD_docs",
         'readme'      => false,
         'td'          => true,
     ],*/
     [
-        'tl_schema'   => ['mtproto' => __DIR__.'/src/danog/MadelineProto/TL_mtproto_v1.json'],
+        'tl_schema'   => ['mtproto' => "$d/src/danog/MadelineProto/TL_mtproto_v1.json"],
         'title'       => 'MadelineProto API documentation (mtproto)',
         'description' => 'MadelineProto API documentation (mtproto)',
-        'output_dir'  => __DIR__.'/docs/docs/MTProto_docs',
+        'output_dir'  => "$d/docs/docs/MTProto_docs",
         'readme'      => false,
     ],
     [
-        'tl_schema'   => ['telegram' => __DIR__.'/src/danog/MadelineProto/TL_telegram_v105.tl', 'calls' => __DIR__.'/src/danog/MadelineProto/TL_calls.tl', 'secret' => __DIR__.'/src/danog/MadelineProto/TL_secret.tl', 'td' => __DIR__.'/src/danog/MadelineProto/TL_td.tl'],
+        'tl_schema'   => ['telegram' => "$d/src/danog/MadelineProto/TL_telegram_v105.tl", 'calls' => "$d/src/danog/MadelineProto/TL_calls.tl", 'secret' => "$d/src/danog/MadelineProto/TL_secret.tl", 'td' => "$d/src/danog/MadelineProto/TL_td.tl"],
         'title'       => 'MadelineProto API documentation (layer 105)',
         'description' => 'MadelineProto API documentation (layer 105)',
-        'output_dir'  => __DIR__.'/docs/docs/API_docs',
+        'output_dir'  => "$d/docs/docs/API_docs",
         'readme'      => false,
     ],
 ];
 
 $layer_list = '';
-foreach (\array_slice(\glob(__DIR__.'/src/danog/MadelineProto/TL_telegram_*'), 0, -1) as $file) {
+foreach (\array_slice(\glob("$d/src/danog/MadelineProto/TL_telegram_*"), 0, -1) as $file) {
     $layer = \preg_replace(['/.*telegram_/', '/\..+/'], '', $file);
     $docs[] = [
         'tl_schema'   => ['telegram' => $file],
         'title'       => 'MadelineProto API documentation (layer '.$layer.')',
         'description' => 'MadelineProto API documentation (layer '.$layer.')',
-        'output_dir'  => __DIR__.'/docs/old_docs/API_docs_'.$layer,
+        'output_dir'  => "$d/docs/old_docs/API_docs_".$layer,
         'readme'      => true,
     ];
     $layer_list = '[Layer '.$layer.'](API_docs_'.$layer.'/)  
@@ -76,14 +79,14 @@ description: Documentation of old mtproto layers
 '.$layer_list);
 
 $doc = new \danog\MadelineProto\AnnotationsBuilder($logger, $docs[1]);
-$doc->mk_annotations();
+$doc->mkAnnotations();
 
 foreach ($docs as $settings) {
     $doc = new \danog\MadelineProto\DocsBuilder($logger, $settings);
-    $doc->mk_docs();
+    $doc->mkDocs();
 }
 
-\chdir(__DIR__);
+\chdir(__DIR__.'/..');
 
 $orderedfiles = [];
 $order = [
