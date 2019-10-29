@@ -237,6 +237,6 @@ class Logger
 
     public function __destruct()
     {
-        //$this->wait($this->stdout->write(''));
+        //\danog\MadelineProto\Tools::wait($this->stdout->write(''));
     }
 }

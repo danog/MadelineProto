@@ -570,11 +570,11 @@ class ReferenceDatabase implements TLCallback
         switch ($locationType) {
             case self::DOCUMENT_LOCATION:
             case self::PHOTO_LOCATION:
-                return $locationType.(\is_int($location['id']) ? $this->packSignedLong($location['id']) : $location['id']);
+                return $locationType.(\is_int($location['id']) ? \danog\MadelineProto\Tools::packSignedLong($location['id']) : $location['id']);
             case self::PHOTO_LOCATION_LOCATION:
-                $dc_id = $this->packSignedInt($location['dc_id']);
-                $volume_id = \is_int($location['volume_id']) ? $this->packSignedLong($location['volume_id']) : $location['volume_id'];
-                $local_id = $this->packSignedInt($location['local_id']);
+                $dc_id = \danog\MadelineProto\Tools::packSignedInt($location['dc_id']);
+                $volume_id = \is_int($location['volume_id']) ? \danog\MadelineProto\Tools::packSignedLong($location['volume_id']) : $location['volume_id'];
+                $local_id = \danog\MadelineProto\Tools::packSignedInt($location['local_id']);
 
                 return $locationType.$dc_id.$volume_id.$local_id;
         }

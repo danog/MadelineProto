@@ -54,7 +54,7 @@ abstract class Loop implements LoopInterface
 
             return false;
         }
-        return $this->callFork($this->loopImpl());
+        return \danog\MadelineProto\Tools::callFork($this->loopImpl());
     }
 
     private function loopImpl()

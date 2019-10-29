@@ -137,12 +137,12 @@ class WriteLoop extends ResumableSignalLoop
                 $length = \strlen($message['serialized_body']);
 
                 $pad_length = -$length & 15;
-                $pad_length += 16 * $this->randomInt($modulus = 16);
+                $pad_length += 16 * \danog\MadelineProto\Tools::randomInt($modulus = 16);
 
-                $pad = $this->random($pad_length);
+                $pad = \danog\MadelineProto\Tools::random($pad_length);
                 $buffer = yield $connection->stream->getWriteBuffer(8 + 8 + 4 + $pad_length + $length);
 
-                yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.$this->packUnsignedInt($length).$message['serialized_body'].$pad);
+                yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.\danog\MadelineProto\Tools::packUnsignedInt($length).$message['serialized_body'].$pad);
 
                 //var_dump("plain ".bin2hex($message_id));
                 $connection->httpSent();
@@ -336,11 +336,11 @@ class WriteLoop extends ResumableSignalLoop
             unset($messages);
 
             $plaintext = $shared->getTempAuthKey()->getServerSalt().$connection->session_id.$message_id.\pack('VV', $seq_no, $message_data_length).$message_data;
-            $padding = $this->posmod(-\strlen($plaintext), 16);
+            $padding = \danog\MadelineProto\Tools::posmod(-\strlen($plaintext), 16);
             if ($padding < 12) {
                 $padding += 16;
             }
-            $padding = $this->random($padding);
+            $padding = \danog\MadelineProto\Tools::random($padding);
             $message_key = \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 88, 32).$plaintext.$padding, true), 8, 16);
             list($aes_key, $aes_iv) = $this->aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey());
             $message = $shared->getTempAuthKey()->getID().$message_key.$this->igeEncrypt($plaintext.$padding, $aes_key, $aes_iv);

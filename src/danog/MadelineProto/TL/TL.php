@@ -147,10 +147,10 @@ trait TL
                 }
             } else {
                 foreach ($TL_dict['constructors'] as $key => $value) {
-                    $TL_dict['constructors'][$key]['id'] = $this->packSignedInt($TL_dict['constructors'][$key]['id']);
+                    $TL_dict['constructors'][$key]['id'] = \danog\MadelineProto\Tools::packSignedInt($TL_dict['constructors'][$key]['id']);
                 }
                 foreach ($TL_dict['methods'] as $key => $value) {
-                    $TL_dict['methods'][$key]['id'] = $this->packSignedInt($TL_dict['methods'][$key]['id']);
+                    $TL_dict['methods'][$key]['id'] = \danog\MadelineProto\Tools::packSignedInt($TL_dict['methods'][$key]['id']);
                 }
             }
 
@@ -262,19 +262,19 @@ trait TL
             case 'int':
                 if (!\is_numeric($object)) {
                     if (\is_array($object) && $type['name'] === 'hash') {
-                        $object = $this->genVectorHash($object);
+                        $object = \danog\MadelineProto\Tools::genVectorHash($object);
                     } else {
                         throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
                     }
                 }
 
-                return $this->packSignedInt($object);
+                return \danog\MadelineProto\Tools::packSignedInt($object);
             case '#':
                 if (!\is_numeric($object)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
                 }
 
-                return $this->packUnsignedInt($object);
+                return \danog\MadelineProto\Tools::packUnsignedInt($object);
             case 'long':
                 if (\is_object($object)) {
                     return \str_pad(\strrev($object->toBytes()), 8, \chr(0));
@@ -289,7 +289,7 @@ trait TL
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
                 }
 
-                return $this->packSignedLong($object);
+                return \danog\MadelineProto\Tools::packSignedLong($object);
             case 'int128':
                 if (\strlen($object) !== 16) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['long_not_16']);
@@ -309,7 +309,7 @@ trait TL
 
                 return (string) $object;
             case 'double':
-                return $this->packDouble($object);
+                return \danog\MadelineProto\Tools::packDouble($object);
             case 'string':
                 if (!\is_string($object)) {
                     throw new Exception("You didn't provide a valid string");
@@ -320,12 +320,12 @@ trait TL
                 if ($l <= 253) {
                     $concat .= \chr($l);
                     $concat .= $object;
-                    $concat .= \pack('@'.$this->posmod(-$l - 1, 4));
+                    $concat .= \pack('@'.\danog\MadelineProto\Tools::posmod(-$l - 1, 4));
                 } else {
                     $concat .= \chr(254);
-                    $concat .= \substr($this->packSignedInt($l), 0, 3);
+                    $concat .= \substr(\danog\MadelineProto\Tools::packSignedInt($l), 0, 3);
                     $concat .= $object;
-                    $concat .= \pack('@'.$this->posmod(-$l, 4));
+                    $concat .= \pack('@'.\danog\MadelineProto\Tools::posmod(-$l, 4));
                 }
 
                 return $concat;
@@ -341,12 +341,12 @@ trait TL
                 if ($l <= 253) {
                     $concat .= \chr($l);
                     $concat .= $object;
-                    $concat .= \pack('@'.$this->posmod(-$l - 1, 4));
+                    $concat .= \pack('@'.\danog\MadelineProto\Tools::posmod(-$l - 1, 4));
                 } else {
                     $concat .= \chr(254);
-                    $concat .= \substr($this->packSignedInt($l), 0, 3);
+                    $concat .= \substr(\danog\MadelineProto\Tools::packSignedInt($l), 0, 3);
                     $concat .= $object;
-                    $concat .= \pack('@'.$this->posmod(-$l, 4));
+                    $concat .= \pack('@'.\danog\MadelineProto\Tools::posmod(-$l, 4));
                 }
 
                 return $concat;
@@ -364,7 +364,7 @@ trait TL
                     throw new Exception('You must provide an array of '.$type['subtype'].' objects, not a '.$type['subtype']." object. Example: [['_' => ".$type['subtype'].', ... ]]');
                 }
                 $concat = $this->constructors->findByPredicate('vector')['id'];
-                $concat .= $this->packUnsignedInt(\count($object));
+                $concat .= \danog\MadelineProto\Tools::packUnsignedInt(\count($object));
                 foreach ($object as $k => $current_object) {
                     $concat .= yield $this->serializeObject(['type' => $type['subtype']], $current_object, $k);
                 }
@@ -374,7 +374,7 @@ trait TL
                 if (!\is_array($object)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['array_invalid']);
                 }
-                $concat = $this->packUnsignedInt(\count($object));
+                $concat = \danog\MadelineProto\Tools::packUnsignedInt(\count($object));
                 foreach ($object as $k => $current_object) {
                     $concat .= yield $this->serializeObject(['type' => $type['subtype']], $current_object, $k);
                 }
@@ -546,7 +546,7 @@ trait TL
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= yield $this->serializeObject(['type' => 'bytes'], $this->random(15 + 4 * $this->randomInt($modulus = 3)), 'random_bytes');
+                    $serialized .= yield $this->serializeObject(['type' => 'bytes'], \danog\MadelineProto\Tools::random(15 + 4 * \danog\MadelineProto\Tools::randomInt($modulus = 3)), 'random_bytes');
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService']) && isset($arguments['message'])) {
@@ -556,16 +556,16 @@ trait TL
                 if ($current_argument['name'] === 'random_id') {
                     switch ($current_argument['type']) {
                         case 'long':
-                            $serialized .= $this->random(8);
+                            $serialized .= \danog\MadelineProto\Tools::random(8);
                             continue 2;
                         case 'int':
-                            $serialized .= $this->random(4);
+                            $serialized .= \danog\MadelineProto\Tools::random(4);
                             continue 2;
                         case 'Vector t':
                             if (isset($arguments['id'])) {
                                 $serialized .= $this->constructors->findByPredicate('vector')['id'];
-                                $serialized .= $this->packUnsignedInt(\count($arguments['id']));
-                                $serialized .= $this->random(8 * \count($arguments['id']));
+                                $serialized .= \danog\MadelineProto\Tools::packUnsignedInt(\count($arguments['id']));
+                                $serialized .= \danog\MadelineProto\Tools::random(8 * \count($arguments['id']));
                                 continue 2;
                             }
                     }
@@ -601,10 +601,10 @@ trait TL
                         break;
                     /*
                     case 'long':
-                        $serialized .= $this->random(8);
+                        $serialized .= \danog\MadelineProto\Tools::random(8);
                         continue 2;
                     case 'int':
-                        $serialized .= $this->random(4);
+                        $serialized .= \danog\MadelineProto\Tools::random(4);
                         continue 2;
                     case 'string':
                     case 'bytes':
@@ -690,7 +690,7 @@ trait TL
             case 'Bool':
                 return $this->deserializeBool(\stream_get_contents($stream, 4));
             case 'int':
-                return $this->unpackSignedInt(\stream_get_contents($stream, 4));
+                return \danog\MadelineProto\Tools::unpackSignedInt(\stream_get_contents($stream, 4));
             case '#':
                 return \unpack('V', \stream_get_contents($stream, 4))[1];
             case 'long':
@@ -698,9 +698,9 @@ trait TL
                     return \stream_get_contents($stream, 8);
                 }
 
-                return \danog\MadelineProto\Magic::$bigint || isset($type['strlong']) ? \stream_get_contents($stream, 8) : $this->unpackSignedLong(\stream_get_contents($stream, 8));
+                return \danog\MadelineProto\Magic::$bigint || isset($type['strlong']) ? \stream_get_contents($stream, 8) : \danog\MadelineProto\Tools::unpackSignedLong(\stream_get_contents($stream, 8));
             case 'double':
-                return $this->unpackDouble(\stream_get_contents($stream, 8));
+                return \danog\MadelineProto\Tools::unpackDouble(\stream_get_contents($stream, 8));
             case 'int128':
                 return \stream_get_contents($stream, 16);
             case 'int256':
@@ -716,13 +716,13 @@ trait TL
                 if ($l === 254) {
                     $long_len = \unpack('V', \stream_get_contents($stream, 3).\chr(0))[1];
                     $x = \stream_get_contents($stream, $long_len);
-                    $resto = $this->posmod(-$long_len, 4);
+                    $resto = \danog\MadelineProto\Tools::posmod(-$long_len, 4);
                     if ($resto > 0) {
                         \stream_get_contents($stream, $resto);
                     }
                 } else {
                     $x = $l ? \stream_get_contents($stream, $l) : '';
-                    $resto = $this->posmod(-($l + 1), 4);
+                    $resto = \danog\MadelineProto\Tools::posmod(-($l + 1), 4);
                     if ($resto > 0) {
                         \stream_get_contents($stream, $resto);
                     }
@@ -885,7 +885,7 @@ trait TL
 
         if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
             foreach ($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) {
-                $this->callFork($callback($x));
+                \danog\MadelineProto\Tools::callFork($callback($x));
             }
         } elseif ($x['_'] === 'rpc_result'
             && isset($type['connection']->outgoing_messages[$x['req_msg_id']]['_'])

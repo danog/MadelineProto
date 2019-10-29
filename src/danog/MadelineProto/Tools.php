@@ -489,4 +489,52 @@ trait Tools
     {
         return $params;
     }
+    public function base64urlDecode($data)
+    {
+        return \base64_decode(\str_pad(\strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT));
+    }
+
+    public function base64urlEncode($data)
+    {
+        return \rtrim(\strtr(\base64_encode($data), '+/', '-_'), '=');
+    }
+
+    public function rleDecode($string)
+    {
+        $new = '';
+        $last = '';
+        $null = \chr(0);
+        foreach (\str_split($string) as $cur) {
+            if ($last === $null) {
+                $new .= \str_repeat($last, \ord($cur));
+                $last = '';
+            } else {
+                $new .= $last;
+                $last = $cur;
+            }
+        }
+        $string = $new.$last;
+
+        return $string;
+    }
+
+    public function rleEncode($string)
+    {
+        $new = '';
+        $count = 0;
+        $null = \chr(0);
+        foreach (\str_split($string) as $cur) {
+            if ($cur === $null) {
+                $count++;
+            } else {
+                if ($count > 0) {
+                    $new .= $null.\chr($count);
+                    $count = 0;
+                }
+                $new .= $cur;
+            }
+        }
+
+        return $new;
+    }
 }

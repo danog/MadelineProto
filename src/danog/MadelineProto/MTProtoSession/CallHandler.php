@@ -58,7 +58,7 @@ trait CallHandler
                 } else {
                     $res = $this->sendMessage($this->outgoing_messages[$message_id], false);
                 }
-                $this->callFork($res);
+                \danog\MadelineProto\Tools::callFork($res);
                 $this->ackOutgoingMessageId($message_id);
                 $this->gotResponseForOutgoingMessageId($message_id);
             } else {
@@ -120,7 +120,7 @@ trait CallHandler
      */
     public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
     {
-        return $this->call($this->methodCallAsyncWriteGenerator($method, $args, $aargs));
+        return \danog\MadelineProto\Tools::call($this->methodCallAsyncWriteGenerator($method, $args, $aargs));
     }
 
     /**

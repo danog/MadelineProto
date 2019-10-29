@@ -129,7 +129,7 @@ class ProxySocketPool implements SocketPool
 
             try {
                 /** @var ClientSocket $rawSocket */
-                $rawSocket = yield $this->call(($this->connectCallback)($uri, $token, $this->socketContext));
+                $rawSocket = yield \danog\MadelineProto\Tools::call(($this->connectCallback)($uri, $token, $this->socketContext));
             } finally {
                 if (--$this->pendingCount[$uri] === 0) {
                     unset($this->pendingCount[$uri]);

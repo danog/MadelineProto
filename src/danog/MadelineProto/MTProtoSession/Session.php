@@ -49,7 +49,7 @@ abstract class Session
      */
     public function resetSession()
     {
-        $this->session_id = $this->random(8);
+        $this->session_id = \danog\MadelineProto\Tools::random(8);
         $this->session_in_seq_no = 0;
         $this->session_out_seq_no = 0;
         $this->max_incoming_id = null;
@@ -63,7 +63,7 @@ abstract class Session
     public function createSession()
     {
         if ($this->session_id === null) {
-            $this->session_id = $this->random(8);
+            $this->session_id = \danog\MadelineProto\Tools::random(8);
             $this->session_in_seq_no = 0;
             $this->session_out_seq_no = 0;
         }

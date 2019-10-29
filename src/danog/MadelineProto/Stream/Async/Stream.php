@@ -35,6 +35,6 @@ trait Stream
 
     public function connect(ConnectionContext $ctx, string $header = ''): Promise
     {
-        return $this->call($this->connectGenerator($ctx, $header));
+        return \danog\MadelineProto\Tools::call($this->connectGenerator($ctx, $header));
     }
 }

@@ -175,7 +175,7 @@ trait ResponseHandler
                     $only_updates = false;
                     unset($this->new_incoming[$current_msg_id]);
 
-                    $this->callFork($this->sendMsgsStateInfo($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
+                    \danog\MadelineProto\Tools::callFork($this->sendMsgsStateInfo($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
                     unset($this->incoming_messages[$current_msg_id]['content']);
                     break;
                 case 'msgs_all_info':
@@ -208,7 +208,7 @@ trait ResponseHandler
                         if (isset($this->incoming_messages[$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {
                             $this->handleResponse($this->incoming_messages[$current_msg_id]['content']['msg_id'], $this->incoming_messages[$current_msg_id]['content']['answer_msg_id']);
                         } else {
-                            $this->callFork($this->objectCall('msg_resend_req', ['msg_ids' => [$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['postpone' => true]));
+                            \danog\MadelineProto\Tools::callFork($this->objectCall('msg_resend_req', ['msg_ids' => [$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['postpone' => true]));
                         }
                     }
                     break;
@@ -220,7 +220,7 @@ trait ResponseHandler
                     if (isset($this->incoming_messages[$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {
                         $this->ackIncomingMessageId($this->incoming_messages[$current_msg_id]['content']['answer_msg_id']);
                     } else {
-                        $this->callFork($this->objectCall('msg_resend_req', ['msg_ids' => [$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['postpone' => true]));
+                        \danog\MadelineProto\Tools::callFork($this->objectCall('msg_resend_req', ['msg_ids' => [$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['postpone' => true]));
                     }
                     break;
                 case 'msg_resend_req':
@@ -239,7 +239,7 @@ trait ResponseHandler
                             $this->methodRecall('', ['message_id' => $msg_id, 'postpone' => true]);
                         }
                     } else {
-                        $this->callFork($this->sendMsgsStateInfo($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
+                        \danog\MadelineProto\Tools::callFork($this->sendMsgsStateInfo($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
                     }
                     break;
                 case 'msg_resend_ans_req':
@@ -247,10 +247,10 @@ trait ResponseHandler
                     $only_updates = false;
                     unset($this->new_incoming[$current_msg_id]);
 
-                    $this->callFork($this->sendMsgsStateInfo($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
+                    \danog\MadelineProto\Tools::callFork($this->sendMsgsStateInfo($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
                     foreach ($this->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
                         if (isset($this->incoming_messages[$msg_id]['response']) && isset($this->outgoing_messages[$this->incoming_messages[$msg_id]['response']])) {
-                            $this->callFork($this->objectCall($this->outgoing_messages[$this->incoming_messages[$msg_id]['response']]['_'], $this->outgoing_messages[$this->incoming_messages[$msg_id]['response']]['body'], ['postpone' => true]));
+                            \danog\MadelineProto\Tools::callFork($this->objectCall($this->outgoing_messages[$this->incoming_messages[$msg_id]['response']]['_'], $this->outgoing_messages[$this->incoming_messages[$msg_id]['response']]['body'], ['postpone' => true]));
                         }
                     }
                     break;
@@ -265,7 +265,7 @@ trait ResponseHandler
                             unset($this->new_incoming[$current_msg_id]);
 
                             if (!$this->isCdn()) {
-                                $this->callForkDefer($this->API->handleUpdates($this->incoming_messages[$current_msg_id]['content']));
+                                \danog\MadelineProto\Tools::callForkDefer($this->API->handleUpdates($this->incoming_messages[$current_msg_id]['content']));
                             }
 
                             unset($this->incoming_messages[$current_msg_id]['content']);
@@ -438,7 +438,7 @@ trait ResponseHandler
 
                                     $this->API->resetSession();
 
-                                    $this->callFork((function () use (&$request, &$response) {
+                                    \danog\MadelineProto\Tools::callFork((function () use (&$request, &$response) {
                                         yield $this->API->initAuthorization();
 
                                         $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
@@ -450,7 +450,7 @@ trait ResponseHandler
                                     if ($this->API->authorized !== MTProto::LOGGED_IN) {
                                         $this->gotResponseForOutgoingMessageId($request_id);
 
-                                        $this->callFork((function () use (&$request, &$response) {
+                                        \danog\MadelineProto\Tools::callFork((function () use (&$request, &$response) {
                                             yield $this->API->initAuthorization();
 
                                             $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
@@ -483,7 +483,7 @@ trait ResponseHandler
 
                                         $this->API->resetSession();
 
-                                        $this->callFork((function () use (&$request, &$response) {
+                                        \danog\MadelineProto\Tools::callFork((function () use (&$request, &$response) {
                                             yield $this->API->initAuthorization();
 
                                             $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
@@ -491,7 +491,7 @@ trait ResponseHandler
 
                                         return;
                                     }
-                                    $this->callFork((function () use ($request_id) {
+                                    \danog\MadelineProto\Tools::callFork((function () use ($request_id) {
                                         yield $this->API->initAuthorization();
 
                                         $this->methodRecall('', ['message_id' => $request_id, ]);
@@ -502,7 +502,7 @@ trait ResponseHandler
                                     $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', \danog\MadelineProto\Logger::ERROR);
 
                                     $this->shared->setTempAuthKey(null);
-                                    $this->callFork((function () use ($request_id) {
+                                    \danog\MadelineProto\Tools::callFork((function () use ($request_id) {
                                         yield $this->API->initAuthorization();
                                         $this->methodRecall('', ['message_id' => $request_id, ]);
                                     })());
@@ -555,7 +555,7 @@ trait ResponseHandler
                             $this->logger->logger('Set time delta to '.$this->time_delta, \danog\MadelineProto\Logger::WARNING);
                             $this->API->resetMTProtoSession();
                             $this->shared->setTempAuthKey(null);
-                            $this->callFork((function () use ($request_id) {
+                            \danog\MadelineProto\Tools::callFork((function () use ($request_id) {
                                 yield $this->API->initAuthorization();
                                 $this->methodRecall('', ['message_id' => $request_id, ]);
                             })());
@@ -581,13 +581,13 @@ trait ResponseHandler
         $botAPI = isset($request['botAPI']) && $request['botAPI'];
         if (isset($response['_']) && !$this->isCdn() && $this->API->constructors->findByPredicate($response['_'])['type'] === 'Updates') {
             $response['request'] = $request;
-            $this->callForkDefer($this->API->handleUpdates($response));
+            \danog\MadelineProto\Tools::callForkDefer($this->API->handleUpdates($response));
         }
         unset($request);
         $this->gotResponseForOutgoingMessageId($request_id);
         $r = isset($response['_']) ? $response['_'] : \json_encode($response);
         $this->logger->logger("Defer sending $r to deferred");
-        $this->callFork((
+        \danog\MadelineProto\Tools::callFork((
             function () use ($request_id, $response,  $botAPI) {
                 $r = isset($response['_']) ? $response['_'] : \json_encode($response);
                 $this->logger->logger("Deferred: sent $r to deferred");

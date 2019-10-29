@@ -37,7 +37,7 @@ trait CallHandler
      */
     public function methodCall(string $method, $args = [], array $aargs = ['msg_id' => null])
     {
-        return $this->wait($this->methodCallAsyncRead($method, $args, $aargs));
+        return \danog\MadelineProto\Tools::wait($this->methodCallAsyncRead($method, $args, $aargs));
     }
 
     /**

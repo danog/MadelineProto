@@ -67,8 +67,8 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      */
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
-        $padding_length = $this->randomInt($modulus = 16);
-        $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.$this->random($padding_length));
+        $padding_length = \danog\MadelineProto\Tools::randomInt($modulus = 16);
+        $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.\danog\MadelineProto\Tools::random($padding_length));
         yield $buffer->bufferWrite(\pack('V', $padding_length + $length));
 
         return $buffer;

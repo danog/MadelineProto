@@ -205,14 +205,14 @@ trait Files
         $part_num = 0;
         $method = $size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
         $constructor = 'input'.($encrypted === true ? 'Encrypted' : '').($size > 10 * 1024 * 1024 ? 'FileBig' : 'File').($encrypted === true ? 'Uploaded' : '');
-        $file_id = $this->random(8);
+        $file_id = \danog\MadelineProto\Tools::random(8);
 
         $ige = null;
         if ($encrypted === true) {
-            $key = $this->random(32);
-            $iv = $this->random(32);
+            $key = \danog\MadelineProto\Tools::random(32);
+            $iv = \danog\MadelineProto\Tools::random(32);
             $digest = \hash('md5', $key.$iv, true);
-            $fingerprint = $this->unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
+            $fingerprint = \danog\MadelineProto\Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
             $ige = new \phpseclib\Crypt\AES('ige');
             $ige->setIV($iv);
             $ige->setKey($key);
@@ -225,7 +225,7 @@ trait Files
         $cb = function () use ($cb, $part_total_num) {
             static $cur = 0;
             $cur++;
-            $this->callFork($cb($cur * 100 / $part_total_num));
+            \danog\MadelineProto\Tools::callFork($cb($cur * 100 / $part_total_num));
         };
 
         $start = \microtime(true);
@@ -263,7 +263,7 @@ trait Files
             $promises[] = $read_deferred->promise();
 
             if (!($part_num % $parallel_chunks)) { // 20 mb at a time, for a typical bandwidth of 1gbps (run the code in this every second)
-                $result = yield $this->all($promises);
+                $result = yield \danog\MadelineProto\Tools::all($promises);
                 foreach ($result as $kkey => $result) {
                     if (!$result) {
                         throw new \danog\MadelineProto\Exception('Upload of part '.$kkey.' failed');
@@ -371,7 +371,7 @@ trait Files
         $read = $this->uploadFromCallable($reader, $size, $mime, '', $cb, false, $encrypted);
         $write = $this->downloadToCallable($media, $writer, null, true, 0, -1, $chunk_size);
 
-        list($res) = yield $this->all([$read, $write]);
+        list($res) = yield \danog\MadelineProto\Tools::all([$read, $write]);
 
         return $res;
     }
@@ -869,7 +869,7 @@ trait Files
         $stream = yield open($file, 'cb');
 
         $this->logger->logger('Waiting for lock of file to download...');
-        $unlock = yield $this->flock($file, LOCK_EX);
+        $unlock = yield \danog\MadelineProto\Tools::flock($file, LOCK_EX);
 
         try {
             yield $this->downloadToStream($message_media, $stream, $cb, $size, -1);
@@ -948,7 +948,7 @@ trait Files
 
         if (isset($message_media['key'])) {
             $digest = \hash('md5', $message_media['key'].$message_media['iv'], true);
-            $fingerprint = $this->unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
+            $fingerprint = \danog\MadelineProto\Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
             if ($fingerprint !== $message_media['key_fingerprint']) {
                 throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
             }
@@ -998,7 +998,7 @@ trait Files
         $cb = function () use ($cb, $count) {
             static $cur = 0;
             $cur++;
-            $this->callFork($cb($cur * 100 / $count));
+            \danog\MadelineProto\Tools::callFork($cb($cur * 100 / $count));
         };
 
         $cdn = false;
@@ -1014,7 +1014,7 @@ trait Files
             $promises = [];
             foreach ($params as $key => $param) {
                 $param['previous_promise'] = $previous_promise;
-                $previous_promise = $this->call($this->downloadPart($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $parallelize));
+                $previous_promise = \danog\MadelineProto\Tools::call($this->downloadPart($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $parallelize));
                 $previous_promise->onResolve(static function ($e, $res) use (&$size) {
                     if ($res) {
                         $size += $res;
@@ -1024,7 +1024,7 @@ trait Files
                 $promises[] = $previous_promise;
 
                 if (!($key % $parallel_chunks)) { // 20 mb at a time, for a typical bandwidth of 1gbps
-                    yield $this->all($promises);
+                    yield \danog\MadelineProto\Tools::all($promises);
                     $promises = [];
 
                     $time = \microtime(true) - $start;
@@ -1034,7 +1034,7 @@ trait Files
                 }
             }
             if ($promises) {
-                yield $this->all($promises);
+                yield \danog\MadelineProto\Tools::all($promises);
             }
         }
         $time = \microtime(true) - $start;

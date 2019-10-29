@@ -31,7 +31,7 @@ trait MessageHandler
 
             return false;
         }
-        $message['random_id'] = $this->random(8);
+        $message['random_id'] = \danog\MadelineProto\Tools::random(8);
         $this->secret_chats[$chat_id]['ttr']--;
         if ($this->secret_chats[$chat_id]['layer'] > 8) {
             if (($this->secret_chats[$chat_id]['ttr'] <= 0 || \time() - $this->secret_chats[$chat_id]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$chat_id]['rekeying'][0] === 0) {
@@ -42,19 +42,19 @@ trait MessageHandler
         }
         $this->secret_chats[$chat_id]['outgoing'][$this->secret_chats[$chat_id]['out_seq_no']] = $message;
         $message = yield $this->serializeObject(['type' => $constructor = $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer'], $message, $constructor, $this->secret_chats[$chat_id]['layer']);
-        $message = $this->packUnsignedInt(\strlen($message)).$message;
+        $message = \danog\MadelineProto\Tools::packUnsignedInt(\strlen($message)).$message;
         if ($this->secret_chats[$chat_id]['mtproto'] === 2) {
-            $padding = $this->posmod(-\strlen($message), 16);
+            $padding = \danog\MadelineProto\Tools::posmod(-\strlen($message), 16);
             if ($padding < 12) {
                 $padding += 16;
             }
-            $message .= $this->random($padding);
+            $message .= \danog\MadelineProto\Tools::random($padding);
             $message_key = \substr(\hash('sha256', \substr($this->secret_chats[$chat_id]['key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 0 : 8), 32).$message, true), 8, 16);
             list($aes_key, $aes_iv) = $this->aesCalculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], $this->secret_chats[$chat_id]['admin']);
         } else {
             $message_key = \substr(\sha1($message, true), -16);
             list($aes_key, $aes_iv) = $this->oldAesCalculate($message_key, $this->secret_chats[$chat_id]['key']['auth_key'], true);
-            $message .= $this->random($this->posmod(-\strlen($message), 16));
+            $message .= \danog\MadelineProto\Tools::random(\danog\MadelineProto\Tools::posmod(-\strlen($message), 16));
         }
         $message = $this->secret_chats[$chat_id]['key']['fingerprint'].$message_key.$this->igeEncrypt($message, $aes_key, $aes_iv);
 

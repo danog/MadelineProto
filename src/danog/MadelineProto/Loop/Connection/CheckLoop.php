@@ -131,7 +131,7 @@ class CheckLoop extends ResumableSignalLoop
                                     }
                                 }
                                 if ($reply) {
-                                    $this->callFork($connection->objectCall('msg_resend_ans_req', ['msg_ids' => $reply], ['postpone' => true]));
+                                    \danog\MadelineProto\Tools::callFork($connection->objectCall('msg_resend_ans_req', ['msg_ids' => $reply], ['postpone' => true]));
                                 }
                                 $connection->flush();
                             }

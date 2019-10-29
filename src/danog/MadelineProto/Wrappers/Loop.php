@@ -156,7 +156,7 @@ trait Loop
             foreach ($updates as $update) {
                 $r = $this->settings['updates']['callback']($update);
                 if (\is_object($r)) {
-                    $this->callFork($r);
+                    \danog\MadelineProto\Tools::callFork($r);
                 }
             }
             $updates = [];

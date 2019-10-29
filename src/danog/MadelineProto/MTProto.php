@@ -1251,14 +1251,14 @@ class MTProto extends AsyncConstruct implements TLCallback
         foreach ($this->datacenter->getDcs() as $new_dc) {
             $dcs[] = $this->datacenter->dcConnect($new_dc);
         }
-        yield $this->all($dcs);
+        yield \danog\MadelineProto\Tools::all($dcs);
         yield $this->initAuthorization();
         yield $this->parseConfig();
         $dcs = [];
         foreach ($this->datacenter->getDcs(false) as $new_dc) {
             $dcs[] = $this->datacenter->dcConnect($new_dc);
         }
-        yield $this->all($dcs);
+        yield \danog\MadelineProto\Tools::all($dcs);
         yield $this->initAuthorization();
         yield $this->parseConfig();
 

@@ -229,12 +229,12 @@ class CombinedAPI
     public function loop($max_forks = 0)
     {
         if (\is_callable($max_forks)) {
-            return $this->wait($max_forks());
+            return \danog\MadelineProto\Tools::wait($max_forks());
         }
 
         $loops = [];
         foreach ($this->instances as $path => $instance) {
-            $this->wait($instance->initAsynchronously());
+            \danog\MadelineProto\Tools::wait($instance->initAsynchronously());
             if ($instance->API->authorized !== MTProto::LOGGED_IN) {
                 continue;
             }
@@ -248,7 +248,7 @@ class CombinedAPI
             if ($this->loop_callback !== null) {
                 $instance->setLoopCallback($this->loop_callback, ['async' => false]);
             }
-            $loops[] = $this->call($instance->loop(0, ['async' => true]));
+            $loops[] = \danog\MadelineProto\Tools::call($instance->loop(0, ['async' => true]));
         }
 
         Loop::repeat($this->serialization_interval * 1000, function () {
@@ -257,6 +257,6 @@ class CombinedAPI
         });
 
         \danog\MadelineProto\Logger::log('Started update loop', \danog\MadelineProto\Logger::NOTICE);
-        $this->wait(all($loops));
+        \danog\MadelineProto\Tools::wait(all($loops));
     }
 }

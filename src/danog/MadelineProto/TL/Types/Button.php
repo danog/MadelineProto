@@ -63,7 +63,7 @@ class Button implements \JsonSerializable, \ArrayAccess
                 break;
         }
 
-        return $async ? $res : $this->wait($res);
+        return $async ? $res : \danog\MadelineProto\Tools::wait($res);
     }
 
     public function __debugInfo()

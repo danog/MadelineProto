@@ -267,7 +267,7 @@ class MyTelegramOrgWrapper
     }
     public function loop($callable)
     {
-        return $this->wait($callable());
+        return \danog\MadelineProto\Tools::wait($callable());
     }
     public function __call($name, $arguments)
     {
@@ -277,6 +277,6 @@ class MyTelegramOrgWrapper
         if (!\method_exists($this, $name)) {
             throw new Exception("$name does not exist!");
         }
-        return $async ? $this->{$name}(...$arguments) : $this->wait($this->{$name}(...$arguments));
+        return $async ? $this->{$name}(...$arguments) : \danog\MadelineProto\Tools::wait($this->{$name}(...$arguments));
     }
 }

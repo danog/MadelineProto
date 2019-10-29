@@ -169,7 +169,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             return new Success(\fread($this->memory_stream, $length));
         }
 
-        return $this->call($this->bufferReadGenerator($length));
+        return \danog\MadelineProto\Tools::call($this->bufferReadGenerator($length));
     }
 
     /**

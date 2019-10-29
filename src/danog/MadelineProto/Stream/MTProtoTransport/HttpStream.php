@@ -158,7 +158,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
 
             \danog\MadelineProto\Logger::log($read);
 
-            $this->code = $this->packSignedInt(-$code);
+            $this->code = \danog\MadelineProto\Tools::packSignedInt(-$code);
             $length = 4;
 
             return $this;

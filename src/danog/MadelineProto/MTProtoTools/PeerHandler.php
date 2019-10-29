@@ -163,7 +163,7 @@ trait PeerHandler
 
     public function cachePwrChat($id, $full_fetch, $send)
     {
-        $this->callFork((function () use ($id, $full_fetch, $send) {
+        \danog\MadelineProto\Tools::callFork((function () use ($id, $full_fetch, $send) {
             try {
                 yield $this->getPwrChat($id, $full_fetch, $send);
             } catch (\danog\MadelineProto\Exception $e) {
@@ -886,7 +886,7 @@ trait PeerHandler
             $ids[] = $participant['user_id'];
         }
         \sort($ids, SORT_NUMERIC);
-        $gres['hash'] = $this->genVectorHash($ids);
+        $gres['hash'] = \danog\MadelineProto\Tools::genVectorHash($ids);
         $this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit] = $gres;
     }
 

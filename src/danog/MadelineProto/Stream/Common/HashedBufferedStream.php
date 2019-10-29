@@ -274,7 +274,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
             return $this->read_buffer->bufferRead($length);
         }
 
-        return $this->call($this->bufferReadGenerator($length));
+        return \danog\MadelineProto\Tools::call($this->bufferReadGenerator($length));
     }
 
     /**

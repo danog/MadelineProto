@@ -81,7 +81,7 @@ trait AuthKeyHandler
                  *               Vector long    $server_public_key_fingerprints                : This is a list of public RSA key fingerprints
                  *               ]
                  */
-                $nonce = $this->random(16);
+                $nonce = \danog\MadelineProto\Tools::random(16);
                 $ResPQ = yield $connection->methodCallAsyncRead($req_pq, ['nonce' => $nonce]);
                 /*
                  * ***********************************************************************
@@ -184,7 +184,7 @@ trait AuthKeyHandler
                  */
                 $p_bytes = $p->toBytes();
                 $q_bytes = $q->toBytes();
-                $new_nonce = $this->random(32);
+                $new_nonce = \danog\MadelineProto\Tools::random(32);
                 $data_unserialized = ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => \preg_replace('|_.*|', '', $datacenter)];
                 $p_q_inner_data = yield $this->serializeObject(['type' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp')], $data_unserialized, 'p_q_inner_data');
                 /*
@@ -192,7 +192,7 @@ trait AuthKeyHandler
                  * Encrypt serialized object
                  */
                 $sha_digest = \sha1($p_q_inner_data, true);
-                $random_bytes = $this->random(255 - \strlen($p_q_inner_data) - \strlen($sha_digest));
+                $random_bytes = \danog\MadelineProto\Tools::random(255 - \strlen($p_q_inner_data) - \strlen($sha_digest));
                 $to_encrypt = $sha_digest.$p_q_inner_data.$random_bytes;
                 $encrypted_data = $key->encrypt($to_encrypt);
                 $this->logger->logger('Starting Diffie Hellman key exchange', \danog\MadelineProto\Logger::VERBOSE);
@@ -294,7 +294,7 @@ trait AuthKeyHandler
                 $this->checkG($g_a, $dh_prime);
                 for ($retry_id = 0; $retry_id <= $this->settings['max_tries']['authorization']; $retry_id++) {
                     $this->logger->logger('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
-                    $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
+                    $b = new \phpseclib\Math\BigInteger(\danog\MadelineProto\Tools::random(256), 256);
                     $this->logger->logger('Generating g_b...', \danog\MadelineProto\Logger::VERBOSE);
                     $g_b = $g->powMod($b, $dh_prime);
                     $this->checkG($g_b, $dh_prime);
@@ -326,7 +326,7 @@ trait AuthKeyHandler
                      * encrypt client_DH_inner_data
                      */
                     $data_with_sha = \sha1($data, true).$data;
-                    $data_with_sha_padded = $data_with_sha.$this->random($this->posmod(-\strlen($data_with_sha), 16));
+                    $data_with_sha_padded = $data_with_sha.\danog\MadelineProto\Tools::random(\danog\MadelineProto\Tools::posmod(-\strlen($data_with_sha), 16));
                     $encrypted_data = $this->igeEncrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
                     $this->logger->logger('Executing set_client_DH_params...', \danog\MadelineProto\Logger::VERBOSE);
                     /*
@@ -545,7 +545,7 @@ trait AuthKeyHandler
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
                 $this->logger->logger('Binding authorization keys...', \danog\MadelineProto\Logger::VERBOSE);
-                $nonce = $this->random(8);
+                $nonce = \danog\MadelineProto\Tools::random(8);
                 $expires_at = \time() + $expires_in;
                 $temp_auth_key_id = $datacenterConnection->getTempAuthKey()->getID();
                 $perm_auth_key_id = $datacenterConnection->getPermAuthKey()->getID();
@@ -553,9 +553,9 @@ trait AuthKeyHandler
                 $message_data = yield $this->serializeObject(['type' => 'bind_auth_key_inner'], ['nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bindTempAuthKey_inner');
                 $message_id = $connection->generateMessageId();
                 $seq_no = 0;
-                $encrypted_data = $this->random(16).$message_id.\pack('VV', $seq_no, \strlen($message_data)).$message_data;
+                $encrypted_data = \danog\MadelineProto\Tools::random(16).$message_id.\pack('VV', $seq_no, \strlen($message_data)).$message_data;
                 $message_key = \substr(\sha1($encrypted_data, true), -16);
-                $padding = $this->random($this->posmod(-\strlen($encrypted_data), 16));
+                $padding = \danog\MadelineProto\Tools::random(\danog\MadelineProto\Tools::posmod(-\strlen($encrypted_data), 16));
                 list($aes_key, $aes_iv) = $this->oldAesCalculate($message_key, $datacenterConnection->getPermAuthKey()->getAuthKey());
                 $encrypted_message = $datacenterConnection->getPermAuthKey()->getID().$message_key.$this->igeEncrypt($encrypted_data.$padding, $aes_key, $aes_iv);
                 $res = yield $connection->methodCallAsyncRead('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], ['msg_id' => $message_id]);
@@ -671,7 +671,7 @@ trait AuthKeyHandler
             foreach ($dcs as $id => &$dc) {
                 $dc = $dc();
             }
-            yield $this->all($dcs);
+            yield \danog\MadelineProto\Tools::all($dcs);
 
             foreach ($postpone as $id => $socket) {
                 yield $this->initAuthorizationSocket($id, $socket);

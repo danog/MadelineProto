@@ -33,16 +33,16 @@ trait RawStream
 
     public function read(): Promise
     {
-        return $this->call($this->readGenerator());
+        return \danog\MadelineProto\Tools::call($this->readGenerator());
     }
 
     public function write(string $data): Promise
     {
-        return $this->call($this->writeGenerator($data));
+        return \danog\MadelineProto\Tools::call($this->writeGenerator($data));
     }
 
     public function end(string $finalData = ''): Promise
     {
-        return $this->call($this->endGenerator($finalData));
+        return \danog\MadelineProto\Tools::call($this->endGenerator($finalData));
     }
 }

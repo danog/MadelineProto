@@ -31,11 +31,11 @@ trait Buffer
 {
     public function bufferRead(int $length): Promise
     {
-        return $this->call($this->bufferReadGenerator($length));
+        return \danog\MadelineProto\Tools::call($this->bufferReadGenerator($length));
     }
 
     public function bufferWrite(string $data): Promise
     {
-        return $this->call($this->bufferWriteGenerator($data));
+        return \danog\MadelineProto\Tools::call($this->bufferWriteGenerator($data));
     }
 }

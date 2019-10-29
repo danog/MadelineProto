@@ -162,7 +162,7 @@ class PasswordCalculator
      */
     public function createSalt(string $prefix = ''): string
     {
-        return $prefix.$this->random(32);
+        return $prefix.\danog\MadelineProto\Tools::random(32);
     }
 
     /**
@@ -224,7 +224,7 @@ class PasswordCalculator
         $k = new BigInteger(\hash('sha256', $pForHash.$gForHash, true), 256);
         $kg_x = $k->multiply($g_x)->powMod(Magic::$one, $p);
 
-        $a = new BigInteger($this->random(2048 / 8), 256);
+        $a = new BigInteger(\danog\MadelineProto\Tools::random(2048 / 8), 256);
         $A = $g->powMod($a, $p);
         $this->checkG($A, $p);
         $AForHash = \str_pad($A->toBytes(), 256, \chr(0), \STR_PAD_LEFT);

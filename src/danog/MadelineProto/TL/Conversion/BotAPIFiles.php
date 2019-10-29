@@ -21,55 +21,6 @@ namespace danog\MadelineProto\TL\Conversion;
 
 trait BotAPIFiles
 {
-    public function base64urlDecode($data)
-    {
-        return \base64_decode(\str_pad(\strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT));
-    }
-
-    public function base64urlEncode($data)
-    {
-        return \rtrim(\strtr(\base64_encode($data), '+/', '-_'), '=');
-    }
-
-    public function rleDecode($string)
-    {
-        $new = '';
-        $last = '';
-        $null = \chr(0);
-        foreach (\str_split($string) as $cur) {
-            if ($last === $null) {
-                $new .= \str_repeat($last, \ord($cur));
-                $last = '';
-            } else {
-                $new .= $last;
-                $last = $cur;
-            }
-        }
-        $string = $new.$last;
-
-        return $string;
-    }
-
-    public function rleEncode($string)
-    {
-        $new = '';
-        $count = 0;
-        $null = \chr(0);
-        foreach (\str_split($string) as $cur) {
-            if ($cur === $null) {
-                $count++;
-            } else {
-                if ($count > 0) {
-                    $new .= $null.\chr($count);
-                    $count = 0;
-                }
-                $new .= $cur;
-            }
-        }
-
-        return $new;
-    }
-
     public function photosizeToBotAPI($photoSize, $photo, $thumbnail = false)
     {
         $ext = '.jpg';//$this->getExtensionFromLocation(['_' => 'inputFileLocation', 'volume_id' => $photoSize['location']['volume_id'], 'local_id' => $photoSize['location']['local_id'], 'secret' => $photoSize['location']['secret'], 'dc_id' => $photoSize['location']['dc_id']], '.jpg');
@@ -81,7 +32,7 @@ trait BotAPIFiles
         $data = (yield $this->serializeObject(['type' => 'File'], $photoSize['location'], 'File')).\chr(2);
 
         return [
-            'file_id' => $this->base64urlEncode($this->rleEncode($data)),
+            'file_id' => \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode($data)),
             'width' => $photoSize['w'],
             'height' => $photoSize['h'],
             'file_size' => isset($photoSize['size']) ? $photoSize['size'] : \strlen($photoSize['bytes']),
@@ -92,7 +43,7 @@ trait BotAPIFiles
 
     public function unpackFileId($file_id)
     {
-        $file_id = $this->rleDecode($this->base64urlDecode($file_id));
+        $file_id = \danog\MadelineProto\Tools::rleDecode(\danog\MadelineProto\Tools::base64urlDecode($file_id));
         if ($file_id[\strlen($file_id) - 1] !== \chr(2)) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['last_byte_invalid']);
         }

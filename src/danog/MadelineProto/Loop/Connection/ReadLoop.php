@@ -163,7 +163,7 @@ class ReadLoop extends SignalLoop
         }
 
         if ($payload_length === 4) {
-            $payload = $this->unpackSignedInt(yield $buffer->bufferRead(4));
+            $payload = \danog\MadelineProto\Tools::unpackSignedInt(yield $buffer->bufferRead(4));
             $API->logger->logger("Received $payload from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             return $payload;

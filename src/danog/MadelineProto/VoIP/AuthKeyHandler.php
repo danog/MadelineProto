@@ -31,17 +31,17 @@ trait AuthKeyHandler
 
     public function requestCall($user)
     {
-        return $this->wait($this->requestCallAsync($user));
+        return \danog\MadelineProto\Tools::wait($this->requestCallAsync($user));
     }
 
     public function acceptCall($user)
     {
-        return $this->wait($this->acceptCallAsync($user));
+        return \danog\MadelineProto\Tools::wait($this->acceptCallAsync($user));
     }
 
     public function discardCall($call, $reason, $rating = [], $need_debug = true)
     {
-        return $this->wait($this->discardCallAsync($call, $reason, $rating, $need_debug));
+        return \danog\MadelineProto\Tools::wait($this->discardCallAsync($call, $reason, $rating, $need_debug));
     }
 
     public function requestCallAsync($user)

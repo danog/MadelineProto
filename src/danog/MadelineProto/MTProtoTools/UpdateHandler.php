@@ -71,7 +71,7 @@ trait UpdateHandler
             if (!$params['timeout']) {
                 $params['timeout'] = 0.001;
             }
-            yield $this->first([$this->waitUpdate(), $this->sleep($params['timeout'])]);
+            yield \danog\MadelineProto\Tools::first([$this->waitUpdate(), \danog\MadelineProto\Tools::sleep($params['timeout'])]);
         }
 
         if (empty($this->updates)) {
@@ -391,7 +391,7 @@ trait UpdateHandler
 
             return false;
         }
-        $this->callFork((function () use ($payload) {
+        \danog\MadelineProto\Tools::callFork((function () use ($payload) {
             $request = (new Request($this->hook_url, 'POST'))->withHeader('content-type', 'application/json')->withBody($payload);
 
             $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody();
