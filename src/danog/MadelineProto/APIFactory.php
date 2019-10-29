@@ -160,7 +160,7 @@ class APIFactory extends AsyncConstruct
     public function __call_async($name, $arguments)
     {
         if ($this->asyncInitPromise) {
-            yield $this->initAsync();
+            yield $this->initAsynchronously();
             $this->API->logger->logger('Finished init asynchronously');
         }
         if (Magic::is_fork() && !Magic::$processed_fork) {
@@ -170,7 +170,7 @@ class APIFactory extends AsyncConstruct
             throw new Exception('API did not init!');
         }
         if ($this->API->asyncInitPromise) {
-            yield $this->API->initAsync();
+            yield $this->API->initAsynchronously();
             $this->API->logger->logger('Finished init asynchronously');
         }
         if (isset($this->session) && !\is_null($this->session) && \time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
@@ -180,10 +180,10 @@ class APIFactory extends AsyncConstruct
         if ($this->API->flushSettings) {
             $this->API->flushSettings = false;
             $this->API->__construct($this->API->settings);
-            yield $this->API->initAsync();
+            yield $this->API->initAsynchronously();
         }
         if ($this->API->asyncInitPromise) {
-            yield $this->API->initAsync();
+            yield $this->API->initAsynchronously();
             $this->API->logger->logger('Finished init asynchronously');
         }
 

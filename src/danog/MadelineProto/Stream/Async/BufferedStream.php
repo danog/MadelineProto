@@ -40,7 +40,7 @@ trait BufferedStream
      */
     public function getReadBuffer(&$length): Promise
     {
-        return $this->call($this->getReadBufferAsync($length));
+        return $this->call($this->getReadBufferGenerator($length));
     }
 
     /**
@@ -53,6 +53,6 @@ trait BufferedStream
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
-        return $this->call($this->getWriteBufferAsync($length, $append));
+        return $this->call($this->getWriteBufferGenerator($length, $append));
     }
 }

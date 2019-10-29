@@ -234,7 +234,7 @@ class CombinedAPI
 
         $loops = [];
         foreach ($this->instances as $path => $instance) {
-            $this->wait($instance->initAsync());
+            $this->wait($instance->initAsynchronously());
             if ($instance->API->authorized !== MTProto::LOGGED_IN) {
                 continue;
             }

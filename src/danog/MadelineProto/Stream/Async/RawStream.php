@@ -33,16 +33,16 @@ trait RawStream
 
     public function read(): Promise
     {
-        return $this->call($this->readAsync());
+        return $this->call($this->readGenerator());
     }
 
     public function write(string $data): Promise
     {
-        return $this->call($this->writeAsync($data));
+        return $this->call($this->writeGenerator($data));
     }
 
     public function end(string $finalData = ''): Promise
     {
-        return $this->call($this->endAsync($finalData));
+        return $this->call($this->endGenerator($finalData));
     }
 }

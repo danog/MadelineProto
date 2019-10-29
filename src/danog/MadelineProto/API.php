@@ -138,7 +138,7 @@ class API extends InternalDoc
                     $this->APIFactory();
                     $unserialized->oldInstance = true;
                     $deferred->resolve();
-                    yield $this->API->initAsync();
+                    yield $this->API->initAsynchronously();
                     $this->APIFactory();
                     //\danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
                     $this->asyncInitPromise = null;
@@ -161,7 +161,7 @@ class API extends InternalDoc
         $this->APIFactory();
         $deferred->resolve();
         Logger::log(\danog\MadelineProto\Lang::$current_lang['apifactory_start'], Logger::VERBOSE);
-        yield $this->API->initAsync();
+        yield $this->API->initAsynchronously();
         $this->APIFactory();
         $this->asyncInitPromise = null;
         //\danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
@@ -300,7 +300,7 @@ class API extends InternalDoc
                 return false;
             }
             if ($this->API && $this->API->asyncInitPromise) {
-                yield $this->API->initAsync();
+                yield $this->API->initAsynchronously();
             }
             $this->serialized = \time();
             $realpaths = Serialization::realpaths($filename);

@@ -38,7 +38,7 @@ class AsyncConstruct
         }
     }
 
-    public function initAsync()
+    public function initAsynchronously()
     {
         if ($this->asyncInitPromise) {
             yield $this->asyncInitPromise;

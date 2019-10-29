@@ -35,6 +35,6 @@ trait Stream
 
     public function connect(ConnectionContext $ctx, string $header = ''): Promise
     {
-        return $this->call($this->connectAsync($ctx, $header));
+        return $this->call($this->connectGenerator($ctx, $header));
     }
 }

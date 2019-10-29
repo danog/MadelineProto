@@ -31,11 +31,11 @@ trait Buffer
 {
     public function bufferRead(int $length): Promise
     {
-        return $this->call($this->bufferReadAsync($length));
+        return $this->call($this->bufferReadGenerator($length));
     }
 
     public function bufferWrite(string $data): Promise
     {
-        return $this->call($this->bufferWriteAsync($data));
+        return $this->call($this->bufferWriteGenerator($data));
     }
 }

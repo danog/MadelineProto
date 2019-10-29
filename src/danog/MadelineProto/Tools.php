@@ -380,7 +380,7 @@ trait Tools
      */
     public static function flock(string $file, int $operation, $polling = 0.1): Promise
     {
-        return self::call(self::flockAsync($file, $operation, $polling));
+        return self::call(self::flockGenerator($file, $operation, $polling));
     }
     public static function noCache(int $status, string $message)
     {
@@ -390,7 +390,7 @@ trait Tools
         \http_response_code($status);
         return self::echo($message);
     }
-    public static function flockAsync(string $file, int $operation, $polling)
+    public static function flockGenerator(string $file, int $operation, $polling)
     {
         if (!yield exists($file)) {
             yield \touch($file);
@@ -419,9 +419,9 @@ trait Tools
     }
     public static function readLine($prompt = '')
     {
-        return self::call(Tools::readLineAsync($prompt));
+        return self::call(Tools::readLineGenerator($prompt));
     }
-    public static function readLineAsync($prompt = '')
+    public static function readLineGenerator($prompt = '')
     {
         $stdin = getStdin();
         $stdout = getStdout();
