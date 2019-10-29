@@ -48,7 +48,7 @@ trait UpdateHandler
 
     public function getUpdatesUpdateHandler($update)
     {
-        if (!$this->settings['updates']['handleUpdates']) {
+        if (!$this->settings['updates']['handle_updates']) {
             return;
         }
         $this->updates[$this->updates_key++] = $update;
@@ -56,8 +56,8 @@ trait UpdateHandler
 
     public function getUpdates($params = [])
     {
-        if (!$this->settings['updates']['handleUpdates']) {
-            $this->settings['updates']['handleUpdates'] = true;
+        if (!$this->settings['updates']['handle_updates']) {
+            $this->settings['updates']['handle_updates'] = true;
             $this->startUpdateSystem();
         }
         if (!$this->settings['updates']['run_callback']) {
@@ -173,7 +173,7 @@ trait UpdateHandler
 
     public function handleUpdates($updates, $actual_updates = null)
     {
-        if (!$this->settings['updates']['handleUpdates']) {
+        if (!$this->settings['updates']['handle_updates']) {
             return;
         }
         if ($actual_updates) {
@@ -365,7 +365,7 @@ trait UpdateHandler
         //if ($update['_'] === 'updateServiceNotification' && strpos($update['type'], 'AUTH_KEY_DROP_') === 0) {
 
         //}
-        if (!$this->settings['updates']['handleUpdates']) {
+        if (!$this->settings['updates']['handle_updates']) {
             return;
         }
         if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') {

@@ -32,7 +32,7 @@ class Lua
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['script_not_exist']);
         }
         $this->MadelineProto = $MadelineProto;
-        $this->MadelineProto->settings['updates']['handleUpdates'] = true;
+        $this->MadelineProto->settings['updates']['handle_updates'] = true;
         $this->MadelineProto->API->datacenter->sockets[$this->MadelineProto->settings['connection_settings']['default_dc']]->startUpdateLoop();
 
         $this->script = $script;

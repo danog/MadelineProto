@@ -816,7 +816,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings['peer']['cache_all_peers_on_startup']) {
             yield $this->getDialogs($force);
         }
-        if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handleUpdates']) {
+        if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates']) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
             yield $this->updaters[false]->resume();
         }
@@ -1113,7 +1113,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             // Should madeline fetch the full member list of every group it meets?
             'cache_all_peers_on_startup' => false,
         ], 'requests' => ['gzip_encode_if_gt' => 1024 * 1024], 'updates' => [
-            'handleUpdates' => false,
+            'handle_updates' => false,
             // Should I handle updates?
             'handle_old_updates' => true,
             // Should I handle old updates on startup?
@@ -1182,7 +1182,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
         }
         $this->settings = $settings;
-        if (!$this->settings['updates']['handleUpdates']) {
+        if (!$this->settings['updates']['handle_updates']) {
             $this->updates = [];
         }
         // Setup logger

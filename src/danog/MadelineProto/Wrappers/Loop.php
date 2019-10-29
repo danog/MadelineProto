@@ -140,8 +140,8 @@ trait Loop
 
             $this->closeConnection('Bot was started');
         }
-        if (!$this->settings['updates']['handleUpdates']) {
-            $this->settings['updates']['handleUpdates'] = true;
+        if (!$this->settings['updates']['handle_updates']) {
+            $this->settings['updates']['handle_updates'] = true;
         }
         if (!$this->settings['updates']['run_callback']) {
             $this->settings['updates']['run_callback'] = true;

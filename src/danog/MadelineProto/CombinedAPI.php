@@ -238,8 +238,8 @@ class CombinedAPI
             if ($instance->API->authorized !== MTProto::LOGGED_IN) {
                 continue;
             }
-            if (!$instance->API->settings['updates']['handleUpdates']) {
-                $instance->API->settings['updates']['handleUpdates'] = true;
+            if (!$instance->API->settings['updates']['handle_updates']) {
+                $instance->API->settings['updates']['handle_updates'] = true;
                 $instance->API->startUpdateSystem();
             }
             $instance->setCallback(function ($update) use ($path) {
