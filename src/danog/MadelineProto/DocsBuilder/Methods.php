@@ -21,7 +21,7 @@ namespace danog\MadelineProto\DocsBuilder;
 
 trait Methods
 {
-    public function mk_methods()
+    public function mkMethods()
     {
         static $bots;
         if (!$bots) {
@@ -82,7 +82,7 @@ trait Methods
                 $params .= "'".$param['name']."' => ".(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
             if (!isset($this->td_descriptions['methods'][$data['method']])) {
-                $this->add_to_lang('method_'.$data['method']);
+                $this->addToLang('method_'.$data['method']);
 
                 if (\danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']] !== '') {
                     $this->td_descriptions['methods'][$data['method']]['description'] = \danog\MadelineProto\Lang::$lang['en']['method_'.$data['method']];
@@ -161,16 +161,16 @@ trait Methods
                 }
                 $type_or_bare_type = \ctype_upper($this->end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
                 if (!isset($this->td_descriptions['methods'][$data['method']]['params'][$param['name']])) {
-                    $this->add_to_lang('method_'.$data['method'].'_param_'.$param['name'].'_type_'.$param['type']);
+                    $this->addToLang('method_'.$data['method'].'_param_'.$param['name'].'_type_'.$param['type']);
                     if (isset($this->td_descriptions['methods'][$data['method']]['description'])) {
                         $this->td_descriptions['methods'][$data['method']]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['method_'.$data['method'].'_param_'.$param['name'].'_type_'.$param['type']];
                     }
                 }
 
                 if (isset($this->td_descriptions['methods'][$data['method']])) {
-                    $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->td_descriptions['methods'][$data['method']]['params'][$param['name']].' | '.(isset($param['pow']) || (($id = $this->constructors->find_by_predicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type']) || (($id = $this->constructors->find_by_predicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type']) ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->td_descriptions['methods'][$data['method']]['params'][$param['name']].' | '.(isset($param['pow']) || (($id = $this->constructors->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type']) || (($id = $this->constructors->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type']) ? 'Optional' : 'Yes').'|';
                 } else {
-                    $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || (($id = $this->constructors->find_by_predicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type']) || (($id = $this->constructors->find_by_predicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type']) ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || (($id = $this->constructors->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type']) || (($id = $this->constructors->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type']) ? 'Optional' : 'Yes').'|';
                 }
                 $table .= PHP_EOL;
                 $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;

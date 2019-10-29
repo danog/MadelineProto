@@ -63,7 +63,7 @@ class WsStream implements RawStreamInterface
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $this->dc = $ctx->getIntDc();
         $stream = yield $ctx->getStream();
@@ -112,7 +112,7 @@ class WsStream implements RawStreamInterface
         }
     }
 
-    public function readAsync(): \Generator
+    public function readGenerator(): \Generator
     {
         try {
             if (!$this->message || ($data = yield $this->message->buffer()) === null) {

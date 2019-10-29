@@ -37,7 +37,7 @@ class CombinedAPI
     public function __magic_construct($session, $paths = [])
     {
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        \danog\MadelineProto\Magic::class_exists();
+        \danog\MadelineProto\Magic::classExists();
 
         $realpaths = Serialization::realpaths($session);
         $this->session = $realpaths['file'];
@@ -118,7 +118,7 @@ class CombinedAPI
 
     public function __destruct()
     {
-        if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread()) || Magic::is_fork()) {
+        if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread()) || Magic::isFork()) {
             return;
         }
 
@@ -200,7 +200,7 @@ class CombinedAPI
         }
     }
 
-    public function event_update_handler($update, $instance)
+    public function eventUpdateHandler($update, $instance)
     {
         if (isset($this->event_handler_methods[$update['_']])) {
             return $this->event_handler_methods[$update['_']]($update, $instance);
@@ -222,7 +222,7 @@ class CombinedAPI
         $this->loop_callback = $callback;
     }
 
-    public function get_updates($params = [])
+    public function getUpdates($params = [])
     {
     }
 
@@ -243,7 +243,7 @@ class CombinedAPI
                 $instance->API->startUpdateSystem();
             }
             $instance->setCallback(function ($update) use ($path) {
-                return $this->event_update_handler($update, $path);
+                return $this->eventUpdateHandler($update, $path);
             }, ['async' => false]);
             if ($this->loop_callback !== null) {
                 $instance->setLoopCallback($this->loop_callback, ['async' => false]);

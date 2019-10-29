@@ -149,7 +149,7 @@ class APIFactory extends AsyncConstruct
 
         try {
             $yielded = Tools::wait($yielded);
-            Lua::convert_objects($yielded);
+            Lua::convertObjects($yielded);
 
             return $yielded;
         } catch (\Throwable $e) {
@@ -163,7 +163,7 @@ class APIFactory extends AsyncConstruct
             yield $this->initAsynchronously();
             $this->API->logger->logger('Finished init asynchronously');
         }
-        if (Magic::is_fork() && !Magic::$processed_fork) {
+        if (Magic::isFork() && !Magic::$processed_fork) {
             throw new Exception('Forking not supported, use async logic, instead: https://docs.madelineproto.xyz/docs/ASYNC.html');
         }
         if (!$this->API) {
@@ -195,7 +195,7 @@ class APIFactory extends AsyncConstruct
             $aargs['datacenter'] = $this->API->datacenter->curdc;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
 
-            return yield $this->API->method_call_async_read($name, $args, $aargs);
+            return yield $this->API->methodCallAsyncRead($name, $args, $aargs);
         }
         return yield $this->methods[$lower_name](...$arguments);
     }

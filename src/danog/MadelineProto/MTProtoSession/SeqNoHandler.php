@@ -31,7 +31,7 @@ trait SeqNoHandler
 
     public $session_id;
 
-    public function generate_out_seq_no($content_related)
+    public function generateOutSeqNo($content_related)
     {
         $in = $content_related ? 1 : 0;
         $value = $this->session_out_seq_no;
@@ -40,17 +40,17 @@ trait SeqNoHandler
         return $value * 2 + $in;
     }
 
-    public function check_in_seq_no($current_msg_id)
+    public function checkInSeqNo($current_msg_id)
     {
         $type = isset($this->incoming_messages[$current_msg_id]['content']['_']) ? $this->incoming_messages[$current_msg_id]['content']['_'] : '-';
-        if (isset($this->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generate_in_seq_no($this->content_related($this->incoming_messages[$current_msg_id]['content']))) !== $this->incoming_messages[$current_msg_id]['seq_no']) {
+        if (isset($this->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generateInSeqNo($this->contentRelated($this->incoming_messages[$current_msg_id]['content']))) !== $this->incoming_messages[$current_msg_id]['seq_no']) {
             $this->API->logger->logger('SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$this->incoming_messages[$current_msg_id]['seq_no'].', '.$type.')', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         } elseif (isset($seq_no)) {
             $this->API->logger->logger('Seqno OK (should be '.$seq_no.', is '.$this->incoming_messages[$current_msg_id]['seq_no'].', '.$type.')', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         }
     }
 
-    public function generate_in_seq_no($content_related)
+    public function generateInSeqNo($content_related)
     {
         $in = $content_related ? 1 : 0;
         $value = $this->session_in_seq_no;
@@ -59,7 +59,7 @@ trait SeqNoHandler
         return $value * 2 + $in;
     }
 
-    public function content_related($method)
+    public function contentRelated($method)
     {
         $method = \is_array($method) && isset($method['_']) ? $method['_'] : $method;
 

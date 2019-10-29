@@ -21,7 +21,7 @@ namespace danog\MadelineProto\TL\Conversion;
 
 trait TD
 {
-    public function tdcli_to_td(&$params, $key = null)
+    public function tdcliToTd(&$params, $key = null)
     {
         if (!\is_array($params)) {
             return $params;
@@ -32,7 +32,7 @@ trait TD
             return $params;
         }
         foreach ($params as $key => $value) {
-            $value = $this->tdcli_to_td($value);
+            $value = $this->tdcliToTd($value);
             if (\preg_match('/_$/', $key)) {
                 $params[\preg_replace('/_$/', '', $key)] = $value;
                 unset($params[$key]);
@@ -44,7 +44,7 @@ trait TD
         return $params;
     }
 
-    public function td_to_mtproto_async($params)
+    public function tdToMTProto($params)
     {
         $newparams = ['_' => self::REVERSE[$params['_']]];
         foreach (self::TD_PARAMS_CONVERSION[$newparams['_']] as $td => $mtproto) {
@@ -66,7 +66,7 @@ trait TD
                     default:
                         $newparams[$mtproto[0]] = isset($params[$td]) ? $params[$td] : null;
                         if (\is_array($newparams[$mtproto[0]])) {
-                            $newparams[$mtproto[0]] = yield $this->mtproto_to_td_async($newparams[$mtproto[0]]);
+                            $newparams[$mtproto[0]] = yield $this->MTProtoToTd($newparams[$mtproto[0]]);
                         }
                 }
             }
@@ -75,12 +75,12 @@ trait TD
         return $newparams;
     }
 
-    public function mtproto_to_tdcli_async($params)
+    public function MTProtoToTdcli($params)
     {
-        return $this->td_to_tdcli(yield $this->mtproto_to_td_async($params));
+        return $this->tdToTdcli(yield $this->MTProtoToTd($params));
     }
 
-    public function mtproto_to_td_async(&$params)
+    public function MTProtoToTd(&$params)
     {
         if (!\is_array($params)) {
             return $params;
@@ -100,7 +100,7 @@ trait TD
             } else {
                 switch (\end($mtproto)) {
                     case 'choose_chat_id_from_botapi':
-                        $newparams[$td] = (yield $this->get_info_async($params[$mtproto[0]]))['bot_api_id'] == $this->authorization['user']['id'] ? $params['from_id'] : yield $this->get_info_async($params[$mtproto[0]])['bot_api_id'];
+                        $newparams[$td] = (yield $this->getInfo($params[$mtproto[0]]))['bot_api_id'] == $this->authorization['user']['id'] ? $params['from_id'] : yield $this->getInfo($params[$mtproto[0]])['bot_api_id'];
                         break;
                     case 'choose_incoming_or_sent':
                         $newparams[$td] = ['_' => $params['out'] ? 'messageIsSuccessfullySent' : 'messageIsIncoming'];
@@ -138,7 +138,7 @@ trait TD
                         if ($params['message'] !== '') {
                             $newparams[$td] = ['_' => 'messageText', 'text' => $params['message']];
                             if (isset($params['media']['_']) && $params['media']['_'] === 'messageMediaWebPage') {
-                                $newparams[$td]['web_page'] = yield $this->mtproto_to_td_async($params['media']['webpage']);
+                                $newparams[$td]['web_page'] = yield $this->MTProtoToTd($params['media']['webpage']);
                             }
                             if (isset($params['entities'])) {
                                 $newparams[$td]['entities'] = $params['entities'];
@@ -154,7 +154,7 @@ trait TD
                             $newparams[$td] = isset($params[$mtproto[0]]) ? $params[$mtproto[0]] : null;
                         }
                         if (\is_array($newparams[$td])) {
-                            $newparams[$td] = yield $this->mtproto_to_td_async($newparams[$td]);
+                            $newparams[$td] = yield $this->MTProtoToTd($newparams[$td]);
                         }
                 }
             }
@@ -163,7 +163,7 @@ trait TD
         return $newparams;
     }
 
-    public function td_to_tdcli($params)
+    public function tdToTdcli($params)
     {
         if (!\is_array($params)) {
             return $params;
@@ -176,7 +176,7 @@ trait TD
                 if (!\is_numeric($key) && !\preg_match('/_^/', $key)) {
                     $key = $key.'_';
                 }
-                $newparams[$key] = $this->td_to_tdcli($value);
+                $newparams[$key] = $this->tdToTdcli($value);
             }
         }
 

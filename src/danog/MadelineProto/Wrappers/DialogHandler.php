@@ -21,25 +21,25 @@ namespace danog\MadelineProto\Wrappers;
 
 trait DialogHandler
 {
-    public function get_dialogs_async($force = true)
+    public function getDialogs($force = true)
     {
         if ($this->authorization['user']['bot']) {
             $res = [];
             foreach ($this->chats as $chat) {
-                $res[] = $this->gen_all($chat)['Peer'];
+                $res[] = $this->genAll($chat)['Peer'];
             }
 
             return $res;
         }
         $res = [];
-        foreach (yield $this->get_full_dialogs_async($force) as $dialog) {
+        foreach (yield $this->getFullDialogs($force) as $dialog) {
             $res[] = $dialog['peer'];
         }
 
         return $res;
     }
 
-    public function get_full_dialogs_async($force = true)
+    public function getFullDialogs($force = true)
     {
         if ($force || !isset($this->dialog_params['offset_date']) || \is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || \is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || \is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || \is_null($this->dialog_params['count'])) {
             $this->dialog_params = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];
@@ -53,13 +53,13 @@ trait DialogHandler
 
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getting_dialogs']);
         while ($this->dialog_params['count'] < $res['count']) {
-            $res = yield $this->method_call_async_read('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
+            $res = yield $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
             $last_peer = 0;
             $last_date = 0;
             $last_id = 0;
             $res['messages'] = \array_reverse($res['messages'] ?? []);
             foreach (\array_reverse($res['dialogs'] ?? []) as $dialog) {
-                $id = $this->get_id($dialog['peer']);
+                $id = $this->getId($dialog['peer']);
                 if (!isset($dialogs[$id])) {
                     $dialogs[$id] = $dialog;
                 }
@@ -71,7 +71,7 @@ trait DialogHandler
                         $last_id = $dialog['top_message'];
                     }
                     foreach ($res['messages'] as $message) {
-                        if ($this->get_id($message) === $last_peer && $last_id === $message['id']) {
+                        if ($this->getId($message) === $last_peer && $last_id === $message['id']) {
                             $last_date = $message['date'];
                             break;
                         }

@@ -52,7 +52,7 @@ class PremadeStream extends Socket implements RawStreamInterface, ProxyStreamInt
         return $this->stream;
     }
 
-    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
         if ($header !== '') {
             yield $this->stream->write($header);

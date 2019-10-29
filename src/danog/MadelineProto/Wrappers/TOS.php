@@ -24,12 +24,12 @@ namespace danog\MadelineProto\Wrappers;
  */
 trait TOS
 {
-    public function check_tos_async()
+    public function checkTos()
     {
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
             if ($this->tos['expires'] < \time()) {
                 $this->logger->logger('Fetching TOS...');
-                $this->tos = yield $this->method_call_async_read('help.getTermsOfServiceUpdate', [], ['datacenter' => $this->datacenter->curdc]);
+                $this->tos = yield $this->methodCallAsyncRead('help.getTermsOfServiceUpdate', [], ['datacenter' => $this->datacenter->curdc]);
                 $this->tos['accepted'] = $this->tos['_'] === 'help.termsOfServiceUpdateEmpty';
             }
 
@@ -46,9 +46,9 @@ trait TOS
         }
     }
 
-    public function accept_tos_async()
+    public function acceptTos()
     {
-        $this->tos['accepted'] = yield $this->method_call_async_read('help.acceptTermsOfService', ['id' => $this->tos['terms_of_service']['id']], ['datacenter' => $this->datacenter->curdc]);
+        $this->tos['accepted'] = yield $this->methodCallAsyncRead('help.acceptTermsOfService', ['id' => $this->tos['terms_of_service']['id']], ['datacenter' => $this->datacenter->curdc]);
         if ($this->tos['accepted']) {
             $this->logger->logger('TOS accepted successfully');
         } else {
@@ -56,9 +56,9 @@ trait TOS
         }
     }
 
-    public function decline_tos_async()
+    public function declineTos()
     {
-        yield $this->method_call_async_read('account.deleteAccount', ['reason' => 'Decline ToS update'], ['datacenter' => $this->datacenter->curdc]);
-        yield $this->logout_async();
+        yield $this->methodCallAsyncRead('account.deleteAccount', ['reason' => 'Decline ToS update'], ['datacenter' => $this->datacenter->curdc]);
+        yield $this->logout();
     }
 }

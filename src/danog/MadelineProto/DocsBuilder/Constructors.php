@@ -21,7 +21,7 @@ namespace danog\MadelineProto\DocsBuilder;
 
 trait Constructors
 {
-    public function mk_constructors()
+    public function mkConstructors()
     {
         foreach (\glob('constructors/'.$this->any) as $unlink) {
             \unlink($unlink);
@@ -41,7 +41,7 @@ trait Constructors
             $got[$id] = '';
             /*
                         if (preg_match('/%/', $type)) {
-                            $type = $this->constructors->find_by_type(str_replace('%', '', $type))['predicate'];
+                            $type = $this->constructors->findByType(str_replace('%', '', $type))['predicate'];
                         }*/
             $layer = isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '';
             $type = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
@@ -67,7 +67,7 @@ trait Constructors
                 $type_or_bare_type = \ctype_upper($this->end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512']) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = \str_replace(['.', 'true', 'false'], ['_', 'Bool', 'Bool'], $param[$type_or_subtype]);
                 if (\preg_match('/%/', $param[$type_or_subtype])) {
-                    $param[$type_or_subtype] = $this->constructors->find_by_type(\str_replace('%', '', $param[$type_or_subtype]))['predicate'];
+                    $param[$type_or_subtype] = $this->constructors->findByType(\str_replace('%', '', $param[$type_or_subtype]))['predicate'];
                 }
                 if (\substr($param[$type_or_subtype], -1) === '>') {
                     $param[$type_or_subtype] = \substr($param[$type_or_subtype], 0, -1);
@@ -86,7 +86,7 @@ trait Constructors
 |----------|---------------|----------|
 ';
             if (!isset($this->td_descriptions['constructors'][$data['predicate']])) {
-                $this->add_to_lang('object_'.$data['predicate']);
+                $this->addToLang('object_'.$data['predicate']);
                 if (\danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate']] !== '') {
                     $this->td_descriptions['constructors'][$data['predicate']]['description'] = \danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate']];
                 }
@@ -124,7 +124,7 @@ trait Constructors
                       }
                   }*/
                 if (\preg_match('/%/', $ptype)) {
-                    $ptype = $this->constructors->find_by_type(\str_replace('%', '', $ptype))['predicate'];
+                    $ptype = $this->constructors->findByType(\str_replace('%', '', $ptype))['predicate'];
                 }
                 $type_or_bare_type = (\ctype_upper($this->end(\explode('_', $ptype))[0]) || \in_array($ptype, ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'])) && $ptype !== 'MTmessage' ? 'types' : 'constructors';
                 if (\substr($ptype, -1) === '>') {
@@ -154,10 +154,10 @@ trait Constructors
                 if (\in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->find_by_predicate(\lcfirst($param['type']).'Empty') || ($data['type'] === 'InputMedia' && $param['name'] === 'mime_type') || ($data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration'])) ? 'Optional' : 'Yes').'|';
+                $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->findByPredicate(\lcfirst($param['type']).'Empty') || ($data['type'] === 'InputMedia' && $param['name'] === 'mime_type') || ($data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration'])) ? 'Optional' : 'Yes').'|';
 
                 if (!isset($this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']])) {
-                    $this->add_to_lang('object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']);
+                    $this->addToLang('object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']);
                     if (isset($this->td_descriptions['constructors'][$data['predicate']]['description'])) {
                         $this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']];
                     }

@@ -21,17 +21,17 @@ namespace danog\MadelineProto\TL\Conversion;
 
 trait BotAPIFiles
 {
-    public function base64url_decode($data)
+    public function base64urlDecode($data)
     {
         return \base64_decode(\str_pad(\strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT));
     }
 
-    public function base64url_encode($data)
+    public function base64urlEncode($data)
     {
         return \rtrim(\strtr(\base64_encode($data), '+/', '-_'), '=');
     }
 
-    public function rle_decode($string)
+    public function rleDecode($string)
     {
         $new = '';
         $last = '';
@@ -50,7 +50,7 @@ trait BotAPIFiles
         return $string;
     }
 
-    public function rle_encode($string)
+    public function rleEncode($string)
     {
         $new = '';
         $count = 0;
@@ -70,18 +70,18 @@ trait BotAPIFiles
         return $new;
     }
 
-    public function photosize_to_botapi_async($photoSize, $photo, $thumbnail = false)
+    public function photosizeToBotAPI($photoSize, $photo, $thumbnail = false)
     {
-        $ext = '.jpg';//$this->get_extension_from_location(['_' => 'inputFileLocation', 'volume_id' => $photoSize['location']['volume_id'], 'local_id' => $photoSize['location']['local_id'], 'secret' => $photoSize['location']['secret'], 'dc_id' => $photoSize['location']['dc_id']], '.jpg');
+        $ext = '.jpg';//$this->getExtensionFromLocation(['_' => 'inputFileLocation', 'volume_id' => $photoSize['location']['volume_id'], 'local_id' => $photoSize['location']['local_id'], 'secret' => $photoSize['location']['secret'], 'dc_id' => $photoSize['location']['dc_id']], '.jpg');
         $photoSize['location']['access_hash'] = $photo['access_hash'] ?? 0;
         $photoSize['location']['id'] = $photo['id'] ?? 0;
         $photoSize['location']['secret'] = $photo['location']['secret'] ?? 0;
         $photoSize['location']['dc_id'] = $photo['dc_id'] ?? 0;
         $photoSize['location']['_'] = $thumbnail ? 'bot_thumbnail' : 'bot_photo';
-        $data = (yield $this->serialize_object_async(['type' => 'File'], $photoSize['location'], 'File')).\chr(2);
+        $data = (yield $this->serializeObject(['type' => 'File'], $photoSize['location'], 'File')).\chr(2);
 
         return [
-            'file_id' => $this->base64url_encode($this->rle_encode($data)),
+            'file_id' => $this->base64urlEncode($this->rleEncode($data)),
             'width' => $photoSize['w'],
             'height' => $photoSize['h'],
             'file_size' => isset($photoSize['size']) ? $photoSize['size'] : \strlen($photoSize['bytes']),
@@ -90,9 +90,9 @@ trait BotAPIFiles
         ];
     }
 
-    public function unpack_file_id($file_id)
+    public function unpackFileId($file_id)
     {
-        $file_id = $this->rle_decode($this->base64url_decode($file_id));
+        $file_id = $this->rleDecode($this->base64urlDecode($file_id));
         if ($file_id[\strlen($file_id) - 1] !== \chr(2)) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['last_byte_invalid']);
         }

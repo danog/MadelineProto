@@ -46,7 +46,7 @@ class API extends InternalDoc
 
     public function __magic_construct($params = [], $settings = [])
     {
-        Magic::class_exists();
+        Magic::classExists();
         $deferred = new Deferred();
         $this->asyncAPIPromise = $deferred->promise();
         $this->asyncAPIPromise->onResolve(function () {
@@ -81,7 +81,7 @@ class API extends InternalDoc
                 } finally {
                     $unlock();
                 }
-                \danog\MadelineProto\Magic::class_exists();
+                \danog\MadelineProto\Magic::classExists();
 
                 try {
                     $unserialized = \unserialize($tounserialize);
@@ -153,7 +153,7 @@ class API extends InternalDoc
         Logger::constructorFromSettings($settings);
 
         if (!isset($params['app_info']['api_id']) || !$params['app_info']['api_id']) {
-            $app = yield $this->api_start_async($params);
+            $app = yield $this->APIStart($params);
             $params['app_info']['api_id'] = $app['api_id'];
             $params['app_info']['api_hash'] = $app['api_hash'];
         }
@@ -188,7 +188,7 @@ class API extends InternalDoc
 
     public function __destruct()
     {
-        if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread()) || Magic::is_fork()) {
+        if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread()) || Magic::isFork()) {
             return;
         }
         if ($this->asyncInitPromise) {
@@ -213,7 +213,7 @@ class API extends InternalDoc
     }
 
 
-    public function my_get_self()
+    public function myGetSelf()
     {
         return isset($this->API) && isset($this->API->authorization['user']) ? $this->API->authorization['user'] : false;
     }
@@ -221,7 +221,7 @@ class API extends InternalDoc
     public function APIFactory()
     {
         if ($this->API && !$this->API->asyncInitPromise) {
-            foreach ($this->API->get_method_namespaces() as $namespace) {
+            foreach ($this->API->getMethodNamespaces() as $namespace) {
                 $this->{$namespace} = new APIFactory($namespace, $this->API, $this->async);
             }
             $methods = \get_class_methods($this->API);
@@ -254,7 +254,7 @@ class API extends InternalDoc
                 if (\strpos($method, '_') !== false) {
                     $this->methods[\strtolower(\str_replace('_', '', $method))] = $actual_method;
                 } else {
-                    $this->methods[\strtolower(Tools::from_camel_case($method))] = $actual_method;
+                    $this->methods[\strtolower(Tools::fromCamelCase($method))] = $actual_method;
                 }
             }
 
@@ -265,7 +265,7 @@ class API extends InternalDoc
         }
     }
 
-    public function get_all_methods()
+    public function getAllMethods()
     {
         if ($this->asyncInitPromise) {
             $this->init();

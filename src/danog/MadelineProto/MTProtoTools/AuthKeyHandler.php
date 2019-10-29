@@ -55,7 +55,7 @@ trait AuthKeyHandler
      *
      * @return \Generator<AuthKey>
      */
-    public function create_auth_key_async(int $expires_in, string $datacenter): \Generator
+    public function createAuthKey(int $expires_in, string $datacenter): \Generator
     {
         $connection = $this->datacenter->getAuthConnection($datacenter);
         $cdn = $connection->isCDN();
@@ -82,7 +82,7 @@ trait AuthKeyHandler
                  *               ]
                  */
                 $nonce = $this->random(16);
-                $ResPQ = yield $connection->method_call_async_read($req_pq, ['nonce' => $nonce]);
+                $ResPQ = yield $connection->methodCallAsyncRead($req_pq, ['nonce' => $nonce]);
                 /*
                  * ***********************************************************************
                  * Check if the client's nonce and the server's nonce are the same
@@ -160,7 +160,7 @@ trait AuthKeyHandler
                                 if (!$pq->equals($p->multiply($q))) {
                                     $this->logger->logger('Automatic factorization failed, trying wolfram module', \danog\MadelineProto\Logger::ERROR);
 
-                                    $p = new \phpseclib\Math\BigInteger(yield $this->wolfram_single_async($pq->__toString()));
+                                    $p = new \phpseclib\Math\BigInteger(yield $this->wolframSingle($pq->__toString()));
                                     if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                                         $q = $pq->divide($p)[0];
                                         if ($p->compare($q) > 0) {
@@ -186,7 +186,7 @@ trait AuthKeyHandler
                 $q_bytes = $q->toBytes();
                 $new_nonce = $this->random(32);
                 $data_unserialized = ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => \preg_replace('|_.*|', '', $datacenter)];
-                $p_q_inner_data = yield $this->serialize_object_async(['type' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp')], $data_unserialized, 'p_q_inner_data');
+                $p_q_inner_data = yield $this->serializeObject(['type' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp')], $data_unserialized, 'p_q_inner_data');
                 /*
                  * ***********************************************************************
                  * Encrypt serialized object
@@ -216,7 +216,7 @@ trait AuthKeyHandler
                  * ]
                  */
                 //
-                $server_dh_params = yield $connection->method_call_async_read('req_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'p' => $p_bytes, 'q' => $q_bytes, 'public_key_fingerprint' => $key->fp, 'encrypted_data' => $encrypted_data]);
+                $server_dh_params = yield $connection->methodCallAsyncRead('req_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'p' => $p_bytes, 'q' => $q_bytes, 'public_key_fingerprint' => $key->fp, 'encrypted_data' => $encrypted_data]);
                 /*
                  * ***********************************************************************
                  * Check if the client's nonce and the server's nonce are the same
@@ -246,7 +246,7 @@ trait AuthKeyHandler
                 $encrypted_answer = $server_dh_params['encrypted_answer'];
                 $tmp_aes_key = \sha1($new_nonce.$server_nonce, true).\substr(\sha1($server_nonce.$new_nonce, true), 0, 12);
                 $tmp_aes_iv = \substr(\sha1($server_nonce.$new_nonce, true), 12, 8).\sha1($new_nonce.$new_nonce, true).\substr($new_nonce, 0, 4);
-                $answer_with_hash = $this->ige_decrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
+                $answer_with_hash = $this->igeDecrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
                 /*
                  * ***********************************************************************
                  * Separate answer and hash
@@ -270,7 +270,7 @@ trait AuthKeyHandler
                  * ***********************************************************************
                  * Do some checks
                  */
-                $server_DH_inner_data_length = $this->get_length($answer);
+                $server_DH_inner_data_length = $this->getLength($answer);
                 if (\sha1(\substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
                     throw new \danog\MadelineProto\SecurityException('answer_hash mismatch.');
                 }
@@ -290,14 +290,14 @@ trait AuthKeyHandler
                 $server_time = $server_DH_inner_data['server_time'];
                 $connection->time_delta = $server_time - \time();
                 $this->logger->logger(\sprintf('Server-client time delta = %.1f s', $connection->time_delta), \danog\MadelineProto\Logger::VERBOSE);
-                $this->check_p_g($dh_prime, $g);
-                $this->check_G($g_a, $dh_prime);
+                $this->checkPG($dh_prime, $g);
+                $this->checkG($g_a, $dh_prime);
                 for ($retry_id = 0; $retry_id <= $this->settings['max_tries']['authorization']; $retry_id++) {
                     $this->logger->logger('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
                     $b = new \phpseclib\Math\BigInteger($this->random(256), 256);
                     $this->logger->logger('Generating g_b...', \danog\MadelineProto\Logger::VERBOSE);
                     $g_b = $g->powMod($b, $dh_prime);
-                    $this->check_G($g_b, $dh_prime);
+                    $this->checkG($g_b, $dh_prime);
                     /*
                      * ***********************************************************************
                      * Check validity of g_b
@@ -320,14 +320,14 @@ trait AuthKeyHandler
                      *         string        $g_b                            : g^b mod dh_prime
                      * ]
                      */
-                    $data = yield $this->serialize_object_async(['type' => 'client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str], 'client_DH_inner_data');
+                    $data = yield $this->serializeObject(['type' => 'client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str], 'client_DH_inner_data');
                     /*
                      * ***********************************************************************
                      * encrypt client_DH_inner_data
                      */
                     $data_with_sha = \sha1($data, true).$data;
                     $data_with_sha_padded = $data_with_sha.$this->random($this->posmod(-\strlen($data_with_sha), 16));
-                    $encrypted_data = $this->ige_encrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
+                    $encrypted_data = $this->igeEncrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
                     $this->logger->logger('Executing set_client_DH_params...', \danog\MadelineProto\Logger::VERBOSE);
                     /*
                      * ***********************************************************************
@@ -346,7 +346,7 @@ trait AuthKeyHandler
                      *         int128         $new_nonce_hash2                : Return this value if server responds with dh_gen_fail
                      * ]
                      */
-                    $Set_client_DH_params_answer = yield $connection->method_call_async_read('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
+                    $Set_client_DH_params_answer = yield $connection->methodCallAsyncRead('set_client_DH_params', ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'encrypted_data' => $encrypted_data]);
                     /*
                      * ***********************************************************************
                      * Generate auth_key
@@ -436,7 +436,7 @@ trait AuthKeyHandler
      *
      * @return bool
      */
-    public function check_G(BigInteger $g_a, BigInteger $p): bool
+    public function checkG(BigInteger $g_a, BigInteger $p): bool
     {
         /*
          * ***********************************************************************
@@ -463,7 +463,7 @@ trait AuthKeyHandler
      *
      * @return boolean
      */
-    public function check_p_g(BigInteger $p, BigInteger $g): bool
+    public function checkPG(BigInteger $p, BigInteger $g): bool
     {
         /*
          * ***********************************************************************
@@ -514,9 +514,9 @@ trait AuthKeyHandler
      *
      * @return \Generator<array>
      */
-    public function get_dh_config_async(): \Generator
+    public function getDhConfig(): \Generator
     {
-        $dh_config = yield $this->method_call_async_read('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0], ['datacenter' => $this->datacenter->curdc]);
+        $dh_config = yield $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0], ['datacenter' => $this->datacenter->curdc]);
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {
             $this->logger->logger(\danog\MadelineProto\Logger::VERBOSE, ['DH configuration not modified']);
 
@@ -524,7 +524,7 @@ trait AuthKeyHandler
         }
         $dh_config['p'] = new \phpseclib\Math\BigInteger((string) $dh_config['p'], 256);
         $dh_config['g'] = new \phpseclib\Math\BigInteger($dh_config['g']);
-        $this->check_p_g($dh_config['p'], $dh_config['g']);
+        $this->checkPG($dh_config['p'], $dh_config['g']);
 
         return $this->dh_config = $dh_config;
     }
@@ -537,7 +537,7 @@ trait AuthKeyHandler
      *
      * @return \Generator<bool>
      */
-    public function bind_temp_auth_key_async(int $expires_in, string $datacenter): \Generator
+    public function bindTempAuthKey(int $expires_in, string $datacenter): \Generator
     {
         $datacenterConnection = $this->datacenter->getDataCenterConnection($datacenter);
         $connection = $datacenterConnection->getAuthConnection();
@@ -550,15 +550,15 @@ trait AuthKeyHandler
                 $temp_auth_key_id = $datacenterConnection->getTempAuthKey()->getID();
                 $perm_auth_key_id = $datacenterConnection->getPermAuthKey()->getID();
                 $temp_session_id = $connection->session_id;
-                $message_data = yield $this->serialize_object_async(['type' => 'bind_auth_key_inner'], ['nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bind_temp_auth_key_inner');
-                $message_id = $connection->generate_message_id();
+                $message_data = yield $this->serializeObject(['type' => 'bind_auth_key_inner'], ['nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bind_temp_auth_key_inner');
+                $message_id = $connection->generateMessageId();
                 $seq_no = 0;
                 $encrypted_data = $this->random(16).$message_id.\pack('VV', $seq_no, \strlen($message_data)).$message_data;
                 $message_key = \substr(\sha1($encrypted_data, true), -16);
                 $padding = $this->random($this->posmod(-\strlen($encrypted_data), 16));
-                list($aes_key, $aes_iv) = $this->old_aes_calculate($message_key, $datacenterConnection->getPermAuthKey()->getAuthKey());
-                $encrypted_message = $datacenterConnection->getPermAuthKey()->getID().$message_key.$this->ige_encrypt($encrypted_data.$padding, $aes_key, $aes_iv);
-                $res = yield $connection->method_call_async_read('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], ['msg_id' => $message_id]);
+                list($aes_key, $aes_iv) = $this->oldAesCalculate($message_key, $datacenterConnection->getPermAuthKey()->getAuthKey());
+                $encrypted_message = $datacenterConnection->getPermAuthKey()->getID().$message_key.$this->igeEncrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+                $res = yield $connection->methodCallAsyncRead('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], ['msg_id' => $message_id]);
                 if ($res === true) {
                     $this->logger->logger('Bound temporary and permanent authorization keys, DC '.$datacenter, \danog\MadelineProto\Logger::NOTICE);
                     $datacenterConnection->bind();
@@ -585,7 +585,7 @@ trait AuthKeyHandler
      *
      * @return \Generator<string|bool>
      */
-    public function wolfram_single_async($what): \Generator
+    public function wolframSingle($what): \Generator
     {
         $code = yield $this->datacenter->fileGetContents('http://www.wolframalpha.com/api/v1/code');
         $query = 'Do prime factorization of '.$what;
@@ -633,7 +633,7 @@ trait AuthKeyHandler
      *
      * @return \Generator
      */
-    public function init_authorization_async(): \Generator
+    public function initAuthorization(): \Generator
     {
         if ($this->pending_auth) {
             $this->logger("Pending auth, not initing auth");
@@ -660,7 +660,7 @@ trait AuthKeyHandler
                     continue;
                 }
                 $dcs[$id] = function () use ($id, $socket) {
-                    return $this->init_authorization_socket_async($id, $socket);
+                    return $this->initAuthorizationSocket($id, $socket);
                 };
             }
             if ($dcs) {
@@ -674,12 +674,12 @@ trait AuthKeyHandler
             yield $this->all($dcs);
 
             foreach ($postpone as $id => $socket) {
-                yield $this->init_authorization_socket_async($id, $socket);
+                yield $this->initAuthorizationSocket($id, $socket);
             }
 
             if ($this->pending_auth && empty($this->init_auth_dcs)) {
                 $this->pending_auth = false;
-                yield $this->init_authorization_async();
+                yield $this->initAuthorization();
             }
         } finally {
             $this->pending_auth = false;
@@ -695,7 +695,7 @@ trait AuthKeyHandler
      *
      * @return \Generator
      */
-    public function init_authorization_socket_async(string $id, DataCenterConnection $socket): \Generator
+    public function initAuthorizationSocket(string $id, DataCenterConnection $socket): \Generator
     {
         $this->logger("Initing authorization DC $id...");
         $this->init_auth_dcs[$id] = true;
@@ -710,7 +710,7 @@ trait AuthKeyHandler
             if (!$socket->hasTempAuthKey() || !$socket->hasPermAuthKey() || !$socket->isBound()) {
                 if (!$socket->hasPermAuthKey() && !$cdn && !$media) {
                     $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                    $socket->setPermAuthKey(yield $this->create_auth_key_async(-1, $id));
+                    $socket->setPermAuthKey(yield $this->createAuthKey(-1, $id));
                     //$socket->authorized(false);
                 }
                 if ($media) {
@@ -727,28 +727,28 @@ trait AuthKeyHandler
                         //$socket->authorized = false;
 
                         $socket->setTempAuthKey(null);
-                        $socket->setTempAuthKey(yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
-                        yield $this->bind_temp_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                        $socket->setTempAuthKey(yield $this->createAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
+                        yield $this->bindTempAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
 
-                        $this->config = yield $connection->method_call_async_read('help.getConfig', []);
+                        $this->config = yield $connection->methodCallAsyncRead('help.getConfig', []);
 
-                        yield $this->sync_authorization_async($id);
+                        yield $this->syncAuthorization($id);
                     } elseif (!$socket->hasTempAuthKey()) {
                         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                        $socket->setTempAuthKey(yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
+                        $socket->setTempAuthKey(yield $this->createAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
                     }
                 } else {
                     if (!$cdn) {
                         $socket->bind(false);
-                        $this->config = yield $connection->method_call_async_read('help.getConfig', []);
-                        yield $this->sync_authorization_async($id);
+                        $this->config = yield $connection->methodCallAsyncRead('help.getConfig', []);
+                        yield $this->syncAuthorization($id);
                     } elseif (!$socket->hasTempAuthKey()) {
                         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                        $socket->setTempAuthKey(yield $this->create_auth_key_async($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
+                        $socket->setTempAuthKey(yield $this->createAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
                     }
                 }
             } elseif (!$cdn) {
-                yield $this->sync_authorization_async($id);
+                yield $this->syncAuthorization($id);
             }
         } finally {
             $this->logger("Done initing authorization DC $id");
@@ -763,7 +763,7 @@ trait AuthKeyHandler
      *
      * @return \Generator
      */
-    public function sync_authorization_async(string $id): \Generator
+    public function syncAuthorization(string $id): \Generator
     {
         if (!$this->datacenter->has($id)) {
             return false;
@@ -777,8 +777,8 @@ trait AuthKeyHandler
                 if ($authorized_socket->hasTempAuthKey() && $authorized_socket->hasPermAuthKey() && $authorized_socket->isAuthorized() && $this->authorized === self::LOGGED_IN && !$socket->isAuthorized() && !$authorized_socket->isCDN()) {
                     try {
                         $this->logger->logger('Trying to copy authorization from dc '.$authorized_dc_id.' to dc '.$id);
-                        $exported_authorization = yield $this->method_call_async_read('auth.exportAuthorization', ['dc_id' => \preg_replace('|_.*|', '', $id)], ['datacenter' => $authorized_dc_id]);
-                        $authorization = yield $this->method_call_async_read('auth.importAuthorization', $exported_authorization, ['datacenter' => $id]);
+                        $exported_authorization = yield $this->methodCallAsyncRead('auth.exportAuthorization', ['dc_id' => \preg_replace('|_.*|', '', $id)], ['datacenter' => $authorized_dc_id]);
+                        $authorization = yield $this->methodCallAsyncRead('auth.importAuthorization', $exported_authorization, ['datacenter' => $id]);
                         $socket->authorized(true);
                         break;
                     } catch (\danog\MadelineProto\Exception $e) {

@@ -116,7 +116,7 @@ class RPCErrorException extends \Exception
     {
         $this->rpc = $message;
         parent::__construct($message, $code, $previous);
-        $this->prettify_tl($caller);
+        $this->prettifyTl($caller);
         $this->caller = $caller;
 
         $additional = [];

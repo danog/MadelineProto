@@ -42,7 +42,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();

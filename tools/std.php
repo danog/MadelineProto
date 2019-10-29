@@ -31,7 +31,7 @@ foreach ($methods as $methodObj) {
     }
     $new = Tools::from_snake_case($method);
     $new = \str_ireplace(['mtproto', 'api'], ['MTProto', 'API'], $new);
-    $new = preg_replace('/async$/i', '', $new);
+    if (!in_array($method, ['discard_call_async', 'accept_call_async', 'request_call_async'])) $new = preg_replace('/async$/i', '', $new);
 
     if (method_exists((string) $methodObj->getDeclaringClass(), preg_replace('/async$/i', '', $method))) {
         var_dump("Skipping $method => $new");
@@ -61,6 +61,8 @@ foreach (new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryI
         $new = \str_replace($find, $replace, $old = \file_get_contents($filename));
     } while ($old !== $new);
 }
+exit;
+
 foreach (new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(\realpath('docs'))), '/\.md$/') as $filename) {
     $filename = (string) $filename;
     $new = \str_replace($find, $replace, $old = \file_get_contents($filename));

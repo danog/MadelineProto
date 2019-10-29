@@ -59,7 +59,7 @@ class FeedLoop extends ResumableSignalLoop
                 return;
             }
         }
-        $this->state = $this->channelId === false ? (yield $API->load_update_state_async()) : $API->loadChannelState($this->channelId);
+        $this->state = $this->channelId === false ? (yield $API->loadUpdateState()) : $API->loadChannelState($this->channelId);
 
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
@@ -84,7 +84,7 @@ class FeedLoop extends ResumableSignalLoop
                 $parsedUpdates = $this->parsedUpdates;
                 $this->parsedUpdates = [];
                 foreach ($parsedUpdates as $update) {
-                    yield $API->save_update_async($update);
+                    yield $API->saveUpdate($update);
                 }
                 $parsedUpdates = null;
                 $this->API->signalUpdate();
@@ -128,7 +128,7 @@ class FeedLoop extends ResumableSignalLoop
                     continue;
                 }
                 if (isset($update['message']['id'], $update['message']['to_id']) && !\in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage', 'updateMessageID'])) {
-                    if (!$this->API->check_msg_id($update['message'])) {
+                    if (!$this->API->checkMsgId($update['message'])) {
                         $logger('MSGID duplicate');
 
                         continue;
@@ -201,11 +201,11 @@ class FeedLoop extends ResumableSignalLoop
                 $via_bot = false;
                 $entities = false;
                 if ($update['message']['_'] !== 'messageEmpty' && (
-                    ($from = isset($update['message']['from_id']) && !yield $this->API->peer_isset_async($update['message']['from_id'])) ||
-                    ($to = !yield $this->API->peer_isset_async($update['message']['to_id'])) ||
-                    ($via_bot = isset($update['message']['via_bot_id']) && !yield $this->API->peer_isset_async($update['message']['via_bot_id'])) ||
-                    ($entities = isset($update['message']['entities']) && !yield $this->API->entities_peer_isset_async($update['message']['entities'])) // ||
-                    //isset($update['message']['fwd_from']) && !yield $this->fwd_peer_isset_async($update['message']['fwd_from'])
+                    ($from = isset($update['message']['from_id']) && !yield $this->API->peerIsset($update['message']['from_id'])) ||
+                    ($to = !yield $this->API->peerIsset($update['message']['to_id'])) ||
+                    ($via_bot = isset($update['message']['via_bot_id']) && !yield $this->API->peerIsset($update['message']['via_bot_id'])) ||
+                    ($entities = isset($update['message']['entities']) && !yield $this->API->entitiesPeerIsset($update['message']['entities'])) // ||
+                    //isset($update['message']['fwd_from']) && !yield $this->fwdPeerIsset($update['message']['fwd_from'])
                 )) {
                     $log = '';
                     if ($from) {
@@ -232,7 +232,7 @@ class FeedLoop extends ResumableSignalLoop
                 }
                 break;
             default:
-                if ($channelId && !yield $this->API->peer_isset_async($this->API->to_supergroup($channelId))) {
+                if ($channelId && !yield $this->API->peerIsset($this->API->toSupergroup($channelId))) {
                     $this->API->logger->logger('Skipping update, I do not have the channel id '.$channelId, \danog\MadelineProto\Logger::ERROR);
 
                     return false;
@@ -261,7 +261,7 @@ class FeedLoop extends ResumableSignalLoop
     public function saveMessages($messages)
     {
         foreach ($messages as $message) {
-            if (!$this->API->check_msg_id($message)) {
+            if (!$this->API->checkMsgId($message)) {
                 $this->API->logger->logger("MSGID duplicate ({$message['id']}) in $this");
 
                 continue;

@@ -36,6 +36,6 @@ class Exception extends \Exception
     public function __construct($message, $file = '')
     {
         parent::__construct($message);
-        $this->prettify_tl($file);
+        $this->prettifyTl($file);
     }
 }

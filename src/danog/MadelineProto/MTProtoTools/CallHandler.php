@@ -35,9 +35,9 @@ trait CallHandler
      *
      * @return array
      */
-    public function method_call(string $method, $args = [], array $aargs = ['msg_id' => null])
+    public function methodCall(string $method, $args = [], array $aargs = ['msg_id' => null])
     {
-        return $this->wait($this->method_call_async_read($method, $args, $aargs));
+        return $this->wait($this->methodCallAsyncRead($method, $args, $aargs));
     }
 
     /**
@@ -51,9 +51,9 @@ trait CallHandler
      *
      * @return Promise
      */
-    public function method_call_async_read(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
+    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
     {
-        return $this->datacenter->getConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->method_call_async_read($method, $args, $aargs);
+        return $this->datacenter->getConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->methodCallAsyncRead($method, $args, $aargs);
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -64,8 +64,8 @@ trait CallHandler
      *
      * @return Promise
      */
-    public function method_call_async_write(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
+    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
     {
-        return $this->datacenter->getConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->method_call_async_write($method, $args, $aargs);
+        return $this->datacenter->getConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->methodCallAsyncWrite($method, $args, $aargs);
     }
 }

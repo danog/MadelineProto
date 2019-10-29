@@ -19,7 +19,7 @@ namespace danog\MadelineProto\TL\Conversion;
  */
 trait Extension
 {
-    public function get_mime_from_extension($extension, $default)
+    public function getMimeFromExtension($extension, $default)
     {
         $ext = \ltrim($extension, '.');
         if (isset(self::ALL_MIMES[$ext])) {
@@ -29,7 +29,7 @@ trait Extension
         return $default;
     }
 
-    public function get_extension_from_mime($mime)
+    public function getExtensionFromMime($mime)
     {
         foreach (self::ALL_MIMES as $key => $value) {
             if (\array_search($mime, $value) !== false) {
@@ -40,7 +40,7 @@ trait Extension
         return '';
     }
 
-    public function get_extension_from_location($location, $default)
+    public function getExtensionFromLocation($location, $default)
     {
         return $default;
         //('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 2], ['heavy' => true, 'datacenter' => $location['dc_id']]);
@@ -69,14 +69,14 @@ trait Extension
         }
     }
 
-    public function get_mime_from_file($file)
+    public function getMimeFromFile($file)
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
 
         return $finfo->file($file);
     }
 
-    public function get_mime_from_buffer($buffer)
+    public function getMimeFromBuffer($buffer)
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
 

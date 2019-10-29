@@ -55,7 +55,7 @@ class Lua
             $this->Lua->registerCallback($method, [$this->MadelineProto, $method]);
         }
         $methods = [];
-        foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
+        foreach ($this->MadelineProto->getMethodsNamespaced() as $pair) {
             $namespace = \key($pair);
             $method = $pair[$namespace];
             if ($namespace === 'upload') {
@@ -63,7 +63,7 @@ class Lua
             }
             $methods[$namespace][$method] = [$this->MadelineProto->{$namespace}, $method];
         }
-        foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
+        foreach ($this->MadelineProto->getMethodsNamespaced() as $pair) {
             $namespace = \key($pair);
             $method = $pair[$namespace];
             if ($namespace === 'upload') {
@@ -72,19 +72,19 @@ class Lua
             $this->{$namespace} = $methods[$namespace];
         }
         $this->MadelineProto->lua = true;
-        foreach ($this->MadelineProto->get_methods_namespaced() as $pair) {
+        foreach ($this->MadelineProto->getMethodsNamespaced() as $pair) {
             $namespace = \key($pair);
             $this->MadelineProto->{$namespace}->lua = true;
         }
     }
 
-    public function tdcli_function($params, $cb = null, $cb_extra = null)
+    public function tdcliFunction($params, $cb = null, $cb_extra = null)
     {
-        $params = $this->MadelineProto->td_to_mtproto($this->MadelineProto->tdcli_to_td($params));
+        $params = $this->MadelineProto->td_to_mtproto($this->MadelineProto->tdcliToTd($params));
         if ($params === 0) {
             return 0;
         }
-        $result = $this->MadelineProto->API->method_call($params['_'], $params, ['datacenter' => $this->MadelineProto->API->datacenter->curdc]);
+        $result = $this->MadelineProto->API->methodCall($params['_'], $params, ['datacenter' => $this->MadelineProto->API->datacenter->curdc]);
         if (\is_callable($cb)) {
             $cb($this->MadelineProto->mtproto_to_td($result), $cb_extra);
         }
@@ -92,23 +92,23 @@ class Lua
         return $result;
     }
 
-    public function madeline_function($params, $cb = null, $cb_extra = null)
+    public function madelineFunction($params, $cb = null, $cb_extra = null)
     {
-        $result = $this->MadelineProto->API->method_call($params['_'], $params, ['datacenter' => $this->MadelineProto->API->datacenter->curdc]);
+        $result = $this->MadelineProto->API->methodCall($params['_'], $params, ['datacenter' => $this->MadelineProto->API->datacenter->curdc]);
         if (\is_callable($cb)) {
             $cb($result, $cb_extra);
         }
-        self::convert_objects($result);
+        self::convertObjects($result);
 
         return $result;
     }
 
-    public function tdcli_update_callback($update)
+    public function tdcliUpdateCallback($update)
     {
-        $this->Lua->tdcli_update_callback($this->MadelineProto->mtproto_to_tdcli($update));
+        $this->Lua->tdcliUpdateCallback($this->MadelineProto->mtproto_to_tdcli($update));
     }
 
-    private function convert_array($array)
+    private function convertArray($array)
     {
         if (!\is_array($array)) {
             return $array;
@@ -120,7 +120,7 @@ class Lua
         }
     }
 
-    private function is_sequential(array $arr)
+    private function isSequential(array $arr)
     {
         if ([] === $arr) {
             return false;
@@ -140,7 +140,7 @@ class Lua
 
     public function __call($name, $params)
     {
-        self::convert_objects($params);
+        self::convertObjects($params);
 
         try {
             return $this->Lua->{$name}(...$params);
@@ -166,7 +166,7 @@ class Lua
         return $this->Lua->{$name} = $value;
     }
 
-    public static function convert_objects(&$data)
+    public static function convertObjects(&$data)
     {
         \array_walk_recursive($data, function (&$value, $key) {
             if (\is_object($value) && !$value instanceof \phpseclib\Math\BigInteger) {

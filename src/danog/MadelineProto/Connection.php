@@ -439,9 +439,9 @@ class Connection extends Session
             }
 
             if ($message['method']) {
-                $body = yield $this->API->serialize_method_async($message['_'], $body);
+                $body = yield $this->API->serializeMethod($message['_'], $body);
             } else {
-                $body = yield $this->API->serialize_object_async(['type' => $message['_']], $body, $message['_']);
+                $body = yield $this->API->serializeObject(['type' => $message['_']], $body, $message['_']);
             }
             if ($refresh_next) {
                 $this->API->referenceDatabase->refreshNext(false);
@@ -558,7 +558,7 @@ class Connection extends Session
     {
         $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect(true);
-        yield $this->API->datacenter->dcConnectAsync($this->ctx->getDc(), $this->id);
+        yield $this->API->datacenter->dcConnect($this->ctx->getDc(), $this->id);
     }
 
     /**

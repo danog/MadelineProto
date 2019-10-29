@@ -33,7 +33,7 @@ trait UpdateHandler
     public $updates = [];
     public $updates_key = 0;
 
-    public function pwr_update_handler($update)
+    public function pwrUpdateHandler($update)
     {
         if (isset($this->settings['pwr']['update_handler'])) {
             if (\is_array($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'][0] === false) {
@@ -42,11 +42,11 @@ trait UpdateHandler
             if (\is_string($this->settings['pwr']['update_handler'])) {
                 return $this->{$this->settings['pwr']['update_handler']}($update);
             }
-            \in_array($this->settings['pwr']['update_handler'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->get_updates_update_handler($update) : $this->settings['pwr']['update_handler']($update);
+            \in_array($this->settings['pwr']['update_handler'], [['danog\\MadelineProto\\API', 'get_updates_update_handler'], 'get_updates_update_handler']) ? $this->getUpdatesUpdateHandler($update) : $this->settings['pwr']['update_handler']($update);
         }
     }
 
-    public function get_updates_update_handler($update)
+    public function getUpdatesUpdateHandler($update)
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
@@ -54,7 +54,7 @@ trait UpdateHandler
         $this->updates[$this->updates_key++] = $update;
     }
 
-    public function get_updates_async($params = [])
+    public function getUpdates($params = [])
     {
         if (!$this->settings['updates']['handle_updates']) {
             $this->settings['updates']['handle_updates'] = true;
@@ -119,14 +119,14 @@ trait UpdateHandler
         });
     }
 
-    public function check_msg_id($message)
+    public function checkMsgId($message)
     {
         if (!isset($message['to_id'])) {
             return true;
         }
 
         try {
-            $peer_id = $this->get_id($message['to_id']);
+            $peer_id = $this->getId($message['to_id']);
         } catch (\danog\MadelineProto\Exception $e) {
             return true;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -142,11 +142,11 @@ trait UpdateHandler
         return false;
     }
 
-    public function load_update_state_async()
+    public function loadUpdateState()
     {
         if (!$this->got_state) {
             $this->got_state = true;
-            $this->channels_state->get(false, yield $this->get_updates_state_async());
+            $this->channels_state->get(false, yield $this->getUpdatesState());
         }
 
         return $this->channels_state->get(false);
@@ -162,16 +162,16 @@ trait UpdateHandler
         return $this->channels_state;
     }
 
-    public function get_updates_state_async()
+    public function getUpdatesState()
     {
-        $data = yield $this->method_call_async_read('updates.getState', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
-        yield $this->get_cdn_config_async($this->settings['connection_settings']['default_dc']);
+        $data = yield $this->methodCallAsyncRead('updates.getState', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+        yield $this->getCdnConfig($this->settings['connection_settings']['default_dc']);
 
         return $data;
     }
 
 
-    public function handle_updates_async($updates, $actual_updates = null)
+    public function handleUpdates($updates, $actual_updates = null)
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
@@ -211,7 +211,7 @@ trait UpdateHandler
                 if (!isset($updates['request']['body'])) {
                     break;
                 }
-                $updates['user_id'] = (yield $this->get_info_async($updates['request']['body']['peer']))['bot_api_id'];
+                $updates['user_id'] = (yield $this->getInfo($updates['request']['body']['peer']))['bot_api_id'];
                 $updates['message'] = $updates['request']['body']['message'];
                 unset($updates['request']);
                 // no break
@@ -219,7 +219,7 @@ trait UpdateHandler
             case 'updateShortChatMessage':
                 $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
-                if (!yield $this->peer_isset_async($from_id) || !yield $this->peer_isset_async($to_id) || isset($updates['via_bot_id']) && !yield $this->peer_isset_async($updates['via_bot_id']) || isset($updates['entities']) && !yield $this->entities_peer_isset_async($updates['entities']) || isset($updates['fwd_from']) && !yield $this->fwd_peer_isset_async($updates['fwd_from'])) {
+                if (!yield $this->peerIsset($from_id) || !yield $this->peerIsset($to_id) || isset($updates['via_bot_id']) && !yield $this->peerIsset($updates['via_bot_id']) || isset($updates['entities']) && !yield $this->entitiesPeerIsset($updates['entities']) || isset($updates['fwd_from']) && !yield $this->fwdPeerIsset($updates['fwd_from'])) {
                     yield $this->updaters[false]->resume();
 
                     return;
@@ -229,7 +229,7 @@ trait UpdateHandler
                 $message['from_id'] = $from_id;
 
                 try {
-                    $message['to_id'] = (yield $this->get_info_async($to_id))['Peer'];
+                    $message['to_id'] = (yield $this->getInfo($to_id))['Peer'];
                 } catch (\danog\MadelineProto\Exception $e) {
                     $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
                     //$this->pending_updates[] = $updates;
@@ -250,21 +250,21 @@ trait UpdateHandler
                 break;
         }
     }
-    public function save_update_async($update)
+    public function saveUpdate($update)
     {
         if ($update['_'] === 'updateConfig') {
             $this->config['expires'] = 0;
-            yield $this->get_config_async();
+            yield $this->getConfig();
         }
         if (\in_array($update['_'], ['updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'])) {
-            $id = $this->get_id($update);
+            $id = $this->getId($update);
             $this->full_chats[$id]['last_update'] = 0;
-            yield $this->get_full_info_async($id);
+            yield $this->getFullInfo($id);
         }
         if ($update['_'] === 'updateDcOptions') {
             $this->logger->logger('Got new dc options', \danog\MadelineProto\Logger::VERBOSE);
             $this->config['dc_options'] = $update['dc_options'];
-            yield $this->parse_config_async();
+            yield $this->parseConfig();
 
             return;
         }
@@ -285,13 +285,13 @@ trait UpdateHandler
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']] = $controller;
                     break;
                 case 'phoneCallAccepted':
-                    if (!yield $this->confirm_call_async($update['phone_call'])) {
+                    if (!yield $this->confirmCall($update['phone_call'])) {
                         return;
                     }
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']];
                     break;
                 case 'phoneCall':
-                    if (!yield $this->complete_call_async($update['phone_call'])) {
+                    if (!yield $this->completeCall($update['phone_call'])) {
                         return;
                     }
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']];
@@ -306,7 +306,7 @@ trait UpdateHandler
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
             if (isset($update['qts'])) {
-                $cur_state = yield $this->load_update_state_async();
+                $cur_state = yield $this->loadUpdateState();
                 if ($cur_state->qts() === -1) {
                     $cur_state->qts($update['qts']);
                 }
@@ -322,9 +322,9 @@ trait UpdateHandler
                     return false;
                 }
                 $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
-                yield $this->method_call_async_read('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+                yield $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             }
-            yield $this->handle_encrypted_update_async($update);
+            yield $this->handleEncryptedUpdate($update);
 
             return;
         }
@@ -340,7 +340,7 @@ trait UpdateHandler
                         return;
                     }
                     $this->logger->logger('Accepting secret chat '.$update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
-                    yield $this->accept_secret_chat_async($update['chat']);
+                    yield $this->acceptSecretChat($update['chat']);
                     break;
                 case 'encryptedChatDiscarded':
                     $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user', \danog\MadelineProto\Logger::NOTICE);
@@ -357,7 +357,7 @@ trait UpdateHandler
                     break;
                 case 'encryptedChat':
                     $this->logger->logger('Completing creation of secret chat '.$update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
-                    yield $this->complete_secret_chat_async($update['chat']);
+                    yield $this->completeSecretChat($update['chat']);
                     break;
             }
             //$this->logger->logger($update, \danog\MadelineProto\Logger::NOTICE);
@@ -376,13 +376,13 @@ trait UpdateHandler
         }
         //$this->logger->logger('Saving an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict'] && isset($this->settings['pwr']['update_handler'])) {
-            $this->pwr_update_handler($update);
+            $this->pwrUpdateHandler($update);
         } elseif ($this->settings['updates']['run_callback']) {
-            $this->get_updates_update_handler($update);
+            $this->getUpdatesUpdateHandler($update);
         }
     }
 
-    public function pwr_webhook($update)
+    public function pwrWebhook($update)
     {
         $payload = \json_encode($update);
         //$this->logger->logger($update, $payload, json_last_error());
@@ -400,7 +400,7 @@ trait UpdateHandler
             $result = \json_decode($result, true);
             if (\is_array($result) && isset($result['method']) && $result['method'] != '' && \is_string($result['method'])) {
                 try {
-                    $this->logger->logger('Reverse webhook command returned', yield $this->method_call_async_read($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
+                    $this->logger->logger('Reverse webhook command returned', yield $this->methodCallAsyncRead($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
                 } catch (\Throwable $e) {
                     $this->logger->logger("Reverse webhook command returned: $e");
                 }

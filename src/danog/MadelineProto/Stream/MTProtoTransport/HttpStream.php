@@ -51,7 +51,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $this->ctx = $ctx->getCtx();
         $this->stream = yield $ctx->getStream($header);
@@ -89,7 +89,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @return Generator
      */
-    public function getWriteBufferAsync(int $length, string $append = ''): \Generator
+    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
         $headers = 'POST '.$this->uri->getPath()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length.$this->header."\r\n\r\n";
         $buffer = yield $this->stream->getWriteBuffer(\strlen($headers) + $length, $append);
@@ -105,7 +105,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @return Generator
      */
-    public function getReadBufferAsync(&$length): \Generator
+    public function getReadBufferGenerator(&$length): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
         $headers = '';
@@ -158,7 +158,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
 
             \danog\MadelineProto\Logger::log($read);
 
-            $this->code = $this->pack_signed_int(-$code);
+            $this->code = $this->packSignedInt(-$code);
             $length = 4;
 
             return $this;

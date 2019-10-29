@@ -101,7 +101,7 @@ class ReadLoop extends SignalLoop
                                 $connection->outgoing_messages[$message_id]['sent'] = 0;
                             }
                             yield $shared->reconnect();
-                            yield $API->init_authorization_async();
+                            yield $API->initAuthorization();
                         } else {
                             yield $connection->reconnect();
                         }
@@ -163,7 +163,7 @@ class ReadLoop extends SignalLoop
         }
 
         if ($payload_length === 4) {
-            $payload = $this->unpack_signed_int(yield $buffer->bufferRead(4));
+            $payload = $this->unpackSignedInt(yield $buffer->bufferRead(4));
             $API->logger->logger("Received $payload from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
             return $payload;
@@ -176,7 +176,7 @@ class ReadLoop extends SignalLoop
             if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
                 $message_id = yield $buffer->bufferRead(8);
                 if (!\in_array($message_id, [1, 0])) {
-                    $connection->check_message_id($message_id, ['outgoing' => false, 'container' => false]);
+                    $connection->checkMessageId($message_id, ['outgoing' => false, 'container' => false]);
                 }
                 $message_length = \unpack('V', yield $buffer->bufferRead(4))[1];
                 $message_data = yield $buffer->bufferRead($message_length);
@@ -191,14 +191,14 @@ class ReadLoop extends SignalLoop
                 $connection->incoming_messages[$message_id] = [];
             } elseif ($auth_key_id === $shared->getTempAuthKey()->getID()) {
                 $message_key = yield $buffer->bufferRead(16);
-                list($aes_key, $aes_iv) = $this->aes_calculate($message_key, $shared->getTempAuthKey()->getAuthKey(), false);
+                list($aes_key, $aes_iv) = $this->aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey(), false);
                 $encrypted_data = yield $buffer->bufferRead($payload_length - 24);
 
                 $protocol_padding = \strlen($encrypted_data) % 16;
                 if ($protocol_padding) {
                     $encrypted_data = \substr($encrypted_data, 0, -$protocol_padding);
                 }
-                $decrypted_data = $this->ige_decrypt($encrypted_data, $aes_key, $aes_iv);
+                $decrypted_data = $this->igeDecrypt($encrypted_data, $aes_key, $aes_iv);
                 /*
                 $server_salt = substr($decrypted_data, 0, 8);
                 if ($server_salt != $shared->getTempAuthKey()->getServerSalt()) {
@@ -212,7 +212,7 @@ class ReadLoop extends SignalLoop
                     throw new NothingInTheSocketException();
                 }
                 $message_id = \substr($decrypted_data, 16, 8);
-                $connection->check_message_id($message_id, ['outgoing' => false, 'container' => false]);
+                $connection->checkMessageId($message_id, ['outgoing' => false, 'container' => false]);
                 $seq_no = \unpack('V', \substr($decrypted_data, 24, 4))[1];
 
                 $message_data_length = \unpack('V', \substr($decrypted_data, 28, 4))[1];

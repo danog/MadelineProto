@@ -52,7 +52,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $this->stream = yield $ctx->getStream($header);
         $this->memory_stream = \fopen('php://memory', 'r+');
@@ -169,7 +169,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             return new Success(\fread($this->memory_stream, $length));
         }
 
-        return $this->call($this->bufferReadAsync($length));
+        return $this->call($this->bufferReadGenerator($length));
     }
 
     /**
@@ -179,7 +179,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @return \Generator
      */
-    public function bufferReadAsync(int $length): \Generator
+    public function bufferReadGenerator(int $length): \Generator
     {
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);

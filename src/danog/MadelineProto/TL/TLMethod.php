@@ -41,10 +41,10 @@ class TLMethod
         if (isset($namespace[1])) {
             $this->method_namespace[] = [$namespace[0] => $namespace[1]];
         }
-        $this->parse_params($json_dict['id']);
+        $this->parseParams($json_dict['id']);
     }
 
-    public function find_by_id($id)
+    public function findById($id)
     {
         if (isset($this->by_id[$id])) {
             $method = $this->by_id[$id];
@@ -56,7 +56,7 @@ class TLMethod
         return false;
     }
 
-    public function find_by_method($method_name)
+    public function findByMethod($method_name)
     {
         if (isset($this->by_method[$method_name])) {
             $method = $this->by_id[$this->by_method[$method_name]];

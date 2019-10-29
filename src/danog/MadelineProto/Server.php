@@ -99,7 +99,7 @@ class Server
         }
     }
 
-    public function sig_handler($sig)
+    public function sigHandler($sig)
     {
         switch ($sig) {
             case SIGTERM:

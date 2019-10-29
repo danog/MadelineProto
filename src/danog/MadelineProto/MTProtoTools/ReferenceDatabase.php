@@ -271,7 +271,7 @@ class ReferenceDatabase implements TLCallback
         switch ($data['_']) {
             case 'message':
             case 'messageService':
-                $origin['peer'] = $this->API->get_id($data);
+                $origin['peer'] = $this->API->getId($data);
                 $origin['msg_id'] = $data['id'];
                 break;
             case 'messages.savedGifs':
@@ -303,7 +303,7 @@ class ReferenceDatabase implements TLCallback
                 break;
             case 'channelFull':
             case 'channel':
-                $origin['peer'] = $this->API->to_supergroup($data['id']);
+                $origin['peer'] = $this->API->toSupergroup($data['id']);
                 break;
             case 'document':
                 foreach ($data['attributes'] as $attribute) {
@@ -483,13 +483,13 @@ class ReferenceDatabase implements TLCallback
                 // Peer + msg ID
                 case self::MESSAGE_ORIGIN:
                     if (\is_array($origin['peer'])) {
-                        $origin['peer'] = $this->API->get_id($origin['peer']);
+                        $origin['peer'] = $this->API->getId($origin['peer']);
                     }
                     if ($origin['peer'] < 0) {
-                        yield $this->API->method_call_async_read('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                        yield $this->API->methodCallAsyncRead('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                         break;
                     }
-                    yield $this->API->method_call_async_read('messages.getMessages', ['id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield $this->API->methodCallAsyncRead('messages.getMessages', ['id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 // Peer + photo ID
                 case self::PEER_PHOTO_ORIGIN:
@@ -500,25 +500,25 @@ class ReferenceDatabase implements TLCallback
                     break;
                 // Peer (default photo ID)
                 case self::USER_PHOTO_ORIGIN:
-                    yield $this->API->method_call_async_read('photos.getUserPhotos', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield $this->API->methodCallAsyncRead('photos.getUserPhotos', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 case self::SAVED_GIFS_ORIGIN:
-                    yield $this->API->method_call_async_read('messages.getSavedGifs', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield $this->API->methodCallAsyncRead('messages.getSavedGifs', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 case self::STICKER_SET_ID_ORIGIN:
-                    yield $this->API->method_call_async_read('messages.getStickerSet', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield $this->API->methodCallAsyncRead('messages.getStickerSet', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 case self::STICKER_SET_RECENT_ORIGIN:
-                    yield $this->API->method_call_async_read('messages.getRecentStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield $this->API->methodCallAsyncRead('messages.getRecentStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 case self::STICKER_SET_FAVED_ORIGIN:
-                    yield $this->API->method_call_async_read('messages.getFavedStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield $this->API->methodCallAsyncRead('messages.getFavedStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 case self::STICKER_SET_EMOTICON_ORIGIN:
-                    yield $this->API->method_call_async_read('messages.getStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield $this->API->methodCallAsyncRead('messages.getStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 case self::WALLPAPER_ORIGIN:
-                    yield $this->API->method_call_async_read('account.getWallPapers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield $this->API->methodCallAsyncRead('account.getWallPapers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 default:
                     throw new \danog\MadelineProto\Exception("Unknown origin type $originType");
@@ -570,11 +570,11 @@ class ReferenceDatabase implements TLCallback
         switch ($locationType) {
             case self::DOCUMENT_LOCATION:
             case self::PHOTO_LOCATION:
-                return $locationType.(\is_int($location['id']) ? $this->pack_signed_long($location['id']) : $location['id']);
+                return $locationType.(\is_int($location['id']) ? $this->packSignedLong($location['id']) : $location['id']);
             case self::PHOTO_LOCATION_LOCATION:
-                $dc_id = $this->pack_signed_int($location['dc_id']);
-                $volume_id = \is_int($location['volume_id']) ? $this->pack_signed_long($location['volume_id']) : $location['volume_id'];
-                $local_id = $this->pack_signed_int($location['local_id']);
+                $dc_id = $this->packSignedInt($location['dc_id']);
+                $volume_id = \is_int($location['volume_id']) ? $this->packSignedLong($location['volume_id']) : $location['volume_id'];
+                $local_id = $this->packSignedInt($location['local_id']);
 
                 return $locationType.$dc_id.$volume_id.$local_id;
         }

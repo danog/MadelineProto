@@ -26,120 +26,120 @@ use danog\MadelineProto\Tools;
  */
 trait Start
 {
-    public function start_async()
+    public function start()
     {
         if ($this->authorized === self::LOGGED_IN) {
-            return yield $this->get_self_async();
+            return yield $this->getSelf();
         }
         if (PHP_SAPI === 'cli') {
             if (\strpos(yield Tools::readLine('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
-                yield $this->bot_login_async(yield Tools::readLine('Enter your bot token: '));
+                yield $this->botLogin(yield Tools::readLine('Enter your bot token: '));
             } else {
-                yield $this->phone_login_async(yield Tools::readLine('Enter your phone number: '));
-                $authorization = yield $this->complete_phone_login_async(yield Tools::readLine('Enter the phone code: '));
+                yield $this->phoneLogin(yield Tools::readLine('Enter your phone number: '));
+                $authorization = yield $this->completePhoneLogin(yield Tools::readLine('Enter the phone code: '));
                 if ($authorization['_'] === 'account.password') {
-                    $authorization = yield $this->complete_2fa_login_async(yield Tools::readLine('Please enter your password (hint '.$authorization['hint'].'): '));
+                    $authorization = yield $this->complete2faLogin(yield Tools::readLine('Please enter your password (hint '.$authorization['hint'].'): '));
                 }
                 if ($authorization['_'] === 'account.needSignup') {
-                    $authorization = yield $this->complete_signup_async(yield Tools::readLine('Please enter your first name: '), yield Tools::readLine('Please enter your last name (can be empty): '));
+                    $authorization = yield $this->completeSignup(yield Tools::readLine('Please enter your first name: '), yield Tools::readLine('Please enter your last name (can be empty): '));
                 }
             }
             $this->serialize();
 
-            return yield $this->get_self_async();
+            return yield $this->getSelf();
         }
         if ($this->authorized === self::NOT_LOGGED_IN) {
             if (isset($_POST['phone_number'])) {
-                yield $this->web_phone_login_async();
+                yield $this->webPhoneLogin();
             } elseif (isset($_POST['token'])) {
-                yield $this->web_bot_login_async();
+                yield $this->webBotLogin();
             } else {
-                yield $this->web_echo_async();
+                yield $this->webEcho();
             }
         } elseif ($this->authorized === self::WAITING_CODE) {
             if (isset($_POST['phone_code'])) {
-                yield $this->web_complete_phone_login_async();
+                yield $this->webCompletePhoneLogin();
             } else {
-                yield $this->web_echo_async("You didn't provide a phone code!");
+                yield $this->webEcho("You didn't provide a phone code!");
             }
         } elseif ($this->authorized === self::WAITING_PASSWORD) {
             if (isset($_POST['password'])) {
-                yield $this->web_complete_2fa_login_async();
+                yield $this->webComplete2faLogin();
             } else {
-                yield $this->web_echo_async("You didn't provide the password!");
+                yield $this->webEcho("You didn't provide the password!");
             }
         } elseif ($this->authorized === self::WAITING_SIGNUP) {
             if (isset($_POST['first_name'])) {
-                yield $this->web_complete_signup_async();
+                yield $this->webCompleteSignup();
             } else {
-                yield $this->web_echo_async("You didn't provide the first name!");
+                yield $this->webEcho("You didn't provide the first name!");
             }
         }
         if ($this->authorized === self::LOGGED_IN) {
             $this->serialize();
 
-            return yield $this->get_self_async();
+            return yield $this->getSelf();
         }
         exit;
     }
 
-    public function web_phone_login_async()
+    public function webPhoneLogin()
     {
         try {
-            yield $this->phone_login_async($_POST['phone_number']);
-            yield $this->web_echo_async();
+            yield $this->phoneLogin($_POST['phone_number']);
+            yield $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->web_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->web_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
 
-    public function web_complete_phone_login_async()
+    public function webCompletePhoneLogin()
     {
         try {
-            yield $this->complete_phone_login_async($_POST['phone_code']);
-            yield $this->web_echo_async();
+            yield $this->completePhoneLogin($_POST['phone_code']);
+            yield $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->web_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->web_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
 
-    public function web_complete_2fa_login_async()
+    public function webComplete2faLogin()
     {
         try {
-            yield $this->complete_2fa_login_async($_POST['password']);
-            yield $this->web_echo_async();
+            yield $this->complete2faLogin($_POST['password']);
+            yield $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->web_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->web_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
 
-    public function web_complete_signup_async()
+    public function webCompleteSignup()
     {
         try {
-            yield $this->complete_signup_async($_POST['first_name'], isset($_POST['last_name']) ? $_POST['last_name'] : '');
-            yield $this->web_echo_async();
+            yield $this->completeSignup($_POST['first_name'], isset($_POST['last_name']) ? $_POST['last_name'] : '');
+            yield $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->web_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->web_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
 
-    public function web_bot_login_async()
+    public function webBotLogin()
     {
         try {
-            yield $this->bot_login_async($_POST['token']);
-            yield $this->web_echo_async();
+            yield $this->botLogin($_POST['token']);
+            yield $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->web_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->web_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
 }

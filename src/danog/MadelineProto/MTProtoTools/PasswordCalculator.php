@@ -111,7 +111,7 @@ class PasswordCalculator
                 case 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow':
                     $object['current_algo']['g'] = new BigInteger($object['current_algo']['g']);
                     $object['current_algo']['p'] = new BigInteger((string) $object['current_algo']['p'], 256);
-                    $this->check_p_g($object['current_algo']['p'], $object['current_algo']['g']);
+                    $this->checkPG($object['current_algo']['p'], $object['current_algo']['g']);
                     $object['current_algo']['gForHash'] = \str_pad($object['current_algo']['g']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
                     $object['current_algo']['pForHash'] = \str_pad($object['current_algo']['p']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
 
@@ -142,7 +142,7 @@ class PasswordCalculator
             case 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow':
                 $object['new_algo']['g'] = new BigInteger($object['new_algo']['g']);
                 $object['new_algo']['p'] = new BigInteger((string) $object['new_algo']['p'], 256);
-                $this->check_p_g($object['new_algo']['p'], $object['new_algo']['g']);
+                $this->checkPG($object['new_algo']['p'], $object['new_algo']['g']);
                 $object['new_algo']['gForHash'] = \str_pad($object['new_algo']['g']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
                 $object['new_algo']['pForHash'] = \str_pad($object['new_algo']['p']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
 
@@ -226,7 +226,7 @@ class PasswordCalculator
 
         $a = new BigInteger($this->random(2048 / 8), 256);
         $A = $g->powMod($a, $p);
-        $this->check_G($A, $p);
+        $this->checkG($A, $p);
         $AForHash = \str_pad($A->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
 
         $b_kg_x = $B->powMod(Magic::$one, $p)->subtract($kg_x);

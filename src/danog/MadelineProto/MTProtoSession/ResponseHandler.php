@@ -27,7 +27,7 @@ use danog\MadelineProto\MTProto;
  */
 trait ResponseHandler
 {
-    public function send_msgs_state_info_async($req_msg_id, $msg_ids)
+    public function sendMsgsStateInfo($req_msg_id, $msg_ids)
     {
         $this->logger->logger('Sending state info for '.\count($msg_ids).' message IDs');
         $info = '';
@@ -51,12 +51,12 @@ trait ResponseHandler
             }
             $info .= \chr($cur_info);
         }
-        $this->outgoing_messages[yield $this->object_call_async('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['postpone' => true])]['response'] = $req_msg_id;
+        $this->outgoing_messages[yield $this->objectCall('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['postpone' => true])]['response'] = $req_msg_id;
     }
 
     public $n = 0;
 
-    public function handle_messages()
+    public function handleMessages()
     {
         $only_updates = true;
         while ($this->new_incoming) {
@@ -71,10 +71,10 @@ trait ResponseHandler
             switch ($this->incoming_messages[$current_msg_id]['content']['_']) {
                 case 'msgs_ack':
                     unset($this->new_incoming[$current_msg_id]);
-                    $this->check_in_seq_no($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
                     $only_updates = false;
                     foreach ($this->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
-                        $this->ack_outgoing_message_id($msg_id);
+                        $this->ackOutgoingMessageId($msg_id);
                         // Acknowledge that the server received my message
                     }
 
@@ -82,14 +82,14 @@ trait ResponseHandler
                     break;
                 case 'rpc_result':
                     unset($this->new_incoming[$current_msg_id]);
-                    $this->ack_incoming_message_id($current_msg_id);
+                    $this->ackIncomingMessageId($current_msg_id);
                     $only_updates = false;
                     // Acknowledge that the server received my request
                     $req_msg_id = $this->incoming_messages[$current_msg_id]['content']['req_msg_id'];
                     $this->incoming_messages[$current_msg_id]['content'] = $this->incoming_messages[$current_msg_id]['content']['result'];
-                    $this->check_in_seq_no($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
 
-                    $this->handle_response($req_msg_id, $current_msg_id);
+                    $this->handleResponse($req_msg_id, $current_msg_id);
                     break;
 
                 case 'future_salts':
@@ -103,20 +103,20 @@ trait ResponseHandler
                 case 'pong':
                     $msg_id_type = isset($msg_id_type) ? $msg_id_type : 'msg_id';
                     unset($this->new_incoming[$current_msg_id]);
-                    $this->check_in_seq_no($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
                     $only_updates = false;
 
-                    $this->handle_response($this->incoming_messages[$current_msg_id]['content'][$msg_id_type], $current_msg_id);
+                    $this->handleResponse($this->incoming_messages[$current_msg_id]['content'][$msg_id_type], $current_msg_id);
                     unset($msg_id_type);
                     break;
 
                 case 'new_session_created':
                     unset($this->new_incoming[$current_msg_id]);
-                    $this->check_in_seq_no($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
                     $only_updates = false;
 
                     $this->shared->getTempAuthKey()->setServerSalt($this->incoming_messages[$current_msg_id]['content']['server_salt']);
-                    $this->ack_incoming_message_id($current_msg_id);
+                    $this->ackIncomingMessageId($current_msg_id);
 
                     // Acknowledge that I received the server's response
                     if ($this->API->authorized === MTProto::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->curdc)->hasTempAuthKey() && isset($this->API->updaters[false])) {
@@ -130,29 +130,29 @@ trait ResponseHandler
                     $only_updates = false;
 
                     foreach ($this->incoming_messages[$current_msg_id]['content']['messages'] as $message) {
-                        $this->check_message_id($message['msg_id'], ['outgoing' => false, 'container' => true]);
+                        $this->checkMessageId($message['msg_id'], ['outgoing' => false, 'container' => true]);
                         $this->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body'], 'from_container' => true];
                         $this->new_incoming[$message['msg_id']] = $message['msg_id'];
                     }
                     \ksort($this->new_incoming);
-                    //$this->handle_messages();
-                    //$this->check_in_seq_no($current_msg_id);
+                    //$this->handleMessages();
+                    //$this->checkInSeqNo($current_msg_id);
 
                     unset($this->incoming_messages[$current_msg_id]['content']);
                     break;
                 case 'msg_copy':
                     unset($this->new_incoming[$current_msg_id]);
-                    $this->check_in_seq_no($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
                     $only_updates = false;
 
-                    $this->ack_incoming_message_id($current_msg_id);
+                    $this->ackIncomingMessageId($current_msg_id);
                     // Acknowledge that I received the server's response
                     if (isset($this->incoming_messages[$this->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id']])) {
-                        $this->ack_incoming_message_id($this->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id']);
+                        $this->ackIncomingMessageId($this->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id']);
                     // Acknowledge that I received the server's response
                     } else {
                         $message = $this->incoming_messages[$current_msg_id]['content'];
-                        $this->check_message_id($message['orig_message']['msg_id'], ['outgoing' => false, 'container' => true]);
+                        $this->checkMessageId($message['orig_message']['msg_id'], ['outgoing' => false, 'container' => true]);
                         $this->incoming_messages[$message['orig_message']['msg_id']] = ['content' => $this->incoming_messages[$current_msg_id]['content']['orig_message']];
                         $this->new_incoming[$message['orig_message']['msg_id']] = $message['orig_message']['msg_id'];
                     }
@@ -162,7 +162,7 @@ trait ResponseHandler
 
                 case 'http_wait':
                     unset($this->new_incoming[$current_msg_id]);
-                    $this->check_in_seq_no($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
                     $only_updates = false;
 
                     $this->logger->logger($this->incoming_messages[$current_msg_id]['content'], \danog\MadelineProto\Logger::NOTICE);
@@ -171,15 +171,15 @@ trait ResponseHandler
                     break;
 
                 case 'msgs_state_req':
-                    $this->check_in_seq_no($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
                     $only_updates = false;
                     unset($this->new_incoming[$current_msg_id]);
 
-                    $this->callFork($this->send_msgs_state_info_async($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
+                    $this->callFork($this->sendMsgsStateInfo($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
                     unset($this->incoming_messages[$current_msg_id]['content']);
                     break;
                 case 'msgs_all_info':
-                    $this->check_in_seq_no($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
                     $only_updates = false;
                     unset($this->new_incoming[$current_msg_id]);
 
@@ -188,7 +188,7 @@ trait ResponseHandler
                         $msg_id = new \phpseclib\Math\BigInteger(\strrev($msg_id), 256);
                         $status = 'Status for message id '.$msg_id.': ';
                         /*if ($info & 4) {
-                         *$this->got_response_for_outgoing_message_id($msg_id);
+                         *$this->gotResponseForOutgoingMessageId($msg_id);
                          *}
                          */
                         foreach (MTProto::MSGS_INFO_FLAGS as $flag => $description) {
@@ -200,31 +200,31 @@ trait ResponseHandler
                     }
                     break;
                 case 'msg_detailed_info':
-                    $this->check_in_seq_no($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
                     unset($this->new_incoming[$current_msg_id]);
 
                     $only_updates = false;
                     if (isset($this->outgoing_messages[$this->incoming_messages[$current_msg_id]['content']['msg_id']])) {
                         if (isset($this->incoming_messages[$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {
-                            $this->handle_response($this->incoming_messages[$current_msg_id]['content']['msg_id'], $this->incoming_messages[$current_msg_id]['content']['answer_msg_id']);
+                            $this->handleResponse($this->incoming_messages[$current_msg_id]['content']['msg_id'], $this->incoming_messages[$current_msg_id]['content']['answer_msg_id']);
                         } else {
-                            $this->callFork($this->object_call_async('msg_resend_req', ['msg_ids' => [$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['postpone' => true]));
+                            $this->callFork($this->objectCall('msg_resend_req', ['msg_ids' => [$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['postpone' => true]));
                         }
                     }
                     break;
                 case 'msg_new_detailed_info':
-                    $this->check_in_seq_no($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
                     $only_updates = false;
                     unset($this->new_incoming[$current_msg_id]);
 
                     if (isset($this->incoming_messages[$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {
-                        $this->ack_incoming_message_id($this->incoming_messages[$current_msg_id]['content']['answer_msg_id']);
+                        $this->ackIncomingMessageId($this->incoming_messages[$current_msg_id]['content']['answer_msg_id']);
                     } else {
-                        $this->callFork($this->object_call_async('msg_resend_req', ['msg_ids' => [$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['postpone' => true]));
+                        $this->callFork($this->objectCall('msg_resend_req', ['msg_ids' => [$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['postpone' => true]));
                     }
                     break;
                 case 'msg_resend_req':
-                    $this->check_in_seq_no($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
                     $only_updates = false;
                     unset($this->new_incoming[$current_msg_id]);
 
@@ -236,36 +236,36 @@ trait ResponseHandler
                     }
                     if ($ok) {
                         foreach ($this->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
-                            $this->method_recall('', ['message_id' => $msg_id, 'postpone' => true]);
+                            $this->methodRecall('', ['message_id' => $msg_id, 'postpone' => true]);
                         }
                     } else {
-                        $this->callFork($this->send_msgs_state_info_async($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
+                        $this->callFork($this->sendMsgsStateInfo($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
                     }
                     break;
                 case 'msg_resend_ans_req':
-                    $this->check_in_seq_no($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
                     $only_updates = false;
                     unset($this->new_incoming[$current_msg_id]);
 
-                    $this->callFork($this->send_msgs_state_info_async($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
+                    $this->callFork($this->sendMsgsStateInfo($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
                     foreach ($this->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
                         if (isset($this->incoming_messages[$msg_id]['response']) && isset($this->outgoing_messages[$this->incoming_messages[$msg_id]['response']])) {
-                            $this->callFork($this->object_call_async($this->outgoing_messages[$this->incoming_messages[$msg_id]['response']]['_'], $this->outgoing_messages[$this->incoming_messages[$msg_id]['response']]['body'], ['postpone' => true]));
+                            $this->callFork($this->objectCall($this->outgoing_messages[$this->incoming_messages[$msg_id]['response']]['_'], $this->outgoing_messages[$this->incoming_messages[$msg_id]['response']]['body'], ['postpone' => true]));
                         }
                     }
                     break;
                 default:
-                    $this->check_in_seq_no($current_msg_id);
-                    $this->ack_incoming_message_id($current_msg_id);
+                    $this->checkInSeqNo($current_msg_id);
+                    $this->ackIncomingMessageId($current_msg_id);
                     // Acknowledge that I received the server's response
-                    $response_type = $this->API->constructors->find_by_predicate($this->incoming_messages[$current_msg_id]['content']['_'])['type'];
+                    $response_type = $this->API->constructors->findByPredicate($this->incoming_messages[$current_msg_id]['content']['_'])['type'];
 
                     switch ($response_type) {
                         case 'Updates':
                             unset($this->new_incoming[$current_msg_id]);
 
                             if (!$this->isCdn()) {
-                                $this->callForkDefer($this->API->handle_updates_async($this->incoming_messages[$current_msg_id]['content']));
+                                $this->callForkDefer($this->API->handleUpdates($this->incoming_messages[$current_msg_id]['content']));
                             }
 
                             unset($this->incoming_messages[$current_msg_id]['content']);
@@ -285,7 +285,7 @@ trait ResponseHandler
                                 if ($response_type === $expecting['type']) {
                                     $this->logger->logger('Yes', \danog\MadelineProto\Logger::VERBOSE);
                                     unset($this->new_incoming[$current_msg_id]);
-                                    $this->handle_response($expecting_msg_id, $current_msg_id);
+                                    $this->handleResponse($expecting_msg_id, $current_msg_id);
                                     break 2;
                                 }
                                 $this->logger->logger('No', \danog\MadelineProto\Logger::VERBOSE);
@@ -315,7 +315,7 @@ trait ResponseHandler
      *
      * @return void
      */
-    public function handle_reject(array &$request, \Throwable $data)
+    public function handleReject(array &$request, \Throwable $data)
     {
         if (isset($request['promise']) && \is_object($request['promise'])) {
             Loop::defer(function () use (&$request, $data) {
@@ -337,7 +337,7 @@ trait ResponseHandler
             });
         } elseif (isset($request['container'])) {
             foreach ($request['container'] as $message_id) {
-                $this->handle_reject($this->outgoing_messages[$message_id], $data);
+                $this->handleReject($this->outgoing_messages[$message_id], $data);
             }
         } else {
             $this->logger->logger('Rejecting: already got response for '.(isset($request['_']) ? $request['_'] : '-'));
@@ -345,7 +345,7 @@ trait ResponseHandler
         }
     }
 
-    public function handle_response($request_id, $response_id)
+    public function handleResponse($request_id, $response_id)
     {
         $response = &$this->incoming_messages[$response_id]['content'];
         unset($this->incoming_messages[$response_id]['content']);
@@ -359,8 +359,8 @@ trait ResponseHandler
                     }
 
                     if (\in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_INVALID'])) {
-                        $this->got_response_for_outgoing_message_id($request_id);
-                        $this->handle_reject($request, new \danog\MadelineProto\PTSException($response['error_message']));
+                        $this->gotResponseForOutgoingMessageId($request_id);
+                        $this->handleReject($request, new \danog\MadelineProto\PTSException($response['error_message']));
 
                         return;
                     }
@@ -375,7 +375,7 @@ trait ResponseHandler
                             unset($request['serialized_body']);
                         }
 
-                        $this->method_recall('', ['message_id' => $request_id, 'postpone' => true]);
+                        $this->methodRecall('', ['message_id' => $request_id, 'postpone' => true]);
 
                         return;
                     }
@@ -384,7 +384,7 @@ trait ResponseHandler
                         case -500:
                             if ($response['error_message'] === 'MSG_WAIT_FAILED') {
                                 $this->call_queue[$request['queue']] = [];
-                                $this->method_recall('', ['message_id' => $request_id, 'postpone' => true]);
+                                $this->methodRecall('', ['message_id' => $request_id, 'postpone' => true]);
 
                                 return;
                             }
@@ -392,9 +392,9 @@ trait ResponseHandler
                                 Loop::delay(1 * 1000, [$this, 'method_recall'], ['message_id' => $request_id, ]);
                                 return;
                             }
-                            $this->got_response_for_outgoing_message_id($request_id);
+                            $this->gotResponseForOutgoingMessageId($request_id);
 
-                            $this->handle_reject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
+                            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
 
                             return;
                         case 303:
@@ -409,7 +409,7 @@ trait ResponseHandler
                                 $this->API->settings['connection_settings']['default_dc'] = $this->API->authorized_dc = $this->API->datacenter->curdc;
                             }
                             Loop::defer([$this, 'method_recall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
-                            //$this->API->method_recall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
+                            //$this->API->methodRecall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
 
                             return;
                         case 401:
@@ -417,7 +417,7 @@ trait ResponseHandler
                                 case 'USER_DEACTIVATED':
                                 case 'SESSION_REVOKED':
                                 case 'SESSION_EXPIRED':
-                                    $this->got_response_for_outgoing_message_id($request_id);
+                                    $this->gotResponseForOutgoingMessageId($request_id);
 
                                     $this->logger->logger($response['error_message'], \danog\MadelineProto\Logger::FATAL_ERROR);
                                     foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
@@ -439,21 +439,21 @@ trait ResponseHandler
                                     $this->API->resetSession();
 
                                     $this->callFork((function () use (&$request, &$response) {
-                                        yield $this->API->init_authorization_async();
+                                        yield $this->API->initAuthorization();
 
-                                        $this->handle_reject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
+                                        $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
                                     })());
 
                                     return;
                                 case 'AUTH_KEY_UNREGISTERED':
                                 case 'AUTH_KEY_INVALID':
                                     if ($this->API->authorized !== MTProto::LOGGED_IN) {
-                                        $this->got_response_for_outgoing_message_id($request_id);
+                                        $this->gotResponseForOutgoingMessageId($request_id);
 
                                         $this->callFork((function () use (&$request, &$response) {
-                                            yield $this->API->init_authorization_async();
+                                            yield $this->API->initAuthorization();
 
-                                            $this->handle_reject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
+                                            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
                                         })());
 
                                         return;
@@ -465,7 +465,7 @@ trait ResponseHandler
                                     $this->logger->logger('Auth key not registered, resetting temporary and permanent auth keys...', \danog\MadelineProto\Logger::ERROR);
 
                                     if ($this->API->authorized_dc === $this->datacenter && $this->API->authorized === MTProto::LOGGED_IN) {
-                                        $this->got_response_for_outgoing_message_id($request_id);
+                                        $this->gotResponseForOutgoingMessageId($request_id);
 
                                         $this->logger->logger('Permanent auth key was main authorized key, logging out...', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
@@ -484,17 +484,17 @@ trait ResponseHandler
                                         $this->API->resetSession();
 
                                         $this->callFork((function () use (&$request, &$response) {
-                                            yield $this->API->init_authorization_async();
+                                            yield $this->API->initAuthorization();
 
-                                            $this->handle_reject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
+                                            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
                                         })());
 
                                         return;
                                     }
                                     $this->callFork((function () use ($request_id) {
-                                        yield $this->API->init_authorization_async();
+                                        yield $this->API->initAuthorization();
 
-                                        $this->method_recall('', ['message_id' => $request_id, ]);
+                                        $this->methodRecall('', ['message_id' => $request_id, ]);
                                     })());
 
                                     return;
@@ -503,22 +503,22 @@ trait ResponseHandler
 
                                     $this->shared->setTempAuthKey(null);
                                     $this->callFork((function () use ($request_id) {
-                                        yield $this->API->init_authorization_async();
-                                        $this->method_recall('', ['message_id' => $request_id, ]);
+                                        yield $this->API->initAuthorization();
+                                        $this->methodRecall('', ['message_id' => $request_id, ]);
                                     })());
 
                                     return;
                             }
-                            $this->got_response_for_outgoing_message_id($request_id);
+                            $this->gotResponseForOutgoingMessageId($request_id);
 
-                            $this->handle_reject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
+                            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
 
                             return;
                         case 420:
                             $seconds = \preg_replace('/[^0-9]+/', '', $response['error_message']);
                             $limit = isset($request['FloodWaitLimit']) ? $request['FloodWaitLimit'] : $this->API->settings['flood_timeout']['wait_if_lt'];
                             if (\is_numeric($seconds) && $seconds < $limit) {
-                                //$this->got_response_for_outgoing_message_id($request_id);
+                                //$this->gotResponseForOutgoingMessageId($request_id);
 
                                 $this->logger->logger('Flood, waiting '.$seconds.' seconds before repeating async call...', \danog\MadelineProto\Logger::NOTICE);
                                 $request['sent'] += $seconds;
@@ -528,9 +528,9 @@ trait ResponseHandler
                             }
                         // no break
                         default:
-                            $this->got_response_for_outgoing_message_id($request_id);
+                            $this->gotResponseForOutgoingMessageId($request_id);
 
-                            $this->handle_reject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
+                            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
 
                             return;
                     }
@@ -546,7 +546,7 @@ trait ResponseHandler
                     switch ($response['error_code']) {
                         case 48:
                             $this->shared->getTempAuthKey()->setServerSalt($response['new_server_salt']);
-                            $this->method_recall('', ['message_id' => $request_id, 'postpone' => true]);
+                            $this->methodRecall('', ['message_id' => $request_id, 'postpone' => true]);
 
                             return;
                         case 16:
@@ -556,14 +556,14 @@ trait ResponseHandler
                             $this->API->resetMTProtoSession();
                             $this->shared->setTempAuthKey(null);
                             $this->callFork((function () use ($request_id) {
-                                yield $this->API->init_authorization_async();
-                                $this->method_recall('', ['message_id' => $request_id, ]);
+                                yield $this->API->initAuthorization();
+                                $this->methodRecall('', ['message_id' => $request_id, ]);
                             })());
 
                             return;
                     }
-                    $this->got_response_for_outgoing_message_id($request_id);
-                    $this->handle_reject($request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
+                    $this->gotResponseForOutgoingMessageId($request_id);
+                    $this->handleReject($request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], isset($request['_']) ? $request['_'] : ''));
 
                     return;
             }
@@ -579,12 +579,12 @@ trait ResponseHandler
             return;
         }
         $botAPI = isset($request['botAPI']) && $request['botAPI'];
-        if (isset($response['_']) && !$this->isCdn() && $this->API->constructors->find_by_predicate($response['_'])['type'] === 'Updates') {
+        if (isset($response['_']) && !$this->isCdn() && $this->API->constructors->findByPredicate($response['_'])['type'] === 'Updates') {
             $response['request'] = $request;
-            $this->callForkDefer($this->API->handle_updates_async($response));
+            $this->callForkDefer($this->API->handleUpdates($response));
         }
         unset($request);
-        $this->got_response_for_outgoing_message_id($request_id);
+        $this->gotResponseForOutgoingMessageId($request_id);
         $r = isset($response['_']) ? $response['_'] : \json_encode($response);
         $this->logger->logger("Defer sending $r to deferred");
         $this->callFork((
@@ -592,7 +592,7 @@ trait ResponseHandler
                 $r = isset($response['_']) ? $response['_'] : \json_encode($response);
                 $this->logger->logger("Deferred: sent $r to deferred");
                 if ($botAPI) {
-                    $response = yield $this->MTProto_to_botAPI_async($response);
+                    $response = yield $this->MTProtoToBotAPI($response);
                 }
                 if (isset($this->outgoing_messages[$request_id]['promise'])) { // This should not happen but happens, should debug
                     $promise = $this->outgoing_messages[$request_id]['promise'];

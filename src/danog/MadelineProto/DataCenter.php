@@ -200,7 +200,7 @@ class DataCenter
         $changedSettings = $this->settings !== $settings;
         if (!$reconnectAll) {
             $changed = [];
-            $test = ($API->get_cached_config()['test_mode'] ?? false) ? 'test' : 'main';
+            $test = ($API->getCachedConfig()['test_mode'] ?? false) ? 'test' : 'main';
             foreach ($dclist[$test] as $ipv6 => $dcs) {
                 foreach ($dcs as $id => $dc) {
                     if ($dc !== ($this->dclist[$test][$ipv6][$id] ?? [])) {
@@ -234,7 +234,7 @@ class DataCenter
                 new HttpSocketPool(
                     new ProxySocketPool(
                         function (string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null) {
-                            return $this->rawConnectAsync($uri, $token, $ctx, true);
+                            return $this->rawConnect($uri, $token, $ctx, true);
                         }
                     )
                 )
@@ -493,7 +493,7 @@ class DataCenter
         });
     }
 
-    public function rawConnectAsync(string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null, $fromDns = false): \Generator
+    public function rawConnect(string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null, $fromDns = false): \Generator
     {
         $ctxs = $this->generateContexts(0, $uri, $ctx);
         if (empty($ctxs)) {
@@ -524,7 +524,7 @@ class DataCenter
         throw new \danog\MadelineProto\Exception("Could not connect to URI $uri");
     }
 
-    public function dcConnectAsync(string $dc_number, int $id = -1): \Generator
+    public function dcConnect(string $dc_number, int $id = -1): \Generator
     {
         $old = isset($this->sockets[$dc_number]) && (
             $this->sockets[$dc_number]->shouldReconnect() ||
@@ -958,7 +958,7 @@ class DataCenter
      *
      * @return array
      */
-    public function get_dcs($all = true): array
+    public function getDcs($all = true): array
     {
         $test = $this->settings['all']['test_mode'] ? 'test' : 'main';
         $ipv6 = $this->settings['all']['ipv6'] ? 'ipv6' : 'ipv4';

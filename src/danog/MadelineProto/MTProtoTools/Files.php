@@ -47,7 +47,7 @@ use function Amp\Promise\all;
  */
 trait Files
 {
-    public function upload_async($file, $file_name = '', $cb = null, $encrypted = false)
+    public function upload($file, $file_name = '', $cb = null, $encrypted = false)
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -55,10 +55,10 @@ trait Files
         }
         if (\is_string($file) || (\is_object($file) && \method_exists($file, '__toString'))) {
             if (\filter_var($file, FILTER_VALIDATE_URL)) {
-                return yield $this->upload_from_url_async($file);
+                return yield $this->uploadFromUrl($file);
             }
         } elseif (\is_array($file)) {
-            return yield $this->upload_from_tgfile_async($file, $cb, $encrypted);
+            return yield $this->uploadFromTgfile($file, $cb, $encrypted);
         }
 
         $file = \danog\MadelineProto\Absolute::absolute($file);
@@ -77,15 +77,15 @@ trait Files
         }
 
         $stream = yield open($file, 'rb');
-        $mime = $this->get_mime_from_file($file);
+        $mime = $this->getMimeFromFile($file);
 
         try {
-            return yield $this->upload_from_stream_async($stream, $size, $mime, $file_name, $cb, $encrypted);
+            return yield $this->uploadFromStream($stream, $size, $mime, $file_name, $cb, $encrypted);
         } finally {
             yield $stream->close();
         }
     }
-    public function upload_from_url_async($url, int $size = 0, string $file_name = '', $cb = null, bool $encrypted = false)
+    public function uploadFromUrl($url, int $size = 0, string $file_name = '', $cb = null, bool $encrypted = false)
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
@@ -116,9 +116,9 @@ trait Files
             yield $stream->seek(0);
         }
 
-        return yield $this->upload_from_stream_async($stream, $size, $mime, $file_name, $cb, $encrypted);
+        return yield $this->uploadFromStream($stream, $size, $mime, $file_name, $cb, $encrypted);
     }
-    public function upload_from_stream_async($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false)
+    public function uploadFromStream($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false)
     {
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
@@ -172,13 +172,13 @@ trait Files
             $seekable = false;
         }
 
-        $res = yield $this->upload_from_callable_async($callable, $size, $mime, $file_name, $cb, $seekable, $encrypted);
+        $res = yield $this->uploadFromCallable($callable, $size, $mime, $file_name, $cb, $seekable, $encrypted);
         if ($created) {
             $stream->disconnect();
         }
         return $res;
     }
-    public function upload_from_callable_async($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $refetchable = true, bool $encrypted = false)
+    public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $refetchable = true, bool $encrypted = false)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
@@ -212,7 +212,7 @@ trait Files
             $key = $this->random(32);
             $iv = $this->random(32);
             $digest = \hash('md5', $key.$iv, true);
-            $fingerprint = $this->unpack_signed_int(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
+            $fingerprint = $this->unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
             $ige = new \phpseclib\Crypt\AES('ige');
             $ige->setIV($iv);
             $ige->setKey($key);
@@ -230,7 +230,7 @@ trait Files
 
         $start = \microtime(true);
         while ($part_num < $part_total_num) {
-            $read_deferred = yield $this->method_call_async_write(
+            $read_deferred = yield $this->methodCallAsyncWrite(
                 $method,
                 new AsyncParameters(
                     static function () use ($file_id, $part_num, $part_total_num, $part_size, $callable, $ctx, $ige) {
@@ -300,18 +300,18 @@ trait Files
         return $constructor;
     }
 
-    public function upload_encrypted_async($file, $file_name = '', $cb = null)
+    public function uploadEncrypted($file, $file_name = '', $cb = null)
     {
-        return $this->upload_async($file, $file_name, $cb, true);
+        return $this->upload($file, $file_name, $cb, true);
     }
 
-    public function upload_from_tgfile_async($media, $cb = null, $encrypted = false)
+    public function uploadFromTgfile($media, $cb = null, $encrypted = false)
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
             $media = $media->getFile();
         }
-        $media = yield $this->get_download_info_async($media);
+        $media = yield $this->getDownloadInfo($media);
         if (!isset($media['size'], $media['mime'])) {
             throw new Exception('Wrong file provided!');
         }
@@ -368,17 +368,17 @@ trait Files
         $reader = [$bridge, 'read'];
         $writer = [$bridge, 'write'];
 
-        $read = $this->upload_from_callable_async($reader, $size, $mime, '', $cb, false, $encrypted);
-        $write = $this->download_to_callable_async($media, $writer, null, true, 0, -1, $chunk_size);
+        $read = $this->uploadFromCallable($reader, $size, $mime, '', $cb, false, $encrypted);
+        $write = $this->downloadToCallable($media, $writer, null, true, 0, -1, $chunk_size);
 
         list($res) = yield $this->all([$read, $write]);
 
         return $res;
     }
 
-    public function gen_all_file_async($media)
+    public function genAllFile($media)
     {
-        $res = [$this->constructors->find_by_predicate($media['_'])['type'] => $media];
+        $res = [$this->constructors->findByPredicate($media['_'])['type'] => $media];
         switch ($media['_']) {
             case 'messageMediaPoll':
                 $res['Poll'] = $media['poll'];
@@ -469,10 +469,10 @@ trait Files
         return $res;
     }
 
-    public function get_file_info_async($constructor)
+    public function getFileInfo($constructor)
     {
         if (\is_string($constructor)) {
-            $constructor = $this->unpack_file_id($constructor)['MessageMedia'];
+            $constructor = $this->unpackFileId($constructor)['MessageMedia'];
         }
         switch ($constructor['_']) {
             case 'updateNewMessage':
@@ -486,16 +486,16 @@ trait Files
                 $constructor = $constructor['media'];
         }
 
-        return yield $this->gen_all_file_async($constructor);
+        return yield $this->genAllFile($constructor);
     }
-    public function get_propic_info_async($data)
+    public function getPropicInfo($data)
     {
-        return yield $this->get_download_info_async($this->chats[(yield $this->get_info_async($data))['bot_api_id']]);
+        return yield $this->getDownloadInfo($this->chats[(yield $this->getInfo($data))['bot_api_id']]);
     }
-    public function get_download_info_async($message_media)
+    public function getDownloadInfo($message_media)
     {
         if (\is_string($message_media)) {
-            $message_media = $this->unpack_file_id($message_media)['MessageMedia'];
+            $message_media = $this->unpackFileId($message_media)['MessageMedia'];
         }
         if (!isset($message_media['_'])) {
             return $message_media;
@@ -508,7 +508,7 @@ trait Files
                 $message_media = $message_media['message'];
                 // no break
             case 'message':
-                return yield $this->get_download_info_async($message_media['media']);
+                return yield $this->getDownloadInfo($message_media['media']);
             case 'updateNewEncryptedMessage':
                 $message_media = $message_media['message'];
 
@@ -516,7 +516,7 @@ trait Files
             // no break
             case 'encryptedMessage':
                 if ($message_media['decrypted_message']['media']['_'] === 'decryptedMessageMediaExternalDocument') {
-                    return yield $this->get_download_info_async($message_media['decrypted_message']['media']);
+                    return yield $this->getDownloadInfo($message_media['decrypted_message']['media']);
                 }
                 $res['InputFileLocation'] = ['_' => 'inputEncryptedFileLocation', 'id' => $message_media['file']['id'], 'access_hash' => $message_media['file']['access_hash'], 'dc_id' => $message_media['file']['dc_id']];
                 $res['size'] = $message_media['decrypted_message']['media']['size'];
@@ -558,19 +558,19 @@ trait Files
                     }
                 }
                 if (!isset($res['ext']) || $res['ext'] === '') {
-                    $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime($res['mime'] ?? 'image/jpeg'));
+                    $res['ext'] = $this->getExtensionFromLocation($res['InputFileLocation'], $this->getExtensionFromMime($res['mime'] ?? 'image/jpeg'));
                 }
                 if (!isset($res['mime']) || $res['mime'] === '') {
-                    $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
+                    $res['mime'] = $this->getMimeFromExtension($res['ext'], 'image/jpeg');
                 }
                 if (!isset($res['name']) || $res['name'] === '') {
-                    $res['name'] = Tools::unpack_signed_long_string($message_media['file']['access_hash']);
+                    $res['name'] = Tools::unpackSignedLongString($message_media['file']['access_hash']);
                 }
 
                 return $res;
             // Wallpapers
             case 'wallPaper':
-                return $this->get_download_info_async($res['document']);
+                return $this->getDownloadInfo($res['document']);
             // Photos
             case 'photo':
             case 'messageMediaPhoto':
@@ -581,7 +581,7 @@ trait Files
                 $message_media = $message_media['photo'];
                 $size = \end($message_media['sizes']);
 
-                $res = \array_merge($res, yield $this->get_download_info_async($size));
+                $res = \array_merge($res, yield $this->getDownloadInfo($size));
 
                 $res['InputFileLocation'] = [
                     '_' => 'inputPhotoFileLocation',
@@ -601,13 +601,13 @@ trait Files
             case 'channel':
             case 'chat':
             case 'updateUserPhoto':
-                $res = yield $this->get_download_info_async($message_media['photo']);
+                $res = yield $this->getDownloadInfo($message_media['photo']);
 
                 $res['InputFileLocation'] = [
                     '_' => 'inputPeerPhotoFileLocation',
                     'big' => true,
                     'dc_id' => $res['InputFileLocation']['dc_id'],
-                    'peer' => (yield $this->get_info_async($message_media))['InputPeer'],
+                    'peer' => (yield $this->getInfo($message_media))['InputPeer'],
                     'volume_id' => $res['InputFileLocation']['volume_id'],
                     'local_id' => $res['InputFileLocation']['local_id'],
                     // The peer field will be added later
@@ -618,7 +618,7 @@ trait Files
             case 'chatPhoto':
                 $size = $message_media['photo_big'];
 
-                $res = yield $this->get_download_info_async($size);
+                $res = yield $this->getDownloadInfo($size);
                 $res['InputFileLocation']['dc_id'] = $message_media['dc_id'];
                 return $res;
             case 'photoStrippedSize':
@@ -634,16 +634,16 @@ trait Files
                 $res['thumb_size'] = $message_media['type'];
 
                 if ($message_media['location']['_'] === 'fileLocationUnavailable') {
-                    $res['name'] = Tools::unpack_signed_long_string($message_media['volume_id']).'_'.$message_media['local_id'];
-                    $res['mime'] = $this->get_mime_from_buffer($res['data']);
-                    $res['ext'] = $this->get_extension_from_mime($res['mime']);
+                    $res['name'] = Tools::unpackSignedLongString($message_media['volume_id']).'_'.$message_media['local_id'];
+                    $res['mime'] = $this->getMimeFromBuffer($res['data']);
+                    $res['ext'] = $this->getExtensionFromMime($res['mime']);
                 } else {
-                    $res = \array_merge($res, yield $this->get_download_info_async($message_media['location']));
+                    $res = \array_merge($res, yield $this->getDownloadInfo($message_media['location']));
                 }
 
                 return $res;
             case 'photoSize':
-                $res = yield $this->get_download_info_async($message_media['location']);
+                $res = yield $this->getDownloadInfo($message_media['location']);
 
                 $res['thumb_size'] = $message_media['type'];
                 //$res['thumb_size'] = $size;
@@ -656,7 +656,7 @@ trait Files
             case 'fileLocationUnavailable':
                 throw new \danog\MadelineProto\Exception('File location unavailable');
             case 'fileLocation':
-                $res['name'] = Tools::unpack_signed_long_string($message_media['volume_id']).'_'.$message_media['local_id'];
+                $res['name'] = Tools::unpackSignedLongString($message_media['volume_id']).'_'.$message_media['local_id'];
                 $res['InputFileLocation'] = [
                     '_' => 'inputFileLocation',
                     'volume_id' => $message_media['volume_id'],
@@ -668,14 +668,14 @@ trait Files
                         $message_media
                     ),
                 ];
-                $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], '.jpg');
-                $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
+                $res['ext'] = $this->getExtensionFromLocation($res['InputFileLocation'], '.jpg');
+                $res['mime'] = $this->getMimeFromExtension($res['ext'], 'image/jpeg');
 
                 return $res;
             case 'fileLocationToBeDeprecated':
-                $res['name'] = Tools::unpack_signed_long_string($message_media['volume_id']).'_'.$message_media['local_id'];
+                $res['name'] = Tools::unpackSignedLongString($message_media['volume_id']).'_'.$message_media['local_id'];
                 $res['ext'] = '.jpg';
-                $res['mime'] = $this->get_mime_from_extension($res['ext'], 'image/jpeg');
+                $res['mime'] = $this->getMimeFromExtension($res['ext'], 'image/jpeg');
                 $res['InputFileLocation'] = [
                     '_' => 'inputFileLocationTemp', // Will be overwritten
                     'volume_id' => $message_media['volume_id'],
@@ -726,10 +726,10 @@ trait Files
                 ];
 
                 if (!isset($res['ext']) || $res['ext'] === '') {
-                    $res['ext'] = $this->get_extension_from_location($res['InputFileLocation'], $this->get_extension_from_mime($message_media['document']['mime_type']));
+                    $res['ext'] = $this->getExtensionFromLocation($res['InputFileLocation'], $this->getExtensionFromMime($message_media['document']['mime_type']));
                 }
                 if (!isset($res['name']) || $res['name'] === '') {
-                    $res['name'] = Tools::unpack_signed_long_string($message_media['document']['access_hash']);
+                    $res['name'] = Tools::unpackSignedLongString($message_media['document']['access_hash']);
                 }
                 if (isset($message_media['document']['size'])) {
                     $res['size'] = $message_media['document']['size'];
@@ -757,7 +757,7 @@ trait Files
     $message_media = $message_media->getFile();
     }
 
-    $message_media = yield $this->get_download_info_async($message_media);
+    $message_media = yield $this->getDownloadInfo($message_media);
 
     $servefile = $_SERVER['REQUEST_METHOD'] !== 'HEAD';
 
@@ -814,7 +814,7 @@ trait Files
     }, $seek_start, $seek_end + 1);
     //analytics(true, $file_path, $MadelineProto->get_self()['id'], $dbuser, $dbpassword);
     $MadelineProto->API->getting_state = false;
-    $MadelineProto->API->store_db([], true);
+    $MadelineProto->API->storeDb([], true);
     $MadelineProto->API->reset_session();
     } else {
     if ($seek_start > 0 || $seek_end < $select['file_size'] - 1) {
@@ -835,22 +835,22 @@ trait Files
     header('Content-Length: '.$info['size']);
     header('Content-Type: '.$info['mime']);
     }*/
-    public function extract_photosize($photo)
+    public function extractPhotosize($photo)
     {
     }
-    public function download_to_dir_async($message_media, $dir, $cb = null)
+    public function downloadToDir($message_media, $dir, $cb = null)
     {
         if (\is_object($dir) && $dir instanceof FileCallbackInterface) {
             $cb = $dir;
             $dir = $dir->getFile();
         }
 
-        $message_media = yield $this->get_download_info_async($message_media);
+        $message_media = yield $this->getDownloadInfo($message_media);
 
-        return yield $this->download_to_file_async($message_media, $dir.'/'.$message_media['name'].$message_media['ext'], $cb);
+        return yield $this->downloadToFile($message_media, $dir.'/'.$message_media['name'].$message_media['ext'], $cb);
     }
 
-    public function download_to_file_async($message_media, $file, $cb = null)
+    public function downloadToFile($message_media, $file, $cb = null)
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -861,7 +861,7 @@ trait Files
             yield \touch($file);
         }
         $file = \realpath($file);
-        $message_media = yield $this->get_download_info_async($message_media);
+        $message_media = yield $this->getDownloadInfo($message_media);
 
         StatCache::clear($file);
 
@@ -872,7 +872,7 @@ trait Files
         $unlock = yield $this->flock($file, LOCK_EX);
 
         try {
-            yield $this->download_to_stream_async($message_media, $stream, $cb, $size, -1);
+            yield $this->downloadToStream($message_media, $stream, $cb, $size, -1);
         } finally {
             $unlock();
             yield $stream->close();
@@ -881,9 +881,9 @@ trait Files
 
         return $file;
     }
-    public function download_to_stream_async($message_media, $stream, $cb = null, $offset = 0, $end = -1)
+    public function downloadToStream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
     {
-        $message_media = yield $this->get_download_info_async($message_media);
+        $message_media = yield $this->getDownloadInfo($message_media);
 
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
@@ -914,11 +914,11 @@ trait Files
             return yield $stream->write($payload);
         };
 
-        return yield $this->download_to_callable_async($message_media, $callable, $cb, $seekable, $offset, $end);
+        return yield $this->downloadToCallable($message_media, $callable, $cb, $seekable, $offset, $end);
     }
-    public function download_to_callable_async($message_media, $callable, $cb = null, $parallelize = true, $offset = 0, $end = -1, int $part_size = null)
+    public function downloadToCallable($message_media, $callable, $cb = null, $parallelize = true, $offset = 0, $end = -1, int $part_size = null)
     {
-        $message_media = yield $this->get_download_info_async($message_media);
+        $message_media = yield $this->getDownloadInfo($message_media);
 
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
@@ -948,7 +948,7 @@ trait Files
 
         if (isset($message_media['key'])) {
             $digest = \hash('md5', $message_media['key'].$message_media['iv'], true);
-            $fingerprint = $this->unpack_signed_int(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
+            $fingerprint = $this->unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
             if ($fingerprint !== $message_media['key_fingerprint']) {
                 throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
             }
@@ -1006,7 +1006,7 @@ trait Files
         $params[0]['previous_promise'] = new Success(true);
 
         $start = \microtime(true);
-        $size = yield $this->download_part($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, \array_shift($params), $callable, $parallelize);
+        $size = yield $this->downloadPart($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, \array_shift($params), $callable, $parallelize);
 
         if ($params) {
             $previous_promise = new Success(true);
@@ -1014,7 +1014,7 @@ trait Files
             $promises = [];
             foreach ($params as $key => $param) {
                 $param['previous_promise'] = $previous_promise;
-                $previous_promise = $this->call($this->download_part($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $parallelize));
+                $previous_promise = $this->call($this->downloadPart($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $parallelize));
                 $previous_promise->onResolve(static function ($e, $res) use (&$size) {
                     if ($res) {
                         $size += $res;
@@ -1043,13 +1043,13 @@ trait Files
         $this->logger->logger("Total download speed: $speed mbps");
 
         if ($cdn) {
-            $this->clear_cdn_hashes($message_media['file_token']);
+            $this->clearCdnHashes($message_media['file_token']);
         }
 
         return true;
     }
 
-    private function download_part(&$message_media, &$cdn, &$datacenter, &$old_dc, &$ige, $cb, $offset, $callable, $seekable, $postpone = false)
+    private function downloadPart(&$message_media, &$cdn, &$datacenter, &$old_dc, &$ige, $cb, $offset, $callable, $seekable, $postpone = false)
     {
         static $method = [
             false => 'upload.getFile', // non-cdn
@@ -1067,7 +1067,7 @@ trait Files
             }
 
             try {
-                $res = yield $this->method_call_async_read(
+                $res = yield $this->methodCallAsyncRead(
                     $method[$cdn],
                     $basic_param + $offset,
                     [
@@ -1082,7 +1082,7 @@ trait Files
                 if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
                     if (isset($message_media['MessageMedia']) && !$this->authorization['user']['bot'] && $this->settings['download']['report_broken_media']) {
                         try {
-                            yield $this->method_call_async_read('messages.sendMedia', ['peer' => 'support', 'media' => $message_media['MessageMedia'], 'message' => "I can't download this file, could you please help?"], ['datacenter' => $this->datacenter->curdc]);
+                            yield $this->methodCallAsyncRead('messages.sendMedia', ['peer' => 'support', 'media' => $message_media['MessageMedia'], 'message' => "I can't download this file, could you please help?"], ['datacenter' => $this->datacenter->curdc]);
                         } catch (RPCErrorException $e) {
                             $this->logger->logger('An error occurred while reporting the broken file: '.$e->rpc, Logger::FATAL_ERROR);
                         } catch (Exception $e) {
@@ -1110,15 +1110,15 @@ trait Files
                 $datacenter = $res['dc_id'].'_cdn';
                 if (!$this->datacenter->has($datacenter)) {
                     $this->config['expires'] = -1;
-                    yield $this->get_config_async([], ['datacenter' => $this->datacenter->curdc]);
+                    yield $this->getConfig([], ['datacenter' => $this->datacenter->curdc]);
                 }
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['stored_on_cdn'], \danog\MadelineProto\Logger::NOTICE);
             } elseif ($res['_'] === 'upload.cdnFileReuploadNeeded') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['cdn_reupload'], \danog\MadelineProto\Logger::NOTICE);
-                yield $this->get_config_async([], ['datacenter' => $this->datacenter->curdc]);
+                yield $this->getConfig([], ['datacenter' => $this->datacenter->curdc]);
 
                 try {
-                    $this->add_cdn_hashes($message_media['file_token'], yield $this->method_call_async_read('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
+                    $this->addCdnHashes($message_media['file_token'], yield $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     switch ($e->rpc) {
                         case 'FILE_TOKEN_INVALID':
@@ -1139,13 +1139,13 @@ trait Files
                 $res['bytes'] === '' &&
                 $this->datacenter->has(++$datacenter)
             ) {
-                $res = yield $this->method_call_async_read('upload.getFile', $basic_param + $offset, ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => $datacenter]);
+                $res = yield $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => $datacenter]);
             }
 
             if (isset($message_media['cdn_key'])) {
                 $ivec = \substr($message_media['cdn_iv'], 0, 12).\pack('N', $offset['offset'] >> 4);
-                $res['bytes'] = $this->ctr_encrypt($res['bytes'], $message_media['cdn_key'], $ivec);
-                $this->check_cdn_hash($message_media['file_token'], $offset['offset'], $res['bytes'], $old_dc);
+                $res['bytes'] = $this->ctrEncrypt($res['bytes'], $message_media['cdn_key'], $ivec);
+                $this->checkCdnHash($message_media['file_token'], $offset['offset'], $res['bytes'], $old_dc);
             }
             if (isset($message_media['key'])) {
                 $res['bytes'] = $ige->decrypt($res['bytes']);
@@ -1165,7 +1165,7 @@ trait Files
 
     private $cdn_hashes = [];
 
-    private function add_cdn_hashes($file, $hashes)
+    private function addCdnHashes($file, $hashes)
     {
         if (!isset($this->cdn_hashes[$file])) {
             $this->cdn_hashes = [];
@@ -1175,11 +1175,11 @@ trait Files
         }
     }
 
-    private function check_cdn_hash($file, $offset, $data, &$datacenter)
+    private function checkCdnHash($file, $offset, $data, &$datacenter)
     {
         while (\strlen($data)) {
             if (!isset($this->cdn_hashes[$file][$offset])) {
-                $this->add_cdn_hashes($file, yield $this->method_call_async_read('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => $datacenter]));
+                $this->addCdnHashes($file, yield $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => $datacenter]));
             }
             if (!isset($this->cdn_hashes[$file][$offset])) {
                 throw new \danog\MadelineProto\Exception('Could not fetch CDN hashes for offset '.$offset);
@@ -1194,7 +1194,7 @@ trait Files
         return true;
     }
 
-    private function clear_cdn_hashes($file)
+    private function clearCdnHashes($file)
     {
         unset($this->cdn_hashes[$file]);
 

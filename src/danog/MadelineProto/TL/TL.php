@@ -29,10 +29,10 @@ trait TL
     public $td_descriptions;
     public $tl_callbacks = [];
 
-    public function construct_tl($files, $objects = [])
+    public function constructTl($files, $objects = [])
     {
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_loading'], \danog\MadelineProto\Logger::VERBOSE);
-        $this->update_callbacks($objects);
+        $this->updateCallbacks($objects);
         $this->constructors = new TLConstructor();
         $this->methods = new TLMethod();
         $this->td_constructors = new TLConstructor();
@@ -147,10 +147,10 @@ trait TL
                 }
             } else {
                 foreach ($TL_dict['constructors'] as $key => $value) {
-                    $TL_dict['constructors'][$key]['id'] = $this->pack_signed_int($TL_dict['constructors'][$key]['id']);
+                    $TL_dict['constructors'][$key]['id'] = $this->packSignedInt($TL_dict['constructors'][$key]['id']);
                 }
                 foreach ($TL_dict['methods'] as $key => $value) {
-                    $TL_dict['methods'][$key]['id'] = $this->pack_signed_int($TL_dict['methods'][$key]['id']);
+                    $TL_dict['methods'][$key]['id'] = $this->packSignedInt($TL_dict['methods'][$key]['id']);
                 }
             }
 
@@ -176,7 +176,7 @@ trait TL
         if (isset($files['td']) && isset($files['telegram'])) {
             foreach ($this->td_constructors->by_id as $id => $data) {
                 $name = $data['predicate'];
-                if ($this->constructors->find_by_id($id) === false) {
+                if ($this->constructors->findById($id) === false) {
                     unset($this->td_descriptions['constructors'][$name]);
                 } else {
                     if (!\count($this->td_descriptions['constructors'][$name]['params'])) {
@@ -189,7 +189,7 @@ trait TL
             }
             foreach ($this->td_methods->by_id as $id => $data) {
                 $name = $data['method'];
-                if ($this->methods->find_by_id($id) === false) {
+                if ($this->methods->findById($id) === false) {
                     unset($this->td_descriptions['methods'][$name]);
                 } else {
                     foreach ($this->td_descriptions['methods'][$name]['params'] as $k => $param) {
@@ -200,7 +200,7 @@ trait TL
         }
     }
 
-    public function get_method_namespaces()
+    public function getMethodNamespaces()
     {
         $res = [];
         foreach ($this->methods->method_namespace as $pair) {
@@ -211,12 +211,12 @@ trait TL
         return $res;
     }
 
-    public function get_methods_namespaced()
+    public function getMethodsNamespaced()
     {
         return $this->methods->method_namespace;
     }
 
-    public function update_callbacks($objects)
+    public function updateCallbacks($objects)
     {
         $this->tl_callbacks = [];
         foreach ($objects as $object) {
@@ -246,9 +246,9 @@ trait TL
         }
     }
 
-    public function deserialize_bool($id)
+    public function deserializeBool($id)
     {
-        $tl_elem = $this->constructors->find_by_id($id);
+        $tl_elem = $this->constructors->findById($id);
         if ($tl_elem === false) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['bool_error']);
         }
@@ -256,25 +256,25 @@ trait TL
         return $tl_elem['predicate'] === 'boolTrue';
     }
 
-    public function serialize_object_async($type, $object, $ctx, $layer = -1)
+    public function serializeObject($type, $object, $ctx, $layer = -1)
     {
         switch ($type['type']) {
             case 'int':
                 if (!\is_numeric($object)) {
                     if (\is_array($object) && $type['name'] === 'hash') {
-                        $object = $this->gen_vector_hash($object);
+                        $object = $this->genVectorHash($object);
                     } else {
                         throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
                     }
                 }
 
-                return $this->pack_signed_int($object);
+                return $this->packSignedInt($object);
             case '#':
                 if (!\is_numeric($object)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
                 }
 
-                return $this->pack_unsigned_int($object);
+                return $this->packUnsignedInt($object);
             case 'long':
                 if (\is_object($object)) {
                     return \str_pad(\strrev($object->toBytes()), 8, \chr(0));
@@ -289,7 +289,7 @@ trait TL
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
                 }
 
-                return $this->pack_signed_long($object);
+                return $this->packSignedLong($object);
             case 'int128':
                 if (\strlen($object) !== 16) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['long_not_16']);
@@ -309,7 +309,7 @@ trait TL
 
                 return (string) $object;
             case 'double':
-                return $this->pack_double($object);
+                return $this->packDouble($object);
             case 'string':
                 if (!\is_string($object)) {
                     throw new Exception("You didn't provide a valid string");
@@ -323,7 +323,7 @@ trait TL
                     $concat .= \pack('@'.$this->posmod(-$l - 1, 4));
                 } else {
                     $concat .= \chr(254);
-                    $concat .= \substr($this->pack_signed_int($l), 0, 3);
+                    $concat .= \substr($this->packSignedInt($l), 0, 3);
                     $concat .= $object;
                     $concat .= \pack('@'.$this->posmod(-$l, 4));
                 }
@@ -344,14 +344,14 @@ trait TL
                     $concat .= \pack('@'.$this->posmod(-$l - 1, 4));
                 } else {
                     $concat .= \chr(254);
-                    $concat .= \substr($this->pack_signed_int($l), 0, 3);
+                    $concat .= \substr($this->packSignedInt($l), 0, 3);
                     $concat .= $object;
                     $concat .= \pack('@'.$this->posmod(-$l, 4));
                 }
 
                 return $concat;
             case 'Bool':
-                return $this->constructors->find_by_predicate((bool) $object ? 'boolTrue' : 'boolFalse')['id'];
+                return $this->constructors->findByPredicate((bool) $object ? 'boolTrue' : 'boolFalse')['id'];
             case 'true':
                 return;
             case '!X':
@@ -363,10 +363,10 @@ trait TL
                 if (isset($object['_'])) {
                     throw new Exception('You must provide an array of '.$type['subtype'].' objects, not a '.$type['subtype']." object. Example: [['_' => ".$type['subtype'].', ... ]]');
                 }
-                $concat = $this->constructors->find_by_predicate('vector')['id'];
-                $concat .= $this->pack_unsigned_int(\count($object));
+                $concat = $this->constructors->findByPredicate('vector')['id'];
+                $concat .= $this->packUnsignedInt(\count($object));
                 foreach ($object as $k => $current_object) {
-                    $concat .= yield $this->serialize_object_async(['type' => $type['subtype']], $current_object, $k);
+                    $concat .= yield $this->serializeObject(['type' => $type['subtype']], $current_object, $k);
                 }
 
                 return $concat;
@@ -374,9 +374,9 @@ trait TL
                 if (!\is_array($object)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['array_invalid']);
                 }
-                $concat = $this->pack_unsigned_int(\count($object));
+                $concat = $this->packUnsignedInt(\count($object));
                 foreach ($object as $k => $current_object) {
-                    $concat .= yield $this->serialize_object_async(['type' => $type['subtype']], $current_object, $k);
+                    $concat .= yield $this->serializeObject(['type' => $type['subtype']], $current_object, $k);
                 }
 
                 return $concat;
@@ -389,7 +389,7 @@ trait TL
 
         if ($type['type'] === 'InputMessage' && !\is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];
-        } elseif (isset($this->tl_callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->find_by_predicate($object['_'])['type'] !== $type['type'])) {
+        } elseif (isset($this->tl_callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
             $object = yield $this->tl_callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception("Could not convert {$type['type']} object");
@@ -397,7 +397,7 @@ trait TL
             $object = $object[$type['type']];
         }
         if (!isset($object['_'])) {
-            $constructorData = $this->constructors->find_by_predicate($type['type'], $layer);
+            $constructorData = $this->constructors->findByPredicate($type['type'], $layer);
             if ($constructorData === false) {
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['predicate_not_set']);
             }
@@ -409,7 +409,7 @@ trait TL
         }
 
         $predicate = $object['_'];
-        $constructorData = $this->constructors->find_by_predicate($predicate, $layer);
+        $constructorData = $this->constructors->findByPredicate($predicate, $layer);
         if ($constructorData === false) {
             $this->logger->logger($object, \danog\MadelineProto\Logger::FATAL_ERROR);
 
@@ -422,7 +422,7 @@ trait TL
             $bare = true;
         }
         if ($predicate === 'messageEntityMentionName') {
-            $constructorData = $this->constructors->find_by_predicate('inputMessageEntityMentionName');
+            $constructorData = $this->constructors->findByPredicate('inputMessageEntityMentionName');
         }
 
         $concat = '';
@@ -430,10 +430,10 @@ trait TL
             $concat = $constructorData['id'];
         }
 
-        return $concat.yield $this->serialize_params_async($constructorData, $object, '', $layer);
+        return $concat.yield $this->serializeParams($constructorData, $object, '', $layer);
     }
 
-    public function serialize_method_async($method, $arguments)
+    public function serializeMethod($method, $arguments)
     {
         if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && \preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
             if ($matches[1] === '') {
@@ -466,11 +466,11 @@ trait TL
                 if (
                     (
                         !\is_array($arguments['file']) ||
-                        !(isset($arguments['file']['_']) && $this->constructors->find_by_predicate($arguments['file']['_']) === 'InputEncryptedFile')
+                        !(isset($arguments['file']['_']) && $this->constructors->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')
                     ) &&
                     $this->settings['upload']['allow_automatic_upload']
                 ) {
-                    $arguments['file'] = yield $this->upload_encrypted_async($arguments['file']);
+                    $arguments['file'] = yield $this->uploadEncrypted($arguments['file']);
                 }
                 if (isset($arguments['file']['key'])) {
                     $arguments['message']['media']['key'] = $arguments['file']['key'];
@@ -480,7 +480,7 @@ trait TL
                 }
             }
         } elseif (\in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && isset($arguments['chat_id']) && (!\is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
-            $res = yield $this->get_info_async($arguments['chat_id']);
+            $res = yield $this->getInfo($arguments['chat_id']);
             if ($res['type'] !== 'chat') {
                 throw new \danog\MadelineProto\Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
             }
@@ -505,18 +505,18 @@ trait TL
             }
         }
 
-        $tl = $this->methods->find_by_method($method);
+        $tl = $this->methods->findByMethod($method);
         if ($tl === false) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'].$method);
         }
 
-        return $tl['id'].yield $this->serialize_params_async($tl, $arguments, $method);
+        return $tl['id'].yield $this->serializeParams($tl, $arguments, $method);
     }
 
-    public function serialize_params_async($tl, $arguments, $ctx, $layer = -1)
+    public function serializeParams($tl, $arguments, $ctx, $layer = -1)
     {
         $serialized = '';
-        $arguments = yield $this->botAPI_to_MTProto_async($arguments);
+        $arguments = yield $this->botAPIToMTProto($arguments);
         $flags = 0;
         foreach ($tl['params'] as $cur_flag) {
             if (isset($cur_flag['pow'])) {
@@ -546,11 +546,11 @@ trait TL
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= yield $this->serialize_object_async(['type' => 'bytes'], $this->random(15 + 4 * $this->random_int($modulus = 3)), 'random_bytes');
+                    $serialized .= yield $this->serializeObject(['type' => 'bytes'], $this->random(15 + 4 * $this->randomInt($modulus = 3)), 'random_bytes');
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService']) && isset($arguments['message'])) {
-                    $serialized .= yield $this->serialize_object_async($current_argument, yield $this->encrypt_secret_message_async($arguments['peer']['chat_id'], $arguments['message']), 'data');
+                    $serialized .= yield $this->serializeObject($current_argument, yield $this->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message']), 'data');
                     continue;
                 }
                 if ($current_argument['name'] === 'random_id') {
@@ -563,8 +563,8 @@ trait TL
                             continue 2;
                         case 'Vector t':
                             if (isset($arguments['id'])) {
-                                $serialized .= $this->constructors->find_by_predicate('vector')['id'];
-                                $serialized .= $this->pack_unsigned_int(\count($arguments['id']));
+                                $serialized .= $this->constructors->findByPredicate('vector')['id'];
+                                $serialized .= $this->packUnsignedInt(\count($arguments['id']));
                                 $serialized .= $this->random(8 * \count($arguments['id']));
                                 continue 2;
                             }
@@ -575,7 +575,7 @@ trait TL
                     continue;
                 }
                 if ($tl['type'] === 'InputMedia' && $current_argument['name'] === 'mime_type') {
-                    $serialized .= yield $this->serialize_object_async($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer);
+                    $serialized .= yield $this->serializeObject($current_argument, $arguments['file']['mime_type'], $current_argument['name'], $layer);
                     continue;
                 }
                 if ($tl['type'] === 'DocumentAttribute' && \in_array($current_argument['name'], ['w', 'h', 'duration'])) {
@@ -586,11 +586,11 @@ trait TL
                     $serialized .= \pack('@4');
                     continue;
                 }
-                if (($id = $this->constructors->find_by_predicate(\lcfirst($current_argument['type']).'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
+                if (($id = $this->constructors->findByPredicate(\lcfirst($current_argument['type']).'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
                     $serialized .= $id['id'];
                     continue;
                 }
-                if (($id = $this->constructors->find_by_predicate('input'.$current_argument['type'].'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
+                if (($id = $this->constructors->findByPredicate('input'.$current_argument['type'].'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
                     $serialized .= $id['id'];
                     continue;
                 }
@@ -614,7 +614,7 @@ trait TL
                         $arguments[$current_argument['name']] = false;
                         break;
                     default:
-                        $arguments[$current_argument['name']] = ['_' => $this->constructors->find_by_type($current_argument['type'])['predicate']];
+                        $arguments[$current_argument['name']] = ['_' => $this->constructors->findByType($current_argument['type'])['predicate']];
                         break;*/
                 }
             }
@@ -633,17 +633,17 @@ trait TL
                     !\is_array($arguments[$current_argument['name']])
                     || !(
                         isset($arguments[$current_argument['name']]['_'])
-                        && $this->constructors->find_by_predicate($arguments[$current_argument['name']]['_']) === 'InputFile'
+                        && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_']) === 'InputFile'
                     )
                 )
                 && $this->settings['upload']['allow_automatic_upload']
             ) {
-                $arguments[$current_argument['name']] = yield $this->upload_async($arguments[$current_argument['name']]);
+                $arguments[$current_argument['name']] = yield $this->upload($arguments[$current_argument['name']]);
             }
 
-            if ($current_argument['type'] === 'InputEncryptedChat' && (!\is_array($arguments[$current_argument['name']]) || isset($arguments[$current_argument['name']]['_']) && $this->constructors->find_by_predicate($arguments[$current_argument['name']]['_'])['type'] !== $current_argument['type'])) {
+            if ($current_argument['type'] === 'InputEncryptedChat' && (!\is_array($arguments[$current_argument['name']]) || isset($arguments[$current_argument['name']]['_']) && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] !== $current_argument['type'])) {
                 if (\is_array($arguments[$current_argument['name']])) {
-                    $arguments[$current_argument['name']] = (yield $this->get_info_async($arguments[$current_argument['name']]))['InputEncryptedChat'];
+                    $arguments[$current_argument['name']] = (yield $this->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat'];
                 } else {
                     if (!isset($this->secret_chats[$arguments[$current_argument['name']]])) {
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
@@ -652,13 +652,13 @@ trait TL
                 }
             }
             //$this->logger->logger('Serializing '.$current_argument['name'].' of type '.$current_argument['type');
-            $serialized .= yield $this->serialize_object_async($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer);
+            $serialized .= yield $this->serializeObject($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer);
         }
 
         return $serialized;
     }
 
-    public function get_length($stream, $type = ['type' => ''])
+    public function getLength($stream, $type = ['type' => ''])
     {
         if (\is_string($stream)) {
             $res = \fopen('php://memory', 'rw+b');
@@ -688,9 +688,9 @@ trait TL
         }
         switch ($type['type']) {
             case 'Bool':
-                return $this->deserialize_bool(\stream_get_contents($stream, 4));
+                return $this->deserializeBool(\stream_get_contents($stream, 4));
             case 'int':
-                return $this->unpack_signed_int(\stream_get_contents($stream, 4));
+                return $this->unpackSignedInt(\stream_get_contents($stream, 4));
             case '#':
                 return \unpack('V', \stream_get_contents($stream, 4))[1];
             case 'long':
@@ -698,9 +698,9 @@ trait TL
                     return \stream_get_contents($stream, 8);
                 }
 
-                return \danog\MadelineProto\Magic::$bigint || isset($type['strlong']) ? \stream_get_contents($stream, 8) : $this->unpack_signed_long(\stream_get_contents($stream, 8));
+                return \danog\MadelineProto\Magic::$bigint || isset($type['strlong']) ? \stream_get_contents($stream, 8) : $this->unpackSignedLong(\stream_get_contents($stream, 8));
             case 'double':
-                return $this->unpack_double(\stream_get_contents($stream, 8));
+                return $this->unpackDouble(\stream_get_contents($stream, 8));
             case 'int128':
                 return \stream_get_contents($stream, 16);
             case 'int256':
@@ -734,9 +734,9 @@ trait TL
                 return $type['type'] === 'bytes' ? new Types\Bytes($x) : $x;
             case 'Vector t':
                 $id = \stream_get_contents($stream, 4);
-                $constructorData = $this->constructors->find_by_id($id);
+                $constructorData = $this->constructors->findById($id);
                 if ($constructorData === false) {
-                    $constructorData = $this->methods->find_by_id($id);
+                    $constructorData = $this->methods->findById($id);
                     $constructorData['predicate'] = 'method_'.$constructorData['method'];
                 }
                 if ($constructorData === false) {
@@ -764,17 +764,17 @@ trait TL
         }
         if ($type['type'] != '' && $type['type'][0] === '%') {
             $checkType = \substr($type['type'], 1);
-            $constructorData = $this->constructors->find_by_type($checkType);
+            $constructorData = $this->constructors->findByType($checkType);
             if ($constructorData === false) {
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['constructor_not_found'].$checkType);
             }
         } else {
-            $constructorData = $this->constructors->find_by_predicate($type['type']);
+            $constructorData = $this->constructors->findByPredicate($type['type']);
             if ($constructorData === false) {
                 $id = \stream_get_contents($stream, 4);
-                $constructorData = $this->constructors->find_by_id($id);
+                $constructorData = $this->constructors->findById($id);
                 if ($constructorData === false) {
-                    $constructorData = $this->methods->find_by_id($id);
+                    $constructorData = $this->methods->findById($id);
                     if ($constructorData === false) {
                         throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error_id'], $type['type'], \bin2hex(\strrev($id))));
                     }

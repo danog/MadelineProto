@@ -52,7 +52,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
         if (isset($this->extra['address'])) {
             $ctx = $ctx->getCtx();
@@ -111,7 +111,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
      *
      * @return Generator
      */
-    public function getWriteBufferAsync(int $length, string $append = ''): \Generator
+    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
         $this->write_buffer = yield $this->stream->getWriteBuffer($length);
         if (\strlen($append)) {
@@ -129,7 +129,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
      *
      * @return Generator
      */
-    public function getReadBufferAsync(&$length): \Generator
+    public function getReadBufferGenerator(&$length): \Generator
     {
         $this->read_buffer = yield $this->stream->getReadBuffer($l);
 
@@ -145,7 +145,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
      *
      * @return Generator That resolves with a string when the provided promise is resolved and the data is decrypted
      */
-    public function bufferReadAsync(int $length): \Generator
+    public function bufferReadGenerator(int $length): \Generator
     {
         return @$this->decrypt->encrypt(yield $this->read_buffer->bufferRead($length));
     }

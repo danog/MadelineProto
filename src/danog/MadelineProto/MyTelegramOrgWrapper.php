@@ -71,7 +71,7 @@ class MyTelegramOrgWrapper
         );
     }
 
-    public function login_async($number)
+    public function login($number)
     {
         $this->number = $number;
         $request = new Request(self::MY_TELEGRAM_URL.'/auth/send_password', 'POST');
@@ -87,7 +87,7 @@ class MyTelegramOrgWrapper
         $this->hash = $resulta['random_hash'];
     }
 
-    public function complete_login_async($password)
+    public function completeLogin($password)
     {
         if ($this->logged) {
             throw new Exception('Already logged in!');
@@ -112,12 +112,12 @@ class MyTelegramOrgWrapper
         return $this->logged = true;
     }
 
-    public function logged_in_async()
+    public function loggedIn()
     {
         return $this->logged;
     }
 
-    public function has_app_async()
+    public function hasApp()
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
@@ -143,7 +143,7 @@ class MyTelegramOrgWrapper
         throw new Exception($title);
     }
 
-    public function get_app_async()
+    public function getApp()
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
@@ -168,12 +168,12 @@ class MyTelegramOrgWrapper
         return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
     }
 
-    public function create_app_async($settings)
+    public function createApp($settings)
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
         }
-        if (yield $this->has_app_async()) {
+        if (yield $this->hasApp()) {
             throw new Exception('The app was already created!');
         }
 

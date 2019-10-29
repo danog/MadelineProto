@@ -43,7 +43,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $this->stream = yield $ctx->getStream(\str_repeat(\chr(221), 4).$header);
     }
@@ -65,9 +65,9 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @return Generator
      */
-    public function getWriteBufferAsync(int $length, string $append = ''): \Generator
+    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
-        $padding_length = $this->random_int($modulus = 16);
+        $padding_length = $this->randomInt($modulus = 16);
         $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.$this->random($padding_length));
         yield $buffer->bufferWrite(\pack('V', $padding_length + $length));
 
@@ -81,7 +81,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @return Generator
      */
-    public function getReadBufferAsync(&$length): \Generator
+    public function getReadBufferGenerator(&$length): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
         $length = \unpack('V', yield $buffer->bufferRead(4))[1];

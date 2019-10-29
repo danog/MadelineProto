@@ -49,10 +49,10 @@ class Handler extends \danog\MadelineProto\Connection
     {
         echo 'Closing socket in fork '.\getmypid().PHP_EOL;
         unset($this->sock);
-        $this->destruct_madeline();
+        $this->destructMadeline();
     }
 
-    public function destruct_madeline()
+    public function destructMadeline()
     {
         if (isset($this->madeline) && $this->madeline !== null) {
             $this->madeline->API->settings['logger'] = ['logger' => 0, 'logger_param' => ''];
@@ -120,24 +120,24 @@ class Handler extends \danog\MadelineProto\Connection
                     throw new \danog\MadelineProto\Exception('Invalid object received');
                 }
                 $request_id = $message['request_id'];
-                $this->send_response($request_id, $this->on_request($request_id, $message['method'], $message['args']));
+                $this->sendResponse($request_id, $this->onRequest($request_id, $message['method'], $message['args']));
             } catch (\danog\MadelineProto\TL\Exception $e) {
-                $this->send_exception($request_id, $e);
+                $this->sendException($request_id, $e);
                 continue;
             } catch (\danog\MadelineProto\Exception $e) {
-                $this->send_exception($request_id, $e);
+                $this->sendException($request_id, $e);
                 continue;
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                $this->send_exception($request_id, $e);
+                $this->sendException($request_id, $e);
                 continue;
             } catch (\DOMException $e) {
-                $this->send_exception($request_id, $e);
+                $this->sendException($request_id, $e);
                 continue;
             }
         }
     }
 
-    public function on_request($request_id, $method, $args)
+    public function onRequest($request_id, $method, $args)
     {
         if (\count($method) === 0 || \count($method) > 2) {
             throw new \danog\MadelineProto\Exception('Invalid method called');
@@ -204,7 +204,7 @@ class Handler extends \danog\MadelineProto\Connection
         }
     }
 
-    public function send_exception($request_id, $e)
+    public function sendException($request_id, $e)
     {
         echo $e.PHP_EOL;
         if ($e instanceof \danog\MadelineProto\RPCErrorException) {
@@ -253,17 +253,17 @@ class Handler extends \danog\MadelineProto\Connection
             }
             $exception['trace']['frames'][] = $tl_frame;
         }
-        $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], ['_' => 'socketMessageException', 'request_id' => $request_id, 'exception' => $exception], 'exception'));
+        $this->sendMessageSafe(yield $this->serializeObject(['type' => ''], ['_' => 'socketMessageException', 'request_id' => $request_id, 'exception' => $exception], 'exception'));
     }
 
-    public function send_response($request_id, $response)
+    public function sendResponse($request_id, $response)
     {
-        $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], ['_' => 'socketMessageResponse', 'request_id' => $request_id, 'data' => $response], 'exception'));
+        $this->sendMessageSafe(yield $this->serializeObject(['type' => ''], ['_' => 'socketMessageResponse', 'request_id' => $request_id, 'data' => $response], 'exception'));
     }
 
-    public function send_data($stream_id, $data)
+    public function sendData($stream_id, $data)
     {
-        $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], ['_' => 'socketMessageRawData', 'stream_id' => $stream_id, 'data' => $data], 'data'));
+        $this->sendMessageSafe(yield $this->serializeObject(['type' => ''], ['_' => 'socketMessageRawData', 'stream_id' => $stream_id, 'data' => $data], 'data'));
     }
 
     public $logging = false;
@@ -274,16 +274,16 @@ class Handler extends \danog\MadelineProto\Connection
             try {
                 $this->logging = true;
 
-                $message = ['_' => 'socketMessageLog', 'data' => $message, 'level' => $level, 'thread' => \danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread()), 'process' => \danog\MadelineProto\Magic::is_fork(), 'file' => \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'], '.php')];
+                $message = ['_' => 'socketMessageLog', 'data' => $message, 'level' => $level, 'thread' => \danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread()), 'process' => \danog\MadelineProto\Magic::isFork(), 'file' => \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'], '.php')];
 
-                $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], $message, 'log'));
+                $this->sendMessageSafe(yield $this->serializeObject(['type' => ''], $message, 'log'));
             } finally {
                 $this->logging = false;
             }
         }
     }
 
-    public function send_message_safe($message)
+    public function sendMessageSafe($message)
     {
         if (!isset($this->sock)) {
             return false;
@@ -297,13 +297,13 @@ class Handler extends \danog\MadelineProto\Connection
         }
     }
 
-    public function update_handler($update)
+    public function updateHandler($update)
     {
-        $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], ['_' => 'socketMessageUpdate', 'data' => $update], 'update'));
+        $this->sendMessageSafe(yield $this->serializeObject(['type' => ''], ['_' => 'socketMessageUpdate', 'data' => $update], 'update'));
     }
 
     public function __call($method, $args)
     {
-        $this->send_message_safe(yield $this->serialize_object_async(['type' => ''], ['_' => 'socketMessageRequest', 'request_id' => 0, 'method' => [$method], 'args' => $args], 'method'));
+        $this->sendMessageSafe(yield $this->serializeObject(['type' => ''], ['_' => 'socketMessageRequest', 'request_id' => 0, 'method' => [$method], 'args' => $args], 'method'));
     }
 }

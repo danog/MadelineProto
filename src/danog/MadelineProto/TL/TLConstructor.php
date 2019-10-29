@@ -50,10 +50,10 @@ class TLConstructor
             $json_dict['layer'] = '';
         }
         $this->by_predicate_and_layer[$predicate.$json_dict['layer']] = $json_dict['id'];
-        $this->parse_params($json_dict['id'], $scheme_type === 'mtproto');
+        $this->parseParams($json_dict['id'], $scheme_type === 'mtproto');
     }
 
-    public function find_by_type($type)
+    public function findByType($type)
     {
         foreach ($this->by_id as $id => $constructor) {
             if ($constructor['type'] === $type) {
@@ -66,7 +66,7 @@ class TLConstructor
         return false;
     }
 
-    public function find_by_predicate($predicate, $layer = -1)
+    public function findByPredicate($predicate, $layer = -1)
     {
         if ($layer !== -1) {
             foreach ($this->layers as $alayer) {
@@ -96,7 +96,7 @@ class TLConstructor
         return false;
     }
 
-    public function find_by_id($id)
+    public function findById($id)
     {
         if (isset($this->by_id[$id])) {
             $constructor = $this->by_id[$id];

@@ -35,7 +35,7 @@ trait Loop
         $this->loop_callback = $callback;
     }
 
-    public function loop_async($max_forks = 0)
+    public function loop($max_forks = 0)
     {
         if (\is_callable($max_forks)) {
             $this->logger->logger('Running async callable');
@@ -115,7 +115,7 @@ trait Loop
                     $uri = $_SERVER['REQUEST_URI'];
 
                     $params = $_GET;
-                    $params['MadelineSelfRestart'] = Tools::random_int();
+                    $params['MadelineSelfRestart'] = Tools::randomInt();
 
                     $url = \explode($uri, '?', 2)[0] ?? '';
 

@@ -42,7 +42,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $this->stream = yield $ctx->getStream(\chr(239).$header);
     }
@@ -64,7 +64,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return \Generator
      */
-    public function getWriteBufferAsync(int $length, string $append = ''): \Generator
+    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
         $length >>= 2;
         if ($length < 127) {
@@ -85,7 +85,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return Generator
      */
-    public function getReadBufferAsync(&$length): \Generator
+    public function getReadBufferGenerator(&$length): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
         $length = \ord(yield $buffer->bufferRead(1));

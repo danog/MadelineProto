@@ -34,9 +34,9 @@ class WssStream extends WsStream
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        return parent::connectAsync($ctx->getCtx()->secure(true), $header);
+        return parent::connectGenerator($ctx->getCtx()->secure(true), $header);
     }
 
     public static function getName(): string

@@ -24,7 +24,7 @@ namespace danog\MadelineProto\MTProtoSession;
  */
 trait AckHandler
 {
-    public function ack_outgoing_message_id($message_id): bool
+    public function ackOutgoingMessageId($message_id): bool
     {
         // The server acknowledges that it received my message
         if (!isset($this->outgoing_messages[$message_id])) {
@@ -43,7 +43,7 @@ trait AckHandler
         return true;
     }
 
-    public function got_response_for_outgoing_message_id($message_id): bool
+    public function gotResponseForOutgoingMessageId($message_id): bool
     {
         // The server acknowledges that it received my message
         if (!isset($this->outgoing_messages[$message_id])) {
@@ -64,7 +64,7 @@ trait AckHandler
         return true;
     }
 
-    public function ack_incoming_message_id($message_id): bool
+    public function ackIncomingMessageId($message_id): bool
     {
         // I let the server know that I received its message
         if (!isset($this->incoming_messages[$message_id])) {

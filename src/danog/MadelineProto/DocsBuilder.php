@@ -59,7 +59,7 @@ class DocsBuilder
         return \str_replace('_', '\\_', $hwat);
     }
 
-    public function mk_docs()
+    public function mkDocs()
     {
         \danog\MadelineProto\Logger::log('Generating documentation index...', \danog\MadelineProto\Logger::NOTICE);
         \file_put_contents($this->index, '---
@@ -78,7 +78,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 [Types](types/)');
         $this->mk_methodS();
-        $this->mk_constructors();
+        $this->mkConstructors();
         foreach (\glob('types/*') as $unlink) {
             \unlink($unlink);
         }
@@ -634,7 +634,7 @@ class Lang
     public static $current_lang = %s;
 }';
 
-    public function add_to_lang($key)
+    public function addToLang($key)
     {
         if (!isset(\danog\MadelineProto\Lang::$lang['en'][$key])) {
             \danog\MadelineProto\Lang::$lang['en'][$key] = '';

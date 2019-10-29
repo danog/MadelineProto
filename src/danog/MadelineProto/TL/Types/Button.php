@@ -53,7 +53,7 @@ class Button implements \JsonSerializable, \ArrayAccess
             case 'keyboardButtonUrl':
                 return $this->data['url'];
             case 'keyboardButton':
-                $res = $this->info['API']->method_call_async_read('messages.sendMessage', ['peer' => $this->info['peer'], 'message' => $this->data['text'], 'reply_to_msg_id' => $this->info['id']], ['datacenter' => $this->info['API']->datacenter->curdc]);
+                $res = $this->info['API']->methodCallAsyncRead('messages.sendMessage', ['peer' => $this->info['peer'], 'message' => $this->data['text'], 'reply_to_msg_id' => $this->info['id']], ['datacenter' => $this->info['API']->datacenter->curdc]);
                 break;
             case 'keyboardButtonCallback':
                 $res = $this->info['API']->$method('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'data' => $this->data['data']], ['datacenter' => $this->info['API']->datacenter->curdc]);

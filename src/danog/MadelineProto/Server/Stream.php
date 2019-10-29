@@ -39,7 +39,7 @@ class Stream
         return \stream_context_create([self::WRAPPER_NAME => ['handler' => $handler, 'stream_id' => $stream_id]]);
     }
 
-    public function stream_open($path, $mode, $options, &$opened_path)
+    public function streamOpen($path, $mode, $options, &$opened_path)
     {
         $opt = \stream_context_get_options($this->context);
 
@@ -55,12 +55,12 @@ class Stream
         return true;
     }
 
-    public function stream_write($data)
+    public function streamWrite($data)
     {
-        $this->_handler->send_data($this->_stream_id, $data);
+        $this->_handler->sendData($this->_stream_id, $data);
     }
 
-    public function stream_lock($mode)
+    public function streamLock($mode)
     {
     }
 }

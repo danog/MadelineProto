@@ -54,7 +54,7 @@ class UpdateLoop extends ResumableSignalLoop
                 return;
             }
         }
-        $this->state = $state = $this->channelId === false ? (yield $API->load_update_state_async()) : $API->loadChannelState($this->channelId);
+        $this->state = $state = $this->channelId === false ? (yield $API->loadUpdateState()) : $API->loadChannelState($this->channelId);
 
         $timeout = $API->settings['updates']['getdifference_interval'];
         $first = true;
@@ -82,7 +82,7 @@ class UpdateLoop extends ResumableSignalLoop
                     $request_pts = $state->pts();
 
                     try {
-                        $difference = yield $API->method_call_async_read('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $API->datacenter->curdc, 'postpone' => $first]);
+                        $difference = yield $API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => 'channel#'.$this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['datacenter' => $API->datacenter->curdc, 'postpone' => $first]);
                     } catch (RPCErrorException $e) {
                         if (\in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN', 'CHANNEL_INVALID'])) {
                             $feeder->signal(true);
@@ -149,7 +149,7 @@ class UpdateLoop extends ResumableSignalLoop
                 } else {
                     $API->logger->logger('Resumed and fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
-                    $difference = yield $API->method_call_async_read('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $API->settings['connection_settings']['default_dc']]);
+                    $difference = yield $API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $API->settings['connection_settings']['default_dc']]);
                     $API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     switch ($difference['_']) {
                         case 'updates.differenceEmpty':

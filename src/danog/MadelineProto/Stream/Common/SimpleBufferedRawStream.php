@@ -36,7 +36,7 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
      *
      * @return \Generator
      */
-    public function bufferReadAsync(int $length): \Generator
+    public function bufferReadGenerator(int $length): \Generator
     {
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);

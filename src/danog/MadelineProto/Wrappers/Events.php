@@ -71,7 +71,7 @@ trait Events
         return $this->event_handler_instance;
     }
 
-    public function event_update_handler($update)
+    public function eventUpdateHandler($update)
     {
         if (isset($this->event_handler_methods[$update['_']])) {
             return $this->event_handler_methods[$update['_']]($update);

@@ -73,7 +73,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return Generator
      */
-    public function getWriteBufferAsync(int $length, string $append = ''): \Generator
+    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
         $this->stream->startWriteHash();
         $this->stream->checkWriteHash($length + 8);
@@ -91,7 +91,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return Generator
      */
-    public function getReadBufferAsync(&$length): \Generator
+    public function getReadBufferGenerator(&$length): \Generator
     {
         $this->stream->startReadHash();
         $buffer = yield $this->stream->getReadBuffer($l);

@@ -431,9 +431,9 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function __construct_async($settings = [])
     {
-        \danog\MadelineProto\Magic::class_exists();
+        \danog\MadelineProto\Magic::classExists();
         // Parse settings
-        $this->parse_settings($settings);
+        $this->parseSettings($settings);
         // Connect to servers
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
         if (!($this->channels_state instanceof CombinedUpdatesState)) {
@@ -472,12 +472,12 @@ class MTProto extends AsyncConstruct implements TLCallback
             $callbacks []= $this->minDatabase;
         }
         $this->construct_TL($this->settings['tl_schema']['src'], $callbacks);
-        yield $this->connect_to_all_dcs_async();
+        yield $this->connectToAllDcs();
         $this->startLoops();
         $this->datacenter->curdc = 2;
         if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->hasTempAuthKey()) {
             try {
-                $nearest_dc = yield $this->method_call_async_read('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
+                $nearest_dc = yield $this->methodCallAsyncRead('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
                 $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
                 if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
                     $this->settings['connection_settings']['default_dc'] = $this->datacenter->curdc = (int) $nearest_dc['nearest_dc'];
@@ -488,7 +488,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 }
             }
         }
-        yield $this->get_config_async([], ['datacenter' => $this->datacenter->curdc]);
+        yield $this->getConfig([], ['datacenter' => $this->datacenter->curdc]);
         $this->startUpdateSystem(true);
         $this->v = self::V;
     }
@@ -514,7 +514,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks []= $this->minDatabase;
         }
-        $this->update_callbacks($callbacks);
+        $this->updateCallbacks($callbacks);
         return $this;
     }
 
@@ -641,7 +641,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function __wakeup_async($backtrace)
     {
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        $this->setup_logger();
+        $this->setupLogger();
         if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread())) {
             return;
         }
@@ -659,7 +659,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks []= $this->minDatabase;
         }
-        $this->update_callbacks($callbacks);
+        $this->updateCallbacks($callbacks);
 
         $this->settings['connection_settings']['all']['ipv6'] = \danog\MadelineProto\Magic::$ipv6;
         /*if (isset($this->settings['pwr']['update_handler']) && $this->settings['pwr']['update_handler'] === $this->settings['updates']['callback']) {
@@ -697,7 +697,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->resetMTProtoSession();
         if (isset($backtrace[2]['function'], $backtrace[2]['class'], $backtrace[2]['args']) && $backtrace[2]['class'] === 'danog\\MadelineProto\\API' && $backtrace[2]['function'] === '__construct_async') {
             if (\count($backtrace[2]['args']) >= 2) {
-                $this->parse_settings(\array_replace_recursive($this->settings, $backtrace[2]['args'][1]));
+                $this->parseSettings(\array_replace_recursive($this->settings, $backtrace[2]['args'][1]));
             }
         }
 
@@ -780,7 +780,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             foreach ($this->secret_chats as $chat => $data) {
                 try {
                     if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== null) {
-                        yield $this->notify_layer_async($chat);
+                        yield $this->notifyLayer($chat);
                     }
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                 }
@@ -792,7 +792,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->msg_ids = [];
         $this->got_state = false;
         }*/
-        yield $this->connect_to_all_dcs_async();
+        yield $this->connectToAllDcs();
         foreach ($this->calls as $id => $controller) {
             if (!\is_object($controller)) {
                 unset($this->calls[$id]);
@@ -804,17 +804,17 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
         }
         $this->startLoops();
-        if (yield $this->get_self_async()) {
+        if (yield $this->getSelf()) {
             $this->authorized = self::LOGGED_IN;
         }
 
         if ($this->authorized === self::LOGGED_IN) {
-            yield $this->get_cdn_config_async($this->datacenter->curdc);
-            $this->setup_logger();
+            yield $this->getCdnConfig($this->datacenter->curdc);
+            $this->setupLogger();
         }
         $this->startUpdateSystem(true);
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings['peer']['cache_all_peers_on_startup']) {
-            yield $this->get_dialogs_async($force);
+            yield $this->getDialogs($force);
         }
         if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates']) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
@@ -850,7 +850,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     public static function getSettings($settings, $previousSettings = [])
     {
-        Magic::class_exists();
+        Magic::classExists();
         if (isset($previousSettings['connection_settings']['default_dc'])) {
             $settings['connection_settings']['default_dc'] = $previousSettings['connection_settings']['default_dc'];
         }
@@ -1175,7 +1175,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         return $settings;
     }
-    public function parse_settings($settings)
+    public function parseSettings($settings)
     {
         $settings = self::getSettings($settings, $this->settings);
         if ($settings['app_info'] === null) {
@@ -1186,10 +1186,10 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->updates = [];
         }
         // Setup logger
-        $this->setup_logger();
+        $this->setupLogger();
     }
 
-    public function setup_logger()
+    public function setupLogger()
     {
         $this->logger = Logger::getLoggerFromSettings($this->settings, isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '');
     }
@@ -1230,7 +1230,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
-    public function connect_to_all_dcs_async(bool $reconnectAll = true): \Generator
+    public function connectToAllDcs(bool $reconnectAll = true): \Generator
     {
         $this->channels_state->get(false);
         foreach ($this->channels_state->get() as $state) {
@@ -1248,21 +1248,21 @@ class MTProto extends AsyncConstruct implements TLCallback
 
         $this->datacenter->__construct($this, $this->settings['connection'], $this->settings['connection_settings'], $reconnectAll);
         $dcs = [];
-        foreach ($this->datacenter->get_dcs() as $new_dc) {
-            $dcs[] = $this->datacenter->dcConnectAsync($new_dc);
+        foreach ($this->datacenter->getDcs() as $new_dc) {
+            $dcs[] = $this->datacenter->dcConnect($new_dc);
         }
         yield $this->all($dcs);
-        yield $this->init_authorization_async();
-        yield $this->parse_config_async();
+        yield $this->initAuthorization();
+        yield $this->parseConfig();
         $dcs = [];
-        foreach ($this->datacenter->get_dcs(false) as $new_dc) {
-            $dcs[] = $this->datacenter->dcConnectAsync($new_dc);
+        foreach ($this->datacenter->getDcs(false) as $new_dc) {
+            $dcs[] = $this->datacenter->dcConnect($new_dc);
         }
         yield $this->all($dcs);
-        yield $this->init_authorization_async();
-        yield $this->parse_config_async();
+        yield $this->initAuthorization();
+        yield $this->parseConfig();
 
-        yield $this->get_phone_config_async();
+        yield $this->getPhoneConfig();
     }
     public function resetSession()
     {
@@ -1371,25 +1371,25 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
     }
 
-    public function get_phone_config_async($watcherId = null)
+    public function getPhoneConfig($watcherId = null)
     {
         if ($this->authorized === self::LOGGED_IN && \class_exists(VoIPServerConfigInternal::class) && !$this->authorization['user']['bot'] && $this->datacenter->getDataCenterConnection($this->settings['connection_settings']['default_dc'])->hasTempAuthKey()) {
             $this->logger->logger('Fetching phone config...');
-            VoIPServerConfig::updateDefault(yield $this->method_call_async_read('phone.getCallConfig', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]));
+            VoIPServerConfig::updateDefault(yield $this->methodCallAsyncRead('phone.getCallConfig', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]));
         } else {
             $this->logger->logger('Not fetching phone config');
         }
     }
 
 
-    public function get_cdn_config_async($datacenter)
+    public function getCdnConfig($datacenter)
     {
         /*
          * ***********************************************************************
          * Fetch RSA keys for CDN datacenters
          */
         try {
-            foreach ((yield $this->method_call_async_read('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
+            foreach ((yield $this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
                 $tempkey = new \danog\MadelineProto\RSA($curkey['public_key']);
                 $this->cdn_rsa_keys[$tempkey->fp] = $tempkey;
             }
@@ -1398,34 +1398,34 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
     }
 
-    public function get_cached_config()
+    public function getCachedConfig()
     {
         return $this->config;
     }
 
-    public function get_config_async($config = [], $options = [])
+    public function getConfig($config = [], $options = [])
     {
         if ($this->config['expires'] > \time()) {
             return $this->config;
         }
-        $this->config = empty($config) ? yield $this->method_call_async_read('help.getConfig', $config, empty($options) ? ['datacenter' => $this->settings['connection_settings']['default_dc']] : $options) : $config;
-        yield $this->parse_config_async();
+        $this->config = empty($config) ? yield $this->methodCallAsyncRead('help.getConfig', $config, empty($options) ? ['datacenter' => $this->settings['connection_settings']['default_dc']] : $options) : $config;
+        yield $this->parseConfig();
 
         return $this->config;
     }
 
-    public function parse_config_async()
+    public function parseConfig()
     {
         if (isset($this->config['dc_options'])) {
             $options = $this->config['dc_options'];
             unset($this->config['dc_options']);
-            yield $this->parse_dc_options_async($options);
+            yield $this->parseDcOptions($options);
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['config_updated'], Logger::NOTICE);
         $this->logger->logger($this->config, Logger::NOTICE);
     }
 
-    public function parse_dc_options_async($dc_options)
+    public function parseDcOptions($dc_options)
     {
         foreach ($dc_options as $dc) {
             $test = $this->config['test_mode'] ? 'test' : 'main';
@@ -1449,15 +1449,15 @@ class MTProto extends AsyncConstruct implements TLCallback
         $curdc = $this->datacenter->curdc;
         if (!$this->datacenter->has($curdc) || $this->datacenter->getDataCenterConnection($curdc)->byIPAddress()) {
             $this->logger->logger('Got new DC options, reconnecting');
-            yield $this->connect_to_all_dcs_async(false);
+            yield $this->connectToAllDcs(false);
         }
         $this->datacenter->curdc = $curdc;
     }
 
-    public function get_self_async()
+    public function getSelf()
     {
         try {
-            $this->authorization = ['user' => (yield $this->method_call_async_read('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc]))[0]];
+            $this->authorization = ['user' => (yield $this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc]))[0]];
         } catch (RPCErrorException $e) {
             $this->logger->logger($e->getMessage());
 

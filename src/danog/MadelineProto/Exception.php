@@ -31,7 +31,7 @@ class Exception extends \Exception
 
     public function __construct($message = null, $code = 0, self $previous = null, $file = null, $line = null)
     {
-        $this->prettify_tl();
+        $this->prettifyTl();
         if ($file !== null) {
             $this->file = $file;
         }
@@ -75,7 +75,7 @@ class Exception extends \Exception
      *
      * Error handler
      */
-    public static function ExceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null)
+    public static function exceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null)
     {
         // If error is suppressed with @, don't throw an exception
         if (\error_reporting() === 0 || \strpos($errstr, 'headers already sent') || ($errfile && \strpos($errfile, 'vendor/amphp') !== false)) {
@@ -90,7 +90,7 @@ class Exception extends \Exception
      *
      * Error handler
      */
-    public static function ExceptionHandler($exception)
+    public static function exceptionHandler($exception)
     {
         Logger::log($exception, Logger::FATAL_ERROR);
         Magic::shutdown(1);

@@ -181,7 +181,7 @@ class MinDatabase implements TLCallback
                     $peers[$location['from_id']] = true;
                 }
                 if (isset($location['channel_id'])) {
-                    $peers[$this->API->to_supergroup($location['channel_id'])] = true;
+                    $peers[$this->API->toSupergroup($location['channel_id'])] = true;
                 }
                 break;
             case 'messageActionChatCreate':
@@ -191,13 +191,13 @@ class MinDatabase implements TLCallback
                 }
                 break;
             case 'message':
-                $peers[$this->API->get_id($location['to_id'])] = true;
+                $peers[$this->API->getId($location['to_id'])] = true;
                 if (isset($location['from_id'])) {
                     $peers[$location['from_id']] = true;
                 }
                 break;
             default:
-                $peers[$this->API->get_id($location)] = true;
+                $peers[$this->API->getId($location)] = true;
         }
         $this->API->logger->logger("Caching peer location info from location from {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $key = \count($this->cache) - 1;
@@ -224,7 +224,7 @@ class MinDatabase implements TLCallback
         switch ($data['_']) {
             case 'message':
             case 'messageService':
-                $origin['peer'] = $this->API->get_id($data);
+                $origin['peer'] = $this->API->getId($data);
                 $origin['msg_id'] = $data['id'];
                 break;
             default:
@@ -244,11 +244,11 @@ class MinDatabase implements TLCallback
         if (!($object['min'] ?? false)) {
             return $object;
         }
-        $id = $this->API->get_id($object);
+        $id = $this->API->getId($object);
         if (isset($this->db[$id])) {
             $new = \array_merge($object, $this->db[$id]);
             $new['_'] .= 'FromMessage';
-            $new['peer'] = (yield $this->API->get_info_async($new['peer']))['InputPeer'];
+            $new['peer'] = (yield $this->API->getInfo($new['peer']))['InputPeer'];
             if ($new['peer']['min']) {
                 $this->API->logger->logger("Don't have origin peer subinfo with min peer $id, this may fail");
                 return $object;

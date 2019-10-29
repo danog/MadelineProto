@@ -42,7 +42,7 @@ use function Amp\Promise\wait;
  */
 trait Tools
 {
-    public static function gen_vector_hash($ints)
+    public static function genVectorHash($ints)
     {
         //sort($ints, SORT_NUMERIC);
         if (\danog\MadelineProto\Magic::$bigint) {
@@ -50,7 +50,7 @@ trait Tools
             foreach ($ints as $int) {
                 $hash = $hash->multiply(\danog\MadelineProto\Magic::$twozerotwosixone)->add(\danog\MadelineProto\Magic::$zeroeight)->add(new \phpseclib\Math\BigInteger($int))->divide(\danog\MadelineProto\Magic::$zeroeight)[1];
             }
-            $hash = self::unpack_signed_int(\strrev(\str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
+            $hash = self::unpackSignedInt(\strrev(\str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
         } else {
             $hash = 0;
             foreach ($ints as $int) {
@@ -61,7 +61,7 @@ trait Tools
         return $hash;
     }
 
-    public static function random_int($modulus = false)
+    public static function randomInt($modulus = false)
     {
         if ($modulus === false) {
             $modulus = PHP_INT_MAX;
@@ -81,9 +81,9 @@ trait Tools
         }
 
         if (Magic::$bigint) {
-            $number = self::unpack_signed_int(self::random(4));
+            $number = self::unpackSignedInt(self::random(4));
         } else {
-            $number = self::unpack_signed_long(self::random(8));
+            $number = self::unpackSignedLong(self::random(8));
         }
 
         return ($number & PHP_INT_MAX) % $modulus;
@@ -105,7 +105,7 @@ trait Tools
         return $resto < 0 ? $resto + \abs($b) : $resto;
     }
 
-    public static function unpack_signed_int($value)
+    public static function unpackSignedInt($value)
     {
         if (\strlen($value) !== 4) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_4']);
@@ -114,7 +114,7 @@ trait Tools
         return \unpack('l', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
 
-    public static function unpack_signed_long($value)
+    public static function unpackSignedLong($value)
     {
         if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
@@ -123,7 +123,7 @@ trait Tools
         return \unpack('q', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
 
-    public static function unpack_signed_long_string($value)
+    public static function unpackSignedLongString($value)
     {
         if (\is_int($value)) {
             return (string) $value;
@@ -136,7 +136,7 @@ trait Tools
         return (string) $big;
     }
 
-    public static function pack_signed_int($value)
+    public static function packSignedInt($value)
     {
         if ($value > 2147483647) {
             throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_2147483647'], $value));
@@ -149,7 +149,7 @@ trait Tools
         return \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($res) : $res;
     }
 
-    public static function pack_signed_long($value)
+    public static function packSignedLong($value)
     {
         if ($value > 9223372036854775807) {
             throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_9223372036854775807'], $value));
@@ -157,12 +157,12 @@ trait Tools
         if ($value < -9.223372036854776E+18) {
             throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_9223372036854775808'], $value));
         }
-        $res = \danog\MadelineProto\Magic::$bigint ? self::pack_signed_int($value)."\0\0\0\0" : (\danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev(\pack('q', $value)) : \pack('q', $value));
+        $res = \danog\MadelineProto\Magic::$bigint ? self::packSignedInt($value)."\0\0\0\0" : (\danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev(\pack('q', $value)) : \pack('q', $value));
 
         return $res;
     }
 
-    public static function pack_unsigned_int($value)
+    public static function packUnsignedInt($value)
     {
         if ($value > 4294967295) {
             throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_4294967296'], $value));
@@ -174,7 +174,7 @@ trait Tools
         return \pack('V', $value);
     }
 
-    public static function pack_double($value)
+    public static function packDouble($value)
     {
         $res = \pack('d', $value);
         if (\strlen($res) !== 8) {
@@ -184,7 +184,7 @@ trait Tools
         return \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($res) : $res;
     }
 
-    public static function unpack_double($value)
+    public static function unpackDouble($value)
     {
         if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
@@ -441,7 +441,7 @@ trait Tools
     {
         return getOutputBufferStream()->write($string);
     }
-    public static function is_array_or_alike($var)
+    public static function isArrayOrAlike($var)
     {
         return \is_array($var) ||
             ($var instanceof ArrayAccess &&
@@ -456,7 +456,7 @@ trait Tools
      *
      * @return string
      */
-    public static function from_snake_case(string $input): string
+    public static function fromSnakeCase(string $input): string
     {
         return \lcfirst(\str_replace('_', '', \ucwords($input, '_')));
     }
@@ -467,7 +467,7 @@ trait Tools
      *
      * @return string
      */
-    public static function from_camel_case(string $input): string
+    public static function fromCamelCase(string $input): string
     {
         \preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
         $ret = $matches[0];

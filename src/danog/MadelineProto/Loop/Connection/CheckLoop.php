@@ -74,7 +74,7 @@ class CheckLoop extends ResumableSignalLoop
             }
 
             if ($connection->hasPendingCalls()) {
-                $last_msgid = $connection->get_max_id(true);
+                $last_msgid = $connection->getMaxId(true);
                 $last_chunk = $connection->getLastChunk();
 
                 if ($shared->hasTempAuthKey()) {
@@ -109,11 +109,11 @@ class CheckLoop extends ResumableSignalLoop
                                         case 2:
                                         case 3:
                                             if ($connection->outgoing_messages[$message_id]['_'] === 'msgs_state_req') {
-                                                $connection->got_response_for_outgoing_message_id($message_id);
+                                                $connection->gotResponseForOutgoingMessageId($message_id);
                                                 break;
                                             }
                                             $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.($message_id).' not received by server, resending...', \danog\MadelineProto\Logger::ERROR);
-                                            $connection->method_recall('watcherId', ['message_id' => $message_id, 'postpone' => true]);
+                                            $connection->methodRecall('watcherId', ['message_id' => $message_id, 'postpone' => true]);
                                             break;
                                         case 4:
                                             if ($chr & 32) {
@@ -131,7 +131,7 @@ class CheckLoop extends ResumableSignalLoop
                                     }
                                 }
                                 if ($reply) {
-                                    $this->callFork($connection->object_call_async('msg_resend_ans_req', ['msg_ids' => $reply], ['postpone' => true]));
+                                    $this->callFork($connection->objectCall('msg_resend_ans_req', ['msg_ids' => $reply], ['postpone' => true]));
                                 }
                                 $connection->flush();
                             }
@@ -142,7 +142,7 @@ class CheckLoop extends ResumableSignalLoop
                             $list .= $connection->outgoing_messages[$message_id]['_'].', ';
                         }
                         $API->logger->logger("Still missing $list on DC $datacenter, sending state request", \danog\MadelineProto\Logger::ERROR);
-                        yield $connection->object_call_async('msgs_state_req', ['msg_ids' => $message_ids], ['promise' => $deferred]);
+                        yield $connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], ['promise' => $deferred]);
                     }
                 } else {
                     foreach ($connection->new_outgoing as $message_id) {
@@ -151,7 +151,7 @@ class CheckLoop extends ResumableSignalLoop
                             && $connection->outgoing_messages[$message_id]['unencrypted']
                         ) {
                             $API->logger->logger('Still missing '.$connection->outgoing_messages[$message_id]['_'].' with message id '.($message_id)." on DC $datacenter, resending", \danog\MadelineProto\Logger::ERROR);
-                            $connection->method_recall('', ['message_id' => $message_id, 'postpone' => true]);
+                            $connection->methodRecall('', ['message_id' => $message_id, 'postpone' => true]);
                         }
                     }
                     $connection->flush();
@@ -160,7 +160,7 @@ class CheckLoop extends ResumableSignalLoop
                     return;
                 }
 
-                if ($connection->get_max_id(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {
+                if ($connection->getMaxId(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {
                     $API->logger->logger("We did not receive a response for $timeout seconds: reconnecting and exiting check loop on DC $datacenter");
                     //$this->exitedLoop();
                     Tools::callForkDefer($connection->reconnect());

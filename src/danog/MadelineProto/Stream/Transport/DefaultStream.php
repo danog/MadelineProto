@@ -53,7 +53,7 @@ class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInt
         return $this->stream;
     }
 
-    public function connectAsync(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
+    public function connectGenerator(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
     {
         if ($ctx->isSecure()) {
             $this->stream = yield ($this->cryptoConnector)($ctx->getStringUri(), $ctx->getSocketContext(), null, $ctx->getCancellationToken());

@@ -28,7 +28,7 @@ use function Amp\ByteStream\getStdout;
  */
 trait ApiStart
 {
-    public function api_start_async($settings)
+    public function APIStart($settings)
     {
         if (PHP_SAPI === 'cli') {
             $stdout = getStdout();
@@ -49,16 +49,16 @@ Note that you can also provide the API parameters directly in the code using the
                 return $app;
             }
             $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($settings);
-            yield $this->my_telegram_org_wrapper->login_async(yield Tools::readLine('Enter a phone number that is already registered on Telegram: '));
-            yield $this->my_telegram_org_wrapper->complete_login_async(yield Tools::readLine('Enter the verification code you received in telegram: '));
-            if (!yield $this->my_telegram_org_wrapper->has_app_async()) {
+            yield $this->my_telegram_org_wrapper->login(yield Tools::readLine('Enter a phone number that is already registered on Telegram: '));
+            yield $this->my_telegram_org_wrapper->completeLogin(yield Tools::readLine('Enter the verification code you received in telegram: '));
+            if (!yield $this->my_telegram_org_wrapper->hasApp()) {
                 $app_title = yield Tools::readLine('Enter the app\'s name, can be anything: ');
                 $short_name = yield Tools::readLine('Enter the app\'s short name, can be anything: ');
                 $url = yield Tools::readLine('Enter the app/website\'s URL, or t.me/yourusername: ');
                 $description = yield Tools::readLine('Describe your app: ');
-                $app = yield $this->my_telegram_org_wrapper->create_app_async(['app_title' => $app_title, 'app_shortname' => $short_name, 'app_url' => $url, 'app_platform' => 'web', 'app_desc' => $description]);
+                $app = yield $this->my_telegram_org_wrapper->createApp(['app_title' => $app_title, 'app_shortname' => $short_name, 'app_url' => $url, 'app_platform' => 'web', 'app_desc' => $description]);
             } else {
-                $app = yield $this->my_telegram_org_wrapper->get_app_async();
+                $app = yield $this->my_telegram_org_wrapper->getApp();
             }
 
             return $app;
@@ -72,17 +72,17 @@ Note that you can also provide the API parameters directly in the code using the
 
                 return $app;
             } elseif (isset($_POST['phone_number'])) {
-                yield $this->web_api_phone_login_async($settings);
+                yield $this->webAPIPhoneLogin($settings);
             } else {
-                yield $this->web_api_echo_async();
+                yield $this->webAPIEcho();
             }
         } elseif (!$this->my_telegram_org_wrapper->logged_in()) {
             if (isset($_POST['code'])) {
-                yield $this->web_api_complete_login_async();
-                if (yield $this->my_telegram_org_wrapper->has_app_async()) {
-                    return yield $this->my_telegram_org_wrapper->get_app_async();
+                yield $this->webAPICompleteLogin();
+                if (yield $this->my_telegram_org_wrapper->hasApp()) {
+                    return yield $this->my_telegram_org_wrapper->getApp();
                 }
-                yield $this->web_api_echo_async();
+                yield $this->webAPIEcho();
             } elseif (isset($_POST['api_id']) && isset($_POST['api_hash'])) {
                 $app['api_id'] = (int) $_POST['api_id'];
                 $app['api_hash'] = $_POST['api_hash'];
@@ -90,58 +90,58 @@ Note that you can also provide the API parameters directly in the code using the
 
                 return $app;
             } elseif (isset($_POST['phone_number'])) {
-                yield $this->web_api_phone_login_async($settings);
+                yield $this->webAPIPhoneLogin($settings);
             } else {
                 $this->my_telegram_org_wrapper = null;
-                yield $this->web_api_echo_async();
+                yield $this->webAPIEcho();
             }
         } else {
             if (isset($_POST['app_title'], $_POST['app_shortname'], $_POST['app_url'], $_POST['app_platform'], $_POST['app_desc'])) {
-                $app = yield $this->web_api_create_app_async();
+                $app = yield $this->webAPICreateApp();
                 $this->getting_api_id = false;
 
                 return $app;
             }
-            yield $this->web_api_echo_async("You didn't provide all of the required parameters!");
+            yield $this->webAPIEcho("You didn't provide all of the required parameters!");
         }
         $this->asyncInitPromise = null;
         exit;
     }
 
-    public function web_api_phone_login_async($settings)
+    public function webAPIPhoneLogin($settings)
     {
         try {
             $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($settings);
-            yield $this->my_telegram_org_wrapper->login_async($_POST['phone_number']);
-            yield $this->web_api_echo_async();
+            yield $this->my_telegram_org_wrapper->login($_POST['phone_number']);
+            yield $this->webAPIEcho();
         } catch (\Throwable $e) {
-            yield $this->web_api_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webAPIEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
 
-    public function web_api_complete_login_async()
+    public function webAPICompleteLogin()
     {
         try {
-            yield $this->my_telegram_org_wrapper->complete_login_async($_POST['code']);
+            yield $this->my_telegram_org_wrapper->completeLogin($_POST['code']);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->web_api_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webAPIEcho('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->web_api_echo_async('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webAPIEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
 
-    public function web_api_create_app_async()
+    public function webAPICreateApp()
     {
         try {
             $params = $_POST;
             unset($params['creating_app']);
-            $app = yield $this->my_telegram_org_wrapper->create_app_async($params);
+            $app = yield $this->my_telegram_org_wrapper->createApp($params);
 
             return $app;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->web_api_echo_async('ERROR: '.$e->getMessage().' Try again.');
+            yield $this->webAPIEcho('ERROR: '.$e->getMessage().' Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->web_api_echo_async('ERROR: '.$e->getMessage().' Try again.');
+            yield $this->webAPIEcho('ERROR: '.$e->getMessage().' Try again.');
         }
     }
 }

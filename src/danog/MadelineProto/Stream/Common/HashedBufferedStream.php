@@ -154,7 +154,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return Generator That resolves with a string when the provided promise is resolved and the data is added to the hashing context
      */
-    public function bufferReadAsync(int $length): \Generator
+    public function bufferReadGenerator(int $length): \Generator
     {
         if ($this->read_check_after && $length + $this->read_check_pos >= $this->read_check_after) {
             if ($length + $this->read_check_pos > $this->read_check_after) {
@@ -203,7 +203,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return \Generator
      */
-    public function connectAsync(ConnectionContext $ctx): \Generator
+    public function connectGenerator(ConnectionContext $ctx): \Generator
     {
         $this->write_hash = null;
         $this->write_check_after = 0;
@@ -232,7 +232,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return Generator
      */
-    public function getReadBufferAsync(&$length): \Generator
+    public function getReadBufferGenerator(&$length): \Generator
     {
         if ($this->read_hash) {
             $this->read_buffer = yield $this->stream->getReadBuffer($length);
@@ -250,7 +250,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return Generator
      */
-    public function getWriteBufferAsync(int $length, string $append = ''): \Generator
+    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
         if ($this->write_hash) {
             $this->write_buffer = yield $this->stream->getWriteBuffer($length, $append);
@@ -274,7 +274,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
             return $this->read_buffer->bufferRead($length);
         }
 
-        return $this->call($this->bufferReadAsync($length));
+        return $this->call($this->bufferReadGenerator($length));
     }
 
     /**

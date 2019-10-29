@@ -55,7 +55,7 @@ trait PrettyException
     {
         if (!$this->updated) {
             $this->updated = true;
-            $this->prettify_tl($this->method, $trace);
+            $this->prettifyTl($this->method, $trace);
         }
     }
     /**
@@ -76,7 +76,7 @@ trait PrettyException
      *
      * @return void
      */
-    public function prettify_tl(string $init = '', array $trace = null)
+    public function prettifyTl(string $init = '', array $trace = null)
     {
         $this->method = $init;
         $previous_trace = $this->tl_trace;
