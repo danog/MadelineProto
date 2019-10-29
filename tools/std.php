@@ -29,9 +29,10 @@ foreach ($methods as $methodObj) {
     if (\strpos($method, '__') === 0 || $method === 'async') {
         continue;
     }
-    $new = Tools::from_snake_case($method);
+    $new = Tools::fromSnakeCase($method);
     $new = \str_ireplace(['mtproto', 'api'], ['MTProto', 'API'], $new);
-    if (!\in_array($method, ['discard_call_async', 'accept_call_async', 'request_call_async'])) {
+    $new = \preg_replace('/TL$/i', 'TL', $new);
+    if (!\in_array($method, ['discardCallAsync', 'acceptCallAsync', 'requestCallAsync'])) {
         $new = \preg_replace('/async$/i', '', $new);
     }
 
@@ -55,7 +56,7 @@ foreach ($methods as $methodObj) {
     $replace[] = "function $new(";
 }
 
-foreach (new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(\realpath('src'))), '/\.php$/') as $filename) {
+foreach (new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(\realpath('.'))), '/\.php$/') as $filename) {
     $filename = (string) $filename;
     $new = \str_replace($find, $replace, $old = \file_get_contents($filename));
     do {

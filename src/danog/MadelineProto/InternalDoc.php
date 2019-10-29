@@ -4740,7 +4740,7 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
 
-    public function constructTl($files, $objects = [
+    public function constructTL($files, $objects = [
     ], array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$files, $objects, $extra]);

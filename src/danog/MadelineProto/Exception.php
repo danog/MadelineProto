@@ -31,7 +31,7 @@ class Exception extends \Exception
 
     public function __construct($message = null, $code = 0, self $previous = null, $file = null, $line = null)
     {
-        $this->prettifyTl();
+        $this->prettifyTL();
         if ($file !== null) {
             $this->file = $file;
         }
