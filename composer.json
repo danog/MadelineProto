@@ -34,7 +34,8 @@
         "phpdocumentor/reflection-docblock": "^4.3",
         "ennexa/amp-update-cache": "dev-master",
         "phpunit/phpunit": "^8",
-        "amphp/php-cs-fixer-config": "dev-master"
+        "amphp/php-cs-fixer-config": "dev-master",
+        "haydenpierce/class-finder": "^0.4"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)"
@@ -44,8 +45,8 @@
         "email": "daniil@daniil.it"
     }],
     "autoload": {
-        "psr-0": {
-            "danog\\MadelineProto\\": "src/"
+        "psr-4": {
+            "danog\\MadelineProto\\": "src/danog/MadelineProto"
         },
         "files": [
             "src/BigIntegor.php",
