@@ -42,12 +42,11 @@ class Button implements \JsonSerializable, \ArrayAccess
     public function click($donotwait = false, $params = [])
     {
         if (\is_array($donotwait)) {
-            $async = $donotwait;
-        } else {
-            $async = $params;
+            $params = $donotwait;
+            $donotwait = false;
         }
-        $async = isset($async['async']) ? $async['async'] : (isset($this->info['API']->wrapper) ? $this->info['API']->wrapper->async : true);
-        $method = $donotwait === true ? 'method_call_async_write' : 'method_call_async_read';
+        $async = $params['async']) ?? (isset($this->info['API']->wrapper) ? $this->info['API']->wrapper->async : true);
+        $method = $donotwait ? 'method_call_async_write' : 'method_call_async_read';
         switch ($this->data['_']) {
             default:
                 return false;
