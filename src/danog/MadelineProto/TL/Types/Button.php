@@ -45,7 +45,7 @@ class Button implements \JsonSerializable, \ArrayAccess
             $params = $donotwait;
             $donotwait = false;
         }
-        $async = $params['async']) ?? (isset($this->info['API']->wrapper) ? $this->info['API']->wrapper->async : true);
+        $async = $params['async'] ?? (isset($this->info['API']->wrapper) ? $this->info['API']->wrapper->async : true);
         $method = $donotwait ? 'method_call_async_write' : 'method_call_async_read';
         switch ($this->data['_']) {
             default:
