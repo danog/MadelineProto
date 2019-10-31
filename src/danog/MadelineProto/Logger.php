@@ -16,9 +16,6 @@
  *
  * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
-/*
- * Logger class
- */
 
 namespace danog\MadelineProto;
 
@@ -27,6 +24,9 @@ use Amp\Failure;
 use function Amp\ByteStream\getStderr;
 use function Amp\ByteStream\getStdout;
 
+/**
+ * Logger class
+ */
 class Logger
 {
     use Tools;
@@ -36,14 +36,54 @@ class Logger
     const SET = ['bold' => 1, 'dim' => 2, 'underlined' => 3, 'blink' => 4, 'reverse' => 5, 'hidden' => 6];
     const RESET = ['all' => 0, 'bold' => 21, 'dim' => 22, 'underlined' => 24, 'blink' => 25, 'reverse' => 26, 'hidden' => 28];
 
+    /**
+     * Logging mode
+     *
+     * @var integer
+     */
     public $mode = 0;
+    /**
+     * Optional logger parameter
+     *
+     * @var mixed
+     */
     public $optional = null;
+    /**
+     * Logger prefix
+     *
+     * @var string
+     */
     public $prefix = '';
-    public $level = 3;
+    /**
+     * Logging level
+     *
+     * @var integer
+     */
+    public $level = self::NOTICE;
+    /**
+     * Logging colors
+     *
+     * @var array
+     */
     public $colors = [];
+    /**
+     * Newline
+     *
+     * @var string
+     */
     public $newline = "\n";
 
+    /**
+     * Default logger instance
+     *
+     * @var self
+     */
     public static $default;
+    /**
+     * Whether the AGPL notice was printed
+     *
+     * @var boolean
+     */
     public static $printed = false;
 
     const ULTRA_VERBOSE = 5;
@@ -53,7 +93,6 @@ class Logger
     const ERROR = 1;
     const FATAL_ERROR = 0;
 
-
     const NO_LOGGER = 0;
     const DEFAULT_LOGGER = 1;
     const FILE_LOGGER = 2;
@@ -61,23 +100,10 @@ class Logger
     const CALLABLE_LOGGER = 4;
 
     /**
-     * Construct global logger.
-     *
-     * @param [type] $mode
-     * @param [type] $optional
-     * @param string $prefix
-     * @param [type] $level
-     * @param [type] $max_size
-     * @return void
-     */
-    public static function constructor($mode, $optional = null, $prefix = '', $level = self::NOTICE, $max_size = 100 * 1024 * 1024)
-    {
-        self::$default = new self($mode, $optional, $prefix, $level, $max_size);
-    }
-    /**
      * Construct global static logger from MadelineProto settings.
      *
-     * @param array $settings
+     * @param array $settings Settings array
+     * 
      * @return void
      */
     public static function constructorFromSettings(array $settings)
@@ -90,8 +116,9 @@ class Logger
     /**
      * Get logger from MadelineProto settings.
      *
-     * @param array $settings
-     * @param string $prefix Optional prefix
+     * @param array  $settings Settings array
+     * @param string $prefix   Optional prefix for log messages
+     * 
      * @return self
      */
     public static function getLoggerFromSettings(array $settings, string $prefix = ''): self
@@ -127,7 +154,35 @@ class Logger
 
         return $logger;
     }
-    public function __construct($mode, $optional = null, $prefix = '', $level = self::NOTICE, $max_size = 100 * 1024 * 1024)
+
+    /**
+     * Construct global logger.
+     *
+     * @param int    $mode     One of the logger constants
+     * @param mixed  $optional Optional parameter for logger  
+     * @param string $prefix   Prefix for log messages
+     * @param int    $level    Default logging level
+     * @param int    $max_size Maximum size for logfile
+     * 
+     * @return void
+     */
+    public static function constructor(int $mode, $optional = null, string $prefix = '', int $level = self::NOTICE, int $max_size = 100 * 1024 * 1024)
+    {
+        self::$default = new self($mode, $optional, $prefix, $level, $max_size);
+    }
+
+    /**
+     * Construct global logger.
+     *
+     * @param int    $mode     One of the logger constants
+     * @param mixed  $optional Optional parameter for logger  
+     * @param string $prefix   Prefix for log messages
+     * @param int    $level    Default logging level
+     * @param int    $max_size Maximum size for logfile
+     * 
+     * @return void
+     */
+    public function __construct(int $mode, $optional = null, string $prefix = '', int $level = self::NOTICE, int $max_size = 100 * 1024 * 1024)
     {
         if ($mode === null) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['no_mode_specified']);
@@ -176,7 +231,15 @@ class Logger
         }
     }
 
-    public static function log($param, $level = self::NOTICE)
+    /**
+     * Log a message
+     *
+     * @param mixed $param Message
+     * @param int   $level Logging level
+     * 
+     * @return void
+     */
+    public static function log($param, int $level = self::NOTICE)
     {
         if (!\is_null(self::$default)) {
             self::$default->logger($param, $level, \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php'));
@@ -185,7 +248,16 @@ class Logger
         }
     }
 
-    public function logger($param, $level = self::NOTICE, $file = null)
+    /**
+     * Log a message
+     *
+     * @param mixed  $param Message to log
+     * @param int    $level Logging level 
+     * @param string $file  File that originated the message
+     * 
+     * @return void
+     */
+    public function logger($param, int $level = self::NOTICE, string $file = '')
     {
         if ($level > $this->level || $this->mode === 0) {
             return false;
@@ -213,7 +285,7 @@ class Logger
         } elseif (!\is_string($param)) {
             $param = \json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
-        if ($file === null) {
+        if (empty($file)) {
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
         $param = \str_pad($file.$prefix.': ', 16 + \strlen($prefix))."\t".$param;
@@ -233,10 +305,5 @@ class Logger
                     }
                     break;
             }
-    }
-
-    public function __destruct()
-    {
-        //\danog\MadelineProto\Tools::wait($this->stdout->write(''));
     }
 }

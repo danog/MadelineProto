@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Artax\Client;
+use Amp\Dns\Resolver;
 use Amp\Loop;
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Loop\Generic\PeriodicLoop;
@@ -411,6 +413,13 @@ class MTProto extends AsyncConstruct implements TLCallback
     public $datacenter;
 
     /**
+     * Logger instance
+     *
+     * @var Logger
+     */
+    public $logger;
+
+    /**
      * Constructor function.
      *
      * @param array $settings Settings
@@ -512,7 +521,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @return void
      */
-    private function cleanup()
+    public function cleanup()
     {
         $this->referenceDatabase = new ReferenceDatabase($this);
         $callbacks = [$this, $this->referenceDatabase];
@@ -523,7 +532,16 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this;
     }
 
-    public function logger($param, $level = Logger::NOTICE, $file = null)
+    /**
+     * Logger
+     *
+     * @param string $param Parameter
+     * @param int    $level Logging level 
+     * @param string $file  File where the message originated
+     * 
+     * @return void
+     */
+    public function logger($param, int $level = Logger::NOTICE, string $file = '')
     {
         if ($file === null) {
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
@@ -533,37 +551,37 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Whether this is altervista
+     * Get async HTTP client
      *
-     * @return boolean
+     * @return \Amp\Artax\Client
      */
-    public function isAltervista(): bool
-    {
-        return Magic::$altervista;
-    }
-
-    public function isInitingAuthorization()
-    {
-        return $this->initing_authorization;
-    }
-
-    public function getHTTPClient()
+    public function getHTTPClient(): Client
     {
         return $this->datacenter->getHTTPClient();
     }
 
-    public function getDNSClient()
+    /**
+     * Get async DNS client
+     *
+     * @return \Amp\Dns\Resolver
+     */
+    public function getDNSClient(): Resolver
     {
         return $this->datacenter->getDNSClient();
     }
 
-    public function fileGetContents($url): \Generator
+    /**
+     * Get contents of remote file asynchronously
+     *
+     * @param string $url URL
+     * 
+     * @return \Generator<string>
+     */
+    public function fileGetContents(string $url): \Generator
     {
         return $this->datacenter->fileGetContents($url);
     }
-    public function testing(callable $a, ?string $b = null, $c = null, $d = 2, $e = self::METHOD_BEFORE_CALLBACK): ?string
-    {
-    }
+
     /**
      * Get all datacenter connections.
      *
@@ -588,6 +606,11 @@ class MTProto extends AsyncConstruct implements TLCallback
 
         return true;
     }
+    /**
+     * Prompt serialization of instance
+     *
+     * @return void
+     */
     public function serialize()
     {
         if ($this->wrapper instanceof API && isset($this->wrapper->session) && !\is_null($this->wrapper->session) && !$this->asyncInitPromise) {
@@ -595,7 +618,12 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->wrapper->serialize($this->wrapper->session);
         }
     }
-    public function startLoops()
+    /**
+     * Start all internal loops
+     *
+     * @return void
+     */
+    private function startLoops()
     {
         if (!$this->callCheckerLoop) {
             $this->callCheckerLoop = new PeriodicLoop($this, [$this, 'checkCalls'], 'call check', 10);
@@ -619,7 +647,12 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->configLoop->start();
         $this->checkTosLoop->start();
     }
-    public function stopLoops()
+    /**
+     * Stop all internal loops
+     *
+     * @return void
+     */
+    private function stopLoops()
     {
         if ($this->callCheckerLoop) {
             $this->callCheckerLoop->signal(true);
@@ -642,6 +675,10 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->checkTosLoop = null;
         }
     }
+
+    /**
+     * Wakeup function
+     */
     public function __wakeup()
     {
         $backtrace = \debug_backtrace(0, 3);
@@ -649,7 +686,14 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->setInitPromise($this->__wakeup_async($backtrace));
     }
 
-    public function __wakeup_async($backtrace)
+    /**
+     * Async wakeup function
+     *
+     * @param array $backtrace Stack trace
+     * 
+     * @return \Generator
+     */
+    public function __wakeup_async(array $backtrace): \Generator
     {
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         $this->setupLogger();
@@ -834,6 +878,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->updaters[false]->start();
     }
 
+    /**
+     * Destructor
+     */
     public function __destruct()
     {
         $this->stopLoops();
@@ -859,7 +906,15 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->logger("Successfully destroyed MadelineProto");
     }
 
-    public static function getSettings($settings, $previousSettings = []): array
+    /**
+     * Get correct settings array for the latest version
+     *
+     * @param array $settings         Current settings array
+     * @param array $previousSettings Previous settings array
+     * 
+     * @return array
+     */
+    public static function getSettings(array $settings, array $previousSettings = []): array
     {
         Magic::classExists();
         if (isset($previousSettings['connection_settings']['default_dc'])) {
@@ -1186,7 +1241,14 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         return $settings;
     }
-    public function parseSettings($settings)
+    /**
+     * Parse and store settings
+     *
+     * @param array $settings Settings
+     * 
+     * @return void
+     */
+    public function parseSettings(array $settings)
     {
         $settings = self::getSettings($settings, $this->settings);
         if ($settings['app_info'] === null) {
@@ -1200,6 +1262,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->setupLogger();
     }
 
+    /**
+     * Setup logger
+     *
+     * @return void
+     */
     public function setupLogger()
     {
         $this->logger = Logger::getLoggerFromSettings($this->settings, isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '');
@@ -1240,7 +1307,19 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->datacenter->isHttp($datacenter);
     }
 
-    // Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
+
+    public function isInitingAuthorization()
+    {
+        return $this->initing_authorization;
+    }
+
+    /**
+     * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
+     *
+     * @param boolean $reconnectAll Whether to reconnect to all DCs
+     * 
+     * @return \Generator
+     */
     public function connectToAllDcs(bool $reconnectAll = true): \Generator
     {
         $this->channels_state->get(false);
@@ -1275,6 +1354,11 @@ class MTProto extends AsyncConstruct implements TLCallback
 
         yield $this->getPhoneConfig();
     }
+    /**
+     * Clean up MadelineProto session after logout
+     *
+     * @return void
+     */
     public function resetSession()
     {
         if (isset($this->seqUpdater)) {
@@ -1316,6 +1400,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->dialog_params = ['_' => 'MadelineProto.dialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
         $this->full_chats = [];
     }
+    /**
+     * Reset the update state and fetch all updates from the beginning
+     *
+     * @return void
+     */
     public function resetUpdateState()
     {
         if (isset($this->seqUpdater)) {
@@ -1343,6 +1432,13 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->startUpdateSystem();
     }
 
+    /**
+     * Start the update system
+     *
+     * @param boolean $anyway Force start update system?
+     * 
+     * @return void
+     */
     public function startUpdateSystem($anyway = false)
     {
         if ($this->asyncInitPromise && !$anyway) {
@@ -1382,6 +1478,13 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
     }
 
+    /**
+     * Store shared phone config
+     *
+     * @param mixed $watcherId Watcher ID
+     * 
+     * @return void
+     */
     public function getPhoneConfig($watcherId = null)
     {
         if ($this->authorized === self::LOGGED_IN && \class_exists(VoIPServerConfigInternal::class) && !$this->authorization['user']['bot'] && $this->datacenter->getDataCenterConnection($this->settings['connection_settings']['default_dc'])->hasTempAuthKey()) {
@@ -1392,13 +1495,15 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
     }
 
-
-    public function getCdnConfig($datacenter)
+    /**
+     * Store RSA keys for CDN datacenters
+     *
+     * @param string $datacenter DC ID
+     * 
+     * @return \Generator
+     */
+    public function getCdnConfig(string $datacenter): \Generator
     {
-        /*
-         * ***********************************************************************
-         * Fetch RSA keys for CDN datacenters
-         */
         try {
             foreach ((yield $this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
                 $tempkey = new \danog\MadelineProto\RSA($curkey['public_key']);
@@ -1409,12 +1514,25 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
     }
 
-    public function getCachedConfig()
+    /**
+     * Get cached server-side config
+     *
+     * @return array
+     */
+    public function getCachedConfig(): array
     {
         return $this->config;
     }
 
-    public function getConfig($config = [], $options = [])
+    /**
+     * Get cached (or eventually re-fetch) server-side config
+     *
+     * @param array $config  Current config
+     * @param array $options Options for method call
+     * 
+     * @return \Generator
+     */
+    public function getConfig(array $config = [], array $options = []): \Generator
     {
         if ($this->config['expires'] > \time()) {
             return $this->config;
@@ -1425,7 +1543,12 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->config;
     }
 
-    public function parseConfig()
+    /**
+     * Parse cached config
+     *
+     * @return \Generator
+     */
+    private function parseConfig(): \Generator
     {
         if (isset($this->config['dc_options'])) {
             $options = $this->config['dc_options'];
@@ -1436,7 +1559,14 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->logger->logger($this->config, Logger::NOTICE);
     }
 
-    public function parseDcOptions($dc_options)
+    /**
+     * Parse DC options from config
+     *
+     * @param array $dc_options DC options
+     * 
+     * @return \Generator
+     */
+    private function parseDcOptions(array $dc_options): \Generator
     {
         foreach ($dc_options as $dc) {
             $test = $this->config['test_mode'] ? 'test' : 'main';

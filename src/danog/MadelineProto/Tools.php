@@ -223,10 +223,10 @@ trait Tools
     }
 
     /**
-     * Convert value to unsigned base256 int
+     * Convert value to unsigned base256 int.
      *
      * @param int $value Value
-     * 
+     *
      * @return string
      */
     public static function packUnsignedInt(int $value): string
@@ -242,10 +242,10 @@ trait Tools
     }
 
     /**
-     * Convert double to binary version
+     * Convert double to binary version.
      *
      * @param double $value Value to convert
-     * 
+     *
      * @return string
      */
     public static function packDouble(double $value): string
@@ -259,10 +259,10 @@ trait Tools
     }
 
     /**
-     * Unpack binary double
+     * Unpack binary double.
      *
      * @param string $value Value to unpack
-     * 
+     *
      * @return double
      */
     public static function unpackDouble(string $value): double
@@ -275,11 +275,11 @@ trait Tools
     }
 
     /**
-     * Synchronously wait for a promise|generator
+     * Synchronously wait for a promise|generator.
      *
      * @param \Generator|Promise $promise      The promise to wait for
      * @param boolean            $ignoreSignal Whether to ignore shutdown signals
-     * 
+     *
      * @return mixed
      */
     public static function wait($promise, $ignoreSignal = false)
@@ -320,7 +320,7 @@ trait Tools
      * Returned promise succeeds with an array of values used to succeed each contained promise, with keys corresponding to the array of promises.
      *
      * @param array<\Generator|Promise> $promises Promises
-     * 
+     *
      * @return Promise
      */
     public static function all(array $promises): Promise
@@ -334,9 +334,9 @@ trait Tools
 
     /**
      * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
-     * 
+     *
      * @param array<Promise|\Generator> $promises Promises
-     * 
+     *
      * @return Promise
      */
     public static function any(array $promises): Promise
@@ -353,7 +353,7 @@ trait Tools
      * The returned promise will only fail if the given number of required promises fail.
      *
      * @param array<Promise|\Generator> $promises Promises
-     * 
+     *
      * @return Promise
      */
     public static function some(array $promises): Promise
@@ -369,7 +369,7 @@ trait Tools
      * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
      *
      * @param array<Promise|\Generator> $promises Promises
-     * 
+     *
      * @return Promise
      */
     public static function first(array $promises): Promise
@@ -382,11 +382,11 @@ trait Tools
     }
 
     /**
-     * Create an artificial timeout for any \Generator or Promise
+     * Create an artificial timeout for any \Generator or Promise.
      *
      * @param \Generator|Promise $promise
      * @param integer $timeout
-     * 
+     *
      * @return Promise
      */
     public static function timeout($promise, int $timeout): Promise
@@ -395,10 +395,10 @@ trait Tools
     }
 
     /**
-     * Convert generator, promise or any other value to a promise
+     * Convert generator, promise or any other value to a promise.
      *
      * @param \Generator|Promise|mixed $promise
-     * 
+     *
      * @return Promise
      */
     public static function call($promise): Promise
@@ -413,12 +413,12 @@ trait Tools
     }
 
     /**
-     * Call promise in background
+     * Call promise in background.
      *
      * @param \Generator|Promise  $promise Promise to resolve
      * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
      * @param string              $file    File
-     * 
+     *
      * @return void
      */
     public static function callFork($promise, $actual = null, $file = '')
@@ -454,10 +454,10 @@ trait Tools
     }
 
     /**
-     * Call promise in background, deferring execution
+     * Call promise in background, deferring execution.
      *
      * @param \Generator|Promise $promise Promise to resolve
-     * 
+     *
      * @return void
      */
     public static function callForkDefer($promise)
@@ -466,11 +466,11 @@ trait Tools
     }
 
     /**
-     * Rethrow error catched in strand
+     * Rethrow error catched in strand.
      *
      * @param \Throwable $e    Exception
      * @param string     $file File where the strand started
-     * 
+     *
      * @return void
      */
     public static function rethrow(\Throwable $e, $file = '')
@@ -499,11 +499,11 @@ trait Tools
     }
 
     /**
-     * Call promise $b after promise $a
+     * Call promise $b after promise $a.
      *
      * @param \Generator|Promise $a Promise A
      * @param \Generator|Promise $b Promise B
-     * 
+     *
      * @return Promise
      */
     public static function after($a, $b): Promise
@@ -513,9 +513,9 @@ trait Tools
         $a->onResolve(static function ($e, $res) use ($b, $deferred) {
             if ($e) {
                 if (isset($this)) {
-                    $this->rethrow($e, $file);
+                    $this->rethrow($e);
                 } else {
-                    self::rethrow($e, $file);
+                    self::rethrow($e);
                 }
                 return;
             }
@@ -523,9 +523,9 @@ trait Tools
             $b->onResolve(function ($e, $res) use ($deferred) {
                 if ($e) {
                     if (isset($this)) {
-                        $this->rethrow($e, $file);
+                        $this->rethrow($e);
                     } else {
-                        self::rethrow($e, $file);
+                        self::rethrow($e);
                     }
                     return;
                 }
@@ -808,5 +808,15 @@ trait Tools
     public function markdownEscape(string $hwat): string
     {
         return \str_replace('_', '\\_', $hwat);
+    }
+
+    /**
+     * Whether this is altervista.
+     *
+     * @return boolean
+     */
+    public function isAltervista(): bool
+    {
+        return Magic::$altervista;
     }
 }
