@@ -20,12 +20,22 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 /**
- * Stores multiple states.
+ * Stores multiple update states.
  */
 class CombinedUpdatesState
 {
+    /**
+     * Update states.
+     *
+     * @var array<UpdatesState>
+     */
     private $states = [];
 
+    /**
+     * Constructor function.
+     *
+     * @param array $init Initial array of states
+     */
     public function __construct($init = [])
     {
         $this->states[false] = new UpdatesState();
@@ -41,14 +51,14 @@ class CombinedUpdatesState
     }
 
     /**
-     * Update multiple parameters.
+     * Get or update multiple parameters.
      *
-     * @param array|null $init
-     * @param int        $channel
+     * @param int   $channel Channel to get info about (optional, if not provided returns the entire info array)
+     * @param array $init    Parameters to update
      *
-     * @return UpdatesState
+     * @return UpdatesState|UpdatesState[]
      */
-    public function get($channel = null, $init = [])
+    public function get(int $channel = null, array $init = [])
     {
         if ($channel === null) {
             return $this->states;
@@ -63,11 +73,11 @@ class CombinedUpdatesState
     /**
      * Remove update state.
      *
-     * @param int $channel
+     * @param int $channel Channel whose state should be removed
      *
      * @return void
      */
-    public function remove($channel)
+    public function remove(int $channel)
     {
         if (isset($this->states[$channel])) {
             unset($this->states[$channel]);
@@ -77,11 +87,11 @@ class CombinedUpdatesState
     /**
      * Check if update state is present.
      *
-     * @param int $channel
+     * @param int $channel Channel ID
      *
-     * @return void
+     * @return bool
      */
-    public function has($channel)
+    public function has(int $channel): bool
     {
         return isset($this->states[$channel]);
     }
@@ -89,12 +99,12 @@ class CombinedUpdatesState
     /**
      * Are we currently busy?
      *
-     * @param int       $channel
-     * @param bool|null $set
+     * @param int       $channel Channel to get info about
+     * @param bool|null $set     Busy flag to set before returning
      *
      * @return bool
      */
-    public function syncLoading($channel, $set = null)
+    public function syncLoading(int $channel, bool $set = null): bool
     {
         return $this->get($channel)->syncLoading($set);
     }

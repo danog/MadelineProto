@@ -19,16 +19,66 @@
 
 namespace danog\MadelineProto\TL;
 
+use danog\MadelineProto\MTProto;
+
 trait TL
 {
+    /**
+     * Highest available secret chat layer version
+     *
+     * @var integer
+     */
     public $encrypted_layer = -1;
+    /**
+     * Constructors
+     *
+     * @var TLConstructor
+     */
     public $constructors;
+    /**
+     * Methods
+     *
+     * @var TLMethods
+     */
     public $methods;
+    /**
+     * TD Constructors
+     *
+     * @var TLConstructors
+     */
     public $td_constructors;
+    /**
+     * TD Methods
+     *
+     * @var TLMethods
+     */
     public $td_methods;
+    /**
+     * Descriptions
+     *
+     * @var array
+     */
     public $td_descriptions;
+    /**
+     * TL callbacks
+     *
+     * @var array
+     */
     public $tl_callbacks = [];
-
+    /**
+     * API instance
+     *
+     * @var \danog\MadelineProto\MTProto
+     */
+    private $API;
+    /**
+     * Constructor function
+     *
+     * @param MTProto $API API instance
+     */
+    public function __construct(MTProto $API) {
+        $this->API = $API;
+    }
     public function constructTL($files, $objects = [])
     {
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_loading'], \danog\MadelineProto\Logger::VERBOSE);

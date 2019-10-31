@@ -19,9 +19,17 @@
 
 namespace danog\MadelineProto;
 
+/**
+ * Event handler
+ */
 class EventHandler extends InternalDoc
 {
-    public function __construct($MadelineProto)
+    /**
+     * Constructor
+     *
+     * @param API|null $MadelineProto MadelineProto instance
+     */
+    public function __construct(?API $MadelineProto)
     {
         if (!$MadelineProto) {
             return;

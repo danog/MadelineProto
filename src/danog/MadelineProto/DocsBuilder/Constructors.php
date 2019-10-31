@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\DocsBuilder;
 
+use danog\MadelineProto\Tools;
+
 trait Constructors
 {
     public function mkConstructors()
@@ -64,7 +66,7 @@ trait Constructors
                     $param['type'] = 'DecryptedMessage';
                 }
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
-                $type_or_bare_type = \ctype_upper($this->end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512']) ? 'types' : 'constructors';
+                $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512']) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = \str_replace(['.', 'true', 'false'], ['_', 'Bool', 'Bool'], $param[$type_or_subtype]);
                 if (\preg_match('/%/', $param[$type_or_subtype])) {
                     $param[$type_or_subtype] = $this->constructors->findByType(\str_replace('%', '', $param[$type_or_subtype]))['predicate'];
@@ -73,7 +75,7 @@ trait Constructors
                     $param[$type_or_subtype] = \substr($param[$type_or_subtype], 0, -1);
                 }
                 $params .= "'".$param['name']."' => ";
-                $param[$type_or_subtype] = '['.$this->escape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
+                $param[$type_or_subtype] = '['.Tools::markdownEscape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $params .= (isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
             $md_constructor = \str_replace('_', '\\_', $constructor.$layer);
@@ -126,7 +128,7 @@ trait Constructors
                 if (\preg_match('/%/', $ptype)) {
                     $ptype = $this->constructors->findByType(\str_replace('%', '', $ptype))['predicate'];
                 }
-                $type_or_bare_type = (\ctype_upper($this->end(\explode('_', $ptype))[0]) || \in_array($ptype, ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'])) && $ptype !== 'MTmessage' ? 'types' : 'constructors';
+                $type_or_bare_type = (\ctype_upper(Tools::end(\explode('_', $ptype))[0]) || \in_array($ptype, ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'])) && $ptype !== 'MTmessage' ? 'types' : 'constructors';
                 if (\substr($ptype, -1) === '>') {
                     $ptype = \substr($ptype, 0, -1);
                 }

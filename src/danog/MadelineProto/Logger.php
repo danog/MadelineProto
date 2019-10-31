@@ -25,7 +25,7 @@ use function Amp\ByteStream\getStderr;
 use function Amp\ByteStream\getStdout;
 
 /**
- * Logger class
+ * Logger class.
  */
 class Logger
 {
@@ -37,50 +37,50 @@ class Logger
     const RESET = ['all' => 0, 'bold' => 21, 'dim' => 22, 'underlined' => 24, 'blink' => 25, 'reverse' => 26, 'hidden' => 28];
 
     /**
-     * Logging mode
+     * Logging mode.
      *
      * @var integer
      */
     public $mode = 0;
     /**
-     * Optional logger parameter
+     * Optional logger parameter.
      *
      * @var mixed
      */
     public $optional = null;
     /**
-     * Logger prefix
+     * Logger prefix.
      *
      * @var string
      */
     public $prefix = '';
     /**
-     * Logging level
+     * Logging level.
      *
      * @var integer
      */
     public $level = self::NOTICE;
     /**
-     * Logging colors
+     * Logging colors.
      *
      * @var array
      */
     public $colors = [];
     /**
-     * Newline
+     * Newline.
      *
      * @var string
      */
     public $newline = "\n";
 
     /**
-     * Default logger instance
+     * Default logger instance.
      *
      * @var self
      */
     public static $default;
     /**
-     * Whether the AGPL notice was printed
+     * Whether the AGPL notice was printed.
      *
      * @var boolean
      */
@@ -103,7 +103,7 @@ class Logger
      * Construct global static logger from MadelineProto settings.
      *
      * @param array $settings Settings array
-     * 
+     *
      * @return void
      */
     public static function constructorFromSettings(array $settings)
@@ -118,7 +118,7 @@ class Logger
      *
      * @param array  $settings Settings array
      * @param string $prefix   Optional prefix for log messages
-     * 
+     *
      * @return self
      */
     public static function getLoggerFromSettings(array $settings, string $prefix = ''): self
@@ -159,11 +159,11 @@ class Logger
      * Construct global logger.
      *
      * @param int    $mode     One of the logger constants
-     * @param mixed  $optional Optional parameter for logger  
+     * @param mixed  $optional Optional parameter for logger
      * @param string $prefix   Prefix for log messages
      * @param int    $level    Default logging level
      * @param int    $max_size Maximum size for logfile
-     * 
+     *
      * @return void
      */
     public static function constructor(int $mode, $optional = null, string $prefix = '', int $level = self::NOTICE, int $max_size = 100 * 1024 * 1024)
@@ -175,11 +175,11 @@ class Logger
      * Construct global logger.
      *
      * @param int    $mode     One of the logger constants
-     * @param mixed  $optional Optional parameter for logger  
+     * @param mixed  $optional Optional parameter for logger
      * @param string $prefix   Prefix for log messages
      * @param int    $level    Default logging level
      * @param int    $max_size Maximum size for logfile
-     * 
+     *
      * @return void
      */
     public function __construct(int $mode, $optional = null, string $prefix = '', int $level = self::NOTICE, int $max_size = 100 * 1024 * 1024)
@@ -232,11 +232,11 @@ class Logger
     }
 
     /**
-     * Log a message
+     * Log a message.
      *
      * @param mixed $param Message
      * @param int   $level Logging level
-     * 
+     *
      * @return void
      */
     public static function log($param, int $level = self::NOTICE)
@@ -249,12 +249,12 @@ class Logger
     }
 
     /**
-     * Log a message
+     * Log a message.
      *
      * @param mixed  $param Message to log
-     * @param int    $level Logging level 
+     * @param int    $level Logging level
      * @param string $file  File that originated the message
-     * 
+     *
      * @return void
      */
     public function logger($param, int $level = self::NOTICE, string $file = '')

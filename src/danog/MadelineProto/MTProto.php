@@ -244,7 +244,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Authorization info (User).
      *
-     * @var [type]
+     * @var array|null
      */
     public $authorization = null;
     /**
@@ -413,7 +413,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public $datacenter;
 
     /**
-     * Logger instance
+     * Logger instance.
      *
      * @var Logger
      */
@@ -440,32 +440,13 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function __construct_async($settings = [])
     {
-        \danog\MadelineProto\Magic::classExists();
-        // Parse settings
+        Magic::classExists();
+        // Parse and store settings
         $this->parseSettings($settings);
-        // Connect to servers
-        $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
-        if (!($this->channels_state instanceof CombinedUpdatesState)) {
-            $this->channels_state = new CombinedUpdatesState($this->channels_state);
-        }
-        if (isset($this->updates_state)) {
-            if (!($this->updates_state instanceof UpdatesState)) {
-                $this->updates_state = new UpdatesState($this->updates_state);
-            }
-            $this->channels_state->__construct([false => $this->updates_state]);
-            unset($this->updates_state);
-        }
-        if (!isset($this->datacenter)) {
-            $this->datacenter = new DataCenter($this, $this->settings['connection'], $this->settings['connection_settings']);
-        }
-        if (!isset($this->referenceDatabase)) {
-            $this->referenceDatabase = new ReferenceDatabase($this);
-        }
-        if (!isset($this->minDatabase)) {
-            $this->minDatabase = new MinDatabase($this);
-        }
+        $this->logger->logger(Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
+        $this->cleanupProperties();
         // Load rsa keys
-        $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);
+        $this->logger->logger(Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);
         $this->rsa_keys = [];
         foreach ($this->settings['authorization']['rsa_keys'] as $key) {
             $key = yield (new RSA())->load($key);
@@ -475,7 +456,7 @@ class MTProto extends AsyncConstruct implements TLCallback
          * ***********************************************************************
          * Define some needed numbers for BigInteger
          */
-        $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_translation'], Logger::ULTRA_VERBOSE);
+        $this->logger->logger(Lang::$current_lang['TL_translation'], Logger::ULTRA_VERBOSE);
         $callbacks = [$this, $this->referenceDatabase];
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks []= $this->minDatabase;
@@ -487,7 +468,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->hasTempAuthKey()) {
             try {
                 $nearest_dc = yield $this->methodCallAsyncRead('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
-                $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
+                $this->logger->logger(\sprintf(Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
                 if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
                     $this->settings['connection_settings']['default_dc'] = $this->datacenter->curdc = (int) $nearest_dc['nearest_dc'];
                 }
@@ -503,7 +484,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Sleep function
+     * Sleep function.
      *
      * @return array
      */
@@ -512,7 +493,74 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->settings['serialization']['cleanup_before_serialization']) {
             $this->cleanup();
         }
-        return ['supportUser', 'referenceDatabase', 'minDatabase', 'channel_participants', 'event_handler', 'event_handler_instance', 'loop_callback', 'web_template', 'encrypted_layer', 'settings', 'config', 'authorization', 'authorized', 'rsa_keys', 'dh_config', 'chats', 'last_stored', 'qres', 'got_state', 'channels_state', 'updates', 'updates_key', 'full_chats', 'msg_ids', 'dialog_params', 'datacenter', 'v', 'constructors', 'td_constructors', 'methods', 'td_methods', 'td_descriptions', 'tl_callbacks', 'temp_requested_secret_chats', 'temp_rekeyed_secret_chats', 'secret_chats', 'hook_url', 'storage', 'authorized_dc', 'tos'];
+        return [
+            // Databases
+            'chats', 
+            'full_chats', 
+            'referenceDatabase', 
+            'minDatabase', 
+            'channel_participants', 
+
+            // Misc caching
+            'dialog_params', 
+            'last_stored', 
+            'qres', 
+            'supportUser', 
+            'tos',
+
+            // Event handler
+            'event_handler', 
+            'event_handler_instance', 
+            'loop_callback',
+            'updates', 
+            'updates_key', 
+
+            'hook_url',
+
+            // Web login template
+            'web_template', 
+
+            // Settings
+            'settings', 
+            'config', 
+
+            // Authorization keys
+            'datacenter', 
+
+            // Authorization state
+            'authorization', 
+            'authorized', 
+            'authorized_dc', 
+
+            // Authorization cache
+            'rsa_keys', 
+            'dh_config', 
+
+            // Update state
+            'got_state', 
+            'channels_state', 
+            'msg_ids', 
+
+            // Version
+            'v', 
+
+            // TL (we don't need this)
+            'constructors', 
+            'td_constructors', 
+            'methods', 
+            'td_methods', 
+            'td_descriptions', 
+            'tl_callbacks', 
+
+            // Secret chats
+            'secret_chats', 
+            'encrypted_layer', 
+            'temp_requested_secret_chats', 
+            'temp_rekeyed_secret_chats', 
+
+            // Object storage
+            'storage', 
+        ];           
     }
 
 
@@ -533,12 +581,12 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Logger
+     * Logger.
      *
      * @param string $param Parameter
-     * @param int    $level Logging level 
+     * @param int    $level Logging level
      * @param string $file  File where the message originated
-     * 
+     *
      * @return void
      */
     public function logger($param, int $level = Logger::NOTICE, string $file = '')
@@ -551,7 +599,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Get async HTTP client
+     * Get async HTTP client.
      *
      * @return \Amp\Artax\Client
      */
@@ -561,7 +609,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Get async DNS client
+     * Get async DNS client.
      *
      * @return \Amp\Dns\Resolver
      */
@@ -571,10 +619,10 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Get contents of remote file asynchronously
+     * Get contents of remote file asynchronously.
      *
      * @param string $url URL
-     * 
+     *
      * @return \Generator<string>
      */
     public function fileGetContents(string $url): \Generator
@@ -592,22 +640,8 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->datacenter->getDataCenterConnections();
     }
 
-    public function hasAllAuth(): bool
-    {
-        if ($this->isInitingAuthorization()) {
-            return false;
-        }
-
-        foreach ($this->datacenter->getDataCenterConnections() as $dc) {
-            if (!$dc->isAuthorized() || !$dc->hasTempAuthKey()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
     /**
-     * Prompt serialization of instance
+     * Prompt serialization of instance.
      *
      * @return void
      */
@@ -619,7 +653,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
     }
     /**
-     * Start all internal loops
+     * Start all internal loops.
      *
      * @return void
      */
@@ -648,7 +682,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->checkTosLoop->start();
     }
     /**
-     * Stop all internal loops
+     * Stop all internal loops.
      *
      * @return void
      */
@@ -677,63 +711,12 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Wakeup function
-     */
-    public function __wakeup()
-    {
-        $backtrace = \debug_backtrace(0, 3);
-        $this->asyncInitPromise = true;
-        $this->setInitPromise($this->__wakeup_async($backtrace));
-    }
-
-    /**
-     * Async wakeup function
+     * Clean up properties from previous versions of MadelineProto.
      *
-     * @param array $backtrace Stack trace
-     * 
-     * @return \Generator
+     * @return void
      */
-    public function __wakeup_async(array $backtrace): \Generator
+    private function cleanupProperties()
     {
-        \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        $this->setupLogger();
-        if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread())) {
-            return;
-        }
-        Lang::$current_lang = &Lang::$lang['en'];
-        if (isset($this->settings['app_info']['lang_code']) && isset(Lang::$lang[$this->settings['app_info']['lang_code']])) {
-            Lang::$current_lang = &Lang::$lang[$this->settings['app_info']['lang_code']];
-        }
-        if (!isset($this->referenceDatabase)) {
-            $this->referenceDatabase = new ReferenceDatabase($this);
-        }
-        if (!isset($this->minDatabase)) {
-            $this->minDatabase = new MinDatabase($this);
-        }
-        $callbacks = [$this, $this->referenceDatabase];
-        if (!($this->authorization['user']['bot'] ?? false)) {
-            $callbacks []= $this->minDatabase;
-        }
-        $this->updateCallbacks($callbacks);
-
-        $this->settings['connection_settings']['all']['ipv6'] = \danog\MadelineProto\Magic::$ipv6;
-        /*if (isset($this->settings['pwr']['updateHandler']) && $this->settings['pwr']['updateHandler'] === $this->settings['updates']['callback']) {
-        unset($this->settings['pwr']['updateHandler']);
-        $this->updates = [];
-        }*/
-        /*$keys = array_keys((array) get_object_vars($this));
-        if (count($keys) !== count(array_unique($keys))) {
-        throw new Bug74586Exception();
-        }
-        if (isset($this->data)) {
-        foreach ($this->data as $k => $v) {
-        $this->{$k} = $v;
-        }
-        unset($this->data);
-        }*/
-        if ($this->authorized === true) {
-            $this->authorized = self::LOGGED_IN;
-        }
         if (!($this->channels_state instanceof CombinedUpdatesState)) {
             $this->channels_state = new CombinedUpdatesState($this->channels_state);
         }
@@ -744,9 +727,147 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->channels_state->__construct([false => $this->updates_state]);
             unset($this->updates_state);
         }
+        if (!isset($this->datacenter)) {
+            $this->datacenter = new DataCenter($this, $this->settings['connection'], $this->settings['connection_settings']);
+        }
+        if (!isset($this->referenceDatabase)) {
+            $this->referenceDatabase = new ReferenceDatabase($this);
+        }
+        if (!isset($this->minDatabase)) {
+            $this->minDatabase = new MinDatabase($this);
+        }
+    }
+    /**
+     * Upgrade MadelineProto instance
+     *
+     * @return \Generator
+     */
+    private function upgradeMadelineProto(): \Generator
+    {
+        $this->logger->logger(Lang::$current_lang['serialization_ofd'], Logger::WARNING);
+        foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
+            if ($this->authorized === self::LOGGED_IN && \strpos($dc_id, '_') === false && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
+                $socket->bind();
+                $socket->authorized(true);
+            }
+        }
+        $settings = $this->settings;
+        if (isset($settings['updates']['callback'][0]) && $settings['updates']['callback'][0] === $this) {
+            $settings['updates']['callback'] = 'getUpdatesUpdateHandler';
+        }
+        if (isset($settings['updates']['getdifference_interval']) && $settings['updates']['getdifference_interval'] === -1) {
+            unset($settings['updates']['getdifference_interval']);
+        }
+        unset($settings['tl_schema']);
+        if (isset($settings['authorization']['rsa_key'])) {
+            unset($settings['authorization']['rsa_key']);
+        }
+        if (!isset($this->full_chats)) {
+            $this->full_chats = [];
+        }
+        if (!isset($this->secret_chats)) {
+            $this->secret_chats = [];
+        }
 
-        if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->event_handler, '\danog\MadelineProto\EventHandler')) {
-            $this->setEventHandler($this->event_handler);
+        foreach ($this->full_chats as $id => $full) {
+            if (isset($full['full'], $full['last_update'])) {
+                $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
+            }
+        }
+        foreach ($this->secret_chats as $key => &$chat) {
+            if (!\is_array($chat)) {
+                unset($this->secret_chats[$key]);
+                continue;
+            }
+            if ($chat['layer'] >= 73) {
+                $chat['mtproto'] = 2;
+            } else {
+                $chat['mtproto'] = 1;
+            }
+        }
+        foreach ($settings['connection_settings'] as $key => &$connection) {
+            if (\in_array($key, ['default_dc', 'media_socket_count', 'robin_period'])) {
+                continue;
+            }
+            if (!\is_array($connection)) {
+                unset($settings['connection_settings'][$key]);
+                continue;
+            }
+            if (!isset($connection['proxy'])) {
+                $connection['proxy'] = '\\Socket';
+            }
+            if (!isset($connection['proxy_extra'])) {
+                $connection['proxy_extra'] = [];
+            }
+            if (!isset($connection['pfs'])) {
+                $connection['pfs'] = \extension_loaded('gmp');
+            }
+            if ($connection['protocol'] === 'obfuscated2') {
+                $connection['protocol'] = 'tcp_intermediate_padded';
+                $connection['obfuscated'] = true;
+            }
+        }
+        if ($settings['app_info']['api_id'] === 6) {
+            unset($settings['app_info']);
+        }
+        $this->resetMTProtoSession(true, true);
+        $this->config = ['expires' => -1];
+        $this->dh_config = ['version' => 0];
+        yield $this->__construct_async($settings);
+        foreach ($this->secret_chats as $chat => $data) {
+            try {
+                if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== null) {
+                    yield $this->notifyLayer($chat);
+                }
+            } catch (\danog\MadelineProto\RPCErrorException $e) {
+            }
+        }
+    }
+    /**
+     * Wakeup function.
+     */
+    public function __wakeup()
+    {
+        $backtrace = \debug_backtrace(0, 3);
+        $this->asyncInitPromise = true;
+        $this->setInitPromise($this->__wakeup_async($backtrace));
+    }
+
+    /**
+     * Async wakeup function.
+     *
+     * @param array $backtrace Stack trace
+     *
+     * @return \Generator
+     */
+    public function __wakeup_async(array $backtrace): \Generator
+    {
+        // Setup one-time stuffs
+        Magic::classExists();
+        // Setup logger
+        $this->setupLogger();
+        // We don't like threads
+        if (Magic::$has_thread && \is_object(\Thread::getCurrentThread())) {
+            return;
+        }
+        // Setup language
+        Lang::$current_lang = &Lang::$lang['en'];
+        if (Lang::$lang[$this->settings['app_info']['lang_code'] ?? 'en'] ?? false) {
+            Lang::$current_lang = &Lang::$lang[$this->settings['app_info']['lang_code']];
+        }
+        // Cleanup old properties, init new stuffs
+        $this->cleanupProperties();
+
+        // Update TL callbacks
+        $callbacks = [$this, $this->referenceDatabase];
+        if (!($this->authorization['user']['bot'] ?? false)) {
+            $callbacks []= $this->minDatabase;
+        }
+        $this->updateCallbacks($callbacks);
+
+        $this->settings['connection_settings']['all']['ipv6'] = Magic::$ipv6;
+        if ($this->authorized === true) {
+            $this->authorized = self::LOGGED_IN;
         }
         $force = false;
         $this->resetMTProtoSession();
@@ -756,97 +877,19 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
         }
 
-        if (isset($this->settings['tl_schema']['src']['botAPI']) && $this->settings['tl_schema']['src']['botAPI'] !== __DIR__.'/TL_botAPI.tl') {
+        if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->event_handler, EventHandler::class)) {
+            $this->setEventHandler($this->event_handler);
+        }
+
+        if (($this->settings['tl_schema']['src']['botAPI'] ?? '') !== __DIR__.'/TL_botAPI.tl') {
             unset($this->v);
         }
 
         if (!isset($this->v) || $this->v !== self::V) {
-            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['serialization_ofd'], Logger::WARNING);
-            foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
-                if ($this->authorized === self::LOGGED_IN && \strpos($dc_id, '_') === false && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
-                    $socket->bind();
-                    $socket->authorized(true);
-                }
-            }
-            $settings = $this->settings;
-            if (isset($settings['updates']['callback'][0]) && $settings['updates']['callback'][0] === $this) {
-                $settings['updates']['callback'] = 'getUpdatesUpdateHandler';
-            }
-            if (isset($settings['updates']['getdifference_interval']) && $settings['updates']['getdifference_interval'] === -1) {
-                unset($settings['updates']['getdifference_interval']);
-            }
-            unset($settings['tl_schema']);
-            if (isset($settings['authorization']['rsa_key'])) {
-                unset($settings['authorization']['rsa_key']);
-            }
-            if (!isset($this->full_chats)) {
-                $this->full_chats = [];
-            }
-            if (!isset($this->secret_chats)) {
-                $this->secret_chats = [];
-            }
-
-            foreach ($this->full_chats as $id => $full) {
-                if (isset($full['full'], $full['last_update'])) {
-                    $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
-                }
-            }
-            foreach ($this->secret_chats as $key => &$chat) {
-                if (!\is_array($chat)) {
-                    unset($this->secret_chats[$key]);
-                    continue;
-                }
-                if ($chat['layer'] >= 73) {
-                    $chat['mtproto'] = 2;
-                } else {
-                    $chat['mtproto'] = 1;
-                }
-            }
-            foreach ($settings['connection_settings'] as $key => &$connection) {
-                if (\in_array($key, ['default_dc', 'media_socket_count', 'robin_period'])) {
-                    continue;
-                }
-                if (!\is_array($connection)) {
-                    unset($settings['connection_settings'][$key]);
-                    continue;
-                }
-                if (!isset($connection['proxy'])) {
-                    $connection['proxy'] = '\\Socket';
-                }
-                if (!isset($connection['proxy_extra'])) {
-                    $connection['proxy_extra'] = [];
-                }
-                if (!isset($connection['pfs'])) {
-                    $connection['pfs'] = \extension_loaded('gmp');
-                }
-                if ($connection['protocol'] === 'obfuscated2') {
-                    $connection['protocol'] = 'tcp_intermediate_padded';
-                    $connection['obfuscated'] = true;
-                }
-            }
-            if ($settings['app_info']['api_id'] === 6) {
-                unset($settings['app_info']);
-            }
-            $this->resetMTProtoSession(true, true);
-            $this->config = ['expires' => -1];
-            $this->dh_config = ['version' => 0];
-            yield $this->__construct_async($settings);
+            yield $this->upgradeMadelineProto();
             $force = true;
-            foreach ($this->secret_chats as $chat => $data) {
-                try {
-                    if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== null) {
-                        yield $this->notifyLayer($chat);
-                    }
-                } catch (\danog\MadelineProto\RPCErrorException $e) {
-                }
-            }
         }
 
-        /*if (!$this->settings['updates']['handle_old_updates']) {
-        $this->channels_state = new CombinedUpdatesState();
-        $this->msg_ids = [];
-        $this->got_state = false;
-        }*/
         yield $this->connectToAllDcs();
         foreach ($this->calls as $id => $controller) {
             if (!\is_object($controller)) {
@@ -872,14 +915,14 @@ class MTProto extends AsyncConstruct implements TLCallback
             yield $this->getDialogs($force);
         }
         if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates']) {
-            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
+            $this->logger->logger(Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
             yield $this->updaters[false]->resume();
         }
         $this->updaters[false]->start();
     }
 
     /**
-     * Destructor
+     * Destructor.
      */
     public function __destruct()
     {
@@ -907,11 +950,11 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Get correct settings array for the latest version
+     * Get correct settings array for the latest version.
      *
      * @param array $settings         Current settings array
      * @param array $previousSettings Previous settings array
-     * 
+     *
      * @return array
      */
     public static function getSettings(array $settings, array $previousSettings = []): array
@@ -1097,7 +1140,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 // can be tcp_full, tcp_abridged, tcp_intermediate, http, https, obfuscated2, udp (unsupported)
                 'test_mode' => false,
                 // decides whether to connect to the main telegram servers or to the testing servers (deep telegram)
-                'ipv6' => \danog\MadelineProto\Magic::$ipv6,
+                'ipv6' => Magic::$ipv6,
                 // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
                 'timeout' => 2,
                 // timeout for sockets
@@ -1242,17 +1285,17 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $settings;
     }
     /**
-     * Parse and store settings
+     * Parse and store settings.
      *
      * @param array $settings Settings
-     * 
+     *
      * @return void
      */
     public function parseSettings(array $settings)
     {
         $settings = self::getSettings($settings, $this->settings);
         if ($settings['app_info'] === null) {
-            throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
+            throw new \danog\MadelineProto\Exception(Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
         }
         $this->settings = $settings;
         if (!$this->settings['updates']['handle_updates']) {
@@ -1263,7 +1306,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Setup logger
+     * Setup logger.
      *
      * @return void
      */
@@ -1283,7 +1326,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function resetMTProtoSession(bool $de = true, bool $auth_key = false)
     {
         if (!\is_object($this->datacenter)) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['session_corrupted']);
+            throw new Exception(Lang::$current_lang['session_corrupted']);
         }
         foreach ($this->datacenter->getDataCenterConnections() as $id => $socket) {
             if ($de) {
@@ -1307,6 +1350,20 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->datacenter->isHttp($datacenter);
     }
 
+    public function hasAllAuth(): bool
+    {
+        if ($this->isInitingAuthorization()) {
+            return false;
+        }
+
+        foreach ($this->datacenter->getDataCenterConnections() as $dc) {
+            if (!$dc->isAuthorized() || !$dc->hasTempAuthKey()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     public function isInitingAuthorization()
     {
@@ -1314,10 +1371,10 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info
+     * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info.
      *
      * @param boolean $reconnectAll Whether to reconnect to all DCs
-     * 
+     *
      * @return \Generator
      */
     public function connectToAllDcs(bool $reconnectAll = true): \Generator
@@ -1355,7 +1412,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         yield $this->getPhoneConfig();
     }
     /**
-     * Clean up MadelineProto session after logout
+     * Clean up MadelineProto session after logout.
      *
      * @return void
      */
@@ -1401,7 +1458,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->full_chats = [];
     }
     /**
-     * Reset the update state and fetch all updates from the beginning
+     * Reset the update state and fetch all updates from the beginning.
      *
      * @return void
      */
@@ -1433,10 +1490,10 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Start the update system
+     * Start the update system.
      *
      * @param boolean $anyway Force start update system?
-     * 
+     *
      * @return void
      */
     public function startUpdateSystem($anyway = false)
@@ -1479,10 +1536,10 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Store shared phone config
+     * Store shared phone config.
      *
      * @param mixed $watcherId Watcher ID
-     * 
+     *
      * @return void
      */
     public function getPhoneConfig($watcherId = null)
@@ -1496,10 +1553,10 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Store RSA keys for CDN datacenters
+     * Store RSA keys for CDN datacenters.
      *
      * @param string $datacenter DC ID
-     * 
+     *
      * @return \Generator
      */
     public function getCdnConfig(string $datacenter): \Generator
@@ -1515,7 +1572,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Get cached server-side config
+     * Get cached server-side config.
      *
      * @return array
      */
@@ -1525,11 +1582,11 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Get cached (or eventually re-fetch) server-side config
+     * Get cached (or eventually re-fetch) server-side config.
      *
      * @param array $config  Current config
      * @param array $options Options for method call
-     * 
+     *
      * @return \Generator
      */
     public function getConfig(array $config = [], array $options = []): \Generator
@@ -1544,7 +1601,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Parse cached config
+     * Parse cached config.
      *
      * @return \Generator
      */
@@ -1555,15 +1612,15 @@ class MTProto extends AsyncConstruct implements TLCallback
             unset($this->config['dc_options']);
             yield $this->parseDcOptions($options);
         }
-        $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['config_updated'], Logger::NOTICE);
+        $this->logger->logger(Lang::$current_lang['config_updated'], Logger::NOTICE);
         $this->logger->logger($this->config, Logger::NOTICE);
     }
 
     /**
-     * Parse DC options from config
+     * Parse DC options from config.
      *
      * @param array $dc_options DC options
-     * 
+     *
      * @return \Generator
      */
     private function parseDcOptions(array $dc_options): \Generator
@@ -1596,7 +1653,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
     /**
-     * Get info about the logged-in user
+     * Get info about the logged-in user.
      *
      * @return \Generator<array>
      */
@@ -1653,7 +1710,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
 
     /**
-     * Get debug information for var_dump
+     * Get debug information for var_dump.
      *
      * @return array
      */

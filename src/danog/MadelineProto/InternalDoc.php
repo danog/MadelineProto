@@ -4018,39 +4018,56 @@ interface folders
 
 class InternalDoc extends APIFactory
 {
-    public function logger($param, $level = \danog\MadelineProto\Logger::NOTICE, $file = null, array $extra = [])
+    /**
+         * Cleanup memory and session file.
+         *
+         * @return void
+         */
+    public function cleanup(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Logger.
+     *
+     * @param string $param Parameter
+     * @param int    $level Logging level
+     * @param string $file  File where the message originated
+     *
+     * @return void
+     */
+    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = '', array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$param, $level, $file, $extra]);
     }
-
-    public function isAltervista(array $extra = [])
+    /**
+     * Get async HTTP client.
+     *
+     * @return \Amp\Artax\Client
+     */
+    public function getHTTPClient(array $extra = []): Amp\Artax\Client
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
-    public function isInitingAuthorization(array $extra = [])
+    /**
+     * Get async DNS client.
+     *
+     * @return \Amp\Dns\Resolver
+     */
+    public function getDNSClient(array $extra = []): Amp\Dns\Resolver
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
-    public function getHTTPClient(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function getDNSClient(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function fileGetContents($url, array $extra = [])
+    /**
+     * Get contents of remote file asynchronously.
+     *
+     * @param string $url URL
+     *
+     * @return \Generator<string>
+     */
+    public function fileGetContents(string $url, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$url, $extra]);
-    }
-
-    public function testing(callable $a, ?string $b = null, $c = null, $d = 2, $e = \danog\MadelineProto\MTProto::METHOD_BEFORE_CALLBACK, array $extra = []): ?string
-    {
-        return $this->__call(__FUNCTION__, [$a, $b, $c, $d, $e, $extra]);
     }
     /**
      * Get all datacenter connections.
@@ -4062,32 +4079,39 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function hasAllAuth(array $extra = [])
+    public function hasAllAuth(array $extra = []): bool
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
-    public function startLoops(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function stopLoops(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function getSettings($settings, $previousSettings = [
-    ], array $extra = [])
+    /**
+     * Get correct settings array for the latest version.
+     *
+     * @param array $settings         Current settings array
+     * @param array $previousSettings Previous settings array
+     *
+     * @return array
+     */
+    public function getSettings(array $settings, array $previousSettings = [
+    ], array $extra = []): array
     {
         return $this->__call(__FUNCTION__, [$settings, $previousSettings, $extra]);
     }
-
-    public function parseSettings($settings, array $extra = [])
+    /**
+     * Parse and store settings.
+     *
+     * @param array $settings Settings
+     *
+     * @return void
+     */
+    public function parseSettings(array $settings, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$settings, $extra]);
     }
-
+    /**
+     * Setup logger.
+     *
+     * @return void
+     */
     public function setupLogger(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
@@ -4111,63 +4135,105 @@ class InternalDoc extends APIFactory
      *
      * @return boolean
      */
-    public function isHttp(string $datacenter, array $extra = [])
+    public function isHttp(string $datacenter, array $extra = []): bool
     {
         return $this->__call(__FUNCTION__, [$datacenter, $extra]);
     }
 
+    public function isInitingAuthorization(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info.
+     *
+     * @param boolean $reconnectAll Whether to reconnect to all DCs
+     *
+     * @return \Generator
+     */
     public function connectToAllDcs(bool $reconnectAll = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$reconnectAll, $extra]);
     }
-
+    /**
+     * Clean up MadelineProto session after logout.
+     *
+     * @return void
+     */
     public function resetSession(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
+    /**
+     * Reset the update state and fetch all updates from the beginning.
+     *
+     * @return void
+     */
     public function resetUpdateState(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
+    /**
+     * Start the update system.
+     *
+     * @param boolean $anyway Force start update system?
+     *
+     * @return void
+     */
     public function startUpdateSystem($anyway = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$anyway, $extra]);
     }
-
+    /**
+     * Store shared phone config.
+     *
+     * @param mixed $watcherId Watcher ID
+     *
+     * @return void
+     */
     public function getPhoneConfig($watcherId = null, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$watcherId, $extra]);
     }
-
-    public function getCdnConfig($datacenter, array $extra = [])
+    /**
+     * Store RSA keys for CDN datacenters.
+     *
+     * @param string $datacenter DC ID
+     *
+     * @return \Generator
+     */
+    public function getCdnConfig(string $datacenter, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$datacenter, $extra]);
     }
-
-    public function getCachedConfig(array $extra = [])
+    /**
+     * Get cached server-side config.
+     *
+     * @return array
+     */
+    public function getCachedConfig(array $extra = []): array
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
-    public function getConfig($config = [
-    ], $options = [
+    /**
+     * Get cached (or eventually re-fetch) server-side config.
+     *
+     * @param array $config  Current config
+     * @param array $options Options for method call
+     *
+     * @return \Generator
+     */
+    public function getConfig(array $config = [
+    ], array $options = [
     ], array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$config, $options, $extra]);
     }
-
-    public function parseConfig(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function parseDcOptions($dc_options, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$dc_options, $extra]);
-    }
-
+    /**
+     * Get info about the logged-in user.
+     *
+     * @return \Generator<array>
+     */
     public function getSelf(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
@@ -4990,82 +5056,186 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$value, $extra]);
     }
-
-    public function packSignedInt($value, array $extra = [])
+    /**
+     * Convert integer to base256 signed int.
+     *
+     * @param integer $value Value to convert
+     *
+     * @return string
+     */
+    public function packSignedInt(int $value, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$value, $extra]);
     }
-
-    public function packSignedLong($value, array $extra = [])
+    /**
+     * Convert integer to base256 long.
+     *
+     * @param int $value Value to convert
+     *
+     * @return string
+     */
+    public function packSignedLong(int $value, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$value, $extra]);
     }
-
-    public function packUnsignedInt($value, array $extra = [])
+    /**
+     * Convert value to unsigned base256 int.
+     *
+     * @param int $value Value
+     *
+     * @return string
+     */
+    public function packUnsignedInt(int $value, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$value, $extra]);
     }
-
-    public function packDouble($value, array $extra = [])
+    /**
+     * Convert double to binary version.
+     *
+     * @param double $value Value to convert
+     *
+     * @return string
+     */
+    public function packDouble(\danog\MadelineProto\double $value, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$value, $extra]);
     }
-
-    public function unpackDouble($value, array $extra = [])
+    /**
+     * Unpack binary double.
+     *
+     * @param string $value Value to unpack
+     *
+     * @return double
+     */
+    public function unpackDouble(string $value, array $extra = []): danog\MadelineProto\double
     {
         return $this->__call(__FUNCTION__, [$value, $extra]);
     }
-
+    /**
+     * Synchronously wait for a promise|generator.
+     *
+     * @param \Generator|Promise $promise      The promise to wait for
+     * @param boolean            $ignoreSignal Whether to ignore shutdown signals
+     *
+     * @return mixed
+     */
     public function wait($promise, $ignoreSignal = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$promise, $ignoreSignal, $extra]);
     }
-
-    public function all($promises, array $extra = [])
+    /**
+     * Returns a promise that succeeds when all promises succeed, and fails if any promise fails.
+     * Returned promise succeeds with an array of values used to succeed each contained promise, with keys corresponding to the array of promises.
+     *
+     * @param array<\Generator|Promise> $promises Promises
+     *
+     * @return Promise
+     */
+    public function all(array $promises, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$promises, $extra]);
     }
-
-    public function any($promises, array $extra = [])
+    /**
+     * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
+     *
+     * @param array<Promise|\Generator> $promises Promises
+     *
+     * @return Promise
+     */
+    public function any(array $promises, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$promises, $extra]);
     }
-
-    public function some($promises, array $extra = [])
+    /**
+     * Resolves with a two-item array delineating successful and failed Promise results.
+     * The returned promise will only fail if the given number of required promises fail.
+     *
+     * @param array<Promise|\Generator> $promises Promises
+     *
+     * @return Promise
+     */
+    public function some(array $promises, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$promises, $extra]);
     }
-
-    public function first($promises, array $extra = [])
+    /**
+     * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
+     *
+     * @param array<Promise|\Generator> $promises Promises
+     *
+     * @return Promise
+     */
+    public function first(array $promises, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$promises, $extra]);
     }
-
-    public function timeout($promise, $timeout, array $extra = [])
+    /**
+     * Create an artificial timeout for any \Generator or Promise.
+     *
+     * @param \Generator|Promise $promise
+     * @param integer $timeout
+     *
+     * @return Promise
+     */
+    public function timeout($promise, int $timeout, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$promise, $timeout, $extra]);
     }
-
+    /**
+     * Convert generator, promise or any other value to a promise.
+     *
+     * @param \Generator|Promise|mixed $promise
+     *
+     * @return Promise
+     */
     public function call($promise, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$promise, $extra]);
     }
-
+    /**
+     * Call promise in background.
+     *
+     * @param \Generator|Promise  $promise Promise to resolve
+     * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
+     * @param string              $file    File
+     *
+     * @return void
+     */
     public function callFork($promise, $actual = null, $file = '', array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$promise, $actual, $file, $extra]);
     }
-
+    /**
+     * Call promise in background, deferring execution.
+     *
+     * @param \Generator|Promise $promise Promise to resolve
+     *
+     * @return void
+     */
     public function callForkDefer($promise, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$promise, $extra]);
     }
-
-    public function rethrow($e, $file = '', array $extra = [])
+    /**
+     * Rethrow error catched in strand.
+     *
+     * @param \Throwable $e    Exception
+     * @param string     $file File where the strand started
+     *
+     * @return void
+     */
+    public function rethrow(\Throwable $e, $file = '', array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$e, $file, $extra]);
     }
-
+    /**
+     * Call promise $b after promise $a.
+     *
+     * @param \Generator|Promise $a Promise A
+     * @param \Generator|Promise $b Promise B
+     *
+     * @return Promise
+     */
     public function after($a, $b, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$a, $b, $extra]);
@@ -5240,6 +5410,37 @@ class InternalDoc extends APIFactory
     public function rleEncode(string $string, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$string, $extra]);
+    }
+    /**
+     * Get final element of array.
+     *
+     * @param array $what Array
+     *
+     * @return mixed
+     */
+    public function end(array $what, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$what, $extra]);
+    }
+    /**
+     * Escape string for markdown.
+     *
+     * @param string $hwat String to escape
+     *
+     * @return void
+     */
+    public function markdownEscape(string $hwat, array $extra = []): string
+    {
+        return $this->__call(__FUNCTION__, [$hwat, $extra]);
+    }
+    /**
+     * Whether this is altervista.
+     *
+     * @return boolean
+     */
+    public function isAltervista(array $extra = []): bool
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 
     public function requestCall($user, array $extra = [])

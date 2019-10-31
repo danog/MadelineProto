@@ -66,12 +66,17 @@
         }
     ],
     "scripts": {
+        "build": [
+            "@docs",
+            "@cs-fix"
+        ],
         "check": [
             "@cs",
             "@test"
         ],
         "cs": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff --dry-run",
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff",
+        "docs": "php tools/build_docs.php",
         "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text"
     }
 }

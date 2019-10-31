@@ -819,4 +819,22 @@ trait Tools
     {
         return Magic::$altervista;
     }
+
+
+    /**
+     * Accesses a private variable from an object.
+     *
+     * @param object $obj Object
+     * @param string $var Attribute name
+     * 
+     * @return mixed
+     * @access public
+     */
+    public static function getVar($obj, string $var)
+    {
+        $reflection = new \ReflectionClass(\get_class($obj));
+        $prop = $reflection->getProperty($var);
+        $prop->setAccessible(true);
+        return $prop->getValue($obj);
+    }
 }

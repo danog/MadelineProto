@@ -90,7 +90,7 @@ class UpdatesState
      *
      * @return bool
      */
-    public function isChannel()
+    public function isChannel(): bool
     {
         return (bool) $this->channelId;
     }
@@ -108,11 +108,11 @@ class UpdatesState
     /**
      * Are we currently busy?
      *
-     * @param bool|null $set
+     * @param bool|null $set Update the currently busy flag
      *
      * @return bool
      */
-    public function syncLoading($set = null)
+    public function syncLoading(bool $set = null): bool
     {
         if ($set !== null) {
             $this->syncLoading = $set;
@@ -124,11 +124,11 @@ class UpdatesState
     /**
      * Update multiple parameters.
      *
-     * @param array $init
+     * @param array $init Parameters to update
      *
      * @return self
      */
-    public function update($init)
+    public function update(array $init): self
     {
         foreach ($this->channelId ? ['pts'] : ['pts', 'qts', 'seq', 'date'] as $param) {
             if (isset($init[$param])) {
@@ -142,11 +142,11 @@ class UpdatesState
     /**
      * Get/set PTS.
      *
-     * @param int $set
+     * @param int $set PTS to set
      *
-     * @return int
+     * @return int PTS
      */
-    public function pts($set = 0)
+    public function pts(int $set = 0): int
     {
         if ($set !== 0 && $set > $this->pts) {
             $this->pts = $set;
@@ -158,11 +158,11 @@ class UpdatesState
     /**
      * Get/set QTS.
      *
-     * @param int $set
+     * @param int $set QTS to set
      *
-     * @return int
+     * @return int QTS
      */
-    public function qts($set = 0)
+    public function qts(int $set = 0): int
     {
         if ($set !== 0 && $set > $this->qts) {
             $this->qts = $set;
@@ -174,11 +174,11 @@ class UpdatesState
     /**
      * Get/set seq.
      *
-     * @param int $set
+     * @param int $set Seq to set
      *
-     * @return int
+     * @return int seq
      */
-    public function seq($set = 0)
+    public function seq(int $set = 0): int
     {
         if ($set !== 0 && $set > $this->seq) {
             $this->seq = $set;
@@ -190,11 +190,11 @@ class UpdatesState
     /**
      * Get/set date.
      *
-     * @param int $set
+     * @param int $set Date to set
      *
-     * @return int
+     * @return int Date
      */
-    public function date($set = 0)
+    public function date(int $set = 0): int
     {
         if ($set !== 0 && $set > $this->date) {
             $this->date = $set;
@@ -206,11 +206,11 @@ class UpdatesState
     /**
      * Check validity of PTS contained in update.
      *
-     * @param array $update
+     * @param array $update Update
      *
      * @return int -1 if it's too old, 0 if it's ok, 1 if it's too new
      */
-    public function checkPts($update)
+    public function checkPts(array $update): int
     {
         return $update['pts'] - ($this->pts + $update['pts_count']);
     }
@@ -218,11 +218,11 @@ class UpdatesState
     /**
      * Check validity of seq contained in update.
      *
-     * @param int $seq
+     * @param int $seq Seq
      *
      * @return int -1 if it's too old, 0 if it's ok, 1 if it's too new
      */
-    public function checkSeq($seq)
+    public function checkSeq(int $seq): int
     {
         return $seq ? $seq - ($this->seq + 1) : $seq;
     }

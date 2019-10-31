@@ -18,52 +18,74 @@
 
 namespace danog\MadelineProto;
 
+/**
+ * RSA class
+ */
 class RSA
 {
     use \danog\MadelineProto\TL\TL;
     use \danog\MadelineProto\Tools;
     use \danog\Serializable;
+    /**
+     * Exponent
+     *
+     * @var \phpseclib\Math\BigInteger
+     */
     public $e;
+    /**
+     * Modulus
+     *
+     * @var \phpseclib\Math\BigInteger
+     */
     public $n;
+    /**
+     * Fingerprint
+     *
+     * @var string
+     */
     public $fp;
 
-    public function load($rsa_key)
+    /**
+     * Load RSA key
+     *
+     * @param string $rsa_key RSA key
+     * 
+     * @return \Generator<self>
+     */
+    public function load(string $rsa_key): \Generator
     {
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_init'], Logger::ULTRA_VERBOSE);
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['loading_key'], Logger::ULTRA_VERBOSE);
         $key = \phpseclib\Crypt\RSA::load($rsa_key);
-        $this->n = self::getVar($key, 'modulus');
-        $this->e = self::getVar($key, 'exponent');
+        $this->n = Tools::getVar($key, 'modulus');
+        $this->e = Tools::getVar($key, 'exponent');
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['computing_fingerprint'], Logger::ULTRA_VERBOSE);
         $this->fp = \substr(\sha1((yield $this->serializeObject(['type' => 'bytes'], $this->n->toBytes(), 'key')).(yield $this->serializeObject(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
 
         return $this;
     }
 
-    public function __sleep()
+    /**
+     * Sleep function
+     *
+     * @return array
+     */
+    public function __sleep(): array
     {
         return ['e', 'n', 'fp'];
     }
 
-    public function encrypt($data)
+    /**
+     * Encrypt data
+     *
+     * @param string $data Data to encrypt
+     * 
+     * @return string
+     */
+    public function encrypt($data): string
     {
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_encrypting'], Logger::VERBOSE);
 
         return (new \phpseclib\Math\BigInteger((string) $data, 256))->powMod($this->e, $this->n)->toBytes();
-    }
-    /**
-     * Accesses a private variable from an object.
-     *
-     * @param object $obj
-     * @param string $var
-     * @return mixed
-     * @access public
-     */
-    public static function getVar($obj, $var)
-    {
-        $reflection = new \ReflectionClass(\get_class($obj));
-        $prop = $reflection->getProperty($var);
-        $prop->setAccessible(true);
-        return $prop->getValue($obj);
     }
 }

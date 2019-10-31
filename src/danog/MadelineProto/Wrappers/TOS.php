@@ -24,7 +24,12 @@ namespace danog\MadelineProto\Wrappers;
  */
 trait TOS
 {
-    public function checkTos()
+    /**
+     * Check for terms of service update
+     *
+     * @return \Generator
+     */
+    public function checkTos(): \Generator
     {
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
             if ($this->tos['expires'] < \time()) {
@@ -46,7 +51,12 @@ trait TOS
         }
     }
 
-    public function acceptTos()
+    /**
+     * Accept terms of service update
+     *
+     * @return \Generator
+     */
+    public function acceptTos(): \Generator
     {
         $this->tos['accepted'] = yield $this->methodCallAsyncRead('help.acceptTermsOfService', ['id' => $this->tos['terms_of_service']['id']], ['datacenter' => $this->datacenter->curdc]);
         if ($this->tos['accepted']) {
@@ -56,7 +66,14 @@ trait TOS
         }
     }
 
-    public function declineTos()
+    /**
+     * Decline terms of service update
+     * 
+     * THIS WILL DELETE YOUR ACCOUNT!
+     *
+     * @return \Generator
+     */
+    public function declineTos(): \Generator
     {
         yield $this->methodCallAsyncRead('account.deleteAccount', ['reason' => 'Decline ToS update'], ['datacenter' => $this->datacenter->curdc]);
         yield $this->logout();

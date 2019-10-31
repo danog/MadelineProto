@@ -19,15 +19,39 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use EventHandler;
+
 /**
- * Manages logging in and out.
+ * Event handler
  */
 trait Events
 {
+    /**
+     * Event handler class name
+     *
+     * @var string
+     */
     public $event_handler;
+    /**
+     * Event handler instance
+     *
+     * @var \danog\MadelineProto\EventHandler
+     */
     private $event_handler_instance;
+    /**
+     * Event handler method list
+     *
+     * @var array<string>
+     */
     private $event_handler_methods = [];
 
+    /**
+     * Set event handler
+     *
+     * @param string|EventHandler $event_handler Event handler
+     * 
+     * @return void
+     */
     public function setEventHandler($event_handler)
     {
         if (!\class_exists($event_handler) || !\is_subclass_of($event_handler, '\danog\MadelineProto\EventHandler')) {
@@ -66,12 +90,26 @@ trait Events
         }
     }
 
-    public function getEventHandler()
+    /**
+     * Get event handler
+     *
+     * @return EventHandler
+     */
+    public function getEventHandler(): EventHandler
     {
         return $this->event_handler_instance;
     }
 
-    public function eventUpdateHandler($update)
+    /**
+     * Event update handler
+     *
+     * @param array $update Update
+     * 
+     * @return void
+     * 
+     * @internal Internal event handler
+     */
+    public function eventUpdateHandler(array $update)
     {
         if (isset($this->event_handler_methods[$update['_']])) {
             return $this->event_handler_methods[$update['_']]($update);
