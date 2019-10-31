@@ -717,7 +717,7 @@ trait Tools
      *
      * @return string
      */
-    public function base64urlDecode(string $data): string
+    public static function base64urlDecode(string $data): string
     {
         return \base64_decode(\str_pad(\strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT));
     }
@@ -728,7 +728,7 @@ trait Tools
      *
      * @return string
      */
-    public function base64urlEncode(string $data): string
+    public static function base64urlEncode(string $data): string
     {
         return \rtrim(\strtr(\base64_encode($data), '+/', '-_'), '=');
     }
@@ -740,7 +740,7 @@ trait Tools
      *
      * @return string
      */
-    public function rleDecode(string $string): string
+    public static function rleDecode(string $string): string
     {
         $new = '';
         $last = '';
@@ -766,7 +766,7 @@ trait Tools
      *
      * @return string
      */
-    public function rleEncode(string $string): string
+    public static function rleEncode(string $string): string
     {
         $new = '';
         $count = 0;
@@ -805,7 +805,7 @@ trait Tools
      *
      * @return void
      */
-    public function markdownEscape(string $hwat): string
+    public static function markdownEscape(string $hwat): string
     {
         return \str_replace('_', '\\_', $hwat);
     }
@@ -815,7 +815,7 @@ trait Tools
      *
      * @return boolean
      */
-    public function isAltervista(): bool
+    public static function isAltervista(): bool
     {
         return Magic::$altervista;
     }
