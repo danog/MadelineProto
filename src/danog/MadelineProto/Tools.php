@@ -42,7 +42,14 @@ use function Amp\Promise\wait;
  */
 trait Tools
 {
-    public static function genVectorHash($ints)
+    /**
+     * Generate MTProto vector hash.
+     *
+     * @param array $ints IDs
+     *
+     * @return int Vector hash
+     */
+    public static function genVectorHash(array $ints): int
     {
         //sort($ints, SORT_NUMERIC);
         if (\danog\MadelineProto\Magic::$bigint) {
@@ -61,7 +68,14 @@ trait Tools
         return $hash;
     }
 
-    public static function randomInt($modulus = false)
+    /**
+     * Get random integer.
+     *
+     * @param integer $modulus Modulus
+     *
+     * @return int
+     */
+    public static function randomInt($modulus = false): int
     {
         if ($modulus === false) {
             $modulus = PHP_INT_MAX;
@@ -89,23 +103,42 @@ trait Tools
         return ($number & PHP_INT_MAX) % $modulus;
     }
 
-    public static function random($length)
+    /**
+     * Get random string of specified length.
+     *
+     * @param integer $length Length
+     *
+     * @return string Random string
+     */
+    public static function random(int $length): string
     {
         return $length === 0 ? '' : \phpseclib\Crypt\Random::string($length);
     }
 
     /**
-     * posmod(numeric,numeric) : numeric
+     * Positive modulo
      * Works just like the % (modulus) operator, only returns always a postive number.
+     *
+     * @param int $a A
+     * @param int $b B
+     *
+     * @return int Modulo
      */
-    public static function posmod($a, $b)
+    public static function posmod(int $a, int $b): int
     {
         $resto = $a % $b;
 
         return $resto < 0 ? $resto + \abs($b) : $resto;
     }
 
-    public static function unpackSignedInt($value)
+    /**
+     * Unpack base256 signed int.
+     *
+     * @param string $value base256 int
+     *
+     * @return integer
+     */
+    public static function unpackSignedInt($value): int
     {
         if (\strlen($value) !== 4) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_4']);
@@ -114,7 +147,14 @@ trait Tools
         return \unpack('l', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
 
-    public static function unpackSignedLong($value)
+    /**
+     * Unpack base256 signed long.
+     *
+     * @param string $value base256 long
+     *
+     * @return integer
+     */
+    public static function unpackSignedLong($value): int
     {
         if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
@@ -122,8 +162,14 @@ trait Tools
 
         return \unpack('q', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
-
-    public static function unpackSignedLongString($value)
+    /**
+     * Unpack base256 signed long to string.
+     *
+     * @param string $value base256 long
+     *
+     * @return string
+     */
+    public static function unpackSignedLongString($value): string
     {
         if (\is_int($value)) {
             return (string) $value;
@@ -136,7 +182,14 @@ trait Tools
         return (string) $big;
     }
 
-    public static function packSignedInt($value)
+    /**
+     * Convert integer to base256 signed int.
+     *
+     * @param integer $value Value to convert
+     *
+     * @return string
+     */
+    public static function packSignedInt(int $value): string
     {
         if ($value > 2147483647) {
             throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_2147483647'], $value));
@@ -149,7 +202,14 @@ trait Tools
         return \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($res) : $res;
     }
 
-    public static function packSignedLong($value)
+    /**
+     * Convert integer to base256 long.
+     *
+     * @param int $value Value to convert
+     *
+     * @return string
+     */
+    public static function packSignedLong(int $value): string
     {
         if ($value > 9223372036854775807) {
             throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_9223372036854775807'], $value));
@@ -162,7 +222,14 @@ trait Tools
         return $res;
     }
 
-    public static function packUnsignedInt($value)
+    /**
+     * Convert value to unsigned base256 int
+     *
+     * @param int $value Value
+     * 
+     * @return string
+     */
+    public static function packUnsignedInt(int $value): string
     {
         if ($value > 4294967295) {
             throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_bigger_than_4294967296'], $value));
@@ -174,7 +241,14 @@ trait Tools
         return \pack('V', $value);
     }
 
-    public static function packDouble($value)
+    /**
+     * Convert double to binary version
+     *
+     * @param double $value Value to convert
+     * 
+     * @return string
+     */
+    public static function packDouble(double $value): string
     {
         $res = \pack('d', $value);
         if (\strlen($res) !== 8) {
@@ -184,7 +258,14 @@ trait Tools
         return \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($res) : $res;
     }
 
-    public static function unpackDouble($value)
+    /**
+     * Unpack binary double
+     *
+     * @param string $value Value to unpack
+     * 
+     * @return double
+     */
+    public static function unpackDouble(string $value): double
     {
         if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
@@ -193,6 +274,14 @@ trait Tools
         return \unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
 
+    /**
+     * Synchronously wait for a promise|generator
+     *
+     * @param \Generator|Promise $promise      The promise to wait for
+     * @param boolean            $ignoreSignal Whether to ignore shutdown signals
+     * 
+     * @return mixed
+     */
     public static function wait($promise, $ignoreSignal = false)
     {
         if ($promise instanceof \Generator) {
@@ -226,7 +315,15 @@ trait Tools
         return $value;
     }
 
-    public static function all($promises)
+    /**
+     * Returns a promise that succeeds when all promises succeed, and fails if any promise fails.
+     * Returned promise succeeds with an array of values used to succeed each contained promise, with keys corresponding to the array of promises.
+     *
+     * @param array<\Generator|Promise> $promises Promises
+     * 
+     * @return Promise
+     */
+    public static function all(array $promises): Promise
     {
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
@@ -235,7 +332,14 @@ trait Tools
         return all($promises);
     }
 
-    public static function any($promises)
+    /**
+     * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
+     * 
+     * @param array<Promise|\Generator> $promises Promises
+     * 
+     * @return Promise
+     */
+    public static function any(array $promises): Promise
     {
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
@@ -244,7 +348,15 @@ trait Tools
         return any($promises);
     }
 
-    public static function some($promises)
+    /**
+     * Resolves with a two-item array delineating successful and failed Promise results.
+     * The returned promise will only fail if the given number of required promises fail.
+     *
+     * @param array<Promise|\Generator> $promises Promises
+     * 
+     * @return Promise
+     */
+    public static function some(array $promises): Promise
     {
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
@@ -253,7 +365,14 @@ trait Tools
         return some($promises);
     }
 
-    public static function first($promises)
+    /**
+     * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
+     *
+     * @param array<Promise|\Generator> $promises Promises
+     * 
+     * @return Promise
+     */
+    public static function first(array $promises): Promise
     {
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
@@ -262,12 +381,27 @@ trait Tools
         return first($promises);
     }
 
-    public static function timeout($promise, $timeout)
+    /**
+     * Create an artificial timeout for any \Generator or Promise
+     *
+     * @param \Generator|Promise $promise
+     * @param integer $timeout
+     * 
+     * @return Promise
+     */
+    public static function timeout($promise, int $timeout): Promise
     {
         return timeout(self::call($promise), $timeout);
     }
 
-    public static function call($promise)
+    /**
+     * Convert generator, promise or any other value to a promise
+     *
+     * @param \Generator|Promise|mixed $promise
+     * 
+     * @return Promise
+     */
+    public static function call($promise): Promise
     {
         if ($promise instanceof \Generator) {
             $promise = new Coroutine($promise);
@@ -278,6 +412,15 @@ trait Tools
         return $promise;
     }
 
+    /**
+     * Call promise in background
+     *
+     * @param \Generator|Promise  $promise Promise to resolve
+     * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
+     * @param string              $file    File
+     * 
+     * @return void
+     */
     public static function callFork($promise, $actual = null, $file = '')
     {
         if ($actual) {
@@ -310,12 +453,27 @@ trait Tools
         return $promise;
     }
 
+    /**
+     * Call promise in background, deferring execution
+     *
+     * @param \Generator|Promise $promise Promise to resolve
+     * 
+     * @return void
+     */
     public static function callForkDefer($promise)
     {
         Loop::defer([__CLASS__, 'callFork'], $promise);
     }
 
-    public static function rethrow($e, $file = '')
+    /**
+     * Rethrow error catched in strand
+     *
+     * @param \Throwable $e    Exception
+     * @param string     $file File where the strand started
+     * 
+     * @return void
+     */
+    public static function rethrow(\Throwable $e, $file = '')
     {
         $zis = isset($this) ? $this : null;
         $logger = isset($zis->logger) ? $zis->logger : Logger::$default;
@@ -340,7 +498,15 @@ trait Tools
         }
     }
 
-    public static function after($a, $b)
+    /**
+     * Call promise $b after promise $a
+     *
+     * @param \Generator|Promise $a Promise A
+     * @param \Generator|Promise $b Promise B
+     * 
+     * @return Promise
+     */
+    public static function after($a, $b): Promise
     {
         $a = self::call($a());
         $deferred = new Deferred();
@@ -370,19 +536,14 @@ trait Tools
         return $deferred->promise();
     }
     /**
-     * Asynchronously lock a file
-     * Resolves with a callbable that MUST eventually be called in order to release the lock.
+     * Asynchronously send noCache headers.
      *
-     * @param string $file File to lock
-     * @param integer $operation Locking mode (see flock)
-     * @param numeric $polling   Polling interval for lock
+     * @param integer $status  HTTP status code to send
+     * @param string  $message Message to print
+     *
      * @return Promise
      */
-    public static function flock(string $file, int $operation, $polling = 0.1): Promise
-    {
-        return self::call(self::flockGenerator($file, $operation, $polling));
-    }
-    public static function noCache(int $status, string $message)
+    public static function noCache(int $status, string $message): Promise
     {
         \header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         \header('Cache-Control: post-check=0, pre-check=0', false);
@@ -390,7 +551,31 @@ trait Tools
         \http_response_code($status);
         return self::echo($message);
     }
-    public static function flockGenerator(string $file, int $operation, $polling)
+
+    /**
+     * Asynchronously lock a file
+     * Resolves with a callbable that MUST eventually be called in order to release the lock.
+     *
+     * @param string  $file      File to lock
+     * @param integer $operation Locking mode
+     * @param integer $polling   Polling interval
+    *
+     * @return Promise
+     */
+    public static function flock(string $file, int $operation, $polling = 0.1): Promise
+    {
+        return self::call(self::flockGenerator($file, $operation, $polling));
+    }
+    /**
+     * Asynchronously lock a file (internal generator function).
+     *
+     * @param string  $file      File to lock
+     * @param integer $operation Locking mode
+     * @param integer $polling   Polling interval
+     *
+     * @return void
+     */
+    private static function flockGenerator(string $file, int $operation, $polling)
     {
         if (!yield exists($file)) {
             yield \touch($file);
@@ -413,15 +598,37 @@ trait Tools
             }
         };
     }
-    public static function sleep($time)
+    /**
+     * Asynchronously sleep.
+     *
+     * @param int $time Number of seconds to sleep for
+     *
+     * @return Promise
+     */
+    public static function sleep(int $time): Promise
     {
         return new \Amp\Delayed($time * 1000);
     }
-    public static function readLine($prompt = '')
+
+    /**
+     * Asynchronously read line.
+     *
+     * @param string $prompt Prompt
+     *
+     * @return Promise
+     */
+    public static function readLine(string $prompt = ''): Promise
     {
         return self::call(Tools::readLineGenerator($prompt));
     }
-    public static function readLineGenerator($prompt = '')
+    /**
+     * Asynchronously read line (generator function).
+     *
+     * @param string $prompt Prompt
+     *
+     * @return void
+     */
+    private static function readLineGenerator(string $prompt = '')
     {
         $stdin = getStdin();
         $stdout = getStdout();
@@ -437,10 +644,24 @@ trait Tools
         return \array_shift($lines);
     }
 
-    public static function echo($string)
+    /**
+     * Asynchronously write to stdout/browser.
+     *
+     * @param string $string Message to echo
+     *
+     * @return Promise
+     */
+    public static function echo(string $string): Promise
     {
         return getOutputBufferStream()->write($string);
     }
+    /**
+     * Check if is array or similar (traversable && countable && arrayAccess).
+     *
+     * @param arraylike $var Value to check
+     *
+     * @return boolean
+     */
     public static function isArrayOrAlike($var)
     {
         return \is_array($var) ||
@@ -489,17 +710,37 @@ trait Tools
     {
         return $params;
     }
-    public function base64urlDecode($data)
+    /**
+     * base64URL decode.
+     *
+     * @param string $data Data to decode
+     *
+     * @return string
+     */
+    public function base64urlDecode(string $data): string
     {
         return \base64_decode(\str_pad(\strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT));
     }
-
-    public function base64urlEncode($data)
+    /**
+     * Base64URL encode.
+     *
+     * @param string $data Data to encode
+     *
+     * @return string
+     */
+    public function base64urlEncode(string $data): string
     {
         return \rtrim(\strtr(\base64_encode($data), '+/', '-_'), '=');
     }
 
-    public function rleDecode($string)
+    /**
+     * null-byte RLE decode.
+     *
+     * @param string $string Data to decode
+     *
+     * @return string
+     */
+    public function rleDecode(string $string): string
     {
         $new = '';
         $last = '';
@@ -518,7 +759,14 @@ trait Tools
         return $string;
     }
 
-    public function rleEncode($string)
+    /**
+     * null-byte RLE encode.
+     *
+     * @param string $string Data to encode
+     *
+     * @return string
+     */
+    public function rleEncode(string $string): string
     {
         $new = '';
         $count = 0;
@@ -536,5 +784,29 @@ trait Tools
         }
 
         return $new;
+    }
+
+    /**
+     * Get final element of array.
+     *
+     * @param array $what Array
+     *
+     * @return mixed
+     */
+    public static function end(array $what)
+    {
+        return \end($what);
+    }
+
+    /**
+     * Escape string for markdown.
+     *
+     * @param string $hwat String to escape
+     *
+     * @return void
+     */
+    public function markdownEscape(string $hwat): string
+    {
+        return \str_replace('_', '\\_', $hwat);
     }
 }

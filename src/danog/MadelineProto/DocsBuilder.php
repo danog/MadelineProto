@@ -49,16 +49,6 @@ class DocsBuilder
     public $types = [];
     public $any = '*';
 
-    public function end($what)
-    {
-        return \end($what);
-    }
-
-    public function escape($hwat)
-    {
-        return \str_replace('_', '\\_', $hwat);
-    }
-
     public function mkDocs()
     {
         \danog\MadelineProto\Logger::log('Generating documentation index...', \danog\MadelineProto\Logger::NOTICE);

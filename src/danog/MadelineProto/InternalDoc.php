@@ -4303,22 +4303,6 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
     /**
-     * Synchronous wrapper for methodCall.
-     *
-     * @param string $method Method name
-     * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
-     *
-     * @return array
-     */
-    public function methodCall(string $method, $args = [
-    ], array $aargs = [
-      'msg_id' => null,
-    ], array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$method, $args, $aargs, $extra]);
-    }
-    /**
      * Call method and wait asynchronously for response.
      *
      * If the $aargs['noResponse'] is true, will not wait for a response.
@@ -4329,7 +4313,7 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function methodCallRead(string $method, $args = [
+    public function methodCall(string $method, $args = [
     ], array $aargs = [
       'msg_id' => null,
     ], array $extra = [])
@@ -4868,26 +4852,6 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$button_list, $extra]);
     }
 
-    public function base64urlDecode($data, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$data, $extra]);
-    }
-
-    public function base64urlEncode($data, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$data, $extra]);
-    }
-
-    public function rleDecode($string, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$string, $extra]);
-    }
-
-    public function rleEncode($string, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$string, $extra]);
-    }
-
     public function photosizeToBotAPI($photoSize, $photo, $thumbnail = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$photoSize, $photo, $thumbnail, $extra]);
@@ -4947,41 +4911,82 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
-
-    public function genVectorHash($ints, array $extra = [])
+    /**
+     * Generate MTProto vector hash.
+     *
+     * @param array $ints IDs
+     *
+     * @return int Vector hash
+     */
+    public function genVectorHash(array $ints, array $extra = []): int
     {
         return $this->__call(__FUNCTION__, [$ints, $extra]);
     }
-
-    public function randomInt($modulus = false, array $extra = [])
+    /**
+     * Get random integer.
+     *
+     * @param integer $modulus Modulus
+     *
+     * @return int
+     */
+    public function randomInt($modulus = false, array $extra = []): int
     {
         return $this->__call(__FUNCTION__, [$modulus, $extra]);
     }
-
-    public function random($length, array $extra = [])
+    /**
+     * Get random string of specified length.
+     *
+     * @param integer $length Length
+     *
+     * @return string Random string
+     */
+    public function random(int $length, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$length, $extra]);
     }
     /**
-     * posmod(numeric,numeric) : numeric
+     * Positive modulo
      * Works just like the % (modulus) operator, only returns always a postive number.
+     *
+     * @param int $a A
+     * @param int $b B
+     *
+     * @return int Modulo
      */
-    public function posmod($a, $b, array $extra = [])
+    public function posmod(int $a, int $b, array $extra = []): int
     {
         return $this->__call(__FUNCTION__, [$a, $b, $extra]);
     }
-
-    public function unpackSignedInt($value, array $extra = [])
+    /**
+     * Unpack base256 signed int.
+     *
+     * @param string $value base256 int
+     *
+     * @return integer
+     */
+    public function unpackSignedInt($value, array $extra = []): int
     {
         return $this->__call(__FUNCTION__, [$value, $extra]);
     }
-
-    public function unpackSignedLong($value, array $extra = [])
+    /**
+     * Unpack base256 signed long.
+     *
+     * @param string $value base256 long
+     *
+     * @return integer
+     */
+    public function unpackSignedLong($value, array $extra = []): int
     {
         return $this->__call(__FUNCTION__, [$value, $extra]);
     }
-
-    public function unpackSignedLongString($value, array $extra = [])
+    /**
+     * Unpack base256 signed long to string.
+     *
+     * @param string $value base256 long
+     *
+     * @return string
+     */
+    public function unpackSignedLongString($value, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$value, $extra]);
     }
@@ -5066,49 +5071,95 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$a, $b, $extra]);
     }
     /**
+     * Asynchronously send noCache headers.
+     *
+     * @param integer $status  HTTP status code to send
+     * @param string  $message Message to print
+     *
+     * @return Promise
+     */
+    public function noCache(int $status, string $message, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$status, $message, $extra]);
+    }
+    /**
      * Asynchronously lock a file
      * Resolves with a callbable that MUST eventually be called in order to release the lock.
      *
-     * @param string $file File to lock
-     * @param integer $operation Locking mode (see flock)
-     * @param numeric $polling   Polling interval for lock
+     * @param string  $file      File to lock
+     * @param integer $operation Locking mode
+     * @param integer $polling   Polling interval
+    *
      * @return Promise
      */
     public function flock(string $file, int $operation, $polling = 0.1, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$file, $operation, $polling, $extra]);
     }
-
-    public function noCache(int $status, string $message, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$status, $message, $extra]);
-    }
-
+    /**
+     * Asynchronously lock a file (internal generator function).
+     *
+     * @param string  $file      File to lock
+     * @param integer $operation Locking mode
+     * @param integer $polling   Polling interval
+     *
+     * @return void
+     */
     public function flockGenerator(string $file, int $operation, $polling, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$file, $operation, $polling, $extra]);
     }
-
-    public function sleep($time, array $extra = [])
+    /**
+     * Asynchronously sleep.
+     *
+     * @param int $time Number of seconds to sleep for
+     *
+     * @return Promise
+     */
+    public function sleep(int $time, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$time, $extra]);
     }
-
-    public function readLine($prompt = '', array $extra = [])
+    /**
+     * Asynchronously read line.
+     *
+     * @param string $prompt Prompt
+     *
+     * @return Promise
+     */
+    public function readLine(string $prompt = '', array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$prompt, $extra]);
     }
-
-    public function readLineGenerator($prompt = '', array $extra = [])
+    /**
+     * Asynchronously read line (generator function).
+     *
+     * @param string $prompt Prompt
+     *
+     * @return void
+     */
+    public function readLineGenerator(string $prompt = '', array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$prompt, $extra]);
     }
-
-    public function echo($string, array $extra = [])
+    /**
+     * Asynchronously write to stdout/browser.
+     *
+     * @param string $string Message to echo
+     *
+     * @return Promise
+     */
+    public function echo(string $string, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$string, $extra]);
     }
-
+    /**
+     * Check if is array or similar (traversable && countable && arrayAccess).
+     *
+     * @param arraylike $var Value to check
+     *
+     * @return boolean
+     */
     public function isArrayOrAlike($var, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$var, $extra]);
@@ -5145,6 +5196,50 @@ class InternalDoc extends APIFactory
     public function arr(...$params): array
     {
         return $this->__call(__FUNCTION__, Tools::arr(...$params));
+    }
+    /**
+     * base64URL decode.
+     *
+     * @param string $data Data to decode
+     *
+     * @return string
+     */
+    public function base64urlDecode(string $data, array $extra = []): string
+    {
+        return $this->__call(__FUNCTION__, [$data, $extra]);
+    }
+    /**
+     * Base64URL encode.
+     *
+     * @param string $data Data to encode
+     *
+     * @return string
+     */
+    public function base64urlEncode(string $data, array $extra = []): string
+    {
+        return $this->__call(__FUNCTION__, [$data, $extra]);
+    }
+    /**
+     * null-byte RLE decode.
+     *
+     * @param string $string Data to decode
+     *
+     * @return string
+     */
+    public function rleDecode(string $string, array $extra = []): string
+    {
+        return $this->__call(__FUNCTION__, [$string, $extra]);
+    }
+    /**
+     * null-byte RLE encode.
+     *
+     * @param string $string Data to encode
+     *
+     * @return string
+     */
+    public function rleEncode(string $string, array $extra = []): string
+    {
+        return $this->__call(__FUNCTION__, [$string, $extra]);
     }
 
     public function requestCall($user, array $extra = [])

@@ -493,7 +493,12 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->v = self::V;
     }
 
-    public function __sleep()
+    /**
+     * Sleep function
+     *
+     * @return array
+     */
+    public function __sleep(): array
     {
         if ($this->settings['serialization']['cleanup_before_serialization']) {
             $this->cleanup();
@@ -526,7 +531,13 @@ class MTProto extends AsyncConstruct implements TLCallback
 
         return isset($this->logger) ? $this->logger->logger($param, $level, $file) : Logger::$default->logger($param, $level, $file);
     }
-    public function isAltervista()
+
+    /**
+     * Whether this is altervista
+     *
+     * @return boolean
+     */
+    public function isAltervista(): bool
     {
         return Magic::$altervista;
     }
@@ -563,7 +574,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->datacenter->getDataCenterConnections();
     }
 
-    public function hasAllAuth()
+    public function hasAllAuth(): bool
     {
         if ($this->isInitingAuthorization()) {
             return false;
@@ -848,7 +859,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->logger("Successfully destroyed MadelineProto");
     }
 
-    public static function getSettings($settings, $previousSettings = [])
+    public static function getSettings($settings, $previousSettings = []): array
     {
         Magic::classExists();
         if (isset($previousSettings['connection_settings']['default_dc'])) {
@@ -1224,7 +1235,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @return boolean
      */
-    public function isHttp(string $datacenter)
+    public function isHttp(string $datacenter): bool
     {
         return $this->datacenter->isHttp($datacenter);
     }
@@ -1454,7 +1465,12 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->datacenter->curdc = $curdc;
     }
 
-    public function getSelf()
+    /**
+     * Get info about the logged-in user
+     *
+     * @return \Generator<array>
+     */
+    public function getSelf(): \Generator
     {
         try {
             $this->authorization = ['user' => (yield $this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc]))[0]];
@@ -1506,7 +1522,12 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
 
 
-    public function __debugInfo()
+    /**
+     * Get debug information for var_dump
+     *
+     * @return array
+     */
+    public function __debugInfo(): array
     {
         return ['MadelineProto instance '.\spl_object_hash($this)];
     }
