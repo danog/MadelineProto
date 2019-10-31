@@ -35,13 +35,13 @@ class TL
     /**
      * Constructors.
      *
-     * @var TLConstructor
+     * @var TLConstructors
      */
     private $constructors;
     /**
      * Methods.
      *
-     * @var TLMethod
+     * @var TLMethods
      */
     private $methods;
     /**
@@ -53,7 +53,7 @@ class TL
     /**
      * TD Methods.
      *
-     * @var TLMethod
+     * @var TLMethods
      */
     private $td_methods;
     /**
@@ -99,9 +99,9 @@ class TL
      *
      * @param int $td Whether to get TD or normal methods
      *
-     * @return TLConstructor
+     * @return TLConstructors
      */
-    public function getConstructors(bool $td = false): TLConstructor
+    public function getConstructors(bool $td = false): TLConstructors
     {
         return $td ? $this->td_constructors : $this->constructors;
     }
@@ -111,9 +111,9 @@ class TL
      *
      * @param int $td Whether to get TD or normal methods
      *
-     * @return TLMethod
+     * @return TLMethods
      */
-    public function getMethods(bool $td = false): TLMethod
+    public function getMethods(bool $td = false): TLMethods
     {
         return $td ? $this->td_methods : $this->methods;
     }
@@ -140,10 +140,10 @@ class TL
     {
         $this->API->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_loading'], \danog\MadelineProto\Logger::VERBOSE);
         $this->updateCallbacks($objects);
-        $this->constructors = new TLConstructor();
-        $this->methods = new TLMethod();
-        $this->td_constructors = new TLConstructor();
-        $this->td_methods = new TLMethod();
+        $this->constructors = new TLConstructors();
+        $this->methods = new TLMethods();
+        $this->td_constructors = new TLConstructors();
+        $this->td_methods = new TLMethods();
         $this->td_descriptions = ['types' => [], 'constructors' => [], 'methods' => []];
         foreach ($files as $scheme_type => $file) {
             $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['file_parsing'], \basename($file)), \danog\MadelineProto\Logger::VERBOSE);

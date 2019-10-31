@@ -88,7 +88,7 @@ class API extends InternalDoc
                 } catch (\danog\MadelineProto\Bug74586Exception $e) {
                     \class_exists('\\Volatile');
                     $tounserialize = \str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
-                    foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
+                    foreach (['RSA', 'TL\\TLMethods', 'TL\\TLConstructors', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
                         \class_exists('\\danog\\MadelineProto\\'.$class);
                     }
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
@@ -100,7 +100,7 @@ class API extends InternalDoc
                         throw $e;
                     }
                     \class_exists('\\Volatile');
-                    foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
+                    foreach (['RSA', 'TL\\TLMethods', 'TL\\TLConstructors', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
                         \class_exists('\\danog\\MadelineProto\\'.$class);
                     }
                     $changed = false;
