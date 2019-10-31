@@ -16,7 +16,7 @@
  * @copyright 2016-2019 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  *
- * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
  /*
