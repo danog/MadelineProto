@@ -35,15 +35,15 @@ trait Constructors
         $this->docs_constructors = [];
         $this->logger->logger('Generating constructors documentation...', \danog\MadelineProto\Logger::NOTICE);
         $got = [];
-        foreach ($this->constructors->by_predicate_and_layer as $predicate => $id) {
-            $data = $this->constructors->by_id[$id];
+        foreach ($this->TL->getConstructors($this->td)->by_predicate_and_layer as $predicate => $id) {
+            $data = $this->TL->getConstructors($this->td)->by_id[$id];
             if (isset($got[$id])) {
                 $data['layer'] = '';
             }
             $got[$id] = '';
             /*
                         if (preg_match('/%/', $type)) {
-                            $type = $this->constructors->findByType(str_replace('%', '', $type))['predicate'];
+                            $type = $this->TL->getConstructors($this->td)->findByType(str_replace('%', '', $type))['predicate'];
                         }*/
             $layer = isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '';
             $type = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
@@ -69,7 +69,7 @@ trait Constructors
                 $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512']) ? 'types' : 'constructors';
                 $param[$type_or_subtype] = \str_replace(['.', 'true', 'false'], ['_', 'Bool', 'Bool'], $param[$type_or_subtype]);
                 if (\preg_match('/%/', $param[$type_or_subtype])) {
-                    $param[$type_or_subtype] = $this->constructors->findByType(\str_replace('%', '', $param[$type_or_subtype]))['predicate'];
+                    $param[$type_or_subtype] = $this->TL->getConstructors($this->td)->findByType(\str_replace('%', '', $param[$type_or_subtype]))['predicate'];
                 }
                 if (\substr($param[$type_or_subtype], -1) === '>') {
                     $param[$type_or_subtype] = \substr($param[$type_or_subtype], 0, -1);
@@ -87,14 +87,14 @@ trait Constructors
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 ';
-            if (!isset($this->td_descriptions['constructors'][$data['predicate']])) {
+            if (!isset($this->TL->getDescriptions()['constructors'][$data['predicate']])) {
                 $this->addToLang('object_'.$data['predicate']);
                 if (\danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate']] !== '') {
-                    $this->td_descriptions['constructors'][$data['predicate']]['description'] = \danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate']];
+                    $this->TL->getDescriptions()['constructors'][$data['predicate']]['description'] = \danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate']];
                 }
             }
 
-            if (isset($this->td_descriptions['constructors'][$data['predicate']]) && !empty($data['params'])) {
+            if (isset($this->TL->getDescriptions()['constructors'][$data['predicate']]) && !empty($data['params'])) {
                 $table = '### Attributes:
 
 | Name     |    Type       | Required | Description |
@@ -126,7 +126,7 @@ trait Constructors
                       }
                   }*/
                 if (\preg_match('/%/', $ptype)) {
-                    $ptype = $this->constructors->findByType(\str_replace('%', '', $ptype))['predicate'];
+                    $ptype = $this->TL->getConstructors($this->td)->findByType(\str_replace('%', '', $ptype))['predicate'];
                 }
                 $type_or_bare_type = (\ctype_upper(Tools::end(\explode('_', $ptype))[0]) || \in_array($ptype, ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512'])) && $ptype !== 'MTmessage' ? 'types' : 'constructors';
                 if (\substr($ptype, -1) === '>') {
@@ -156,16 +156,16 @@ trait Constructors
                 if (\in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->constructors->findByPredicate(\lcfirst($param['type']).'Empty') || ($data['type'] === 'InputMedia' && $param['name'] === 'mime_type') || ($data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration'])) ? 'Optional' : 'Yes').'|';
+                $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty') || ($data['type'] === 'InputMedia' && $param['name'] === 'mime_type') || ($data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration'])) ? 'Optional' : 'Yes').'|';
 
-                if (!isset($this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']])) {
+                if (!isset($this->TL->getDescriptions()['constructors'][$data['predicate']]['params'][$param['name']])) {
                     $this->addToLang('object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']);
-                    if (isset($this->td_descriptions['constructors'][$data['predicate']]['description'])) {
-                        $this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']];
+                    if (isset($this->TL->getDescriptions()['constructors'][$data['predicate']]['description'])) {
+                        $this->TL->getDescriptions()['constructors'][$data['predicate']]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']];
                     }
                 }
-                if (isset($this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']])) {
-                    $table .= $this->td_descriptions['constructors'][$data['predicate']]['params'][$param['name']].'|';
+                if (isset($this->TL->getDescriptions()['constructors'][$data['predicate']]['params'][$param['name']])) {
+                    $table .= $this->TL->getDescriptions()['constructors'][$data['predicate']]['params'][$param['name']].'|';
                 }
                 $table .= PHP_EOL;
                 $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
@@ -183,7 +183,7 @@ trait Constructors
             $params = "['_' => '".$data['predicate']."'".$params.']';
             $lua_params = "{_='".$data['predicate']."'".$lua_params.'}';
             $pwr_params = '{"_": "'.$data['predicate'].'"'.$pwr_params.'}';
-            $description = isset($this->td_descriptions['constructors'][$data['predicate']]) ? $this->td_descriptions['constructors'][$data['predicate']]['description'] : $constructor.' attributes, type and example';
+            $description = isset($this->TL->getDescriptions()['constructors'][$data['predicate']]) ? $this->TL->getDescriptions()['constructors'][$data['predicate']]['description'] : $constructor.' attributes, type and example';
             $header = '---
 title: '.$data['predicate'].'
 description: '.$description.'
@@ -199,8 +199,8 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 
 
 ';
-            if (isset($this->td_descriptions['constructors'][$data['predicate']])) {
-                $header .= $this->td_descriptions['constructors'][$data['predicate']]['description'].PHP_EOL.PHP_EOL;
+            if (isset($this->TL->getDescriptions()['constructors'][$data['predicate']])) {
+                $header .= $this->TL->getDescriptions()['constructors'][$data['predicate']]['description'].PHP_EOL.PHP_EOL;
             }
             $type = '### Type: ['.\str_replace('_', '\\_', $php_type).'](../types/'.$php_type.'.md)
 

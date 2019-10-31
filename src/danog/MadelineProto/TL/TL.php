@@ -22,69 +22,123 @@ namespace danog\MadelineProto\TL;
 use danog\MadelineProto\MTProto;
 
 /**
- * TL serialization
+ * TL serialization.
  */
 class TL
 {
     /**
-     * Highest available secret chat layer version
+     * Highest available secret chat layer version.
      *
      * @var integer
      */
-    public $encrypted_layer = -1;
+    private $encrypted_layer = -1;
     /**
-     * Constructors
+     * Constructors.
      *
      * @var TLConstructor
      */
-    public $constructors;
+    private $constructors;
     /**
-     * Methods
+     * Methods.
      *
-     * @var TLMethods
+     * @var TLMethod
      */
-    public $methods;
+    private $methods;
     /**
-     * TD Constructors
+     * TD Constructors.
      *
      * @var TLConstructors
      */
-    public $td_constructors;
+    private $td_constructors;
     /**
-     * TD Methods
+     * TD Methods.
      *
-     * @var TLMethods
+     * @var TLMethod
      */
-    public $td_methods;
+    private $td_methods;
     /**
-     * Descriptions
-     *
-     * @var array
-     */
-    public $td_descriptions;
-    /**
-     * TL callbacks
+     * Descriptions.
      *
      * @var array
      */
-    public $tl_callbacks = [];
+    private $td_descriptions;
     /**
-     * API instance
+     * TL callbacks.
+     *
+     * @var array
+     */
+    private $tl_callbacks = [];
+    /**
+     * API instance.
      *
      * @var \danog\MadelineProto\MTProto
      */
     private $API;
     /**
-     * Constructor function
+     * Constructor function.
      *
      * @param MTProto $API API instance
      */
-    public function __construct(MTProto $API) {
+    public function __construct($API = null)
+    {
         $this->API = $API;
     }
-    public function constructTL($files, $objects = [])
+
+    /**
+     * Get secret chat layer version.
+     *
+     * @return integer
+     */
+    public function getSecretLayer(): int
     {
-        $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_loading'], \danog\MadelineProto\Logger::VERBOSE);
+        return $this->encrypted_layer;
+    }
+
+    /**
+     * Get constructors.
+     *
+     * @param int $td Whether to get TD or normal methods
+     *
+     * @return TLConstructor
+     */
+    public function getConstructors(bool $td = false): TLConstructor
+    {
+        return $td ? $this->td_constructors : $this->constructors;
+    }
+
+    /**
+     * Get methods.
+     *
+     * @param int $td Whether to get TD or normal methods
+     *
+     * @return TLMethod
+     */
+    public function getMethods(bool $td = false): TLMethod
+    {
+        return $td ? $this->td_methods : $this->methods;
+    }
+
+    /**
+     * Get TL descriptions.
+     *
+     * @return array
+     */
+    public function getDescriptions(): array
+    {
+        return $this->td_descriptions;
+    }
+
+    /**
+     * Initialize TL parser.
+     *
+     * @param array        $files   Scheme files
+     * @param TLCallback[] $objects TL Callback objects
+     *
+     * @return void
+     */
+    public function init(array $files, array $objects = [])
+    {
+        $this->API->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_loading'], \danog\MadelineProto\Logger::VERBOSE);
         $this->updateCallbacks($objects);
         $this->constructors = new TLConstructor();
         $this->methods = new TLMethod();
@@ -92,7 +146,7 @@ class TL
         $this->td_methods = new TLMethod();
         $this->td_descriptions = ['types' => [], 'constructors' => [], 'methods' => []];
         foreach ($files as $scheme_type => $file) {
-            $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['file_parsing'], \basename($file)), \danog\MadelineProto\Logger::VERBOSE);
+            $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['file_parsing'], \basename($file)), \danog\MadelineProto\Logger::VERBOSE);
             $filec = \file_get_contents(\danog\MadelineProto\Absolute::absolute($file));
             $TL_dict = \json_decode($filec, true);
             if ($TL_dict === null) {
@@ -165,7 +219,7 @@ class TL
                     if (\preg_match('/^[^\s]+#([a-f0-9]*)/i', $line, $matches)) {
                         $nid = \str_pad($matches[1], 8, '0', \STR_PAD_LEFT);
                         if ($id !== $nid && $scheme_type !== 'botAPI') {
-                            $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['crc32_mismatch'], $id, $nid, $line), \danog\MadelineProto\Logger::ERROR);
+                            $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['crc32_mismatch'], $id, $nid, $line), \danog\MadelineProto\Logger::ERROR);
                         }
                         $id = $nid;
                     }
@@ -210,15 +264,14 @@ class TL
             if (empty($TL_dict) || empty($TL_dict['constructors']) || !isset($TL_dict['methods'])) {
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['src_file_invalid'].$file);
             }
-            $orig = $this->encrypted_layer;
-            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_obj'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->API->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_obj'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
                 if ($scheme_type === 'secret') {
                     $this->encrypted_layer = \max($this->encrypted_layer, $elem['layer']);
                 }
                 $this->{($scheme_type === 'td' ? 'td_' : '').'constructors'}->add($elem, $scheme_type);
             }
-            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_methods'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->API->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_methods'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
                 $this->{($scheme_type === 'td' ? 'td_' : '').'methods'}->add($elem);
                 if ($scheme_type === 'secret') {
@@ -253,7 +306,12 @@ class TL
         }
     }
 
-    public function getMethodNamespaces()
+    /**
+     * Get TL namespaces.
+     *
+     * @return array
+     */
+    public function getMethodNamespaces(): array
     {
         $res = [];
         foreach ($this->methods->method_namespace as $pair) {
@@ -264,16 +322,28 @@ class TL
         return $res;
     }
 
-    public function getMethodsNamespaced()
+    /**
+     * Get namespaced methods (method => namespace).
+     *
+     * @return array
+     */
+    public function getMethodsNamespaced(): array
     {
         return $this->methods->method_namespace;
     }
 
-    public function updateCallbacks($objects)
+    /**
+     * Update TL callbacks.
+     *
+     * @param TLCallback[] $objects TL callbacks
+     *
+     * @return void
+     */
+    public function updateCallbacks(array $objects)
     {
         $this->tl_callbacks = [];
         foreach ($objects as $object) {
-            if (!isset(\class_implements(\get_class($object))['danog\\MadelineProto\\TL\\TLCallback'])) {
+            if (!isset(\class_implements(\get_class($object))[TLCallback::class])) {
                 throw new Exception('Invalid callback object provided!');
             }
             $new = [
@@ -298,8 +368,14 @@ class TL
             }
         }
     }
-
-    public function deserializeBool($id)
+    /**
+     * Deserialize bool.
+     *
+     * @param string $id Constructor ID
+     *
+     * @return bool
+     */
+    private function deserializeBool(string $id): bool
     {
         $tl_elem = $this->constructors->findById($id);
         if ($tl_elem === false) {
@@ -309,7 +385,17 @@ class TL
         return $tl_elem['predicate'] === 'boolTrue';
     }
 
-    public function serializeObject($type, $object, $ctx, $layer = -1)
+    /**
+     * Serialize TL object.
+     *
+     * @param array   $type   TL type definition
+     * @param mixed   $object Object to serialize
+     * @param string  $ctx    Context
+     * @param integer $layer  Layer version
+     *
+     * @return \Generator<string>
+     */
+    public function serializeObject(array $type, $object, $ctx, int $layer = -1): \Generator
     {
         switch ($type['type']) {
             case 'int':
@@ -464,7 +550,7 @@ class TL
         $predicate = $object['_'];
         $constructorData = $this->constructors->findByPredicate($predicate, $layer);
         if ($constructorData === false) {
-            $this->logger->logger($object, \danog\MadelineProto\Logger::FATAL_ERROR);
+            $this->API->logger->logger($object, \danog\MadelineProto\Logger::FATAL_ERROR);
 
             throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error'], $predicate));
         }
@@ -486,7 +572,15 @@ class TL
         return $concat.yield $this->serializeParams($constructorData, $object, '', $layer);
     }
 
-    public function serializeMethod($method, $arguments)
+    /**
+     * Serialize method.
+     *
+     * @param string $method    Method name
+     * @param mixed  $arguments Arguments
+     *
+     * @return \Generator<string>
+     */
+    public function serializeMethod(string $method, $arguments): \Generator
     {
         if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && \preg_match('@(?:t|telegram)\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
             if ($matches[1] === '') {
@@ -523,7 +617,7 @@ class TL
                     ) &&
                     $this->settings['upload']['allow_automatic_upload']
                 ) {
-                    $arguments['file'] = yield $this->uploadEncrypted($arguments['file']);
+                    $arguments['file'] = yield $this->API->uploadEncrypted($arguments['file']);
                 }
                 if (isset($arguments['file']['key'])) {
                     $arguments['message']['media']['key'] = $arguments['file']['key'];
@@ -533,7 +627,7 @@ class TL
                 }
             }
         } elseif (\in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && isset($arguments['chat_id']) && (!\is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
-            $res = yield $this->getInfo($arguments['chat_id']);
+            $res = yield $this->API->getInfo($arguments['chat_id']);
             if ($res['type'] !== 'chat') {
                 throw new \danog\MadelineProto\Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
             }
@@ -566,10 +660,20 @@ class TL
         return $tl['id'].yield $this->serializeParams($tl, $arguments, $method);
     }
 
-    public function serializeParams($tl, $arguments, $ctx, $layer = -1)
+    /**
+     * Serialize parameters.
+     *
+     * @param array     $tl        TL object definition
+     * @param arrayLike $arguments Arguments
+     * @param string    $ctx       Context
+     * @param integer   $layer     Layer
+     *
+     * @return \Generator<string>
+     */
+    private function serializeParams(array $tl, $arguments, $ctx, int $layer = -1): \Generator
     {
         $serialized = '';
-        $arguments = yield $this->botAPIToMTProto($arguments);
+        $arguments = yield $this->API->botAPIToMTProto($arguments);
         $flags = 0;
         foreach ($tl['params'] as $cur_flag) {
             if (isset($cur_flag['pow'])) {
@@ -595,7 +699,7 @@ class TL
         foreach ($tl['params'] as $current_argument) {
             if (!isset($arguments[$current_argument['name']])) {
                 if (isset($current_argument['pow']) && (\in_array($current_argument['type'], ['true', 'false']) || ($flags & $current_argument['pow']) === 0)) {
-                    //$this->logger->logger('Skipping '.$current_argument['name'].' of type '.$current_argument['type');
+                    //$this->API->logger->logger('Skipping '.$current_argument['name'].' of type '.$current_argument['type');
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
@@ -603,7 +707,7 @@ class TL
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService']) && isset($arguments['message'])) {
-                    $serialized .= yield $this->serializeObject($current_argument, yield $this->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message']), 'data');
+                    $serialized .= yield $this->serializeObject($current_argument, yield $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message']), 'data');
                     continue;
                 }
                 if ($current_argument['name'] === 'random_id') {
@@ -691,27 +795,35 @@ class TL
                 )
                 && $this->settings['upload']['allow_automatic_upload']
             ) {
-                $arguments[$current_argument['name']] = yield $this->upload($arguments[$current_argument['name']]);
+                $arguments[$current_argument['name']] = yield $this->API->upload($arguments[$current_argument['name']]);
             }
 
             if ($current_argument['type'] === 'InputEncryptedChat' && (!\is_array($arguments[$current_argument['name']]) || isset($arguments[$current_argument['name']]['_']) && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] !== $current_argument['type'])) {
                 if (\is_array($arguments[$current_argument['name']])) {
-                    $arguments[$current_argument['name']] = (yield $this->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat'];
+                    $arguments[$current_argument['name']] = (yield $this->API->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat'];
                 } else {
-                    if (!isset($this->secret_chats[$arguments[$current_argument['name']]])) {
+                    if (!$this->API->hasSecretChat($arguments[$current_argument['name']])) {
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);
                     }
-                    $arguments[$current_argument['name']] = $this->secret_chats[$arguments[$current_argument['name']]]['InputEncryptedChat'];
+                    $arguments[$current_argument['name']] = $this->API->getSecretChat($arguments[$current_argument['name']])['InputEncryptedChat'];
                 }
             }
-            //$this->logger->logger('Serializing '.$current_argument['name'].' of type '.$current_argument['type');
+            //$this->API->logger->logger('Serializing '.$current_argument['name'].' of type '.$current_argument['type');
             $serialized .= yield $this->serializeObject($current_argument, $arguments[$current_argument['name']], $current_argument['name'], $layer);
         }
 
         return $serialized;
     }
 
-    public function getLength($stream, $type = ['type' => ''])
+    /**
+     * Get length of TL payload.
+     *
+     * @param resource $stream Stream
+     * @param array    $type   Type identifier
+     *
+     * @return int
+     */
+    public function getLength($stream, $type = ['type' => '']): int
     {
         if (\is_string($stream)) {
             $res = \fopen('php://memory', 'rw+b');
@@ -726,8 +838,14 @@ class TL
         return \ftell($stream);
     }
 
+
     /**
-     * :type stream: io.BytesIO object.
+     * Deserialize TL object.
+     *
+     * @param resource $stream Stream
+     * @param array    $type   Type identifier
+     *
+     * @return mixed
      */
     public function deserialize($stream, $type = ['type' => ''])
     {

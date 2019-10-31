@@ -22,34 +22,34 @@ namespace danog\MadelineProto\Wrappers;
 use EventHandler;
 
 /**
- * Event handler
+ * Event handler.
  */
 trait Events
 {
     /**
-     * Event handler class name
+     * Event handler class name.
      *
      * @var string
      */
     public $event_handler;
     /**
-     * Event handler instance
+     * Event handler instance.
      *
      * @var \danog\MadelineProto\EventHandler
      */
     private $event_handler_instance;
     /**
-     * Event handler method list
+     * Event handler method list.
      *
      * @var array<string>
      */
     private $event_handler_methods = [];
 
     /**
-     * Set event handler
+     * Set event handler.
      *
      * @param string|EventHandler $event_handler Event handler
-     * 
+     *
      * @return void
      */
     public function setEventHandler($event_handler)
@@ -91,7 +91,7 @@ trait Events
     }
 
     /**
-     * Get event handler
+     * Get event handler.
      *
      * @return EventHandler
      */
@@ -101,12 +101,12 @@ trait Events
     }
 
     /**
-     * Event update handler
+     * Event update handler.
      *
      * @param array $update Update
-     * 
+     *
      * @return void
-     * 
+     *
      * @internal Internal event handler
      */
     public function eventUpdateHandler(array $update)

@@ -4041,6 +4041,33 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$param, $level, $file, $extra]);
     }
     /**
+     * Get TL namespaces.
+     *
+     * @return array
+     */
+    public function getMethodNamespaces(array $extra = []): array
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Get namespaced methods (method => namespace).
+     *
+     * @return array
+     */
+    public function getMethodsNamespaced(array $extra = []): array
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Get TL serializer.
+     *
+     * @return TL
+     */
+    public function getTL(array $extra = []): danog\MadelineProto\TL\TL
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
      * Get async HTTP client.
      *
      * @return \Amp\Artax\Client
@@ -4075,11 +4102,6 @@ class InternalDoc extends APIFactory
      * @return array<DataCenterConnection>
      */
     public function getDataCenterConnections(array $extra = []): array
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function hasAllAuth(array $extra = []): bool
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -4139,7 +4161,20 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$datacenter, $extra]);
     }
-
+    /**
+     * Checks whether all datacenters are authorized.
+     *
+     * @return boolean
+     */
+    public function hasAllAuth(array $extra = []): bool
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Whether we're initing authorization.
+     *
+     * @return boolean
+     */
     public function isInitingAuthorization(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
@@ -4689,57 +4724,79 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$message_media, $callable, $cb, $parallelize, $offset, $end, $part_size, $extra]);
     }
-
+    /**
+     * Accept secret chat.
+     *
+     * @param array $params Secret chat ID
+     *
+     * @return \Generator
+     */
     public function acceptSecretChat($params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
-
+    /**
+     * Request secret chat.
+     *
+     * @param mixed $user User to start secret chat with
+     *
+     * @return \Generator
+     */
     public function requestSecretChat($user, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$user, $extra]);
     }
-
-    public function completeSecretChat($params, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$params, $extra]);
-    }
-
-    public function notifyLayer($chat, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$chat, $extra]);
-    }
-
+    /**
+     * Rekey secret chat.
+     *
+     * @param mixed $chat Secret chat to rekey
+     *
+     * @return \Generator
+     */
     public function rekey($chat, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
-
-    public function acceptRekey($chat, $params, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$chat, $params, $extra]);
-    }
-
-    public function commitRekey($chat, $params, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$chat, $params, $extra]);
-    }
-
-    public function completeRekey($chat, $params, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$chat, $params, $extra]);
-    }
-
-    public function secretChatStatus($chat, array $extra = [])
+    /**
+     * Get secret chat status.
+     *
+     * @param int $chat Chat ID
+     *
+     * @return int One of MTProto::SECRET_EMPTY, MTProto::SECRET_REQUESTED, MTProto::SECRET_READY
+     */
+    public function secretChatStatus(int $chat, array $extra = []): int
     {
         return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
-
-    public function getSecretChat($chat, array $extra = [])
+    /**
+     * Get secret chat.
+     *
+     * @param array|int $chat Secret chat ID
+     *
+     * @return array
+     */
+    public function getSecretChat($chat, array $extra = []): array
     {
         return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
-
+    /**
+     * Check whether secret chat exists.
+     *
+     * @param array|int $chat Secret chat ID
+     *
+     * @return boolean
+     */
+    public function hasSecretChat($chat, array $extra = []): bool
+    {
+        return $this->__call(__FUNCTION__, [$chat, $extra]);
+    }
+    /**
+     * Discard secret chat.
+     *
+     * @param array|int $chat Secret chat ID
+     *
+     * @return \Generator
+     */
     public function discardSecretChat($chat, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$chat, $extra]);
@@ -4788,63 +4845,6 @@ class InternalDoc extends APIFactory
     public function generateSecretOutSeqNo($chat, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$chat, $extra]);
-    }
-
-    public function constructTL($files, $objects = [
-    ], array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$files, $objects, $extra]);
-    }
-
-    public function getMethodNamespaces(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function getMethodsNamespaced(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function updateCallbacks($objects, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$objects, $extra]);
-    }
-
-    public function deserializeBool($id, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$id, $extra]);
-    }
-
-    public function serializeObject($type, $object, $ctx, $layer = -1, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$type, $object, $ctx, $layer, $extra]);
-    }
-
-    public function serializeMethod($method, $arguments, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$method, $arguments, $extra]);
-    }
-
-    public function serializeParams($tl, $arguments, $ctx, $layer = -1, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$tl, $arguments, $ctx, $layer, $extra]);
-    }
-
-    public function getLength($stream, $type = [
-      'type' => '',
-    ], array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$stream, $type, $extra]);
-    }
-    /**
-     * :type stream: io.BytesIO object.
-     */
-    public function deserialize($stream, $type = [
-      'type' => '',
-    ], array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$stream, $type, $extra]);
     }
 
     public function htmlEntityDecode($stuff, array $extra = [])
@@ -5442,6 +5442,19 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
+    /**
+     * Accesses a private variable from an object.
+     *
+     * @param object $obj Object
+     * @param string $var Attribute name
+     *
+     * @return mixed
+     * @access public
+     */
+    public function getVar($obj, string $var, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$obj, $var, $extra]);
+    }
 
     public function requestCall($user, array $extra = [])
     {
@@ -5483,28 +5496,58 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
+    /**
+     * Get dialog peers.
+     *
+     * @param boolean $force Whether to refetch all dialogs ignoring cache
+     *
+     * @return \Generator<array<Peer>>
+     */
     public function getDialogs($force = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$force, $extra]);
     }
-
+    /**
+     * Get full info of all dialogs.
+     *
+     * @param boolean $force Whether to refetch all dialogs ignoring cache
+     *
+     * @return \Generator
+     */
     public function getFullDialogs($force = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$force, $extra]);
     }
-
+    /**
+     * Set event handler.
+     *
+     * @param string|EventHandler $event_handler Event handler
+     *
+     * @return void
+     */
     public function setEventHandler($event_handler, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$event_handler, $extra]);
     }
-
-    public function getEventHandler(array $extra = [])
+    /**
+     * Get event handler.
+     *
+     * @return EventHandler
+     */
+    public function getEventHandler(array $extra = []): EventHandler
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
-    public function eventUpdateHandler($update, array $extra = [])
+    /**
+     * Event update handler.
+     *
+     * @param array $update Update
+     *
+     * @return void
+     *
+     * @internal Internal event handler
+     */
+    public function eventUpdateHandler(array $update, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$update, $extra]);
     }
@@ -5645,17 +5688,31 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$template, $extra]);
     }
-
+    /**
+     * Check for terms of service update.
+     *
+     * @return \Generator
+     */
     public function checkTos(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
+    /**
+     * Accept terms of service update.
+     *
+     * @return \Generator
+     */
     public function acceptTos(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
+    /**
+     * Decline terms of service update.
+     *
+     * THIS WILL DELETE YOUR ACCOUNT!
+     *
+     * @return \Generator
+     */
     public function declineTos(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);

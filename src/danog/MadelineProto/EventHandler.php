@@ -20,12 +20,12 @@
 namespace danog\MadelineProto;
 
 /**
- * Event handler
+ * Event handler.
  */
 class EventHandler extends InternalDoc
 {
     /**
-     * Constructor
+     * Constructor.
      *
      * @param API|null $MadelineProto MadelineProto instance
      */

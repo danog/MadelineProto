@@ -41,7 +41,7 @@ trait MessageHandler
             $this->secret_chats[$chat_id]['out_seq_no']++;
         }
         $this->secret_chats[$chat_id]['outgoing'][$this->secret_chats[$chat_id]['out_seq_no']] = $message;
-        $message = yield $this->serializeObject(['type' => $constructor = $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer'], $message, $constructor, $this->secret_chats[$chat_id]['layer']);
+        $message = yield $this->TL->serializeObject(['type' => $constructor = $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer'], $message, $constructor, $this->secret_chats[$chat_id]['layer']);
         $message = \danog\MadelineProto\Tools::packUnsignedInt(\strlen($message)).$message;
         if ($this->secret_chats[$chat_id]['mtproto'] === 2) {
             $padding = \danog\MadelineProto\Tools::posmod(-\strlen($message), 16);
@@ -111,7 +111,7 @@ trait MessageHandler
                 $this->secret_chats[$message['message']['chat_id']]['mtproto'] = 2;
             }
         }
-        $deserialized = $this->deserialize($message_data, ['type' => '']);
+        $deserialized = $this->TL->deserialize($message_data, ['type' => '']);
         $this->secret_chats[$message['message']['chat_id']]['ttr']--;
         if (($this->secret_chats[$message['message']['chat_id']]['ttr'] <= 0 || \time() - $this->secret_chats[$message['message']['chat_id']]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$message['message']['chat_id']]['rekeying'][0] === 0) {
             yield $this->rekey($message['message']['chat_id']);

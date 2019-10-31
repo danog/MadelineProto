@@ -826,7 +826,7 @@ trait Tools
      *
      * @param object $obj Object
      * @param string $var Attribute name
-     * 
+     *
      * @return mixed
      * @access public
      */

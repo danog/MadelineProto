@@ -25,7 +25,7 @@ namespace danog\MadelineProto\Wrappers;
 trait TOS
 {
     /**
-     * Check for terms of service update
+     * Check for terms of service update.
      *
      * @return \Generator
      */
@@ -52,7 +52,7 @@ trait TOS
     }
 
     /**
-     * Accept terms of service update
+     * Accept terms of service update.
      *
      * @return \Generator
      */
@@ -67,8 +67,8 @@ trait TOS
     }
 
     /**
-     * Decline terms of service update
-     * 
+     * Decline terms of service update.
+     *
      * THIS WILL DELETE YOUR ACCOUNT!
      *
      * @return \Generator

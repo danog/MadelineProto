@@ -96,7 +96,14 @@ class TLConstructor
         return false;
     }
 
-    public function findById($id)
+    /**
+     * Find constructor by ID.
+     *
+     * @param string $id Constructor ID
+     *
+     * @return array|false
+     */
+    public function findById(string $id)
     {
         if (isset($this->by_id[$id])) {
             $constructor = $this->by_id[$id];

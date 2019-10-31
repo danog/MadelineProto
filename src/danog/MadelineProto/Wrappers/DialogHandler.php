@@ -22,10 +22,10 @@ namespace danog\MadelineProto\Wrappers;
 trait DialogHandler
 {
     /**
-     * Get dialog peers
+     * Get dialog peers.
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
-     * 
+     *
      * @return \Generator<array<Peer>>
      */
     public function getDialogs($force = true): \Generator
@@ -47,10 +47,10 @@ trait DialogHandler
     }
 
     /**
-     * Get full info of all dialogs
+     * Get full info of all dialogs.
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
-     * 
+     *
      * @return \Generator
      */
     public function getFullDialogs($force = true): \Generator

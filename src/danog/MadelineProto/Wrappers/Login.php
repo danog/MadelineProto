@@ -44,7 +44,7 @@ trait Login
             yield $this->logout();
         }
         $callbacks = [$this, $this->referenceDatabase];
-        $this->updateCallbacks($callbacks);
+        $this->TL->updateCallbacks($callbacks);
 
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_bot'], \danog\MadelineProto\Logger::NOTICE);
         $this->authorization = yield $this->methodCallAsyncRead('auth.importBotAuthorization', ['bot_auth_token' => $token, 'api_id' => $this->settings['app_info']['api_id'], 'api_hash' => $this->settings['app_info']['api_hash']], ['datacenter' => $this->datacenter->curdc]);
@@ -159,7 +159,7 @@ trait Login
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks []= $this->minDatabase;
         }
-        $this->updateCallbacks($callbacks);
+        $this->TL->updateCallbacks($callbacks);
 
         $this->startUpdateSystem();
 

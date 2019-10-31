@@ -186,7 +186,7 @@ trait AuthKeyHandler
                 $q_bytes = $q->toBytes();
                 $new_nonce = \danog\MadelineProto\Tools::random(32);
                 $data_unserialized = ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => \preg_replace('|_.*|', '', $datacenter)];
-                $p_q_inner_data = yield $this->serializeObject(['type' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp')], $data_unserialized, 'p_q_inner_data');
+                $p_q_inner_data = yield $this->TL->serializeObject(['type' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp')], $data_unserialized, 'p_q_inner_data');
                 /*
                  * ***********************************************************************
                  * Encrypt serialized object
@@ -265,12 +265,12 @@ trait AuthKeyHandler
                  *         int            $server_time
                  * ]
                  */
-                $server_DH_inner_data = $this->deserialize($answer, ['type' => '']);
+                $server_DH_inner_data = $this->TL->deserialize($answer, ['type' => '']);
                 /*
                  * ***********************************************************************
                  * Do some checks
                  */
-                $server_DH_inner_data_length = $this->getLength($answer);
+                $server_DH_inner_data_length = $this->TL->getLength($answer);
                 if (\sha1(\substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
                     throw new \danog\MadelineProto\SecurityException('answer_hash mismatch.');
                 }
@@ -320,7 +320,7 @@ trait AuthKeyHandler
                      *         string        $g_b                            : g^b mod dh_prime
                      * ]
                      */
-                    $data = yield $this->serializeObject(['type' => 'client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str], 'client_DH_inner_data');
+                    $data = yield $this->TL->serializeObject(['type' => 'client_DH_inner_data'], ['nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str], 'client_DH_inner_data');
                     /*
                      * ***********************************************************************
                      * encrypt client_DH_inner_data
@@ -550,7 +550,7 @@ trait AuthKeyHandler
                 $temp_auth_key_id = $datacenterConnection->getTempAuthKey()->getID();
                 $perm_auth_key_id = $datacenterConnection->getPermAuthKey()->getID();
                 $temp_session_id = $connection->session_id;
-                $message_data = yield $this->serializeObject(['type' => 'bind_auth_key_inner'], ['nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bindTempAuthKey_inner');
+                $message_data = yield $this->TL->serializeObject(['type' => 'bind_auth_key_inner'], ['nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bindTempAuthKey_inner');
                 $message_id = $connection->generateMessageId();
                 $seq_no = 0;
                 $encrypted_data = \danog\MadelineProto\Tools::random(16).$message_id.\pack('VV', $seq_no, \strlen($message_data)).$message_data;

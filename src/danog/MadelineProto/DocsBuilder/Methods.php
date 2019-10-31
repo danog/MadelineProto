@@ -54,7 +54,7 @@ trait Methods
         $this->docs_methods = [];
         $this->human_docs_methods = [];
         $this->logger->logger('Generating methods documentation...', \danog\MadelineProto\Logger::NOTICE);
-        foreach ($this->methods->by_id as $id => $data) {
+        foreach ($this->TL->getMethods($this->td)->by_id as $id => $data) {
             $method = $data['method'];
             $php_method = \str_replace('.', '->', $data['method']);
             $type = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
@@ -170,9 +170,9 @@ trait Methods
                 }
 
                 if (isset($this->td_descriptions['methods'][$data['method']])) {
-                    $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->td_descriptions['methods'][$data['method']]['params'][$param['name']].' | '.(isset($param['pow']) || (($id = $this->constructors->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type']) || (($id = $this->constructors->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type']) ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->td_descriptions['methods'][$data['method']]['params'][$param['name']].' | '.(isset($param['pow']) || (($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type']) || (($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type']) ? 'Optional' : 'Yes').'|';
                 } else {
-                    $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || (($id = $this->constructors->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type']) || (($id = $this->constructors->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type']) ? 'Optional' : 'Yes').'|';
+                    $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || (($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type']) || (($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type']) ? 'Optional' : 'Yes').'|';
                 }
                 $table .= PHP_EOL;
                 $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;

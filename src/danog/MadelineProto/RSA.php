@@ -18,41 +18,43 @@
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\TL\TL;
+
 /**
- * RSA class
+ * RSA class.
  */
 class RSA
 {
-    use \danog\MadelineProto\TL\TL;
     use \danog\MadelineProto\Tools;
     use \danog\Serializable;
     /**
-     * Exponent
+     * Exponent.
      *
      * @var \phpseclib\Math\BigInteger
      */
     public $e;
     /**
-     * Modulus
+     * Modulus.
      *
      * @var \phpseclib\Math\BigInteger
      */
     public $n;
     /**
-     * Fingerprint
+     * Fingerprint.
      *
      * @var string
      */
     public $fp;
 
     /**
-     * Load RSA key
+     * Load RSA key.
      *
+     * @param TL     $TL      TL serializer
      * @param string $rsa_key RSA key
-     * 
+     *
      * @return \Generator<self>
      */
-    public function load(string $rsa_key): \Generator
+    public function load(TL $TL, string $rsa_key): \Generator
     {
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_init'], Logger::ULTRA_VERBOSE);
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['loading_key'], Logger::ULTRA_VERBOSE);
@@ -60,13 +62,13 @@ class RSA
         $this->n = Tools::getVar($key, 'modulus');
         $this->e = Tools::getVar($key, 'exponent');
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['computing_fingerprint'], Logger::ULTRA_VERBOSE);
-        $this->fp = \substr(\sha1((yield $this->serializeObject(['type' => 'bytes'], $this->n->toBytes(), 'key')).(yield $this->serializeObject(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
+        $this->fp = \substr(\sha1((yield $TL->serializeObject(['type' => 'bytes'], $this->n->toBytes(), 'key')).(yield $TL->serializeObject(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
 
         return $this;
     }
 
     /**
-     * Sleep function
+     * Sleep function.
      *
      * @return array
      */
@@ -76,10 +78,10 @@ class RSA
     }
 
     /**
-     * Encrypt data
+     * Encrypt data.
      *
      * @param string $data Data to encrypt
-     * 
+     *
      * @return string
      */
     public function encrypt($data): string

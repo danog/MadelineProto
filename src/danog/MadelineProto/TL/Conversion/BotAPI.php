@@ -374,7 +374,7 @@ trait BotAPI
                 $data['document']['_'] = 'bot_'.$type_name;
                 $res['file_size'] = $data['document']['size'];
                 $res['mime_type'] = $data['document']['mime_type'];
-                $res['file_id'] = \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode((yield $this->serializeObject(['type' => 'File'], $data['document'], 'File')).\chr(2)));
+                $res['file_id'] = \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode((yield $this->TL->serializeObject(['type' => 'File'], $data['document'], 'File')).\chr(2)));
 
                 return [$type_name => $res, 'caption' => isset($data['caption']) ? $data['caption'] : ''];
             default:

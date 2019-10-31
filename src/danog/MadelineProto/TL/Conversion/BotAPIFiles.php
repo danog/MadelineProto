@@ -29,7 +29,7 @@ trait BotAPIFiles
         $photoSize['location']['secret'] = $photo['location']['secret'] ?? 0;
         $photoSize['location']['dc_id'] = $photo['dc_id'] ?? 0;
         $photoSize['location']['_'] = $thumbnail ? 'bot_thumbnail' : 'bot_photo';
-        $data = (yield $this->serializeObject(['type' => 'File'], $photoSize['location'], 'File')).\chr(2);
+        $data = (yield $this->TL->serializeObject(['type' => 'File'], $photoSize['location'], 'File')).\chr(2);
 
         return [
             'file_id' => \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode($data)),
@@ -47,7 +47,7 @@ trait BotAPIFiles
         if ($file_id[\strlen($file_id) - 1] !== \chr(2)) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['last_byte_invalid']);
         }
-        $deserialized = $this->deserialize($file_id);
+        $deserialized = $this->TL->deserialize($file_id);
         $res = ['type' => \str_replace('bot_', '', $deserialized['_'])];
         switch ($deserialized['_']) {
             case 'bot_thumbnail':

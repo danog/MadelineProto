@@ -31,6 +31,7 @@ use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
 use danog\MadelineProto\MTProtoTools\MinDatabase;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
+use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
 
 /**
@@ -49,7 +50,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     use \danog\MadelineProto\SecretChats\MessageHandler;
     use \danog\MadelineProto\SecretChats\ResponseHandler;
     use \danog\MadelineProto\SecretChats\SeqNoHandler;
-    use \danog\MadelineProto\TL\TL;
     use \danog\MadelineProto\TL\Conversion\BotAPI;
     use \danog\MadelineProto\TL\Conversion\BotAPIFiles;
     use \danog\MadelineProto\TL\Conversion\Extension;
@@ -163,10 +163,24 @@ class MTProto extends AsyncConstruct implements TLCallback
         64 => ' and content-related response to message already generated',
         128 => ' and other party knows for a fact that message is already received'
     ];
-    const REQUESTED = 0;
-    const ACCEPTED = 1;
-    const CONFIRMED = 2;
-    const READY = 3;
+    /**
+     * Secret chat was not found.
+     *
+     * @var int
+     */
+    const SECRET_EMPTY = 0;
+    /**
+     * Secret chat was requested.
+     *
+     * @var int
+     */
+    const SECRET_REQUESTED = 1;
+    /**
+     * Secret chat was found.
+     *
+     * @var int
+     */
+    const SECRET_READY = 2;
     const TD_PARAMS_CONVERSION = ['updateNewMessage' => ['_' => 'updateNewMessage', 'disable_notification' => ['message', 'silent'], 'message' => ['message']], 'message' => ['_' => 'message', 'id' => ['id'], 'sender_user_id' => ['from_id'], 'chat_id' => ['to_id', 'choose_chat_id_from_botapi'], 'send_state' => ['choose_incoming_or_sent'], 'can_be_edited' => ['choose_can_edit'], 'can_be_deleted' => ['choose_can_delete'], 'is_post' => ['post'], 'date' => ['date'], 'edit_date' => ['edit_date'], 'forward_info' => ['fwd_info', 'choose_forward_info'], 'reply_to_message_id' => ['reply_to_msg_id'], 'ttl' => ['choose_ttl'], 'ttl_expires_in' => ['choose_ttl_expires_in'], 'via_bot_user_id' => ['via_bot_id'], 'views' => ['views'], 'content' => ['choose_message_content'], 'reply_markup' => ['reply_markup']], 'messages.sendMessage' => ['chat_id' => ['peer'], 'reply_to_message_id' => ['reply_to_msg_id'], 'disable_notification' => ['silent'], 'from_background' => ['background'], 'input_message_content' => ['choose_message_content'], 'reply_markup' => ['reply_markup']]];
     const TD_REVERSE = ['sendMessage' => 'messages.sendMessage'];
     const TD_IGNORE = ['updateMessageID'];
@@ -420,6 +434,13 @@ class MTProto extends AsyncConstruct implements TLCallback
     public $logger;
 
     /**
+     * TL serializer.
+     *
+     * @var \danog\MadelineProto\TL\TL
+     */
+    private $TL;
+
+    /**
      * Constructor function.
      *
      * @param array $settings Settings
@@ -449,19 +470,17 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->logger->logger(Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);
         $this->rsa_keys = [];
         foreach ($this->settings['authorization']['rsa_keys'] as $key) {
-            $key = yield (new RSA())->load($key);
+            $key = yield (new RSA())->load($this->TL, $key);
             $this->rsa_keys[$key->fp] = $key;
         }
-        /*
-         * ***********************************************************************
-         * Define some needed numbers for BigInteger
-         */
+        // (re)-initialize TL
         $this->logger->logger(Lang::$current_lang['TL_translation'], Logger::ULTRA_VERBOSE);
         $callbacks = [$this, $this->referenceDatabase];
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks []= $this->minDatabase;
         }
-        $this->constructTL($this->settings['tl_schema']['src'], $callbacks);
+        $this->TL->init($this->settings['tl_schema']['src'], $callbacks);
+
         yield $this->connectToAllDcs();
         $this->startLoops();
         $this->datacenter->curdc = 2;
@@ -495,72 +514,66 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         return [
             // Databases
-            'chats', 
-            'full_chats', 
-            'referenceDatabase', 
-            'minDatabase', 
-            'channel_participants', 
+            'chats',
+            'full_chats',
+            'referenceDatabase',
+            'minDatabase',
+            'channel_participants',
 
             // Misc caching
-            'dialog_params', 
-            'last_stored', 
-            'qres', 
-            'supportUser', 
+            'dialog_params',
+            'last_stored',
+            'qres',
+            'supportUser',
             'tos',
 
             // Event handler
-            'event_handler', 
-            'event_handler_instance', 
+            'event_handler',
+            'event_handler_instance',
             'loop_callback',
-            'updates', 
-            'updates_key', 
+            'updates',
+            'updates_key',
 
             'hook_url',
 
             // Web login template
-            'web_template', 
+            'web_template',
 
             // Settings
-            'settings', 
-            'config', 
+            'settings',
+            'config',
 
             // Authorization keys
-            'datacenter', 
+            'datacenter',
 
             // Authorization state
-            'authorization', 
-            'authorized', 
-            'authorized_dc', 
+            'authorization',
+            'authorized',
+            'authorized_dc',
 
             // Authorization cache
-            'rsa_keys', 
-            'dh_config', 
+            'rsa_keys',
+            'dh_config',
 
             // Update state
-            'got_state', 
-            'channels_state', 
-            'msg_ids', 
+            'got_state',
+            'channels_state',
+            'msg_ids',
 
             // Version
-            'v', 
+            'v',
 
-            // TL (we don't need this)
-            'constructors', 
-            'td_constructors', 
-            'methods', 
-            'td_methods', 
-            'td_descriptions', 
-            'tl_callbacks', 
+            // TL
+            'TL',
 
             // Secret chats
-            'secret_chats', 
-            'encrypted_layer', 
-            'temp_requested_secret_chats', 
-            'temp_rekeyed_secret_chats', 
+            'secret_chats',
+            'temp_requested_secret_chats',
+            'temp_rekeyed_secret_chats',
 
             // Object storage
-            'storage', 
-        ];           
+            'storage',
+        ];
     }
 
 
@@ -576,7 +589,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks []= $this->minDatabase;
         }
-        $this->updateCallbacks($callbacks);
+        $this->TL->updateCallbacks($callbacks);
         return $this;
     }
 
@@ -596,6 +609,37 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
 
         return isset($this->logger) ? $this->logger->logger($param, $level, $file) : Logger::$default->logger($param, $level, $file);
+    }
+
+    /**
+     * Get TL namespaces.
+     *
+     * @return array
+     */
+    public function getMethodNamespaces(): array
+    {
+        return $this->TL->getMethodNamespaces();
+    }
+
+
+    /**
+     * Get namespaced methods (method => namespace).
+     *
+     * @return array
+     */
+    public function getMethodsNamespaced(): array
+    {
+        return $this->TL->getMethodsNamespaced();
+    }
+
+    /**
+     * Get TL serializer.
+     *
+     * @return TL
+     */
+    public function getTL(): TL
+    {
+        return $this->TL;
     }
 
     /**
@@ -736,9 +780,18 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!isset($this->minDatabase)) {
             $this->minDatabase = new MinDatabase($this);
         }
+        if (!isset($this->TL)) {
+            $this->TL = new TL($this);
+            $this->logger->logger(Lang::$current_lang['TL_translation'], Logger::ULTRA_VERBOSE);
+            $callbacks = [$this, $this->referenceDatabase];
+            if (!($this->authorization['user']['bot'] ?? false)) {
+                $callbacks []= $this->minDatabase;
+            }
+            $this->TL->init($this->settings['tl_schema']['src'], $callbacks);
+        }
     }
     /**
-     * Upgrade MadelineProto instance
+     * Upgrade MadelineProto instance.
      *
      * @return \Generator
      */
@@ -863,7 +916,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks []= $this->minDatabase;
         }
-        $this->updateCallbacks($callbacks);
+        $this->TL->updateCallbacks($callbacks);
 
         $this->settings['connection_settings']['all']['ipv6'] = Magic::$ipv6;
         if ($this->authorized === true) {
@@ -1350,6 +1403,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->datacenter->isHttp($datacenter);
     }
 
+    /**
+     * Checks whether all datacenters are authorized.
+     *
+     * @return boolean
+     */
     public function hasAllAuth(): bool
     {
         if ($this->isInitingAuthorization()) {
@@ -1365,6 +1423,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         return true;
     }
 
+    /**
+     * Whether we're initing authorization.
+     *
+     * @return boolean
+     */
     public function isInitingAuthorization()
     {
         return $this->initing_authorization;
@@ -1563,8 +1626,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         try {
             foreach ((yield $this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
-                $tempkey = new \danog\MadelineProto\RSA($curkey['public_key']);
-                $this->cdn_rsa_keys[$tempkey->fp] = $tempkey;
+                $this->cdn_rsa_keys[$tempkey->fp] = yield (new RSA)->load($this->TL, $curkey['public_key']);
             }
         } catch (\danog\MadelineProto\TL\Exception $e) {
             $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::FATAL_ERROR);

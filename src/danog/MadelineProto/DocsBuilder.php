@@ -19,10 +19,11 @@
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\TL\TL;
+
 // This code was written a few years ago: it is garbage, and has to be rewritten
 class DocsBuilder
 {
-    use \danog\MadelineProto\TL\TL;
     use \danog\MadelineProto\DocsBuilder\Methods;
     use \danog\MadelineProto\DocsBuilder\Constructors;
     use Tools;
@@ -32,10 +33,14 @@ class DocsBuilder
     {
         $this->logger = $logger;
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        $this->constructTL($settings['tl_schema']);
+        $this->TL = new TL(new class($logger) {
+            public function __construct($logger)
+            {
+                $this->logger = $logger;
+            }
+        });
+        $this->TL->init($settings['tl_schema']);
         if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) {
-            $this->constructors = $this->td_constructors;
-            $this->methods = $this->td_methods;
             $this->td = true;
         }
         $this->settings = $settings;
