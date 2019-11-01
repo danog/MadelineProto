@@ -27,6 +27,7 @@ use danog\MadelineProto\MTProto;
  */
 trait ResponseHandler
 {
+
     public function sendMsgsStateInfo($req_msg_id, $msg_ids)
     {
         $this->logger->logger('Sending state info for '.\count($msg_ids).' message IDs');
@@ -258,7 +259,7 @@ trait ResponseHandler
                     $this->checkInSeqNo($current_msg_id);
                     $this->ackIncomingMessageId($current_msg_id);
                     // Acknowledge that I received the server's response
-                    $response_type = $this->API->constructors->findByPredicate($this->incoming_messages[$current_msg_id]['content']['_'])['type'];
+                    $response_type = $this->API->getTL()->getConstructors()->findByPredicate($this->incoming_messages[$current_msg_id]['content']['_'])['type'];
 
                     switch ($response_type) {
                         case 'Updates':
@@ -579,7 +580,7 @@ trait ResponseHandler
             return;
         }
         $botAPI = isset($request['botAPI']) && $request['botAPI'];
-        if (isset($response['_']) && !$this->isCdn() && $this->API->constructors->findByPredicate($response['_'])['type'] === 'Updates') {
+        if (isset($response['_']) && !$this->isCdn() && $this->API->getTL()->getConstructors()->findByPredicate($response['_'])['type'] === 'Updates') {
             $response['request'] = $request;
             \danog\MadelineProto\Tools::callForkDefer($this->API->handleUpdates($response));
         }

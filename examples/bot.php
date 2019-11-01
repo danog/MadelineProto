@@ -22,7 +22,7 @@
  /*
  * Various ways to load MadelineProto
  */
-if (\file_exists(__DIR__.'/vendor/autoload.php')) {
+if (\file_exists('vendor/autoload.php')) {
     include 'vendor/autoload.php';
 } else {
     if (!\file_exists('madeline.php')) {

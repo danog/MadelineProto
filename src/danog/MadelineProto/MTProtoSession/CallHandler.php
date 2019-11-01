@@ -189,7 +189,7 @@ trait CallHandler
             $aargs,
             [
                 '_' => $method,
-                'type' => $this->API->methods->findByMethod($method)['type'],
+                'type' => $this->API->getTL()->getMethods()->findByMethod($method)['type'],
                 'contentRelated' => $this->contentRelated($method),
                 'promise' => $deferred,
                 'method' => true,

@@ -378,7 +378,7 @@ trait Files
 
     public function genAllFile($media)
     {
-        $res = [$this->constructors->findByPredicate($media['_'])['type'] => $media];
+        $res = [$this->TL->getConstructors()->findByPredicate($media['_'])['type'] => $media];
         switch ($media['_']) {
             case 'messageMediaPoll':
                 $res['Poll'] = $media['poll'];

@@ -543,7 +543,7 @@ trait PeerHandler
 
     public function genAll($constructor, $folder_id = null)
     {
-        $res = [$this->constructors->findByPredicate($constructor['_'])['type'] => $constructor];
+        $res = [$this->TL->getConstructors()->findByPredicate($constructor['_'])['type'] => $constructor];
         switch ($constructor['_']) {
             case 'user':
                 if ($constructor['self']) {

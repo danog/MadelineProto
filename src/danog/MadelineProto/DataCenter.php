@@ -227,7 +227,7 @@ class DataCenter
 
         if ($reconnectAll || $changedSettings || !$this->CookieJar) {
             $this->CookieJar = $jar ?? new ArrayCookieJar;
-            $this->HTTPClient = new DefaultClient($this->CookieJar, new HttpSocketPool(new ProxySocketPool([$this, 'rawConnectAsync'])));
+            $this->HTTPClient = new DefaultClient($this->CookieJar, new HttpSocketPool(new ProxySocketPool([$this, 'rawConnect'])));
 
             $DoHHTTPClient = new DefaultClient(
                 $this->CookieJar,
@@ -433,7 +433,7 @@ class DataCenter
                     }
 
                     // The following hack looks like the only way to detect connection refused errors with PHP's stream sockets.
-                    if (\stream_socket_getName($socket, true) === false) {
+                    if (\stream_socket_get_name($socket, true) === false) {
                         \fclose($socket);
                         throw new ConnectException(\sprintf(
                             "Connection to %s refused%s",

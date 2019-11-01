@@ -244,11 +244,11 @@ trait Tools
     /**
      * Convert double to binary version.
      *
-     * @param double $value Value to convert
+     * @param float $value Value to convert
      *
      * @return string
      */
-    public static function packDouble(double $value): string
+    public static function packDouble(float $value): string
     {
         $res = \pack('d', $value);
         if (\strlen($res) !== 8) {
@@ -263,9 +263,9 @@ trait Tools
      *
      * @param string $value Value to unpack
      *
-     * @return double
+     * @return float
      */
-    public static function unpackDouble(string $value): double
+    public static function unpackDouble(string $value): float
     {
         if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
@@ -419,9 +419,9 @@ trait Tools
      * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
      * @param string              $file    File
      *
-     * @return void
+     * @return Promise
      */
-    public static function callFork($promise, $actual = null, $file = '')
+    public static function callFork($promise, $actual = null, $file = ''): Promise
     {
         if ($actual) {
             $promise = $actual;
@@ -558,11 +558,11 @@ trait Tools
      *
      * @param string  $file      File to lock
      * @param integer $operation Locking mode
-     * @param integer $polling   Polling interval
+     * @param float  $polling   Polling interval
     *
      * @return Promise
      */
-    public static function flock(string $file, int $operation, $polling = 0.1): Promise
+    public static function flock(string $file, int $operation, float $polling = 0.1): Promise
     {
         return self::call(self::flockGenerator($file, $operation, $polling));
     }
@@ -571,11 +571,11 @@ trait Tools
      *
      * @param string  $file      File to lock
      * @param integer $operation Locking mode
-     * @param integer $polling   Polling interval
+     * @param float  $polling   Polling interval
      *
-     * @return void
+     * @return \Generator
      */
-    private static function flockGenerator(string $file, int $operation, $polling)
+    private static function flockGenerator(string $file, int $operation, float $polling): \Generator
     {
         if (!yield exists($file)) {
             yield \touch($file);
@@ -626,9 +626,9 @@ trait Tools
      *
      * @param string $prompt Prompt
      *
-     * @return void
+     * @return \Generator
      */
-    private static function readLineGenerator(string $prompt = '')
+    private static function readLineGenerator(string $prompt = ''): \Generator
     {
         $stdin = getStdin();
         $stdout = getStdout();
@@ -662,7 +662,7 @@ trait Tools
      *
      * @return boolean
      */
-    public static function isArrayOrAlike($var)
+    public static function isArrayOrAlike($var): bool
     {
         return \is_array($var) ||
             ($var instanceof ArrayAccess &&

@@ -31,7 +31,7 @@ class TL
      *
      * @var integer
      */
-    private $encrypted_layer = -1;
+    private $secretLayer = -1;
     /**
      * Constructors.
      *
@@ -49,25 +49,25 @@ class TL
      *
      * @var TLConstructors
      */
-    private $td_constructors;
+    private $tdConstructors;
     /**
      * TD Methods.
      *
      * @var TLMethods
      */
-    private $td_methods;
+    private $tdMethods;
     /**
      * Descriptions.
      *
      * @var array
      */
-    private $td_descriptions;
+    private $tdDescriptions;
     /**
      * TL callbacks.
      *
      * @var array
      */
-    private $tl_callbacks = [];
+    private $callbacks = [];
     /**
      * API instance.
      *
@@ -91,7 +91,7 @@ class TL
      */
     public function getSecretLayer(): int
     {
-        return $this->encrypted_layer;
+        return $this->secretLayer;
     }
 
     /**
@@ -103,7 +103,7 @@ class TL
      */
     public function getConstructors(bool $td = false): TLConstructors
     {
-        return $td ? $this->td_constructors : $this->constructors;
+        return $td ? $this->tdConstructors : $this->constructors;
     }
 
     /**
@@ -115,7 +115,7 @@ class TL
      */
     public function getMethods(bool $td = false): TLMethods
     {
-        return $td ? $this->td_methods : $this->methods;
+        return $td ? $this->tdMethods : $this->methods;
     }
 
     /**
@@ -125,7 +125,7 @@ class TL
      */
     public function getDescriptions(): array
     {
-        return $this->td_descriptions;
+        return $this->tdDescriptions;
     }
 
     /**
@@ -142,9 +142,9 @@ class TL
         $this->updateCallbacks($objects);
         $this->constructors = new TLConstructors();
         $this->methods = new TLMethods();
-        $this->td_constructors = new TLConstructors();
-        $this->td_methods = new TLMethods();
-        $this->td_descriptions = ['types' => [], 'constructors' => [], 'methods' => []];
+        $this->tdConstructors = new TLConstructors();
+        $this->tdMethods = new TLMethods();
+        $this->tdDescriptions = ['types' => [], 'constructors' => [], 'methods' => []];
         foreach ($files as $scheme_type => $file) {
             $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['file_parsing'], \basename($file)), \danog\MadelineProto\Logger::VERBOSE);
             $filec = \file_get_contents(\danog\MadelineProto\Absolute::absolute($file));
@@ -174,7 +174,7 @@ class TL
                             }
                             if ($elem[0] === 'description') {
                                 if (!\is_null($class)) {
-                                    $this->td_descriptions['types'][$class] = $elem[1];
+                                    $this->tdDescriptions['types'][$class] = $elem[1];
                                     $class = null;
                                 } else {
                                     $e = $elem[1];
@@ -224,7 +224,7 @@ class TL
                         $id = $nid;
                     }
                     if (!\is_null($e)) {
-                        $this->td_descriptions[$type][$name] = ['description' => $e, 'params' => $dparams];
+                        $this->tdDescriptions[$type][$name] = ['description' => $e, 'params' => $dparams];
                         $e = null;
                         $dparams = [];
                     }
@@ -267,7 +267,7 @@ class TL
             $this->API->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_obj'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
                 if ($scheme_type === 'secret') {
-                    $this->encrypted_layer = \max($this->encrypted_layer, $elem['layer']);
+                    $this->secretLayer = \max($this->secretLayer, $elem['layer']);
                 }
                 $this->{($scheme_type === 'td' ? 'td_' : '').'constructors'}->add($elem, $scheme_type);
             }
@@ -275,31 +275,31 @@ class TL
             foreach ($TL_dict['methods'] as $elem) {
                 $this->{($scheme_type === 'td' ? 'td_' : '').'methods'}->add($elem);
                 if ($scheme_type === 'secret') {
-                    $this->encrypted_layer = \max($this->encrypted_layer, $elem['layer']);
+                    $this->secretLayer = \max($this->secretLayer, $elem['layer']);
                 }
             }
         }
         if (isset($files['td']) && isset($files['telegram'])) {
-            foreach ($this->td_constructors->by_id as $id => $data) {
+            foreach ($this->tdConstructors->by_id as $id => $data) {
                 $name = $data['predicate'];
                 if ($this->constructors->findById($id) === false) {
-                    unset($this->td_descriptions['constructors'][$name]);
+                    unset($this->tdDescriptions['constructors'][$name]);
                 } else {
-                    if (!\count($this->td_descriptions['constructors'][$name]['params'])) {
+                    if (!\count($this->tdDescriptions['constructors'][$name]['params'])) {
                         continue;
                     }
-                    foreach ($this->td_descriptions['constructors'][$name]['params'] as $k => $param) {
-                        $this->td_descriptions['constructors'][$name]['params'][$k] = \str_replace('nullable', 'optional', $param);
+                    foreach ($this->tdDescriptions['constructors'][$name]['params'] as $k => $param) {
+                        $this->tdDescriptions['constructors'][$name]['params'][$k] = \str_replace('nullable', 'optional', $param);
                     }
                 }
             }
-            foreach ($this->td_methods->by_id as $id => $data) {
+            foreach ($this->tdMethods->by_id as $id => $data) {
                 $name = $data['method'];
                 if ($this->methods->findById($id) === false) {
-                    unset($this->td_descriptions['methods'][$name]);
+                    unset($this->tdDescriptions['methods'][$name]);
                 } else {
-                    foreach ($this->td_descriptions['methods'][$name]['params'] as $k => $param) {
-                        $this->td_descriptions['constructors'][$name]['params'][$k] = \str_replace('nullable', 'optional', $param);
+                    foreach ($this->tdDescriptions['methods'][$name]['params'] as $k => $param) {
+                        $this->tdDescriptions['constructors'][$name]['params'][$k] = \str_replace('nullable', 'optional', $param);
                     }
                 }
             }
@@ -341,7 +341,7 @@ class TL
      */
     public function updateCallbacks(array $objects)
     {
-        $this->tl_callbacks = [];
+        $this->callbacks = [];
         foreach ($objects as $object) {
             if (!isset(\class_implements(\get_class($object))[TLCallback::class])) {
                 throw new Exception('Invalid callback object provided!');
@@ -356,13 +356,13 @@ class TL
             ];
             foreach ($new as $type => $values) {
                 foreach ($values as $match => $callback) {
-                    if (!isset($this->tl_callbacks[$type][$match])) {
-                        $this->tl_callbacks[$type][$match] = [];
+                    if (!isset($this->callbacks[$type][$match])) {
+                        $this->callbacks[$type][$match] = [];
                     }
                     if (\in_array($type, [TLCallback::TYPE_MISMATCH_CALLBACK, TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK])) {
-                        $this->tl_callbacks[$type][$match] = $callback;
+                        $this->callbacks[$type][$match] = $callback;
                     } else {
-                        $this->tl_callbacks[$type][$match] = \array_merge($callback, $this->tl_callbacks[$type][$match]);
+                        $this->callbacks[$type][$match] = \array_merge($callback, $this->callbacks[$type][$match]);
                     }
                 }
             }
@@ -528,8 +528,8 @@ class TL
 
         if ($type['type'] === 'InputMessage' && !\is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];
-        } elseif (isset($this->tl_callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
-            $object = yield $this->tl_callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
+        } elseif (isset($this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
+            $object = yield $this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception("Could not convert {$type['type']} object");
             }
@@ -543,8 +543,8 @@ class TL
             $auto = true;
             $object['_'] = $constructorData['predicate'];
         }
-        if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']])) {
-            $object = yield $this->tl_callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']]($object);
+        if (isset($this->callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']])) {
+            $object = yield $this->callbacks[TLCallback::CONSTRUCTOR_SERIALIZE_CALLBACK][$object['_']]($object);
         }
 
         $predicate = $object['_'];
@@ -973,8 +973,8 @@ class TL
             return false;
         }
         $x = ['_' => $constructorData['predicate']];
-        if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_BEFORE_CALLBACK][$x['_']])) {
-            foreach ($this->tl_callbacks[TLCallback::CONSTRUCTOR_BEFORE_CALLBACK][$x['_']] as $callback) {
+        if (isset($this->callbacks[TLCallback::CONSTRUCTOR_BEFORE_CALLBACK][$x['_']])) {
+            foreach ($this->callbacks[TLCallback::CONSTRUCTOR_BEFORE_CALLBACK][$x['_']] as $callback) {
                 $callback($x['_']);
             }
         }
@@ -1008,9 +1008,9 @@ class TL
             }
             if ($x['_'] === 'rpc_result' && $arg['name'] === 'result') {
                 if (isset($type['connection']->outgoing_messages[$x['req_msg_id']]['_'])
-                    && isset($this->tl_callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']])
+                    && isset($this->callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']])
                 ) {
-                    foreach ($this->tl_callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {
+                    foreach ($this->callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {
                         $callback($type['connection']->outgoing_messages[$x['req_msg_id']]['_']);
                     }
                 }
@@ -1054,15 +1054,15 @@ class TL
             }
         }
 
-        if (isset($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
-            foreach ($this->tl_callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) {
+        if (isset($this->callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
+            foreach ($this->callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) {
                 \danog\MadelineProto\Tools::callFork($callback($x));
             }
         } elseif ($x['_'] === 'rpc_result'
             && isset($type['connection']->outgoing_messages[$x['req_msg_id']]['_'])
-            && isset($this->tl_callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']])
+            && isset($this->callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']])
         ) {
-            foreach ($this->tl_callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {
+            foreach ($this->callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {
                 $callback($type['connection']->outgoing_messages[$x['req_msg_id']], $x['result']);
             }
         }

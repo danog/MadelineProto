@@ -241,7 +241,7 @@ class ReadLoop extends SignalLoop
 
                 return -404;
             }
-            $deserialized = $API->deserialize($message_data, ['type' => '', 'connection' => $connection]);
+            $deserialized = $API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $connection]);
             $API->referenceDatabase->reset();
 
             $connection->incoming_messages[$message_id]['content'] = $deserialized;

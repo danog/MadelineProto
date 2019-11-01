@@ -94,7 +94,7 @@ class WriteLoop extends ResumableSignalLoop
 
             $connection->writing(true);
             try {
-                $please_wait = yield $this->{$shared->hasTempAuthKey() ? 'encryptedWriteLoopAsync' : 'unencryptedWriteLoopAsync'}();
+                $please_wait = yield $this->{$shared->hasTempAuthKey() ? 'encryptedWriteLoop' : 'unencryptedWriteLoop'}();
             } catch (StreamException $e) {
                 if ($connection->shouldReconnect()) {
                     return;
