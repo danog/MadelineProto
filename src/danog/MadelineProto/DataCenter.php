@@ -55,6 +55,7 @@ use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Proxy\HttpProxy;
 use danog\MadelineProto\Stream\Proxy\SocksProxy;
+use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
@@ -581,9 +582,11 @@ class DataCenter
         $ipv6 = $this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4';
 
         switch ($this->settings[$dc_config_number]['protocol']) {
+            case 'abridged':
             case 'tcp_abridged':
                 $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [AbridgedStream::getName(), []]];
                 break;
+            case 'intermediate':
             case 'tcp_intermediate':
                 $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [IntermediateStream::getName(), []]];
                 break;
@@ -591,9 +594,11 @@ class DataCenter
                 $this->settings[$dc_config_number]['protocol'] = 'tcp_intermediate_padded';
                 $this->settings[$dc_config_number]['obfuscated'] = true;
                 // no break
+            case 'intermediate_padded':
             case 'tcp_intermediate_padded':
                 $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [IntermediatePaddedStream::getName(), []]];
                 break;
+            case 'full':
             case 'tcp_full':
                 $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [FullStream::getName(), []]];
                 break;
@@ -663,7 +668,7 @@ class DataCenter
                     continue;
                 }
                 $extra = $proxy_extras[$key];
-                if (!isset(\class_implements($proxy)['danog\\MadelineProto\\Stream\\StreamInterface'])) {
+                if (!isset(\class_implements($proxy)[StreamInterface::class])) {
                     throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
                 }
                 if ($proxy === ObfuscatedStream::getName() && \in_array(\strlen($extra['secret']), [17, 34])) {
@@ -776,7 +781,7 @@ class DataCenter
                         }
                         $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
 
-                        $uri = 'tcp://'.$subdomain.'.'.'web.telegram.org'.':'.$port.'/'.$path;
+                        $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
                     } elseif ($combo[1][0] === WsStream::getName()) {
                         $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\D+/', '', $dc_number)];
                         if (\strpos($dc_number, '_media') !== false) {
@@ -867,7 +872,14 @@ class DataCenter
         return $this->DoHClient;
     }
 
-    public function fileGetContents($url): \Generator
+    /**
+     * Get contents of file
+     *
+     * @param string $url URL to fetch
+     * 
+     * @return \Generator<string>
+     */
+    public function fileGetContents(string $url): \Generator
     {
         return yield (yield $this->getHTTPClient()->request($url))->getBody();
     }
