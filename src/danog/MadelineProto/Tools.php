@@ -421,7 +421,7 @@ trait Tools
      *
      * @return Promise
      */
-    public static function callFork($promise, $actual = null, $file = ''): Promise
+    public static function callFork($promise, $actual = null, $file = '')
     {
         if ($actual) {
             $promise = $actual;
