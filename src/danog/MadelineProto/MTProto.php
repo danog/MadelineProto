@@ -1626,7 +1626,8 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         try {
             foreach ((yield $this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
-                $this->cdn_rsa_keys[$tempkey->fp] = yield (new RSA)->load($this->TL, $curkey['public_key']);
+                $curkey = yield (new RSA)->load($this->TL, $curkey['public_key']);
+                $this->cdn_rsa_keys[$curkey->fp] = $curkey;
             }
         } catch (\danog\MadelineProto\TL\Exception $e) {
             $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::FATAL_ERROR);
