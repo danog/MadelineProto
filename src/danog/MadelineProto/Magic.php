@@ -123,7 +123,10 @@ class Magic
             self::$altervista = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
             self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
             self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
-            self::$revision = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/master');
+	    $revisionFilename = __DIR__ . '/../../../.git/refs/heads/master';
+            if (file_exists($revisionFilename) {
+                self::$revision = \file_get_contents($revisionFilename);
+            }
             if (self::$revision) {
                 self::$revision = \trim(self::$revision);
                 $latest = @\file_get_contents('https://phar.madelineproto.xyz/release');
