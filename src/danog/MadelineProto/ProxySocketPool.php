@@ -14,7 +14,7 @@ use Amp\Socket\ClientSocket;
 use Amp\Socket\SocketPool;
 use Amp\Struct;
 use Amp\Success;
-use League\Uri;
+use League\Uri\UriString;
 use function Amp\call;
 
 class ProxySocketPool implements SocketPool
@@ -54,7 +54,7 @@ class ProxySocketPool implements SocketPool
         }
 
         try {
-            $parts = Uri\parse($uri);
+            $parts = UriString::parse($uri);
         } catch (\Exception $exception) {
             throw new SocketException('Could not parse URI', 0, $exception);
         }
