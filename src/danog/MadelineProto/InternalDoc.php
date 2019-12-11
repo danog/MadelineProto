@@ -5092,11 +5092,11 @@ class InternalDoc extends APIFactory
     /**
      * Convert double to binary version.
      *
-     * @param double $value Value to convert
+     * @param float $value Value to convert
      *
      * @return string
      */
-    public function packDouble(\danog\MadelineProto\double $value, array $extra = []): string
+    public function packDouble(float $value, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$value, $extra]);
     }
@@ -5105,9 +5105,9 @@ class InternalDoc extends APIFactory
      *
      * @param string $value Value to unpack
      *
-     * @return double
+     * @return float
      */
-    public function unpackDouble(string $value, array $extra = []): danog\MadelineProto\double
+    public function unpackDouble(string $value, array $extra = []): float
     {
         return $this->__call(__FUNCTION__, [$value, $extra]);
     }
@@ -5199,7 +5199,7 @@ class InternalDoc extends APIFactory
      * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
      * @param string              $file    File
      *
-     * @return void
+     * @return Promise
      */
     public function callFork($promise, $actual = null, $file = '', array $extra = [])
     {
@@ -5258,11 +5258,11 @@ class InternalDoc extends APIFactory
      *
      * @param string  $file      File to lock
      * @param integer $operation Locking mode
-     * @param integer $polling   Polling interval
+     * @param float  $polling   Polling interval
     *
      * @return Promise
      */
-    public function flock(string $file, int $operation, $polling = 0.1, array $extra = [])
+    public function flock(string $file, int $operation, float $polling = 0.1, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$file, $operation, $polling, $extra]);
     }
@@ -5271,11 +5271,11 @@ class InternalDoc extends APIFactory
      *
      * @param string  $file      File to lock
      * @param integer $operation Locking mode
-     * @param integer $polling   Polling interval
+     * @param float  $polling   Polling interval
      *
-     * @return void
+     * @return \Generator
      */
-    public function flockGenerator(string $file, int $operation, $polling, array $extra = [])
+    public function flockGenerator(string $file, int $operation, float $polling, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$file, $operation, $polling, $extra]);
     }
@@ -5306,7 +5306,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $prompt Prompt
      *
-     * @return void
+     * @return \Generator
      */
     public function readLineGenerator(string $prompt = '', array $extra = [])
     {
@@ -5330,7 +5330,7 @@ class InternalDoc extends APIFactory
      *
      * @return boolean
      */
-    public function isArrayOrAlike($var, array $extra = [])
+    public function isArrayOrAlike($var, array $extra = []): bool
     {
         return $this->__call(__FUNCTION__, [$var, $extra]);
     }

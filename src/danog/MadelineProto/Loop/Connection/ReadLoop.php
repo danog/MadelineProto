@@ -174,7 +174,6 @@ class ReadLoop extends SignalLoop
             $auth_key_id = yield $buffer->bufferRead(8);
 
             if ($auth_key_id === "\0\0\0\0\0\0\0\0") {
-
                 $message_id = yield $buffer->bufferRead(8);
                 if (!\in_array($message_id, [1, 0])) {
                     $connection->checkMessageId($message_id, ['outgoing' => false, 'container' => false]);

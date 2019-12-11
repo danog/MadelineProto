@@ -873,10 +873,10 @@ class DataCenter
     }
 
     /**
-     * Get contents of file
+     * Get contents of file.
      *
      * @param string $url URL to fetch
-     * 
+     *
      * @return \Generator<string>
      */
     public function fileGetContents(string $url): \Generator

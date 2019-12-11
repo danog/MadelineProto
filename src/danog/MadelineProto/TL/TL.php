@@ -269,11 +269,11 @@ class TL
                 if ($scheme_type === 'secret') {
                     $this->secretLayer = \max($this->secretLayer, $elem['layer']);
                 }
-                $this->{($scheme_type === 'td' ? 'td_' : '').'constructors'}->add($elem, $scheme_type);
+                $this->{$scheme_type === 'td' ? 'tdConstructors' : 'constructors'}->add($elem, $scheme_type);
             }
             $this->API->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_methods'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
-                $this->{($scheme_type === 'td' ? 'td_' : '').'methods'}->add($elem);
+                $this->{$scheme_type === 'td' ? 'tdMethods' : 'methods'}->add($elem);
                 if ($scheme_type === 'secret') {
                     $this->secretLayer = \max($this->secretLayer, $elem['layer']);
                 }

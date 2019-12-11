@@ -27,7 +27,6 @@ use danog\MadelineProto\MTProto;
  */
 trait ResponseHandler
 {
-
     public function sendMsgsStateInfo($req_msg_id, $msg_ids)
     {
         $this->logger->logger('Sending state info for '.\count($msg_ids).' message IDs');
