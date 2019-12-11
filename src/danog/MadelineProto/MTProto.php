@@ -1203,7 +1203,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 // Extra parameters to pass to the proxy class using setExtra
                 'obfuscated' => false,
                 'transport' => 'tcp',
-                'pfs' => \extension_loaded('gmp'),
+                'pfs' => false,//\extension_loaded('gmp'),
             ],
             'media_socket_count' => [
                 'min' => 5,

@@ -192,17 +192,19 @@ class WriteLoop extends ResumableSignalLoop
             $has_http_wait = false;
             $messages = [];
             $keys = [];
-            foreach ($connection->pending_outgoing as $message) {
-                if ($message['_'] === 'http_wait') {
-                    $has_http_wait = true;
-                    break;
+            if ($shared->isHttp()) {
+                foreach ($connection->pending_outgoing as $message) {
+                    if ($message['_'] === 'http_wait') {
+                        $has_http_wait = true;
+                        break;
+                    }
                 }
-            }
-            if ($shared->isHttp() && !$has_http_wait) {
-                $API->logger->logger("Adding http_wait {$connection->pending_outgoing_key}", Logger::ULTRA_VERBOSE);
-                $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'http_wait', 'serialized_body' => yield $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'contentRelated' => true, 'unencrypted' => false, 'method' => true];
-                $temporary_keys[$connection->pending_outgoing_key] = true;
-                $connection->pending_outgoing_key++;
+                if (!$has_http_wait) {
+                    $API->logger->logger("Adding http_wait {$connection->pending_outgoing_key}", Logger::ULTRA_VERBOSE);
+                    $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'http_wait', 'serialized_body' => yield $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'contentRelated' => true, 'unencrypted' => false, 'method' => true];
+                    $temporary_keys[$connection->pending_outgoing_key] = true;
+                    $connection->pending_outgoing_key++;
+                }
             }
 
             $total_length = 0;
@@ -341,8 +343,11 @@ class WriteLoop extends ResumableSignalLoop
                 $padding += 16;
             }
             $padding = \danog\MadelineProto\Tools::random($padding);
+
             $message_key = \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 88, 32).$plaintext.$padding, true), 8, 16);
+
             list($aes_key, $aes_iv) = $this->aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey());
+
             $message = $shared->getTempAuthKey()->getID().$message_key.$this->igeEncrypt($plaintext.$padding, $aes_key, $aes_iv);
 
             $buffer = yield $connection->stream->getWriteBuffer($len = \strlen($message));

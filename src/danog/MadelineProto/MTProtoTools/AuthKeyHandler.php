@@ -184,6 +184,7 @@ trait AuthKeyHandler
                  */
                 $p_bytes = $p->toBytes();
                 $q_bytes = $q->toBytes();
+
                 $new_nonce = \danog\MadelineProto\Tools::random(32);
                 $data_unserialized = ['pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => \preg_replace('|_.*|', '', $datacenter)];
                 $p_q_inner_data = yield $this->TL->serializeObject(['type' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp')], $data_unserialized, 'p_q_inner_data');
@@ -194,6 +195,7 @@ trait AuthKeyHandler
                 $sha_digest = \sha1($p_q_inner_data, true);
                 $random_bytes = \danog\MadelineProto\Tools::random(255 - \strlen($p_q_inner_data) - \strlen($sha_digest));
                 $to_encrypt = $sha_digest.$p_q_inner_data.$random_bytes;
+
                 $encrypted_data = $key->encrypt($to_encrypt);
                 $this->logger->logger('Starting Diffie Hellman key exchange', \danog\MadelineProto\Logger::VERBOSE);
                 /*
@@ -244,8 +246,10 @@ trait AuthKeyHandler
                  * Get key, iv and decrypt answer
                  */
                 $encrypted_answer = $server_dh_params['encrypted_answer'];
-                $tmp_aes_key = \sha1($new_nonce.$server_nonce, true).\substr(\sha1($server_nonce.$new_nonce, true), 0, 12);
+
+                $tmp_aes_key =  \sha1($new_nonce.$server_nonce, true).\substr(\sha1($server_nonce.$new_nonce, true), 0, 12);
                 $tmp_aes_iv = \substr(\sha1($server_nonce.$new_nonce, true), 12, 8).\sha1($new_nonce.$new_nonce, true).\substr($new_nonce, 0, 4);
+
                 $answer_with_hash = $this->igeDecrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
                 /*
                  * ***********************************************************************
@@ -388,7 +392,7 @@ trait AuthKeyHandler
                             if ($expires_in >= 0) {
                                 $key->expires(\time() + $expires_in);
                             }
-                            $key->setServerSalt(\substr($new_nonce, 0, 8 - 0) ^ \substr($server_nonce, 0, 8 - 0));
+                            $key->setServerSalt(\substr($new_nonce, 0, 8) ^ \substr($server_nonce, 0, 8));
                             $key->setAuthKey($auth_key_str);
 
                             $this->logger->logger('Auth key generated', \danog\MadelineProto\Logger::NOTICE);

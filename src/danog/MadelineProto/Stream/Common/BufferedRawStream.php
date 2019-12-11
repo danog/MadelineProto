@@ -168,7 +168,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         if ($buffer_length >= $length) {
             return new Success(\fread($this->memory_stream, $length));
         }
-
         return \danog\MadelineProto\Tools::call($this->bufferReadGenerator($length));
     }
 

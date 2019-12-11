@@ -54,7 +54,7 @@ class ProxySocketPool implements SocketPool
         }
 
         try {
-            $parts = Uri\parse($uri);
+            $parts = \League\Uri\UriString::parse($uri);
         } catch (\Exception $exception) {
             throw new SocketException('Could not parse URI', 0, $exception);
         }

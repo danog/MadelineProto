@@ -130,7 +130,6 @@ class WsStream implements RawStreamInterface
 
             return null;
         }
-
         return $data;
     }
 
