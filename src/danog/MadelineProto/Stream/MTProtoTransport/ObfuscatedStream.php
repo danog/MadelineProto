@@ -19,6 +19,7 @@
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Promise;
+use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\Buffer;
 use danog\MadelineProto\Stream\Async\BufferedStream;
@@ -201,9 +202,9 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
     /**
      * {@inheritdoc}
      *
-     * @return \Amp\Socket\Socket
+     * @return EncryptableSocket
      */
-    public function getSocket(): \Amp\Socket\Socket
+    public function getSocket(): EncryptableSocket
     {
         return $this->stream->getSocket();
     }

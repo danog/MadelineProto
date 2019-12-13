@@ -19,6 +19,7 @@
 namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\ByteStream\ClosedException;
+use Amp\CancellationToken;
 use Amp\Promise;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Stream\Async\RawStream;
@@ -42,10 +43,11 @@ class PremadeStream extends Socket implements RawStreamInterface, ProxyStreamInt
     {
     }
 
-    public function enableCrypto(ClientTlsContext $tlsContext = null): \Amp\Promise
+    public function setupTls(?CancellationToken $cancellationToken = null): \Amp\Promise
     {
-        return $this->stream->enableCrypto($tlsContext);
+        return $this->stream->setupTls($cancellationToken);
     }
+
 
     public function getStream()
     {
@@ -115,7 +117,7 @@ class PremadeStream extends Socket implements RawStreamInterface, ProxyStreamInt
      *
      * @return \Amp\Socket\Socket
      */
-    public function getSocket(): \Amp\Socket\Socket
+    public function getSocket(): Socket
     {
         return $this->stream;
     }

@@ -19,6 +19,7 @@
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Promise;
+use Amp\Socket\EncryptableSocket;
 use Amp\Success;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
@@ -183,9 +184,9 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     /**
      * {@inheritdoc}
      *
-     * @return \Amp\Socket\Socket
+     * @return EncryptableSocket
      */
-    public function getSocket(): \Amp\Socket\Socket
+    public function getSocket(): EncryptableSocket
     {
         return $this->stream->getSocket();
     }

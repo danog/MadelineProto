@@ -19,6 +19,7 @@
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Promise;
+use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -100,9 +101,9 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
     /**
      * {@inheritdoc}
      *
-     * @return \Amp\Socket\Socket
+     * @return EncryptableSocket
      */
-    public function getSocket(): \Amp\Socket\Socket
+    public function getSocket(): EncryptableSocket
     {
         return $this->stream->getSocket();
     }

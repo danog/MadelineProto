@@ -19,6 +19,7 @@
 namespace danog\MadelineProto\Stream;
 
 use Amp\Promise;
+use Amp\Socket\EncryptableSocket;
 use Amp\Socket\Socket;
 
 /**
@@ -47,7 +48,7 @@ interface StreamInterface
     /**
      * Get underlying AMPHP socket resource.
      *
-     * @return \Amp\Socket\Socket
+     * @return EncryptableSocket
      */
     public function getSocket(): Socket;
 }

@@ -19,11 +19,6 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Artax\Client;
-use Amp\Artax\Cookie\ArrayCookieJar;
-use Amp\Artax\Cookie\CookieJar;
-use Amp\Artax\DefaultClient;
-use Amp\Artax\HttpSocketPool;
 use Amp\CancellationToken;
 use Amp\Deferred;
 use Amp\Dns\Record;
@@ -32,15 +27,20 @@ use Amp\Dns\Rfc1035StubResolver;
 use Amp\DoH\DoHConfig;
 use Amp\DoH\Nameserver;
 use Amp\DoH\Rfc8484StubResolver;
+use Amp\Http\Client\Connection\DefaultConnectionFactory;
+use Amp\Http\Client\Connection\UnlimitedConnectionPool;
+use Amp\Http\Client\Cookie\CookieInterceptor;
+use Amp\Http\Client\Cookie\CookieJar;
+use Amp\Http\Client\Cookie\InMemoryCookieJar;
+use Amp\Http\Client\DelegateHttpClient;
+use Amp\Http\Client\HttpClientBuilder;
 use Amp\Loop;
 use Amp\MultiReasonException;
 use Amp\NullCancellationToken;
 use Amp\Promise;
-use Amp\Socket\ClientConnectContext;
 use Amp\Socket\ClientSocket;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectException;
-use Amp\Socket\Socket;
 use Amp\TimeoutException;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
@@ -102,7 +102,7 @@ class DataCenter
     /**
      * HTTP client.
      *
-     * @var \Amp\Artax\Client
+     * @var \Amp\Http\Client\DelegateHttpClient
      */
     private $HTTPClient;
     /**
@@ -120,7 +120,7 @@ class DataCenter
     /**
      * Cookie jar.
      *
-     * @var \Amp\Artax\Cookie\CookieJar
+     * @var \Amp\Http\Client\Cookie\CookieJar
      */
     private $CookieJar;
 
@@ -227,101 +227,40 @@ class DataCenter
         }
 
         if ($reconnectAll || $changedSettings || !$this->CookieJar) {
-            $this->CookieJar = $jar ?? new ArrayCookieJar;
-            $this->HTTPClient = new DefaultClient($this->CookieJar, new HttpSocketPool(new ProxySocketPool([$this, 'rawConnect'])));
+            $this->CookieJar = $jar ?? new InMemoryCookieJar;
+            $this->HTTPClient = (new HttpClientBuilder)
+                ->interceptNetwork(new CookieInterceptor($this->CookieJar))
+                ->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ProxyConnector($this))))
+                ->build();
 
-            $DoHHTTPClient = new DefaultClient(
-                $this->CookieJar,
-                new HttpSocketPool(
-                    new ProxySocketPool(
-                        function (string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null) {
-                            return $this->rawConnect($uri, $token, $ctx, true);
-                        }
-                    )
-                )
-            );
+            $DoHHTTPClient = (new HttpClientBuilder)
+                ->interceptNetwork(new CookieInterceptor($this->CookieJar))
+                ->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ProxyConnector($this, true))))
+                ->build();
+
             $DoHConfig = new DoHConfig(
                 [
-                new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
-                new Nameserver('https://google.com/resolve', Nameserver::GOOGLE_JSON, ["Host" => "dns.google.com"]),
-            ],
+                    new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
+                    new Nameserver('https://dns.google/resolve'),
+                ],
                 $DoHHTTPClient
             );
             $NonProxiedDoHConfig = new DoHConfig(
                 [
-                new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
-                new Nameserver('https://google.com/resolve', Nameserver::GOOGLE_JSON, ["Host" => "dns.google.com"]),
-            ]
+                    new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
+                    new Nameserver('https://dns.google/resolve'),
+                ]
             );
-            $this->DoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($DoHConfig);
-            $this->NonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($NonProxiedDoHConfig);
+            $this->DoHClient = Magic::$altervista || Magic::$zerowebhost ? 
+                new Rfc1035StubResolver() : 
+                new Rfc8484StubResolver($DoHConfig);
+
+            $this->NonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost ? 
+                new Rfc1035StubResolver() : 
+                new Rfc8484StubResolver($NonProxiedDoHConfig);
         }
     }
 
-    /**
-     * Asynchronously establish an encrypted TCP connection (non-blocking).
-     *
-     * Note: Once resolved the socket stream will already be set to non-blocking mode.
-     *
-     * @param ConnectionContext    $ctx
-     * @param string               $uricall
-     * @param ClientConnectContext $socketContext
-     * @param ClientTlsContext     $tlsContext
-     * @param CancellationToken    $token
-     *
-     * @return Promise<ClientSocket>
-     */
-    public function cryptoConnect(
-        ConnectionContext $ctx,
-        string $uri,
-        ClientConnectContext $socketContext = null,
-        ClientTlsContext $tlsContext = null,
-        CancellationToken $token = null
-    ): Promise {
-        return call(function () use ($ctx, $uri, $socketContext, $tlsContext, $token) {
-            $tlsContext = $tlsContext ?? new ClientTlsContext;
-
-            if ($tlsContext->getPeerName() === null) {
-                $tlsContext = $tlsContext->withPeerName(\parse_url($uri, PHP_URL_HOST));
-            }
-
-            /** @var ClientSocket $socket */
-            $socket = yield $this->socketConnect($ctx, $uri, $socketContext, $token);
-
-            $promise = $socket->enableCrypto($tlsContext);
-
-            if ($token) {
-                $deferred = new Deferred;
-                $id = $token->subscribe([$deferred, "fail"]);
-
-                $promise->onResolve(function ($exception) use ($id, $token, $deferred) {
-                    if ($token->isRequested()) {
-                        return;
-                    }
-
-                    $token->unsubscribe($id);
-
-                    if ($exception) {
-                        $deferred->fail($exception);
-                        return;
-                    }
-
-                    $deferred->resolve();
-                });
-
-                $promise = $deferred->promise();
-            }
-
-            try {
-                yield $promise;
-            } catch (\Throwable $exception) {
-                $socket->close();
-                throw $exception;
-            }
-
-            return $socket;
-        });
-    }
     /**
      * Asynchronously establish a socket connection to the specified URI.
      *
@@ -493,38 +432,6 @@ class DataCenter
             throw $e;
         });
     }
-
-    public function rawConnect(string $uri, CancellationToken $token = null, ClientConnectContext $ctx = null, $fromDns = false): \Generator
-    {
-        $ctxs = $this->generateContexts(0, $uri, $ctx);
-        if (empty($ctxs)) {
-            throw new Exception("No contexts for raw connection to URI $uri");
-        }
-        foreach ($ctxs as $ctx) {
-            /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
-            try {
-                $ctx->setIsDns($fromDns);
-                $ctx->setCancellationToken($token);
-                $result = yield $ctx->getStream();
-                $this->API->logger->logger('OK!', \danog\MadelineProto\Logger::WARNING);
-
-                return $result->getSocket();
-            } catch (\Throwable $e) {
-                if (\defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
-                    throw $e;
-                }
-                $this->API->logger->logger('Connection failed: '.$e, \danog\MadelineProto\Logger::ERROR);
-                if ($e instanceof MultiReasonException) {
-                    foreach ($e->getReasons() as $reason) {
-                        $this->API->logger->logger('Multireason: '.$reason, \danog\MadelineProto\Logger::ERROR);
-                    }
-                }
-            }
-        }
-
-        throw new \danog\MadelineProto\Exception("Could not connect to URI $uri");
-    }
-
     public function dcConnect(string $dc_number, int $id = -1): \Generator
     {
         $old = isset($this->sockets[$dc_number]) && (
@@ -732,15 +639,7 @@ class DataCenter
                                     CancellationToken $token = null
                                 ) use ($ctx): Promise {
                                     return $this->socketConnect($ctx, $uri, $socketContext, $token);
-                                },
-                                function (
-                                    string $uri,
-                                    ClientConnectContext $socketContext = null,
-                                    ClientTlsContext $tlsContext = null,
-                                    CancellationToken $token = null
-                                ) use ($ctx): Promise {
-                                    return $this->cryptoConnect($ctx, $uri, $socketContext, $tlsContext, $token);
-                                },
+                                }
                             ];
                         }
                         $ctx->addStream(...$stream);
@@ -844,19 +743,19 @@ class DataCenter
     }
 
     /**
-     * Get Artax async HTTP client.
+     * Get async HTTP client.
      *
-     * @return \Amp\Artax\Client
+     * @return \Amp\Http\Client\DelegateHttpClient
      */
-    public function getHTTPClient(): Client
+    public function getHTTPClient(): DelegateHttpClient
     {
         return $this->HTTPClient;
     }
 
     /**
-     * Get Artax async HTTP client.
+     * Get async HTTP client cookies.
      *
-     * @return \Amp\Artax\CookieJar
+     * @return \Amp\Http\Client\Cookie\CookieJar
      */
     public function getCookieJar(): CookieJar
     {

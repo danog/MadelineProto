@@ -19,7 +19,7 @@
 namespace danog\MadelineProto\Stream;
 
 use Amp\CancellationToken;
-use Amp\Socket\ClientConnectContext;
+use Amp\Socket\ConnectContext;
 use Amp\Uri\Uri;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
@@ -74,7 +74,7 @@ class ConnectionContext
     /**
      * Socket context.
      *
-     * @var \Amp\Socket\ClientConnectionContext
+     * @var \Amp\Socket\ConnectContext
      */
     private $socketContext;
     /**
@@ -118,11 +118,11 @@ class ConnectionContext
     /**
      * Set the socket context.
      *
-     * @param ClientConnectContext $socketContext
+     * @param ConnectContext $socketContext
      *
      * @return self
      */
-    public function setSocketContext(ClientConnectContext $socketContext): self
+    public function setSocketContext(ConnectContext $socketContext): self
     {
         $this->socketContext = $socketContext;
 
@@ -132,9 +132,9 @@ class ConnectionContext
     /**
      * Get the socket context.
      *
-     * @return ClientConnectContext
+     * @return ConnectContext
      */
-    public function getSocketContext(): ClientConnectContext
+    public function getSocketContext(): ConnectContext
     {
         return $this->socketContext;
     }

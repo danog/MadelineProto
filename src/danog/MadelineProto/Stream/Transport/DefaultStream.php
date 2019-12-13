@@ -19,11 +19,15 @@
 namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\ByteStream\ClosedException;
+use Amp\CancellationToken;
 use Amp\Promise;
+use Amp\Socket\EncryptableSocket;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+
+use function Amp\Socket\connect;
 
 /**
  * Default stream wrapper.
@@ -32,20 +36,23 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInterface
+class DefaultStream extends Socket implements RawStreamInterface
 {
     use RawStream;
+    /**
+     * Socket
+     *
+     * @var EncryptableSocket
+     */
     private $stream;
-    private $connector = 'Amp\\Socket\\connect';
-    private $cryptoConnector = 'Amp\\Socket\\cryptoConnect';
 
     public function __construct()
     {
     }
 
-    public function enableCrypto(ClientTlsContext $tlsContext = null): \Amp\Promise
+    public function setupTls(?CancellationToken $cancellationToken = null): \Amp\Promise
     {
-        return $this->stream->enableCrypto($tlsContext);
+        return $this->stream->setupTls($cancellationToken);
     }
 
     public function getStream()
@@ -55,10 +62,9 @@ class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInt
 
     public function connectGenerator(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
     {
+        $this->stream = yield connect($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
         if ($ctx->isSecure()) {
-            $this->stream = yield ($this->cryptoConnector)($ctx->getStringUri(), $ctx->getSocketContext(), null, $ctx->getCancellationToken());
-        } else {
-            $this->stream = yield ($this->connector)($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
+            yield $this->stream->setupTls();
         }
         yield $this->stream->write($header);
     }
@@ -89,9 +95,9 @@ class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInt
     }
 
     /**
-     * Async close.
+     * Close.
      *
-     * @return Generator
+     * @return void
      */
     public function disconnect()
     {
@@ -107,6 +113,11 @@ class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInt
         }
     }
 
+    /**
+     * Close
+     * 
+     * @return void
+     */
     public function close()
     {
         $this->disconnect();
@@ -115,20 +126,13 @@ class DefaultStream extends Socket implements RawStreamInterface, ProxyStreamInt
     /**
      * {@inheritdoc}
      *
-     * @return \Amp\Socket\Socket
+     * @return EncryptableSocket
      */
-    public function getSocket(): \Amp\Socket\Socket
+    public function getSocket(): EncryptableSocket
     {
         return $this->stream;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtra($extra)
-    {
-        list($this->connector, $this->cryptoConnector) = $extra;
-    }
     public static function getName(): string
     {
         return __CLASS__;

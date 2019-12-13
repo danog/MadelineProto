@@ -2,6 +2,7 @@
     "name": "danog/madelineproto",
     "description": "PHP implementation of telegram's MTProto protocol.",
     "type": "project",
+    "minimum-stability": "dev",
     "license": "AGPL-3.0-only",
     "homepage": "https://daniil.it/MadelineProto",
     "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
@@ -12,32 +13,34 @@
         "php": ">=7.1.0",
         "danog/primemodule": "^1",
         "danog/magicalserializer": "^1.0",
-        "phpseclib/phpseclib": "dev-master#5e7d39153270dfd19d585504b0a29ac65a62adf9 as 2.0.15",
+        "phpseclib/phpseclib": "dev-master#f715b2928976aaef389839a056c947aa8023277b as 2.0.15",
         "vlucas/phpdotenv": "^3",
         "erusev/parsedown": "^1.7",
         "ext-mbstring": "*",
         "ext-json": "*",
         "ext-xml": "*",
+        "ext-dom": "*",
+        "ext-filter": "*",
+        "ext-hash": "*",
+        "ext-zlib": "*",
         "ext-fileinfo": "*",
         "amphp/amp": "^2.0",
-
-
-        "amphp/websocket": "dev-master#db2da8c5b3ed22eae37da5ffa10ab3ea8de19342 as 1",
-        "amphp/websocket-client": "dev-master#aff808025637bd705672338b4904ad03a4dbdc04 as 1",
-        "amphp/socket": "0.10.12 as 1",
-        "amphp/dns": "dev-master#aa1892bdf13b787d759df6f2523e8027a434d927 as v0.9.x-dev",
-        "amphp/artax": "dev-master as 3.0.99",
-        "amphp/file": "^0.3",
-        "amphp/uri": "^0.1.4",
+        "amphp/websocket-client": "dev-master as 1.0.0-rc2",
+        "amphp/http-client": "dev-master as 4.0.0-rc11",
+        "amphp/socket": "^1",
+        "amphp/dns": "dev-master#ecbeca2ae0e93c08e8150a92810a3961fad8ecbe as v1",
+        "amphp/file": "^1",
         "amphp/byte-stream": "^1.6",
-        "danog/dns-over-https": "^0.1"
+        "danog/dns-over-https": "^0.2",
+        "amphp/http-client-cookies": "dev-master"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^4.3",
         "ennexa/amp-update-cache": "dev-master",
         "phpunit/phpunit": "^8",
         "amphp/php-cs-fixer-config": "dev-master",
-        "haydenpierce/class-finder": "^0.4"
+        "haydenpierce/class-finder": "^0.4",
+        "ext-ctype":"*"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)"

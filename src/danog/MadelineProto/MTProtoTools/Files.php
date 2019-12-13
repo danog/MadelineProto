@@ -19,13 +19,12 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Artax\Client;
 use Amp\ByteStream\InputStream;
 use Amp\ByteStream\OutputStream;
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\ByteStream\StreamException;
 use Amp\Deferred;
-use Amp\File\BlockingHandle;
+use Amp\File\BlockingFile;
 use Amp\File\Handle;
 use Amp\File\StatCache;
 use Amp\Success;
@@ -34,6 +33,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
@@ -91,7 +91,7 @@ trait Files
             $cb = $url;
             $url = $url->getFile();
         }
-        /** @var $response \Amp\Artax\Response */
+        /** @var $response \Amp\Http\Client\Response */
         $response = yield $this->datacenter->getHTTPClient()->request($url, [Client::OP_MAX_BODY_BYTES => 512 * 1024 * 3000, Client::OP_TRANSFER_TIMEOUT => 10*1000*3600]);
         if (200 !== $status = $response->getStatus()) {
             throw new Exception("Wrong status code: $status ".$response->getReason());
@@ -104,7 +104,7 @@ trait Files
             $this->logger->logger("No content length for $url, caching first");
 
             $body = $stream;
-            $stream = new BlockingHandle(\fopen('php://temp', 'r+b'), 'php://temp', 'r+b');
+            $stream = new BlockingFile(\fopen('php://temp', 'r+b'), 'php://temp', 'r+b');
 
             while (null !== $chunk = yield $body->read()) {
                 yield $stream->write($chunk);

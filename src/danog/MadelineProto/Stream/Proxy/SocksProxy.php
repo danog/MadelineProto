@@ -58,6 +58,11 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
         $secure = $ctx->isSecure();
+
+        if ($secure) {
+            $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
+        }
+
         $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
 
         $methods = \chr(0);
@@ -150,8 +155,8 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
 
         \danog\MadelineProto\Logger::log(['Connected to '.$ip.':'.$port.' via socks5']);
 
-        if ($secure && \method_exists($this->getSocket(), 'enableCrypto')) {
-            yield $this->getSocket()->enableCrypto((new ClientTlsContext())->withPeerName($uri->getHost()));
+        if ($secure) {
+            yield $this->getSocket()->setupTls();
         }
         if (\strlen($header)) {
             yield (yield $this->stream->getWriteBuffer(\strlen($header)))->bufferWrite($header);
@@ -217,9 +222,9 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     /**
      * {@inheritdoc}
      *
-     * @return \Amp\Socket\Socket
+     * @return EncryptableSocket
      */
-    public function getSocket(): \Amp\Socket\Socket
+    public function getSocket(): EncryptableSocket
     {
         return $this->stream->getSocket();
     }

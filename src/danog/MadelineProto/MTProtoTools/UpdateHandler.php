@@ -19,8 +19,8 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Artax\Request;
 use Amp\Deferred;
+use Amp\Http\Client\Request;
 use Amp\Loop;
 
 /**
@@ -392,9 +392,11 @@ trait UpdateHandler
             return false;
         }
         \danog\MadelineProto\Tools::callFork((function () use ($payload) {
-            $request = (new Request($this->hook_url, 'POST'))->withHeader('content-type', 'application/json')->withBody($payload);
+            $request = new Request($this->hook_url, 'POST');
+            $request->setHeader('content-type', 'application/json');
+            $request->setBody($payload);
 
-            $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody();
+            $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();
 
             $this->logger->logger('Result of webhook query is '.$result, \danog\MadelineProto\Logger::NOTICE);
             $result = \json_decode($result, true);

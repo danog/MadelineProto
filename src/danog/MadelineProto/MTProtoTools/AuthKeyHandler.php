@@ -19,7 +19,7 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Artax\Request;
+use Amp\Http\Client\Request;
 use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\MTProto\AuthKey;
 use danog\MadelineProto\MTProto\PermAuthKey;
@@ -605,9 +605,10 @@ trait AuthKeyHandler
         ];
         $url = 'https://www.wolframalpha.com/input/json.jsp?'.\http_build_query($params);
 
-        $request = (new Request($url))->withHeader('referer', 'https://www.wolframalpha.com/input/?i='.\urlencode($query));
+        $request = new Request($url);
+        $request->setHeader('referer', 'https://www.wolframalpha.com/input/?i='.\urlencode($query));
 
-        $res = \json_decode(yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody(), true);
+        $res = \json_decode(yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody()->buffer(), true);
         if (!isset($res['queryresult']['pods'])) {
             return false;
         }

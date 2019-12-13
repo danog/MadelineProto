@@ -40,16 +40,6 @@ class HttpsStream extends HttpStream implements MTProtoBufferInterface
         return parent::connectGenerator($ctx->getCtx()->secure(true), $header);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return \Amp\Socket\Socket
-     */
-    public function getSocket(): \Amp\Socket\Socket
-    {
-        return $this->stream->getSocket();
-    }
-
     public static function getName(): string
     {
         return __CLASS__;

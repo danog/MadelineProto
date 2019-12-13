@@ -20,6 +20,7 @@ namespace danog\MadelineProto\Stream\Proxy;
 
 use Amp\Promise;
 use Amp\Socket\ClientTlsContext;
+use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -47,6 +48,11 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
         $secure = $ctx->isSecure();
+
+        if ($secure) {
+            $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
+        }
+
         $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
 
         $this->stream = yield $ctx->getStream();
@@ -125,8 +131,8 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             $read = yield $buffer->bufferRead($length);
         }
 
-        if ($secure && \method_exists($this->getSocket(), 'enableCrypto')) {
-            yield $this->getSocket()->enableCrypto((new ClientTlsContext())->withPeerName($uri->getHost()));
+        if ($secure) {
+            yield $this->getSocket()->setupTls();
         }
         \danog\MadelineProto\Logger::log('Connected to '.$address.':'.$port.' via http');
 
@@ -203,9 +209,9 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     /**
      * {@inheritdoc}
      *
-     * @return \Amp\Socket\Socket
+     * @return EncryptableSocket
      */
-    public function getSocket(): \Amp\Socket\Socket
+    public function getSocket(): EncryptableSocket
     {
         return $this->stream->getSocket();
     }
