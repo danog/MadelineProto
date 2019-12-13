@@ -69,7 +69,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
         $this->dc = $ctx->getIntDc();
 
         $handshake = new Handshake(\str_replace('tcp://', $ctx->isSecure() ? 'wss://' : 'ws://', $ctx->getStringUri()));
-        
+
         $this->stream = yield ($this->connector ?? connector())->connect($handshake, $ctx->getCancellationToken());
 
         yield $this->write($header);
