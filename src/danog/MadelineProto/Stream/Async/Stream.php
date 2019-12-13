@@ -20,7 +20,6 @@ namespace danog\MadelineProto\Stream\Async;
 
 use Amp\Promise;
 use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Tools;
 
 /**
  * Generic stream helper trait.
@@ -31,8 +30,6 @@ use danog\MadelineProto\Tools;
  */
 trait Stream
 {
-    use Tools;
-
     public function connect(ConnectionContext $ctx, string $header = ''): Promise
     {
         return \danog\MadelineProto\Tools::call($this->connectGenerator($ctx, $header));

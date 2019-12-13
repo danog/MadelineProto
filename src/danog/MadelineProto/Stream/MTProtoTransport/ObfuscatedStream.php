@@ -22,7 +22,9 @@ use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Stream\Async\Buffer;
 use danog\MadelineProto\Stream\Async\BufferedStream;
+use danog\MadelineProto\Stream\Async\Stream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
+use danog\MadelineProto\Stream\Common\CtrStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 
 /**
@@ -34,16 +36,10 @@ use danog\MadelineProto\Stream\ConnectionContext;
  */
 class ObfuscatedStream implements BufferedProxyStreamInterface
 {
-    use Buffer;
-    use BufferedStream;
-    private $encrypt;
-    private $decrypt;
+    use Stream;
+
     private $stream;
-    private $write_buffer;
-    private $read_buffer;
     private $extra;
-    private $append = '';
-    private $append_after = 0;
 
     /**
      * Connect to stream.
@@ -79,19 +75,25 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
             $keyRev = \hash('sha256', $keyRev.$this->extra['secret'], true);
         }
 
-        $this->encrypt = new \phpseclib3\Crypt\AES('ctr');
-        $this->encrypt->enableContinuousBuffer();
-        $this->encrypt->setKey($key);
-        $this->encrypt->setIV(\substr($random, 40, 16));
+        $iv = \substr($random, 40, 16);
+        $ivRev = \substr($reversed, 40, 16);
 
-        $this->decrypt = new \phpseclib3\Crypt\AES('ctr');
-        $this->decrypt->enableContinuousBuffer();
-        $this->decrypt->setKey($keyRev);
-        $this->decrypt->setIV(\substr($reversed, 40, 16));
+        $this->stream = new CtrStream;
+        $this->stream->setExtra([
+            'encrypt' => [
+                'key' => $key,
+                'iv' => $iv
+            ],
+            'decrypt' => [
+                'key' => $keyRev,
+                'iv' => $ivRev
+            ]
+        ]);
+        yield $this->stream->connect($ctx);
 
-        $random = \substr_replace($random, \substr(@$this->encrypt->encrypt($random), 56, 8), 56, 8);
-
-        $this->stream = yield $ctx->getStream($random);
+        $random = \substr_replace($random, \substr(@$this->stream->getEncryptor()->encrypt($random), 56, 8), 56, 8);
+        
+        yield $this->stream->getPlainStream()->write($random);
     }
 
     /**
@@ -104,78 +106,31 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
         return $this->stream->disconnect();
     }
 
-    /**
-     * Get write buffer asynchronously.
-     *
-     * @param int $length Length of data that is going to be written to the write buffer
-     *
-     * @return Generator
-     */
-    public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
-    {
-        $this->write_buffer = yield $this->stream->getWriteBuffer($length);
-        if (\strlen($append)) {
-            $this->append = $append;
-            $this->append_after = $length - \strlen($append);
-        }
-
-        return $this;
-    }
-
+    
     /**
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Generator
+     * @return Promise
      */
-    public function getReadBufferGenerator(&$length): \Generator
+    public function getReadBuffer(&$length): Promise
     {
-        $this->read_buffer = yield $this->stream->getReadBuffer($l);
-
-        return $this;
+        return $this->stream->getReadBuffer($length);
     }
 
     /**
-     * Decrypts read data asynchronously.
+     * Get write buffer asynchronously.
      *
-     * @param Promise $promise Promise that resolves with a string when new data is available or `null` if the stream has closed.
+     * @param int $length Total length of data that is going to be piped in the buffer
      *
-     * @throws PendingReadError Thrown if another read operation is still pending.
-     *
-     * @return Generator That resolves with a string when the provided promise is resolved and the data is decrypted
+     * @return Promise
      */
-    public function bufferReadGenerator(int $length): \Generator
+    public function getWriteBuffer(int $length, string $append = ''): Promise
     {
-        return @$this->decrypt->encrypt(yield $this->read_buffer->bufferRead($length));
+        return $this->stream->getWriteBuffer($length, $append);
     }
 
-    /**
-     * Writes data to the stream.
-     *
-     * @param string $data Bytes to write.
-     *
-     * @throws ClosedException If the stream has already been closed.
-     *
-     * @return Promise Succeeds once the data has been successfully written to the stream.
-     */
-    public function bufferWrite(string $data): Promise
-    {
-        if ($this->append_after) {
-            $this->append_after -= \strlen($data);
-            if ($this->append_after === 0) {
-                $data .= $this->append;
-                $this->append = '';
-            } elseif ($this->append_after < 0) {
-                $this->append_after = 0;
-                $this->append = '';
-
-                throw new \danog\MadelineProto\Exception('Tried to send too much out of frame data, cannot append');
-            }
-        }
-
-        return $this->write_buffer->bufferWrite(@$this->encrypt->encrypt($data));
-    }
 
     /**
      * Does nothing.

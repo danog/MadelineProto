@@ -72,7 +72,9 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
 
         $this->stream = yield ($this->connector ?? connector())->connect($handshake, $ctx->getCancellationToken());
 
-        yield $this->write($header);
+        if (\strlen($header)) {
+            yield $this->write($header);
+        }
     }
 
     /**
