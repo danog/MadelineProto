@@ -27,6 +27,7 @@ use Amp\Deferred;
 use Amp\File\BlockingFile;
 use Amp\File\Handle;
 use Amp\File\StatCache;
+use Amp\Http\Client\Request;
 use Amp\Success;
 use danog\MadelineProto\Async\AsyncParameters;
 use danog\MadelineProto\Exception;
@@ -92,7 +93,10 @@ trait Files
             $url = $url->getFile();
         }
         /** @var $response \Amp\Http\Client\Response */
-        $response = yield $this->datacenter->getHTTPClient()->request($url, [Client::OP_MAX_BODY_BYTES => 512 * 1024 * 3000, Client::OP_TRANSFER_TIMEOUT => 10*1000*3600]);
+        $request = new Request($url);
+        $request->setTransferTimeout(10*1000*3600);
+        $request->setBodySizeLimit(512 * 1024 * 3000);
+        $response = yield $this->datacenter->getHTTPClient()->request($request);
         if (200 !== $status = $response->getStatus()) {
             throw new Exception("Wrong status code: $status ".$response->getReason());
         }
