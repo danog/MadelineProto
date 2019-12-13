@@ -455,7 +455,6 @@ class DataCenter
                 // This is only for non-MTProto connections
                 if (!$dc_number) {
                     /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
-                    $context->with
                     $ctx = (new ConnectionContext())
                         ->setSocketContext($context)
                         ->setUri($uri)

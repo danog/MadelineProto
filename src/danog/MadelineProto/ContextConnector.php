@@ -46,7 +46,7 @@ class ContextConnector implements Connector
     {
         return Tools::call(function () use ($uri, $socketContext, $token) {
             $socketContext = $socketContext ?? new ConnectContext;
-            $token = $token ?? new NullCancellationToken
+            $token = $token ?? new NullCancellationToken;
 
             $attempt = 0;
             $uris = [];
