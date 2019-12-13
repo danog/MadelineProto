@@ -180,7 +180,7 @@ class Magic
                 $DohConfig = new DoHConfig(
                     [
                         new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
-                        new Nameserver('https://google.com/resolve', Nameserver::GOOGLE_JSON, ["Host" => "dns.google.com"]),
+                        new Nameserver('https://dns.google/resolve'),
                     ]
                 );
                 resolver(new Rfc8484StubResolver($DohConfig));

@@ -31,6 +31,8 @@ use Amp\Http\Client\Cookie\CookieJar;
 use Amp\Http\Client\Cookie\InMemoryCookieJar;
 use Amp\Http\Client\DelegateHttpClient;
 use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Interceptor\ModifyRequest;
+use Amp\Http\Client\Interceptor\RemoveRequestHeader;
 use Amp\Http\Client\Request;
 use Amp\Socket\ConnectContext;
 use Amp\Websocket\Client\Rfc6455Connector;

@@ -20,6 +20,7 @@ namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
+use Amp\Websocket\Client\Connector;
 use Amp\Websocket\Client\Handshake;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -67,8 +68,8 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     {
         $this->dc = $ctx->getIntDc();
 
-        $handshake = new Handshake(\str_replace('tcp://', $ctx->isSecure() ? 'ws://' : 'wss://', $ctx->getStringUri()));
-
+        $handshake = new Handshake(\str_replace('tcp://', $ctx->isSecure() ? 'wss://' : 'ws://', $ctx->getStringUri()));
+        
         $this->stream = yield ($this->connector ?? connector())->connect($handshake, $ctx->getCancellationToken());
 
         yield $this->write($header);
@@ -96,7 +97,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
                 $data = yield $this->message->buffer();
                 $this->message = null;
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             if ($e->getReason() !== 'Client closed the underlying TCP connection') {
                 throw $e;
             }
@@ -129,7 +130,9 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     }
     public function setExtra($extra)
     {
-        $this->connector = $extra;
+        if ($extra instanceof Connector) {
+            $this->connector = $extra;
+        }
     }
 
     public static function getName(): string
