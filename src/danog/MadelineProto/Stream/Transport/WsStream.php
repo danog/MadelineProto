@@ -46,7 +46,7 @@ class WsStream implements RawStreamInterface
     /**
      * Websocket stream.
      *
-     * @var Rfc6455Connection
+     * @var Connection
      */
     private $stream;
     /**

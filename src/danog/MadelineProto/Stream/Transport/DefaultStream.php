@@ -36,7 +36,7 @@ use function Amp\Socket\connector;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class DefaultStream extends Socket implements
+class DefaultStream implements
     RawStreamInterface,
     ProxyStreamInterface
 {

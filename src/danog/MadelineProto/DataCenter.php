@@ -19,9 +19,6 @@
 
 namespace danog\MadelineProto;
 
-use Amp\CancellationToken;
-use Amp\Deferred;
-use Amp\Dns\Record;
 use Amp\Dns\Resolver;
 use Amp\Dns\Rfc1035StubResolver;
 use Amp\DoH\DoHConfig;
@@ -34,15 +31,8 @@ use Amp\Http\Client\Cookie\CookieJar;
 use Amp\Http\Client\Cookie\InMemoryCookieJar;
 use Amp\Http\Client\DelegateHttpClient;
 use Amp\Http\Client\HttpClientBuilder;
-use Amp\Loop;
-use Amp\MultiReasonException;
-use Amp\NullCancellationToken;
-use Amp\Promise;
-use Amp\Socket\ClientSocket;
-use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectContext;
-use Amp\Socket\ConnectException;
-use Amp\TimeoutException;
+use Amp\Websocket\Client\Rfc6455Connector;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
@@ -60,8 +50,6 @@ use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
-use function Amp\call;
-use function Amp\Socket\Internal\parseUri;
 
 /**
  * Manages datacenters.
@@ -117,7 +105,7 @@ class DataCenter
      *
      * @var \Amp\DoH\Rfc8484StubResolver
      */
-    private $NonProxiedDoHClient;
+    private $nonProxiedDoHClient;
     /**
      * Cookie jar.
      *
@@ -231,12 +219,12 @@ class DataCenter
             $this->CookieJar = $jar ?? new InMemoryCookieJar;
             $this->HTTPClient = (new HttpClientBuilder)
                 ->interceptNetwork(new CookieInterceptor($this->CookieJar))
-                ->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ProxyConnector($this))))
+                ->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this))))
                 ->build();
 
             $DoHHTTPClient = (new HttpClientBuilder)
                 ->interceptNetwork(new CookieInterceptor($this->CookieJar))
-                ->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ProxyConnector($this, true))))
+                ->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this, true))))
                 ->build();
 
             $DoHConfig = new DoHConfig(
@@ -246,19 +234,19 @@ class DataCenter
                 ],
                 $DoHHTTPClient
             );
-            $NonProxiedDoHConfig = new DoHConfig(
+            $nonProxiedDoHConfig = new DoHConfig(
                 [
                     new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
                     new Nameserver('https://dns.google/resolve'),
                 ]
             );
-            $this->DoHClient = Magic::$altervista || Magic::$zerowebhost ? 
-                new Rfc1035StubResolver() : 
+            $this->DoHClient = Magic::$altervista || Magic::$zerowebhost ?
+                new Rfc1035StubResolver() :
                 new Rfc8484StubResolver($DoHConfig);
 
-            $this->NonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost ? 
-                new Rfc1035StubResolver() : 
-                new Rfc8484StubResolver($NonProxiedDoHConfig);
+            $this->nonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost ?
+                new Rfc1035StubResolver() :
+                new Rfc8484StubResolver($nonProxiedDoHConfig);
         }
     }
 
@@ -297,11 +285,9 @@ class DataCenter
 
                 return true;
             } catch (\Throwable $e) {
-                if (\defined(\MADELINEPROTO_TEST::class) && MADELINEPROTO_TEST === 'pony') {
+                if (\MADELINEPROTO_TEST === 'pony') {
                     throw $e;
                 }
-                $this->API->logger->logger('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
-            } catch (\Exception $e) {
                 $this->API->logger->logger('Connection failed: '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             }
         }
@@ -454,7 +440,7 @@ class DataCenter
             foreach ($ipv6 as $ipv6) {
                 // This is only for non-MTProto connections
                 if (!$dc_number) {
-                    /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
+                    /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
                     $ctx = (new ConnectionContext())
                         ->setSocketContext($context)
                         ->setUri($uri)
@@ -462,15 +448,7 @@ class DataCenter
 
                     foreach ($combo as $stream) {
                         if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
-                            $stream[1] = [
-                                function (
-                                    string $uri,
-                                    ClientConnectContext $socketContext = null,
-                                    CancellationToken $token = null
-                                ) use ($ctx): Promise {
-                                    return $this->socketConnect($ctx, $uri, $socketContext, $token);
-                                }
-                            ];
+                            $stream[1] = new DoHConnector($this, $ctx);
                         }
                         $ctx->addStream(...$stream);
                     }
@@ -522,7 +500,7 @@ class DataCenter
                         $uri = 'tcp://'.$address.':'.$port.'/'.$path;
                     }
 
-                    /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
+                    /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
                     $ctx = (new ConnectionContext())
                         ->setDc($dc_number)
                         ->setTest($this->settings[$dc_config_number]['test_mode'])
@@ -532,7 +510,20 @@ class DataCenter
 
                     foreach ($combo as $stream) {
                         if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
-                            $stream[1] = new ContextConnector($this, $ctx);
+                            $stream[1] = new DoHConnector($this, $ctx);
+                        }
+                        if (\in_array($stream[0], [WsStream::class, WssStream::class]) && $stream[1] === []) {
+                            $stream[1] = new Rfc6455Connector(
+                                (new HttpClientBuilder)
+                                    ->usingPool(
+                                        new UnlimitedConnectionPool(
+                                            new DefaultConnectionFactory(
+                                                new DoHConnector($this, $ctx)
+                                            )
+                                        )
+                                    )
+                                    ->build()
+                            );
                         }
                         $ctx->addStream(...$stream);
                     }
@@ -549,7 +540,7 @@ class DataCenter
             unset($this->sockets[$dc_number]);
 
             $this->API->logger->logger("No info for DC $dc_number", \danog\MadelineProto\Logger::ERROR);
-        } elseif (\defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
+        } elseif (\MADELINEPROTO_TEST === 'pony') {
             return [$ctxs[0]];
         }
 

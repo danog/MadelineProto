@@ -96,7 +96,7 @@ class API extends InternalDoc
                     if ($e->getFile() === 'MadelineProto' && $e->getLine() === 1) {
                         throw $e;
                     }
-                    if (\defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
+                    if (\MADELINEPROTO_TEST === 'pony') {
                         throw $e;
                     }
                     \class_exists('\\Volatile');
