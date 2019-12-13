@@ -30,13 +30,13 @@ class RSA
     /**
      * Exponent.
      *
-     * @var \phpseclib\Math\BigInteger
+     * @var \phpseclib3\Math\BigInteger
      */
     public $e;
     /**
      * Modulus.
      *
-     * @var \phpseclib\Math\BigInteger
+     * @var \phpseclib3\Math\BigInteger
      */
     public $n;
     /**
@@ -58,7 +58,7 @@ class RSA
     {
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_init'], Logger::ULTRA_VERBOSE);
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['loading_key'], Logger::ULTRA_VERBOSE);
-        $key = \phpseclib\Crypt\RSA::load($rsa_key);
+        $key = \phpseclib3\Crypt\RSA::load($rsa_key);
         $this->n = Tools::getVar($key, 'modulus');
         $this->e = Tools::getVar($key, 'exponent');
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['computing_fingerprint'], Logger::ULTRA_VERBOSE);
@@ -88,6 +88,6 @@ class RSA
     {
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_encrypting'], Logger::VERBOSE);
 
-        return (new \phpseclib\Math\BigInteger((string) $data, 256))->powMod($this->e, $this->n)->toBytes();
+        return (new \phpseclib3\Math\BigInteger((string) $data, 256))->powMod($this->e, $this->n)->toBytes();
     }
 }

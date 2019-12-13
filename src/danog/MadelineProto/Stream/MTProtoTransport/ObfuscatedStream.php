@@ -80,12 +80,12 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
             $keyRev = \hash('sha256', $keyRev.$this->extra['secret'], true);
         }
 
-        $this->encrypt = new \phpseclib\Crypt\AES('ctr');
+        $this->encrypt = new \phpseclib3\Crypt\AES('ctr');
         $this->encrypt->enableContinuousBuffer();
         $this->encrypt->setKey($key);
         $this->encrypt->setIV(\substr($random, 40, 16));
 
-        $this->decrypt = new \phpseclib\Crypt\AES('ctr');
+        $this->decrypt = new \phpseclib3\Crypt\AES('ctr');
         $this->decrypt->enableContinuousBuffer();
         $this->decrypt->setKey($keyRev);
         $this->decrypt->setIV(\substr($reversed, 40, 16));

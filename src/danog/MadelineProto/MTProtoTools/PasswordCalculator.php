@@ -22,7 +22,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
-use phpseclib\Math\BigInteger;
+use phpseclib3\Math\BigInteger;
 
 /**
  * Manages SRP password calculation.

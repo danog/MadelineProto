@@ -30,13 +30,13 @@ trait MsgIdHandler
     public function checkMessageId($new_message_id, $aargs)
     {
         if (!\is_object($new_message_id)) {
-            $new_message_id = new \phpseclib\Math\BigInteger(\strrev($new_message_id), 256);
+            $new_message_id = new \phpseclib3\Math\BigInteger(\strrev($new_message_id), 256);
         }
-        $min_message_id = (new \phpseclib\Math\BigInteger(\time() + $this->time_delta - 300))->bitwise_leftShift(32);
+        $min_message_id = (new \phpseclib3\Math\BigInteger(\time() + $this->time_delta - 300))->bitwise_leftShift(32);
         if ($min_message_id->compare($new_message_id) > 0) {
             $this->API->logger->logger('Given message id ('.$new_message_id.') is too old compared to the min value ('.$min_message_id.').', \danog\MadelineProto\Logger::WARNING);
         }
-        $max_message_id = (new \phpseclib\Math\BigInteger(\time() + $this->time_delta + 30))->bitwise_leftShift(32);
+        $max_message_id = (new \phpseclib3\Math\BigInteger(\time() + $this->time_delta + 30))->bitwise_leftShift(32);
         if ($max_message_id->compare($new_message_id) < 0) {
             throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too new compared to the max value ('.$max_message_id.'). Consider syncing your date.');
         }
@@ -84,7 +84,7 @@ trait MsgIdHandler
 
     public function generateMessageId()
     {
-        $message_id = (new \phpseclib\Math\BigInteger(\time() + $this->time_delta))->bitwise_leftShift(32);
+        $message_id = (new \phpseclib3\Math\BigInteger(\time() + $this->time_delta))->bitwise_leftShift(32);
         if ($message_id->compare($key = $this->getMaxId($incoming = false)) <= 0) {
             $message_id = $key->add(\danog\MadelineProto\Magic::$four);
         }

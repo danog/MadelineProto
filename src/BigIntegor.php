@@ -17,7 +17,7 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace phpseclib\Math;
+namespace phpseclib3\Math;
 
 if (PHP_MAJOR_VERSION < 7 && !(\class_exists(\Phar::class) && \Phar::running())) {
     throw new \Exception('MadelineProto requires php 7 to run natively, use phar.madelineproto.xyz to run on PHP 5.6');
@@ -26,7 +26,7 @@ if (\defined('HHVM_VERSION')) {
     $engines = [['PHP64', ['OpenSSL']], ['BCMath', ['OpenSSL']], ['PHP32', ['OpenSSL']]];
     foreach ($engines as $engine) {
         try {
-            \phpseclib\Math\BigInteger::setEngine($engine[0], isset($engine[1]) ? $engine[1] : []);
+            \phpseclib3\Math\BigInteger::setEngine($engine[0], isset($engine[1]) ? $engine[1] : []);
             break;
         } catch (\Exception $e) {
         }

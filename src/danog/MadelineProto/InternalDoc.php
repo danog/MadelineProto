@@ -4323,7 +4323,7 @@ class InternalDoc extends APIFactory
      *
      * @return bool
      */
-    public function checkG(\phpseclib\Math\BigInteger $g_a, \phpseclib\Math\BigInteger $p, array $extra = []): bool
+    public function checkG(\phpseclib3\Math\BigInteger $g_a, \phpseclib3\Math\BigInteger $p, array $extra = []): bool
     {
         return $this->__call(__FUNCTION__, [$g_a, $p, $extra]);
     }
@@ -4335,7 +4335,7 @@ class InternalDoc extends APIFactory
      *
      * @return boolean
      */
-    public function checkPG(\phpseclib\Math\BigInteger $p, \phpseclib\Math\BigInteger $g, array $extra = []): bool
+    public function checkPG(\phpseclib3\Math\BigInteger $p, \phpseclib3\Math\BigInteger $g, array $extra = []): bool
     {
         return $this->__call(__FUNCTION__, [$p, $g, $extra]);
     }
