@@ -108,12 +108,12 @@ class API extends InternalDoc
                         $tounserialize = \str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                         $changed = true;
                     }
-                    if (\strpos($tounserialize, 'C:25:"phpseclib\Math\BigInteger') !== false) {
-                        $tounserialize = \str_replace('C:25:"phpseclib\Math\BigInteger', 'C:26:"phpseclib3\Math\BigInteger', $tounserialize);
-                        $changed = true;
-                    }
                     if (\strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
                         $tounserialize = \str_replace('phpseclib\\Math\\BigInteger', 'phpseclib\\Math\\BigIntegor', $tounserialize);
+                        $changed = true;
+                    }
+                    if (\strpos($tounserialize, 'C:25:"phpseclib\\Math\\BigInteger') !== false) {
+                        $tounserialize = \str_replace('C:25:"phpseclib\\Math\\BigInteger', 'C:26:"phpseclib3\\Math\\BigInteger', $tounserialize);
                         $changed = true;
                     }
 

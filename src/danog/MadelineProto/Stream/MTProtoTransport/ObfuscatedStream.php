@@ -20,8 +20,6 @@ namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
-use danog\MadelineProto\Stream\Async\Buffer;
-use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\Async\Stream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\Common\CtrStream;
