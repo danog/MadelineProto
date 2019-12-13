@@ -19,7 +19,6 @@
 
 namespace danog\MadelineProto;
 
-use Amp\MultiReasonException;
 use Amp\Socket\Connector;
 
 class ProxyConnector implements Connector
@@ -34,7 +33,7 @@ class ProxyConnector implements Connector
 
     public function connect(string $uri, ?ConnectContext $ctx = null, ?CancellationToken $token = null): Promise
     {
-        return Tools::call(static function () use ($uri, $ctx, $token) {
+        return Tools::call(function () use ($uri, $ctx, $token) {
             $ctx = $ctx ?? new ConnectContext;
             $token = $token ?? new NullCancellationToken;
 

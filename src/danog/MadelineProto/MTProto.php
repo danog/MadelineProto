@@ -19,8 +19,8 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Artax\Client;
 use Amp\Dns\Resolver;
+use Amp\Http\Client\DelegateHttpClient;
 use Amp\Loop;
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Loop\Generic\PeriodicLoop;
@@ -645,9 +645,9 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Get async HTTP client.
      *
-     * @return \Amp\Artax\Client
+     * @return \Amp\Http\Client\DelegateHttpClient
      */
-    public function getHTTPClient(): Client
+    public function getHTTPClient(): DelegateHttpClient
     {
         return $this->datacenter->getHTTPClient();
     }

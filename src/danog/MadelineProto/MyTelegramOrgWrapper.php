@@ -18,8 +18,8 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Artax\Cookie\ArrayCookieJar;
-use Amp\Artax\Request;
+use Amp\Http\Client\Cookie\InMemoryCookieJar;
+use Amp\Http\Client\Request;
 
 /**
  * Wrapper for my.telegram.org.
@@ -54,7 +54,7 @@ class MyTelegramOrgWrapper
             $this->settings = [];
         }
         if (!$this->jar) {
-            $this->jar = new ArrayCookieJar;
+            $this->jar = new InMemoryCookieJar;
         }
         $this->settings = MTProto::getSettings($this->settings);
         $this->datacenter = new DataCenter(
@@ -75,10 +75,10 @@ class MyTelegramOrgWrapper
     {
         $this->number = $number;
         $request = new Request(self::MY_TELEGRAM_URL.'/auth/send_password', 'POST');
-        $request = $request->withBody(\http_build_query(['phone' => $number]));
-        $request = $request->withHeaders($this->getHeaders('origin'));
+        $request->setBody(\http_build_query(['phone' => $number]));
+        $request->setHeaders($this->getHeaders('origin'));
         $response = yield $this->datacenter->getHTTPClient()->request($request);
-        $result = yield $response->getBody();
+        $result = yield $response->getBody()->buffer();
         $resulta = \json_decode($result, true);
 
         if (!isset($resulta['random_hash'])) {
@@ -94,11 +94,11 @@ class MyTelegramOrgWrapper
         }
 
         $request = new Request(self::MY_TELEGRAM_URL.'/auth/login', 'POST');
-        $request = $request->withBody(\http_build_query(['phone' => $this->number, 'random_hash' => $this->hash, 'password' => $password]));
-        $request = $request->withHeaders($this->getHeaders('origin'));
-        $request = $request->withHeader('user-agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
+        $request->setBody(\http_build_query(['phone' => $this->number, 'random_hash' => $this->hash, 'password' => $password]));
+        $request->setHeaders($this->getHeaders('origin'));
+        $request->setHeader('user-agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
         $response = yield $this->datacenter->getHTTPClient()->request($request);
-        $result = yield $response->getBody();
+        $result = yield $response->getBody()->buffer();
 
 
         switch ($result) {
@@ -124,9 +124,9 @@ class MyTelegramOrgWrapper
         }
 
         $request = new Request(self::MY_TELEGRAM_URL.'/apps');
-        $request = $request->withHeaders($this->getHeaders('refer'));
+        $request->setHeaders($this->getHeaders('refer'));
         $response = yield $this->datacenter->getHTTPClient()->request($request);
-        $result = yield $response->getBody();
+        $result = yield $response->getBody()->buffer();
 
         $title = \explode('</title>', \explode('<title>', $result)[1])[0];
         switch ($title) {
@@ -150,9 +150,9 @@ class MyTelegramOrgWrapper
         }
 
         $request = new Request(self::MY_TELEGRAM_URL.'/apps');
-        $request = $request->withHeaders($this->getHeaders('refer'));
+        $request->setHeaders($this->getHeaders('refer'));
         $response = yield $this->datacenter->getHTTPClient()->request($request);
-        $result = yield $response->getBody();
+        $result = yield $response->getBody()->buffer();
 
         $cose = \explode('<label for="app_id" class="col-md-4 text-right control-label">App api_id:</label>
       <div class="col-md-7">
@@ -178,19 +178,19 @@ class MyTelegramOrgWrapper
         }
 
         $request = new Request(self::MY_TELEGRAM_URL.'/apps/create', 'POST');
-        $request = $request->withHeaders($this->getHeaders('app'));
-        $request = $request->withBody(\http_build_query(['hash' => $this->creation_hash, 'app_title' => $settings['app_title'], 'app_shortname' => $settings['app_shortname'], 'app_url' => $settings['app_url'], 'app_platform' => $settings['app_platform'], 'app_desc' => $settings['app_desc']]));
+        $request->setHeaders($this->getHeaders('app'));
+        $request = $request->setBody(\http_build_query(['hash' => $this->creation_hash, 'app_title' => $settings['app_title'], 'app_shortname' => $settings['app_shortname'], 'app_url' => $settings['app_url'], 'app_platform' => $settings['app_platform'], 'app_desc' => $settings['app_desc']]));
         $response = yield $this->datacenter->getHTTPClient()->request($request);
-        $result = yield $response->getBody();
+        $result = yield $response->getBody()->buffer();
 
         if ($result) {
             throw new Exception(\html_entity_decode($result));
         }
 
         $request = new Request(self::MY_TELEGRAM_URL.'/apps');
-        $request = $request->withHeaders($this->getHeaders('refer'));
+        $request->setHeaders($this->getHeaders('refer'));
         $response = yield $this->datacenter->getHTTPClient()->request($request);
-        $result = yield $response->getBody();
+        $result = yield $response->getBody()->buffer();
 
         $title = \explode('</title>', \explode('<title>', $result)[1])[0];
         if ($title === 'Create new application') {
@@ -267,7 +267,7 @@ class MyTelegramOrgWrapper
     }
     public function loop($callable)
     {
-        return \danog\MadelineProto\Tools::wait($callable());
+        return Tools::wait($callable());
     }
     public function __call($name, $arguments)
     {
@@ -277,6 +277,6 @@ class MyTelegramOrgWrapper
         if (!\method_exists($this, $name)) {
             throw new Exception("$name does not exist!");
         }
-        return $async ? $this->{$name}(...$arguments) : \danog\MadelineProto\Tools::wait($this->{$name}(...$arguments));
+        return $async ? $this->{$name}(...$arguments) : Tools::wait($this->{$name}(...$arguments));
     }
 }

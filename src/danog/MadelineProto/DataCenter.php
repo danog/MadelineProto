@@ -40,6 +40,7 @@ use Amp\NullCancellationToken;
 use Amp\Promise;
 use Amp\Socket\ClientSocket;
 use Amp\Socket\ClientTlsContext;
+use Amp\Socket\ConnectContext;
 use Amp\Socket\ConnectException;
 use Amp\TimeoutException;
 use danog\MadelineProto\MTProto\PermAuthKey;
@@ -261,177 +262,6 @@ class DataCenter
         }
     }
 
-    /**
-     * Asynchronously establish a socket connection to the specified URI.
-     *
-     * @param ConnectionContext                   $ctx Connection context
-     * @param string                 $uri URI in scheme://host:port format. TCP is assumed if no scheme is present.
-     * @param ClientConnectContext   $socketContext Socket connect context to use when connecting.
-     * @param CancellationToken|null $token
-     *
-     * @return Promise<\Amp\Socket\ClientSocket>
-     */
-    public function socketConnect(ConnectionContext $ctx, string $uri, ClientConnectContext $socketContext = null, CancellationToken $token = null): Promise
-    {
-        return call(function () use ($ctx, $uri, $socketContext, $token) {
-            $socketContext = $socketContext ?? new ClientConnectContext;
-            $token = $token ?? new NullCancellationToken;
-            $attempt = 0;
-            $uris = [];
-            $failures = [];
-
-            list($scheme, $host, $port) = parseUri($uri);
-
-            if ($host[0] === '[') {
-                $host = \substr($host, 1, -1);
-            }
-
-            if ($port === 0 || @\inet_pton($host)) {
-                // Host is already an IP address or file path.
-                $uris = [$uri];
-            } else {
-                // Host is not an IP address, so resolve the domain name.
-                // When we're connecting to a host, we may need to resolve the domain name, first.
-                // The resolution is usually done using DNS over HTTPS.
-                //
-                // The DNS over HTTPS resolver needs to resolve the domain name of the DOH server:
-                // this is handled internally by the DNS over HTTPS client,
-                // by redirecting the resolution request to the plain DNS client.
-                //
-                // However, if the DoH connection is proxied with a proxy that has a domain name itself,
-                // we cannot resolve it with the DoH resolver, since this will cause an infinite loop
-                //
-                // resolve host.com => (DoH resolver) => resolve dohserver.com => (simple resolver) => OK
-                //
-                //                                     |> resolve dohserver.com => (simple resolver) => OK
-                // resolve host.com => (DoH resolver) =|
-                //                                     |> resolve proxy.com => (non-proxied resolver) => OK
-                //
-                //
-                // This means that we must detect if the domain name we're trying to resolve is a proxy domain name.
-                //
-                // Here, we simply check if the connection URI has changed since we first set it:
-                // this would indicate that a proxy class has changed the connection URI to the proxy URI.
-                //
-                if ($ctx->isDns()) {
-                    $records = yield $this->NonProxiedDoHClient->resolve($host, $socketContext->getDnsTypeRestriction());
-                } else {
-                    $records = yield $this->DoHClient->resolve($host, $socketContext->getDnsTypeRestriction());
-                }
-                \usort($records, function (Record $a, Record $b) {
-                    return $a->getType() - $b->getType();
-                });
-                if ($ctx->getIpv6()) {
-                    $records = \array_reverse($records);
-                }
-
-                foreach ($records as $record) {
-                    /** @var Record $record */
-                    if ($record->getType() === Record::AAAA) {
-                        $uris[] = \sprintf("%s://[%s]:%d", $scheme, $record->getValue(), $port);
-                    } else {
-                        $uris[] = \sprintf("%s://%s:%d", $scheme, $record->getValue(), $port);
-                    }
-                }
-            }
-
-            $flags = \STREAM_CLIENT_CONNECT | \STREAM_CLIENT_ASYNC_CONNECT;
-            $timeout = $socketContext->getConnectTimeout();
-
-            foreach ($uris as $builtUri) {
-                try {
-                    $context = \stream_context_create($socketContext->toStreamContextArray());
-
-                    if (!$socket = @\stream_socket_client($builtUri, $errno, $errstr, null, $flags, $context)) {
-                        throw new ConnectException(\sprintf(
-                            "Connection to %s failed: [Error #%d] %s%s",
-                            $uri,
-                            $errno,
-                            $errstr,
-                            $failures ? "; previous attempts: ".\implode($failures) : ""
-                        ), $errno);
-                    }
-
-                    \stream_set_blocking($socket, false);
-
-                    $deferred = new Deferred;
-                    $watcher = Loop::onWritable($socket, [$deferred, 'resolve']);
-                    $id = $token->subscribe([$deferred, 'fail']);
-
-                    try {
-                        yield Promise\timeout($deferred->promise(), $timeout);
-                    } catch (TimeoutException $e) {
-                        throw new ConnectException(\sprintf(
-                            "Connecting to %s failed: timeout exceeded (%d ms)%s",
-                            $uri,
-                            $timeout,
-                            $failures ? "; previous attempts: ".\implode($failures) : ""
-                        ), 110); // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno
-                    } finally {
-                        Loop::cancel($watcher);
-                        $token->unsubscribe($id);
-                    }
-
-                    // The following hack looks like the only way to detect connection refused errors with PHP's stream sockets.
-                    if (\stream_socket_get_name($socket, true) === false) {
-                        \fclose($socket);
-                        throw new ConnectException(\sprintf(
-                            "Connection to %s refused%s",
-                            $uri,
-                            $failures ? "; previous attempts: ".\implode($failures) : ""
-                        ), 111); // See ECONNREFUSED in http://www.virtsync.com/c-error-codes-include-errno
-                    }
-                } catch (ConnectException $e) {
-                    // Includes only error codes used in this file, as error codes on other OS families might be different.
-                    // In fact, this might show a confusing error message on OS families that return 110 or 111 by itself.
-                    $knownReasons = [
-                        110 => "connection timeout",
-                        111 => "connection refused",
-                    ];
-
-                    $code = $e->getCode();
-                    $reason = $knownReasons[$code] ?? ("Error #".$code);
-
-                    if (++$attempt === $socketContext->getMaxAttempts()) {
-                        break;
-                    }
-
-                    $failures[] = "{$uri} ({$reason})";
-
-                    continue; // Could not connect to host, try next host in the list.
-                }
-                if ($ctx->hasReadCallback()) {
-                    $socket = new class($socket) extends ClientSocket {
-                        private $callback;
-                        public function setReadCallback($callback)
-                        {
-                            $this->callback = $callback;
-                        }
-
-                        /** @inheritdoc */
-                        public function read(): Promise
-                        {
-                            $promise = parent::read();
-                            $promise->onResolve(function ($e, $res) {
-                                if ($res) {
-                                    ($this->callback)();
-                                }
-                            });
-                            return $promise;
-                        }
-                    };
-                    $socket->setReadCallback($ctx->getReadCallback());
-                } else {
-                    $socket = new ClientSocket($socket);
-                }
-
-                return $socket;
-            }
-
-            // This is reached if either all URIs failed or the maximum number of attempts is reached.
-            throw $e;
-        });
-    }
     public function dcConnect(string $dc_number, int $id = -1): \Generator
     {
         $old = isset($this->sockets[$dc_number]) && (
@@ -479,7 +309,7 @@ class DataCenter
         throw new \danog\MadelineProto\Exception("Could not connect to DC $dc_number");
     }
 
-    public function generateContexts($dc_number = 0, string $uri = '', ClientConnectContext $context = null)
+    public function generateContexts($dc_number = 0, string $uri = '', ConnectContext $context = null)
     {
         $ctxs = [];
         $combos = [];
@@ -516,7 +346,7 @@ class DataCenter
                 $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [HttpsStream::getName(), []]];
                 break;
             default:
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['protocol_invalid']);
+                throw new Exception(Lang::$current_lang['protocol_invalid']);
         }
         if ($this->settings[$dc_config_number]['obfuscated'] && !\in_array($default[2][0], [HttpsStream::getName(), HttpStream::getName()])) {
             $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], \end($default)];
@@ -615,8 +445,8 @@ class DataCenter
             }
             $combos = \array_unique($combos, SORT_REGULAR);
         }
-        /* @var $context \Amp\ClientConnectContext */
-        $context = $context ?? (new ClientConnectContext())->withMaxAttempts(1)->withConnectTimeout(1000 * $this->settings[$dc_config_number]['timeout']);
+        /* @var $context \Amp\ConnectContext */
+        $context = $context ?? (new ConnectContext())->withMaxAttempts(1)->withConnectTimeout(1000 * $this->settings[$dc_config_number]['timeout']);
 
         foreach ($combos as $combo) {
             $ipv6 = [$this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4', $this->settings[$dc_config_number]['ipv6'] ? 'ipv4' : 'ipv6'];
@@ -625,6 +455,7 @@ class DataCenter
                 // This is only for non-MTProto connections
                 if (!$dc_number) {
                     /** @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
+                    $context->with
                     $ctx = (new ConnectionContext())
                         ->setSocketContext($context)
                         ->setUri($uri)
@@ -702,23 +533,7 @@ class DataCenter
 
                     foreach ($combo as $stream) {
                         if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
-                            $stream[1] = [
-                                function (
-                                    string $uri,
-                                    ClientConnectContext $socketContext = null,
-                                    CancellationToken $token = null
-                                ) use ($ctx): Promise {
-                                    return $this->socketConnect($ctx, $uri, $socketContext, $token);
-                                },
-                                function (
-                                    string $uri,
-                                    ClientConnectContext $socketContext = null,
-                                    ClientTlsContext $tlsContext = null,
-                                    CancellationToken $token = null
-                                ) use ($ctx): Promise {
-                                    return $this->cryptoConnect($ctx, $uri, $socketContext, $tlsContext, $token);
-                                },
-                            ];
+                            $stream[1] = new ContextConnector($this, $ctx);
                         }
                         $ctx->addStream(...$stream);
                     }
@@ -770,6 +585,15 @@ class DataCenter
     {
         return $this->DoHClient;
     }
+    /**
+     * Get non-proxied DNS over HTTPS async DNS client.
+     *
+     * @return \Amp\Dns\Resolver
+     */
+    public function getNonProxiedDNSClient(): Resolver
+    {
+        return $this->DoHClient;
+    }
 
     /**
      * Get contents of file.
@@ -780,7 +604,7 @@ class DataCenter
      */
     public function fileGetContents(string $url): \Generator
     {
-        return yield (yield $this->getHTTPClient()->request($url))->getBody();
+        return yield (yield $this->getHTTPClient()->request($url))->getBody()->buffer();
     }
 
     /**

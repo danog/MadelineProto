@@ -27,7 +27,7 @@ use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
 
-use function Amp\Socket\connect;
+use function Amp\Socket\connector;
 
 /**
  * Default stream wrapper.
@@ -36,19 +36,24 @@ use function Amp\Socket\connect;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class DefaultStream extends Socket implements RawStreamInterface
+class DefaultStream extends Socket implements
+    RawStreamInterface,
+    ProxyStreamInterface
 {
     use RawStream;
     /**
-     * Socket
+     * Socket.
      *
      * @var EncryptableSocket
      */
     private $stream;
 
-    public function __construct()
-    {
-    }
+    /**
+     * Connector.
+     *
+     * @var Connector
+     */
+    private $connector;
 
     public function setupTls(?CancellationToken $cancellationToken = null): \Amp\Promise
     {
@@ -62,7 +67,7 @@ class DefaultStream extends Socket implements RawStreamInterface
 
     public function connectGenerator(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = yield connect($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
+        $this->stream = yield ($this->connector ?? connector())($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
         if ($ctx->isSecure()) {
             yield $this->stream->setupTls();
         }
@@ -114,8 +119,8 @@ class DefaultStream extends Socket implements RawStreamInterface
     }
 
     /**
-     * Close
-     * 
+     * Close.
+     *
      * @return void
      */
     public function close()
@@ -131,6 +136,11 @@ class DefaultStream extends Socket implements RawStreamInterface
     public function getSocket(): EncryptableSocket
     {
         return $this->stream;
+    }
+
+    public function setExtra($extra)
+    {
+        $this->connector = $extra;
     }
 
     public static function getName(): string

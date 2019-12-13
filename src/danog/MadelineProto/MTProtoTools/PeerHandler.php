@@ -19,7 +19,7 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Artax\Request;
+use Amp\Http\Client\Request;
 
 /**
  * Manages peers.
@@ -921,9 +921,13 @@ trait PeerHandler
             //file_put_contents($path, $payload);
             $id = isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'];
 
-            $request = (new Request('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id, 'POST'))->withHeader('content-type', 'application/json')->withBody($payload);
+            $request = new Request('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id, 'POST');
+            $request->setHeader('content-type', 'application/json');
+            $request->setBody($payload);
 
-            $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody();
+            $result = yield (
+                yield $this->datacenter->getHTTPClient()->request($request)
+            )->getBody()->buffer();
 
             $this->logger->logger("============ $result =============", \danog\MadelineProto\Logger::VERBOSE);
             $this->qres = [];
