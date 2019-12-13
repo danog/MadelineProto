@@ -31,6 +31,7 @@ use Amp\Http\Client\Cookie\CookieJar;
 use Amp\Http\Client\Cookie\InMemoryCookieJar;
 use Amp\Http\Client\DelegateHttpClient;
 use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Request;
 use Amp\Socket\ConnectContext;
 use Amp\Websocket\Client\Rfc6455Connector;
 use danog\MadelineProto\MTProto\PermAuthKey;
@@ -513,17 +514,7 @@ class DataCenter
                             $stream[1] = new DoHConnector($this, $ctx);
                         }
                         if (\in_array($stream[0], [WsStream::class, WssStream::class]) && $stream[1] === []) {
-                            $stream[1] = new Rfc6455Connector(
-                                (new HttpClientBuilder)
-                                    ->usingPool(
-                                        new UnlimitedConnectionPool(
-                                            new DefaultConnectionFactory(
-                                                new DoHConnector($this, $ctx)
-                                            )
-                                        )
-                                    )
-                                    ->build()
-                            );
+                            $stream[1] = new Rfc6455Connector($this->HTTPClient);
                         }
                         $ctx->addStream(...$stream);
                     }
@@ -545,6 +536,16 @@ class DataCenter
         }
 
         return $ctxs;
+    }
+
+    /**
+     * Get main API.
+     *
+     * @return MTProto
+     */
+    public function getAPI(): MTProto
+    {
+        return $this->API;
     }
 
     /**
@@ -594,7 +595,7 @@ class DataCenter
      */
     public function fileGetContents(string $url): \Generator
     {
-        return yield (yield $this->getHTTPClient()->request($url))->getBody()->buffer();
+        return yield (yield $this->getHTTPClient()->request(new Request($url)))->getBody()->buffer();
     }
 
     /**

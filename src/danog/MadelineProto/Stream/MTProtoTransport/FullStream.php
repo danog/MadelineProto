@@ -102,7 +102,7 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
         $this->in_seq_no++;
         $in_seq_no = \unpack('V', yield $buffer->bufferRead(4))[1];
         if ($in_seq_no != $this->in_seq_no) {
-            throw new Exception('Incoming seq_no mismatch');
+            throw new \danog\MadelineProto\Exception('Incoming seq_no mismatch');
         }
 
         return $buffer;

@@ -37,13 +37,13 @@ use function Amp\Socket\Internal\parseUri;
 class DoHConnector implements Connector
 {
     /**
-     * Datacenter instance
-     * 
+     * Datacenter instance.
+     *
      * @property DataCenter $dataCenter
      */
     private $dataCenter;
     /**
-     * Connection context
+     * Connection context.
      *
      * @var ConnectionContext
      */
@@ -56,7 +56,7 @@ class DoHConnector implements Connector
 
     public function connect(string $uri, ?ConnectContext $socketContext = null, ?CancellationToken $token = null): Promise
     {
-        return Tools::call(function () use ($uri, $socketContext, $token) {
+        return Tools::call((function () use ($uri, $socketContext, $token) {
             $socketContext = $socketContext ?? new ConnectContext;
             $token = $token ?? new NullCancellationToken;
 
@@ -115,7 +115,7 @@ class DoHConnector implements Connector
                     }
                 }
             }
-            
+
             $flags = \STREAM_CLIENT_CONNECT | \STREAM_CLIENT_ASYNC_CONNECT;
             $timeout = $socketContext->getConnectTimeout();
             foreach ($uris as $builtUri) {
@@ -176,7 +176,6 @@ class DoHConnector implements Connector
             // This is reached if either all URIs failed or the maximum number of attempts is reached.
             /** @noinspection PhpUndefinedVariableInspection */
             throw $e;
-
-        });
+        })());
     }
 }

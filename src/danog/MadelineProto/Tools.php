@@ -665,9 +665,9 @@ trait Tools
     public static function isArrayOrAlike($var): bool
     {
         return \is_array($var) ||
-            ($var instanceof ArrayAccess &&
-            $var instanceof Traversable &&
-            $var instanceof Countable);
+            ($var instanceof \ArrayAccess &&
+            $var instanceof \Traversable &&
+            $var instanceof \Countable);
     }
 
     /**

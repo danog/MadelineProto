@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Stream\Transport;
 use Amp\ByteStream\ClosedException;
 use Amp\CancellationToken;
 use Amp\Promise;
+use Amp\Socket\ClientTlsContext;
 use Amp\Socket\EncryptableSocket;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Stream\Async\RawStream;
@@ -67,7 +68,18 @@ class DefaultStream implements
 
     public function connectGenerator(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = yield ($this->connector ?? connector())($ctx->getStringUri(), $ctx->getSocketContext(), $ctx->getCancellationToken());
+        $ctx = $ctx->getCtx();
+        $uri = $ctx->getUri();
+        $secure = $ctx->isSecure();
+        if ($secure) {
+            $ctx->setSocketContext(
+                $ctx->getSocketContext()->withTlsContext(
+                    new ClientTlsContext($uri->getHost())
+                )
+            );
+        }
+
+        $this->stream = yield ($this->connector ?? connector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellationToken());
         if ($ctx->isSecure()) {
             yield $this->stream->setupTls();
         }

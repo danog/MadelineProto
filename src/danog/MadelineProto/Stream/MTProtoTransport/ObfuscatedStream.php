@@ -20,7 +20,6 @@ namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
-use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\Buffer;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
@@ -171,7 +170,7 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
                 $this->append_after = 0;
                 $this->append = '';
 
-                throw new Exception('Tried to send too much out of frame data, cannot append');
+                throw new \danog\MadelineProto\Exception('Tried to send too much out of frame data, cannot append');
             }
         }
 

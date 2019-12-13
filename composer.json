@@ -32,7 +32,8 @@
         "amphp/file": "^1",
         "amphp/byte-stream": "^1.6",
         "danog/dns-over-https": "^0.2",
-        "amphp/http-client-cookies": "dev-master"
+        "amphp/http-client-cookies": "dev-master",
+        "amphp/uri": "dev-master"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^4.3",

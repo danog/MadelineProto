@@ -637,9 +637,18 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @return TL
      */
-    public function getTL(): TL
+    public function getTL(): \danog\MadelineProto\TL\TL
     {
         return $this->TL;
+    }
+    /**
+     * Get logger.
+     *
+     * @return Logger
+     */
+    public function getLogger(): Logger
+    {
+        return $this->logger;
     }
 
     /**

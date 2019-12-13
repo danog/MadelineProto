@@ -4068,11 +4068,20 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
+     * Get logger.
+     *
+     * @return Logger
+     */
+    public function getLogger(array $extra = []): danog\MadelineProto\Logger
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
      * Get async HTTP client.
      *
-     * @return \Amp\Artax\Client
+     * @return \Amp\Http\Client\DelegateHttpClient
      */
-    public function getHTTPClient(array $extra = []): Amp\Artax\Client
+    public function getHTTPClient(array $extra = []): Amp\Http\Client\DelegateHttpClient
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }

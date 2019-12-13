@@ -20,6 +20,7 @@ namespace danog\MadelineProto\Stream\Proxy;
 
 use Amp\Promise;
 use Amp\Socket\ClientTlsContext;
+use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;

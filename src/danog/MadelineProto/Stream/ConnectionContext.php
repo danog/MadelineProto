@@ -20,6 +20,7 @@ namespace danog\MadelineProto\Stream;
 
 use Amp\CancellationToken;
 use Amp\Socket\ConnectContext;
+use Amp\Uri\Uri;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
