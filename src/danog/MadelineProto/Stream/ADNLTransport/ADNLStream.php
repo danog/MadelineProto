@@ -1,6 +1,6 @@
 <?php
 /**
- * TCP Intermediate stream wrapper.
+ * ADNL stream wrapper.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -16,7 +16,7 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Stream\MTProtoTransport;
+namespace danog\MadelineProto\Stream\ADNLTransport;
 
 use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
@@ -29,9 +29,9 @@ use danog\MadelineProto\Stream\RawStreamInterface;
 use danog\MadelineProto\Tools;
 
 /**
- * TCP Intermediate stream wrapper.
+ * ADNL stream wrapper.
  *
- * Manages obfuscated2 encryption/decryption
+ * Manages ADNL envelope
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */

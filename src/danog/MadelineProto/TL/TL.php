@@ -158,6 +158,7 @@ class TL
                 $e = null;
                 $class = null;
                 $dparams = [];
+                $lineBuf = '';
                 foreach ($tl_file as $line_number => $line) {
                     $line = \rtrim($line);
                     if (\preg_match('|^//@|', $line)) {
@@ -211,10 +212,21 @@ class TL
                         continue;
                     }
                     $name = \preg_replace(['/#.*/', '/\\s.*/'], '', $line);
-                    if (\in_array($name, ['bytes', 'int128', 'int256', 'int512'])) {
+                    if (\in_array($name, ['bytes', 'int128', 'int256', 'int512', 'int', 'long', 'double', 'string', 'bytes', 'object', 'function'])) {
                         continue;
                     }
-                    $clean = \preg_replace(['/:bytes /', '/;/', '/#[a-f0-9]+ /', '/ [a-zA-Z0-9_]+\\:flags\\.[0-9]+\\?true/', '/[<]/', '/[>]/', '/  /', '/^ /', '/ $/', '/\\?bytes /', '/{/', '/}/'], [':string ', '', ' ', '', ' ', ' ', ' ', '', '', '?string ', '', ''], $line);
+                    $line = \preg_replace('/[(]([\w\.]+) ([\w\.]+)[)]/', '$1<$2>', $line);
+                    if (\strpos($line, ';') === false) {
+                        $lineBuf .= $line;
+                        continue;
+                    } elseif ($lineBuf) {
+                        $lineBuf .= $line;
+                        $line = $lineBuf;
+                        $lineBuf = '';
+                    }
+
+                    $clean = \preg_replace(['/:bytes /', '/;/', '/#[a-f0-9]+ /', '/ [a-zA-Z0-9_]+\\:flags\\.[0-9]+\\?true/', '/[<]/', '/[>]/', '/  /', '/^ /', '/ $/', '/\\?bytes /', '/{/', '/}/', '/\s+/'], [':string ', '', ' ', '', ' ', ' ', ' ', '', '', '?string ', '', '', ' '], $line);
+
                     $id = \hash('crc32b', $clean);
                     if (\preg_match('/^[^\s]+#([a-f0-9]*)/i', $line, $matches)) {
                         $nid = \str_pad($matches[1], 8, '0', \STR_PAD_LEFT);

@@ -27,9 +27,11 @@ class AnnotationsBuilder
 {
     use Tools;
 
-    public function __construct($logger, $settings)
+    public function __construct(Logger $logger, array $settings, string $output, array $reflectionClasses, string $namespace)
     {
+        $this->reflectionClasses = $reflectionClasses;
         $this->logger = $logger;
+        $this->namespace = $namespace;
         $this->TL = new TL(new class($logger) {
             public function __construct($logger)
             {
@@ -38,6 +40,7 @@ class AnnotationsBuilder
         });
         $this->TL->init($settings['tl_schema']);
         $this->settings = $settings;
+        $this->output = $output;
     }
 
     public function mkAnnotations()
@@ -58,7 +61,7 @@ class AnnotationsBuilder
     {
         \danog\MadelineProto\Logger::log('Generating properties...', \danog\MadelineProto\Logger::NOTICE);
         $fixture = DocBlockFactory::createInstance();
-        $class = new \ReflectionClass(APIFactory::class);
+        $class = new \ReflectionClass($this->reflectionClasses['APIFactory']);
         $content = \file_get_contents($filename = $class->getFileName());
         foreach ($class->getProperties() as $property) {
             if ($raw_docblock = $property->getDocComment()) {
@@ -80,17 +83,17 @@ class AnnotationsBuilder
     private function createInternalClasses()
     {
         \danog\MadelineProto\Logger::log('Creating internal classes...', \danog\MadelineProto\Logger::NOTICE);
-        $handle = \fopen(\dirname(__FILE__).'/InternalDoc.php', 'w');
-        \fwrite($handle, "<?php namespace danog\\MadelineProto; class InternalDoc extends APIFactory {}");
+        $handle = \fopen($this->output, 'w');
+        \fwrite($handle, "<?php namespace {$this->namespace}; class InternalDoc extends APIFactory {}");
 
-        $class = new \ReflectionClass(API::class);
+        $class = new \ReflectionClass($this->reflectionClasses['API']);
         $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
         $ignoreMethods = [];
         foreach ($methods as $method) {
             $ignoreMethods[$method->getName()] = $method->getName();
         }
         \fclose($handle);
-        $handle = \fopen(\dirname(__FILE__).'/InternalDoc.php', 'w');
+        $handle = \fopen($this->output, 'w');
 
         $internalDoc = [];
         foreach ($this->TL->getMethods()->by_id as $id => $data) {
@@ -103,7 +106,7 @@ class AnnotationsBuilder
             }
             $internalDoc[$namespace][$method]['title'] = Lang::$current_lang["method_{$data['method']}"] ?? '';
 
-            $type = \str_ireplace(['vector<', '>'], ['_of_', '[]'], $data['type']);
+            $type = \str_ireplace(['vector<', '>'], [' of ', '[]'], $data['type']);
             foreach ($data['params'] as $param) {
                 if (\in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
                     continue;
@@ -126,7 +129,7 @@ class AnnotationsBuilder
                     $stype = 'subtype';
                 }
 
-                $ptype = \str_replace('.', '_', $param[$stype]);
+                $ptype = $param[$stype];
                 switch ($ptype) {
                     case 'true':
                     case 'false':
@@ -136,7 +139,7 @@ class AnnotationsBuilder
                 $opt = ($param['pow'] ?? false) ? 'Optional: ' : '';
                 $internalDoc[$namespace][$method]['attr'][$param['name']] = [
                     'type' => $ptype,
-                    'description' => $opt.Lang::$current_lang["method_{$data['method']}_param_{$param['name']}_type_{$param['type']}"]
+                    'description' => $opt.(Lang::$current_lang["method_{$data['method']}_param_{$param['name']}_type_{$param['type']}"] ?? '')
                 ];
             }
             if ($type === 'Bool') {
@@ -145,7 +148,7 @@ class AnnotationsBuilder
             $internalDoc[$namespace][$method]['return'] = $type;
         }
 
-        $class = new \ReflectionClass(MTProto::class);
+        $class = new \ReflectionClass($this->reflectionClasses['MTProto']);
         $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
         foreach ($methods as $key => $method) {
             $name = $method->getName();
@@ -254,7 +257,7 @@ class AnnotationsBuilder
         \fwrite($handle, " * and is used only for autocomplete in multiple IDE\n");
         \fwrite($handle, " * don't modify manually.\n");
         \fwrite($handle, " */\n\n");
-        \fwrite($handle, "namespace danog\\MadelineProto;\n");
+        \fwrite($handle, "namespace {$this->namespace};\n");
         foreach ($internalDoc as $namespace => $methods) {
             if ($namespace === 'InternalDoc') {
                 \fwrite($handle, "\nclass {$namespace} extends APIFactory\n{\n");

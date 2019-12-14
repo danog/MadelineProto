@@ -11,6 +11,13 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+use danog\MadelineProto\API;
+use danog\MadelineProto\APIFactory;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\TON\ADNL;
+use danog\MadelineProto\TON\API as TONAPI;
+use danog\MadelineProto\TON\APIFactory as TONAPIFactory;
+
 \chdir($d=__DIR__.'/..');
 
 require 'vendor/autoload.php';
@@ -78,9 +85,39 @@ description: Documentation of old mtproto layers
 
 '.$layer_list);
 
-$doc = new \danog\MadelineProto\AnnotationsBuilder($logger, $docs[1]);
+$doc = new \danog\MadelineProto\AnnotationsBuilder(
+    $logger,
+    $docs[1],
+    \dirname(__FILE__).'/../src/danog/MadelineProto/InternalDoc.php',
+    [
+        'API' => API::class,
+        'APIFactory' => APIFactory::class,
+        'MTProto' => MTProto::class
+    ],
+    'danog\\MadelineProto'
+);
 $doc->mkAnnotations();
 
+$ton = [
+    'tl_schema' => [
+        'lite_api' => "$d/src/danog/MadelineProto/TON/lite_api.tl",
+        'ton_api' => "$d/src/danog/MadelineProto/TON/ton_api.tl",
+        //'tonlib_api' => "$d/src/danog/MadelineProto/TON/tonlib_api.tl",
+    ]
+];
+
+$doc = new \danog\MadelineProto\AnnotationsBuilder(
+    $logger,
+    $ton,
+    \dirname(__FILE__).'/../src/danog/MadelineProto/TON/InternalDoc.php',
+    [
+        'API' => TONAPI::class,
+        'APIFactory' => TONAPIFactory::class,
+        'MTProto' => ADNL::class
+    ],
+    'danog\\MadelineProto\\TON'
+);
+$doc->mkAnnotations();
 foreach ($docs as $settings) {
     $doc = new \danog\MadelineProto\DocsBuilder($logger, $settings);
     $doc->mkDocs();

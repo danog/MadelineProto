@@ -469,7 +469,7 @@ interface account
      *
      * Parameters:
      * * `InputCheckPasswordSRP`         **password**     - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
-     * * `account_PasswordInputSettings` **new_settings** - New 2FA settings
+     * * `account.PasswordInputSettings` **new_settings** - New 2FA settings
      *
      * @param array $params Parameters
      *
@@ -545,7 +545,7 @@ interface account
     /**
      * Get all secure telegram passport values.
      *
-     * @return _of_SecureValue[]
+     * @return  of SecureValue[]
      */
     public function getAllSecureValues();
 
@@ -557,7 +557,7 @@ interface account
      *
      * @param array $params Parameters
      *
-     * @return _of_SecureValue[]
+     * @return  of SecureValue[]
      */
     public function getSecureValue($params);
 
@@ -947,7 +947,7 @@ interface users
      *
      * @param array $params Parameters
      *
-     * @return _of_User[]
+     * @return  of User[]
      */
     public function getUsers($params);
 
@@ -987,14 +987,14 @@ interface contacts
      *
      * @param array $params Parameters
      *
-     * @return _of_int[]
+     * @return  of int[]
      */
     public function getContactIDs($params);
 
     /**
      * Get online status of all users.
      *
-     * @return _of_ContactStatus[]
+     * @return  of ContactStatus[]
      */
     public function getStatuses();
 
@@ -1153,7 +1153,7 @@ interface contacts
     /**
      * Get saved contacts.
      *
-     * @return _of_SavedContact[]
+     * @return  of SavedContact[]
      */
     public function getSaved();
 
@@ -1333,7 +1333,7 @@ interface messages
      *
      * @param array $params Parameters
      *
-     * @return _of_ReceivedNotifyMessage[]
+     * @return  of ReceivedNotifyMessage[]
      */
     public function receivedMessages($params);
 
@@ -1665,7 +1665,7 @@ interface messages
      *
      * @param array $params Parameters
      *
-     * @return _of_long[]
+     * @return  of long[]
      */
     public function receivedQueue($params);
 
@@ -1828,7 +1828,7 @@ interface messages
      *
      * @param array $params Parameters
      *
-     * @return _of_int[]
+     * @return  of int[]
      */
     public function getMessagesViews($params);
 
@@ -2206,7 +2206,7 @@ interface messages
      *
      * @param array $params Parameters
      *
-     * @return _of_StickerSetCovered[]
+     * @return  of StickerSetCovered[]
      */
     public function getAttachedStickers($params);
 
@@ -2518,7 +2518,7 @@ interface messages
     /**
      * Get message ranges to fetch.
      *
-     * @return _of_MessageRange[]
+     * @return  of MessageRange[]
      */
     public function getSplitRanges();
 
@@ -2538,7 +2538,7 @@ interface messages
     /**
      * Get dialogs marked as unread manually.
      *
-     * @return _of_DialogPeer[]
+     * @return  of DialogPeer[]
      */
     public function getDialogUnreadMarks();
 
@@ -2675,7 +2675,7 @@ interface messages
      *
      * @param array $params Parameters
      *
-     * @return _of_EmojiLanguage[]
+     * @return  of EmojiLanguage[]
      */
     public function getEmojiKeywordsLanguages($params);
 
@@ -2700,7 +2700,7 @@ interface messages
      *
      * @param array $params Parameters
      *
-     * @return _of_messages.SearchCounter[]
+     * @return  of messages.SearchCounter[]
      */
     public function getSearchCounters($params);
 
@@ -2873,7 +2873,7 @@ interface photos
      *
      * @param array $params Parameters
      *
-     * @return _of_long[]
+     * @return  of long[]
      */
     public function deletePhotos($params);
 
@@ -2976,7 +2976,7 @@ interface upload
      *
      * @param array $params Parameters
      *
-     * @return _of_FileHash[]
+     * @return  of FileHash[]
      */
     public function reuploadCdnFile($params);
 
@@ -2989,7 +2989,7 @@ interface upload
      *
      * @param array $params Parameters
      *
-     * @return _of_FileHash[]
+     * @return  of FileHash[]
      */
     public function getCdnFileHashes($params);
 
@@ -3002,7 +3002,7 @@ interface upload
      *
      * @param array $params Parameters
      *
-     * @return _of_FileHash[]
+     * @return  of FileHash[]
      */
     public function getFileHashes($params);
 }
@@ -3945,7 +3945,7 @@ interface langpack
      *
      * @param array $params Parameters
      *
-     * @return _of_LangPackString[]
+     * @return  of LangPackString[]
      */
     public function getStrings($params);
 
@@ -3971,7 +3971,7 @@ interface langpack
      *
      * @param array $params Parameters
      *
-     * @return _of_LangPackLanguage[]
+     * @return  of LangPackLanguage[]
      */
     public function getLanguages($params);
 
