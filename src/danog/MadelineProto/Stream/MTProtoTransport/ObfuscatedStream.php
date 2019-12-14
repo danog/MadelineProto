@@ -32,7 +32,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class ObfuscatedStream implements BufferedProxyStreamInterface
+class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
 {
     use Stream;
 
@@ -76,57 +76,23 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
         $iv = \substr($random, 40, 16);
         $ivRev = \substr($reversed, 40, 16);
 
-        $this->stream = new CtrStream;
-        $this->stream->setExtra([
-            'encrypt' => [
-                'key' => $key,
-                'iv' => $iv
-            ],
-            'decrypt' => [
-                'key' => $keyRev,
-                'iv' => $ivRev
+        parent::setExtra(
+            [
+                'encrypt' => [
+                    'key' => $key,
+                    'iv' => $iv
+                ],
+                'decrypt' => [
+                    'key' => $keyRev,
+                    'iv' => $ivRev
+                ]
             ]
-        ]);
-        yield $this->stream->connect($ctx);
+        );
+        yield from parent::connectGenerator($ctx);
 
-        $random = \substr_replace($random, \substr(@$this->stream->getEncryptor()->encrypt($random), 56, 8), 56, 8);
-        
-        yield $this->stream->getPlainStream()->write($random);
-    }
+        $random = \substr_replace($random, \substr(@$this->getEncryptor()->encrypt($random), 56, 8), 56, 8);
 
-    /**
-     * Async close.
-     *
-     * @return Promise
-     */
-    public function disconnect()
-    {
-        return $this->stream->disconnect();
-    }
-
-    
-    /**
-     * Get read buffer asynchronously.
-     *
-     * @param int $length Length of payload, as detected by this layer
-     *
-     * @return Promise
-     */
-    public function getReadBuffer(&$length): Promise
-    {
-        return $this->stream->getReadBuffer($length);
-    }
-
-    /**
-     * Get write buffer asynchronously.
-     *
-     * @param int $length Total length of data that is going to be piped in the buffer
-     *
-     * @return Promise
-     */
-    public function getWriteBuffer(int $length, string $append = ''): Promise
-    {
-        return $this->stream->getWriteBuffer($length, $append);
+        yield $this->getPlainStream()->write($random);
     }
 
 
@@ -149,16 +115,6 @@ class ObfuscatedStream implements BufferedProxyStreamInterface
         }
 
         $this->extra = $extra;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return EncryptableSocket
-     */
-    public function getSocket(): EncryptableSocket
-    {
-        return $this->stream->getSocket();
     }
 
     public static function getName(): string
