@@ -211,11 +211,7 @@ class TL
                     if (\strpos($line, ' ?= ') !== false) {
                         continue;
                     }
-                    $name = \preg_replace(['/#.*/', '/\\s.*/'], '', $line);
-                    if (\in_array($name, ['bytes', 'int128', 'int256', 'int512', 'int', 'long', 'double', 'string', 'bytes', 'object', 'function'])) {
-                        continue;
-                    }
-                    $line = \preg_replace('/[(]([\w\.]+) ([\w\.]+)[)]/', '$1<$2>', $line);
+                    $line = \preg_replace(['/[(]([\w\.]+) ([\w\.]+)[)]/', '/\s+/'], ['$1<$2>', ' '], $line);
                     if (\strpos($line, ';') === false) {
                         $lineBuf .= $line;
                         continue;
@@ -225,7 +221,11 @@ class TL
                         $lineBuf = '';
                     }
 
-                    $clean = \preg_replace(['/:bytes /', '/;/', '/#[a-f0-9]+ /', '/ [a-zA-Z0-9_]+\\:flags\\.[0-9]+\\?true/', '/[<]/', '/[>]/', '/  /', '/^ /', '/ $/', '/\\?bytes /', '/{/', '/}/', '/\s+/'], [':string ', '', ' ', '', ' ', ' ', ' ', '', '', '?string ', '', '', ' '], $line);
+                    $name = \preg_replace(['/#.*/', '/\\s.*/'], '', $line);
+                    if (\in_array($name, ['bytes', 'int128', 'int256', 'int512', 'int', 'long', 'double', 'string', 'bytes', 'object', 'function'])) {
+                        continue;
+                    }
+                    $clean = \preg_replace(['/:bytes /', '/;/', '/#[a-f0-9]+ /', '/ [a-zA-Z0-9_]+\\:flags\\.[0-9]+\\?true/', '/[<]/', '/[>]/', '/  /', '/^ /', '/ $/', '/\\?bytes /', '/{/', '/}/'], [':string ', '', ' ', '', ' ', ' ', ' ', '', '', '?string ', '', ''], $line);
 
                     $id = \hash('crc32b', $clean);
                     if (\preg_match('/^[^\s]+#([a-f0-9]*)/i', $line, $matches)) {
@@ -262,6 +262,12 @@ class TL
                             $TL_dict[$type][$key]['params'][] = ['name' => $explode[0], 'type' => $explode[1]];
                         }
                     }
+                    /*
+                    if (!$TL_dict[$type][$key][$type === 'constructors' ? 'predicate' : 'method']) {
+                        var_dump($line);
+                        \var_dump($TL_dict[$type][$key]);
+                    }*/
+
                     $key++;
                 }
             } else {
@@ -443,19 +449,28 @@ class TL
                 return \danog\MadelineProto\Tools::packSignedLong($object);
             case 'int128':
                 if (\strlen($object) !== 16) {
-                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['long_not_16']);
+                    $object = \base64_decode($object);
+                    if (\strlen($object) !== 16) {
+                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['long_not_16']);
+                    }
                 }
 
                 return (string) $object;
             case 'int256':
                 if (\strlen($object) !== 32) {
-                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['long_not_32']);
+                    $object = \base64_decode($object);
+                    if (\strlen($object) !== 32) {
+                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['long_not_32']);
+                    }
                 }
 
                 return (string) $object;
             case 'int512':
                 if (\strlen($object) !== 64) {
-                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['long_not_64']);
+                    $object = \base64_decode($object);
+                    if (\strlen($object) !== 64) {
+                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['long_not_64']);
+                    }
                 }
 
                 return (string) $object;
@@ -861,6 +876,8 @@ class TL
      */
     public function deserialize($stream, $type = ['type' => ''])
     {
+        //var_dump($type);
+
         if (\is_string($stream)) {
             $res = \fopen('php://memory', 'rw+b');
             \fwrite($res, $stream);
@@ -965,6 +982,8 @@ class TL
                 }
             }
         }
+        //var_dump($constructorData);
+
         if ($constructorData['predicate'] === 'gzip_packed') {
             if (!isset($type['subtype'])) {
                 $type['subtype'] = '';

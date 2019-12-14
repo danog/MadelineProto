@@ -38,6 +38,11 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         $this->async = &$async;
     }
 
+    public function async($async)
+    {
+        $this->async = $async;
+    }
+
     public function __call($name, $arguments)
     {
         $yielded = Tools::call($this->__call_async($name, $arguments));

@@ -100,9 +100,9 @@ $doc->mkAnnotations();
 
 $ton = [
     'tl_schema' => [
-        'lite_api' => "$d/src/danog/MadelineProto/TON/lite_api.tl",
-        'ton_api' => "$d/src/danog/MadelineProto/TON/ton_api.tl",
-        //'tonlib_api' => "$d/src/danog/MadelineProto/TON/tonlib_api.tl",
+        'lite_api' => "$d/src/danog/MadelineProto/TON/schemes/lite_api.tl",
+        'ton_api' => "$d/src/danog/MadelineProto/TON/schemes/ton_api.tl",
+        //'tonlib_api' => "$d/src/danog/MadelineProto/TON/schemes/tonlib_api.tl",
     ]
 ];
 

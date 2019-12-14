@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TON API module.
+ * TON tools module.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,12 +19,25 @@
 
 namespace danog\MadelineProto\TON;
 
-/**
- * TON API.
- */
-class ADNL
+class Tools
 {
-    public function test()
+    /**
+     * Sanify TL obtained from JSON for TL serialization.
+     *
+     * @param array $input Data to sanitize
+
+     * @return array
+     */
+    public static function convertJsonTL(array $input): array
     {
+        $cb = static function (&$val) use (&$cb) {
+            if (isset($val['@type'])) {
+                $val['_'] = $val['@type'];
+            } elseif (\is_array($val)) {
+                \array_walk($val, $cb);
+            }
+        };
+        \array_walk($input, $cb);
+        return $input;
     }
 }

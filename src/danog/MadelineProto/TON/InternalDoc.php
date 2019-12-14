@@ -863,8 +863,26 @@ interface engine
 
 class InternalDoc extends APIFactory
 {
-    public function test(array $extra = [])
+    /**
+         * Connect to the lite endpoints specified in the config file.
+         *
+         * @param string $config Path to config file
+         *
+         * @return \Generator
+         */
+    public function connect(string $config, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->__call(__FUNCTION__, [$config, $extra]);
+    }
+    /**
+     * Asynchronously run async callable.
+     *
+     * @param callable $func Function
+     *
+     * @return \Generator
+     */
+    public function loop(callable $func, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$func, $extra]);
     }
 }

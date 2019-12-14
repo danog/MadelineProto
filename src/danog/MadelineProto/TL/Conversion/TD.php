@@ -86,7 +86,7 @@ trait TD
             return $params;
         }
         if (!isset($params['_'])) {
-            \array_walk($params, [$this, 'mtproto_to_td']);
+            \array_walk($params, [$this, 'mtprotoToTd']);
 
             return $params;
         }
