@@ -31,7 +31,7 @@
         "amphp/file": "^1",
         "amphp/byte-stream": "^1.6",
         "danog/dns-over-https": "^0.2",
-        "amphp/http-client-cookies": "dev-master",
+        "amphp/http-client-cookies": "dev-master#09d5740414fe5a76c9242d27caabc2f4990550d1",
         "amphp/uri": "dev-master"
     },
     "require-dev": {
