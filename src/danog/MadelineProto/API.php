@@ -105,15 +105,18 @@ class API extends InternalDoc
                     }
                     $changed = false;
                     if (\strpos($tounserialize, 'O:26:"danog\\MadelineProto\\Button":') !== false) {
+                        Logger::log("SUBBING BUTTONS!");
                         $tounserialize = \str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                         $changed = true;
                     }
                     if (\strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
+                        Logger::log("SUBBING BIGINTEGOR!");
                         $tounserialize = \str_replace('phpseclib\\Math\\BigInteger', 'phpseclib\\Math\\BigIntegor', $tounserialize);
                         $changed = true;
                     }
-                    if (\strpos($tounserialize, 'C:25:"phpseclib\\Math\\BigInteger') !== false) {
-                        $tounserialize = \str_replace('C:25:"phpseclib\\Math\\BigInteger', 'C:26:"phpseclib3\\Math\\BigInteger', $tounserialize);
+                    if (\strpos($tounserialize, 'C:25:"phpseclib\\Math\\BigInteger"') !== false) {
+                        Logger::log("SUBBING PHPSECLIB3!");
+                        $tounserialize = \str_replace('C:25:"phpseclib\\Math\\BigInteger"', 'C:26:"phpseclib3\\Math\\BigInteger"', $tounserialize);
                         $changed = true;
                     }
 
@@ -122,7 +125,11 @@ class API extends InternalDoc
                         throw $e;
                     }
 
-                    $unserialized = \danog\Serialization::unserialize($tounserialize);
+                    try {
+                        $unserialized = \danog\Serialization::unserialize($tounserialize);
+                    } catch (\Throwable $e) {
+                        $unserialized = unserialize($tounserialize);
+                    }
                 } catch (\Throwable $e) {
                     Logger::log((string) $e, Logger::ERROR);
                     throw $e;
