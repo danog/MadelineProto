@@ -26,6 +26,7 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
 use danog\MadelineProto\Stream\RawStreamInterface;
+use danog\MadelineProto\Tools;
 
 /**
  * TCP Intermediate stream wrapper.
@@ -34,7 +35,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBufferInterface
+class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     use BufferedStream;
     private $stream;
@@ -48,7 +49,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      */
     public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = yield $ctx->getStream(\str_repeat(\chr(221), 4).$header);
+        $this->stream = yield $ctx->getStream($header);
     }
 
     /**
@@ -70,9 +71,11 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      */
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
-        $padding_length = \danog\MadelineProto\Tools::randomInt($modulus = 16);
-        $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.\danog\MadelineProto\Tools::random($padding_length));
-        yield $buffer->bufferWrite(\pack('V', $padding_length + $length));
+        $buffer = yield $this->stream->getWriteBuffer($length + 68, $append);
+        yield $buffer->bufferWrite(\pack('V', $length));
+        $this->stream->startWriteHash();
+        $this->stream->checkWriteHash($length + 32);
+        yield $buffer->bufferWrite(Tools::random(32));
 
         return $buffer;
     }
@@ -87,7 +90,11 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     public function getReadBufferGenerator(&$length): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
-        $length = \unpack('V', yield $buffer->bufferRead(4))[1];
+        $this->stream->startReadHash();
+        $length = \unpack('V', yield $buffer->bufferRead(4))[1] - 32;
+        $this->stream->checkReadHash($length);
+        yield $buffer->bufferRead(32);
+        $length -= 32;
 
         return $buffer;
     }
@@ -110,6 +117,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     {
         return $this->stream;
     }
+
 
     public static function getName(): string
     {

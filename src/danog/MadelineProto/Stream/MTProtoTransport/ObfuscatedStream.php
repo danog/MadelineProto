@@ -18,12 +18,11 @@
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use Amp\Promise;
-use Amp\Socket\EncryptableSocket;
 use danog\MadelineProto\Stream\Async\Stream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\Common\CtrStream;
 use danog\MadelineProto\Stream\ConnectionContext;
+
 
 /**
  * Obfuscated2 stream wrapper.
@@ -92,7 +91,7 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
 
         $random = \substr_replace($random, \substr(@$this->getEncryptor()->encrypt($random), 56, 8), 56, 8);
 
-        yield $this->getPlainStream()->write($random);
+        yield $this->getStream()->write($random);
     }
 
 
@@ -116,7 +115,6 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
 
         $this->extra = $extra;
     }
-
     public static function getName(): string
     {
         return __CLASS__;

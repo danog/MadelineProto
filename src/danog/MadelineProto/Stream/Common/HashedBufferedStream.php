@@ -20,10 +20,11 @@ namespace danog\MadelineProto\Stream\Common;
 
 use Amp\Promise;
 use danog\MadelineProto\Stream\Async\BufferedStream;
-use danog\MadelineProto\Stream\Async\Stream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
+
+use danog\MadelineProto\Stream\RawStreamInterface;
 
 /**
  * Hash stream wrapper.
@@ -203,7 +204,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return \Generator
      */
-    public function connectGenerator(ConnectionContext $ctx): \Generator
+    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $this->write_hash = null;
         $this->write_check_after = 0;
@@ -212,7 +213,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         $this->read_check_after = 0;
         $this->read_check_pos = 0;
 
-        $this->stream = yield $ctx->getStream();
+        $this->stream = yield $ctx->getStream($header);
     }
 
     /**
@@ -321,6 +322,15 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         return $this->stream->getSocket();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return RawStreamInterface
+     */
+    public function getStream(): RawStreamInterface
+    {
+        return $this->stream;
+    }
     public static function getName(): string
     {
         return __CLASS__;

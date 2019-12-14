@@ -26,7 +26,7 @@ use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use danog\MadelineProto\Stream\StreamInterface;
+
 use phpseclib3\Crypt\AES;
 
 /**
@@ -155,7 +155,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     }
 
     /**
-     * Set obfuscation keys/IVs
+     * Set obfuscation keys/IVs.
      *
      * @param array $data Keys
      *
@@ -176,7 +176,12 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
         return $this->stream->getSocket();
     }
 
-    public function getPlainStream(): RawStreamInterface 
+    /**
+     * {@inheritDoc}
+     *
+     * @return RawStreamInterface
+     */
+    public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }

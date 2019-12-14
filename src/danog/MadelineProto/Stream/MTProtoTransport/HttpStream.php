@@ -25,6 +25,7 @@ use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
+use danog\MadelineProto\Stream\RawStreamInterface;
 
 /**
  * HTTP stream wrapper.
@@ -189,6 +190,15 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     public function getSocket(): EncryptableSocket
     {
         return $this->stream->getSocket();
+    }
+    /**
+     * {@inheritDoc}
+     *
+     * @return RawStreamInterface
+     */
+    public function getStream(): RawStreamInterface
+    {
+        return $this->stream;
     }
 
     public static function getName(): string

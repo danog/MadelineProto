@@ -26,6 +26,8 @@ use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
 
+use danog\MadelineProto\Stream\RawStreamInterface;
+
 /**
  * HTTP proxy stream wrapper.
  *
@@ -216,6 +218,15 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         return $this->stream->getSocket();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return RawStreamInterface
+     */
+    public function getStream(): RawStreamInterface
+    {
+        return $this->stream;
+    }
     public static function getName(): string
     {
         return __CLASS__;

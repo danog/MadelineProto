@@ -26,6 +26,8 @@ use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
 
+use danog\MadelineProto\Stream\RawStreamInterface;
+
 /**
  * Socks5 stream wrapper.
  *
@@ -218,6 +220,15 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     public function setExtra($extra)
     {
         $this->extra = $extra;
+    }
+    /**
+     * {@inheritDoc}
+     *
+     * @return RawStreamInterface
+     */
+    public function getStream(): RawStreamInterface
+    {
+        return $this->stream;
     }
 
     /**

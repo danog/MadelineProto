@@ -27,7 +27,6 @@ use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use function Amp\Socket\connect;
 
 /**
  * Buffered raw stream.
@@ -235,6 +234,15 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     public function getSocket(): \Amp\Socket\Socket
     {
         return $this->stream->getSocket();
+    }
+    /**
+     * {@inheritDoc}
+     *
+     * @return RawStreamInterface
+     */
+    public function getStream(): RawStreamInterface
+    {
+        return $this->stream;
     }
 
     /**

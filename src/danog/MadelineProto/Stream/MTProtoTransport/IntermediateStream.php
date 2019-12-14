@@ -25,6 +25,8 @@ use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
+use danog\MadelineProto\Stream\RawStreamInterface;
+
 /**
  * TCP Intermediate stream wrapper.
  *
@@ -97,6 +99,15 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     public function getSocket(): EncryptableSocket
     {
         return $this->stream->getSocket();
+    }
+    /**
+     * {@inheritDoc}
+     *
+     * @return RawStreamInterface
+     */
+    public function getStream(): RawStreamInterface
+    {
+        return $this->stream;
     }
 
 

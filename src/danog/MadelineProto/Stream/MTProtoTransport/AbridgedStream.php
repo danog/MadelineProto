@@ -24,6 +24,7 @@ use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
+use danog\MadelineProto\Stream\RawStreamInterface;
 
 /**
  * Abridged stream wrapper.
@@ -108,6 +109,15 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
         return $this->stream->getSocket();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return RawStreamInterface
+     */
+    public function getStream(): RawStreamInterface
+    {
+        return $this->stream;
+    }
     public static function getName(): string
     {
         return __CLASS__;

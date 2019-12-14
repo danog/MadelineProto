@@ -128,7 +128,7 @@ class API extends InternalDoc
                     try {
                         $unserialized = \danog\Serialization::unserialize($tounserialize);
                     } catch (\Throwable $e) {
-                        $unserialized = unserialize($tounserialize);
+                        $unserialized = \unserialize($tounserialize);
                     }
                 } catch (\Throwable $e) {
                     Logger::log((string) $e, Logger::ERROR);

@@ -58,6 +58,15 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
 
         return \fread($this->memory_stream, $length);
     }
+    /**
+     * {@inheritDoc}
+     *
+     * @return RawStreamInterface
+     */
+    public function getStream(): RawStreamInterface
+    {
+        return $this->stream;
+    }
 
     /**
      * Get class name.

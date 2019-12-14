@@ -21,6 +21,8 @@ namespace danog\MadelineProto\Stream\MTProtoTransport;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 
+use danog\MadelineProto\Stream\RawStreamInterface;
+
 /**
  * HTTPS stream wrapper.
  *
@@ -40,6 +42,15 @@ class HttpsStream extends HttpStream implements MTProtoBufferInterface
         return parent::connectGenerator($ctx->getCtx()->secure(true), $header);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return RawStreamInterface
+     */
+    public function getStream(): RawStreamInterface
+    {
+        return $this->stream;
+    }
     public static function getName(): string
     {
         return __CLASS__;

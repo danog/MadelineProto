@@ -25,6 +25,7 @@ use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\Common\HashedBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
+use danog\MadelineProto\Stream\RawStreamInterface;
 
 /**
  * TCP full stream wrapper.
@@ -118,6 +119,15 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
         return $this->stream->getSocket();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return RawStreamInterface
+     */
+    public function getStream(): RawStreamInterface
+    {
+        return $this->stream;
+    }
     public static function getName(): string
     {
         return __CLASS__;

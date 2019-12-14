@@ -53,4 +53,10 @@ interface BufferedStreamInterface extends StreamInterface
      * @return string
      */
     public static function getName(): string;
+    /**
+     * Get underlying stream resource.
+     *
+     * @return RawStreamInterface
+     */
+    public function getStream(): RawStreamInterface;
 }
