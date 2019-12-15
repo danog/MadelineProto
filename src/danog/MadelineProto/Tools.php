@@ -42,6 +42,26 @@ use function Amp\Promise\wait;
  */
 trait Tools
 {
+
+    /**
+     * Sanify TL obtained from JSON for TL serialization.
+     *
+     * @param array $input Data to sanitize
+
+     * @return array
+     */
+    public static function convertJsonTL(array $input): array
+    {
+        $cb = static function (&$val) use (&$cb) {
+            if (isset($val['@type'])) {
+                $val['_'] = $val['@type'];
+            } elseif (\is_array($val)) {
+                \array_walk($val, $cb);
+            }
+        };
+        \array_walk($input, $cb);
+        return $input;
+    }
     /**
      * Generate MTProto vector hash.
      *

@@ -21,6 +21,7 @@ namespace danog\MadelineProto\TON;
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\TL\TL;
+use danog\MadelineProto\Tools;
 
 use function Amp\File\get;
 
@@ -54,6 +55,12 @@ class Lite
      */
     public $logger;
     /**
+     * Liteserver connections.
+     *
+     * @var ADNLConnection[]
+     */
+    private $connections = [];
+    /**
      * Construct settings.
      *
      * @param array $settings
@@ -83,7 +90,7 @@ class Lite
         $config['_'] = 'liteclient.config.global';
         $config = Tools::convertJsonTL($config);
         $config['validator']['init_block'] = $config['validator']['init_block'] ?? $config['validator']['zero_state'];
-        
+
         $this->config = yield $this->TL->deserialize(
             yield $this->TL->serializeObject(
                 ['type' => ''],
@@ -91,7 +98,17 @@ class Lite
                 'cleanup'
             )
         );
-        var_dump($this->config);
+
+        foreach ($this->config['liteservers'] as $lite) {
+            $this->connections[] = $connection = new ADNLConnection($this->TL);
+            yield $connection->connect($lite);
+            yield $connection->send(
+                [
+                    '_' => 'liteServer.getTime'
+                ]
+            );
+        }
+        yield Tools::sleep(10);
     }
 
     /**

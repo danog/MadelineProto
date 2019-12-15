@@ -27,7 +27,7 @@ use danog\MadelineProto\Magic;
 class API extends InternalDoc
 {
     /**
-     * Construct API
+     * Construct API.
      *
      * @param array $settings Settings
      */
@@ -37,7 +37,7 @@ class API extends InternalDoc
 
         $this->API = new Lite($settings);
         foreach (\get_class_methods($this->API) as $method) {
-            $this->methods[$method] = [$this->API, strtolower($method)];
+            $this->methods[$method] = [$this->API, \strtolower($method)];
         }
     }
 }

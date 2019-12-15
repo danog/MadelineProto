@@ -21,7 +21,7 @@ namespace danog\MadelineProto\MTProtoTools;
 
 trait Crypt
 {
-    public function aesCalculate($msg_key, $auth_key, $to_server = true)
+    public static function aesCalculate($msg_key, $auth_key, $to_server = true)
     {
         $x = $to_server ? 0 : 8;
         $sha256_a = \hash('sha256', $msg_key.\substr($auth_key, $x, 36), true);
@@ -32,7 +32,7 @@ trait Crypt
         return [$aes_key, $aes_iv];
     }
 
-    public function oldAesCalculate($msg_key, $auth_key, $to_server = true)
+    public static function oldAesCalculate($msg_key, $auth_key, $to_server = true)
     {
         $x = $to_server ? 0 : 8;
         $sha1_a = \sha1($msg_key.\substr($auth_key, $x, 32), true);
@@ -45,7 +45,7 @@ trait Crypt
         return [$aes_key, $aes_iv];
     }
 
-    public function ctrEncrypt($message, $key, $iv)
+    public static function ctrEncrypt($message, $key, $iv)
     {
         $cipher = new \phpseclib3\Crypt\AES('ctr');
         $cipher->setKey($key);
@@ -54,7 +54,7 @@ trait Crypt
         return @$cipher->encrypt($message);
     }
 
-    public function igeEncrypt($message, $key, $iv)
+    public static function igeEncrypt($message, $key, $iv)
     {
         $cipher = new \phpseclib3\Crypt\AES('ige');
         $cipher->setKey($key);
@@ -62,7 +62,7 @@ trait Crypt
 
         return @$cipher->encrypt($message);
     }
-    public function igeDecrypt($message, $key, $iv)
+    public static function igeDecrypt($message, $key, $iv)
     {
         $cipher = new \phpseclib3\Crypt\AES('ige');
         $cipher->setKey($key);

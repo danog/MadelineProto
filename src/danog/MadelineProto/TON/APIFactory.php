@@ -79,11 +79,11 @@ class APIFactory extends AbstractAPIFactory
     public $liteServer;
 
     /**
-     * Just proxy async requests to API
+     * Just proxy async requests to API.
      *
      * @param string $name     Method name
      * @param array $arguments Arguments
-     * 
+     *
      * @return mixed
      */
     public function __call_async($name, $arguments)

@@ -262,11 +262,6 @@ class TL
                             $TL_dict[$type][$key]['params'][] = ['name' => $explode[0], 'type' => $explode[1]];
                         }
                     }
-                    /*
-                    if (!$TL_dict[$type][$key][$type === 'constructors' ? 'predicate' : 'method']) {
-                        var_dump($line);
-                        \var_dump($TL_dict[$type][$key]);
-                    }*/
 
                     $key++;
                 }
@@ -584,17 +579,14 @@ class TL
         if ($bare = $type['type'] != '' && $type['type'][0] === '%') {
             $type['type'] = \substr($type['type'], 1);
         }
-        if ($predicate === $type['type'] && !$auto) {
+        if ($predicate === $type['type']) {//} && !$auto) {
             $bare = true;
         }
         if ($predicate === 'messageEntityMentionName') {
             $constructorData = $this->constructors->findByPredicate('inputMessageEntityMentionName');
         }
 
-        $concat = '';
-        if (!$bare) {
-            $concat = $constructorData['id'];
-        }
+        $concat = $bare ? '' : $constructorData['id'];
 
         return $concat.yield $this->serializeParams($constructorData, $object, '', $layer);
     }
@@ -876,8 +868,6 @@ class TL
      */
     public function deserialize($stream, $type = ['type' => ''])
     {
-        //var_dump($type);
-
         if (\is_string($stream)) {
             $res = \fopen('php://memory', 'rw+b');
             \fwrite($res, $stream);
