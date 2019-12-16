@@ -24,6 +24,7 @@ use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Stream\ADNLTransport\ADNLStream;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
+use danog\MadelineProto\Stream\Common\CtrStream;
 use danog\MadelineProto\Stream\Common\HashedBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
@@ -77,6 +78,7 @@ class ADNLConnection
         }
 
         $random = Tools::random(256 - 32 - 64);
+        //$random = strrev(hex2bin(strrev('9E7C27765D12CE634414F0875D55CE5C58E7A9D58CD45C57CAB516D1241B7864691E5B0AFC4ECB54BFF2CEFC2060F1D45F5B5DEB76A9EF6471D75816AAAEC83CD7DE39EE99B9E980B6C0D4565A916D00908613E63657D5539118F89A14FD73ABB8ECD3AC26C287EEBD0FA44F52B315F01DD60F486EFF4C5B4D71EA6F443358FF141E7294BBBB5D7C079F16BD46C28A12507E1948722E7121B94C3B5C7832ADE7')));
         $s1 = \substr($random, 0, 32);
         $s2 = \substr($random, 32, 32);
         $v1 = \substr($random, 64, 16);
@@ -120,8 +122,6 @@ class ADNLConnection
         // Generate secret
         $secret = DH::computeSecret($private, $peerPublic);
 
-        var_dumP($private, $peerPublic, bin2hex($secret));
-
         // Encrypting random with obf keys
         $digest = \hash('sha256', $random, true);
 
@@ -136,8 +136,6 @@ class ADNLConnection
         $payload .= $digest;
         $payload .= $encryptedRandom;
 
-        \var_dump(bin2hex($payload));
-
         $ip = \long2ip(\unpack('V', Tools::packSignedInt($endpoint['ip']))[1]);
         $port = $endpoint['port'];
         $ctx = (new ConnectionContext())
@@ -145,19 +143,20 @@ class ADNLConnection
             ->setUri("tcp://$ip:$port")
             ->addStream(DefaultStream::getName())
             ->addStream(BufferedRawStream::getName())
-            ->addStream(ObfuscatedStream::getName(), $obf)
+            ->addStream(CtrStream::getName(), $obf)
             ->addStream(HashedBufferedStream::getName(), 'sha256')
             ->addStream(ADNLStream::getName());
 
         $this->stream = yield $ctx->getStream($payload);
-        \var_dump("Connected");
 
         Tools::callFork((function () {
-            yield Tools::sleep(2);
+            //yield Tools::sleep(1);
             while (true) {
                 $buffer = yield $this->stream->getReadBuffer($length);
                 \var_dump($length, "GOT PACKET WITH LENGTH $length");
-                \var_dump($length, yield $buffer->bufferRead($length));
+                if ($length) {
+                    \var_dump($length, yield $buffer->bufferRead($length));
+                }
             }
         })());
     }
@@ -171,7 +170,18 @@ class ADNLConnection
      */
     public function send(array $payload): \Generator
     {
+        var_dumP("Sending moar");
         $data = yield $this->TL->serializeMethod($payload['_'], $payload);
+        $data = yield $this->TL->serializeObject(
+            ['type' => ''], 
+            [
+                '_' => 'adnl.message.query',
+                'query_id' => Tools::random(32),
+                'query' => $data
+            ],
+            ''
+        );
+        var_dump(unpack('V*', $data));
         (yield $this->stream->getWriteBuffer(\strlen($data)))->bufferWrite($data);
     }
 }

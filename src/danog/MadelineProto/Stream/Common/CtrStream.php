@@ -108,7 +108,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      */
     public function getReadBufferGenerator(&$length): \Generator
     {
-        $this->read_buffer = yield $this->stream->getReadBuffer($l);
+        $this->read_buffer = yield $this->stream->getReadBuffer($length);
 
         return $this;
     }

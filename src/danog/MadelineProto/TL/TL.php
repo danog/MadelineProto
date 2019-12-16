@@ -223,9 +223,16 @@ class TL
 
                     $name = \preg_replace(['/#.*/', '/\\s.*/'], '', $line);
                     if (\in_array($name, ['bytes', 'int128', 'int256', 'int512', 'int', 'long', 'double', 'string', 'bytes', 'object', 'function'])) {
+                        /*if (!(\in_array($scheme_type, ['ton_api', 'lite_api']) && $name === 'bytes')) {
+                            continue;
+                        }*/
                         continue;
                     }
-                    $clean = \preg_replace(['/:bytes /', '/;/', '/#[a-f0-9]+ /', '/ [a-zA-Z0-9_]+\\:flags\\.[0-9]+\\?true/', '/[<]/', '/[>]/', '/  /', '/^ /', '/ $/', '/\\?bytes /', '/{/', '/}/'], [':string ', '', ' ', '', ' ', ' ', ' ', '', '', '?string ', '', ''], $line);
+                    if (\in_array($scheme_type, ['ton_api', 'lite_api'])) {
+                        $clean = \preg_replace(['/;/', '/#[a-f0-9]+ /', '/ [a-zA-Z0-9_]+\\:flags\\.[0-9]+\\?true/', '/[<]/', '/[>]/', '/  /', '/^ /', '/ $/', '/{/', '/}/'], ['', ' ', '', ' ', ' ', ' ', '', '', '', ''], $line);
+                    } else {
+                        $clean = \preg_replace(['/:bytes /', '/;/', '/#[a-f0-9]+ /', '/ [a-zA-Z0-9_]+\\:flags\\.[0-9]+\\?true/', '/[<]/', '/[>]/', '/  /', '/^ /', '/ $/', '/\\?bytes /', '/{/', '/}/'], [':string ', '', ' ', '', ' ', ' ', ' ', '', '', '?string ', '', ''], $line);
+                    }
 
                     $id = \hash('crc32b', $clean);
                     if (\preg_match('/^[^\s]+#([a-f0-9]*)/i', $line, $matches)) {
@@ -241,7 +248,7 @@ class TL
                         $dparams = [];
                     }
                     $TL_dict[$type][$key][$type === 'constructors' ? 'predicate' : 'method'] = $name;
-                    $TL_dict[$type][$key]['id'] = \strrev(\hex2bin($id));
+                    $TL_dict[$type][$key]['id'] = $a = \strrev(\hex2bin($id));
                     $TL_dict[$type][$key]['params'] = [];
                     $TL_dict[$type][$key]['type'] = \preg_replace(['/.+\\s+=\\s+/', '/;/'], '', $line);
                     if ($layer !== null) {

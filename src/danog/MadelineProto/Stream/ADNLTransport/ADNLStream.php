@@ -71,10 +71,11 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
      */
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
-        $buffer = yield $this->stream->getWriteBuffer($length + 68, $append);
+        $length += 64;
+        $buffer = yield $this->stream->getWriteBuffer($length + 4, $append);
         yield $buffer->bufferWrite(\pack('V', $length));
         $this->stream->startWriteHash();
-        $this->stream->checkWriteHash($length + 32);
+        $this->stream->checkWriteHash($length - 32);
         yield $buffer->bufferWrite(Tools::random(32));
 
         return $buffer;
@@ -90,8 +91,8 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
     public function getReadBufferGenerator(&$length): \Generator
     {
         $buffer = yield $this->stream->getReadBuffer($l);
-        $this->stream->startReadHash();
         $length = \unpack('V', yield $buffer->bufferRead(4))[1] - 32;
+        $this->stream->startReadHash();
         $this->stream->checkReadHash($length);
         yield $buffer->bufferRead(32);
         $length -= 32;
