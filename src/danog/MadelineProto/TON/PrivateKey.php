@@ -1,7 +1,6 @@
 <?php
-
 /**
- * BigInteger placeholder for deserialization.
+ * TON public key module.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -17,22 +16,26 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace phpseclib\Math;
+namespace danog\MadelineProto\TON;
 
-if (PHP_MAJOR_VERSION < 7 && !(\class_exists(\Phar::class) && \Phar::running())) {
-    throw new \Exception('MadelineProto requires php 7 to run natively, use phar.madelineproto.xyz to run on PHP 5.6');
-}
-if (\defined('HHVM_VERSION')) {
-    $engines = [['PHP64', ['OpenSSL']], ['BCMath', ['OpenSSL']], ['PHP32', ['OpenSSL']]];
-    foreach ($engines as $engine) {
-        try {
-            \phpseclib3\Math\BigInteger::setEngine($engine[0], isset($engine[1]) ? $engine[1] : []);
-            break;
-        } catch (\Exception $e) {
-        }
-    }
-}
+use phpseclib3\Crypt\EC\Curves\Curve25519;
+use phpseclib3\Crypt\EC\PrivateKey as ECPrivateKey;
 
-class BigIntegor
+class PrivateKey extends ECPrivateKey
 {
+    public static function load($key, $password = false)
+    {
+        self::initialize_static_variables();
+
+        $components = false;
+
+        $curve = new Curve25519;
+        $peerPublic = Common::extractPoint($key, $curve);
+        
+        $components['format'] = 'TON';
+        $components['curve'] = $curve;
+
+        $new = static::onLoad($components);
+        return $new;
+    }
 }
