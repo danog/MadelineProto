@@ -29,7 +29,11 @@ class Button implements \JsonSerializable, \ArrayAccess
     public function __magic_construct($API, $message, $button)
     {
         $this->data = $button;
+		if(isset($API->authorization)&&isset($API->authorization['user'])&&isset($API->authorization['user']['id']))
         $this->info['peer'] = $message['to_id'] === ['_' => 'peerUser', 'user_id' => $API->authorization['user']['id']] ? $message['from_id'] : $message['to_id'];
+		else {
+			$this->info['peer'] = $message['to_id'];
+		}
         $this->info['id'] = $message['id'];
         $this->info['API'] = $API;
     }
