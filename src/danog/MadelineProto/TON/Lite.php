@@ -102,13 +102,13 @@ class Lite
         foreach ($this->config['liteservers'] as $lite) {
             $this->connections[] = $connection = new ADNLConnection($this->TL);
             yield $connection->connect($lite);
-            yield $connection->send(
-                [
-                    '_' => 'liteServer.getTime'
-                ]
-            );
         }
-        yield Tools::sleep(10);
+    }
+
+    public function methodCall(string $methodName, array $args = [], array $aargs = []) {
+        $data = yield $this->TL->serializeMethod($methodName, $args);
+        $data = yield $this->TL->serializeMethod('liteServer.query', ['data' => $data]);
+        return yield $this->connections[rand(0, count($this->connections) - 1)]->query($data);
     }
 
     /**
@@ -133,5 +133,15 @@ class Lite
     public function botAPItoMTProto(array $parameters)
     {
         return $parameters;
+    }
+    
+    /**
+     * Get TL method namespaces
+     *
+     * @return void
+     */
+    public function getMethodNamespaces()
+    {
+        return $this->TL->getMethodNamespaces();
     }
 }

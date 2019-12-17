@@ -39,5 +39,8 @@ class API extends InternalDoc
         foreach (\get_class_methods($this->API) as $method) {
             $this->methods[$method] = [$this->API, \strtolower($method)];
         }
+        foreach ($this->API->getMethodNamespaces() as $namespace) {
+            $this->{$namespace} = new APIFactory($namespace, $this->API, $this->async);
+        }
     }
 }

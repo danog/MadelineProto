@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\TON;
 
+use Amp\Deferred;
 use Amp\Socket\ConnectContext;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
@@ -27,10 +28,10 @@ use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\CtrStream;
 use danog\MadelineProto\Stream\Common\HashedBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
-use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
+use Exception;
 use phpseclib3\Crypt\DH;
 use phpseclib3\Crypt\EC;
 use phpseclib3\Crypt\EC\Curves\Curve25519;
@@ -52,6 +53,12 @@ class ADNLConnection
      * @var StreamInterface
      */
     private $stream;
+    /**
+     * Request list.
+     *
+     * @var array
+     */
+    private $requests = [];
     /**
      * Construct class.
      *
@@ -98,25 +105,25 @@ class ADNLConnection
         $private = EC::createKey('Ed25519');
 
         $public = $private->getPublicKey();
-        $public = strrev(Tools::getVar($public, 'QA')[1]->toBytes());
+        $public = \strrev(Tools::getVar($public, 'QA')[1]->toBytes());
 
-        $private = strrev(Tools::getVar($private, 'dA')->toBytes());
+        $private = \strrev(Tools::getVar($private, 'dA')->toBytes());
         $private = PrivateKey::loadFormat('MontgomeryPrivate', $private);
 
         // Transpose their public
         $key = $endpoint['id']['key'];
-        $key[31] = $key[31] & chr(127);
+        $key[31] = $key[31] & \chr(127);
 
         $curve = new Curve25519;
         $modulo = Tools::getVar($curve, "modulo");
-        $y = new BigInteger(strrev($key), 256);
+        $y = new BigInteger(\strrev($key), 256);
         $y2 = clone $y;
         $y = $y->add(Magic::$one);
         $y2 = $y2->subtract(Magic::$one);
         $y2 = $modulo->subtract($y2)->powMod(Magic::$one, $modulo);
         $y2 = $y2->modInverse($modulo);
 
-        $key = strrev($y->multiply($y2)->powMod(Magic::$one, $modulo)->toBytes());
+        $key = \strrev($y->multiply($y2)->powMod(Magic::$one, $modulo)->toBytes());
         $peerPublic = PublicKey::loadFormat('MontgomeryPublic', $key);
 
         // Generate secret
@@ -153,35 +160,37 @@ class ADNLConnection
             //yield Tools::sleep(1);
             while (true) {
                 $buffer = yield $this->stream->getReadBuffer($length);
-                \var_dump($length, "GOT PACKET WITH LENGTH $length");
                 if ($length) {
-                    \var_dump($length, yield $buffer->bufferRead($length));
+                    $data = yield $buffer->bufferRead($length);
+                    $data = yield $this->TL->deserialize($data);
+                    if ($data['_'] !== 'adnl.message.answer') {
+                        throw new Exception('Wrong answer type: '.$data['_']);
+                    }
+                    $this->requests[$data['query_id']]->resolve(yield $this->TL->deserialize((string) $data['answer']));
                 }
             }
         })());
     }
 
     /**
-     * Send TL payload.
+     * Send ADNL query.
      *
-     * @param array $payload Payload to send
+     * @param string $payload Payload to send
      *
      * @return \Generator
      */
-    public function send(array $payload): \Generator
+    public function query(string $payload): \Generator
     {
-        var_dumP("Sending moar");
-        $data = yield $this->TL->serializeMethod($payload['_'], $payload);
         $data = yield $this->TL->serializeObject(
-            ['type' => ''], 
+            ['type' => ''],
             [
                 '_' => 'adnl.message.query',
-                'query_id' => Tools::random(32),
-                'query' => $data
+                'query_id' => $id = Tools::random(32),
+                'query' => $payload
             ],
             ''
         );
-        var_dump(unpack('V*', $data));
         (yield $this->stream->getWriteBuffer(\strlen($data)))->bufferWrite($data);
+        return ($this->requests[$id] = new Deferred)->promise();
     }
 }

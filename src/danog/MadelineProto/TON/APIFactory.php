@@ -95,7 +95,7 @@ class APIFactory extends AbstractAPIFactory
             $aargs['apifactory'] = true;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
 
-            return $this->API->methodCallAsyncRead($name, $args, $aargs);
+            return $this->API->methodCall($name, $args, $aargs);
         }
         return $this->methods[$lower_name](...$arguments);
     }

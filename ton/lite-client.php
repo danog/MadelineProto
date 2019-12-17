@@ -17,5 +17,6 @@ $API->async(true);
 $API->loop(
     function () use ($API) {
         yield $API->connect(__DIR__.'/ton-lite-client-test1.config.json');
+        var_dump(yield $API->liteServer->getTime());
     }
 );
