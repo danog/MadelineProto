@@ -34,11 +34,11 @@ trait ResponseHandler
         foreach ($msg_ids as $msg_id) {
             $cur_info = 0;
             if (!isset($this->incoming_messages[$msg_id])) {
-                $msg_id = new \phpseclib3\Math\BigInteger(\strrev($msg_id), 256);
-                if ((new \phpseclib3\Math\BigInteger(\time() + $this->time_delta + 30))->bitwise_leftShift(32)->compare($msg_id) < 0) {
+                $msg_id = new \tgseclib\Math\BigInteger(\strrev($msg_id), 256);
+                if ((new \tgseclib\Math\BigInteger(\time() + $this->time_delta + 30))->bitwise_leftShift(32)->compare($msg_id) < 0) {
                     $this->logger->logger("Do not know anything about $msg_id and it is too small");
                     $cur_info |= 3;
-                } elseif ((new \phpseclib3\Math\BigInteger(\time() + $this->time_delta - 300))->bitwise_leftShift(32)->compare($msg_id) > 0) {
+                } elseif ((new \tgseclib\Math\BigInteger(\time() + $this->time_delta - 300))->bitwise_leftShift(32)->compare($msg_id) > 0) {
                     $this->logger->logger("Do not know anything about $msg_id and it is too big");
                     $cur_info |= 1;
                 } else {
@@ -185,7 +185,7 @@ trait ResponseHandler
 
                     foreach ($this->incoming_messages[$current_msg_id]['content']['msg_ids'] as $key => $msg_id) {
                         $info = \ord($this->incoming_messages[$current_msg_id]['content']['info'][$key]);
-                        $msg_id = new \phpseclib3\Math\BigInteger(\strrev($msg_id), 256);
+                        $msg_id = new \tgseclib\Math\BigInteger(\strrev($msg_id), 256);
                         $status = 'Status for message id '.$msg_id.': ';
                         /*if ($info & 4) {
                          *$this->gotResponseForOutgoingMessageId($msg_id);
@@ -551,7 +551,7 @@ trait ResponseHandler
                             return;
                         case 16:
                         case 17:
-                            $this->time_delta = (int) (new \phpseclib3\Math\BigInteger(\strrev($response_id), 256))->bitwise_rightShift(32)->subtract(new \phpseclib3\Math\BigInteger(\time()))->toString();
+                            $this->time_delta = (int) (new \tgseclib\Math\BigInteger(\strrev($response_id), 256))->bitwise_rightShift(32)->subtract(new \tgseclib\Math\BigInteger(\time()))->toString();
                             $this->logger->logger('Set time delta to '.$this->time_delta, \danog\MadelineProto\Logger::WARNING);
                             $this->API->resetMTProtoSession();
                             $this->shared->setTempAuthKey(null);

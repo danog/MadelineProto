@@ -27,7 +27,7 @@ use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
 
-use phpseclib3\Crypt\AES;
+use tgseclib\Crypt\AES;
 
 /**
  * AES CTR stream wrapper.
@@ -58,12 +58,12 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      */
     public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->encrypt = new \phpseclib3\Crypt\AES('ctr');
+        $this->encrypt = new \tgseclib\Crypt\AES('ctr');
         $this->encrypt->enableContinuousBuffer();
         $this->encrypt->setKey($this->extra['encrypt']['key']);
         $this->encrypt->setIV($this->extra['encrypt']['iv']);
 
-        $this->decrypt = new \phpseclib3\Crypt\AES('ctr');
+        $this->decrypt = new \tgseclib\Crypt\AES('ctr');
         $this->decrypt->enableContinuousBuffer();
         $this->decrypt->setKey($this->extra['decrypt']['key']);
         $this->decrypt->setIV($this->extra['decrypt']['iv']);

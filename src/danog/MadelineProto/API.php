@@ -115,8 +115,13 @@ class API extends InternalDoc
                         $changed = true;
                     }
                     if (\strpos($tounserialize, 'C:25:"phpseclib\\Math\\BigInteger"') !== false) {
-                        Logger::log("SUBBING PHPSECLIB3!");
-                        $tounserialize = \str_replace('C:25:"phpseclib\\Math\\BigInteger"', 'C:26:"phpseclib3\\Math\\BigInteger"', $tounserialize);
+                        Logger::log("SUBBING TGSECLIB old!");
+                        $tounserialize = \str_replace('C:25:"phpseclib\\Math\\BigInteger"', 'C:24:"tgseclib\\Math\\BigInteger"', $tounserialize);
+                        $changed = true;
+                    }
+                    if (\strpos($tounserialize, 'C:26:"phpseclib3\\Math\\BigInteger"') !== false) {
+                        Logger::log("SUBBING TGSECLIB!");
+                        $tounserialize = \str_replace('C:26:"phpseclib3\\Math\\BigInteger"', 'C:24:"tgseclib\\Math\\BigInteger"', $tounserialize);
                         $changed = true;
                     }
 

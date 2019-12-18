@@ -13,7 +13,7 @@
         "php": ">=7.4.0",
         "danog/primemodule": "^1",
         "danog/magicalserializer": "^1.0",
-        "phpseclib/phpseclib": "dev-master#f715b2928976aaef389839a056c947aa8023277b as 2.0.15",
+        "danog/tgseclib": "^3",
         "erusev/parsedown": "^1.7",
         "ext-mbstring": "*",
         "ext-json": "*",
@@ -62,10 +62,6 @@
         ]
     },
     "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/danog/phpseclib"
-        },
         {
             "type": "git",
             "url": "https://github.com/danog/dns"

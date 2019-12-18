@@ -26,7 +26,7 @@ if (\defined('HHVM_VERSION')) {
     $engines = [['PHP64', ['OpenSSL']], ['BCMath', ['OpenSSL']], ['PHP32', ['OpenSSL']]];
     foreach ($engines as $engine) {
         try {
-            \phpseclib3\Math\BigInteger::setEngine($engine[0], isset($engine[1]) ? $engine[1] : []);
+            \tgseclib\Math\BigInteger::setEngine($engine[0], isset($engine[1]) ? $engine[1] : []);
             break;
         } catch (\Exception $e) {
         }

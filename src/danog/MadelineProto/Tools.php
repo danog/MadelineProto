@@ -24,7 +24,7 @@ use Amp\File\StatCache;
 use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
-use phpseclib3\Math\BigInteger;
+use tgseclib\Math\BigInteger;
 
 use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;
@@ -73,9 +73,9 @@ trait Tools
     {
         //sort($ints, SORT_NUMERIC);
         if (\danog\MadelineProto\Magic::$bigint) {
-            $hash = new \phpseclib3\Math\BigInteger(0);
+            $hash = new \tgseclib\Math\BigInteger(0);
             foreach ($ints as $int) {
-                $hash = $hash->multiply(\danog\MadelineProto\Magic::$twozerotwosixone)->add(\danog\MadelineProto\Magic::$zeroeight)->add(new \phpseclib3\Math\BigInteger($int))->divide(\danog\MadelineProto\Magic::$zeroeight)[1];
+                $hash = $hash->multiply(\danog\MadelineProto\Magic::$twozerotwosixone)->add(\danog\MadelineProto\Magic::$zeroeight)->add(new \tgseclib\Math\BigInteger($int))->divide(\danog\MadelineProto\Magic::$zeroeight)[1];
             }
             $hash = self::unpackSignedInt(\strrev(\str_pad($hash->toBytes(), 4, "\0", STR_PAD_LEFT)));
         } else {
@@ -132,7 +132,7 @@ trait Tools
      */
     public static function random(int $length): string
     {
-        return $length === 0 ? '' : \phpseclib3\Crypt\Random::string($length);
+        return $length === 0 ? '' : \tgseclib\Crypt\Random::string($length);
     }
 
     /**

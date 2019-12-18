@@ -47,7 +47,7 @@ trait Crypt
 
     public static function ctrEncrypt($message, $key, $iv)
     {
-        $cipher = new \phpseclib3\Crypt\AES('ctr');
+        $cipher = new \tgseclib\Crypt\AES('ctr');
         $cipher->setKey($key);
         $cipher->setIV($iv);
 
@@ -56,7 +56,7 @@ trait Crypt
 
     public static function igeEncrypt($message, $key, $iv)
     {
-        $cipher = new \phpseclib3\Crypt\AES('ige');
+        $cipher = new \tgseclib\Crypt\AES('ige');
         $cipher->setKey($key);
         $cipher->setIV($iv);
 
@@ -64,7 +64,7 @@ trait Crypt
     }
     public static function igeDecrypt($message, $key, $iv)
     {
-        $cipher = new \phpseclib3\Crypt\AES('ige');
+        $cipher = new \tgseclib\Crypt\AES('ige');
         $cipher->setKey($key);
         $cipher->setIV($iv);
 

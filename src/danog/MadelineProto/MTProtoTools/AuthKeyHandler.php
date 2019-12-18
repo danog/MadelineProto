@@ -24,7 +24,7 @@ use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\MTProto\AuthKey;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
-use phpseclib3\Math\BigInteger;
+use tgseclib\Math\BigInteger;
 
 /**
  * Manages the creation of the authorization key.
@@ -108,9 +108,9 @@ trait AuthKeyHandler
                  * ***********************************************************************
                  * Compute p and q
                  */
-                $pq = new \phpseclib3\Math\BigInteger((string) $pq_bytes, 256);
-                $q = new \phpseclib3\Math\BigInteger(0);
-                $p = new \phpseclib3\Math\BigInteger(\danog\PrimeModule::auto_single($pq->__toString()));
+                $pq = new \tgseclib\Math\BigInteger((string) $pq_bytes, 256);
+                $q = new \tgseclib\Math\BigInteger(0);
+                $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::auto_single($pq->__toString()));
                 if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                     $q = $pq->divide($p)[0];
                     if ($p->compare($q) > 0) {
@@ -119,7 +119,7 @@ trait AuthKeyHandler
                 }
                 if (!$pq->equals($p->multiply($q))) {
                     $this->logger->logger('Automatic factorization failed, trying native CPP module', \danog\MadelineProto\Logger::ERROR);
-                    $p = new \phpseclib3\Math\BigInteger(\danog\PrimeModule::native_single_cpp($pq->__toString()));
+                    $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::native_single_cpp($pq->__toString()));
                     if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                         $q = $pq->divide($p)[0];
                         if ($p->compare($q) > 0) {
@@ -129,7 +129,7 @@ trait AuthKeyHandler
 
                     if (!$pq->equals($p->multiply($q))) {
                         $this->logger->logger('Automatic factorization failed, trying alt py module', \danog\MadelineProto\Logger::ERROR);
-                        $p = new \phpseclib3\Math\BigInteger(\danog\PrimeModule::python_single_alt($pq->__toString()));
+                        $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::python_single_alt($pq->__toString()));
                         if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                             $q = $pq->divide($p)[0];
                             if ($p->compare($q) > 0) {
@@ -139,7 +139,7 @@ trait AuthKeyHandler
 
                         if (!$pq->equals($p->multiply($q))) {
                             $this->logger->logger('Automatic factorization failed, trying py module', \danog\MadelineProto\Logger::ERROR);
-                            $p = new \phpseclib3\Math\BigInteger(\danog\PrimeModule::python_single($pq->__toString()));
+                            $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::python_single($pq->__toString()));
                             if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                                 $q = $pq->divide($p)[0];
                                 if ($p->compare($q) > 0) {
@@ -149,7 +149,7 @@ trait AuthKeyHandler
 
                             if (!$pq->equals($p->multiply($q))) {
                                 $this->logger->logger('Automatic factorization failed, trying native module', \danog\MadelineProto\Logger::ERROR);
-                                $p = new \phpseclib3\Math\BigInteger(\danog\PrimeModule::native_single($pq->__toString()));
+                                $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::native_single($pq->__toString()));
                                 if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                                     $q = $pq->divide($p)[0];
                                     if ($p->compare($q) > 0) {
@@ -160,7 +160,7 @@ trait AuthKeyHandler
                                 if (!$pq->equals($p->multiply($q))) {
                                     $this->logger->logger('Automatic factorization failed, trying wolfram module', \danog\MadelineProto\Logger::ERROR);
 
-                                    $p = new \phpseclib3\Math\BigInteger(yield $this->wolframSingle($pq->__toString()));
+                                    $p = new \tgseclib\Math\BigInteger(yield $this->wolframSingle($pq->__toString()));
                                     if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                                         $q = $pq->divide($p)[0];
                                         if ($p->compare($q) > 0) {
@@ -284,9 +284,9 @@ trait AuthKeyHandler
                 if ($server_nonce != $server_DH_inner_data['server_nonce']) {
                     throw new \danog\MadelineProto\SecurityException('wrong server nonce');
                 }
-                $g = new \phpseclib3\Math\BigInteger($server_DH_inner_data['g']);
-                $g_a = new \phpseclib3\Math\BigInteger((string) $server_DH_inner_data['g_a'], 256);
-                $dh_prime = new \phpseclib3\Math\BigInteger((string) $server_DH_inner_data['dh_prime'], 256);
+                $g = new \tgseclib\Math\BigInteger($server_DH_inner_data['g']);
+                $g_a = new \tgseclib\Math\BigInteger((string) $server_DH_inner_data['g_a'], 256);
+                $dh_prime = new \tgseclib\Math\BigInteger((string) $server_DH_inner_data['dh_prime'], 256);
                 /*
                  * ***********************************************************************
                  * Time delta
@@ -298,7 +298,7 @@ trait AuthKeyHandler
                 $this->checkG($g_a, $dh_prime);
                 for ($retry_id = 0; $retry_id <= $this->settings['max_tries']['authorization']; $retry_id++) {
                     $this->logger->logger('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
-                    $b = new \phpseclib3\Math\BigInteger(\danog\MadelineProto\Tools::random(256), 256);
+                    $b = new \tgseclib\Math\BigInteger(\danog\MadelineProto\Tools::random(256), 256);
                     $this->logger->logger('Generating g_b...', \danog\MadelineProto\Logger::VERBOSE);
                     $g_b = $g->powMod($b, $dh_prime);
                     $this->checkG($g_b, $dh_prime);
@@ -526,8 +526,8 @@ trait AuthKeyHandler
 
             return $this->dh_config;
         }
-        $dh_config['p'] = new \phpseclib3\Math\BigInteger((string) $dh_config['p'], 256);
-        $dh_config['g'] = new \phpseclib3\Math\BigInteger($dh_config['g']);
+        $dh_config['p'] = new \tgseclib\Math\BigInteger((string) $dh_config['p'], 256);
+        $dh_config['g'] = new \tgseclib\Math\BigInteger($dh_config['g']);
         $this->checkPG($dh_config['p'], $dh_config['g']);
 
         return $this->dh_config = $dh_config;

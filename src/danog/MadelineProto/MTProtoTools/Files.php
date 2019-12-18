@@ -217,7 +217,7 @@ trait Files
             $iv = \danog\MadelineProto\Tools::random(32);
             $digest = \hash('md5', $key.$iv, true);
             $fingerprint = \danog\MadelineProto\Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
-            $ige = new \phpseclib3\Crypt\AES('ige');
+            $ige = new \tgseclib\Crypt\AES('ige');
             $ige->setIV($iv);
             $ige->setKey($key);
             $ige->enableContinuousBuffer();
@@ -956,7 +956,7 @@ trait Files
             if ($fingerprint !== $message_media['key_fingerprint']) {
                 throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
             }
-            $ige = new \phpseclib3\Crypt\AES('ige');
+            $ige = new \tgseclib\Crypt\AES('ige');
             $ige->setIV($message_media['iv']);
             $ige->setKey($message_media['key']);
             $ige->enableContinuousBuffer();

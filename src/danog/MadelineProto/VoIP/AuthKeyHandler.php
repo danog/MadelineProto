@@ -57,7 +57,7 @@ trait AuthKeyHandler
         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['calling_user'], $user['user_id']), \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = yield $this->getDhConfig();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['generating_a'], \danog\MadelineProto\Logger::VERBOSE);
-        $a = \phpseclib3\Math\BigInteger::randomRange(\danog\MadelineProto\Magic::$two, $dh_config['p']->subtract(\danog\MadelineProto\Magic::$two));
+        $a = \tgseclib\Math\BigInteger::randomRange(\danog\MadelineProto\Magic::$two, $dh_config['p']->subtract(\danog\MadelineProto\Magic::$two));
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['generating_g_a'], \danog\MadelineProto\Logger::VERBOSE);
         $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
         $this->checkG($g_a, $dh_config['p']);
@@ -84,7 +84,7 @@ trait AuthKeyHandler
         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['accepting_call'], $this->calls[$call['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = yield $this->getDhConfig();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['generating_b'], \danog\MadelineProto\Logger::VERBOSE);
-        $b = \phpseclib3\Math\BigInteger::randomRange(\danog\MadelineProto\Magic::$two, $dh_config['p']->subtract(\danog\MadelineProto\Magic::$two));
+        $b = \tgseclib\Math\BigInteger::randomRange(\danog\MadelineProto\Magic::$two, $dh_config['p']->subtract(\danog\MadelineProto\Magic::$two));
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->checkG($g_b, $dh_config['p']);
 
@@ -123,7 +123,7 @@ trait AuthKeyHandler
         }
         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_confirming'], $this->calls[$params['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = yield $this->getDhConfig();
-        $params['g_b'] = new \phpseclib3\Math\BigInteger((string) $params['g_b'], 256);
+        $params['g_b'] = new \tgseclib\Math\BigInteger((string) $params['g_b'], 256);
         $this->checkG($params['g_b'], $dh_config['p']);
         $key = \str_pad($params['g_b']->powMod($this->calls[$params['id']]->storage['a'], $dh_config['p'])->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
         try {
@@ -145,10 +145,10 @@ trait AuthKeyHandler
         }
 
         $visualization = [];
-        $length = new \phpseclib3\Math\BigInteger(\count(\danog\MadelineProto\Magic::$emojis));
+        $length = new \tgseclib\Math\BigInteger(\count(\danog\MadelineProto\Magic::$emojis));
         foreach (\str_split(\hash('sha256', $key.\str_pad($this->calls[$params['id']]->storage['g_a'], 256, \chr(0), \STR_PAD_LEFT), true), 8) as $number) {
             $number[0] = \chr(\ord($number[0]) & 0x7f);
-            $visualization[] = \danog\MadelineProto\Magic::$emojis[(int) (new \phpseclib3\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
+            $visualization[] = \danog\MadelineProto\Magic::$emojis[(int) (new \tgseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
         }
         $this->calls[$params['id']]->setVisualization($visualization);
 
@@ -175,17 +175,17 @@ trait AuthKeyHandler
         if (\hash('sha256', $params['g_a_or_b'], true) != $this->calls[$params['id']]->storage['g_a_hash']) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['invalid_g_a']);
         }
-        $params['g_a_or_b'] = new \phpseclib3\Math\BigInteger((string) $params['g_a_or_b'], 256);
+        $params['g_a_or_b'] = new \tgseclib\Math\BigInteger((string) $params['g_a_or_b'], 256);
         $this->checkG($params['g_a_or_b'], $dh_config['p']);
         $key = \str_pad($params['g_a_or_b']->powMod($this->calls[$params['id']]->storage['b'], $dh_config['p'])->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
         if (\substr(\sha1($key, true), -8) != $params['key_fingerprint']) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['fingerprint_invalid']);
         }
         $visualization = [];
-        $length = new \phpseclib3\Math\BigInteger(\count(\danog\MadelineProto\Magic::$emojis));
+        $length = new \tgseclib\Math\BigInteger(\count(\danog\MadelineProto\Magic::$emojis));
         foreach (\str_split(\hash('sha256', $key.\str_pad($params['g_a_or_b']->toBytes(), 256, \chr(0), \STR_PAD_LEFT), true), 8) as $number) {
             $number[0] = \chr(\ord($number[0]) & 0x7f);
-            $visualization[] = \danog\MadelineProto\Magic::$emojis[(int) (new \phpseclib3\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
+            $visualization[] = \danog\MadelineProto\Magic::$emojis[(int) (new \tgseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
         }
         $this->calls[$params['id']]->setVisualization($visualization);
         $this->calls[$params['id']]->configuration['endpoints'] = \array_merge($params['connections'], $this->calls[$params['id']]->configuration['endpoints']);

@@ -169,7 +169,7 @@ class Lua
     public static function convertObjects(&$data)
     {
         \array_walk_recursive($data, function (&$value, $key) {
-            if (\is_object($value) && !$value instanceof \phpseclib3\Math\BigInteger) {
+            if (\is_object($value) && !$value instanceof \tgseclib\Math\BigInteger) {
                 $newval = [];
                 foreach (\get_class_methods($value) as $name) {
                     $newval[$name] = [$value, $name];
