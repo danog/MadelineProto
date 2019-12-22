@@ -25,14 +25,14 @@
         "ext-fileinfo": "*",
         "amphp/amp": "^2.0",
         "amphp/websocket-client": "dev-master as 1.0.0-rc2",
-        "amphp/http-client": "dev-master as 4.0.0-rc11",
+        "amphp/http-client": "dev-master as 4",
         "amphp/socket": "^1",
         "amphp/dns": "dev-master#ecbeca2ae0e93c08e8150a92810a3961fad8ecbe as v1",
         "amphp/file": "^1",
         "amphp/byte-stream": "^1.6",
         "danog/dns-over-https": "^0.2",
-        "amphp/http-client-cookies": "dev-master#09d5740414fe5a76c9242d27caabc2f4990550d1",
-        "amphp/uri": "dev-master"
+        "amphp/http-client-cookies": "^1",
+        "amphp/uri": "^0.1"
     },
     "require-dev": {
         "vlucas/phpdotenv": "^3",
