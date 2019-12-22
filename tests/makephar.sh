@@ -25,10 +25,6 @@ echo '{
     },
     "repositories": [
         {
-            "type": "git",
-            "url": "https://github.com/danog/phpseclib"
-        },
-        {
             "type": "path",
             "url": "'$madelinePath'",
             "options": {

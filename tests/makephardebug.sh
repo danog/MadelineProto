@@ -16,12 +16,6 @@ echo '{
         "danog/madelineproto": "dev-master",
         "amphp/dns": "dev-master#ecbeca2ae0e93c08e8150a92810a3961fad8ecbe as v1"
     },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/danog/phpseclib"
-        }
-    ],
     "authors": [
         {
             "name": "Daniil Gentili",
