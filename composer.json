@@ -25,11 +25,11 @@
         "ext-fileinfo": "*",
         "amphp/amp": "^2.0",
         "amphp/websocket-client": "dev-master as 1.0.0-rc2",
-        "amphp/http-client": "dev-master as 4",
+        "amphp/http-client": "^4",
         "amphp/socket": "^1",
         "amphp/dns": "dev-master#ecbeca2ae0e93c08e8150a92810a3961fad8ecbe as v1",
         "amphp/file": "^1",
-        "amphp/byte-stream": "^1.6",
+        "amphp/byte-stream": "^1",
         "danog/dns-over-https": "^0.2",
         "amphp/http-client-cookies": "^1",
         "amphp/uri": "^0.1"
