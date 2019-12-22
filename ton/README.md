@@ -4,10 +4,10 @@ MadelineProto is now capable of integrating with the [Telegram TON blockchain](h
 
 It allows **async** interaction with liteservers in the same manner as the official `lite-client`, only with way more abstractions and ease of use.
 
-
 Please note that the project is in alpha stage.
 
-For a pure JS client-side implementation of the TON protocol check out [madelineTon.js](https://github.com/danog/madelineTon.js): interact **directly with the TON blockchain** with no middlemans, directly from your browser!
+
+For a **fully separate and standalone** pure JS client-side implementation of the TON protocol check out [madelineTon.js](https://github.com/danog/madelineTon.js): interact **directly with the TON blockchain** with no middlemans, directly from your browser!
 
 
 ## Instantiation
@@ -43,4 +43,4 @@ For a full list of methods that can be used, simply look at the PHPDOC suggestio
 This API can be used to build web-facing HTTP APIs that query the TON blockchain (using the async [http-client](https://github.com/amphp/http-client)), off-chain elements for TON applications and so much more!
 
 
-For a pure JS client-side implementation of the TON protocol check out [madelineTon.js](https://github.com/danog/madelineTon.js): interact **directly with the TON blockchain** with no middlemans, directly from your browser!
+For a **fully separate and standalone** pure JS client-side implementation of the TON protocol check out [madelineTon.js](https://github.com/danog/madelineTon.js): interact **directly with the TON blockchain** with no middlemans, directly from your browser!
