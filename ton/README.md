@@ -12,7 +12,7 @@ For a **fully separate and standalone** pure JS client-side implementation of th
 
 ## Instantiation
 
-```
+```php
 use danog\MadelineProto\TON\API;
 
 $API = new API(
@@ -26,7 +26,7 @@ $API = new API(
 
 ## Usage
 
-```
+```php
 $API->async(true);
 $API->loop(
     function () use ($API) {
