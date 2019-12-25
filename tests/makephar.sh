@@ -66,6 +66,8 @@ cd ..
     sed 's/public static function echo/public static function echo_/g' -i phar5/vendor/danog/madelineproto/src/danog/MadelineProto/Tools.php
     
     find phar5/vendor/amphp -type f -name '*.php' -exec sed "s/extension_loaded[(]'zlib'[)]/false/g;s/new[(]/new_(/g;s/clone[(]/clone_(/g" -i {} +
+
+    find phar5/vendor/league/uri -type f -name '*.php' -exec sed 's/withScheme[(]\$scheme[)]: UriInterface/withScheme(?string $scheme): UriInterface/g' -i {} +
     
     find phar5/vendor/danog/madelineproto -type f -name '*.php' -exec sed 's/: EncryptableSocket/: \\Amp\\Socket\\Socket/g' -i {} +
     
@@ -80,6 +82,8 @@ cd ..
         [ -f $HOME/.config/composer/vendor/bin/php7to70 ] && php7to70=$HOME/.config/composer/vendor/bin/php7to70
         
         $php7to70 convert --copy-all phar7 phar5 >/dev/null
+        find phar5/vendor/league/uri -type f -name '*.php' -exec sed 's/withScheme[(]\$scheme[)]: UriInterface/withScheme(?string $scheme): UriInterface/g' -i {} +
+
         find phar5/vendor/danog/madelineproto -type f -name '*.php' -exec sed 's/: EncryptableSocket/: \\Amp\\Socket\\Socket/g' -i {} +
         
         php=70
