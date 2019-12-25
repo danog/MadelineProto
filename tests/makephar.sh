@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 # Configure
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
@@ -89,16 +89,17 @@ for f in $(find phar5 -type f -name '*.php'); do php -l $f;done
 
 branch="-$TRAVIS_BRANCH"
 cd $madelinePath
-php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" $TRAVIS_COMMIT
-
-curl -s https://api.telegram.org/bot$BOT_TOKEN/sendDocument -F chat_id=101374607 -F document="@$TRAVIS_PHAR"
-
 
 export TRAVIS_PHAR="madeline$php$branch.phar"
 export TEST_SECRET_CHAT=test
 export TEST_USERNAME=danogentili
 export TEST_DESTINATION_GROUPS='["@danogentili"]'
 export MTPROTO_SETTINGS='{"logger":{"logger_level":5}}'
+
+php tools/makephar.php $HOME/phar5 "$TRAVIS_PHAR" $TRAVIS_COMMIT
+
+curl -s https://api.telegram.org/bot$BOT_TOKEN/sendDocument -F chat_id=101374607 -F document="@$TRAVIS_PHAR"
+
 
 tests/testing.php <<EOF
 m
