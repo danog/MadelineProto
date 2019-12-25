@@ -8,6 +8,20 @@ function returnMe($res)
 {
     return $res;
 }
+function __coalesce($ifNotNull, $then) {
+    return $ifNotNull ? $ifNotNull : $then;
+}
+function __destructure($list, $value) {
+    $res = [];
+    foreach ($list as $key) {
+        if (is_string($key)) {
+            $res []= $value[$key];
+        } else {
+            $res = array_merge($res, __destructure($key, $value[$key]));
+        }
+    }
+    return $res;
+}
 if (!\function_exists('is_iterable')) {
     function is_iterable($var)
     {
