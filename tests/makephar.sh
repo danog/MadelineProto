@@ -55,7 +55,8 @@ cd ..
     [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
     [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
     
-    php7.3 $php7to5 convert --copy-all phar7 phar5 >/dev/null
+    php7.3 $php7to5 convert --copy-all phar7 phar5t >/dev/null
+    php7.3 $php7to5 convert --copy-all phar5t phar5 >/dev/null
     
     sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
     echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
@@ -64,7 +65,7 @@ cd ..
     sed 's/namespace danog\\MadelineProto;/namespace Amp;/g' -i phar5/vendor/amphp/amp/lib/Coroutine.php
     sed 's/public static function echo/public static function echo_/g' -i phar5/vendor/danog/madelineproto/src/danog/MadelineProto/Tools.php
     
-    find phar5/vendor/amphp -type f -name '*.php' -exec sed "s/extension_loaded[(]'zlib'[)]/false/g" -i {} +
+    find phar5/vendor/amphp -type f -name '*.php' -exec sed "s/extension_loaded[(]'zlib'[)]/false/g;s/new[(]/new_(/g;s/clone[(]/clone_(/g" -i {} +
     
     find phar5/vendor/danog/madelineproto -type f -name '*.php' -exec sed 's/: EncryptableSocket/: \\Amp\\Socket\\Socket/g' -i {} +
     
