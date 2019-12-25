@@ -641,7 +641,7 @@ class TL
                         !\is_array($arguments['file']) ||
                         !(isset($arguments['file']['_']) && $this->constructors->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')
                     ) &&
-                    $this->settings['upload']['allow_automatic_upload']
+                    $this->API->settings['upload']['allow_automatic_upload']
                 ) {
                     $arguments['file'] = yield $this->API->uploadEncrypted($arguments['file']);
                 }
@@ -819,7 +819,7 @@ class TL
                         && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_']) === 'InputFile'
                     )
                 )
-                && $this->settings['upload']['allow_automatic_upload']
+                && $this->API->settings['upload']['allow_automatic_upload']
             ) {
                 $arguments[$current_argument['name']] = yield $this->API->upload($arguments[$current_argument['name']]);
             }
