@@ -105,10 +105,11 @@ class Lite
         }
     }
 
-    public function methodCall(string $methodName, array $args = [], array $aargs = []) {
+    public function methodCall(string $methodName, array $args = [], array $aargs = [])
+    {
         $data = yield $this->TL->serializeMethod($methodName, $args);
         $data = yield $this->TL->serializeMethod('liteServer.query', ['data' => $data]);
-        return yield $this->connections[rand(0, count($this->connections) - 1)]->query($data);
+        return yield $this->connections[\rand(0, \count($this->connections) - 1)]->query($data);
     }
 
     /**
@@ -134,9 +135,9 @@ class Lite
     {
         return $parameters;
     }
-    
+
     /**
-     * Get TL method namespaces
+     * Get TL method namespaces.
      *
      * @return void
      */

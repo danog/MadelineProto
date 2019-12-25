@@ -236,9 +236,9 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     public function getReadBufferGenerator(&$length): \Generator
     {
         //if ($this->read_hash) {
-            $this->read_buffer = yield $this->stream->getReadBuffer($length);
+        $this->read_buffer = yield $this->stream->getReadBuffer($length);
 
-            return $this;
+        return $this;
         //}
 
         //return yield $this->stream->getReadBuffer($length);
@@ -254,9 +254,9 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
         //if ($this->write_hash) {
-            $this->write_buffer = yield $this->stream->getWriteBuffer($length, $append);
+        $this->write_buffer = yield $this->stream->getWriteBuffer($length, $append);
 
-            return $this;
+        return $this;
         //}
 
         //return yield $this->stream->getWriteBuffer($length, $append);

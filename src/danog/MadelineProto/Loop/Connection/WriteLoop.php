@@ -182,7 +182,7 @@ class WriteLoop extends ResumableSignalLoop
             $temporary_keys = [];
             if (\count($to_ack = $connection->ack_queue)) {
                 foreach (\array_chunk($connection->ack_queue, 8192) as $acks) {
-                    $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msgs_ack', 'serialized_body' => yield $this->API->getTL()->serializeObject(['type' => 'msgs_ack'], ['msg_ids' => $acks], 'msgs_ack'), 'contentRelated' => false, 'unencrypted' => false, 'method' => false];
+                    $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msgs_ack', 'serialized_body' => yield $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'msgs_ack','msg_ids' => $acks], 'msgs_ack'), 'contentRelated' => false, 'unencrypted' => false, 'method' => false];
                     $temporary_keys[$connection->pending_outgoing_key] = true;
                     $API->logger->logger("Adding msgs_ack {$connection->pending_outgoing_key}", Logger::ULTRA_VERBOSE);
                     $connection->pending_outgoing_key++;
@@ -280,7 +280,7 @@ class WriteLoop extends ResumableSignalLoop
                         // TODO
                         /*                        if ($API->settings['requests']['gzip_encode_if_gt'] !== -1 && ($l = strlen($MTmessage['body'])) > $API->settings['requests']['gzip_encode_if_gt']) {
                     if (($g = strlen($gzipped = gzencode($MTmessage['body']))) < $l) {
-                    $MTmessage['body'] = yield $API->getTL()->serializeObject(['type' => 'gzip_packed'], ['packed_data' => $gzipped], 'gzipped data');
+                    $MTmessage['body'] = yield $API->getTL()->serializeObject(['type' => ''], ['_' => 'gzip_packed', 'packed_data' => $gzipped], 'gzipped data');
                     $API->logger->logger('Using GZIP compression for ' . $message['_'] . ', saved ' . ($l - $g) . ' bytes of data, reduced call size by ' . $g * 100 / $l . '%', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     }
                     unset($gzipped);

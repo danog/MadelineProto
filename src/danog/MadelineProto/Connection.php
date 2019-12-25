@@ -441,7 +441,7 @@ class Connection extends Session
             if ($message['method']) {
                 $body = yield $this->API->getTL()->serializeMethod($message['_'], $body);
             } else {
-                $body = yield $this->API->getTL()->serializeObject(['type' => $message['_']], $body, $message['_']);
+                $body = yield $this->API->getTL()->serializeObject(['type' => ''], $body, $message['_']);
             }
             if ($refreshNext) {
                 $this->API->referenceDatabase->refreshNext(false);

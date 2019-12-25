@@ -23,7 +23,6 @@ use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\Common\CtrStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 
-
 /**
  * Obfuscated2 stream wrapper.
  *
