@@ -60,7 +60,7 @@ cd ..
     $madelinePath/tests/conversion/prepare-5.sh
     cd ..
 
-    php7.3 $php7to5 convert --copy-all phar7 phar5 >/dev/null
+    php7.3 $php7to5 convert --copy-all phar7 phar5
 
     cd phar5
     ls
@@ -82,7 +82,7 @@ cd ..
         $madelinePath/tests/conversion/prepare-70.sh
         cd ..
 
-        $php7to70 convert --copy-all phar7 phar5 >/dev/null
+        $php7to70 convert --copy-all phar7 phar5
 
         cd phar5
     ls
