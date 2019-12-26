@@ -44,6 +44,7 @@ composer clearcache
 composer update
 [ $PHP_MAJOR_VERSION -eq 5 ] && composer require dstuecken/php7ify
 composer dumpautoload --optimize
+cp -a $madelinePath/src vendor/danog/madelineproto
 cd ..
 
 [ $PHP_MAJOR_VERSION -eq 5 ] && {
