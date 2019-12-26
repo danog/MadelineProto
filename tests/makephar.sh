@@ -56,12 +56,12 @@ cd ..
     [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
     [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
 
-    sed -re 's/\?(\w*) (\$\w+)/\2 = NULL/g;s/= null = null/=null/ig;s/: self//g' -i vendor/league/uri-interfaces/src/Contracts/UriInterface.php
-    while IFS= read -r line; do l=$(echo "$line" | sed 's/[(].*//g'); sed -i "s/$l.*/$line/g" vendor/league/uri/src/Uri.php; done <<< $(grep 'public function' vendor/league/uri-interfaces/src/Contracts/UriInterface.php | sed 's/;//g;s/: self//g')
+    sed -re 's/\?(\w*) (\$\w+)/\2 = NULL/g;s/= null = null/=null/ig;s/: self//g' -i phar7/vendor/league/uri-interfaces/src/Contracts/UriInterface.php
+    while IFS= read -r line; do l=$(echo "$line" | sed 's/[(].*//g'); sed -i "s/$l.*/$line/g" phar7/vendor/league/uri/src/Uri.php; done <<< $(grep 'public function' phar7/vendor/league/uri-interfaces/src/Contracts/UriInterface.php | sed 's/;//g;s/: self//g')
 
-    sed -i 's/handleConnectionWindowIncrement[(]\$windowSize[)]/handleConnectionWindowIncrement(int $windowSize)/g' vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php
+    sed -i 's/handleConnectionWindowIncrement[(]\$windowSize[)]/handleConnectionWindowIncrement(int $windowSize)/g' phar7/vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php
 
-    sed -ri 's/^\{/{ use \\MyCallableMaker;/g;s/\\Closure::fromCallable[(]\[(.+), (.+)\][)]/\1->callableFromInstanceMethod(\2)/g' vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php vendor/amphp/http-client/src/Connection/Http{2,1}Connection.php
+    sed -ri 's/^\{/{ use \\MyCallableMaker;/g;s/\\Closure::fromCallable[(]\[(.+), (.+)\][)]/\1->callableFromInstanceMethod(\2)/g' phar7/vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php phar7/vendor/amphp/http-client/src/Connection/Http{2,1}Connection.php
 
     php7.3 $php7to5 convert --copy-all phar7 phar5 >/dev/null
     
@@ -76,7 +76,7 @@ cd ..
 
     find phar5/vendor/danog/madelineproto -type f -name '*.php' -exec sed 's/: EncryptableSocket/: \\Amp\\Socket\\Socket/g' -i {} +
     
-    sed 's/use Kelunik\\Certificate\\Certificate/use Kelunik\Certificate\Certificate as _Certificate/g;s/new Certificate/new _Certificate/g' -i vendor/amphp/socket/src/TlsInfo.php
+    sed 's/use Kelunik\\Certificate\\Certificate/use Kelunik\Certificate\Certificate as _Certificate/g;s/new Certificate/new _Certificate/g' -i phar5/vendor/amphp/socket/src/TlsInfo.php
 
     echo "<?php
     
@@ -84,7 +84,7 @@ namespace League\Uri\Contracts;
 
 interface UriException
 {
-}" > vendor/league/uri-interfaces/src/Contracts/UriException.php
+}" > phar5/vendor/league/uri-interfaces/src/Contracts/UriException.php
 
     php -v
     
@@ -96,12 +96,12 @@ interface UriException
         [ -f $HOME/.composer/vendor/bin/php7to70 ] && php7to70=$HOME/.composer/vendor/bin/php7to70
         [ -f $HOME/.config/composer/vendor/bin/php7to70 ] && php7to70=$HOME/.config/composer/vendor/bin/php7to70
 
-        sed -re 's/\?(\w*) (\$\w+)/\2 = NULL/g;s/= null = null/=null/ig;s/: self//g' -i vendor/league/uri-interfaces/src/Contracts/UriInterface.php
-        while IFS= read -r line; do l=$(echo "$line" | sed 's/[(].*//g'); sed -i "s/$l.*/$line/g" vendor/league/uri/src/Uri.php; done <<< $(grep 'public function' vendor/league/uri-interfaces/src/Contracts/UriInterface.php | sed 's/;//g;s/: self//g')
+        sed -re 's/\?(\w*) (\$\w+)/\2 = NULL/g;s/= null = null/=null/ig;s/: self//g' -i phar7/vendor/league/uri-interfaces/src/Contracts/UriInterface.php
+        while IFS= read -r line; do l=$(echo "$line" | sed 's/[(].*//g'); sed -i "s/$l.*/$line/g" phar7/vendor/league/uri/src/Uri.php; done <<< $(grep 'public function' phar7/vendor/league/uri-interfaces/src/Contracts/UriInterface.php | sed 's/;//g;s/: self//g')
 
-        sed -i 's/handleConnectionWindowIncrement[(]\$windowSize[)]/handleConnectionWindowIncrement(int $windowSize)/g' vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php
+        sed -i 's/handleConnectionWindowIncrement[(]\$windowSize[)]/handleConnectionWindowIncrement(int $windowSize)/g' phar7/vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php
 
-        sed -ri 's/^\{/{ use \\MyCallableMaker;/g;s/\\Closure::fromCallable[(]\[(.+), (.+)\][)]/\1->callableFromInstanceMethod(\2)/g' vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php vendor/amphp/http-client/src/Connection/Http{2,1}Connection.php
+        sed -ri 's/^\{/{ use \\MyCallableMaker;/g;s/\\Closure::fromCallable[(]\[(.+), (.+)\][)]/\1->callableFromInstanceMethod(\2)/g' phar7/vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php phar7/vendor/amphp/http-client/src/Connection/Http{2,1}Connection.php
         
         $php7to70 convert --copy-all phar7 phar5 >/dev/null
 
