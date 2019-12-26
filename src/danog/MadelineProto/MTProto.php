@@ -185,6 +185,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     const TD_REVERSE = ['sendMessage' => 'messages.sendMessage'];
     const TD_IGNORE = ['updateMessageID'];
     const BOTAPI_PARAMS_CONVERSION = ['disable_web_page_preview' => 'no_webpage', 'disable_notification' => 'silent', 'reply_to_message_id' => 'reply_to_msg_id', 'chat_id' => 'peer', 'text' => 'message'];
+    // Not content related constructors
     const NOT_CONTENT_RELATED = [
         //'rpc_result',
         //'rpc_error',
