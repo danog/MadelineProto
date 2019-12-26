@@ -36,7 +36,10 @@ echo '{
         }
     ]
 }' > composer.json
+composer config platform.php "7.4"
+#composer clearcache
 composer update
+composer dumpautoload --optimize
 
 $madelinePath/tests/conversion/prepare-$1.sh
 
@@ -46,7 +49,6 @@ mv newVendor vendor
 
 $madelinePath/tests/conversion/after-$1.sh
 
-composer dumpautoload --optimize
 
 cd $madelinePath
 if [ $1 -eq 5 ];then

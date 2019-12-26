@@ -40,9 +40,9 @@ echo '{
     ]
 }' > composer.json
 composer config platform.php "7.4"
-[ $PHP_MAJOR_VERSION -eq 5 ] && composer require dstuecken/php7ify
 composer clearcache
 composer update
+[ $PHP_MAJOR_VERSION -eq 5 ] && composer require dstuecken/php7ify
 composer dumpautoload --optimize
 cp -a $madelinePath/src vendor/danog/madelineproto/
 cd ..
@@ -57,7 +57,7 @@ cd ..
     [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
 
     cd phar7
-    $madelinePath/tests/conversion/before-5.sh
+    $madelinePath/tests/conversion/prepare-5.sh
     cd ..
 
     php7.3 $php7to5 convert --copy-all phar7 phar5 >/dev/null
@@ -77,7 +77,7 @@ cd ..
         [ -f $HOME/.config/composer/vendor/bin/php7to70 ] && php7to70=$HOME/.config/composer/vendor/bin/php7to70
 
         cd phar7
-        $madelinePath/tests/conversion/before-70.sh
+        $madelinePath/tests/conversion/prepare-70.sh
         cd ..
 
         $php7to70 convert --copy-all phar7 phar5 >/dev/null
