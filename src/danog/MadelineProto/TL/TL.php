@@ -636,8 +636,7 @@ class TL
             }
         } elseif ($method === 'messages.sendEncryptedFile') {
             if (isset($arguments['file'])) {
-                if (
-                    (
+                if ((
                         !\is_array($arguments['file']) ||
                         !(isset($arguments['file']['_']) && $this->constructors->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')
                     ) &&

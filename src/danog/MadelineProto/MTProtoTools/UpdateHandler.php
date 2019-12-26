@@ -22,6 +22,8 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Deferred;
 use Amp\Http\Client\Request;
 use Amp\Loop;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\RPCErrorException;
 
 /**
  * Manages updates.
@@ -340,7 +342,11 @@ trait UpdateHandler
                         return;
                     }
                     $this->logger->logger('Accepting secret chat '.$update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
-                    yield $this->acceptSecretChat($update['chat']);
+                    try {
+                        yield $this->acceptSecretChat($update['chat']);
+                    } catch (RPCErrorException $e) {
+                        $this->logger->logger("Error while accepting secret chat: $e", Logger::FATAL_ERROR);
+                    }
                     break;
                 case 'encryptedChatDiscarded':
                     $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user', \danog\MadelineProto\Logger::NOTICE);

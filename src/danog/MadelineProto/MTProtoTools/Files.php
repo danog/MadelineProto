@@ -244,11 +244,11 @@ trait Files
 
                         $bytes = yield $callable($part_num * $part_size, $part_size);
 
-                        if (!$already_fetched) {
-                            \hash_update($ctx, $bytes);
-                        }
                         if ($ige) {
                             $bytes = $ige->encrypt(\str_pad($bytes, $part_size, \chr(0)));
+                        }
+                        if (!$already_fetched) {
+                            \hash_update($ctx, $bytes);
                         }
 
                         return ['file_id' => $file_id, 'file_part' => $part_num, 'file_total_parts' => $part_total_num, 'bytes' => $bytes];
@@ -1070,38 +1070,46 @@ trait Files
                 ];
             }
 
-            try {
-                $res = yield $this->methodCallAsyncRead(
-                    $method[$cdn],
-                    $basic_param + $offset,
-                    [
-                        'heavy' => true,
-                        'file' => true,
-                        'FloodWaitLimit' => 0,
-                        'datacenter' => &$datacenter,
-                        'postpone' => $postpone,
-                    ]
-                );
-            } catch (\danog\MadelineProto\RPCErrorException $e) {
-                if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
-                    if (isset($message_media['MessageMedia']) && !$this->authorization['user']['bot'] && $this->settings['download']['report_broken_media']) {
-                        try {
-                            yield $this->methodCallAsyncRead('messages.sendMedia', ['peer' => 'support', 'media' => $message_media['MessageMedia'], 'message' => "I can't download this file, could you please help?"], ['datacenter' => $this->datacenter->curdc]);
-                        } catch (RPCErrorException $e) {
-                            $this->logger->logger('An error occurred while reporting the broken file: '.$e->rpc, Logger::FATAL_ERROR);
-                        } catch (Exception $e) {
-                            $this->logger->logger('An error occurred while reporting the broken file: '.$e->getMessage(), Logger::FATAL_ERROR);
+            $x = 0;
+            while (true) {
+                try {
+                    $res = yield $this->methodCallAsyncRead(
+                        $method[$cdn],
+                        $basic_param + $offset,
+                        [
+                            'heavy' => true,
+                            'file' => true,
+                            'FloodWaitLimit' => 0,
+                            'datacenter' => &$datacenter,
+                            'postpone' => $postpone,
+                        ]
+                    );
+                    break;
+                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
+                        if (isset($message_media['MessageMedia']) && !$this->authorization['user']['bot'] && $this->settings['download']['report_broken_media']) {
+                            try {
+                                yield $this->methodCallAsyncRead('messages.sendMedia', ['peer' => 'support', 'media' => $message_media['MessageMedia'], 'message' => "I can't download this file, could you please help?"], ['datacenter' => $this->datacenter->curdc]);
+                            } catch (RPCErrorException $e) {
+                                $this->logger->logger('An error occurred while reporting the broken file: '.$e->rpc, Logger::FATAL_ERROR);
+                            } catch (Exception $e) {
+                                $this->logger->logger('An error occurred while reporting the broken file: '.$e->getMessage(), Logger::FATAL_ERROR);
+                            }
                         }
-                    }
 
-                    throw new \danog\MadelineProto\Exception('The media server where this file is hosted is offline/overloaded, please try again later. Send the media to the telegram devs or to @danogentili to fix this.');
-                }
-                switch ($e->rpc) {
-                    case 'FILE_TOKEN_INVALID':
-                        $cdn = false;
-                        continue 2;
-                    default:
-                        throw $e;
+                        if ($x++ === 5) {
+                            throw new \danog\MadelineProto\Exception('The media server where this file is hosted is offline/overloaded, please try again later. Send the media to the telegram devs or to @danogentili to fix this.');
+                        }
+                        yield Tools::sleep(1);
+                        continue;
+                    }
+                    switch ($e->rpc) {
+                        case 'FILE_TOKEN_INVALID':
+                            $cdn = false;
+                            continue 3;
+                        default:
+                            throw $e;
+                    }
                 }
             }
 

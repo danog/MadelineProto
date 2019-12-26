@@ -71,7 +71,7 @@ trait Events
             if ($method === 'onLoop') {
                 $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
             } elseif ($method === 'onAny') {
-                foreach ($this->constructors->by_id as $id => $constructor) {
+                foreach ($this->getTL()->getConstructors()->by_id as $id => $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($this->event_handler_methods[$constructor['predicate']])) {
                         $this->event_handler_methods[$constructor['predicate']] = [$this->event_handler_instance, 'onAny'];
                     }

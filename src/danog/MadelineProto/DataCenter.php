@@ -543,7 +543,7 @@ class DataCenter
      *
      * @return MTProto
      */
-    public function getAPI(): MTProto
+    public function getAPI()
     {
         return $this->API;
     }

@@ -41,7 +41,9 @@
         "phpunit/phpunit": "^8",
         "amphp/php-cs-fixer-config": "dev-master",
         "haydenpierce/class-finder": "^0.4",
-        "ext-ctype":"*"
+        "ext-ctype":"*",
+        "danog/7to70": "^1",
+        "danog/7to5": "^1"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)"

@@ -522,7 +522,7 @@ trait AuthKeyHandler
     {
         $dh_config = yield $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0], ['datacenter' => $this->datacenter->curdc]);
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {
-            $this->logger->logger(\danog\MadelineProto\Logger::VERBOSE, ['DH configuration not modified']);
+            $this->logger->logger('DH configuration not modified', \danog\MadelineProto\Logger::VERBOSE);
 
             return $this->dh_config;
         }
