@@ -191,6 +191,8 @@ class ADNLConnection
             ''
         );
         (yield $this->stream->getWriteBuffer(\strlen($data)))->bufferWrite($data);
-        return ($this->requests[$id] = new Deferred)->promise();
+        $this->requests[$id] = new Deferred;
+
+        return $this->requests[$id]->promise();
     }
 }

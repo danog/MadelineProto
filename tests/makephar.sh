@@ -54,6 +54,9 @@ cd ..
     composer global require spatie/7to5 dev-master#0420ad3
     [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
     [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
+
+    find phar7/vendor/league/uri -type f -name '*.php' -exec sed 's/withScheme[(]\$scheme[)]: UriInterface/withScheme(?string $scheme): UriInterface/g' -i {} +
+    
     
     php7.3 $php7to5 convert --copy-all phar7 phar5 >/dev/null
     
@@ -64,8 +67,8 @@ cd ..
     sed 's/namespace danog\\MadelineProto;/namespace Amp;/g' -i phar5/vendor/amphp/amp/lib/Coroutine.php
     sed 's/public static function echo/public static function echo_/g' -i phar5/vendor/danog/madelineproto/src/danog/MadelineProto/Tools.php
     
-    find phar5/vendor/amphp -type f -name '*.php' -exec sed "s/extension_loaded[(]'zlib'[)]/false/g" -i {} +
-    
+    find phar5/vendor/amphp -type f -name '*.php' -exec sed "s/extension_loaded[(]'zlib'[)]/false/g;s/new[(]/new_(/g;s/clone[(]/clone_(/g" -i {} +
+
     find phar5/vendor/danog/madelineproto -type f -name '*.php' -exec sed 's/: EncryptableSocket/: \\Amp\\Socket\\Socket/g' -i {} +
     
     php -v
@@ -77,8 +80,11 @@ cd ..
         composer global require danog/7to70
         [ -f $HOME/.composer/vendor/bin/php7to70 ] && php7to70=$HOME/.composer/vendor/bin/php7to70
         [ -f $HOME/.config/composer/vendor/bin/php7to70 ] && php7to70=$HOME/.config/composer/vendor/bin/php7to70
+
+        find phar7/vendor/league/uri -type f -name '*.php' -exec sed 's/withScheme[(]\$scheme[)]: UriInterface/withScheme(?string $scheme): UriInterface/g' -i {} +
         
         $php7to70 convert --copy-all phar7 phar5 >/dev/null
+
         find phar5/vendor/danog/madelineproto -type f -name '*.php' -exec sed 's/: EncryptableSocket/: \\Amp\\Socket\\Socket/g' -i {} +
         
         php=70

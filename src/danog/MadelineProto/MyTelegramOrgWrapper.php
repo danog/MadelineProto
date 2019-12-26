@@ -53,7 +53,7 @@ class MyTelegramOrgWrapper
         if ($this->settings === null) {
             $this->settings = [];
         }
-        if (!$this->jar) {
+        if (!$this->jar || !($this->jar instanceof InMemoryCookieJar)) {
             $this->jar = new InMemoryCookieJar;
         }
         $this->settings = MTProto::getSettings($this->settings);
