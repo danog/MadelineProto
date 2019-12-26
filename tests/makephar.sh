@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 # Configure
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')

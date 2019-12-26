@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 sed 's/^Loop::set.*;//g' -i vendor/amphp/amp/lib/Loop.php
 echo 'Loop::set((new DriverFactory())->create());' >> vendor/amphp/amp/lib/Loop.php
