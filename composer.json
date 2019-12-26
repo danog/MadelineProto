@@ -41,7 +41,7 @@
         "phpunit/phpunit": "^8",
         "amphp/php-cs-fixer-config": "dev-master",
         "haydenpierce/class-finder": "^0.4",
-        "ext-ctype":"*",
+        "ext-ctype": "*",
         "danog/7to70": "^1",
         "danog/7to5": "^1"
     },
@@ -63,12 +63,10 @@
             "src/polyfill.php"
         ]
     },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/danog/dns"
-        }
-    ],
+    "repositories": [{
+        "type": "git",
+        "url": "https://github.com/danog/dns"
+    }],
     "scripts": {
         "build": [
             "@docs",
@@ -78,6 +76,9 @@
             "@cs",
             "@test"
         ],
+        "prepare-convert": "rm -rf tempConv && mkdir tempConv",
+        "test-php7": "tests/test-conversion.sh 70",
+        "test-php56": "tests/test-conversion.sh 5",
         "cs": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff --dry-run",
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff",
         "docs": "php tools/build_docs.php",

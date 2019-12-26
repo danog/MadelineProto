@@ -16,18 +16,32 @@ If not, see <http://www.gnu.org/licenses/>.
  */
 
 
+$loader = false;
 if (!\file_exists(__DIR__.'/../vendor/autoload.php')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
     if ($phar = \getenv('TRAVIS_PHAR')) {
-        include $phar;
+        $loader = include $phar;
     } else {
         if (!\file_exists('madeline.php')) {
             \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
         }
         include 'madeline.php';
     }
+} elseif (\file_exists('/tmp/tempConv/vendor/autoload.php')) {
+    \define('TESTING_VERSIONS', 1);
+    $loader = require_once('/tmp/tempConv/vendor/autoload.php');
 } else {
     require_once 'vendor/autoload.php';
+}
+
+if ($loader) {
+    foreach ($loader->getClassMap() as $class => $file) {
+        if (\in_array($class, ['Amp\\Sync\\Internal\\MutexStorage', 'Amp\\Sync\\Internal\\SemaphoreStorage', 'Amp\\Parallel\\Sync\\Internal\\ParcelStorage', 'Amp\\Parallel\\Context\\Internal\\Thread'])) {
+            continue;
+        }
+        echo "Requiring $class => $file\n";
+        require_once($file);
+    }
 }
 
 /*

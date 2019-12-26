@@ -38,3 +38,10 @@ if (!\function_exists('error_clear_last')) {
 if (!\defined('MADELINEPROTO_TEST')) {
     \define('MADELINEPROTO_TEST', 'NOT PONY');
 }
+trait MyCallableMaker
+{
+    use \Amp\CallableMaker {
+        callableFromInstanceMethod as public;
+        callableFromStaticMethod as public;
+    }
+}

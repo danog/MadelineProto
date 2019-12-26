@@ -34,7 +34,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class PremadeStream extends Socket implements RawStreamInterface, ProxyStreamInterface
+class PremadeStream implements RawStreamInterface, ProxyStreamInterface
 {
     use RawStream;
     private $stream;

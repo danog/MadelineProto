@@ -90,4 +90,4 @@ function ___install_madeline()
 
 ___install_madeline();
 
-require 'madeline.phar';
+return require_once 'madeline.phar';

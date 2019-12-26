@@ -162,18 +162,18 @@ if (!\is_callable('random_bytes')) {
                 return \serialize($arr);
             }
             // prevent circular array recursion
-            if (isset($arr['__phpseclib_marker'])) {
+            if (isset($arr['__tgseclib_marker'])) {
                 return '';
             }
             $safearr = [];
-            $arr['__phpseclib_marker'] = true;
+            $arr['__tgseclib_marker'] = true;
             foreach (\array_keys($arr) as $key) {
-                // do not recurse on the '__phpseclib_marker' key itself, for smaller memory usage
-                if ($key !== '__phpseclib_marker') {
+                // do not recurse on the '__tgseclib_marker' key itself, for smaller memory usage
+                if ($key !== '__tgseclib_marker') {
                     $safearr[$key] = safe_serialize($arr[$key]);
                 }
             }
-            unset($arr['__phpseclib_marker']);
+            unset($arr['__tgseclib_marker']);
             return \serialize($safearr);
         }
         /**
@@ -236,23 +236,23 @@ if (!\is_callable('random_bytes')) {
                 //
                 // http://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator#Designs_based_on_cryptographic_primitives
                 switch (true) {
-                case \class_exists('\\phpseclib\\Crypt\\AES'):
-                    $crypto = new \phpseclib\Crypt\AES('ctr');
+                case \class_exists('\\tgseclib\\Crypt\\AES'):
+                    $crypto = new \tgseclib\Crypt\AES('ctr');
                     break;
-                case \class_exists('\\phpseclib\\Crypt\\Twofish'):
-                    $crypto = new \phpseclib\Crypt\Twofish('ctr');
+                case \class_exists('\\tgseclib\\Crypt\\Twofish'):
+                    $crypto = new \tgseclib\Crypt\Twofish('ctr');
                     break;
-                case \class_exists('\\phpseclib\\Crypt\\Blowfish'):
-                    $crypto = new \phpseclib\Crypt\Blowfish('ctr');
+                case \class_exists('\\tgseclib\\Crypt\\Blowfish'):
+                    $crypto = new \tgseclib\Crypt\Blowfish('ctr');
                     break;
-                case \class_exists('\\phpseclib\\Crypt\\TripleDES'):
-                    $crypto = new \phpseclib\Crypt\TripleDES('ctr');
+                case \class_exists('\\tgseclib\\Crypt\\TripleDES'):
+                    $crypto = new \tgseclib\Crypt\TripleDES('ctr');
                     break;
-                case \class_exists('\\phpseclib\\Crypt\\DES'):
-                    $crypto = new \phpseclib\Crypt\DES('ctr');
+                case \class_exists('\\tgseclib\\Crypt\\DES'):
+                    $crypto = new \tgseclib\Crypt\DES('ctr');
                     break;
-                case \class_exists('\\phpseclib\\Crypt\\RC4'):
-                    $crypto = new \phpseclib\Crypt\RC4();
+                case \class_exists('\\tgseclib\\Crypt\\RC4'):
+                    $crypto = new \tgseclib\Crypt\RC4();
                     break;
                 default:
                     throw new \RuntimeException(__CLASS__ . ' requires at least one symmetric cipher be loaded');

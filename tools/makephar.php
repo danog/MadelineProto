@@ -38,6 +38,6 @@ if ($contents = file_get_contents("https://phar.madelineproto.xyz/phar.php?v=new
 
 Phar::interceptFileFuncs(); 
 Phar::mapPhar("'.$argv[2].'"); 
-require_once "phar://'.$argv[2].'/vendor/autoload.php"; 
+return require_once "phar://'.$argv[2].'/vendor/autoload.php"; 
 
 __HALT_COMPILER(); ?>');

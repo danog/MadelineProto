@@ -43,6 +43,7 @@ composer config platform.php "7.4"
 [ $PHP_MAJOR_VERSION -eq 5 ] && composer require dstuecken/php7ify
 composer clearcache
 composer update
+composer dumpautoload --optimize
 cp -a $madelinePath/src vendor/danog/madelineproto/
 cd ..
 
@@ -51,13 +52,17 @@ cd ..
     sudo apt-get update -q
     sudo apt-get install php7.3-cli php7.3-json php7.3-mbstring php7.3-curl php7.3-xml php7.3-json -y
     
-    composer global require spatie/7to5 dev-master#0420ad3
+    composer global require danog/7to5
     [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
     [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
 
-    find phar7/vendor/league/uri -type f -name '*.php' -exec sed 's/withScheme[(]\$scheme[)]: UriInterface/withScheme(?string $scheme): UriInterface/g' -i {} +
-    
-    
+    sed -re 's/\?(\w*) (\$\w+)/\2 = NULL/g;s/= null = null/=null/ig;s/: self//g' -i vendor/league/uri-interfaces/src/Contracts/UriInterface.php
+    while IFS= read -r line; do l=$(echo "$line" | sed 's/[(].*//g'); sed -i "s/$l.*/$line/g" vendor/league/uri/src/Uri.php; done <<< $(grep 'public function' vendor/league/uri-interfaces/src/Contracts/UriInterface.php | sed 's/;//g;s/: self//g')
+
+    sed -i 's/handleConnectionWindowIncrement[(]\$windowSize[)]/handleConnectionWindowIncrement(int $windowSize)/g' vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php
+
+    sed -ri 's/^\{/{ use \\MyCallableMaker;/g;s/\\Closure::fromCallable[(]\[(.+), (.+)\][)]/\1->callableFromInstanceMethod(\2)/g' vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php vendor/amphp/http-client/src/Connection/Http{2,1}Connection.php
+
     php7.3 $php7to5 convert --copy-all phar7 phar5 >/dev/null
     
     sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
@@ -71,6 +76,16 @@ cd ..
 
     find phar5/vendor/danog/madelineproto -type f -name '*.php' -exec sed 's/: EncryptableSocket/: \\Amp\\Socket\\Socket/g' -i {} +
     
+    sed 's/use Kelunik\\Certificate\\Certificate/use Kelunik\Certificate\Certificate as _Certificate/g;s/new Certificate/new _Certificate/g' -i vendor/amphp/socket/src/TlsInfo.php
+
+    echo "<?php
+    
+namespace League\Uri\Contracts;
+
+interface UriException
+{
+}" > vendor/league/uri-interfaces/src/Contracts/UriException.php
+
     php -v
     
     php=5
@@ -81,7 +96,12 @@ cd ..
         [ -f $HOME/.composer/vendor/bin/php7to70 ] && php7to70=$HOME/.composer/vendor/bin/php7to70
         [ -f $HOME/.config/composer/vendor/bin/php7to70 ] && php7to70=$HOME/.config/composer/vendor/bin/php7to70
 
-        find phar7/vendor/league/uri -type f -name '*.php' -exec sed 's/withScheme[(]\$scheme[)]: UriInterface/withScheme(?string $scheme): UriInterface/g' -i {} +
+        sed -re 's/\?(\w*) (\$\w+)/\2 = NULL/g;s/= null = null/=null/ig;s/: self//g' -i vendor/league/uri-interfaces/src/Contracts/UriInterface.php
+        while IFS= read -r line; do l=$(echo "$line" | sed 's/[(].*//g'); sed -i "s/$l.*/$line/g" vendor/league/uri/src/Uri.php; done <<< $(grep 'public function' vendor/league/uri-interfaces/src/Contracts/UriInterface.php | sed 's/;//g;s/: self//g')
+
+        sed -i 's/handleConnectionWindowIncrement[(]\$windowSize[)]/handleConnectionWindowIncrement(int $windowSize)/g' vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php
+
+        sed -ri 's/^\{/{ use \\MyCallableMaker;/g;s/\\Closure::fromCallable[(]\[(.+), (.+)\][)]/\1->callableFromInstanceMethod(\2)/g' vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php vendor/amphp/http-client/src/Connection/Http{2,1}Connection.php
         
         $php7to70 convert --copy-all phar7 phar5 >/dev/null
 
