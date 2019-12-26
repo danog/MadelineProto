@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 rm -rf vendor/danog/madelineproto/docs
 

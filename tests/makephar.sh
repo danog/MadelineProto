@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 # Configure
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
@@ -44,7 +44,6 @@ composer clearcache
 composer update
 [ $PHP_MAJOR_VERSION -eq 5 ] && composer require dstuecken/php7ify
 composer dumpautoload --optimize
-cp -a $madelinePath/src vendor/danog/madelineproto/
 cd ..
 
 [ $PHP_MAJOR_VERSION -eq 5 ] && {
@@ -57,12 +56,14 @@ cd ..
     [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
 
     cd phar7
+    ls
     $madelinePath/tests/conversion/prepare-5.sh
     cd ..
 
     php7.3 $php7to5 convert --copy-all phar7 phar5 >/dev/null
 
     cd phar5
+    ls
     $madelinePath/tests/conversion/after-5.sh
     cd ..
 
@@ -77,12 +78,14 @@ cd ..
         [ -f $HOME/.config/composer/vendor/bin/php7to70 ] && php7to70=$HOME/.config/composer/vendor/bin/php7to70
 
         cd phar7
+    ls
         $madelinePath/tests/conversion/prepare-70.sh
         cd ..
 
         $php7to70 convert --copy-all phar7 phar5 >/dev/null
 
         cd phar5
+    ls
         $madelinePath/tests/conversion/after-70.sh
         cd ..
 
@@ -95,7 +98,8 @@ cd ..
 find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
 
 # Make sure conversion worked
-for f in $(find phar5 -type f -name '*.php'); do php -l $f;done
+# Not needed anymore, tests/testing.php preloads all classes
+#for f in $(find phar5 -type f -name '*.php'); do php -l $f;done
 
 branch="-$TRAVIS_BRANCH"
 cd $madelinePath
