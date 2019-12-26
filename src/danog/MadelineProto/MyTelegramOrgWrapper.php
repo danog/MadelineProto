@@ -63,6 +63,10 @@ class MyTelegramOrgWrapper
                 {
                     $this->logger = Logger::getLoggerFromSettings($settings);
                 }
+                public function getLogger()
+                {
+                    return $this->logger;
+                }
             },
             [],
             $this->settings['connection_settings'],
