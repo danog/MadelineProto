@@ -4,7 +4,7 @@
     "type": "project",
     "minimum-stability": "dev",
     "license": "AGPL-3.0-only",
-    "homepage": "https://daniil.it/MadelineProto",
+    "homepage": "https://docs.madelineproto.xyz",
     "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
     "conflict": {
         "krakjoe/pthreads-polyfill": "*"

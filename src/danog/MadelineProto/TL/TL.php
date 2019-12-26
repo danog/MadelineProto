@@ -637,9 +637,9 @@ class TL
         } elseif ($method === 'messages.sendEncryptedFile') {
             if (isset($arguments['file'])) {
                 if ((
-                        !\is_array($arguments['file']) ||
+                    !\is_array($arguments['file']) ||
                         !(isset($arguments['file']['_']) && $this->constructors->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')
-                    ) &&
+                ) &&
                     $this->API->settings['upload']['allow_automatic_upload']
                 ) {
                     $arguments['file'] = yield $this->API->uploadEncrypted($arguments['file']);

@@ -19,7 +19,7 @@
 
 namespace phpseclib\Math;
 
-if (PHP_MAJOR_VERSION < 7 && !((\class_exists(\Phar::class) && \Phar::running()) || defined('TESTING_VERSIONS'))) {
+if (PHP_MAJOR_VERSION < 7 && !((\class_exists(\Phar::class) && \Phar::running()) || \defined('TESTING_VERSIONS'))) {
     throw new \Exception('MadelineProto requires php 7 to run natively, use phar.madelineproto.xyz to run on PHP 5.6');
 }
 if (\defined('HHVM_VERSION')) {
