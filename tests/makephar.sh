@@ -56,35 +56,15 @@ cd ..
     [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
     [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
 
-    sed -re 's/\?(\w*) (\$\w+)/\2 = NULL/g;s/= null = null/=null/ig;s/: self//g' -i phar7/vendor/league/uri-interfaces/src/Contracts/UriInterface.php
-    while IFS= read -r line; do l=$(echo "$line" | sed 's/[(].*//g'); sed -i "s/$l.*/$line/g" phar7/vendor/league/uri/src/Uri.php; done <<< $(grep 'public function' phar7/vendor/league/uri-interfaces/src/Contracts/UriInterface.php | sed 's/;//g;s/: self//g')
-
-    sed -i 's/handleConnectionWindowIncrement[(]\$windowSize[)]/handleConnectionWindowIncrement(int $windowSize)/g' phar7/vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php
-
-    sed -ri 's/^\{/{ use \\MyCallableMaker;/g;s/\\Closure::fromCallable[(]\[(.+), (.+)\][)]/\1->callableFromInstanceMethod(\2)/g' phar7/vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php phar7/vendor/amphp/http-client/src/Connection/Http{2,1}Connection.php
+    cd phar7
+    $madelinePath/tests/conversion/before-5.sh
+    cd ..
 
     php7.3 $php7to5 convert --copy-all phar7 phar5 >/dev/null
-    
-    sed 's/^Loop::set.*;//g' -i phar5/vendor/amphp/amp/lib/Loop.php
-    echo 'Loop::set((new DriverFactory())->create());' >> phar5/vendor/amphp/amp/lib/Loop.php
-    cp $madelinePath/tests/random.php phar5/vendor/paragonie/random_compat/lib/random.php
-    cp phar5/vendor/danog/madelineproto/src/danog/MadelineProto/Coroutine.php phar5/vendor/amphp/amp/lib/Coroutine.php
-    sed 's/namespace danog\\MadelineProto;/namespace Amp;/g' -i phar5/vendor/amphp/amp/lib/Coroutine.php
-    sed 's/public static function echo/public static function echo_/g' -i phar5/vendor/danog/madelineproto/src/danog/MadelineProto/Tools.php
-    
-    find phar5/vendor/amphp -type f -name '*.php' -exec sed "s/extension_loaded[(]'zlib'[)]/false/g;s/new[(]/new_(/g;s/clone[(]/clone_(/g" -i {} +
 
-    find phar5/vendor/danog/madelineproto -type f -name '*.php' -exec sed 's/: EncryptableSocket/: \\Amp\\Socket\\Socket/g' -i {} +
-    
-    sed 's/use Kelunik\\Certificate\\Certificate/use Kelunik\Certificate\Certificate as _Certificate/g;s/new Certificate/new _Certificate/g' -i phar5/vendor/amphp/socket/src/TlsInfo.php
-
-    echo "<?php
-    
-namespace League\Uri\Contracts;
-
-interface UriException
-{
-}" > phar5/vendor/league/uri-interfaces/src/Contracts/UriException.php
+    cd phar5
+    $madelinePath/tests/conversion/after-5.sh
+    cd ..
 
     php -v
     
@@ -96,17 +76,16 @@ interface UriException
         [ -f $HOME/.composer/vendor/bin/php7to70 ] && php7to70=$HOME/.composer/vendor/bin/php7to70
         [ -f $HOME/.config/composer/vendor/bin/php7to70 ] && php7to70=$HOME/.config/composer/vendor/bin/php7to70
 
-        sed -re 's/\?(\w*) (\$\w+)/\2 = NULL/g;s/= null = null/=null/ig;s/: self//g' -i phar7/vendor/league/uri-interfaces/src/Contracts/UriInterface.php
-        while IFS= read -r line; do l=$(echo "$line" | sed 's/[(].*//g'); sed -i "s/$l.*/$line/g" phar7/vendor/league/uri/src/Uri.php; done <<< $(grep 'public function' phar7/vendor/league/uri-interfaces/src/Contracts/UriInterface.php | sed 's/;//g;s/: self//g')
+        cd phar7
+        $madelinePath/tests/conversion/before-70.sh
+        cd ..
 
-        sed -i 's/handleConnectionWindowIncrement[(]\$windowSize[)]/handleConnectionWindowIncrement(int $windowSize)/g' phar7/vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php
-
-        sed -ri 's/^\{/{ use \\MyCallableMaker;/g;s/\\Closure::fromCallable[(]\[(.+), (.+)\][)]/\1->callableFromInstanceMethod(\2)/g' phar7/vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php phar7/vendor/amphp/http-client/src/Connection/Http{2,1}Connection.php
-        
         $php7to70 convert --copy-all phar7 phar5 >/dev/null
 
-        find phar5/vendor/danog/madelineproto -type f -name '*.php' -exec sed 's/: EncryptableSocket/: \\Amp\\Socket\\Socket/g' -i {} +
-        
+        cd phar5
+        $madelinePath/tests/conversion/after-70.sh
+        cd ..
+
         php=70
     } || {
         cp -a phar7 phar5

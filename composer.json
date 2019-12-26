@@ -76,7 +76,6 @@
             "@cs",
             "@test"
         ],
-        "prepare-convert": "rm -rf tempConv && mkdir tempConv",
         "test-php7": "tests/test-conversion.sh 70",
         "test-php56": "tests/test-conversion.sh 5",
         "cs": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff --dry-run",

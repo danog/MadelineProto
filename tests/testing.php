@@ -27,9 +27,9 @@ if (!\file_exists(__DIR__.'/../vendor/autoload.php')) {
         }
         include 'madeline.php';
     }
-} elseif (\file_exists('/tmp/tempConv/vendor/autoload.php')) {
+} elseif (isset($argv[1]) && \file_exists("/tmp/tempConv{$argv[1]}/vendor/autoload.php")) {
     \define('TESTING_VERSIONS', 1);
-    $loader = require_once('/tmp/tempConv/vendor/autoload.php');
+    $loader = require_once("/tmp/tempConv{$argv[1]}/vendor/autoload.php");
 } else {
     require_once 'vendor/autoload.php';
 }
