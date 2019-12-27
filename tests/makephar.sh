@@ -137,10 +137,10 @@ git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
 
 [ "$php" == "70" ] && {
-    while [ "$(cat release$branch)" != "$TRAVIS_COMMIT" ]; do sleep 1; git pull; done
+    while [ "$(cat release$branch)" != "$TRAVIS_COMMIT"- ]; do sleep 1; git pull; done
 }
 [ "$php" == "5" ] && {
-    while [ "$(cat release70$branch)" != "$TRAVIS_COMMIT" ]; do sleep 1; git pull; done
+    while [ "$(cat release70$branch)" != "$TRAVIS_COMMIT"-70 ]; do sleep 1; git pull; done
 }
 
 cp "../madeline$php$branch.phar" .
