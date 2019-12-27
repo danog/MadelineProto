@@ -54,6 +54,13 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
     if (!isset(\danog\MadelineProto\Lang::$lang[$lang_code][$key])) {
         \danog\MadelineProto\Lang::$lang[$lang_code][$key] = $value;
     }
+    \preg_match('/^[^_]+_(.*?)(?:_param_(.*)_type_(.*))?$/', $key, $matches);
+    $method_name = isset($matches[1]) ? $matches[1] : '';
+    $param_name = isset($matches[2]) ? $matches[2] : '';
+    $param_type = isset($matches[3]) ? $matches[3] : '';
+    if (isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$method_name])) {
+        \danog\MadelineProto\Lang::$lang[$lang_code][$key] = \danog\MadelineProto\MTProto::DISALLOWED_METHODS[$method_name];
+    }
 
     if (\danog\MadelineProto\Lang::$lang[$lang_code][$key] === $value && (
         $lang_code !== 'en' || $value == '' ||
@@ -67,21 +74,22 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
         }
         if ($value == '') {
             $value = $key;
-        }/*
+        }
         \preg_match('/^[^_]+_(.*?)(?:_param_(.*)_type_(.*))?$/', $key, $matches);
         $method_name = isset($matches[1]) ? $matches[1] : '';
         $param_name = isset($matches[2]) ? $matches[2] : '';
         $param_type = isset($matches[3]) ? $matches[3] : '';
-
+        if (isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$method_name])) {
+            \danog\MadelineProto\Lang::$lang[$lang_code][$key] = \danog\MadelineProto\MTProto::DISALLOWED_METHODS[$method_name];
+        }
+        /*
         if ($param_name === 'nonce' && $param_type === 'int128') {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = 'Random number for cryptographic security';
         } elseif ($param_name === 'server_nonce' && $param_type === 'int128') {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = 'Random number for cryptographic security, given by server';
         } elseif ($param_name === 'random_id' && $param_type === 'long') {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = 'Random number for cryptographic security';
-        } elseif (isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$method_name])) {
-            \danog\MadelineProto\Lang::$lang[$lang_code][$key] = \danog\MadelineProto\MTProto::DISALLOWED_METHODS[$method_name];
-        } elseif (\strpos($value, 'Update ') === 0) {
+        } else elseif (\strpos($value, 'Update ') === 0) {
             if (!$param_name && \strpos($key, 'object_') === 0) {
                 $value = \str_replace('Update ', '', $value).' update';
             }

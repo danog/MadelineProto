@@ -57,7 +57,7 @@ trait Methods
         foreach ($this->TL->getMethods($this->td)->by_id as $id => $data) {
             $method = $data['method'];
             $php_method = \str_replace('.', '->', $data['method']);
-            $type = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
+            $type = \str_replace(['<', '>'], ['_of_', ''], $data['type']);
             $php_type = \preg_replace('/.*_of_/', '', $type);
             if (!isset($this->types[$php_type])) {
                 $this->types[$php_type] = ['methods' => [], 'constructors' => []];
@@ -96,7 +96,11 @@ trait Methods
 ';
 
             if (isset($this->td_descriptions['methods'][$data['method']])) {
-                $this->human_docs_methods[$this->td_descriptions['methods'][$data['method']]['description'].': '.$data['method']] = '* <a href="'.$method.'.html" name="'.$method.'">'.$this->td_descriptions['methods'][$data['method']]['description'].': '.$data['method'].'</a>
+                $desc = \Parsedown::instance()->line(\trim(\explode("\n", $this->td_descriptions['methods'][$data['method']]['description'])[0], '.'));
+                $dom = new \DOMDocument();
+                $dom->loadHTML(\mb_convert_encoding($desc, 'HTML-ENTITIES', 'UTF-8'));
+                $desc = $dom->textContent;
+                $this->human_docs_methods[$this->td_descriptions['methods'][$data['method']]['description'].': '.$data['method']] = '* <a href="'.$method.'.html" name="'.$method.'">'.$desc.': '.$data['method'].'</a>
 
 ';
             }

@@ -10,13 +10,13 @@ namespace danog\MadelineProto;
 interface auth
 {
     /**
-     * Send the verification code for login.
+     * You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `string`       **phone_number** - Phone number in international format
-     * * `int`          **api_id**       - Application identifier (see [App configuration](https://core.telegram.org/myapp))
-     * * `string`       **api_hash**     - Application secret hash (see [App configuration](https://core.telegram.org/myapp))
-     * * `CodeSettings` **settings**     - Settings for the code type to send
+     * * `string`       **phone_number** - You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `int`          **api_id**       - You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string`       **api_hash**     - You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `CodeSettings` **settings**     - You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -25,13 +25,13 @@ interface auth
     public function sendCode($params);
 
     /**
-     * Registers a validated phone number in the system.
+     * You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `string` **phone_number**    - Phone number in the international format
-     * * `string` **phone_code_hash** - SMS-message ID
-     * * `string` **first_name**      - New user first name
-     * * `string` **last_name**       - New user last name
+     * * `string` **phone_number**    - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_code_hash** - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **first_name**      - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **last_name**       - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -40,12 +40,12 @@ interface auth
     public function signUp($params);
 
     /**
-     * Signs in a user with a validated phone number.
+     * You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `string` **phone_number**    - Phone number in the international format
-     * * `string` **phone_code_hash** - SMS-message ID, obtained from [auth.sendCode](../methods/auth.sendCode.md)
-     * * `string` **phone_code**      - Valid numerical code from the SMS-message
+     * * `string` **phone_number**    - You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_code_hash** - You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_code**      - You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -54,7 +54,7 @@ interface auth
     public function signIn($params);
 
     /**
-     * Logs out the user.
+     * You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info).
      *
      * @return bool
      */
@@ -70,10 +70,10 @@ After calling this method it is necessary to reregister the current device using
     public function resetAuthorizations();
 
     /**
-     * Returns data for copying authorization to another data-centre.
+     * You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html.
      *
      * Parameters:
-     * * `int` **dc_id** - Number of a target data-centre
+     * * `int` **dc_id** - You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
      *
      * @param array $params Parameters
      *
@@ -82,11 +82,11 @@ After calling this method it is necessary to reregister the current device using
     public function exportAuthorization($params);
 
     /**
-     * Logs in a user using a key transmitted from his native data-centre.
+     * You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html.
      *
      * Parameters:
-     * * `int`   **id**    - User ID
-     * * `bytes` **bytes** - Authorization key
+     * * `int`   **id**    - You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * * `bytes` **bytes** - You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
      *
      * @param array $params Parameters
      *
@@ -95,15 +95,13 @@ After calling this method it is necessary to reregister the current device using
     public function importAuthorization($params);
 
     /**
-     * Binds a temporary authorization key `temp_auth_key_id` to the permanent authorization key `perm_auth_key_id`. Each permanent key may only be bound to one temporary key at a time, binding a new temporary key overwrites the previous one.
-
-For more information, see [Perfect Forward Secrecy](https://core.telegram.org/api/pfs).
+     * You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info.
      *
      * Parameters:
-     * * `long`  **perm_auth_key_id**  - Permanent auth\_key\_id to bind to
-     * * `long`  **nonce**             - Random long from [Binding message contents](#binding-message-contents)
-     * * `int`   **expires_at**        - Unix timestamp to invalidate temporary key, see [Binding message contents](#binding-message-contents)
-     * * `bytes` **encrypted_message** - See [Generating encrypted\_message](#generating-encrypted-message)
+     * * `long`  **perm_auth_key_id**  - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
+     * * `long`  **nonce**             - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
+     * * `int`   **expires_at**        - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
+     * * `bytes` **encrypted_message** - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
      *
      * @param array $params Parameters
      *
@@ -112,12 +110,12 @@ For more information, see [Perfect Forward Secrecy](https://core.telegram.org/ap
     public function bindTempAuthKey($params);
 
     /**
-     * Login as a bot.
+     * You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `int`    **api_id**         - Application identifier (see. [App configuration](https://core.telegram.org/myapp))
-     * * `string` **api_hash**       - Application identifier hash (see. [App configuration](https://core.telegram.org/myapp))
-     * * `string` **bot_auth_token** - Bot token (see [bots](https://core.telegram.org/bots))
+     * * `int`    **api_id**         - You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **api_hash**       - You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **bot_auth_token** - You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -126,10 +124,10 @@ For more information, see [Perfect Forward Secrecy](https://core.telegram.org/ap
     public function importBotAuthorization($params);
 
     /**
-     * Try logging to an account protected by a [2FA password](https://core.telegram.org/api/srp).
+     * You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `InputCheckPasswordSRP` **password** - The account's password (see [SRP](https://core.telegram.org/api/srp))
+     * * `InputCheckPasswordSRP` **password** - You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -315,7 +313,7 @@ interface account
      * Validates a username and checks availability.
      *
      * Parameters:
-     * * `string` **username** - username<br>Accepted characters: A-z (case-insensitive), 0-9 and underscores.<br>Length: 5-32 characters.
+     * * `string` **username** - Username<br>Accepted characters: A-z (case-insensitive), 0-9 and underscores.<br>Length: 5-32 characters.
      *
      * @param array $params Parameters
      *
@@ -327,7 +325,7 @@ interface account
      * Changes username for the current user.
      *
      * Parameters:
-     * * `string` **username** - username or empty string if username is to be removed<br>Accepted characters: a-z (case-insensitive), 0-9 and underscores.<br>Length: 5-32 characters.
+     * * `string` **username** - Username or empty string if username is to be removed<br>Accepted characters: a-z (case-insensitive), 0-9 and underscores.<br>Length: 5-32 characters.
      *
      * @param array $params Parameters
      *
@@ -457,10 +455,10 @@ interface account
     public function getPassword();
 
     /**
-     * Get private info associated to the password info (recovery email, telegram [passport](https://core.telegram.org/passport) info & so on).
+     * You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `InputCheckPasswordSRP` **password** - The password (see [SRP](https://core.telegram.org/api/srp))
+     * * `InputCheckPasswordSRP` **password** - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -469,11 +467,11 @@ interface account
     public function getPasswordSettings($params);
 
     /**
-     * Set a new 2FA password.
+     * You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `InputCheckPasswordSRP`         **password**     - The old password (see [SRP](https://core.telegram.org/api/srp))
-     * * `account.PasswordInputSettings` **new_settings** - The new password (see [SRP](https://core.telegram.org/api/srp))
+     * * `InputCheckPasswordSRP`         **password**     - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
+     * * `account.PasswordInputSettings` **new_settings** - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -956,10 +954,10 @@ interface users
     public function getUsers($params);
 
     /**
-     * Returns extended user info by ID.
+     * You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `InputUser` **id** - User ID
+     * * `InputUser` **id** - You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -1103,10 +1101,10 @@ interface contacts
     public function search($params);
 
     /**
-     * Resolve a @username to get peer info.
+     * You cannot use this method directly, use the resolveUsername, getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `string` **username** - @username to resolve
+     * * `string` **username** - You cannot use this method directly, use the resolveUsername, getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -1468,7 +1466,7 @@ interface messages
     public function getChats($params);
 
     /**
-     * Returns full chat info according to its ID.
+     * You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
      * * `InputPeer` **chat_id** - You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
@@ -1546,11 +1544,11 @@ interface messages
     public function createChat($params);
 
     /**
-     * Returns configuration parameters for Diffie-Hellman key generation. Can also return a random sequence of bytes of required length.
+     * You cannot use this method directly, instead use $MadelineProto->getDhConfig();.
      *
      * Parameters:
-     * * `int` **version**       - Value of the **version** parameter from [messages.dhConfig](../constructors/messages.dhConfig.md), avialable at the client
-     * * `int` **random_length** - Length of the required random sequence
+     * * `int` **version**       - You cannot use this method directly, instead use $MadelineProto->getDhConfig();
+     * * `int` **random_length** - You cannot use this method directly, instead use $MadelineProto->getDhConfig();
      *
      * @param array $params Parameters
      *
@@ -1559,11 +1557,11 @@ interface messages
     public function getDhConfig($params);
 
     /**
-     * Sends a request to start a secret chat to the user.
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats.
      *
      * Parameters:
-     * * `InputUser` **user_id** - User ID
-     * * `bytes`     **g_a**     - `A = g ^ a mod p`, see [Wikipedia](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange)
+     * * `InputUser` **user_id** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * * `bytes`     **g_a**     - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
      *
      * @param array $params Parameters
      *
@@ -1572,12 +1570,12 @@ interface messages
     public function requestEncryption($params);
 
     /**
-     * Confirms creation of a secret chat.
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats.
      *
      * Parameters:
-     * * `InputEncryptedChat` **peer**            - Secret chat ID
-     * * `bytes`              **g_b**             - `B = g ^ b mod p`, see [Wikipedia](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange)
-     * * `long`               **key_fingerprint** - 64-bit fingerprint of the received key
+     * * `InputEncryptedChat` **peer**            - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * * `bytes`              **g_b**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * * `long`               **key_fingerprint** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
      *
      * @param array $params Parameters
      *
@@ -1586,10 +1584,10 @@ interface messages
     public function acceptEncryption($params);
 
     /**
-     * Cancels a request for creation and/or delete info on secret chat.
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats.
      *
      * Parameters:
-     * * `int` **chat_id** - Secret chat ID
+     * * `int` **chat_id** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
      *
      * @param array $params Parameters
      *
@@ -1664,10 +1662,10 @@ interface messages
     public function sendEncryptedService($params);
 
     /**
-     * Confirms receipt of messages in a secret chat by client, cancels push notifications.
+     * You cannot use this method directly.
      *
      * Parameters:
-     * * `int` **max_qts** - Maximum qts value available at the client
+     * * `int` **max_qts** - You cannot use this method directly
      *
      * @param array $params Parameters
      *
@@ -2809,20 +2807,20 @@ Use this method to respond to such pre-checkout queries.
 interface updates
 {
     /**
-     * Returns a current state of updates.
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
      *
      * @return updates.State
      */
     public function getState();
 
     /**
-     * Get new [updates](https://core.telegram.org/api/updates).
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
      *
      * Parameters:
-     * * `int` **pts**             - PTS, see [updates](https://core.telegram.org/api/updates).
-     * * `int` **pts_total_limit** - Optional: For fast updating: if provided and `pts + pts_total_limit < remote pts`, [updates.differenceTooLong](../constructors/updates.differenceTooLong.md) will be returned.<br>Simply tells the server to not return the difference if it is bigger than `pts_total_limit`<br>If the remote pts is too big (> ~4000000), this field will default to 1000000
-     * * `int` **date**            - date, see [updates](https://core.telegram.org/api/updates).
-     * * `int` **qts**             - QTS, see [updates](https://core.telegram.org/api/updates).
+     * * `int` **pts**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `int` **pts_total_limit** - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `int` **date**            - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `int` **qts**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
      *
      * @param array $params Parameters
      *
@@ -2831,14 +2829,14 @@ interface updates
     public function getDifference($params);
 
     /**
-     * Returns the difference between the current state of updates of a certain channel and transmitted.
+     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
      *
      * Parameters:
-     * * `boolean`               **force**   - Optional: Set to true to skip some possibly unneeded updates and reduce server-side load
-     * * `InputChannel`          **channel** - The channel
-     * * `ChannelMessagesFilter` **filter**  - Messsage filter
-     * * `int`                   **pts**     - Persistent timestamp (see [updates](https://core.telegram.org/api/updates))
-     * * `int`                   **limit**   - How many updates to fetch, max `100000`<br>Ordinary (non-bot) users are supposed to pass `10-100`
+     * * `boolean`               **force**   - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `InputChannel`          **channel** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `ChannelMessagesFilter` **filter**  - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `int`                   **pts**     - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `int`                   **limit**   - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
      *
      * @param array $params Parameters
      *
@@ -2904,12 +2902,12 @@ interface photos
 interface upload
 {
     /**
-     * Saves a part of file for futher sending to one of the methods.
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `long`  **file_id**   - Random file identifier created by the client
-     * * `int`   **file_part** - Numerical order of a part
-     * * `bytes` **bytes**     - Binary data, contend of a part
+     * * `long`  **file_id**   - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **file_part** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **bytes**     - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -2918,13 +2916,13 @@ interface upload
     public function saveFilePart($params);
 
     /**
-     * Returns content of a whole file or its part.
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `boolean`           **precise**  - Optional: Disable some checks on limit and offset values, useful for example to stream videos by keyframes
-     * * `InputFileLocation` **location** - File location
-     * * `int`               **offset**   - Number of bytes to be skipped
-     * * `int`               **limit**    - Number of bytes to be returned
+     * * `boolean`           **precise**  - Optional: You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `InputFileLocation` **location** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`               **offset**   - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`               **limit**    - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -2933,13 +2931,13 @@ interface upload
     public function getFile($params);
 
     /**
-     * Saves a part of a large file (over 10Mb in size) to be later passed to one of the methods.
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `long`  **file_id**          - Random file id, created by the client
-     * * `int`   **file_part**        - Part sequence number
-     * * `int`   **file_total_parts** - Total number of parts
-     * * `bytes` **bytes**            - Binary data, part contents
+     * * `long`  **file_id**          - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **file_part**        - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **file_total_parts** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **bytes**            - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -2962,12 +2960,12 @@ interface upload
     public function getWebFile($params);
 
     /**
-     * Download a [CDN](https://core.telegram.org/cdn) file.
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `bytes` **file_token** - File token
-     * * `int`   **offset**     - Offset of chunk to download
-     * * `int`   **limit**      - Length of chunk to download
+     * * `bytes` **file_token** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **offset**     - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **limit**      - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -2976,11 +2974,11 @@ interface upload
     public function getCdnFile($params);
 
     /**
-     * Request a reupload of a certain file to a [CDN DC](https://core.telegram.org/cdn).
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `bytes` **file_token**    - File token
-     * * `bytes` **request_token** - Request token
+     * * `bytes` **file_token**    - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **request_token** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -2989,11 +2987,11 @@ interface upload
     public function reuploadCdnFile($params);
 
     /**
-     * Get SHA256 hashes for verifying downloaded [CDN](https://core.telegram.org/cdn) files.
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `bytes` **file_token** - File
-     * * `int`   **offset**     - Offset from which to start getting hashes
+     * * `bytes` **file_token** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`   **offset**     - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -3002,11 +3000,11 @@ interface upload
     public function getCdnFileHashes($params);
 
     /**
-     * Get SHA256 hashes for verifying downloaded files.
+     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `InputFileLocation` **location** - File
-     * * `int`               **offset**   - Offset from which to get file hashes
+     * * `InputFileLocation` **location** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`               **offset**   - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -3314,10 +3312,10 @@ interface channels
     public function getChannels($params);
 
     /**
-     * Get full info about a channel.
+     * You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel to get info about
+     * * `InputChannel` **channel** - You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -3828,13 +3826,13 @@ interface phone
     public function getCallConfig();
 
     /**
-     * Start a telegram phone call.
+     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
      *
      * Parameters:
-     * * `boolean`           **video**    - Optional: Whether to start a video call
-     * * `InputUser`         **user_id**  - Destination of the phone call
-     * * `bytes`             **g_a_hash** - [Parameter for E2E encryption key exchange »](https://core.telegram.org/api/end-to-end/voice-calls)
-     * * `PhoneCallProtocol` **protocol** - Phone call settings
+     * * `boolean`           **video**    - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `InputUser`         **user_id**  - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `bytes`             **g_a_hash** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `PhoneCallProtocol` **protocol** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
      *
      * @param array $params Parameters
      *
@@ -3843,12 +3841,12 @@ interface phone
     public function requestCall($params);
 
     /**
-     * Accept incoming call.
+     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
      *
      * Parameters:
-     * * `InputPhoneCall`    **peer**     - The call to accept
-     * * `bytes`             **g_b**      - [Parameter for E2E encryption key exchange »](https://core.telegram.org/api/end-to-end/voice-calls)
-     * * `PhoneCallProtocol` **protocol** - Phone call settings
+     * * `InputPhoneCall`    **peer**     - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `bytes`             **g_b**      - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `PhoneCallProtocol` **protocol** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
      *
      * @param array $params Parameters
      *
@@ -3857,13 +3855,13 @@ interface phone
     public function acceptCall($params);
 
     /**
-     * [Complete phone call E2E encryption key exchange »](https://core.telegram.org/api/end-to-end/voice-calls).
+     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
      *
      * Parameters:
-     * * `InputPhoneCall`    **peer**            - The phone call
-     * * `bytes`             **g_a**             - [Parameter for E2E encryption key exchange »](https://core.telegram.org/api/end-to-end/voice-calls)
-     * * `long`              **key_fingerprint** - Key fingerprint
-     * * `PhoneCallProtocol` **protocol**        - Phone call settings
+     * * `InputPhoneCall`    **peer**            - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `bytes`             **g_a**             - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `long`              **key_fingerprint** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `PhoneCallProtocol` **protocol**        - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
      *
      * @param array $params Parameters
      *
@@ -3884,14 +3882,14 @@ interface phone
     public function receivedCall($params);
 
     /**
-     * Refuse or end running call.
+     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
      *
      * Parameters:
-     * * `boolean`                **video**         - Optional: Whether this is a video call
-     * * `InputPhoneCall`         **peer**          - The phone call
-     * * `int`                    **duration**      - Call duration
-     * * `PhoneCallDiscardReason` **reason**        - Why was the call discarded
-     * * `long`                   **connection_id** - Preferred libtgvoip relay ID
+     * * `boolean`                **video**         - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `InputPhoneCall`         **peer**          - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `int`                    **duration**      - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `PhoneCallDiscardReason` **reason**        - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `long`                   **connection_id** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
      *
      * @param array $params Parameters
      *

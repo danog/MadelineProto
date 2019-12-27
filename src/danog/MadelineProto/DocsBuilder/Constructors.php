@@ -46,9 +46,9 @@ trait Constructors
                             $type = $this->TL->getConstructors($this->td)->findByType(str_replace('%', '', $type))['predicate'];
                         }*/
             $layer = isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '';
-            $type = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['type']);
+            $type = \str_replace(['<', '>'], ['_of_', ''], $data['type']);
             $php_type = \preg_replace('/.*_of_/', '', $type);
-            $constructor = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $data['predicate']);
+            $constructor = \str_replace(['<', '>'], ['_of_', ''], $data['predicate']);
             $php_constructor = \preg_replace('/.*_of_/', '', $constructor);
             if (!isset($this->types[$php_type])) {
                 $this->types[$php_type] = ['constructors' => [], 'methods' => []];
@@ -67,7 +67,7 @@ trait Constructors
                 }
                 $type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type';
                 $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int53', 'int', 'long', 'int128', 'int256', 'int512']) ? 'types' : 'constructors';
-                $param[$type_or_subtype] = \str_replace(['.', 'true', 'false'], ['.', 'Bool', 'Bool'], $param[$type_or_subtype]);
+                $param[$type_or_subtype] = \str_replace(['true', 'false'], ['Bool', 'Bool'], $param[$type_or_subtype]);
                 if (\preg_match('/%/', $param[$type_or_subtype])) {
                     $param[$type_or_subtype] = $this->TL->getConstructors($this->td)->findByType(\str_replace('%', '', $param[$type_or_subtype]))['predicate'];
                 }
@@ -118,7 +118,7 @@ trait Constructors
                     unset(\danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']]);
                     continue;
                 }
-                $ptype = \str_replace('.', '_', $param[isset($param['subtype']) ? 'subtype' : 'type']);
+                $ptype = $param[isset($param['subtype']) ? 'subtype' : 'type'];
                 //$type_or_bare_type = 'types';
                 /*if (isset($param['subtype'])) {
                       if ($param['type'] === 'vector') {

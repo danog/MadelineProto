@@ -88,14 +88,14 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
         foreach ($this->types as $otype => $keys) {
             $new_namespace = \preg_replace('/_.*/', '', $otype);
             //$br = $new_namespace != $last_namespace ? '***<br><br>' : '';
-            $type = \str_replace(['.', '<', '>'], ['_', '_of_', ''], $otype);
+            $type = \str_replace(['<', '>'], ['_of_', ''], $otype);
             $type = \preg_replace('/.*_of_/', '', $type);
             $index .= '['.\str_replace('_', '\\_', $type).']('.$type.'.md)<a name="'.$type.'"></a>  
 
 ';
             $constructors = '';
             foreach ($keys['constructors'] as $data) {
-                $predicate = \str_replace('.', '_', $data['predicate']).(isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '');
+                $predicate = $data['predicate'].(isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '');
                 $md_predicate = \str_replace('_', '\\_', $predicate);
                 $constructors .= '['.$md_predicate.'](../constructors/'.$predicate.'.md)  
 
@@ -103,13 +103,13 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
             }
             $methods = '';
             foreach ($keys['methods'] as $data) {
-                $name = \str_replace('.', '_', $data['method']);
-                $md_name = \str_replace('_', '->', $name);
+                $name = $data['method'];
+                $md_name = \str_replace(['.', '_'], ['->', '\\_'], $name);
                 $methods .= '[$MadelineProto->'.$md_name.'](../methods/'.$name.'.md)  
 
 ';
             }
-            $description = isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] : 'constructors and methods of typr '.$type;
+            $description = isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] : 'constructors and methods of type '.$type;
             $header = '---
 title: '.$type.'
 description: constructors and methods of type '.$type.'

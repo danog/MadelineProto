@@ -123,7 +123,7 @@ class TL
      *
      * @return array
      */
-    public function getDescriptions(): array
+    public function &getDescriptions(): array
     {
         return $this->tdDescriptions;
     }
