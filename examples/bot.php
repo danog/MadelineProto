@@ -85,7 +85,7 @@ $settings = [
     ],
 ];
 
-$MadelineProto = new \danog\MadelineProto\API('/home/daniil/lmao.session', $settings);
+$MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
 $MadelineProto->async(true);
 $MadelineProto->loop(function () use ($MadelineProto) {
     yield $MadelineProto->start();
