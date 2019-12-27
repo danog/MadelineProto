@@ -145,7 +145,7 @@ cd MadelineProtoPhar
 
 cp "../madeline$php$branch.phar" .
 cp ../tools/phar.php ../examples/mtproxyd .
-echo -n $TRAVIS_COMMIT > release$php$branch
+echo -n "$TRAVIS_COMMIT-$php" > release$php$branch
 
 [ "$IS_RELEASE" == "y" ] && {
     cp release$php$branch release$php
