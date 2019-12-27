@@ -918,15 +918,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (Lang::$lang[$this->settings['app_info']['lang_code'] ?? 'en'] ?? false) {
             Lang::$current_lang = &Lang::$lang[$this->settings['app_info']['lang_code']];
         }
-        // Cleanup old properties, init new stuffs
-        $this->cleanupProperties();
-
-        // Update TL callbacks
-        $callbacks = [$this, $this->referenceDatabase];
-        if (!($this->authorization['user']['bot'] ?? false)) {
-            $callbacks []= $this->minDatabase;
-        }
-        $this->TL->updateCallbacks($callbacks);
 
         $this->settings['connection_settings']['all']['ipv6'] = Magic::$ipv6;
         if ($this->authorized === true) {
@@ -940,17 +931,30 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
         }
 
-        if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->event_handler, EventHandler::class)) {
-            $this->setEventHandler($this->event_handler);
-        }
-
         if (($this->settings['tl_schema']['src']['botAPI'] ?? '') !== __DIR__.'/TL_botAPI.tl') {
+            unset($this->v);
+        }
+        if (!\file_exists($this->settings['tl_schema']['src']['telegram'])) {
             unset($this->v);
         }
 
         if (!isset($this->v) || $this->v !== self::V) {
             yield $this->upgradeMadelineProto();
             $force = true;
+        }
+
+        // Cleanup old properties, init new stuffs
+        $this->cleanupProperties();
+
+        // Update TL callbacks
+        $callbacks = [$this, $this->referenceDatabase];
+        if (!($this->authorization['user']['bot'] ?? false)) {
+            $callbacks []= $this->minDatabase;
+        }
+        $this->TL->updateCallbacks($callbacks);
+
+        if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->event_handler, EventHandler::class)) {
+            $this->setEventHandler($this->event_handler);
         }
 
         yield $this->connectToAllDcs();
