@@ -30,22 +30,36 @@ trait Loop
 {
     private $loop_callback;
 
-    public function setLoopCallback($callback)
+    /**
+     * Set loop callback (DEPRECATED).
+     *
+     * @param callable $callback Callback
+     *
+     * @return void
+     */
+    public function setLoopCallback($callback): void
     {
         $this->loop_callback = $callback;
     }
 
-    public function loop($max_forks = 0)
+    /**
+     * Start MadelineProto's update handling loop, or run the provided async callable.
+     *
+     * @param callable $callback Async callable to run
+     *
+     * @return mixed
+     */
+    public function loop($callback = null)
     {
-        if (\is_callable($max_forks)) {
+        if (\is_callable($max_fcallbackorks)) {
             $this->logger->logger('Running async callable');
 
-            return yield $max_forks();
+            return yield $callback();
         }
-        if ($max_forks instanceof Promise) {
+        if ($callback instanceof Promise) {
             $this->logger->logger('Resolving async promise');
 
-            return yield $max_forks;
+            return yield $callback;
         }
         if (!$this->authorized) {
             $this->logger->logger('Not authorized, not starting event loop', \danog\MadelineProto\Logger::FATAL_ERROR);
@@ -169,7 +183,14 @@ trait Loop
         }
     }
 
-    public function closeConnection($message = 'OK!')
+    /**
+     * Close connection with server.
+     *
+     * @param string $message Message
+     *
+     * @return void
+     */
+    public function closeConnection($message = 'OK!'): void
     {
         if (PHP_SAPI === 'cli' || isset($GLOBALS['exited']) || \headers_sent()) {
             return;

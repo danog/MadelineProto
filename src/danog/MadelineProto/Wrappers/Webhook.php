@@ -24,7 +24,15 @@ namespace danog\MadelineProto\Wrappers;
  */
 trait Webhook
 {
-    public function setWebhook($hook_url, $pem_path = null)
+    /**
+     * Set webhook update handler.
+     *
+     * @param string $hook_url Webhook URL
+     * @param string $pem_path PEM path for self-signed certificate
+     *
+     * @return void
+     */
+    public function setWebhook($hook_url, $pem_path = null): void
     {
         $this->pem_path = $pem_path;
         $this->hook_url = $hook_url;

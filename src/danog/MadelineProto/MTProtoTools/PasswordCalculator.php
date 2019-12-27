@@ -94,9 +94,10 @@ class PasswordCalculator
      * Popupate 2FA configuration.
      *
      * @param array $object 2FA configuration object obtained using account.getPassword
+     *
      * @return void
      */
-    public function addInfo(array $object)
+    public function addInfo(array $object): void
     {
         if ($object['_'] !== 'account.password') {
             throw new Exception('Wrong constructor');

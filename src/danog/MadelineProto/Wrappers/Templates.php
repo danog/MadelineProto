@@ -23,7 +23,7 @@ use function Amp\ByteStream\getOutputBufferStream;
 
 trait Templates
 {
-    public function webEcho($message = '')
+    public function webEcho(string $message = '')
     {
         $stdout = getOutputBufferStream();
         switch ($this->authorized) {
@@ -68,17 +68,29 @@ trait Templates
         </body>
         </html>';
 
-    public function webEchoTemplate($message, $form)
+    public function webEchoTemplate($message, $form): string
     {
         return \sprintf($this->web_template, $form, $message);
     }
 
-    public function getWebTemplate()
+    /**
+     * Get web template.
+     *
+     * @return string
+     */
+    public function getWebTemplate(): string
     {
         return $this->web_template;
     }
 
-    public function setWebTemplate($template)
+    /**
+     * Set web template.
+     *
+     * @param string $template Template
+     *
+     * @return void
+     */
+    public function setWebTemplate(string $template): void
     {
         $this->web_template = $template;
     }

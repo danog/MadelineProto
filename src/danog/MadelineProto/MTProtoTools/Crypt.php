@@ -21,7 +21,16 @@ namespace danog\MadelineProto\MTProtoTools;
 
 trait Crypt
 {
-    public static function aesCalculate($msg_key, $auth_key, $to_server = true)
+    /**
+     * AES KDF function for MTProto v2.
+     *
+     * @param string  $msg_key   Message key
+     * @param string  $auth_key  Auth key
+     * @param boolean $to_server To server/from server direction
+     *
+     * @return array
+     */
+    public static function aesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
     {
         $x = $to_server ? 0 : 8;
         $sha256_a = \hash('sha256', $msg_key.\substr($auth_key, $x, 36), true);
@@ -32,7 +41,16 @@ trait Crypt
         return [$aes_key, $aes_iv];
     }
 
-    public static function oldAesCalculate($msg_key, $auth_key, $to_server = true)
+    /**
+     * AES KDF function for MTProto v1.
+     *
+     * @param string  $msg_key   Message key
+     * @param string  $auth_key  Auth key
+     * @param boolean $to_server To server/from server direction
+     *
+     * @return array
+     */
+    public static function oldAesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
     {
         $x = $to_server ? 0 : 8;
         $sha1_a = \sha1($msg_key.\substr($auth_key, $x, 32), true);
@@ -45,7 +63,16 @@ trait Crypt
         return [$aes_key, $aes_iv];
     }
 
-    public static function ctrEncrypt($message, $key, $iv)
+    /**
+     * CTR encrypt.
+     *
+     * @param string $message Message to encrypt
+     * @param string $key     Key
+     * @param string $iv      IV
+     *
+     * @return string
+     */
+    public static function ctrEncrypt(string $message, string $key, string $iv): string
     {
         $cipher = new \tgseclib\Crypt\AES('ctr');
         $cipher->setKey($key);
@@ -54,7 +81,16 @@ trait Crypt
         return @$cipher->encrypt($message);
     }
 
-    public static function igeEncrypt($message, $key, $iv)
+    /**
+     * IGE encrypt.
+     *
+     * @param string $message Message to encrypt
+     * @param string $key     Key
+     * @param string $iv      IV
+     *
+     * @return string
+     */
+    public static function igeEncrypt(string $message, string $key, string $iv): string
     {
         $cipher = new \tgseclib\Crypt\AES('ige');
         $cipher->setKey($key);
@@ -62,7 +98,16 @@ trait Crypt
 
         return @$cipher->encrypt($message);
     }
-    public static function igeDecrypt($message, $key, $iv)
+    /**
+     * CTR decrypt.
+     *
+     * @param string $message Message to encrypt
+     * @param string $key     Key
+     * @param string $iv      IV
+     *
+     * @return string
+     */
+    public static function igeDecrypt(string $message, string $key, string $iv): string
     {
         $cipher = new \tgseclib\Crypt\AES('ige');
         $cipher->setKey($key);

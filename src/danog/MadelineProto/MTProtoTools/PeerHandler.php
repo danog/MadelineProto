@@ -32,17 +32,38 @@ trait PeerHandler
 
     public $caching_full_info = [];
 
-    public function toSupergroup($id)
+    /**
+     * Convert MTProto channel ID to bot API channel ID.
+     *
+     * @param int $id MTProto channel ID
+     *
+     * @return int
+     */
+    public static function toSupergroup($id)
     {
         return -($id + \pow(10, (int) \floor(\log($id, 10) + 3)));
     }
 
-    public function fromSupergroup($id)
+    /**
+     * Convert bot API channel ID to MTProto channel ID.
+     *
+     * @param int $id Bot API channel ID
+     *
+     * @return int
+     */
+    public static function fromSupergroup($id)
     {
         return -$id - \pow(10, (int) \floor(\log(-$id, 10)));
     }
 
-    public function isSupergroup($id)
+    /**
+     * Check whether provided bot API ID is a channel.
+     *
+     * @param int $id Bot API ID
+     *
+     * @return boolean
+     */
+    public static function isSupergroup($id): bool
     {
         $log = \log(-$id, 10);
 
@@ -174,7 +195,14 @@ trait PeerHandler
         })());
     }
 
-    public function peerIsset($id)
+    /**
+     * Check if peer is present in internal peer database.
+     *
+     * @param mixed $id Peer
+     *
+     * @return \Generator<boolean>
+     */
+    public function peerIsset($id): \Generator
     {
         try {
             return isset($this->chats[(yield $this->getInfo($id))['bot_api_id']]);
@@ -192,7 +220,7 @@ trait PeerHandler
         }
     }
 
-    public function entitiesPeerIsset($entities)
+    public function entitiesPeerIsset($entities): \Generator
     {
         try {
             foreach ($entities as $entity) {
@@ -209,7 +237,7 @@ trait PeerHandler
         return true;
     }
 
-    public function fwdPeerIsset($fwd)
+    public function fwdPeerIsset($fwd): \Generator
     {
         try {
             if (isset($fwd['user_id']) && !yield $this->peerIsset($fwd['user_id'])) {
@@ -225,6 +253,13 @@ trait PeerHandler
         return true;
     }
 
+    /**
+     * Get folder ID from object.
+     *
+     * @param mixed $id Object
+     *
+     * @return ?int
+     */
     public function getFolderId($id)
     {
         if (!\is_array($id)) {
@@ -235,6 +270,13 @@ trait PeerHandler
         }
         return $id['folder_id'];
     }
+    /**
+     * Get bot API ID from peer object.
+     *
+     * @param mixed $id Peer
+     *
+     * @return int
+     */
     public function getId($id)
     {
         if (\is_array($id)) {
@@ -377,7 +419,17 @@ trait PeerHandler
         return false;
     }
 
-    public function getInfo($id, $recursive = true)
+    /**
+     * Get info about peer, returns an Info object.
+     *
+     * @param mixed   $id        Peer
+     * @param boolean $recursive Internal
+     *
+     * @see https://docs.madelineproto.xyz/Info.html
+     *
+     * @return \Generator<array> Info object
+     */
+    public function getInfo($id, $recursive = true): \Generator
     {
         if (\is_array($id)) {
             switch ($id['_']) {
@@ -608,7 +660,16 @@ trait PeerHandler
         return isset($this->full_chats[$id]['last_update']) ? $this->full_chats[$id]['last_update'] : 0;
     }
 
-    public function getFullInfo($id)
+    /**
+     * Get full info about peer, returns an FullInfo object.
+     *
+     * @param mixed $id Peer
+     *
+     * @see https://docs.madelineproto.xyz/FullInfo.html
+     *
+     * @return \Generator<array> FullInfo object
+     */
+    public function getFullInfo($id): \Generator
     {
         $partial = yield $this->getInfo($id);
         if (\time() - $this->fullChatLastUpdated($partial['bot_api_id']) < (isset($this->settings['peer']['full_info_cache_time']) ? $this->settings['peer']['full_info_cache_time'] : 0)) {
@@ -638,7 +699,16 @@ trait PeerHandler
         return \array_merge($partial, $res);
     }
 
-    public function getPwrChat($id, $fullfetch = true, $send = true)
+    /**
+     * Get full info about peer (including full list of channel members), returns a Chat object.
+     *
+     * @param mixed $id Peer
+     *
+     * @see https://docs.madelineproto.xyz/Chat.html
+     *
+     * @return \Generator<array> Chat object
+     */
+    public function getPwrChat($id, $fullfetch = true, $send = true): \Generator
     {
         $full = $fullfetch ? yield $this->getFullInfo($id) : yield $this->getInfo($id);
         $res = ['id' => $full['bot_api_id'], 'type' => $full['type']];

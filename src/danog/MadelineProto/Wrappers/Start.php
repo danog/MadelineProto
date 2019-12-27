@@ -26,7 +26,12 @@ use danog\MadelineProto\Tools;
  */
 trait Start
 {
-    public function start()
+    /**
+     * Log in to telegram (via CLI or web).
+     *
+     * @return \Generator
+     */
+    public function start(): \Generator
     {
         if ($this->authorized === self::LOGGED_IN) {
             return yield $this->getSelf();

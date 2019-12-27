@@ -21,7 +21,12 @@ namespace danog\MadelineProto\Wrappers;
 
 trait Noop
 {
-    public function setNoop()
+    /**
+     * Set NOOP update handler, ignoring all updates.
+     *
+     * @return void
+     */
+    public function setNoop(): void
     {
         $this->settings['updates']['callback'] = [$this, 'noop'];
         $this->settings['updates']['run_callback'] = false;
@@ -29,7 +34,12 @@ trait Noop
         $this->startUpdateSystem();
     }
 
-    public function noop()
+    /**
+     * Noop update handler.
+     *
+     * @return void
+     */
+    public function noop(): void
     {
     }
 }

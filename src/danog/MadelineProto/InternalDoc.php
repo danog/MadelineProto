@@ -4452,43 +4452,101 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$method, $args, $aargs, $extra]);
     }
-
-    public function aesCalculate($msg_key, $auth_key, $to_server = true, array $extra = [])
+    /**
+     * AES KDF function for MTProto v2.
+     *
+     * @param string  $msg_key   Message key
+     * @param string  $auth_key  Auth key
+     * @param boolean $to_server To server/from server direction
+     *
+     * @return array
+     */
+    public function aesCalculate(string $msg_key, string $auth_key, bool $to_server = true, array $extra = []): array
     {
         return $this->__call(__FUNCTION__, [$msg_key, $auth_key, $to_server, $extra]);
     }
-
-    public function oldAesCalculate($msg_key, $auth_key, $to_server = true, array $extra = [])
+    /**
+     * AES KDF function for MTProto v1.
+     *
+     * @param string  $msg_key   Message key
+     * @param string  $auth_key  Auth key
+     * @param boolean $to_server To server/from server direction
+     *
+     * @return array
+     */
+    public function oldAesCalculate(string $msg_key, string $auth_key, bool $to_server = true, array $extra = []): array
     {
         return $this->__call(__FUNCTION__, [$msg_key, $auth_key, $to_server, $extra]);
     }
-
-    public function ctrEncrypt($message, $key, $iv, array $extra = [])
+    /**
+     * CTR encrypt.
+     *
+     * @param string $message Message to encrypt
+     * @param string $key     Key
+     * @param string $iv      IV
+     *
+     * @return string
+     */
+    public function ctrEncrypt(string $message, string $key, string $iv, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$message, $key, $iv, $extra]);
     }
-
-    public function igeEncrypt($message, $key, $iv, array $extra = [])
+    /**
+     * IGE encrypt.
+     *
+     * @param string $message Message to encrypt
+     * @param string $key     Key
+     * @param string $iv      IV
+     *
+     * @return string
+     */
+    public function igeEncrypt(string $message, string $key, string $iv, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$message, $key, $iv, $extra]);
     }
-
-    public function igeDecrypt($message, $key, $iv, array $extra = [])
+    /**
+     * CTR decrypt.
+     *
+     * @param string $message Message to encrypt
+     * @param string $key     Key
+     * @param string $iv      IV
+     *
+     * @return string
+     */
+    public function igeDecrypt(string $message, string $key, string $iv, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$message, $key, $iv, $extra]);
     }
-
+    /**
+     * Convert MTProto channel ID to bot API channel ID.
+     *
+     * @param int $id MTProto channel ID
+     *
+     * @return int
+     */
     public function toSupergroup($id, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
-
+    /**
+     * Convert bot API channel ID to MTProto channel ID.
+     *
+     * @param int $id Bot API channel ID
+     *
+     * @return int
+     */
     public function fromSupergroup($id, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
-
-    public function isSupergroup($id, array $extra = [])
+    /**
+     * Check whether provided bot API ID is a channel.
+     *
+     * @param int $id Bot API ID
+     *
+     * @return boolean
+     */
+    public function isSupergroup($id, array $extra = []): bool
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
@@ -4512,7 +4570,13 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$id, $full_fetch, $send, $extra]);
     }
-
+    /**
+     * Check if peer is present in internal peer database.
+     *
+     * @param mixed $id Peer
+     *
+     * @return \Generator<boolean>
+     */
     public function peerIsset($id, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
@@ -4527,17 +4591,38 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$fwd, $extra]);
     }
-
+    /**
+     * Get folder ID from object.
+     *
+     * @param mixed $id Object
+     *
+     * @return ?int
+     */
     public function getFolderId($id, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
-
+    /**
+     * Get bot API ID from peer object.
+     *
+     * @param mixed $id Peer
+     *
+     * @return int
+     */
     public function getId($id, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
-
+    /**
+     * Get info about peer, returns an Info object.
+     *
+     * @param mixed   $id        Peer
+     * @param boolean $recursive Internal
+     *
+     * @see https://docs.madelineproto.xyz/Info.html
+     *
+     * @return \Generator<array> Info object
+     */
     public function getInfo($id, $recursive = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $recursive, $extra]);
@@ -4552,12 +4637,28 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
-
+    /**
+     * Get full info about peer, returns an FullInfo object.
+     *
+     * @param mixed $id Peer
+     *
+     * @see https://docs.madelineproto.xyz/FullInfo.html
+     *
+     * @return \Generator<array> FullInfo object
+     */
     public function getFullInfo($id, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
-
+    /**
+     * Get full info about peer (including full list of channel members), returns a Chat object.
+     *
+     * @param mixed $id Peer
+     *
+     * @see https://docs.madelineproto.xyz/Chat.html
+     *
+     * @return \Generator<array> Chat object
+     */
     public function getPwrChat($id, $fullfetch = true, $send = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $fullfetch, $send, $extra]);
@@ -4664,33 +4765,91 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$update, $extra]);
     }
-
-    public function upload($file, $file_name = '', $cb = null, $encrypted = false, array $extra = [])
+    /**
+     * Upload file.
+     *
+     * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
+     * @param string                             $file_name File name
+     * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean                            $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array
+     */
+    public function upload($file, string $file_name = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$file, $file_name, $cb, $encrypted, $extra]);
     }
-
+    /**
+     * Upload file from URL.
+     *
+     * @param string|FileCallbackInterface $url       URL of file
+     * @param integer                      $size      Size of file
+     * @param string                       $file_name File name
+     * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean                      $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array
+     */
     public function uploadFromUrl($url, int $size = 0, string $file_name = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$url, $size, $file_name, $cb, $encrypted, $extra]);
     }
-
+    /**
+     * Upload file from stream.
+     *
+     * @param mixed    $stream    Stream
+     * @param integer  $size      File size
+     * @param string   $mime      Mime type
+     * @param string   $file_name File name
+     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array
+     */
     public function uploadFromStream($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$stream, $size, $mime, $file_name, $cb, $encrypted, $extra]);
     }
-
+    /**
+     * Upload file from callable.
+     *
+     * @param mixed    $callable    Callable
+     * @param integer  $size        File size
+     * @param string   $mime        Mime type
+     * @param string   $file_name   File name
+     * @param callable $cb          Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean  $refetchable Whether each chunk can be refetched more than once
+     * @param boolean  $encrypted   Whether to encrypt file for secret chats
+     *
+     * @return array
+     */
     public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $refetchable = true, bool $encrypted = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$callable, $size, $mime, $file_name, $cb, $refetchable, $encrypted, $extra]);
     }
-
-    public function uploadEncrypted($file, $file_name = '', $cb = null, array $extra = [])
+    /**
+     * Upload file to secret chat.
+     *
+     * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
+     * @param string                             $file_name File name
+     * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     *
+     * @return array
+     */
+    public function uploadEncrypted($file, string $file_name = '', $cb = null, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$file, $file_name, $cb, $extra]);
     }
-
-    public function uploadFromTgfile($media, $cb = null, $encrypted = false, array $extra = [])
+    /**
+     * Reupload telegram file.
+     *
+     * @param mixed    $media     Telegram file
+     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array
+     */
+    public function uploadFromTgfile($media, $cb = null, bool $encrypted = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$media, $cb, $encrypted, $extra]);
     }
@@ -4704,12 +4863,36 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$constructor, $extra]);
     }
-
+    /**
+     * Get download info of the propic of a user
+     * Returns an array with the following structure:.
+     *
+     * `$info['ext']` - The file extension
+     * `$info['name']` - The file name, without the extension
+     * `$info['mime']` - The file mime type
+     * `$info['size']` - The file size
+     *
+     * @param mixed $message_media File ID
+     *
+     * @return \Generator<array>
+     */
     public function getPropicInfo($data, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$data, $extra]);
     }
-
+    /**
+     * Get download info of file
+     * Returns an array with the following structure:.
+     *
+     * `$info['ext']` - The file extension
+     * `$info['name']` - The file name, without the extension
+     * `$info['mime']` - The file mime type
+     * `$info['size']` - The file size
+     *
+     * @param mixed $message_media File ID
+     *
+     * @return \Generator<array>
+     */
     public function getDownloadInfo($message_media, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$message_media, $extra]);
@@ -4719,25 +4902,66 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$photo, $extra]);
     }
-
+    /**
+     * Download file to directory.
+     *
+     * @param mixed                        $message_media File to download
+     * @param string|FileCallbackInterface $dir           Directory where to download the file
+     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     *
+     * @return \Generator<string> Downloaded file path
+     */
     public function downloadToDir($message_media, $dir, $cb = null, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$message_media, $dir, $cb, $extra]);
     }
-
+    /**
+     * Download file.
+     *
+     * @param mixed                        $message_media File to download
+     * @param string|FileCallbackInterface $file          Downloaded file path
+     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     *
+     * @return \Generator<string> Downloaded file path
+     */
     public function downloadToFile($message_media, $file, $cb = null, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$message_media, $file, $cb, $extra]);
     }
-
-    public function downloadToStream($message_media, $stream, $cb = null, $offset = 0, $end = -1, array $extra = [])
+    /**
+     * Download file to stream.
+     *
+     * @param mixed                       $message_media File to download
+     * @param mixed|FileCallbackInterface $stream        Stream where to download file
+     * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     * @param int                         $offset        Offset where to start downloading
+     * @param int                         $end           Offset where to end download
+     *
+     * @return \Generator<bool>
+     */
+    public function downloadToStream($message_media, $stream, $cb = null, int $offset = 0, int $end = -1, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$message_media, $stream, $cb, $offset, $end, $extra]);
     }
-
-    public function downloadToCallable($message_media, $callable, $cb = null, $parallelize = true, $offset = 0, $end = -1, ?int $part_size = null, array $extra = [])
+    /**
+     * Download file to callable.
+     * The callable must accept two parameters: string $payload, int $offset
+     * The callable will be called (possibly out of order, depending on the value of $seekable).
+     * The callable should return the number of written bytes.
+     *
+     * @param mixed                          $message_media File to download
+     * @param callable|FileCallbackInterface $callable      Chunk callback
+     * @param callable                       $cb            Status callback (DEPRECATED, use FileCallbackInterface)
+     * @param bool                           $seekable      Whether the callable can be called out of order
+     * @param int                            $offset        Offset where to start downloading
+     * @param int                            $end           Offset where to stop downloading (inclusive)
+     * @param int                            $part_size     Size of each chunk
+     *
+     * @return \Generator<bool>
+     */
+    public function downloadToCallable($message_media, $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_media, $callable, $cb, $parallelize, $offset, $end, $part_size, $extra]);
+        return $this->__call(__FUNCTION__, [$message_media, $callable, $cb, $seekable, $offset, $end, $part_size, $extra]);
     }
     /**
      * Accept secret chat.
@@ -5577,13 +5801,26 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$update, $extra]);
     }
-
-    public function setWebhook($hook_url, $pem_path = null, array $extra = [])
+    /**
+     * Set webhook update handler.
+     *
+     * @param string $hook_url Webhook URL
+     * @param string $pem_path PEM path for self-signed certificate
+     *
+     * @return void
+     */
+    public function setWebhook($hook_url, $pem_path = null, array $extra = []): void
     {
         return $this->__call(__FUNCTION__, [$hook_url, $pem_path, $extra]);
     }
-
-    public function setCallback($callback, array $extra = [])
+    /**
+     * Set update handling callback.
+     *
+     * @param callable $callback Callback
+     *
+     * @return void
+     */
+    public function setCallback($callback, array $extra = []): void
     {
         return $this->__call(__FUNCTION__, [$callback, $extra]);
     }
@@ -5639,32 +5876,62 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
-
-    public function setLoopCallback($callback, array $extra = [])
+    /**
+     * Set loop callback (DEPRECATED).
+     *
+     * @param callable $callback Callback
+     *
+     * @return void
+     */
+    public function setLoopCallback($callback, array $extra = []): void
     {
         return $this->__call(__FUNCTION__, [$callback, $extra]);
     }
-
-    public function loop($max_forks = 0, array $extra = [])
+    /**
+     * Start MadelineProto's update handling loop, or run the provided async callable.
+     *
+     * @param callable $callback Async callable to run
+     *
+     * @return mixed
+     */
+    public function loop($callback = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$max_forks, $extra]);
+        return $this->__call(__FUNCTION__, [$callback, $extra]);
     }
-
-    public function closeConnection($message = 'OK!', array $extra = [])
+    /**
+     * Close connection with server.
+     *
+     * @param string $message Message
+     *
+     * @return void
+     */
+    public function closeConnection($message = 'OK!', array $extra = []): void
     {
         return $this->__call(__FUNCTION__, [$message, $extra]);
     }
-
-    public function setNoop(array $extra = [])
+    /**
+     * Set NOOP update handler, ignoring all updates.
+     *
+     * @return void
+     */
+    public function setNoop(array $extra = []): void
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
-    public function noop(array $extra = [])
+    /**
+     * Noop update handler.
+     *
+     * @return void
+     */
+    public function noop(array $extra = []): void
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
+    /**
+     * Log in to telegram (via CLI or web).
+     *
+     * @return \Generator
+     */
     public function start(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
@@ -5695,22 +5962,32 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$extra]);
     }
 
-    public function webEcho($message = '', array $extra = [])
+    public function webEcho(string $message = '', array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$message, $extra]);
     }
 
-    public function webEchoTemplate($message, $form, array $extra = [])
+    public function webEchoTemplate($message, $form, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$message, $form, $extra]);
     }
-
-    public function getWebTemplate(array $extra = [])
+    /**
+     * Get web template.
+     *
+     * @return string
+     */
+    public function getWebTemplate(array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
-    public function setWebTemplate($template, array $extra = [])
+    /**
+     * Set web template.
+     *
+     * @param string $template Template
+     *
+     * @return void
+     */
+    public function setWebTemplate(string $template, array $extra = []): void
     {
         return $this->__call(__FUNCTION__, [$template, $extra]);
     }

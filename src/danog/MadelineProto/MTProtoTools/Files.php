@@ -48,7 +48,17 @@ use function Amp\Promise\all;
  */
 trait Files
 {
-    public function upload($file, $file_name = '', $cb = null, $encrypted = false)
+    /**
+     * Upload file.
+     *
+     * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
+     * @param string                             $file_name File name
+     * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean                            $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array
+     */
+    public function upload($file, string $file_name = '', $cb = null, bool $encrypted = false): \Generator
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -86,7 +96,18 @@ trait Files
             yield $stream->close();
         }
     }
-    public function uploadFromUrl($url, int $size = 0, string $file_name = '', $cb = null, bool $encrypted = false)
+    /**
+     * Upload file from URL.
+     *
+     * @param string|FileCallbackInterface $url       URL of file
+     * @param integer                      $size      Size of file
+     * @param string                       $file_name File name
+     * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean                      $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array
+     */
+    public function uploadFromUrl($url, int $size = 0, string $file_name = '', $cb = null, bool $encrypted = false): \Generator
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
@@ -122,14 +143,26 @@ trait Files
 
         return yield $this->uploadFromStream($stream, $size, $mime, $file_name, $cb, $encrypted);
     }
-    public function uploadFromStream($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false)
+    /**
+     * Upload file from stream.
+     *
+     * @param mixed    $stream    Stream
+     * @param integer  $size      File size
+     * @param string   $mime      Mime type
+     * @param string   $file_name File name
+     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array
+     */
+    public function uploadFromStream($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false): \Generator
     {
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
             $stream = $stream->getFile();
         }
 
-        /** @var $stream \Amp\ByteStream\OutputStream */
+        /* @var $stream \Amp\ByteStream\OutputStream */
         if (!\is_object($stream)) {
             $stream = new ResourceOutputStream($stream);
         }
@@ -182,6 +215,19 @@ trait Files
         }
         return $res;
     }
+    /**
+     * Upload file from callable.
+     *
+     * @param mixed    $callable    Callable
+     * @param integer  $size        File size
+     * @param string   $mime        Mime type
+     * @param string   $file_name   File name
+     * @param callable $cb          Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean  $refetchable Whether each chunk can be refetched more than once
+     * @param boolean  $encrypted   Whether to encrypt file for secret chats
+     *
+     * @return array
+     */
     public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $refetchable = true, bool $encrypted = false)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
@@ -304,12 +350,30 @@ trait Files
         return $constructor;
     }
 
-    public function uploadEncrypted($file, $file_name = '', $cb = null)
+    /**
+     * Upload file to secret chat.
+     *
+     * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
+     * @param string                             $file_name File name
+     * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     *
+     * @return array
+     */
+    public function uploadEncrypted($file, string  $file_name = '', $cb = null)
     {
         return $this->upload($file, $file_name, $cb, true);
     }
 
-    public function uploadFromTgfile($media, $cb = null, $encrypted = false)
+    /**
+     * Reupload telegram file.
+     *
+     * @param mixed    $media     Telegram file
+     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array
+     */
+    public function uploadFromTgfile($media, $cb = null, bool $encrypted = false)
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
@@ -492,11 +556,37 @@ trait Files
 
         return yield $this->genAllFile($constructor);
     }
-    public function getPropicInfo($data)
+    /**
+     * Get download info of the propic of a user
+     * Returns an array with the following structure:.
+     *
+     * `$info['ext']` - The file extension
+     * `$info['name']` - The file name, without the extension
+     * `$info['mime']` - The file mime type
+     * `$info['size']` - The file size
+     *
+     * @param mixed $message_media File ID
+     *
+     * @return \Generator<array>
+     */
+    public function getPropicInfo($data): \Generator
     {
         return yield $this->getDownloadInfo($this->chats[(yield $this->getInfo($data))['bot_api_id']]);
     }
-    public function getDownloadInfo($message_media)
+    /**
+     * Get download info of file
+     * Returns an array with the following structure:.
+     *
+     * `$info['ext']` - The file extension
+     * `$info['name']` - The file name, without the extension
+     * `$info['mime']` - The file mime type
+     * `$info['size']` - The file size
+     *
+     * @param mixed $message_media File ID
+     *
+     * @return \Generator<array>
+     */
+    public function getDownloadInfo($message_media): \Generator
     {
         if (\is_string($message_media)) {
             $message_media = $this->unpackFileId($message_media)['MessageMedia'];
@@ -842,7 +932,16 @@ trait Files
     public function extractPhotosize($photo)
     {
     }
-    public function downloadToDir($message_media, $dir, $cb = null)
+    /**
+     * Download file to directory.
+     *
+     * @param mixed                        $message_media File to download
+     * @param string|FileCallbackInterface $dir           Directory where to download the file
+     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     *
+     * @return \Generator<string> Downloaded file path
+     */
+    public function downloadToDir($message_media, $dir, $cb = null): \Generator
     {
         if (\is_object($dir) && $dir instanceof FileCallbackInterface) {
             $cb = $dir;
@@ -854,7 +953,16 @@ trait Files
         return yield $this->downloadToFile($message_media, $dir.'/'.$message_media['name'].$message_media['ext'], $cb);
     }
 
-    public function downloadToFile($message_media, $file, $cb = null)
+    /**
+     * Download file.
+     *
+     * @param mixed                        $message_media File to download
+     * @param string|FileCallbackInterface $file          Downloaded file path
+     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     *
+     * @return \Generator<string> Downloaded file path
+     */
+    public function downloadToFile($message_media, $file, $cb = null): \Generator
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -885,7 +993,18 @@ trait Files
 
         return $file;
     }
-    public function downloadToStream($message_media, $stream, $cb = null, $offset = 0, $end = -1)
+    /**
+     * Download file to stream.
+     *
+     * @param mixed                       $message_media File to download
+     * @param mixed|FileCallbackInterface $stream        Stream where to download file
+     * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     * @param int                         $offset        Offset where to start downloading
+     * @param int                         $end           Offset where to end download
+     *
+     * @return \Generator<bool>
+     */
+    public function downloadToStream($message_media, $stream, $cb = null, int $offset = 0, int $end = -1): \Generator
     {
         $message_media = yield $this->getDownloadInfo($message_media);
 
@@ -920,7 +1039,23 @@ trait Files
 
         return yield $this->downloadToCallable($message_media, $callable, $cb, $seekable, $offset, $end);
     }
-    public function downloadToCallable($message_media, $callable, $cb = null, $parallelize = true, $offset = 0, $end = -1, int $part_size = null)
+    /**
+     * Download file to callable.
+     * The callable must accept two parameters: string $payload, int $offset
+     * The callable will be called (possibly out of order, depending on the value of $seekable).
+     * The callable should return the number of written bytes.
+     *
+     * @param mixed                          $message_media File to download
+     * @param callable|FileCallbackInterface $callable      Chunk callback
+     * @param callable                       $cb            Status callback (DEPRECATED, use FileCallbackInterface)
+     * @param bool                           $seekable      Whether the callable can be called out of order
+     * @param int                            $offset        Offset where to start downloading
+     * @param int                            $end           Offset where to stop downloading (inclusive)
+     * @param int                            $part_size     Size of each chunk
+     *
+     * @return \Generator<bool>
+     */
+    public function downloadToCallable($message_media, $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null): \Generator
     {
         $message_media = yield $this->getDownloadInfo($message_media);
 
@@ -960,7 +1095,7 @@ trait Files
             $ige->setIV($message_media['iv']);
             $ige->setKey($message_media['key']);
             $ige->enableContinuousBuffer();
-            $parallelize = false;
+            $seekable = false;
         }
 
         if ($offset === $end) {
@@ -1010,7 +1145,7 @@ trait Files
         $params[0]['previous_promise'] = new Success(true);
 
         $start = \microtime(true);
-        $size = yield $this->downloadPart($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, \array_shift($params), $callable, $parallelize);
+        $size = yield $this->downloadPart($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, \array_shift($params), $callable, $seekable);
 
         if ($params) {
             $previous_promise = new Success(true);
@@ -1018,7 +1153,7 @@ trait Files
             $promises = [];
             foreach ($params as $key => $param) {
                 $param['previous_promise'] = $previous_promise;
-                $previous_promise = \danog\MadelineProto\Tools::call($this->downloadPart($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $parallelize));
+                $previous_promise = \danog\MadelineProto\Tools::call($this->downloadPart($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable));
                 $previous_promise->onResolve(static function ($e, $res) use (&$size) {
                     if ($res) {
                         $size += $res;
@@ -1053,7 +1188,23 @@ trait Files
         return true;
     }
 
-    private function downloadPart(&$message_media, &$cdn, &$datacenter, &$old_dc, &$ige, $cb, $offset, $callable, $seekable, $postpone = false)
+    /**
+     * Download file part.
+     *
+     * @param array    $message_media File object
+     * @param bool     $cdn           Whether this is a CDN file
+     * @param string   $datacenter    DC ID
+     * @param string   $old_dc        Previous DC ID
+     * @param AES      $ige           IGE decryptor instance
+     * @param callable $cb            Status callback
+     * @param int      $offset        Offset
+     * @param callable $callable      Chunk callback
+     * @param boolean  $seekable      Whether the download file is seekable
+     * @param boolean  $postpone      Whether to postpone method call
+     *
+     * @return \Generator
+     */
+    private function downloadPart(&$message_media, bool &$cdn, &$datacenter, &$old_dc, &$ige, $cb, int $offset, $callable, bool $seekable, bool $postpone = false): \Generator
     {
         static $method = [
             false => 'upload.getFile', // non-cdn
