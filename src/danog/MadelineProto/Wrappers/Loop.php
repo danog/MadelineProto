@@ -51,7 +51,7 @@ trait Loop
      */
     public function loop($callback = null)
     {
-        if (\is_callable($max_fcallbackorks)) {
+        if (\is_callable($callback)) {
             $this->logger->logger('Running async callable');
 
             return yield $callback();

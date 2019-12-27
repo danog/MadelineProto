@@ -660,7 +660,7 @@ trait AuthKeyHandler
                     }
                     continue;
                 }
-                if (isset($this->init_auth_dcs[$id])) {
+                if (isset($this->init_auth_dcs[$id]) || !$socket->hasConnection(0)) {
                     $this->pending_auth = true;
                     continue;
                 }
