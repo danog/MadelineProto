@@ -146,7 +146,7 @@ trait Files
     /**
      * Upload file from stream.
      *
-     * @param mixed    $stream    Stream
+     * @param mixed    $stream    PHP resource or AMPHP async stream
      * @param integer  $size      File size
      * @param string   $mime      Mime type
      * @param string   $file_name File name
@@ -218,17 +218,20 @@ trait Files
     /**
      * Upload file from callable.
      *
-     * @param mixed    $callable    Callable
-     * @param integer  $size        File size
-     * @param string   $mime        Mime type
-     * @param string   $file_name   File name
-     * @param callable $cb          Callback (DEPRECATED, use FileCallbackInterface)
-     * @param boolean  $refetchable Whether each chunk can be refetched more than once
-     * @param boolean  $encrypted   Whether to encrypt file for secret chats
+     * The callable must accept two parameters: int $offset, int $size
+     * The callable must return a string with the contest of the file at the specified offset and size.
+     *
+     * @param mixed    $callable  Callable
+     * @param integer  $size      File size
+     * @param string   $mime      Mime type
+     * @param string   $file_name File name
+     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean  $seekable  Whether chunks can be fetched out of order
+     * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
      * @return array
      */
-    public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $refetchable = true, bool $encrypted = false)
+    public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $seekable = true, bool $encrypted = false)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
@@ -267,7 +270,7 @@ trait Files
             $ige->setIV($iv);
             $ige->setKey($key);
             $ige->enableContinuousBuffer();
-            $refetchable = false;
+            $seekable = false;
         }
         $ctx = \hash_init('md5');
         $promises = [];
@@ -299,7 +302,7 @@ trait Files
 
                         return ['file_id' => $file_id, 'file_part' => $part_num, 'file_total_parts' => $part_total_num, 'bytes' => $bytes];
                     },
-                    $refetchable
+                    $seekable
                 ),
                 ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]
             );

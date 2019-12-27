@@ -4797,7 +4797,7 @@ class InternalDoc extends APIFactory
     /**
      * Upload file from stream.
      *
-     * @param mixed    $stream    Stream
+     * @param mixed    $stream    PHP resource or AMPHP async stream
      * @param integer  $size      File size
      * @param string   $mime      Mime type
      * @param string   $file_name File name
@@ -4813,19 +4813,22 @@ class InternalDoc extends APIFactory
     /**
      * Upload file from callable.
      *
-     * @param mixed    $callable    Callable
-     * @param integer  $size        File size
-     * @param string   $mime        Mime type
-     * @param string   $file_name   File name
-     * @param callable $cb          Callback (DEPRECATED, use FileCallbackInterface)
-     * @param boolean  $refetchable Whether each chunk can be refetched more than once
-     * @param boolean  $encrypted   Whether to encrypt file for secret chats
+     * The callable must accept two parameters: int $offset, int $size
+     * The callable must return a string with the contest of the file at the specified offset and size.
+     *
+     * @param mixed    $callable  Callable
+     * @param integer  $size      File size
+     * @param string   $mime      Mime type
+     * @param string   $file_name File name
+     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean  $seekable  Whether chunks can be fetched out of order
+     * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
      * @return array
      */
-    public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $refetchable = true, bool $encrypted = false, array $extra = [])
+    public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $seekable = true, bool $encrypted = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$callable, $size, $mime, $file_name, $cb, $refetchable, $encrypted, $extra]);
+        return $this->__call(__FUNCTION__, [$callable, $size, $mime, $file_name, $cb, $seekable, $encrypted, $extra]);
     }
     /**
      * Upload file to secret chat.
