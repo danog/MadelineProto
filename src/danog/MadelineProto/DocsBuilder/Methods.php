@@ -206,10 +206,12 @@ trait Methods
                 }
             }
             $description = isset($this->td_descriptions['methods'][$data['method']]) ? $this->td_descriptions['methods'][$data['method']]['description'] : $data['method'].' parameters, return type and example';
+            $symFile = \str_replace('.', '_', $method);
+            $redir = $symFile !== $method ? "\nredirect_from: /API_docs/methods/$symFile.html" : '';
             $header = '---
 title: '.$data['method'].'
 description: '.$description.'
-image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redir.'
 ---
 # Method: '.\str_replace('_', '\\_', $data['method']).'  
 [Back to methods index](index.md)

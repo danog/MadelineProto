@@ -184,10 +184,12 @@ trait Constructors
             $lua_params = "{_='".$data['predicate']."'".$lua_params.'}';
             $pwr_params = '{"_": "'.$data['predicate'].'"'.$pwr_params.'}';
             $description = isset($this->TL->getDescriptions()['constructors'][$data['predicate']]) ? $this->TL->getDescriptions()['constructors'][$data['predicate']]['description'] : $constructor.' attributes, type and example';
+            $symFile = \str_replace('.', '_', $constructor.$layer);
+            $redir = $symFile !== $constructor.$layer ? "\nredirect_from: /API_docs/constructors/$symFile.html" : '';
             $header = '---
 title: '.$data['predicate'].'
 description: '.$description.'
-image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redir.'
 ---
 # Constructor: '.\str_replace('_', '\\_', $data['predicate'].$layer).'  
 [Back to constructors index](index.md)

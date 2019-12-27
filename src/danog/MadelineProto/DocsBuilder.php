@@ -110,10 +110,13 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ';
             }
             $description = isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] : 'constructors and methods of type '.$type;
+            $symFile = \str_replace('.', '_', $type);
+            $redir = $symFile !== $type ? "\nredirect_from: /API_docs/types/$symFile.html" : '';
+
             $header = '---
 title: '.$type.'
 description: constructors and methods of type '.$type.'
-image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redir.'
 ---
 # Type: '.\str_replace('_', '\\_', $type).'  
 [Back to types index](index.md)
