@@ -584,7 +584,7 @@ trait Tools
      */
     public static function flock(string $file, int $operation, float $polling = 0.1): Promise
     {
-        return self::call(self::flockGenerator($file, $operation, $polling));
+        return self::call(Tools::flockGenerator($file, $operation, $polling));
     }
     /**
      * Asynchronously lock a file (internal generator function).
@@ -595,7 +595,7 @@ trait Tools
      *
      * @return \Generator
      */
-    private static function flockGenerator(string $file, int $operation, float $polling): \Generator
+    public static function flockGenerator(string $file, int $operation, float $polling): \Generator
     {
         if (!yield exists($file)) {
             yield \touch($file);
@@ -648,7 +648,7 @@ trait Tools
      *
      * @return \Generator
      */
-    private static function readLineGenerator(string $prompt = ''): \Generator
+    public static function readLineGenerator(string $prompt = ''): \Generator
     {
         $stdin = getStdin();
         $stdout = getStdout();
