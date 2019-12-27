@@ -5814,7 +5814,7 @@ class InternalDoc extends APIFactory
      */
     public function setWebhook($hook_url, $pem_path = null, array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$hook_url, $pem_path, $extra]);
+        $this->__call(__FUNCTION__, [$hook_url, $pem_path, $extra]);
     }
     /**
      * Set update handling callback.
@@ -5825,7 +5825,7 @@ class InternalDoc extends APIFactory
      */
     public function setCallback($callback, array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$callback, $extra]);
+        $this->__call(__FUNCTION__, [$callback, $extra]);
     }
 
     public function logout(array $extra = [])
@@ -5888,7 +5888,7 @@ class InternalDoc extends APIFactory
      */
     public function setLoopCallback($callback, array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$callback, $extra]);
+        $this->__call(__FUNCTION__, [$callback, $extra]);
     }
     /**
      * Start MadelineProto's update handling loop, or run the provided async callable.
@@ -5910,7 +5910,7 @@ class InternalDoc extends APIFactory
      */
     public function closeConnection($message = 'OK!', array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$message, $extra]);
+        $this->__call(__FUNCTION__, [$message, $extra]);
     }
     /**
      * Set NOOP update handler, ignoring all updates.
@@ -5919,7 +5919,7 @@ class InternalDoc extends APIFactory
      */
     public function setNoop(array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Noop update handler.
@@ -5928,7 +5928,7 @@ class InternalDoc extends APIFactory
      */
     public function noop(array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Log in to telegram (via CLI or web).
@@ -5992,7 +5992,7 @@ class InternalDoc extends APIFactory
      */
     public function setWebTemplate(string $template, array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$template, $extra]);
+        $this->__call(__FUNCTION__, [$template, $extra]);
     }
     /**
      * Check for terms of service update.

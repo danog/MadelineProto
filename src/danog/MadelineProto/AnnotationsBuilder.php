@@ -243,8 +243,10 @@ class AnnotationsBuilder
             }
             $paramList = $hasVariadic ? "Tools::arr($paramList)" : "[$paramList]";
 
+            $ret = $type && $type->getName() === 'void' ? '' : 'return';
+
             $doc .= "\n{\n";
-            $doc .= "    return \$this->__call(__FUNCTION__, $paramList);\n";
+            $doc .= "    $ret \$this->__call(__FUNCTION__, $paramList);\n";
             $doc .= "}\n";
 
             $internalDoc['InternalDoc'][$name]['method'] = $method->getDocComment() ?? '';
