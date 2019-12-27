@@ -602,7 +602,7 @@ Any json-encodable data.
         \danog\MadelineProto\Logger::log('Done!', \danog\MadelineProto\Logger::NOTICE);
     }
 
-    public $template = '<?php
+    public static $template = '<?php
 /**
  * Lang module
  *
@@ -629,11 +629,12 @@ class Lang
     public static $current_lang = %s;
 }';
 
-    public function addToLang($key)
+    public static function addToLang(string $key, string $value = '', bool $force = false)
     {
-        if (!isset(\danog\MadelineProto\Lang::$lang['en'][$key])) {
-            \danog\MadelineProto\Lang::$lang['en'][$key] = '';
-            \file_put_contents(__DIR__.'/Lang.php', \sprintf($this->template, \var_export(\danog\MadelineProto\Lang::$lang, true), \var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
+        if (!isset(\danog\MadelineProto\Lang::$lang['en'][$key]) || $force) {
+            \var_dump("Adding $key");
+            \danog\MadelineProto\Lang::$lang['en'][$key] = $value;
+            \file_put_contents(__DIR__.'/Lang.php', \sprintf(self::$template, \var_export(\danog\MadelineProto\Lang::$lang, true), \var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
         }
     }
 }

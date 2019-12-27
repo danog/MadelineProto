@@ -54,6 +54,7 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
     if (!isset(\danog\MadelineProto\Lang::$lang[$lang_code][$key])) {
         \danog\MadelineProto\Lang::$lang[$lang_code][$key] = $value;
     }
+
     if (\danog\MadelineProto\Lang::$lang[$lang_code][$key] === $value && (
         $lang_code !== 'en' || $value == '' ||
         \strpos($value, 'You cannot use this method directly') === 0 ||
@@ -66,7 +67,7 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
         }
         if ($value == '') {
             $value = $key;
-        }
+        }/*
         \preg_match('/^[^_]+_(.*?)(?:_param_(.*)_type_(.*))?$/', $key, $matches);
         $method_name = isset($matches[1]) ? $matches[1] : '';
         $param_name = isset($matches[2]) ? $matches[2] : '';
@@ -109,7 +110,7 @@ foreach (\danog\MadelineProto\Lang::$current_lang as $key => $value) {
                 \danog\MadelineProto\Lang::$lang[$lang_code][$key] = $l;
                 echo 'Using default value '.\danog\MadelineProto\Lang::$lang[$lang_code][$key].PHP_EOL;
             }
-        }
+        }*/
         \danog\MadelineProto\Lang::$lang[$lang_code][$key] = \ucfirst(\danog\MadelineProto\Lang::$lang[$lang_code][$key]);
         if (\in_array($key, ['v_error', 'v_tgerror'])) {
             \danog\MadelineProto\Lang::$lang[$lang_code][$key] = \bin2hex(\danog\MadelineProto\Lang::$lang[$lang_code][$key]);

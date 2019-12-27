@@ -874,6 +874,13 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$config, $extra]);
     }
+
+    public function methodCall(string $methodName, array $args = [
+    ], array $aargs = [
+    ], array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$methodName, $args, $aargs, $extra]);
+    }
     /**
      * Asynchronously run async callable.
      *
@@ -884,5 +891,25 @@ class InternalDoc extends APIFactory
     public function loop(callable $func, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$func, $extra]);
+    }
+    /**
+     * Convert parameters.
+     *
+     * @param array $parameters Parameters
+     *
+     * @return void
+     */
+    public function botAPItoMTProto(array $parameters, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$parameters, $extra]);
+    }
+    /**
+     * Get TL method namespaces.
+     *
+     * @return void
+     */
+    public function getMethodNamespaces(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
     }
 }

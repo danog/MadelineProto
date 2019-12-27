@@ -14,9 +14,9 @@
 use danog\MadelineProto\API;
 use danog\MadelineProto\APIFactory;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\TON\ADNL;
 use danog\MadelineProto\TON\API as TONAPI;
 use danog\MadelineProto\TON\APIFactory as TONAPIFactory;
+use danog\MadelineProto\TON\Lite;
 
 \chdir($d=__DIR__.'/..');
 
@@ -113,7 +113,7 @@ $doc = new \danog\MadelineProto\AnnotationsBuilder(
     [
         'API' => TONAPI::class,
         'APIFactory' => TONAPIFactory::class,
-        'MTProto' => ADNL::class
+        'MTProto' => Lite::class
     ],
     'danog\\MadelineProto\\TON'
 );

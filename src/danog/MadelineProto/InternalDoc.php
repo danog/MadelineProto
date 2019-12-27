@@ -10,13 +10,13 @@ namespace danog\MadelineProto;
 interface auth
 {
     /**
-     * Use phoneLogin instead.
+     * Send the verification code for login.
      *
      * Parameters:
-     * * `string`       **phone_number** - Use phoneLogin instead
-     * * `int`          **api_id**       - Use phoneLogin instead
-     * * `string`       **api_hash**     - Use phoneLogin instead
-     * * `CodeSettings` **settings**     - You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string`       **phone_number** - Phone number in international format
+     * * `int`          **api_id**       - Application identifier (see [App configuration](https://core.telegram.org/myapp))
+     * * `string`       **api_hash**     - Application secret hash (see [App configuration](https://core.telegram.org/myapp))
+     * * `CodeSettings` **settings**     - Settings for the code type to send
      *
      * @param array $params Parameters
      *
@@ -25,13 +25,13 @@ interface auth
     public function sendCode($params);
 
     /**
-     * You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info).
+     * Registers a validated phone number in the system.
      *
      * Parameters:
-     * * `string` **phone_number**    - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **phone_code_hash** - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **first_name**      - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **last_name**       - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_number**    - Phone number in the international format
+     * * `string` **phone_code_hash** - SMS-message ID
+     * * `string` **first_name**      - New user first name
+     * * `string` **last_name**       - New user last name
      *
      * @param array $params Parameters
      *
@@ -40,12 +40,12 @@ interface auth
     public function signUp($params);
 
     /**
-     * You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info).
+     * Signs in a user with a validated phone number.
      *
      * Parameters:
-     * * `string` **phone_number**    - You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **phone_code_hash** - You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **phone_code**      - You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_number**    - Phone number in the international format
+     * * `string` **phone_code_hash** - SMS-message ID, obtained from [auth.sendCode](../methods/auth.sendCode.md)
+     * * `string` **phone_code**      - Valid numerical code from the SMS-message
      *
      * @param array $params Parameters
      *
@@ -54,24 +54,26 @@ interface auth
     public function signIn($params);
 
     /**
-     * You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info).
+     * Logs out the user.
      *
      * @return bool
      */
     public function logOut();
 
     /**
-     * Delete all logged-in sessions.
+     * Terminates all user's authorized sessions except for the current one.
+
+After calling this method it is necessary to reregister the current device using the method [account.registerDevice](../methods/account.registerDevice.md)
      *
      * @return bool
      */
     public function resetAuthorizations();
 
     /**
-     * You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html.
+     * Returns data for copying authorization to another data-centre.
      *
      * Parameters:
-     * * `int` **dc_id** - You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * * `int` **dc_id** - Number of a target data-centre
      *
      * @param array $params Parameters
      *
@@ -80,11 +82,11 @@ interface auth
     public function exportAuthorization($params);
 
     /**
-     * You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html.
+     * Logs in a user using a key transmitted from his native data-centre.
      *
      * Parameters:
-     * * `int`   **id**    - You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
-     * * `bytes` **bytes** - You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * * `int`   **id**    - User ID
+     * * `bytes` **bytes** - Authorization key
      *
      * @param array $params Parameters
      *
@@ -93,13 +95,15 @@ interface auth
     public function importAuthorization($params);
 
     /**
-     * You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info.
+     * Binds a temporary authorization key `temp_auth_key_id` to the permanent authorization key `perm_auth_key_id`. Each permanent key may only be bound to one temporary key at a time, binding a new temporary key overwrites the previous one.
+
+For more information, see [Perfect Forward Secrecy](https://core.telegram.org/api/pfs).
      *
      * Parameters:
-     * * `long`  **perm_auth_key_id**  - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
-     * * `long`  **nonce**             - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
-     * * `int`   **expires_at**        - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
-     * * `bytes` **encrypted_message** - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
+     * * `long`  **perm_auth_key_id**  - Permanent auth\_key\_id to bind to
+     * * `long`  **nonce**             - Random long from [Binding message contents](#binding-message-contents)
+     * * `int`   **expires_at**        - Unix timestamp to invalidate temporary key, see [Binding message contents](#binding-message-contents)
+     * * `bytes` **encrypted_message** - See [Generating encrypted\_message](#generating-encrypted-message)
      *
      * @param array $params Parameters
      *
@@ -108,12 +112,12 @@ interface auth
     public function bindTempAuthKey($params);
 
     /**
-     * You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info).
+     * Login as a bot.
      *
      * Parameters:
-     * * `int`    **api_id**         - You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **api_hash**       - You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **bot_auth_token** - You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `int`    **api_id**         - Application identifier (see. [App configuration](https://core.telegram.org/myapp))
+     * * `string` **api_hash**       - Application identifier hash (see. [App configuration](https://core.telegram.org/myapp))
+     * * `string` **bot_auth_token** - Bot token (see [bots](https://core.telegram.org/bots))
      *
      * @param array $params Parameters
      *
@@ -122,10 +126,10 @@ interface auth
     public function importBotAuthorization($params);
 
     /**
-     * You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info).
+     * Try logging to an account protected by a [2FA password](https://core.telegram.org/api/srp).
      *
      * Parameters:
-     * * `InputCheckPasswordSRP` **password** - You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputCheckPasswordSRP` **password** - The account's password (see [SRP](https://core.telegram.org/api/srp))
      *
      * @param array $params Parameters
      *
@@ -134,17 +138,17 @@ interface auth
     public function checkPassword($params);
 
     /**
-     * Send an email to recover the 2FA password.
+     * Request recovery code of a [2FA password](https://core.telegram.org/api/srp), only for accounts with a [recovery email configured](https://core.telegram.org/api/srp#email-verification).
      *
      * @return auth.PasswordRecovery
      */
     public function requestPasswordRecovery();
 
     /**
-     * Use the code that was emailed to you after running $MadelineProto->auth->requestPasswordRecovery to login to your account.
+     * Reset the [2FA password](https://core.telegram.org/api/srp) using the recovery code sent using [auth.requestPasswordRecovery](../methods/auth.requestPasswordRecovery.md).
      *
      * Parameters:
-     * * `string` **code** - The code that was emailed to you
+     * * `string` **code** - Code received via email
      *
      * @param array $params Parameters
      *
@@ -153,11 +157,11 @@ interface auth
     public function recoverPassword($params);
 
     /**
-     * Resend the SMS verification code.
+     * Resend the login code via another medium, the phone code type is determined by the return value of the previous auth.sendCode/auth.resendCode: see [login](https://core.telegram.org/api/auth) for more info.
      *
      * Parameters:
      * * `string` **phone_number**    - The phone number
-     * * `string` **phone_code_hash** - The phone code hash
+     * * `string` **phone_code_hash** - The phone code hash obtained from [auth.sendCode](../methods/auth.sendCode.md)
      *
      * @param array $params Parameters
      *
@@ -166,11 +170,11 @@ interface auth
     public function resendCode($params);
 
     /**
-     * Invalidate sent phone code.
+     * Cancel the login verification code.
      *
      * Parameters:
      * * `string` **phone_number**    - Phone number
-     * * `string` **phone_code_hash** - Phone code hash
+     * * `string` **phone_code_hash** - Phone code hash from [auth.sendCode](../methods/auth.sendCode.md)
      *
      * @param array $params Parameters
      *
@@ -179,7 +183,7 @@ interface auth
     public function cancelCode($params);
 
     /**
-     * Delete all temporary authorization keys except the ones provided.
+     * Delete all temporary authorization keys **except for** the ones specified.
      *
      * Parameters:
      * * `[long]` **except_auth_keys** - The temporary authorization keys to keep
@@ -194,14 +198,14 @@ interface auth
 interface account
 {
     /**
-     * Register device for push notifications.
+     * Register device to receive [PUSH notifications](https://core.telegram.org/api/push-updates).
      *
      * Parameters:
-     * * `boolean` **no_muted**    - Optional: Idk yet
-     * * `int`     **token_type**  - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone, 6 - Blackberry, and other, see source code of official apps for more info
-     * * `string`  **token**       - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info
-     * * `Bool`    **app_sandbox** - Should the app run in a sandbox?
-     * * `bytes`   **secret**      - Secret
+     * * `boolean` **no_muted**    - Optional: Avoid receiving (silent and invisible background) notifications. Useful to save battery.
+     * * `int`     **token_type**  - Device token type.<br>**Possible values**:<br>`1` \- APNS (device token for apple push)<br>`2` \- FCM (firebase token for google firebase)<br>`3` \- MPNS (channel URI for microsoft push)<br>`4` \- Simple push (endpoint for firefox's simple push API)<br>`5` \- Ubuntu phone (token for ubuntu push)<br>`6` \- Blackberry (token for blackberry push)<br>`7` \- Unused<br>`8` \- WNS (windows push)<br>`9` \- APNS VoIP (token for apple push VoIP)<br>`10` \- Web push (web push, see below)<br>`11` \- MPNS VoIP (token for microsoft push VoIP)<br>`12` \- Tizen (token for tizen push)<br><br>For `10` web push, the token must be a JSON-encoded object containing the keys described in [PUSH updates](https://core.telegram.org/api/push-updates)
+     * * `string`  **token**       - Device token
+     * * `Bool`    **app_sandbox** - If [(boolTrue)](../constructors/boolTrue.md) is transmitted, a sandbox-certificate will be used during transmission.
+     * * `bytes`   **secret**      - For FCM and APNS VoIP, optional encryption key used to encrypt push notifications
      * * `[int]`   **other_uids**  - Other UIDs
      *
      * @param array $params Parameters
@@ -211,11 +215,11 @@ interface account
     public function registerDevice($params);
 
     /**
-     * Stop sending PUSH notifications to app.
+     * Deletes a device by its token, stops sending PUSH-notifications to it.
      *
      * Parameters:
-     * * `int`    **token_type** - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info
-     * * `string` **token**      - Device token type. Possible values: 1 - APNS, 2 - GCM, 3 - MPNS, 4 - Simple Push, 5 - Ubuntu Phone,6 - Blackberry, and other, see source code of official apps for more info
+     * * `int`    **token_type** - Device token type.<br>**Possible values**:<br>`1` \- APNS (device token for apple push)<br>`2` \- FCM (firebase token for google firebase)<br>`3` \- MPNS (channel URI for microsoft push)<br>`4` \- Simple push (endpoint for firefox's simple push API)<br>`5` \- Ubuntu phone (token for ubuntu push)<br>`6` \- Blackberry (token for blackberry push)<br>`7` \- Unused<br>`8` \- WNS (windows push)<br>`9` \- APNS VoIP (token for apple push VoIP)<br>`10` \- Web push (web push, see below)<br>`11` \- MPNS VoIP (token for microsoft push VoIP)<br>`12` \- Tizen (token for tizen push)<br><br>For `10` web push, the token must be a JSON-encoded object containing the keys described in [PUSH updates](https://core.telegram.org/api/push-updates)
+     * * `string` **token**      - Device token
      * * `[int]`  **other_uids** - Other UIDs
      *
      * @param array $params Parameters
@@ -225,10 +229,10 @@ interface account
     public function unregisterDevice($params);
 
     /**
-     * Change notification settings.
+     * Edits notification settings from a given user/group, from all users/all groups.
      *
      * Parameters:
-     * * `InputNotifyPeer`         **peer**     - The peers to which the notification settings should be applied
+     * * `InputNotifyPeer`         **peer**     - Notification source
      * * `InputPeerNotifySettings` **settings** - Notification settings
      *
      * @param array $params Parameters
@@ -238,7 +242,7 @@ interface account
     public function updateNotifySettings($params);
 
     /**
-     * Get notification settings.
+     * Gets current notification settings for a given user/group, from all users/all groups.
      *
      * Parameters:
      * * `InputNotifyPeer` **peer** - Notification source
@@ -250,19 +254,19 @@ interface account
     public function getNotifySettings($params);
 
     /**
-     * Reset all notification settings.
+     * Resets all notification settings from users and groups.
      *
      * @return bool
      */
     public function resetNotifySettings();
 
     /**
-     * Update profile info.
+     * Updates user profile.
      *
      * Parameters:
-     * * `string` **first_name** - Optional: The first name
-     * * `string` **last_name**  - Optional: The last name
-     * * `string` **about**      - Optional: The bio/about field
+     * * `string` **first_name** - Optional: New user first name
+     * * `string` **last_name**  - Optional: New user last name
+     * * `string` **about**      - Optional: New bio
      *
      * @param array $params Parameters
      *
@@ -271,10 +275,10 @@ interface account
     public function updateProfile($params);
 
     /**
-     * Update online status.
+     * Updates online user status.
      *
      * Parameters:
-     * * `Bool` **offline** - True to set the status to offline
+     * * `Bool` **offline** - If [(boolTrue)](../constructors/boolTrue.md) is transmitted, user status will change to [(userStatusOffline)](../constructors/userStatusOffline.md).
      *
      * @param array $params Parameters
      *
@@ -295,11 +299,11 @@ interface account
     public function getWallPapers($params);
 
     /**
-     * Report for spam.
+     * Report a peer for violation of telegram's Terms of Service.
      *
      * Parameters:
      * * `InputPeer`    **peer**   - The peer to report
-     * * `ReportReason` **reason** - Why are you reporting this peer
+     * * `ReportReason` **reason** - The reason why this peer is being reported
      *
      * @param array $params Parameters
      *
@@ -308,10 +312,10 @@ interface account
     public function reportPeer($params);
 
     /**
-     * Check if this username is available.
+     * Validates a username and checks availability.
      *
      * Parameters:
-     * * `string` **username** - The username to check
+     * * `string` **username** - username<br>Accepted characters: A-z (case-insensitive), 0-9 and underscores.<br>Length: 5-32 characters.
      *
      * @param array $params Parameters
      *
@@ -320,10 +324,10 @@ interface account
     public function checkUsername($params);
 
     /**
-     * Update this user's username.
+     * Changes username for the current user.
      *
      * Parameters:
-     * * `string` **username** - The new username
+     * * `string` **username** - username or empty string if username is to be removed<br>Accepted characters: a-z (case-insensitive), 0-9 and underscores.<br>Length: 5-32 characters.
      *
      * @param array $params Parameters
      *
@@ -332,10 +336,10 @@ interface account
     public function updateUsername($params);
 
     /**
-     * Get privacy settings.
+     * Get privacy settings of current account.
      *
      * Parameters:
-     * * `InputPrivacyKey` **key** - Privacy setting key
+     * * `InputPrivacyKey` **key** - Peer category whose privacy settings should be fetched
      *
      * @param array $params Parameters
      *
@@ -344,10 +348,10 @@ interface account
     public function getPrivacy($params);
 
     /**
-     * Set privacy settings.
+     * Change privacy settings of current account.
      *
      * Parameters:
-     * * `InputPrivacyKey`    **key**   - Privacy setting
+     * * `InputPrivacyKey`    **key**   - Peers to which the privacy rules apply
      * * `[InputPrivacyRule]` **rules** - Privacy settings
      *
      * @param array $params Parameters
@@ -357,10 +361,10 @@ interface account
     public function setPrivacy($params);
 
     /**
-     * Delete this account.
+     * Delete the user's account from the telegram servers. Can be used, for example, to delete the account of a user that provided the login code, but forgot the [2FA password and no recovery method is configured](https://core.telegram.org/api/srp).
      *
      * Parameters:
-     * * `string` **reason** - Why are you going away? :(
+     * * `string` **reason** - Why is the account being deleted, can be empty
      *
      * @param array $params Parameters
      *
@@ -369,17 +373,17 @@ interface account
     public function deleteAccount($params);
 
     /**
-     * Get account TTL.
+     * Get days to live of account.
      *
      * @return AccountDaysTTL
      */
     public function getAccountTTL();
 
     /**
-     * Set account TTL.
+     * Set account self-destruction period.
      *
      * Parameters:
-     * * `AccountDaysTTL` **ttl** - Time To Live of account
+     * * `AccountDaysTTL` **ttl** - Time to live in days
      *
      * @param array $params Parameters
      *
@@ -388,11 +392,11 @@ interface account
     public function setAccountTTL($params);
 
     /**
-     * Change the phone number.
+     * Verify a new phone number to associate to the current account.
      *
      * Parameters:
      * * `string`       **phone_number** - New phone number
-     * * `CodeSettings` **settings**     - Code settings
+     * * `CodeSettings` **settings**     - Phone code settings
      *
      * @param array $params Parameters
      *
@@ -401,12 +405,12 @@ interface account
     public function sendChangePhoneCode($params);
 
     /**
-     * Change the phone number associated to this account.
+     * Change the phone number of the current account.
      *
      * Parameters:
-     * * `string` **phone_number**    - Phone number
-     * * `string` **phone_code_hash** - Phone code hash returned by account.sendChangePhoneCode
-     * * `string` **phone_code**      - The phone code sent by account.sendChangePhoneCode
+     * * `string` **phone_number**    - New phone number
+     * * `string` **phone_code_hash** - Phone code hash received when calling [account.sendChangePhoneCode](../methods/account.sendChangePhoneCode.md)
+     * * `string` **phone_code**      - Phone code received when calling [account.sendChangePhoneCode](../methods/account.sendChangePhoneCode.md)
      *
      * @param array $params Parameters
      *
@@ -415,10 +419,10 @@ interface account
     public function changePhone($params);
 
     /**
-     * Disable all notifications for a certain period.
+     * When client-side passcode lock feature is enabled, will not show message texts in incoming [PUSH notifications](https://core.telegram.org/api/push-updates).
      *
      * Parameters:
-     * * `int` **period** - For how long should notifications be disabled
+     * * `int` **period** - Inactivity period after which to start hiding message texts in [PUSH notifications](https://core.telegram.org/api/push-updates).
      *
      * @param array $params Parameters
      *
@@ -427,17 +431,17 @@ interface account
     public function updateDeviceLocked($params);
 
     /**
-     * Get all logged-in authorizations.
+     * Get logged-in sessions.
      *
      * @return account.Authorizations
      */
     public function getAuthorizations();
 
     /**
-     * Delete a certain session.
+     * Log out an active [authorized session](https://core.telegram.org/api/auth) by its hash.
      *
      * Parameters:
-     * * `long` **hash** - The session hash, obtained from $MadelineProto->account->getAuthorizations
+     * * `long` **hash** - Session hash
      *
      * @param array $params Parameters
      *
@@ -446,17 +450,17 @@ interface account
     public function resetAuthorization($params);
 
     /**
-     * Get the current password.
+     * Obtain configuration for two-factor authorization with password.
      *
      * @return account.Password
      */
     public function getPassword();
 
     /**
-     * Get the current 2FA settings.
+     * Get private info associated to the password info (recovery email, telegram [passport](https://core.telegram.org/passport) info & so on).
      *
      * Parameters:
-     * * `InputCheckPasswordSRP` **password** - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputCheckPasswordSRP` **password** - The password (see [SRP](https://core.telegram.org/api/srp))
      *
      * @param array $params Parameters
      *
@@ -465,11 +469,11 @@ interface account
     public function getPasswordSettings($params);
 
     /**
-     * You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info).
+     * Set a new 2FA password.
      *
      * Parameters:
-     * * `InputCheckPasswordSRP`         **password**     - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
-     * * `account.PasswordInputSettings` **new_settings** - New 2FA settings
+     * * `InputCheckPasswordSRP`         **password**     - The old password (see [SRP](https://core.telegram.org/api/srp))
+     * * `account.PasswordInputSettings` **new_settings** - The new password (see [SRP](https://core.telegram.org/api/srp))
      *
      * @param array $params Parameters
      *
@@ -478,11 +482,11 @@ interface account
     public function updatePasswordSettings($params);
 
     /**
-     * Send confirmation phone code.
+     * Send confirmation code to cancel account deletion, for more info [click here »](https://core.telegram.org/api/account-deletion).
      *
      * Parameters:
-     * * `string`       **hash**     - The hash
-     * * `CodeSettings` **settings** - Code settings
+     * * `string`       **hash**     - The hash from the service notification, for more info [click here »](https://core.telegram.org/api/account-deletion)
+     * * `CodeSettings` **settings** - Phone code settings
      *
      * @param array $params Parameters
      *
@@ -491,11 +495,11 @@ interface account
     public function sendConfirmPhoneCode($params);
 
     /**
-     * Confirm this phone number is associated to this account, obtain phone_code_hash from sendConfirmPhoneCode.
+     * Confirm a phone number to cancel account deletion, for more info [click here »](https://core.telegram.org/api/account-deletion).
      *
      * Parameters:
-     * * `string` **phone_code_hash** - Obtain phone_code_hash from sendConfirmPhoneCode
-     * * `string` **phone_code**      - The code sent by sendConfirmPhoneCode
+     * * `string` **phone_code_hash** - Phone code hash, for more info [click here »](https://core.telegram.org/api/account-deletion)
+     * * `string` **phone_code**      - SMS code, for more info [click here »](https://core.telegram.org/api/account-deletion)
      *
      * @param array $params Parameters
      *
@@ -504,11 +508,11 @@ interface account
     public function confirmPhone($params);
 
     /**
-     * Get temporary password for buying products through bots.
+     * Get temporary payment password.
      *
      * Parameters:
-     * * `InputCheckPasswordSRP` **password** - Password
-     * * `int`                   **period**   - The validity period
+     * * `InputCheckPasswordSRP` **password** - SRP password parameters
+     * * `int`                   **period**   - Time during which the temporary password will be valid, in seconds; should be between 60 and 86400
      *
      * @param array $params Parameters
      *
@@ -517,17 +521,17 @@ interface account
     public function getTmpPassword($params);
 
     /**
-     * Get telegram web login authorizations.
+     * Get web [login widget](https://core.telegram.org/widgets/login) authorizations.
      *
      * @return account.WebAuthorizations
      */
     public function getWebAuthorizations();
 
     /**
-     * Delete a certain telegram web login authorization.
+     * Log out an active web [telegram login](https://core.telegram.org/widgets/login) session.
      *
      * Parameters:
-     * * `long` **hash** - The authorization's hash
+     * * `long` **hash** - [Session](../constructors/webAuthorization.md) hash
      *
      * @param array $params Parameters
      *
@@ -536,21 +540,21 @@ interface account
     public function resetWebAuthorization($params);
 
     /**
-     * Reset all telegram web login authorizations.
+     * Reset all active web [telegram login](https://core.telegram.org/widgets/login) sessions.
      *
      * @return bool
      */
     public function resetWebAuthorizations();
 
     /**
-     * Get all secure telegram passport values.
+     * Get all saved [Telegram Passport](https://core.telegram.org/passport) documents, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption).
      *
      * @return  of SecureValue[]
      */
     public function getAllSecureValues();
 
     /**
-     * Get secure value for telegram passport.
+     * Get saved [Telegram Passport](https://core.telegram.org/passport) document, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption).
      *
      * Parameters:
      * * `[SecureValueType]` **types** - Get telegram passport secure parameters
@@ -562,11 +566,11 @@ interface account
     public function getSecureValue($params);
 
     /**
-     * Save telegram passport secure value.
+     * Securely save [Telegram Passport](https://core.telegram.org/passport) document, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption).
      *
      * Parameters:
-     * * `InputSecureValue` **value**            - Encrypted value
-     * * `long`             **secure_secret_id** - Secret
+     * * `InputSecureValue` **value**            - Secure value, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption)
+     * * `long`             **secure_secret_id** - Passport secret hash, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption)
      *
      * @param array $params Parameters
      *
@@ -575,7 +579,7 @@ interface account
     public function saveSecureValue($params);
 
     /**
-     * Delete secure telegram passport value.
+     * Delete stored [Telegram Passport](https://core.telegram.org/passport) documents, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption).
      *
      * Parameters:
      * * `[SecureValueType]` **types** - The values to delete
@@ -587,12 +591,12 @@ interface account
     public function deleteSecureValue($params);
 
     /**
-     * Bots only: get telegram passport authorization form.
+     * Returns a Telegram Passport authorization form for sharing data with a service.
      *
      * Parameters:
-     * * `int`    **bot_id**     - Bot ID
-     * * `string` **scope**      - Scope
-     * * `string` **public_key** - Bot's public key
+     * * `int`    **bot_id**     - User identifier of the service's bot
+     * * `string` **scope**      - Telegram Passport element types requested by the service
+     * * `string` **public_key** - Service's public key
      *
      * @param array $params Parameters
      *
@@ -601,14 +605,14 @@ interface account
     public function getAuthorizationForm($params);
 
     /**
-     * Accept telegram passport authorization.
+     * Sends a Telegram Passport authorization form, effectively sharing data with the service.
      *
      * Parameters:
      * * `int`                        **bot_id**       - Bot ID
-     * * `string`                     **scope**        - Scope
-     * * `string`                     **public_key**   - The bot's RSA public key
+     * * `string`                     **scope**        - Telegram Passport element types requested by the service
+     * * `string`                     **public_key**   - Service's public key
      * * `[SecureValueHash]`          **value_hashes** - Hashes of the encrypted credentials
-     * * `SecureCredentialsEncrypted` **credentials**  - Encrypted secure credentials
+     * * `SecureCredentialsEncrypted` **credentials**  - Encrypted values
      *
      * @param array $params Parameters
      *
@@ -617,11 +621,11 @@ interface account
     public function acceptAuthorization($params);
 
     /**
-     * Send phone verification code.
+     * Send the verification phone code for telegram [passport](https://core.telegram.org/passport).
      *
      * Parameters:
-     * * `string`       **phone_number** - The phone number
-     * * `CodeSettings` **settings**     - Code settings
+     * * `string`       **phone_number** - The phone number to verify
+     * * `CodeSettings` **settings**     - Phone code settings
      *
      * @param array $params Parameters
      *
@@ -630,12 +634,12 @@ interface account
     public function sendVerifyPhoneCode($params);
 
     /**
-     * Verify phone number.
+     * Verify a phone number for telegram [passport](https://core.telegram.org/passport).
      *
      * Parameters:
-     * * `string` **phone_number**    - The phone number
-     * * `string` **phone_code_hash** - The phone code hash returned by account.sendVerifyPhoneCode
-     * * `string` **phone_code**      - The phone code type returned by account.sendVerifyPhoneCode
+     * * `string` **phone_number**    - Phone number
+     * * `string` **phone_code_hash** - Phone code hash received from the call to [account.sendVerifyPhoneCode](../methods/account.sendVerifyPhoneCode.md)
+     * * `string` **phone_code**      - Code received after the call to [account.sendVerifyPhoneCode](../methods/account.sendVerifyPhoneCode.md)
      *
      * @param array $params Parameters
      *
@@ -644,10 +648,10 @@ interface account
     public function verifyPhone($params);
 
     /**
-     * Send email verification code.
+     * Send the verification email code for telegram [passport](https://core.telegram.org/passport).
      *
      * Parameters:
-     * * `string` **email** - Email
+     * * `string` **email** - The email where to send the code
      *
      * @param array $params Parameters
      *
@@ -656,11 +660,11 @@ interface account
     public function sendVerifyEmailCode($params);
 
     /**
-     * Verify email address.
+     * Verify an email address for telegram [passport](https://core.telegram.org/passport).
      *
      * Parameters:
-     * * `string` **email** - The email address
-     * * `string` **code**  - The received code
+     * * `string` **email** - The email to verify
+     * * `string` **code**  - The verification code that was received
      *
      * @param array $params Parameters
      *
@@ -669,16 +673,16 @@ interface account
     public function verifyEmail($params);
 
     /**
-     * Start account exporting session.
+     * Intialize account takeout session.
      *
      * Parameters:
-     * * `boolean` **contacts**           - Optional: Export contacts?
-     * * `boolean` **message_users**      - Optional: Export users?
-     * * `boolean` **message_chats**      - Optional: Export chats?
-     * * `boolean` **message_megagroups** - Optional: Export supergroups?
-     * * `boolean` **message_channels**   - Optional: Export channel messages?
-     * * `boolean` **files**              - Optional: Export files?
-     * * `int`     **file_max_size**      - Optional: Export only files smaller than this size
+     * * `boolean` **contacts**           - Optional: Whether to export contacts
+     * * `boolean` **message_users**      - Optional: Whether to export messages in private chats
+     * * `boolean` **message_chats**      - Optional: Whether to export messages in [legacy groups](https://core.telegram.org/api/channel)
+     * * `boolean` **message_megagroups** - Optional: Whether to export messages in [supergroups](https://core.telegram.org/api/channel)
+     * * `boolean` **message_channels**   - Optional: Whether to export messages in [channels](https://core.telegram.org/api/channel)
+     * * `boolean` **files**              - Optional: Whether to export files
+     * * `int`     **file_max_size**      - Optional: Maximum size of files to export
      *
      * @param array $params Parameters
      *
@@ -687,10 +691,10 @@ interface account
     public function initTakeoutSession($params);
 
     /**
-     * Finish account exporting session.
+     * Finish account takeout session.
      *
      * Parameters:
-     * * `boolean` **success** - Optional: Did the data export succeed?
+     * * `boolean` **success** - Optional: Data exported successfully
      *
      * @param array $params Parameters
      *
@@ -699,10 +703,10 @@ interface account
     public function finishTakeoutSession($params);
 
     /**
-     * Confirm password recovery using email.
+     * Verify an email to use as [2FA recovery method](https://core.telegram.org/api/srp).
      *
      * Parameters:
-     * * `string` **code** - Code
+     * * `string` **code** - The phone code that was received after [setting a recovery email](https://core.telegram.org/api/srp#email-verification)
      *
      * @param array $params Parameters
      *
@@ -711,31 +715,31 @@ interface account
     public function confirmPasswordEmail($params);
 
     /**
-     * Resend password recovery email.
+     * Resend the code to verify an email to use as [2FA recovery method](https://core.telegram.org/api/srp).
      *
      * @return bool
      */
     public function resendPasswordEmail();
 
     /**
-     * Cancel password recovery email.
+     * Cancel the code that was sent to verify an email to use as [2FA recovery method](https://core.telegram.org/api/srp).
      *
      * @return bool
      */
     public function cancelPasswordEmail();
 
     /**
-     * Contact signup notification setting value.
+     * Whether the user will receive notifications when contacts sign up.
      *
      * @return bool
      */
     public function getContactSignUpNotification();
 
     /**
-     * Set contact sign up notification.
+     * Toggle contact sign up notifications.
      *
      * Parameters:
-     * * `Bool` **silent** - Silent?
+     * * `Bool` **silent** - Whether to disable contact sign up notifications
      *
      * @param array $params Parameters
      *
@@ -744,11 +748,11 @@ interface account
     public function setContactSignUpNotification($params);
 
     /**
-     * Get notification exceptions.
+     * Returns list of chats with non-default notification settings.
      *
      * Parameters:
-     * * `boolean`         **compare_sound** - Optional: Compare sound?
-     * * `InputNotifyPeer` **peer**          - Optional: Peer
+     * * `boolean`         **compare_sound** - Optional: If true, chats with non-default sound will also be returned
+     * * `InputNotifyPeer` **peer**          - Optional: If specified, only chats of the specified category will be returned
      *
      * @param array $params Parameters
      *
@@ -757,10 +761,10 @@ interface account
     public function getNotifyExceptions($params);
 
     /**
-     * Get wallpaper info.
+     * Get info about a certain wallpaper.
      *
      * Parameters:
-     * * `InputWallPaper` **wallpaper** - Wallpaper
+     * * `InputWallPaper` **wallpaper** - The wallpaper to get info about
      *
      * @param array $params Parameters
      *
@@ -769,11 +773,11 @@ interface account
     public function getWallPaper($params);
 
     /**
-     * Upload wallpaper.
+     * Create and upload a new wallpaper.
      *
      * Parameters:
-     * * `InputFile`         **file**      - Image
-     * * `string`            **mime_type** - Mime type
+     * * `InputFile`         **file**      - The JPG/PNG wallpaper
+     * * `string`            **mime_type** - MIME type of uploaded wallpaper
      * * `WallPaperSettings` **settings**  - Wallpaper settings
      *
      * @param array $params Parameters
@@ -783,12 +787,12 @@ interface account
     public function uploadWallPaper($params);
 
     /**
-     * Save wallpaper.
+     * Install/uninstall wallpaper.
      *
      * Parameters:
-     * * `InputWallPaper`    **wallpaper** - The wallpaper to save
-     * * `Bool`              **unsave**    - Delete saved wallpaper
-     * * `WallPaperSettings` **settings**  - The wallpaper to save
+     * * `InputWallPaper`    **wallpaper** - Wallpaper to save
+     * * `Bool`              **unsave**    - Uninstall wallpaper?
+     * * `WallPaperSettings` **settings**  - Wallpaper settings
      *
      * @param array $params Parameters
      *
@@ -810,26 +814,26 @@ interface account
     public function installWallPaper($params);
 
     /**
-     * Reset wallpapers.
+     * Delete installed wallpapers.
      *
      * @return bool
      */
     public function resetWallPapers();
 
     /**
-     * Get autodownload settings.
+     * Get media autodownload settings.
      *
      * @return account.AutoDownloadSettings
      */
     public function getAutoDownloadSettings();
 
     /**
-     * Save autodownload settings.
+     * Change media autodownload settings.
      *
      * Parameters:
-     * * `boolean`              **low**      - Optional: Low preset
-     * * `boolean`              **high**     - Optional: High preset
-     * * `AutoDownloadSettings` **settings** - Autodownload settings
+     * * `boolean`              **low**      - Optional: Whether to save settings in the low data usage preset
+     * * `boolean`              **high**     - Optional: Whether to save settings in the high data usage preset
+     * * `AutoDownloadSettings` **settings** - Media autodownload settings
      *
      * @param array $params Parameters
      *
@@ -841,10 +845,10 @@ interface account
      * Upload theme.
      *
      * Parameters:
-     * * `InputFile` **file**      - File
-     * * `InputFile` **thumb**     - Optional: Thumb
+     * * `InputFile` **file**      - Theme file uploaded as described in [files »](https://core.telegram.org/api/files)
+     * * `InputFile` **thumb**     - Optional: Thumbnail
      * * `string`    **file_name** - File name
-     * * `string`    **mime_type** - Mime type
+     * * `string`    **mime_type** - MIME type, must be `application/x-tgtheme-{format}`, where `format` depends on the client
      *
      * @param array $params Parameters
      *
@@ -883,7 +887,7 @@ interface account
     public function updateTheme($params);
 
     /**
-     * Save theme.
+     * Save a theme.
      *
      * Parameters:
      * * `InputTheme` **theme**  - Theme to save
@@ -896,11 +900,11 @@ interface account
     public function saveTheme($params);
 
     /**
-     * Install theme.
+     * Install a theme.
      *
      * Parameters:
      * * `boolean`    **dark**   - Optional: Whether to install the dark version
-     * * `string`     **format** - Optional: Format
+     * * `string`     **format** - Optional: Theme format, a string that identifies the theming engines supported by the client
      * * `InputTheme` **theme**  - Optional: Theme to install
      *
      * @param array $params Parameters
@@ -940,7 +944,7 @@ interface account
 interface users
 {
     /**
-     * Get info about users.
+     * Returns basic user info according to their identifiers.
      *
      * Parameters:
      * * `[InputUser]` **id** - The ids of the users
@@ -952,10 +956,10 @@ interface users
     public function getUsers($params);
 
     /**
-     * You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
+     * Returns extended user info by ID.
      *
      * Parameters:
-     * * `InputUser` **id** - You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputUser` **id** - User ID
      *
      * @param array $params Parameters
      *
@@ -964,10 +968,12 @@ interface users
     public function getFullUser($params);
 
     /**
-     * Set secure value error for telegram passport.
+     * Notify the user that the sent [passport](https://core.telegram.org/passport) data contains some errors The user will not be able to re-submit their Passport data to you until the errors are fixed (the contents of the field for which you returned the error must change).
+
+Use this if the data submitted by the user doesn't satisfy the standards your service requires for any reason. For example, if a birthday date seems invalid, a submitted document is blurry, a scan shows evidence of tampering, etc. Supply some details in the error message to make sure the user knows how to correct the issues.
      *
      * Parameters:
-     * * `InputUser`          **id**     - The user ID
+     * * `InputUser`          **id**     - The user
      * * `[SecureValueError]` **errors** - The errors
      *
      * @param array $params Parameters
@@ -980,7 +986,7 @@ interface users
 interface contacts
 {
     /**
-     * Get contacts by IDs.
+     * Get contact by telegram IDs.
      *
      * Parameters:
      * * `[int]` **hash** - Optional: Previously fetched IDs
@@ -992,14 +998,14 @@ interface contacts
     public function getContactIDs($params);
 
     /**
-     * Get online status of all users.
+     * Returns the list of contact statuses.
      *
      * @return  of ContactStatus[]
      */
     public function getStatuses();
 
     /**
-     * Get all contacts.
+     * Returns the current user's contact list.
      *
      * Parameters:
      * * `[int]` **hash** - Optional: User IDs of previously cached contacts
@@ -1011,7 +1017,7 @@ interface contacts
     public function getContacts($params);
 
     /**
-     * Add phone number as contact.
+     * Imports contacts: saves a full list on the server, adds already registered contacts to the contact list, returns added contacts and their info.
      *
      * Parameters:
      * * `[InputContact]` **contacts** - The numbers to import
@@ -1023,7 +1029,7 @@ interface contacts
     public function importContacts($params);
 
     /**
-     * Delete multiple contacts.
+     * Deletes several contacts from the list.
      *
      * Parameters:
      * * `[InputUser]` **id** - The contacts to delete
@@ -1035,7 +1041,7 @@ interface contacts
     public function deleteContacts($params);
 
     /**
-     * Delete contacts by phones.
+     * Delete contacts by phone number.
      *
      * Parameters:
      * * `[string]` **phones** - Phones
@@ -1047,10 +1053,10 @@ interface contacts
     public function deleteByPhones($params);
 
     /**
-     * Block a user.
+     * Adds the user to the blacklist.
      *
      * Parameters:
-     * * `InputUser` **id** - The user to block
+     * * `InputUser` **id** - User ID
      *
      * @param array $params Parameters
      *
@@ -1059,10 +1065,10 @@ interface contacts
     public function block($params);
 
     /**
-     * Unblock a user.
+     * Deletes the user from the blacklist.
      *
      * Parameters:
-     * * `InputUser` **id** - The user to unblock
+     * * `InputUser` **id** - User ID
      *
      * @param array $params Parameters
      *
@@ -1071,11 +1077,11 @@ interface contacts
     public function unblock($params);
 
     /**
-     * Get blocked users.
+     * Returns the list of blocked users.
      *
      * Parameters:
-     * * `int` **offset** - Initially 0, then set to the number of blocked contacts previously fetched
-     * * `int` **limit**  - How many blocked contacts to fetch
+     * * `int` **offset** - The number of list elements to be skipped
+     * * `int` **limit**  - The number of list elements to be returned
      *
      * @param array $params Parameters
      *
@@ -1084,11 +1090,11 @@ interface contacts
     public function getBlocked($params);
 
     /**
-     * Search contacts.
+     * Returns users found by username substring.
      *
      * Parameters:
-     * * `string` **q**     - The search query
-     * * `int`    **limit** - How many results should be returned
+     * * `string` **q**     - Target substring
+     * * `int`    **limit** - Maximum number of users to be returned
      *
      * @param array $params Parameters
      *
@@ -1097,10 +1103,10 @@ interface contacts
     public function search($params);
 
     /**
-     * You cannot use this method directly, use the resolveUsername, getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
+     * Resolve a @username to get peer info.
      *
      * Parameters:
-     * * `string` **username** - You cannot use this method directly, use the resolveUsername, getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **username** - @username to resolve
      *
      * @param array $params Parameters
      *
@@ -1109,19 +1115,19 @@ interface contacts
     public function resolveUsername($params);
 
     /**
-     * Get most used chats.
+     * Get most used peers.
      *
      * Parameters:
-     * * `boolean` **correspondents** - Optional: Fetch users?
-     * * `boolean` **bots_pm**        - Optional: Fetch bots?
-     * * `boolean` **bots_inline**    - Optional: Fetch inline bots?
-     * * `boolean` **phone_calls**    - Optional: Fetch phone calls?
-     * * `boolean` **forward_users**  - Optional: Forward users?
-     * * `boolean` **forward_chats**  - Optional: Forward chats?
-     * * `boolean` **groups**         - Optional: Fetch groups?
-     * * `boolean` **channels**       - Optional: Fetch channels and supergroups?
-     * * `int`     **offset**         - Initially 0, then `$offset += $contacts_TopPeers['categories']['count'];`
-     * * `int`     **limit**          - How many results to fetch
+     * * `boolean` **correspondents** - Optional: Users we've chatted most frequently with
+     * * `boolean` **bots_pm**        - Optional: Most used bots
+     * * `boolean` **bots_inline**    - Optional: Most used inline bots
+     * * `boolean` **phone_calls**    - Optional: Most frequently called users
+     * * `boolean` **forward_users**  - Optional: Users to which the users often forwards messages to
+     * * `boolean` **forward_chats**  - Optional: Chats to which the users often forwards messages to
+     * * `boolean` **groups**         - Optional: Often-opened groups and supergroups
+     * * `boolean` **channels**       - Optional: Most frequently visited channels
+     * * `int`     **offset**         - Offset for [pagination](https://core.telegram.org/api/offsets)
+     * * `int`     **limit**          - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      * * `[int]`   **hash**           - Optional: Peer IDs of previously cached peers
      *
      * @param array $params Parameters
@@ -1131,11 +1137,11 @@ interface contacts
     public function getTopPeers($params);
 
     /**
-     * Reset top peer rating for a certain category/peer.
+     * Reset [rating](https://core.telegram.org/api/top-rating) of top peer.
      *
      * Parameters:
-     * * `TopPeerCategory` **category** - The category
-     * * `InputPeer`       **peer**     - The peer
+     * * `TopPeerCategory` **category** - Top peer category
+     * * `InputPeer`       **peer**     - Peer whose rating should be reset
      *
      * @param array $params Parameters
      *
@@ -1144,24 +1150,24 @@ interface contacts
     public function resetTopPeerRating($params);
 
     /**
-     * Reset saved contacts.
+     * Delete saved contacts.
      *
      * @return bool
      */
     public function resetSaved();
 
     /**
-     * Get saved contacts.
+     * Get all contacts.
      *
      * @return  of SavedContact[]
      */
     public function getSaved();
 
     /**
-     * Toggle top peers.
+     * Enable/disable [top peers](https://core.telegram.org/api/top-rating).
      *
      * Parameters:
-     * * `Bool` **enabled** - Enable or disable top peer
+     * * `Bool` **enabled** - Enable/disable
      *
      * @param array $params Parameters
      *
@@ -1170,14 +1176,14 @@ interface contacts
     public function toggleTopPeers($params);
 
     /**
-     * Add contact.
+     * Add an existing telegram user as contact.
      *
      * Parameters:
-     * * `boolean`   **add_phone_privacy_exception** - Optional: Phone privacy exception?
-     * * `InputUser` **id**                          - ID
+     * * `boolean`   **add_phone_privacy_exception** - Optional: Allow the other user to see our phone number?
+     * * `InputUser` **id**                          - Telegram ID of the other user
      * * `string`    **first_name**                  - First name
      * * `string`    **last_name**                   - Last name
-     * * `string`    **phone**                       - Phone number
+     * * `string`    **phone**                       - User's phone number
      *
      * @param array $params Parameters
      *
@@ -1186,10 +1192,10 @@ interface contacts
     public function addContact($params);
 
     /**
-     * Accept contact.
+     * If the [peer settings](../constructors/peerSettings.md) of a new user allow us to add him as contact, add that user as contact.
      *
      * Parameters:
-     * * `InputUser` **id** - ID
+     * * `InputUser` **id** - The user to add as contact
      *
      * @param array $params Parameters
      *
@@ -1198,10 +1204,10 @@ interface contacts
     public function acceptContact($params);
 
     /**
-     * Get people nearby (geochats).
+     * Get contacts near you.
      *
      * Parameters:
-     * * `InputGeoPoint` **geo_point** - Current location
+     * * `InputGeoPoint` **geo_point** - Geolocation
      *
      * @param array $params Parameters
      *
@@ -1213,7 +1219,7 @@ interface contacts
 interface messages
 {
     /**
-     * Get messages.
+     * Returns the list of messages by their IDs.
      *
      * Parameters:
      * * `[InputMessage]` **id** - The IDs of messages to fetch (only for users and normal groups)
@@ -1225,15 +1231,15 @@ interface messages
     public function getMessages($params);
 
     /**
-     * Gets list of chats: you should use $MadelineProto->getDialogs() instead: https://docs.madelineproto.xyz/docs/DIALOGS.html.
+     * Returns the current user dialog list.
      *
      * Parameters:
-     * * `boolean`   **exclude_pinned** - Optional: Do not fetch pinned chats
+     * * `boolean`   **exclude_pinned** - Optional: Exclude pinned dialogs
      * * `int`       **folder_id**      - Optional: Folder ID
-     * * `int`       **offset_date**    - End($res['messages'])['date'];
-     * * `int`       **offset_id**      - End($res['messages'])['id'];
-     * * `InputPeer` **offset_peer**    - End($res['dialogs'])['peer'];
-     * * `int`       **limit**          - Number of dialogs to fetch
+     * * `int`       **offset_date**    - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * * `int`       **offset_id**      - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * * `InputPeer` **offset_peer**    - [Offset peer for pagination](https://core.telegram.org/api/offsets)
+     * * `int`       **limit**          - Number of list elements to be returned
      * * `[int]`     **hash**           - Optional: IDs of previously fetched dialogs
      *
      * @param array $params Parameters
@@ -1243,16 +1249,16 @@ interface messages
     public function getDialogs($params);
 
     /**
-     * Get previous messages of a group.
+     * Gets back the conversation history with one interlocutor / within a chat.
      *
      * Parameters:
-     * * `InputPeer` **peer**        - The chat
-     * * `int`       **offset_id**   - The last fetched message ID, initially 0
-     * * `int`       **offset_date** - The date of the last previously fetched message, initially 0
-     * * `int`       **add_offset**  - Additional offset, can be 0
-     * * `int`       **limit**       - Number of messages to fetch
-     * * `int`       **max_id**      - Maximum message ID to fetch
-     * * `int`       **min_id**      - Minumum message ID to fetch
+     * * `InputPeer` **peer**        - Target peer
+     * * `int`       **offset_id**   - Only return messages starting from the specified message ID
+     * * `int`       **offset_date** - Only return messages sent after the specified date
+     * * `int`       **add_offset**  - Number of list elements to be skipped, negative values are also accepted.
+     * * `int`       **limit**       - Number of results to return
+     * * `int`       **max_id**      - If a positive value was transferred, the method will return only messages with IDs less than **max\_id**
+     * * `int`       **min_id**      - If a positive value was transferred, the method will return only messages with IDs more than **min\_id**
      * * `[int]`     **hash**        - Optional: IDs of messages you already fetched
      *
      * @param array $params Parameters
@@ -1262,20 +1268,20 @@ interface messages
     public function getHistory($params);
 
     /**
-     * Search peers or messages.
+     * Gets back found messages.
      *
      * Parameters:
-     * * `InputPeer`      **peer**       - Where to search
-     * * `string`         **q**          - What to search
-     * * `InputUser`      **from_id**    - Optional: Show only messages from a certain user?
-     * * `MessagesFilter` **filter**     - Message filter
-     * * `int`            **min_date**   - Minumum date of results to fetch
-     * * `int`            **max_date**   - Maximum date of results to fetch
-     * * `int`            **offset_id**  - Message ID offset
-     * * `int`            **add_offset** - Additional offset, can be 0
-     * * `int`            **limit**      - Number of results to return
-     * * `int`            **max_id**     - Maximum message id to return
-     * * `int`            **min_id**     - Minumum message id to return
+     * * `InputPeer`      **peer**       - User or chat, histories with which are searched, or [(inputPeerEmpty)](../constructors/inputPeerEmpty.md) constructor for global search
+     * * `string`         **q**          - Text search request
+     * * `InputUser`      **from_id**    - Optional: Only return messages sent by the specified user ID
+     * * `MessagesFilter` **filter**     - Filter to return only specified message types
+     * * `int`            **min_date**   - If a positive value was transferred, only messages with a sending date bigger than the transferred one will be returned
+     * * `int`            **max_date**   - If a positive value was transferred, only messages with a sending date smaller than the transferred one will be returned
+     * * `int`            **offset_id**  - Only return messages starting from the specified message ID
+     * * `int`            **add_offset** - [Additional offset](https://core.telegram.org/api/offsets)
+     * * `int`            **limit**      - [Number of results to return](https://core.telegram.org/api/offsets)
+     * * `int`            **max_id**     - [Maximum message ID to return](https://core.telegram.org/api/offsets)
+     * * `int`            **min_id**     - [Minimum message ID to return](https://core.telegram.org/api/offsets)
      * * `[int]`          **hash**       - Optional: The IDs of messages you already fetched
      *
      * @param array $params Parameters
@@ -1285,11 +1291,11 @@ interface messages
     public function search($params);
 
     /**
-     * Mark messages as read.
+     * Marks message history as read.
      *
      * Parameters:
-     * * `InputPeer` **peer**   - Where to mark messages as read
-     * * `int`       **max_id** - Maximum message ID to mark as read
+     * * `InputPeer` **peer**   - Target user or group
+     * * `int`       **max_id** - If a positive value is passed, only messages with identifiers less or equal than the given one will be read
      *
      * @param array $params Parameters
      *
@@ -1298,13 +1304,13 @@ interface messages
     public function readHistory($params);
 
     /**
-     * Delete chat history.
+     * Deletes communication history.
      *
      * Parameters:
-     * * `boolean`   **just_clear** - Optional: Only clear it from your side
-     * * `boolean`   **revoke**     - Optional: Delete messages for the other user
-     * * `InputPeer` **peer**       - Where to clear it
-     * * `int`       **max_id**     - Maximum message id of messages to delete
+     * * `boolean`   **just_clear** - Optional: Just clear history for the current user, without actually removing messages for every chat user
+     * * `boolean`   **revoke**     - Optional: Whether to delete the message history for all chat participants
+     * * `InputPeer` **peer**       - User or chat, communication history of which will be deleted
+     * * `int`       **max_id**     - Maximum ID of message to delete
      *
      * @param array $params Parameters
      *
@@ -1313,10 +1319,10 @@ interface messages
     public function deleteHistory($params);
 
     /**
-     * Delete messages.
+     * Deletes messages by their identifiers.
      *
      * Parameters:
-     * * `boolean` **revoke** - Optional: Delete the messages for everyone?
+     * * `boolean` **revoke** - Optional: Whether to delete messages for all participants of the chat
      * * `[int]`   **id**     - IDs of messages to delete, use channels->deleteMessages for supergroups
      *
      * @param array $params Parameters
@@ -1326,10 +1332,10 @@ interface messages
     public function deleteMessages($params);
 
     /**
-     * Mark messages as read.
+     * Confirms receipt of messages by a client, cancels PUSH-notification sending.
      *
      * Parameters:
-     * * `int` **max_id** - Maximum message id of messages to mark as read
+     * * `int` **max_id** - Maximum message ID available in a client.
      *
      * @param array $params Parameters
      *
@@ -1338,11 +1344,11 @@ interface messages
     public function receivedMessages($params);
 
     /**
-     * Change typing status.
+     * Sends a current user typing event (see [SendMessageAction](../types/SendMessageAction.md) for all event types) to a conversation partner or group.
      *
      * Parameters:
-     * * `InputPeer`         **peer**   - Where to change typing status
-     * * `SendMessageAction` **action** - Typing status
+     * * `InputPeer`         **peer**   - Target user or group
+     * * `SendMessageAction` **action** - Type of action<br>Parameter added in [Layer 17](https://core.telegram.org/api/layers#layer-17).
      *
      * @param array $params Parameters
      *
@@ -1351,19 +1357,19 @@ interface messages
     public function setTyping($params);
 
     /**
-     * Send a message.
+     * Sends a message to a chat.
      *
      * Parameters:
-     * * `boolean`         **no_webpage**      - Optional: Disable webpage preview?
-     * * `boolean`         **silent**          - Optional: Disable notifications?
-     * * `boolean`         **background**      - Optional: Disable background notifications?
-     * * `boolean`         **clear_draft**     - Optional: Clear the message draft of this chat?
-     * * `InputPeer`       **peer**            - The chat where to send this message
-     * * `int`             **reply_to_msg_id** - Optional: Reply to message by ID
-     * * `string`          **message**         - The message to send
-     * * `ReplyMarkup`     **reply_markup**    - Optional: Keyboards to send
+     * * `boolean`         **no_webpage**      - Optional: Set this flag to disable generation of the webpage preview
+     * * `boolean`         **silent**          - Optional: Send this message silently (no notifications for the receivers)
+     * * `boolean`         **background**      - Optional: Send this message as background message
+     * * `boolean`         **clear_draft**     - Optional: Clear the draft field
+     * * `InputPeer`       **peer**            - The destination where the message will be sent
+     * * `int`             **reply_to_msg_id** - Optional: The message ID to which this message will reply to
+     * * `string`          **message**         - The message
+     * * `ReplyMarkup`     **reply_markup**    - Optional: Reply markup for sending bot buttons
      * * `[MessageEntity]` **entities**        - Optional: Entities to send (for styled text)
-     * * `int`             **schedule_date**   - Optional: Schedule date
+     * * `int`             **schedule_date**   - Optional: Scheduled message date for scheduled messages
      *
      * @param array $params Parameters
      *
@@ -1375,16 +1381,16 @@ interface messages
      * Send a media.
      *
      * Parameters:
-     * * `boolean`         **silent**          - Optional: Disable notifications?
-     * * `boolean`         **background**      - Optional: Disable background notifications?
-     * * `boolean`         **clear_draft**     - Optional: Clear the message draft of this chat?
-     * * `InputPeer`       **peer**            - Where to send the media
-     * * `int`             **reply_to_msg_id** - Optional: Reply to message by ID
-     * * `InputMedia`      **media**           - The media to send
-     * * `string`          **message**         - The caption
-     * * `ReplyMarkup`     **reply_markup**    - Optional: Keyboards to send
+     * * `boolean`         **silent**          - Optional: Send message silently (no notification should be triggered)
+     * * `boolean`         **background**      - Optional: Send message in background
+     * * `boolean`         **clear_draft**     - Optional: Clear the draft
+     * * `InputPeer`       **peer**            - Destination
+     * * `int`             **reply_to_msg_id** - Optional: Message ID to which this message should reply to
+     * * `InputMedia`      **media**           - Attached media
+     * * `string`          **message**         - Caption
+     * * `ReplyMarkup`     **reply_markup**    - Optional: Reply markup for bot keyboards
      * * `[MessageEntity]` **entities**        - Optional: Entities for styled text
-     * * `int`             **schedule_date**   - Optional: Schedule date
+     * * `int`             **schedule_date**   - Optional: Scheduled message date for scheduled messages
      *
      * @param array $params Parameters
      *
@@ -1393,17 +1399,17 @@ interface messages
     public function sendMedia($params);
 
     /**
-     * Forward messages.
+     * Forwards messages by their IDs.
      *
      * Parameters:
-     * * `boolean`   **silent**        - Optional: Disable notifications
-     * * `boolean`   **background**    - Optional: Disable background notifications
-     * * `boolean`   **with_my_score** - Optional: If forwarding a game, forward your score, too
-     * * `boolean`   **grouped**       - Optional: Set to true if forwarding albums
-     * * `InputPeer` **from_peer**     - From where to forward the messages
+     * * `boolean`   **silent**        - Optional: Whether to send messages silently (no notification will be triggered on the destination clients)
+     * * `boolean`   **background**    - Optional: Whether to send the message in background
+     * * `boolean`   **with_my_score** - Optional: When forwarding games, whether to include your score in the game
+     * * `boolean`   **grouped**       - Optional: Whether the specified messages represent an album (grouped media)
+     * * `InputPeer` **from_peer**     - Source of messages
      * * `[int]`     **id**            - The message IDs
-     * * `InputPeer` **to_peer**       - Where to forward the messages
-     * * `int`       **schedule_date** - Optional: Schedule date
+     * * `InputPeer` **to_peer**       - Destination peer
+     * * `int`       **schedule_date** - Optional: Scheduled message date for scheduled messages
      *
      * @param array $params Parameters
      *
@@ -1412,10 +1418,10 @@ interface messages
     public function forwardMessages($params);
 
     /**
-     * Report a peer for spam.
+     * Report a new incoming chat for spam, if the [peer settings](../constructors/peerSettings.md) of the chat allow us to do that.
      *
      * Parameters:
-     * * `InputPeer` **peer** - The peer to report
+     * * `InputPeer` **peer** - Peer to report
      *
      * @param array $params Parameters
      *
@@ -1424,7 +1430,7 @@ interface messages
     public function reportSpam($params);
 
     /**
-     * Get the settings of  apeer.
+     * Get peer settings.
      *
      * Parameters:
      * * `InputPeer` **peer** - The peer
@@ -1436,12 +1442,12 @@ interface messages
     public function getPeerSettings($params);
 
     /**
-     * Report a message.
+     * Report a message in a chat for violation of telegram's Terms of Service.
      *
      * Parameters:
-     * * `InputPeer`    **peer**   - The user that sent the messages
+     * * `InputPeer`    **peer**   - Peer
      * * `[int]`        **id**     - The messages to report
-     * * `ReportReason` **reason** - The reason why you're sending this report
+     * * `ReportReason` **reason** - Why are these messages being reported
      *
      * @param array $params Parameters
      *
@@ -1450,7 +1456,7 @@ interface messages
     public function report($params);
 
     /**
-     * Get info about chats.
+     * Returns chat basic info on their IDs.
      *
      * Parameters:
      * * `[int]` **id** - The MTProto IDs of chats to fetch info about
@@ -1462,7 +1468,7 @@ interface messages
     public function getChats($params);
 
     /**
-     * You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
+     * Returns full chat info according to its ID.
      *
      * Parameters:
      * * `InputPeer` **chat_id** - You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
@@ -1474,11 +1480,11 @@ interface messages
     public function getFullChat($params);
 
     /**
-     * Edit the title of a normal chat (not supergroup).
+     * Chanages chat name and sends a service message on it.
      *
      * Parameters:
      * * `InputPeer` **chat_id** - The ID of the chat
-     * * `string`    **title**   - The new title
+     * * `string`    **title**   - New chat name, different from the old one
      *
      * @param array $params Parameters
      *
@@ -1487,11 +1493,11 @@ interface messages
     public function editChatTitle($params);
 
     /**
-     * Edit the photo of a normal chat (not supergroup).
+     * Changes chat photo and sends a service message on it.
      *
      * Parameters:
      * * `InputPeer`      **chat_id** - The ID of the chat
-     * * `InputChatPhoto` **photo**   - The new phto
+     * * `InputChatPhoto` **photo**   - Photo to be set
      *
      * @param array $params Parameters
      *
@@ -1500,12 +1506,12 @@ interface messages
     public function editChatPhoto($params);
 
     /**
-     * Add a user to a normal chat (use channels->inviteToChannel for supergroups).
+     * Adds a user to a chat and sends a service message on it.
      *
      * Parameters:
      * * `InputPeer` **chat_id**   - The chat where to invite users
-     * * `InputUser` **user_id**   - The user to invite
-     * * `int`       **fwd_limit** - Number of old messages the user will see
+     * * `InputUser` **user_id**   - User ID to be added
+     * * `int`       **fwd_limit** - Number of last messages to be forwarded
      *
      * @param array $params Parameters
      *
@@ -1514,11 +1520,11 @@ interface messages
     public function addChatUser($params);
 
     /**
-     * Delete a user from a chat (not supergroup).
+     * Deletes a user from a chat and sends a service message on it.
      *
      * Parameters:
      * * `InputPeer` **chat_id** - The ID of the chat
-     * * `InputUser` **user_id** - The user to delete (pass @me to leave the chat)
+     * * `InputUser` **user_id** - User ID to be deleted
      *
      * @param array $params Parameters
      *
@@ -1527,11 +1533,11 @@ interface messages
     public function deleteChatUser($params);
 
     /**
-     * Create a chat (not supergroup).
+     * Creates a new chat.
      *
      * Parameters:
      * * `[InputUser]` **users** - The users to add to the chat
-     * * `string`      **title** - The new chat's title
+     * * `string`      **title** - Chat name
      *
      * @param array $params Parameters
      *
@@ -1540,11 +1546,11 @@ interface messages
     public function createChat($params);
 
     /**
-     * You cannot use this method directly, instead use $MadelineProto->getDhConfig();.
+     * Returns configuration parameters for Diffie-Hellman key generation. Can also return a random sequence of bytes of required length.
      *
      * Parameters:
-     * * `int` **version**       - You cannot use this method directly, instead use $MadelineProto->getDhConfig();
-     * * `int` **random_length** - You cannot use this method directly, instead use $MadelineProto->getDhConfig();
+     * * `int` **version**       - Value of the **version** parameter from [messages.dhConfig](../constructors/messages.dhConfig.md), avialable at the client
+     * * `int` **random_length** - Length of the required random sequence
      *
      * @param array $params Parameters
      *
@@ -1553,11 +1559,11 @@ interface messages
     public function getDhConfig($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats.
+     * Sends a request to start a secret chat to the user.
      *
      * Parameters:
-     * * `InputUser` **user_id** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
-     * * `bytes`     **g_a**     - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * * `InputUser` **user_id** - User ID
+     * * `bytes`     **g_a**     - `A = g ^ a mod p`, see [Wikipedia](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange)
      *
      * @param array $params Parameters
      *
@@ -1566,12 +1572,12 @@ interface messages
     public function requestEncryption($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats.
+     * Confirms creation of a secret chat.
      *
      * Parameters:
-     * * `InputEncryptedChat` **peer**            - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
-     * * `bytes`              **g_b**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
-     * * `long`               **key_fingerprint** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * * `InputEncryptedChat` **peer**            - Secret chat ID
+     * * `bytes`              **g_b**             - `B = g ^ b mod p`, see [Wikipedia](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange)
+     * * `long`               **key_fingerprint** - 64-bit fingerprint of the received key
      *
      * @param array $params Parameters
      *
@@ -1580,10 +1586,10 @@ interface messages
     public function acceptEncryption($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats.
+     * Cancels a request for creation and/or delete info on secret chat.
      *
      * Parameters:
-     * * `int` **chat_id** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * * `int` **chat_id** - Secret chat ID
      *
      * @param array $params Parameters
      *
@@ -1592,11 +1598,11 @@ interface messages
     public function discardEncryption($params);
 
     /**
-     * Send typing notification to secret chat.
+     * Send typing event by the current user to a secret chat.
      *
      * Parameters:
-     * * `InputEncryptedChat` **peer**   - The secret chat where to send the notification
-     * * `Bool`               **typing** - Set to true to enable the notification, false to disable it
+     * * `InputEncryptedChat` **peer**   - Secret chat ID
+     * * `Bool`               **typing** - Typing.<br>**Possible values**:<br>[(boolTrue)](../constructors/boolTrue.md), if the user started typing and more than **5 seconds** have passed since the last request<br>[(boolFalse)](../constructors/boolFalse.md), if the user stopped typing
      *
      * @param array $params Parameters
      *
@@ -1605,11 +1611,11 @@ interface messages
     public function setEncryptedTyping($params);
 
     /**
-     * Mark messages as read in secret chats.
+     * Marks message history within a secret chat as read.
      *
      * Parameters:
-     * * `InputEncryptedChat` **peer**     - The secret chat where to mark messages as read
-     * * `int`                **max_date** - Maximum date of messages to mark
+     * * `InputEncryptedChat` **peer**     - Secret chat ID
+     * * `int`                **max_date** - Maximum date value for received messages in history
      *
      * @param array $params Parameters
      *
@@ -1618,10 +1624,10 @@ interface messages
     public function readEncryptedHistory($params);
 
     /**
-     * Send message to secret chat.
+     * Sends a text message to a secret chat.
      *
      * Parameters:
-     * * `InputEncryptedChat` **peer**    - The chat where to send the message
+     * * `InputEncryptedChat` **peer**    - Secret chat ID
      * * `DecryptedMessage`   **message** - The message to send
      *
      * @param array $params Parameters
@@ -1631,12 +1637,12 @@ interface messages
     public function sendEncrypted($params);
 
     /**
-     * Send a file to a secret chat.
+     * Sends a message with a file attachment to a secret chat.
      *
      * Parameters:
-     * * `InputEncryptedChat` **peer**    - The chat where to send the file
+     * * `InputEncryptedChat` **peer**    - Secret chat ID
      * * `DecryptedMessage`   **message** - The message with the file
-     * * `InputEncryptedFile` **file**    - The file (optional)
+     * * `InputEncryptedFile` **file**    - File attachment for the secret chat
      *
      * @param array $params Parameters
      *
@@ -1645,10 +1651,10 @@ interface messages
     public function sendEncryptedFile($params);
 
     /**
-     * Send a service message to a secret chat.
+     * Sends a service message to a secret chat.
      *
      * Parameters:
-     * * `InputEncryptedChat` **peer**    - The chat where to send the service message
+     * * `InputEncryptedChat` **peer**    - Secret chat ID
      * * `DecryptedMessage`   **message** - The service message
      *
      * @param array $params Parameters
@@ -1658,10 +1664,10 @@ interface messages
     public function sendEncryptedService($params);
 
     /**
-     * You cannot use this method directly.
+     * Confirms receipt of messages in a secret chat by client, cancels push notifications.
      *
      * Parameters:
-     * * `int` **max_qts** - You cannot use this method directly
+     * * `int` **max_qts** - Maximum qts value available at the client
      *
      * @param array $params Parameters
      *
@@ -1670,10 +1676,10 @@ interface messages
     public function receivedQueue($params);
 
     /**
-     * Report for spam a secret chat.
+     * Report a secret chat for spam.
      *
      * Parameters:
-     * * `InputEncryptedChat` **peer** - The chat to report
+     * * `InputEncryptedChat` **peer** - The secret chat to report
      *
      * @param array $params Parameters
      *
@@ -1682,7 +1688,7 @@ interface messages
     public function reportEncryptedSpam($params);
 
     /**
-     * Mark message as read.
+     * Notifies the sender about the recipient having listened a voice message or watched a video.
      *
      * Parameters:
      * * `[int]` **id** - The messages to mark as read (only users and normal chats, not supergroups)
@@ -1694,10 +1700,10 @@ interface messages
     public function readMessageContents($params);
 
     /**
-     * Get stickers.
+     * Get stickers by emoji.
      *
      * Parameters:
-     * * `string` **emoticon** - Search by emoji
+     * * `string` **emoticon** - The emoji
      * * `[int]`  **hash**     - Optional:  the hash parameter of the previous result of this method
      *
      * @param array $params Parameters
@@ -1707,7 +1713,7 @@ interface messages
     public function getStickers($params);
 
     /**
-     * Get all stickerpacks.
+     * Get all installed stickers.
      *
      * Parameters:
      * * `[int]` **hash** - Optional: The hash parameter of the previous result of this method
@@ -1719,10 +1725,10 @@ interface messages
     public function getAllStickers($params);
 
     /**
-     * Get webpage preview.
+     * Get preview of webpage.
      *
      * Parameters:
-     * * `string`          **message**  - Extract preview from this message
+     * * `string`          **message**  - Message from which to extract the preview
      * * `[MessageEntity]` **entities** - Optional: Entities for styled text
      *
      * @param array $params Parameters
@@ -1732,10 +1738,10 @@ interface messages
     public function getWebPagePreview($params);
 
     /**
-     * Export chat invite.
+     * Export an invite link for a chat.
      *
      * Parameters:
-     * * `InputPeer` **peer** - Export invite only for this user
+     * * `InputPeer` **peer** - Chat
      *
      * @param array $params Parameters
      *
@@ -1744,10 +1750,10 @@ interface messages
     public function exportChatInvite($params);
 
     /**
-     * Check if an invitation link is valid.
+     * Check the validity of a chat invite link and get basic info about it.
      *
      * Parameters:
-     * * `string` **hash** - The invite link in t.me/joinchat/aflakf format
+     * * `string` **hash** - Invite hash in `t.me/joinchat/hash`
      *
      * @param array $params Parameters
      *
@@ -1756,10 +1762,10 @@ interface messages
     public function checkChatInvite($params);
 
     /**
-     * Import chat invite.
+     * Import a chat invite and join a private chat/supergroup/channel.
      *
      * Parameters:
-     * * `string` **hash** - The invite link in t.me/joinchat/aflakf format
+     * * `string` **hash** - `hash` from `t.me/joinchat/hash`
      *
      * @param array $params Parameters
      *
@@ -1768,10 +1774,10 @@ interface messages
     public function importChatInvite($params);
 
     /**
-     * Get a stickerset.
+     * Get info about a stickerset.
      *
      * Parameters:
-     * * `InputStickerSet` **stickerset** - The stickerset to get
+     * * `InputStickerSet` **stickerset** - Stickerset
      *
      * @param array $params Parameters
      *
@@ -1780,11 +1786,11 @@ interface messages
     public function getStickerSet($params);
 
     /**
-     * Add a sticker set.
+     * Install a stickerset.
      *
      * Parameters:
-     * * `InputStickerSet` **stickerset** - The sticker set to add
-     * * `Bool`            **archived**   - Archive this set?
+     * * `InputStickerSet` **stickerset** - Stickerset to install
+     * * `Bool`            **archived**   - Whether to archive stickerset
      *
      * @param array $params Parameters
      *
@@ -1793,10 +1799,10 @@ interface messages
     public function installStickerSet($params);
 
     /**
-     * Remove a sticker set.
+     * Uninstall a stickerset.
      *
      * Parameters:
-     * * `InputStickerSet` **stickerset** - The sticker set to remove
+     * * `InputStickerSet` **stickerset** - The stickerset to uninstall
      *
      * @param array $params Parameters
      *
@@ -1805,12 +1811,12 @@ interface messages
     public function uninstallStickerSet($params);
 
     /**
-     * Start a bot.
+     * Start a conversation with a bot using a [deep linking parameter](https://core.telegram.org/bots#deep-linking).
      *
      * Parameters:
-     * * `InputUser` **bot**         - The bot's ID or username
-     * * `InputPeer` **peer**        - Where to start the bot (@me or group ID/username)
-     * * `string`    **start_param** - The bot's start parameter
+     * * `InputUser` **bot**         - The bot
+     * * `InputPeer` **peer**        - The chat where to start the bot, can be the bot's private chat or a group
+     * * `string`    **start_param** - [Deep linking parameter](https://core.telegram.org/bots#deep-linking)
      *
      * @param array $params Parameters
      *
@@ -1819,12 +1825,12 @@ interface messages
     public function startBot($params);
 
     /**
-     * Get and increase message views.
+     * Get and increase the view counter of a message sent or forwarded from a [channel](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputPeer` **peer**      - The chat where the message is located
+     * * `InputPeer` **peer**      - Peer where the message was found
      * * `[int]`     **id**        - The IDs messages to get
-     * * `Bool`      **increment** - Increase message views?
+     * * `Bool`      **increment** - Whether to mark the message as viewed and increment the view counter
      *
      * @param array $params Parameters
      *
@@ -1833,12 +1839,12 @@ interface messages
     public function getMessagesViews($params);
 
     /**
-     * Edit admin permissions.
+     * Make a user admin in a [legacy group](https://core.telegram.org/api/channel).
      *
      * Parameters:
      * * `InputPeer` **chat_id**  - The chat ID (no supergroups)
-     * * `InputUser` **user_id**  - The user ID
-     * * `Bool`      **is_admin** - Should the user be admin?
+     * * `InputUser` **user_id**  - The user to make admin
+     * * `Bool`      **is_admin** - Whether to make him admin
      *
      * @param array $params Parameters
      *
@@ -1847,7 +1853,7 @@ interface messages
     public function editChatAdmin($params);
 
     /**
-     * Convert chat to supergroup.
+     * Turn a [legacy group into a supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
      * * `InputPeer` **chat_id** - The chat to convert
@@ -1859,15 +1865,15 @@ interface messages
     public function migrateChat($params);
 
     /**
-     * Global message search.
+     * Search for messages and peers globally.
      *
      * Parameters:
-     * * `int`       **folder_id**   - Optional: Folder ID
-     * * `string`    **q**           - The query
-     * * `int`       **offset_rate** - Offset rate
-     * * `InputPeer` **offset_peer** - 0 or the peer offset
-     * * `int`       **offset_id**   - 0 or the message ID offset
-     * * `int`       **limit**       - The number of results to return
+     * * `int`       **folder_id**   - Optional: Folder where to search
+     * * `string`    **q**           - Query
+     * * `int`       **offset_rate** - Initially 0, then set to the [`next_rate` parameter of messages.messagesSlice](../constructors/messages.messagesSlice.md)
+     * * `InputPeer` **offset_peer** - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * * `int`       **offset_id**   - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * * `int`       **limit**       - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      *
      * @param array $params Parameters
      *
@@ -1876,10 +1882,10 @@ interface messages
     public function searchGlobal($params);
 
     /**
-     * Reorder sticker sets.
+     * Reorder installed stickersets.
      *
      * Parameters:
-     * * `boolean` **masks** - Optional: Reorder masks?
+     * * `boolean` **masks** - Optional: Reorder mask stickersets
      * * `[long]`  **order** - The order
      *
      * @param array $params Parameters
@@ -1889,12 +1895,12 @@ interface messages
     public function reorderStickerSets($params);
 
     /**
-     * Get document by SHA256 hash.
+     * Get a document by its SHA256 hash, mainly used for gifs.
      *
      * Parameters:
-     * * `bytes`  **sha256**    - `hash('sha256', $filename, true);`
-     * * `int`    **size**      - The file size
-     * * `string` **mime_type** - The mime type of the file
+     * * `bytes`  **sha256**    - SHA256 of file
+     * * `int`    **size**      - Size of the file in bytes
+     * * `string` **mime_type** - Mime type
      *
      * @param array $params Parameters
      *
@@ -1903,11 +1909,11 @@ interface messages
     public function getDocumentByHash($params);
 
     /**
-     * Search gifs.
+     * Search for GIFs.
      *
      * Parameters:
-     * * `string` **q**      - The search query
-     * * `int`    **offset** - The offset
+     * * `string` **q**      - Text query
+     * * `int`    **offset** - Offset for [pagination »](https://core.telegram.org/api/offsets)
      *
      * @param array $params Parameters
      *
@@ -1916,7 +1922,7 @@ interface messages
     public function searchGifs($params);
 
     /**
-     * Get saved gifs.
+     * Get saved GIFs.
      *
      * Parameters:
      * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
@@ -1928,11 +1934,11 @@ interface messages
     public function getSavedGifs($params);
 
     /**
-     * Save a GIF.
+     * Add GIF to saved gifs list.
      *
      * Parameters:
-     * * `InputDocument` **id**     - The GIF to save
-     * * `Bool`          **unsave** - Remove the gif?
+     * * `InputDocument` **id**     - GIF to save
+     * * `Bool`          **unsave** - Whether to remove GIF from saved gifs list
      *
      * @param array $params Parameters
      *
@@ -1941,14 +1947,14 @@ interface messages
     public function saveGif($params);
 
     /**
-     * Call inline bot.
+     * Query an inline bot.
      *
      * Parameters:
-     * * `InputUser`     **bot**       - The bot to call
-     * * `InputPeer`     **peer**      - The chat where to call the bot
-     * * `InputGeoPoint` **geo_point** - Optional: The current location
-     * * `string`        **query**     - The query to send to the bot
-     * * `string`        **offset**    - The offset to send to the bot
+     * * `InputUser`     **bot**       - The bot to query
+     * * `InputPeer`     **peer**      - The currently opened chat
+     * * `InputGeoPoint` **geo_point** - Optional: The geolocation, if requested
+     * * `string`        **query**     - The query
+     * * `string`        **offset**    - The offset within the results, will be passed directly as-is to the bot.
      *
      * @param array $params Parameters
      *
@@ -1957,16 +1963,16 @@ interface messages
     public function getInlineBotResults($params);
 
     /**
-     * Bots only: set the results of an inline query.
+     * Answer an inline query, for bots only.
      *
      * Parameters:
-     * * `boolean`                **gallery**     - Optional: Is this a gallery?
-     * * `boolean`                **private**     - Optional: Is this result private (not cached)?
-     * * `long`                   **query_id**    - Query ID
+     * * `boolean`                **gallery**     - Optional: Set this flag if the results are composed of media files
+     * * `boolean`                **private**     - Optional: Set this flag if results may be cached on the server side only for the user that sent the query. By default, results may be returned to any user who sends the same query
+     * * `long`                   **query_id**    - Unique identifier for the answered query
      * * `[InputBotInlineResult]` **results**     - Results
-     * * `int`                    **cache_time**  - Cache time
-     * * `string`                 **next_offset** - Optional: The next offset
-     * * `InlineBotSwitchPM`      **switch_pm**   - Optional: Switch to PM?
+     * * `int`                    **cache_time**  - The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300.
+     * * `string`                 **next_offset** - Optional: Pass the offset that a client should send in the next query with the same text to receive more results. Pass an empty string if there are no more results or if you don‘t support pagination. Offset length can’t exceed 64 bytes.
+     * * `InlineBotSwitchPM`      **switch_pm**   - Optional: If passed, clients will display a button with specified text that switches the user to a private chat with the bot and sends the bot a start message with a certain parameter.
      *
      * @param array $params Parameters
      *
@@ -1975,18 +1981,18 @@ interface messages
     public function setInlineBotResults($params);
 
     /**
-     * Send inline bot result obtained with messages.getInlineBotResults to the chat.
+     * Send a result obtained using [messages.getInlineBotResults](../methods/messages.getInlineBotResults.md).
      *
      * Parameters:
-     * * `boolean`   **silent**          - Optional: Disable notifications?
-     * * `boolean`   **background**      - Optional: Disable background notifications?
-     * * `boolean`   **clear_draft**     - Optional: Clear the message draft?
-     * * `boolean`   **hide_via**        - Optional: Hide "via @bot"
-     * * `InputPeer` **peer**            - Where to send the message
-     * * `int`       **reply_to_msg_id** - Optional: Reply to message by ID
-     * * `long`      **query_id**        - The inline query ID
-     * * `string`    **id**              - The ID of one of the inline results
-     * * `int`       **schedule_date**   - Optional: Schedule date
+     * * `boolean`   **silent**          - Optional: Whether to send the message silently (no notification will be triggered on the other client)
+     * * `boolean`   **background**      - Optional: Whether to send the message in background
+     * * `boolean`   **clear_draft**     - Optional: Whether to clear the [draft](https://core.telegram.org/api/drafts)
+     * * `boolean`   **hide_via**        - Optional: Whether to hide the `via @botname` in the resulting message (only for bot usernames encountered in the [config](../constructors/config.md))
+     * * `InputPeer` **peer**            - Destination
+     * * `int`       **reply_to_msg_id** - Optional: ID of the message this message should reply to
+     * * `long`      **query_id**        - Query ID from [messages.getInlineBotResults](../methods/messages.getInlineBotResults.md)
+     * * `string`    **id**              - Result ID from [messages.getInlineBotResults](../methods/messages.getInlineBotResults.md)
+     * * `int`       **schedule_date**   - Optional: Scheduled message date for scheduled messages
      *
      * @param array $params Parameters
      *
@@ -1995,11 +2001,11 @@ interface messages
     public function sendInlineBotResult($params);
 
     /**
-     * Check if about to edit a message or a media caption.
+     * Find out if a media message's caption can be edited.
      *
      * Parameters:
-     * * `InputPeer` **peer** - The chat
-     * * `int`       **id**   - The message ID
+     * * `InputPeer` **peer** - Peer where the media was sent
+     * * `int`       **id**   - ID of message
      *
      * @param array $params Parameters
      *
@@ -2008,17 +2014,17 @@ interface messages
     public function getMessageEditData($params);
 
     /**
-     * Edit a message.
+     * Edit message.
      *
      * Parameters:
      * * `boolean`         **no_webpage**    - Optional: Disable webpage preview
-     * * `InputPeer`       **peer**          - The chat
-     * * `int`             **id**            - The message ID
-     * * `string`          **message**       - Optional: The new message
-     * * `InputMedia`      **media**         - Optional: The media to substitute
-     * * `ReplyMarkup`     **reply_markup**  - Optional: The new keyboard
+     * * `InputPeer`       **peer**          - Where was the message sent
+     * * `int`             **id**            - ID of the message to edit
+     * * `string`          **message**       - Optional: New message
+     * * `InputMedia`      **media**         - Optional: New attached media
+     * * `ReplyMarkup`     **reply_markup**  - Optional: Reply markup for inline keyboards
      * * `[MessageEntity]` **entities**      - Optional: The new entities (for styled text)
-     * * `int`             **schedule_date** - Optional: Schedule date
+     * * `int`             **schedule_date** - Optional: Scheduled message date for scheduled messages
      *
      * @param array $params Parameters
      *
@@ -2027,14 +2033,14 @@ interface messages
     public function editMessage($params);
 
     /**
-     * Edit a sent inline message.
+     * Edit an inline bot message.
      *
      * Parameters:
      * * `boolean`                 **no_webpage**   - Optional: Disable webpage preview
-     * * `InputBotInlineMessageID` **id**           - The message ID
-     * * `string`                  **message**      - Optional: The new message
-     * * `InputMedia`              **media**        - Optional: The media to substitute
-     * * `ReplyMarkup`             **reply_markup** - Optional: The new keyboard
+     * * `InputBotInlineMessageID` **id**           - Sent inline message ID
+     * * `string`                  **message**      - Optional: Message
+     * * `InputMedia`              **media**        - Optional: Media
+     * * `ReplyMarkup`             **reply_markup** - Optional: Reply markup for inline keyboards
      * * `[MessageEntity]`         **entities**     - Optional: The new entities (for styled text)
      *
      * @param array $params Parameters
@@ -2044,13 +2050,13 @@ interface messages
     public function editInlineBotMessage($params);
 
     /**
-     * Get the callback answer of a bot (after clicking a button).
+     * Press an inline callback button and get a callback answer from the bot.
      *
      * Parameters:
-     * * `boolean`   **game**   - Optional: Is this a game?
-     * * `InputPeer` **peer**   - The chat
-     * * `int`       **msg_id** - The message ID
-     * * `bytes`     **data**   - Optional: The data to send to the bot
+     * * `boolean`   **game**   - Optional: Whether this is a "play game" button
+     * * `InputPeer` **peer**   - Where was the inline keyboard sent
+     * * `int`       **msg_id** - ID of the Message with the inline keyboard
+     * * `bytes`     **data**   - Optional: Callback data
      *
      * @param array $params Parameters
      *
@@ -2059,14 +2065,14 @@ interface messages
     public function getBotCallbackAnswer($params);
 
     /**
-     * Bots only: set the callback answer (after a button was clicked).
+     * Set the callback answer to a user button press (bots only).
      *
      * Parameters:
-     * * `boolean` **alert**      - Optional: Is this an alert?
-     * * `long`    **query_id**   - The query ID
-     * * `string`  **message**    - Optional: The message
-     * * `string`  **url**        - Optional: The URL
-     * * `int`     **cache_time** - Cache time
+     * * `boolean` **alert**      - Optional: Whether to show the message as a popup instead of a toast notification
+     * * `long`    **query_id**   - Query ID
+     * * `string`  **message**    - Optional: Popup to show
+     * * `string`  **url**        - Optional: URL to open
+     * * `int`     **cache_time** - Cache validity
      *
      * @param array $params Parameters
      *
@@ -2075,7 +2081,7 @@ interface messages
     public function setBotCallbackAnswer($params);
 
     /**
-     * Get dialog info of peers.
+     * Get dialog info of specified peers.
      *
      * Parameters:
      * * `[InputDialogPeer]` **peers** - The peers
@@ -2087,13 +2093,13 @@ interface messages
     public function getPeerDialogs($params);
 
     /**
-     * Save a message draft.
+     * Save a message [draft](https://core.telegram.org/api/drafts) associated to a chat.
      *
      * Parameters:
-     * * `boolean`         **no_webpage**      - Optional: Disable webpage preview
-     * * `int`             **reply_to_msg_id** - Optional: Reply to message by ID
-     * * `InputPeer`       **peer**            - The chat
-     * * `string`          **message**         - The message
+     * * `boolean`         **no_webpage**      - Optional: Disable generation of the webpage preview
+     * * `int`             **reply_to_msg_id** - Optional: Message ID the message should reply to
+     * * `InputPeer`       **peer**            - Destination of the message that should be sent
+     * * `string`          **message**         - The draft
      * * `[MessageEntity]` **entities**        - Optional: The entities (for styled text)
      *
      * @param array $params Parameters
@@ -2103,7 +2109,7 @@ interface messages
     public function saveDraft($params);
 
     /**
-     * Get all message drafts.
+     * Save get all message [drafts](https://core.telegram.org/api/drafts).
      *
      * @return Updates
      */
@@ -2137,7 +2143,7 @@ interface messages
      * Get recent stickers.
      *
      * Parameters:
-     * * `boolean` **attached** - Optional: Get stickers attached to image?
+     * * `boolean` **attached** - Optional: Get stickers recently attached to photo or video files
      * * `[int]`   **hash**     - Optional: IDs the hash parameter of the previous result of this method
      *
      * @param array $params Parameters
@@ -2147,12 +2153,12 @@ interface messages
     public function getRecentStickers($params);
 
     /**
-     * Add a sticker to recent stickers.
+     * Add/remove sticker from recent stickers list.
      *
      * Parameters:
-     * * `boolean`       **attached** - Optional: Get stickers attached to image?
-     * * `InputDocument` **id**       - The sticker
-     * * `Bool`          **unsave**   - Remove the sticker from recent stickers?
+     * * `boolean`       **attached** - Optional: Whether to add/remove stickers recently attached to photo or video files
+     * * `InputDocument` **id**       - Sticker
+     * * `Bool`          **unsave**   - Whether to save or unsave the sticker
      *
      * @param array $params Parameters
      *
@@ -2161,10 +2167,10 @@ interface messages
     public function saveRecentSticker($params);
 
     /**
-     * Clear all recent stickers.
+     * Clear recent stickers.
      *
      * Parameters:
-     * * `boolean` **attached** - Optional: Clear recent stickers attached to images?
+     * * `boolean` **attached** - Optional: Set this flag to clear the list of stickers recently attached to photo or video files
      *
      * @param array $params Parameters
      *
@@ -2176,9 +2182,9 @@ interface messages
      * Get all archived stickers.
      *
      * Parameters:
-     * * `boolean` **masks**     - Optional: Get masks?
-     * * `long`    **offset_id** - Sticker ID offset
-     * * `int`     **limit**     - Number of stickers to fetch
+     * * `boolean` **masks**     - Optional: Get mask stickers
+     * * `long`    **offset_id** - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * * `int`     **limit**     - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      *
      * @param array $params Parameters
      *
@@ -2187,7 +2193,7 @@ interface messages
     public function getArchivedStickers($params);
 
     /**
-     * Get masks.
+     * Get installed mask stickers.
      *
      * Parameters:
      * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
@@ -2199,10 +2205,10 @@ interface messages
     public function getMaskStickers($params);
 
     /**
-     * Get stickers attachable to images.
+     * Get stickers attached to a photo or video.
      *
      * Parameters:
-     * * `InputStickeredMedia` **media** - The stickered media
+     * * `InputStickeredMedia` **media** - Stickered media
      *
      * @param array $params Parameters
      *
@@ -2211,15 +2217,15 @@ interface messages
     public function getAttachedStickers($params);
 
     /**
-     * Set the game score.
+     * Use this method to set the score of the specified user in a game sent as a normal message (bots only).
      *
      * Parameters:
-     * * `boolean`   **edit_message** - Optional: Should the message with the game be edited?
-     * * `boolean`   **force**        - Optional: Force setting the game score
-     * * `InputPeer` **peer**         - The chat where the game was sent
-     * * `int`       **id**           - The message ID
-     * * `InputUser` **user_id**      - The user that set the score
-     * * `int`       **score**        - The score
+     * * `boolean`   **edit_message** - Optional: Set this flag if the game message should be automatically edited to include the current scoreboard
+     * * `boolean`   **force**        - Optional: Set this flag if the high score is allowed to decrease. This can be useful when fixing mistakes or banning cheaters
+     * * `InputPeer` **peer**         - Unique identifier of target chat
+     * * `int`       **id**           - Identifier of the sent message
+     * * `InputUser` **user_id**      - User identifier
+     * * `int`       **score**        - New score
      *
      * @param array $params Parameters
      *
@@ -2228,14 +2234,14 @@ interface messages
     public function setGameScore($params);
 
     /**
-     * Set the game score of an inline message.
+     * Use this method to set the score of the specified user in a game sent as an inline message (bots only).
      *
      * Parameters:
-     * * `boolean`                 **edit_message** - Optional: Should the message with the game be edited?
-     * * `boolean`                 **force**        - Optional: Force setting the game score
-     * * `InputBotInlineMessageID` **id**           - The ID of the inline message
-     * * `InputUser`               **user_id**      - The user that set the score
-     * * `int`                     **score**        - The score
+     * * `boolean`                 **edit_message** - Optional: Set this flag if the game message should be automatically edited to include the current scoreboard
+     * * `boolean`                 **force**        - Optional: Set this flag if the high score is allowed to decrease. This can be useful when fixing mistakes or banning cheaters
+     * * `InputBotInlineMessageID` **id**           - ID of the inline message
+     * * `InputUser`               **user_id**      - User identifier
+     * * `int`                     **score**        - New score
      *
      * @param array $params Parameters
      *
@@ -2244,12 +2250,12 @@ interface messages
     public function setInlineGameScore($params);
 
     /**
-     * Get high scores of a game.
+     * Get highscores of a game.
      *
      * Parameters:
-     * * `InputPeer` **peer**    - The chat
-     * * `int`       **id**      - The message ID
-     * * `InputUser` **user_id** - The user that set the high scores
+     * * `InputPeer` **peer**    - Where was the game sent
+     * * `int`       **id**      - ID of message with game media attachment
+     * * `InputUser` **user_id** - Get high scores made by a certain user
      *
      * @param array $params Parameters
      *
@@ -2258,11 +2264,11 @@ interface messages
     public function getGameHighScores($params);
 
     /**
-     * Get high scores of a game sent in an inline message.
+     * Get highscores of a game sent using an inline bot.
      *
      * Parameters:
-     * * `InputBotInlineMessageID` **id**      - The inline message
-     * * `InputUser`               **user_id** - The user that set the high scores
+     * * `InputBotInlineMessageID` **id**      - ID of inline message
+     * * `InputUser`               **user_id** - Get high scores of a certain user
      *
      * @param array $params Parameters
      *
@@ -2274,9 +2280,9 @@ interface messages
      * Get chats in common with a user.
      *
      * Parameters:
-     * * `InputUser` **user_id** - The user
-     * * `int`       **max_id**  - The maximum chat ID to fetch
-     * * `int`       **limit**   - Number of results to fetch
+     * * `InputUser` **user_id** - User ID
+     * * `int`       **max_id**  - Maximum ID of chat to return (see [pagination](https://core.telegram.org/api/offsets))
+     * * `int`       **limit**   - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      *
      * @param array $params Parameters
      *
@@ -2285,7 +2291,7 @@ interface messages
     public function getCommonChats($params);
 
     /**
-     * Get all chats (not supergroups or channels).
+     * Get all chats, channels and supergroups.
      *
      * Parameters:
      * * `[int]` **except_ids** - Do not fetch these chats (MTProto id)
@@ -2297,10 +2303,10 @@ interface messages
     public function getAllChats($params);
 
     /**
-     * Get webpage preview.
+     * Get [instant view](https://instantview.telegram.org) page.
      *
      * Parameters:
-     * * `string` **url**  - URL
+     * * `string` **url**  - URL of IV page to fetch
      * * `[int]`  **hash** - Optional:  the hash parameter of the previous result of this method
      *
      * @param array $params Parameters
@@ -2310,10 +2316,10 @@ interface messages
     public function getWebPage($params);
 
     /**
-     * Pin or unpin dialog.
+     * Pin/unpin a dialog.
      *
      * Parameters:
-     * * `boolean`         **pinned** - Optional: Pin or unpin the dialog?
+     * * `boolean`         **pinned** - Optional: Whether to pin or unpin the dialog
      * * `InputDialogPeer` **peer**   - The dialog to pin
      *
      * @param array $params Parameters
@@ -2326,7 +2332,7 @@ interface messages
      * Reorder pinned dialogs.
      *
      * Parameters:
-     * * `boolean`           **force**     - Optional: Force reordering
+     * * `boolean`           **force**     - Optional: If set, dialogs pinned server-side but not present in the `order` field will be unpinned.
      * * `int`               **folder_id** - Folder ID
      * * `[InputDialogPeer]` **order**     - New order
      *
@@ -2349,11 +2355,11 @@ interface messages
     public function getPinnedDialogs($params);
 
     /**
-     * Bots only: set shipping results.
+     * If you sent an invoice requesting a shipping address and the parameter is\_flexible was specified, the bot will receive an [updateBotShippingQuery](../constructors/updateBotShippingQuery.md) update. Use this method to reply to shipping queries.
      *
      * Parameters:
-     * * `long`             **query_id**         - Query ID
-     * * `string`           **error**            - Optional: Error
+     * * `long`             **query_id**         - Unique identifier for the query to be answered
+     * * `string`           **error**            - Optional: Error message in human readable form that explains why it is impossible to complete the order (e.g. "Sorry, delivery to your desired address is unavailable'). Telegram will display this message to the user.
      * * `[ShippingOption]` **shipping_options** - Optional: Shipping options
      *
      * @param array $params Parameters
@@ -2363,12 +2369,14 @@ interface messages
     public function setBotShippingResults($params);
 
     /**
-     * Bots only: set precheckout results.
+     * Once the user has confirmed their payment and shipping details, the bot receives an [updateBotPrecheckoutQuery](../constructors/updateBotPrecheckoutQuery.md) update.
+Use this method to respond to such pre-checkout queries.
+**Note**: Telegram must receive an answer within 10 seconds after the pre-checkout query was sent.
      *
      * Parameters:
-     * * `boolean` **success**  - Optional: Success?
-     * * `long`    **query_id** - Query ID
-     * * `string`  **error**    - Optional: Error
+     * * `boolean` **success**  - Optional: Set this flag if everything is alright (goods are available, etc.) and the bot is ready to proceed with the order, otherwise do not set it, and set the `error` field, instead
+     * * `long`    **query_id** - Unique identifier for the query to be answered
+     * * `string`  **error**    - Optional: Required if the `success` isn't set. Error message in human readable form that explains the reason for failure to proceed with the checkout (e.g. "Sorry, somebody just bought the last of our amazing black T-shirts while you were busy filling out your payment details. Please choose a different color or garment!"). Telegram will display this message to the user.
      *
      * @param array $params Parameters
      *
@@ -2377,11 +2385,11 @@ interface messages
     public function setBotPrecheckoutResults($params);
 
     /**
-     * Upload a file without sending it to anyone.
+     * Upload a file and associate it to a chat (without actually sending it to the chat).
      *
      * Parameters:
-     * * `InputPeer`  **peer**  - Nothing
-     * * `InputMedia` **media** - The media to upload
+     * * `InputPeer`  **peer**  - The chat, can be an [inputPeerEmpty](../constructors/inputPeerEmpty.md) for bots
+     * * `InputMedia` **media** - File uploaded in chunks as described in [files »](https://core.telegram.org/api/files)
      *
      * @param array $params Parameters
      *
@@ -2390,11 +2398,11 @@ interface messages
     public function uploadMedia($params);
 
     /**
-     * Send screenshot notification.
+     * Notify the other user in a private chat that a screenshot of the chat was taken.
      *
      * Parameters:
-     * * `InputPeer` **peer**            - Where to send the notification
-     * * `int`       **reply_to_msg_id** - Reply to message by ID
+     * * `InputPeer` **peer**            - Other user
+     * * `int`       **reply_to_msg_id** - ID of message that was screenshotted, can be 0
      *
      * @param array $params Parameters
      *
@@ -2403,7 +2411,7 @@ interface messages
     public function sendScreenshotNotification($params);
 
     /**
-     * Get favorite stickers.
+     * Get faved stickers.
      *
      * Parameters:
      * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
@@ -2415,11 +2423,11 @@ interface messages
     public function getFavedStickers($params);
 
     /**
-     * Add a sticker to favorites.
+     * Mark a sticker as favorite.
      *
      * Parameters:
-     * * `InputDocument` **id**     - The sticker to add to favorites
-     * * `Bool`          **unfave** - Remove it from favorites?
+     * * `InputDocument` **id**     - Sticker to mark as favorite
+     * * `Bool`          **unfave** - Unfavorite
      *
      * @param array $params Parameters
      *
@@ -2428,15 +2436,15 @@ interface messages
     public function faveSticker($params);
 
     /**
-     * Get unread mentions.
+     * Get unread messages where we were mentioned.
      *
      * Parameters:
-     * * `InputPeer` **peer**       - The chat where to get unread mentions
-     * * `int`       **offset_id**  - The offset
-     * * `int`       **add_offset** - The additional offset
-     * * `int`       **limit**      - The number of results to fetch
-     * * `int`       **max_id**     - The maximum message ID to fetch
-     * * `int`       **min_id**     - The minumum message ID to fetch
+     * * `InputPeer` **peer**       - Peer where to look for mentions
+     * * `int`       **offset_id**  - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * * `int`       **add_offset** - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * * `int`       **limit**      - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
+     * * `int`       **max_id**     - Maximum message ID to return, [see pagination](https://core.telegram.org/api/offsets)
+     * * `int`       **min_id**     - Minimum message ID to return, [see pagination](https://core.telegram.org/api/offsets)
      *
      * @param array $params Parameters
      *
@@ -2448,7 +2456,7 @@ interface messages
      * Mark mentions as read.
      *
      * Parameters:
-     * * `InputPeer` **peer** - The chat
+     * * `InputPeer` **peer** - Dialog
      *
      * @param array $params Parameters
      *
@@ -2457,11 +2465,11 @@ interface messages
     public function readMentions($params);
 
     /**
-     * Get recent locations.
+     * Get live location history of a certain user.
      *
      * Parameters:
-     * * `InputPeer` **peer**  - The chat where to search locations
-     * * `int`       **limit** - Number of results to return
+     * * `InputPeer` **peer**  - User
+     * * `int`       **limit** - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      * * `[int]`     **hash**  - Optional: IDs of locations you already fetched
      *
      * @param array $params Parameters
@@ -2471,16 +2479,16 @@ interface messages
     public function getRecentLocations($params);
 
     /**
-     * Send an album.
+     * Send an album of media.
      *
      * Parameters:
-     * * `boolean`            **silent**          - Optional: Disable notifications?
-     * * `boolean`            **background**      - Optional: Disable background notification?
-     * * `boolean`            **clear_draft**     - Optional: Clear draft?
-     * * `InputPeer`          **peer**            - Where to send the album
-     * * `int`                **reply_to_msg_id** - Optional: Reply to message by ID
+     * * `boolean`            **silent**          - Optional: Whether to send the album silently (no notification triggered)
+     * * `boolean`            **background**      - Optional: Send in background?
+     * * `boolean`            **clear_draft**     - Optional: Whether to clear [drafts](https://core.telegram.org/api/drafts)
+     * * `InputPeer`          **peer**            - The destination chat
+     * * `int`                **reply_to_msg_id** - Optional: The message to reply to
      * * `[InputSingleMedia]` **multi_media**     - The album
-     * * `int`                **schedule_date**   - Optional: Schedule date
+     * * `int`                **schedule_date**   - Optional: Scheduled message date for scheduled messages
      *
      * @param array $params Parameters
      *
@@ -2489,10 +2497,10 @@ interface messages
     public function sendMultiMedia($params);
 
     /**
-     * Upload a secret chat file without sending it to anyone.
+     * Upload encrypted file and associate it to a secret chat.
      *
      * Parameters:
-     * * `InputEncryptedChat` **peer** - The chat where to upload the media
+     * * `InputEncryptedChat` **peer** - The secret chat to associate the file to
      * * `InputEncryptedFile` **file** - The file
      *
      * @param array $params Parameters
@@ -2502,11 +2510,11 @@ interface messages
     public function uploadEncryptedFile($params);
 
     /**
-     * Find a sticker set.
+     * Search for stickersets.
      *
      * Parameters:
-     * * `boolean` **exclude_featured** - Optional: Exclude featured sticker sets from the search?
-     * * `string`  **q**                - The search query
+     * * `boolean` **exclude_featured** - Optional: Exclude featured stickersets from results
+     * * `string`  **q**                - Query string
      * * `[int]`   **hash**             - Optional: The IDs of stickersets you already fetched
      *
      * @param array $params Parameters
@@ -2516,18 +2524,18 @@ interface messages
     public function searchStickerSets($params);
 
     /**
-     * Get message ranges to fetch.
+     * Get message ranges for saving the user's chat history.
      *
      * @return  of MessageRange[]
      */
     public function getSplitRanges();
 
     /**
-     * Mark dialog as unread.
+     * Manually mark dialog as unread.
      *
      * Parameters:
-     * * `boolean`         **unread** - Optional: Should it be marked or unmarked as read
-     * * `InputDialogPeer` **peer**   - The dialog to mark as unread
+     * * `boolean`         **unread** - Optional: Mark as unread/read
+     * * `InputDialogPeer` **peer**   - Dialog
      *
      * @param array $params Parameters
      *
@@ -2536,26 +2544,26 @@ interface messages
     public function markDialogUnread($params);
 
     /**
-     * Get dialogs marked as unread manually.
+     * Get dialogs manually marked as unread.
      *
      * @return  of DialogPeer[]
      */
     public function getDialogUnreadMarks();
 
     /**
-     * Clear all drafts.
+     * Clear all [drafts](https://core.telegram.org/api/drafts).
      *
      * @return bool
      */
     public function clearAllDrafts();
 
     /**
-     * Update pinned message.
+     * Pin a message.
      *
      * Parameters:
-     * * `boolean`   **silent** - Optional: Silent?
-     * * `InputPeer` **peer**   - Peer
-     * * `int`       **id**     - Message ID
+     * * `boolean`   **silent** - Optional: Pin the message silently, without triggering a notification
+     * * `InputPeer` **peer**   - The peer where to pin the message
+     * * `int`       **id**     - The message to pin, can be 0 to unpin any currently pinned messages
      *
      * @param array $params Parameters
      *
@@ -2564,11 +2572,11 @@ interface messages
     public function updatePinnedMessage($params);
 
     /**
-     * Send vote.
+     * Vote in a [poll](../constructors/poll.md).
      *
      * Parameters:
-     * * `InputPeer` **peer**    - Peer
-     * * `int`       **msg_id**  - Message ID
+     * * `InputPeer` **peer**    - The chat where the poll was sent
+     * * `int`       **msg_id**  - The message ID of the poll
      * * `[bytes]`   **options** - Options
      *
      * @param array $params Parameters
@@ -2581,8 +2589,8 @@ interface messages
      * Get poll results.
      *
      * Parameters:
-     * * `InputPeer` **peer**   - Peer
-     * * `int`       **msg_id** - Message ID
+     * * `InputPeer` **peer**   - Peer where the poll was found
+     * * `int`       **msg_id** - Message ID of poll message
      *
      * @param array $params Parameters
      *
@@ -2591,10 +2599,10 @@ interface messages
     public function getPollResults($params);
 
     /**
-     * Get online users.
+     * Get count of online users in a chat.
      *
      * Parameters:
-     * * `InputPeer` **peer** - Peer
+     * * `InputPeer` **peer** - The chat
      *
      * @param array $params Parameters
      *
@@ -2603,12 +2611,12 @@ interface messages
     public function getOnlines($params);
 
     /**
-     * Get stats URL.
+     * Returns URL with the chat statistics. Currently this method can be used only for channels.
      *
      * Parameters:
-     * * `boolean`   **dark**   - Optional: Dark?
-     * * `InputPeer` **peer**   - Peer
-     * * `string`    **params** - Params
+     * * `boolean`   **dark**   - Optional: Pass true if a URL with the dark theme must be returned
+     * * `InputPeer` **peer**   - Chat identifier
+     * * `string`    **params** - Parameters from `tg://statsrefresh?params=******` link
      *
      * @param array $params Parameters
      *
@@ -2617,11 +2625,11 @@ interface messages
     public function getStatsURL($params);
 
     /**
-     * Edit chat info.
+     * Edit the description of a [group/supergroup/channel](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputPeer` **peer**  - Chat
-     * * `string`    **about** - Info
+     * * `InputPeer` **peer**  - The [group/supergroup/channel](https://core.telegram.org/api/channel).
+     * * `string`    **about** - The new description
      *
      * @param array $params Parameters
      *
@@ -2630,11 +2638,11 @@ interface messages
     public function editChatAbout($params);
 
     /**
-     * Edit default rights of chat.
+     * Edit the default banned rights of a [channel/supergroup/group](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputPeer`        **peer**          - Chat
-     * * `ChatBannedRights` **banned_rights** - Global chat rights
+     * * `InputPeer`        **peer**          - The peer
+     * * `ChatBannedRights` **banned_rights** - The new global rights
      *
      * @param array $params Parameters
      *
@@ -2643,7 +2651,7 @@ interface messages
     public function editChatDefaultBannedRights($params);
 
     /**
-     * Get emoji keywords.
+     * Get localized emoji keywords.
      *
      * Parameters:
      * * `string` **lang_code** - Language code
@@ -2655,11 +2663,11 @@ interface messages
     public function getEmojiKeywords($params);
 
     /**
-     * Get emoji keyword difference.
+     * Get changed emoji keywords.
      *
      * Parameters:
      * * `string` **lang_code**    - Language code
-     * * `int`    **from_version** - From version
+     * * `int`    **from_version** - Previous emoji keyword localization version
      *
      * @param array $params Parameters
      *
@@ -2668,7 +2676,7 @@ interface messages
     public function getEmojiKeywordsDifference($params);
 
     /**
-     * Get emoji keyword languages.
+     * Get info about an emoji keyword localization.
      *
      * Parameters:
      * * `[string]` **lang_codes** - Language codes
@@ -2680,10 +2688,10 @@ interface messages
     public function getEmojiKeywordsLanguages($params);
 
     /**
-     * Get emoji URL.
+     * Returns an HTTP URL which can be used to automatically log in into translation platform and suggest new emoji replacements. The URL will be valid for 30 seconds after generation.
      *
      * Parameters:
-     * * `string` **lang_code** - Language code
+     * * `string` **lang_code** - Language code for which the emoji replacements will be suggested
      *
      * @param array $params Parameters
      *
@@ -2692,10 +2700,10 @@ interface messages
     public function getEmojiURL($params);
 
     /**
-     * Get search counter.
+     * Get the number of results that would be found by a [messages.search](../methods/messages.search.md) call with the same parameters.
      *
      * Parameters:
-     * * `InputPeer`        **peer**    - Peer
+     * * `InputPeer`        **peer**    - Peer where to search
      * * `[MessagesFilter]` **filters** - Filters
      *
      * @param array $params Parameters
@@ -2705,12 +2713,12 @@ interface messages
     public function getSearchCounters($params);
 
     /**
-     * Request URL authorization.
+     * Get more info about a Seamless Telegram Login authorization request, for more info [click here »](https://core.telegram.org/api/url-authorization).
      *
      * Parameters:
-     * * `InputPeer` **peer**      - Peer
-     * * `int`       **msg_id**    - Message ID
-     * * `int`       **button_id** - Button ID
+     * * `InputPeer` **peer**      - Peer where the message is located
+     * * `int`       **msg_id**    - The message
+     * * `int`       **button_id** - The ID of the button with the authorization request
      *
      * @param array $params Parameters
      *
@@ -2719,13 +2727,13 @@ interface messages
     public function requestUrlAuth($params);
 
     /**
-     * Accept URL authorization.
+     * Use this to accept a Seamless Telegram Login authorization request, for more info [click here »](https://core.telegram.org/api/url-authorization).
      *
      * Parameters:
-     * * `boolean`   **write_allowed** - Optional: Write allowed?
-     * * `InputPeer` **peer**          - Peer
-     * * `int`       **msg_id**        - Message ID
-     * * `int`       **button_id**     - Button ID
+     * * `boolean`   **write_allowed** - Optional: Set this flag to allow the bot to send messages to you (if requested)
+     * * `InputPeer` **peer**          - The location of the message
+     * * `int`       **msg_id**        - Message ID of the message with the login button
+     * * `int`       **button_id**     - ID of the login button
      *
      * @param array $params Parameters
      *
@@ -2734,7 +2742,7 @@ interface messages
     public function acceptUrlAuth($params);
 
     /**
-     * Hide peer settings bar.
+     * Should be called after the user hides the report spam/add as contact bar of a new chat, effectively prevents the user from executing the actions specified in the [peer's settings](../constructors/peerSettings.md).
      *
      * Parameters:
      * * `InputPeer` **peer** - Peer
@@ -2746,7 +2754,7 @@ interface messages
     public function hidePeerSettingsBar($params);
 
     /**
-     * Get scheduled history.
+     * Get scheduled messages.
      *
      * Parameters:
      * * `InputPeer` **peer** - Peer
@@ -2772,7 +2780,7 @@ interface messages
     public function getScheduledMessages($params);
 
     /**
-     * Send scheduled messages.
+     * Send scheduled messages right away.
      *
      * Parameters:
      * * `InputPeer` **peer** - Peer
@@ -2801,20 +2809,20 @@ interface messages
 interface updates
 {
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
+     * Returns a current state of updates.
      *
      * @return updates.State
      */
     public function getState();
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
+     * Get new [updates](https://core.telegram.org/api/updates).
      *
      * Parameters:
-     * * `int` **pts**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `int` **pts_total_limit** - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `int` **date**            - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `int` **qts**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `int` **pts**             - PTS, see [updates](https://core.telegram.org/api/updates).
+     * * `int` **pts_total_limit** - Optional: For fast updating: if provided and `pts + pts_total_limit < remote pts`, [updates.differenceTooLong](../constructors/updates.differenceTooLong.md) will be returned.<br>Simply tells the server to not return the difference if it is bigger than `pts_total_limit`<br>If the remote pts is too big (> ~4000000), this field will default to 1000000
+     * * `int` **date**            - date, see [updates](https://core.telegram.org/api/updates).
+     * * `int` **qts**             - QTS, see [updates](https://core.telegram.org/api/updates).
      *
      * @param array $params Parameters
      *
@@ -2823,14 +2831,14 @@ interface updates
     public function getDifference($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
+     * Returns the difference between the current state of updates of a certain channel and transmitted.
      *
      * Parameters:
-     * * `boolean`               **force**   - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `InputChannel`          **channel** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `ChannelMessagesFilter` **filter**  - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `int`                   **pts**     - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `int`                   **limit**   - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `boolean`               **force**   - Optional: Set to true to skip some possibly unneeded updates and reduce server-side load
+     * * `InputChannel`          **channel** - The channel
+     * * `ChannelMessagesFilter` **filter**  - Messsage filter
+     * * `int`                   **pts**     - Persistent timestamp (see [updates](https://core.telegram.org/api/updates))
+     * * `int`                   **limit**   - How many updates to fetch, max `100000`<br>Ordinary (non-bot) users are supposed to pass `10-100`
      *
      * @param array $params Parameters
      *
@@ -2842,10 +2850,10 @@ interface updates
 interface photos
 {
     /**
-     * Change the profile photo.
+     * Installs a previously uploaded photo as a profile photo.
      *
      * Parameters:
-     * * `InputPhoto` **id** - The photo to use
+     * * `InputPhoto` **id** - Input photo
      *
      * @param array $params Parameters
      *
@@ -2854,10 +2862,10 @@ interface photos
     public function updateProfilePhoto($params);
 
     /**
-     * Upload profile photo.
+     * Updates current user profile photo.
      *
      * Parameters:
-     * * `InputFile` **file** - The photo
+     * * `InputFile` **file** - File saved in parts by means of [upload.saveFilePart](../methods/upload.saveFilePart.md) method
      *
      * @param array $params Parameters
      *
@@ -2866,7 +2874,7 @@ interface photos
     public function uploadProfilePhoto($params);
 
     /**
-     * Delete profile photos.
+     * Deletes profile photos.
      *
      * Parameters:
      * * `[InputPhoto]` **id** - The profile photos to delete
@@ -2878,13 +2886,13 @@ interface photos
     public function deletePhotos($params);
 
     /**
-     * Get the profile photos of a user.
+     * Returns the list of user photos.
      *
      * Parameters:
-     * * `InputUser` **user_id** - The user
-     * * `int`       **offset**  - Offset
-     * * `long`      **max_id**  - Maximum ID of photo to return
-     * * `int`       **limit**   - Number of photos to return
+     * * `InputUser` **user_id** - User ID
+     * * `int`       **offset**  - Number of list elements to be skipped
+     * * `long`      **max_id**  - If a positive value was transferred, the method will return only photos with IDs less than the set one
+     * * `int`       **limit**   - Number of list elements to be returned
      *
      * @param array $params Parameters
      *
@@ -2896,12 +2904,12 @@ interface photos
 interface upload
 {
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Saves a part of file for futher sending to one of the methods.
      *
      * Parameters:
-     * * `long`  **file_id**   - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **file_part** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `bytes` **bytes**     - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `long`  **file_id**   - Random file identifier created by the client
+     * * `int`   **file_part** - Numerical order of a part
+     * * `bytes` **bytes**     - Binary data, contend of a part
      *
      * @param array $params Parameters
      *
@@ -2910,13 +2918,13 @@ interface upload
     public function saveFilePart($params);
 
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Returns content of a whole file or its part.
      *
      * Parameters:
-     * * `boolean`           **precise**  - Optional: You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `InputFileLocation` **location** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`               **offset**   - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`               **limit**    - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `boolean`           **precise**  - Optional: Disable some checks on limit and offset values, useful for example to stream videos by keyframes
+     * * `InputFileLocation` **location** - File location
+     * * `int`               **offset**   - Number of bytes to be skipped
+     * * `int`               **limit**    - Number of bytes to be returned
      *
      * @param array $params Parameters
      *
@@ -2925,13 +2933,13 @@ interface upload
     public function getFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Saves a part of a large file (over 10Mb in size) to be later passed to one of the methods.
      *
      * Parameters:
-     * * `long`  **file_id**          - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **file_part**        - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **file_total_parts** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `bytes` **bytes**            - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `long`  **file_id**          - Random file id, created by the client
+     * * `int`   **file_part**        - Part sequence number
+     * * `int`   **file_total_parts** - Total number of parts
+     * * `bytes` **bytes**            - Binary data, part contents
      *
      * @param array $params Parameters
      *
@@ -2940,12 +2948,12 @@ interface upload
     public function saveBigFilePart($params);
 
     /**
-     * Download a file through telegram.
+     * Returns content of an HTTP file or a part, by proxying the request through telegram.
      *
      * Parameters:
-     * * `InputWebFileLocation` **location** - The file
-     * * `int`                  **offset**   - The offset in bytes
-     * * `int`                  **limit**    - The number of bytes to fetch
+     * * `InputWebFileLocation` **location** - The file to download
+     * * `int`                  **offset**   - Number of bytes to be skipped
+     * * `int`                  **limit**    - Number of bytes to be returned
      *
      * @param array $params Parameters
      *
@@ -2954,12 +2962,12 @@ interface upload
     public function getWebFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Download a [CDN](https://core.telegram.org/cdn) file.
      *
      * Parameters:
-     * * `bytes` **file_token** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **offset**     - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **limit**      - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **file_token** - File token
+     * * `int`   **offset**     - Offset of chunk to download
+     * * `int`   **limit**      - Length of chunk to download
      *
      * @param array $params Parameters
      *
@@ -2968,11 +2976,11 @@ interface upload
     public function getCdnFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Request a reupload of a certain file to a [CDN DC](https://core.telegram.org/cdn).
      *
      * Parameters:
-     * * `bytes` **file_token**    - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `bytes` **request_token** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **file_token**    - File token
+     * * `bytes` **request_token** - Request token
      *
      * @param array $params Parameters
      *
@@ -2981,11 +2989,11 @@ interface upload
     public function reuploadCdnFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Get SHA256 hashes for verifying downloaded [CDN](https://core.telegram.org/cdn) files.
      *
      * Parameters:
-     * * `bytes` **file_token** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **offset**     - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **file_token** - File
+     * * `int`   **offset**     - Offset from which to start getting hashes
      *
      * @param array $params Parameters
      *
@@ -2994,11 +3002,11 @@ interface upload
     public function getCdnFileHashes($params);
 
     /**
-     * Get file hashes.
+     * Get SHA256 hashes for verifying downloaded files.
      *
      * Parameters:
-     * * `InputFileLocation` **location** - The file
-     * * `int`               **offset**   - Offset
+     * * `InputFileLocation` **location** - File
+     * * `int`               **offset**   - Offset from which to get file hashes
      *
      * @param array $params Parameters
      *
@@ -3010,21 +3018,21 @@ interface upload
 interface help
 {
     /**
-     * Get server configuration.
+     * Returns current configuration, icluding data center configuration.
      *
      * @return Config
      */
     public function getConfig();
 
     /**
-     * Get nearest datacenter.
+     * Returns info on data centre nearest to the user.
      *
      * @return NearestDc
      */
     public function getNearestDc();
 
     /**
-     * Get info about app updates.
+     * Returns information on update availability for the current application.
      *
      * Parameters:
      * * `string` **source** - Source
@@ -3036,21 +3044,21 @@ interface help
     public function getAppUpdate($params);
 
     /**
-     * Get invitation text.
+     * Returns text of a text message with an invitation.
      *
      * @return help.InviteText
      */
     public function getInviteText();
 
     /**
-     * Get info of support user.
+     * Returns the support user for the 'ask a question' feature.
      *
      * @return help.Support
      */
     public function getSupport();
 
     /**
-     * Get the changelog of this app.
+     * Get changelog of current app.
      *
      * Parameters:
      * * `string` **prev_app_version** - Previous app version
@@ -3062,11 +3070,11 @@ interface help
     public function getAppChangelog($params);
 
     /**
-     * Set the update status of webhook.
+     * Informs the server about the number of pending bot updates if they haven't been processed for a long time; for bots only.
      *
      * Parameters:
-     * * `int`    **pending_updates_count** - Pending update count
-     * * `string` **message**               - Message
+     * * `int`    **pending_updates_count** - Number of pending updates
+     * * `string` **message**               - Error message, if present
      *
      * @param array $params Parameters
      *
@@ -3075,17 +3083,17 @@ interface help
     public function setBotUpdatesStatus($params);
 
     /**
-     * Get CDN configuration.
+     * Get configuration for [CDN](https://core.telegram.org/cdn) file downloads.
      *
      * @return CdnConfig
      */
     public function getCdnConfig();
 
     /**
-     * Get recent t.me URLs.
+     * Get recently used `t.me` links.
      *
      * Parameters:
-     * * `string` **referer** - Referrer
+     * * `string` **referer** - Referer
      *
      * @param array $params Parameters
      *
@@ -3094,24 +3102,24 @@ interface help
     public function getRecentMeUrls($params);
 
     /**
-     * Get information about the current proxy.
+     * Get promotion info of the currently-used MTProxy.
      *
      * @return help.ProxyData
      */
     public function getProxyData();
 
     /**
-     * Get updated TOS.
+     * Look for updates of telegram's terms of service.
      *
      * @return help.TermsOfServiceUpdate
      */
     public function getTermsOfServiceUpdate();
 
     /**
-     * Accept telegram's TOS.
+     * Accept the new terms of service.
      *
      * Parameters:
-     * * `DataJSON` **id** - TOS
+     * * `DataJSON` **id** - ID of terms of service
      *
      * @param array $params Parameters
      *
@@ -3120,10 +3128,10 @@ interface help
     public function acceptTermsOfService($params);
 
     /**
-     * Get deep link info.
+     * Get info about a `t.me` link.
      *
      * Parameters:
-     * * `string` **path** - Deep link
+     * * `string` **path** - Path in `t.me/path`
      *
      * @param array $params Parameters
      *
@@ -3132,14 +3140,14 @@ interface help
     public function getDeepLinkInfo($params);
 
     /**
-     * Get app config.
+     * Get app-specific configuration.
      *
      * @return JSONValue
      */
     public function getAppConfig();
 
     /**
-     * Log data for developer of this app.
+     * Saves logs of application on the server.
      *
      * Parameters:
      * * `[InputAppEvent]` **events** - Event list
@@ -3151,7 +3159,7 @@ interface help
     public function saveAppLog($params);
 
     /**
-     * Get passport config.
+     * Get [passport](https://core.telegram.org/passport) configuration.
      *
      * Parameters:
      * * `[int]` **hash** - Optional: Hash
@@ -3163,14 +3171,14 @@ interface help
     public function getPassportConfig($params);
 
     /**
-     * Get support name.
+     * Get localized name of the telegram support user.
      *
      * @return help.SupportName
      */
     public function getSupportName();
 
     /**
-     * Get user info.
+     * Internal use.
      *
      * Parameters:
      * * `InputUser` **user_id** - User ID
@@ -3182,10 +3190,10 @@ interface help
     public function getUserInfo($params);
 
     /**
-     * Edit user info.
+     * Internal use.
      *
      * Parameters:
-     * * `InputUser`       **user_id**  - User ID
+     * * `InputUser`       **user_id**  - User
      * * `string`          **message**  - Message
      * * `[MessageEntity]` **entities** - Entities
      *
@@ -3199,11 +3207,11 @@ interface help
 interface channels
 {
     /**
-     * Mark channel/supergroup history as read.
+     * Mark [channel/supergroup](https://core.telegram.org/api/channel) history as read.
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel/supergroup
-     * * `int`          **max_id**  - Maximum message ID to mark as read
+     * * `InputChannel` **channel** - [Channel/supergroup](https://core.telegram.org/api/channel)
+     * * `int`          **max_id**  - ID of message up to which messages should be marked as read
      *
      * @param array $params Parameters
      *
@@ -3212,10 +3220,10 @@ interface channels
     public function readHistory($params);
 
     /**
-     * Delete channel/supergroup messages.
+     * Delete messages in a [channel/supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel/supergroup
+     * * `InputChannel` **channel** - [Channel/supergroup](https://core.telegram.org/api/channel)
      * * `[int]`        **id**      - The IDs of messages to delete
      *
      * @param array $params Parameters
@@ -3225,11 +3233,11 @@ interface channels
     public function deleteMessages($params);
 
     /**
-     * Delete all messages of a user in a channel/supergroup.
+     * Delete all messages sent by a certain user in a [supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel/supergroup
-     * * `InputUser`    **user_id** - The user
+     * * `InputChannel` **channel** - [Supergroup](https://core.telegram.org/api/channel)
+     * * `InputUser`    **user_id** - User whose messages should be deleted
      *
      * @param array $params Parameters
      *
@@ -3238,11 +3246,11 @@ interface channels
     public function deleteUserHistory($params);
 
     /**
-     * Report a message in a supergroup/channel for spam.
+     * Reports some messages from a user in a supergroup as spam; requires administrator rights in the supergroup.
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel
-     * * `InputUser`    **user_id** - The user that sent the messages
+     * * `InputChannel` **channel** - Supergroup
+     * * `InputUser`    **user_id** - ID of the user that sent the spam messages
      * * `[int]`        **id**      - The IDs of messages to report
      *
      * @param array $params Parameters
@@ -3252,10 +3260,10 @@ interface channels
     public function reportSpam($params);
 
     /**
-     * Get channel/supergroup messages.
+     * Get [channel/supergroup](https://core.telegram.org/api/channel) messages.
      *
      * Parameters:
-     * * `InputChannel`   **channel** - The channel/supergroup
+     * * `InputChannel`   **channel** - Channel/supergroup
      * * `[InputMessage]` **id**      - The message IDs
      *
      * @param array $params Parameters
@@ -3265,13 +3273,13 @@ interface channels
     public function getMessages($params);
 
     /**
-     * Get channel/supergroup participants (you should use `$MadelineProto->getPwrChat($id)` instead).
+     * Get the participants of a channel.
      *
      * Parameters:
-     * * `InputChannel`              **channel** - The channel
-     * * `ChannelParticipantsFilter` **filter**  - Member filter
-     * * `int`                       **offset**  - Offset
-     * * `int`                       **limit**   - Limit
+     * * `InputChannel`              **channel** - Channel
+     * * `ChannelParticipantsFilter` **filter**  - Which participant types to fetch
+     * * `int`                       **offset**  - [Offset](https://core.telegram.org/api/offsets)
+     * * `int`                       **limit**   - [Limit](https://core.telegram.org/api/offsets)
      * * `[int]`                     **hash**    - Optional: IDs of previously fetched participants
      *
      * @param array $params Parameters
@@ -3281,11 +3289,11 @@ interface channels
     public function getParticipants($params);
 
     /**
-     * Get info about a certain channel/supergroup participant.
+     * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant.
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel/supergroup
-     * * `InputUser`    **user_id** - The user to fetch info about
+     * * `InputChannel` **channel** - Channel/supergroup
+     * * `InputUser`    **user_id** - ID of participant to get info about
      *
      * @param array $params Parameters
      *
@@ -3294,7 +3302,7 @@ interface channels
     public function getParticipant($params);
 
     /**
-     * Get info about multiple channels/supergroups.
+     * Get info about [channels/supergroups](https://core.telegram.org/api/channel).
      *
      * Parameters:
      * * `[InputChannel]` **id** - The channel/supergroup MTProto IDs
@@ -3306,10 +3314,10 @@ interface channels
     public function getChannels($params);
 
     /**
-     * You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
+     * Get full info about a channel.
      *
      * Parameters:
-     * * `InputChannel` **channel** - You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputChannel` **channel** - The channel to get info about
      *
      * @param array $params Parameters
      *
@@ -3318,15 +3326,15 @@ interface channels
     public function getFullChannel($params);
 
     /**
-     * Create channel/supergroup.
+     * Create a [supergroup/channel](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `boolean`       **broadcast** - Optional: Set this to true to create a channel
-     * * `boolean`       **megagroup** - Optional: Set this to true to create a supergroup
-     * * `string`        **title**     - Supergroup/channel title
-     * * `string`        **about**     - About text
-     * * `InputGeoPoint` **geo_point** - Optional: Geopoint (geochats)
-     * * `string`        **address**   - Optional: Physical address (geochats)
+     * * `boolean`       **broadcast** - Optional: Whether to create a [channel](https://core.telegram.org/api/channel)
+     * * `boolean`       **megagroup** - Optional: Whether to create a [supergroup](https://core.telegram.org/api/channel)
+     * * `string`        **title**     - Channel title
+     * * `string`        **about**     - Channel description
+     * * `InputGeoPoint` **geo_point** - Optional: Geogroup location
+     * * `string`        **address**   - Optional: Geogroup address
      *
      * @param array $params Parameters
      *
@@ -3335,13 +3343,13 @@ interface channels
     public function createChannel($params);
 
     /**
-     * Edit admin permissions of a user in a channel/supergroup.
+     * Modify the admin rights of a user in a [supergroup/channel](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputChannel`    **channel**      - The channel
-     * * `InputUser`       **user_id**      - The user
-     * * `ChatAdminRights` **admin_rights** - Admin rights
-     * * `string`          **rank**         - Admin rank, an arbitrary string
+     * * `InputChannel`    **channel**      - The [supergroup/channel](https://core.telegram.org/api/channel).
+     * * `InputUser`       **user_id**      - The ID of the user whose admin rights should be modified
+     * * `ChatAdminRights` **admin_rights** - The admin rights
+     * * `string`          **rank**         - Indicates the role (rank) of the admin in the group: just an arbitrary string
      *
      * @param array $params Parameters
      *
@@ -3350,11 +3358,11 @@ interface channels
     public function editAdmin($params);
 
     /**
-     * Edit the title of a supergroup/channel.
+     * Edit the name of a [channel/supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel
-     * * `string`       **title**   - The new channel/supergroup title
+     * * `InputChannel` **channel** - Channel/supergroup
+     * * `string`       **title**   - New name
      *
      * @param array $params Parameters
      *
@@ -3363,11 +3371,11 @@ interface channels
     public function editTitle($params);
 
     /**
-     * Edit the photo of a supergroup/channel.
+     * Change the photo of a [channel/supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputChannel`   **channel** - The channel
-     * * `InputChatPhoto` **photo**   - The new photo
+     * * `InputChannel`   **channel** - Channel/supergroup whose photo should be edited
+     * * `InputChatPhoto` **photo**   - New photo
      *
      * @param array $params Parameters
      *
@@ -3376,11 +3384,11 @@ interface channels
     public function editPhoto($params);
 
     /**
-     * Check if this username is free and can be assigned to a channel/supergroup.
+     * Check if a username is free and can be assigned to a channel/supergroup.
      *
      * Parameters:
-     * * `InputChannel` **channel**  - The channel/supergroup
-     * * `string`       **username** - The new username for this channel/supergroup
+     * * `InputChannel` **channel**  - The [channel/supergroup](https://core.telegram.org/api/channel) that will assigned the specified username
+     * * `string`       **username** - The username to check
      *
      * @param array $params Parameters
      *
@@ -3389,11 +3397,11 @@ interface channels
     public function checkUsername($params);
 
     /**
-     * Update the username of a supergroup/channel.
+     * Change the username of a supergroup/channel.
      *
      * Parameters:
-     * * `InputChannel` **channel**  - The channel/supergroup
-     * * `string`       **username** - The new username
+     * * `InputChannel` **channel**  - Channel
+     * * `string`       **username** - New username
      *
      * @param array $params Parameters
      *
@@ -3405,7 +3413,7 @@ interface channels
      * Join a channel/supergroup.
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel/supergroup to join
+     * * `InputChannel` **channel** - Channel/supergroup to join
      *
      * @param array $params Parameters
      *
@@ -3414,10 +3422,10 @@ interface channels
     public function joinChannel($params);
 
     /**
-     * Leave a channel/supergroup.
+     * Leave a [channel/supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel/supergroup to leave
+     * * `InputChannel` **channel** - [Channel/supergroup](https://core.telegram.org/api/channel) to leave
      *
      * @param array $params Parameters
      *
@@ -3426,10 +3434,10 @@ interface channels
     public function leaveChannel($params);
 
     /**
-     * Add users to channel/supergroup.
+     * Invite users to a channel/supergroup.
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel/supergroup
+     * * `InputChannel` **channel** - Channel/supergroup
      * * `[InputUser]`  **users**   - The users to add
      *
      * @param array $params Parameters
@@ -3439,10 +3447,10 @@ interface channels
     public function inviteToChannel($params);
 
     /**
-     * Delete a channel/supergroup.
+     * Delete a [channel/supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel/supergroup to delete
+     * * `InputChannel` **channel** - [Channel/supergroup](https://core.telegram.org/api/channel) to delete
      *
      * @param array $params Parameters
      *
@@ -3451,12 +3459,12 @@ interface channels
     public function deleteChannel($params);
 
     /**
-     * Get the link of a message in a channel.
+     * Get link and embed info of a message in a [channel/supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel/supergroup
-     * * `int`          **id**      - The ID of the message
-     * * `Bool`         **grouped** - Is this an album?
+     * * `InputChannel` **channel** - Channel
+     * * `int`          **id**      - Message ID
+     * * `Bool`         **grouped** - Whether to include other grouped media (for albums)
      *
      * @param array $params Parameters
      *
@@ -3465,11 +3473,11 @@ interface channels
     public function exportMessageLink($params);
 
     /**
-     * Toggle channel signatures.
+     * Enable/disable message signatures in channels.
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel/supergroup
-     * * `Bool`         **enabled** - Enable or disable channel signatures?
+     * * `InputChannel` **channel** - Channel
+     * * `Bool`         **enabled** - Value
      *
      * @param array $params Parameters
      *
@@ -3478,11 +3486,11 @@ interface channels
     public function toggleSignatures($params);
 
     /**
-     * Get all supergroups/channels where you're admin.
+     * Get [channels/supergroups/geogroups](https://core.telegram.org/api/channel) we're admin in. Usually called when the user exceeds the [limit](../constructors/config.md) for owned public [channels/supergroups/geogroups](https://core.telegram.org/api/channel), and the user is given the choice to remove one of his channels/supergroups/geogroups.
      *
      * Parameters:
-     * * `boolean` **by_location** - Optional: Get channels by location
-     * * `boolean` **check_limit** - Optional: Check limit
+     * * `boolean` **by_location** - Optional: Get geogroups
+     * * `boolean` **check_limit** - Optional: If set and the user has reached the limit of owned public [channels/supergroups/geogroups](https://core.telegram.org/api/channel), instead of returning the channel list one of the specified [errors](#possible-errors) will be returned.<br>Useful to check if a new public channel can indeed be created, even before asking the user to enter a channel username to use in [channels.checkUsername](../methods/channels.checkUsername.md)/[channels.updateUsername](../methods/channels.updateUsername.md).
      *
      * @param array $params Parameters
      *
@@ -3491,12 +3499,12 @@ interface channels
     public function getAdminedPublicChannels($params);
 
     /**
-     * Kick or ban a user from a channel/supergroup.
+     * Ban/unban/kick a user in a [supergroup/channel](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputChannel`     **channel**       - The channel/supergroup
-     * * `InputUser`        **user_id**       - The user to kick/ban
-     * * `ChatBannedRights` **banned_rights** - Banned rights
+     * * `InputChannel`     **channel**       - The [supergroup/channel](https://core.telegram.org/api/channel).
+     * * `InputUser`        **user_id**       - The ID of the user whose banned rights should be modified
+     * * `ChatBannedRights` **banned_rights** - The banned rights
      *
      * @param array $params Parameters
      *
@@ -3505,16 +3513,16 @@ interface channels
     public function editBanned($params);
 
     /**
-     * Get admin log of a channel/supergroup.
+     * Get the admin log of a [channel/supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputChannel`                **channel**       - The channel/supergroup
-     * * `string`                      **q**             - Search query
+     * * `InputChannel`                **channel**       - Channel
+     * * `string`                      **q**             - Search query, can be empty
      * * `ChannelAdminLogEventsFilter` **events_filter** - Optional: Event filter
      * * `[InputUser]`                 **admins**        - Optional: Fetch only actions from these admins
-     * * `long`                        **max_id**        - Maximum message ID to fetch
-     * * `long`                        **min_id**        - Minimum message ID to fetch
-     * * `int`                         **limit**         - Number of results to fetch
+     * * `long`                        **max_id**        - Maximum ID of message to return (see [pagination](https://core.telegram.org/api/offsets))
+     * * `long`                        **min_id**        - Minimum ID of message to return (see [pagination](https://core.telegram.org/api/offsets))
+     * * `int`                         **limit**         - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      *
      * @param array $params Parameters
      *
@@ -3523,11 +3531,11 @@ interface channels
     public function getAdminLog($params);
 
     /**
-     * Set the supergroup/channel stickerpack.
+     * Associate a stickerset to the supergroup.
      *
      * Parameters:
-     * * `InputChannel`    **channel**    - The channel/supergoup
-     * * `InputStickerSet` **stickerset** - The stickerset
+     * * `InputChannel`    **channel**    - Supergroup
+     * * `InputStickerSet` **stickerset** - The stickerset to associate
      *
      * @param array $params Parameters
      *
@@ -3536,10 +3544,10 @@ interface channels
     public function setStickers($params);
 
     /**
-     * Mark channel/supergroup messages as read.
+     * Mark [channel/supergroup](https://core.telegram.org/api/channel) message contents as read.
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel
+     * * `InputChannel` **channel** - [Channel/supergroup](https://core.telegram.org/api/channel)
      * * `[int]`        **id**      - List of message IDs
      *
      * @param array $params Parameters
@@ -3549,11 +3557,11 @@ interface channels
     public function readMessageContents($params);
 
     /**
-     * Delete the history of a supergroup/channel.
+     * Delete the history of a [supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel/supergroup
-     * * `int`          **max_id**  - Maximum message ID to delete
+     * * `InputChannel` **channel** - [Supergroup](https://core.telegram.org/api/channel) whose history must be deleted
+     * * `int`          **max_id**  - ID of message **up to which** the history must be deleted
      *
      * @param array $params Parameters
      *
@@ -3562,11 +3570,11 @@ interface channels
     public function deleteHistory($params);
 
     /**
-     * Enable or disable hidden history for new channel/supergroup users.
+     * Hide/unhide message history for new channel/supergroup users.
      *
      * Parameters:
-     * * `InputChannel` **channel** - The channel/supergroup
-     * * `Bool`         **enabled** - Enable or disable hidden history for new channel/supergroup users
+     * * `InputChannel` **channel** - Channel/supergroup
+     * * `Bool`         **enabled** - Hide/unhide
      *
      * @param array $params Parameters
      *
@@ -3575,10 +3583,10 @@ interface channels
     public function togglePreHistoryHidden($params);
 
     /**
-     * Get all channels you left.
+     * Get a list of [channels/supergroups](https://core.telegram.org/api/channel) we left.
      *
      * Parameters:
-     * * `int` **offset** - Offset
+     * * `int` **offset** - Offset for [pagination](https://core.telegram.org/api/offsets)
      *
      * @param array $params Parameters
      *
@@ -3587,18 +3595,18 @@ interface channels
     public function getLeftChannels($params);
 
     /**
-     * Get groups for discussion.
+     * Get all groups that can be used as [discussion groups](https://telegram.org/blog/privacy-discussions-web-bots).
      *
      * @return messages.Chats
      */
     public function getGroupsForDiscussion();
 
     /**
-     * Set discussion group of channel.
+     * Associate a group to a channel as [discussion group](https://telegram.org/blog/privacy-discussions-web-bots) for that channel.
      *
      * Parameters:
-     * * `InputChannel` **broadcast** - The channel
-     * * `InputChannel` **group**     - The group
+     * * `InputChannel` **broadcast** - Channel
+     * * `InputChannel` **group**     - Discussion group to associate to the channel
      *
      * @param array $params Parameters
      *
@@ -3607,12 +3615,12 @@ interface channels
     public function setDiscussionGroup($params);
 
     /**
-     * Edit creator of channel.
+     * Transfer channel ownership.
      *
      * Parameters:
      * * `InputChannel`          **channel**  - Channel
-     * * `InputUser`             **user_id**  - User ID
-     * * `InputCheckPasswordSRP` **password** - Password
+     * * `InputUser`             **user_id**  - New channel owner
+     * * `InputCheckPasswordSRP` **password** - [2FA password](https://core.telegram.org/api/srp) of account
      *
      * @param array $params Parameters
      *
@@ -3621,12 +3629,12 @@ interface channels
     public function editCreator($params);
 
     /**
-     * Edit location (geochats).
+     * Edit location of geogroup.
      *
      * Parameters:
-     * * `InputChannel`  **channel**   - Channel
-     * * `InputGeoPoint` **geo_point** - Geo point
-     * * `string`        **address**   - Physical location (geochats)
+     * * `InputChannel`  **channel**   - [Geogroup](https://core.telegram.org/api/channel)
+     * * `InputGeoPoint` **geo_point** - New geolocation
+     * * `string`        **address**   - Address string
      *
      * @param array $params Parameters
      *
@@ -3635,10 +3643,10 @@ interface channels
     public function editLocation($params);
 
     /**
-     * Toggle slow mode.
+     * Toggle supergroup slow mode: if enabled, users will only be able to send one message every `seconds` seconds.
      *
      * Parameters:
-     * * `InputChannel` **channel** - Supergroup
+     * * `InputChannel` **channel** - The [supergroup](https://core.telegram.org/api/channel)
      * * `int`          **seconds** - Users will only be able to send one message every `seconds` seconds, `0` to disable the limitation
      *
      * @param array $params Parameters
@@ -3651,11 +3659,11 @@ interface channels
 interface bots
 {
     /**
-     * Send a custom request to the bot API.
+     * Sends a custom request; for bots only.
      *
      * Parameters:
-     * * `string`   **custom_method** - The method to call
-     * * `DataJSON` **params**        - Method parameters
+     * * `string`   **custom_method** - The method name
+     * * `DataJSON` **params**        - JSON-serialized method parameters
      *
      * @param array $params Parameters
      *
@@ -3664,11 +3672,11 @@ interface bots
     public function sendCustomRequest($params);
 
     /**
-     * Send webhook request via bot API.
+     * Answers a custom query; for bots only.
      *
      * Parameters:
-     * * `long`     **query_id** - The query ID
-     * * `DataJSON` **data**     - The parameters
+     * * `long`     **query_id** - Identifier of a custom query
+     * * `DataJSON` **data**     - JSON-serialized answer to the query
      *
      * @param array $params Parameters
      *
@@ -3680,10 +3688,10 @@ interface bots
 interface payments
 {
     /**
-     * Get payment form.
+     * Get a payment form.
      *
      * Parameters:
-     * * `int` **msg_id** - Message ID
+     * * `int` **msg_id** - Message ID of payment form
      *
      * @param array $params Parameters
      *
@@ -3695,7 +3703,7 @@ interface payments
      * Get payment receipt.
      *
      * Parameters:
-     * * `int` **msg_id** - The message ID
+     * * `int` **msg_id** - Message ID of receipt
      *
      * @param array $params Parameters
      *
@@ -3704,12 +3712,12 @@ interface payments
     public function getPaymentReceipt($params);
 
     /**
-     * Validate requested payment info.
+     * Submit requested order information for validation.
      *
      * Parameters:
-     * * `boolean`              **save**   - Optional: Save payment info?
-     * * `int`                  **msg_id** - The message ID
-     * * `PaymentRequestedInfo` **info**   - The requested payment info
+     * * `boolean`              **save**   - Optional: Save order information to re-use it for future orders
+     * * `int`                  **msg_id** - Message ID of payment form
+     * * `PaymentRequestedInfo` **info**   - Requested order information
      *
      * @param array $params Parameters
      *
@@ -3718,12 +3726,12 @@ interface payments
     public function validateRequestedInfo($params);
 
     /**
-     * Bots only: send payment form.
+     * Send compiled payment form.
      *
      * Parameters:
-     * * `int`                     **msg_id**             - Message ID
-     * * `string`                  **requested_info_id**  - Optional: ID of requested info
-     * * `string`                  **shipping_option_id** - Optional: Shipping option ID
+     * * `int`                     **msg_id**             - Message ID of form
+     * * `string`                  **requested_info_id**  - Optional: ID of saved and validated [order info](../constructors/payments.validatedRequestedInfo.md)
+     * * `string`                  **shipping_option_id** - Optional: Chosen shipping option ID
      * * `InputPaymentCredentials` **credentials**        - Payment credentials
      *
      * @param array $params Parameters
@@ -3733,18 +3741,18 @@ interface payments
     public function sendPaymentForm($params);
 
     /**
-     * Get saved payments info.
+     * Get saved payment information.
      *
      * @return payments.SavedInfo
      */
     public function getSavedInfo();
 
     /**
-     * Clear saved payments info.
+     * Clear saved payment information.
      *
      * Parameters:
-     * * `boolean` **credentials** - Optional: Clear credentials?
-     * * `boolean` **info**        - Optional: Clear payment info?
+     * * `boolean` **credentials** - Optional: Remove saved payment credentials
+     * * `boolean` **info**        - Optional: Clear the last order settings saved by the user
      *
      * @param array $params Parameters
      *
@@ -3756,13 +3764,13 @@ interface payments
 interface stickers
 {
     /**
-     * Create stickerset.
+     * Create a stickerset, bots only.
      *
      * Parameters:
-     * * `boolean`               **masks**      - Optional: Masks?
-     * * `InputUser`             **user_id**    - The user ID associated to this stickerset
-     * * `string`                **title**      - The stickerset title
-     * * `string`                **short_name** - The stickerset short name
+     * * `boolean`               **masks**      - Optional: Whether this is a mask stickerset
+     * * `InputUser`             **user_id**    - Stickerset owner
+     * * `string`                **title**      - Stickerset name, `1-64` chars
+     * * `string`                **short_name** - Sticker set name. Can contain only English letters, digits and underscores. Must end with *"*by*<bot username="">"</bot>* (*<bot_username></bot_username>* is case insensitive); 1-64 characters
      * * `[InputStickerSetItem]` **stickers**   - The stickers to add
      *
      * @param array $params Parameters
@@ -3772,7 +3780,7 @@ interface stickers
     public function createStickerSet($params);
 
     /**
-     * Remove sticker from stickerset.
+     * Remove a sticker from the set where it belongs, bots only. The sticker set must have been created by the bot.
      *
      * Parameters:
      * * `InputDocument` **sticker** - The sticker to remove
@@ -3784,11 +3792,11 @@ interface stickers
     public function removeStickerFromSet($params);
 
     /**
-     * Change sticker position in photo.
+     * Changes the absolute position of a sticker in the set to which it belongs; for bots only. The sticker set must have been created by the bot.
      *
      * Parameters:
      * * `InputDocument` **sticker**  - The sticker
-     * * `int`           **position** - New position
+     * * `int`           **position** - The new position of the sticker, zero-based
      *
      * @param array $params Parameters
      *
@@ -3797,7 +3805,7 @@ interface stickers
     public function changeStickerPosition($params);
 
     /**
-     * Add sticker to stickerset.
+     * Add a sticker to a stickerset, bots only. The sticker set must have been created by the bot.
      *
      * Parameters:
      * * `InputStickerSet`     **stickerset** - The stickerset
@@ -3813,20 +3821,20 @@ interface stickers
 interface phone
 {
     /**
-     * Get call configuration.
+     * Get phone call configuration to be passed to libtgvoip's shared config.
      *
      * @return DataJSON
      */
     public function getCallConfig();
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
+     * Start a telegram phone call.
      *
      * Parameters:
-     * * `boolean`           **video**    - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `InputUser`         **user_id**  - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `bytes`             **g_a_hash** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `PhoneCallProtocol` **protocol** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `boolean`           **video**    - Optional: Whether to start a video call
+     * * `InputUser`         **user_id**  - Destination of the phone call
+     * * `bytes`             **g_a_hash** - [Parameter for E2E encryption key exchange »](https://core.telegram.org/api/end-to-end/voice-calls)
+     * * `PhoneCallProtocol` **protocol** - Phone call settings
      *
      * @param array $params Parameters
      *
@@ -3835,12 +3843,12 @@ interface phone
     public function requestCall($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
+     * Accept incoming call.
      *
      * Parameters:
-     * * `InputPhoneCall`    **peer**     - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `bytes`             **g_b**      - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `PhoneCallProtocol` **protocol** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `InputPhoneCall`    **peer**     - The call to accept
+     * * `bytes`             **g_b**      - [Parameter for E2E encryption key exchange »](https://core.telegram.org/api/end-to-end/voice-calls)
+     * * `PhoneCallProtocol` **protocol** - Phone call settings
      *
      * @param array $params Parameters
      *
@@ -3849,13 +3857,13 @@ interface phone
     public function acceptCall($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
+     * [Complete phone call E2E encryption key exchange »](https://core.telegram.org/api/end-to-end/voice-calls).
      *
      * Parameters:
-     * * `InputPhoneCall`    **peer**            - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `bytes`             **g_a**             - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `long`              **key_fingerprint** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `PhoneCallProtocol` **protocol**        - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `InputPhoneCall`    **peer**            - The phone call
+     * * `bytes`             **g_a**             - [Parameter for E2E encryption key exchange »](https://core.telegram.org/api/end-to-end/voice-calls)
+     * * `long`              **key_fingerprint** - Key fingerprint
+     * * `PhoneCallProtocol` **protocol**        - Phone call settings
      *
      * @param array $params Parameters
      *
@@ -3864,10 +3872,10 @@ interface phone
     public function confirmCall($params);
 
     /**
-     * Notify server that you received a call (server will refuse all incoming calls until the current call is over).
+     * Optional: notify the server that the user is currently busy in a call: this will automatically refuse all incoming phone calls until the current phone call is ended.
      *
      * Parameters:
-     * * `InputPhoneCall` **peer** - The phone call you received
+     * * `InputPhoneCall` **peer** - The phone call we're currently in
      *
      * @param array $params Parameters
      *
@@ -3876,14 +3884,14 @@ interface phone
     public function receivedCall($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
+     * Refuse or end running call.
      *
      * Parameters:
-     * * `boolean`                **video**         - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `InputPhoneCall`         **peer**          - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `int`                    **duration**      - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `PhoneCallDiscardReason` **reason**        - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `long`                   **connection_id** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `boolean`                **video**         - Optional: Whether this is a video call
+     * * `InputPhoneCall`         **peer**          - The phone call
+     * * `int`                    **duration**      - Call duration
+     * * `PhoneCallDiscardReason` **reason**        - Why was the call discarded
+     * * `long`                   **connection_id** - Preferred libtgvoip relay ID
      *
      * @param array $params Parameters
      *
@@ -3892,13 +3900,13 @@ interface phone
     public function discardCall($params);
 
     /**
-     * Set phone call rating.
+     * Rate a call.
      *
      * Parameters:
-     * * `boolean`        **user_initiative** - Optional: User initiative
-     * * `InputPhoneCall` **peer**            - The phone call
-     * * `int`            **rating**          - Rating (1-5 stars)
-     * * `string`         **comment**         - An optional comment
+     * * `boolean`        **user_initiative** - Optional: Whether the user decided on their own initiative to rate the call
+     * * `InputPhoneCall` **peer**            - The call to rate
+     * * `int`            **rating**          - Rating in `1-5` stars
+     * * `string`         **comment**         - An additional comment
      *
      * @param array $params Parameters
      *
@@ -3907,11 +3915,11 @@ interface phone
     public function setCallRating($params);
 
     /**
-     * Save call debugging info.
+     * Send phone call debug data to server.
      *
      * Parameters:
-     * * `InputPhoneCall` **peer**  - The call
-     * * `DataJSON`       **debug** - Debugging info
+     * * `InputPhoneCall` **peer**  - Phone call
+     * * `DataJSON`       **debug** - Debug statistics obtained from libtgvoip
      *
      * @param array $params Parameters
      *
@@ -3923,10 +3931,10 @@ interface phone
 interface langpack
 {
     /**
-     * Get language pack.
+     * Get localization pack strings.
      *
      * Parameters:
-     * * `string` **lang_pack** - Lang pack
+     * * `string` **lang_pack** - Language pack name
      * * `string` **lang_code** - Language code
      *
      * @param array $params Parameters
@@ -3936,10 +3944,10 @@ interface langpack
     public function getLangPack($params);
 
     /**
-     * Get language pack strings.
+     * Get strings from a language pack.
      *
      * Parameters:
-     * * `string`   **lang_pack** - Lang pack
+     * * `string`   **lang_pack** - Language pack name
      * * `string`   **lang_code** - Language code
      * * `[string]` **keys**      - Keys
      *
@@ -3950,12 +3958,12 @@ interface langpack
     public function getStrings($params);
 
     /**
-     * Get language pack updates.
+     * Get new strings in languagepack.
      *
      * Parameters:
      * * `string` **lang_pack**    - Language pack
-     * * `string` **lang_code**    - Lang code
-     * * `int`    **from_version** - Previous version
+     * * `string` **lang_code**    - Language code
+     * * `int`    **from_version** - Previous localization pack version
      *
      * @param array $params Parameters
      *
@@ -3964,10 +3972,10 @@ interface langpack
     public function getDifference($params);
 
     /**
-     * Get available languages.
+     * Get information about all languages in a localization pack.
      *
      * Parameters:
-     * * `string` **lang_pack** - Lang pack
+     * * `string` **lang_pack** - Language pack
      *
      * @param array $params Parameters
      *
@@ -3976,11 +3984,11 @@ interface langpack
     public function getLanguages($params);
 
     /**
-     * Get language.
+     * Get information about a language in a localization pack.
      *
      * Parameters:
-     * * `string` **lang_pack** - Lang pack
-     * * `string` **lang_code** - Lang code
+     * * `string` **lang_pack** - Language pack name
+     * * `string` **lang_code** - Language code
      *
      * @param array $params Parameters
      *
@@ -3992,7 +4000,7 @@ interface langpack
 interface folders
 {
     /**
-     * Edit folder.
+     * Edit peers in folder.
      *
      * Parameters:
      * * `[InputFolderPeer]` **folder_peers** - New folder peers
@@ -4004,10 +4012,10 @@ interface folders
     public function editPeerFolders($params);
 
     /**
-     * Delete folder.
+     * Delete a folder.
      *
      * Parameters:
-     * * `int` **folder_id** - Folder ID
+     * * `int` **folder_id** - Folder to delete
      *
      * @param array $params Parameters
      *
@@ -4985,6 +4993,17 @@ class InternalDoc extends APIFactory
     public function tdToTdcli($params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
+    }
+    /**
+     * Sanify TL obtained from JSON for TL serialization.
+     *
+     * @param array $input Data to sanitize
+
+     * @return array
+     */
+    public function convertJsonTL(array $input, array $extra = []): array
+    {
+        return $this->__call(__FUNCTION__, [$input, $extra]);
     }
     /**
      * Generate MTProto vector hash.
