@@ -4,8 +4,9 @@
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 
-IS_RELEASE=n
-git rev-parse "$TRAVIS_COMMIT" 2>/dev/null | grep "$TRAVIS_COMMIT" -q && IS_RELEASE=y
+[ "$(git rev-list --tags --max-count=1)" == "$TRAVIS_COMMIT" ] && IS_RELEASE=y || IS_RELEASE=n
+
+echo "Is release: $IS_RELEASE"
 
 # Clean up
 rm -rf phar7 phar5 MadelineProtoPhar
@@ -21,7 +22,7 @@ echo '{
     "minimum-stability":"dev",
     "require": {
         "danog/madelineproto": "dev-master",
-        "amphp/dns": "dev-master#ecbeca2ae0e93c08e8150a92810a3961fad8ecbe as v1"
+        "amphp/dns": "dev-master#eb0b0a2 as v1"
     },
     "repositories": [
         {

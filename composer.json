@@ -27,7 +27,7 @@
         "amphp/websocket-client": "dev-master as 1.0.0-rc2",
         "amphp/http-client": "^4",
         "amphp/socket": "^1",
-        "amphp/dns": "dev-master#ecbeca2ae0e93c08e8150a92810a3961fad8ecbe as v1",
+        "amphp/dns": "dev-master#eb0b0a2 as v1",
         "amphp/file": "^1",
         "amphp/byte-stream": "^1",
         "danog/dns-over-https": "^0.2",
