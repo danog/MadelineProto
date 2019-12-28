@@ -27,7 +27,13 @@ use danog\MadelineProto\MTProtoTools\PasswordCalculator;
  */
 trait Login
 {
-    public function logout()
+
+    /**
+     * Log out currently logged in user.
+     *
+     * @return \Generator
+     */
+    public function logout(): \Generator
     {
         yield $this->methodCallAsyncRead('auth.logOut', [], ['datacenter' => $this->datacenter->curdc]);
         $this->resetSession();
@@ -37,7 +43,14 @@ trait Login
         return true;
     }
 
-    public function botLogin($token)
+    /**
+     * Login as bot.
+     *
+     * @param string $token Bot token
+     *
+     * @return \Generator
+     */
+    public function botLogin(string $token): \Generator
     {
         if ($this->authorized === self::LOGGED_IN) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
@@ -61,7 +74,15 @@ trait Login
         return $this->authorization;
     }
 
-    public function phoneLogin($number, $sms_type = 5)
+    /**
+     * Login as user.
+     *
+     * @param string  $number   Phone number
+     * @param integer $sms_type SMS type
+     *
+     * @return \Generator
+     */
+    public function phoneLogin($number, $sms_type = 5): \Generator
     {
         if ($this->authorized === self::LOGGED_IN) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
@@ -80,7 +101,14 @@ trait Login
         return $this->authorization;
     }
 
-    public function completePhoneLogin($code)
+    /**
+     * Complet user login using login code.
+     *
+     * @param string $code Login code
+     *
+     * @return \Generator
+     */
+    public function completePhoneLogin($code): \Generator
     {
         if ($this->authorized !== self::WAITING_CODE) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['login_code_uncalled']);
@@ -131,7 +159,14 @@ trait Login
         return $this->authorization;
     }
 
-    public function importAuthorization($authorization)
+    /**
+     * Import authorization.
+     *
+     * @param mixed $authorization Authorization info
+     *
+     * @return \Generator
+     */
+    public function importAuthorization($authorization): \Generator
     {
         if ($this->authorized === self::LOGGED_IN) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
@@ -166,7 +201,12 @@ trait Login
         return $res;
     }
 
-    public function exportAuthorization()
+    /**
+     * Export authorization.
+     *
+     * @return \Generator<array>
+     */
+    public function exportAuthorization(): \Generator
     {
         if ($this->authorized !== self::LOGGED_IN) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['not_loggedIn']);
@@ -177,7 +217,15 @@ trait Login
         return [$this->datacenter->curdc, $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->getPermAuthKey()->getAuthKey()];
     }
 
-    public function completeSignup($first_name, $last_name)
+    /**
+     * Complete signup to Telegram.
+     *
+     * @param string $first_name First name
+     * @param string $last_name  Last name
+     *
+     * @return \Generator
+     */
+    public function completeSignup(string $first_name, string $last_name = ''): \Generator
     {
         if ($this->authorized !== self::WAITING_SIGNUP) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['signup_uncalled']);
@@ -196,7 +244,14 @@ trait Login
         return $this->authorization;
     }
 
-    public function complete2faLogin($password)
+    /**
+     * Complete 2FA login.
+     *
+     * @param string $password Password
+     *
+     * @return \Generator
+     */
+    public function complete2faLogin(string $password): \Generator
     {
         if ($this->authorized !== self::WAITING_PASSWORD) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['2fa_uncalled']);
@@ -222,9 +277,10 @@ trait Login
      * The params array can contain password, new_password, email and hint params.
      *
      * @param array $params The params
-     * @return void
+     *
+     * @return \Generator
      */
-    public function update2fa(array $params)
+    public function update2fa(array $params): \Generator
     {
         $hasher = new PasswordCalculator($this->logger);
         $hasher->addInfo(yield $this->methodCallAsyncRead('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]));

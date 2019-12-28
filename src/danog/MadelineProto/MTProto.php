@@ -581,9 +581,9 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Cleanup memory and session file.
      *
-     * @return void
+     * @return self
      */
-    public function cleanup()
+    public function cleanup(): self
     {
         $this->referenceDatabase = new ReferenceDatabase($this);
         $callbacks = [$this, $this->referenceDatabase];
@@ -603,13 +603,13 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @return void
      */
-    public function logger($param, int $level = Logger::NOTICE, string $file = '')
+    public function logger($param, int $level = Logger::NOTICE, string $file = ''): void
     {
         if ($file === null) {
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
 
-        return isset($this->logger) ? $this->logger->logger($param, $level, $file) : Logger::$default->logger($param, $level, $file);
+        isset($this->logger) ? $this->logger->logger($param, $level, $file) : Logger::$default->logger($param, $level, $file);
     }
 
     /**
@@ -766,6 +766,8 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     /**
      * Clean up properties from previous versions of MadelineProto.
+     *
+     * @internal
      *
      * @return void
      */
@@ -1358,7 +1360,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @return void
      */
-    public function parseSettings(array $settings)
+    private function parseSettings(array $settings): void
     {
         $settings = self::getSettings($settings, $this->settings);
         if ($settings['app_info'] === null) {
@@ -1377,7 +1379,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @return void
      */
-    public function setupLogger()
+    public function setupLogger(): void
     {
         $this->logger = Logger::getLoggerFromSettings($this->settings, isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '');
     }
@@ -1388,9 +1390,11 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @param boolean $de       Whether to reset the session ID
      * @param boolean $auth_key Whether to reset the auth key
      *
+     * @internal
+     *
      * @return void
      */
-    public function resetMTProtoSession(bool $de = true, bool $auth_key = false)
+    public function resetMTProtoSession(bool $de = true, bool $auth_key = false): void
     {
         if (!\is_object($this->datacenter)) {
             throw new Exception(Lang::$current_lang['session_corrupted']);
@@ -1439,6 +1443,8 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     /**
      * Whether we're initing authorization.
+     *
+     * @internal
      *
      * @return boolean
      */
@@ -1493,7 +1499,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @return void
      */
-    public function resetSession()
+    public function resetSession(): void
     {
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->signal(true);
@@ -1539,7 +1545,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @return void
      */
-    public function resetUpdateState()
+    public function resetUpdateState(): void
     {
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->signal(true);
@@ -1571,9 +1577,11 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param boolean $anyway Force start update system?
      *
+     * @internal
+     *
      * @return void
      */
-    public function startUpdateSystem($anyway = false)
+    public function startUpdateSystem($anyway = false): void
     {
         if ($this->asyncInitPromise && !$anyway) {
             $this->logger("Not starting update system");
@@ -1617,9 +1625,11 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param mixed $watcherId Watcher ID
      *
-     * @return void
+     * @internal
+     *
+     * @return \Generator<void>
      */
-    public function getPhoneConfig($watcherId = null)
+    public function getPhoneConfig($watcherId = null): \Generator
     {
         if ($this->authorized === self::LOGGED_IN && \class_exists(VoIPServerConfigInternal::class) && !$this->authorization['user']['bot'] && $this->datacenter->getDataCenterConnection($this->settings['connection_settings']['default_dc'])->hasTempAuthKey()) {
             $this->logger->logger('Fetching phone config...');
@@ -1747,16 +1757,35 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->authorization['user'];
     }
 
+    /**
+     * Called right before serialization of method starts.
+     *
+     * Pass the method name
+     *
+     * @return array
+     */
     public function getMethodCallbacks(): array
     {
         return [];
     }
 
+    /**
+     * Called right before serialization of method starts.
+     *
+     * Pass the method name
+     *
+     * @return array
+     */
     public function getMethodBeforeCallbacks(): array
     {
         return [];
     }
 
+    /**
+     * Called right after deserialization of object, passing the final object.
+     *
+     * @return array
+     */
     public function getConstructorCallbacks(): array
     {
         return \array_merge(
@@ -1766,16 +1795,38 @@ class MTProto extends AsyncConstruct implements TLCallback
         );
     }
 
+    /**
+     * Called right before deserialization of object.
+     *
+     * Pass only the constructor name
+     *
+     * @return array
+     */
     public function getConstructorBeforeCallbacks(): array
     {
         return [];
     }
 
+    /**
+     * Called right before serialization of constructor.
+     *
+     * Passed the object, will return a modified version.
+     *
+     * @return array
+     */
     public function getConstructorSerializeCallbacks(): array
     {
         return [];
     }
 
+    /**
+     * Called if objects of the specified type cannot be serialized.
+     *
+     * Passed the unserializable object,
+     * will try to convert it to an object of the proper type.
+     *
+     * @return array
+     */
     public function getTypeMismatchCallbacks(): array
     {
         return \array_merge(

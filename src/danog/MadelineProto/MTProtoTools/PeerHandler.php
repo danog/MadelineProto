@@ -51,7 +51,7 @@ trait PeerHandler
      *
      * @return int
      */
-    public static function fromSupergroup($id)
+    public static function fromSupergroup($id): int
     {
         return -$id - \pow(10, (int) \floor(\log(-$id, 10)));
     }
@@ -70,12 +70,28 @@ trait PeerHandler
         return ($log - \intval($log)) * 1000 < 10;
     }
 
-    public function addSupport($support)
+    /**
+     * Set support info.
+     *
+     * @param array $support Support info
+     *
+     * @internal
+     *
+     * @return void
+     */
+    public function addSupport(array $support): void
     {
         $this->supportUser = $support['user']['id'];
     }
 
-    public function addUser($user)
+    /**
+     * Add user info.
+     *
+     * @param array $user User info
+     *
+     * @return void
+     */
+    public function addUser(array $user): void
     {
         if (!isset($user['access_hash']) && !($user['min'] ?? false)) {
             if (isset($this->chats[$user['id']]['access_hash']) && $this->chats[$user['id']]['access_hash']) {
@@ -117,11 +133,19 @@ trait PeerHandler
                 break;
             default:
                 throw new \danog\MadelineProto\Exception('Invalid user provided', $user);
-                break;
         }
     }
 
-    public function addChat($chat)
+    /**
+     * Add chat to database.
+     *
+     * @param array $chat Chat
+     *
+     * @internal
+     *
+     * @return void
+     */
+    public function addChat($chat): \Generator
     {
         switch ($chat['_']) {
             case 'chat':
@@ -182,7 +206,7 @@ trait PeerHandler
         }
     }
 
-    public function cachePwrChat($id, $full_fetch, $send)
+    private function cachePwrChat($id, $full_fetch, $send)
     {
         \danog\MadelineProto\Tools::callFork((function () use ($id, $full_fetch, $send) {
             try {
@@ -220,7 +244,16 @@ trait PeerHandler
         }
     }
 
-    public function entitiesPeerIsset($entities): \Generator
+    /**
+     * Check if all peer entities are in db.
+     *
+     * @param array $entities Entity list
+     *
+     * @internal
+     *
+     * @return \Generator<bool>
+     */
+    public function entitiesPeerIsset(array $entities): \Generator
     {
         try {
             foreach ($entities as $entity) {
@@ -237,7 +270,16 @@ trait PeerHandler
         return true;
     }
 
-    public function fwdPeerIsset($fwd): \Generator
+    /**
+     * Check if fwd peer is set.
+     *
+     * @param array $fwd Forward info
+     *
+     * @internal
+     *
+     * @return \Generator
+     */
+    public function fwdPeerIsset(array $fwd): \Generator
     {
         try {
             if (isset($fwd['user_id']) && !yield $this->peerIsset($fwd['user_id'])) {
@@ -260,7 +302,7 @@ trait PeerHandler
      *
      * @return ?int
      */
-    public function getFolderId($id)
+    public function getFolderId($id): ?int
     {
         if (!\is_array($id)) {
             return null;
@@ -593,7 +635,7 @@ trait PeerHandler
         throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
     }
 
-    public function genAll($constructor, $folder_id = null)
+    private function genAll($constructor, $folder_id = null)
     {
         $res = [$this->TL->getConstructors()->findByPredicate($constructor['_'])['type'] => $constructor];
         switch ($constructor['_']) {
@@ -655,7 +697,14 @@ trait PeerHandler
         return $res;
     }
 
-    public function fullChatLastUpdated($id)
+    /**
+     * When were full info for this chat last cached.
+     *
+     * @param mixed $id Chat ID
+     *
+     * @return integer
+     */
+    public function fullChatLastUpdated($id): int
     {
         return isset($this->full_chats[$id]['last_update']) ? $this->full_chats[$id]['last_update'] : 0;
     }
@@ -845,7 +894,7 @@ trait PeerHandler
         return $res;
     }
 
-    public function recurseAlphabetSearchParticipants($channel, $filter, $q, $total_count, &$res)
+    private function recurseAlphabetSearchParticipants($channel, $filter, $q, $total_count, &$res)
     {
         if (!yield $this->fetchParticipants($channel, $filter, $q, $total_count, $res)) {
             return false;
@@ -856,7 +905,7 @@ trait PeerHandler
         }
     }
 
-    public function fetchParticipants($channel, $filter, $q, $total_count, &$res)
+    private function fetchParticipants($channel, $filter, $q, $total_count, &$res)
     {
         $offset = 0;
         $limit = 200;
@@ -942,12 +991,12 @@ trait PeerHandler
         return $has_more;
     }
 
-    public function fetchParticipantsCache($channel, $filter, $q, $offset, $limit)
+    private function fetchParticipantsCache($channel, $filter, $q, $offset, $limit)
     {
         return $this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit];
     }
 
-    public function storeParticipantsCache($gres, $channel, $filter, $q, $offset, $limit)
+    private function storeParticipantsCache($gres, $channel, $filter, $q, $offset, $limit)
     {
         //return;
         unset($gres['users']);
@@ -960,12 +1009,12 @@ trait PeerHandler
         $this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit] = $gres;
     }
 
-    public function getParticipantsHash($channel, $filter, $q, $offset, $limit)
+    private function getParticipantsHash($channel, $filter, $q, $offset, $limit)
     {
         return isset($this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit]) ? $this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit]['hash'] : 0;
     }
 
-    public function storeDb($res, $force = false)
+    private function storeDb($res, $force = false)
     {
         $settings = isset($this->settings['connection_settings'][$this->datacenter->curdc]) ? $this->settings['connection_settings'][$this->datacenter->curdc] : $this->settings['connection_settings']['all'];
         if (!isset($this->settings['pwr']) || $this->settings['pwr']['pwr'] === false || $settings['test_mode']) {
@@ -1007,7 +1056,14 @@ trait PeerHandler
         }
     }
 
-    public function resolveUsername($username)
+    /**
+     * Resolve username (use getInfo instead).
+     *
+     * @param string $username Username
+     *
+     * @return \Generator
+     */
+    public function resolveUsername(string $username): \Generator
     {
         try {
             $this->caching_simple_username[$username] = true;

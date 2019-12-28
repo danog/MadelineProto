@@ -480,7 +480,7 @@ trait Tools
      *
      * @return void
      */
-    public static function callForkDefer($promise)
+    public static function callForkDefer($promise): void
     {
         Loop::defer([__CLASS__, 'callFork'], $promise);
     }
@@ -493,7 +493,7 @@ trait Tools
      *
      * @return void
      */
-    public static function rethrow(\Throwable $e, $file = '')
+    public static function rethrow(\Throwable $e, $file = ''): void
     {
         $zis = isset($this) ? $this : null;
         $logger = isset($zis->logger) ? $zis->logger : Logger::$default;
@@ -593,6 +593,8 @@ trait Tools
      * @param integer $operation Locking mode
      * @param float  $polling   Polling interval
      *
+     * @internal Generator function
+     *
      * @return \Generator
      */
     public static function flockGenerator(string $file, int $operation, float $polling): \Generator
@@ -645,6 +647,8 @@ trait Tools
      * Asynchronously read line (generator function).
      *
      * @param string $prompt Prompt
+     *
+     * @internal Generator function
      *
      * @return \Generator
      */

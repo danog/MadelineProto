@@ -24,7 +24,17 @@ namespace danog\MadelineProto\SecretChats;
  */
 trait MessageHandler
 {
-    public function encryptSecretMessage($chat_id, $message)
+    /**
+     * Encrypt secret chat message.
+     *
+     * @param integer $chat_id Chat ID
+     * @param array   $message Message to encrypt
+     *
+     * @internal
+     *
+     * @return \Generator
+     */
+    public function encryptSecretMessage(int $chat_id, array $message): \Generator
     {
         if (!isset($this->secret_chats[$chat_id])) {
             $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $chat_id));
@@ -61,7 +71,7 @@ trait MessageHandler
         return $message;
     }
 
-    public function handleEncryptedUpdate($message, $test = false)
+    private function handleEncryptedUpdate(array $message): \Generator
     {
         if (!isset($this->secret_chats[$message['message']['chat_id']])) {
             $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $message['message']['chat_id']));
@@ -122,7 +132,7 @@ trait MessageHandler
         yield $this->handleDecryptedUpdate($message);
     }
 
-    public function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data)
+    private function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data)
     {
         list($aes_key, $aes_iv) = $this->oldAesCalculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], true);
         $decrypted_data = $this->igeDecrypt($encrypted_data, $aes_key, $aes_iv);
@@ -144,7 +154,7 @@ trait MessageHandler
         return $message_data;
     }
 
-    public function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data)
+    private function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data)
     {
         list($aes_key, $aes_iv) = $this->aesCalculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], !$this->secret_chats[$chat_id]['admin']);
         $decrypted_data = $this->igeDecrypt($encrypted_data, $aes_key, $aes_iv);

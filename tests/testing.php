@@ -64,218 +64,221 @@ $settings = \json_decode(\getenv('MTPROTO_SETTINGS'), true) ?: [];
  */
 echo 'Loading MadelineProto...'.PHP_EOL;
 $MadelineProto = new \danog\MadelineProto\API(\getcwd().'/testing.madeline', $settings);
-$MadelineProto->fileGetContents('https://google.com');
-$MadelineProto->start();
-$MadelineProto->async(false);
+$MadelineProto->async(true);
+$MadelineProto->loop(function () use ($MadelineProto) {
+    yield $MadelineProto->fileGetContents('https://google.com');
+    yield $MadelineProto->start();
 
-try {
-    $MadelineProto->getSelf();
-} catch (\danog\MadelineProto\Exception $e) {
-    if ($e->getMessage() === 'TOS action required, check the logs') {
-        $MadelineProto->acceptTos();
+    try {
+        yield $MadelineProto->getSelf();
+    } catch (\danog\MadelineProto\Exception $e) {
+        if ($e->getMessage() === 'TOS action required, check the logs') {
+            yield $MadelineProto->acceptTos();
+        }
     }
-}
 
-//var_dump(count($MadelineProto->getPwrChat('@madelineproto')['participants']));
+    //var_dump(count($MadelineProto->getPwrChat('@madelineproto')['participants']));
 
-/*
- * Test logging
- */
-\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::VERBOSE);
-\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::NOTICE);
-\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::WARNING);
-\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::ERROR);
-\danog\MadelineProto\Logger::log('hey', \danog\MadelineProto\Logger::FATAL_ERROR);
+    /*
+     * Test logging
+     */
+    $MadelineProto->logger('hey', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+    $MadelineProto->logger('hey', \danog\MadelineProto\Logger::VERBOSE);
+    $MadelineProto->logger('hey', \danog\MadelineProto\Logger::NOTICE);
+    $MadelineProto->logger('hey', \danog\MadelineProto\Logger::WARNING);
+    $MadelineProto->logger('hey', \danog\MadelineProto\Logger::ERROR);
+    $MadelineProto->logger('hey', \danog\MadelineProto\Logger::FATAL_ERROR);
 
-/**
- * A small example message to use for tests.
- */
-$message = (\getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.\getenv('TRAVIS_COMMIT').', job '.\getenv('TRAVIS_JOB_NUMBER').', PHP version: '.\getenv('TRAVIS_PHP_VERSION'));
+    /**
+     * A small example message to use for tests.
+     */
+    $message = (\getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.\getenv('TRAVIS_COMMIT').', job '.\getenv('TRAVIS_JOB_NUMBER').', PHP version: '.\getenv('TRAVIS_PHP_VERSION'));
 
-/*
- * Try making a phone call
- */
-if (!\getenv('TRAVIS_COMMIT') && \stripos($MadelineProto->readline('Do you want to make a call? (y/n): '), 'y') !== false) {
-    $controller = $MadelineProto->requestCall(\getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
-    while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
-        $MadelineProto->getUpdates();
+    /*
+     * Try making a phone call
+     */
+    if (!\getenv('TRAVIS_COMMIT') && \stripos(yield $MadelineProto->readline('Do you want to make a call? (y/n): '), 'y') !== false) {
+        $controller = yield $MadelineProto->requestCall(\getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
+        while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
+            yield $MadelineProto->getUpdates();
+        }
+        $MadelineProto->logger($controller->configuration);
+        while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+            yield $MadelineProto->getUpdates();
+        }
     }
-    \danog\MadelineProto\Logger::log($controller->configuration);
-    while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-        $MadelineProto->getUpdates();
-    }
-}
 
-/*
- * Try receiving a phone call
- */
-if (!\getenv('TRAVIS_COMMIT') && \stripos($MadelineProto->readline('Do you want to handle incoming calls? (y/n): '), 'y') !== false) {
-    $howmany = $MadelineProto->readline('How many calls would you like me to handle? ');
-    $offset = 0;
-    while ($howmany > 0) {
-        $updates = $MadelineProto->getUpdates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
-        foreach ($updates as $update) {
-            \danog\MadelineProto\Logger::log($update);
-            $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
-            switch ($update['update']['_']) {
+    /*
+     * Try receiving a phone call
+     */
+    if (!\getenv('TRAVIS_COMMIT') && \stripos(yield $MadelineProto->readline('Do you want to handle incoming calls? (y/n): '), 'y') !== false) {
+        $howmany = yield $MadelineProto->readline('How many calls would you like me to handle? ');
+        $offset = 0;
+        while ($howmany > 0) {
+            $updates = yield $MadelineProto->getUpdates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
+            foreach ($updates as $update) {
+                $MadelineProto->logger($update);
+                $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
+                switch ($update['update']['_']) {
                 case 'updatePhoneCall':
                     if (\is_object($update['update']['phone_call']) && $update['update']['phone_call']->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_INCOMING) {
                         $update['update']['phone_call']->accept()->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
                         $howmany--;
                     }
             }
+            }
         }
     }
-}
-
-/*
- * Secret chat usage
- */
-if (!\getenv('TRAVIS_COMMIT') && \stripos($MadelineProto->readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
-    /**
-     * Request a secret chat.
-     */
-    $secret_chat_id = $MadelineProto->requestSecretChat(\getenv('TEST_SECRET_CHAT'));
-    echo 'Waiting for '.\getenv('TEST_SECRET_CHAT').' (secret chat id '.$secret_chat_id.') to accept the secret chat...'.PHP_EOL;
 
     /*
-     * Wait until the other party accepts it
+     * Secret chat usage
      */
-    while ($MadelineProto->secretChatStatus($secret_chat_id) !== 2) {
-        $MadelineProto->getUpdates();
-    }
+    if (!\getenv('TRAVIS_COMMIT') && \stripos(yield $MadelineProto->readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
+        /**
+         * Request a secret chat.
+         */
+        $secret_chat_id = yield $MadelineProto->requestSecretChat(\getenv('TEST_SECRET_CHAT'));
+        echo 'Waiting for '.\getenv('TEST_SECRET_CHAT').' (secret chat id '.$secret_chat_id.') to accept the secret chat...'.PHP_EOL;
 
-    /**
-     * Send a markdown-formatted text message with expiration after 10 seconds.
-     */
-    $sentMessage = $MadelineProto->messages->sendEncrypted([
-        'peer' => $secret_chat_id,
-        'message' => [
-            '_' => 'decryptedMessage',
-            'media' => ['_' => 'decryptedMessageMediaEmpty'], // No media
-            'ttl' => 10, // This message self-destructs 10 seconds after reception
-            'message' => '```'.$message.'```', // Code Markdown
-            'parse_mode' => 'Markdown',
-        ],
-    ]);
-    \danog\MadelineProto\Logger::log($sentMessage, \danog\MadelineProto\Logger::NOTICE);
+        /*
+         * Wait until the other party accepts it
+         */
+        while (yield $MadelineProto->secretChatStatus($secret_chat_id) !== 2) {
+            yield $MadelineProto->getUpdates();
+        }
 
-    /**
-     * Send secret media.
-     */
-    $secret_media = [];
+        /**
+         * Send a markdown-formatted text message with expiration after 10 seconds.
+         */
+        $sentMessage = yield $MadelineProto->messages->sendEncrypted([
+            'peer' => $secret_chat_id,
+            'message' => [
+                '_' => 'decryptedMessage',
+                'media' => ['_' => 'decryptedMessageMediaEmpty'], // No media
+                'ttl' => 10, // This message self-destructs 10 seconds after reception
+                'message' => '```'.$message.'```', // Code Markdown
+                'parse_mode' => 'Markdown',
+            ],
+        ]);
+        $MadelineProto->logger($sentMessage, \danog\MadelineProto\Logger::NOTICE);
 
-    // Photo uploaded as document, secret chat
-    $secret_media['document_photo'] = [
-        'peer' => $secret_chat_id,
-        'file' => 'tests/faust.jpg', // The file to send
-        'message' => [
-            '_' => 'decryptedMessage',
-            'ttl' => 0, // This message does not self-destruct
-            'message' => '', // No text message, only media
-            'media' => [
-                '_' => 'decryptedMessageMediaDocument',
-                'thumb' => \file_get_contents('tests/faust.preview.jpg'), // The thumbnail must be generated manually, it must be in jpg format, 90x90
-                'thumb_w' => 90,
-                'thumb_h' => 90,
-                'mime_type' => \mime_content_type('tests/faust.jpg'), // The file's mime type
-                'caption' => 'This file was uploaded using @MadelineProto', // The caption
-                'file_name' => 'faust.jpg', // The file's name
-                'size' => \filesize('tests/faust.jpg'), // The file's size
-                'attributes' => [
-                    ['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914], // Image's resolution
+        /**
+         * Send secret media.
+         */
+        $secret_media = [];
+
+        // Photo uploaded as document, secret chat
+        $secret_media['document_photo'] = [
+            'peer' => $secret_chat_id,
+            'file' => 'tests/faust.jpg', // The file to send
+            'message' => [
+                '_' => 'decryptedMessage',
+                'ttl' => 0, // This message does not self-destruct
+                'message' => '', // No text message, only media
+                'media' => [
+                    '_' => 'decryptedMessageMediaDocument',
+                    'thumb' => \file_get_contents('tests/faust.preview.jpg'), // The thumbnail must be generated manually, it must be in jpg format, 90x90
+                    'thumb_w' => 90,
+                    'thumb_h' => 90,
+                    'mime_type' => \mime_content_type('tests/faust.jpg'), // The file's mime type
+                    'caption' => 'This file was uploaded using @MadelineProto', // The caption
+                    'file_name' => 'faust.jpg', // The file's name
+                    'size' => \filesize('tests/faust.jpg'), // The file's size
+                    'attributes' => [
+                        ['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914], // Image's resolution
+                    ],
                 ],
             ],
-        ],
-    ];
+        ];
 
-    // Photo, secret chat
-    $secret_media['photo'] = [
-        'peer' => $secret_chat_id,
-        'file' => 'tests/faust.jpg',
-        'message' => [
-            '_' => 'decryptedMessage',
-            'ttl' => 0,
-            'message' => '',
-            'media' => [
-                '_' => 'decryptedMessageMediaPhoto',
-                'thumb' => \file_get_contents('tests/faust.preview.jpg'),
-                'thumb_w' => 90,
-                'thumb_h' => 90,
-                'caption' => 'This file was uploaded using @MadelineProto',
-                'size' => \filesize('tests/faust.jpg'),
-                'w' => 1280,
-                'h' => 914,
+        // Photo, secret chat
+        $secret_media['photo'] = [
+            'peer' => $secret_chat_id,
+            'file' => 'tests/faust.jpg',
+            'message' => [
+                '_' => 'decryptedMessage',
+                'ttl' => 0,
+                'message' => '',
+                'media' => [
+                    '_' => 'decryptedMessageMediaPhoto',
+                    'thumb' => \file_get_contents('tests/faust.preview.jpg'),
+                    'thumb_w' => 90,
+                    'thumb_h' => 90,
+                    'caption' => 'This file was uploaded using @MadelineProto',
+                    'size' => \filesize('tests/faust.jpg'),
+                    'w' => 1280,
+                    'h' => 914,
+                ],
             ],
-        ],
-    ];
+        ];
 
-    // GIF, secret chat
-    $secret_media['gif'] = ['peer' => $secret_chat_id, 'file' => 'tests/pony.mp4', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/pony.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/pony.mp4'), 'caption' => 'test', 'file_name' => 'pony.mp4', 'size' => \filesize('tests/faust.jpg'), 'attributes' => [['_' => 'documentAttributeAnimated']]]]];
+        // GIF, secret chat
+        $secret_media['gif'] = ['peer' => $secret_chat_id, 'file' => 'tests/pony.mp4', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/pony.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/pony.mp4'), 'caption' => 'test', 'file_name' => 'pony.mp4', 'size' => \filesize('tests/faust.jpg'), 'attributes' => [['_' => 'documentAttributeAnimated']]]]];
 
-    // Sticker, secret chat
-    $secret_media['sticker'] = ['peer' => $secret_chat_id, 'file' => 'tests/lel.webp', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/lel.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/lel.webp'), 'caption' => 'test', 'file_name' => 'lel.webp', 'size' => \filesize('tests/lel.webp'), 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL', 'stickerset' => ['_' => 'inputStickerSetEmpty']]]]]];
+        // Sticker, secret chat
+        $secret_media['sticker'] = ['peer' => $secret_chat_id, 'file' => 'tests/lel.webp', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/lel.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/lel.webp'), 'caption' => 'test', 'file_name' => 'lel.webp', 'size' => \filesize('tests/lel.webp'), 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL', 'stickerset' => ['_' => 'inputStickerSetEmpty']]]]]];
 
-    // Document, secret chat
-    $secret_media['document'] = ['peer' => $secret_chat_id, 'file' => 'tests/60', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => 'magic/magic', 'caption' => 'test', 'file_name' => 'magic.magic', 'size' => \filesize('tests/60'), 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'fairy']]]]];
+        // Document, secret chat
+        $secret_media['document'] = ['peer' => $secret_chat_id, 'file' => 'tests/60', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => 'magic/magic', 'caption' => 'test', 'file_name' => 'magic.magic', 'size' => \filesize('tests/60'), 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'fairy']]]]];
 
-    // Video, secret chat
-    $secret_media['video'] = ['peer' => $secret_chat_id, 'file' => 'tests/swing.mp4', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/swing.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/swing.mp4'), 'caption' => 'test', 'file_name' => 'swing.mp4', 'size' => \filesize('tests/swing.mp4'), 'attributes' => [['_' => 'documentAttributeVideo']]]]];
+        // Video, secret chat
+        $secret_media['video'] = ['peer' => $secret_chat_id, 'file' => 'tests/swing.mp4', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/swing.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/swing.mp4'), 'caption' => 'test', 'file_name' => 'swing.mp4', 'size' => \filesize('tests/swing.mp4'), 'attributes' => [['_' => 'documentAttributeVideo']]]]];
 
-    // audio, secret chat
-    $secret_media['audio'] = ['peer' => $secret_chat_id, 'file' => 'tests/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => \filesize('tests/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
-    $secret_media['voice'] = ['peer' => $secret_chat_id, 'file' => 'tests/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => \filesize('tests/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
+        // audio, secret chat
+        $secret_media['audio'] = ['peer' => $secret_chat_id, 'file' => 'tests/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => \filesize('tests/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
+        $secret_media['voice'] = ['peer' => $secret_chat_id, 'file' => 'tests/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => \filesize('tests/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
 
-    foreach ($secret_media as $type => $smessage) {
-        \danog\MadelineProto\Logger::log("Encrypting and uploading $type...");
-        $type = $MadelineProto->messages->sendEncryptedFile($smessage);
+        foreach ($secret_media as $type => $smessage) {
+            $MadelineProto->logger("Encrypting and uploading $type...");
+            $type = yield $MadelineProto->messages->sendEncryptedFile($smessage);
+        }
     }
-}
 
-$mention = $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
-$mention = $mention['user_id']; // Selects only the numeric user id
-$media = [];
+    $mention = yield $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
+    $mention = $mention['user_id']; // Selects only the numeric user id
+    $media = [];
 
-// Image
-$media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => 'tests/faust.jpg'];
+    // Image
+    $media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => 'tests/faust.jpg'];
 
-// Sticker
-$media['sticker'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/lel.webp', 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL']]];
+    // Sticker
+    $media['sticker'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/lel.webp', 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL']]];
 
-// Video
-$media['video'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/swing.mp4', 'attributes' => [['_' => 'documentAttributeVideo']]];
+    // Video
+    $media['video'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/swing.mp4', 'attributes' => [['_' => 'documentAttributeVideo']]];
 
-// audio
-$media['audio'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/mosconi.mp3', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]];
+    // audio
+    $media['audio'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/mosconi.mp3', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]];
 
-// voice
-$media['voice'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/mosconi.mp3', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]];
+    // voice
+    $media['voice'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/mosconi.mp3', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]];
 
-// Document
-$media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/60', 'mime_type' => 'magic/magic', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
+    // Document
+    $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/60', 'mime_type' => 'magic/magic', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
 
-$message = 'yay '.\PHP_VERSION_ID;
-$mention = $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
-$mention = $mention['user_id']; // Selects only the numeric user id
+    $message = 'yay '.\PHP_VERSION_ID;
+    $mention = yield $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
+    $mention = $mention['user_id']; // Selects only the numeric user id
 
 /*
 $t = time();
-$MadelineProto->upload('big');
+yield $MadelineProto->upload('big');
 var_dump(time()-$t);
  */
 
-foreach (\json_decode(\getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => \mb_strlen($message), 'user_id' => $mention]]]);
-    \danog\MadelineProto\Logger::log($sentMessage, \danog\MadelineProto\Logger::NOTICE);
+    foreach (\json_decode(\getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
+        $sentMessage = yield $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => \mb_strlen($message), 'user_id' => $mention]]]);
+        $MadelineProto->logger($sentMessage, \danog\MadelineProto\Logger::NOTICE);
 
-    foreach ($media as $type => $inputMedia) {
-        \danog\MadelineProto\Logger::log("Sending $type");
-        $type = $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']);
+        foreach ($media as $type => $inputMedia) {
+            $MadelineProto->logger("Sending $type");
+            $type = yield $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']);
+            yield $MadelineProto->downloadToDir(yield $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]), '/tmp');
+        }
     }
-}
 
-foreach (\json_decode(\getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => \mb_strlen($message), 'user_id' => $mention]]]);
-    \danog\MadelineProto\Logger::log($sentMessage, \danog\MadelineProto\Logger::NOTICE);
-}
+    foreach (\json_decode(\getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
+        $sentMessage = yield $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => \mb_strlen($message), 'user_id' => $mention]]]);
+        $MadelineProto->logger($sentMessage, \danog\MadelineProto\Logger::NOTICE);
+    }
+});

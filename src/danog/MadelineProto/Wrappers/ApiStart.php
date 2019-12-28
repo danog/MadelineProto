@@ -108,7 +108,7 @@ Note that you can also provide the API parameters directly in the code using the
         exit;
     }
 
-    public function webAPIPhoneLogin($settings)
+    private function webAPIPhoneLogin($settings)
     {
         try {
             $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($settings);
@@ -119,7 +119,7 @@ Note that you can also provide the API parameters directly in the code using the
         }
     }
 
-    public function webAPICompleteLogin()
+    private function webAPICompleteLogin()
     {
         try {
             yield $this->my_telegram_org_wrapper->completeLogin($_POST['code']);
@@ -130,7 +130,7 @@ Note that you can also provide the API parameters directly in the code using the
         }
     }
 
-    public function webAPICreateApp()
+    private function webAPICreateApp()
     {
         try {
             $params = $_POST;

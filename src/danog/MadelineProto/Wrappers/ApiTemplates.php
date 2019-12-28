@@ -38,22 +38,32 @@ trait ApiTemplates
         </body>
         </html>';
 
-    public function webAPIEchoTemplate($message, $form)
+    private function webAPIEchoTemplate($message, $form)
     {
         return \sprintf($this->web_api_template, $message, $form);
     }
 
-    public function getWebAPITemplate()
+    /**
+     * Get web API login HTML template string.
+     *
+     * @return string
+     */
+    public function getWebAPITemplate(): string
     {
         return $this->web_template;
     }
 
-    public function setWebAPITemplate($template)
+    /**
+     * Set web API login HTML template string.
+     *
+     * @return string
+     */
+    public function setWebAPITemplate(string $template)
     {
         $this->web_template = $template;
     }
 
-    public function webAPIEcho($message = '')
+    private function webAPIEcho(string $message = '')
     {
         $stdout = getOutputBufferStream();
         if (!isset($this->my_telegram_org_wrapper)) {

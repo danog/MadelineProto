@@ -14,22 +14,39 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto\TL\Conversion;
 
+use danog\MadelineProto\MTProto;
+
 /**
  * Manages generation of extensions for files.
  */
 trait Extension
 {
-    public function getMimeFromExtension($extension, $default)
+    /**
+     * Get mime type from file extension.
+     *
+     * @param string $extension File extension
+     * @param string $default   Default mime type
+     *
+     * @return string
+     */
+    public function getMimeFromExtension(string $extension, string $default): string
     {
         $ext = \ltrim($extension, '.');
-        if (isset(self::ALL_MIMES[$ext])) {
-            return self::ALL_MIMES[$ext][0];
+        if (isset(MTProto::ALL_MIMES[$ext])) {
+            return MTProto::ALL_MIMES[$ext][0];
         }
 
         return $default;
     }
 
-    public function getExtensionFromMime($mime)
+    /**
+     * Get extension from mime type.
+     *
+     * @param string $mime MIME type
+     *
+     * @return string
+     */
+    public function getExtensionFromMime(string $mime): string
     {
         foreach (self::ALL_MIMES as $key => $value) {
             if (\array_search($mime, $value) !== false) {
@@ -40,7 +57,15 @@ trait Extension
         return '';
     }
 
-    public function getExtensionFromLocation($location, $default)
+    /**
+     * Get extension from file location.
+     *
+     * @param mixed  $location File location
+     * @param string $default  Default extension
+     *
+     * @return string
+     */
+    public function getExtensionFromLocation($location, string $default): string
     {
         return $default;
         //('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 2], ['heavy' => true, 'datacenter' => $location['dc_id']]);
@@ -69,14 +94,28 @@ trait Extension
         }
     }
 
-    public function getMimeFromFile($file)
+    /**
+     * Get mime type of file.
+     *
+     * @param string $file File
+     *
+     * @return string
+     */
+    public function getMimeFromFile(string $file): string
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
 
         return $finfo->file($file);
     }
 
-    public function getMimeFromBuffer($buffer)
+    /**
+     * Get mime type from buffer.
+     *
+     * @param string $buffer Buffer
+     *
+     * @return string
+     */
+    public function getMimeFromBuffer(string $buffer): string
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
 

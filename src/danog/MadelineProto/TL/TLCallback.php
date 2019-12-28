@@ -45,7 +45,7 @@ interface TLCallback
      *
      * Pass the method name and arguments
      *
-     * @var array
+     * @return array
      */
     public function getMethodCallbacks(): array;
 
@@ -54,14 +54,14 @@ interface TLCallback
      *
      * Pass the method name
      *
-     * @var array
+     * @return array
      */
     public function getMethodBeforeCallbacks(): array;
 
     /**
      * Called right after deserialization of object, passing the final object.
      *
-     * @var array
+     * @return array
      */
     public function getConstructorCallbacks(): array;
 
@@ -70,7 +70,7 @@ interface TLCallback
      *
      * Pass only the constructor name
      *
-     * @var array
+     * @return array
      */
     public function getConstructorBeforeCallbacks(): array;
 
@@ -79,7 +79,7 @@ interface TLCallback
      *
      * Passed the object, will return a modified version.
      *
-     * @var array
+     * @return array
      */
     public function getConstructorSerializeCallbacks(): array;
 
@@ -89,7 +89,7 @@ interface TLCallback
      * Passed the unserializable object,
      * will try to convert it to an object of the proper type.
      *
-     * @var array
+     * @return array
      */
     public function getTypeMismatchCallbacks(): array;
 }

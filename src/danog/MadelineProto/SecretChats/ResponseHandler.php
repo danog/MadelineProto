@@ -24,7 +24,7 @@ namespace danog\MadelineProto\SecretChats;
  */
 trait ResponseHandler
 {
-    public function handleDecryptedUpdate($update)
+    private function handleDecryptedUpdate($update)
     {
         /*if (isset($update['message']['decrypted_message']['random_bytes']) && strlen($update['message']['decrypted_message']['random_bytes']) < 15) {
               throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['rand_bytes_too_short']);

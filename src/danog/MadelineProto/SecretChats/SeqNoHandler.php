@@ -24,7 +24,7 @@ namespace danog\MadelineProto\SecretChats;
  */
 trait SeqNoHandler
 {
-    public function checkSecretInSeqNo($chat_id, $seqno)
+    private function checkSecretInSeqNo($chat_id, $seqno)
     {
         $seqno = ($seqno - $this->secret_chats[$chat_id]['out_seq_no_x']) / 2;
         $last = 0;
@@ -47,7 +47,7 @@ trait SeqNoHandler
         return true;
     }
 
-    public function checkSecretOutSeqNo($chat_id, $seqno)
+    private function checkSecretOutSeqNo($chat_id, $seqno)
     {
         $seqno = ($seqno - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2;
         $C = 0;
@@ -78,12 +78,12 @@ trait SeqNoHandler
         return true;
     }
 
-    public function generateSecretInSeqNo($chat)
+    private function generateSecretInSeqNo($chat)
     {
         return $this->secret_chats[$chat]['layer'] > 8 ? $this->secret_chats[$chat]['in_seq_no'] * 2 + $this->secret_chats[$chat]['in_seq_no_x'] : -1;
     }
 
-    public function generateSecretOutSeqNo($chat)
+    private function generateSecretOutSeqNo($chat)
     {
         return $this->secret_chats[$chat]['layer'] > 8 ? $this->secret_chats[$chat]['out_seq_no'] * 2 + $this->secret_chats[$chat]['out_seq_no_x'] : -1;
     }

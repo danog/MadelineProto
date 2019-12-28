@@ -257,10 +257,10 @@ class Logger
      *
      * @return void
      */
-    public function logger($param, int $level = self::NOTICE, string $file = '')
+    public function logger($param, int $level = self::NOTICE, string $file = ''): void
     {
         if ($level > $this->level || $this->mode === 0) {
-            return false;
+            return;
         }
         if (!self::$printed) {
             self::$printed = true;
@@ -274,7 +274,8 @@ class Logger
             $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
         }
         if ($this->mode === 4) {
-            return \call_user_func_array($this->optional, [$param, $level]);
+            \call_user_func_array($this->optional, [$param, $level]);
+            return;
         }
         $prefix = $this->prefix;
         if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread())) {

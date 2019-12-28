@@ -88,7 +88,7 @@ trait Start
         exit;
     }
 
-    public function webPhoneLogin()
+    private function webPhoneLogin()
     {
         try {
             yield $this->phoneLogin($_POST['phone_number']);
@@ -100,7 +100,7 @@ trait Start
         }
     }
 
-    public function webCompletePhoneLogin()
+    private function webCompletePhoneLogin()
     {
         try {
             yield $this->completePhoneLogin($_POST['phone_code']);
@@ -112,7 +112,7 @@ trait Start
         }
     }
 
-    public function webComplete2faLogin()
+    private function webComplete2faLogin()
     {
         try {
             yield $this->complete2faLogin($_POST['password']);
@@ -124,7 +124,7 @@ trait Start
         }
     }
 
-    public function webCompleteSignup()
+    private function webCompleteSignup()
     {
         try {
             yield $this->completeSignup($_POST['first_name'], isset($_POST['last_name']) ? $_POST['last_name'] : '');
@@ -136,7 +136,7 @@ trait Start
         }
     }
 
-    public function webBotLogin()
+    private function webBotLogin()
     {
         try {
             yield $this->botLogin($_POST['token']);

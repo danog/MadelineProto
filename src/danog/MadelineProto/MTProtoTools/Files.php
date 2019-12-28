@@ -56,7 +56,7 @@ trait Files
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                            $encrypted Whether to encrypt file for secret chats
      *
-     * @return array
+     * @return \Generator<array>
      */
     public function upload($file, string $file_name = '', $cb = null, bool $encrypted = false): \Generator
     {
@@ -229,9 +229,9 @@ trait Files
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return array
+     * @return \Generator<array>
      */
-    public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $seekable = true, bool $encrypted = false)
+    public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $seekable = true, bool $encrypted = false): \Generator
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
@@ -360,9 +360,9 @@ trait Files
      * @param string                             $file_name File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      *
-     * @return array
+     * @return \Generator<array>
      */
-    public function uploadEncrypted($file, string  $file_name = '', $cb = null)
+    public function uploadEncrypted($file, string  $file_name = '', $cb = null): \Generator
     {
         return $this->upload($file, $file_name, $cb, true);
     }
@@ -374,9 +374,9 @@ trait Files
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return array
+     * @return \Generator<array>
      */
-    public function uploadFromTgfile($media, $cb = null, bool $encrypted = false)
+    public function uploadFromTgfile($media, $cb = null, bool $encrypted = false): \Generator
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
@@ -447,7 +447,7 @@ trait Files
         return $res;
     }
 
-    public function genAllFile($media)
+    private function genAllFile($media)
     {
         $res = [$this->TL->getConstructors()->findByPredicate($media['_'])['type'] => $media];
         switch ($media['_']) {
@@ -540,7 +540,14 @@ trait Files
         return $res;
     }
 
-    public function getFileInfo($constructor)
+    /**
+     * Get info about file.
+     *
+     * @param mixed $constructor File ID
+     *
+     * @return \Generator<array>
+     */
+    public function getFileInfo($constructor): \Generator
     {
         if (\is_string($constructor)) {
             $constructor = $this->unpackFileId($constructor)['MessageMedia'];
@@ -932,6 +939,15 @@ trait Files
     header('Content-Length: '.$info['size']);
     header('Content-Type: '.$info['mime']);
     }*/
+    /**
+     * Extract photo size.
+     *
+     * @param mixed $photo Photo
+     *
+     * @internal
+     *
+     * @return void
+     */
     public function extractPhotosize($photo)
     {
     }
@@ -1224,7 +1240,7 @@ trait Files
                 ];
             }
 
-            $x = 0;
+            //$x = 0;
             while (true) {
                 try {
                     $res = yield $this->methodCallAsyncRead(
@@ -1241,7 +1257,7 @@ trait Files
                     break;
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0) {
-                        if ($x++ === 5) {
+                        /*if ($x++ === 5) {
                             if (isset($message_media['MessageMedia']) && !$this->authorization['user']['bot'] && $this->settings['download']['report_broken_media']) {
                                 try {
                                     yield $this->methodCallAsyncRead('messages.sendMedia', ['peer' => 'support', 'media' => $message_media['MessageMedia'], 'message' => "I can't download this file, could you please help?"], ['datacenter' => $this->datacenter->curdc]);
@@ -1253,7 +1269,7 @@ trait Files
                             }
 
                             throw new \danog\MadelineProto\Exception('The media server where this file is hosted is offline/overloaded, please try again later. Send the media to the telegram devs or to @danogentili to fix this.');
-                        }
+                        }*/
                         yield Tools::sleep(1);
                         continue;
                     }

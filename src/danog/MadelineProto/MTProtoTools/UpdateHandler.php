@@ -35,6 +35,15 @@ trait UpdateHandler
     public $updates = [];
     public $updates_key = 0;
 
+    /**
+     * PWR update handler.
+     *
+     * @param array $update Update
+     *
+     * @internal
+     *
+     * @return void
+     */
     public function pwrUpdateHandler($update)
     {
         if (isset($this->settings['pwr']['updateHandler'])) {
@@ -48,7 +57,16 @@ trait UpdateHandler
         }
     }
 
-    public function getUpdatesUpdateHandler($update)
+    /**
+     * Getupdates update handler.
+     *
+     * @param array $update Update
+     *
+     * @internal
+     *
+     * @return void
+     */
+    public function getUpdatesUpdateHandler(array $update): void
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
@@ -56,7 +74,16 @@ trait UpdateHandler
         $this->updates[$this->updates_key++] = $update;
     }
 
-    public function getUpdates($params = [])
+    /**
+     * Get updates.
+     *
+     * @param array $params Params
+     *
+     * @internal
+     *
+     * @return \Generator<array>
+     */
+    public function getUpdates($params = []): \Generator
     {
         if (!$this->settings['updates']['handle_updates']) {
             $this->settings['updates']['handle_updates'] = true;
@@ -98,7 +125,14 @@ trait UpdateHandler
     public $update_resolved = false;
     public $update_deferred;
 
-    public function waitUpdate()
+    /**
+     * Wait for update.
+     *
+     * @internal
+     *
+     * @return \Generator
+     */
+    public function waitUpdate(): \Generator
     {
         if (!$this->update_deferred) {
             $this->update_deferred = new Deferred();
@@ -108,7 +142,14 @@ trait UpdateHandler
         $this->update_deferred = new Deferred();
     }
 
-    public function signalUpdate()
+    /**
+     * Signal update.
+     *
+     * @internal
+     *
+     * @return void
+     */
+    public function signalUpdate(): void
     {
         if (!$this->update_deferred) {
             $this->update_deferred = new Deferred();
@@ -121,7 +162,17 @@ trait UpdateHandler
         });
     }
 
-    public function checkMsgId($message)
+
+    /**
+     * Check message ID.
+     *
+     * @param array $message Message
+     *
+     * @internal
+     *
+     * @return boolean
+     */
+    public function checkMsgId(array $message): bool
     {
         if (!isset($message['to_id'])) {
             return true;
@@ -144,6 +195,13 @@ trait UpdateHandler
         return false;
     }
 
+    /**
+     * Get channel state.
+     *
+     * @internal
+     *
+     * @return UpdatesState|UpdatesState[]
+     */
     public function loadUpdateState()
     {
         if (!$this->got_state) {
@@ -154,17 +212,41 @@ trait UpdateHandler
         return $this->channels_state->get(false);
     }
 
+    /**
+     * Load channel state.
+     *
+     * @param ?int  $channelId Channel ID
+     * @param array $init      Init
+     *
+     * @internal
+     *
+     * @return UpdatesState|UpdatesState[]
+     */
     public function loadChannelState($channelId = null, $init = [])
     {
         return $this->channels_state->get($channelId, $init);
     }
 
+    /**
+     * Get channel states.
+     *
+     * @internal
+     *
+     * @return CombinedUpdatesState
+     */
     public function getChannelStates()
     {
         return $this->channels_state;
     }
 
-    public function getUpdatesState()
+    /**
+     * Get update state.
+     *
+     * @internal
+     *
+     * @return \Generator
+     */
+    public function getUpdatesState(): \Generator
     {
         $data = yield $this->methodCallAsyncRead('updates.getState', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
         yield $this->getCdnConfig($this->settings['connection_settings']['default_dc']);
@@ -173,7 +255,17 @@ trait UpdateHandler
     }
 
 
-    public function handleUpdates($updates, $actual_updates = null)
+    /**
+     * Undocumented function.
+     *
+     * @param array $updates        Updates
+     * @param array $actual_updates Actual updates for deferred
+     *
+     * @internal
+     *
+     * @return \Generator
+     */
+    public function handleUpdates($updates, $actual_updates = null): \Generator
     {
         if (!$this->settings['updates']['handle_updates']) {
             return;
@@ -252,7 +344,16 @@ trait UpdateHandler
                 break;
         }
     }
-    public function saveUpdate($update)
+    /**
+     * Save update.
+     *
+     * @param array $update Update to save
+     *
+     * @internal
+     *
+     * @return \Generator
+     */
+    public function saveUpdate(array $update): \Generator
     {
         if ($update['_'] === 'updateConfig') {
             $this->config['expires'] = 0;
@@ -388,14 +489,21 @@ trait UpdateHandler
         }
     }
 
-    public function pwrWebhook($update)
+    /**
+     * Send update to webhook.
+     *
+     * @param array $update Update
+     *
+     * @return void
+     */
+    private function pwrWebhook(array $update): void
     {
         $payload = \json_encode($update);
         //$this->logger->logger($update, $payload, json_last_error());
         if ($payload === '') {
             $this->logger->logger('EMPTY UPDATE');
 
-            return false;
+            return;
         }
         \danog\MadelineProto\Tools::callFork((function () use ($payload) {
             $request = new Request($this->hook_url, 'POST');

@@ -23,12 +23,19 @@ use danog\MadelineProto\Logger;
 
 trait BotAPI
 {
-    public function htmlEntityDecode($stuff)
+    private function htmlEntityDecode($stuff)
     {
         return \html_entity_decode(\preg_replace('#< *br */? *>#', "\n", $stuff));
     }
 
-    public function mbStrlen($text)
+    /**
+     * Get Telegram UTF-8 length of string.
+     *
+     * @param string $text Text
+     *
+     * @return int
+     */
+    public function mbStrlen(string $text): int
     {
         $length = 0;
         $textlength = \strlen($text);
@@ -42,7 +49,16 @@ trait BotAPI
         return $length;
     }
 
-    public function mbSubstr($text, $offset, $length = null)
+    /**
+     * Telegram UTF-8 multibyte substring.
+     *
+     * @param string  $text   Text to substring
+     * @param integer $offset Offset
+     * @param ?int    $length Length
+     *
+     * @return string
+     */
+    public function mbSubstr(string $text, int $offset, $length = null): string
     {
         $mb_text_length = $this->mbStrlen($text);
         if ($offset < 0) {
@@ -75,7 +91,15 @@ trait BotAPI
         return $new_text;
     }
 
-    public function mbStrSplit($text, $length)
+    /**
+     * Telegram UTF-8 multibyte split.
+     *
+     * @param string  $text   Text
+     * @param integer $length Length
+     *
+     * @return string
+     */
+    public function mbStrSplit(string $text, int $length): string
     {
         $tlength = \mb_strlen($text, 'UTF-8');
         $result = [];
@@ -86,7 +110,7 @@ trait BotAPI
         return $result;
     }
 
-    public function parseButtons($rows)
+    private function parseButtons($rows)
     {
         $newrows = [];
         $key = 0;
@@ -125,7 +149,7 @@ trait BotAPI
         return $newrows;
     }
 
-    public function parseReplyMarkup($markup)
+    private function parseReplyMarkup($markup)
     {
         if (isset($markup['force_reply']) && $markup['force_reply']) {
             $markup['_'] = 'replyKeyboardForceReply';
@@ -157,7 +181,15 @@ trait BotAPI
         return $markup;
     }
 
-    public function MTProtoToBotAPI($data, $sent_arguments = [])
+    /**
+     * Convert MTProto parameters to bot API parameters.
+     *
+     * @param array $data           Data
+     * @param array $sent_arguments Sent arguments
+     *
+     * @return \Generator<array>
+     */
+    public function MTProtoToBotAPI(array $data, array $sent_arguments = []): \Generator
     {
         $newd = [];
         if (!isset($data['_'])) {
@@ -382,7 +414,14 @@ trait BotAPI
         }
     }
 
-    public function botAPIToMTProto($arguments)
+    /**
+     * Convert bot API parameters to MTProto parameters.
+     *
+     * @param array $arguments Arguments
+     *
+     * @return \Generator<array>
+     */
+    public function botAPIToMTProto(array $arguments): \Generator
     {
         foreach (self::BOTAPI_PARAMS_CONVERSION as $bot => $mtproto) {
             if (isset($arguments[$bot]) && !isset($arguments[$mtproto])) {
@@ -400,7 +439,7 @@ trait BotAPI
         return $arguments;
     }
 
-    public function parseNode($node, &$entities, &$new_message, &$offset)
+    private function parseNode($node, &$entities, &$new_message, &$offset)
     {
         switch ($node->nodeName) {
             case 'br':
@@ -518,7 +557,7 @@ trait BotAPI
         }
     }
 
-    public function parseMode($arguments)
+    private function parseMode($arguments)
     {
         if ($arguments['message'] === '' || !isset($arguments['message']) || !isset($arguments['parse_mode'])) {
             return $arguments;
@@ -555,7 +594,7 @@ trait BotAPI
         return $arguments;
     }
 
-    public function splitToChunks($args)
+    private function splitToChunks($args)
     {
         $args = yield $this->parseMode($args);
         if (!isset($args['entities'])) {
@@ -665,7 +704,7 @@ trait BotAPI
         return $multiple_args;
     }
 
-    public function multipleExplodeKeepDelimiters($delimiters, $string)
+    private function multipleExplodeKeepDelimiters($delimiters, $string)
     {
         $initialArray = \explode(\chr(1), \str_replace($delimiters, \chr(1), $string));
         $finalArray = [];
@@ -681,7 +720,7 @@ trait BotAPI
         return $finalArray;
     }
 
-    public function htmlFixtags($text)
+    private function htmlFixtags($text)
     {
         $diff = 0;
         \preg_match_all('#(.*?)(<(\bu\b|\bs\b|\ba\b|\bb\b|\bstrong\b|\bblockquote\b|\bstrike\b|\bdel\b|\bem\b|i|\bcode\b|\bpre\b)[^>]*>)(.*?)([<]\s*/\s*\3[>])#is', $text, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
@@ -724,7 +763,7 @@ trait BotAPI
         return \htmlentities($text);
     }
 
-    public function buildRows($button_list)
+    private function buildRows($button_list)
     {
         $end = false;
         $rows = [];

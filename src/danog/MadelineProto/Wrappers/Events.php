@@ -52,7 +52,7 @@ trait Events
      *
      * @return void
      */
-    public function setEventHandler($event_handler)
+    public function setEventHandler($event_handler): void
     {
         if (!\class_exists($event_handler) || !\is_subclass_of($event_handler, '\danog\MadelineProto\EventHandler')) {
             throw new \danog\MadelineProto\Exception('Wrong event handler was defined');

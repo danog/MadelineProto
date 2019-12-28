@@ -21,7 +21,7 @@ namespace danog\MadelineProto\TL\Conversion;
 
 trait BotAPIFiles
 {
-    public function photosizeToBotAPI($photoSize, $photo, $thumbnail = false)
+    private function photosizeToBotAPI($photoSize, $photo, $thumbnail = false)
     {
         $ext = '.jpg';//$this->getExtensionFromLocation(['_' => 'inputFileLocation', 'volume_id' => $photoSize['location']['volume_id'], 'local_id' => $photoSize['location']['local_id'], 'secret' => $photoSize['location']['secret'], 'dc_id' => $photoSize['location']['dc_id']], '.jpg');
         $photoSize['location']['access_hash'] = $photo['access_hash'] ?? 0;
@@ -41,7 +41,14 @@ trait BotAPIFiles
         ];
     }
 
-    public function unpackFileId($file_id)
+    /**
+     * Unpack bot API file ID.
+     *
+     * @param string $file_id Bot API file ID
+     *
+     * @return array Unpacked file ID
+     */
+    public function unpackFileId(string $file_id): array
     {
         $file_id = \danog\MadelineProto\Tools::rleDecode(\danog\MadelineProto\Tools::base64urlDecode($file_id));
         if ($file_id[\strlen($file_id) - 1] !== \chr(2)) {

@@ -635,7 +635,6 @@ class Lang
     public static function addToLang(string $key, string $value = '', bool $force = false)
     {
         if (!isset(\danog\MadelineProto\Lang::$lang['en'][$key]) || $force) {
-            \var_dump("Adding $key");
             \danog\MadelineProto\Lang::$lang['en'][$key] = $value;
             \file_put_contents(__DIR__.'/Lang.php', \sprintf(self::$template, \var_export(\danog\MadelineProto\Lang::$lang, true), \var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
         }

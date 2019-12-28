@@ -21,7 +21,15 @@ namespace danog\MadelineProto\TL\Conversion;
 
 trait TD
 {
-    public function tdcliToTd(&$params, $key = null)
+    /**
+     * Convert tdcli parameters to tdcli.
+     *
+     * @param array $params Params
+     * @param array $key    Key
+     *
+     * @return array
+     */
+    public function tdcliToTd(&$params, $key = null): array
     {
         if (!\is_array($params)) {
             return $params;
@@ -44,7 +52,14 @@ trait TD
         return $params;
     }
 
-    public function tdToMTProto($params)
+    /**
+     * Convert TD to MTProto parameters.
+     *
+     * @param array $params Parameters
+     *
+     * @return \Generator<array>
+     */
+    public function tdToMTProto(array $params): \Generator
     {
         $newparams = ['_' => self::REVERSE[$params['_']]];
         foreach (self::TD_PARAMS_CONVERSION[$newparams['_']] as $td => $mtproto) {
@@ -75,12 +90,26 @@ trait TD
         return $newparams;
     }
 
-    public function MTProtoToTdcli($params)
+    /**
+     * MTProto to TDCLI params.
+     *
+     * @param mixed $params Params
+     *
+     * @return \Generator
+     */
+    public function MTProtoToTdcli($params): \Generator
     {
         return $this->tdToTdcli(yield $this->MTProtoToTd($params));
     }
 
-    public function MTProtoToTd(&$params)
+    /**
+     * MTProto to TD params.
+     *
+     * @param mixed $params Params
+     *
+     * @return \Generator
+     */
+    public function MTProtoToTd(&$params): \Generator
     {
         if (!\is_array($params)) {
             return $params;
@@ -163,6 +192,13 @@ trait TD
         return $newparams;
     }
 
+    /**
+     * Convert TD parameters to tdcli.
+     *
+     * @param mixed $params Parameters
+     *
+     * @return mixed
+     */
     public function tdToTdcli($params)
     {
         if (!\is_array($params)) {

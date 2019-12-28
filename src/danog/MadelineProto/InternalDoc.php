@@ -4027,9 +4027,9 @@ class InternalDoc extends APIFactory
     /**
          * Cleanup memory and session file.
          *
-         * @return void
+         * @return self
          */
-    public function cleanup(array $extra = [])
+    public function cleanup(array $extra = []): self
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -4042,9 +4042,9 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = '', array $extra = [])
+    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = '', array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$param, $level, $file, $extra]);
+        $this->__call(__FUNCTION__, [$param, $level, $file, $extra]);
     }
     /**
      * Get TL namespaces.
@@ -4134,36 +4134,13 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$settings, $previousSettings, $extra]);
     }
     /**
-     * Parse and store settings.
-     *
-     * @param array $settings Settings
-     *
-     * @return void
-     */
-    public function parseSettings(array $settings, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$settings, $extra]);
-    }
-    /**
      * Setup logger.
      *
      * @return void
      */
-    public function setupLogger(array $extra = [])
+    public function setupLogger(array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Reset all MTProto sessions.
-     *
-     * @param boolean $de       Whether to reset the session ID
-     * @param boolean $auth_key Whether to reset the auth key
-     *
-     * @return void
-     */
-    public function resetMTProtoSession(bool $de = true, bool $auth_key = false, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$de, $auth_key, $extra]);
+        $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Check if connected to datacenter using HTTP.
@@ -4186,15 +4163,6 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
-     * Whether we're initing authorization.
-     *
-     * @return boolean
-     */
-    public function isInitingAuthorization(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
      * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info.
      *
      * @param boolean $reconnectAll Whether to reconnect to all DCs
@@ -4210,40 +4178,18 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function resetSession(array $extra = [])
+    public function resetSession(array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Reset the update state and fetch all updates from the beginning.
      *
      * @return void
      */
-    public function resetUpdateState(array $extra = [])
+    public function resetUpdateState(array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Start the update system.
-     *
-     * @param boolean $anyway Force start update system?
-     *
-     * @return void
-     */
-    public function startUpdateSystem($anyway = false, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$anyway, $extra]);
-    }
-    /**
-     * Store shared phone config.
-     *
-     * @param mixed $watcherId Watcher ID
-     *
-     * @return void
-     */
-    public function getPhoneConfig($watcherId = null, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$watcherId, $extra]);
+        $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Store RSA keys for CDN datacenters.
@@ -4285,36 +4231,6 @@ class InternalDoc extends APIFactory
      * @return \Generator<array>
      */
     public function getSelf(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function getMethodCallbacks(array $extra = []): array
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function getMethodBeforeCallbacks(array $extra = []): array
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function getConstructorCallbacks(array $extra = []): array
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function getConstructorBeforeCallbacks(array $extra = []): array
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function getConstructorSerializeCallbacks(array $extra = []): array
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function getTypeMismatchCallbacks(array $extra = []): array
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -4535,7 +4451,7 @@ class InternalDoc extends APIFactory
      *
      * @return int
      */
-    public function fromSupergroup($id, array $extra = [])
+    public function fromSupergroup($id, array $extra = []): int
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
@@ -4550,25 +4466,16 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
-
-    public function addSupport($support, array $extra = [])
+    /**
+     * Add user info.
+     *
+     * @param array $user User info
+     *
+     * @return void
+     */
+    public function addUser(array $user, array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$support, $extra]);
-    }
-
-    public function addUser($user, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$user, $extra]);
-    }
-
-    public function addChat($chat, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$chat, $extra]);
-    }
-
-    public function cachePwrChat($id, $full_fetch, $send, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$id, $full_fetch, $send, $extra]);
+        $this->__call(__FUNCTION__, [$user, $extra]);
     }
     /**
      * Check if peer is present in internal peer database.
@@ -4581,16 +4488,6 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
-
-    public function entitiesPeerIsset($entities, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$entities, $extra]);
-    }
-
-    public function fwdPeerIsset($fwd, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$fwd, $extra]);
-    }
     /**
      * Get folder ID from object.
      *
@@ -4598,7 +4495,7 @@ class InternalDoc extends APIFactory
      *
      * @return ?int
      */
-    public function getFolderId($id, array $extra = [])
+    public function getFolderId($id, array $extra = []): ?int
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
@@ -4627,13 +4524,14 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$id, $recursive, $extra]);
     }
-
-    public function genAll($constructor, $folder_id = null, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$constructor, $folder_id, $extra]);
-    }
-
-    public function fullChatLastUpdated($id, array $extra = [])
+    /**
+     * When were full info for this chat last cached.
+     *
+     * @param mixed $id Chat ID
+     *
+     * @return integer
+     */
+    public function fullChatLastUpdated($id, array $extra = []): int
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
@@ -4663,107 +4561,16 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$id, $fullfetch, $send, $extra]);
     }
-
-    public function recurseAlphabetSearchParticipants($channel, $filter, $q, $total_count, &$res, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $total_count, $res, $extra]);
-    }
-
-    public function fetchParticipants($channel, $filter, $q, $total_count, &$res, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $total_count, $res, $extra]);
-    }
-
-    public function fetchParticipantsCache($channel, $filter, $q, $offset, $limit, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $offset, $limit, $extra]);
-    }
-
-    public function storeParticipantsCache($gres, $channel, $filter, $q, $offset, $limit, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$gres, $channel, $filter, $q, $offset, $limit, $extra]);
-    }
-
-    public function getParticipantsHash($channel, $filter, $q, $offset, $limit, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$channel, $filter, $q, $offset, $limit, $extra]);
-    }
-
-    public function storeDb($res, $force = false, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$res, $force, $extra]);
-    }
-
-    public function resolveUsername($username, array $extra = [])
+    /**
+     * Resolve username (use getInfo instead).
+     *
+     * @param string $username Username
+     *
+     * @return \Generator
+     */
+    public function resolveUsername(string $username, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$username, $extra]);
-    }
-
-    public function pwrUpdateHandler($update, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$update, $extra]);
-    }
-
-    public function getUpdatesUpdateHandler($update, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$update, $extra]);
-    }
-
-    public function getUpdates($params = [
-    ], array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$params, $extra]);
-    }
-
-    public function waitUpdate(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function signalUpdate(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function checkMsgId($message, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$message, $extra]);
-    }
-
-    public function loadUpdateState(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function loadChannelState($channelId = null, $init = [
-    ], array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$channelId, $init, $extra]);
-    }
-
-    public function getChannelStates(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function getUpdatesState(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function handleUpdates($updates, $actual_updates = null, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$updates, $actual_updates, $extra]);
-    }
-
-    public function saveUpdate($update, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$update, $extra]);
-    }
-
-    public function pwrWebhook($update, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$update, $extra]);
     }
     /**
      * Upload file.
@@ -4773,7 +4580,7 @@ class InternalDoc extends APIFactory
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                            $encrypted Whether to encrypt file for secret chats
      *
-     * @return array
+     * @return \Generator<array>
      */
     public function upload($file, string $file_name = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
@@ -4824,7 +4631,7 @@ class InternalDoc extends APIFactory
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return array
+     * @return \Generator<array>
      */
     public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $seekable = true, bool $encrypted = false, array $extra = [])
     {
@@ -4837,7 +4644,7 @@ class InternalDoc extends APIFactory
      * @param string                             $file_name File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      *
-     * @return array
+     * @return \Generator<array>
      */
     public function uploadEncrypted($file, string $file_name = '', $cb = null, array $extra = [])
     {
@@ -4850,18 +4657,19 @@ class InternalDoc extends APIFactory
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return array
+     * @return \Generator<array>
      */
     public function uploadFromTgfile($media, $cb = null, bool $encrypted = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$media, $cb, $encrypted, $extra]);
     }
-
-    public function genAllFile($media, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$media, $extra]);
-    }
-
+    /**
+     * Get info about file.
+     *
+     * @param mixed $constructor File ID
+     *
+     * @return \Generator<array>
+     */
     public function getFileInfo($constructor, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$constructor, $extra]);
@@ -4899,11 +4707,6 @@ class InternalDoc extends APIFactory
     public function getDownloadInfo($message_media, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$message_media, $extra]);
-    }
-
-    public function extractPhotosize($photo, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$photo, $extra]);
     }
     /**
      * Download file to directory.
@@ -5043,178 +4846,186 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
-
-    public function encryptSecretMessage($chat_id, $message, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$chat_id, $message, $extra]);
-    }
-
-    public function handleEncryptedUpdate($message, $test = false, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$message, $test, $extra]);
-    }
-
-    public function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$message_key, $chat_id, $old, $encrypted_data, $extra]);
-    }
-
-    public function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$message_key, $chat_id, $old, $encrypted_data, $extra]);
-    }
-
-    public function handleDecryptedUpdate($update, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$update, $extra]);
-    }
-
-    public function checkSecretInSeqNo($chat_id, $seqno, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$chat_id, $seqno, $extra]);
-    }
-
-    public function checkSecretOutSeqNo($chat_id, $seqno, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$chat_id, $seqno, $extra]);
-    }
-
-    public function generateSecretInSeqNo($chat, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$chat, $extra]);
-    }
-
-    public function generateSecretOutSeqNo($chat, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$chat, $extra]);
-    }
-
-    public function htmlEntityDecode($stuff, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$stuff, $extra]);
-    }
-
-    public function mbStrlen($text, array $extra = [])
+    /**
+     * Get Telegram UTF-8 length of string.
+     *
+     * @param string $text Text
+     *
+     * @return int
+     */
+    public function mbStrlen(string $text, array $extra = []): int
     {
         return $this->__call(__FUNCTION__, [$text, $extra]);
     }
-
-    public function mbSubstr($text, $offset, $length = null, array $extra = [])
+    /**
+     * Telegram UTF-8 multibyte substring.
+     *
+     * @param string  $text   Text to substring
+     * @param integer $offset Offset
+     * @param ?int    $length Length
+     *
+     * @return string
+     */
+    public function mbSubstr(string $text, int $offset, $length = null, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$text, $offset, $length, $extra]);
     }
-
-    public function mbStrSplit($text, $length, array $extra = [])
+    /**
+     * Telegram UTF-8 multibyte split.
+     *
+     * @param string  $text   Text
+     * @param integer $length Length
+     *
+     * @return string
+     */
+    public function mbStrSplit(string $text, int $length, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$text, $length, $extra]);
     }
-
-    public function parseButtons($rows, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$rows, $extra]);
-    }
-
-    public function parseReplyMarkup($markup, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$markup, $extra]);
-    }
-
-    public function MTProtoToBotAPI($data, $sent_arguments = [
+    /**
+     * Convert MTProto parameters to bot API parameters.
+     *
+     * @param array $data           Data
+     * @param array $sent_arguments Sent arguments
+     *
+     * @return \Generator<array>
+     */
+    public function MTProtoToBotAPI(array $data, array $sent_arguments = [
     ], array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$data, $sent_arguments, $extra]);
     }
-
-    public function botAPIToMTProto($arguments, array $extra = [])
+    /**
+     * Convert bot API parameters to MTProto parameters.
+     *
+     * @param array $arguments Arguments
+     *
+     * @return \Generator<array>
+     */
+    public function botAPIToMTProto(array $arguments, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$arguments, $extra]);
     }
-
-    public function parseNode($node, &$entities, &$new_message, &$offset, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$node, $entities, $new_message, $offset, $extra]);
-    }
-
-    public function parseMode($arguments, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$arguments, $extra]);
-    }
-
-    public function splitToChunks($args, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$args, $extra]);
-    }
-
-    public function multipleExplodeKeepDelimiters($delimiters, $string, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$delimiters, $string, $extra]);
-    }
-
-    public function htmlFixtags($text, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$text, $extra]);
-    }
-
-    public function buildRows($button_list, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$button_list, $extra]);
-    }
-
-    public function photosizeToBotAPI($photoSize, $photo, $thumbnail = false, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$photoSize, $photo, $thumbnail, $extra]);
-    }
-
-    public function unpackFileId($file_id, array $extra = [])
+    /**
+     * Unpack bot API file ID.
+     *
+     * @param string $file_id Bot API file ID
+     *
+     * @return array Unpacked file ID
+     */
+    public function unpackFileId(string $file_id, array $extra = []): array
     {
         return $this->__call(__FUNCTION__, [$file_id, $extra]);
     }
-
-    public function getMimeFromExtension($extension, $default, array $extra = [])
+    /**
+     * Get mime type from file extension.
+     *
+     * @param string $extension File extension
+     * @param string $default   Default mime type
+     *
+     * @return string
+     */
+    public function getMimeFromExtension(string $extension, string $default, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$extension, $default, $extra]);
     }
-
-    public function getExtensionFromMime($mime, array $extra = [])
+    /**
+     * Get extension from mime type.
+     *
+     * @param string $mime MIME type
+     *
+     * @return string
+     */
+    public function getExtensionFromMime(string $mime, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$mime, $extra]);
     }
-
-    public function getExtensionFromLocation($location, $default, array $extra = [])
+    /**
+     * Get extension from file location.
+     *
+     * @param mixed  $location File location
+     * @param string $default  Default extension
+     *
+     * @return string
+     */
+    public function getExtensionFromLocation($location, string $default, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$location, $default, $extra]);
     }
-
-    public function getMimeFromFile($file, array $extra = [])
+    /**
+     * Get mime type of file.
+     *
+     * @param string $file File
+     *
+     * @return string
+     */
+    public function getMimeFromFile(string $file, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$file, $extra]);
     }
-
-    public function getMimeFromBuffer($buffer, array $extra = [])
+    /**
+     * Get mime type from buffer.
+     *
+     * @param string $buffer Buffer
+     *
+     * @return string
+     */
+    public function getMimeFromBuffer(string $buffer, array $extra = []): string
     {
         return $this->__call(__FUNCTION__, [$buffer, $extra]);
     }
-
-    public function tdcliToTd(&$params, $key = null, array $extra = [])
+    /**
+     * Convert tdcli parameters to tdcli.
+     *
+     * @param array $params Params
+     * @param array $key    Key
+     *
+     * @return array
+     */
+    public function tdcliToTd(&$params, $key = null, array $extra = []): array
     {
         return $this->__call(__FUNCTION__, [$params, $key, $extra]);
     }
-
-    public function tdToMTProto($params, array $extra = [])
+    /**
+     * Convert TD to MTProto parameters.
+     *
+     * @param array $params Parameters
+     *
+     * @return \Generator<array>
+     */
+    public function tdToMTProto(array $params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
-
+    /**
+     * MTProto to TDCLI params.
+     *
+     * @param mixed $params Params
+     *
+     * @return \Generator
+     */
     public function MTProtoToTdcli($params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
-
+    /**
+     * MTProto to TD params.
+     *
+     * @param mixed $params Params
+     *
+     * @return \Generator
+     */
     public function MTProtoToTd(&$params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
-
+    /**
+     * Convert TD parameters to tdcli.
+     *
+     * @param mixed $params Parameters
+     *
+     * @return mixed
+     */
     public function tdToTdcli($params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
@@ -5465,9 +5276,9 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function callForkDefer($promise, array $extra = [])
+    public function callForkDefer($promise, array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$promise, $extra]);
+        $this->__call(__FUNCTION__, [$promise, $extra]);
     }
     /**
      * Rethrow error catched in strand.
@@ -5477,9 +5288,9 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function rethrow(\Throwable $e, $file = '', array $extra = [])
+    public function rethrow(\Throwable $e, $file = '', array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$e, $file, $extra]);
+        $this->__call(__FUNCTION__, [$e, $file, $extra]);
     }
     /**
      * Call promise $b after promise $a.
@@ -5520,19 +5331,6 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$file, $operation, $polling, $extra]);
     }
     /**
-     * Asynchronously lock a file (internal generator function).
-     *
-     * @param string  $file      File to lock
-     * @param integer $operation Locking mode
-     * @param float  $polling   Polling interval
-     *
-     * @return \Generator
-     */
-    public function flockGenerator(string $file, int $operation, float $polling, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$file, $operation, $polling, $extra]);
-    }
-    /**
      * Asynchronously sleep.
      *
      * @param int $time Number of seconds to sleep for
@@ -5551,17 +5349,6 @@ class InternalDoc extends APIFactory
      * @return Promise
      */
     public function readLine(string $prompt = '', array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$prompt, $extra]);
-    }
-    /**
-     * Asynchronously read line (generator function).
-     *
-     * @param string $prompt Prompt
-     *
-     * @return \Generator
-     */
-    public function readLineGenerator(string $prompt = '', array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$prompt, $extra]);
     }
@@ -5708,46 +5495,95 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$obj, $var, $extra]);
     }
-
-    public function requestCall($user, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$user, $extra]);
-    }
-
-    public function acceptCall($call, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$call, $extra]);
-    }
-
+    /**
+     * Discard call.
+     *
+     * @param array   $call       Call
+     * @param string  $reason     Discard reason
+     * @param array   $rating     Rating
+     * @param boolean $need_debug Need debug?
+     *
+     * @return \Generator
+     */
     public function discardCall($call, $reason, $rating = [
     ], $need_debug = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug, $extra]);
     }
-
+    /**
+     * Request VoIP call.
+     *
+     * @param mixed $user User
+     *
+     * @return void
+     */
+    public function requestCall($user, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$user, $extra]);
+    }
+    /**
+     * Accept call.
+     *
+     * @param array $call Call
+     *
+     * @return \Generator
+     */
+    public function acceptCall($call, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$call, $extra]);
+    }
+    /**
+     * Confirm call.
+     *
+     * @param array $params Params
+     *
+     * @return \Generator
+     */
     public function confirmCall($params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
-
+    /**
+     * Complete call handshake.
+     *
+     * @param array $params Params
+     *
+     * @return \Generator
+     */
     public function completeCall($params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
-
-    public function callStatus($id, array $extra = [])
+    /**
+     * Get call status.
+     *
+     * @param array $id Call ID
+     *
+     * @return integer
+     */
+    public function callStatus($id, array $extra = []): int
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
-
-    public function getCall($call, array $extra = [])
+    /**
+     * Get call info.
+     *
+     * @param mixed $call Call ID
+     *
+     * @return array
+     */
+    public function getCall($call, array $extra = []): array
     {
         return $this->__call(__FUNCTION__, [$call, $extra]);
     }
-
-    public function checkCalls(array $extra = [])
+    /**
+     * Check state of calls.
+     *
+     * @return void
+     */
+    public function checkCalls(array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Get dialog peers.
@@ -5778,9 +5614,9 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function setEventHandler($event_handler, array $extra = [])
+    public function setEventHandler($event_handler, array $extra = []): void
     {
-        return $this->__call(__FUNCTION__, [$event_handler, $extra]);
+        $this->__call(__FUNCTION__, [$event_handler, $extra]);
     }
     /**
      * Get event handler.
@@ -5790,19 +5626,6 @@ class InternalDoc extends APIFactory
     public function getEventHandler(array $extra = []): EventHandler
     {
         return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Event update handler.
-     *
-     * @param array $update Update
-     *
-     * @return void
-     *
-     * @internal Internal event handler
-     */
-    public function eventUpdateHandler(array $update, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$update, $extra]);
     }
     /**
      * Set webhook update handler.
@@ -5827,43 +5650,89 @@ class InternalDoc extends APIFactory
     {
         $this->__call(__FUNCTION__, [$callback, $extra]);
     }
-
+    /**
+     * Log out currently logged in user.
+     *
+     * @return \Generator
+     */
     public function logout(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
-    public function botLogin($token, array $extra = [])
+    /**
+     * Login as bot.
+     *
+     * @param string $token Bot token
+     *
+     * @return \Generator
+     */
+    public function botLogin(string $token, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$token, $extra]);
     }
-
+    /**
+     * Login as user.
+     *
+     * @param string  $number   Phone number
+     * @param integer $sms_type SMS type
+     *
+     * @return \Generator
+     */
     public function phoneLogin($number, $sms_type = 5, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$number, $sms_type, $extra]);
     }
-
+    /**
+     * Complet user login using login code.
+     *
+     * @param string $code Login code
+     *
+     * @return \Generator
+     */
     public function completePhoneLogin($code, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$code, $extra]);
     }
-
+    /**
+     * Import authorization.
+     *
+     * @param mixed $authorization Authorization info
+     *
+     * @return \Generator
+     */
     public function importAuthorization($authorization, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$authorization, $extra]);
     }
-
+    /**
+     * Export authorization.
+     *
+     * @return \Generator<array>
+     */
     public function exportAuthorization(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
-    public function completeSignup($first_name, $last_name, array $extra = [])
+    /**
+     * Complete signup to Telegram.
+     *
+     * @param string $first_name First name
+     * @param string $last_name  Last name
+     *
+     * @return \Generator
+     */
+    public function completeSignup(string $first_name, string $last_name = '', array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$first_name, $last_name, $extra]);
     }
-
-    public function complete2faLogin($password, array $extra = [])
+    /**
+     * Complete 2FA login.
+     *
+     * @param string $password Password
+     *
+     * @return \Generator
+     */
+    public function complete2faLogin(string $password, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$password, $extra]);
     }
@@ -5873,7 +5742,8 @@ class InternalDoc extends APIFactory
      * The params array can contain password, new_password, email and hint params.
      *
      * @param array $params The params
-     * @return void
+     *
+     * @return \Generator
      */
     public function update2fa(array $params, array $extra = [])
     {
@@ -5938,41 +5808,6 @@ class InternalDoc extends APIFactory
     public function start(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function webPhoneLogin(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function webCompletePhoneLogin(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function webComplete2faLogin(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function webCompleteSignup(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function webBotLogin(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-
-    public function webEcho(string $message = '', array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$message, $extra]);
-    }
-
-    public function webEchoTemplate($message, $form, array $extra = []): string
-    {
-        return $this->__call(__FUNCTION__, [$message, $form, $extra]);
     }
     /**
      * Get web template.

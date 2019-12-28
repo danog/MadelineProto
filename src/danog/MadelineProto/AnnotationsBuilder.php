@@ -21,6 +21,7 @@ namespace danog\MadelineProto;
 
 use Amp\Promise;
 use danog\MadelineProto\TL\TL;
+use danog\MadelineProto\TL\TLCallback;
 use phpDocumentor\Reflection\DocBlockFactory;
 
 class AnnotationsBuilder
@@ -78,9 +79,11 @@ class AnnotationsBuilder
     }
 
     /**
-     * Create file InternalDoc with all interfaces.
+     * Create internalDoc.
+     *
+     * @return void
      */
-    private function createInternalClasses()
+    private function createInternalClasses(): void
     {
         \danog\MadelineProto\Logger::log('Creating internal classes...', \danog\MadelineProto\Logger::NOTICE);
         $handle = \fopen($this->output, 'w');
@@ -92,6 +95,13 @@ class AnnotationsBuilder
         foreach ($methods as $method) {
             $ignoreMethods[$method->getName()] = $method->getName();
         }
+
+        $class = new \ReflectionClass(TLCallback::class);
+        $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
+        foreach ($methods as $method) {
+            $ignoreMethods[$method->getName()] = $method->getName();
+        }
+
         \fclose($handle);
         $handle = \fopen($this->output, 'w');
 
@@ -167,6 +177,9 @@ class AnnotationsBuilder
         foreach ($methods as $method) {
             $name = $method->getName();
             if (isset($ignoreMethods[$name])) {
+                continue;
+            }
+            if (\strpos($method->getDocComment() ?? '', '@internal') !== false) {
                 continue;
             }
 
@@ -248,6 +261,13 @@ class AnnotationsBuilder
             $doc .= "\n{\n";
             $doc .= "    $ret \$this->__call(__FUNCTION__, $paramList);\n";
             $doc .= "}\n";
+
+            if (!$method->getDocComment()) {
+                Logger::log("$name has no PHPDOC!", Logger::FATAL_ERROR);
+            }
+            if (!$type) {
+                Logger::log("$name has no return type!", Logger::FATAL_ERROR);
+            }
 
             $internalDoc['InternalDoc'][$name]['method'] = $method->getDocComment() ?? '';
             $internalDoc['InternalDoc'][$name]['method'] .= "\n    ".\implode("\n    ", \explode("\n", $doc));
