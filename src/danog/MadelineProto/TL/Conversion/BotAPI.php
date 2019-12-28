@@ -556,8 +556,16 @@ trait BotAPI
                 break;
         }
     }
-
-    private function parseMode($arguments)
+    /**
+     * Convert markdown and HTML messages
+     *
+     * @param array $arguments Arguments
+     *
+     * @internal
+     *
+     * @return array
+     */
+    public function parseMode(array $arguments): array
     {
         if ($arguments['message'] === '' || !isset($arguments['message']) || !isset($arguments['parse_mode'])) {
             return $arguments;
@@ -594,7 +602,16 @@ trait BotAPI
         return $arguments;
     }
 
-    private function splitToChunks($args)
+    /**
+     * Split too long message into chunks
+     *
+     * @param array $args Arguments
+     *
+     * @internal
+     *
+     * @return \Generator
+     */
+    public function splitToChunks($args): \Generator
     {
         $args = yield $this->parseMode($args);
         if (!isset($args['entities'])) {

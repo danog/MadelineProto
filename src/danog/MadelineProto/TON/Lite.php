@@ -104,8 +104,34 @@ class Lite
             yield $connection->connect($lite);
         }
     }
+    /**
+     * Logger.
+     *
+     * @param string $param Parameter
+     * @param int    $level Logging level
+     * @param string $file  File where the message originated
+     *
+     * @return void
+     */
+    public function logger($param, int $level = Logger::NOTICE, string $file = ''): void
+    {
+        if ($file === null) {
+            $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
+        }
 
-    public function methodCall(string $methodName, array $args = [], array $aargs = [])
+        isset($this->logger) ? $this->logger->logger($param, $level, $file) : Logger::$default->logger($param, $level, $file);
+    }
+
+
+    /**
+     * Call lite method.
+     *
+     * @param string $methodName Method name
+     * @param array  $args       Arguments
+     *
+     * @return \Generator
+     */
+    public function methodCall(string $methodName, array $args = [], array $aargs = []): \Generator
     {
         $data = yield $this->TL->serializeMethod($methodName, $args);
         $data = yield $this->TL->serializeMethod('liteServer.query', ['data' => $data]);
@@ -129,9 +155,9 @@ class Lite
      *
      * @param array $parameters Parameters
      *
-     * @return void
+     * @return array
      */
-    public function botAPItoMTProto(array $parameters)
+    public function botAPItoMTProto(array $parameters): array
     {
         return $parameters;
     }
@@ -139,9 +165,9 @@ class Lite
     /**
      * Get TL method namespaces.
      *
-     * @return void
+     * @return array
      */
-    public function getMethodNamespaces()
+    public function getMethodNamespaces(): array
     {
         return $this->TL->getMethodNamespaces();
     }
