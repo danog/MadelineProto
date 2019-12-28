@@ -1200,14 +1200,14 @@ trait Files
      * @param string   $old_dc        Previous DC ID
      * @param AES      $ige           IGE decryptor instance
      * @param callable $cb            Status callback
-     * @param int      $offset        Offset
+     * @param array    $offset        Offset
      * @param callable $callable      Chunk callback
      * @param boolean  $seekable      Whether the download file is seekable
      * @param boolean  $postpone      Whether to postpone method call
      *
      * @return \Generator
      */
-    private function downloadPart(&$message_media, bool &$cdn, &$datacenter, &$old_dc, &$ige, $cb, int $offset, $callable, bool $seekable, bool $postpone = false): \Generator
+    private function downloadPart(&$message_media, bool &$cdn, &$datacenter, &$old_dc, &$ige, $cb, array $offset, $callable, bool $seekable, bool $postpone = false): \Generator
     {
         static $method = [
             false => 'upload.getFile', // non-cdn
