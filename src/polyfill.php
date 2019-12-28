@@ -10,7 +10,7 @@ function returnMe($res)
 }
 function __coalesce($ifNotNull, $then)
 {
-    return $ifNotNull ? $ifNotNull : $then;
+    return $ifNotNull ?: $then;
 }
 function __destructure($list, $value)
 {

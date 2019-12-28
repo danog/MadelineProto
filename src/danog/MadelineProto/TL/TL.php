@@ -815,7 +815,7 @@ class TL
                     !\is_array($arguments[$current_argument['name']])
                     || !(
                         isset($arguments[$current_argument['name']]['_'])
-                        && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_']) === 'InputFile'
+                        && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] === 'InputFile'
                     )
                 )
                 && $this->API->settings['upload']['allow_automatic_upload']
