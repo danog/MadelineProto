@@ -23,7 +23,7 @@ use danog\MadelineProto\Logger;
 
 trait BotAPI
 {
-    private function htmlEntityDecode($stuff)
+    private function htmlEntityDecode(string $stuff): string
     {
         return \html_entity_decode(\preg_replace('#< *br */? *>#', "\n", $stuff));
     }
@@ -97,9 +97,9 @@ trait BotAPI
      * @param string  $text   Text
      * @param integer $length Length
      *
-     * @return string
+     * @return array
      */
-    public static function mbStrSplit(string $text, int $length): string
+    public static function mbStrSplit(string $text, int $length): array
     {
         $tlength = \mb_strlen($text, 'UTF-8');
         $result = [];
