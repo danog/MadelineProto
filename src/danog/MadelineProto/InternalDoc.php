@@ -4143,17 +4143,6 @@ class InternalDoc extends APIFactory
         $this->__call(__FUNCTION__, [$extra]);
     }
     /**
-     * Check if connected to datacenter using HTTP.
-     *
-     * @param string $datacenter DC ID
-     *
-     * @return boolean
-     */
-    public function isHttp(string $datacenter, array $extra = []): bool
-    {
-        return $this->__call(__FUNCTION__, [$datacenter, $extra]);
-    }
-    /**
      * Checks whether all datacenters are authorized.
      *
      * @return boolean
@@ -4226,18 +4215,6 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
-     * Create authorization key.
-     *
-     * @param int    $expires_in Expiry date of auth key, -1 for permanent auth key
-     * @param string $datacenter DC ID
-     *
-     * @return \Generator<AuthKey>
-     */
-    public function createAuthKey(int $expires_in, string $datacenter, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$expires_in, $datacenter, $extra]);
-    }
-    /**
      * Check validity of g_a parameters.
      *
      * @param BigInteger $g_a
@@ -4248,71 +4225,6 @@ class InternalDoc extends APIFactory
     public function checkG(\tgseclib\Math\BigInteger $g_a, \tgseclib\Math\BigInteger $p, array $extra = []): bool
     {
         return $this->__call(__FUNCTION__, [$g_a, $p, $extra]);
-    }
-    /**
-     * Check validity of p and g parameters.
-     *
-     * @param BigInteger $p
-     * @param BigInteger $g
-     *
-     * @return boolean
-     */
-    public function checkPG(\tgseclib\Math\BigInteger $p, \tgseclib\Math\BigInteger $g, array $extra = []): bool
-    {
-        return $this->__call(__FUNCTION__, [$p, $g, $extra]);
-    }
-    /**
-     * Get diffie-hellman configuration.
-     *
-     * @return \Generator<array>
-     */
-    public function getDhConfig(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Bind temporary and permanent auth keys.
-     *
-     * @param integer $expires_in Date of expiry for binding
-     * @param string  $datacenter DC ID
-     *
-     * @return \Generator<bool>
-     */
-    public function bindTempAuthKey(int $expires_in, string $datacenter, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$expires_in, $datacenter, $extra]);
-    }
-    /**
-     * Asynchronously create, bind and check auth keys for all DCs.
-     *
-     * @return \Generator
-     */
-    public function initAuthorization(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Init auth keys for single DC.
-     *
-     * @param string               $id     DC ID
-     * @param DataCenterConnection $socket DC object
-     *
-     * @return \Generator
-     */
-    public function initAuthorizationSocket(string $id, \danog\MadelineProto\DataCenterConnection $socket, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$id, $socket, $extra]);
-    }
-    /**
-     * Sync authorization data between DCs.
-     *
-     * @param string $id DC ID
-     *
-     * @return \Generator
-     */
-    public function syncAuthorization(string $id, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
     /**
      * Call method and wait asynchronously for response.
@@ -4944,17 +4856,6 @@ class InternalDoc extends APIFactory
     public function tdToTdcli($params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
-    }
-    /**
-     * Sanify TL obtained from JSON for TL serialization.
-     *
-     * @param array $input Data to sanitize
-
-     * @return array
-     */
-    public function convertJsonTL(array $input): array
-    {
-        return \danog\MadelineProto\MTProto::convertJsonTL($input);
     }
     /**
      * Generate MTProto vector hash.

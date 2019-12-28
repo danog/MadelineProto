@@ -53,6 +53,8 @@ trait AuthKeyHandler
      * @param int    $expires_in Expiry date of auth key, -1 for permanent auth key
      * @param string $datacenter DC ID
      *
+     * @internal
+     *
      * @return \Generator<AuthKey>
      */
     public function createAuthKey(int $expires_in, string $datacenter): \Generator
@@ -465,6 +467,8 @@ trait AuthKeyHandler
      * @param BigInteger $p
      * @param BigInteger $g
      *
+     * @internal
+     *
      * @return boolean
      */
     public function checkPG(BigInteger $p, BigInteger $g): bool
@@ -516,6 +520,8 @@ trait AuthKeyHandler
     /**
      * Get diffie-hellman configuration.
      *
+     * @internal
+     *
      * @return \Generator<array>
      */
     public function getDhConfig(): \Generator
@@ -538,6 +544,8 @@ trait AuthKeyHandler
      *
      * @param integer $expires_in Date of expiry for binding
      * @param string  $datacenter DC ID
+     *
+     * @internal
      *
      * @return \Generator<bool>
      */
@@ -636,6 +644,8 @@ trait AuthKeyHandler
     /**
      * Asynchronously create, bind and check auth keys for all DCs.
      *
+     * @internal
+     *
      * @return \Generator
      */
     public function initAuthorization(): \Generator
@@ -697,6 +707,8 @@ trait AuthKeyHandler
      *
      * @param string               $id     DC ID
      * @param DataCenterConnection $socket DC object
+     *
+     * @internal
      *
      * @return \Generator
      */
@@ -765,6 +777,8 @@ trait AuthKeyHandler
      * Sync authorization data between DCs.
      *
      * @param string $id DC ID
+     *
+     * @internal
      *
      * @return \Generator
      */

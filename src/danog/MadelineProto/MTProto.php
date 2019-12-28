@@ -1414,6 +1414,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param string $datacenter DC ID
      *
+     * @internal
+     *
      * @return boolean
      */
     public function isHttp(string $datacenter): bool

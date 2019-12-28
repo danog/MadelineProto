@@ -48,8 +48,8 @@ trait Tools
      *
      * @param array $input Data to sanitize
      *
-     * @internal 
-     * 
+     * @internal
+     *
      * @return array
      */
     public static function convertJsonTL(array $input): array
