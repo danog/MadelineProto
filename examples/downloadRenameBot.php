@@ -178,7 +178,9 @@ while (true) {
     try {
         $MadelineProto->loop();
     } catch (\Throwable $e) {
-        $MadelineProto->logger("Surfaced: $e");
-        $MadelineProto->getEventHandler(['async' => false])->report("Surfaced: $e");
+        try {
+            $MadelineProto->logger("Surfaced: $e");
+            $MadelineProto->getEventHandler(['async' => false])->report("Surfaced: $e");
+        } catch (\Throwable $e) {}
     }
 }
