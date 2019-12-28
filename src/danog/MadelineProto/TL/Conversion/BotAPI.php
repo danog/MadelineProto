@@ -35,7 +35,7 @@ trait BotAPI
      *
      * @return int
      */
-    public function mbStrlen(string $text): int
+    public static function mbStrlen(string $text): int
     {
         $length = 0;
         $textlength = \strlen($text);
@@ -58,9 +58,9 @@ trait BotAPI
      *
      * @return string
      */
-    public function mbSubstr(string $text, int $offset, $length = null): string
+    public static function mbSubstr(string $text, int $offset, $length = null): string
     {
-        $mb_text_length = $this->mbStrlen($text);
+        $mb_text_length = self::mbStrlen($text);
         if ($offset < 0) {
             $offset = $mb_text_length + $offset;
         }
@@ -99,7 +99,7 @@ trait BotAPI
      *
      * @return string
      */
-    public function mbStrSplit(string $text, int $length): string
+    public static function mbStrSplit(string $text, int $length): string
     {
         $tlength = \mb_strlen($text, 'UTF-8');
         $result = [];

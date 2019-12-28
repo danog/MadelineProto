@@ -37,6 +37,8 @@ trait Noop
     /**
      * Noop update handler.
      *
+     * @internal
+     *
      * @return void
      */
     public function noop(): void

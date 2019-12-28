@@ -302,7 +302,7 @@ trait PeerHandler
      *
      * @return ?int
      */
-    public function getFolderId($id): ?int
+    public static function getFolderId($id): ?int
     {
         if (!\is_array($id)) {
             return null;
@@ -319,7 +319,7 @@ trait PeerHandler
      *
      * @return int
      */
-    public function getId($id)
+    public static function getId($id)
     {
         if (\is_array($id)) {
             switch ($id['_']) {

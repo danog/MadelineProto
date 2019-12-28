@@ -29,7 +29,7 @@ trait Extension
      *
      * @return string
      */
-    public function getMimeFromExtension(string $extension, string $default): string
+    public static function getMimeFromExtension(string $extension, string $default): string
     {
         $ext = \ltrim($extension, '.');
         if (isset(MTProto::ALL_MIMES[$ext])) {
@@ -46,7 +46,7 @@ trait Extension
      *
      * @return string
      */
-    public function getExtensionFromMime(string $mime): string
+    public static function getExtensionFromMime(string $mime): string
     {
         foreach (self::ALL_MIMES as $key => $value) {
             if (\array_search($mime, $value) !== false) {
@@ -65,7 +65,7 @@ trait Extension
      *
      * @return string
      */
-    public function getExtensionFromLocation($location, string $default): string
+    public static function getExtensionFromLocation($location, string $default): string
     {
         return $default;
         //('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 2], ['heavy' => true, 'datacenter' => $location['dc_id']]);
@@ -101,7 +101,7 @@ trait Extension
      *
      * @return string
      */
-    public function getMimeFromFile(string $file): string
+    public static function getMimeFromFile(string $file): string
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
 
@@ -115,7 +115,7 @@ trait Extension
      *
      * @return string
      */
-    public function getMimeFromBuffer(string $buffer): string
+    public static function getMimeFromBuffer(string $buffer): string
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
 

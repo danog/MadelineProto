@@ -62,8 +62,8 @@ interface auth
 
     /**
      * Terminates all user's authorized sessions except for the current one.
-
-After calling this method it is necessary to reregister the current device using the method [account.registerDevice](../methods/account.registerDevice.md)
+     *
+     * After calling this method it is necessary to reregister the current device using the method [account.registerDevice](https://docs.madelineproto.xyz/API_docs/methods/account.registerDevice.html)
      *
      * @return bool
      */
@@ -143,7 +143,7 @@ After calling this method it is necessary to reregister the current device using
     public function requestPasswordRecovery();
 
     /**
-     * Reset the [2FA password](https://core.telegram.org/api/srp) using the recovery code sent using [auth.requestPasswordRecovery](../methods/auth.requestPasswordRecovery.md).
+     * Reset the [2FA password](https://core.telegram.org/api/srp) using the recovery code sent using [auth.requestPasswordRecovery](https://docs.madelineproto.xyz/API_docs/methods/auth.requestPasswordRecovery.html).
      *
      * Parameters:
      * * `string` **code** - Code received via email
@@ -159,7 +159,7 @@ After calling this method it is necessary to reregister the current device using
      *
      * Parameters:
      * * `string` **phone_number**    - The phone number
-     * * `string` **phone_code_hash** - The phone code hash obtained from [auth.sendCode](../methods/auth.sendCode.md)
+     * * `string` **phone_code_hash** - The phone code hash obtained from [auth.sendCode](https://docs.madelineproto.xyz/API_docs/methods/auth.sendCode.html)
      *
      * @param array $params Parameters
      *
@@ -172,7 +172,7 @@ After calling this method it is necessary to reregister the current device using
      *
      * Parameters:
      * * `string` **phone_number**    - Phone number
-     * * `string` **phone_code_hash** - Phone code hash from [auth.sendCode](../methods/auth.sendCode.md)
+     * * `string` **phone_code_hash** - Phone code hash from [auth.sendCode](https://docs.madelineproto.xyz/API_docs/methods/auth.sendCode.html)
      *
      * @param array $params Parameters
      *
@@ -202,7 +202,7 @@ interface account
      * * `boolean` **no_muted**    - Optional: Avoid receiving (silent and invisible background) notifications. Useful to save battery.
      * * `int`     **token_type**  - Device token type.<br>**Possible values**:<br>`1` \- APNS (device token for apple push)<br>`2` \- FCM (firebase token for google firebase)<br>`3` \- MPNS (channel URI for microsoft push)<br>`4` \- Simple push (endpoint for firefox's simple push API)<br>`5` \- Ubuntu phone (token for ubuntu push)<br>`6` \- Blackberry (token for blackberry push)<br>`7` \- Unused<br>`8` \- WNS (windows push)<br>`9` \- APNS VoIP (token for apple push VoIP)<br>`10` \- Web push (web push, see below)<br>`11` \- MPNS VoIP (token for microsoft push VoIP)<br>`12` \- Tizen (token for tizen push)<br><br>For `10` web push, the token must be a JSON-encoded object containing the keys described in [PUSH updates](https://core.telegram.org/api/push-updates)
      * * `string`  **token**       - Device token
-     * * `Bool`    **app_sandbox** - If [(boolTrue)](../constructors/boolTrue.md) is transmitted, a sandbox-certificate will be used during transmission.
+     * * `Bool`    **app_sandbox** - If [(boolTrue)](https://docs.madelineproto.xyz/API_docs/constructors/boolTrue.html) is transmitted, a sandbox-certificate will be used during transmission.
      * * `bytes`   **secret**      - For FCM and APNS VoIP, optional encryption key used to encrypt push notifications
      * * `[int]`   **other_uids**  - Other UIDs
      *
@@ -276,7 +276,7 @@ interface account
      * Updates online user status.
      *
      * Parameters:
-     * * `Bool` **offline** - If [(boolTrue)](../constructors/boolTrue.md) is transmitted, user status will change to [(userStatusOffline)](../constructors/userStatusOffline.md).
+     * * `Bool` **offline** - If [(boolTrue)](https://docs.madelineproto.xyz/API_docs/constructors/boolTrue.html) is transmitted, user status will change to [(userStatusOffline)](https://docs.madelineproto.xyz/API_docs/constructors/userStatusOffline.html).
      *
      * @param array $params Parameters
      *
@@ -407,8 +407,8 @@ interface account
      *
      * Parameters:
      * * `string` **phone_number**    - New phone number
-     * * `string` **phone_code_hash** - Phone code hash received when calling [account.sendChangePhoneCode](../methods/account.sendChangePhoneCode.md)
-     * * `string` **phone_code**      - Phone code received when calling [account.sendChangePhoneCode](../methods/account.sendChangePhoneCode.md)
+     * * `string` **phone_code_hash** - Phone code hash received when calling [account.sendChangePhoneCode](https://docs.madelineproto.xyz/API_docs/methods/account.sendChangePhoneCode.html)
+     * * `string` **phone_code**      - Phone code received when calling [account.sendChangePhoneCode](https://docs.madelineproto.xyz/API_docs/methods/account.sendChangePhoneCode.html)
      *
      * @param array $params Parameters
      *
@@ -529,7 +529,7 @@ interface account
      * Log out an active web [telegram login](https://core.telegram.org/widgets/login) session.
      *
      * Parameters:
-     * * `long` **hash** - [Session](../constructors/webAuthorization.md) hash
+     * * `long` **hash** - [Session](https://docs.madelineproto.xyz/API_docs/constructors/webAuthorization.html) hash
      *
      * @param array $params Parameters
      *
@@ -636,8 +636,8 @@ interface account
      *
      * Parameters:
      * * `string` **phone_number**    - Phone number
-     * * `string` **phone_code_hash** - Phone code hash received from the call to [account.sendVerifyPhoneCode](../methods/account.sendVerifyPhoneCode.md)
-     * * `string` **phone_code**      - Code received after the call to [account.sendVerifyPhoneCode](../methods/account.sendVerifyPhoneCode.md)
+     * * `string` **phone_code_hash** - Phone code hash received from the call to [account.sendVerifyPhoneCode](https://docs.madelineproto.xyz/API_docs/methods/account.sendVerifyPhoneCode.html)
+     * * `string` **phone_code**      - Code received after the call to [account.sendVerifyPhoneCode](https://docs.madelineproto.xyz/API_docs/methods/account.sendVerifyPhoneCode.html)
      *
      * @param array $params Parameters
      *
@@ -967,8 +967,8 @@ interface users
 
     /**
      * Notify the user that the sent [passport](https://core.telegram.org/passport) data contains some errors The user will not be able to re-submit their Passport data to you until the errors are fixed (the contents of the field for which you returned the error must change).
-
-Use this if the data submitted by the user doesn't satisfy the standards your service requires for any reason. For example, if a birthday date seems invalid, a submitted document is blurry, a scan shows evidence of tampering, etc. Supply some details in the error message to make sure the user knows how to correct the issues.
+     *
+     * Use this if the data submitted by the user doesn't satisfy the standards your service requires for any reason. For example, if a birthday date seems invalid, a submitted document is blurry, a scan shows evidence of tampering, etc. Supply some details in the error message to make sure the user knows how to correct the issues.
      *
      * Parameters:
      * * `InputUser`          **id**     - The user
@@ -1190,7 +1190,7 @@ interface contacts
     public function addContact($params);
 
     /**
-     * If the [peer settings](../constructors/peerSettings.md) of a new user allow us to add him as contact, add that user as contact.
+     * If the [peer settings](https://docs.madelineproto.xyz/API_docs/constructors/peerSettings.html) of a new user allow us to add him as contact, add that user as contact.
      *
      * Parameters:
      * * `InputUser` **id** - The user to add as contact
@@ -1269,7 +1269,7 @@ interface messages
      * Gets back found messages.
      *
      * Parameters:
-     * * `InputPeer`      **peer**       - User or chat, histories with which are searched, or [(inputPeerEmpty)](../constructors/inputPeerEmpty.md) constructor for global search
+     * * `InputPeer`      **peer**       - User or chat, histories with which are searched, or [(inputPeerEmpty)](https://docs.madelineproto.xyz/API_docs/constructors/inputPeerEmpty.html) constructor for global search
      * * `string`         **q**          - Text search request
      * * `InputUser`      **from_id**    - Optional: Only return messages sent by the specified user ID
      * * `MessagesFilter` **filter**     - Filter to return only specified message types
@@ -1342,7 +1342,7 @@ interface messages
     public function receivedMessages($params);
 
     /**
-     * Sends a current user typing event (see [SendMessageAction](../types/SendMessageAction.md) for all event types) to a conversation partner or group.
+     * Sends a current user typing event (see [SendMessageAction](https://docs.madelineproto.xyz/API_docs/types/SendMessageAction.html) for all event types) to a conversation partner or group.
      *
      * Parameters:
      * * `InputPeer`         **peer**   - Target user or group
@@ -1416,7 +1416,7 @@ interface messages
     public function forwardMessages($params);
 
     /**
-     * Report a new incoming chat for spam, if the [peer settings](../constructors/peerSettings.md) of the chat allow us to do that.
+     * Report a new incoming chat for spam, if the [peer settings](https://docs.madelineproto.xyz/API_docs/constructors/peerSettings.html) of the chat allow us to do that.
      *
      * Parameters:
      * * `InputPeer` **peer** - Peer to report
@@ -1600,7 +1600,7 @@ interface messages
      *
      * Parameters:
      * * `InputEncryptedChat` **peer**   - Secret chat ID
-     * * `Bool`               **typing** - Typing.<br>**Possible values**:<br>[(boolTrue)](../constructors/boolTrue.md), if the user started typing and more than **5 seconds** have passed since the last request<br>[(boolFalse)](../constructors/boolFalse.md), if the user stopped typing
+     * * `Bool`               **typing** - Typing.<br>**Possible values**:<br>[(boolTrue)](https://docs.madelineproto.xyz/API_docs/constructors/boolTrue.html), if the user started typing and more than **5 seconds** have passed since the last request<br>[(boolFalse)](https://docs.madelineproto.xyz/API_docs/constructors/boolFalse.html), if the user stopped typing
      *
      * @param array $params Parameters
      *
@@ -1868,7 +1868,7 @@ interface messages
      * Parameters:
      * * `int`       **folder_id**   - Optional: Folder where to search
      * * `string`    **q**           - Query
-     * * `int`       **offset_rate** - Initially 0, then set to the [`next_rate` parameter of messages.messagesSlice](../constructors/messages.messagesSlice.md)
+     * * `int`       **offset_rate** - Initially 0, then set to the [`next_rate` parameter of messages.messagesSlice](https://docs.madelineproto.xyz/API_docs/constructors/messages.messagesSlice.html)
      * * `InputPeer` **offset_peer** - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      * * `int`       **offset_id**   - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      * * `int`       **limit**       - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
@@ -1979,17 +1979,17 @@ interface messages
     public function setInlineBotResults($params);
 
     /**
-     * Send a result obtained using [messages.getInlineBotResults](../methods/messages.getInlineBotResults.md).
+     * Send a result obtained using [messages.getInlineBotResults](https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html).
      *
      * Parameters:
      * * `boolean`   **silent**          - Optional: Whether to send the message silently (no notification will be triggered on the other client)
      * * `boolean`   **background**      - Optional: Whether to send the message in background
      * * `boolean`   **clear_draft**     - Optional: Whether to clear the [draft](https://core.telegram.org/api/drafts)
-     * * `boolean`   **hide_via**        - Optional: Whether to hide the `via @botname` in the resulting message (only for bot usernames encountered in the [config](../constructors/config.md))
+     * * `boolean`   **hide_via**        - Optional: Whether to hide the `via @botname` in the resulting message (only for bot usernames encountered in the [config](https://docs.madelineproto.xyz/API_docs/constructors/config.html))
      * * `InputPeer` **peer**            - Destination
      * * `int`       **reply_to_msg_id** - Optional: ID of the message this message should reply to
-     * * `long`      **query_id**        - Query ID from [messages.getInlineBotResults](../methods/messages.getInlineBotResults.md)
-     * * `string`    **id**              - Result ID from [messages.getInlineBotResults](../methods/messages.getInlineBotResults.md)
+     * * `long`      **query_id**        - Query ID from [messages.getInlineBotResults](https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html)
+     * * `string`    **id**              - Result ID from [messages.getInlineBotResults](https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html)
      * * `int`       **schedule_date**   - Optional: Scheduled message date for scheduled messages
      *
      * @param array $params Parameters
@@ -2353,7 +2353,7 @@ interface messages
     public function getPinnedDialogs($params);
 
     /**
-     * If you sent an invoice requesting a shipping address and the parameter is\_flexible was specified, the bot will receive an [updateBotShippingQuery](../constructors/updateBotShippingQuery.md) update. Use this method to reply to shipping queries.
+     * If you sent an invoice requesting a shipping address and the parameter is\_flexible was specified, the bot will receive an [updateBotShippingQuery](https://docs.madelineproto.xyz/API_docs/constructors/updateBotShippingQuery.html) update. Use this method to reply to shipping queries.
      *
      * Parameters:
      * * `long`             **query_id**         - Unique identifier for the query to be answered
@@ -2367,9 +2367,9 @@ interface messages
     public function setBotShippingResults($params);
 
     /**
-     * Once the user has confirmed their payment and shipping details, the bot receives an [updateBotPrecheckoutQuery](../constructors/updateBotPrecheckoutQuery.md) update.
-Use this method to respond to such pre-checkout queries.
-**Note**: Telegram must receive an answer within 10 seconds after the pre-checkout query was sent.
+     * Once the user has confirmed their payment and shipping details, the bot receives an [updateBotPrecheckoutQuery](https://docs.madelineproto.xyz/API_docs/constructors/updateBotPrecheckoutQuery.html) update.
+     * Use this method to respond to such pre-checkout queries.
+     * **Note**: Telegram must receive an answer within 10 seconds after the pre-checkout query was sent.
      *
      * Parameters:
      * * `boolean` **success**  - Optional: Set this flag if everything is alright (goods are available, etc.) and the bot is ready to proceed with the order, otherwise do not set it, and set the `error` field, instead
@@ -2386,7 +2386,7 @@ Use this method to respond to such pre-checkout queries.
      * Upload a file and associate it to a chat (without actually sending it to the chat).
      *
      * Parameters:
-     * * `InputPeer`  **peer**  - The chat, can be an [inputPeerEmpty](../constructors/inputPeerEmpty.md) for bots
+     * * `InputPeer`  **peer**  - The chat, can be an [inputPeerEmpty](https://docs.madelineproto.xyz/API_docs/constructors/inputPeerEmpty.html) for bots
      * * `InputMedia` **media** - File uploaded in chunks as described in [files »](https://core.telegram.org/api/files)
      *
      * @param array $params Parameters
@@ -2570,7 +2570,7 @@ Use this method to respond to such pre-checkout queries.
     public function updatePinnedMessage($params);
 
     /**
-     * Vote in a [poll](../constructors/poll.md).
+     * Vote in a [poll](https://docs.madelineproto.xyz/API_docs/constructors/poll.html).
      *
      * Parameters:
      * * `InputPeer` **peer**    - The chat where the poll was sent
@@ -2698,7 +2698,7 @@ Use this method to respond to such pre-checkout queries.
     public function getEmojiURL($params);
 
     /**
-     * Get the number of results that would be found by a [messages.search](../methods/messages.search.md) call with the same parameters.
+     * Get the number of results that would be found by a [messages.search](https://docs.madelineproto.xyz/API_docs/methods/messages.search.html) call with the same parameters.
      *
      * Parameters:
      * * `InputPeer`        **peer**    - Peer where to search
@@ -2740,7 +2740,7 @@ Use this method to respond to such pre-checkout queries.
     public function acceptUrlAuth($params);
 
     /**
-     * Should be called after the user hides the report spam/add as contact bar of a new chat, effectively prevents the user from executing the actions specified in the [peer's settings](../constructors/peerSettings.md).
+     * Should be called after the user hides the report spam/add as contact bar of a new chat, effectively prevents the user from executing the actions specified in the [peer's settings](https://docs.madelineproto.xyz/API_docs/constructors/peerSettings.html).
      *
      * Parameters:
      * * `InputPeer` **peer** - Peer
@@ -2863,7 +2863,7 @@ interface photos
      * Updates current user profile photo.
      *
      * Parameters:
-     * * `InputFile` **file** - File saved in parts by means of [upload.saveFilePart](../methods/upload.saveFilePart.md) method
+     * * `InputFile` **file** - File saved in parts by means of [upload.saveFilePart](https://docs.madelineproto.xyz/API_docs/methods/upload.saveFilePart.html) method
      *
      * @param array $params Parameters
      *
@@ -3484,11 +3484,11 @@ interface channels
     public function toggleSignatures($params);
 
     /**
-     * Get [channels/supergroups/geogroups](https://core.telegram.org/api/channel) we're admin in. Usually called when the user exceeds the [limit](../constructors/config.md) for owned public [channels/supergroups/geogroups](https://core.telegram.org/api/channel), and the user is given the choice to remove one of his channels/supergroups/geogroups.
+     * Get [channels/supergroups/geogroups](https://core.telegram.org/api/channel) we're admin in. Usually called when the user exceeds the [limit](https://docs.madelineproto.xyz/API_docs/constructors/config.html) for owned public [channels/supergroups/geogroups](https://core.telegram.org/api/channel), and the user is given the choice to remove one of his channels/supergroups/geogroups.
      *
      * Parameters:
      * * `boolean` **by_location** - Optional: Get geogroups
-     * * `boolean` **check_limit** - Optional: If set and the user has reached the limit of owned public [channels/supergroups/geogroups](https://core.telegram.org/api/channel), instead of returning the channel list one of the specified [errors](#possible-errors) will be returned.<br>Useful to check if a new public channel can indeed be created, even before asking the user to enter a channel username to use in [channels.checkUsername](../methods/channels.checkUsername.md)/[channels.updateUsername](../methods/channels.updateUsername.md).
+     * * `boolean` **check_limit** - Optional: If set and the user has reached the limit of owned public [channels/supergroups/geogroups](https://core.telegram.org/api/channel), instead of returning the channel list one of the specified [errors](#possible-errors) will be returned.<br>Useful to check if a new public channel can indeed be created, even before asking the user to enter a channel username to use in [channels.checkUsername](https://docs.madelineproto.xyz/API_docs/methods/channels.checkUsername.html)/[channels.updateUsername](https://docs.madelineproto.xyz/API_docs/methods/channels.updateUsername.html).
      *
      * @param array $params Parameters
      *
@@ -3728,7 +3728,7 @@ interface payments
      *
      * Parameters:
      * * `int`                     **msg_id**             - Message ID of form
-     * * `string`                  **requested_info_id**  - Optional: ID of saved and validated [order info](../constructors/payments.validatedRequestedInfo.md)
+     * * `string`                  **requested_info_id**  - Optional: ID of saved and validated [order info](https://docs.madelineproto.xyz/API_docs/constructors/payments.validatedRequestedInfo.html)
      * * `string`                  **shipping_option_id** - Optional: Chosen shipping option ID
      * * `InputPaymentCredentials` **credentials**        - Payment credentials
      *
@@ -4029,7 +4029,7 @@ class InternalDoc extends APIFactory
          *
          * @return self
          */
-    public function cleanup(array $extra = []): self
+    public function cleanup(array $extra = []): \danog\MadelineProto\MTProto
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -4069,7 +4069,7 @@ class InternalDoc extends APIFactory
      *
      * @return TL
      */
-    public function getTL(array $extra = []): danog\MadelineProto\TL\TL
+    public function getTL(array $extra = []): \danog\MadelineProto\TL\TL
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -4078,7 +4078,7 @@ class InternalDoc extends APIFactory
      *
      * @return Logger
      */
-    public function getLogger(array $extra = []): danog\MadelineProto\Logger
+    public function getLogger(array $extra = []): \danog\MadelineProto\Logger
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -4087,7 +4087,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Amp\Http\Client\DelegateHttpClient
      */
-    public function getHTTPClient(array $extra = []): Amp\Http\Client\DelegateHttpClient
+    public function getHTTPClient(array $extra = []): \Amp\Http\Client\DelegateHttpClient
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -4096,7 +4096,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Amp\Dns\Resolver
      */
-    public function getDNSClient(array $extra = []): Amp\Dns\Resolver
+    public function getDNSClient(array $extra = []): \Amp\Dns\Resolver
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -4129,9 +4129,9 @@ class InternalDoc extends APIFactory
      * @return array
      */
     public function getSettings(array $settings, array $previousSettings = [
-    ], array $extra = []): array
+    ]): array
     {
-        return $this->__call(__FUNCTION__, [$settings, $previousSettings, $extra]);
+        return \danog\MadelineProto\MTProto::getSettings($settings, $previousSettings);
     }
     /**
      * Setup logger.
@@ -4377,9 +4377,9 @@ class InternalDoc extends APIFactory
      *
      * @return array
      */
-    public function aesCalculate(string $msg_key, string $auth_key, bool $to_server = true, array $extra = []): array
+    public function aesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
     {
-        return $this->__call(__FUNCTION__, [$msg_key, $auth_key, $to_server, $extra]);
+        return \danog\MadelineProto\MTProto::aesCalculate($msg_key, $auth_key, $to_server);
     }
     /**
      * AES KDF function for MTProto v1.
@@ -4390,9 +4390,9 @@ class InternalDoc extends APIFactory
      *
      * @return array
      */
-    public function oldAesCalculate(string $msg_key, string $auth_key, bool $to_server = true, array $extra = []): array
+    public function oldAesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
     {
-        return $this->__call(__FUNCTION__, [$msg_key, $auth_key, $to_server, $extra]);
+        return \danog\MadelineProto\MTProto::oldAesCalculate($msg_key, $auth_key, $to_server);
     }
     /**
      * CTR encrypt.
@@ -4403,9 +4403,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function ctrEncrypt(string $message, string $key, string $iv, array $extra = []): string
+    public function ctrEncrypt(string $message, string $key, string $iv): string
     {
-        return $this->__call(__FUNCTION__, [$message, $key, $iv, $extra]);
+        return \danog\MadelineProto\MTProto::ctrEncrypt($message, $key, $iv);
     }
     /**
      * IGE encrypt.
@@ -4416,9 +4416,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function igeEncrypt(string $message, string $key, string $iv, array $extra = []): string
+    public function igeEncrypt(string $message, string $key, string $iv): string
     {
-        return $this->__call(__FUNCTION__, [$message, $key, $iv, $extra]);
+        return \danog\MadelineProto\MTProto::igeEncrypt($message, $key, $iv);
     }
     /**
      * CTR decrypt.
@@ -4429,9 +4429,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function igeDecrypt(string $message, string $key, string $iv, array $extra = []): string
+    public function igeDecrypt(string $message, string $key, string $iv): string
     {
-        return $this->__call(__FUNCTION__, [$message, $key, $iv, $extra]);
+        return \danog\MadelineProto\MTProto::igeDecrypt($message, $key, $iv);
     }
     /**
      * Convert MTProto channel ID to bot API channel ID.
@@ -4440,9 +4440,9 @@ class InternalDoc extends APIFactory
      *
      * @return int
      */
-    public function toSupergroup($id, array $extra = [])
+    public function toSupergroup($id)
     {
-        return $this->__call(__FUNCTION__, [$id, $extra]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     /**
      * Convert bot API channel ID to MTProto channel ID.
@@ -4451,9 +4451,9 @@ class InternalDoc extends APIFactory
      *
      * @return int
      */
-    public function fromSupergroup($id, array $extra = []): int
+    public function fromSupergroup($id): int
     {
-        return $this->__call(__FUNCTION__, [$id, $extra]);
+        return \danog\MadelineProto\MTProto::fromSupergroup($id);
     }
     /**
      * Check whether provided bot API ID is a channel.
@@ -4462,9 +4462,9 @@ class InternalDoc extends APIFactory
      *
      * @return boolean
      */
-    public function isSupergroup($id, array $extra = []): bool
+    public function isSupergroup($id): bool
     {
-        return $this->__call(__FUNCTION__, [$id, $extra]);
+        return \danog\MadelineProto\MTProto::isSupergroup($id);
     }
     /**
      * Add user info.
@@ -4495,9 +4495,9 @@ class InternalDoc extends APIFactory
      *
      * @return ?int
      */
-    public function getFolderId($id, array $extra = []): ?int
+    public function getFolderId($id): ?int
     {
-        return $this->__call(__FUNCTION__, [$id, $extra]);
+        return \danog\MadelineProto\MTProto::getFolderId($id);
     }
     /**
      * Get bot API ID from peer object.
@@ -4506,9 +4506,9 @@ class InternalDoc extends APIFactory
      *
      * @return int
      */
-    public function getId($id, array $extra = [])
+    public function getId($id)
     {
-        return $this->__call(__FUNCTION__, [$id, $extra]);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     /**
      * Get info about peer, returns an Info object.
@@ -4853,9 +4853,9 @@ class InternalDoc extends APIFactory
      *
      * @return int
      */
-    public function mbStrlen(string $text, array $extra = []): int
+    public function mbStrlen(string $text): int
     {
-        return $this->__call(__FUNCTION__, [$text, $extra]);
+        return \danog\MadelineProto\MTProto::mbStrlen($text);
     }
     /**
      * Telegram UTF-8 multibyte substring.
@@ -4866,9 +4866,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function mbSubstr(string $text, int $offset, $length = null, array $extra = []): string
+    public function mbSubstr(string $text, int $offset, $length = null): string
     {
-        return $this->__call(__FUNCTION__, [$text, $offset, $length, $extra]);
+        return \danog\MadelineProto\MTProto::mbSubstr($text, $offset, $length);
     }
     /**
      * Telegram UTF-8 multibyte split.
@@ -4878,9 +4878,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function mbStrSplit(string $text, int $length, array $extra = []): string
+    public function mbStrSplit(string $text, int $length): string
     {
-        return $this->__call(__FUNCTION__, [$text, $length, $extra]);
+        return \danog\MadelineProto\MTProto::mbStrSplit($text, $length);
     }
     /**
      * Convert MTProto parameters to bot API parameters.
@@ -4925,9 +4925,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function getMimeFromExtension(string $extension, string $default, array $extra = []): string
+    public function getMimeFromExtension(string $extension, string $default): string
     {
-        return $this->__call(__FUNCTION__, [$extension, $default, $extra]);
+        return \danog\MadelineProto\MTProto::getMimeFromExtension($extension, $default);
     }
     /**
      * Get extension from mime type.
@@ -4936,9 +4936,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function getExtensionFromMime(string $mime, array $extra = []): string
+    public function getExtensionFromMime(string $mime): string
     {
-        return $this->__call(__FUNCTION__, [$mime, $extra]);
+        return \danog\MadelineProto\MTProto::getExtensionFromMime($mime);
     }
     /**
      * Get extension from file location.
@@ -4948,9 +4948,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function getExtensionFromLocation($location, string $default, array $extra = []): string
+    public function getExtensionFromLocation($location, string $default): string
     {
-        return $this->__call(__FUNCTION__, [$location, $default, $extra]);
+        return \danog\MadelineProto\MTProto::getExtensionFromLocation($location, $default);
     }
     /**
      * Get mime type of file.
@@ -4959,9 +4959,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function getMimeFromFile(string $file, array $extra = []): string
+    public function getMimeFromFile(string $file): string
     {
-        return $this->__call(__FUNCTION__, [$file, $extra]);
+        return \danog\MadelineProto\MTProto::getMimeFromFile($file);
     }
     /**
      * Get mime type from buffer.
@@ -4970,9 +4970,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function getMimeFromBuffer(string $buffer, array $extra = []): string
+    public function getMimeFromBuffer(string $buffer): string
     {
-        return $this->__call(__FUNCTION__, [$buffer, $extra]);
+        return \danog\MadelineProto\MTProto::getMimeFromBuffer($buffer);
     }
     /**
      * Convert tdcli parameters to tdcli.
@@ -5037,9 +5037,9 @@ class InternalDoc extends APIFactory
 
      * @return array
      */
-    public function convertJsonTL(array $input, array $extra = []): array
+    public function convertJsonTL(array $input): array
     {
-        return $this->__call(__FUNCTION__, [$input, $extra]);
+        return \danog\MadelineProto\MTProto::convertJsonTL($input);
     }
     /**
      * Generate MTProto vector hash.
@@ -5048,9 +5048,9 @@ class InternalDoc extends APIFactory
      *
      * @return int Vector hash
      */
-    public function genVectorHash(array $ints, array $extra = []): int
+    public function genVectorHash(array $ints): int
     {
-        return $this->__call(__FUNCTION__, [$ints, $extra]);
+        return \danog\MadelineProto\MTProto::genVectorHash($ints);
     }
     /**
      * Get random integer.
@@ -5059,9 +5059,9 @@ class InternalDoc extends APIFactory
      *
      * @return int
      */
-    public function randomInt($modulus = false, array $extra = []): int
+    public function randomInt($modulus = false): int
     {
-        return $this->__call(__FUNCTION__, [$modulus, $extra]);
+        return \danog\MadelineProto\MTProto::randomInt($modulus);
     }
     /**
      * Get random string of specified length.
@@ -5070,9 +5070,9 @@ class InternalDoc extends APIFactory
      *
      * @return string Random string
      */
-    public function random(int $length, array $extra = []): string
+    public function random(int $length): string
     {
-        return $this->__call(__FUNCTION__, [$length, $extra]);
+        return \danog\MadelineProto\MTProto::random($length);
     }
     /**
      * Positive modulo
@@ -5083,9 +5083,9 @@ class InternalDoc extends APIFactory
      *
      * @return int Modulo
      */
-    public function posmod(int $a, int $b, array $extra = []): int
+    public function posmod(int $a, int $b): int
     {
-        return $this->__call(__FUNCTION__, [$a, $b, $extra]);
+        return \danog\MadelineProto\MTProto::posmod($a, $b);
     }
     /**
      * Unpack base256 signed int.
@@ -5094,9 +5094,9 @@ class InternalDoc extends APIFactory
      *
      * @return integer
      */
-    public function unpackSignedInt($value, array $extra = []): int
+    public function unpackSignedInt($value): int
     {
-        return $this->__call(__FUNCTION__, [$value, $extra]);
+        return \danog\MadelineProto\MTProto::unpackSignedInt($value);
     }
     /**
      * Unpack base256 signed long.
@@ -5105,9 +5105,9 @@ class InternalDoc extends APIFactory
      *
      * @return integer
      */
-    public function unpackSignedLong($value, array $extra = []): int
+    public function unpackSignedLong($value): int
     {
-        return $this->__call(__FUNCTION__, [$value, $extra]);
+        return \danog\MadelineProto\MTProto::unpackSignedLong($value);
     }
     /**
      * Unpack base256 signed long to string.
@@ -5116,9 +5116,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function unpackSignedLongString($value, array $extra = []): string
+    public function unpackSignedLongString($value): string
     {
-        return $this->__call(__FUNCTION__, [$value, $extra]);
+        return \danog\MadelineProto\MTProto::unpackSignedLongString($value);
     }
     /**
      * Convert integer to base256 signed int.
@@ -5127,9 +5127,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function packSignedInt(int $value, array $extra = []): string
+    public function packSignedInt(int $value): string
     {
-        return $this->__call(__FUNCTION__, [$value, $extra]);
+        return \danog\MadelineProto\MTProto::packSignedInt($value);
     }
     /**
      * Convert integer to base256 long.
@@ -5138,9 +5138,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function packSignedLong(int $value, array $extra = []): string
+    public function packSignedLong(int $value): string
     {
-        return $this->__call(__FUNCTION__, [$value, $extra]);
+        return \danog\MadelineProto\MTProto::packSignedLong($value);
     }
     /**
      * Convert value to unsigned base256 int.
@@ -5149,9 +5149,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function packUnsignedInt(int $value, array $extra = []): string
+    public function packUnsignedInt(int $value): string
     {
-        return $this->__call(__FUNCTION__, [$value, $extra]);
+        return \danog\MadelineProto\MTProto::packUnsignedInt($value);
     }
     /**
      * Convert double to binary version.
@@ -5160,9 +5160,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function packDouble(float $value, array $extra = []): string
+    public function packDouble(float $value): string
     {
-        return $this->__call(__FUNCTION__, [$value, $extra]);
+        return \danog\MadelineProto\MTProto::packDouble($value);
     }
     /**
      * Unpack binary double.
@@ -5171,9 +5171,9 @@ class InternalDoc extends APIFactory
      *
      * @return float
      */
-    public function unpackDouble(string $value, array $extra = []): float
+    public function unpackDouble(string $value): float
     {
-        return $this->__call(__FUNCTION__, [$value, $extra]);
+        return \danog\MadelineProto\MTProto::unpackDouble($value);
     }
     /**
      * Synchronously wait for a promise|generator.
@@ -5183,9 +5183,9 @@ class InternalDoc extends APIFactory
      *
      * @return mixed
      */
-    public function wait($promise, $ignoreSignal = false, array $extra = [])
+    public function wait($promise, $ignoreSignal = false)
     {
-        return $this->__call(__FUNCTION__, [$promise, $ignoreSignal, $extra]);
+        return $this->__call(__FUNCTION__, [$promise, $ignoreSignal]);
     }
     /**
      * Returns a promise that succeeds when all promises succeed, and fails if any promise fails.
@@ -5195,9 +5195,9 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function all(array $promises, array $extra = [])
+    public function all(array $promises)
     {
-        return $this->__call(__FUNCTION__, [$promises, $extra]);
+        return $this->__call(__FUNCTION__, [$promises]);
     }
     /**
      * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
@@ -5206,9 +5206,9 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function any(array $promises, array $extra = [])
+    public function any(array $promises)
     {
-        return $this->__call(__FUNCTION__, [$promises, $extra]);
+        return $this->__call(__FUNCTION__, [$promises]);
     }
     /**
      * Resolves with a two-item array delineating successful and failed Promise results.
@@ -5218,9 +5218,9 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function some(array $promises, array $extra = [])
+    public function some(array $promises)
     {
-        return $this->__call(__FUNCTION__, [$promises, $extra]);
+        return $this->__call(__FUNCTION__, [$promises]);
     }
     /**
      * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
@@ -5229,9 +5229,9 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function first(array $promises, array $extra = [])
+    public function first(array $promises)
     {
-        return $this->__call(__FUNCTION__, [$promises, $extra]);
+        return $this->__call(__FUNCTION__, [$promises]);
     }
     /**
      * Create an artificial timeout for any \Generator or Promise.
@@ -5241,9 +5241,9 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function timeout($promise, int $timeout, array $extra = [])
+    public function timeout($promise, int $timeout)
     {
-        return $this->__call(__FUNCTION__, [$promise, $timeout, $extra]);
+        return $this->__call(__FUNCTION__, [$promise, $timeout]);
     }
     /**
      * Convert generator, promise or any other value to a promise.
@@ -5252,9 +5252,9 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function call($promise, array $extra = [])
+    public function call($promise)
     {
-        return $this->__call(__FUNCTION__, [$promise, $extra]);
+        return $this->__call(__FUNCTION__, [$promise]);
     }
     /**
      * Call promise in background.
@@ -5265,9 +5265,9 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function callFork($promise, $actual = null, $file = '', array $extra = [])
+    public function callFork($promise, $actual = null, $file = '')
     {
-        return $this->__call(__FUNCTION__, [$promise, $actual, $file, $extra]);
+        return $this->__call(__FUNCTION__, [$promise, $actual, $file]);
     }
     /**
      * Call promise in background, deferring execution.
@@ -5276,9 +5276,9 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function callForkDefer($promise, array $extra = []): void
+    public function callForkDefer($promise): void
     {
-        $this->__call(__FUNCTION__, [$promise, $extra]);
+        \danog\MadelineProto\MTProto::callForkDefer($promise);
     }
     /**
      * Rethrow error catched in strand.
@@ -5288,9 +5288,9 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function rethrow(\Throwable $e, $file = '', array $extra = []): void
+    public function rethrow(\Throwable $e, $file = ''): void
     {
-        $this->__call(__FUNCTION__, [$e, $file, $extra]);
+        \danog\MadelineProto\MTProto::rethrow($e, $file);
     }
     /**
      * Call promise $b after promise $a.
@@ -5300,9 +5300,9 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function after($a, $b, array $extra = [])
+    public function after($a, $b)
     {
-        return $this->__call(__FUNCTION__, [$a, $b, $extra]);
+        return $this->__call(__FUNCTION__, [$a, $b]);
     }
     /**
      * Asynchronously send noCache headers.
@@ -5312,9 +5312,9 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function noCache(int $status, string $message, array $extra = [])
+    public function noCache(int $status, string $message)
     {
-        return $this->__call(__FUNCTION__, [$status, $message, $extra]);
+        return $this->__call(__FUNCTION__, [$status, $message]);
     }
     /**
      * Asynchronously lock a file
@@ -5326,9 +5326,9 @@ class InternalDoc extends APIFactory
     *
      * @return Promise
      */
-    public function flock(string $file, int $operation, float $polling = 0.1, array $extra = [])
+    public function flock(string $file, int $operation, float $polling = 0.1)
     {
-        return $this->__call(__FUNCTION__, [$file, $operation, $polling, $extra]);
+        return $this->__call(__FUNCTION__, [$file, $operation, $polling]);
     }
     /**
      * Asynchronously sleep.
@@ -5337,9 +5337,9 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function sleep(int $time, array $extra = [])
+    public function sleep(int $time)
     {
-        return $this->__call(__FUNCTION__, [$time, $extra]);
+        return $this->__call(__FUNCTION__, [$time]);
     }
     /**
      * Asynchronously read line.
@@ -5348,9 +5348,9 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function readLine(string $prompt = '', array $extra = [])
+    public function readLine(string $prompt = '')
     {
-        return $this->__call(__FUNCTION__, [$prompt, $extra]);
+        return $this->__call(__FUNCTION__, [$prompt]);
     }
     /**
      * Asynchronously write to stdout/browser.
@@ -5359,9 +5359,9 @@ class InternalDoc extends APIFactory
      *
      * @return Promise
      */
-    public function echo(string $string, array $extra = [])
+    public function echo(string $string)
     {
-        return $this->__call(__FUNCTION__, [$string, $extra]);
+        return $this->__call(__FUNCTION__, [$string]);
     }
     /**
      * Check if is array or similar (traversable && countable && arrayAccess).
@@ -5370,9 +5370,9 @@ class InternalDoc extends APIFactory
      *
      * @return boolean
      */
-    public function isArrayOrAlike($var, array $extra = []): bool
+    public function isArrayOrAlike($var): bool
     {
-        return $this->__call(__FUNCTION__, [$var, $extra]);
+        return \danog\MadelineProto\MTProto::isArrayOrAlike($var);
     }
     /**
      * Convert to camelCase.
@@ -5381,9 +5381,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function fromSnakeCase(string $input, array $extra = []): string
+    public function fromSnakeCase(string $input): string
     {
-        return $this->__call(__FUNCTION__, [$input, $extra]);
+        return \danog\MadelineProto\MTProto::fromSnakeCase($input);
     }
     /**
      * Convert to snake_case.
@@ -5392,9 +5392,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function fromCamelCase(string $input, array $extra = []): string
+    public function fromCamelCase(string $input): string
     {
-        return $this->__call(__FUNCTION__, [$input, $extra]);
+        return \danog\MadelineProto\MTProto::fromCamelCase($input);
     }
     /**
      * Create array.
@@ -5405,7 +5405,7 @@ class InternalDoc extends APIFactory
      */
     public function arr(...$params): array
     {
-        return $this->__call(__FUNCTION__, Tools::arr(...$params));
+        return \danog\MadelineProto\MTProto::arr(...$params);
     }
     /**
      * base64URL decode.
@@ -5414,9 +5414,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function base64urlDecode(string $data, array $extra = []): string
+    public function base64urlDecode(string $data): string
     {
-        return $this->__call(__FUNCTION__, [$data, $extra]);
+        return \danog\MadelineProto\MTProto::base64urlDecode($data);
     }
     /**
      * Base64URL encode.
@@ -5425,9 +5425,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function base64urlEncode(string $data, array $extra = []): string
+    public function base64urlEncode(string $data): string
     {
-        return $this->__call(__FUNCTION__, [$data, $extra]);
+        return \danog\MadelineProto\MTProto::base64urlEncode($data);
     }
     /**
      * null-byte RLE decode.
@@ -5436,9 +5436,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function rleDecode(string $string, array $extra = []): string
+    public function rleDecode(string $string): string
     {
-        return $this->__call(__FUNCTION__, [$string, $extra]);
+        return \danog\MadelineProto\MTProto::rleDecode($string);
     }
     /**
      * null-byte RLE encode.
@@ -5447,9 +5447,9 @@ class InternalDoc extends APIFactory
      *
      * @return string
      */
-    public function rleEncode(string $string, array $extra = []): string
+    public function rleEncode(string $string): string
     {
-        return $this->__call(__FUNCTION__, [$string, $extra]);
+        return \danog\MadelineProto\MTProto::rleEncode($string);
     }
     /**
      * Get final element of array.
@@ -5458,9 +5458,9 @@ class InternalDoc extends APIFactory
      *
      * @return mixed
      */
-    public function end(array $what, array $extra = [])
+    public function end(array $what)
     {
-        return $this->__call(__FUNCTION__, [$what, $extra]);
+        return $this->__call(__FUNCTION__, [$what]);
     }
     /**
      * Escape string for markdown.
@@ -5469,18 +5469,18 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function markdownEscape(string $hwat, array $extra = []): string
+    public function markdownEscape(string $hwat): string
     {
-        return $this->__call(__FUNCTION__, [$hwat, $extra]);
+        return \danog\MadelineProto\MTProto::markdownEscape($hwat);
     }
     /**
      * Whether this is altervista.
      *
      * @return boolean
      */
-    public function isAltervista(array $extra = []): bool
+    public function isAltervista(): bool
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return \danog\MadelineProto\MTProto::isAltervista();
     }
     /**
      * Accesses a private variable from an object.
@@ -5491,9 +5491,9 @@ class InternalDoc extends APIFactory
      * @return mixed
      * @access public
      */
-    public function getVar($obj, string $var, array $extra = [])
+    public function getVar($obj, string $var)
     {
-        return $this->__call(__FUNCTION__, [$obj, $var, $extra]);
+        return $this->__call(__FUNCTION__, [$obj, $var]);
     }
     /**
      * Discard call.
@@ -5623,7 +5623,7 @@ class InternalDoc extends APIFactory
      *
      * @return EventHandler
      */
-    public function getEventHandler(array $extra = []): EventHandler
+    public function getEventHandler(array $extra = []): \EventHandler
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -5788,15 +5788,6 @@ class InternalDoc extends APIFactory
      * @return void
      */
     public function setNoop(array $extra = []): void
-    {
-        $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Noop update handler.
-     *
-     * @return void
-     */
-    public function noop(array $extra = []): void
     {
         $this->__call(__FUNCTION__, [$extra]);
     }

@@ -114,7 +114,7 @@ class AnnotationsBuilder
             if (!\in_array($namespace, $this->TL->getMethodNamespaces())) {
                 continue;
             }
-            $internalDoc[$namespace][$method]['title'] = Lang::$current_lang["method_{$data['method']}"] ?? '';
+            $internalDoc[$namespace][$method]['title'] = \str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], Lang::$current_lang["method_{$data['method']}"] ?? '');
 
             $type = \str_ireplace(['vector<', '>'], [' of ', '[]'], $data['type']);
             foreach ($data['params'] as $param) {
@@ -149,7 +149,7 @@ class AnnotationsBuilder
                 $opt = ($param['pow'] ?? false) ? 'Optional: ' : '';
                 $internalDoc[$namespace][$method]['attr'][$param['name']] = [
                     'type' => $ptype,
-                    'description' => $opt.(Lang::$current_lang["method_{$data['method']}_param_{$param['name']}_type_{$param['type']}"] ?? '')
+                    'description' => \str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], $opt.(Lang::$current_lang["method_{$data['method']}_param_{$param['name']}_type_{$param['type']}"] ?? ''))
                 ];
             }
             if ($type === 'Bool') {
@@ -181,6 +181,15 @@ class AnnotationsBuilder
             }
             if (\strpos($method->getDocComment() ?? '', '@internal') !== false) {
                 continue;
+            }
+            $static = $method->isStatic();
+
+            if (!$static) {
+                $code = \file_get_contents($method->getFileName());
+                $code = \implode("\n", \array_slice(\explode("\n", $code), $method->getStartLine(), $method->getEndLine() - $method->getStartLine()));
+                if (\strpos($code, '$this') === false) {
+                    Logger::log("$name should be STATIC!", Logger::FATAL_ERROR);
+                }
             }
 
             if ($name == 'methodCallAsyncRead') {
@@ -240,27 +249,38 @@ class AnnotationsBuilder
                 }
                 $paramList .= '$'.$param->getName().', ';
             }
-            if (!$hasVariadic) {
+            if (!$hasVariadic && !$static) {
                 $paramList .= '$extra, ';
                 $doc .= 'array $extra = []';
             }
             $doc = \rtrim($doc, ', ');
             $paramList = \rtrim($paramList, ', ');
             $doc .= ")";
+            $async = true;
             if (($type = $method->getReturnType()) && !\in_array($type->getName(), [\Generator::class, Promise::class])) {
                 $doc .= ': ';
                 if ($type->allowsNull()) {
                     $doc .= '?';
                 }
-                $doc .= $type->getName();
+                if (!$type->isBuiltin()) {
+                    $doc .= '\\';
+                }
+                $doc .= $type->getName() === 'self' ? $method->getDeclaringClass()->getName() : $type->getName();
+                $async = false;
             }
-            $paramList = $hasVariadic ? "Tools::arr($paramList)" : "[$paramList]";
+            $finalParamList = $hasVariadic ? "Tools::arr($paramList)" : "[$paramList]";
 
             $ret = $type && $type->getName() === 'void' ? '' : 'return';
 
-            $doc .= "\n{\n";
-            $doc .= "    $ret \$this->__call(__FUNCTION__, $paramList);\n";
-            $doc .= "}\n";
+            if ($async || !$static) {
+                $doc .= "\n{\n";
+                $doc .= "    $ret \$this->__call(__FUNCTION__, $finalParamList);\n";
+                $doc .= "}\n";
+            } else {
+                $doc .= "\n{\n";
+                $doc .= "    $ret \\".$method->getDeclaringClass()->getName()."::".$name."($paramList);\n";
+                $doc .= "}\n";
+            }
 
             if (!$method->getDocComment()) {
                 Logger::log("$name has no PHPDOC!", Logger::FATAL_ERROR);
@@ -291,8 +311,9 @@ class AnnotationsBuilder
                     \fwrite($handle, $properties['method']);
                     continue;
                 }
+                $title = \implode("\n     * ", \explode("\n", $properties['title']));
                 \fwrite($handle, "\n    /**\n");
-                \fwrite($handle, "     * {$properties['title']}\n");
+                \fwrite($handle, "     * {$title}\n");
                 \fwrite($handle, "     *\n");
                 if (isset($properties['attr'])) {
                     \fwrite($handle, "     * Parameters: \n");
