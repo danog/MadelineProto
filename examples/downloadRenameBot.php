@@ -88,8 +88,9 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             }
             if (isset($this->states[$peerId])) {
                 $name = $update['message']['message'];
-                list($file, $id) = $this->states[$peerId];
+                list($url, $id) = $this->states[$peerId];
                 unset($this->states[$peerId]);
+                $method = 'uploadFromTgFile';
             } else {
                 $url = \explode(' ', $update['message']['message'], 2);
                 $name = \trim($url[1] ?? \basename($update['message']['message']));
@@ -100,24 +101,24 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                 if (\strpos($url, 'http') !== 0) {
                     $url = "http://$url";
                 }
-
-                $id = yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Preparing...', 'reply_to_msg_id' => $messageId])['id'];
-                $file = yield $this->uploadFromUrl(new \danog\MadelineProto\FileCallback(
-                    $url,
-                    function ($progress) use ($peerId, $id) {
-                        static $prev = 0;
-                        $progressR = (int) ($progress / 10);
-                        if ($progressR === $prev) {
-                            return;
-                        }
-                        $prev = $progressR;
-                        try {
-                            yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => 'Upload progress: '.$progress.'%']);
-                        } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        }
-                    }
-                ));
+                $method = 'uploadFromUrl';
             }
+            $id = yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Preparing...', 'reply_to_msg_id' => $messageId])['id'];
+            $file = yield $this->$method(new \danog\MadelineProto\FileCallback(
+                $url,
+                function ($progress) use ($peerId, $id) {
+                    static $prev = 0;
+                    $progressR = (int) ($progress / 10);
+                    if ($progressR === $prev) {
+                        return;
+                    }
+                    $prev = $progressR;
+                    try {
+                        yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => 'Upload progress: '.$progress.'%']);
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    }
+                }
+            ));
             yield $this->messages->sendMedia(
                 [
                     'peer' => $peerId,
