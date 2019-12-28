@@ -384,7 +384,7 @@ class API extends InternalDoc
             //Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
 
             if ($filename == '') {
-                throw new \danog\MadelineProto\Exception('Empty filename');
+                return;
             }
             if (isset($this->API->flushSettings) && $this->API->flushSettings) {
                 $this->API->flushSettings = false;

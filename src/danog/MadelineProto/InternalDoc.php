@@ -4703,9 +4703,9 @@ class InternalDoc extends APIFactory
      * @param string  $text   Text
      * @param integer $length Length
      *
-     * @return string
+     * @return array
      */
-    public function mbStrSplit(string $text, int $length): string
+    public function mbStrSplit(string $text, int $length): array
     {
         return \danog\MadelineProto\MTProto::mbStrSplit($text, $length);
     }

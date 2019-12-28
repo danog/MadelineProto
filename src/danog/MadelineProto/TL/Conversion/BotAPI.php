@@ -557,7 +557,7 @@ trait BotAPI
         }
     }
     /**
-     * Convert markdown and HTML messages
+     * Convert markdown and HTML messages.
      *
      * @param array $arguments Arguments
      *
@@ -603,7 +603,7 @@ trait BotAPI
     }
 
     /**
-     * Split too long message into chunks
+     * Split too long message into chunks.
      *
      * @param array $args Arguments
      *
