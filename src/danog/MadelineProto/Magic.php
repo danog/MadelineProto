@@ -326,7 +326,7 @@ class Magic
                     Magic::shutdown(1);
                 }));
             }
-            if (!self::$altervista && !self::$zerowebhost) {
+            /*if (!self::$altervista && !self::$zerowebhost) {
                 $DohConfig = new DoHConfig(
                     [
                         new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'),
@@ -334,7 +334,7 @@ class Magic
                     ]
                 );
                 resolver(new Rfc8484StubResolver($DohConfig));
-            }
+            }*/
             if (PHP_SAPI !== 'cli') {
                 try {
                     \error_reporting(E_ALL);
