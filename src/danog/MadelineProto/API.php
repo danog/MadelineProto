@@ -20,11 +20,16 @@
 namespace danog\MadelineProto;
 
 use Amp\Deferred;
+use Amp\Promise;
+
 use function Amp\File\exists;
 use function Amp\File\get;
 use function Amp\File\put;
 use function Amp\File\rename as renameAsync;
 
+/**
+ * Main API wrapper for MadelineProto.
+ */
 class API extends InternalDoc
 {
     use \danog\Serializable;
@@ -38,13 +43,40 @@ class API extends InternalDoc
      * @var MTProto
      */
     public $API;
+    /**
+     * Whether we're getting our API ID.
+     *
+     * @internal
+     *
+     * @var boolean
+     */
     public $getting_api_id = false;
+    /**
+     * my.telegram.org API wrapper.
+     *
+     * @internal
+     *
+     * @var MyTelegramOrgWrapper
+     */
     public $my_telegram_org_wrapper;
+    /**
+     * Async ini tpromise.
+     *
+     * @var Promise
+     */
     public $asyncAPIPromise;
     private $oldInstance = false;
     private $destructing = false;
 
-    public function __magic_construct($params = [], $settings = [])
+    /**
+     * Magic constructor function.
+     *
+     * @param array $params   Params
+     * @param array $settings Settings
+     *
+     * @return void
+     */
+    public function __magic_construct($params = [], $settings = []): void
     {
         Magic::classExists();
         $deferred = new Deferred();
@@ -63,7 +95,16 @@ class API extends InternalDoc
         }
     }
 
-    public function __construct_async($params, $settings, $deferred)
+    /**
+     * Async constructor function.
+     *
+     * @param mixed $params   Params
+     * @param mixed $settings Settings
+     * @param mixed $deferred Deferred
+     *
+     * @return \Generator
+     */
+    public function __construct_async($params, $settings, $deferred): \Generator
     {
         if (\is_string($params)) {
             Logger::constructorFromSettings($settings);
@@ -186,7 +227,14 @@ class API extends InternalDoc
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 
-    public function async($async)
+    /**
+     * Enable or disable async.
+     *
+     * @param bool $async Whether to enable or disable async
+     *
+     * @return void
+     */
+    public function async(bool $async): void
     {
         $this->async = $async;
 
@@ -197,11 +245,11 @@ class API extends InternalDoc
         }
     }
 
-    public function __wakeup()
-    {
-        //$this->APIFactory();
-    }
-
+    /**
+     * Destruct function.
+     *
+     * @internal
+     */
     public function __destruct()
     {
         if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread()) || Magic::isFork()) {
@@ -223,18 +271,37 @@ class API extends InternalDoc
         //restore_error_handler();
     }
 
-    public function __sleep()
+    /**
+     * Sleep function.
+     *
+     * @internal
+     *
+     * @return array
+     */
+    public function __sleep(): array
     {
         return ['API', 'web_api_template', 'getting_api_id', 'my_telegram_org_wrapper'];
     }
 
 
+    /**
+     * Custom fast getSelf.
+     *
+     * @internal
+     *
+     * @return array|false
+     */
     public function myGetSelf()
     {
         return isset($this->API) && isset($this->API->authorization['user']) ? $this->API->authorization['user'] : false;
     }
 
-    public function APIFactory()
+    /**
+     * Init API wrapper.
+     *
+     * @return void
+     */
+    private function APIFactory(): void
     {
         if ($this->API && !$this->API->asyncInitPromise) {
             foreach ($this->API->getMethodNamespaces() as $namespace) {
@@ -281,7 +348,12 @@ class API extends InternalDoc
         }
     }
 
-    public function getAllMethods()
+    /**
+     * Get full list of MTProto and API methods.
+     *
+     * @return array
+     */
+    public function getAllMethods(): array
     {
         if ($this->asyncInitPromise) {
             $this->init();
@@ -294,14 +366,20 @@ class API extends InternalDoc
         return \array_merge($methods, \get_class_methods($this->API));
     }
 
-    public function serialize($filename = null)
+    /**
+     * Serialize session.
+     *
+     * @param string $filename File name
+     *
+     * @internal Do not use this manually, the session is already serialized automatically
+     *
+     * @return Promise
+     */
+    public function serialize(string $filename = ''): Promise
     {
         return Tools::callFork((function () use ($filename) {
-            if ($filename === null) {
-                $filename = $this->session;
-            }
             if (empty($filename)) {
-                return;
+                $filename = $this->session;
             }
             //Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
 

@@ -23,12 +23,50 @@ use danog\MadelineProto\Async\AsyncConstruct;
 
 abstract class AbstractAPIFactory extends AsyncConstruct
 {
+    /**
+     * Namespace.
+     *
+     * @internal
+     *
+     * @var string
+     */
     public $namespace = '';
+    /**
+     * MTProto instance.
+     *
+     * @internal
+     *
+     * @var MTProto
+     */
     public $API;
+    /**
+     * Whether lua is being used.
+     *
+     * @internal
+     *
+     * @var boolean
+     */
     public $lua = false;
+    /**
+     * Whether async is enabled.
+     *
+     * @internal
+     *
+     * @var boolean
+     */
     public $async = false;
+    /**
+     * Async init promise.
+     *
+     * @var Promise
+     */
     public $asyncAPIPromise;
 
+    /**
+     * Method list.
+     *
+     * @var string[]
+     */
     protected $methods = [];
 
     public function __construct($namespace, &$API, &$async)
@@ -38,12 +76,29 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         $this->async = &$async;
     }
 
-    public function async($async)
+    /**
+     * Enable or disable async.
+     *
+     * @param bool $async Whether to enable or disable async
+     *
+     * @return void
+     */
+    public function async(bool $async): void
     {
         $this->async = $async;
     }
 
-    public function __call($name, $arguments)
+    /**
+     * Call async wrapper function.
+     *
+     * @param string $name      Method name
+     * @param array  $arguments Arguments
+     *
+     * @internal
+     *
+     * @return mixed
+     */
+    public function __call(string $name, array $arguments)
     {
         $yielded = Tools::call($this->__call_async($name, $arguments));
         $async = $this->lua === false && (\is_array(\end($arguments)) && isset(\end($arguments)['async']) ? \end($arguments)['async'] : ($this->async && $name !== 'loop'));
@@ -65,7 +120,17 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         }
     }
 
-    public function __call_async($name, $arguments)
+    /**
+     * Call async wrapper function.
+     *
+     * @param string $name      Method name
+     * @param array  $arguments Arguments
+     *
+     * @internal
+     *
+     * @return \Generator
+     */
+    public function __call_async(string $name, array $arguments): \Generator
     {
         if ($this->asyncInitPromise) {
             yield $this->initAsynchronously();
@@ -108,7 +173,16 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         return yield $this->methods[$lower_name](...$arguments);
     }
 
-    public function &__get($name)
+    /**
+     * Get attribute.
+     *
+     * @param string $name Attribute nam
+     *
+     * @internal
+     *
+     * @return mixed
+     */
+    public function &__get(string $name)
     {
         if ($this->asyncAPIPromise) {
             Tools::wait($this->asyncAPIPromise);
@@ -125,7 +199,17 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         return $this->API->storage[$name];
     }
 
-    public function __set($name, $value)
+    /**
+     * Set an attribute.
+     *
+     * @param string $name  Name
+     * @param mixed  $value Value
+     *
+     * @internal
+     *
+     * @return mixed
+     */
+    public function __set(string $name, $value)
     {
         if ($this->asyncAPIPromise) {
             Tools::wait($this->asyncAPIPromise);
@@ -141,7 +225,14 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         return $this->API->storage[$name] = $value;
     }
 
-    public function __isset($name)
+    /**
+     * Whether an attribute exists.
+     *
+     * @param string $name Attribute name
+     *
+     * @return boolean
+     */
+    public function __isset(string $name): bool
     {
         if ($this->asyncAPIPromise) {
             Tools::wait($this->asyncAPIPromise);
@@ -150,7 +241,14 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         return isset($this->API->storage[$name]);
     }
 
-    public function __unset($name)
+    /**
+     * Unset attribute.
+     *
+     * @param string $name Attribute name
+     *
+     * @return void
+     */
+    public function __unset(string $name): void
     {
         if ($this->asyncAPIPromise) {
             Tools::wait($this->asyncAPIPromise);

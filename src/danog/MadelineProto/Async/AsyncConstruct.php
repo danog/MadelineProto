@@ -29,23 +29,47 @@ use danog\MadelineProto\Tools;
  */
 class AsyncConstruct
 {
+    /**
+     * Async init promise.
+     *
+     * @var Promise
+     */
     public $asyncInitPromise;
 
-    public function init()
+    /**
+     * Blockingly init.
+     *
+     * @return void
+     */
+    public function init(): void
     {
         if ($this->asyncInitPromise) {
             Tools::wait($this->asyncInitPromise);
         }
     }
 
-    public function initAsynchronously()
+    /**
+     * Asynchronously init.
+     *
+     * @return \Generator
+     */
+    public function initAsynchronously(): \Generator
     {
         if ($this->asyncInitPromise) {
             yield $this->asyncInitPromise;
         }
     }
 
-    public function setInitPromise($promise)
+    /**
+     * Set init promise.
+     *
+     * @param Promise $promise
+     *
+     * @internal
+     *
+     * @return void
+     */
+    public function setInitPromise($promise): void
     {
         $this->asyncInitPromise = Tools::callFork($promise);
         $this->asyncInitPromise->onResolve(function ($error, $result) {

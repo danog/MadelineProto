@@ -4174,15 +4174,6 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$reconnectAll, $extra]);
     }
     /**
-     * Clean up MadelineProto session after logout.
-     *
-     * @return void
-     */
-    public function resetSession(array $extra = []): void
-    {
-        $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
      * Reset the update state and fetch all updates from the beginning.
      *
      * @return void
@@ -4356,71 +4347,6 @@ class InternalDoc extends APIFactory
     ], array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$method, $args, $aargs, $extra]);
-    }
-    /**
-     * AES KDF function for MTProto v2.
-     *
-     * @param string  $msg_key   Message key
-     * @param string  $auth_key  Auth key
-     * @param boolean $to_server To server/from server direction
-     *
-     * @return array
-     */
-    public function aesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
-    {
-        return \danog\MadelineProto\MTProto::aesCalculate($msg_key, $auth_key, $to_server);
-    }
-    /**
-     * AES KDF function for MTProto v1.
-     *
-     * @param string  $msg_key   Message key
-     * @param string  $auth_key  Auth key
-     * @param boolean $to_server To server/from server direction
-     *
-     * @return array
-     */
-    public function oldAesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
-    {
-        return \danog\MadelineProto\MTProto::oldAesCalculate($msg_key, $auth_key, $to_server);
-    }
-    /**
-     * CTR encrypt.
-     *
-     * @param string $message Message to encrypt
-     * @param string $key     Key
-     * @param string $iv      IV
-     *
-     * @return string
-     */
-    public function ctrEncrypt(string $message, string $key, string $iv): string
-    {
-        return \danog\MadelineProto\MTProto::ctrEncrypt($message, $key, $iv);
-    }
-    /**
-     * IGE encrypt.
-     *
-     * @param string $message Message to encrypt
-     * @param string $key     Key
-     * @param string $iv      IV
-     *
-     * @return string
-     */
-    public function igeEncrypt(string $message, string $key, string $iv): string
-    {
-        return \danog\MadelineProto\MTProto::igeEncrypt($message, $key, $iv);
-    }
-    /**
-     * CTR decrypt.
-     *
-     * @param string $message Message to encrypt
-     * @param string $key     Key
-     * @param string $iv      IV
-     *
-     * @return string
-     */
-    public function igeDecrypt(string $message, string $key, string $iv): string
-    {
-        return \danog\MadelineProto\MTProto::igeDecrypt($message, $key, $iv);
     }
     /**
      * Convert MTProto channel ID to bot API channel ID.

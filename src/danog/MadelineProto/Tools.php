@@ -47,7 +47,9 @@ trait Tools
      * Sanify TL obtained from JSON for TL serialization.
      *
      * @param array $input Data to sanitize
-
+     *
+     * @internal 
+     * 
      * @return array
      */
     public static function convertJsonTL(array $input): array

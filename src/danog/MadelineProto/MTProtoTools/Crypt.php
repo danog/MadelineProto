@@ -28,6 +28,8 @@ trait Crypt
      * @param string  $auth_key  Auth key
      * @param boolean $to_server To server/from server direction
      *
+     * @internal
+     *
      * @return array
      */
     public static function aesCalculate(string $msg_key, string $auth_key, bool $to_server = true): array
@@ -47,6 +49,8 @@ trait Crypt
      * @param string  $msg_key   Message key
      * @param string  $auth_key  Auth key
      * @param boolean $to_server To server/from server direction
+     *
+     * @internal
      *
      * @return array
      */
@@ -70,6 +74,8 @@ trait Crypt
      * @param string $key     Key
      * @param string $iv      IV
      *
+     * @internal
+     *
      * @return string
      */
     public static function ctrEncrypt(string $message, string $key, string $iv): string
@@ -88,6 +94,8 @@ trait Crypt
      * @param string $key     Key
      * @param string $iv      IV
      *
+     * @internal
+     *
      * @return string
      */
     public static function igeEncrypt(string $message, string $key, string $iv): string
@@ -104,6 +112,8 @@ trait Crypt
      * @param string $message Message to encrypt
      * @param string $key     Key
      * @param string $iv      IV
+     *
+     * @internal
      *
      * @return string
      */

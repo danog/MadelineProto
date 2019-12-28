@@ -86,7 +86,7 @@ class APIFactory extends AbstractAPIFactory
      *
      * @return mixed
      */
-    public function __call_async($name, $arguments)
+    public function __call_async(string $name, array $arguments): \Generator
     {
         $lower_name = \strtolower($name);
         if ($this->namespace !== '' || !isset($this->methods[$lower_name])) {
@@ -95,8 +95,8 @@ class APIFactory extends AbstractAPIFactory
             $aargs['apifactory'] = true;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
 
-            return $this->API->methodCall($name, $args, $aargs);
+            return yield $this->API->methodCall($name, $args, $aargs);
         }
-        return $this->methods[$lower_name](...$arguments);
+        return yield $this->methods[$lower_name](...$arguments);
     }
 }

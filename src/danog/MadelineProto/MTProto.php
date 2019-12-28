@@ -1497,6 +1497,8 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Clean up MadelineProto session after logout.
      *
+     * @internal
+     *
      * @return void
      */
     public function resetSession(): void

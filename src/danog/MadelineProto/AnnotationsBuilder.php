@@ -91,7 +91,7 @@ class AnnotationsBuilder
 
         $class = new \ReflectionClass($this->reflectionClasses['API']);
         $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
-        $ignoreMethods = [];
+        $ignoreMethods = ['fetchserializableobject'];
         foreach ($methods as $method) {
             $ignoreMethods[$method->getName()] = $method->getName();
         }
