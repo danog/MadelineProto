@@ -563,9 +563,9 @@ trait BotAPI
      *
      * @internal
      *
-     * @return array
+     * @return \Generator<array>
      */
-    public function parseMode(array $arguments): array
+    public function parseMode(array $arguments): \Generator
     {
         if ($arguments['message'] === '' || !isset($arguments['message']) || !isset($arguments['parse_mode'])) {
             return $arguments;
