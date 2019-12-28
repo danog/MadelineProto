@@ -223,6 +223,8 @@ class AnnotationsBuilder
                     }
                     $doc .= $type->getName();
                     $doc .= ' ';
+                } else {
+                    Logger::log($name.'.'.$param->getName()." has no type!", Logger::WARNING);
                 }
                 if ($param->isVariadic()) {
                     $doc .= '...';

@@ -589,7 +589,7 @@ trait AuthKeyHandler
      *
      * @return \Generator<string|bool>
      */
-    public function wolframSingle($what): \Generator
+    private function wolframSingle($what): \Generator
     {
         $code = yield $this->datacenter->fileGetContents('http://www.wolframalpha.com/api/v1/code');
         $query = 'Do prime factorization of '.$what;

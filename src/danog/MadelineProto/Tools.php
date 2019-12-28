@@ -95,9 +95,9 @@ trait Tools
      *
      * @return int
      */
-    public static function randomInt($modulus = false): int
+    public static function randomInt(int $modulus = 0): int
     {
-        if ($modulus === false) {
+        if ($modulus === 0) {
             $modulus = PHP_INT_MAX;
         }
 
@@ -158,7 +158,7 @@ trait Tools
      *
      * @return integer
      */
-    public static function unpackSignedInt($value): int
+    public static function unpackSignedInt(string $value): int
     {
         if (\strlen($value) !== 4) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_4']);
@@ -174,7 +174,7 @@ trait Tools
      *
      * @return integer
      */
-    public static function unpackSignedLong($value): int
+    public static function unpackSignedLong(string $value): int
     {
         if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);

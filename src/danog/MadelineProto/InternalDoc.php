@@ -4292,17 +4292,6 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$expires_in, $datacenter, $extra]);
     }
     /**
-     * Factorize number asynchronously using the wolfram API.
-     *
-     * @param string|integer $what Number to factorize
-     *
-     * @return \Generator<string|bool>
-     */
-    public function wolframSingle($what, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$what, $extra]);
-    }
-    /**
      * Asynchronously create, bind and check auth keys for all DCs.
      *
      * @return \Generator
@@ -4794,11 +4783,11 @@ class InternalDoc extends APIFactory
     /**
      * Rekey secret chat.
      *
-     * @param mixed $chat Secret chat to rekey
+     * @param int $chat Secret chat to rekey
      *
      * @return \Generator
      */
-    public function rekey($chat, array $extra = [])
+    public function rekey(int $chat, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
@@ -4838,11 +4827,11 @@ class InternalDoc extends APIFactory
     /**
      * Discard secret chat.
      *
-     * @param array|int $chat Secret chat ID
+     * @param int $chat Secret chat ID
      *
      * @return \Generator
      */
-    public function discardSecretChat($chat, array $extra = [])
+    public function discardSecretChat(int $chat, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
@@ -5059,7 +5048,7 @@ class InternalDoc extends APIFactory
      *
      * @return int
      */
-    public function randomInt($modulus = false): int
+    public function randomInt(int $modulus = 0): int
     {
         return \danog\MadelineProto\MTProto::randomInt($modulus);
     }
@@ -5094,7 +5083,7 @@ class InternalDoc extends APIFactory
      *
      * @return integer
      */
-    public function unpackSignedInt($value): int
+    public function unpackSignedInt(string $value): int
     {
         return \danog\MadelineProto\MTProto::unpackSignedInt($value);
     }
@@ -5105,7 +5094,7 @@ class InternalDoc extends APIFactory
      *
      * @return integer
      */
-    public function unpackSignedLong($value): int
+    public function unpackSignedLong(string $value): int
     {
         return \danog\MadelineProto\MTProto::unpackSignedLong($value);
     }
@@ -5505,8 +5494,8 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator
      */
-    public function discardCall($call, $reason, $rating = [
-    ], $need_debug = true, array $extra = [])
+    public function discardCall(array $call, string $reason, array $rating = [
+    ], bool $need_debug = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug, $extra]);
     }
@@ -5528,7 +5517,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator
      */
-    public function acceptCall($call, array $extra = [])
+    public function acceptCall(array $call, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$call, $extra]);
     }
@@ -5539,7 +5528,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator
      */
-    public function confirmCall($params, array $extra = [])
+    public function confirmCall(array $params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
@@ -5550,29 +5539,29 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator
      */
-    public function completeCall($params, array $extra = [])
+    public function completeCall(array $params, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
     /**
      * Get call status.
      *
-     * @param array $id Call ID
+     * @param int $id Call ID
      *
      * @return integer
      */
-    public function callStatus($id, array $extra = []): int
+    public function callStatus(int $id, array $extra = []): int
     {
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
     /**
      * Get call info.
      *
-     * @param mixed $call Call ID
+     * @param int $call Call ID
      *
      * @return array
      */
-    public function getCall($call, array $extra = []): array
+    public function getCall(int $call, array $extra = []): array
     {
         return $this->__call(__FUNCTION__, [$call, $extra]);
     }
@@ -5592,7 +5581,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator<array<Peer>>
      */
-    public function getDialogs($force = true, array $extra = [])
+    public function getDialogs(bool $force = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$force, $extra]);
     }
@@ -5603,7 +5592,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator
      */
-    public function getFullDialogs($force = true, array $extra = [])
+    public function getFullDialogs(bool $force = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$force, $extra]);
     }
@@ -5635,7 +5624,7 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function setWebhook($hook_url, $pem_path = null, array $extra = []): void
+    public function setWebhook(string $hook_url, string $pem_path = '', array $extra = []): void
     {
         $this->__call(__FUNCTION__, [$hook_url, $pem_path, $extra]);
     }

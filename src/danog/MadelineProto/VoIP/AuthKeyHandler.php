@@ -46,13 +46,13 @@ trait AuthKeyHandler
     /**
      * Accept call (synchronous).
      *
-     * @param mixed $user Accept call
+     * @param array $user Accept call
      *
      * @internal
      *
      * @return bool
      */
-    public function acceptCall($user): bool
+    public function acceptCall(array $user): bool
     {
         return \danog\MadelineProto\Tools::wait($this->acceptCallAsync($user));
     }
@@ -67,7 +67,7 @@ trait AuthKeyHandler
      *
      * @return array
      */
-    public function discardCall($call, $reason, $rating = [], $need_debug = true): void
+    public function discardCall(array $call, string $reason, array $rating = [], bool $need_debug = true): void
     {
         \danog\MadelineProto\Tools::wait($this->discardCallAsync($call, $reason, $rating, $need_debug));
     }
@@ -113,7 +113,7 @@ trait AuthKeyHandler
      *
      * @return \Generator
      */
-    public function acceptCallAsync($call): \Generator
+    public function acceptCallAsync(array $call): \Generator
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw new \danog\MadelineProto\Exception();
@@ -160,7 +160,7 @@ trait AuthKeyHandler
      *
      * @return \Generator
      */
-    public function confirmCall($params): \Generator
+    public function confirmCall(array $params): \Generator
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw \danog\MadelineProto\Exception::extension('libtgvoip');
@@ -216,7 +216,7 @@ trait AuthKeyHandler
      *
      * @return \Generator
      */
-    public function completeCall($params): \Generator
+    public function completeCall(array $params): \Generator
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw \danog\MadelineProto\Exception::extension('libtgvoip');
@@ -254,11 +254,11 @@ trait AuthKeyHandler
     /**
      * Get call status.
      *
-     * @param array $id Call ID
+     * @param int $id Call ID
      *
      * @return integer
      */
-    public function callStatus($id): int
+    public function callStatus(int $id): int
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw \danog\MadelineProto\Exception::extension('libtgvoip');
@@ -273,11 +273,11 @@ trait AuthKeyHandler
     /**
      * Get call info.
      *
-     * @param mixed $call Call ID
+     * @param int $call Call ID
      *
      * @return array
      */
-    public function getCall($call): array
+    public function getCall(int $call): array
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw \danog\MadelineProto\Exception::extension('libtgvoip');
@@ -296,7 +296,7 @@ trait AuthKeyHandler
      *
      * @return \Generator
      */
-    public function discardCallAsync($call, $reason, $rating = [], $need_debug = true): \Generator
+    public function discardCallAsync(array $call, string $reason, array $rating = [], bool $need_debug = true): \Generator
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw \danog\MadelineProto\Exception::extension('libtgvoip');

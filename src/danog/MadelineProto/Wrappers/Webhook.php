@@ -32,7 +32,7 @@ trait Webhook
      *
      * @return void
      */
-    public function setWebhook($hook_url, $pem_path = null): void
+    public function setWebhook(string $hook_url, string $pem_path = ''): void
     {
         $this->pem_path = $pem_path;
         $this->hook_url = $hook_url;

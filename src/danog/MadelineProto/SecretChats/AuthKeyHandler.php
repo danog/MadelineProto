@@ -111,7 +111,7 @@ trait AuthKeyHandler
      *
      * @return \Generator
      */
-    private function completeSecretChat($params): \Generator
+    private function completeSecretChat(array $params): \Generator
     {
         if ($this->secretChatStatus($params['id']) !== 1) {
             //$this->logger->logger($this->secretChatStatus($params['id']));
@@ -153,11 +153,11 @@ trait AuthKeyHandler
     /**
      * Rekey secret chat.
      *
-     * @param mixed $chat Secret chat to rekey
+     * @param int $chat Secret chat to rekey
      *
      * @return \Generator
      */
-    public function rekey($chat): \Generator
+    public function rekey(int $chat): \Generator
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
             return;
@@ -181,12 +181,12 @@ trait AuthKeyHandler
     /**
      * Accept rekeying.
      *
-     * @param mixed $chat   Chat
+     * @param int   $chat   Chat
      * @param array $params Parameters
      *
      * @return \Generator
      */
-    private function acceptRekey($chat, array $params): \Generator
+    private function acceptRekey(int $chat, array $params): \Generator
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 0) {
             $my_exchange_id = new \tgseclib\Math\BigInteger($this->secret_chats[$chat]['rekeying'][1], -256);
@@ -222,12 +222,12 @@ trait AuthKeyHandler
     /**
      * Commit rekeying of secret chat.
      *
-     * @param mixed $chat   Chat
+     * @param int   $chat   Chat
      * @param array $params Parameters
      *
      * @return \Generator
      */
-    private function commitRekey($chat, array $params): \Generator
+    private function commitRekey(int $chat, array $params): \Generator
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 1 || !isset($this->temp_rekeyed_secret_chats[$params['exchange_id']])) {
             $this->secret_chats[$chat]['rekeying'] = [0];
@@ -260,12 +260,12 @@ trait AuthKeyHandler
     /**
      * Complete rekeying.
      *
-     * @param mixed $chat   Chat
+     * @param int   $chat   Chat
      * @param array $params Parameters
      *
      * @return \Generator
      */
-    private function completeRekey($chat, array $params): \Generator
+    private function completeRekey(int $chat, array $params): \Generator
     {
         if ($this->secret_chats[$chat]['rekeying'][0] !== 2 || !isset($this->temp_rekeyed_secret_chats['fingerprint'])) {
             return;
@@ -334,11 +334,11 @@ trait AuthKeyHandler
     /**
      * Discard secret chat.
      *
-     * @param array|int $chat Secret chat ID
+     * @param int $chat Secret chat ID
      *
      * @return \Generator
      */
-    public function discardSecretChat($chat): \Generator
+    public function discardSecretChat(int $chat): \Generator
     {
         $this->logger->logger('Discarding secret chat '.$chat.'...', \danog\MadelineProto\Logger::VERBOSE);
         if (isset($this->secret_chats[$chat])) {
