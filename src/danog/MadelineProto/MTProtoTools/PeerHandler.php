@@ -319,7 +319,7 @@ trait PeerHandler
      *
      * @return int
      */
-    public static function getId($id)
+    public function getId($id)
     {
         if (\is_array($id)) {
             switch ($id['_']) {

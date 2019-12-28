@@ -4495,9 +4495,9 @@ class InternalDoc extends APIFactory
      *
      * @return int
      */
-    public function getId($id)
+    public function getId($id, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
     /**
      * Get info about peer, returns an Info object.
