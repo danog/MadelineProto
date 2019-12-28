@@ -136,7 +136,7 @@ class Logger
             $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
         }
 
-        $logger = new self($settings['logger']['logger'], isset($settings['logger']['logger_param']) ? $settings['logger']['logger_param'] : '', $prefix, isset($settings['logger']['logger_level']) ? $settings['logger']['logger_level'] : Logger::VERBOSE, isset($settings['logger']['max_size']) ? $settings['logger']['max_size'] : 100 * 1024 * 1024);
+        $logger = new self($settings['logger']['logger'], $settings['logger']['logger_param'] ?? '', $prefix, $settings['logger']['logger_level'] ?? Logger::VERBOSE, $settings['logger']['max_size'] ?? 100 * 1024 * 1024);
         if (!self::$default) {
             self::$default = $logger;
         }
