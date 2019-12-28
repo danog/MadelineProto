@@ -146,7 +146,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             }
             try {
                 yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => 'Error: '.$e->getMessage()]);
-            } catch (\danog\MadelineProto\RPCErrorException $e) {
+            } catch (\Throwable $e) {
                 $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
             }
         }
