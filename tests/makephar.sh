@@ -113,6 +113,7 @@ export MTPROTO_SETTINGS='{"logger":{"logger_level":5}}'
 
 php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" $TRAVIS_COMMIT
 
+cat tests/testing.php
 tests/testing.php <<EOF
 m
 $API_ID
@@ -125,10 +126,12 @@ n
 
 EOF
 export TRAVIS_PHAR="madeline$php$branch.phar"
+cat tests/testing.php
 tests/testing.php
 
 rm testing.madeline
 
+cat tests/testing.php
 tests/testing.php <<EOF
 m
 $API_ID
@@ -140,6 +143,7 @@ n
 n
 
 EOF
+cat tests/testing.php
 tests/testing.php
 
 eval "$(ssh-agent -s)"

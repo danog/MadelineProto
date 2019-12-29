@@ -123,7 +123,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                     'reply_to_msg_id' => $messageId,
                     'media' => [
                         '_' => 'inputMediaUploadedDocument',
-                        'file' => $file,
+                        'file' => $url,
                         'attributes' => [
                             ['_' => 'documentAttributeFilename', 'file_name' => $name]
                         ]
