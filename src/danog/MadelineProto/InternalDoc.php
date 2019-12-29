@@ -4403,30 +4403,30 @@ class InternalDoc extends APIFactory
      * Upload file.
      *
      * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
-     * @param string                             $file_name File name
+     * @param string                             $fileName  File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                            $encrypted Whether to encrypt file for secret chats
      *
      * @return \Generator<array>
      */
-    public function upload($file, string $file_name = '', $cb = null, bool $encrypted = false, array $extra = [])
+    public function upload($file, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$file, $file_name, $cb, $encrypted, $extra]);
+        return $this->__call(__FUNCTION__, [$file, $fileName, $cb, $encrypted, $extra]);
     }
     /**
      * Upload file from URL.
      *
      * @param string|FileCallbackInterface $url       URL of file
      * @param integer                      $size      Size of file
-     * @param string                       $file_name File name
+     * @param string                       $fileName  File name
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      *
      * @return array
      */
-    public function uploadFromUrl($url, int $size = 0, string $file_name = '', $cb = null, bool $encrypted = false, array $extra = [])
+    public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$url, $size, $file_name, $cb, $encrypted, $extra]);
+        return $this->__call(__FUNCTION__, [$url, $size, $fileName, $cb, $encrypted, $extra]);
     }
     /**
      * Upload file from stream.
@@ -4434,15 +4434,15 @@ class InternalDoc extends APIFactory
      * @param mixed    $stream    PHP resource or AMPHP async stream
      * @param integer  $size      File size
      * @param string   $mime      Mime type
-     * @param string   $file_name File name
+     * @param string   $fileName  File name
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
      * @return array
      */
-    public function uploadFromStream($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false, array $extra = [])
+    public function uploadFromStream($stream, int $size, string $mime, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$stream, $size, $mime, $file_name, $cb, $encrypted, $extra]);
+        return $this->__call(__FUNCTION__, [$stream, $size, $mime, $fileName, $cb, $encrypted, $extra]);
     }
     /**
      * Upload file from callable.
@@ -4453,29 +4453,29 @@ class InternalDoc extends APIFactory
      * @param mixed    $callable  Callable
      * @param integer  $size      File size
      * @param string   $mime      Mime type
-     * @param string   $file_name File name
+     * @param string   $fileName  File name
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
      * @return \Generator<array>
      */
-    public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $seekable = true, bool $encrypted = false, array $extra = [])
+    public function uploadFromCallable($callable, int $size, string $mime, string $fileName = '', $cb = null, bool $seekable = true, bool $encrypted = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$callable, $size, $mime, $file_name, $cb, $seekable, $encrypted, $extra]);
+        return $this->__call(__FUNCTION__, [$callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $extra]);
     }
     /**
      * Upload file to secret chat.
      *
      * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
-     * @param string                             $file_name File name
+     * @param string                             $fileName  File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      *
      * @return \Generator<array>
      */
-    public function uploadEncrypted($file, string $file_name = '', $cb = null, array $extra = [])
+    public function uploadEncrypted($file, string $fileName = '', $cb = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$file, $file_name, $cb, $extra]);
+        return $this->__call(__FUNCTION__, [$file, $fileName, $cb, $extra]);
     }
     /**
      * Reupload telegram file.

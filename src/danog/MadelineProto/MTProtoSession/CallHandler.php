@@ -23,7 +23,6 @@ use Amp\Deferred;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Async\AsyncParameters;
-use danog\MadelineProto\Async\Parameters;
 use danog\MadelineProto\Tools;
 
 use function Amp\Promise\all;

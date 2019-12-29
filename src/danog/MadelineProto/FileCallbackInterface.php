@@ -19,9 +19,26 @@
 
 namespace danog\MadelineProto;
 
+/**
+ * File callback interface.
+ */
 interface FileCallbackInterface
 {
+    /**
+     * Get file.
+     *
+     * @return mixed
+     */
     public function getFile();
 
+    /**
+     * Invoke callback.
+     *
+     * @param int $percent Percent
+     * @param int $speed   Speed in mbps
+     * @param int $time    Time
+     *
+     * @return mixed
+     */
     public function __invoke($percent, $speed, $time);
 }

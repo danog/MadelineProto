@@ -174,12 +174,12 @@ $settings = [
 
 $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
 $MadelineProto->async(true);
-$MadelineProto->loop(function () use ($MadelineProto) {
-    yield $MadelineProto->start();
-    yield $MadelineProto->setEventHandler('\EventHandler');
-});
 while (true) {
     try {
+        $MadelineProto->loop(function () use ($MadelineProto) {
+            yield $MadelineProto->start();
+            yield $MadelineProto->setEventHandler('\EventHandler');
+        });
         $MadelineProto->loop();
     } catch (\Throwable $e) {
         try {

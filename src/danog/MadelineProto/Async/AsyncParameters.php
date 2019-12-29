@@ -28,14 +28,14 @@ namespace danog\MadelineProto\Async;
 class AsyncParameters
 {
     /**
-     * Async callable
+     * Async callable.
      *
      * @var callable
      */
     private $callable;
 
     /**
-     * Create async parameters
+     * Create async parameters.
      *
      * @param callable $callable Async callable that will return parameters
      */
@@ -46,7 +46,7 @@ class AsyncParameters
 
 
     /**
-     * Create async parameters
+     * Create async parameters.
      *
      * @param callable $callable Async callable that will return parameters
      */
@@ -56,7 +56,7 @@ class AsyncParameters
     }
 
     /**
-     * Get parameters asynchronously
+     * Get parameters asynchronously.
      *
      * @return \Generator<array>|\Amp\Promise<array>
      */

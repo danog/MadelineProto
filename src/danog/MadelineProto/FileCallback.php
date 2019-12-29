@@ -19,22 +19,55 @@
 
 namespace danog\MadelineProto;
 
+/**
+ * File callback interface.
+ */
 class FileCallback implements FileCallbackInterface
 {
+    /**
+     * File to download/upload.
+     *
+     * @var mixed
+     */
     private $file;
+    /**
+     * Callback.
+     *
+     * @var callable
+     */
     private $callback;
 
-    public function __construct($file, $callback)
+    /**
+     * Construct file callback.
+     *
+     * @param mixed    $file     File to download/upload
+     * @param callable $callback Callback
+     */
+    public function __construct($file, callable $callback)
     {
         $this->file = $file;
         $this->callback = $callback;
     }
 
+    /**
+     * Get file.
+     *
+     * @return mixed
+     */
     public function getFile()
     {
         return $this->file;
     }
 
+    /**
+     * Invoke callback.
+     *
+     * @param int $percent Percent
+     * @param int $speed   Speed in mbps
+     * @param int $time    Time
+     *
+     * @return mixed
+     */
     public function __invoke($percent, $speed, $time)
     {
         $callback = $this->callback;

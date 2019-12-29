@@ -131,7 +131,7 @@ trait Loop
                     $params = $_GET;
                     $params['MadelineSelfRestart'] = Tools::randomInt();
 
-                    $url = \explode($uri, '?', 2)[0] ?? '';
+                    $url = \explode('?', $uri, 2)[0] ?? '';
 
                     $query = \http_build_query($params);
                     $uri = \implode('?', [$url, $query]);

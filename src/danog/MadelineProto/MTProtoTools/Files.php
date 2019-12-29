@@ -412,7 +412,7 @@ trait Files
              */
             private $partSize;
             /**
-             * Offset for callback
+             * Offset for callback.
              *
              * @var int
              */
@@ -460,7 +460,7 @@ trait Files
                 return $this->read[$offset]->promise();
             }
             /**
-             * Read callback, called when the chunk is read and fully resent
+             * Read callback, called when the chunk is read and fully resent.
              *
              * @return void
              */
