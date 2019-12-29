@@ -49,11 +49,11 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return Promise
+     * @return \Generator<Promise>
      */
-    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
+    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
-        return $this->datacenter->getConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->methodCallAsyncRead($method, $args, $aargs);
+        return (yield $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncRead($method, $args, $aargs);
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -62,10 +62,10 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return Promise
+     * @return \Generator<Promise>
      */
-    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
+    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
-        return $this->datacenter->getConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->methodCallAsyncWrite($method, $args, $aargs);
+        return (yield $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncWrite($method, $args, $aargs);
     }
 }

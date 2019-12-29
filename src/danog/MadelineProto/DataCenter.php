@@ -32,6 +32,7 @@ use Amp\Http\Client\Cookie\InMemoryCookieJar;
 use Amp\Http\Client\DelegateHttpClient;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
+use Amp\Promise;
 use Amp\Socket\ConnectContext;
 use Amp\Websocket\Client\Rfc6455Connector;
 use danog\MadelineProto\MTProto\PermAuthKey;
@@ -620,6 +621,17 @@ class DataCenter
     public function getConnection(string $dc): Connection
     {
         return $this->sockets[$dc]->getConnection();
+    }
+    /**
+     * Get Connection instance asynchronously.
+     *
+     * @param string $dc DC ID
+     *
+     * @return Promise<Connection>
+     */
+    public function waitGetConnection(string $dc): Promise
+    {
+        return $this->sockets[$dc]->waitGetConnection();
     }
     /**
      * Get DataCenterConnection instance.

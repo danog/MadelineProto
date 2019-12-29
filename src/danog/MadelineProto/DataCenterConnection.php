@@ -18,6 +18,9 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Deferred;
+use Amp\Promise;
+use Amp\Success;
 use danog\MadelineProto\Loop\Generic\PeriodicLoop;
 use danog\MadelineProto\MTProto\AuthKey;
 use danog\MadelineProto\MTProto\PermAuthKey;
@@ -33,6 +36,19 @@ class DataCenterConnection implements JsonSerializable
     const READ_WEIGHT = 1;
     const READ_WEIGHT_MEDIA = 5;
     const WRITE_WEIGHT = 10;
+
+    /**
+     * Promise for connection.
+     *
+     * @var Promise
+     */
+    private $connectionsPromise;
+    /**
+     * Deferred for connection.
+     *
+     * @var Deferred
+     */
+    private $connectionsDeferred;
 
     /**
      * Temporary auth key.
@@ -379,6 +395,13 @@ class DataCenterConnection implements JsonSerializable
             }
             yield $this->connectMore($count);
             yield $this->restoreBackup();
+
+            $this->connectionsPromise = new Success();
+            if ($this->connectionsDeferred) {
+                $connectionsDeferred = $this->connectionsDeferred;
+                $this->connectionsDeferred = null;
+                $connectionsDeferred->resolve();
+            }
         } else {
             $this->availableConnections[$id] = 0;
             yield $this->connections[$id]->connect($ctx);
@@ -435,6 +458,9 @@ class DataCenterConnection implements JsonSerializable
      */
     public function disconnect()
     {
+        $this->connectionsDeferred = new Deferred;
+        $this->connectionsPromise = $this->connectionsDeferred->promise();
+
         $this->API->logger->logger("Disconnecting from shared DC {$this->datacenter}");
         if ($this->robinLoop) {
             $this->robinLoop->signal(true);
@@ -499,6 +525,20 @@ class DataCenterConnection implements JsonSerializable
     public function hasConnection(int $id = -1): bool
     {
         return $id < 0 ? \count($this->connections) : isset($this->connections[$id]);
+    }
+    /**
+     * Get best socket in round robin, asynchronously.
+     *
+     * @return Promise<Connection>
+     */
+    public function waitGetConnection(): Promise
+    {
+        if (empty($this->availableConnections)) {
+            return $this->connectionsPromise->onResolve(function ($e, $v) {
+                return $this->getConnection();
+            });
+        }
+        return new Success($this->getConnection());
     }
     /**
      * Get best socket in round robin.

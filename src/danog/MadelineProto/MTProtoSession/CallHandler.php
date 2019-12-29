@@ -54,7 +54,11 @@ trait CallHandler
         foreach ($message_ids as $message_id) {
             if (isset($this->outgoing_messages[$message_id]['body'])) {
                 if ($datacenter) {
-                    $res = $this->API->datacenter->getConnection($datacenter)->sendMessage($this->outgoing_messages[$message_id], false);
+                    $res = $this->API->datacenter->waitGetConnection($datacenter)->onResolve(
+                        function ($e, $r) use ($message_id) {
+                            return $r->sendMessage($this->outgoing_messages[$message_id], false);
+                        }
+                    );
                 } else {
                     $res = $this->sendMessage($this->outgoing_messages[$message_id], false);
                 }
@@ -140,11 +144,13 @@ trait CallHandler
             && $args['id']['_'] === 'inputBotInlineMessageID'
             && $this->datacenter !== $args['id']['dc_id']
         ) {
-            return yield $this->API->datacenter->getConnection($args['id']['dc_id'])->methodCallAsyncWriteGenerator($method, $args, $aargs);
+            $aargs['datacenter'] = $args['id']['dc_id'];
+            return $this->API->methodCallAsyncWriteGenerator($method, $args, $aargs);
         }
         if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has($this->datacenter.'_media')) {
             $this->logger->logger('Using media DC');
-            return yield $this->API->datacenter->getConnection($this->datacenter.'_media')->methodCallAsyncWriteGenerator($method, $args, $aargs);
+            $aargs['datacenter'] = $this->datacenter.'_media';
+            return $this->API->methodCallAsyncWriteGenerator($method, $args, $aargs);
         }
         if (\in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) {
             $aargs['queue'] = 'secret';
