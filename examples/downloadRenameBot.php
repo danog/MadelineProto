@@ -80,7 +80,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             if ($update['message']['message'] === '/start') {
                 return $this->messages->sendMessage(['peer' => $peerId, 'message' => self::START, 'parse_mode' => 'Markdown', 'reply_to_msg_id' => $update['message']['id']]);
             }
-            if (isset($update['message']['media'])) {
+            if (isset($update['message']['media']['_']) && $update['message']['media']['_'] !== 'messageMediaWebPage') {
                 $id = yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a new name for this file: ', 'reply_to_msg_id' => $messageId])['id'];
                 $this->states[$peerId] = [$update['message']['media'], $id];
 
