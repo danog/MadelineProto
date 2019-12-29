@@ -277,10 +277,12 @@ trait Files
         $ctx = \hash_init('md5');
         $promises = [];
 
-        $cb = function () use ($cb, $part_total_num) {
+        $speed = 0;
+        $time = 0;
+        $cb = function () use ($cb, $part_total_num, &$speed, &$time) {
             static $cur = 0;
             $cur++;
-            \danog\MadelineProto\Tools::callFork($cb($cur * 100 / $part_total_num));
+            \danog\MadelineProto\Tools::callFork($cb($cur * 100 / $part_total_num, $speed, $time));
         };
 
         $start = \microtime(true);
@@ -1155,10 +1157,12 @@ trait Files
         }
         $count = \count($params);
 
-        $cb = function () use ($cb, $count) {
+        $time = 0;
+        $speed = 0;
+        $cb = function () use ($cb, $count, &$time, &$speed) {
             static $cur = 0;
             $cur++;
-            \danog\MadelineProto\Tools::callFork($cb($cur * 100 / $count));
+            \danog\MadelineProto\Tools::callFork($cb($cur * 100 / $count, $time, $speed));
         };
 
         $cdn = false;
