@@ -48,7 +48,7 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
                 Loop::cancel($this->resumeWatcher);
                 $this->resumeWatcher = null;
             }
-            $this->resumeWatcher = Loop::delay($time * 1000, [$this, 'resume'], $resume);
+            $this->resumeWatcher = Loop::delay((int) ($time * 1000), [$this, 'resume'], $resume);
         }
         $this->resume = new Deferred();
 
