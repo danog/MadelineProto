@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Deferred;
 use Amp\Promise;
 
 /**
@@ -49,11 +50,21 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return \Generator<Promise>
+     * @return Promise
      */
-    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
+    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
     {
-        return (yield $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncRead($method, $args, $aargs);
+        $deferred = new Deferred;
+        $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->onResolve(
+            static function ($e, $res) use (&$method, &$args, &$aargs, &$deferred) {
+                if ($e) {
+                    throw $e;
+                }
+                $deferred->resolve($res->methodCallAsyncRead($method, $args, $aargs));
+            }
+        );
+
+        return $deferred->promise();
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -62,10 +73,20 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return \Generator<Promise>
+     * @return Promise
      */
-    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
+    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
     {
-        return (yield $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncWrite($method, $args, $aargs);
+        $deferred = new Deferred;
+        $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->onResolve(
+            static function ($e, $res) use (&$method, &$args, &$aargs, &$deferred) {
+                if ($e) {
+                    throw $e;
+                }
+                $deferred->resolve($res->methodCallAsyncWrite($method, $args, $aargs));
+            }
+        );
+
+        return $deferred->promise();
     }
 }

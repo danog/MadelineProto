@@ -63,7 +63,7 @@ class AsyncConstruct
     /**
      * Set init promise.
      *
-     * @param Promise $promise
+     * @param Promise $promise Promise
      *
      * @internal
      *

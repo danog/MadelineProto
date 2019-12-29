@@ -22,6 +22,7 @@ namespace danog\MadelineProto\MTProtoSession;
 use Amp\Deferred;
 use Amp\Promise;
 use Amp\Success;
+use danog\MadelineProto\Async\AsyncParameters;
 use danog\MadelineProto\Async\Parameters;
 use danog\MadelineProto\Tools;
 
@@ -203,7 +204,7 @@ trait CallHandler
             ]
         );
 
-        if (\is_object($args) && $args instanceof Parameters) {
+        if (\is_object($args) && $args instanceof AsyncParameters) {
             $message['body'] = yield $args->fetchParameters();
         } else {
             $message['body'] = $args;

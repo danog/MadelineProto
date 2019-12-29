@@ -25,36 +25,45 @@ namespace danog\MadelineProto\Async;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class AsyncParameters extends Parameters
+class AsyncParameters
 {
+    /**
+     * Async callable
+     *
+     * @var callable
+     */
     private $callable;
-    private $refetchable = true;
 
-    public function __construct(callable $callable, bool $refetchable = true)
-    {
-        $this->callable = $callable;
-        $this->refetchable = $refetchable;
-    }
-
-    public function setRefetchable(bool $refetchable)
-    {
-        $this->refetchable = $refetchable;
-    }
-
-    public function setCallable(callable $callable)
+    /**
+     * Create async parameters
+     *
+     * @param callable $callable Async callable that will return parameters
+     */
+    public function __construct(callable $callable)
     {
         $this->callable = $callable;
     }
 
-    public function isRefetchable(): bool
+
+    /**
+     * Create async parameters
+     *
+     * @param callable $callable Async callable that will return parameters
+     */
+    public function setCallable(callable $callable): void
     {
-        return $this->refetchable;
+        $this->callable = $callable;
     }
 
+    /**
+     * Get parameters asynchronously
+     *
+     * @return \Generator<array>|\Amp\Promise<array>
+     */
     public function getParameters()
     {
         $callable = $this->callable;
 
-        return yield $callable();
+        return $callable();
     }
 }
