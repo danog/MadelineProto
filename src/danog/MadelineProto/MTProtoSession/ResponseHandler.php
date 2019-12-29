@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\Loop;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 
 /**
@@ -586,11 +587,11 @@ trait ResponseHandler
         unset($request);
         $this->gotResponseForOutgoingMessageId($request_id);
         $r = isset($response['_']) ? $response['_'] : \json_encode($response);
-        $this->logger->logger("Defer sending $r to deferred");
+        $this->logger->logger("Defer sending $r to deferred", Logger::ULTRA_VERBOSE);
         \danog\MadelineProto\Tools::callFork((
             function () use ($request_id, $response,  $botAPI) {
                 $r = isset($response['_']) ? $response['_'] : \json_encode($response);
-                $this->logger->logger("Deferred: sent $r to deferred");
+                $this->logger->logger("Deferred: sent $r to deferred", Logger::ULTRA_VERBOSE);
                 if ($botAPI) {
                     $response = yield $this->MTProtoToBotAPI($response);
                 }

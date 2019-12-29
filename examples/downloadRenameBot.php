@@ -153,7 +153,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
 }
 $settings = [
     'logger' => [
-        'logger_level' => 5
+        'logger_level' => 4
     ],
     'serialization' => [
         'serialization_interval' => 30
