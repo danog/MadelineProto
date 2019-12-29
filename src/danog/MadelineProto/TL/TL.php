@@ -818,7 +818,6 @@ class TL
                         && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] === 'InputFile'
                     )
                 )
-                && $this->API->settings['upload']['allow_automatic_upload']
             ) {
                 $arguments[$current_argument['name']] = yield $this->API->upload($arguments[$current_argument['name']]);
             }

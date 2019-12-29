@@ -52,13 +52,13 @@ trait Files
      * Upload file.
      *
      * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
-     * @param string                             $file_name File name
+     * @param string                             $fileName  File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                            $encrypted Whether to encrypt file for secret chats
      *
      * @return \Generator<array>
      */
-    public function upload($file, string $file_name = '', $cb = null, bool $encrypted = false): \Generator
+    public function upload($file, string $fileName = '', $cb = null, bool $encrypted = false): \Generator
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
@@ -66,18 +66,20 @@ trait Files
         }
         if (\is_string($file) || (\is_object($file) && \method_exists($file, '__toString'))) {
             if (\filter_var($file, FILTER_VALIDATE_URL)) {
-                return yield $this->uploadFromUrl($file);
+                return yield $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
             }
         } elseif (\is_array($file)) {
             return yield $this->uploadFromTgfile($file, $cb, $encrypted);
+        } elseif (!$this->API->settings['upload']['allow_automatic_upload']) {
+            return yield $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
         }
 
         $file = \danog\MadelineProto\Absolute::absolute($file);
         if (!yield exists($file)) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['file_not_exist']);
         }
-        if (empty($file_name)) {
-            $file_name = \basename($file);
+        if (empty($fileName)) {
+            $fileName = \basename($file);
         }
 
         StatCache::clear($file);
@@ -91,7 +93,7 @@ trait Files
         $mime = $this->getMimeFromFile($file);
 
         try {
-            return yield $this->uploadFromStream($stream, $size, $mime, $file_name, $cb, $encrypted);
+            return yield $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
         } finally {
             yield $stream->close();
         }
@@ -101,13 +103,13 @@ trait Files
      *
      * @param string|FileCallbackInterface $url       URL of file
      * @param integer                      $size      Size of file
-     * @param string                       $file_name File name
+     * @param string                       $fileName  File name
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      *
      * @return array
      */
-    public function uploadFromUrl($url, int $size = 0, string $file_name = '', $cb = null, bool $encrypted = false): \Generator
+    public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false): \Generator
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
@@ -141,7 +143,7 @@ trait Files
             yield $stream->seek(0);
         }
 
-        return yield $this->uploadFromStream($stream, $size, $mime, $file_name, $cb, $encrypted);
+        return yield $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
     }
     /**
      * Upload file from stream.
@@ -149,13 +151,13 @@ trait Files
      * @param mixed    $stream    PHP resource or AMPHP async stream
      * @param integer  $size      File size
      * @param string   $mime      Mime type
-     * @param string   $file_name File name
+     * @param string   $fileName  File name
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
      * @return array
      */
-    public function uploadFromStream($stream, int $size, string $mime, string $file_name = '', $cb = null, bool $encrypted = false): \Generator
+    public function uploadFromStream($stream, int $size, string $mime, string $fileName = '', $cb = null, bool $encrypted = false): \Generator
     {
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
@@ -209,7 +211,7 @@ trait Files
             $seekable = false;
         }
 
-        $res = yield $this->uploadFromCallable($callable, $size, $mime, $file_name, $cb, $seekable, $encrypted);
+        $res = yield $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted);
         if ($created) {
             $stream->disconnect();
         }
@@ -224,14 +226,14 @@ trait Files
      * @param mixed    $callable  Callable
      * @param integer  $size      File size
      * @param string   $mime      Mime type
-     * @param string   $file_name File name
+     * @param string   $fileName  File name
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
      * @return \Generator<array>
      */
-    public function uploadFromCallable($callable, int $size, string $mime, string $file_name = '', $cb = null, bool $seekable = true, bool $encrypted = false): \Generator
+    public function uploadFromCallable($callable, int $size, string $mime, string $fileName = '', $cb = null, bool $seekable = true, bool $encrypted = false): \Generator
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
@@ -342,7 +344,7 @@ trait Files
         $this->logger->logger("Total upload time: $time");
         $this->logger->logger("Total upload speed: $speed mbps");
 
-        $constructor = ['_' => $constructor, 'id' => $file_id, 'parts' => $part_total_num, 'name' => $file_name, 'mime_type' => $mime];
+        $constructor = ['_' => $constructor, 'id' => $file_id, 'parts' => $part_total_num, 'name' => $fileName, 'mime_type' => $mime];
         if ($encrypted === true) {
             $constructor['key_fingerprint'] = $fingerprint;
             $constructor['key'] = $key;
@@ -357,14 +359,14 @@ trait Files
      * Upload file to secret chat.
      *
      * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
-     * @param string                             $file_name File name
+     * @param string                             $fileName  File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      *
      * @return \Generator<array>
      */
-    public function uploadEncrypted($file, string  $file_name = '', $cb = null): \Generator
+    public function uploadEncrypted($file, string  $fileName = '', $cb = null): \Generator
     {
-        return $this->upload($file, $file_name, $cb, true);
+        return $this->upload($file, $fileName, $cb, true);
     }
 
     /**

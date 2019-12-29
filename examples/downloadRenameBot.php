@@ -90,7 +90,6 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                 $name = $update['message']['message'];
                 list($url, $id) = $this->states[$peerId];
                 unset($this->states[$peerId]);
-                $method = 'uploadFromTgFile';
             } else {
                 $url = \explode(' ', $update['message']['message'], 2);
                 $name = \trim($url[1] ?? \basename($update['message']['message']));
@@ -101,10 +100,9 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                 if (\strpos($url, 'http') !== 0) {
                     $url = "http://$url";
                 }
-                $method = 'uploadFromUrl';
             }
             $id = yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Preparing...', 'reply_to_msg_id' => $messageId])['id'];
-            $file = yield $this->$method(new \danog\MadelineProto\FileCallback(
+            $url = new \danog\MadelineProto\FileCallback(
                 $url,
                 function ($progress) use ($peerId, $id) {
                     static $prev = 0;
@@ -118,7 +116,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                     }
                 }
-            ));
+            );
             yield $this->messages->sendMedia(
                 [
                     'peer' => $peerId,
@@ -165,6 +163,9 @@ $settings = [
            'min' => 20,
            'max' => 1000,
        ]
+    ],
+    'upload' => [
+        'allow_automatic_upload' => false // IMPORTANT: for security reasons, upload by URL will still be allowed
     ]
 ];
 
@@ -181,6 +182,7 @@ while (true) {
         try {
             $MadelineProto->logger("Surfaced: $e");
             $MadelineProto->getEventHandler(['async' => false])->report("Surfaced: $e");
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
     }
 }
