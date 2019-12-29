@@ -175,11 +175,11 @@ class DataCenter
     /**
      * Constructor function.
      *
-     * @param MTProto $API          Main MTProto instance
-     * @param array $dclist         DC IP list
-     * @param array $settings       Settings
-     * @param boolean $reconnectAll Whether to reconnect to all DCs or just to changed ones
-     * @param CookieJar $jar        Cookie jar
+     * @param MTProto   $API          Main MTProto instance
+     * @param array     $dclist       DC IP list
+     * @param array     $settings     Settings
+     * @param boolean   $reconnectAll Whether to reconnect to all DCs or just to changed ones
+     * @param CookieJar $jar          Cookie jar
      *
      * @return void
      */
@@ -207,6 +207,7 @@ class DataCenter
             if ($socket instanceof DataCenterConnection && !\strpos($key, '_bk')) {
                 //$this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
                 if ($reconnectAll || isset($changed[$id])) {
+                    $this->API->logger->logger("Disconnecting all before reconnect!");
                     $socket->needReconnect(true);
                     $socket->setExtra($this->API);
                     $socket->disconnect();
@@ -583,7 +584,7 @@ class DataCenter
      */
     public function getNonProxiedDNSClient(): Resolver
     {
-        return $this->DoHClient;
+        return $this->nonProxiedDoHClient;
     }
 
     /**

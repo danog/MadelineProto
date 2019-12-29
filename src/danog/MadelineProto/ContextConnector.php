@@ -34,7 +34,7 @@ class ContextConnector implements Connector
     public function __construct(DataCenter $dataCenter, bool $fromDns = false)
     {
         $this->dataCenter = $dataCenter;
-        $this->fromDns = false;
+        $this->fromDns = $fromDns;
         $this->logger = $dataCenter->getAPI()->getLogger();
     }
 

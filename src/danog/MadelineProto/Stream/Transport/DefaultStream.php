@@ -78,9 +78,9 @@ class DefaultStream implements
                 )
             );
         }
-
+        
         $this->stream = yield ($this->connector ?? connector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellationToken());
-        if ($ctx->isSecure()) {
+        if ($secure) {
             yield $this->stream->setupTls();
         }
         yield $this->stream->write($header);

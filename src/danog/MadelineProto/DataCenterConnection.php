@@ -372,7 +372,7 @@ class DataCenterConnection implements JsonSerializable
         $this->decRead = $media ? self::READ_WEIGHT_MEDIA : self::READ_WEIGHT;
         $this->decWrite = self::WRITE_WEIGHT;
 
-        if ($id === -1) {
+        if ($id === -1 || !isset($this->connections[$id])) {
             if ($this->connections) {
                 $this->API->logger("Already connected!", Logger::WARNING);
                 return;
