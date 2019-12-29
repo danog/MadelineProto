@@ -170,20 +170,20 @@ $MadelineProto->loop(function () use ($MadelineProto) {
         // Photo uploaded as document, secret chat
         $secret_media['document_photo'] = [
             'peer' => $secret_chat_id,
-            'file' => 'tests/faust.jpg', // The file to send
+            'file' => __DIR__.'/faust.jpg', // The file to send
             'message' => [
                 '_' => 'decryptedMessage',
                 'ttl' => 0, // This message does not self-destruct
                 'message' => '', // No text message, only media
                 'media' => [
                     '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => \file_get_contents('tests/faust.preview.jpg'), // The thumbnail must be generated manually, it must be in jpg format, 90x90
+                    'thumb' => \file_get_contents(__DIR__.'/faust.preview.jpg'), // The thumbnail must be generated manually, it must be in jpg format, 90x90
                     'thumb_w' => 90,
                     'thumb_h' => 90,
-                    'mime_type' => \mime_content_type('tests/faust.jpg'), // The file's mime type
+                    'mime_type' => \mime_content_type(__DIR__.'/faust.jpg'), // The file's mime type
                     'caption' => 'This file was uploaded using @MadelineProto', // The caption
                     'file_name' => 'faust.jpg', // The file's name
-                    'size' => \filesize('tests/faust.jpg'), // The file's size
+                    'size' => \filesize(__DIR__.'/faust.jpg'), // The file's size
                     'attributes' => [
                         ['_' => 'documentAttributeImageSize', 'w' => 1280, 'h' => 914], // Image's resolution
                     ],
@@ -194,18 +194,18 @@ $MadelineProto->loop(function () use ($MadelineProto) {
         // Photo, secret chat
         $secret_media['photo'] = [
             'peer' => $secret_chat_id,
-            'file' => 'tests/faust.jpg',
+            'file' => __DIR__.'/faust.jpg',
             'message' => [
                 '_' => 'decryptedMessage',
                 'ttl' => 0,
                 'message' => '',
                 'media' => [
                     '_' => 'decryptedMessageMediaPhoto',
-                    'thumb' => \file_get_contents('tests/faust.preview.jpg'),
+                    'thumb' => \file_get_contents(__DIR__.'/faust.preview.jpg'),
                     'thumb_w' => 90,
                     'thumb_h' => 90,
                     'caption' => 'This file was uploaded using @MadelineProto',
-                    'size' => \filesize('tests/faust.jpg'),
+                    'size' => \filesize(__DIR__.'/faust.jpg'),
                     'w' => 1280,
                     'h' => 914,
                 ],
@@ -213,20 +213,20 @@ $MadelineProto->loop(function () use ($MadelineProto) {
         ];
 
         // GIF, secret chat
-        $secret_media['gif'] = ['peer' => $secret_chat_id, 'file' => 'tests/pony.mp4', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/pony.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/pony.mp4'), 'caption' => 'test', 'file_name' => 'pony.mp4', 'size' => \filesize('tests/faust.jpg'), 'attributes' => [['_' => 'documentAttributeAnimated']]]]];
+        $secret_media['gif'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/pony.mp4', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents(__DIR__.'/pony.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type(__DIR__.'/pony.mp4'), 'caption' => 'test', 'file_name' => 'pony.mp4', 'size' => \filesize(__DIR__.'/faust.jpg'), 'attributes' => [['_' => 'documentAttributeAnimated']]]]];
 
         // Sticker, secret chat
-        $secret_media['sticker'] = ['peer' => $secret_chat_id, 'file' => 'tests/lel.webp', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/lel.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/lel.webp'), 'caption' => 'test', 'file_name' => 'lel.webp', 'size' => \filesize('tests/lel.webp'), 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL', 'stickerset' => ['_' => 'inputStickerSetEmpty']]]]]];
+        $secret_media['sticker'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/lel.webp', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents(__DIR__.'/lel.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type(__DIR__.'/lel.webp'), 'caption' => 'test', 'file_name' => 'lel.webp', 'size' => \filesize(__DIR__.'/lel.webp'), 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL', 'stickerset' => ['_' => 'inputStickerSetEmpty']]]]]];
 
         // Document, secret chat
-        $secret_media['document'] = ['peer' => $secret_chat_id, 'file' => 'tests/60', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => 'magic/magic', 'caption' => 'test', 'file_name' => 'magic.magic', 'size' => \filesize('tests/60'), 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'fairy']]]]];
+        $secret_media['document'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/60', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents(__DIR__.'/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => 'magic/magic', 'caption' => 'test', 'file_name' => 'magic.magic', 'size' => \filesize(__DIR__.'/60'), 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'fairy']]]]];
 
         // Video, secret chat
-        $secret_media['video'] = ['peer' => $secret_chat_id, 'file' => 'tests/swing.mp4', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/swing.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/swing.mp4'), 'caption' => 'test', 'file_name' => 'swing.mp4', 'size' => \filesize('tests/swing.mp4'), 'attributes' => [['_' => 'documentAttributeVideo']]]]];
+        $secret_media['video'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/swing.mp4', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents(__DIR__.'/swing.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type(__DIR__.'/swing.mp4'), 'caption' => 'test', 'file_name' => 'swing.mp4', 'size' => \filesize(__DIR__.'/swing.mp4'), 'attributes' => [['_' => 'documentAttributeVideo']]]]];
 
         // audio, secret chat
-        $secret_media['audio'] = ['peer' => $secret_chat_id, 'file' => 'tests/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => \filesize('tests/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
-        $secret_media['voice'] = ['peer' => $secret_chat_id, 'file' => 'tests/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => \filesize('tests/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
+        $secret_media['audio'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents(__DIR__.'/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type(__DIR__.'/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => \filesize(__DIR__.'/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
+        $secret_media['voice'] = ['peer' => $secret_chat_id, 'file' => __DIR__.'/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents(__DIR__.'/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type(__DIR__.'/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => \filesize(__DIR__.'/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
 
         foreach ($secret_media as $type => $smessage) {
             $MadelineProto->logger("Encrypting and uploading $type...");
@@ -239,22 +239,22 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     $media = [];
 
     // Image
-    $media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => 'tests/faust.jpg'];
+    $media['photo'] = ['_' => 'inputMediaUploadedPhoto', 'file' => __DIR__.'/faust.jpg'];
 
     // Sticker
-    $media['sticker'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/lel.webp', 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL']]];
+    $media['sticker'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/lel.webp', 'attributes' => [['_' => 'documentAttributeSticker', 'alt' => 'LEL']]];
 
     // Video
-    $media['video'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/swing.mp4', 'attributes' => [['_' => 'documentAttributeVideo']]];
+    $media['video'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/swing.mp4', 'attributes' => [['_' => 'documentAttributeVideo']]];
 
     // audio
-    $media['audio'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/mosconi.mp3', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]];
+    $media['audio'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/mosconi.mp3', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]];
 
     // voice
-    $media['voice'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/mosconi.mp3', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]];
+    $media['voice'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/mosconi.mp3', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]];
 
     // Document
-    $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => 'tests/60', 'mime_type' => 'magic/magic', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
+    $media['document'] = ['_' => 'inputMediaUploadedDocument', 'file' => __DIR__.'/60', 'mime_type' => 'magic/magic', 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'magic.magic']]];
 
     $message = 'yay '.\PHP_VERSION_ID;
     $mention = yield $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
