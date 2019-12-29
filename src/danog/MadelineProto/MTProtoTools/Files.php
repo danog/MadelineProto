@@ -392,7 +392,7 @@ trait Files
 
         $chunk_size = $this->settings['upload']['part_size'];
 
-        $bridge = new class($size, $chunk_size) {
+        $bridge = new class($size, $chunk_size, $cb) {
             /**
              * Read promises.
              *
@@ -417,20 +417,28 @@ trait Files
              * @var int
              */
             private $offset = 0;
+            /**
+             * Callback
+             *
+             * @var ?callable
+             */
+            private $cb;
 
             /**
              * Constructor.
              *
              * @param integer $size     Total file size
              * @param integer $partSize Part size
+             * @param integer $cb       Callback
              */
-            public function __construct(int $size, int $partSize)
+            public function __construct(int $size, int $partSize, $cb)
             {
                 for ($x = 0; $x < $size; $x += $partSize) {
                     $this->read []= new Deferred;
                     $this->write []= new Deferred;
                 }
                 $this->partSize = $partSize;
+                $this->cb = $cb;
             }
             /**
              * Read chunk.
@@ -467,15 +475,14 @@ trait Files
             public function callback(): void
             {
                 $this->read[$this->offset++]->resolve();
+                if ($this->cb) {
+                    Tools::callFork(($this->cb)());
+                }
             }
         };
         $reader = [$bridge, 'read'];
         $writer = [$bridge, 'write'];
-
-        $cb = static function (...$params) use ($cb, $bridge): \Generator {
-            $bridge->callback();
-            yield $cb(...$params);
-        };
+        $cb = [$bridge, 'callback'];
 
         $read = $this->uploadFromCallable($reader, $size, $mime, '', $cb, true, $encrypted);
         $write = $this->downloadToCallable($media, $writer, null, true, 0, -1, $chunk_size);

@@ -273,7 +273,9 @@ var_dump(time()-$t);
         foreach ($media as $type => $inputMedia) {
             $MadelineProto->logger("Sending $type");
             $type = yield $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']);
-            yield $MadelineProto->downloadToDir(yield $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]), '/tmp');
+            yield $MadelineProto->downloadToDir($media = yield $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]), '/tmp');
+            $inputMedia['file'] = $media;
+            yield $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]);
         }
     }
 
