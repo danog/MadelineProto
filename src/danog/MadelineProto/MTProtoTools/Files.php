@@ -273,7 +273,7 @@ trait Files
             $ige->enableContinuousBuffer();
             $seekable = false;
         }
-        $ctx = \hash_init('md5');
+        //$ctx = \hash_init('md5');
         $promises = [];
 
         $speed = 0;
@@ -284,13 +284,13 @@ trait Files
             \danog\MadelineProto\Tools::callFork($cb($cur * 100 / $part_total_num, $speed, $time));
         };
 
-        $callable = static function (int $part_num) use ($file_id, $part_total_num, $part_size, $callable, $ctx, $ige) {
+        $callable = static function (int $part_num) use ($file_id, $part_total_num, $part_size, $callable, $ige) {
             $bytes = yield $callable($part_num * $part_size, $part_size);
 
             if ($ige) {
                 $bytes = $ige->encrypt(\str_pad($bytes, $part_size, \chr(0)));
             }
-            \hash_update($ctx, $bytes);
+            //\hash_update($ctx, $bytes);
 
             return ['file_id' => $file_id, 'file_part' => $part_num, 'file_total_parts' => $part_total_num, 'bytes' => $bytes];
         };
@@ -349,7 +349,7 @@ trait Files
             $constructor['key'] = $key;
             $constructor['iv'] = $iv;
         }
-        $constructor['md5_checksum'] = \hash_final($ctx);
+        $constructor['md5_checksum'] = ''; //\hash_final($ctx);
 
         return $constructor;
     }

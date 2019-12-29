@@ -168,8 +168,8 @@ $settings = [
        ]
     ],
     'upload' => [
-        'allow_automatic_upload' => false // IMPORTANT: for security reasons, upload by URL will still be allowed
-    ]
+        'allow_automatic_upload' => false, // IMPORTANT: for security reasons, upload by URL will still be allowed
+    ],
 ];
 
 $MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
