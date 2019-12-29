@@ -70,7 +70,8 @@ trait Files
             }
         } elseif (\is_array($file)) {
             return yield $this->uploadFromTgfile($file, $cb, $encrypted);
-        } elseif (!$this->API->settings['upload']['allow_automatic_upload']) {
+        }
+        if (!$this->settings['upload']['allow_automatic_upload']) {
             return yield $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
         }
 

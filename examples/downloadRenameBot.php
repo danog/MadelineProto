@@ -20,6 +20,7 @@
  */
 
 use danog\MadelineProto\Logger;
+use League\Uri\Contracts\UriException;
 
 /*
  * Various ways to load MadelineProto
@@ -141,7 +142,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                 yield $this->messages->deleteMessages(['revoke' => true, 'id' => [$id]]);
             }
         } catch (\Throwable $e) {
-            if (\strpos($e->getMessage(), 'Could not connect to URI') === false) {
+            if (\strpos($e->getMessage(), 'Could not connect to URI') === false && !($e instanceof UriException)) {
                 $this->report((string) $e);
                 $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
             }
