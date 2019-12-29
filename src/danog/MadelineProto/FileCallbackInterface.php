@@ -23,5 +23,5 @@ interface FileCallbackInterface
 {
     public function getFile();
 
-    public function __invoke($percent);
+    public function __invoke($percent, $speed, $time);
 }

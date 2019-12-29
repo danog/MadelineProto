@@ -104,15 +104,17 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             $id = yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Preparing...', 'reply_to_msg_id' => $messageId])['id'];
             $url = new \danog\MadelineProto\FileCallback(
                 $url,
-                function ($progress) use ($peerId, $id) {
-                    static $prev = 0;
+                function ($progress, $speed, $time) use ($peerId, $id) {
+                    $this->logger("Upload progress: $progress%");
+
+                    static $prev = -1;
                     $progressR = (int) ($progress / 10);
                     if ($progressR === $prev) {
                         return;
                     }
                     $prev = $progressR;
                     try {
-                        yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => 'Upload progress: '.$progress.'%']);
+                        yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => "Upload progress: $progress%\nSpeed: $speed mbps\nTime elapsed since start: $time"]);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                     }
                 }
