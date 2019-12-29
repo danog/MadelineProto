@@ -272,7 +272,7 @@ class DataCenter
         }
         foreach ($ctxs as $ctx) {
             try {
-                if ($old && $this->sockets[$dc_number]->hasConnection($id)) {
+                if ($old) {
                     $this->API->logger->logger("Reconnecting to DC $dc_number ($id) from existing", \danog\MadelineProto\Logger::WARNING);
                     $this->sockets[$dc_number]->setExtra($this->API);
                     yield $this->sockets[$dc_number]->connect($ctx, $id);
