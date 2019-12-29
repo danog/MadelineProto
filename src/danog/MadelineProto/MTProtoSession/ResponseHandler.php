@@ -321,6 +321,8 @@ trait ResponseHandler
         if (isset($request['promise']) && \is_object($request['promise'])) {
             Loop::defer(function () use (&$request, $data) {
                 if (isset($request['promise'])) {
+                    $this->logger->logger('Rejecting: '.(isset($request['_']) ? $request['_'] : '-'));
+
                     $promise = $request['promise'];
                     unset($request['promise']);
                     try {
@@ -521,7 +523,7 @@ trait ResponseHandler
                             if (\is_numeric($seconds) && $seconds < $limit) {
                                 //$this->gotResponseForOutgoingMessageId($request_id);
 
-                                $this->logger->logger('Flood, waiting '.$seconds.' seconds before repeating async call...', \danog\MadelineProto\Logger::NOTICE);
+                                $this->logger->logger('Flood, waiting '.$seconds.' seconds before repeating async call of '.($request['_'] ?? '').'...', \danog\MadelineProto\Logger::NOTICE);
                                 $request['sent'] += $seconds;
                                 Loop::delay($seconds * 1000, [$this, 'methodRecall'], ['message_id' => $request_id, ]);
 

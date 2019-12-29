@@ -470,13 +470,15 @@ trait Files
             /**
              * Read callback, called when the chunk is read and fully resent.
              *
+             * @param mixed ...$params Params to be passed to cb
+             *
              * @return void
              */
-            public function callback(): void
+            public function callback(...$params): void
             {
                 $this->read[$this->offset++]->resolve();
                 if ($this->cb) {
-                    Tools::callFork(($this->cb)());
+                    Tools::callFork(($this->cb)(...$params));
                 }
             }
         };
