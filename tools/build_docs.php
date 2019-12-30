@@ -127,7 +127,6 @@ foreach ($docs as $settings) {
 
 $orderedfiles = [];
 $order = [
-    'ASYNC',
     'CREATING_A_CLIENT',
     'LOGIN',
     'FEATURES',
@@ -147,6 +146,7 @@ $order = [
     'SECRET_CHATS',
     'LUA',
     'PROXY',
+    'ASYNC',
     'USING_METHODS',
     'CONTRIB',
     'TEMPLATES',

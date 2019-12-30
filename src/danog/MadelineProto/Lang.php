@@ -12,7 +12,7 @@
  * @author    Daniil Gentili <daniil@daniil.it>
  * @copyright 2016-2019 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- * @link      https://docs.madelineproto.xyz MadelineProto documentation
+ * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto;
@@ -5625,6 +5625,10 @@ Contains the reason why access to a certain object must be restricted. Clients a
     'object_botInlineMediaResultDocument_param_send_message_type_BotInlineMessage' => '',
     'object_botInlineMediaResultPhoto_param_send_message_type_BotInlineMessage' => '',
     'object_channelBannedRights_param_send_messages_type_true' => '',
+    'method_messages.getMessagesReactions_param_id_type_Vector t' => '',
+    'object_message_param_reactions_type_MessageReactions' => '',
+    'object_message_param_restriction_reason_type_string' => '',
+    'object_messageReactions_param_results_type_Vector t' => '',
   ],
 ];
 
@@ -11091,5 +11095,9 @@ Contains the reason why access to a certain object must be restricted. Clients a
   'object_botInlineMediaResultDocument_param_send_message_type_BotInlineMessage' => '',
   'object_botInlineMediaResultPhoto_param_send_message_type_BotInlineMessage' => '',
   'object_channelBannedRights_param_send_messages_type_true' => '',
+  'method_messages.getMessagesReactions_param_id_type_Vector t' => '',
+  'object_message_param_reactions_type_MessageReactions' => '',
+  'object_message_param_restriction_reason_type_string' => '',
+  'object_messageReactions_param_results_type_Vector t' => '',
 ];
 }
