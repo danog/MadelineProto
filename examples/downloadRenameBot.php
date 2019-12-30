@@ -54,7 +54,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
     private $states = [];
     public function onUpdateNewChannelMessage($update)
     {
-        yield $this->onUpdateNewMessage($update);
+        //yield $this->onUpdateNewMessage($update);
     }
     public function report($message)
     {
@@ -79,17 +79,17 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             $messageId = $update['message']['id'];
 
             if ($update['message']['message'] === '/start') {
-                return $this->messages->sendMessage(['peer' => $peerId, 'message' => self::START, 'parse_mode' => 'Markdown', 'reply_to_msg_id' => $update['message']['id']]);
+                return $this->messages->sendMessage(['peer' => $peerId, 'message' => self::START, 'parse_mode' => 'Markdown', 'reply_to_msg_id' => $messageId]);
             }
             if (isset($update['message']['media']['_']) && $update['message']['media']['_'] !== 'messageMediaWebPage') {
-                $id = yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a new name for this file: ', 'reply_to_msg_id' => $messageId])['id'];
-                $this->states[$peerId] = [$update['message']['media'], $id];
+                yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a new name for this file: ', 'reply_to_msg_id' => $messageId]);
+                $this->states[$peerId] = $update['message']['media'];
 
                 return;
             }
             if (isset($this->states[$peerId])) {
                 $name = $update['message']['message'];
-                list($url, $id) = $this->states[$peerId];
+                $url = $this->states[$peerId];
                 unset($this->states[$peerId]);
             } else {
                 $url = \explode(' ', $update['message']['message'], 2);
@@ -102,20 +102,32 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                     $url = "http://$url";
                 }
             }
-            $id = yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Preparing...', 'reply_to_msg_id' => $messageId])['id'];
+            $id = yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Preparing...', 'reply_to_msg_id' => $messageId]);
+            if (!isset($id['id'])) {
+                $this->report(\json_encode($id));
+                foreach ($id['updates'] as $updat) {
+                    if (isset($updat['id'])) {
+                        $id = $updat['id'];
+                        break;
+                    }
+                }
+            } else {
+                $id = $id['id'];
+            }
+
             $url = new \danog\MadelineProto\FileCallback(
                 $url,
                 function ($progress, $speed, $time) use ($peerId, $id) {
                     $this->logger("Upload progress: $progress%");
 
-                    static $prev = -1;
-                    $progressR = (int) ($progress / 10);
-                    if ($progressR === $prev) {
+                    static $prev = 0;
+                    $now = \time();
+                    if ($now - $prev < 10 && $progress < 100) {
                         return;
                     }
-                    $prev = $progressR;
+                    $prev = $now;
                     try {
-                        yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => "Upload progress: $progress%\nSpeed: $speed mbps\nTime elapsed since start: $time"]);
+                        yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => "Upload progress: $progress%\nSpeed: $speed mbps\nTime elapsed since start: $time"], ['FloodWaitLimit' => 0]);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                     }
                 }
@@ -142,7 +154,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                 yield $this->messages->deleteMessages(['revoke' => true, 'id' => [$id]]);
             }
         } catch (\Throwable $e) {
-            if (\strpos($e->getMessage(), 'Could not connect to URI') === false && !($e instanceof UriException)) {
+            if (\strpos($e->getMessage(), 'Could not connect to URI') === false && !($e instanceof UriException) && \strpos($e->getMessage(), 'URI') === false) {
                 $this->report((string) $e);
                 $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
             }
@@ -172,7 +184,7 @@ $settings = [
     ],
 ];
 
-$MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
+$MadelineProto = new \danog\MadelineProto\API(($argv[1] ?? 'bot').'.madeline', $settings);
 $MadelineProto->async(true);
 while (true) {
     try {
