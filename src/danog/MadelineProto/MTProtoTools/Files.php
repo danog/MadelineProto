@@ -418,7 +418,7 @@ trait Files
              */
             private $offset = 0;
             /**
-             * Callback
+             * Callback.
              *
              * @var ?callable
              */
