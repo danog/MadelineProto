@@ -316,7 +316,7 @@ trait ResponseHandler
      *
      * @return void
      */
-    public function handleReject(array &$request, \Throwable $data)
+    public function handleReject(&$request, \Throwable $data)
     {
         if (isset($request['promise']) && \is_object($request['promise'])) {
             Loop::defer(function () use (&$request, $data) {
