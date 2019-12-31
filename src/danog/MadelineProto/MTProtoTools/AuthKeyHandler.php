@@ -663,6 +663,7 @@ trait AuthKeyHandler
             $dcs = [];
             $postpone = [];
             foreach ($this->datacenter->getDataCenterConnections() as $id => $socket) {
+                if (!$socket->hasCtx()) continue;
                 if ($socket->isMedia()) {
                     $oid = \intval($id);
                     if (isset($dcs[$oid])) {

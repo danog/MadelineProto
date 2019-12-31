@@ -361,6 +361,16 @@ class DataCenterConnection implements JsonSerializable
     }
 
     /**
+     * Has connection context?
+     *
+     * @return bool
+     */
+    public function hasCtx(): bool
+    {
+        return isset($this->ctx);
+    }
+
+    /**
      * Connect function.
      *
      * @param ConnectionContext $ctx Connection context
