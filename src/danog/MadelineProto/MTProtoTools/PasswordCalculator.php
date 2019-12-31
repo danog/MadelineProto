@@ -285,7 +285,7 @@ class PasswordCalculator
                 'p' => $pForHash,
             ];
             $new_settings['new_password_hash'] = $vForHash;
-            $new_settings['hint'] = $params['hint'];
+            $new_settings['hint'] = $params['hint'] ?? '';
             if (isset($params['email'])) {
                 $new_settings['email'] = $params['email'];
             }

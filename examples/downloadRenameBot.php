@@ -20,6 +20,7 @@
  */
 
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\RPCErrorException;
 use League\Uri\Contracts\UriException;
 
 /*
@@ -157,6 +158,9 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             if (\strpos($e->getMessage(), 'Could not connect to URI') === false && !($e instanceof UriException) && \strpos($e->getMessage(), 'URI') === false) {
                 $this->report((string) $e);
                 $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
+            }
+            if ($e instanceof RPCErrorException && $e->rpc === 'FILE_PARTS_INVALID') {
+                $this->report(json_encode($url));
             }
             try {
                 yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => 'Error: '.$e->getMessage()]);

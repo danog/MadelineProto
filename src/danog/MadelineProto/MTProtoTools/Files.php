@@ -296,6 +296,7 @@ trait Files
         };
 
         $resPromises = [];
+        $exception = null;
 
         $start = \microtime(true);
         while ($part_num < $part_total_num) {
@@ -308,17 +309,24 @@ trait Files
                 yield $writePromise;
             }
             $writePromise->onResolve(
-                static function ($e, $readDeferred) use ($cb, $part_num, &$resPromises) {
+                function ($e, $readDeferred) use ($cb, $part_num, &$resPromises, &$exception) {
                     if ($e) {
-                        throw $e;
+                        $this->logger("Got exception while uploading: $e");
+                        $exception = $e;
+                        return;
                     }
                     $resPromises []= $readDeferred->promise();
-                    // Wrote chunk!
-                    if (!yield Tools::call($readDeferred->promise())) {
-                        throw new \danog\MadelineProto\Exception('Upload of part '.$part_num.' failed');
+                    try {
+                        // Wrote chunk!
+                        if (!yield Tools::call($readDeferred->promise())) {
+                            throw new \danog\MadelineProto\Exception('Upload of part '.$part_num.' failed');
+                        }
+                        // Got OK from server for chunk!
+                        $cb();
+                    } catch (\Throwable $e) {
+                        $this->logger("Got exception while uploading: $e");
+                        $exception = $e;
                     }
-                    // Got OK from server for chunk!
-                    $cb();
                 }
             );
             $promises []= $writePromise;
@@ -327,6 +335,9 @@ trait Files
             if (!($part_num % $parallel_chunks)) { // By default, 10 mb at a time, for a typical bandwidth of 1gbps (run the code in this every second)
                 yield Tools::all($promises);
                 $promises = [];
+                if ($exception) {
+                    throw $exception;
+                }
 
                 $time = \microtime(true) - $start;
                 $speed = (int) (($size * 8) / $time) / 1000000;
