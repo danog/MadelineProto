@@ -451,7 +451,11 @@ class DataCenterConnection implements JsonSerializable
     {
         $backup = $this->connections[$id]->backupSession();
         $list = '';
-        foreach ($backup as $message) {
+        foreach ($backup as $k => $message) {
+            if (($message['_'] ?? '') === 'msgs_state_req') {
+                unset($backup[$k]);
+                continue;
+            }
             $list .= $message['_'] ?? '-';
             $list .= ', ';
         }

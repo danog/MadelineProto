@@ -40,7 +40,7 @@ trait CallHandler
      *
      * @return void
      */
-    public function methodRecall(string $watcherId, array $args)
+    public function methodRecall(string $watcherId, array $args): void
     {
         $message_id = $args['message_id'];
         $postpone = $args['postpone'] ?? false;

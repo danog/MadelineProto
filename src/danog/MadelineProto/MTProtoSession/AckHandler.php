@@ -92,14 +92,18 @@ trait AckHandler
         $settings = $this->shared->getSettings();
         $timeout = $settings['timeout'];
         $pfs = $settings['pfs'];
+        $unencrypted = !$this->shared->hasTempAuthKey();
+        $notBound = !$this->shared->isBound();
+
+        $pfsNotBound = $pfs && $notBound;
 
         foreach ($this->new_outgoing as $message_id) {
             if (isset($this->outgoing_messages[$message_id]['sent'])
                 && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time()
-                && $this->shared->hasTempAuthKey() === !$this->outgoing_messages[$message_id]['unencrypted']
+                && $unencrypted === $this->outgoing_messages[$message_id]['unencrypted']
                 && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
             ) {
-                if ($pfs && !$this->shared->isBound() && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+                if ($pfsNotBound && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
                     continue;
                 }
 
@@ -111,7 +115,7 @@ trait AckHandler
     }
 
     /**
-     * Get all pending calls.
+     * Get all pending calls (also clear pending state requests).
      *
      * @return array
      */
@@ -120,15 +124,23 @@ trait AckHandler
         $settings = $this->shared->getSettings();
         $timeout = $settings['timeout'];
         $pfs = $settings['pfs'];
+        $unencrypted = !$this->shared->hasTempAuthKey();
+        $notBound = !$this->shared->isBound();
+
+        $pfsNotBound = $pfs && $notBound;
 
         $result = [];
-        foreach ($this->new_outgoing as $message_id) {
+        foreach ($this->new_outgoing as $k => $message_id) {
             if (isset($this->outgoing_messages[$message_id]['sent'])
                 && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time()
-                && $this->shared->hasTempAuthKey() === !$this->outgoing_messages[$message_id]['unencrypted']
-                && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
+                && $unencrypted === $this->outgoing_messages[$message_id]['unencrypted']
             ) {
-                if ($pfs && !$this->shared->isBound() && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+                if ($pfsNotBound && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+                    continue;
+                }
+                if ($this->outgoing_messages[$message_id]['_'] === 'msgs_state_req') {
+                    unset($this->new_outgoing[$k], $this->outgoing_messages[$message_id]);
+
                     continue;
                 }
 

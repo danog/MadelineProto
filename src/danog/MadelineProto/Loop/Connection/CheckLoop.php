@@ -66,6 +66,7 @@ class CheckLoop extends ResumableSignalLoop
         $shared = $this->datacenterConnection;
 
         $timeout = $shared->getSettings()['timeout'];
+        $timeoutResend = $timeout * $timeout; // Typically 25 seconds, good enough
         while (true) {
             while (empty($connection->new_outgoing)) {
                 if (yield $this->waitSignal($this->pause())) {
@@ -82,7 +83,7 @@ class CheckLoop extends ResumableSignalLoop
                     foreach (\array_chunk($full_message_ids, 8192) as $message_ids) {
                         $deferred = new Deferred();
                         $deferred->promise()->onResolve(
-                            function ($e, $result) use ($message_ids, $API, $connection, $datacenter) {
+                            function ($e, $result) use ($message_ids, $API, $connection, $datacenter, $timeoutResend) {
                                 if ($e) {
                                     $API->logger("Got exception in check loop for DC $datacenter");
                                     $API->logger((string) $e);
@@ -117,7 +118,12 @@ class CheckLoop extends ResumableSignalLoop
                                             break;
                                         case 4:
                                             if ($chr & 32) {
-                                                $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.($message_id).' received by server and is being processed, waiting...', \danog\MadelineProto\Logger::ERROR);
+                                                if ($connection->new_outgoing[$message_id]['sent'] + $timeoutResend < \time()) {
+                                                    $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.($message_id).' received by server and is being processed for way too long, resending request...', \danog\MadelineProto\Logger::ERROR);
+                                                    $connection->methodRecall('', ['message_id' => $message_id, 'postpone' => true]);
+                                                } else {
+                                                    $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.($message_id).' received by server and is being processed, waiting...', \danog\MadelineProto\Logger::ERROR);
+                                                }
                                             } elseif ($chr & 64) {
                                                 $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.($message_id).' received by server and was already processed, requesting reply...', \danog\MadelineProto\Logger::ERROR);
                                                 $reply[] = $message_id;
