@@ -99,7 +99,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                 if (!$url) {
                     return;
                 }
-                if (\strpos($url, 'http') !== 0) {
+                if (\stripos($url, 'http') !== 0) {
                     $url = "http://$url";
                 }
             }
