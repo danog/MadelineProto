@@ -118,7 +118,7 @@ class CheckLoop extends ResumableSignalLoop
                                             break;
                                         case 4:
                                             if ($chr & 32) {
-                                                if ($connection->new_outgoing[$message_id]['sent'] + $timeoutResend < \time()) {
+                                                if ($connection->outgoing_messages[$message_id]['sent'] + $timeoutResend < \time()) {
                                                     $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.($message_id).' received by server and is being processed for way too long, resending request...', \danog\MadelineProto\Logger::ERROR);
                                                     $connection->methodRecall('', ['message_id' => $message_id, 'postpone' => true]);
                                                 } else {
