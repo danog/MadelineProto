@@ -274,15 +274,18 @@ class AnnotationsBuilder
 
             $ret = $type && $type->getName() === 'void' ? '' : 'return';
 
+            $doc .= "\n{\n";
             if ($async || !$static) {
-                $doc .= "\n{\n";
-                $doc .= "    $ret \$this->__call(__FUNCTION__, $finalParamList);\n";
-                $doc .= "}\n";
+                if ($async) {
+                    $doc .= "    $ret \$this->__call(__FUNCTION__, $finalParamList);\n";
+                } else {
+                    $doc .= "    $ret \$this->API->$name($paramList);\n";
+                }
             } else {
-                $doc .= "\n{\n";
                 $doc .= "    $ret \\".$method->getDeclaringClass()->getName()."::".$name."($paramList);\n";
-                $doc .= "}\n";
             }
+            $doc .= "}\n";
+
 
             if (!$method->getDocComment()) {
                 Logger::log("$name has no PHPDOC!", Logger::FATAL_ERROR);

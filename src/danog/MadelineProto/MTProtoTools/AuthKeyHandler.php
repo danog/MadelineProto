@@ -440,6 +440,8 @@ trait AuthKeyHandler
      * @param BigInteger $g_a
      * @param BigInteger $p
      *
+     * @internal
+     *
      * @return bool
      */
     public function checkG(BigInteger $g_a, BigInteger $p): bool
@@ -663,7 +665,9 @@ trait AuthKeyHandler
             $dcs = [];
             $postpone = [];
             foreach ($this->datacenter->getDataCenterConnections() as $id => $socket) {
-                if (!$socket->hasCtx()) continue;
+                if (!$socket->hasCtx()) {
+                    continue;
+                }
                 if ($socket->isMedia()) {
                     $oid = \intval($id);
                     if (isset($dcs[$oid])) {

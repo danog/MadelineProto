@@ -4031,7 +4031,7 @@ class InternalDoc extends APIFactory
          */
     public function cleanup(array $extra = []): \danog\MadelineProto\MTProto
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->cleanup($extra);
     }
     /**
      * Logger.
@@ -4044,7 +4044,7 @@ class InternalDoc extends APIFactory
      */
     public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = '', array $extra = []): void
     {
-        $this->__call(__FUNCTION__, [$param, $level, $file, $extra]);
+        $this->API->logger($param, $level, $file, $extra);
     }
     /**
      * Get TL namespaces.
@@ -4053,7 +4053,7 @@ class InternalDoc extends APIFactory
      */
     public function getMethodNamespaces(array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->getMethodNamespaces($extra);
     }
     /**
      * Get namespaced methods (method => namespace).
@@ -4062,7 +4062,7 @@ class InternalDoc extends APIFactory
      */
     public function getMethodsNamespaced(array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->getMethodsNamespaced($extra);
     }
     /**
      * Get TL serializer.
@@ -4071,7 +4071,7 @@ class InternalDoc extends APIFactory
      */
     public function getTL(array $extra = []): \danog\MadelineProto\TL\TL
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->getTL($extra);
     }
     /**
      * Get logger.
@@ -4080,7 +4080,7 @@ class InternalDoc extends APIFactory
      */
     public function getLogger(array $extra = []): \danog\MadelineProto\Logger
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->getLogger($extra);
     }
     /**
      * Get async HTTP client.
@@ -4089,7 +4089,7 @@ class InternalDoc extends APIFactory
      */
     public function getHTTPClient(array $extra = []): \Amp\Http\Client\DelegateHttpClient
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->getHTTPClient($extra);
     }
     /**
      * Get async DNS client.
@@ -4098,7 +4098,7 @@ class InternalDoc extends APIFactory
      */
     public function getDNSClient(array $extra = []): \Amp\Dns\Resolver
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->getDNSClient($extra);
     }
     /**
      * Get contents of remote file asynchronously.
@@ -4118,7 +4118,7 @@ class InternalDoc extends APIFactory
      */
     public function getDataCenterConnections(array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->getDataCenterConnections($extra);
     }
     /**
      * Get correct settings array for the latest version.
@@ -4140,7 +4140,7 @@ class InternalDoc extends APIFactory
      */
     public function setupLogger(array $extra = []): void
     {
-        $this->__call(__FUNCTION__, [$extra]);
+        $this->API->setupLogger($extra);
     }
     /**
      * Checks whether all datacenters are authorized.
@@ -4149,7 +4149,7 @@ class InternalDoc extends APIFactory
      */
     public function hasAllAuth(array $extra = []): bool
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->hasAllAuth($extra);
     }
     /**
      * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info.
@@ -4169,7 +4169,7 @@ class InternalDoc extends APIFactory
      */
     public function resetUpdateState(array $extra = []): void
     {
-        $this->__call(__FUNCTION__, [$extra]);
+        $this->API->resetUpdateState($extra);
     }
     /**
      * Store RSA keys for CDN datacenters.
@@ -4189,7 +4189,7 @@ class InternalDoc extends APIFactory
      */
     public function getCachedConfig(array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->getCachedConfig($extra);
     }
     /**
      * Get cached (or eventually re-fetch) server-side config.
@@ -4213,18 +4213,6 @@ class InternalDoc extends APIFactory
     public function getSelf(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Check validity of g_a parameters.
-     *
-     * @param BigInteger $g_a
-     * @param BigInteger $p
-     *
-     * @return bool
-     */
-    public function checkG(\tgseclib\Math\BigInteger $g_a, \tgseclib\Math\BigInteger $p, array $extra = []): bool
-    {
-        return $this->__call(__FUNCTION__, [$g_a, $p, $extra]);
     }
     /**
      * Call method and wait asynchronously for response.
@@ -4302,7 +4290,7 @@ class InternalDoc extends APIFactory
      */
     public function addUser(array $user, array $extra = []): void
     {
-        $this->__call(__FUNCTION__, [$user, $extra]);
+        $this->API->addUser($user, $extra);
     }
     /**
      * Check if peer is present in internal peer database.
@@ -4360,7 +4348,7 @@ class InternalDoc extends APIFactory
      */
     public function fullChatLastUpdated($id, array $extra = []): int
     {
-        return $this->__call(__FUNCTION__, [$id, $extra]);
+        return $this->API->fullChatLastUpdated($id, $extra);
     }
     /**
      * Get full info about peer, returns an FullInfo object.
@@ -4638,7 +4626,7 @@ class InternalDoc extends APIFactory
      */
     public function secretChatStatus(int $chat, array $extra = []): int
     {
-        return $this->__call(__FUNCTION__, [$chat, $extra]);
+        return $this->API->secretChatStatus($chat, $extra);
     }
     /**
      * Get secret chat.
@@ -4649,7 +4637,7 @@ class InternalDoc extends APIFactory
      */
     public function getSecretChat($chat, array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, [$chat, $extra]);
+        return $this->API->getSecretChat($chat, $extra);
     }
     /**
      * Check whether secret chat exists.
@@ -4660,7 +4648,7 @@ class InternalDoc extends APIFactory
      */
     public function hasSecretChat($chat, array $extra = []): bool
     {
-        return $this->__call(__FUNCTION__, [$chat, $extra]);
+        return $this->API->hasSecretChat($chat, $extra);
     }
     /**
      * Discard secret chat.
@@ -4742,7 +4730,7 @@ class InternalDoc extends APIFactory
      */
     public function unpackFileId(string $file_id, array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, [$file_id, $extra]);
+        return $this->API->unpackFileId($file_id, $extra);
     }
     /**
      * Get mime type from file extension.
@@ -4811,7 +4799,7 @@ class InternalDoc extends APIFactory
      */
     public function tdcliToTd(&$params, $key = null, array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, [$params, $key, $extra]);
+        return $this->API->tdcliToTd($params, $key, $extra);
     }
     /**
      * Convert TD to MTProto parameters.
@@ -5379,7 +5367,7 @@ class InternalDoc extends APIFactory
      */
     public function callStatus(int $id, array $extra = []): int
     {
-        return $this->__call(__FUNCTION__, [$id, $extra]);
+        return $this->API->callStatus($id, $extra);
     }
     /**
      * Get call info.
@@ -5390,7 +5378,7 @@ class InternalDoc extends APIFactory
      */
     public function getCall(int $call, array $extra = []): array
     {
-        return $this->__call(__FUNCTION__, [$call, $extra]);
+        return $this->API->getCall($call, $extra);
     }
     /**
      * Check state of calls.
@@ -5399,7 +5387,7 @@ class InternalDoc extends APIFactory
      */
     public function checkCalls(array $extra = []): void
     {
-        $this->__call(__FUNCTION__, [$extra]);
+        $this->API->checkCalls($extra);
     }
     /**
      * Get dialog peers.
@@ -5432,7 +5420,7 @@ class InternalDoc extends APIFactory
      */
     public function setEventHandler($event_handler, array $extra = []): void
     {
-        $this->__call(__FUNCTION__, [$event_handler, $extra]);
+        $this->API->setEventHandler($event_handler, $extra);
     }
     /**
      * Get event handler.
@@ -5441,7 +5429,7 @@ class InternalDoc extends APIFactory
      */
     public function getEventHandler(array $extra = []): \EventHandler
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->getEventHandler($extra);
     }
     /**
      * Set webhook update handler.
@@ -5453,7 +5441,7 @@ class InternalDoc extends APIFactory
      */
     public function setWebhook(string $hook_url, string $pem_path = '', array $extra = []): void
     {
-        $this->__call(__FUNCTION__, [$hook_url, $pem_path, $extra]);
+        $this->API->setWebhook($hook_url, $pem_path, $extra);
     }
     /**
      * Set update handling callback.
@@ -5464,7 +5452,7 @@ class InternalDoc extends APIFactory
      */
     public function setCallback($callback, array $extra = []): void
     {
-        $this->__call(__FUNCTION__, [$callback, $extra]);
+        $this->API->setCallback($callback, $extra);
     }
     /**
      * Log out currently logged in user.
@@ -5574,7 +5562,7 @@ class InternalDoc extends APIFactory
      */
     public function setLoopCallback($callback, array $extra = []): void
     {
-        $this->__call(__FUNCTION__, [$callback, $extra]);
+        $this->API->setLoopCallback($callback, $extra);
     }
     /**
      * Start MadelineProto's update handling loop, or run the provided async callable.
@@ -5596,7 +5584,7 @@ class InternalDoc extends APIFactory
      */
     public function closeConnection($message = 'OK!', array $extra = []): void
     {
-        $this->__call(__FUNCTION__, [$message, $extra]);
+        $this->API->closeConnection($message, $extra);
     }
     /**
      * Set NOOP update handler, ignoring all updates.
@@ -5605,7 +5593,7 @@ class InternalDoc extends APIFactory
      */
     public function setNoop(array $extra = []): void
     {
-        $this->__call(__FUNCTION__, [$extra]);
+        $this->API->setNoop($extra);
     }
     /**
      * Log in to telegram (via CLI or web).
@@ -5623,7 +5611,7 @@ class InternalDoc extends APIFactory
      */
     public function getWebTemplate(array $extra = []): string
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->getWebTemplate($extra);
     }
     /**
      * Set web template.
@@ -5634,7 +5622,7 @@ class InternalDoc extends APIFactory
      */
     public function setWebTemplate(string $template, array $extra = []): void
     {
-        $this->__call(__FUNCTION__, [$template, $extra]);
+        $this->API->setWebTemplate($template, $extra);
     }
     /**
      * Check for terms of service update.

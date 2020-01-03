@@ -160,7 +160,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
                 $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
             }
             if ($e instanceof RPCErrorException && $e->rpc === 'FILE_PARTS_INVALID') {
-                $this->report(json_encode($url));
+                $this->report(\json_encode($url));
             }
             try {
                 yield $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => 'Error: '.$e->getMessage()]);

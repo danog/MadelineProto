@@ -66,8 +66,9 @@ echo 'Loading MadelineProto...'.PHP_EOL;
 $MadelineProto = new \danog\MadelineProto\API(__DIR__.'/../testing.madeline', $settings);
 $MadelineProto->async(true);
 $MadelineProto->loop(function () use ($MadelineProto) {
-    yield $MadelineProto->fileGetContents('https://google.com');
     yield $MadelineProto->start();
+    $MadelineProto->getHttpClient();
+    yield $MadelineProto->fileGetContents('https://google.com');
 
     try {
         yield $MadelineProto->getSelf();
