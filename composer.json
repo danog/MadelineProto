@@ -25,7 +25,7 @@
         "ext-fileinfo": "*",
         "amphp/amp": "^2.0",
         "amphp/websocket-client": "dev-master as 1.0.0-rc2",
-        "amphp/http-client": "^4",
+        "amphp/http-client": "dev-master as 4",
         "amphp/socket": "^1",
         "amphp/dns": "^1",
         "amphp/file": "^1",

@@ -46,6 +46,10 @@ trait AckHandler
     public function gotResponseForOutgoingMessageId($message_id): bool
     {
         // The server acknowledges that it received my message
+        if (isset($this->new_outgoing[$message_id])) {
+            unset($this->new_outgoing[$message_id]);
+        }
+
         if (!isset($this->outgoing_messages[$message_id])) {
             $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
 
@@ -56,9 +60,6 @@ trait AckHandler
         }
         if (isset($this->outgoing_messages[$message_id]['serialized_body'])) {
             unset($this->outgoing_messages[$message_id]['serialized_body']);
-        }
-        if (isset($this->new_outgoing[$message_id])) {
-            unset($this->new_outgoing[$message_id]);
         }
 
         return true;

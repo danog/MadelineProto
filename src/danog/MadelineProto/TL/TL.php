@@ -987,7 +987,7 @@ class TL
         }
         if ($constructorData['type'] === 'Vector t') {
             $constructorData['connection'] = $type['connection'];
-            $constructorData['subtype'] = isset($type['subtype']) ? $type['subtype'] : '';
+            $constructorData['subtype'] = $type['subtype'] ?? '';
             $constructorData['type'] = 'vector';
 
             return $this->deserialize($stream, $constructorData);
