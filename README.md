@@ -56,6 +56,15 @@ $MadelineProto->loop(function () use ($MadelineProto) {
 
 Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgroup) the error message and the `MadelineProto.log` file that was created in the same directory (if running from a browser).  
 
+## Examples
+
+You can find examples for nearly every MadelineProto function in
+* [magnaluna webradio](https://magna.madelineproto.xyz) - Multifeatured Telegram VoIP webradio
+* [`downloadRenameBot.php`](https://github.com/danog/MadelineProto/blob/master/examples/downloadRenameBot.php) - download files by URL and rename Telegram files using this async parallelized bot!
+* [`bot.php`](https://github.com/danog/MadelineProto/blob/master/examples/bot.php) - examples for sending normal messages, downloading any media
+* [`secret_bot.php`](https://github.com/danog/MadelineProto/blob/master/examples/secret_bot.php) - secret chat bot
+* [`pipesbot.php`](https://github.com/danog/MadelineProto/blob/master/examples/pipesbot.php) - examples for creating inline bots and using other inline bots via a userbot
+
 ## Documentation
 
 * [Creating a client](https://docs.madelineproto.xyz/docs/CREATING_A_CLIENT.html)
@@ -120,13 +129,13 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * [Download to browser (streaming)](https://docs.madelineproto.xyz/docs/FILES.html#download-to-browser-with-streams)
   * [Getting progress](https://docs.madelineproto.xyz/docs/FILES.html#getting-progress)
 * [Getting info about chats](https://docs.madelineproto.xyz/docs/CHAT_INFO.html)
-  * [Full chat info with full list of participants](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#get_pwr_chat-now-fully-async)
-  * [Full chat info](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#get_full_info-now-fully-async)
-  * [Reduced chat info (very fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#get_info-now-fully-async)
+  * [Full chat info with full list of participants](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getPwrChat-now-fully-async)
+  * [Full chat info](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getFullInfo-now-fully-async)
+  * [Reduced chat info (very fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getInfo-now-fully-async)
   * [Just the chat ID (extremely fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#get_id-now-fully-async)
 * [Getting all chats (dialogs)](https://docs.madelineproto.xyz/docs/DIALOGS.html)
-  * [Dialog list](https://docs.madelineproto.xyz/docs/DIALOGS.html#get_dialogs-now-fully-async)
-  * [Full dialog info](https://docs.madelineproto.xyz/docs/DIALOGS.html#get_full_dialogs-now-fully-async)
+  * [Dialog list](https://docs.madelineproto.xyz/docs/DIALOGS.html#getDialogs-now-fully-async)
+  * [Full dialog info](https://docs.madelineproto.xyz/docs/DIALOGS.html#getFullDialogs-now-fully-async)
 * [Inline buttons ([now fully async!](https://docs.madelineproto.xyz/docs/ASYNC.html))](https://docs.madelineproto.xyz/docs/INLINE_BUTTONS.html)
 * [Secret chats](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html)
   * [Requesting secret chats](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html#requesting-secret-chats-now-fully-async)
@@ -479,9 +488,9 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.exportAuthorization.html" name="auth.exportAuthorization">You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html: auth.exportAuthorization</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.importAuthorization.html" name="auth.importAuthorization">You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html: auth.importAuthorization</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.importBotAuthorization.html" name="auth.importBotAuthorization">You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info): auth.importBotAuthorization</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.checkPassword.html" name="auth.checkPassword">You cannot use this method directly, use the complete2falogin method instead (see https://docs.madelineproto.xyz for more info): auth.checkPassword</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.signIn.html" name="auth.signIn">You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info): auth.signIn</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.signUp.html" name="auth.signUp">You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info): auth.signUp</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.checkPassword.html" name="auth.checkPassword">You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info): auth.checkPassword</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getFullChannel.html" name="channels.getFullChannel">You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info): channels.getFullChannel</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getFullChat.html" name="messages.getFullChat">You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info): messages.getFullChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/users.getFullUser.html" name="users.getFullUser">You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info): users.getFullUser</a>
@@ -496,8 +505,8 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/upload.saveBigFilePart.html" name="upload.saveBigFilePart">You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info: upload.saveBigFilePart</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/upload.saveFilePart.html" name="upload.saveFilePart">You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info: upload.saveFilePart</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.receivedQueue.html" name="messages.receivedQueue">You cannot use this method directly: messages.receivedQueue</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getPasswordSettings.html" name="account.getPasswordSettings">You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info): account.getPasswordSettings</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updatePasswordSettings.html" name="account.updatePasswordSettings">You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info): account.updatePasswordSettings</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getPasswordSettings.html" name="account.getPasswordSettings">You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info): account.getPasswordSettings</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updatePasswordSettings.html" name="account.updatePasswordSettings">You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info): account.updatePasswordSettings</a>
   * [Peers](https://docs.madelineproto.xyz/docs/USING_METHODS.html#peers)
   * [Files](https://docs.madelineproto.xyz/docs/FILES.html)
   * [Secret chats](https://docs.madelineproto.xyz/docs/USING_METHODS.html#secret-chats)
@@ -512,15 +521,4 @@ Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgro
   * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIB.html#contribution-guide)
   * [Credits](https://docs.madelineproto.xyz/docs/CONTRIB.html#credits)
 * [Web templates for `$MadelineProto->start()`](https://docs.madelineproto.xyz/docs/TEMPLATES.html)
-
-## Very complex and complete examples
-
-You can find examples for nearly every MadelineProto function in
-* [magnaluna webradio](https://magna.madelineproto.xyz) - Multifeatured Telegram VoIP webradio
-* [`downloadRenameBot.php`](https://github.com/danog/MadelineProto/blob/master/examples/downloadRenameBot.php) - download files by URL and rename Telegram files using this async parallelized bot!
-* [`tests/testing.php`](https://github.com/danog/MadelineProto/blob/master/tests/testing.php) - examples for making/receiving calls, making secret chats, sending secret chat messages, videos, audios, voice recordings, gifs, stickers, photos, sending normal messages, videos, audios, voice recordings, gifs, stickers, photos.
-* [`bot.php`](https://github.com/danog/MadelineProto/blob/master/examples/bot.php) - examples for sending normal messages, downloading any media
-* [`secret_bot.php`](https://github.com/danog/MadelineProto/blob/master/examples/secret_bot.php) - secret chat bot
-* [`pipesbot.php`](https://github.com/danog/MadelineProto/blob/master/examples/pipesbot.php) - examples for creating inline bots and using other inline bots via a userbot
-
 

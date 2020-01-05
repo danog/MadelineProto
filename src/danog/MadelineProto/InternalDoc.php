@@ -124,10 +124,10 @@ interface auth
     public function importBotAuthorization($params);
 
     /**
-     * You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info).
+     * You cannot use this method directly, use the complete2falogin method instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `InputCheckPasswordSRP` **password** - You cannot use this method directly, use the complete_2fa_login method instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputCheckPasswordSRP` **password** - You cannot use this method directly, use the complete2falogin method instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -455,10 +455,10 @@ interface account
     public function getPassword();
 
     /**
-     * You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info).
+     * You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `InputCheckPasswordSRP` **password** - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputCheckPasswordSRP` **password** - You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
@@ -467,11 +467,11 @@ interface account
     public function getPasswordSettings($params);
 
     /**
-     * You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info).
+     * You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info).
      *
      * Parameters:
-     * * `InputCheckPasswordSRP`         **password**     - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
-     * * `account.PasswordInputSettings` **new_settings** - You cannot use this method directly; use $MadelineProto->update_2fa($params), instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputCheckPasswordSRP`         **password**     - You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info)
+     * * `account.PasswordInputSettings` **new_settings** - You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info)
      *
      * @param array $params Parameters
      *
