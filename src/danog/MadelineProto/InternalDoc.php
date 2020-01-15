@@ -5427,7 +5427,7 @@ class InternalDoc extends APIFactory
      *
      * @return EventHandler
      */
-    public function getEventHandler(array $extra = []): \EventHandler
+    public function getEventHandler(array $extra = []): EventHandler
     {
         return $this->API->getEventHandler($extra);
     }

@@ -95,7 +95,7 @@ trait Events
      *
      * @return EventHandler
      */
-    public function getEventHandler(): EventHandler
+    public function getEventHandler(): \danog\MadelineProto\EventHandler
     {
         return $this->event_handler_instance;
     }
