@@ -267,10 +267,10 @@ trait AuthKeyHandler
      */
     private function completeRekey(int $chat, array $params): \Generator
     {
-        if ($this->secret_chats[$chat]['rekeying'][0] !== 2 || !isset($this->temp_rekeyed_secret_chats['fingerprint'])) {
+        if ($this->secret_chats[$chat]['rekeying'][0] !== 2 || !isset($this->temp_rekeyed_secret_chats[$params['exchange_id']]['fingerprint'])) {
             return;
         }
-        if ($this->temp_rekeyed_secret_chats['fingerprint'] !== $params['key_fingerprint']) {
+        if ($this->temp_rekeyed_secret_chats[$params['exchange_id']]['fingerprint'] !== $params['key_fingerprint']) {
             yield $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]], ['datacenter' => $this->datacenter->curdc]);
 
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
@@ -278,7 +278,7 @@ trait AuthKeyHandler
         $this->logger->logger('Completing rekeying of secret chat '.$chat.'...', \danog\MadelineProto\Logger::VERBOSE);
         $this->secret_chats[$chat]['rekeying'] = [0];
         $this->secret_chats[$chat]['old_key'] = $this->secret_chats[$chat]['key'];
-        $this->secret_chats[$chat]['key'] = $this->temp_rekeyed_secret_chats[$chat];
+        $this->secret_chats[$chat]['key'] = $this->temp_rekeyed_secret_chats[$params['exchange_id']];
         $this->secret_chats[$chat]['ttr'] = 100;
         $this->secret_chats[$chat]['updated'] = \time();
         unset($this->temp_rekeyed_secret_chats[$params['exchange_id']]);
