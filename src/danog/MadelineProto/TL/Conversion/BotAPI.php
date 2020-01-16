@@ -567,7 +567,7 @@ trait BotAPI
      */
     public function parseMode(array $arguments): \Generator
     {
-        if ($arguments['message'] === '' || !isset($arguments['message']) || !isset($arguments['parse_mode'])) {
+        if (($arguments['message'] ?? '') === '' || !isset($arguments['parse_mode'])) {
             return $arguments;
         }
         if (isset($arguments['parse_mode']['_'])) {
