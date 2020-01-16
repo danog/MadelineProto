@@ -608,7 +608,15 @@ trait Files
     public function getFileInfo($constructor): \Generator
     {
         if (\is_string($constructor)) {
-            $constructor = $this->unpackFileId($constructor)['MessageMedia'];
+            $constructor = $this->unpackFileId($constructor);
+            if (isset($constructor['MessageMedia'])) {
+                $constructor = $constructor['MessageMedia'];
+            } elseif (isset($constructor['InputMedia'])) {
+                return $constructor;
+            } else {
+                $constructor = yield $this->getPwrChat($constructor['Chat'] ?? $constructor['User']);
+                $constructor = $constructor['photo'];
+            }
         }
         switch ($constructor['_']) {
             case 'updateNewMessage':
@@ -657,7 +665,11 @@ trait Files
     public function getDownloadInfo($message_media): \Generator
     {
         if (\is_string($message_media)) {
-            $message_media = $this->unpackFileId($message_media)['MessageMedia'];
+            $message_media = $this->unpackFileId($message_media);
+            if (isset($message_media['InputFileLocation'])) {
+                return $message_media;
+            }
+            $message_media = $message_media['MessageMedia'] ?? $message_media['User'] ?? $message_media['Chat'];
         }
         if (!isset($message_media['_'])) {
             return $message_media;
@@ -765,11 +777,17 @@ trait Files
             case 'updateUserPhoto':
                 $res = yield $this->getDownloadInfo($message_media['photo']);
 
+                if (\is_array($message_media) && ($message_media['min'] ?? false) && isset($message_media['access_hash'])) { // bot API file ID
+                    $message_media['min'] = false;
+                    $peer = $this->genAll($message_media)['InputPeer'];
+                } else {
+                    $peer = (yield $this->getInfo($message_media))['InputPeer'];
+                }
                 $res['InputFileLocation'] = [
                     '_' => 'inputPeerPhotoFileLocation',
-                    'big' => true,
+                    'big' => $res['big'],
                     'dc_id' => $res['InputFileLocation']['dc_id'],
-                    'peer' => (yield $this->getInfo($message_media))['InputPeer'],
+                    'peer' => $peer,
                     'volume_id' => $res['InputFileLocation']['volume_id'],
                     'local_id' => $res['InputFileLocation']['local_id'],
                     // The peer field will be added later
@@ -778,10 +796,12 @@ trait Files
 
             case 'userProfilePhoto':
             case 'chatPhoto':
-                $size = $message_media['photo_big'];
+                $size = $message_media['photo_big'] ?? $message_media['photo_small'];
 
                 $res = yield $this->getDownloadInfo($size);
+                $res['big'] = isset($message_media['photo_big']);
                 $res['InputFileLocation']['dc_id'] = $message_media['dc_id'];
+
                 return $res;
             case 'photoStrippedSize':
                 $res['size'] = \strlen($message_media['bytes']);
@@ -1213,6 +1233,7 @@ trait Files
 
         $time = 0;
         $speed = 0;
+        $origCb = $cb;
         $cb = function () use ($cb, $count, &$time, &$speed) {
             static $cur = 0;
             $cur++;
@@ -1224,7 +1245,11 @@ trait Files
         $params[0]['previous_promise'] = new Success(true);
 
         $start = \microtime(true);
-        $size = yield $this->downloadPart($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, \array_shift($params), $callable, $seekable);
+        $size = yield $this->downloadPart($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = \array_shift($params), $callable, $seekable);
+        if ($initParam['part_end_at'] - $initParam['part_start_at'] !== $size) { // Premature end for undefined length files
+            $origCb(100);
+            return true;
+        }
 
         if ($params) {
             $previous_promise = new Success(true);
@@ -1237,13 +1262,17 @@ trait Files
                     if ($res) {
                         $size += $res;
                     }
+                    return (bool) $res;
                 });
 
                 $promises[] = $previous_promise;
 
                 if (!($key % $parallel_chunks)) { // 20 mb at a time, for a typical bandwidth of 1gbps
-                    yield \danog\MadelineProto\Tools::all($promises);
-                    $promises = [];
+                    $res = array_sum(yield \danog\MadelineProto\Tools::all($promises));
+                    if ($res !== count($promises)) {
+                        $promises = [];
+                        break;
+                    }
 
                     $time = \microtime(true) - $start;
                     $speed = (int) (($size * 8) / $time) / 1000000;
@@ -1262,6 +1291,10 @@ trait Files
 
         if ($cdn) {
             $this->clearCdnHashes($message_media['file_token']);
+        }
+
+        if (!isset($message_media['size'])) {
+            $origCb(100);
         }
 
         return true;
@@ -1369,6 +1402,10 @@ trait Files
                 $this->datacenter->has(++$datacenter)
             ) {
                 $res = yield $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, ['heavy' => true, 'file' => true, 'FloodWaitLimit' => 0, 'datacenter' => $datacenter]);
+            }
+
+            if ($res['bytes'] === '') {
+                return 0;
             }
 
             if (isset($message_media['cdn_key'])) {

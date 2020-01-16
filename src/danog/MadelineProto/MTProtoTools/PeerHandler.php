@@ -640,7 +640,7 @@ trait PeerHandler
         $res = [$this->TL->getConstructors()->findByPredicate($constructor['_'])['type'] => $constructor];
         switch ($constructor['_']) {
             case 'user':
-                if ($constructor['self']) {
+                if ($constructor['self'] ?? false) {
                     $res['InputPeer'] = ['_' => 'inputPeerSelf'];
                     $res['InputUser'] = ['_' => 'inputUserSelf'];
                 } elseif (isset($constructor['access_hash'])) {
@@ -656,7 +656,7 @@ trait PeerHandler
                 $res['InputNotifyPeer'] = ['_' => 'inputNotifyPeer', 'peer' => $res['InputPeer']];
                 $res['user_id'] = $constructor['id'];
                 $res['bot_api_id'] = $constructor['id'];
-                $res['type'] = $constructor['bot'] ? 'bot' : 'user';
+                $res['type'] = ($constructor['bot'] ?? false) ? 'bot' : 'user';
                 break;
             case 'chat':
             case 'chatForbidden':
@@ -683,7 +683,7 @@ trait PeerHandler
                 $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min']];
                 $res['channel_id'] = $constructor['id'];
                 $res['bot_api_id'] = $this->toSupergroup($constructor['id']);
-                $res['type'] = $constructor['megagroup'] ? 'supergroup' : 'channel';
+                $res['type'] = ($constructor['megagroup'] ?? false) ? 'supergroup' : 'channel';
                 break;
             case 'channelForbidden':
                 throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
@@ -775,7 +775,7 @@ trait PeerHandler
                     }
                 }
                 if (isset($full['full']['profile_photo']['sizes'])) {
-                    $res['photo'] = yield $this->photosizeToBotAPI(\end($full['full']['profile_photo']['sizes']), $full['full']['profile_photo']);
+                    $res['photo'] = $full['full']['profile_photo'];
                 }
                 break;
             case 'chat':
@@ -793,7 +793,7 @@ trait PeerHandler
                     $res['all_members_are_administrators'] = !$res['admins_enabled'];
                 }
                 if (isset($full['full']['chat_photo']['sizes'])) {
-                    $res['photo'] = yield $this->photosizeToBotAPI(\end($full['full']['chat_photo']['sizes']), $full['full']['chat_photo']);
+                    $res['photo'] = $full['full']['chat_photo'];
                 }
                 if (isset($full['full']['exported_invite']['link'])) {
                     $res['invite'] = $full['full']['exported_invite']['link'];
@@ -815,7 +815,7 @@ trait PeerHandler
                     }
                 }
                 if (isset($full['full']['chat_photo']['sizes'])) {
-                    $res['photo'] = yield $this->photosizeToBotAPI(\end($full['full']['chat_photo']['sizes']), $full['full']['chat_photo']);
+                    $res['photo'] = $full['full']['chat_photo'];
                 }
                 if (isset($full['full']['exported_invite']['link'])) {
                     $res['invite'] = $full['full']['exported_invite']['link'];

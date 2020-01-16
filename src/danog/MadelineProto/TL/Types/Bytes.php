@@ -19,7 +19,7 @@
 
 namespace danog\MadelineProto\TL\Types;
 
-class Bytes implements \JsonSerializable
+class Bytes implements \JsonSerializable, \ArrayAccess
 {
     use \danog\Serializable;
     private $bytes = [];
@@ -42,5 +42,29 @@ class Bytes implements \JsonSerializable
     public function jsonSerialize()
     {
         return ['_' => 'bytes', 'bytes' => \base64_encode($this->bytes)];
+    }
+
+    public function offsetSet($name, $value)
+    {
+        if ($name === null) {
+            $this->bytes .= $value;
+        } else {
+            $this->bytes[$name] = $value;
+        }
+    }
+
+    public function offsetGet($name)
+    {
+        return $this->bytes[$name];
+    }
+
+    public function offsetUnset($name)
+    {
+        unset($this->bytes[$name]);
+    }
+
+    public function offsetExists($name)
+    {
+        return isset($this->bytes[$name]);
     }
 }
