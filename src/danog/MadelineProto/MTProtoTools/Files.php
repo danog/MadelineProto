@@ -411,6 +411,12 @@ trait Files
              */
             private $read = [];
             /**
+             * Read promises (write lenth).
+             *
+             * @var int[]
+             */
+            private $wrote = [];
+            /**
              * Write promises.
              *
              * @var Deferred[]
@@ -476,6 +482,7 @@ trait Files
             {
                 $offset /= $this->partSize;
                 $this->write[$offset]->resolve($data);
+                $this->wrote[$offset] = strlen($data);
                 return $this->read[$offset]->promise();
             }
             /**
@@ -487,7 +494,8 @@ trait Files
              */
             public function callback(...$params): void
             {
-                $this->read[$this->offset++]->resolve();
+                $offset = $this->offset++;
+                $this->read[$offset]->resolve($this->wrote[$offset]);
                 if ($this->cb) {
                     Tools::callFork(($this->cb)(...$params));
                 }
@@ -1079,6 +1087,7 @@ trait Files
 
         $this->logger->logger('Waiting for lock of file to download...');
         $unlock = yield \danog\MadelineProto\Tools::flock($file, LOCK_EX);
+        $this->logger->logger('Got lock of file to download');
 
         try {
             yield $this->downloadToStream($message_media, $stream, $cb, $size, -1);
@@ -1262,16 +1271,17 @@ trait Files
                     if ($res) {
                         $size += $res;
                     }
-                    return (bool) $res;
                 });
 
                 $promises[] = $previous_promise;
 
                 if (!($key % $parallel_chunks)) { // 20 mb at a time, for a typical bandwidth of 1gbps
-                    $res = array_sum(yield \danog\MadelineProto\Tools::all($promises));
-                    if ($res !== count($promises)) {
-                        $promises = [];
-                        break;
+                    $res = yield \danog\MadelineProto\Tools::all($promises);
+                    $promises = [];
+                    foreach ($res as $r) {
+                        if (!$r) {
+                            break 2;
+                        }
                     }
 
                     $time = \microtime(true) - $start;
@@ -1393,6 +1403,8 @@ trait Files
                 }
                 continue;
             }
+            $res['bytes'] = (string) $res['bytes'];
+
             if ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '') {
                 $datacenter = 0;
             }
@@ -1423,7 +1435,7 @@ trait Files
             if (!$seekable) {
                 yield $offset['previous_promise'];
             }
-            $res = yield $callable((string) $res['bytes'], $offset['offset'] + $offset['part_start_at']);
+            $res = yield $callable($res['bytes'], $offset['offset'] + $offset['part_start_at']);
             $cb();
             return $res;
         } while (true);

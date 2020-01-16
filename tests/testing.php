@@ -101,11 +101,11 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     if (!\getenv('TRAVIS_COMMIT') && \stripos(yield $MadelineProto->readline('Do you want to make a call? (y/n): '), 'y') !== false) {
         $controller = yield $MadelineProto->requestCall(\getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
         while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
-            yield $MadelineProto->getUpdates();
+            yield $MadelineProto->sleep(1);
         }
         $MadelineProto->logger($controller->configuration);
         while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
-            yield $MadelineProto->getUpdates();
+            yield $MadelineProto->sleep(1);
         }
     }
 
@@ -273,10 +273,15 @@ var_dump(time()-$t);
 
         foreach ($media as $type => $inputMedia) {
             $MadelineProto->logger("Sending $type");
-            $type = yield $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']);
-            yield $MadelineProto->downloadToDir($media = yield $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]), '/tmp');
+            yield $MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']);
+            $MadelineProto->logger("Uploading $type");
+            $media = yield $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]);
+            $MadelineProto->logger("Downloading $type");
+            yield $MadelineProto->downloadToDir($media, '/tmp');
+            $MadelineProto->logger("Re-sending $type");
             $inputMedia['file'] = $media;
             yield $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]);
+            $MadelineProto->logger("Done $type");
         }
     }
 
