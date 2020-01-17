@@ -444,15 +444,16 @@ trait Files
             /**
              * Constructor.
              *
-             * @param integer $size     Total file size
-             * @param integer $partSize Part size
-             * @param integer $cb       Callback
+             * @param integer  $size     Total file size
+             * @param integer  $partSize Part size
+             * @param callable $cb       Callback
              */
-            public function __construct(int $size, int $partSize, $cb)
+            public function __construct(int $size, int $partSize, callable $cb)
             {
                 for ($x = 0; $x < $size; $x += $partSize) {
                     $this->read []= new Deferred;
                     $this->write []= new Deferred;
+                    $this->wrote []= $size - $x < $partSize ? $size - $x : $partSize;
                 }
                 $this->partSize = $partSize;
                 $this->cb = $cb;
@@ -482,7 +483,6 @@ trait Files
             {
                 $offset /= $this->partSize;
                 $this->write[$offset]->resolve($data);
-                $this->wrote[$offset] = strlen($data);
                 return $this->read[$offset]->promise();
             }
             /**
