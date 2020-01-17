@@ -248,7 +248,7 @@ trait AuthKeyHandler
             throw new \danog\MadelineProto\SecurityException('Invalid key fingerprint!');
         }
         yield $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionCommitKey', 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]], ['datacenter' => $this->datacenter->curdc]);
-        unset($this->temp_rekeyed_secret_chats[$chat]);
+        unset($this->temp_rekeyed_secret_chats[$params['exchange_id']]);
         $this->secret_chats[$chat]['rekeying'] = [0];
         $this->secret_chats[$chat]['old_key'] = $this->secret_chats[$chat]['key'];
         $this->secret_chats[$chat]['key'] = $key;
@@ -347,9 +347,7 @@ trait AuthKeyHandler
         if (isset($this->temp_requested_secret_chats[$chat])) {
             unset($this->temp_requested_secret_chats[$chat]);
         }
-        if (isset($this->temp_rekeyed_secret_chats[$chat])) {
-            unset($this->temp_rekeyed_secret_chats[$chat]);
-        }
+        
 
         try {
             yield $this->methodCallAsyncRead('messages.discardEncryption', ['chat_id' => $chat], ['datacenter' => $this->datacenter->curdc]);
