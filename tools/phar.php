@@ -82,18 +82,35 @@ function ___install_madeline()
         $phar = \file_get_contents(\sprintf($phar_template, $release_branch));
 
         if ($phar) {
+            $extractVersions = static function () {
+                if (!file_exists('phar://madeline.phar/vendor/composer/installed.json')) {
+                    return array();
+                }
+                $composer = \json_decode(\file_get_contents('phar://madeline.phar/vendor/composer/installed.json'), true);
+                $packages = array();
+                foreach ($composer as $dep) {
+                    $packages[$dep['name']] = $dep['version_normalized'];
+                }
+                return $packages;
+            };
+            $previous = $extractVersions();
+            $previous['danog/madelineproto'] = 'old';
+
             \file_put_contents('madeline.phar', $phar);
             \file_put_contents('madeline.phar.version', $release);
 
-
-            $composer = \json_decode(\file_get_contents('phar://madeline.phar/vendor/composer/installed.json'), true);
-            $postData = ['downloads' => []];
-            foreach ($composer as $dep) {
+            $current = $extractVersions();
+            $postData = array('downloads' => array());
+            foreach ($current as $name => $version) {
+                if (isset($previous[$name]) && $previous[$name] === $version) {
+                    continue;
+                }
                 $postData['downloads'][] = [
-                    'name' => $dep['name'],
-                    'version' => $dep['version_normalized']
+                    'name' => $name,
+                    'version' => $version
                 ];
             }
+
             $opts = ['http' =>
                 [
                     'method' => 'POST',
