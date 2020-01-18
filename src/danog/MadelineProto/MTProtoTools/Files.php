@@ -232,7 +232,7 @@ trait Files
      *
      * @return \Generator<array>
      */
-    public function uploadFromCallable($callable, int $size, string $mime, string $fileName = '', $cb = null, bool $seekable = true, bool $encrypted = false): \Generator
+    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', $cb = null, bool $seekable = true, bool $encrypted = false): \Generator
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
@@ -446,9 +446,9 @@ trait Files
              *
              * @param integer  $size     Total file size
              * @param integer  $partSize Part size
-             * @param callable $cb       Callback
+             * @param ?callable $cb       Callback
              */
-            public function __construct(int $size, int $partSize, callable $cb)
+            public function __construct(int $size, int $partSize, ?callable $cb)
             {
                 for ($x = 0; $x < $size; $x += $partSize) {
                     $this->read []= new Deferred;
@@ -1304,7 +1304,7 @@ trait Files
         }
 
         if (!isset($message_media['size'])) {
-            $origCb(100, 0, 0);
+            $origCb(100, $time, $speed);
         }
 
         return true;
