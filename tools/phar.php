@@ -84,6 +84,25 @@ function ___install_madeline()
         if ($phar) {
             \file_put_contents('madeline.phar', $phar);
             \file_put_contents('madeline.phar.version', $release);
+
+
+            $composer = \json_decode(\file_get_contents('phar://madeline.phar/vendor/composer/installed.json'), true);
+            $postData = ['downloads' => []];
+            foreach ($composer as $dep) {
+                $postData['downloads'][] = [
+                    'name' => $dep['name'],
+                    'version' => $dep['version_normalized']
+                ];
+            }
+            $opts = ['http' =>
+                [
+                    'method' => 'POST',
+                    'header' => ['Content-Type: application/json'],
+                    'content' => \json_encode($postData),
+                    'timeout' => 6,
+                ],
+            ];
+            @\file_get_contents("https://packagist.org/downloads/", false, \stream_context_create($opts));
         }
     }
 }
