@@ -1205,7 +1205,7 @@ trait Files
         }
 
         if ($offset === $end) {
-            $cb(100);
+            $cb(100, 0, 0);
             return true;
         }
         $params = [];
@@ -1235,7 +1235,7 @@ trait Files
         }
 
         if (!$params) {
-            $cb(100);
+            $cb(100, 0, 0);
             return true;
         }
         $count = \count($params);
@@ -1256,7 +1256,7 @@ trait Files
         $start = \microtime(true);
         $size = yield $this->downloadPart($message_media, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = \array_shift($params), $callable, $seekable);
         if ($initParam['part_end_at'] - $initParam['part_start_at'] !== $size) { // Premature end for undefined length files
-            $origCb(100);
+            $origCb(100, 0, 0);
             return true;
         }
 
@@ -1304,7 +1304,7 @@ trait Files
         }
 
         if (!isset($message_media['size'])) {
-            $origCb(100);
+            $origCb(100, 0, 0);
         }
 
         return true;
