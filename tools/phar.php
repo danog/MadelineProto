@@ -83,11 +83,11 @@ function ___install_madeline()
 
         if ($phar) {
             $extractVersions = static function () {
-                if (!file_exists('phar://madeline.phar/vendor/composer/installed.json')) {
-                    return array();
+                if (!\file_exists('phar://madeline.phar/vendor/composer/installed.json')) {
+                    return [];
                 }
                 $composer = \json_decode(\file_get_contents('phar://madeline.phar/vendor/composer/installed.json'), true);
-                $packages = array();
+                $packages = [];
                 foreach ($composer as $dep) {
                     $packages[$dep['name']] = $dep['version_normalized'];
                 }
@@ -100,7 +100,7 @@ function ___install_madeline()
             \file_put_contents('madeline.phar.version', $release);
 
             $current = $extractVersions();
-            $postData = array('downloads' => array());
+            $postData = ['downloads' => []];
             foreach ($current as $name => $version) {
                 if (isset($previous[$name]) && $previous[$name] === $version) {
                     continue;

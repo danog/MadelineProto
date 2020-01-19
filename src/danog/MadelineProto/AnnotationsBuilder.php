@@ -251,7 +251,8 @@ class AnnotationsBuilder
                 }
                 $paramList .= '$'.$param->getName().', ';
             }
-            if (!$hasVariadic && !$static) {
+            $hasReturnValue = ($type = $method->getReturnType()) && !\in_array($type->getName(), [\Generator::class, Promise::class]);
+            if (!$hasVariadic && !$static && !$hasReturnValue) {
                 $paramList .= '$extra, ';
                 $doc .= 'array $extra = []';
             }
@@ -259,7 +260,7 @@ class AnnotationsBuilder
             $paramList = \rtrim($paramList, ', ');
             $doc .= ")";
             $async = true;
-            if (($type = $method->getReturnType()) && !\in_array($type->getName(), [\Generator::class, Promise::class])) {
+            if ($hasReturnValue) {
                 $doc .= ': ';
                 if ($type->allowsNull()) {
                     $doc .= '?';
@@ -267,22 +268,23 @@ class AnnotationsBuilder
                 if (!$type->isBuiltin()) {
                     $doc .= '\\';
                 }
-                $doc .= $type->getName() === 'self' ? $method->getDeclaringClass()->getName() : $type->getName();
+                $doc .= $type->getName() === 'self' ? $this->reflectionClasses['API'] : $type->getName();
                 $async = false;
             }
             $finalParamList = $hasVariadic ? "Tools::arr($paramList)" : "[$paramList]";
 
-            $ret = $type && $type->getName() === 'void' ? '' : 'return';
+            $ret = $type && \in_array($type->getName(), ['self', 'void']) ? '' : 'return';
 
             $doc .= "\n{\n";
-            if ($async || !$static) {
-                if ($async) {
-                    $doc .= "    $ret \$this->__call(__FUNCTION__, $finalParamList);\n";
-                } else {
-                    $doc .= "    $ret \$this->API->$name($paramList);\n";
-                }
+            if ($async) {
+                $doc .= "    $ret \$this->__call(__FUNCTION__, $finalParamList);\n";
+            } elseif (!$static) {
+                $doc .= "    $ret \$this->API->$name($paramList);\n";
             } else {
                 $doc .= "    $ret \\".$method->getDeclaringClass()->getName()."::".$name."($paramList);\n";
+            }
+            if (!$ret && $type->getName() === 'self') {
+                $doc .= "    return \$this;\n";
             }
             $doc .= "}\n";
 

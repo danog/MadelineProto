@@ -883,9 +883,9 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = '', array $extra = []): void
+    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = ''): void
     {
-        $this->API->logger($param, $level, $file, $extra);
+        $this->API->logger($param, $level, $file);
     }
     /**
      * Call lite method.
@@ -919,17 +919,17 @@ class InternalDoc extends APIFactory
      *
      * @return array
      */
-    public function botAPItoMTProto(array $parameters, array $extra = []): array
+    public function botAPItoMTProto(array $parameters): array
     {
-        return $this->API->botAPItoMTProto($parameters, $extra);
+        return $this->API->botAPItoMTProto($parameters);
     }
     /**
      * Get TL method namespaces.
      *
      * @return array
      */
-    public function getMethodNamespaces(array $extra = []): array
+    public function getMethodNamespaces(): array
     {
-        return $this->API->getMethodNamespaces($extra);
+        return $this->API->getMethodNamespaces();
     }
 }

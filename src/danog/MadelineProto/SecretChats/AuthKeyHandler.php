@@ -347,7 +347,7 @@ trait AuthKeyHandler
         if (isset($this->temp_requested_secret_chats[$chat])) {
             unset($this->temp_requested_secret_chats[$chat]);
         }
-        
+
 
         try {
             yield $this->methodCallAsyncRead('messages.discardEncryption', ['chat_id' => $chat], ['datacenter' => $this->datacenter->curdc]);

@@ -22,6 +22,7 @@ echo '{
     "minimum-stability":"dev",
     "require": {
         "danog/madelineproto": "dev-master",
+        "amphp/websocket-client": "dev-master as 1.0.0-rc2",
         "amphp/dns": "dev-master#eb0b0a2 as v1"
     },
     "repositories": [

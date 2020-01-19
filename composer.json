@@ -4,7 +4,6 @@
     "type": "project",
     "license": "AGPL-3.0-only",
     "homepage": "https://docs.madelineproto.xyz",
-    "minimum-stability": "dev",
     "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
     "conflict": {
         "krakjoe/pthreads-polyfill": "*"
@@ -24,7 +23,6 @@
         "ext-zlib": "*",
         "ext-fileinfo": "*",
         "amphp/amp": "^2.0",
-        "amphp/websocket-client": "dev-master as 1.0.0-rc2",
         "amphp/http-client": "^4",
         "amphp/socket": "^1",
         "amphp/dns": "^1",

@@ -19,7 +19,6 @@
 
 namespace danog\MadelineProto\TL\Conversion;
 
-use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\PeerHandler;
 use danog\MadelineProto\Tools;
 use tgseclib\Math\BigInteger;
@@ -79,12 +78,12 @@ trait BotAPIFiles
                     break;
                 case 1:
                     $deserialized['file_type'] = Tools::unpackSignedInt(\stream_get_contents($file_id, 4));
-                    $deserialized['thumbnail_type'] = chr(Tools::unpackSignedInt(\stream_get_contents($file_id, 4)));
+                    $deserialized['thumbnail_type'] = \chr(Tools::unpackSignedInt(\stream_get_contents($file_id, 4)));
                     break;
                 case 2:
                 case 3:
                     $deserialized['photo_size'] = $deserialized['photosize_source'] === 2 ? 'photo_small' : 'photo_big';
-                    $deserialized['dialog_id'] = (string) new BigInteger(strrev(\stream_get_contents($file_id, 8)), -256);
+                    $deserialized['dialog_id'] = (string) new BigInteger(\strrev(\stream_get_contents($file_id, 8)), -256);
                     $deserialized['dialog_access_hash'] = \stream_get_contents($file_id, 8);
                     break;
                 case 4:
@@ -115,8 +114,8 @@ trait BotAPIFiles
                     return $res;
                 }
                 $res['User'] = [
-                    '_' => 'user', 
-                    'id' => $deserialized['dialog_id'], 
+                    '_' => 'user',
+                    'id' => $deserialized['dialog_id'],
                     'access_hash' => $deserialized['dialog_access_hash'],
                     'photo' => [
                         '_' => 'userProfilePhoto',
@@ -159,15 +158,15 @@ trait BotAPIFiles
                     $constructor['id'] = $deserialized['id'];
                     $constructor['access_hash'] = $deserialized['access_hash'];
                     unset($deserialized['id'], $deserialized['access_hash']);
-    
+
                     $deserialized['_'] = $deserialized['secret'] ? 'fileLocation' : 'fileLocationToBeDeprecated';
                     $constructor['sizes'][0] = ['_' => 'photoSize', 'type' => '', 'location' => $deserialized];
                     $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $constructor, 'caption' => ''];
-    
+
                     return $res;
                 }
                 $res['MessageMedia'] = [
-                    '_' => 'photo', 
+                    '_' => 'photo',
                     'id' => $deserialized['id'],
                     'access_hash' => $deserialized['access_hash'],
                     'sizes' => [
@@ -180,7 +179,7 @@ trait BotAPIFiles
                                 'volume_id' => $deserialized['local_id'],
                             ]
                         ]
-                    ], 
+                    ],
                     'dc_id' => $deserialized['dc_id']
                 ];
                 return $res;
@@ -224,7 +223,7 @@ trait BotAPIFiles
                 unset($deserialized['_']);
                 $constructor = \array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeVideo', 'round_message' => true]]]);
                 $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
-    
+
                 return $res;
             default:
                 throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['file_type_invalid'], $type));
