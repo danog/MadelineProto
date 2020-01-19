@@ -16,12 +16,14 @@ rm -rf phar7 phar5 MadelineProtoPhar
 mkdir phar7
 cd phar7
 
+[ "$IS_RELEASE" == "y" ] && composer=$TRAVIS_BRANCH || composer="dev-$TRAVIS_BRANCH"
+
 # Install
 echo '{
     "name": "danog/madelineprototests",
     "minimum-stability":"dev",
     "require": {
-        "danog/madelineproto": "dev-master",
+        "danog/madelineproto": "'$composer'",
         "amphp/websocket-client": "dev-master as 1.0.0-rc2",
         "amphp/dns": "dev-master#eb0b0a2 as v1"
     },
