@@ -22,7 +22,7 @@
         "ext-hash": "*",
         "ext-zlib": "*",
         "ext-fileinfo": "*",
-        "amphp/amp": "^2.0",
+        "amphp/amp": "^2",
         "amphp/http-client": "^4",
         "amphp/socket": "^1",
         "amphp/dns": "^1",
