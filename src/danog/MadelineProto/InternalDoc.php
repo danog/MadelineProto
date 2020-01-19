@@ -5577,7 +5577,16 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$callback, $extra]);
     }
     /**
-     * Close connection with server.
+     * Stop update loop.
+     *
+     * @return void
+     */
+    public function stop(): void
+    {
+        $this->API->stop();
+    }
+    /**
+     * Close connection with client, connected via web.
      *
      * @param string $message Message
      *

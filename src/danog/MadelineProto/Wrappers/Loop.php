@@ -29,6 +29,12 @@ use danog\MadelineProto\Tools;
 trait Loop
 {
     private $loop_callback;
+    /**
+     * Whether to stop the loop.
+     *
+     * @var boolean
+     */
+    private $stopLoop = false;
 
     /**
      * Set loop callback (DEPRECATED).
@@ -164,7 +170,8 @@ trait Loop
 
         $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
 
-        while (true) {
+        $this->stopLoop = false;
+        do {
             $updates = $this->updates;
             $this->updates = [];
             foreach ($updates as $update) {
@@ -177,14 +184,25 @@ trait Loop
 
             if ($this->loop_callback !== null) {
                 $callback = $this->loop_callback;
-                $callback();
+                Tools::callForkDefer($callback());
             }
             yield $this->waitUpdate();
-        }
+        } while (!$this->stopLoop);
+        $this->stopLoop = false;
+    }
+    /**
+     * Stop update loop.
+     *
+     * @return void
+     */
+    public function stop(): void
+    {
+        $this->stopLoop = true;
+        $this->signalUpdate();
     }
 
     /**
-     * Close connection with server.
+     * Close connection with client, connected via web.
      *
      * @param string $message Message
      *
