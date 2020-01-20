@@ -67,7 +67,7 @@ trait AuthKeyHandler
      *
      * @return array
      */
-    public function discardCall(array $call, string $reason, array $rating = [], bool $need_debug = true): void
+    public function discardCall(array $call, array $reason, array $rating = [], bool $need_debug = true): void
     {
         \danog\MadelineProto\Tools::wait($this->discardCallAsync($call, $reason, $rating, $need_debug));
     }
@@ -296,7 +296,7 @@ trait AuthKeyHandler
      *
      * @return \Generator
      */
-    public function discardCallAsync(array $call, string $reason, array $rating = [], bool $need_debug = true): \Generator
+    public function discardCallAsync(array $call, array $reason, array $rating = [], bool $need_debug = true): \Generator
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw \danog\MadelineProto\Exception::extension('libtgvoip');
