@@ -140,7 +140,7 @@ trait AuthKeyHandler
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['call_already_declined']);
-                yield $this->discardCallAsync($call['id'], 'phoneCallDiscardReasonHangup');
+                yield $this->discardCallAsync($call['id'], ['_' => 'phoneCallDiscardReasonHangup']);
 
                 return false;
             }
@@ -185,7 +185,7 @@ trait AuthKeyHandler
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['call_already_declined']);
-                yield $this->discardCallAsync($call['id'], 'phoneCallDiscardReasonHangup');
+                yield $this->discardCallAsync($call['id'], ['_' => 'phoneCallDiscardReasonHangup']);
 
                 return false;
             }
