@@ -58,20 +58,15 @@ final class Coroutine implements Promise, \ArrayAccess
     /** @var mixed Promise success value when executing next coroutine step, null at all other times. */
     private $value;
 
-    /**
-     * Generator trace.
-     *
-     * @var Trace
-     */
-    private $trace;
+    /** @var ?self Reference to coroutine that started this coroutine */
+    private $parentCoroutine;
 
     /**
      * @param \Generator $generator
      */
-    public function __construct(\Generator $generator, Trace $trace = null)
+    public function __construct(\Generator $generator)
     {
         $this->generator = $generator;
-        //$this->trace = $trace ?? new Trace(\debug_backtrace());
 
         try {
             $yielded = $this->generator->current();
@@ -92,23 +87,12 @@ final class Coroutine implements Promise, \ArrayAccess
                     return;
                 }
                 if ($yielded instanceof \Generator) {
-                    /*if ($this->generator->valid()) {
-                        $reflection = new ReflectionGenerator($this->generator);
-                        $trace = new Trace(
-                            [[
-                                'file' => $reflection->getExecutingFile(),
-                                'line' => $reflection->getExecutingLine(),
-                                'function' => $reflection->getFunction()->getName(),
-                            ]],
-                            $this->trace
-                        );
-                    } else {
-                        $trace = $this->trace;
-                    }
-                    $yielded = new self($yielded, $trace);*/
                     $yielded = new self($yielded);
                 } else {
                     $yielded = $this->generator->send($yielded);
+                }
+                if ($yielded instanceof self) {
+                    $yielded->parentCoroutine = $this;
                 }
             }
         } catch (\Throwable $exception) {
@@ -133,7 +117,7 @@ final class Coroutine implements Promise, \ArrayAccess
                 do {
                     if ($this->exception) {
                         // Throw exception at current execution point.
-                        $yielded = $this->generator->throw($this->exception);
+                        $yielded = $this->throw($this->exception);
                     } else {
                         // Send the new value and execute to next yield statement.
                         $yielded = $this->generator->send($this->value);
@@ -163,6 +147,9 @@ final class Coroutine implements Promise, \ArrayAccess
                             $yielded = $this->generator->send($yielded);
                         }
                     }
+                    if ($yielded instanceof self) {
+                        $yielded->parentCoroutine = $this;
+                    }
                     $this->immediate = false;
                     $yielded->onResolve($this->onResolve);
                 } while ($this->immediate);
@@ -179,13 +166,31 @@ final class Coroutine implements Promise, \ArrayAccess
     }
 
     /**
+     * Throw exception into the generator
+     *
+     * @param \Throwable $reason Exception
+     * 
+     * @internal
+     * 
+     * @return void
+     */
+    public function throw(\Throwable $reason)
+    {
+        if (!isset($reason->yieldedFrames)) {
+            if (method_exists($reason, 'updateTLTrace')) {
+                $reason->updateTLTrace($this->getTrace());
+            } else {
+                $reason->yieldedFrames = $this->getTrace();
+            }
+        }
+        $this->generator->throw($reason);
+    }
+
+    /**
      * @param \Throwable $reason Failure reason.
      */
     public function fail(\Throwable $reason)
     {
-        //if (isset(\class_uses($reason)[TL\PrettyException::class])) {
-        //$reason->updateTLTrace($this->getTrace());
-        //}
         $this->resolve(new Failure($reason));
     }
 
@@ -246,13 +251,48 @@ final class Coroutine implements Promise, \ArrayAccess
             return $result->{$name}($arguments);
         })());
     }
+
     /**
-     * Get stacktrace from when the generator was started.
+     * Get current stack trace for running coroutine.
      *
      * @return array
      */
     public function getTrace(): array
     {
-        return $this->trace->getTrace();
+        $frames = [];
+        try {
+            $reflector = new ReflectionGenerator($this->generator);
+            $frames = $reflector->getTrace();
+            $frames []= \array_merge(
+                $this->parentCoroutine ? $this->parentCoroutine->getFrame() : [],
+                [
+                    'function' => $reflector->getFunction()->getName(),
+                    'args' => []
+                ]
+            );
+        } catch (\Throwable $e) {
+        }
+        if ($this->parentCoroutine) {
+            $frames = \array_merge($frames, $this->parentCoroutine->getTrace());
+        }
+        return $frames;
+    }
+
+    /**
+     * Get current execution frame
+     *
+     * @return array
+     */
+    public function getFrame(): array
+    {
+        try {
+            $reflector = new ReflectionGenerator($this->generator);
+            return [
+                'file' => $reflector->getExecutingFile(),
+                'line' => $reflector->getExecutingLine(),
+            ];
+        } catch (\Throwable $e) {
+        }
+        return [];
     }
 }
