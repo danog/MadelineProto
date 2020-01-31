@@ -87,9 +87,9 @@ final class Coroutine implements Promise, \ArrayAccess
                 } else {
                     $yielded = $this->generator->send($yielded);
                 }
-                if ($yielded instanceof self) {
-                    $yielded->parentCoroutine = $this;
-                }
+            }
+            if ($yielded instanceof self) {
+                $yielded->parentCoroutine = $this;
             }
         } catch (\Throwable $exception) {
             $this->fail($exception);
