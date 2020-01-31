@@ -251,7 +251,7 @@ class DataCenter
                 if (\MADELINEPROTO_TEST === 'pony') {
                     throw $e;
                 }
-                $this->API->logger->logger('Connection failed: ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger("Connection failed ({$dc_number}): " . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             }
         }
         throw new \danog\MadelineProto\Exception("Could not connect to DC {$dc_number}");

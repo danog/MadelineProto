@@ -330,6 +330,7 @@ class Connection extends Session
         $this->API->logger->logger("Connecting to DC {$this->datacenterId}", \danog\MadelineProto\Logger::WARNING);
         $ctx->setReadCallback([$this, 'haveRead']);
         $this->stream = (yield from $ctx->getStream());
+        $this->API->logger->logger("Connected to DC {$this->datacenterId}!", \danog\MadelineProto\Logger::WARNING);
         if ($this->needsReconnect) {
             $this->needsReconnect = false;
         }
