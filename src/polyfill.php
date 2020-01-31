@@ -1,4 +1,5 @@
 <?php
+
 // Polyfill for some PHP 5 functions
 function callMe($allable, ...$args)
 {
@@ -17,7 +18,7 @@ function __destructure($list, $value)
     $res = [];
     foreach ($list as $key) {
         if (\is_string($key)) {
-            $res []= $value[$key];
+            $res[] = $value[$key];
         } else {
             $res = \array_merge($res, __destructure($key, $value[$key]));
         }
@@ -36,7 +37,6 @@ if (!\function_exists('error_clear_last')) {
         @\trigger_error("");
     }
 }
-
 if (!\defined('MADELINEPROTO_TEST')) {
     \define('MADELINEPROTO_TEST', 'NOT PONY');
 }

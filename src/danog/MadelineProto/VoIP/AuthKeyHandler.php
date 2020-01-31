@@ -28,7 +28,6 @@ namespace danog\MadelineProto\VoIP;
 trait AuthKeyHandler
 {
     private $calls = [];
-
     /**
      * Request call (synchronous).
      *
@@ -42,7 +41,6 @@ trait AuthKeyHandler
     {
         return \danog\MadelineProto\Tools::wait($this->requestCallAsync($user));
     }
-
     /**
      * Accept call (synchronous).
      *
@@ -56,7 +54,6 @@ trait AuthKeyHandler
     {
         return \danog\MadelineProto\Tools::wait($this->acceptCallAsync($user));
     }
-
     /**
      * Discard call (synchronous).
      *
@@ -71,7 +68,6 @@ trait AuthKeyHandler
     {
         \danog\MadelineProto\Tools::wait($this->discardCallAsync($call, $reason, $rating, $need_debug));
     }
-
     /**
      * Request VoIP call.
      *
@@ -102,10 +98,8 @@ trait AuthKeyHandler
         $controller->setCall($res['phone_call']);
         $this->calls[$res['phone_call']['id']] = $controller;
         yield $this->updaters[false]->resume();
-
         return $controller;
     }
-
     /**
      * Accept call.
      *
@@ -120,7 +114,6 @@ trait AuthKeyHandler
         }
         if ($this->callStatus($call['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED) {
             $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_1'], $call['id']));
-
             return false;
         }
         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['accepting_call'], $this->calls[$call['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
@@ -129,30 +122,24 @@ trait AuthKeyHandler
         $b = \tgseclib\Math\BigInteger::randomRange(\danog\MadelineProto\Magic::$two, $dh_config['p']->subtract(\danog\MadelineProto\Magic::$two));
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->checkG($g_b, $dh_config['p']);
-
         try {
             $res = yield $this->methodCallAsyncRead('phone.acceptCall', ['peer' => $call, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => \danog\MadelineProto\VoIP::getConnectionMaxLayer()]], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
                 $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_already_accepted'], $call['id']));
-
                 return true;
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['call_already_declined']);
-                yield $this->discardCallAsync($call['id'], 'phoneCallDiscardReasonHangup');
-
+                yield from $this->discardCallAsync($call['id'], 'phoneCallDiscardReasonHangup');
                 return false;
             }
-
             throw $e;
         }
         $this->calls[$res['phone_call']['id']]->storage['b'] = $b;
         yield $this->updaters[false]->resume();
-
         return true;
     }
-
     /**
      * Confirm call.
      *
@@ -167,7 +154,6 @@ trait AuthKeyHandler
         }
         if ($this->callStatus($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_REQUESTED) {
             $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_2'], $params['id']));
-
             return false;
         }
         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_confirming'], $this->calls[$params['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
@@ -180,35 +166,28 @@ trait AuthKeyHandler
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
                 $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_already_accepted'], $call['id']));
-
                 return true;
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['call_already_declined']);
-                yield $this->discardCallAsync($call['id'], 'phoneCallDiscardReasonHangup');
-
+                yield from $this->discardCallAsync($call['id'], 'phoneCallDiscardReasonHangup');
                 return false;
             }
-
             throw $e;
         }
-
         $visualization = [];
         $length = new \tgseclib\Math\BigInteger(\count(\danog\MadelineProto\Magic::$emojis));
-        foreach (\str_split(\hash('sha256', $key.\str_pad($this->calls[$params['id']]->storage['g_a'], 256, \chr(0), \STR_PAD_LEFT), true), 8) as $number) {
+        foreach (\str_split(\hash('sha256', $key . \str_pad($this->calls[$params['id']]->storage['g_a'], 256, \chr(0), \STR_PAD_LEFT), true), 8) as $number) {
             $number[0] = \chr(\ord($number[0]) & 0x7f);
             $visualization[] = \danog\MadelineProto\Magic::$emojis[(int) (new \tgseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
         }
         $this->calls[$params['id']]->setVisualization($visualization);
-
         $this->calls[$params['id']]->configuration['endpoints'] = \array_merge($res['connections'], $this->calls[$params['id']]->configuration['endpoints']);
         $this->calls[$params['id']]->configuration = \array_merge(['recv_timeout' => $this->config['call_receive_timeout_ms'] / 1000, 'init_timeout' => $this->config['call_connect_timeout_ms'] / 1000, 'data_saving' => \danog\MadelineProto\VoIP::DATA_SAVING_NEVER, 'enable_NS' => true, 'enable_AEC' => true, 'enable_AGC' => true, 'auth_key' => $key, 'auth_key_id' => \substr(\sha1($key, true), -8), 'call_id' => \substr(\hash('sha256', $key, true), -16), 'network_type' => \danog\MadelineProto\VoIP::NET_TYPE_ETHERNET], $this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
         $res = $this->calls[$params['id']]->startTheMagic();
-
         return $res;
     }
-
     /**
      * Complete call handshake.
      *
@@ -223,7 +202,6 @@ trait AuthKeyHandler
         }
         if ($this->callStatus($params['id']) !== \danog\MadelineProto\VoIP::CALL_STATE_ACCEPTED || !isset($this->calls[$params['id']]->storage['b'])) {
             $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_error_3'], $params['id']));
-
             return false;
         }
         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_completing'], $this->calls[$params['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
@@ -239,7 +217,7 @@ trait AuthKeyHandler
         }
         $visualization = [];
         $length = new \tgseclib\Math\BigInteger(\count(\danog\MadelineProto\Magic::$emojis));
-        foreach (\str_split(\hash('sha256', $key.\str_pad($params['g_a_or_b']->toBytes(), 256, \chr(0), \STR_PAD_LEFT), true), 8) as $number) {
+        foreach (\str_split(\hash('sha256', $key . \str_pad($params['g_a_or_b']->toBytes(), 256, \chr(0), \STR_PAD_LEFT), true), 8) as $number) {
             $number[0] = \chr(\ord($number[0]) & 0x7f);
             $visualization[] = \danog\MadelineProto\Magic::$emojis[(int) (new \tgseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
         }
@@ -247,10 +225,8 @@ trait AuthKeyHandler
         $this->calls[$params['id']]->configuration['endpoints'] = \array_merge($params['connections'], $this->calls[$params['id']]->configuration['endpoints']);
         $this->calls[$params['id']]->configuration = \array_merge(['recv_timeout' => $this->config['call_receive_timeout_ms'] / 1000, 'init_timeout' => $this->config['call_connect_timeout_ms'] / 1000, 'data_saving' => \danog\MadelineProto\VoIP::DATA_SAVING_NEVER, 'enable_NS' => true, 'enable_AEC' => true, 'enable_AGC' => true, 'auth_key' => $key, 'auth_key_id' => \substr(\sha1($key, true), -8), 'call_id' => \substr(\hash('sha256', $key, true), -16), 'network_type' => \danog\MadelineProto\VoIP::NET_TYPE_ETHERNET], $this->calls[$params['id']]->configuration);
         $this->calls[$params['id']]->parseConfig();
-
         return $this->calls[$params['id']]->startTheMagic();
     }
-
     /**
      * Get call status.
      *
@@ -266,10 +242,8 @@ trait AuthKeyHandler
         if (isset($this->calls[$id])) {
             return $this->calls[$id]->getCallState();
         }
-
         return \danog\MadelineProto\VoIP::CALL_STATE_NONE;
     }
-
     /**
      * Get call info.
      *
@@ -282,10 +256,8 @@ trait AuthKeyHandler
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw \danog\MadelineProto\Exception::extension('libtgvoip');
         }
-
         return $this->calls[$call];
     }
-
     /**
      * Discard call.
      *
@@ -305,7 +277,6 @@ trait AuthKeyHandler
             return;
         }
         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_discarding'], $call['id']), \danog\MadelineProto\Logger::VERBOSE);
-
         try {
             $res = yield $this->methodCallAsyncRead('phone.discardCall', ['peer' => $call, 'duration' => \time() - $this->calls[$call['id']]->whenCreated(), 'connection_id' => $this->calls[$call['id']]->getPreferredRelayID(), 'reason' => $reason], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {

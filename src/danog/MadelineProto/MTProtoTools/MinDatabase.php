@@ -29,26 +29,8 @@ use danog\MadelineProto\Tools;
 class MinDatabase implements TLCallback
 {
     use Tools;
-
-    const SWITCH_CONSTRUCTORS = [
-        'inputChannel',
-        'inputUser',
-        'inputPeerUser',
-        'inputPeerChannel',
-    ];
-    const CATCH_PEERS = [
-        'message',
-        'messageService',
-        'peerUser',
-        'peerChannel',
-        'messageEntityMentionName',
-
-        'messageFwdHeader',
-        'messageActionChatCreate',
-        'messageActionChatAddUser',
-        'messageActionChatDeleteUser',
-        'messageActionChatJoinedByLink',
-    ];
+    const SWITCH_CONSTRUCTORS = ['inputChannel', 'inputUser', 'inputPeerUser', 'inputPeerChannel'];
+    const CATCH_PEERS = ['message', 'messageService', 'peerUser', 'peerChannel', 'messageEntityMentionName', 'messageFwdHeader', 'messageActionChatCreate', 'messageActionChatAddUser', 'messageActionChatDeleteUser', 'messageActionChatJoinedByLink'];
     const ORIGINS = ['message', 'messageService'];
     /**
      * References indexed by location.
@@ -68,23 +50,19 @@ class MinDatabase implements TLCallback
      * @var \danog\MadelineProto\MTProto
      */
     private $API;
-
     public function __construct(MTProto $API)
     {
         $this->API = $API;
         $this->init();
     }
-
     public function __wakeup()
     {
         $this->init();
     }
-
     public function __sleep()
     {
         return ['db', 'API'];
     }
-
     public function init()
     {
         foreach ($this->db as $id => $origin) {
@@ -93,48 +71,37 @@ class MinDatabase implements TLCallback
             }
         }
     }
-
     public function getMethodCallbacks(): array
     {
         return [];
     }
-
     public function getMethodBeforeCallbacks(): array
     {
         return [];
     }
-
     public function getConstructorCallbacks(): array
     {
-        return \array_merge(
-            \array_fill_keys(self::CATCH_PEERS, [[$this, 'addPeer']]),
-            \array_fill_keys(self::ORIGINS, [[$this, 'addOrigin']])
-        );
+        return \array_merge(\array_fill_keys(self::CATCH_PEERS, [[$this, 'addPeer']]), \array_fill_keys(self::ORIGINS, [[$this, 'addOrigin']]));
     }
-
     public function getConstructorBeforeCallbacks(): array
     {
         return \array_fill_keys(self::ORIGINS, [[$this, 'addOriginContext']]);
     }
-
     public function getConstructorSerializeCallbacks(): array
     {
         return \array_fill_keys(self::SWITCH_CONSTRUCTORS, [$this, 'populateFrom']);
     }
-
     public function getTypeMismatchCallbacks(): array
     {
         return [];
     }
-
     public function reset()
     {
         if ($this->cache) {
-            $this->API->logger->logger('Found '.\count($this->cache).' pending contexts', \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger('Found ' . \count($this->cache) . ' pending contexts', \danog\MadelineProto\Logger::ERROR);
             $this->cache = [];
         }
     }
-
     public function addPeer(array $location)
     {
         if (!$this->cache) {
@@ -148,18 +115,15 @@ class MinDatabase implements TLCallback
                         if ($frame['args'][1]['subtype'] === $previous) {
                             continue;
                         }
-
                         $frames[] = $frame['args'][1]['subtype'];
                         $previous = $frame['args'][1]['subtype'];
                     } elseif (isset($frame['args'][1]['type'])) {
                         if ($frame['args'][1]['type'] === '') {
                             break;
                         }
-
                         if ($frame['args'][1]['type'] === $previous) {
                             continue;
                         }
-
                         $frames[] = $frame['args'][1]['type'];
                         $previous = $frame['args'][1]['type'];
                     }
@@ -168,10 +132,9 @@ class MinDatabase implements TLCallback
             $frames = \array_reverse($frames);
             $tl_trace = \array_shift($frames);
             foreach ($frames as $frame) {
-                $tl_trace .= "['".$frame."']";
+                $tl_trace .= "['" . $frame . "']";
             }
             $this->API->logger->logger($tl_trace, \danog\MadelineProto\Logger::ERROR);
-
             return false;
         }
         $peers = [];
@@ -204,16 +167,13 @@ class MinDatabase implements TLCallback
         foreach ($peers as $id => $true) {
             $this->cache[$key][$id] = $id;
         }
-
         return true;
     }
-
     public function addOriginContext(string $type)
     {
         $this->API->logger->logger("Adding peer origin context for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->cache[] = [];
     }
-
     public function addOrigin(array $data = [])
     {
         $cache = \array_pop($this->cache);
@@ -236,10 +196,9 @@ class MinDatabase implements TLCallback
             }
             $this->db[$id] = $origin;
         }
-        $this->API->logger->logger("Added origin ({$data['_']}) to ".\count($cache).' peer locations', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Added origin ({$data['_']}) to " . \count($cache) . ' peer locations', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
     }
-
-    public function populateFrom(array $object)
+    public function populateFrom(array $object): \Generator
     {
         if (!($object['min'] ?? false)) {
             return $object;
@@ -250,17 +209,14 @@ class MinDatabase implements TLCallback
             $new['_'] .= 'FromMessage';
             $new['peer'] = (yield $this->API->getInfo($new['peer']))['InputPeer'];
             if ($new['peer']['min']) {
-                $this->API->logger->logger("Don't have origin peer subinfo with min peer $id, this may fail");
+                $this->API->logger->logger("Don't have origin peer subinfo with min peer {$id}, this may fail");
                 return $object;
             }
             return $new;
         }
-        $this->API->logger->logger("Don't have origin info with min peer $id, this may fail");
-
-
+        $this->API->logger->logger("Don't have origin info with min peer {$id}, this may fail");
         return $object;
     }
-
     /**
      * Check if location info is available for peer.
      *
@@ -274,6 +230,6 @@ class MinDatabase implements TLCallback
     }
     public function __debugInfo()
     {
-        return ['MinDatabase instance '.\spl_object_hash($this)];
+        return ['MinDatabase instance ' . \spl_object_hash($this)];
     }
 }

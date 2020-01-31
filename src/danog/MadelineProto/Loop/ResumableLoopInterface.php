@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Resumable loop interface.
  *
@@ -35,7 +36,6 @@ interface ResumableLoopInterface extends LoopInterface
      * @return Promise
      */
     public function pause($time = null): Promise;
-
     /**
      * Resume the loop.
      *

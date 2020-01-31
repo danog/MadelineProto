@@ -21,7 +21,6 @@ namespace danog\MadelineProto;
 
 use Amp\Deferred;
 use Amp\Promise;
-
 use function Amp\File\exists;
 use function Amp\File\get;
 use function Amp\File\put;
@@ -67,7 +66,6 @@ class API extends InternalDoc
     public $asyncAPIPromise;
     private $oldInstance = false;
     private $destructing = false;
-
     /**
      * Magic constructor function.
      *
@@ -94,7 +92,6 @@ class API extends InternalDoc
             }
         }
     }
-
     /**
      * Async constructor function.
      *
@@ -108,29 +105,25 @@ class API extends InternalDoc
     {
         if (\is_string($params)) {
             Logger::constructorFromSettings($settings);
-
             $realpaths = Serialization::realpaths($params);
             $this->session = $realpaths['file'];
-
             if (yield exists($realpaths['file'])) {
                 Logger::log('Waiting for shared lock of serialization lockfile...');
                 $unlock = yield Tools::flock($realpaths['lockfile'], LOCK_SH);
                 Logger::log('Shared lock acquired, deserializing...');
-
                 try {
                     $tounserialize = yield get($realpaths['file']);
                 } finally {
                     $unlock();
                 }
                 \danog\MadelineProto\Magic::classExists();
-
                 try {
                     $unserialized = \unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Bug74586Exception $e) {
                     \class_exists('\\Volatile');
                     $tounserialize = \str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
                     foreach (['RSA', 'TL\\TLMethods', 'TL\\TLConstructors', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                        \class_exists('\\danog\\MadelineProto\\'.$class);
+                        \class_exists('\\danog\\MadelineProto\\' . $class);
                     }
                     $unserialized = \danog\Serialization::unserialize($tounserialize);
                 } catch (\danog\MadelineProto\Exception $e) {
@@ -142,7 +135,7 @@ class API extends InternalDoc
                     }
                     \class_exists('\\Volatile');
                     foreach (['RSA', 'TL\\TLMethods', 'TL\\TLConstructors', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
-                        \class_exists('\\danog\\MadelineProto\\'.$class);
+                        \class_exists('\\danog\\MadelineProto\\' . $class);
                     }
                     $changed = false;
                     if (\strpos($tounserialize, 'O:26:"danog\\MadelineProto\\Button":') !== false) {
@@ -165,12 +158,10 @@ class API extends InternalDoc
                         $tounserialize = \str_replace('C:26:"phpseclib3\\Math\\BigInteger"', 'C:24:"tgseclib\\Math\\BigInteger"', $tounserialize);
                         $changed = true;
                     }
-
                     Logger::log((string) $e, Logger::ERROR);
                     if (!$changed) {
                         throw $e;
                     }
-
                     try {
                         $unserialized = \danog\Serialization::unserialize($tounserialize);
                     } catch (\Throwable $e) {
@@ -189,7 +180,6 @@ class API extends InternalDoc
                 $this->web_api_template = $unserialized->web_api_template;
                 $this->my_telegram_org_wrapper = $unserialized->my_telegram_org_wrapper;
                 $this->getting_api_id = $unserialized->getting_api_id;
-
                 if (isset($unserialized->API)) {
                     $this->API = $unserialized->API;
                     $this->APIFactory();
@@ -208,7 +198,6 @@ class API extends InternalDoc
             $params = $settings;
         }
         Logger::constructorFromSettings($settings);
-
         if (!isset($params['app_info']['api_id']) || !$params['app_info']['api_id']) {
             $app = yield $this->APIStart($params);
             $params['app_info']['api_id'] = $app['api_id'];
@@ -226,7 +215,6 @@ class API extends InternalDoc
         //\danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
-
     /**
      * Enable or disable async.
      *
@@ -237,14 +225,12 @@ class API extends InternalDoc
     public function async(bool $async): void
     {
         $this->async = $async;
-
         if ($this->API) {
-            if ($this->API->event_handler && \class_exists($this->API->event_handler) && \is_subclass_of($this->API->event_handler, '\danog\MadelineProto\EventHandler')) {
+            if ($this->API->event_handler && \class_exists($this->API->event_handler) && \is_subclass_of($this->API->event_handler, '\\danog\\MadelineProto\\EventHandler')) {
                 $this->API->setEventHandler($this->API->event_handler);
             }
         }
     }
-
     /**
      * Destruct function.
      *
@@ -270,7 +256,6 @@ class API extends InternalDoc
         }
         //restore_error_handler();
     }
-
     /**
      * Sleep function.
      *
@@ -282,8 +267,6 @@ class API extends InternalDoc
     {
         return ['API', 'web_api_template', 'getting_api_id', 'my_telegram_org_wrapper'];
     }
-
-
     /**
      * Custom fast getSelf.
      *
@@ -295,7 +278,6 @@ class API extends InternalDoc
     {
         return isset($this->API) && isset($this->API->authorization['user']) ? $this->API->authorization['user'] : false;
     }
-
     /**
      * Init API wrapper.
      *
@@ -322,7 +304,6 @@ class API extends InternalDoc
             $this->methods = [];
             foreach ($methods as $method) {
                 $actual_method = $method;
-
                 if ($method == 'methodCallAsyncRead') {
                     $method = 'methodCall';
                 } elseif (\stripos($method, 'async') !== false) {
@@ -340,14 +321,12 @@ class API extends InternalDoc
                     $this->methods[\strtolower(Tools::fromCamelCase($method))] = $actual_method;
                 }
             }
-
             $this->API->wrapper = $this;
-            if ($this->API->event_handler && \class_exists($this->API->event_handler) && \is_subclass_of($this->API->event_handler, '\danog\MadelineProto\EventHandler')) {
+            if ($this->API->event_handler && \class_exists($this->API->event_handler) && \is_subclass_of($this->API->event_handler, '\\danog\\MadelineProto\\EventHandler')) {
                 $this->API->setEventHandler($this->API->event_handler);
             }
         }
     }
-
     /**
      * Get full list of MTProto and API methods.
      *
@@ -362,10 +341,8 @@ class API extends InternalDoc
         foreach ($this->API->methods->by_id as $method) {
             $methods[] = $method['method'];
         }
-
         return \array_merge($methods, \get_class_methods($this->API));
     }
-
     /**
      * Serialize session.
      *
@@ -377,12 +354,11 @@ class API extends InternalDoc
      */
     public function serialize(string $filename = ''): Promise
     {
-        return Tools::callFork((function () use ($filename) {
+        return Tools::callFork((function () use ($filename): \Generator {
             if (empty($filename)) {
                 $filename = $this->session;
             }
             //Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
-
             if ($filename == '') {
                 return;
             }
@@ -399,11 +375,8 @@ class API extends InternalDoc
             $this->serialized = \time();
             $realpaths = Serialization::realpaths($filename);
             //Logger::log('Waiting for exclusive lock of serialization lockfile...');
-
             $unlock = yield Tools::flock($realpaths['lockfile'], LOCK_EX);
-
             //Logger::log('Lock acquired, serializing');
-
             try {
                 if (!$this->getting_api_id) {
                     $update_closure = $this->API->settings['updates']['callback'];
@@ -425,7 +398,6 @@ class API extends InternalDoc
                 $unlock();
             }
             //Logger::log('Done serializing');
-
             return $wrote;
         })());
     }

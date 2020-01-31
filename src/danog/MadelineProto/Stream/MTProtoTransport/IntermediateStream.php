@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TCP Intermediate stream wrapper.
  *
@@ -24,7 +25,6 @@ use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
-
 use danog\MadelineProto\Stream\RawStreamInterface;
 
 /**
@@ -38,7 +38,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
 {
     use BufferedStream;
     private $stream;
-
     /**
      * Connect to stream.
      *
@@ -48,9 +47,8 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      */
     public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = yield $ctx->getStream(\str_repeat(\chr(238), 4).$header);
+        $this->stream = yield $ctx->getStream(\str_repeat(\chr(238), 4) . $header);
     }
-
     /**
      * Async close.
      *
@@ -60,7 +58,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     {
         return $this->stream->disconnect();
     }
-
     /**
      * Get write buffer asynchronously.
      *
@@ -72,10 +69,8 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     {
         $buffer = yield $this->stream->getWriteBuffer($length + 4, $append);
         yield $buffer->bufferWrite(\pack('V', $length));
-
         return $buffer;
     }
-
     /**
      * Get read buffer asynchronously.
      *
@@ -87,10 +82,8 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     {
         $buffer = yield $this->stream->getReadBuffer($l);
         $length = \unpack('V', yield $buffer->bufferRead(4))[1];
-
         return $buffer;
     }
-
     /**
      * {@inheritdoc}
      *
@@ -109,8 +102,6 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
     {
         return $this->stream;
     }
-
-
     public static function getName(): string
     {
         return __CLASS__;

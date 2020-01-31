@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AES CTR stream wrapper.
  *
@@ -26,7 +27,6 @@ use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
-
 use tgseclib\Crypt\AES;
 
 /**
@@ -48,7 +48,6 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     private $extra;
     private $append = '';
     private $append_after = 0;
-
     /**
      * Connect to stream.
      *
@@ -62,15 +61,12 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
         $this->encrypt->enableContinuousBuffer();
         $this->encrypt->setKey($this->extra['encrypt']['key']);
         $this->encrypt->setIV($this->extra['encrypt']['iv']);
-
         $this->decrypt = new \tgseclib\Crypt\AES('ctr');
         $this->decrypt->enableContinuousBuffer();
         $this->decrypt->setKey($this->extra['decrypt']['key']);
         $this->decrypt->setIV($this->extra['decrypt']['iv']);
-
         $this->stream = yield $ctx->getStream($header);
     }
-
     /**
      * Async close.
      *
@@ -80,7 +76,6 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     {
         return $this->stream->disconnect();
     }
-
     /**
      * Get write buffer asynchronously.
      *
@@ -95,10 +90,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
             $this->append = $append;
             $this->append_after = $length - \strlen($append);
         }
-
         return $this;
     }
-
     /**
      * Get read buffer asynchronously.
      *
@@ -109,10 +102,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     public function getReadBufferGenerator(&$length): \Generator
     {
         $this->read_buffer = yield $this->stream->getReadBuffer($length);
-
         return $this;
     }
-
     /**
      * Decrypts read data asynchronously.
      *
@@ -126,7 +117,6 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     {
         return @$this->decrypt->encrypt(yield $this->read_buffer->bufferRead($length));
     }
-
     /**
      * Writes data to the stream.
      *
@@ -146,14 +136,11 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
             } elseif ($this->append_after < 0) {
                 $this->append_after = 0;
                 $this->append = '';
-
                 throw new \danog\MadelineProto\Exception('Tried to send too much out of frame data, cannot append');
             }
         }
-
         return $this->write_buffer->bufferWrite(@$this->encrypt->encrypt($data));
     }
-
     /**
      * Set obfuscation keys/IVs.
      *
@@ -165,7 +152,6 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     {
         $this->extra = $data;
     }
-
     /**
      * {@inheritdoc}
      *
@@ -175,7 +161,6 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     {
         return $this->stream->getSocket();
     }
-
     /**
      * {@inheritDoc}
      *
@@ -193,7 +178,6 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     {
         return $this->decrypt;
     }
-
     public static function getName(): string
     {
         return __CLASS__;

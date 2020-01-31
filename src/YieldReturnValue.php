@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Yield return value PHP5 polyfill.
  *
@@ -18,12 +19,10 @@
 class YieldReturnValue
 {
     private $value;
-
     public function __construct($value)
     {
         $this->value = $value;
     }
-
     public function getReturn()
     {
         return $this->value;

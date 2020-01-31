@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Loop helper trait.
  *
@@ -36,7 +37,6 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
     private $resume;
     private $pause;
     private $resumeWatcher;
-
     public function pause($time = null): Promise
     {
         if (!\is_null($time)) {
@@ -51,16 +51,13 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
             $this->resumeWatcher = Loop::delay((int) ($time * 1000), [$this, 'resume'], $resume);
         }
         $this->resume = new Deferred();
-
         $pause = $this->pause;
         $this->pause = new Deferred();
         if ($pause) {
             Loop::defer([$pause, 'resolve']);
         }
-
         return $this->resume->promise();
     }
-
     public function resume($watcherId = null, $expected = 0)
     {
         if ($this->resumeWatcher) {
@@ -75,15 +72,12 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
             $resume = $this->resume;
             $this->resume = null;
             $resume->resolve();
-
             return $this->pause ? $this->pause->promise() : null;
         }
     }
-
     public function resumeDefer()
     {
         Loop::defer([$this, 'resume']);
-
         return $this->pause ? $this->pause->promise() : null;
     }
 }

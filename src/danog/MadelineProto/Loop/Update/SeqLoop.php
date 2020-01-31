@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Update feeder loop.
  *
@@ -31,28 +32,23 @@ class SeqLoop extends ResumableSignalLoop
     private $incomingUpdates = [];
     private $feeder;
     private $pendingWakeups = [];
-
     public function __construct($API)
     {
         $this->API = $API;
     }
-
-    public function loop()
+    public function loop(): \Generator
     {
         $API = $this->API;
         $this->feeder = $API->feeders[false];
-
         if (!$this->API->settings['updates']['handle_updates']) {
             return false;
         }
-
         while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
             if (yield $this->waitSignal($this->pause())) {
                 return;
             }
         }
         $this->state = yield $API->loadUpdateState();
-
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
                 if (yield $this->waitSignal($this->pause())) {
@@ -68,7 +64,7 @@ class SeqLoop extends ResumableSignalLoop
             while ($this->incomingUpdates) {
                 $updates = $this->incomingUpdates;
                 $this->incomingUpdates = [];
-                yield $this->parse($updates);
+                yield from $this->parse($updates);
                 $updates = null;
             }
             while ($this->pendingWakeups) {
@@ -79,8 +75,7 @@ class SeqLoop extends ResumableSignalLoop
             }
         }
     }
-
-    public function parse($updates)
+    public function parse($updates): \Generator
     {
         \reset($updates);
         while ($updates) {
@@ -88,53 +83,43 @@ class SeqLoop extends ResumableSignalLoop
             $key = \key($updates);
             $update = $updates[$key];
             unset($updates[$key]);
-
             $options = $update['options'];
             $seq_start = $options['seq_start'];
             $seq_end = $options['seq_end'];
-
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
-                $this->API->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Seq hole. seq_start: ' . $seq_start . ' != cur seq: ' . ($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
                 yield $this->pause(1.0);
                 if (!$this->incomingUpdates) {
                     yield $this->API->updaters[false]->resume();
                 }
                 $this->incomingUpdates = \array_merge($this->incomingUpdates, [$update], $updates);
-
                 continue;
             }
             if ($result < 0) {
-                $this->API->logger->logger('Seq too old. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Seq too old. seq_start: ' . $seq_start . ' != cur seq: ' . ($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
                 continue;
             }
             $this->state->seq($seq_end);
             if (isset($options['date'])) {
                 $this->state->date($options['date']);
             }
-
-            yield $this->save($update);
+            yield from $this->save($update);
         }
     }
-
     public function feed($updates)
     {
-        $this->API->logger->logger('Was fed updates of type '.$updates['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
-
+        $this->API->logger->logger('Was fed updates of type ' . $updates['_'] . '...', \danog\MadelineProto\Logger::VERBOSE);
         $this->incomingUpdates[] = $updates;
     }
-
-    public function save($updates)
+    public function save($updates): \Generator
     {
         $this->pendingWakeups += yield $this->feeder->feed($updates['updates']);
     }
-
     public function addPendingWakeups($wakeups)
     {
         $this->pendingWakeups += $wakeups;
     }
-
-
     public function __toString(): string
     {
         return 'update seq loop';

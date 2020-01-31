@@ -35,17 +35,14 @@ trait DialogHandler
             foreach ($this->chats as $chat) {
                 $res[] = $this->genAll($chat)['Peer'];
             }
-
             return $res;
         }
         $res = [];
-        foreach (yield $this->getFullDialogs($force) as $dialog) {
+        foreach (yield from $this->getFullDialogs($force) as $dialog) {
             $res[] = $dialog['peer'];
         }
-
         return $res;
     }
-
     /**
      * Get full info of all dialogs.
      *
@@ -64,7 +61,6 @@ trait DialogHandler
         $res = ['dialogs' => [0], 'count' => 1];
         $datacenter = $this->datacenter->curdc;
         $dialogs = [];
-
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getting_dialogs']);
         while ($this->dialog_params['count'] < $res['count']) {
             $res = yield $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
@@ -104,7 +100,6 @@ trait DialogHandler
                 break;
             }
         }
-
         return $dialogs;
     }
 }

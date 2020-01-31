@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MTProto permanent auth key.
  *
@@ -29,7 +30,6 @@ class PermAuthKey extends AuthKey
      * @var boolean
      */
     private $authorized = false;
-
     /**
      * Constructor function.
      *
@@ -51,7 +51,6 @@ class PermAuthKey extends AuthKey
     {
         return $this->authorized;
     }
-
     /**
      * Set the authorized boolean.
      *
@@ -63,8 +62,6 @@ class PermAuthKey extends AuthKey
     {
         $this->authorized = $authorized;
     }
-
-
     /**
      * JSON serialization function.
      *
@@ -72,11 +69,7 @@ class PermAuthKey extends AuthKey
      */
     public function jsonSerialize(): array
     {
-        return [
-            'auth_key' => 'pony'.\base64_encode($this->authKey),
-            'server_salt' => $this->serverSalt,
-            'authorized' => $this->authorized
-        ];
+        return ['auth_key' => 'pony' . \base64_encode($this->authKey), 'server_salt' => $this->serverSalt, 'authorized' => $this->authorized];
     }
     /**
      * Sleep function.
@@ -85,11 +78,6 @@ class PermAuthKey extends AuthKey
      */
     public function __sleep()
     {
-        return [
-            'authKey',
-            'id',
-            'serverSalt',
-            'authorized'
-        ];
+        return ['authKey', 'id', 'serverSalt', 'authorized'];
     }
 }

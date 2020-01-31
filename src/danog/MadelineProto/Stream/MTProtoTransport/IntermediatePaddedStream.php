@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TCP Intermediate stream wrapper.
  *
@@ -24,7 +25,6 @@ use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
-
 use danog\MadelineProto\Stream\RawStreamInterface;
 
 /**
@@ -38,7 +38,6 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
 {
     use BufferedStream;
     private $stream;
-
     /**
      * Connect to stream.
      *
@@ -48,9 +47,8 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      */
     public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = yield $ctx->getStream(\str_repeat(\chr(221), 4).$header);
+        $this->stream = yield $ctx->getStream(\str_repeat(\chr(221), 4) . $header);
     }
-
     /**
      * Async close.
      *
@@ -60,7 +58,6 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     {
         return $this->stream->disconnect();
     }
-
     /**
      * Get write buffer asynchronously.
      *
@@ -71,12 +68,10 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
         $padding_length = \danog\MadelineProto\Tools::randomInt($modulus = 16);
-        $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.\danog\MadelineProto\Tools::random($padding_length));
+        $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append . \danog\MadelineProto\Tools::random($padding_length));
         yield $buffer->bufferWrite(\pack('V', $padding_length + $length));
-
         return $buffer;
     }
-
     /**
      * Get read buffer asynchronously.
      *
@@ -88,10 +83,8 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     {
         $buffer = yield $this->stream->getReadBuffer($l);
         $length = \unpack('V', yield $buffer->bufferRead(4))[1];
-
         return $buffer;
     }
-
     /**
      * {@inheritdoc}
      *
@@ -110,7 +103,6 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     {
         return $this->stream;
     }
-
     public static function getName(): string
     {
         return __CLASS__;

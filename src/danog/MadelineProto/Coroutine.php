@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Coroutine (modified version of AMP Coroutine).
  *
@@ -57,24 +58,20 @@ final class Coroutine implements Promise, \ArrayAccess
     private $exception;
     /** @var mixed Promise success value when executing next coroutine step, null at all other times. */
     private $value;
-
     /** @var ?self Reference to coroutine that started this coroutine */
     private $parentCoroutine;
-
     /**
      * @param \Generator $generator
      */
     public function __construct(\Generator $generator)
     {
         $this->generator = $generator;
-
         try {
             $yielded = $this->generator->current();
             while (!$yielded instanceof Promise) {
                 if ($yielded instanceof \YieldReturnValue) {
                     $this->resolve($yielded->getReturn());
                     $this->generator->next();
-
                     return;
                 }
                 if (!$this->generator->valid()) {
@@ -83,7 +80,6 @@ final class Coroutine implements Promise, \ArrayAccess
                     } else {
                         $this->resolve(null);
                     }
-
                     return;
                 }
                 if ($yielded instanceof \Generator) {
@@ -97,7 +93,6 @@ final class Coroutine implements Promise, \ArrayAccess
             }
         } catch (\Throwable $exception) {
             $this->fail($exception);
-
             return;
         }
         /*
@@ -109,10 +104,8 @@ final class Coroutine implements Promise, \ArrayAccess
             $this->value = $value;
             if (!$this->immediate) {
                 $this->immediate = true;
-
                 return;
             }
-
             try {
                 do {
                     if ($this->exception) {
@@ -127,10 +120,8 @@ final class Coroutine implements Promise, \ArrayAccess
                             $this->resolve($yielded->getReturn());
                             $this->onResolve = null;
                             $this->generator->next();
-
                             return;
                         }
-
                         if (!$this->generator->valid()) {
                             if (PHP_MAJOR_VERSION >= 7) {
                                 $this->resolve($this->generator->getReturn());
@@ -138,7 +129,6 @@ final class Coroutine implements Promise, \ArrayAccess
                                 $this->resolve(null);
                             }
                             $this->onResolve = null;
-
                             return;
                         }
                         if ($yielded instanceof \Generator) {
@@ -164,20 +154,19 @@ final class Coroutine implements Promise, \ArrayAccess
         };
         $yielded->onResolve($this->onResolve);
     }
-
     /**
-     * Throw exception into the generator
+     * Throw exception into the generator.
      *
      * @param \Throwable $reason Exception
-     * 
+     *
      * @internal
-     * 
+     *
      * @return void
      */
     public function throw(\Throwable $reason)
     {
         if (!isset($reason->yieldedFrames)) {
-            if (method_exists($reason, 'updateTLTrace')) {
+            if (\method_exists($reason, 'updateTLTrace')) {
                 $reason->updateTLTrace($this->getTrace());
             } else {
                 $reason->yieldedFrames = $this->getTrace();
@@ -185,7 +174,6 @@ final class Coroutine implements Promise, \ArrayAccess
         }
         $this->generator->throw($reason);
     }
-
     /**
      * @param \Throwable $reason Failure reason.
      */
@@ -193,7 +181,6 @@ final class Coroutine implements Promise, \ArrayAccess
     {
         $this->resolve(new Failure($reason));
     }
-
     public function offsetExists($offset): bool
     {
         throw new Exception('Not supported!');
@@ -207,14 +194,14 @@ final class Coroutine implements Promise, \ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return Tools::call((function () use ($offset) {
+        return Tools::call((function () use ($offset): \Generator {
             $result = yield $this;
             return $result[$offset];
         })());
     }
     public function offsetSet($offset, $value)
     {
-        return Tools::call((function () use ($offset, $value) {
+        return Tools::call((function () use ($offset, $value): \Generator {
             $result = yield $this;
             if ($offset === null) {
                 return $result[] = $value;
@@ -224,12 +211,11 @@ final class Coroutine implements Promise, \ArrayAccess
     }
     public function offsetUnset($offset)
     {
-        return Tools::call((function () use ($offset) {
+        return Tools::call((function () use ($offset): \Generator {
             $result = yield $this;
             unset($result[$offset]);
         })());
     }
-
     /**
      * Get an attribute asynchronously.
      *
@@ -239,19 +225,18 @@ final class Coroutine implements Promise, \ArrayAccess
      */
     public function __get(string $offset)
     {
-        return Tools::call((function () use ($offset) {
+        return Tools::call((function () use ($offset): \Generator {
             $result = yield $this;
             return $result->{$offset};
         })());
     }
     public function __call(string $name, array $arguments)
     {
-        return Tools::call((function () use ($name, $arguments) {
+        return Tools::call((function () use ($name, $arguments): \Generator {
             $result = yield $this;
             return $result->{$name}($arguments);
         })());
     }
-
     /**
      * Get current stack trace for running coroutine.
      *
@@ -263,13 +248,7 @@ final class Coroutine implements Promise, \ArrayAccess
         try {
             $reflector = new ReflectionGenerator($this->generator);
             $frames = $reflector->getTrace();
-            $frames []= \array_merge(
-                $this->parentCoroutine ? $this->parentCoroutine->getFrame() : [],
-                [
-                    'function' => $reflector->getFunction()->getName(),
-                    'args' => []
-                ]
-            );
+            $frames[] = \array_merge($this->parentCoroutine ? $this->parentCoroutine->getFrame() : [], ['function' => $reflector->getFunction()->getName(), 'args' => []]);
         } catch (\Throwable $e) {
         }
         if ($this->parentCoroutine) {
@@ -277,9 +256,8 @@ final class Coroutine implements Promise, \ArrayAccess
         }
         return $frames;
     }
-
     /**
-     * Get current execution frame
+     * Get current execution frame.
      *
      * @return array
      */
@@ -287,10 +265,7 @@ final class Coroutine implements Promise, \ArrayAccess
     {
         try {
             $reflector = new ReflectionGenerator($this->generator);
-            return [
-                'file' => $reflector->getExecutingFile(),
-                'line' => $reflector->getExecutingLine(),
-            ];
+            return ['file' => $reflector->getExecutingFile(), 'line' => $reflector->getExecutingLine()];
         } catch (\Throwable $e) {
         }
         return [];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Buffer interface.
  *
@@ -35,7 +36,6 @@ interface BufferInterface
      * @return Promise
      */
     public function bufferRead(int $length): Promise;
-
     /**
      * Write data asynchronously.
      *

@@ -25,7 +25,6 @@ class Lua
     public $MadelineProto;
     protected $Lua;
     protected $script;
-
     public function __magic_construct($script, $MadelineProto)
     {
         if (!\file_exists($script)) {
@@ -34,16 +33,13 @@ class Lua
         $this->MadelineProto = $MadelineProto;
         $this->MadelineProto->settings['updates']['handle_updates'] = true;
         $this->MadelineProto->API->datacenter->sockets[$this->MadelineProto->settings['connection_settings']['default_dc']]->startUpdateLoop();
-
         $this->script = $script;
         $this->__wakeup();
     }
-
     public function __sleep()
     {
         return ['MadelineProto', 'script'];
     }
-
     public function __wakeup()
     {
         $this->Lua = new \Lua($this->script);
@@ -77,7 +73,6 @@ class Lua
             $this->MadelineProto->{$namespace}->lua = true;
         }
     }
-
     public function tdcliFunction($params, $cb = null, $cb_extra = null)
     {
         $params = $this->MadelineProto->td_to_mtproto($this->MadelineProto->tdcliToTd($params));
@@ -88,10 +83,8 @@ class Lua
         if (\is_callable($cb)) {
             $cb($this->MadelineProto->mtproto_to_td($result), $cb_extra);
         }
-
         return $result;
     }
-
     public function madelineFunction($params, $cb = null, $cb_extra = null)
     {
         $result = $this->MadelineProto->API->methodCall($params['_'], $params, ['datacenter' => $this->MadelineProto->API->datacenter->curdc]);
@@ -99,15 +92,12 @@ class Lua
             $cb($result, $cb_extra);
         }
         self::convertObjects($result);
-
         return $result;
     }
-
     public function tdcliUpdateCallback($update)
     {
         $this->Lua->tdcliUpdateCallback($this->MadelineProto->mtproto_to_tdcli($update));
     }
-
     private function convertArray($array)
     {
         if (!\is_array($array)) {
@@ -119,29 +109,23 @@ class Lua
             }, \array_flip($array)));
         }
     }
-
     private function isSequential(array $arr)
     {
         if ([] === $arr) {
             return false;
         }
-
         return isset($arr[0]) && \array_keys($arr) === \range(0, \count($arr) - 1);
     }
-
     public function __get($name)
     {
         if ($name === 'API') {
             return $this->MadelineProto->API;
         }
-
         return $this->Lua->{$name};
     }
-
     public function __call($name, $params)
     {
         self::convertObjects($params);
-
         try {
             return $this->Lua->{$name}(...$params);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -160,12 +144,10 @@ class Lua
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         }
     }
-
     public function __set($name, $value)
     {
         return $this->Lua->{$name} = $value;
     }
-
     public static function convertObjects(&$data)
     {
         \array_walk_recursive($data, function (&$value, $key) {

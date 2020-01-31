@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tools module.
  *
@@ -25,7 +26,6 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use tgseclib\Math\BigInteger;
-
 use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;
 use function Amp\ByteStream\getStdout;
@@ -42,7 +42,6 @@ use function Amp\Promise\wait;
  */
 trait Tools
 {
-
     /**
      * Sanify TL obtained from JSON for TL serialization.
      *
@@ -83,13 +82,11 @@ trait Tools
         } else {
             $hash = 0;
             foreach ($ints as $int) {
-                $hash = ((($hash * 20261) & 0x7FFFFFFF) + $int) & 0x7FFFFFFF;
+                $hash = ($hash * 20261 & 0x7fffffff) + $int & 0x7fffffff;
             }
         }
-
         return $hash;
     }
-
     /**
      * Get random integer.
      *
@@ -102,7 +99,6 @@ trait Tools
         if ($modulus === 0) {
             $modulus = PHP_INT_MAX;
         }
-
         try {
             return \random_int(0, PHP_INT_MAX) % $modulus;
         } catch (\Exception $e) {
@@ -115,16 +111,13 @@ trait Tools
             // random_bytes(), most of the other calls here will fail too, so we'll end up using
             // the PHP implementation.
         }
-
         if (Magic::$bigint) {
             $number = self::unpackSignedInt(self::random(4));
         } else {
             $number = self::unpackSignedLong(self::random(8));
         }
-
         return ($number & PHP_INT_MAX) % $modulus;
     }
-
     /**
      * Get random string of specified length.
      *
@@ -136,7 +129,6 @@ trait Tools
     {
         return $length === 0 ? '' : \tgseclib\Crypt\Random::string($length);
     }
-
     /**
      * Positive modulo
      * Works just like the % (modulus) operator, only returns always a postive number.
@@ -149,10 +141,8 @@ trait Tools
     public static function posmod(int $a, int $b): int
     {
         $resto = $a % $b;
-
         return $resto < 0 ? $resto + \abs($b) : $resto;
     }
-
     /**
      * Unpack base256 signed int.
      *
@@ -165,10 +155,8 @@ trait Tools
         if (\strlen($value) !== 4) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_4']);
         }
-
         return \unpack('l', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
-
     /**
      * Unpack base256 signed long.
      *
@@ -181,7 +169,6 @@ trait Tools
         if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
-
         return \unpack('q', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
     /**
@@ -199,11 +186,9 @@ trait Tools
         if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
-
         $big = new BigInteger((string) $value, -256);
         return (string) $big;
     }
-
     /**
      * Convert integer to base256 signed int.
      *
@@ -220,10 +205,8 @@ trait Tools
             throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_2147483648'], $value));
         }
         $res = \pack('l', $value);
-
         return \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($res) : $res;
     }
-
     /**
      * Convert integer to base256 long.
      *
@@ -239,11 +222,9 @@ trait Tools
         if ($value < -9.223372036854776E+18) {
             throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_9223372036854775808'], $value));
         }
-        $res = \danog\MadelineProto\Magic::$bigint ? self::packSignedInt($value)."\0\0\0\0" : (\danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev(\pack('q', $value)) : \pack('q', $value));
-
+        $res = \danog\MadelineProto\Magic::$bigint ? self::packSignedInt($value) . "\0\0\0\0" : (\danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev(\pack('q', $value)) : \pack('q', $value));
         return $res;
     }
-
     /**
      * Convert value to unsigned base256 int.
      *
@@ -259,10 +240,8 @@ trait Tools
         if ($value < 0) {
             throw new TL\Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['value_smaller_than_0'], $value));
         }
-
         return \pack('V', $value);
     }
-
     /**
      * Convert double to binary version.
      *
@@ -276,10 +255,8 @@ trait Tools
         if (\strlen($res) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['encode_double_error']);
         }
-
         return \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($res) : $res;
     }
-
     /**
      * Unpack binary double.
      *
@@ -292,10 +269,8 @@ trait Tools
         if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }
-
         return \unpack('d', \danog\MadelineProto\Magic::$BIG_ENDIAN ? \strrev($value) : $value)[1];
     }
-
     /**
      * Synchronously wait for a promise|generator.
      *
@@ -308,10 +283,9 @@ trait Tools
     {
         if ($promise instanceof \Generator) {
             $promise = new Coroutine($promise);
-        } elseif (!($promise instanceof Promise)) {
+        } elseif (!$promise instanceof Promise) {
             return $promise;
         }
-
         $exception = null;
         $value = null;
         $resolved = false;
@@ -329,14 +303,11 @@ trait Tools
                 throw new \Error('Loop exceptionally stopped without resolving the promise', 0, $throwable);
             }
         } while (!$resolved && !(Magic::$signaled && !$ignoreSignal));
-
         if ($exception) {
             throw $exception;
         }
-
         return $value;
     }
-
     /**
      * Returns a promise that succeeds when all promises succeed, and fails if any promise fails.
      * Returned promise succeeds with an array of values used to succeed each contained promise, with keys corresponding to the array of promises.
@@ -350,10 +321,8 @@ trait Tools
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
         }
-
         return all($promises);
     }
-
     /**
      * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
      *
@@ -366,10 +335,8 @@ trait Tools
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
         }
-
         return any($promises);
     }
-
     /**
      * Resolves with a two-item array delineating successful and failed Promise results.
      * The returned promise will only fail if the given number of required promises fail.
@@ -383,10 +350,8 @@ trait Tools
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
         }
-
         return some($promises);
     }
-
     /**
      * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
      *
@@ -399,10 +364,8 @@ trait Tools
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
         }
-
         return first($promises);
     }
-
     /**
      * Create an artificial timeout for any \Generator or Promise.
      *
@@ -415,7 +378,6 @@ trait Tools
     {
         return timeout(self::call($promise), $timeout);
     }
-
     /**
      * Convert generator, promise or any other value to a promise.
      *
@@ -427,13 +389,11 @@ trait Tools
     {
         if ($promise instanceof \Generator) {
             $promise = new Coroutine($promise);
-        } elseif (!($promise instanceof Promise)) {
+        } elseif (!$promise instanceof Promise) {
             return new Success($promise);
         }
-
         return $promise;
     }
-
     /**
      * Call promise in background.
      *
@@ -471,10 +431,8 @@ trait Tools
                 }
             });
         }
-
         return $promise;
     }
-
     /**
      * Call promise in background, deferring execution.
      *
@@ -486,7 +444,6 @@ trait Tools
     {
         Loop::defer([__CLASS__, 'callFork'], $promise);
     }
-
     /**
      * Rethrow error catched in strand.
      *
@@ -500,12 +457,11 @@ trait Tools
         $zis = isset($this) ? $this : null;
         $logger = isset($zis->logger) ? $zis->logger : Logger::$default;
         if ($file) {
-            $file = " started @ $file";
+            $file = " started @ {$file}";
         }
         if ($logger) {
-            $logger->logger("Got the following exception within a forked strand$file, trying to rethrow");
+            $logger->logger("Got the following exception within a forked strand{$file}, trying to rethrow");
         }
-
         if ($e->getMessage() === "Cannot get return value of a generator that hasn't returned") {
             $logger->logger("Well you know, this might actually not be the actual exception, scroll up in the logs to see the actual exception");
             if (!$zis || !$zis->destructing) {
@@ -515,11 +471,9 @@ trait Tools
             if ($logger) {
                 $logger->logger($e);
             }
-
             Promise\rethrow(new Failure($e));
         }
     }
-
     /**
      * Call promise $b after promise $a.
      *
@@ -554,7 +508,6 @@ trait Tools
                 $deferred->resolve($res);
             });
         });
-
         return $deferred->promise();
     }
     /**
@@ -573,7 +526,6 @@ trait Tools
         \http_response_code($status);
         return self::echo($message);
     }
-
     /**
      * Asynchronously lock a file
      * Resolves with a callbable that MUST eventually be called in order to release the lock.
@@ -581,7 +533,7 @@ trait Tools
      * @param string  $file      File to lock
      * @param integer $operation Locking mode
      * @param float  $polling   Polling interval
-    *
+     *
      * @return Promise
      */
     public static function flock(string $file, int $operation, float $polling = 0.1): Promise
@@ -613,7 +565,6 @@ trait Tools
                 yield self::sleep($polling);
             }
         } while (!$result);
-
         return static function () use (&$res) {
             if ($res) {
                 \flock($res, LOCK_UN);
@@ -633,7 +584,6 @@ trait Tools
     {
         return new \Amp\Delayed($time * 1000);
     }
-
     /**
      * Asynchronously read line.
      *
@@ -669,7 +619,6 @@ trait Tools
         }
         return \array_shift($lines);
     }
-
     /**
      * Asynchronously write to stdout/browser.
      *
@@ -690,12 +639,8 @@ trait Tools
      */
     public static function isArrayOrAlike($var): bool
     {
-        return \is_array($var) ||
-            ($var instanceof \ArrayAccess &&
-            $var instanceof \Traversable &&
-            $var instanceof \Countable);
+        return \is_array($var) || $var instanceof \ArrayAccess && $var instanceof \Traversable && $var instanceof \Countable;
     }
-
     /**
      * Convert to camelCase.
      *
@@ -721,10 +666,8 @@ trait Tools
         foreach ($ret as &$match) {
             $match = $match == \strtoupper($match) ? \strtolower($match) : \lcfirst($match);
         }
-
         return \implode('_', $ret);
     }
-
     /**
      * Create array.
      *
@@ -758,7 +701,6 @@ trait Tools
     {
         return \rtrim(\strtr(\base64_encode($data), '+/', '-_'), '=');
     }
-
     /**
      * null-byte RLE decode.
      *
@@ -780,11 +722,9 @@ trait Tools
                 $last = $cur;
             }
         }
-        $string = $new.$last;
-
+        $string = $new . $last;
         return $string;
     }
-
     /**
      * null-byte RLE encode.
      *
@@ -802,16 +742,14 @@ trait Tools
                 $count++;
             } else {
                 if ($count > 0) {
-                    $new .= $null.\chr($count);
+                    $new .= $null . \chr($count);
                     $count = 0;
                 }
                 $new .= $cur;
             }
         }
-
         return $new;
     }
-
     /**
      * Get final element of array.
      *
@@ -823,7 +761,6 @@ trait Tools
     {
         return \end($what);
     }
-
     /**
      * Escape string for markdown.
      *
@@ -835,7 +772,6 @@ trait Tools
     {
         return \str_replace('_', '\\_', $hwat);
     }
-
     /**
      * Whether this is altervista.
      *
@@ -845,8 +781,6 @@ trait Tools
     {
         return Magic::$altervista;
     }
-
-
     /**
      * Accesses a private variable from an object.
      *

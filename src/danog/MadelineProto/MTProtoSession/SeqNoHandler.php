@@ -28,9 +28,7 @@ trait SeqNoHandler
 {
     public $session_out_seq_no = 0;
     public $session_in_seq_no = 0;
-
     public $session_id;
-
     public function generateOutSeqNo($contentRelated)
     {
         $in = $contentRelated ? 1 : 0;
@@ -39,17 +37,15 @@ trait SeqNoHandler
         //$this->API->logger->logger("OUT: $value + $in = ".$this->session_out_seq_no);
         return $value * 2 + $in;
     }
-
     public function checkInSeqNo($current_msg_id)
     {
         $type = isset($this->incoming_messages[$current_msg_id]['content']['_']) ? $this->incoming_messages[$current_msg_id]['content']['_'] : '-';
         if (isset($this->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generateInSeqNo($this->contentRelated($this->incoming_messages[$current_msg_id]['content']))) !== $this->incoming_messages[$current_msg_id]['seq_no']) {
-            $this->API->logger->logger('SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$this->incoming_messages[$current_msg_id]['seq_no'].', '.$type.')', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->API->logger->logger('SECURITY WARNING: Seqno mismatch (should be ' . $seq_no . ', is ' . $this->incoming_messages[$current_msg_id]['seq_no'] . ', ' . $type . ')', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         } elseif (isset($seq_no)) {
-            $this->API->logger->logger('Seqno OK (should be '.$seq_no.', is '.$this->incoming_messages[$current_msg_id]['seq_no'].', '.$type.')', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->API->logger->logger('Seqno OK (should be ' . $seq_no . ', is ' . $this->incoming_messages[$current_msg_id]['seq_no'] . ', ' . $type . ')', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         }
     }
-
     public function generateInSeqNo($contentRelated)
     {
         $in = $contentRelated ? 1 : 0;
@@ -58,11 +54,9 @@ trait SeqNoHandler
         //$this->API->logger->logger("IN: $value + $in = ".$this->session_in_seq_no);
         return $value * 2 + $in;
     }
-
     public function contentRelated($method)
     {
         $method = \is_array($method) && isset($method['_']) ? $method['_'] : $method;
-
         return \is_string($method) ? !\in_array($method, MTProto::NOT_CONTENT_RELATED) : true;
     }
 }

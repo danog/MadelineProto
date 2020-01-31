@@ -35,10 +35,8 @@ trait Extension
         if (isset(MTProto::ALL_MIMES[$ext])) {
             return MTProto::ALL_MIMES[$ext][0];
         }
-
         return $default;
     }
-
     /**
      * Get extension from mime type.
      *
@@ -50,13 +48,11 @@ trait Extension
     {
         foreach (self::ALL_MIMES as $key => $value) {
             if (\array_search($mime, $value) !== false) {
-                return '.'.$key;
+                return '.' . $key;
             }
         }
-
         return '';
     }
-
     /**
      * Get extension from file location.
      *
@@ -93,7 +89,6 @@ trait Extension
                 return $default;
         }
     }
-
     /**
      * Get mime type of file.
      *
@@ -104,10 +99,8 @@ trait Extension
     public static function getMimeFromFile(string $file): string
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
-
         return $finfo->file($file);
     }
-
     /**
      * Get mime type from buffer.
      *
@@ -118,7 +111,6 @@ trait Extension
     public static function getMimeFromBuffer(string $buffer): string
     {
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
-
         return $finfo->buffer($buffer);
     }
 }

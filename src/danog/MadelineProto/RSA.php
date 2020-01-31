@@ -1,4 +1,5 @@
 <?php
+
 /**
  * RSA module.
  *
@@ -45,7 +46,6 @@ class RSA
      * @var string
      */
     public $fp;
-
     /**
      * Load RSA key.
      *
@@ -62,11 +62,9 @@ class RSA
         $this->n = Tools::getVar($key, 'modulus');
         $this->e = Tools::getVar($key, 'exponent');
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['computing_fingerprint'], Logger::ULTRA_VERBOSE);
-        $this->fp = \substr(\sha1((yield $TL->serializeObject(['type' => 'bytes'], $this->n->toBytes(), 'key')).(yield $TL->serializeObject(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
-
+        $this->fp = \substr(\sha1(yield $TL->serializeObject(['type' => 'bytes'], $this->n->toBytes(), 'key') . yield $TL->serializeObject(['type' => 'bytes'], $this->e->toBytes(), 'key'), true), -8);
         return $this;
     }
-
     /**
      * Sleep function.
      *
@@ -76,7 +74,6 @@ class RSA
     {
         return ['e', 'n', 'fp'];
     }
-
     /**
      * Encrypt data.
      *
@@ -87,7 +84,6 @@ class RSA
     public function encrypt($data): string
     {
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_encrypting'], Logger::VERBOSE);
-
         return (new \tgseclib\Math\BigInteger((string) $data, 256))->powMod($this->e, $this->n)->toBytes();
     }
 }

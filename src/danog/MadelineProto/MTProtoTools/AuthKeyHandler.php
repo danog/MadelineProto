@@ -46,7 +46,6 @@ trait AuthKeyHandler
      * @var boolean
      */
     private $pending_auth = false;
-
     /**
      * Create authorization key.
      *
@@ -62,7 +61,6 @@ trait AuthKeyHandler
         $connection = $this->datacenter->getAuthConnection($datacenter);
         $cdn = $connection->isCDN();
         $req_pq = $cdn ? 'req_pq' : 'req_pq_multi';
-
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['req_pq'], \danog\MadelineProto\Logger::VERBOSE);
@@ -128,7 +126,6 @@ trait AuthKeyHandler
                             list($p, $q) = [$q, $p];
                         }
                     }
-
                     if (!$pq->equals($p->multiply($q))) {
                         $this->logger->logger('Automatic factorization failed, trying alt py module', \danog\MadelineProto\Logger::ERROR);
                         $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::python_single_alt($pq->__toString()));
@@ -138,7 +135,6 @@ trait AuthKeyHandler
                                 list($p, $q) = [$q, $p];
                             }
                         }
-
                         if (!$pq->equals($p->multiply($q))) {
                             $this->logger->logger('Automatic factorization failed, trying py module', \danog\MadelineProto\Logger::ERROR);
                             $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::python_single($pq->__toString()));
@@ -148,7 +144,6 @@ trait AuthKeyHandler
                                     list($p, $q) = [$q, $p];
                                 }
                             }
-
                             if (!$pq->equals($p->multiply($q))) {
                                 $this->logger->logger('Automatic factorization failed, trying native module', \danog\MadelineProto\Logger::ERROR);
                                 $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::native_single($pq->__toString()));
@@ -158,37 +153,32 @@ trait AuthKeyHandler
                                         list($p, $q) = [$q, $p];
                                     }
                                 }
-
                                 if (!$pq->equals($p->multiply($q))) {
                                     $this->logger->logger('Automatic factorization failed, trying wolfram module', \danog\MadelineProto\Logger::ERROR);
-
-                                    $p = new \tgseclib\Math\BigInteger(yield $this->wolframSingle($pq->__toString()));
+                                    $p = new \tgseclib\Math\BigInteger(yield from $this->wolframSingle($pq->__toString()));
                                     if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                                         $q = $pq->divide($p)[0];
                                         if ($p->compare($q) > 0) {
                                             list($p, $q) = [$q, $p];
                                         }
                                     }
-
                                     if (!$pq->equals($p->multiply($q))) {
-                                        throw new \danog\MadelineProto\SecurityException("Couldn't compute p and q, install prime.madelineproto.xyz to fix. Original pq: {$pq}, computed p: {$p}, computed q: {$q}, computed pq: ".$p->multiply($q));
+                                        throw new \danog\MadelineProto\SecurityException("Couldn't compute p and q, install prime.madelineproto.xyz to fix. Original pq: {$pq}, computed p: {$p}, computed q: {$q}, computed pq: " . $p->multiply($q));
                                     }
                                 }
                             }
                         }
                     }
                 }
-
-                $this->logger->logger('Factorization '.$pq.' = '.$p.' * '.$q, \danog\MadelineProto\Logger::VERBOSE);
+                $this->logger->logger('Factorization ' . $pq . ' = ' . $p . ' * ' . $q, \danog\MadelineProto\Logger::VERBOSE);
                 /*
                  * ***********************************************************************
                  * Serialize object for req_DH_params
                  */
                 $p_bytes = $p->toBytes();
                 $q_bytes = $q->toBytes();
-
                 $new_nonce = \danog\MadelineProto\Tools::random(32);
-                $data_unserialized = ['_' => 'p_q_inner_data'.($expires_in < 0 ? '' : '_temp'), 'pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => \preg_replace('|_.*|', '', $datacenter)];
+                $data_unserialized = ['_' => 'p_q_inner_data' . ($expires_in < 0 ? '' : '_temp'), 'pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => \preg_replace('|_.*|', '', $datacenter)];
                 $p_q_inner_data = yield $this->TL->serializeObject(['type' => ''], $data_unserialized, 'p_q_inner_data');
                 /*
                  * ***********************************************************************
@@ -196,8 +186,7 @@ trait AuthKeyHandler
                  */
                 $sha_digest = \sha1($p_q_inner_data, true);
                 $random_bytes = \danog\MadelineProto\Tools::random(255 - \strlen($p_q_inner_data) - \strlen($sha_digest));
-                $to_encrypt = $sha_digest.$p_q_inner_data.$random_bytes;
-
+                $to_encrypt = $sha_digest . $p_q_inner_data . $random_bytes;
                 $encrypted_data = $key->encrypt($to_encrypt);
                 $this->logger->logger('Starting Diffie Hellman key exchange', \danog\MadelineProto\Logger::VERBOSE);
                 /*
@@ -248,10 +237,8 @@ trait AuthKeyHandler
                  * Get key, iv and decrypt answer
                  */
                 $encrypted_answer = $server_dh_params['encrypted_answer'];
-
-                $tmp_aes_key =  \sha1($new_nonce.$server_nonce, true).\substr(\sha1($server_nonce.$new_nonce, true), 0, 12);
-                $tmp_aes_iv = \substr(\sha1($server_nonce.$new_nonce, true), 12, 8).\sha1($new_nonce.$new_nonce, true).\substr($new_nonce, 0, 4);
-
+                $tmp_aes_key = \sha1($new_nonce . $server_nonce, true) . \substr(\sha1($server_nonce . $new_nonce, true), 0, 12);
+                $tmp_aes_iv = \substr(\sha1($server_nonce . $new_nonce, true), 12, 8) . \sha1($new_nonce . $new_nonce, true) . \substr($new_nonce, 0, 4);
                 $answer_with_hash = $this->igeDecrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
                 /*
                  * ***********************************************************************
@@ -331,8 +318,8 @@ trait AuthKeyHandler
                      * ***********************************************************************
                      * encrypt client_DH_inner_data
                      */
-                    $data_with_sha = \sha1($data, true).$data;
-                    $data_with_sha_padded = $data_with_sha.\danog\MadelineProto\Tools::random(\danog\MadelineProto\Tools::posmod(-\strlen($data_with_sha), 16));
+                    $data_with_sha = \sha1($data, true) . $data;
+                    $data_with_sha_padded = $data_with_sha . \danog\MadelineProto\Tools::random(\danog\MadelineProto\Tools::posmod(-\strlen($data_with_sha), 16));
                     $encrypted_data = $this->igeEncrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
                     $this->logger->logger('Executing set_client_DH_params...', \danog\MadelineProto\Logger::VERBOSE);
                     /*
@@ -362,9 +349,9 @@ trait AuthKeyHandler
                     $auth_key_str = $auth_key->toBytes();
                     $auth_key_sha = \sha1($auth_key_str, true);
                     $auth_key_aux_hash = \substr($auth_key_sha, 0, 8);
-                    $new_nonce_hash1 = \substr(\sha1($new_nonce.\chr(1).$auth_key_aux_hash, true), -16);
-                    $new_nonce_hash2 = \substr(\sha1($new_nonce.\chr(2).$auth_key_aux_hash, true), -16);
-                    $new_nonce_hash3 = \substr(\sha1($new_nonce.\chr(3).$auth_key_aux_hash, true), -16);
+                    $new_nonce_hash1 = \substr(\sha1($new_nonce . \chr(1) . $auth_key_aux_hash, true), -16);
+                    $new_nonce_hash2 = \substr(\sha1($new_nonce . \chr(2) . $auth_key_aux_hash, true), -16);
+                    $new_nonce_hash3 = \substr(\sha1($new_nonce . \chr(3) . $auth_key_aux_hash, true), -16);
                     /*
                      * ***********************************************************************
                      * Check if the client's nonce and the server's nonce are the same
@@ -389,16 +376,13 @@ trait AuthKeyHandler
                                 throw new \danog\MadelineProto\SecurityException('wrong new_nonce_hash1');
                             }
                             $this->logger->logger('Diffie Hellman key exchange processed successfully!', \danog\MadelineProto\Logger::VERBOSE);
-
                             $key = $expires_in < 0 ? new PermAuthKey() : new TempAuthKey();
                             if ($expires_in >= 0) {
                                 $key->expires(\time() + $expires_in);
                             }
                             $key->setServerSalt(\substr($new_nonce, 0, 8) ^ \substr($server_nonce, 0, 8));
                             $key->setAuthKey($auth_key_str);
-
                             $this->logger->logger('Auth key generated', \danog\MadelineProto\Logger::NOTICE);
-
                             return $key;
                         case 'dh_gen_retry':
                             if ($Set_client_DH_params_answer['new_nonce_hash2'] != $new_nonce_hash2) {
@@ -419,21 +403,20 @@ trait AuthKeyHandler
                     }
                 }
             } catch (\danog\MadelineProto\SecurityException $e) {
-                $this->logger->logger('An exception occurred while generating the authorization key: '.$e->getMessage().' in '.\basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger('An exception occurred while generating the authorization key: ' . $e->getMessage() . ' in ' . \basename($e->getFile(), '.php') . ' on line ' . $e->getLine() . '. Retrying...', \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\Exception $e) {
-                $this->logger->logger('An exception occurred while generating the authorization key: '.$e->getMessage().' in '.\basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger('An exception occurred while generating the authorization key: ' . $e->getMessage() . ' in ' . \basename($e->getFile(), '.php') . ' on line ' . $e->getLine() . '. Retrying...', \danog\MadelineProto\Logger::WARNING);
                 $req_pq = $req_pq === 'req_pq_multi' ? 'req_pq' : 'req_pq_multi';
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                $this->logger->logger('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger('An RPCErrorException occurred while generating the authorization key: ' . $e->getMessage() . ' Retrying (try number ' . $retry_id_total . ')...', \danog\MadelineProto\Logger::WARNING);
             } catch (\Throwable $e) {
-                $this->logger->logger('An exception occurred while generating the authorization key: '.$e.PHP_EOL.' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger('An exception occurred while generating the authorization key: ' . $e . PHP_EOL . ' Retrying (try number ' . $retry_id_total . ')...', \danog\MadelineProto\Logger::WARNING);
             }
         }
         if (!$cdn) {
             throw new \danog\MadelineProto\SecurityException('Auth Failed');
         }
     }
-
     /**
      * Check validity of g_a parameters.
      *
@@ -459,10 +442,8 @@ trait AuthKeyHandler
         if ($g_a->compare(\danog\MadelineProto\Magic::$twoe1984) < 0 || $g_a->compare($p->subtract(\danog\MadelineProto\Magic::$twoe1984)) >= 0) {
             throw new \danog\MadelineProto\SecurityException('g_a is invalid (2^1984 < g_a < p - 2^1984 is false).');
         }
-
         return true;
     }
-
     /**
      * Check validity of p and g parameters.
      *
@@ -492,11 +473,11 @@ trait AuthKeyHandler
          * Almost always fails
          */
         /*
-        $this->logger->logger('Executing p/g checks (2/3)...', \danog\MadelineProto\Logger::VERBOSE);
-        if (!$p->subtract(\danog\MadelineProto\Magic::$one)->divide(\danog\MadelineProto\Magic::$two)[0]->isPrime()) {
-        throw new \danog\MadelineProto\SecurityException("p isn't a safe 2048-bit prime ((p - 1) / 2 isn't a prime).");
-        }
-         */
+                $this->logger->logger('Executing p/g checks (2/3)...', \danog\MadelineProto\Logger::VERBOSE);
+                if (!$p->subtract(\danog\MadelineProto\Magic::$one)->divide(\danog\MadelineProto\Magic::$two)[0]->isPrime()) {
+                throw new \danog\MadelineProto\SecurityException("p isn't a safe 2048-bit prime ((p - 1) / 2 isn't a prime).");
+                }
+        */
         /*
          * ***********************************************************************
          * Check validity of p
@@ -515,10 +496,8 @@ trait AuthKeyHandler
         if ($g->compare(\danog\MadelineProto\Magic::$one) <= 0 || $g->compare($p->subtract(\danog\MadelineProto\Magic::$one)) >= 0) {
             throw new \danog\MadelineProto\SecurityException('g is invalid (1 < g < p - 1 is false).');
         }
-
         return true;
     }
-
     /**
      * Get diffie-hellman configuration.
      *
@@ -531,16 +510,13 @@ trait AuthKeyHandler
         $dh_config = yield $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0], ['datacenter' => $this->datacenter->curdc]);
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {
             $this->logger->logger('DH configuration not modified', \danog\MadelineProto\Logger::VERBOSE);
-
             return $this->dh_config;
         }
         $dh_config['p'] = new \tgseclib\Math\BigInteger((string) $dh_config['p'], 256);
         $dh_config['g'] = new \tgseclib\Math\BigInteger($dh_config['g']);
         $this->checkPG($dh_config['p'], $dh_config['g']);
-
         return $this->dh_config = $dh_config;
     }
-
     /**
      * Bind temporary and permanent auth keys.
      *
@@ -555,7 +531,6 @@ trait AuthKeyHandler
     {
         $datacenterConnection = $this->datacenter->getDataCenterConnection($datacenter);
         $connection = $datacenterConnection->getAuthConnection();
-
         for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
             try {
                 $this->logger->logger('Binding authorization keys...', \danog\MadelineProto\Logger::VERBOSE);
@@ -564,34 +539,31 @@ trait AuthKeyHandler
                 $temp_auth_key_id = $datacenterConnection->getTempAuthKey()->getID();
                 $perm_auth_key_id = $datacenterConnection->getPermAuthKey()->getID();
                 $temp_session_id = $connection->session_id;
-                $message_data = yield $this->TL->serializeObject(['type' => ''], ['_' => 'bind_auth_key_inner','nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bindTempAuthKey_inner');
+                $message_data = yield $this->TL->serializeObject(['type' => ''], ['_' => 'bind_auth_key_inner', 'nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bindTempAuthKey_inner');
                 $message_id = $connection->generateMessageId();
                 $seq_no = 0;
-                $encrypted_data = \danog\MadelineProto\Tools::random(16).$message_id.\pack('VV', $seq_no, \strlen($message_data)).$message_data;
+                $encrypted_data = \danog\MadelineProto\Tools::random(16) . $message_id . \pack('VV', $seq_no, \strlen($message_data)) . $message_data;
                 $message_key = \substr(\sha1($encrypted_data, true), -16);
                 $padding = \danog\MadelineProto\Tools::random(\danog\MadelineProto\Tools::posmod(-\strlen($encrypted_data), 16));
                 list($aes_key, $aes_iv) = $this->oldAesCalculate($message_key, $datacenterConnection->getPermAuthKey()->getAuthKey());
-                $encrypted_message = $datacenterConnection->getPermAuthKey()->getID().$message_key.$this->igeEncrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+                $encrypted_message = $datacenterConnection->getPermAuthKey()->getID() . $message_key . $this->igeEncrypt($encrypted_data . $padding, $aes_key, $aes_iv);
                 $res = yield $connection->methodCallAsyncRead('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], ['msg_id' => $message_id]);
                 if ($res === true) {
-                    $this->logger->logger('Bound temporary and permanent authorization keys, DC '.$datacenter, \danog\MadelineProto\Logger::NOTICE);
+                    $this->logger->logger('Bound temporary and permanent authorization keys, DC ' . $datacenter, \danog\MadelineProto\Logger::NOTICE);
                     $datacenterConnection->bind();
                     $datacenterConnection->flush();
-
                     return true;
                 }
             } catch (\danog\MadelineProto\SecurityException $e) {
-                $this->logger->logger('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger('An exception occurred while generating the authorization key: ' . $e->getMessage() . ' Retrying (try number ' . $retry_id_total . ')...', \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\Exception $e) {
-                $this->logger->logger('An exception occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger('An exception occurred while generating the authorization key: ' . $e->getMessage() . ' Retrying (try number ' . $retry_id_total . ')...', \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                $this->logger->logger('An RPCErrorException occurred while generating the authorization key: '.$e->getMessage().' Retrying (try number '.$retry_id_total.')...', \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger('An RPCErrorException occurred while generating the authorization key: ' . $e->getMessage() . ' Retrying (try number ' . $retry_id_total . ')...', \danog\MadelineProto\Logger::WARNING);
             }
         }
-
         throw new \danog\MadelineProto\SecurityException('An error occurred while binding temporary and permanent authorization keys.');
     }
-
     /**
      * Factorize number asynchronously using the wolfram API.
      *
@@ -602,22 +574,11 @@ trait AuthKeyHandler
     private function wolframSingle($what): \Generator
     {
         $code = yield $this->datacenter->fileGetContents('http://www.wolframalpha.com/api/v1/code');
-        $query = 'Do prime factorization of '.$what;
-        $params = [
-            'async'         => true,
-            'banners'       => 'raw',
-            'debuggingdata' => false,
-            'format'        => 'moutput',
-            'formattimeout' => 8,
-            'input'         => $query,
-            'output'        => 'JSON',
-            'proxycode'     => \json_decode($code, true)['code'],
-        ];
-        $url = 'https://www.wolframalpha.com/input/json.jsp?'.\http_build_query($params);
-
+        $query = 'Do prime factorization of ' . $what;
+        $params = ['async' => true, 'banners' => 'raw', 'debuggingdata' => false, 'format' => 'moutput', 'formattimeout' => 8, 'input' => $query, 'output' => 'JSON', 'proxycode' => \json_decode($code, true)['code']];
+        $url = 'https://www.wolframalpha.com/input/json.jsp?' . \http_build_query($params);
         $request = new Request($url);
-        $request->setHeader('referer', 'https://www.wolframalpha.com/input/?i='.\urlencode($query));
-
+        $request->setHeader('referer', 'https://www.wolframalpha.com/input/?i=' . \urlencode($query));
         $res = \json_decode(yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody()->buffer(), true);
         if (!isset($res['queryresult']['pods'])) {
             return false;
@@ -625,24 +586,20 @@ trait AuthKeyHandler
         $fres = false;
         foreach ($res['queryresult']['pods'] as $cur) {
             if ($cur['id'] === 'Divisors') {
-                $fres = \explode(', ', \preg_replace(["/{\d+, /", "/, \d+}$/"], '', $cur['subpods'][0]['moutput']));
+                $fres = \explode(', ', \preg_replace(["/{\\d+, /", "/, \\d+}\$/"], '', $cur['subpods'][0]['moutput']));
                 break;
             }
         }
         if (\is_array($fres)) {
             $fres = $fres[0];
-
             $newval = \intval($fres);
             if (\is_int($newval)) {
                 $fres = $newval;
             }
-
             return $fres;
         }
-
         return false;
     }
-
     /**
      * Asynchronously create, bind and check auth keys for all DCs.
      *
@@ -658,9 +615,7 @@ trait AuthKeyHandler
         }
         $this->logger("Initing authorization...");
         $initing = $this->initing_authorization;
-
         $this->initing_authorization = true;
-
         try {
             $dcs = [];
             $postpone = [];
@@ -688,26 +643,22 @@ trait AuthKeyHandler
                 $first = \array_shift($dcs)();
                 yield $first;
             }
-
             foreach ($dcs as $id => &$dc) {
                 $dc = $dc();
             }
             yield \danog\MadelineProto\Tools::all($dcs);
-
             foreach ($postpone as $id => $socket) {
-                yield $this->initAuthorizationSocket($id, $socket);
+                yield from $this->initAuthorizationSocket($id, $socket);
             }
-
             if ($this->pending_auth && empty($this->init_auth_dcs)) {
                 $this->pending_auth = false;
-                yield $this->initAuthorization();
+                yield from $this->initAuthorization();
             }
         } finally {
             $this->pending_auth = false;
             $this->initing_authorization = $initing;
         }
     }
-
     /**
      * Init auth keys for single DC.
      *
@@ -720,20 +671,17 @@ trait AuthKeyHandler
      */
     public function initAuthorizationSocket(string $id, DataCenterConnection $socket): \Generator
     {
-        $this->logger("Initing authorization DC $id...");
+        $this->logger("Initing authorization DC {$id}...");
         $this->init_auth_dcs[$id] = true;
         $connection = $socket->getAuthConnection();
-
         try {
             $socket->createSession();
-
             $cdn = $socket->isCDN();
             $media = $socket->isMedia();
-
             if (!$socket->hasTempAuthKey() || !$socket->hasPermAuthKey() || !$socket->isBound()) {
                 if (!$socket->hasPermAuthKey() && !$cdn && !$media) {
                     $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_perm_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                    $socket->setPermAuthKey(yield $this->createAuthKey(-1, $id));
+                    $socket->setPermAuthKey(yield from $this->createAuthKey(-1, $id));
                     //$socket->authorized(false);
                 }
                 if ($media) {
@@ -745,40 +693,35 @@ trait AuthKeyHandler
                 if ($this->datacenter->getDataCenterConnection($id)->getSettings()['pfs']) {
                     if (!$cdn) {
                         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-
                         //$authorized = $socket->authorized;
                         //$socket->authorized = false;
-
                         $socket->setTempAuthKey(null);
-                        $socket->setTempAuthKey(yield $this->createAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
-                        yield $this->bindTempAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
-
+                        $socket->setTempAuthKey(yield from $this->createAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
+                        yield from $this->bindTempAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
                         $this->config = yield $connection->methodCallAsyncRead('help.getConfig', []);
-
-                        yield $this->syncAuthorization($id);
+                        yield from $this->syncAuthorization($id);
                     } elseif (!$socket->hasTempAuthKey()) {
                         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                        $socket->setTempAuthKey(yield $this->createAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
+                        $socket->setTempAuthKey(yield from $this->createAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
                     }
                 } else {
                     if (!$cdn) {
                         $socket->bind(false);
                         $this->config = yield $connection->methodCallAsyncRead('help.getConfig', []);
-                        yield $this->syncAuthorization($id);
+                        yield from $this->syncAuthorization($id);
                     } elseif (!$socket->hasTempAuthKey()) {
                         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                        $socket->setTempAuthKey(yield $this->createAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
+                        $socket->setTempAuthKey(yield from $this->createAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
                     }
                 }
             } elseif (!$cdn) {
-                yield $this->syncAuthorization($id);
+                yield from $this->syncAuthorization($id);
             }
         } finally {
-            $this->logger("Done initing authorization DC $id");
+            $this->logger("Done initing authorization DC {$id}");
             unset($this->init_auth_dcs[$id]);
         }
     }
-
     /**
      * Sync authorization data between DCs.
      *
@@ -801,15 +744,15 @@ trait AuthKeyHandler
                 }
                 if ($authorized_socket->hasTempAuthKey() && $authorized_socket->hasPermAuthKey() && $authorized_socket->isAuthorized() && $this->authorized === self::LOGGED_IN && !$socket->isAuthorized() && !$authorized_socket->isCDN()) {
                     try {
-                        $this->logger->logger('Trying to copy authorization from dc '.$authorized_dc_id.' to dc '.$id);
+                        $this->logger->logger('Trying to copy authorization from dc ' . $authorized_dc_id . ' to dc ' . $id);
                         $exported_authorization = yield $this->methodCallAsyncRead('auth.exportAuthorization', ['dc_id' => \preg_replace('|_.*|', '', $id)], ['datacenter' => $authorized_dc_id]);
                         $authorization = yield $this->methodCallAsyncRead('auth.importAuthorization', $exported_authorization, ['datacenter' => $id]);
                         $socket->authorized(true);
                         break;
                     } catch (\danog\MadelineProto\Exception $e) {
-                        $this->logger->logger('Failure while syncing authorization from DC '.$authorized_dc_id.' to DC '.$id.': '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                        $this->logger->logger('Failure while syncing authorization from DC ' . $authorized_dc_id . ' to DC ' . $id . ': ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        $this->logger->logger('Failure while syncing authorization from DC '.$authorized_dc_id.' to DC '.$id.': '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                        $this->logger->logger('Failure while syncing authorization from DC ' . $authorized_dc_id . ' to DC ' . $id . ': ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
                         if ($e->rpc === 'DC_ID_INVALID') {
                             break;
                         }

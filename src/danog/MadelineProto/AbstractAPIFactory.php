@@ -61,21 +61,18 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      * @var Promise
      */
     public $asyncAPIPromise;
-
     /**
      * Method list.
      *
      * @var string[]
      */
     protected $methods = [];
-
     public function __construct($namespace, &$API, &$async)
     {
-        $this->namespace = $namespace.'.';
-        $this->API = &$API;
-        $this->async = &$async;
+        $this->namespace = $namespace . '.';
+        $this->API =& $API;
+        $this->async =& $async;
     }
-
     /**
      * Enable or disable async.
      *
@@ -87,7 +84,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     {
         $this->async = $async;
     }
-
     /**
      * Call async wrapper function.
      *
@@ -101,25 +97,21 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     public function __call(string $name, array $arguments)
     {
         $yielded = Tools::call($this->__call_async($name, $arguments));
-        $async = $this->lua === false && (\is_array(\end($arguments)) && isset(\end($arguments)['async']) ? \end($arguments)['async'] : ($this->async && $name !== 'loop'));
-
+        $async = $this->lua === false && (\is_array(\end($arguments)) && isset(\end($arguments)['async']) ? \end($arguments)['async'] : $this->async && $name !== 'loop');
         if ($async) {
             return $yielded;
         }
         if (!$this->lua) {
             return Tools::wait($yielded);
         }
-
         try {
             $yielded = Tools::wait($yielded);
             Lua::convertObjects($yielded);
-
             return $yielded;
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         }
     }
-
     /**
      * Call async wrapper function.
      *
@@ -159,20 +151,17 @@ abstract class AbstractAPIFactory extends AsyncConstruct
             yield $this->API->initAsynchronously();
             $this->API->logger->logger('Finished init asynchronously');
         }
-
         $lower_name = \strtolower($name);
         if ($this->namespace !== '' || !isset($this->methods[$lower_name])) {
-            $name = $this->namespace.$name;
+            $name = $this->namespace . $name;
             $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
             $aargs['apifactory'] = true;
             $aargs['datacenter'] = $this->API->datacenter->curdc;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
-
             return yield $this->API->methodCallAsyncRead($name, $args, $aargs);
         }
         return yield $this->methods[$lower_name](...$arguments);
     }
-
     /**
      * Get attribute.
      *
@@ -189,16 +178,13 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         }
         if ($name === 'settings') {
             $this->API->flushSettings = true;
-
             return $this->API->settings;
         }
         if ($name === 'logger') {
             return $this->API->logger;
         }
-
         return $this->API->storage[$name];
     }
-
     /**
      * Set an attribute.
      *
@@ -218,13 +204,10 @@ abstract class AbstractAPIFactory extends AsyncConstruct
             if ($this->API->asyncInitPromise) {
                 $this->API->init();
             }
-
             return $this->API->__construct(\array_replace_recursive($this->API->settings, $value));
         }
-
         return $this->API->storage[$name] = $value;
     }
-
     /**
      * Whether an attribute exists.
      *
@@ -237,10 +220,8 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         if ($this->asyncAPIPromise) {
             Tools::wait($this->asyncAPIPromise);
         }
-
         return isset($this->API->storage[$name]);
     }
-
     /**
      * Unset attribute.
      *

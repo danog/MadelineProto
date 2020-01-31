@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Async constructor abstract class.
  *
@@ -35,7 +36,6 @@ class AsyncConstruct
      * @var Promise
      */
     public $asyncInitPromise;
-
     /**
      * Blockingly init.
      *
@@ -47,7 +47,6 @@ class AsyncConstruct
             Tools::wait($this->asyncInitPromise);
         }
     }
-
     /**
      * Asynchronously init.
      *
@@ -59,7 +58,6 @@ class AsyncConstruct
             yield $this->asyncInitPromise;
         }
     }
-
     /**
      * Set init promise.
      *

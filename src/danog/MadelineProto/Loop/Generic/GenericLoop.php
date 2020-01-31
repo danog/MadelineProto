@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Generic loop.
  *
@@ -30,10 +31,8 @@ class GenericLoop extends ResumableSignalLoop
     const STOP = -1;
     const PAUSE = null;
     const CONTINUE = 0;
-
     protected $callback;
     protected $name;
-
     /**
      * Constructor.
      *
@@ -54,24 +53,21 @@ class GenericLoop extends ResumableSignalLoop
         $this->callback = $callback->bindTo($this);
         $this->name = $name;
     }
-
-    public function loop()
+    public function loop(): \Generator
     {
         $callback = $this->callback;
-
         while (true) {
             $timeout = yield $callback();
             if ($timeout === self::PAUSE) {
-                $this->API->logger->logger("Pausing $this", \danog\MadelineProto\Logger::VERBOSE);
+                $this->API->logger->logger("Pausing {$this}", \danog\MadelineProto\Logger::VERBOSE);
             } elseif ($timeout > 0) {
-                $this->API->logger->logger("Pausing $this for $timeout", \danog\MadelineProto\Logger::VERBOSE);
+                $this->API->logger->logger("Pausing {$this} for {$timeout}", \danog\MadelineProto\Logger::VERBOSE);
             }
             if ($timeout === self::STOP || yield $this->waitSignal($this->pause($timeout))) {
                 return;
             }
         }
     }
-
     public function __toString(): string
     {
         return $this->name;

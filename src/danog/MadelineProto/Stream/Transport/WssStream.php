@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Websocket TLS stream wrapper.
  *
@@ -38,7 +39,6 @@ class WssStream extends WsStream
     {
         return parent::connectGenerator($ctx->getCtx()->secure(true), $header);
     }
-
     public static function getName(): string
     {
         return __CLASS__;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Socks5 stream wrapper.
  *
@@ -25,7 +26,6 @@ use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawProxyStreamInterface;
-
 use danog\MadelineProto\Stream\RawStreamInterface;
 
 /**
@@ -35,20 +35,9 @@ use danog\MadelineProto\Stream\RawStreamInterface;
  */
 class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
 {
-    const REPS = [
-        0 => 'succeeded',
-        1 => 'general SOCKS server failure',
-        2 => 'connection not allowed by ruleset',
-        3 => 'Network unreachable',
-        4 => 'Host unreachable',
-        5 => 'Connection refused',
-        6 => 'TTL expired',
-        7 => 'Command not supported',
-        8 => 'Address type not supported'
-    ];
+    const REPS = [0 => 'succeeded', 1 => 'general SOCKS server failure', 2 => 'connection not allowed by ruleset', 3 => 'Network unreachable', 4 => 'Host unreachable', 5 => 'Connection refused', 6 => 'TTL expired', 7 => 'Command not supported', 8 => 'Address type not supported'];
     use RawStream;
     private $extra;
-
     /**
      * Connect to stream.
      *
@@ -61,78 +50,61 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
         $secure = $ctx->isSecure();
-
         if ($secure) {
             $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
-
-        $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
-
+        $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port'])->secure(false);
         $methods = \chr(0);
         if (isset($this->extra['username']) && isset($this->extra['password'])) {
             $methods .= \chr(2);
         }
-        $this->stream = yield $ctx->getStream(\chr(5).\chr(\strlen($methods)).$methods);
-
+        $this->stream = yield $ctx->getStream(\chr(5) . \chr(\strlen($methods)) . $methods);
         $l = 2;
-
         $buffer = yield $this->stream->getReadBuffer($l);
-
         $version = \ord(yield $buffer->bufferRead(1));
         $method = \ord(yield $buffer->bufferRead(1));
-
         if ($version !== 5) {
-            throw new \danog\MadelineProto\Exception("Wrong SOCKS5 version: $version");
+            throw new \danog\MadelineProto\Exception("Wrong SOCKS5 version: {$version}");
         }
         if ($method === 2) {
-            $auth = \chr(1).\chr(\strlen($this->extra['username'])).$this->extra['username'].\chr(\strlen($this->extra['password'])).$this->extra['password'];
+            $auth = \chr(1) . \chr(\strlen($this->extra['username'])) . $this->extra['username'] . \chr(\strlen($this->extra['password'])) . $this->extra['password'];
             yield $this->stream->write($auth);
-
             $buffer = yield $this->stream->getReadBuffer($l);
-
             $version = \ord(yield $buffer->bufferRead(1));
             $result = \ord(yield $buffer->bufferRead(1));
-
             if ($version !== 1) {
-                throw new \danog\MadelineProto\Exception("Wrong authorized SOCKS version: $version");
+                throw new \danog\MadelineProto\Exception("Wrong authorized SOCKS version: {$version}");
             }
             if ($result !== 0) {
-                throw new \danog\MadelineProto\Exception("Wrong authorization status: $version");
+                throw new \danog\MadelineProto\Exception("Wrong authorization status: {$version}");
             }
         } elseif ($method !== 0) {
-            throw new \danog\MadelineProto\Exception("Wrong method: $method");
+            throw new \danog\MadelineProto\Exception("Wrong method: {$method}");
         }
-        $payload = \pack('C3', 0x05, 0x01, 0x00);
-
+        $payload = \pack('C3', 0x5, 0x1, 0x0);
         try {
             $ip = \inet_pton($uri->getHost());
-            $payload .= $ip ? \pack('C1', \strlen($ip) === 4 ? 0x01 : 0x04).$ip : \pack('C2', 0x03, \strlen($uri->getHost())).$uri->getHost();
+            $payload .= $ip ? \pack('C1', \strlen($ip) === 4 ? 0x1 : 0x4) . $ip : \pack('C2', 0x3, \strlen($uri->getHost())) . $uri->getHost();
         } catch (\danog\MadelineProto\Exception $e) {
-            $payload .= \pack('C2', 0x03, \strlen($uri->getHost())).$uri->getHost();
+            $payload .= \pack('C2', 0x3, \strlen($uri->getHost())) . $uri->getHost();
         }
-
         $payload .= \pack('n', $uri->getPort());
         yield $this->stream->write($payload);
-
         $l = 4;
         $buffer = yield $this->stream->getReadBuffer($l);
-
         $version = \ord(yield $buffer->bufferRead(1));
         if ($version !== 5) {
-            throw new \danog\MadelineProto\Exception("Wrong SOCKS5 version: $version");
+            throw new \danog\MadelineProto\Exception("Wrong SOCKS5 version: {$version}");
         }
-
         $rep = \ord(yield $buffer->bufferRead(1));
         if ($rep !== 0) {
             $rep = self::REPS[$rep] ?? $rep;
-            throw new \danog\MadelineProto\Exception("Wrong SOCKS5 rep: $rep");
+            throw new \danog\MadelineProto\Exception("Wrong SOCKS5 rep: {$rep}");
         }
-
         $rsv = \ord(yield $buffer->bufferRead(1));
         if ($rsv !== 0) {
-            throw new \danog\MadelineProto\Exception("Wrong socks5 final RSV: $rsv");
+            throw new \danog\MadelineProto\Exception("Wrong socks5 final RSV: {$rsv}");
         }
-
         switch (\ord(yield $buffer->bufferRead(1))) {
             case 1:
                 $buffer = yield $this->stream->getReadBuffer($l);
@@ -147,7 +119,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
                 $l = 1;
                 $buffer = yield $this->stream->getReadBuffer($l);
                 $length = \ord(yield $buffer->bufferRead(1));
-
                 $buffer = yield $this->stream->getReadBuffer($length);
                 $ip = yield $buffer->bufferRead($length);
                 break;
@@ -155,9 +126,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $l = 2;
         $buffer = yield $this->stream->getReadBuffer($l);
         $port = \unpack('n', yield $buffer->bufferRead(2))[1];
-
-        \danog\MadelineProto\Logger::log(['Connected to '.$ip.':'.$port.' via socks5']);
-
+        \danog\MadelineProto\Logger::log(['Connected to ' . $ip . ':' . $port . ' via socks5']);
         if ($secure) {
             yield $this->getSocket()->setupTls();
         }
@@ -165,7 +134,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
             yield (yield $this->stream->getWriteBuffer(\strlen($header)))->bufferWrite($header);
         }
     }
-
     /**
      * Async close.
      *
@@ -175,7 +143,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     {
         return $this->stream->disconnect();
     }
-
     /**
      * Get write buffer asynchronously.
      *
@@ -187,7 +154,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     {
         return $this->stream->getWriteBuffer($length, $append);
     }
-
     /**
      * Get read buffer asynchronously.
      *
@@ -199,17 +165,14 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     {
         return $this->stream->getReadBuffer($length);
     }
-
     public function read(): Promise
     {
         return $this->stream->read();
     }
-
     public function write(string $data): Promise
     {
         return $this->stream->write($data);
     }
-
     /**
      * Sets proxy data.
      *
@@ -230,7 +193,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     {
         return $this->stream;
     }
-
     /**
      * {@inheritdoc}
      *
@@ -240,7 +202,6 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
     {
         return $this->stream->getSocket();
     }
-
     public static function getName(): string
     {
         return __CLASS__;

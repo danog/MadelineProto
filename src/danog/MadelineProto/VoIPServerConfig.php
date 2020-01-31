@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VoIPServerConfig.
  *
@@ -36,7 +37,6 @@ if (\class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
          * @var array
          */
         private static $_configDefault = [];
-
         /**
          * Update shared call settings.
          *
@@ -49,7 +49,6 @@ if (\class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
             self::$_config = $config;
             self::updateInternal(self::getFinal());
         }
-
         /**
          * Get shared call settings.
          *
@@ -59,7 +58,6 @@ if (\class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
         {
             return self::$_config;
         }
-
         /**
          * Update default shared call settings.
          *
@@ -72,7 +70,6 @@ if (\class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
             self::$_configDefault = $configDefault;
             self::updateInternal(self::getFinal());
         }
-
         /**
          * Get default shared call settings.
          *
@@ -82,7 +79,6 @@ if (\class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
         {
             return self::$_configDefault;
         }
-
         /**
          * Get final settings.
          *

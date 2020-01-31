@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MTProto Auth key.
  *
@@ -43,7 +44,6 @@ abstract class AuthKey implements JsonSerializable
      * @var string
      */
     protected $serverSalt;
-
     /**
      * Constructor function.
      *
@@ -52,7 +52,7 @@ abstract class AuthKey implements JsonSerializable
     public function __construct(array $old = [])
     {
         if (isset($old['auth_key'])) {
-            if (\strlen($old['auth_key']) !== 2048/8 && \strpos($old['authkey'], 'pony') === 0) {
+            if (\strlen($old['auth_key']) !== 2048 / 8 && \strpos($old['authkey'], 'pony') === 0) {
                 $old['auth_key'] = \base64_decode(\substr($old['auth_key'], 4));
             }
             $this->setAuthKey($old['auth_key']);
@@ -61,8 +61,6 @@ abstract class AuthKey implements JsonSerializable
             $this->setServerSalt($old['server_salt']);
         }
     }
-
-
     /**
      * Set auth key.
      *
@@ -75,7 +73,6 @@ abstract class AuthKey implements JsonSerializable
         $this->authKey = $authKey;
         $this->id = \substr(\sha1($authKey, true), -8);
     }
-
     /**
      * Check if auth key is present.
      *
@@ -85,7 +82,6 @@ abstract class AuthKey implements JsonSerializable
     {
         return $this->authKey !== null;
     }
-
     /**
      * Get auth key.
      *
@@ -95,7 +91,6 @@ abstract class AuthKey implements JsonSerializable
     {
         return $this->authKey;
     }
-
     /**
      * Get auth key ID.
      *
@@ -105,7 +100,6 @@ abstract class AuthKey implements JsonSerializable
     {
         return $this->id;
     }
-
     /**
      * Set server salt.
      *
@@ -117,7 +111,6 @@ abstract class AuthKey implements JsonSerializable
     {
         $this->serverSalt = $salt;
     }
-
     /**
      * Get server salt.
      *
@@ -127,7 +120,6 @@ abstract class AuthKey implements JsonSerializable
     {
         return $this->serverSalt;
     }
-
     /**
      * Check if has server salt.
      *
@@ -137,14 +129,12 @@ abstract class AuthKey implements JsonSerializable
     {
         return $this->serverSalt !== null;
     }
-
     /**
      * Check if we are logged in.
      *
      * @return boolean
      */
     abstract public function isAuthorized(): bool;
-
     /**
      * Set the authorized boolean.
      *

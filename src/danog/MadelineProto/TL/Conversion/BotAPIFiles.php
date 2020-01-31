@@ -27,24 +27,16 @@ trait BotAPIFiles
 {
     private function photosizeToBotAPI($photoSize, $photo, $thumbnail = false): \Generator
     {
-        $ext = '.jpg';//$this->getExtensionFromLocation(['_' => 'inputFileLocation', 'volume_id' => $photoSize['location']['volume_id'], 'local_id' => $photoSize['location']['local_id'], 'secret' => $photoSize['location']['secret'], 'dc_id' => $photoSize['location']['dc_id']], '.jpg');
+        $ext = '.jpg';
+        //$this->getExtensionFromLocation(['_' => 'inputFileLocation', 'volume_id' => $photoSize['location']['volume_id'], 'local_id' => $photoSize['location']['local_id'], 'secret' => $photoSize['location']['secret'], 'dc_id' => $photoSize['location']['dc_id']], '.jpg');
         $photoSize['location']['access_hash'] = $photo['access_hash'] ?? 0;
         $photoSize['location']['id'] = $photo['id'] ?? 0;
         $photoSize['location']['secret'] = $photo['location']['secret'] ?? 0;
         $photoSize['location']['dc_id'] = $photo['dc_id'] ?? 0;
         $photoSize['location']['_'] = $thumbnail ? 'bot_thumbnail' : 'bot_photo';
-        $data = (yield $this->TL->serializeObject(['type' => 'File'], $photoSize['location'], 'File')).\chr(2);
-
-        return [
-            'file_id' => \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode($data)),
-            'width' => $photoSize['w'],
-            'height' => $photoSize['h'],
-            'file_size' => isset($photoSize['size']) ? $photoSize['size'] : \strlen($photoSize['bytes']),
-            'mime_type' => 'image/jpeg',
-            'file_name' => $photoSize['location']['volume_id'].'_'.$photoSize['location']['local_id'].$ext
-        ];
+        $data = yield $this->TL->serializeObject(['type' => 'File'], $photoSize['location'], 'File') . \chr(2);
+        return ['file_id' => \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode($data)), 'width' => $photoSize['w'], 'height' => $photoSize['h'], 'file_size' => isset($photoSize['size']) ? $photoSize['size'] : \strlen($photoSize['bytes']), 'mime_type' => 'image/jpeg', 'file_name' => $photoSize['location']['volume_id'] . '_' . $photoSize['location']['local_id'] . $ext];
     }
-
     /**
      * Unpack bot API file ID.
      *
@@ -57,15 +49,14 @@ trait BotAPIFiles
         $file_id = Tools::rleDecode(Tools::base64urlDecode($file_id));
         $version = \ord($file_id[\strlen($file_id) - 1]);
         $subVersion = $version === 4 ? \ord($file_id[\strlen($file_id) - 2]) : 0;
-        $this->logger("Got file ID with version $version.$subVersion");
+        $this->logger("Got file ID with version {$version}.{$subVersion}");
         if (!\in_array($version, [2, 4])) {
-            throw new Exception("Invalid bot API file ID version $version");
+            throw new Exception("Invalid bot API file ID version {$version}");
         }
         $res = \fopen('php://memory', 'rw+b');
         \fwrite($res, $file_id);
         \fseek($res, 0);
         $file_id = $res;
-
         $deserialized = $this->TL->deserialize($file_id);
         $res = ['type' => \str_replace('bot_', '', $deserialized['_'])];
         if (\in_array($res['type'], ['profile_photo', 'thumbnail', 'photo'])) {
@@ -96,134 +87,64 @@ trait BotAPIFiles
         switch ($deserialized['_']) {
             case 'bot_profile_photo':
                 if ($deserialized['dialog_id'] < 0) {
-                    $res['Chat'] = [
-                        '_' => $deserialized['dialog_id'] < -1000000000000 ? 'channel' : 'chat',
-                        'id' => $deserialized['dialog_id'] < -1000000000000 ? PeerHandler::fromSupergroup($deserialized['dialog_id']) : -$deserialized['dialog_id'],
-                        'access_hash' => $deserialized['dialog_access_hash'],
-                        'photo' => [
-                            '_' => 'chatPhoto',
-                            'dc_id' => $deserialized['dc_id'],
-                            $deserialized['photo_size'] => [
-                                '_' => 'fileLocationToBeDeprecated',
-                                'volume_id' => $deserialized['volume_id'],
-                                'local_id' => $deserialized['local_id'],
-                            ]
-                        ],
-                        'min' => true
-                    ];
+                    $res['Chat'] = ['_' => $deserialized['dialog_id'] < -1000000000000 ? 'channel' : 'chat', 'id' => $deserialized['dialog_id'] < -1000000000000 ? PeerHandler::fromSupergroup($deserialized['dialog_id']) : -$deserialized['dialog_id'], 'access_hash' => $deserialized['dialog_access_hash'], 'photo' => ['_' => 'chatPhoto', 'dc_id' => $deserialized['dc_id'], $deserialized['photo_size'] => ['_' => 'fileLocationToBeDeprecated', 'volume_id' => $deserialized['volume_id'], 'local_id' => $deserialized['local_id']]], 'min' => true];
                     return $res;
                 }
-                $res['User'] = [
-                    '_' => 'user',
-                    'id' => $deserialized['dialog_id'],
-                    'access_hash' => $deserialized['dialog_access_hash'],
-                    'photo' => [
-                        '_' => 'userProfilePhoto',
-                        'dc_id' => $deserialized['dc_id'],
-                        'photo_id' => $deserialized['id'],
-                        $deserialized['photo_size'] => [
-                            '_' => 'fileLocationToBeDeprecated',
-                            'volume_id' => $deserialized['volume_id'],
-                            'local_id' => $deserialized['local_id'],
-                        ]
-                    ],
-                    'min' => true
-                ];
+                $res['User'] = ['_' => 'user', 'id' => $deserialized['dialog_id'], 'access_hash' => $deserialized['dialog_access_hash'], 'photo' => ['_' => 'userProfilePhoto', 'dc_id' => $deserialized['dc_id'], 'photo_id' => $deserialized['id'], $deserialized['photo_size'] => ['_' => 'fileLocationToBeDeprecated', 'volume_id' => $deserialized['volume_id'], 'local_id' => $deserialized['local_id']]], 'min' => true];
                 return $res;
-
             case 'bot_thumbnail':
-                $res['InputFileLocation'] = [
-                    '_' => $deserialized['file_type'] >= 3 ? 'inputDocumentFileLocation' : 'inputPhotoFileLocation',
-                    'id' => $deserialized['id'],
-                    'access_hash' => $deserialized['access_hash'],
-                    'file_reference' => '',
-                    'thumb_size' => (string) $deserialized['thumbnail_type']
-                ];
-                $res['name'] = $deserialized['id'].'_'.$deserialized['thumbnail_type'];
+                $res['InputFileLocation'] = ['_' => $deserialized['file_type'] >= 3 ? 'inputDocumentFileLocation' : 'inputPhotoFileLocation', 'id' => $deserialized['id'], 'access_hash' => $deserialized['access_hash'], 'file_reference' => '', 'thumb_size' => (string) $deserialized['thumbnail_type']];
+                $res['name'] = $deserialized['id'] . '_' . $deserialized['thumbnail_type'];
                 $res['ext'] = 'jpg';
                 $res['mime'] = 'image/jpeg';
-
-                $res['InputMedia'] = [
-                    '_' => $deserialized['file_type'] >= 3 ? 'inputMediaDocument' : 'inputMediaPhoto',
-                    'id' => [
-                        '_' => $deserialized['file_type'] >= 3 ? 'inputDocument' : 'inputPhoto',
-                        'id' => $deserialized['id'],
-                        'access_hash' => $deserialized['access_hash'],
-                    ]
-                ];
+                $res['InputMedia'] = ['_' => $deserialized['file_type'] >= 3 ? 'inputMediaDocument' : 'inputMediaPhoto', 'id' => ['_' => $deserialized['file_type'] >= 3 ? 'inputDocument' : 'inputPhoto', 'id' => $deserialized['id'], 'access_hash' => $deserialized['access_hash']]];
                 return $res;
-
             case 'bot_photo':
                 if ($deserialized['photosize_source'] === 0) {
                     $constructor['id'] = $deserialized['id'];
                     $constructor['access_hash'] = $deserialized['access_hash'];
                     unset($deserialized['id'], $deserialized['access_hash']);
-
                     $deserialized['_'] = $deserialized['secret'] ? 'fileLocation' : 'fileLocationToBeDeprecated';
                     $constructor['sizes'][0] = ['_' => 'photoSize', 'type' => '', 'location' => $deserialized];
                     $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $constructor, 'caption' => ''];
-
                     return $res;
                 }
-                $res['MessageMedia'] = [
-                    '_' => 'photo',
-                    'id' => $deserialized['id'],
-                    'access_hash' => $deserialized['access_hash'],
-                    'sizes' => [
-                        [
-                            '_' => 'photoSize',
-                            'type' => $deserialized['thumbnail_type'],
-                            'location' => [
-                                '_' => 'fileLocationToBeDeprecated',
-                                'local_id' => $deserialized['local_id'],
-                                'volume_id' => $deserialized['local_id'],
-                            ]
-                        ]
-                    ],
-                    'dc_id' => $deserialized['dc_id']
-                ];
+                $res['MessageMedia'] = ['_' => 'photo', 'id' => $deserialized['id'], 'access_hash' => $deserialized['access_hash'], 'sizes' => [['_' => 'photoSize', 'type' => $deserialized['thumbnail_type'], 'location' => ['_' => 'fileLocationToBeDeprecated', 'local_id' => $deserialized['local_id'], 'volume_id' => $deserialized['local_id']]]], 'dc_id' => $deserialized['dc_id']];
                 return $res;
             case 'bot_voice':
                 unset($deserialized['_']);
                 $constructor = \array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true]]]);
                 $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
-
                 return $res;
             case 'bot_video':
                 unset($deserialized['_']);
                 $constructor = \array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeVideo', 'round_message' => false]]]);
                 $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
-
                 return $res;
             case 'bot_document':
                 unset($deserialized['_']);
                 $constructor = \array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => []]);
                 $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
-
                 return $res;
             case 'bot_sticker':
                 unset($deserialized['_']);
                 $constructor = \array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeSticker']]]);
                 $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
-
                 return $res;
             case 'bot_audio':
                 unset($deserialized['_']);
                 $constructor = \array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => false]]]);
                 $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
-
                 return $res;
             case 'bot_gif':
                 unset($deserialized['_']);
                 $constructor = \array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeAnimated']]]);
                 $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
-
                 return $res;
             case 'bot_video_note':
                 unset($deserialized['_']);
                 $constructor = \array_merge($deserialized, ['_' => 'document', 'mime_type' => '', 'attributes' => [['_' => 'documentAttributeVideo', 'round_message' => true]]]);
                 $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
-
                 return $res;
             default:
                 throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['file_type_invalid'], $type));

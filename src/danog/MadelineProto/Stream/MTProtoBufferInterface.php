@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MTProto buffer interface.
  *

@@ -27,7 +27,6 @@ trait BotAPI
     {
         return \html_entity_decode(\preg_replace('#< *br */? *>#', "\n", $stuff));
     }
-
     /**
      * Get Telegram UTF-8 length of string.
      *
@@ -41,14 +40,12 @@ trait BotAPI
         $textlength = \strlen($text);
         for ($x = 0; $x < $textlength; $x++) {
             $char = \ord($text[$x]);
-            if (($char & 0xC0) != 0x80) {
+            if (($char & 0xc0) != 0x80) {
                 $length += 1 + ($char >= 0xf0);
             }
         }
-
         return $length;
     }
-
     /**
      * Telegram UTF-8 multibyte substring.
      *
@@ -65,7 +62,7 @@ trait BotAPI
             $offset = $mb_text_length + $offset;
         }
         if ($length < 0) {
-            $length = ($mb_text_length - $offset) + $length;
+            $length = $mb_text_length - $offset + $length;
         } elseif ($length === null) {
             $length = $mb_text_length - $offset;
         }
@@ -75,7 +72,7 @@ trait BotAPI
         $text_length = \strlen($text);
         for ($x = 0; $x < $text_length; $x++) {
             $char = \ord($text[$x]);
-            if (($char & 0xC0) != 0x80) {
+            if (($char & 0xc0) != 0x80) {
                 $current_offset += 1 + ($char >= 0xf0);
                 if ($current_offset > $offset) {
                     $current_length += 1 + ($char >= 0xf0);
@@ -87,10 +84,8 @@ trait BotAPI
                 }
             }
         }
-
         return $new_text;
     }
-
     /**
      * Telegram UTF-8 multibyte split.
      *
@@ -106,10 +101,8 @@ trait BotAPI
         for ($x = 0; $x < $tlength; $x += $length) {
             $result[] = \mb_substr($text, $x, $length, 'UTF-8');
         }
-
         return $result;
     }
-
     private function parseButtons($rows)
     {
         $newrows = [];
@@ -145,10 +138,8 @@ trait BotAPI
             }
             $key++;
         }
-
         return $newrows;
     }
-
     private function parseReplyMarkup($markup)
     {
         if (isset($markup['force_reply']) && $markup['force_reply']) {
@@ -177,10 +168,8 @@ trait BotAPI
             $markup['rows'] = $this->parseButtons($markup['inline_keyboard']);
             unset($markup['inline_keyboard']);
         }
-
         return $markup;
     }
-
     /**
      * Convert MTProto parameters to bot API parameters.
      *
@@ -194,9 +183,8 @@ trait BotAPI
         $newd = [];
         if (!isset($data['_'])) {
             foreach ($data as $key => $element) {
-                $newd[$key] = yield $this->MTProtoToBotAPI($element, $sent_arguments);
+                $newd[$key] = (yield from $this->MTProtoToBotAPI($element, $sent_arguments));
             }
-
             return $newd;
         }
         switch ($data['_']) {
@@ -209,16 +197,15 @@ trait BotAPI
                 }
                 $newd['chat'] = yield $this->getPwrChat($sent_arguments['peer']);
                 if (isset($data['entities'])) {
-                    $newd['entities'] = yield $this->MTProtoToBotAPI($data['entities'], $sent_arguments);
+                    $newd['entities'] = (yield from $this->MTProtoToBotAPI($data['entities'], $sent_arguments));
                 }
                 if (isset($data['media'])) {
-                    $newd = \array_merge($newd, yield $this->MTProtoToBotAPI($data['media'], $sent_arguments));
+                    $newd = \array_merge($newd, yield from $this->MTProtoToBotAPI($data['media'], $sent_arguments));
                 }
-
                 return $newd;
             case 'updateNewChannelMessage':
             case 'updateNewMessage':
-                return yield $this->MTProtoToBotAPI($data['message']);
+                return yield from $this->MTProtoToBotAPI($data['message']);
             case 'message':
                 $newd['message_id'] = $data['id'];
                 $newd['date'] = $data['date'];
@@ -230,7 +217,7 @@ trait BotAPI
                 }
                 $newd['chat'] = yield $this->getPwrChat($data['to_id']);
                 if (isset($data['entities'])) {
-                    $newd['entities'] = yield $this->MTProtoToBotAPI($data['entities'], $sent_arguments);
+                    $newd['entities'] = (yield from $this->MTProtoToBotAPI($data['entities'], $sent_arguments));
                 }
                 if (isset($data['views'])) {
                     $newd['views'] = $data['views'];
@@ -254,66 +241,54 @@ trait BotAPI
                     $newd['forward_from_message_id'] = $data['fwd_from']['channel_post'];
                 }
                 if (isset($data['media'])) {
-                    $newd = \array_merge($newd, yield $this->MTProtoToBotAPI($data['media'], $sent_arguments));
+                    $newd = \array_merge($newd, yield from $this->MTProtoToBotAPI($data['media'], $sent_arguments));
                 }
-
                 return $newd;
             case 'messageEntityMention':
                 unset($data['_']);
                 $data['type'] = 'mention';
-
                 return $data;
             case 'messageEntityHashtag':
                 unset($data['_']);
                 $data['type'] = 'hashtag';
-
                 return $data;
             case 'messageEntityBotCommand':
                 unset($data['_']);
                 $data['type'] = 'bot_command';
-
                 return $data;
             case 'messageEntityUrl':
                 unset($data['_']);
                 $data['type'] = 'url';
-
                 return $data;
             case 'messageEntityEmail':
                 unset($data['_']);
                 $data['type'] = 'email';
-
                 return $data;
             case 'messageEntityBold':
                 unset($data['_']);
                 $data['type'] = 'bold';
-
                 return $data;
             case 'messageEntityItalic':
                 unset($data['_']);
                 $data['type'] = 'italic';
-
                 return $data;
             case 'messageEntityCode':
                 unset($data['_']);
                 $data['type'] = 'code';
-
                 return $data;
             case 'messageEntityPre':
                 unset($data['_']);
                 $data['type'] = 'pre';
-
                 return $data;
             case 'messageEntityTextUrl':
                 unset($data['_']);
                 $data['type'] = 'text_url';
-
                 return $data;
             case 'messageEntityMentionName':
                 unset($data['_']);
                 $data['type'] = 'text_mention';
                 $data['user'] = yield $this->getPwrChat($data['user_id']);
                 unset($data['user_id']);
-
                 return $data;
             case 'messageMediaPhoto':
                 if (isset($data['caption'])) {
@@ -325,7 +300,6 @@ trait BotAPI
                         $res['photo'][$key] = yield $this->photosizeToBotAPI($photo, $data['photo']);
                     }
                 }
-
                 return $res;
             case 'messageMediaEmpty':
                 return [];
@@ -339,7 +313,7 @@ trait BotAPI
                     switch ($attribute['_']) {
                         case 'documentAttributeFilename':
                             $pathinfo = \pathinfo($attribute['file_name']);
-                            $res['ext'] = isset($pathinfo['extension']) ? '.'.$pathinfo['extension'] : '';
+                            $res['ext'] = isset($pathinfo['extension']) ? '.' . $pathinfo['extension'] : '';
                             $res['file_name'] = $pathinfo['filename'];
                             break;
                         case 'documentAttributeAudio':
@@ -390,30 +364,28 @@ trait BotAPI
                 if (isset($audio) && isset($audio['title']) && !isset($res['file_name'])) {
                     $res['file_name'] = $audio['title'];
                     if (isset($audio['performer'])) {
-                        $res['file_name'] .= ' - '.$audio['performer'];
+                        $res['file_name'] .= ' - ' . $audio['performer'];
                     }
                 }
                 if (!isset($res['file_name'])) {
                     $res['file_name'] = $data['document']['access_hash'];
                 }
-                $res['file_name'] .= '_'.$data['document']['id'];
+                $res['file_name'] .= '_' . $data['document']['id'];
                 if (isset($res['ext'])) {
                     $res['file_name'] .= $res['ext'];
                     unset($res['ext']);
                 } else {
                     $res['file_name'] .= $this->getExtensionFromMime($data['document']['mime_type']);
                 }
-                $data['document']['_'] = 'bot_'.$type_name;
+                $data['document']['_'] = 'bot_' . $type_name;
                 $res['file_size'] = $data['document']['size'];
                 $res['mime_type'] = $data['document']['mime_type'];
-                $res['file_id'] = \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode((yield $this->TL->serializeObject(['type' => 'File'], $data['document'], 'File')).\chr(2)));
-
+                $res['file_id'] = \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode(yield $this->TL->serializeObject(['type' => 'File'], $data['document'], 'File') . \chr(2)));
                 return [$type_name => $res, 'caption' => isset($data['caption']) ? $data['caption'] : ''];
             default:
                 throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['botapi_conversion_error'], $data['_']));
         }
     }
-
     /**
      * Convert bot API parameters to MTProto parameters.
      *
@@ -433,13 +405,11 @@ trait BotAPI
             $arguments['reply_markup'] = $this->parseReplyMarkup($arguments['reply_markup']);
         }
         if (isset($arguments['parse_mode'])) {
-            $arguments = yield $this->parseMode($arguments);
+            $arguments = (yield from $this->parseMode($arguments));
         }
-
         return $arguments;
     }
-
-    private function parseNode($node, &$entities, &$new_message, &$offset)
+    private function parseNode($node, &$entities, &$new_message, &$offset): \Generator
     {
         switch ($node->nodeName) {
             case 'br':
@@ -450,65 +420,51 @@ trait BotAPI
             case 'strike':
             case 'del':
                 $text = $this->htmlEntityDecode($node->textContent);
-
                 $length = $this->mbStrlen($text);
                 $entities[] = ['_' => 'messageEntityStrike', 'offset' => $offset, 'length' => $length];
-
                 $new_message .= $text;
                 $offset += $length;
                 break;
             case 'u':
                 $text = $this->htmlEntityDecode($node->textContent);
-
                 $length = $this->mbStrlen($text);
                 $entities[] = ['_' => 'messageEntityUnderline', 'offset' => $offset, 'length' => $length];
-
                 $new_message .= $text;
                 $offset += $length;
                 break;
             case 'blockquote':
                 $text = $this->htmlEntityDecode($node->textContent);
-
                 $length = $this->mbStrlen($text);
                 $entities[] = ['_' => 'messageEntityBlockquote', 'offset' => $offset, 'length' => $length];
-
                 $new_message .= $text;
                 $offset += $length;
                 break;
             case 'b':
             case 'strong':
                 $text = $this->htmlEntityDecode($node->textContent);
-
                 $length = $this->mbStrlen($text);
                 $entities[] = ['_' => 'messageEntityBold', 'offset' => $offset, 'length' => $length];
-
                 $new_message .= $text;
                 $offset += $length;
                 break;
             case 'i':
             case 'em':
                 $text = $this->htmlEntityDecode($node->textContent);
-
                 $length = $this->mbStrlen($text);
                 $entities[] = ['_' => 'messageEntityItalic', 'offset' => $offset, 'length' => $length];
-
                 $new_message .= $text;
                 $offset += $length;
                 break;
             case 'code':
                 $text = $this->htmlEntityDecode($node->textContent);
-
                 $length = $this->mbStrlen($text);
                 $entities[] = ['_' => 'messageEntityCode', 'offset' => $offset, 'length' => $length];
-
                 $new_message .= $text;
                 $offset += $length;
                 break;
             case 'pre':
                 $text = $this->htmlEntityDecode($node->textContent);
-
                 $length = $this->mbStrlen($text);
-
                 $language = $node->getAttribute('language');
                 if ($language === null) {
                     $language = '';
@@ -519,14 +475,14 @@ trait BotAPI
                 break;
             case 'p':
                 foreach ($node->childNodes as $node) {
-                    yield $this->parseNode($node, $entities, $new_message, $offset);
+                    yield from $this->parseNode($node, $entities, $new_message, $offset);
                 }
                 break;
             case 'a':
                 $text = $this->htmlEntityDecode($node->textContent);
                 $length = $this->mbStrlen($text);
                 $href = $node->getAttribute('href');
-                if (\preg_match('|mention:(.*)|', $href, $matches) || \preg_match('|tg://user\?id=(.*)|', $href, $matches)) {
+                if (\preg_match('|mention:(.*)|', $href, $matches) || \preg_match('|tg://user\\?id=(.*)|', $href, $matches)) {
                     $mention = yield $this->getInfo($matches[1]);
                     if (!isset($mention['InputUser'])) {
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
@@ -579,9 +535,7 @@ trait BotAPI
         }
         if (\stripos($arguments['parse_mode'], 'html') !== false) {
             $new_message = '';
-
             $arguments['message'] = \trim($this->htmlFixtags($arguments['message']));
-
             $dom = new \DOMDocument();
             $dom->loadHTML(\mb_convert_encoding($arguments['message'], 'HTML-ENTITIES', 'UTF-8'));
             if (!isset($arguments['entities'])) {
@@ -589,7 +543,7 @@ trait BotAPI
             }
             $offset = 0;
             foreach ($dom->getElementsByTagName('body')->item(0)->childNodes as $node) {
-                yield $this->parseNode($node, $arguments['entities'], $new_message, $offset);
+                yield from $this->parseNode($node, $arguments['entities'], $new_message, $offset);
             }
             if (isset($arguments['entities']['buttons'])) {
                 $arguments['reply_markup'] = $this->buildRows($arguments['entities']['buttons']);
@@ -598,10 +552,8 @@ trait BotAPI
             unset($arguments['parse_mode']);
             $arguments['message'] = $new_message;
         }
-
         return $arguments;
     }
-
     /**
      * Split too long message into chunks.
      *
@@ -613,15 +565,13 @@ trait BotAPI
      */
     public function splitToChunks($args): \Generator
     {
-        $args = yield $this->parseMode($args);
+        $args = (yield from $this->parseMode($args));
         if (!isset($args['entities'])) {
             $args['entities'] = [];
         }
-
         $max_length = isset($args['media']) ? $this->config['caption_length_max'] : $this->config['message_length_max'];
         $max_entity_length = 100;
         $max_entity_size = 8110;
-
         $text_arr = [];
         foreach ($this->multipleExplodeKeepDelimiters(["\n"], $args['message']) as $word) {
             if (\mb_strlen($word, 'UTF-8') > $max_length) {
@@ -632,12 +582,11 @@ trait BotAPI
                 $text_arr[] = $word;
             }
         }
-
         $multiple_args_base = \array_merge($args, ['entities' => [], 'parse_mode' => 'text', 'message' => '']);
         $multiple_args = [$multiple_args_base];
         $i = 0;
         foreach ($text_arr as $word) {
-            if ($this->mbStrlen($multiple_args[$i]['message'].$word) <= $max_length) {
+            if ($this->mbStrlen($multiple_args[$i]['message'] . $word) <= $max_length) {
                 $multiple_args[$i]['message'] .= $word;
             } else {
                 $i++;
@@ -645,7 +594,6 @@ trait BotAPI
                 $multiple_args[$i]['message'] .= $word;
             }
         }
-
         $i = 0;
         $offset = 0;
         for ($k = 0; $k < \count($args['entities']); $k++) {
@@ -656,19 +604,16 @@ trait BotAPI
                     $i++;
                 }
                 $entity['offset'] -= $offset;
-
                 if ($entity['offset'] + $entity['length'] > $this->mbStrlen($multiple_args[$i]['message'])) {
                     $newentity = $entity;
                     $newentity['length'] = $entity['length'] - ($this->mbStrlen($multiple_args[$i]['message']) - $entity['offset']);
                     $entity['length'] = $this->mbStrlen($multiple_args[$i]['message']) - $entity['offset'];
-
-                    $offset += $entity['length']; //$this->mbStrlen($multiple_args[$i]['message']);
+                    $offset += $entity['length'];
+                    //$this->mbStrlen($multiple_args[$i]['message']);
                     $newentity['offset'] = $offset;
-
                     $prev_length = $this->mbStrlen($multiple_args[$i]['message']);
                     $multiple_args[$i]['message'] = \rtrim($multiple_args[$i]['message']);
                     $diff = $prev_length - $this->mbStrlen($multiple_args[$i]['message']);
-
                     if ($diff) {
                         $entity['length'] -= $diff;
                         foreach ($args['entities'] as $key => &$eentity) {
@@ -677,11 +622,9 @@ trait BotAPI
                             }
                         }
                     }
-
                     $multiple_args[$i]['entities'][] = $entity;
                     $i++;
                     $entity = $newentity;
-
                     continue;
                 }
                 $prev_length = $this->mbStrlen($multiple_args[$i]['message']);
@@ -715,12 +658,10 @@ trait BotAPI
             }
         }
         if ($total) {
-            $this->logger->logger("Too many entities, $total entities will be truncated", Logger::FATAL_ERROR);
+            $this->logger->logger("Too many entities, {$total} entities will be truncated", Logger::FATAL_ERROR);
         }
-
         return $multiple_args;
     }
-
     private function multipleExplodeKeepDelimiters($delimiters, $string)
     {
         $initialArray = \explode(\chr(1), \str_replace($delimiters, \chr(1), $string));
@@ -729,57 +670,47 @@ trait BotAPI
         foreach ($initialArray as $item) {
             $delimOffset += $this->mbStrlen($item);
             //if ($this->mbStrlen($item) > 0) {
-            $finalArray[] = $item.($delimOffset < $this->mbStrlen($string) ? $string[$delimOffset] : '');
+            $finalArray[] = $item . ($delimOffset < $this->mbStrlen($string) ? $string[$delimOffset] : '');
             //}
             $delimOffset++;
         }
-
         return $finalArray;
     }
-
     private function htmlFixtags($text)
     {
         $diff = 0;
-        \preg_match_all('#(.*?)(<(\bu\b|\bs\b|\ba\b|\bb\b|\bstrong\b|\bblockquote\b|\bstrike\b|\bdel\b|\bem\b|i|\bcode\b|\bpre\b)[^>]*>)(.*?)([<]\s*/\s*\3[>])#is', $text, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
+        \preg_match_all('#(.*?)(<(\\bu\\b|\\bs\\b|\\ba\\b|\\bb\\b|\\bstrong\\b|\\bblockquote\\b|\\bstrike\\b|\\bdel\\b|\\bem\\b|i|\\bcode\\b|\\bpre\\b)[^>]*>)(.*?)([<]\\s*/\\s*\\3[>])#is', $text, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
         if ($matches) {
             foreach ($matches as $match) {
                 if (\trim($match[1][0]) != '') {
                     $mod = \htmlentities($match[1][0]);
-
                     $temp = \substr($text, 0, $match[1][1] + $diff);
                     $temp .= $mod;
                     $temp .= \substr($text, $match[1][1] + $diff + \strlen($match[1][0]));
-
                     $diff += \strlen($mod) - \strlen($match[1][0]);
-
                     $text = $temp;
                 }
                 $mod = \htmlentities($match[4][0]);
-
                 $temp = \substr($text, 0, $match[4][1] + $diff);
                 $temp .= $mod;
                 $temp .= \substr($text, $match[4][1] + $diff + \strlen($match[4][0]));
-
                 $diff += \strlen($mod) - \strlen($match[4][0]);
                 $text = $temp;
             }
             $diff = 0;
-            \preg_match_all('#<a\s*href=("|\')(.+?)("|\')\s*>#is', $text, $matches, PREG_OFFSET_CAPTURE);
+            \preg_match_all('#<a\\s*href=("|\')(.+?)("|\')\\s*>#is', $text, $matches, PREG_OFFSET_CAPTURE);
             foreach ($matches[2] as $match) {
                 $mod = \htmlentities($match[0]);
                 $temp = \substr($text, 0, $match[1] + $diff);
                 $temp .= $mod;
                 $temp .= \substr($text, $match[1] + $diff + \strlen($match[0]));
-
                 $diff += \strlen($mod) - \strlen($match[0]);
                 $text = $temp;
             }
-
             return $text;
         }
         return \htmlentities($text);
     }
-
     private function buildRows($button_list)
     {
         $end = false;
@@ -804,7 +735,6 @@ trait BotAPI
             $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
             $rows[] = $row;
         }
-
         return ['_' => 'replyInlineMarkup', 'rows' => $rows];
     }
 }

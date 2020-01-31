@@ -28,7 +28,6 @@ class DocsBuilder
     use \danog\MadelineProto\DocsBuilder\Constructors;
     use Tools;
     public $td = false;
-
     public function __construct($logger, $settings)
     {
         $this->logger = $logger;
@@ -50,19 +49,17 @@ class DocsBuilder
         \chdir($this->settings['output_dir']);
         $this->index = $settings['readme'] ? 'README.md' : 'index.md';
     }
-
     public $types = [];
     public $any = '*';
-
     public function mkDocs()
     {
         \danog\MadelineProto\Logger::log('Generating documentation index...', \danog\MadelineProto\Logger::NOTICE);
         \file_put_contents($this->index, '---
-title: '.$this->settings['title'].'
-description: '.$this->settings['description'].'
+title: ' . $this->settings['title'] . '
+description: ' . $this->settings['description'] . '
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
-# '.$this->settings['description'].'  
+# ' . $this->settings['description'] . '  
 
 [Back to main documentation](..)  
 
@@ -90,14 +87,14 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
             //$br = $new_namespace != $last_namespace ? '***<br><br>' : '';
             $type = \str_replace(['<', '>'], ['_of_', ''], $otype);
             $type = \preg_replace('/.*_of_/', '', $type);
-            $index .= '['.\str_replace('_', '\\_', $type).']('.$type.'.md)<a name="'.$type.'"></a>  
+            $index .= '[' . \str_replace('_', '\\_', $type) . '](' . $type . '.md)<a name="' . $type . '"></a>  
 
 ';
             $constructors = '';
             foreach ($keys['constructors'] as $data) {
-                $predicate = $data['predicate'].(isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '');
+                $predicate = $data['predicate'] . (isset($data['layer']) && $data['layer'] !== '' ? '_' . $data['layer'] : '');
                 $md_predicate = \str_replace('_', '\\_', $predicate);
-                $constructors .= '['.$md_predicate.'](../constructors/'.$predicate.'.md)  
+                $constructors .= '[' . $md_predicate . '](../constructors/' . $predicate . '.md)  
 
 ';
             }
@@ -105,26 +102,25 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
             foreach ($keys['methods'] as $data) {
                 $name = $data['method'];
                 $md_name = \str_replace(['.', '_'], ['->', '\\_'], $name);
-                $methods .= '[$MadelineProto->'.$md_name.'](../methods/'.$name.'.md)  
+                $methods .= '[$MadelineProto->' . $md_name . '](../methods/' . $name . '.md)  
 
 ';
             }
-            $description = isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] : 'constructors and methods of type '.$type;
+            $description = isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] : 'constructors and methods of type ' . $type;
             $symFile = \str_replace('.', '_', $type);
-            $redir = $symFile !== $type ? "\nredirect_from: /API_docs/types/$symFile.html" : '';
-
+            $redir = $symFile !== $type ? "\nredirect_from: /API_docs/types/{$symFile}.html" : '';
             $header = '---
-title: '.$type.'
-description: constructors and methods of type '.$type.'
-image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redir.'
+title: ' . $type . '
+description: constructors and methods of type ' . $type . '
+image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png' . $redir . '
 ---
-# Type: '.\str_replace('_', '\\_', $type).'  
+# Type: ' . \str_replace('_', '\\_', $type) . '  
 [Back to types index](index.md)
 
 
 
 ';
-            $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype].PHP_EOL.PHP_EOL : '';
+            $header .= isset($this->td_descriptions['types'][$otype]) ? $this->td_descriptions['types'][$otype] . PHP_EOL . PHP_EOL : '';
             if (!isset($this->settings['td'])) {
                 if (\in_array($type, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'InputPeer', 'NotifyPeer', 'InputNotifyPeer'])) {
                     $header .= 'You can directly provide the [Update](Update.md) or [Message](Message.md) object here, MadelineProto will automatically extract the destination chat id.
@@ -132,23 +128,11 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redi
 The following syntaxes can also be used:
 
 ```
-$'.$type." = '@username'; // Username
+$' . $type . " = '@username'; // Username\n\n\$" . $type . " = 'me'; // The currently logged-in user\n\n\$" . $type . ' = 44700; // bot API id (users)
+$' . $type . ' = -492772765; // bot API id (chats)
+$' . $type . ' = -10038575794; // bot API id (channels)
 
-\$".$type." = 'me'; // The currently logged-in user
-
-\$".$type.' = 44700; // bot API id (users)
-$'.$type.' = -492772765; // bot API id (chats)
-$'.$type.' = -10038575794; // bot API id (channels)
-
-$'.$type." = 'https://t.me/danogentili'; // t.me URLs
-\$".$type." = 'https://t.me/joinchat/asfln1-21fa_'; // t.me invite links
-
-\$".$type." = 'user#44700'; // tg-cli style id (users)
-\$".$type." = 'chat#492772765'; // tg-cli style id (chats)
-\$".$type." = 'channel#38575794'; // tg-cli style id (channels)
-```
-
-A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputDialogPeer](InputDialogPeer.md), an [InputNotifyPeer](InputNotifyPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), an [DialogPeer](DialogPeer.md), [NotifyPeer](NotifyPeer.md), or a [Chat](Chat.md) object can also be used.\n\n\n";
+$' . $type . " = 'https://t.me/danogentili'; // t.me URLs\n\$" . $type . " = 'https://t.me/joinchat/asfln1-21fa_'; // t.me invite links\n\n\$" . $type . " = 'user#44700'; // tg-cli style id (users)\n\$" . $type . " = 'chat#492772765'; // tg-cli style id (chats)\n\$" . $type . " = 'channel#38575794'; // tg-cli style id (channels)\n```\n\nA [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputDialogPeer](InputDialogPeer.md), an [InputNotifyPeer](InputNotifyPeer.md), an [InputUser](InputUser.md), an [InputChannel](InputChannel.md), a [Peer](Peer.md), an [DialogPeer](DialogPeer.md), [NotifyPeer](NotifyPeer.md), or a [Chat](Chat.md) object can also be used.\n\n\n";
                 }
                 if (\in_array($type, ['InputEncryptedChat'])) {
                     $header .= 'You can directly provide the [Update](Update.md) or [EncryptedMessage](EncryptedMessage.md) object here, MadelineProto will automatically extract the destination chat id.
@@ -156,7 +140,7 @@ A [Chat](Chat.md), a [User](User.md), an [InputPeer](InputPeer.md), an [InputDia
 The following syntax can also be used:
 
 ```
-$'.$type.' = -147286699; // Numeric chat id returned by requestSecretChat, can be positive or negative
+$' . $type . ' = -147286699; // Numeric chat id returned by requestSecretChat, can be positive or negative
 ```
 
 
@@ -166,7 +150,7 @@ $'.$type.' = -147286699; // Numeric chat id returned by requestSecretChat, can b
                     $header .= 'The following syntax can also be used:
 
 ```
-$'.$type.' = \'filename.mp4\'; // The file path can also be used
+$' . $type . ' = \'filename.mp4\'; // The file path can also be used
 ```
 
 
@@ -191,7 +175,7 @@ $'.$type.' = \'filename.mp4\'; // The file path can also be used
                     $header .= 'The following syntax can also be used:
 
 ```
-$'.$type.' = 142; // Numeric message ID
+$' . $type . ' = 142; // Numeric message ID
 ```
 
 
@@ -203,7 +187,7 @@ $'.$type.' = 142; // Numeric message ID
 To click these buttons simply run the `click` method:  
 
 ```
-$result = $'.$type.'->click();
+$result = $' . $type . '->click();
 ```
 
 `$result` can be one of the following:
@@ -224,12 +208,12 @@ You can also access the properties of the constructor as a normal array, for exa
             }
             $constructors = '### Possible values (constructors):
 
-'.$constructors.'
+' . $constructors . '
 
 ';
             $methods = '### Methods that return an object of this type (methods):
 
-'.$methods.'
+' . $methods . '
 
 ';
             if (!isset($this->settings['td'])) {
@@ -389,7 +373,7 @@ Easy as pie:
 
 ```
 $call->storage["pony"] = "fluttershy";
-\danog\MadelineProto\Logger::log($call->storage["pony"]); // fluttershy
+\\danog\\MadelineProto\\Logger::log($call->storage["pony"]); // fluttershy
 ```
 
 Note: when modifying this property, *never* overwrite the previous values. Always either modify the values of the array separately like showed above, or use array_merge.
@@ -416,14 +400,14 @@ After modifying it, you must always parse the new configuration with a call to `
 ';
                 }
             }
-            if (\file_exists('types/'.$type.'.md')) {
+            if (\file_exists('types/' . $type . '.md')) {
                 \danog\MadelineProto\Logger::log($type);
             }
-            \file_put_contents('types/'.$type.'.md', $header.$constructors.$methods);
+            \file_put_contents('types/' . $type . '.md', $header . $constructors . $methods);
             $last_namespace = $new_namespace;
         }
         \danog\MadelineProto\Logger::log('Generating types index...', \danog\MadelineProto\Logger::NOTICE);
-        \file_put_contents('types/'.$this->index, '---
+        \file_put_contents('types/' . $this->index, '---
 title: Types
 description: List of types
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
@@ -432,7 +416,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 [Back to API documentation index](..)
 
 
-'.$index);
+' . $index);
         \danog\MadelineProto\Logger::log('Generating additional types...', \danog\MadelineProto\Logger::NOTICE);
         \file_put_contents('types/string.md', '---
 title: string
@@ -452,7 +436,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ## Type: bytes  
 [Back to constructor index](index.md)
 
-An object of type `\danog\MadelineProto\TL\Types\Bytes`.  
+An object of type `\\danog\\MadelineProto\\TL\\Types\\Bytes`.  
 When casted to string, turns into a string of bytes of variable length, with length smaller than or equal to 16777215.  
 When JSON-serialized, turns into an array of the following format:  
 ```
@@ -604,7 +588,6 @@ Any json-encodable data.
 ');
         \danog\MadelineProto\Logger::log('Done!', \danog\MadelineProto\Logger::NOTICE);
     }
-
     public static $template = '<?php
 /**
  * Lang module
@@ -622,7 +605,7 @@ Any json-encodable data.
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
     
-namespace danog\MadelineProto;
+namespace danog\\MadelineProto;
     
 class Lang
 {
@@ -631,12 +614,11 @@ class Lang
     // THIS WILL BE OVERWRITTEN BY $lang["en"]
     public static $current_lang = %s;
 }';
-
     public static function addToLang(string $key, string $value = '', bool $force = false)
     {
         if (!isset(\danog\MadelineProto\Lang::$lang['en'][$key]) || $force) {
             \danog\MadelineProto\Lang::$lang['en'][$key] = $value;
-            \file_put_contents(__DIR__.'/Lang.php', \sprintf(self::$template, \var_export(\danog\MadelineProto\Lang::$lang, true), \var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
+            \file_put_contents(__DIR__ . '/Lang.php', \sprintf(self::$template, \var_export(\danog\MadelineProto\Lang::$lang, true), \var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
         }
     }
 }

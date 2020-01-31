@@ -40,7 +40,6 @@ trait CallHandler
     {
         return \danog\MadelineProto\Tools::wait($this->methodCallAsyncRead($method, $args, $aargs));
     }
-
     /**
      * Call method and wait asynchronously for response.
      *
@@ -54,16 +53,13 @@ trait CallHandler
      */
     public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
     {
-        $deferred = new Deferred;
-        $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->onResolve(
-            static function ($e, $res) use (&$method, &$args, &$aargs, &$deferred) {
-                if ($e) {
-                    throw $e;
-                }
-                $deferred->resolve($res->methodCallAsyncRead($method, $args, $aargs));
+        $deferred = new Deferred();
+        $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->onResolve(static function ($e, $res) use (&$method, &$args, &$aargs, &$deferred) {
+            if ($e) {
+                throw $e;
             }
-        );
-
+            $deferred->resolve($res->methodCallAsyncRead($method, $args, $aargs));
+        });
         return $deferred->promise();
     }
     /**
@@ -77,16 +73,13 @@ trait CallHandler
      */
     public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
     {
-        $deferred = new Deferred;
-        $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->onResolve(
-            static function ($e, $res) use (&$method, &$args, &$aargs, &$deferred) {
-                if ($e) {
-                    throw $e;
-                }
-                $deferred->resolve($res->methodCallAsyncWrite($method, $args, $aargs));
+        $deferred = new Deferred();
+        $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->onResolve(static function ($e, $res) use (&$method, &$args, &$aargs, &$deferred) {
+            if ($e) {
+                throw $e;
             }
-        );
-
+            $deferred->resolve($res->methodCallAsyncWrite($method, $args, $aargs));
+        });
         return $deferred->promise();
     }
 }

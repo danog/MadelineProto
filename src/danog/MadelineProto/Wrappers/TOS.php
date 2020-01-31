@@ -37,7 +37,6 @@ trait TOS
                 $this->tos = yield $this->methodCallAsyncRead('help.getTermsOfServiceUpdate', [], ['datacenter' => $this->datacenter->curdc]);
                 $this->tos['accepted'] = $this->tos['_'] === 'help.termsOfServiceUpdateEmpty';
             }
-
             if (!$this->tos['accepted']) {
                 $this->logger->logger('Telegram has updated their Terms Of Service', \danog\MadelineProto\Logger::ERROR);
                 $this->logger->logger('Accept the TOS before proceeding by calling $MadelineProto->acceptTos().', \danog\MadelineProto\Logger::ERROR);
@@ -45,12 +44,10 @@ trait TOS
                 $this->logger->logger('By declining the TOS, the currently logged in account will be PERMANENTLY DELETED.', \danog\MadelineProto\Logger::FATAL_ERROR);
                 $this->logger->logger('Read the following TOS very carefully: ', \danog\MadelineProto\Logger::ERROR);
                 $this->logger->logger($this->tos);
-
                 throw new \danog\MadelineProto\Exception('TOS action required, check the logs', 0, null, 'MadelineProto', 1);
             }
         }
     }
-
     /**
      * Accept terms of service update.
      *
@@ -65,7 +62,6 @@ trait TOS
             throw new \danog\MadelineProto\Exception('An error occurred while accepting the TOS');
         }
     }
-
     /**
      * Decline terms of service update.
      *

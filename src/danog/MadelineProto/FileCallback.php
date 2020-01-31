@@ -36,7 +36,6 @@ class FileCallback implements FileCallbackInterface
      * @var callable
      */
     private $callback;
-
     /**
      * Construct file callback.
      *
@@ -48,7 +47,6 @@ class FileCallback implements FileCallbackInterface
         $this->file = $file;
         $this->callback = $callback;
     }
-
     /**
      * Get file.
      *
@@ -58,7 +56,6 @@ class FileCallback implements FileCallbackInterface
     {
         return $this->file;
     }
-
     /**
      * Invoke callback.
      *
@@ -71,7 +68,6 @@ class FileCallback implements FileCallbackInterface
     public function __invoke($percent, $speed, $time)
     {
         $callback = $this->callback;
-
         return $callback($percent, $speed, $time);
     }
 }

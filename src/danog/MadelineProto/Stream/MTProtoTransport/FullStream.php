@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TCP full stream wrapper.
  *
@@ -40,7 +41,6 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
     private $stream;
     private $in_seq_no = -1;
     private $out_seq_no = -1;
-
     /**
      * Stream to use as data source.
      *
@@ -54,10 +54,8 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
         $this->out_seq_no = -1;
         $this->stream = new HashedBufferedStream();
         $this->stream->setExtra('crc32b_rev');
-
         return $this->stream->connect($ctx, $header);
     }
-
     /**
      * Async close.
      *
@@ -67,7 +65,6 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
     {
         return $this->stream->disconnect();
     }
-
     /**
      * Get write buffer asynchronously.
      *
@@ -82,10 +79,8 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
         $buffer = yield $this->stream->getWriteBuffer($length + 12, $append);
         $this->out_seq_no++;
         $buffer->bufferWrite(\pack('VV', $length + 12, $this->out_seq_no));
-
         return $buffer;
     }
-
     /**
      * Get read buffer asynchronously.
      *
@@ -105,10 +100,8 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
         if ($in_seq_no != $this->in_seq_no) {
             throw new \danog\MadelineProto\Exception('Incoming seq_no mismatch');
         }
-
         return $buffer;
     }
-
     /**
      * {@inheritdoc}
      *
@@ -118,7 +111,6 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
     {
         return $this->stream->getSocket();
     }
-
     /**
      * {@inheritDoc}
      *

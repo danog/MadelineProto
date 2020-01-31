@@ -25,7 +25,6 @@ class Button implements \JsonSerializable, \ArrayAccess
     use \danog\MadelineProto\Tools;
     private $info = [];
     private $data = [];
-
     public function __magic_construct($API, $message, $button)
     {
         $this->data = $button;
@@ -33,12 +32,10 @@ class Button implements \JsonSerializable, \ArrayAccess
         $this->info['id'] = $message['id'];
         $this->info['API'] = $API;
     }
-
     public function __sleep()
     {
         return ['data', 'info'];
     }
-
     public function click($donotwait = false, $params = [])
     {
         if (\is_array($donotwait)) {
@@ -56,26 +53,22 @@ class Button implements \JsonSerializable, \ArrayAccess
                 $res = $this->info['API']->methodCallAsyncRead('messages.sendMessage', ['peer' => $this->info['peer'], 'message' => $this->data['text'], 'reply_to_msg_id' => $this->info['id']], ['datacenter' => $this->info['API']->datacenter->curdc]);
                 break;
             case 'keyboardButtonCallback':
-                $res = $this->info['API']->$method('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'data' => $this->data['data']], ['datacenter' => $this->info['API']->datacenter->curdc]);
+                $res = $this->info['API']->{$method}('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'data' => $this->data['data']], ['datacenter' => $this->info['API']->datacenter->curdc]);
                 break;
             case 'keyboardButtonGame':
-                $res = $this->info['API']->$method('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'game' => true], ['datacenter' => $this->info['API']->datacenter->curdc]);
+                $res = $this->info['API']->{$method}('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'game' => true], ['datacenter' => $this->info['API']->datacenter->curdc]);
                 break;
         }
-
         return $async ? $res : \danog\MadelineProto\Tools::wait($res);
     }
-
     public function __debugInfo()
     {
         return ['data' => $this->data, 'info' => ['peer' => $this->info['peer'], 'id' => $this->info['id']]];
     }
-
     public function jsonSerialize()
     {
         return (array) $this->data;
     }
-
     public function offsetSet($name, $value)
     {
         if ($name === null) {
@@ -84,17 +77,14 @@ class Button implements \JsonSerializable, \ArrayAccess
             $this->data[$name] = $value;
         }
     }
-
     public function offsetGet($name)
     {
         return $this->data[$name];
     }
-
     public function offsetUnset($name)
     {
         unset($this->data[$name]);
     }
-
     public function offsetExists($name)
     {
         return isset($this->data[$name]);

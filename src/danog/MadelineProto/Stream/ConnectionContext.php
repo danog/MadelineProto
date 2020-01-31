@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Connection context.
  *
@@ -107,14 +108,12 @@ class ConnectionContext
      * @var int
      */
     private $key = 0;
-
     /**
      * Read callback.
      *
      * @var callable
      */
     private $readCallback;
-
     /**
      * Set the socket context.
      *
@@ -125,10 +124,8 @@ class ConnectionContext
     public function setSocketContext(ConnectContext $socketContext): self
     {
         $this->socketContext = $socketContext;
-
         return $this;
     }
-
     /**
      * Get the socket context.
      *
@@ -138,7 +135,6 @@ class ConnectionContext
     {
         return $this->socketContext;
     }
-
     /**
      * Set the connection URI.
      *
@@ -149,10 +145,8 @@ class ConnectionContext
     public function setUri($uri): self
     {
         $this->uri = $uri instanceof Uri ? $uri : new Uri($uri);
-
         return $this;
     }
-
     /**
      * Get the URI as a string.
      *
@@ -162,7 +156,6 @@ class ConnectionContext
     {
         return (string) $this->uri;
     }
-
     /**
      * Get the URI.
      *
@@ -172,7 +165,6 @@ class ConnectionContext
     {
         return $this->uri;
     }
-
     /**
      * Set the cancellation token.
      *
@@ -183,10 +175,8 @@ class ConnectionContext
     public function setCancellationToken($cancellationToken): self
     {
         $this->cancellationToken = $cancellationToken;
-
         return $this;
     }
-
     /**
      * Get the cancellation token.
      *
@@ -215,10 +205,8 @@ class ConnectionContext
     public function setTest(bool $test): self
     {
         $this->test = $test;
-
         return $this;
     }
-
     /**
      * Whether this is a test connection.
      *
@@ -237,7 +225,6 @@ class ConnectionContext
     {
         return $this->media;
     }
-
     /**
      * Whether this is a CDN connection.
      *
@@ -247,7 +234,6 @@ class ConnectionContext
     {
         return $this->cdn;
     }
-
     /**
      * Whether this connection context will only be used by the DNS client.
      *
@@ -257,7 +243,6 @@ class ConnectionContext
     {
         return $this->isDns;
     }
-
     /**
      * Whether this connection context will only be used by the DNS client.
      *
@@ -279,10 +264,8 @@ class ConnectionContext
     public function secure(bool $secure): self
     {
         $this->secure = $secure;
-
         return $this;
     }
-
     /**
      * Whether to use TLS with socket connections.
      *
@@ -292,7 +275,6 @@ class ConnectionContext
     {
         return $this->secure;
     }
-
     /**
      * Set the DC ID.
      *
@@ -304,15 +286,13 @@ class ConnectionContext
     {
         $int = \intval($dc);
         if (!(1 <= $int && $int <= 1000)) {
-            throw new Exception("Invalid DC id provided: $dc");
+            throw new Exception("Invalid DC id provided: {$dc}");
         }
         $this->dc = $dc;
         $this->media = \strpos($dc, '_media') !== false;
         $this->cdn = \strpos($dc, '_cdn') !== false;
-
         return $this;
     }
-
     /**
      * Get the DC ID.
      *
@@ -322,7 +302,6 @@ class ConnectionContext
     {
         return $this->dc;
     }
-
     /**
      * Get the int DC ID.
      *
@@ -337,10 +316,8 @@ class ConnectionContext
         if ($this->media) {
             $dc = -$dc;
         }
-
         return $dc;
     }
-
     /**
      * Whether to use ipv6.
      *
@@ -351,10 +328,8 @@ class ConnectionContext
     public function setIpv6(bool $ipv6): self
     {
         $this->ipv6 = $ipv6;
-
         return $this;
     }
-
     /**
      * Whether to use ipv6.
      *
@@ -364,7 +339,6 @@ class ConnectionContext
     {
         return $this->ipv6;
     }
-
     /**
      * Add a stream to the stream chain.
      *
@@ -377,10 +351,8 @@ class ConnectionContext
     {
         $this->nextStreams[] = [$streamName, $extra];
         $this->key = \count($this->nextStreams) - 1;
-
         return $this;
     }
-
     /**
      * Set read callback, called every time the socket reads at least a byte.
      *
@@ -392,7 +364,6 @@ class ConnectionContext
     {
         $this->readCallback = $callable;
     }
-
     /**
      * Check if a read callback is present.
      *
@@ -402,7 +373,6 @@ class ConnectionContext
     {
         return $this->readCallback !== null;
     }
-
     /**
      * Get read callback.
      *
@@ -412,7 +382,6 @@ class ConnectionContext
     {
         return $this->readCallback;
     }
-
     /**
      * Get the current stream name from the stream chain.
      *
@@ -422,7 +391,6 @@ class ConnectionContext
     {
         return $this->nextStreams[$this->key][0];
     }
-
     /**
      * Check if has stream within stream chain.
      *
@@ -439,7 +407,6 @@ class ConnectionContext
         }
         return false;
     }
-
     /**
      * Get a stream from the stream chain.
      *
@@ -455,11 +422,8 @@ class ConnectionContext
             $obj->setExtra($extra);
         }
         yield $obj->connect($this, $buffer);
-
         return $obj;
     }
-
-
     /**
      * Get the inputClientProxy proxy MTProto object.
      *
@@ -499,13 +463,11 @@ class ConnectionContext
             }
             $string .= \preg_replace('/.*\\\\/', '', $stream[0]);
             if ($stream[1] && $stream[0] !== DefaultStream::getName()) {
-                $string .= ' ('.\json_encode($stream[1]).')';
+                $string .= ' (' . \json_encode($stream[1]) . ')';
             }
         }
-
         return $string;
     }
-
     /**
      * Returns a representation of the context.
      *

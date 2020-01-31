@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Abridged stream wrapper.
  *
@@ -34,9 +35,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
 class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     use BufferedStream;
-
     private $stream;
-
     /**
      * Connect to stream.
      *
@@ -46,9 +45,8 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      */
     public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = yield $ctx->getStream(\chr(239).$header);
+        $this->stream = yield $ctx->getStream(\chr(239) . $header);
     }
-
     /**
      * Async close.
      *
@@ -58,7 +56,6 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
     {
         return $this->stream->disconnect();
     }
-
     /**
      * Get write buffer asynchronously.
      *
@@ -72,14 +69,12 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
         if ($length < 127) {
             $message = \chr($length);
         } else {
-            $message = \chr(127).\substr(\pack('V', $length), 0, 3);
+            $message = \chr(127) . \substr(\pack('V', $length), 0, 3);
         }
         $buffer = yield $this->stream->getWriteBuffer(\strlen($message) + $length, $append);
         yield $buffer->bufferWrite($message);
-
         return $buffer;
     }
-
     /**
      * Get read buffer asynchronously.
      *
@@ -92,13 +87,11 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
         $buffer = yield $this->stream->getReadBuffer($l);
         $length = \ord(yield $buffer->bufferRead(1));
         if ($length >= 127) {
-            $length = \unpack('V', (yield $buffer->bufferRead(3))."\0")[1];
+            $length = \unpack('V', yield $buffer->bufferRead(3) . "\0")[1];
         }
         $length <<= 2;
-
         return $buffer;
     }
-
     /**
      * {@inheritdoc}
      *
@@ -108,7 +101,6 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
     {
         return $this->stream->getSocket();
     }
-
     /**
      * {@inheritDoc}
      *

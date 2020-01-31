@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ADNL stream wrapper.
  *
@@ -24,7 +25,6 @@ use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
-
 use danog\MadelineProto\Stream\RawStreamInterface;
 use danog\MadelineProto\Tools;
 
@@ -39,7 +39,6 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     use BufferedStream;
     private $stream;
-
     /**
      * Connect to stream.
      *
@@ -51,7 +50,6 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
     {
         $this->stream = yield $ctx->getStream($header);
     }
-
     /**
      * Async close.
      *
@@ -61,7 +59,6 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
     {
         return $this->stream->disconnect();
     }
-
     /**
      * Get write buffer asynchronously.
      *
@@ -77,10 +74,8 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
         $this->stream->startWriteHash();
         $this->stream->checkWriteHash($length - 32);
         yield $buffer->bufferWrite(Tools::random(32));
-
         return $buffer;
     }
-
     /**
      * Get read buffer asynchronously.
      *
@@ -96,10 +91,8 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
         $this->stream->checkReadHash($length);
         yield $buffer->bufferRead(32);
         $length -= 32;
-
         return $buffer;
     }
-
     /**
      * {@inheritdoc}
      *
@@ -118,8 +111,6 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
     {
         return $this->stream;
     }
-
-
     public static function getName(): string
     {
         return __CLASS__;

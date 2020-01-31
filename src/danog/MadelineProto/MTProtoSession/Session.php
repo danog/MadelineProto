@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Session module.
  *
@@ -28,20 +29,15 @@ abstract class Session
     use ResponseHandler;
     use SeqNoHandler;
     use CallHandler;
-
     public $incoming_messages = [];
     public $outgoing_messages = [];
     public $new_incoming = [];
     public $new_outgoing = [];
-
     public $pending_outgoing = [];
     public $pending_outgoing_key = 'a';
-
     public $time_delta = 0;
-
     public $call_queue = [];
     public $ack_queue = [];
-
     /**
      * Reset MTProto session.
      *
@@ -68,7 +64,6 @@ abstract class Session
             $this->session_out_seq_no = 0;
         }
     }
-
     /**
      * Backup eventual unsent messages before session deletion.
      *

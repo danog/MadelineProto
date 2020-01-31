@@ -22,17 +22,14 @@ namespace danog\MadelineProto\TL\Conversion;
 class Exception extends \Exception
 {
     use \danog\MadelineProto\TL\PrettyException;
-
     public function __toString()
     {
-        $result = \get_class($this).($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.\danog\MadelineProto\Magic::$revision.PHP_EOL.'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;
+        $result = \get_class($this) . ($this->message !== '' ? ': ' : '') . $this->message . PHP_EOL . \danog\MadelineProto\Magic::$revision . PHP_EOL . 'TL Trace (YOU ABSOLUTELY MUST READ THE TEXT BELOW):' . PHP_EOL . PHP_EOL . $this->getTLTrace() . PHP_EOL;
         if (PHP_SAPI !== 'cli') {
-            $result = \str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
+            $result = \str_replace(PHP_EOL, '<br>' . PHP_EOL, $result);
         }
-
         return $result;
     }
-
     public function __construct($message, $file = '')
     {
         parent::__construct($message);

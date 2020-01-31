@@ -20,7 +20,6 @@
 namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\Tools;
-
 use function Amp\ByteStream\getStdout;
 
 /**
@@ -28,12 +27,12 @@ use function Amp\ByteStream\getStdout;
  */
 trait ApiStart
 {
-    public function APIStart($settings)
+    public function APIStart($settings): \Generator
     {
         if (PHP_SAPI === 'cli') {
             $stdout = getStdout();
             yield $stdout->write('You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a)
-Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id'.PHP_EOL);
+Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id' . PHP_EOL);
             if (\strpos(yield Tools::readLine('Your choice (m/a): '), 'm') !== false) {
                 yield $stdout->write('1) Login to my.telegram.org
 2) Go to API development tools
@@ -42,10 +41,9 @@ Note that you can also provide the API parameters directly in the code using the
     URL: your app/website\'s URL, or t.me/yourusername
     Platform: anything
     Description: Describe your app here
-4) Click on create application'.PHP_EOL);
+4) Click on create application' . PHP_EOL);
                 $app['api_id'] = yield Tools::readLine('5) Enter your API ID: ');
                 $app['api_hash'] = yield Tools::readLine('6) Enter your API hash: ');
-
                 return $app;
             }
             $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($settings);
@@ -60,7 +58,6 @@ Note that you can also provide the API parameters directly in the code using the
             } else {
                 $app = yield $this->my_telegram_org_wrapper->getApp();
             }
-
             return $app;
         }
         $this->getting_api_id = true;
@@ -69,16 +66,15 @@ Note that you can also provide the API parameters directly in the code using the
                 $app['api_id'] = (int) $_POST['api_id'];
                 $app['api_hash'] = $_POST['api_hash'];
                 $this->getting_api_id = false;
-
                 return $app;
             } elseif (isset($_POST['phone_number'])) {
-                yield $this->webAPIPhoneLogin($settings);
+                yield from $this->webAPIPhoneLogin($settings);
             } else {
                 yield $this->webAPIEcho();
             }
         } elseif (!$this->my_telegram_org_wrapper->loggedIn()) {
             if (isset($_POST['code'])) {
-                yield $this->webAPICompleteLogin();
+                yield from $this->webAPICompleteLogin();
                 if (yield $this->my_telegram_org_wrapper->hasApp()) {
                     return yield $this->my_telegram_org_wrapper->getApp();
                 }
@@ -87,19 +83,17 @@ Note that you can also provide the API parameters directly in the code using the
                 $app['api_id'] = (int) $_POST['api_id'];
                 $app['api_hash'] = $_POST['api_hash'];
                 $this->getting_api_id = false;
-
                 return $app;
             } elseif (isset($_POST['phone_number'])) {
-                yield $this->webAPIPhoneLogin($settings);
+                yield from $this->webAPIPhoneLogin($settings);
             } else {
                 $this->my_telegram_org_wrapper = null;
                 yield $this->webAPIEcho();
             }
         } else {
             if (isset($_POST['app_title'], $_POST['app_shortname'], $_POST['app_url'], $_POST['app_platform'], $_POST['app_desc'])) {
-                $app = yield $this->webAPICreateApp();
+                $app = (yield from $this->webAPICreateApp());
                 $this->getting_api_id = false;
-
                 return $app;
             }
             yield $this->webAPIEcho("You didn't provide all of the required parameters!");
@@ -107,41 +101,37 @@ Note that you can also provide the API parameters directly in the code using the
         $this->asyncInitPromise = null;
         exit;
     }
-
-    private function webAPIPhoneLogin($settings)
+    private function webAPIPhoneLogin($settings): \Generator
     {
         try {
             $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($settings);
             yield $this->my_telegram_org_wrapper->login($_POST['phone_number']);
             yield $this->webAPIEcho();
         } catch (\Throwable $e) {
-            yield $this->webAPIEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webAPIEcho('ERROR: ' . $e->getMessage() . '. Try again.');
         }
     }
-
-    private function webAPICompleteLogin()
+    private function webAPICompleteLogin(): \Generator
     {
         try {
             yield $this->my_telegram_org_wrapper->completeLogin($_POST['code']);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->webAPIEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webAPIEcho('ERROR: ' . $e->getMessage() . '. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->webAPIEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield $this->webAPIEcho('ERROR: ' . $e->getMessage() . '. Try again.');
         }
     }
-
-    private function webAPICreateApp()
+    private function webAPICreateApp(): \Generator
     {
         try {
             $params = $_POST;
             unset($params['creating_app']);
             $app = yield $this->my_telegram_org_wrapper->createApp($params);
-
             return $app;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->webAPIEcho('ERROR: '.$e->getMessage().' Try again.');
+            yield $this->webAPIEcho('ERROR: ' . $e->getMessage() . ' Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->webAPIEcho('ERROR: '.$e->getMessage().' Try again.');
+            yield $this->webAPIEcho('ERROR: ' . $e->getMessage() . ' Try again.');
         }
     }
 }

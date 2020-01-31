@@ -1,4 +1,5 @@
 <?php
+
 /**
  * HttpWait loop.
  *
@@ -40,14 +41,12 @@ class HttpWaitLoop extends ResumableSignalLoop
      * @var string
      */
     protected $datacenter;
-
     /**
      * DataCenterConnection instance.
      *
      * @var \danog\MadelineProto\DataCenterConnection
      */
     protected $datacenterConnection;
-
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
@@ -55,18 +54,15 @@ class HttpWaitLoop extends ResumableSignalLoop
         $this->datacenter = $connection->getDatacenterID();
         $this->datacenterConnection = $connection->getShared();
     }
-
-    public function loop()
+    public function loop(): \Generator
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
         $connection = $this->connection;
         $shared = $this->datacenterConnection;
-
         if (!$shared->isHttp()) {
             return;
         }
-
         while (true) {
             if (yield $this->waitSignal($this->pause())) {
                 return;
@@ -79,14 +75,13 @@ class HttpWaitLoop extends ResumableSignalLoop
                     return;
                 }
             }
-            $API->logger->logger("DC $datacenter: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
-            if ($connection->countHttpSent() === $connection->countHttpReceived() && (!empty($connection->pending_outgoing) || (!empty($connection->new_outgoing) && !$connection->hasPendingCalls()))) {
+            $API->logger->logger("DC {$datacenter}: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
+            if ($connection->countHttpSent() === $connection->countHttpReceived() && (!empty($connection->pending_outgoing) || !empty($connection->new_outgoing) && !$connection->hasPendingCalls())) {
                 yield $connection->sendMessage(['_' => 'http_wait', 'body' => ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'contentRelated' => true, 'unencrypted' => false, 'method' => false]);
             }
-            $API->logger->logger("DC $datacenter: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
+            $API->logger->logger("DC {$datacenter}: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
         }
     }
-
     public function __toString(): string
     {
         return "HTTP wait loop in DC {$this->datacenter}";

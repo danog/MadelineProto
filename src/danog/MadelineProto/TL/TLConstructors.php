@@ -27,21 +27,17 @@ class TLConstructors
     public $by_id = [];
     public $by_predicate_and_layer = [];
     public $layers = [];
-
     public function __sleep()
     {
         return ['by_predicate_and_layer', 'by_id', 'layers'];
     }
-
     public function add($json_dict, $scheme_type)
     {
         if (isset($this->by_id[$json_dict['id']]) && (!isset($this->by_id[$json_dict['id']]['layer']) || $this->by_id[$json_dict['id']]['layer'] > $json_dict['layer'])) {
             return false;
         }
-
-        $predicate = (string) (($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message' ? 'MT' : '').$json_dict['predicate']);
-
-        $this->by_id[$json_dict['id']] = ['predicate' => $predicate, 'params' => $json_dict['params'], 'type' => ($scheme_type === 'mtproto' && $json_dict['type'] === 'Message' ? 'MT' : '').$json_dict['type']];
+        $predicate = (string) (($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message' ? 'MT' : '') . $json_dict['predicate']);
+        $this->by_id[$json_dict['id']] = ['predicate' => $predicate, 'params' => $json_dict['params'], 'type' => ($scheme_type === 'mtproto' && $json_dict['type'] === 'Message' ? 'MT' : '') . $json_dict['type']];
         if ($scheme_type === 'secret') {
             $this->by_id[$json_dict['id']]['layer'] = $json_dict['layer'];
             $this->layers[$json_dict['layer']] = $json_dict['layer'];
@@ -49,33 +45,29 @@ class TLConstructors
         } else {
             $json_dict['layer'] = '';
         }
-        $this->by_predicate_and_layer[$predicate.$json_dict['layer']] = $json_dict['id'];
+        $this->by_predicate_and_layer[$predicate . $json_dict['layer']] = $json_dict['id'];
         $this->parseParams($json_dict['id'], $scheme_type === 'mtproto');
     }
-
     public function findByType($type)
     {
         foreach ($this->by_id as $id => $constructor) {
             if ($constructor['type'] === $type) {
                 $constructor['id'] = $id;
-
                 return $constructor;
             }
         }
-
         return false;
     }
-
     public function findByPredicate($predicate, $layer = -1)
     {
         if ($layer !== -1) {
             foreach ($this->layers as $alayer) {
                 if ($alayer <= $layer) {
-                    if (isset($this->by_predicate_and_layer[$predicate.$alayer])) {
-                        $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
+                    if (isset($this->by_predicate_and_layer[$predicate . $alayer])) {
+                        $chosenid = $this->by_predicate_and_layer[$predicate . $alayer];
                     }
                 } elseif (!isset($chosenid)) {
-                    $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
+                    $chosenid = $this->by_predicate_and_layer[$predicate . $alayer];
                 }
             }
             if (!isset($chosenid)) {
@@ -83,19 +75,15 @@ class TLConstructors
             }
             $constructor = $this->by_id[$chosenid];
             $constructor['id'] = $chosenid;
-
             return $constructor;
         }
         if (isset($this->by_predicate_and_layer[$predicate])) {
             $constructor = $this->by_id[$this->by_predicate_and_layer[$predicate]];
             $constructor['id'] = $this->by_predicate_and_layer[$predicate];
-
             return $constructor;
         }
-
         return false;
     }
-
     /**
      * Find constructor by ID.
      *
@@ -108,10 +96,8 @@ class TLConstructors
         if (isset($this->by_id[$id])) {
             $constructor = $this->by_id[$id];
             $constructor['id'] = $id;
-
             return $constructor;
         }
-
         return false;
     }
 }

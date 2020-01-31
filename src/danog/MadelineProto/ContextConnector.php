@@ -37,16 +37,14 @@ class ContextConnector implements Connector
         $this->fromDns = $fromDns;
         $this->logger = $dataCenter->getAPI()->getLogger();
     }
-
     public function connect(string $uri, ?ConnectContext $ctx = null, ?CancellationToken $token = null): Promise
     {
-        return Tools::call((function () use ($uri, $ctx, $token) {
-            $ctx = $ctx ?? new ConnectContext;
-            $token = $token ?? new NullCancellationToken;
-
+        return Tools::call((function () use ($uri, $ctx, $token): \Generator {
+            $ctx = $ctx ?? new ConnectContext();
+            $token = $token ?? new NullCancellationToken();
             $ctxs = $this->dataCenter->generateContexts(0, $uri, $ctx);
             if (empty($ctxs)) {
-                throw new Exception("No contexts for raw connection to URI $uri");
+                throw new Exception("No contexts for raw connection to URI {$uri}");
             }
             foreach ($ctxs as $ctx) {
                 /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
@@ -55,22 +53,20 @@ class ContextConnector implements Connector
                     $ctx->setCancellationToken($token);
                     $result = yield $ctx->getStream();
                     $this->logger->logger('OK!', \danog\MadelineProto\Logger::WARNING);
-
                     return $result->getSocket();
                 } catch (\Throwable $e) {
                     if (\MADELINEPROTO_TEST === 'pony') {
                         throw $e;
                     }
-                    $this->logger->logger('Connection failed: '.$e, \danog\MadelineProto\Logger::ERROR);
+                    $this->logger->logger('Connection failed: ' . $e, \danog\MadelineProto\Logger::ERROR);
                     if ($e instanceof MultiReasonException) {
                         foreach ($e->getReasons() as $reason) {
-                            $this->logger->logger('Multireason: '.$reason, \danog\MadelineProto\Logger::ERROR);
+                            $this->logger->logger('Multireason: ' . $reason, \danog\MadelineProto\Logger::ERROR);
                         }
                     }
                 }
             }
-
-            throw new \danog\MadelineProto\Exception("Could not connect to URI $uri");
+            throw new \danog\MadelineProto\Exception("Could not connect to URI {$uri}");
         })());
     }
 }

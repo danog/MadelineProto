@@ -27,7 +27,6 @@ use danog\MadelineProto\MTProtoTools\PasswordCalculator;
  */
 trait Login
 {
-
     /**
      * Log out currently logged in user.
      *
@@ -39,10 +38,8 @@ trait Login
         $this->resetSession();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['logout_ok'], \danog\MadelineProto\Logger::NOTICE);
         $this->startUpdateSystem();
-
         return true;
     }
-
     /**
      * Login as bot.
      *
@@ -54,11 +51,10 @@ trait Login
     {
         if ($this->authorized === self::LOGGED_IN) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
-            yield $this->logout();
+            yield from $this->logout();
         }
         $callbacks = [$this, $this->referenceDatabase];
         $this->TL->updateCallbacks($callbacks);
-
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_bot'], \danog\MadelineProto\Logger::NOTICE);
         $this->authorization = yield $this->methodCallAsyncRead('auth.importBotAuthorization', ['bot_auth_token' => $token, 'api_id' => $this->settings['app_info']['api_id'], 'api_hash' => $this->settings['app_info']['api_hash']], ['datacenter' => $this->datacenter->curdc]);
         $this->authorized = self::LOGGED_IN;
@@ -68,12 +64,9 @@ trait Login
         $this->updates_key = 0;
         yield $this->initAuthorization();
         $this->startUpdateSystem();
-
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
-
         return $this->authorization;
     }
-
     /**
      * Login as user.
      *
@@ -86,7 +79,7 @@ trait Login
     {
         if ($this->authorized === self::LOGGED_IN) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
-            yield $this->logout();
+            yield from $this->logout();
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_code_sending'], \danog\MadelineProto\Logger::NOTICE);
         $this->authorization = yield $this->methodCallAsyncRead('auth.sendCode', ['settings' => ['_' => 'codeSettings'], 'phone_number' => $number, 'sms_type' => $sms_type, 'api_id' => $this->settings['app_info']['api_id'], 'api_hash' => $this->settings['app_info']['api_hash'], 'lang_code' => $this->settings['app_info']['lang_code']], ['datacenter' => $this->datacenter->curdc]);
@@ -97,10 +90,8 @@ trait Login
         $this->updates = [];
         $this->updates_key = 0;
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_code_sent'], \danog\MadelineProto\Logger::NOTICE);
-
         return $this->authorization;
     }
-
     /**
      * Complet user login using login code.
      *
@@ -115,7 +106,6 @@ trait Login
         }
         $this->authorized = self::NOT_LOGGED_IN;
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_user'], \danog\MadelineProto\Logger::NOTICE);
-
         try {
             $authorization = yield $this->methodCallAsyncRead('auth.signIn', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => (string) $code], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -126,24 +116,20 @@ trait Login
                     $this->authorization['hint'] = '';
                 }
                 $this->authorized = self::WAITING_PASSWORD;
-
                 return $this->authorization;
             }
             if ($e->rpc === 'PHONE_NUMBER_UNOCCUPIED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_need_signup'], \danog\MadelineProto\Logger::NOTICE);
                 $this->authorized = self::WAITING_SIGNUP;
                 $this->authorization['phone_code'] = $code;
-
                 return ['_' => 'account.needSignup'];
             }
-
             throw $e;
         }
         if ($authorization['_'] === 'auth.authorizationSignUpRequired') {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_need_signup'], \danog\MadelineProto\Logger::NOTICE);
             $this->authorized = self::WAITING_SIGNUP;
             $this->authorization['phone_code'] = $code;
-
             $authorization['_'] = 'account.needSignup';
             return $authorization;
         }
@@ -153,12 +139,9 @@ trait Login
         yield $this->initAuthorization();
         yield $this->getPhoneConfig();
         $this->startUpdateSystem();
-
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
-
         return $this->authorization;
     }
-
     /**
      * Import authorization.
      *
@@ -170,7 +153,7 @@ trait Login
     {
         if ($this->authorized === self::LOGGED_IN) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
-            yield $this->logout();
+            yield from $this->logout();
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_auth_key'], \danog\MadelineProto\Logger::NOTICE);
         list($dc_id, $auth_key) = $authorization;
@@ -178,7 +161,6 @@ trait Login
             $auth_key = ['auth_key' => $auth_key];
         }
         $auth_key = new PermAuthKey($auth_key);
-
         $this->authorized_dc = $dc_id;
         $dataCenterConnection = $this->datacenter->getDataCenterConnection($dc_id);
         $dataCenterConnection->resetSession();
@@ -187,20 +169,15 @@ trait Login
         $this->authorized = self::LOGGED_IN;
         yield $this->initAuthorization();
         yield $this->getPhoneConfig();
-
         $res = yield $this->getSelf();
-
         $callbacks = [$this, $this->referenceDatabase];
         if (!($this->authorization['user']['bot'] ?? false)) {
-            $callbacks []= $this->minDatabase;
+            $callbacks[] = $this->minDatabase;
         }
         $this->TL->updateCallbacks($callbacks);
-
         $this->startUpdateSystem();
-
         return $res;
     }
-
     /**
      * Export authorization.
      *
@@ -213,10 +190,8 @@ trait Login
         }
         yield $this->getSelf();
         $this->authorized_dc = $this->datacenter->curdc;
-
         return [$this->datacenter->curdc, $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->getPermAuthKey()->getAuthKey()];
     }
-
     /**
      * Complete signup to Telegram.
      *
@@ -237,13 +212,10 @@ trait Login
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
         yield $this->initAuthorization();
         yield $this->getPhoneConfig();
-
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['signup_ok'], \danog\MadelineProto\Logger::NOTICE);
         $this->startUpdateSystem();
-
         return $this->authorization;
     }
-
     /**
      * Complete 2FA login.
      *
@@ -267,10 +239,8 @@ trait Login
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
         yield $this->getPhoneConfig();
         $this->startUpdateSystem();
-
         return $this->authorization;
     }
-
     /**
      * Update the 2FA password.
      *
@@ -284,7 +254,6 @@ trait Login
     {
         $hasher = new PasswordCalculator($this->logger);
         $hasher->addInfo(yield $this->methodCallAsyncRead('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]));
-
         return yield $this->methodCallAsyncRead('account.updatePasswordSettings', $hasher->getPassword($params), ['datacenter' => $this->datacenter->curdc]);
     }
 }

@@ -77,7 +77,6 @@ class APIFactory extends AbstractAPIFactory
      * @var liteServer
      */
     public $liteServer;
-
     /**
      * Just proxy async requests to API.
      *
@@ -90,11 +89,10 @@ class APIFactory extends AbstractAPIFactory
     {
         $lower_name = \strtolower($name);
         if ($this->namespace !== '' || !isset($this->methods[$lower_name])) {
-            $name = $this->namespace.$name;
+            $name = $this->namespace . $name;
             $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
             $aargs['apifactory'] = true;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
-
             return yield $this->API->methodCall($name, $args, $aargs);
         }
         return yield $this->methods[$lower_name](...$arguments);

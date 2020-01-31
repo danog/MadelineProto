@@ -26,7 +26,6 @@ trait MsgIdHandler
 {
     public $max_incoming_id;
     public $max_outgoing_id;
-
     public function checkMessageId($new_message_id, $aargs)
     {
         if (!\is_object($new_message_id)) {
@@ -34,18 +33,18 @@ trait MsgIdHandler
         }
         $min_message_id = (new \tgseclib\Math\BigInteger(\time() + $this->time_delta - 300))->bitwise_leftShift(32);
         if ($min_message_id->compare($new_message_id) > 0) {
-            $this->API->logger->logger('Given message id ('.$new_message_id.') is too old compared to the min value ('.$min_message_id.').', \danog\MadelineProto\Logger::WARNING);
+            $this->API->logger->logger('Given message id (' . $new_message_id . ') is too old compared to the min value (' . $min_message_id . ').', \danog\MadelineProto\Logger::WARNING);
         }
         $max_message_id = (new \tgseclib\Math\BigInteger(\time() + $this->time_delta + 30))->bitwise_leftShift(32);
         if ($max_message_id->compare($new_message_id) < 0) {
-            throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is too new compared to the max value ('.$max_message_id.'). Consider syncing your date.');
+            throw new \danog\MadelineProto\Exception('Given message id (' . $new_message_id . ') is too new compared to the max value (' . $max_message_id . '). Consider syncing your date.');
         }
         if ($aargs['outgoing']) {
             if (!$new_message_id->divide(\danog\MadelineProto\Magic::$four)[1]->equals(\danog\MadelineProto\Magic::$zero)) {
-                throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is not divisible by 4. Consider syncing your date.');
+                throw new \danog\MadelineProto\Exception('Given message id (' . $new_message_id . ') is not divisible by 4. Consider syncing your date.');
             }
             if (!\danog\MadelineProto\Magic::$has_thread && $new_message_id->compare($key = $this->getMaxId($incoming = false)) <= 0) {
-                throw new \danog\MadelineProto\Exception('Given message id ('.$new_message_id.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', 1);
+                throw new \danog\MadelineProto\Exception('Given message id (' . $new_message_id . ') is lower than or equal to the current limit (' . $key . '). Consider syncing your date.', 1);
             }
             if (\count($this->outgoing_messages) > $this->API->settings['msg_array_limit']['outgoing']) {
                 \reset($this->outgoing_messages);
@@ -63,11 +62,11 @@ trait MsgIdHandler
             $key = $this->getMaxId($incoming = true);
             if ($aargs['container']) {
                 if ($new_message_id->compare($key = $this->getMaxId($incoming = true)) >= 0) {
-                    $this->API->logger->logger('WARNING: Given message id ('.$new_message_id.') is bigger than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::WARNING);
+                    $this->API->logger->logger('WARNING: Given message id (' . $new_message_id . ') is bigger than or equal to the current limit (' . $key . '). Consider syncing your date.', \danog\MadelineProto\Logger::WARNING);
                 }
             } else {
                 if ($new_message_id->compare($key = $this->getMaxId($incoming = true)) <= 0) {
-                    $this->API->logger->logger('WARNING: Given message id ('.$new_message_id.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::WARNING);
+                    $this->API->logger->logger('WARNING: Given message id (' . $new_message_id . ') is lower than or equal to the current limit (' . $key . '). Consider syncing your date.', \danog\MadelineProto\Logger::WARNING);
                 }
             }
             if (\count($this->incoming_messages) > $this->API->settings['msg_array_limit']['incoming']) {
@@ -81,7 +80,6 @@ trait MsgIdHandler
             $this->incoming_messages[\strrev($new_message_id->toBytes())] = [];
         }
     }
-
     public function generateMessageId()
     {
         $message_id = (new \tgseclib\Math\BigInteger(\time() + $this->time_delta))->bitwise_leftShift(32);
@@ -89,17 +87,14 @@ trait MsgIdHandler
             $message_id = $key->add(\danog\MadelineProto\Magic::$four);
         }
         $this->checkMessageId($message_id, ['outgoing' => true, 'container' => false]);
-
         return \strrev($message_id->toBytes());
     }
-
     public function getMaxId($incoming)
     {
         $incoming = $incoming ? 'incoming' : 'outgoing';
-        if (isset($this->{'max_'.$incoming.'_id'}) && \is_object($this->{'max_'.$incoming.'_id'})) {
-            return $this->{'max_'.$incoming.'_id'};
+        if (isset($this->{'max_' . $incoming . '_id'}) && \is_object($this->{'max_' . $incoming . '_id'})) {
+            return $this->{'max_' . $incoming . '_id'};
         }
-
         return \danog\MadelineProto\Magic::$zero;
     }
 }

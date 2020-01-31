@@ -22,7 +22,8 @@ if (!\class_exists('ReflectionGenerator')) {
         }
         public function getFunction(): ReflectionFunctionAbstract
         {
-            return new ReflectionFunction(function () {});
+            return new ReflectionFunction(function () {
+            });
         }
         public function getThis(): object
         {

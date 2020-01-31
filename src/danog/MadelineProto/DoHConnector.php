@@ -31,7 +31,6 @@ use Amp\Socket\ConnectException;
 use Amp\Socket\Connector;
 use Amp\Socket\ResourceSocket;
 use danog\MadelineProto\Stream\ConnectionContext;
-
 use function Amp\Socket\Internal\parseUri;
 
 class DoHConnector implements Connector
@@ -53,13 +52,11 @@ class DoHConnector implements Connector
         $this->dataCenter = $dataCenter;
         $this->ctx = $ctx;
     }
-
     public function connect(string $uri, ?ConnectContext $socketContext = null, ?CancellationToken $token = null): Promise
     {
-        return Tools::call((function () use ($uri, $socketContext, $token) {
-            $socketContext = $socketContext ?? new ConnectContext;
-            $token = $token ?? new NullCancellationToken;
-
+        return Tools::call((function () use ($uri, $socketContext, $token): \Generator {
+            $socketContext = $socketContext ?? new ConnectContext();
+            $token = $token ?? new NullCancellationToken();
             $attempt = 0;
             $uris = [];
             $failures = [];
@@ -105,7 +102,6 @@ class DoHConnector implements Connector
                 if ($this->ctx->getIpv6()) {
                     $records = \array_reverse($records);
                 }
-
                 foreach ($records as $record) {
                     /** @var Record $record */
                     if ($record->getType() === Record::AAAA) {
@@ -115,34 +111,23 @@ class DoHConnector implements Connector
                     }
                 }
             }
-
             $flags = \STREAM_CLIENT_CONNECT | \STREAM_CLIENT_ASYNC_CONNECT;
             $timeout = $socketContext->getConnectTimeout();
             foreach ($uris as $builtUri) {
                 try {
                     $streamContext = \stream_context_create($socketContext->withoutTlsContext()->toStreamContextArray());
-                    if (!$socket = @\stream_socket_client($builtUri, $errno, $errstr, null, $flags, $streamContext)) {
-                        throw new ConnectException(\sprintf(
-                            'Connection to %s failed: [Error #%d] %s%s',
-                            $uri,
-                            $errno,
-                            $errstr,
-                            $failures ? '; previous attempts: ' . \implode($failures) : ''
-                        ), $errno);
+                    if (!($socket = @\stream_socket_client($builtUri, $errno, $errstr, null, $flags, $streamContext))) {
+                        throw new ConnectException(\sprintf('Connection to %s failed: [Error #%d] %s%s', $uri, $errno, $errstr, $failures ? '; previous attempts: ' . \implode($failures) : ''), $errno);
                     }
                     \stream_set_blocking($socket, false);
-                    $deferred = new Deferred;
+                    $deferred = new Deferred();
                     $watcher = Loop::onWritable($socket, [$deferred, 'resolve']);
                     $id = $token->subscribe([$deferred, 'fail']);
                     try {
                         yield Promise\timeout($deferred->promise(), $timeout);
                     } catch (TimeoutException $e) {
-                        throw new ConnectException(\sprintf(
-                            'Connecting to %s failed: timeout exceeded (%d ms)%s',
-                            $uri,
-                            $timeout,
-                            $failures ? '; previous attempts: ' . \implode($failures) : ''
-                        ), 110); // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno
+                        throw new ConnectException(\sprintf('Connecting to %s failed: timeout exceeded (%d ms)%s', $uri, $timeout, $failures ? '; previous attempts: ' . \implode($failures) : ''), 110);
+                        // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno
                     } finally {
                         Loop::cancel($watcher);
                         $token->unsubscribe($id);
@@ -150,26 +135,21 @@ class DoHConnector implements Connector
                     // The following hack looks like the only way to detect connection refused errors with PHP's stream sockets.
                     if (\stream_socket_get_name($socket, true) === false) {
                         \fclose($socket);
-                        throw new ConnectException(\sprintf(
-                            'Connection to %s refused%s',
-                            $uri,
-                            $failures ? '; previous attempts: ' . \implode($failures) : ''
-                        ), 111); // See ECONNREFUSED in http://www.virtsync.com/c-error-codes-include-errno
+                        throw new ConnectException(\sprintf('Connection to %s refused%s', $uri, $failures ? '; previous attempts: ' . \implode($failures) : ''), 111);
+                        // See ECONNREFUSED in http://www.virtsync.com/c-error-codes-include-errno
                     }
                 } catch (ConnectException $e) {
                     // Includes only error codes used in this file, as error codes on other OS families might be different.
                     // In fact, this might show a confusing error message on OS families that return 110 or 111 by itself.
-                    $knownReasons = [
-                        110 => 'connection timeout',
-                        111 => 'connection refused',
-                    ];
+                    $knownReasons = [110 => 'connection timeout', 111 => 'connection refused'];
                     $code = $e->getCode();
-                    $reason = $knownReasons[$code] ?? ('Error #' . $code);
+                    $reason = $knownReasons[$code] ?? 'Error #' . $code;
                     if (++$attempt === $socketContext->getMaxAttempts()) {
                         break;
                     }
                     $failures[] = "{$uri} ({$reason})";
-                    continue; // Could not connect to host, try next host in the list.
+                    continue;
+                    // Could not connect to host, try next host in the list.
                 }
                 return ResourceSocket::fromClientSocket($socket, $socketContext->getTlsContext());
             }

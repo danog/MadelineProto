@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Buffered stream interface.
  *
@@ -35,7 +36,6 @@ interface BufferedStreamInterface extends StreamInterface
      * @return Promise
      */
     public function getReadBuffer(&$length): Promise;
-
     /**
      * Get write buffer asynchronously.
      *
@@ -44,7 +44,6 @@ interface BufferedStreamInterface extends StreamInterface
      * @return Promise
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise;
-
     /**
      * Get stream name.
      *

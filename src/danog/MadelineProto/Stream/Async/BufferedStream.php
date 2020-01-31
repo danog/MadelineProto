@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Buffered stream helper trait.
  *
@@ -30,7 +31,6 @@ use Amp\Promise;
 trait BufferedStream
 {
     use Stream;
-
     /**
      * Get read buffer asynchronously.
      *
@@ -42,7 +42,6 @@ trait BufferedStream
     {
         return \danog\MadelineProto\Tools::call($this->getReadBufferGenerator($length));
     }
-
     /**
      * Get write buffer asynchronously.
      *

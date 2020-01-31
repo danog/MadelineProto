@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Generic stream interface.
  *
@@ -37,14 +38,12 @@ interface StreamInterface
      * @return Promise
      */
     public function connect(ConnectionContext $ctx, string $header = ''): Promise;
-
     /**
      * Disconnect from the server.
      *
      * @return void
      */
     public function disconnect();
-
     /**
      * Get underlying AMPHP socket resource.
      *

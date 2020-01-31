@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ping loop.
  *
@@ -40,14 +41,12 @@ class PingLoop extends ResumableSignalLoop
      * @var string
      */
     protected $datacenter;
-
     /**
      * DataCenterConnection instance.
      *
      * @var \danog\MadelineProto\DataCenterConnection
      */
     protected $datacenterConnection;
-
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
@@ -55,14 +54,12 @@ class PingLoop extends ResumableSignalLoop
         $this->datacenter = $connection->getDatacenterID();
         $this->datacenterConnection = $connection->getShared();
     }
-
-    public function loop()
+    public function loop(): \Generator
     {
         $API = $this->API;
         $datacenter = $this->datacenter;
         $connection = $this->connection;
         $shared = $this->datacenterConnection;
-
         $timeout = $shared->getSettings()['timeout'];
         while (true) {
             while (!$shared->hasTempAuthKey()) {
@@ -74,17 +71,16 @@ class PingLoop extends ResumableSignalLoop
                 return;
             }
             if (\time() - $connection->getLastChunk() >= $timeout) {
-                $API->logger->logger("Ping DC $datacenter");
+                $API->logger->logger("Ping DC {$datacenter}");
                 try {
                     yield $connection->methodCallAsyncRead('ping', ['ping_id' => \random_bytes(8)]);
                 } catch (\Throwable $e) {
-                    $API->logger->logger("Error while pinging DC $datacenter");
+                    $API->logger->logger("Error while pinging DC {$datacenter}");
                     $API->logger->logger((string) $e);
                 }
             }
         }
     }
-
     public function __toString(): string
     {
         return "Ping loop in DC {$this->datacenter}";

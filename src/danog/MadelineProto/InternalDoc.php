@@ -5128,7 +5128,7 @@ class InternalDoc extends APIFactory
      * @param string  $file      File to lock
      * @param integer $operation Locking mode
      * @param float  $polling   Polling interval
-    *
+     *
      * @return Promise
      */
     public function flock(string $file, int $operation, float $polling = 0.1)

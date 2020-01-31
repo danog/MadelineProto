@@ -30,7 +30,6 @@ class CombinedUpdatesState
      * @var array<UpdatesState>
      */
     private $states = [];
-
     /**
      * Constructor function.
      *
@@ -49,7 +48,6 @@ class CombinedUpdatesState
             $this->states[$channel] = $state;
         }
     }
-
     /**
      * Get or update multiple parameters.
      *
@@ -66,10 +64,8 @@ class CombinedUpdatesState
         if (!isset($this->states[$channel])) {
             return $this->states[$channel] = new UpdatesState($init, $channel);
         }
-
         return $this->states[$channel]->update($init);
     }
-
     /**
      * Remove update state.
      *
@@ -83,7 +79,6 @@ class CombinedUpdatesState
             unset($this->states[$channel]);
         }
     }
-
     /**
      * Check if update state is present.
      *
@@ -95,7 +90,6 @@ class CombinedUpdatesState
     {
         return isset($this->states[$channel]);
     }
-
     /**
      * Are we currently busy?
      *

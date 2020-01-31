@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Buffered raw stream.
  *
@@ -36,14 +37,11 @@ use danog\MadelineProto\Stream\RawStreamInterface;
 class BufferedRawStream implements BufferedStreamInterface, BufferInterface, RawStreamInterface
 {
     use RawStream;
-
     const MAX_SIZE = 10 * 1024 * 1024;
-
     protected $stream;
     protected $memory_stream;
     private $append = '';
     private $append_after = 0;
-
     /**
      * Asynchronously connect to a TCP/TLS server.
      *
@@ -55,10 +53,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     {
         $this->stream = yield $ctx->getStream($header);
         $this->memory_stream = \fopen('php://memory', 'r+');
-
         return true;
     }
-
     /**
      * Async chunked read.
      *
@@ -71,7 +67,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         }
         return $this->stream->read();
     }
-
     /**
      * Async write.
      *
@@ -86,7 +81,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         }
         return $this->stream->write($data);
     }
-
     /**
      * Async close.
      *
@@ -103,7 +97,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             $this->stream = null;
         }
     }
-
     /**
      * Get read buffer asynchronously.
      *
@@ -128,10 +121,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             \fclose($this->memory_stream);
             $this->memory_stream = $new_memory_stream;
         }
-
         return new \Amp\Success($this);
     }
-
     /**
      * Get write buffer asynchronously.
      *
@@ -145,10 +136,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             $this->append = $append;
             $this->append_after = $length - \strlen($append);
         }
-
         return new \Amp\Success($this);
     }
-
     /**
      * Read data asynchronously.
      *
@@ -169,7 +158,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         }
         return \danog\MadelineProto\Tools::call($this->bufferReadGenerator($length));
     }
-
     /**
      * Read data asynchronously.
      *
@@ -185,22 +173,18 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         if ($buffer_length < $length && $buffer_length) {
             \fseek($this->memory_stream, $offset + $buffer_length);
         }
-
         while ($buffer_length < $length) {
             $chunk = yield $this->read();
             if ($chunk === null) {
                 $this->disconnect();
-
                 throw new \danog\MadelineProto\NothingInTheSocketException();
             }
             \fwrite($this->memory_stream, $chunk);
             $buffer_length += \strlen($chunk);
         }
         \fseek($this->memory_stream, $offset);
-
         return \fread($this->memory_stream, $length);
     }
-
     /**
      * Async write.
      *
@@ -218,14 +202,11 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
             } elseif ($this->append_after < 0) {
                 $this->append_after = 0;
                 $this->append = '';
-
                 throw new Exception('Tried to send too much out of frame data, cannot append');
             }
         }
-
         return $this->write($data);
     }
-
     /**
      * {@inheritdoc}
      *
@@ -244,7 +225,6 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     {
         return $this->stream;
     }
-
     /**
      * Get class name.
      *

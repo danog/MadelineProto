@@ -35,8 +35,8 @@ class EventHandler extends InternalDoc
             return;
         }
         $this->API = $MadelineProto->API;
-        $this->async = &$MadelineProto->async;
-        $this->methods = &$MadelineProto->methods;
+        $this->async =& $MadelineProto->async;
+        $this->methods =& $MadelineProto->methods;
         foreach ($this->API->getMethodNamespaces() as $namespace) {
             $this->{$namespace} = new APIFactory($namespace, $this->API, $this->async);
         }

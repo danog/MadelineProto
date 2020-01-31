@@ -24,7 +24,6 @@ use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Async\AsyncParameters;
 use danog\MadelineProto\Tools;
-
 use function Amp\Promise\all;
 
 /**
@@ -48,17 +47,13 @@ trait CallHandler
         if ($datacenter === $this->datacenter) {
             $datacenter = false;
         }
-
         $message_ids = $this->outgoing_messages[$message_id]['container'] ?? [$message_id];
-
         foreach ($message_ids as $message_id) {
             if (isset($this->outgoing_messages[$message_id]['body'])) {
                 if ($datacenter) {
-                    $res = $this->API->datacenter->waitGetConnection($datacenter)->onResolve(
-                        function ($e, $r) use ($message_id) {
-                            return $r->sendMessage($this->outgoing_messages[$message_id], false);
-                        }
-                    );
+                    $res = $this->API->datacenter->waitGetConnection($datacenter)->onResolve(function ($e, $r) use ($message_id) {
+                        return $r->sendMessage($this->outgoing_messages[$message_id], false);
+                    });
                 } else {
                     $res = $this->sendMessage($this->outgoing_messages[$message_id], false);
                 }
@@ -66,7 +61,7 @@ trait CallHandler
                 $this->ackOutgoingMessageId($message_id);
                 $this->gotResponseForOutgoingMessageId($message_id);
             } else {
-                $this->logger->logger('Could not resend '.(isset($this->outgoing_messages[$message_id]['_']) ? $this->outgoing_messages[$message_id]['_'] : $message_id));
+                $this->logger->logger('Could not resend ' . (isset($this->outgoing_messages[$message_id]['_']) ? $this->outgoing_messages[$message_id]['_'] : $message_id));
             }
         }
         if (!$postpone) {
@@ -77,7 +72,6 @@ trait CallHandler
             }
         }
     }
-
     /**
      * Call method and wait asynchronously for response.
      *
@@ -97,22 +91,17 @@ trait CallHandler
                 $deferred->fail($e);
             } else {
                 if (\is_array($read_deferred)) {
-                    $read_deferred = \array_map(
-                        function ($value) {
-                            return $value->promise();
-                        },
-                        $read_deferred
-                    );
+                    $read_deferred = \array_map(function ($value) {
+                        return $value->promise();
+                    }, $read_deferred);
                     $deferred->resolve(all($read_deferred));
                 } else {
                     $deferred->resolve($read_deferred->promise());
                 }
             }
         });
-
-        return ($aargs['noResponse'] ?? false) ? new Success() : $deferred->promise();
+        return $aargs['noResponse'] ?? false ? new Success() : $deferred->promise();
     }
-
     /**
      * Call method and make sure it is asynchronously sent.
      *
@@ -126,7 +115,6 @@ trait CallHandler
     {
         return \danog\MadelineProto\Tools::call($this->methodCallAsyncWriteGenerator($method, $args, $aargs));
     }
-
     /**
      * Call method and make sure it is asynchronously sent (generator).
      *
@@ -138,24 +126,18 @@ trait CallHandler
      */
     public function methodCallAsyncWriteGenerator(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
-        if (\is_array($args)
-            && isset($args['id']['_'])
-            && isset($args['id']['dc_id'])
-            && $args['id']['_'] === 'inputBotInlineMessageID'
-            && $this->datacenter !== $args['id']['dc_id']
-        ) {
+        if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID' && $this->datacenter !== $args['id']['dc_id']) {
             $aargs['datacenter'] = $args['id']['dc_id'];
             return $this->API->methodCallAsyncWriteGenerator($method, $args, $aargs);
         }
-        if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has($this->datacenter.'_media')) {
+        if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has($this->datacenter . '_media')) {
             $this->logger->logger('Using media DC');
-            $aargs['datacenter'] = $this->datacenter.'_media';
+            $aargs['datacenter'] = $this->datacenter . '_media';
             return $this->API->methodCallAsyncWriteGenerator($method, $args, $aargs);
         }
         if (\in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) {
             $aargs['queue'] = 'secret';
         }
-
         if (\is_array($args)) {
             if (isset($args['multiple'])) {
                 $aargs['multiple'] = true;
@@ -170,18 +152,15 @@ trait CallHandler
                 $new_aargs = $aargs;
                 $new_aargs['postpone'] = true;
                 unset($new_aargs['multiple']);
-
                 if (isset($args['multiple'])) {
                     unset($args['multiple']);
                 }
                 foreach ($args as $single_args) {
                     $promises[] = $this->methodCallAsyncWrite($method, $single_args, $new_aargs);
                 }
-
                 if (!isset($aargs['postpone'])) {
                     $this->writer->resume();
                 }
-
                 return yield all($promises);
             }
             $args = yield $this->API->botAPIToMTProto($args);
@@ -189,37 +168,21 @@ trait CallHandler
                 $args['ping_id'] = Tools::packSignedLong($args['ping_id']);
             }
         }
-
         $deferred = new Deferred();
-        $message = \array_merge(
-            $aargs,
-            [
-                '_' => $method,
-                'type' => $this->API->getTL()->getMethods()->findByMethod($method)['type'],
-                'contentRelated' => $this->contentRelated($method),
-                'promise' => $deferred,
-                'method' => true,
-                'unencrypted' => !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false
-            ]
-        );
-
+        $message = \array_merge($aargs, ['_' => $method, 'type' => $this->API->getTL()->getMethods()->findByMethod($method)['type'], 'contentRelated' => $this->contentRelated($method), 'promise' => $deferred, 'method' => true, 'unencrypted' => !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false]);
         if (\is_object($args) && $args instanceof AsyncParameters) {
             $message['body'] = yield $args->fetchParameters();
         } else {
             $message['body'] = $args;
         }
-
-        if (($method === 'users.getUsers' && $args === ['id' => [['_' => 'inputUserSelf']]]) || $method === 'auth.exportAuthorization' || $method === 'updates.getDifference') {
+        if ($method === 'users.getUsers' && $args === ['id' => [['_' => 'inputUserSelf']]] || $method === 'auth.exportAuthorization' || $method === 'updates.getDifference') {
             $message['user_related'] = true;
         }
         $aargs['postpone'] = $aargs['postpone'] ?? false;
         $deferred = yield $this->sendMessage($message, !$aargs['postpone']);
-
         $this->checker->resume();
-
         return $deferred;
     }
-
     /**
      * Send object and make sure it is asynchronously sent (generator).
      *
@@ -235,7 +198,6 @@ trait CallHandler
         if (isset($aargs['promise'])) {
             $message['promise'] = $aargs['promise'];
         }
-
         $aargs['postpone'] = $aargs['postpone'] ?? false;
         return $this->sendMessage($message, !$aargs['postpone']);
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Loop helper trait.
  *
@@ -31,7 +32,6 @@ use danog\MadelineProto\Loop\SignalLoopInterface;
 abstract class SignalLoop extends Loop implements SignalLoopInterface
 {
     private $signalDeferred;
-
     public function signal($what)
     {
         if ($this->signalDeferred) {
@@ -44,7 +44,6 @@ abstract class SignalLoop extends Loop implements SignalLoopInterface
             }
         }
     }
-
     public function waitSignal($promise): Promise
     {
         if ($promise instanceof \Generator) {
@@ -52,7 +51,6 @@ abstract class SignalLoop extends Loop implements SignalLoopInterface
         }
         $this->signalDeferred = new Deferred();
         $dpromise = $this->signalDeferred->promise();
-
         $promise->onResolve(function () use ($promise) {
             if ($this->signalDeferred !== null) {
                 $deferred = $this->signalDeferred;
@@ -60,7 +58,6 @@ abstract class SignalLoop extends Loop implements SignalLoopInterface
                 $deferred->resolve($promise);
             }
         });
-
         return $dpromise;
     }
 }

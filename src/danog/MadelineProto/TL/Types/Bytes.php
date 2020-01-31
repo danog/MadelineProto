@@ -23,27 +23,22 @@ class Bytes implements \JsonSerializable, \ArrayAccess
 {
     use \danog\Serializable;
     private $bytes = [];
-
     public function __magic_construct($bytes)
     {
         $this->bytes = $bytes;
     }
-
     public function __sleep()
     {
         return ['bytes'];
     }
-
     public function __toString()
     {
         return $this->bytes;
     }
-
     public function jsonSerialize()
     {
         return ['_' => 'bytes', 'bytes' => \base64_encode($this->bytes)];
     }
-
     public function offsetSet($name, $value)
     {
         if ($name === null) {
@@ -52,17 +47,14 @@ class Bytes implements \JsonSerializable, \ArrayAccess
             $this->bytes[$name] = $value;
         }
     }
-
     public function offsetGet($name)
     {
         return $this->bytes[$name];
     }
-
     public function offsetUnset($name)
     {
         unset($this->bytes[$name]);
     }
-
     public function offsetExists($name)
     {
         return isset($this->bytes[$name]);

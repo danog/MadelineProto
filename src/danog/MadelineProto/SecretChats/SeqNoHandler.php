@@ -24,7 +24,7 @@ namespace danog\MadelineProto\SecretChats;
  */
 trait SeqNoHandler
 {
-    private function checkSecretInSeqNo($chat_id, $seqno)
+    private function checkSecretInSeqNo($chat_id, $seqno): \Generator
     {
         $seqno = ($seqno - $this->secret_chats[$chat_id]['out_seq_no_x']) / 2;
         $last = 0;
@@ -32,7 +32,6 @@ trait SeqNoHandler
             if (isset($message['decrypted_message']['in_seq_no'])) {
                 if (($message['decrypted_message']['in_seq_no'] - $this->secret_chats[$chat_id]['out_seq_no_x']) / 2 < $last) {
                     yield $this->discardSecretChat($chat_id);
-
                     throw new \danog\MadelineProto\SecurityException('in_seq_no is not increasing');
                 }
                 $last = ($message['decrypted_message']['in_seq_no'] - $this->secret_chats[$chat_id]['out_seq_no_x']) / 2;
@@ -40,14 +39,11 @@ trait SeqNoHandler
         }
         if ($seqno > $this->secret_chats[$chat_id]['out_seq_no'] + 1) {
             yield $this->discardSecretChat($chat_id);
-
             throw new \danog\MadelineProto\SecurityException('in_seq_no is too big');
         }
-
         return true;
     }
-
-    private function checkSecretOutSeqNo($chat_id, $seqno)
+    private function checkSecretOutSeqNo($chat_id, $seqno): \Generator
     {
         $seqno = ($seqno - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2;
         $C = 0;
@@ -55,8 +51,7 @@ trait SeqNoHandler
             if (isset($message['decrypted_message']['out_seq_no']) && $C < $this->secret_chats[$chat_id]['in_seq_no']) {
                 if (($message['decrypted_message']['out_seq_no'] - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2 !== $C) {
                     yield $this->discardSecretChat($chat_id);
-
-                    throw new \danog\MadelineProto\SecurityException('out_seq_no hole: should be '.$C.', is '.($message['decrypted_message']['out_seq_no'] - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2);
+                    throw new \danog\MadelineProto\SecurityException('out_seq_no hole: should be ' . $C . ', is ' . ($message['decrypted_message']['out_seq_no'] - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2);
                 }
                 $C++;
             }
@@ -64,25 +59,20 @@ trait SeqNoHandler
         //$this->logger->logger($C, $seqno);
         if ($seqno < $C) {
             // <= C
-            $this->logger->logger('WARNING: dropping repeated message with seqno '.$seqno);
-
+            $this->logger->logger('WARNING: dropping repeated message with seqno ' . $seqno);
             return false;
         }
         if ($seqno > $C) {
             // > C+1
             yield $this->discardSecretChat($chat_id);
-
-            throw new \danog\MadelineProto\SecurityException('WARNING: out_seq_no gap detected ('.$seqno.' > '.$C.')!');
+            throw new \danog\MadelineProto\SecurityException('WARNING: out_seq_no gap detected (' . $seqno . ' > ' . $C . ')!');
         }
-
         return true;
     }
-
     private function generateSecretInSeqNo($chat)
     {
         return $this->secret_chats[$chat]['layer'] > 8 ? $this->secret_chats[$chat]['in_seq_no'] * 2 + $this->secret_chats[$chat]['in_seq_no_x'] : -1;
     }
-
     private function generateSecretOutSeqNo($chat)
     {
         return $this->secret_chats[$chat]['layer'] > 8 ? $this->secret_chats[$chat]['out_seq_no'] * 2 + $this->secret_chats[$chat]['out_seq_no_x'] : -1;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Loop interface.
  *
@@ -31,14 +32,12 @@ interface LoopInterface
      * @return void
      */
     public function start();
-
     /**
      * The actual loop.
      *
      * @return void
      */
     public function loop();
-
     /**
      * Get name of the loop.
      *

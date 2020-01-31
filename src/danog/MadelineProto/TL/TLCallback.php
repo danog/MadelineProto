@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TL callback module.
  *
@@ -39,7 +40,6 @@ interface TLCallback
      * @var int
      */
     const TYPE_MISMATCH_CALLBACK = 5;
-
     /**
      * Called after serialization of method.
      *
@@ -48,7 +48,6 @@ interface TLCallback
      * @return array
      */
     public function getMethodCallbacks(): array;
-
     /**
      * Called right before serialization of method starts.
      *
@@ -57,14 +56,12 @@ interface TLCallback
      * @return array
      */
     public function getMethodBeforeCallbacks(): array;
-
     /**
      * Called right after deserialization of object, passing the final object.
      *
      * @return array
      */
     public function getConstructorCallbacks(): array;
-
     /**
      * Called right before deserialization of object.
      *
@@ -73,7 +70,6 @@ interface TLCallback
      * @return array
      */
     public function getConstructorBeforeCallbacks(): array;
-
     /**
      * Called right before serialization of constructor.
      *
@@ -82,7 +78,6 @@ interface TLCallback
      * @return array
      */
     public function getConstructorSerializeCallbacks(): array;
-
     /**
      * Called if objects of the specified type cannot be serialized.
      *

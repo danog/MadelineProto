@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Buffered raw stream.
  *
@@ -44,7 +45,6 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
         if ($buffer_length < $length && $buffer_length) {
             \fseek($this->memory_stream, $offset + $buffer_length);
         }
-
         while ($buffer_length < $length) {
             $chunk = yield $this->read();
             if ($chunk === null) {
@@ -55,7 +55,6 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
             $buffer_length += \strlen($chunk);
         }
         \fseek($this->memory_stream, $offset);
-
         return \fread($this->memory_stream, $length);
     }
     /**
@@ -67,7 +66,6 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
     {
         return $this->stream;
     }
-
     /**
      * Get class name.
      *

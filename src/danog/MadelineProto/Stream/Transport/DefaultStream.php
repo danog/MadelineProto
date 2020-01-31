@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Default stream wrapper.
  *
@@ -27,7 +28,6 @@ use Amp\Socket\Socket;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
-
 use function Amp\Socket\connector;
 
 /**
@@ -37,9 +37,7 @@ use function Amp\Socket\connector;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class DefaultStream implements
-    RawStreamInterface,
-    ProxyStreamInterface
+class DefaultStream implements RawStreamInterface, ProxyStreamInterface
 {
     use RawStream;
     /**
@@ -48,44 +46,34 @@ class DefaultStream implements
      * @var EncryptableSocket
      */
     private $stream;
-
     /**
      * Connector.
      *
      * @var Connector
      */
     private $connector;
-
     public function setupTls(?CancellationToken $cancellationToken = null): \Amp\Promise
     {
         return $this->stream->setupTls($cancellationToken);
     }
-
     public function getStream()
     {
         return $this->stream;
     }
-
     public function connectGenerator(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
         $secure = $ctx->isSecure();
         if ($secure) {
-            $ctx->setSocketContext(
-                $ctx->getSocketContext()->withTlsContext(
-                    new ClientTlsContext($uri->getHost())
-                )
-            );
+            $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
-
         $this->stream = yield ($this->connector ?? connector())->connect((string) $uri, $ctx->getSocketContext(), $ctx->getCancellationToken());
         if ($secure) {
             yield $this->stream->setupTls();
         }
         yield $this->stream->write($header);
     }
-
     /**
      * Async chunked read.
      *
@@ -95,7 +83,6 @@ class DefaultStream implements
     {
         return $this->stream ? $this->stream->read() : new \Amp\Success(null);
     }
-
     /**
      * Async write.
      *
@@ -110,7 +97,6 @@ class DefaultStream implements
         }
         return $this->stream->write($data);
     }
-
     /**
      * Close.
      *
@@ -124,10 +110,9 @@ class DefaultStream implements
                 $this->stream = null;
             }
         } catch (\Throwable $e) {
-            \danog\MadelineProto\Logger::log('Got exception while closing stream: '.$e->getMessage());
+            \danog\MadelineProto\Logger::log('Got exception while closing stream: ' . $e->getMessage());
         }
     }
-
     /**
      * Close.
      *
@@ -137,7 +122,6 @@ class DefaultStream implements
     {
         $this->disconnect();
     }
-
     /**
      * {@inheritdoc}
      *
@@ -147,12 +131,10 @@ class DefaultStream implements
     {
         return $this->stream;
     }
-
     public function setExtra($extra)
     {
         $this->connector = $extra;
     }
-
     public static function getName(): string
     {
         return __CLASS__;

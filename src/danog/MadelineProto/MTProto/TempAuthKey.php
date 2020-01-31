@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MTProto temporary auth key.
  *
@@ -31,21 +32,18 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      * @var PermAuthKey|null
      */
     private $bound;
-
     /**
      * Expiration date.
      *
      * @var int
      */
     private $expires = 0;
-
     /**
      * Whether the connection is inited for this auth key.
      *
      * @var boolean
      */
     protected $inited = false;
-
     /**
      * Constructor function.
      *
@@ -61,7 +59,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
             $this->init($old['connection_inited']);
         }
     }
-
     /**
      * Init or deinit connection for auth key.
      *
@@ -82,7 +79,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     {
         return $this->inited;
     }
-
     /**
      * Bind auth key.
      *
@@ -96,11 +92,10 @@ class TempAuthKey extends AuthKey implements JsonSerializable
         $this->bound = $bound;
         if (!$pfs) {
             foreach (['authKey', 'id', 'serverSalt'] as $key) {
-                $this->{$key} = &$bound->{$key};
+                $this->{$key} =& $bound->{$key};
             }
         }
     }
-
     /**
      * Check if auth key is bound.
      *
@@ -110,7 +105,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     {
         return $this->bound !== null;
     }
-
     /**
      * Check if we are logged in.
      *
@@ -120,7 +114,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     {
         return $this->bound ? $this->bound->isAuthorized() : false;
     }
-
     /**
      * Set the authorized boolean.
      *
@@ -132,7 +125,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     {
         $this->bound->authorized($authorized);
     }
-
     /**
      * Set expiration date of temporary auth key.
      *
@@ -144,7 +136,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     {
         $this->expires = $expires;
     }
-
     /**
      * Check if auth key has expired.
      *
@@ -154,7 +145,6 @@ class TempAuthKey extends AuthKey implements JsonSerializable
     {
         return \time() > $this->expires;
     }
-
     /**
      * JSON serialization function.
      *
@@ -162,15 +152,8 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return [
-            'auth_key' => 'pony'.\base64_encode($this->authKey),
-            'server_salt' => $this->serverSalt,
-            'bound' => $this->isBound(),
-            'expires' => $this->expires,
-            'connection_inited' => $this->inited
-        ];
+        return ['auth_key' => 'pony' . \base64_encode($this->authKey), 'server_salt' => $this->serverSalt, 'bound' => $this->isBound(), 'expires' => $this->expires, 'connection_inited' => $this->inited];
     }
-
     /**
      * Sleep function.
      *
@@ -178,14 +161,7 @@ class TempAuthKey extends AuthKey implements JsonSerializable
      */
     public function __sleep()
     {
-        return [
-            'authKey',
-            'id',
-            'serverSalt',
-            'bound',
-            'expires',
-            'inited'
-        ];
+        return ['authKey', 'id', 'serverSalt', 'bound', 'expires', 'inited'];
     }
     /**
      * Wakeup function.

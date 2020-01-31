@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Password calculator module.
  *
@@ -34,7 +35,6 @@ class PasswordCalculator
 {
     use AuthKeyHandler;
     use Tools;
-
     /**
      * The algorithm to use for calculating the hash of new passwords (a PasswordKdfAlgo object).
      *
@@ -47,14 +47,12 @@ class PasswordCalculator
      * @var string
      */
     private $secure_random = '';
-
     /**
      * The algorithm to use for calculatuing the hash of the current password (a PasswordKdfAlgo object).
      *
      * @var array
      */
     private $current_algo;
-
     /**
      * SRP b parameter.
      *
@@ -79,7 +77,6 @@ class PasswordCalculator
      * @var \danog\MadelineProto\Logger
      */
     public $logger;
-
     /**
      * Initialize logger.
      *
@@ -89,7 +86,6 @@ class PasswordCalculator
     {
         $this->logger = $logger;
     }
-
     /**
      * Popupate 2FA configuration.
      *
@@ -115,7 +111,6 @@ class PasswordCalculator
                     $this->checkPG($object['current_algo']['p'], $object['current_algo']['g']);
                     $object['current_algo']['gForHash'] = \str_pad($object['current_algo']['g']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
                     $object['current_algo']['pForHash'] = \str_pad($object['current_algo']['p']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
-
                     break;
                 default:
                     throw new Exception("Unknown KDF algo {$object['current_algo']['_']}");
@@ -146,7 +141,6 @@ class PasswordCalculator
                 $this->checkPG($object['new_algo']['p'], $object['new_algo']['g']);
                 $object['new_algo']['gForHash'] = \str_pad($object['new_algo']['g']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
                 $object['new_algo']['pForHash'] = \str_pad($object['new_algo']['p']->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
-
                 break;
             default:
                 throw new Exception("Unknown KDF algo {$object['new_algo']['_']}");
@@ -154,7 +148,6 @@ class PasswordCalculator
         $this->new_algo = $object['new_algo'];
         $this->secure_random = $object['secure_random'];
     }
-
     /**
      * Create a random string (eventually prefixed by the specified string).
      *
@@ -163,9 +156,8 @@ class PasswordCalculator
      */
     public function createSalt(string $prefix = ''): string
     {
-        return $prefix.\danog\MadelineProto\Tools::random(32);
+        return $prefix . \danog\MadelineProto\Tools::random(32);
     }
-
     /**
      * Hash specified data using the salt with SHA256.
      *
@@ -177,9 +169,8 @@ class PasswordCalculator
      */
     public function hashSha256(string $data, string $salt): string
     {
-        return \hash('sha256', $salt.$data.$salt, true);
+        return \hash('sha256', $salt . $data . $salt, true);
     }
-
     /**
      * Hashes the specified password.
      *
@@ -193,10 +184,8 @@ class PasswordCalculator
         $buf = $this->hashSha256($password, $client_salt);
         $buf = $this->hashSha256($buf, $server_salt);
         $hash = \hash_pbkdf2('sha512', $buf, $client_salt, 100000, 0, true);
-
         return $this->hashSha256($hash, $server_salt);
     }
-
     /**
      * Get the InputCheckPassword object for checking the validity of a password using account.checkPassword.
      *
@@ -214,42 +203,30 @@ class PasswordCalculator
         $gForHash = $this->current_algo['gForHash'];
         $p = $this->current_algo['p'];
         $pForHash = $this->current_algo['pForHash'];
-
         $B = $this->srp_B;
         $BForHash = $this->srp_BForHash;
         $id = $this->srp_id;
-
         $x = new BigInteger($this->hashPassword($password, $client_salt, $server_salt), 256);
         $g_x = $g->powMod($x, $p);
-
-        $k = new BigInteger(\hash('sha256', $pForHash.$gForHash, true), 256);
+        $k = new BigInteger(\hash('sha256', $pForHash . $gForHash, true), 256);
         $kg_x = $k->multiply($g_x)->powMod(Magic::$one, $p);
-
         $a = new BigInteger(\danog\MadelineProto\Tools::random(2048 / 8), 256);
         $A = $g->powMod($a, $p);
         $this->checkG($A, $p);
         $AForHash = \str_pad($A->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
-
         $b_kg_x = $B->powMod(Magic::$one, $p)->subtract($kg_x);
-
-        $u = new BigInteger(\hash('sha256', $AForHash.$BForHash, true), 256);
+        $u = new BigInteger(\hash('sha256', $AForHash . $BForHash, true), 256);
         $ux = $u->multiply($x);
         $a_ux = $a->add($ux);
-
         $S = $b_kg_x->powMod($a_ux, $p);
-
         $SForHash = \str_pad($S->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
         $K = \hash('sha256', $SForHash, true);
-
         $h1 = \hash('sha256', $pForHash, true);
         $h2 = \hash('sha256', $gForHash, true);
         $h1 ^= $h2;
-
-        $M1 = \hash('sha256', $h1.\hash('sha256', $client_salt, true).\hash('sha256', $server_salt, true).$AForHash.$BForHash.$K, true);
-
+        $M1 = \hash('sha256', $h1 . \hash('sha256', $client_salt, true) . \hash('sha256', $server_salt, true) . $AForHash . $BForHash . $K, true);
         return ['_' => 'inputCheckPasswordSRP', 'srp_id' => $id, 'A' => $AForHash, 'M1' => $M1];
     }
-
     /**
      * Get parameters to be passed to the account.updatePasswordSettings to update/set a 2FA password.
      *
@@ -261,36 +238,24 @@ class PasswordCalculator
     public function getPassword(array $params): array
     {
         $oldPassword = $this->getCheckPassword($params['password'] ?? '');
-
         $return = ['password' => $oldPassword, 'new_settings' => ['_' => 'account.passwordInputSettings', 'new_algo' => ['_' => 'passwordKdfAlgoUnknown'], 'new_password_hash' => '', 'hint' => '']];
-
-        $new_settings = &$return['new_settings'];
-
+        $new_settings =& $return['new_settings'];
         if (isset($params['new_password']) && $params['new_password'] !== '') {
             $client_salt = $this->createSalt($this->new_algo['salt1']);
             $server_salt = $this->new_algo['salt2'];
             $g = $this->new_algo['g'];
             $p = $this->new_algo['p'];
             $pForHash = $this->new_algo['pForHash'];
-
             $x = new BigInteger($this->hashPassword($params['new_password'], $client_salt, $server_salt), 256);
             $v = $g->powMod($x, $p);
             $vForHash = \str_pad($v->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
-
-            $new_settings['new_algo'] = [
-                '_' => 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow',
-                'salt1' => $client_salt,
-                'salt2' => $server_salt,
-                'g' => (int) $g->toString(),
-                'p' => $pForHash,
-            ];
+            $new_settings['new_algo'] = ['_' => 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow', 'salt1' => $client_salt, 'salt2' => $server_salt, 'g' => (int) $g->toString(), 'p' => $pForHash];
             $new_settings['new_password_hash'] = $vForHash;
             $new_settings['hint'] = $params['hint'] ?? '';
             if (isset($params['email'])) {
                 $new_settings['email'] = $params['email'];
             }
         }
-
         return $return;
     }
 }

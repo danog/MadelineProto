@@ -27,7 +27,6 @@ class Serialization
     public static function realpaths($file)
     {
         $file = Absolute::absolute($file);
-
-        return ['file' => $file, 'lockfile' => $file.'.lock', 'tempfile' => $file.'.temp.session'];
+        return ['file' => $file, 'lockfile' => $file . '.lock', 'tempfile' => $file . '.temp.session'];
     }
 }

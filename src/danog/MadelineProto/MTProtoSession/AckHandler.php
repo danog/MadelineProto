@@ -28,31 +28,27 @@ trait AckHandler
     {
         // The server acknowledges that it received my message
         if (!isset($this->outgoing_messages[$message_id])) {
-            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
-
+            $this->logger->logger("WARNING: Couldn't find message id " . $message_id . ' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
             return false;
         }
         //$this->logger->logger("Ack-ed ".$this->outgoing_messages[$message_id]['_']." with message ID $message_id on DC $datacenter");
         /*
-        if (isset($this->outgoing_messages[$message_id]['body'])) {
-            unset($this->outgoing_messages[$message_id]['body']);
-        }
-        if (isset($this->new_outgoing[$message_id])) {
-            unset($this->new_outgoing[$message_id]);
-        }*/
+                                        if (isset($this->outgoing_messages[$message_id]['body'])) {
+                                            unset($this->outgoing_messages[$message_id]['body']);
+                                        }
+                                        if (isset($this->new_outgoing[$message_id])) {
+                                            unset($this->new_outgoing[$message_id]);
+                                        }*/
         return true;
     }
-
     public function gotResponseForOutgoingMessageId($message_id): bool
     {
         // The server acknowledges that it received my message
         if (isset($this->new_outgoing[$message_id])) {
             unset($this->new_outgoing[$message_id]);
         }
-
         if (!isset($this->outgoing_messages[$message_id])) {
-            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
-
+            $this->logger->logger("WARNING: Couldn't find message id " . $message_id . ' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
             return false;
         }
         if (isset($this->outgoing_messages[$message_id]['body'])) {
@@ -61,28 +57,21 @@ trait AckHandler
         if (isset($this->outgoing_messages[$message_id]['serialized_body'])) {
             unset($this->outgoing_messages[$message_id]['serialized_body']);
         }
-
         return true;
     }
-
     public function ackIncomingMessageId($message_id): bool
     {
         // I let the server know that I received its message
         if (!isset($this->incoming_messages[$message_id])) {
-            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of incoming messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
+            $this->logger->logger("WARNING: Couldn't find message id " . $message_id . ' in the array of incoming messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
         }
         /*if ($this->temp_auth_key['id'] === null || $this->temp_auth_key['id'] === "\0\0\0\0\0\0\0\0") {
-        // || (isset($this->incoming_messages[$message_id]['ack']) && $this->incoming_messages[$message_id]['ack'])) {
-        return;
-        }*/
+          // || (isset($this->incoming_messages[$message_id]['ack']) && $this->incoming_messages[$message_id]['ack'])) {
+          return;
+          }*/
         $this->ack_queue[$message_id] = $message_id;
-
         return true;
     }
-
-
-
-
     /**
      * Check if there are some pending calls.
      *
@@ -95,26 +84,17 @@ trait AckHandler
         $pfs = $settings['pfs'];
         $unencrypted = !$this->shared->hasTempAuthKey();
         $notBound = !$this->shared->isBound();
-
         $pfsNotBound = $pfs && $notBound;
-
         foreach ($this->new_outgoing as $message_id) {
-            if (isset($this->outgoing_messages[$message_id]['sent'])
-                && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time()
-                && $unencrypted === $this->outgoing_messages[$message_id]['unencrypted']
-                && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req'
-            ) {
+            if (isset($this->outgoing_messages[$message_id]['sent']) && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time() && $unencrypted === $this->outgoing_messages[$message_id]['unencrypted'] && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req') {
                 if ($pfsNotBound && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
                     continue;
                 }
-
                 return true;
             }
         }
-
         return false;
     }
-
     /**
      * Get all pending calls (also clear pending state requests).
      *
@@ -127,28 +107,20 @@ trait AckHandler
         $pfs = $settings['pfs'];
         $unencrypted = !$this->shared->hasTempAuthKey();
         $notBound = !$this->shared->isBound();
-
         $pfsNotBound = $pfs && $notBound;
-
         $result = [];
         foreach ($this->new_outgoing as $k => $message_id) {
-            if (isset($this->outgoing_messages[$message_id]['sent'])
-                && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time()
-                && $unencrypted === $this->outgoing_messages[$message_id]['unencrypted']
-            ) {
+            if (isset($this->outgoing_messages[$message_id]['sent']) && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time() && $unencrypted === $this->outgoing_messages[$message_id]['unencrypted']) {
                 if ($pfsNotBound && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
                     continue;
                 }
                 if ($this->outgoing_messages[$message_id]['_'] === 'msgs_state_req') {
                     unset($this->new_outgoing[$k], $this->outgoing_messages[$message_id]);
-
                     continue;
                 }
-
                 $result[] = $message_id;
             }
         }
-
         return $result;
     }
 }

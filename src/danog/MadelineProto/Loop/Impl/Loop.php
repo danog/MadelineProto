@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Loop helper trait.
  *
@@ -32,59 +33,49 @@ use danog\MadelineProto\Loop\LoopInterface;
 abstract class Loop implements LoopInterface
 {
     use \danog\MadelineProto\Tools;
-
     private $count = 0;
-
     /**
      * MTProto instance.
      *
      * @var \danog\MadelineProto\MTProto
      */
     public $API;
-
     public function __construct($API)
     {
         $this->API = $API;
     }
-
     public function start()
     {
         if ($this->count) {
             //$this->API->logger->logger("NOT entering $this with running count {$this->count}", Logger::ERROR);
-
             return false;
         }
         return \danog\MadelineProto\Tools::callFork($this->loopImpl());
     }
-
-    private function loopImpl()
+    private function loopImpl(): \Generator
     {
         //yield ['my_trace' => debug_backtrace(0, 1)[0], (string) $this];
         $this->startedLoop();
-        $this->API->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
-
+        $this->API->logger->logger("Entered {$this}", Logger::ULTRA_VERBOSE);
         try {
             yield $this->loop();
         } finally {
             $this->exitedLoop();
-            $this->API->logger->logger("Physically exited $this", Logger::ULTRA_VERBOSE);
+            $this->API->logger->logger("Physically exited {$this}", Logger::ULTRA_VERBOSE);
             //return null;
         }
     }
-
     public function exitedLoop()
     {
         if ($this->count) {
-            $this->API->logger->logger("Exited $this", Logger::ULTRA_VERBOSE);
+            $this->API->logger->logger("Exited {$this}", Logger::ULTRA_VERBOSE);
             $this->count--;
         }
     }
-
     public function startedLoop()
     {
         $this->count++;
     }
-
     public function isRunning()
     {
         return $this->count;

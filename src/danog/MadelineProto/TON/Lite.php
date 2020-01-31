@@ -22,7 +22,6 @@ namespace danog\MadelineProto\TON;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
-
 use function Amp\File\get;
 
 /**
@@ -70,12 +69,7 @@ class Lite
         $this->settings = $settings;
         $this->logger = Logger::getLoggerFromSettings($this->settings);
         $this->TL = new TL($this);
-        $this->TL->init(
-            [
-                'lite_api' => __DIR__.'/schemes/lite_api.tl',
-                'ton_api' => __DIR__.'/schemes/ton_api.tl',
-            ]
-        );
+        $this->TL->init(['lite_api' => __DIR__ . '/schemes/lite_api.tl', 'ton_api' => __DIR__ . '/schemes/ton_api.tl']);
     }
     /**
      * Connect to the lite endpoints specified in the config file.
@@ -90,18 +84,10 @@ class Lite
         $config['_'] = 'liteclient.config.global';
         $config = Tools::convertJsonTL($config);
         $config['validator']['init_block'] = $config['validator']['init_block'] ?? $config['validator']['zero_state'];
-
-        $this->config = yield $this->TL->deserialize(
-            yield $this->TL->serializeObject(
-                ['type' => ''],
-                $config,
-                'cleanup'
-            )
-        );
-
+        $this->config = yield $this->TL->deserialize(yield $this->TL->serializeObject(['type' => ''], $config, 'cleanup'));
         foreach ($this->config['liteservers'] as $lite) {
             $this->connections[] = $connection = new ADNLConnection($this->TL);
-            yield $connection->connect($lite);
+            yield from $connection->connect($lite);
         }
     }
     /**
@@ -118,11 +104,8 @@ class Lite
         if ($file === null) {
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
-
         isset($this->logger) ? $this->logger->logger($param, $level, $file) : Logger::$default->logger($param, $level, $file);
     }
-
-
     /**
      * Call lite method.
      *
@@ -137,7 +120,6 @@ class Lite
         $data = yield $this->TL->serializeMethod('liteServer.query', ['data' => $data]);
         return yield $this->connections[\rand(0, \count($this->connections) - 1)]->query($data);
     }
-
     /**
      * Asynchronously run async callable.
      *
@@ -149,7 +131,6 @@ class Lite
     {
         return yield $func();
     }
-
     /**
      * Convert parameters.
      *
@@ -161,7 +142,6 @@ class Lite
     {
         return $parameters;
     }
-
     /**
      * Get TL method namespaces.
      *

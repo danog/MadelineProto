@@ -44,7 +44,6 @@ trait Events
      * @var array<string>
      */
     private $event_handler_methods = [];
-
     /**
      * Set event handler.
      *
@@ -54,13 +53,11 @@ trait Events
      */
     public function setEventHandler($event_handler): void
     {
-        if (!\class_exists($event_handler) || !\is_subclass_of($event_handler, '\danog\MadelineProto\EventHandler')) {
+        if (!\class_exists($event_handler) || !\is_subclass_of($event_handler, '\\danog\\MadelineProto\\EventHandler')) {
             throw new \danog\MadelineProto\Exception('Wrong event handler was defined');
         }
-
         $this->event_handler = $event_handler;
-
-        if (!($this->event_handler_instance instanceof $this->event_handler)) {
+        if (!$this->event_handler_instance instanceof $this->event_handler) {
             $class_name = $this->event_handler;
             $this->event_handler_instance = new $class_name($this->wrapper);
         } elseif ($this->wrapper) {
@@ -81,7 +78,6 @@ trait Events
                 $this->event_handler_methods[$method_name] = [$this->event_handler_instance, $method];
             }
         }
-
         $this->settings['updates']['callback'] = [$this, 'eventUpdateHandler'];
         $this->settings['updates']['handle_updates'] = true;
         $this->settings['updates']['run_callback'] = true;
@@ -89,7 +85,6 @@ trait Events
             $this->startUpdateSystem();
         }
     }
-
     /**
      * Get event handler.
      *
@@ -99,7 +94,6 @@ trait Events
     {
         return $this->event_handler_instance;
     }
-
     /**
      * Event update handler.
      *

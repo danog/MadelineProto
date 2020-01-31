@@ -30,7 +30,6 @@ interface FileCallbackInterface
      * @return mixed
      */
     public function getFile();
-
     /**
      * Invoke callback.
      *

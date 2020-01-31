@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Buffered proxy stream interface.
  *

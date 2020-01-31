@@ -83,38 +83,23 @@ class ADNLConnection
         if ($endpoint['id']['_'] !== 'pub.ed25519') {
             throw new \InvalidArgumentException('Only ECDH is supported at the moment!');
         }
-
         $random = Tools::random(256 - 32 - 64);
         //$random = strrev(hex2bin(strrev('9E7C27765D12CE634414F0875D55CE5C58E7A9D58CD45C57CAB516D1241B7864691E5B0AFC4ECB54BFF2CEFC2060F1D45F5B5DEB76A9EF6471D75816AAAEC83CD7DE39EE99B9E980B6C0D4565A916D00908613E63657D5539118F89A14FD73ABB8ECD3AC26C287EEBD0FA44F52B315F01DD60F486EFF4C5B4D71EA6F443358FF141E7294BBBB5D7C079F16BD46C28A12507E1948722E7121B94C3B5C7832ADE7')));
         $s1 = \substr($random, 0, 32);
         $s2 = \substr($random, 32, 32);
         $v1 = \substr($random, 64, 16);
         $v2 = \substr($random, 80, 16);
-
-        $obf = [
-            'decrypt' => [
-                'key' => $s1,
-                'iv' => $v1
-            ],
-            'encrypt' => [
-                'key' => $s2,
-                'iv' => $v2
-            ],
-        ];
+        $obf = ['decrypt' => ['key' => $s1, 'iv' => $v1], 'encrypt' => ['key' => $s2, 'iv' => $v2]];
         // Generating new private/public params
         $private = EC::createKey('Ed25519');
-
         $public = $private->getPublicKey();
         $public = \strrev(Tools::getVar($public, 'QA')[1]->toBytes());
-
         $private = \strrev(Tools::getVar($private, 'dA')->toBytes());
         $private = PrivateKey::loadFormat('MontgomeryPrivate', $private);
-
         // Transpose their public
         $key = $endpoint['id']['key'];
         $key[31] = $key[31] & \chr(127);
-
-        $curve = new Curve25519;
+        $curve = new Curve25519();
         $modulo = Tools::getVar($curve, "modulo");
         $y = new BigInteger(\strrev($key), 256);
         $y2 = clone $y;
@@ -122,41 +107,25 @@ class ADNLConnection
         $y2 = $y2->subtract(Magic::$one);
         $y2 = $modulo->subtract($y2)->powMod(Magic::$one, $modulo);
         $y2 = $y2->modInverse($modulo);
-
         $key = \strrev($y->multiply($y2)->powMod(Magic::$one, $modulo)->toBytes());
         $peerPublic = PublicKey::loadFormat('MontgomeryPublic', $key);
-
         // Generate secret
         $secret = DH::computeSecret($private, $peerPublic);
-
         // Encrypting random with obf keys
         $digest = \hash('sha256', $random, true);
-
-        $key = \substr($secret, 0, 16).\substr($digest, 16, 16);
-        $iv = \substr($digest, 0, 4).\substr($secret, 20, 12);
-
+        $key = \substr($secret, 0, 16) . \substr($digest, 16, 16);
+        $iv = \substr($digest, 0, 4) . \substr($secret, 20, 12);
         $encryptedRandom = Crypt::ctrEncrypt($random, $key, $iv);
-
         // Generating plaintext init payload
         $payload = \hash('sha256', yield $this->TL->serializeObject(['type' => ''], $endpoint['id'], 'key'), true);
         $payload .= $public;
         $payload .= $digest;
         $payload .= $encryptedRandom;
-
         $ip = \long2ip(\unpack('V', Tools::packSignedInt($endpoint['ip']))[1]);
         $port = $endpoint['port'];
-        $ctx = (new ConnectionContext())
-            ->setSocketContext(new ConnectContext)
-            ->setUri("tcp://$ip:$port")
-            ->addStream(DefaultStream::getName())
-            ->addStream(BufferedRawStream::getName())
-            ->addStream(CtrStream::getName(), $obf)
-            ->addStream(HashedBufferedStream::getName(), 'sha256')
-            ->addStream(ADNLStream::getName());
-
+        $ctx = (new ConnectionContext())->setSocketContext(new ConnectContext())->setUri("tcp://{$ip}:{$port}")->addStream(DefaultStream::getName())->addStream(BufferedRawStream::getName())->addStream(CtrStream::getName(), $obf)->addStream(HashedBufferedStream::getName(), 'sha256')->addStream(ADNLStream::getName());
         $this->stream = yield $ctx->getStream($payload);
-
-        Tools::callFork((function () {
+        Tools::callFork((function (): \Generator {
             //yield Tools::sleep(1);
             while (true) {
                 $buffer = yield $this->stream->getReadBuffer($length);
@@ -164,14 +133,13 @@ class ADNLConnection
                     $data = yield $buffer->bufferRead($length);
                     $data = yield $this->TL->deserialize($data);
                     if ($data['_'] !== 'adnl.message.answer') {
-                        throw new Exception('Wrong answer type: '.$data['_']);
+                        throw new Exception('Wrong answer type: ' . $data['_']);
                     }
                     $this->requests[$data['query_id']]->resolve(yield $this->TL->deserialize((string) $data['answer']));
                 }
             }
         })());
     }
-
     /**
      * Send ADNL query.
      *
@@ -181,18 +149,9 @@ class ADNLConnection
      */
     public function query(string $payload): \Generator
     {
-        $data = yield $this->TL->serializeObject(
-            ['type' => ''],
-            [
-                '_' => 'adnl.message.query',
-                'query_id' => $id = Tools::random(32),
-                'query' => $payload
-            ],
-            ''
-        );
+        $data = yield $this->TL->serializeObject(['type' => ''], ['_' => 'adnl.message.query', 'query_id' => $id = Tools::random(32), 'query' => $payload], '');
         (yield $this->stream->getWriteBuffer(\strlen($data)))->bufferWrite($data);
-        $this->requests[$id] = new Deferred;
-
+        $this->requests[$id] = new Deferred();
         return $this->requests[$id]->promise();
     }
 }

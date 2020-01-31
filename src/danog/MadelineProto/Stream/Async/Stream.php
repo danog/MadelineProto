@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Generic stream helper trait.
  *

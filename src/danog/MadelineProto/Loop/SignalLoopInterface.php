@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Signal loop interface.
  *
@@ -35,7 +36,6 @@ interface SignalLoopInterface extends LoopInterface
      * @return Promise
      */
     public function waitSignal($promise): Promise;
-
     /**
      * Send a signal to the the loop.
      *

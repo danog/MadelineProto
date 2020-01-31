@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Periodic loop.
  *
@@ -31,7 +32,6 @@ class PeriodicLoop extends ResumableSignalLoop
     private $callback;
     private $name;
     private $timeout;
-
     /**
      * Constructor.
      *
@@ -47,22 +47,19 @@ class PeriodicLoop extends ResumableSignalLoop
         $this->name = $name;
         $this->timeout = $timeout;
     }
-
-    public function loop()
+    public function loop(): \Generator
     {
         $callback = $this->callback;
         $logger = $this->API->logger;
-
         while (true) {
             $result = yield $this->waitSignal($this->pause($this->timeout));
             if ($result) {
-                $logger->logger("Got signal in $this, exiting");
+                $logger->logger("Got signal in {$this}, exiting");
                 return;
             }
             yield $callback();
         }
     }
-
     public function __toString(): string
     {
         return $this->name;

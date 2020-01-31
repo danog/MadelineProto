@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Premade stream wrapper.
  *
@@ -38,29 +39,23 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
 {
     use RawStream;
     private $stream;
-
     public function __construct()
     {
     }
-
     public function setupTls(?CancellationToken $cancellationToken = null): \Amp\Promise
     {
         return $this->stream->setupTls($cancellationToken);
     }
-
-
     public function getStream()
     {
         return $this->stream;
     }
-
     public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
         if ($header !== '') {
             yield $this->stream->write($header);
         }
     }
-
     /**
      * Async chunked read.
      *
@@ -70,7 +65,6 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     {
         return $this->stream ? $this->stream->read() : new \Amp\Success(null);
     }
-
     /**
      * Async write.
      *
@@ -85,7 +79,6 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
         }
         return $this->stream->write($data);
     }
-
     /**
      * Async close.
      *
@@ -101,15 +94,13 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
                 $this->stream = null;
             }
         } catch (\Throwable $e) {
-            \danog\MadelineProto\Logger::log('Got exception while closing stream: '.$e->getMessage());
+            \danog\MadelineProto\Logger::log('Got exception while closing stream: ' . $e->getMessage());
         }
     }
-
     public function close()
     {
         $this->disconnect();
     }
-
     /**
      * {@inheritdoc}
      *
@@ -119,7 +110,6 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     {
         return $this->stream;
     }
-
     /**
      * {@inheritdoc}
      */

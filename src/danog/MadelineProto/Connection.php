@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Connection module.
  *
@@ -44,7 +45,6 @@ class Connection extends Session
 {
     use \danog\Serializable;
     use Tools;
-
     /**
      * Writer loop.
      *
@@ -87,7 +87,6 @@ class Connection extends Session
      * @var ConnectionContext
      */
     private $ctx;
-
     /**
      * HTTP request count.
      *
@@ -100,14 +99,12 @@ class Connection extends Session
      * @var integer
      */
     private $httpResCount = 0;
-
     /**
      * Date of last chunk received.
      *
      * @var integer
      */
     private $lastChunk = 0;
-
     /**
      * Logger instance.
      *
@@ -126,28 +123,24 @@ class Connection extends Session
      * @var DataCenterConnection
      */
     protected $shared;
-
     /**
      * DC ID.
      *
      * @var string
      */
     protected $datacenter;
-
     /**
      * Connection ID.
      *
      * @var int
      */
     private $id = 0;
-
     /**
      * DC ID and connection ID concatenated.
      *
      * @var
      */
     private $datacenterId = '';
-
     /**
      * Whether this socket has to be reconnected.
      *
@@ -214,7 +207,6 @@ class Connection extends Session
     {
         $this->shared->reading($reading, $this->id);
     }
-
     /**
      * Tell the class that we have read a chunk of data from the socket.
      *
@@ -233,7 +225,6 @@ class Connection extends Session
     {
         return $this->lastChunk;
     }
-
     /**
      * Indicate a received HTTP response.
      *
@@ -270,7 +261,6 @@ class Connection extends Session
     {
         return $this->httpReqCount;
     }
-
     /**
      * Get connection ID.
      *
@@ -280,7 +270,6 @@ class Connection extends Session
     {
         return $this->id;
     }
-
     /**
      * Get datacenter concatenated with connection ID.
      *
@@ -290,7 +279,6 @@ class Connection extends Session
     {
         return $this->datacenterId;
     }
-
     /**
      * Get connection context.
      *
@@ -300,7 +288,6 @@ class Connection extends Session
     {
         return $this->ctx;
     }
-
     /**
      * Check if is an HTTP connection.
      *
@@ -310,7 +297,6 @@ class Connection extends Session
     {
         return \in_array($this->ctx->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
     }
-
     /**
      * Check if is a media connection.
      *
@@ -320,7 +306,6 @@ class Connection extends Session
     {
         return $this->ctx->isMedia();
     }
-
     /**
      * Check if is a CDN connection.
      *
@@ -330,7 +315,6 @@ class Connection extends Session
     {
         return $this->ctx->isCDN();
     }
-
     /**
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
      *
@@ -342,18 +326,15 @@ class Connection extends Session
     {
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
-        $this->datacenterId = $this->datacenter.'.'.$this->id;
+        $this->datacenterId = $this->datacenter . '.' . $this->id;
         $this->API->logger->logger("Connecting to DC {$this->datacenterId}", \danog\MadelineProto\Logger::WARNING);
-
         $ctx->setReadCallback([$this, 'haveRead']);
         $this->stream = yield $ctx->getStream();
-
         if ($this->needsReconnect) {
             $this->needsReconnect = false;
         }
         $this->httpReqCount = 0;
         $this->httpResCount = 0;
-
         if (!isset($this->writer)) {
             $this->writer = new WriteLoop($this);
         }
@@ -378,7 +359,6 @@ class Connection extends Session
                 unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
             }
         }
-
         $this->writer->start();
         $this->reader->start();
         if (!$this->checker->start()) {
@@ -389,7 +369,6 @@ class Connection extends Session
             $this->pinger->start();
         }
     }
-
     /**
      * Send an MTProto message.
      *
@@ -427,17 +406,13 @@ class Connection extends Session
     public function sendMessage(array $message, bool $flush = true): \Generator
     {
         $deferred = new Deferred();
-
         if (!isset($message['serialized_body'])) {
             $body = \is_object($message['body']) ? yield $message['body'] : $message['body'];
-
             $refreshNext = isset($message['refreshNext']) && $message['refreshNext'];
             //$refreshNext = true;
-
             if ($refreshNext) {
                 $this->API->referenceDatabase->refreshNext(true);
             }
-
             if ($message['method']) {
                 $body = yield $this->API->getTL()->serializeMethod($message['_'], $body);
             } else {
@@ -450,16 +425,13 @@ class Connection extends Session
             $message['serialized_body'] = $body;
             unset($body);
         }
-
         $message['send_promise'] = $deferred;
         $this->pending_outgoing[$this->pending_outgoing_key++] = $message;
         if ($flush && isset($this->writer)) {
             $this->writer->resume();
         }
-
         return $deferred->promise();
     }
-
     /**
      * Flush pending packets.
      *
@@ -500,7 +472,6 @@ class Connection extends Session
         $this->API = $extra->getExtra();
         $this->logger = $this->API->logger;
     }
-
     /**
      * Get main instance.
      *
@@ -510,7 +481,6 @@ class Connection extends Session
     {
         return $this->API;
     }
-
     /**
      * Get shared connection instance.
      *
@@ -520,7 +490,6 @@ class Connection extends Session
     {
         return $this->shared;
     }
-
     /**
      * Disconnect from DC.
      *
@@ -549,7 +518,6 @@ class Connection extends Session
         }
         $this->API->logger->logger("Disconnected from DC {$this->datacenterId}");
     }
-
     /**
      * Reconnect to DC.
      *
@@ -561,7 +529,6 @@ class Connection extends Session
         $this->disconnect(true);
         yield $this->API->datacenter->dcConnect($this->ctx->getDc(), $this->id);
     }
-
     /**
      * Get name.
      *

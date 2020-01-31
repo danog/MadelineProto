@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Buffer helper trait.
  *
@@ -33,7 +34,6 @@ trait Buffer
     {
         return \danog\MadelineProto\Tools::call($this->bufferReadGenerator($length));
     }
-
     public function bufferWrite(string $data): Promise
     {
         return \danog\MadelineProto\Tools::call($this->bufferWriteGenerator($data));

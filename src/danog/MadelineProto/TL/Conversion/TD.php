@@ -36,7 +36,6 @@ trait TD
         }
         if (!isset($params['ID'])) {
             \array_walk($params, [$this, 'tdcliToTd']);
-
             return $params;
         }
         foreach ($params as $key => $value) {
@@ -48,10 +47,8 @@ trait TD
         }
         $params['_'] = \lcfirst($params['ID']);
         unset($params['ID']);
-
         return $params;
     }
-
     /**
      * Convert TD to MTProto parameters.
      *
@@ -81,15 +78,13 @@ trait TD
                     default:
                         $newparams[$mtproto[0]] = isset($params[$td]) ? $params[$td] : null;
                         if (\is_array($newparams[$mtproto[0]])) {
-                            $newparams[$mtproto[0]] = yield $this->MTProtoToTd($newparams[$mtproto[0]]);
+                            $newparams[$mtproto[0]] = (yield from $this->MTProtoToTd($newparams[$mtproto[0]]));
                         }
                 }
             }
         }
-
         return $newparams;
     }
-
     /**
      * MTProto to TDCLI params.
      *
@@ -99,9 +94,8 @@ trait TD
      */
     public function MTProtoToTdcli($params): \Generator
     {
-        return $this->tdToTdcli(yield $this->MTProtoToTd($params));
+        return $this->tdToTdcli(yield from $this->MTProtoToTd($params));
     }
-
     /**
      * MTProto to TD params.
      *
@@ -116,7 +110,6 @@ trait TD
         }
         if (!isset($params['_'])) {
             \array_walk($params, [$this, 'mtprotoToTd']);
-
             return $params;
         }
         $newparams = ['_' => $params['_']];
@@ -144,7 +137,7 @@ trait TD
                         if (isset($params['fwd_from'])) {
                             $newparams[$td] = ['_' => 'messageForwardedFromUser'];
                             if (isset($params['fwd_from']['channel_id'])) {
-                                $newparams[$td] = ['_' => 'messageForwardedPost', 'chat_id' => '-100'.$params['fwd_from']['channel_id']];
+                                $newparams[$td] = ['_' => 'messageForwardedPost', 'chat_id' => '-100' . $params['fwd_from']['channel_id']];
                             }
                             $newparams[$td]['date'] = $params['fwd_from']['date'];
                             if (isset($params['fwd_from']['channel_post'])) {
@@ -167,7 +160,7 @@ trait TD
                         if ($params['message'] !== '') {
                             $newparams[$td] = ['_' => 'messageText', 'text' => $params['message']];
                             if (isset($params['media']['_']) && $params['media']['_'] === 'messageMediaWebPage') {
-                                $newparams[$td]['web_page'] = yield $this->MTProtoToTd($params['media']['webpage']);
+                                $newparams[$td]['web_page'] = (yield from $this->MTProtoToTd($params['media']['webpage']));
                             }
                             if (isset($params['entities'])) {
                                 $newparams[$td]['entities'] = $params['entities'];
@@ -183,15 +176,13 @@ trait TD
                             $newparams[$td] = isset($params[$mtproto[0]]) ? $params[$mtproto[0]] : null;
                         }
                         if (\is_array($newparams[$td])) {
-                            $newparams[$td] = yield $this->MTProtoToTd($newparams[$td]);
+                            $newparams[$td] = (yield from $this->MTProtoToTd($newparams[$td]));
                         }
                 }
             }
         }
-
         return $newparams;
     }
-
     /**
      * Convert TD parameters to tdcli.
      *
@@ -210,12 +201,11 @@ trait TD
                 $newparams['ID'] = \ucfirst($value);
             } else {
                 if (!\is_numeric($key) && !\preg_match('/_^/', $key)) {
-                    $key = $key.'_';
+                    $key = $key . '_';
                 }
                 $newparams[$key] = $this->tdToTdcli($value);
             }
         }
-
         return $newparams;
     }
 }

@@ -48,21 +48,18 @@ class UpdatesState
      * @var int
      */
     private $date = 1;
-
     /**
      * Channel ID.
      *
      * @var int|bool
      */
     private $channelId;
-
     /**
      * Is busy?
      *
      * @var bool
      */
     private $syncLoading = false;
-
     /**
      * Init function.
      *
@@ -74,7 +71,6 @@ class UpdatesState
         $this->channelId = $channelId;
         $this->update($init);
     }
-
     /**
      * Sleep function.
      *
@@ -84,7 +80,6 @@ class UpdatesState
     {
         return $this->channelId ? ['pts', 'channelId'] : ['pts', 'qts', 'seq', 'date', 'channelId'];
     }
-
     /**
      * Is this state relative to a channel?
      *
@@ -94,7 +89,6 @@ class UpdatesState
     {
         return (bool) $this->channelId;
     }
-
     /**
      * Get the channel ID.
      *
@@ -104,7 +98,6 @@ class UpdatesState
     {
         return $this->channelId;
     }
-
     /**
      * Are we currently busy?
      *
@@ -117,10 +110,8 @@ class UpdatesState
         if ($set !== null) {
             $this->syncLoading = $set;
         }
-
         return $this->syncLoading;
     }
-
     /**
      * Update multiple parameters.
      *
@@ -135,10 +126,8 @@ class UpdatesState
                 $this->{$param}($init[$param]);
             }
         }
-
         return $this;
     }
-
     /**
      * Get/set PTS.
      *
@@ -151,10 +140,8 @@ class UpdatesState
         if ($set !== 0 && $set > $this->pts) {
             $this->pts = $set;
         }
-
         return $this->pts;
     }
-
     /**
      * Get/set QTS.
      *
@@ -167,10 +154,8 @@ class UpdatesState
         if ($set !== 0 && $set > $this->qts) {
             $this->qts = $set;
         }
-
         return $this->qts;
     }
-
     /**
      * Get/set seq.
      *
@@ -183,10 +168,8 @@ class UpdatesState
         if ($set !== 0 && $set > $this->seq) {
             $this->seq = $set;
         }
-
         return $this->seq;
     }
-
     /**
      * Get/set date.
      *
@@ -199,10 +182,8 @@ class UpdatesState
         if ($set !== 0 && $set > $this->date) {
             $this->date = $set;
         }
-
         return $this->date;
     }
-
     /**
      * Check validity of PTS contained in update.
      *
@@ -214,7 +195,6 @@ class UpdatesState
     {
         return $update['pts'] - ($this->pts + $update['pts_count']);
     }
-
     /**
      * Check validity of seq contained in update.
      *

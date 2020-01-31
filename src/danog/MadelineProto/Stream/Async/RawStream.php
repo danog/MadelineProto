@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Raw stream helper trait.
  *
@@ -30,17 +31,14 @@ use Amp\Promise;
 trait RawStream
 {
     use Stream;
-
     public function read(): Promise
     {
         return \danog\MadelineProto\Tools::call($this->readGenerator());
     }
-
     public function write(string $data): Promise
     {
         return \danog\MadelineProto\Tools::call($this->writeGenerator($data));
     }
-
     public function end(string $finalData = ''): Promise
     {
         return \danog\MadelineProto\Tools::call($this->endGenerator($finalData));

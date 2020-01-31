@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Websocket stream wrapper.
  *
@@ -26,7 +27,6 @@ use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
-
 use function Amp\Websocket\Client\connector;
 
 /**
@@ -37,7 +37,6 @@ use function Amp\Websocket\Client\connector;
 class WsStream implements RawStreamInterface, ProxyStreamInterface
 {
     use RawStream;
-
     /**
      * Websocket stream.
      *
@@ -56,7 +55,6 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      * @var Connector
      */
     private $connector;
-
     /**
      * Connect to stream.
      *
@@ -69,18 +67,13 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
         if (!\class_exists(Connector::class)) {
             throw new \danog\MadelineProto\Exception('Please install amphp/websocket-client by running "composer require amphp/websocket-client:dev-master"');
         }
-
         $this->dc = $ctx->getIntDc();
-
         $handshake = new Handshake(\str_replace('tcp://', $ctx->isSecure() ? 'wss://' : 'ws://', $ctx->getStringUri()));
-
         $this->stream = yield ($this->connector ?? connector())->connect($handshake, $ctx->getCancellationToken());
-
         if (\strlen($header)) {
             yield $this->write($header);
         }
     }
-
     /**
      * Async close.
      */
@@ -91,7 +84,6 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
         } catch (\Throwable $e) {
         }
     }
-
     public function readGenerator(): \Generator
     {
         try {
@@ -107,12 +99,10 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
             if ($e->getReason() !== 'Client closed the underlying TCP connection') {
                 throw $e;
             }
-
             return null;
         }
         return $data;
     }
-
     /**
      * Async write.
      *
@@ -124,7 +114,6 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     {
         return $this->stream->sendBinary($data);
     }
-
     /**
      * {@inheritdoc}
      *
@@ -140,7 +129,6 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
             $this->connector = $extra;
         }
     }
-
     public static function getName(): string
     {
         return __CLASS__;

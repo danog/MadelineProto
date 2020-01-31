@@ -33,7 +33,6 @@ trait Noop
         $this->settings['updates']['handle_updates'] = true;
         $this->startUpdateSystem();
     }
-
     /**
      * Noop update handler.
      *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Async parameters class.
  *
@@ -33,7 +34,6 @@ class AsyncParameters
      * @var callable
      */
     private $callable;
-
     /**
      * Create async parameters.
      *
@@ -43,8 +43,6 @@ class AsyncParameters
     {
         $this->callable = $callable;
     }
-
-
     /**
      * Create async parameters.
      *
@@ -54,7 +52,6 @@ class AsyncParameters
     {
         $this->callable = $callable;
     }
-
     /**
      * Get parameters asynchronously.
      *
@@ -63,7 +60,6 @@ class AsyncParameters
     public function getParameters()
     {
         $callable = $this->callable;
-
         return $callable();
     }
 }
