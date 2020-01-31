@@ -197,7 +197,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         $this->read_hash = null;
         $this->read_check_after = 0;
         $this->read_check_pos = 0;
-        $this->stream = (yield from $ctx->getStream($header));
+        $this->stream = (yield $ctx->getStream($header));
     }
     /**
      * Async close.

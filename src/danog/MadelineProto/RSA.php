@@ -62,7 +62,7 @@ class RSA
         $this->n = Tools::getVar($key, 'modulus');
         $this->e = Tools::getVar($key, 'exponent');
         \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['computing_fingerprint'], Logger::ULTRA_VERBOSE);
-        $this->fp = \substr(\sha1(yield from $TL->serializeObject(['type' => 'bytes'], $this->n->toBytes(), 'key') . (yield from $TL->serializeObject(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
+        $this->fp = \substr(\sha1((yield from $TL->serializeObject(['type' => 'bytes'], $this->n->toBytes(), 'key')) . (yield from $TL->serializeObject(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
         return $this;
     }
     /**

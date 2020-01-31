@@ -286,7 +286,7 @@ trait UpdateHandler
             case 'updateShortChatMessage':
                 $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
-                if (!(yield from $this->peerIsset($from_id) || !(yield from $this->peerIsset($to_id) || isset($updates['via_bot_id']) && !(yield from $this->peerIsset($updates['via_bot_id']) || isset($updates['entities']) && !(yield from $this->entitiesPeerIsset($updates['entities']) || isset($updates['fwd_from']) && !(yield from $this->fwdPeerIsset($updates['fwd_from']))))))) {
+                if (!((yield from $this->peerIsset($from_id)) || !((yield from $this->peerIsset($to_id)) || isset($updates['via_bot_id']) && !((yield from $this->peerIsset($updates['via_bot_id'])) || isset($updates['entities']) && !((yield from $this->entitiesPeerIsset($updates['entities'])) || isset($updates['fwd_from']) && !(yield from $this->fwdPeerIsset($updates['fwd_from']))))))) {
                     yield $this->updaters[false]->resume();
                     return;
                 }

@@ -79,7 +79,7 @@ trait ResponseHandler
                 yield from $this->saveUpdate($update);
                 break;
             case 'decryptedMessageLayer':
-                if (yield from $this->checkSecretOutSeqNo($update['message']['chat_id'], $update['message']['decrypted_message']['out_seq_no']) && (yield from $this->checkSecretInSeqNo($update['message']['chat_id'], $update['message']['decrypted_message']['in_seq_no']))) {
+                if ((yield from $this->checkSecretOutSeqNo($update['message']['chat_id'], $update['message']['decrypted_message']['out_seq_no'])) && (yield from $this->checkSecretInSeqNo($update['message']['chat_id'], $update['message']['decrypted_message']['in_seq_no']))) {
                     $this->secret_chats[$update['message']['chat_id']]['in_seq_no']++;
                     if ($update['message']['decrypted_message']['layer'] >= 17) {
                         $this->secret_chats[$update['message']['chat_id']]['layer'] = $update['message']['decrypted_message']['layer'];

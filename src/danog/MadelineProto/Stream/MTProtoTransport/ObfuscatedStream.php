@@ -67,7 +67,7 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
         $iv = \substr($random, 40, 16);
         $ivRev = \substr($reversed, 40, 16);
         parent::setExtra(['encrypt' => ['key' => $key, 'iv' => $iv], 'decrypt' => ['key' => $keyRev, 'iv' => $ivRev]]);
-        yield from parent::connectGenerator($ctx);
+        yield parent::connectGenerator($ctx);
         $random = \substr_replace($random, \substr(@$this->getEncryptor()->encrypt($random), 56, 8), 56, 8);
         yield $this->getStream()->write($random);
     }

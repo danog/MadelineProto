@@ -23,6 +23,7 @@ use Amp\Deferred;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Async\AsyncParameters;
+use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
 use function Amp\Promise\all;
 
@@ -61,7 +62,7 @@ trait CallHandler
                 $this->ackOutgoingMessageId($message_id);
                 $this->gotResponseForOutgoingMessageId($message_id);
             } else {
-                $this->logger->logger('Could not resend ' . (isset($this->outgoing_messages[$message_id]['_']) ? $this->outgoing_messages[$message_id]['_'] : $message_id));
+                $this->logger->logger('Could not resend '.(isset($this->outgoing_messages[$message_id]['_']) ? $this->outgoing_messages[$message_id]['_'] : $message_id));
             }
         }
         if (!$postpone) {
@@ -130,9 +131,9 @@ trait CallHandler
             $aargs['datacenter'] = $args['id']['dc_id'];
             return $this->API->methodCallAsyncWriteGenerator($method, $args, $aargs);
         }
-        if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has($this->datacenter . '_media')) {
+        if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has($this->datacenter.'_media')) {
             $this->logger->logger('Using media DC');
-            $aargs['datacenter'] = $this->datacenter . '_media';
+            $aargs['datacenter'] = $this->datacenter.'_media';
             return $this->API->methodCallAsyncWriteGenerator($method, $args, $aargs);
         }
         if (\in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) {
@@ -169,7 +170,21 @@ trait CallHandler
             }
         }
         $deferred = new Deferred();
-        $message = \array_merge($aargs, ['_' => $method, 'type' => $this->API->getTL()->getMethods()->findByMethod($method)['type'], 'contentRelated' => $this->contentRelated($method), 'promise' => $deferred, 'method' => true, 'unencrypted' => !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false]);
+        $methodInfo = $this->API->getTL()->getMethods()->findByMethod($method);
+        if (!$methodInfo) {
+            throw new Exception("Could not find method $method!");
+        }
+        $message = \array_merge(
+            $aargs,
+            [
+                '_' => $method,
+                'type' => $methodInfo['type'],
+                'contentRelated' => $this->contentRelated($method),
+                'promise' => $deferred,
+                'method' => true,
+                'unencrypted' => !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false
+            ]
+        );
         if (\is_object($args) && $args instanceof AsyncParameters) {
             $message['body'] = yield $args->fetchParameters();
         } else {

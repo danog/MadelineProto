@@ -525,7 +525,8 @@ class TL
         if ($type['type'] === 'InputMessage' && !\is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];
         } elseif (isset($this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
-            $object = yield $this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
+            $object = $this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
+            $object = $object instanceof \Generator ? yield from $object : yield $object;
             if (!isset($object[$type['type']])) {
                 throw new \danog\MadelineProto\Exception("Could not convert {$type['type']} object");
             }

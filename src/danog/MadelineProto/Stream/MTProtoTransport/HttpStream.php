@@ -56,7 +56,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $this->ctx = $ctx->getCtx();
-        $this->stream = (yield from $ctx->getStream($header));
+        $this->stream = (yield $ctx->getStream($header));
         $this->uri = $ctx->getUri();
     }
     /**
@@ -147,7 +147,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
             }
             if ($close) {
                 $this->disconnect();
-                yield from $this->connect($this->ctx);
+                yield $this->connect($this->ctx);
             }
             \danog\MadelineProto\Logger::log($read);
             $this->code = \danog\MadelineProto\Tools::packSignedInt(-$code);
@@ -156,7 +156,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
         }
         if ($close) {
             $this->stream->disconnect();
-            yield from $this->stream->connect($this->ctx);
+            yield $this->stream->connect($this->ctx);
         }
         if (isset($headers['content-length'])) {
             $length = (int) $headers['content-length'];

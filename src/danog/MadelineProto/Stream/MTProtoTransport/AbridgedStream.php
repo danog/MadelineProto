@@ -45,7 +45,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      */
     public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = (yield from $ctx->getStream(\chr(239) . $header));
+        $this->stream = (yield $ctx->getStream(\chr(239) . $header));
     }
     /**
      * Async close.
@@ -87,7 +87,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
         $buffer = yield $this->stream->getReadBuffer($l);
         $length = \ord(yield $buffer->bufferRead(1));
         if ($length >= 127) {
-            $length = \unpack('V', yield from $buffer->bufferRead(3) . "\0")[1];
+            $length = \unpack('V', (yield $buffer->bufferRead(3)) . "\0")[1];
         }
         $length <<= 2;
         return $buffer;

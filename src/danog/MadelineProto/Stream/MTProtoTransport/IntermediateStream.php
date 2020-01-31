@@ -47,7 +47,7 @@ class IntermediateStream implements BufferedStreamInterface, MTProtoBufferInterf
      */
     public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = (yield from $ctx->getStream(\str_repeat(\chr(238), 4) . $header));
+        $this->stream = (yield $ctx->getStream(\str_repeat(\chr(238), 4) . $header));
     }
     /**
      * Async close.

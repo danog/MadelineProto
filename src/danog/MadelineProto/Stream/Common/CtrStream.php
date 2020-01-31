@@ -65,7 +65,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
         $this->decrypt->enableContinuousBuffer();
         $this->decrypt->setKey($this->extra['decrypt']['key']);
         $this->decrypt->setIV($this->extra['decrypt']['iv']);
-        $this->stream = (yield from $ctx->getStream($header));
+        $this->stream = (yield $ctx->getStream($header));
     }
     /**
      * Async close.
