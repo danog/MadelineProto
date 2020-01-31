@@ -125,7 +125,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     public function __call_async(string $name, array $arguments): \Generator
     {
         if ($this->asyncInitPromise) {
-            yield $this->initAsynchronously();
+            yield from $this->initAsynchronously();
             $this->API->logger->logger('Finished init asynchronously');
         }
         if (Magic::isFork() && !Magic::$processed_fork) {
@@ -135,7 +135,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
             throw new Exception('API did not init!');
         }
         if ($this->API->asyncInitPromise) {
-            yield $this->API->initAsynchronously();
+            yield from $this->API->initAsynchronously();
             $this->API->logger->logger('Finished init asynchronously');
         }
         if (isset($this->session) && !\is_null($this->session) && \time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
@@ -145,10 +145,10 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         if ($this->API->flushSettings) {
             $this->API->flushSettings = false;
             $this->API->__construct($this->API->settings);
-            yield $this->API->initAsynchronously();
+            yield from $this->API->initAsynchronously();
         }
         if ($this->API->asyncInitPromise) {
-            yield $this->API->initAsynchronously();
+            yield from $this->API->initAsynchronously();
             $this->API->logger->logger('Finished init asynchronously');
         }
         $lower_name = \strtolower($name);

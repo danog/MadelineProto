@@ -48,7 +48,7 @@ class SeqLoop extends ResumableSignalLoop
                 return;
             }
         }
-        $this->state = yield $API->loadUpdateState();
+        $this->state = (yield from $API->loadUpdateState());
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
                 if (yield $this->waitSignal($this->pause())) {
@@ -114,7 +114,7 @@ class SeqLoop extends ResumableSignalLoop
     }
     public function save($updates): \Generator
     {
-        $this->pendingWakeups += yield $this->feeder->feed($updates['updates']);
+        $this->pendingWakeups += (yield from $this->feeder->feed($updates['updates']));
     }
     public function addPendingWakeups($wakeups)
     {

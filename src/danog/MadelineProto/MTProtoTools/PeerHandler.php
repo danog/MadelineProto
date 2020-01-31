@@ -523,7 +523,7 @@ trait PeerHandler
             if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true && $recursive) {
                 $dbres = [];
                 try {
-                    $dbres = \json_decode(yield $this->datacenter->fileGetContents('https://id.pwrtelegram.xyz/db/getusername?id=' . $id), true);
+                    $dbres = \json_decode(yield from $this->datacenter->fileGetContents('https://id.pwrtelegram.xyz/db/getusername?id=' . $id), true);
                 } catch (\Throwable $e) {
                     $this->logger->logger($e);
                 }

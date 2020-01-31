@@ -214,11 +214,11 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png' . $re
 
 ';
             /*
-                                                                        if (isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']])) {
-                                                                            $header .= '**'.\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']]."**\n\n\n\n\n";
-                                                                            file_put_contents('methods/'.$method.'.md', $header);
-                                                                            continue;
-                                                                        }*/
+                                                                                                if (isset(\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']])) {
+                                                                                                    $header .= '**'.\danog\MadelineProto\MTProto::DISALLOWED_METHODS[$data['method']]."**\n\n\n\n\n";
+                                                                                                    file_put_contents('methods/'.$method.'.md', $header);
+                                                                                                    continue;
+                                                                                                }*/
             if ($this->td) {
                 $header .= 'YOU CANNOT USE THIS METHOD IN MADELINEPROTO
 

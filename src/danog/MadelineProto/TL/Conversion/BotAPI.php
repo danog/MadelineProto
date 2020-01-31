@@ -193,9 +193,9 @@ trait BotAPI
                 $newd['date'] = $data['date'];
                 $newd['text'] = $sent_arguments['message'];
                 if ($data['out']) {
-                    $newd['from'] = yield $this->getPwrChat($this->authorization['user']);
+                    $newd['from'] = (yield from $this->getPwrChat($this->authorization['user']));
                 }
-                $newd['chat'] = yield $this->getPwrChat($sent_arguments['peer']);
+                $newd['chat'] = (yield from $this->getPwrChat($sent_arguments['peer']));
                 if (isset($data['entities'])) {
                     $newd['entities'] = (yield from $this->MTProtoToBotAPI($data['entities'], $sent_arguments));
                 }
@@ -213,9 +213,9 @@ trait BotAPI
                 $newd['post'] = $data['post'];
                 $newd['silent'] = $data['silent'];
                 if (isset($data['from_id'])) {
-                    $newd['from'] = yield $this->getPwrChat($data['from_id']);
+                    $newd['from'] = (yield from $this->getPwrChat($data['from_id']));
                 }
-                $newd['chat'] = yield $this->getPwrChat($data['to_id']);
+                $newd['chat'] = (yield from $this->getPwrChat($data['to_id']));
                 if (isset($data['entities'])) {
                     $newd['entities'] = (yield from $this->MTProtoToBotAPI($data['entities'], $sent_arguments));
                 }
@@ -226,13 +226,13 @@ trait BotAPI
                     $newd['edit_date'] = $data['edit_date'];
                 }
                 if (isset($data['via_bot_id'])) {
-                    $newd['via_bot'] = yield $this->getPwrChat($data['via_bot_id']);
+                    $newd['via_bot'] = (yield from $this->getPwrChat($data['via_bot_id']));
                 }
                 if (isset($data['fwd_from']['from_id'])) {
-                    $newd['forward_from'] = yield $this->getPwrChat($data['fwd_from']['from_id']);
+                    $newd['forward_from'] = (yield from $this->getPwrChat($data['fwd_from']['from_id']));
                 }
                 if (isset($data['fwd_from']['channel_id'])) {
-                    $newd['forward_from_chat'] = yield $this->getPwrChat($data['fwd_from']['channel_id']);
+                    $newd['forward_from_chat'] = (yield from $this->getPwrChat($data['fwd_from']['channel_id']));
                 }
                 if (isset($data['fwd_from']['date'])) {
                     $newd['forward_date'] = $data['fwd_from']['date'];
@@ -287,7 +287,7 @@ trait BotAPI
             case 'messageEntityMentionName':
                 unset($data['_']);
                 $data['type'] = 'text_mention';
-                $data['user'] = yield $this->getPwrChat($data['user_id']);
+                $data['user'] = (yield from $this->getPwrChat($data['user_id']));
                 unset($data['user_id']);
                 return $data;
             case 'messageMediaPhoto':
@@ -297,7 +297,7 @@ trait BotAPI
                 $res['photo'] = [];
                 foreach ($data['photo']['sizes'] as $key => $photo) {
                     if (\in_array($photo['_'], ['photoCachedSize', 'photoSize'])) {
-                        $res['photo'][$key] = yield $this->photosizeToBotAPI($photo, $data['photo']);
+                        $res['photo'][$key] = (yield from $this->photosizeToBotAPI($photo, $data['photo']));
                     }
                 }
                 return $res;
@@ -307,7 +307,7 @@ trait BotAPI
                 $type_name = 'document';
                 $res = [];
                 if (isset($data['document']['thumbs']) && $data['document']['thumbs'] && \in_array(\end($data['document']['thumbs'])['_'], ['photoCachedSize', 'photoSize'])) {
-                    $res['thumb'] = yield $this->photosizeToBotAPI(\end($data['document']['thumbs']), [], true);
+                    $res['thumb'] = (yield from $this->photosizeToBotAPI(\end($data['document']['thumbs']), [], true));
                 }
                 foreach ($data['document']['attributes'] as $attribute) {
                     switch ($attribute['_']) {
@@ -380,7 +380,7 @@ trait BotAPI
                 $data['document']['_'] = 'bot_' . $type_name;
                 $res['file_size'] = $data['document']['size'];
                 $res['mime_type'] = $data['document']['mime_type'];
-                $res['file_id'] = \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode(yield $this->TL->serializeObject(['type' => 'File'], $data['document'], 'File') . \chr(2)));
+                $res['file_id'] = \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode(yield from $this->TL->serializeObject(['type' => 'File'], $data['document'], 'File') . \chr(2)));
                 return [$type_name => $res, 'caption' => isset($data['caption']) ? $data['caption'] : ''];
             default:
                 throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['botapi_conversion_error'], $data['_']));
@@ -483,7 +483,7 @@ trait BotAPI
                 $length = $this->mbStrlen($text);
                 $href = $node->getAttribute('href');
                 if (\preg_match('|mention:(.*)|', $href, $matches) || \preg_match('|tg://user\\?id=(.*)|', $href, $matches)) {
-                    $mention = yield $this->getInfo($matches[1]);
+                    $mention = (yield from $this->getInfo($matches[1]));
                     if (!isset($mention['InputUser'])) {
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
                     }

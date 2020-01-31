@@ -56,7 +56,7 @@ class FeedLoop extends ResumableSignalLoop
                 return;
             }
         }
-        $this->state = $this->channelId === false ? yield $API->loadUpdateState() : $API->loadChannelState($this->channelId);
+        $this->state = $this->channelId === false ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
                 if (yield $this->waitSignal($this->pause())) {
@@ -80,7 +80,7 @@ class FeedLoop extends ResumableSignalLoop
                 $parsedUpdates = $this->parsedUpdates;
                 $this->parsedUpdates = [];
                 foreach ($parsedUpdates as $update) {
-                    yield $API->saveUpdate($update);
+                    yield from $API->saveUpdate($update);
                 }
                 $parsedUpdates = null;
                 $this->API->signalUpdate();
@@ -186,7 +186,7 @@ class FeedLoop extends ResumableSignalLoop
                 $from = false;
                 $via_bot = false;
                 $entities = false;
-                if ($update['message']['_'] !== 'messageEmpty' && (($from = isset($update['message']['from_id']) && !yield $this->API->peerIsset($update['message']['from_id'])) || ($to = !yield $this->API->peerIsset($update['message']['to_id'])) || ($via_bot = isset($update['message']['via_bot_id']) && !yield $this->API->peerIsset($update['message']['via_bot_id'])) || ($entities = isset($update['message']['entities']) && !yield $this->API->entitiesPeerIsset($update['message']['entities'])))) {
+                if ($update['message']['_'] !== 'messageEmpty' && (($from = isset($update['message']['from_id']) && !(yield from $this->API->peerIsset($update['message']['from_id']))) || ($to = !(yield from $this->API->peerIsset($update['message']['to_id']))) || ($via_bot = isset($update['message']['via_bot_id']) && !(yield from $this->API->peerIsset($update['message']['via_bot_id']))) || ($entities = isset($update['message']['entities']) && !(yield from $this->API->entitiesPeerIsset($update['message']['entities']))))) {
                     $log = '';
                     if ($from) {
                         $log .= "from_id {$update['message']['from_id']}, ";
@@ -208,7 +208,7 @@ class FeedLoop extends ResumableSignalLoop
                 }
                 break;
             default:
-                if ($channelId && !yield $this->API->peerIsset($this->API->toSupergroup($channelId))) {
+                if ($channelId && !(yield from $this->API->peerIsset($this->API->toSupergroup($channelId)))) {
                     $this->API->logger->logger('Skipping update, I do not have the channel id ' . $channelId, \danog\MadelineProto\Logger::ERROR);
                     return false;
                 }

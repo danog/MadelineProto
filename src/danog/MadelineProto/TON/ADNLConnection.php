@@ -117,14 +117,14 @@ class ADNLConnection
         $iv = \substr($digest, 0, 4) . \substr($secret, 20, 12);
         $encryptedRandom = Crypt::ctrEncrypt($random, $key, $iv);
         // Generating plaintext init payload
-        $payload = \hash('sha256', yield $this->TL->serializeObject(['type' => ''], $endpoint['id'], 'key'), true);
+        $payload = \hash('sha256', yield from $this->TL->serializeObject(['type' => ''], $endpoint['id'], 'key'), true);
         $payload .= $public;
         $payload .= $digest;
         $payload .= $encryptedRandom;
         $ip = \long2ip(\unpack('V', Tools::packSignedInt($endpoint['ip']))[1]);
         $port = $endpoint['port'];
         $ctx = (new ConnectionContext())->setSocketContext(new ConnectContext())->setUri("tcp://{$ip}:{$port}")->addStream(DefaultStream::getName())->addStream(BufferedRawStream::getName())->addStream(CtrStream::getName(), $obf)->addStream(HashedBufferedStream::getName(), 'sha256')->addStream(ADNLStream::getName());
-        $this->stream = yield $ctx->getStream($payload);
+        $this->stream = (yield from $ctx->getStream($payload));
         Tools::callFork((function (): \Generator {
             //yield Tools::sleep(1);
             while (true) {
@@ -149,7 +149,7 @@ class ADNLConnection
      */
     public function query(string $payload): \Generator
     {
-        $data = yield $this->TL->serializeObject(['type' => ''], ['_' => 'adnl.message.query', 'query_id' => $id = Tools::random(32), 'query' => $payload], '');
+        $data = (yield from $this->TL->serializeObject(['type' => ''], ['_' => 'adnl.message.query', 'query_id' => $id = Tools::random(32), 'query' => $payload], ''));
         (yield $this->stream->getWriteBuffer(\strlen($data)))->bufferWrite($data);
         $this->requests[$id] = new Deferred();
         return $this->requests[$id]->promise();

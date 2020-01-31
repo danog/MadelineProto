@@ -58,7 +58,7 @@ abstract class Loop implements LoopInterface
         $this->startedLoop();
         $this->API->logger->logger("Entered {$this}", Logger::ULTRA_VERBOSE);
         try {
-            yield $this->loop();
+            yield from $this->loop();
         } finally {
             $this->exitedLoop();
             $this->API->logger->logger("Physically exited {$this}", Logger::ULTRA_VERBOSE);

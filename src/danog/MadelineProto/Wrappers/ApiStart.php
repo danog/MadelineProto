@@ -47,16 +47,16 @@ Note that you can also provide the API parameters directly in the code using the
                 return $app;
             }
             $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($settings);
-            yield $this->my_telegram_org_wrapper->login(yield Tools::readLine('Enter a phone number that is already registered on Telegram: '));
-            yield $this->my_telegram_org_wrapper->completeLogin(yield Tools::readLine('Enter the verification code you received in telegram: '));
-            if (!yield $this->my_telegram_org_wrapper->hasApp()) {
+            yield from $this->my_telegram_org_wrapper->login(yield Tools::readLine('Enter a phone number that is already registered on Telegram: '));
+            yield from $this->my_telegram_org_wrapper->completeLogin(yield Tools::readLine('Enter the verification code you received in telegram: '));
+            if (!(yield from $this->my_telegram_org_wrapper->hasApp())) {
                 $app_title = yield Tools::readLine('Enter the app\'s name, can be anything: ');
                 $short_name = yield Tools::readLine('Enter the app\'s short name, can be anything: ');
                 $url = yield Tools::readLine('Enter the app/website\'s URL, or t.me/yourusername: ');
                 $description = yield Tools::readLine('Describe your app: ');
-                $app = yield $this->my_telegram_org_wrapper->createApp(['app_title' => $app_title, 'app_shortname' => $short_name, 'app_url' => $url, 'app_platform' => 'web', 'app_desc' => $description]);
+                $app = (yield from $this->my_telegram_org_wrapper->createApp(['app_title' => $app_title, 'app_shortname' => $short_name, 'app_url' => $url, 'app_platform' => 'web', 'app_desc' => $description]));
             } else {
-                $app = yield $this->my_telegram_org_wrapper->getApp();
+                $app = (yield from $this->my_telegram_org_wrapper->getApp());
             }
             return $app;
         }
@@ -70,15 +70,15 @@ Note that you can also provide the API parameters directly in the code using the
             } elseif (isset($_POST['phone_number'])) {
                 yield from $this->webAPIPhoneLogin($settings);
             } else {
-                yield $this->webAPIEcho();
+                yield from $this->webAPIEcho();
             }
         } elseif (!$this->my_telegram_org_wrapper->loggedIn()) {
             if (isset($_POST['code'])) {
                 yield from $this->webAPICompleteLogin();
-                if (yield $this->my_telegram_org_wrapper->hasApp()) {
-                    return yield $this->my_telegram_org_wrapper->getApp();
+                if (yield from $this->my_telegram_org_wrapper->hasApp()) {
+                    return yield from $this->my_telegram_org_wrapper->getApp();
                 }
-                yield $this->webAPIEcho();
+                yield from $this->webAPIEcho();
             } elseif (isset($_POST['api_id']) && isset($_POST['api_hash'])) {
                 $app['api_id'] = (int) $_POST['api_id'];
                 $app['api_hash'] = $_POST['api_hash'];
@@ -88,7 +88,7 @@ Note that you can also provide the API parameters directly in the code using the
                 yield from $this->webAPIPhoneLogin($settings);
             } else {
                 $this->my_telegram_org_wrapper = null;
-                yield $this->webAPIEcho();
+                yield from $this->webAPIEcho();
             }
         } else {
             if (isset($_POST['app_title'], $_POST['app_shortname'], $_POST['app_url'], $_POST['app_platform'], $_POST['app_desc'])) {
@@ -96,7 +96,7 @@ Note that you can also provide the API parameters directly in the code using the
                 $this->getting_api_id = false;
                 return $app;
             }
-            yield $this->webAPIEcho("You didn't provide all of the required parameters!");
+            yield from $this->webAPIEcho("You didn't provide all of the required parameters!");
         }
         $this->asyncInitPromise = null;
         exit;
@@ -105,20 +105,20 @@ Note that you can also provide the API parameters directly in the code using the
     {
         try {
             $this->my_telegram_org_wrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($settings);
-            yield $this->my_telegram_org_wrapper->login($_POST['phone_number']);
-            yield $this->webAPIEcho();
+            yield from $this->my_telegram_org_wrapper->login($_POST['phone_number']);
+            yield from $this->webAPIEcho();
         } catch (\Throwable $e) {
-            yield $this->webAPIEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webAPIEcho('ERROR: ' . $e->getMessage() . '. Try again.');
         }
     }
     private function webAPICompleteLogin(): \Generator
     {
         try {
-            yield $this->my_telegram_org_wrapper->completeLogin($_POST['code']);
+            yield from $this->my_telegram_org_wrapper->completeLogin($_POST['code']);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->webAPIEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webAPIEcho('ERROR: ' . $e->getMessage() . '. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->webAPIEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webAPIEcho('ERROR: ' . $e->getMessage() . '. Try again.');
         }
     }
     private function webAPICreateApp(): \Generator
@@ -126,12 +126,12 @@ Note that you can also provide the API parameters directly in the code using the
         try {
             $params = $_POST;
             unset($params['creating_app']);
-            $app = yield $this->my_telegram_org_wrapper->createApp($params);
+            $app = (yield from $this->my_telegram_org_wrapper->createApp($params));
             return $app;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->webAPIEcho('ERROR: ' . $e->getMessage() . ' Try again.');
+            yield from $this->webAPIEcho('ERROR: ' . $e->getMessage() . ' Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->webAPIEcho('ERROR: ' . $e->getMessage() . ' Try again.');
+            yield from $this->webAPIEcho('ERROR: ' . $e->getMessage() . ' Try again.');
         }
     }
 }

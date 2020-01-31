@@ -50,7 +50,7 @@ class UpdateLoop extends ResumableSignalLoop
                 return;
             }
         }
-        $this->state = $state = $this->channelId === false ? yield $API->loadUpdateState() : $API->loadChannelState($this->channelId);
+        $this->state = $state = $this->channelId === false ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
         $timeout = $API->settings['updates']['getdifference_interval'];
         $first = true;
         while (true) {
@@ -109,7 +109,7 @@ class UpdateLoop extends ResumableSignalLoop
                                 $API->logger->logger("The PTS ({$difference['pts']}) I got with getDifference is smaller than the PTS I requested " . $state->pts() . ', using ' . ($state->pts() + 1), \danog\MadelineProto\Logger::VERBOSE);
                                 $difference['pts'] = $request_pts + 1;
                             }
-                            $result += yield $feeder->feed($difference['other_updates']);
+                            $result += (yield from $feeder->feed($difference['other_updates']));
                             $state->update($difference);
                             $feeder->saveMessages($difference['new_messages']);
                             if (!$difference['final']) {
@@ -147,8 +147,8 @@ class UpdateLoop extends ResumableSignalLoop
                             foreach ($difference['new_encrypted_messages'] as &$encrypted) {
                                 $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
                             }
-                            $result += yield $feeder->feed($difference['other_updates']);
-                            $result += yield $feeder->feed($difference['new_encrypted_messages']);
+                            $result += (yield from $feeder->feed($difference['other_updates']));
+                            $result += (yield from $feeder->feed($difference['new_encrypted_messages']));
                             $state->update($difference['state']);
                             $feeder->saveMessages($difference['new_messages']);
                             unset($difference);
@@ -158,8 +158,8 @@ class UpdateLoop extends ResumableSignalLoop
                             foreach ($difference['new_encrypted_messages'] as &$encrypted) {
                                 $encrypted = ['_' => 'updateNewEncryptedMessage', 'message' => $encrypted];
                             }
-                            $result += yield $feeder->feed($difference['other_updates']);
-                            $result += yield $feeder->feed($difference['new_encrypted_messages']);
+                            $result += (yield from $feeder->feed($difference['other_updates']));
+                            $result += (yield from $feeder->feed($difference['new_encrypted_messages']));
                             $state->update($difference['intermediate_state']);
                             $feeder->saveMessages($difference['new_messages']);
                             if ($difference['intermediate_state']['pts'] >= $toPts) {

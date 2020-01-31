@@ -48,7 +48,7 @@ class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterface
      */
     public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = yield $ctx->getStream($header);
+        $this->stream = (yield from $ctx->getStream($header));
     }
     /**
      * Async close.

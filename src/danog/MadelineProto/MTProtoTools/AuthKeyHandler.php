@@ -179,7 +179,7 @@ trait AuthKeyHandler
                 $q_bytes = $q->toBytes();
                 $new_nonce = \danog\MadelineProto\Tools::random(32);
                 $data_unserialized = ['_' => 'p_q_inner_data' . ($expires_in < 0 ? '' : '_temp'), 'pq' => $pq_bytes, 'p' => $p_bytes, 'q' => $q_bytes, 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'new_nonce' => $new_nonce, 'expires_in' => $expires_in, 'dc' => \preg_replace('|_.*|', '', $datacenter)];
-                $p_q_inner_data = yield $this->TL->serializeObject(['type' => ''], $data_unserialized, 'p_q_inner_data');
+                $p_q_inner_data = (yield from $this->TL->serializeObject(['type' => ''], $data_unserialized, 'p_q_inner_data'));
                 /*
                  * ***********************************************************************
                  * Encrypt serialized object
@@ -313,7 +313,7 @@ trait AuthKeyHandler
                      *         string        $g_b                            : g^b mod dh_prime
                      * ]
                      */
-                    $data = yield $this->TL->serializeObject(['type' => ''], ['_' => 'client_DH_inner_data', 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str], 'client_DH_inner_data');
+                    $data = (yield from $this->TL->serializeObject(['type' => ''], ['_' => 'client_DH_inner_data', 'nonce' => $nonce, 'server_nonce' => $server_nonce, 'retry_id' => $retry_id, 'g_b' => $g_b_str], 'client_DH_inner_data'));
                     /*
                      * ***********************************************************************
                      * encrypt client_DH_inner_data
@@ -539,7 +539,7 @@ trait AuthKeyHandler
                 $temp_auth_key_id = $datacenterConnection->getTempAuthKey()->getID();
                 $perm_auth_key_id = $datacenterConnection->getPermAuthKey()->getID();
                 $temp_session_id = $connection->session_id;
-                $message_data = yield $this->TL->serializeObject(['type' => ''], ['_' => 'bind_auth_key_inner', 'nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bindTempAuthKey_inner');
+                $message_data = (yield from $this->TL->serializeObject(['type' => ''], ['_' => 'bind_auth_key_inner', 'nonce' => $nonce, 'temp_auth_key_id' => $temp_auth_key_id, 'perm_auth_key_id' => $perm_auth_key_id, 'temp_session_id' => $temp_session_id, 'expires_at' => $expires_at], 'bindTempAuthKey_inner'));
                 $message_id = $connection->generateMessageId();
                 $seq_no = 0;
                 $encrypted_data = \danog\MadelineProto\Tools::random(16) . $message_id . \pack('VV', $seq_no, \strlen($message_data)) . $message_data;
@@ -573,7 +573,7 @@ trait AuthKeyHandler
      */
     private function wolframSingle($what): \Generator
     {
-        $code = yield $this->datacenter->fileGetContents('http://www.wolframalpha.com/api/v1/code');
+        $code = (yield from $this->datacenter->fileGetContents('http://www.wolframalpha.com/api/v1/code'));
         $query = 'Do prime factorization of ' . $what;
         $params = ['async' => true, 'banners' => 'raw', 'debuggingdata' => false, 'format' => 'moutput', 'formattimeout' => 8, 'input' => $query, 'output' => 'JSON', 'proxycode' => \json_decode($code, true)['code']];
         $url = 'https://www.wolframalpha.com/input/json.jsp?' . \http_build_query($params);

@@ -42,9 +42,9 @@ trait Constructors
             }
             $got[$id] = '';
             /*
-                                                                        if (preg_match('/%/', $type)) {
-                                                                            $type = $this->TL->getConstructors($this->td)->findByType(str_replace('%', '', $type))['predicate'];
-                                                                        }*/
+                                                                                                if (preg_match('/%/', $type)) {
+                                                                                                    $type = $this->TL->getConstructors($this->td)->findByType(str_replace('%', '', $type))['predicate'];
+                                                                                                }*/
             $layer = isset($data['layer']) && $data['layer'] !== '' ? '_' . $data['layer'] : '';
             $type = \str_replace(['<', '>'], ['_of_', ''], $data['type']);
             $php_type = \preg_replace('/.*_of_/', '', $type);

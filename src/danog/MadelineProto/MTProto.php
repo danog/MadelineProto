@@ -439,7 +439,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->logger->logger(Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);
         $this->rsa_keys = [];
         foreach ($this->settings['authorization']['rsa_keys'] as $key) {
-            $key = yield (new RSA())->load($this->TL, $key);
+            $key = (yield from (new RSA())->load($this->TL, $key));
             $this->rsa_keys[$key->fp] = $key;
         }
         // (re)-initialize TL
@@ -819,7 +819,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         foreach ($this->secret_chats as $chat => $data) {
             try {
                 if (isset($this->secret_chats[$chat]) && $this->secret_chats[$chat]['InputEncryptedChat'] !== null) {
-                    yield $this->notifyLayer($chat);
+                    yield from $this->notifyLayer($chat);
                 }
             } catch (\danog\MadelineProto\RPCErrorException $e) {
             }
@@ -909,7 +909,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         $this->startUpdateSystem(true);
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings['peer']['cache_all_peers_on_startup']) {
-            yield $this->getDialogs($force);
+            yield from $this->getDialogs($force);
         }
         if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates']) {
             $this->logger->logger(Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
@@ -1383,14 +1383,14 @@ class MTProto extends AsyncConstruct implements TLCallback
             $dcs[] = $this->datacenter->dcConnect($new_dc);
         }
         yield \danog\MadelineProto\Tools::all($dcs);
-        yield $this->initAuthorization();
+        yield from $this->initAuthorization();
         yield from $this->parseConfig();
         $dcs = [];
         foreach ($this->datacenter->getDcs(false) as $new_dc) {
             $dcs[] = $this->datacenter->dcConnect($new_dc);
         }
         yield \danog\MadelineProto\Tools::all($dcs);
-        yield $this->initAuthorization();
+        yield from $this->initAuthorization();
         yield from $this->parseConfig();
         yield from $this->getPhoneConfig();
     }
@@ -1547,7 +1547,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         try {
             foreach ((yield $this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
-                $curkey = yield (new RSA())->load($this->TL, $curkey['public_key']);
+                $curkey = (yield from (new RSA())->load($this->TL, $curkey['public_key']));
                 $this->cdn_rsa_keys[$curkey->fp] = $curkey;
             }
         } catch (\danog\MadelineProto\TL\Exception $e) {

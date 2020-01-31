@@ -181,7 +181,7 @@ trait Files
         } else {
             if (!$stream instanceof BufferedRawStream) {
                 $ctx = (new ConnectionContext())->addStream(PremadeStream::getName(), $stream)->addStream(SimpleBufferedRawStream::getName());
-                $stream = yield $ctx->getStream();
+                $stream = (yield from $ctx->getStream());
                 $created = true;
             }
             $callable = static function (int $offset, int $size) use ($stream): \Generator {
@@ -544,7 +544,7 @@ trait Files
             } elseif (isset($constructor['InputMedia'])) {
                 return $constructor;
             } else {
-                $constructor = yield $this->getPwrChat($constructor['Chat'] ?? $constructor['User']);
+                $constructor = (yield from $this->getPwrChat($constructor['Chat'] ?? $constructor['User']));
                 $constructor = $constructor['photo'];
             }
         }
@@ -575,7 +575,7 @@ trait Files
      */
     public function getPropicInfo($data): \Generator
     {
-        return yield from $this->getDownloadInfo($this->chats[(yield $this->getInfo($data))['bot_api_id']]);
+        return yield from $this->getDownloadInfo($this->chats[(yield from $this->getInfo($data))['bot_api_id']]);
     }
     /**
      * Get download info of file
@@ -694,7 +694,7 @@ trait Files
                     $message_media['min'] = false;
                     $peer = $this->genAll($message_media)['InputPeer'];
                 } else {
-                    $peer = (yield $this->getInfo($message_media))['InputPeer'];
+                    $peer = (yield from $this->getInfo($message_media))['InputPeer'];
                 }
                 $res['InputFileLocation'] = ['_' => 'inputPeerPhotoFileLocation', 'big' => $res['big'], 'dc_id' => $res['InputFileLocation']['dc_id'], 'peer' => $peer, 'volume_id' => $res['InputFileLocation']['volume_id'], 'local_id' => $res['InputFileLocation']['local_id']];
                 return $res;
@@ -795,98 +795,98 @@ trait Files
         }
     }
     /*
-                    public function download_to_browser_single_async($message_media, $cb = null)
-                    {
-                    if (php_sapi_name() === 'cli') {
-                    throw new Exception('Cannot download file to browser from command line: start this script from a browser');
-                    }
-                    if (headers_sent()) {
-                    throw new Exception('Headers already sent, cannot stream file to browser!');
-                    }
+                            public function download_to_browser_single_async($message_media, $cb = null)
+                            {
+                            if (php_sapi_name() === 'cli') {
+                            throw new Exception('Cannot download file to browser from command line: start this script from a browser');
+                            }
+                            if (headers_sent()) {
+                            throw new Exception('Headers already sent, cannot stream file to browser!');
+                            }
 
-                    if (is_object($message_media) && $message_media instanceof FileCallbackInterface) {
-                    $cb = $message_media;
-                    $message_media = $message_media->getFile();
-                    }
+                            if (is_object($message_media) && $message_media instanceof FileCallbackInterface) {
+                            $cb = $message_media;
+                            $message_media = $message_media->getFile();
+                            }
 
-                    $message_media = yield $this->getDownloadInfo($message_media);
+                            $message_media = yield $this->getDownloadInfo($message_media);
 
-                    $servefile = $_SERVER['REQUEST_METHOD'] !== 'HEAD';
+                            $servefile = $_SERVER['REQUEST_METHOD'] !== 'HEAD';
 
-                    if (isset($_SERVER['HTTP_RANGE'])) {
-                    $range = explode('=', $_SERVER['HTTP_RANGE'], 2);
-                    if (count($range) == 1) {
-                    $range[1] = '';
-                    }
-                    list($size_unit, $range_orig) = $range;
-                    if ($size_unit == 'bytes') {
-                    //multiple ranges could be specified at the same time, but for simplicity only serve the first range
-                    //http://tools.ietf.org/id/draft-ietf-http-range-retrieval-00.txt
-                    $list = explode(',', $range_orig, 2);
-                    if (count($list) == 1) {
-                    $list[1] = '';
-                    }
-                    list($range, $extra_ranges) = $list;
-                    } else {
-                    $range = '';
-                    return Tools::noCache(416, '<html><body><h1>416 Requested Range Not Satisfiable.</h1><br><p>Could not use selected range.</p></body></html>');
-                    }
-                    } else {
-                    $range = '';
-                    }
-                    $listseek = explode('-', $range, 2);
-                    if (count($listseek) == 1) {
-                    $listseek[1] = '';
-                    }
-                    list($seek_start, $seek_end) = $listseek;
+                            if (isset($_SERVER['HTTP_RANGE'])) {
+                            $range = explode('=', $_SERVER['HTTP_RANGE'], 2);
+                            if (count($range) == 1) {
+                            $range[1] = '';
+                            }
+                            list($size_unit, $range_orig) = $range;
+                            if ($size_unit == 'bytes') {
+                            //multiple ranges could be specified at the same time, but for simplicity only serve the first range
+                            //http://tools.ietf.org/id/draft-ietf-http-range-retrieval-00.txt
+                            $list = explode(',', $range_orig, 2);
+                            if (count($list) == 1) {
+                            $list[1] = '';
+                            }
+                            list($range, $extra_ranges) = $list;
+                            } else {
+                            $range = '';
+                            return Tools::noCache(416, '<html><body><h1>416 Requested Range Not Satisfiable.</h1><br><p>Could not use selected range.</p></body></html>');
+                            }
+                            } else {
+                            $range = '';
+                            }
+                            $listseek = explode('-', $range, 2);
+                            if (count($listseek) == 1) {
+                            $listseek[1] = '';
+                            }
+                            list($seek_start, $seek_end) = $listseek;
 
-                    $seek_end = empty($seek_end) ? ($message_media['size'] - 1) : min(abs(intval($seek_end)), $message_media['size'] - 1);
+                            $seek_end = empty($seek_end) ? ($message_media['size'] - 1) : min(abs(intval($seek_end)), $message_media['size'] - 1);
 
-                    if (!empty($seek_start) && $seek_end < abs(intval($seek_start))) {
-                    return Tools::noCache(416, '<html><body><h1>416 Requested Range Not Satisfiable.</h1><br><p>Could not use selected range.</p></body></html>');
-                    }
-                    $seek_start = empty($seek_start) ? 0 : abs(intval($seek_start));
-                    if ($servefile) {
-                    if ($seek_start > 0 || $seek_end < $select['file_size'] - 1) {
-                    header('HTTP/1.1 206 Partial Content');
-                    header('Content-Range: bytes '.$seek_start.'-'.$seek_end.'/'.$select['file_size']);
-                    header('Content-Length: '.($seek_end - $seek_start + 1));
-                    } else {
-                    header('Content-Length: '.$select['file_size']);
-                    }
-                    header('Content-Type: '.$select['mime']);
-                    header('Cache-Control: max-age=31556926;');
-                    header('Content-Transfer-Encoding: Binary');
-                    header('Accept-Ranges: bytes');
-                    //header('Content-disposition: attachment: filename="'.basename($select['file_path']).'"');
-                    $MadelineProto->downloadToStream($select['file_id'], fopen('php://output', 'w'), function ($percent) {
-                    flush();
-                    ob_flush();
-                    \danog\MadelineProto\Logger::log('Download status: '.$percent.'%');
-                    }, $seek_start, $seek_end + 1);
-                    //analytics(true, $file_path, $MadelineProto->getSelf()['id'], $dbuser, $dbpassword);
-                    $MadelineProto->API->getting_state = false;
-                    $MadelineProto->API->storeDb([], true);
-                    $MadelineProto->API->resetSession();
-                    } else {
-                    if ($seek_start > 0 || $seek_end < $select['file_size'] - 1) {
-                    header('HTTP/1.1 206 Partial Content');
-                    header('Content-Range: bytes '.$seek_start.'-'.$seek_end.'/'.$select['file_size']);
-                    header('Content-Length: '.($seek_end - $seek_start + 1));
-                    } else {
-                    header('Content-Length: '.$select['file_size']);
-                    }
-                    header('Content-Type: '.$select['mime']);
-                    header('Cache-Control: max-age=31556926;');
-                    header('Content-Transfer-Encoding: Binary');
-                    header('Accept-Ranges: bytes');
-                    analytics(true, $file_path, null, $dbuser, $dbpassword);
-                    //header('Content-disposition: attachment: filename="'.basename($select['file_path']).'"');
-                    }
+                            if (!empty($seek_start) && $seek_end < abs(intval($seek_start))) {
+                            return Tools::noCache(416, '<html><body><h1>416 Requested Range Not Satisfiable.</h1><br><p>Could not use selected range.</p></body></html>');
+                            }
+                            $seek_start = empty($seek_start) ? 0 : abs(intval($seek_start));
+                            if ($servefile) {
+                            if ($seek_start > 0 || $seek_end < $select['file_size'] - 1) {
+                            header('HTTP/1.1 206 Partial Content');
+                            header('Content-Range: bytes '.$seek_start.'-'.$seek_end.'/'.$select['file_size']);
+                            header('Content-Length: '.($seek_end - $seek_start + 1));
+                            } else {
+                            header('Content-Length: '.$select['file_size']);
+                            }
+                            header('Content-Type: '.$select['mime']);
+                            header('Cache-Control: max-age=31556926;');
+                            header('Content-Transfer-Encoding: Binary');
+                            header('Accept-Ranges: bytes');
+                            //header('Content-disposition: attachment: filename="'.basename($select['file_path']).'"');
+                            $MadelineProto->downloadToStream($select['file_id'], fopen('php://output', 'w'), function ($percent) {
+                            flush();
+                            ob_flush();
+                            \danog\MadelineProto\Logger::log('Download status: '.$percent.'%');
+                            }, $seek_start, $seek_end + 1);
+                            //analytics(true, $file_path, $MadelineProto->getSelf()['id'], $dbuser, $dbpassword);
+                            $MadelineProto->API->getting_state = false;
+                            $MadelineProto->API->storeDb([], true);
+                            $MadelineProto->API->resetSession();
+                            } else {
+                            if ($seek_start > 0 || $seek_end < $select['file_size'] - 1) {
+                            header('HTTP/1.1 206 Partial Content');
+                            header('Content-Range: bytes '.$seek_start.'-'.$seek_end.'/'.$select['file_size']);
+                            header('Content-Length: '.($seek_end - $seek_start + 1));
+                            } else {
+                            header('Content-Length: '.$select['file_size']);
+                            }
+                            header('Content-Type: '.$select['mime']);
+                            header('Cache-Control: max-age=31556926;');
+                            header('Content-Transfer-Encoding: Binary');
+                            header('Accept-Ranges: bytes');
+                            analytics(true, $file_path, null, $dbuser, $dbpassword);
+                            //header('Content-disposition: attachment: filename="'.basename($select['file_path']).'"');
+                            }
 
-                    header('Content-Length: '.$info['size']);
-                    header('Content-Type: '.$info['mime']);
-                    }*/
+                            header('Content-Length: '.$info['size']);
+                            header('Content-Type: '.$info['mime']);
+                            }*/
     /**
      * Extract photo size.
      *
@@ -1190,12 +1190,12 @@ trait Files
                 $datacenter = $res['dc_id'] . '_cdn';
                 if (!$this->datacenter->has($datacenter)) {
                     $this->config['expires'] = -1;
-                    yield $this->getConfig([], ['datacenter' => $this->datacenter->curdc]);
+                    yield from $this->getConfig([], ['datacenter' => $this->datacenter->curdc]);
                 }
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['stored_on_cdn'], \danog\MadelineProto\Logger::NOTICE);
             } elseif ($res['_'] === 'upload.cdnFileReuploadNeeded') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['cdn_reupload'], \danog\MadelineProto\Logger::NOTICE);
-                yield $this->getConfig([], ['datacenter' => $this->datacenter->curdc]);
+                yield from $this->getConfig([], ['datacenter' => $this->datacenter->curdc]);
                 try {
                     $this->addCdnHashes($message_media['file_token'], yield $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $message_media['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
                 } catch (\danog\MadelineProto\RPCErrorException $e) {

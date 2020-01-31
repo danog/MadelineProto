@@ -62,7 +62,7 @@ trait Login
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
         $this->updates = [];
         $this->updates_key = 0;
-        yield $this->initAuthorization();
+        yield from $this->initAuthorization();
         $this->startUpdateSystem();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
         return $this->authorization;
@@ -136,8 +136,8 @@ trait Login
         $this->authorized = self::LOGGED_IN;
         $this->authorization = $authorization;
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
-        yield $this->initAuthorization();
-        yield $this->getPhoneConfig();
+        yield from $this->initAuthorization();
+        yield from $this->getPhoneConfig();
         $this->startUpdateSystem();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
         return $this->authorization;
@@ -167,9 +167,9 @@ trait Login
         $dataCenterConnection->setPermAuthKey($auth_key);
         $dataCenterConnection->authorized(true);
         $this->authorized = self::LOGGED_IN;
-        yield $this->initAuthorization();
-        yield $this->getPhoneConfig();
-        $res = yield $this->getSelf();
+        yield from $this->initAuthorization();
+        yield from $this->getPhoneConfig();
+        $res = (yield from $this->getSelf());
         $callbacks = [$this, $this->referenceDatabase];
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks[] = $this->minDatabase;
@@ -188,7 +188,7 @@ trait Login
         if ($this->authorized !== self::LOGGED_IN) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['not_loggedIn']);
         }
-        yield $this->getSelf();
+        yield from $this->getSelf();
         $this->authorized_dc = $this->datacenter->curdc;
         return [$this->datacenter->curdc, $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->getPermAuthKey()->getAuthKey()];
     }
@@ -210,8 +210,8 @@ trait Login
         $this->authorization = yield $this->methodCallAsyncRead('auth.signUp', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => $this->authorization['phone_code'], 'first_name' => $first_name, 'last_name' => $last_name], ['datacenter' => $this->datacenter->curdc]);
         $this->authorized = self::LOGGED_IN;
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
-        yield $this->initAuthorization();
-        yield $this->getPhoneConfig();
+        yield from $this->initAuthorization();
+        yield from $this->getPhoneConfig();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['signup_ok'], \danog\MadelineProto\Logger::NOTICE);
         $this->startUpdateSystem();
         return $this->authorization;
@@ -235,9 +235,9 @@ trait Login
         $this->authorization = yield $this->methodCallAsyncRead('auth.checkPassword', ['password' => $hasher->getCheckPassword($password)], ['datacenter' => $this->datacenter->curdc]);
         $this->authorized = self::LOGGED_IN;
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
-        yield $this->initAuthorization();
+        yield from $this->initAuthorization();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
-        yield $this->getPhoneConfig();
+        yield from $this->getPhoneConfig();
         $this->startUpdateSystem();
         return $this->authorization;
     }

@@ -34,7 +34,7 @@ trait BotAPIFiles
         $photoSize['location']['secret'] = $photo['location']['secret'] ?? 0;
         $photoSize['location']['dc_id'] = $photo['dc_id'] ?? 0;
         $photoSize['location']['_'] = $thumbnail ? 'bot_thumbnail' : 'bot_photo';
-        $data = yield $this->TL->serializeObject(['type' => 'File'], $photoSize['location'], 'File') . \chr(2);
+        $data = (yield from $this->TL->serializeObject(['type' => 'File'], $photoSize['location'], 'File') . \chr(2));
         return ['file_id' => \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode($data)), 'width' => $photoSize['w'], 'height' => $photoSize['h'], 'file_size' => isset($photoSize['size']) ? $photoSize['size'] : \strlen($photoSize['bytes']), 'mime_type' => 'image/jpeg', 'file_name' => $photoSize['location']['volume_id'] . '_' . $photoSize['location']['local_id'] . $ext];
     }
     /**

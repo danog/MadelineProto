@@ -329,7 +329,7 @@ class Connection extends Session
         $this->datacenterId = $this->datacenter . '.' . $this->id;
         $this->API->logger->logger("Connecting to DC {$this->datacenterId}", \danog\MadelineProto\Logger::WARNING);
         $ctx->setReadCallback([$this, 'haveRead']);
-        $this->stream = yield $ctx->getStream();
+        $this->stream = (yield from $ctx->getStream());
         if ($this->needsReconnect) {
             $this->needsReconnect = false;
         }
@@ -407,17 +407,17 @@ class Connection extends Session
     {
         $deferred = new Deferred();
         if (!isset($message['serialized_body'])) {
-            $body = \is_object($message['body']) ? yield $message['body'] : $message['body'];
+            $body = \is_object($message['body']) ? yield from $message['body'] : $message['body'];
             $refreshNext = isset($message['refreshNext']) && $message['refreshNext'];
             //$refreshNext = true;
             if ($refreshNext) {
                 $this->API->referenceDatabase->refreshNext(true);
             }
             if ($message['method']) {
-                $body = yield $this->API->getTL()->serializeMethod($message['_'], $body);
+                $body = (yield from $this->API->getTL()->serializeMethod($message['_'], $body));
             } else {
                 $body['_'] = $message['_'];
-                $body = yield $this->API->getTL()->serializeObject(['type' => ''], $body, $message['_']);
+                $body = (yield from $this->API->getTL()->serializeObject(['type' => ''], $body, $message['_']));
             }
             if ($refreshNext) {
                 $this->API->referenceDatabase->refreshNext(false);
@@ -527,7 +527,7 @@ class Connection extends Session
     {
         $this->API->logger->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect(true);
-        yield $this->API->datacenter->dcConnect($this->ctx->getDc(), $this->id);
+        yield from $this->API->datacenter->dcConnect($this->ctx->getDc(), $this->id);
     }
     /**
      * Get name.

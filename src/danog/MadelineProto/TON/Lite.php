@@ -84,7 +84,7 @@ class Lite
         $config['_'] = 'liteclient.config.global';
         $config = Tools::convertJsonTL($config);
         $config['validator']['init_block'] = $config['validator']['init_block'] ?? $config['validator']['zero_state'];
-        $this->config = yield $this->TL->deserialize(yield $this->TL->serializeObject(['type' => ''], $config, 'cleanup'));
+        $this->config = yield $this->TL->deserialize(yield from $this->TL->serializeObject(['type' => ''], $config, 'cleanup'));
         foreach ($this->config['liteservers'] as $lite) {
             $this->connections[] = $connection = new ADNLConnection($this->TL);
             yield from $connection->connect($lite);
@@ -116,9 +116,9 @@ class Lite
      */
     public function methodCall(string $methodName, array $args = [], array $aargs = []): \Generator
     {
-        $data = yield $this->TL->serializeMethod($methodName, $args);
-        $data = yield $this->TL->serializeMethod('liteServer.query', ['data' => $data]);
-        return yield $this->connections[\rand(0, \count($this->connections) - 1)]->query($data);
+        $data = (yield from $this->TL->serializeMethod($methodName, $args));
+        $data = (yield from $this->TL->serializeMethod('liteServer.query', ['data' => $data]));
+        return yield from $this->connections[\rand(0, \count($this->connections) - 1)]->query($data);
     }
     /**
      * Asynchronously run async callable.

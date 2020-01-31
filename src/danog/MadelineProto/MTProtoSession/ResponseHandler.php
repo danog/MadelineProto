@@ -52,7 +52,7 @@ trait ResponseHandler
             }
             $info .= \chr($cur_info);
         }
-        $this->outgoing_messages[yield $this->objectCall('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['postpone' => true])]['response'] = $req_msg_id;
+        $this->outgoing_messages[yield from $this->objectCall('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['postpone' => true])]['response'] = $req_msg_id;
     }
     public $n = 0;
     public function handleMessages()
@@ -391,7 +391,7 @@ trait ResponseHandler
                                     }
                                     $this->API->resetSession();
                                     \danog\MadelineProto\Tools::callFork((function () use (&$request, &$response): \Generator {
-                                        yield $this->API->initAuthorization();
+                                        yield from $this->API->initAuthorization();
                                         $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request['_'] ?? ''));
                                     })());
                                     return;
@@ -400,7 +400,7 @@ trait ResponseHandler
                                     if ($this->API->authorized !== MTProto::LOGGED_IN) {
                                         $this->gotResponseForOutgoingMessageId($request_id);
                                         \danog\MadelineProto\Tools::callFork((function () use (&$request, &$response): \Generator {
-                                            yield $this->API->initAuthorization();
+                                            yield from $this->API->initAuthorization();
                                             $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request['_'] ?? ''));
                                         })());
                                         return;
@@ -425,13 +425,13 @@ trait ResponseHandler
                                         $this->logger->logger('If you intentionally deleted this account, ignore this message.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->API->resetSession();
                                         \danog\MadelineProto\Tools::callFork((function () use (&$request, &$response): \Generator {
-                                            yield $this->API->initAuthorization();
+                                            yield from $this->API->initAuthorization();
                                             $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request['_'] ?? ''));
                                         })());
                                         return;
                                     }
                                     \danog\MadelineProto\Tools::callFork((function () use ($request_id): \Generator {
-                                        yield $this->API->initAuthorization();
+                                        yield from $this->API->initAuthorization();
                                         $this->methodRecall('', ['message_id' => $request_id]);
                                     })());
                                     return;
@@ -439,7 +439,7 @@ trait ResponseHandler
                                     $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', \danog\MadelineProto\Logger::ERROR);
                                     $this->shared->setTempAuthKey(null);
                                     \danog\MadelineProto\Tools::callFork((function () use ($request_id): \Generator {
-                                        yield $this->API->initAuthorization();
+                                        yield from $this->API->initAuthorization();
                                         $this->methodRecall('', ['message_id' => $request_id]);
                                     })());
                                     return;
@@ -483,7 +483,7 @@ trait ResponseHandler
                             $this->API->resetMTProtoSession();
                             $this->shared->setTempAuthKey(null);
                             \danog\MadelineProto\Tools::callFork((function () use ($request_id): \Generator {
-                                yield $this->API->initAuthorization();
+                                yield from $this->API->initAuthorization();
                                 $this->methodRecall('', ['message_id' => $request_id]);
                             })());
                             return;
@@ -514,7 +514,7 @@ trait ResponseHandler
             $r = isset($response['_']) ? $response['_'] : \json_encode($response);
             $this->logger->logger("Deferred: sent {$r} to deferred", Logger::ULTRA_VERBOSE);
             if ($botAPI) {
-                $response = yield $this->MTProtoToBotAPI($response);
+                $response = (yield from $this->MTProtoToBotAPI($response));
             }
             if (isset($this->outgoing_messages[$request_id]['promise'])) {
                 // This should not happen but happens, should debug

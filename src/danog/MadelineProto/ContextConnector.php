@@ -51,7 +51,7 @@ class ContextConnector implements Connector
                 try {
                     $ctx->setIsDns($this->fromDns);
                     $ctx->setCancellationToken($token);
-                    $result = yield $ctx->getStream();
+                    $result = (yield from $ctx->getStream());
                     $this->logger->logger('OK!', \danog\MadelineProto\Logger::WARNING);
                     return $result->getSocket();
                 } catch (\Throwable $e) {

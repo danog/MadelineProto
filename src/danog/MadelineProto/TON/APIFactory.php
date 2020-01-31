@@ -93,7 +93,7 @@ class APIFactory extends AbstractAPIFactory
             $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
             $aargs['apifactory'] = true;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
-            return yield $this->API->methodCall($name, $args, $aargs);
+            return yield from $this->API->methodCall($name, $args, $aargs);
         }
         return yield $this->methods[$lower_name](...$arguments);
     }

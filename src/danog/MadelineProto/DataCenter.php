@@ -238,12 +238,12 @@ class DataCenter
                 if ($old) {
                     $this->API->logger->logger("Reconnecting to DC {$dc_number} ({$id}) from existing", \danog\MadelineProto\Logger::WARNING);
                     $this->sockets[$dc_number]->setExtra($this->API);
-                    yield $this->sockets[$dc_number]->connect($ctx, $id);
+                    yield from $this->sockets[$dc_number]->connect($ctx, $id);
                 } else {
                     $this->API->logger->logger("Connecting to DC {$dc_number} from scratch", \danog\MadelineProto\Logger::WARNING);
                     $this->sockets[$dc_number] = new DataCenterConnection();
                     $this->sockets[$dc_number]->setExtra($this->API);
-                    yield $this->sockets[$dc_number]->connect($ctx);
+                    yield from $this->sockets[$dc_number]->connect($ctx);
                 }
                 $this->API->logger->logger('OK!', \danog\MadelineProto\Logger::WARNING);
                 return true;

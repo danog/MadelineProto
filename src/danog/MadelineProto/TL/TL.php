@@ -600,7 +600,7 @@ class TL
         } elseif ($method === 'messages.sendEncryptedFile') {
             if (isset($arguments['file'])) {
                 if ((!\is_array($arguments['file']) || !(isset($arguments['file']['_']) && $this->constructors->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')) && $this->API->settings['upload']['allow_automatic_upload']) {
-                    $arguments['file'] = yield $this->API->uploadEncrypted($arguments['file']);
+                    $arguments['file'] = (yield from $this->API->uploadEncrypted($arguments['file']));
                 }
                 if (isset($arguments['file']['key'])) {
                     $arguments['message']['media']['key'] = $arguments['file']['key'];
@@ -610,7 +610,7 @@ class TL
                 }
             }
         } elseif (\in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && isset($arguments['chat_id']) && (!\is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
-            $res = yield $this->API->getInfo($arguments['chat_id']);
+            $res = (yield from $this->API->getInfo($arguments['chat_id']));
             if ($res['type'] !== 'chat') {
                 throw new \danog\MadelineProto\Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
             }
@@ -653,7 +653,7 @@ class TL
     private function serializeParams(array $tl, $arguments, $ctx, int $layer = -1): \Generator
     {
         $serialized = '';
-        $arguments = yield $this->API->botAPIToMTProto($arguments);
+        $arguments = (yield from $this->API->botAPIToMTProto($arguments));
         $flags = 0;
         foreach ($tl['params'] as $cur_flag) {
             if (isset($cur_flag['pow'])) {
@@ -687,7 +687,7 @@ class TL
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService']) && isset($arguments['message'])) {
-                    $serialized .= (yield from $this->serializeObject($current_argument, yield $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message']), 'data'));
+                    $serialized .= (yield from $this->serializeObject($current_argument, yield from $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message']), 'data'));
                     continue;
                 }
                 if ($current_argument['name'] === 'random_id') {
@@ -747,11 +747,11 @@ class TL
                 });
             }
             if ($current_argument['type'] === 'InputFile' && (!\is_array($arguments[$current_argument['name']]) || !(isset($arguments[$current_argument['name']]['_']) && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] === 'InputFile'))) {
-                $arguments[$current_argument['name']] = yield $this->API->upload($arguments[$current_argument['name']]);
+                $arguments[$current_argument['name']] = (yield from $this->API->upload($arguments[$current_argument['name']]));
             }
             if ($current_argument['type'] === 'InputEncryptedChat' && (!\is_array($arguments[$current_argument['name']]) || isset($arguments[$current_argument['name']]['_']) && $this->constructors->findByPredicate($arguments[$current_argument['name']]['_'])['type'] !== $current_argument['type'])) {
                 if (\is_array($arguments[$current_argument['name']])) {
-                    $arguments[$current_argument['name']] = (yield $this->API->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat'];
+                    $arguments[$current_argument['name']] = (yield from $this->API->getInfo($arguments[$current_argument['name']]))['InputEncryptedChat'];
                 } else {
                     if (!$this->API->hasSecretChat($arguments[$current_argument['name']])) {
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['sec_peer_not_in_db']);

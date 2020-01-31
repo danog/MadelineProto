@@ -80,7 +80,7 @@ class ReadLoop extends SignalLoop
                 Tools::callForkDefer((function () use ($API, $connection, $datacenter, $e): \Generator {
                     $API->logger->logger($e);
                     $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
-                    yield $connection->reconnect();
+                    yield from $connection->reconnect();
                 })());
                 return;
             }
@@ -95,23 +95,23 @@ class ReadLoop extends SignalLoop
                             foreach ($connection->new_outgoing as $message_id) {
                                 $connection->outgoing_messages[$message_id]['sent'] = 0;
                             }
-                            yield $shared->reconnect();
-                            yield $API->initAuthorization();
+                            yield from $shared->reconnect();
+                            yield from $API->initAuthorization();
                         } else {
-                            yield $connection->reconnect();
+                            yield from $connection->reconnect();
                         }
                     } elseif ($error === -1) {
                         $API->logger->logger("WARNING: Got quick ack from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
-                        yield $connection->reconnect();
+                        yield from $connection->reconnect();
                     } elseif ($error === 0) {
                         $API->logger->logger("Got NOOP from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
-                        yield $connection->reconnect();
+                        yield from $connection->reconnect();
                     } elseif ($error === -429) {
                         $API->logger->logger("Got -429 from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
                         yield Tools::sleep(1);
-                        yield $connection->reconnect();
+                        yield from $connection->reconnect();
                     } else {
-                        yield $connection->reconnect();
+                        yield from $connection->reconnect();
                         throw new \danog\MadelineProto\RPCErrorException($error, $error);
                     }
                 })());

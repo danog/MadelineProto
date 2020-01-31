@@ -53,7 +53,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
         $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port'])->secure(false);
-        $this->stream = yield $ctx->getStream();
+        $this->stream = (yield from $ctx->getStream());
         $address = $uri->getHost();
         $port = $uri->getPort();
         try {
@@ -106,14 +106,14 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             }
             if ($close) {
                 $this->disconnect();
-                yield $this->connect($ctx);
+                yield from $this->connect($ctx);
             }
             \danog\MadelineProto\Logger::log(\trim($read));
             throw new \danog\MadelineProto\Exception($description, $code);
         }
         if ($close) {
             yield $this->stream->disconnect();
-            yield $this->stream->connect($ctx);
+            yield from $this->stream->connect($ctx);
         }
         if (isset($headers['content-length'])) {
             $length = (int) $headers['content-length'];

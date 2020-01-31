@@ -228,7 +228,7 @@ trait UpdateHandler
     public function getUpdatesState(): \Generator
     {
         $data = yield $this->methodCallAsyncRead('updates.getState', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
-        yield $this->getCdnConfig($this->settings['connection_settings']['default_dc']);
+        yield from $this->getCdnConfig($this->settings['connection_settings']['default_dc']);
         return $data;
     }
     /**
@@ -256,7 +256,7 @@ trait UpdateHandler
                 $result = [];
                 foreach ($updates['updates'] as $key => $update) {
                     if ($update['_'] === 'updateNewMessage' || $update['_'] === 'updateReadMessagesContents' || $update['_'] === 'updateEditMessage' || $update['_'] === 'updateDeleteMessages' || $update['_'] === 'updateReadHistoryInbox' || $update['_'] === 'updateReadHistoryOutbox' || $update['_'] === 'updateWebPage' || $update['_'] === 'updateMessageID') {
-                        $result[yield $this->feeders[false]->feedSingle($update)] = true;
+                        $result[yield from $this->feeders[false]->feedSingle($update)] = true;
                         unset($updates['updates'][$key]);
                     }
                 }
@@ -272,13 +272,13 @@ trait UpdateHandler
                 $this->seqUpdater->resume();
                 break;
             case 'updateShort':
-                $this->feeders[yield $this->feeders[false]->feedSingle($updates['update'])]->resume();
+                $this->feeders[yield from $this->feeders[false]->feedSingle($updates['update'])]->resume();
                 break;
             case 'updateShortSentMessage':
                 if (!isset($updates['request']['body'])) {
                     break;
                 }
-                $updates['user_id'] = (yield $this->getInfo($updates['request']['body']['peer']))['bot_api_id'];
+                $updates['user_id'] = (yield from $this->getInfo($updates['request']['body']['peer']))['bot_api_id'];
                 $updates['message'] = $updates['request']['body']['message'];
                 unset($updates['request']);
             // no break
@@ -286,7 +286,7 @@ trait UpdateHandler
             case 'updateShortChatMessage':
                 $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
-                if (!(yield from $this->peerIsset($from_id) || !(yield from $this->peerIsset($to_id) || isset($updates['via_bot_id']) && !(yield from $this->peerIsset($updates['via_bot_id']) || isset($updates['entities']) && !(yield from $this->entitiesPeerIsset($updates['entities']) || isset($updates['fwd_from']) && !yield $this->fwdPeerIsset($updates['fwd_from'])))))) {
+                if (!(yield from $this->peerIsset($from_id) || !(yield from $this->peerIsset($to_id) || isset($updates['via_bot_id']) && !(yield from $this->peerIsset($updates['via_bot_id']) || isset($updates['entities']) && !(yield from $this->entitiesPeerIsset($updates['entities']) || isset($updates['fwd_from']) && !(yield from $this->fwdPeerIsset($updates['fwd_from']))))))) {
                     yield $this->updaters[false]->resume();
                     return;
                 }
@@ -294,7 +294,7 @@ trait UpdateHandler
                 $message['_'] = 'message';
                 $message['from_id'] = $from_id;
                 try {
-                    $message['to_id'] = (yield $this->getInfo($to_id))['Peer'];
+                    $message['to_id'] = (yield from $this->getInfo($to_id))['Peer'];
                 } catch (\danog\MadelineProto\Exception $e) {
                     $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
                     //$this->pending_updates[] = $updates;
@@ -305,7 +305,7 @@ trait UpdateHandler
                     break;
                 }
                 $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
-                $this->feeders[yield $this->feeders[false]->feedSingle($update)]->resume();
+                $this->feeders[yield from $this->feeders[false]->feedSingle($update)]->resume();
                 break;
             case 'updatesTooLong':
                 $this->updaters[false]->resume();
@@ -328,17 +328,17 @@ trait UpdateHandler
     {
         if ($update['_'] === 'updateConfig') {
             $this->config['expires'] = 0;
-            yield $this->getConfig();
+            yield from $this->getConfig();
         }
         if (\in_array($update['_'], ['updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'])) {
             $id = $this->getId($update);
             $this->full_chats[$id]['last_update'] = 0;
-            yield $this->getFullInfo($id);
+            yield from $this->getFullInfo($id);
         }
         if ($update['_'] === 'updateDcOptions') {
             $this->logger->logger('Got new dc options', \danog\MadelineProto\Logger::VERBOSE);
             $this->config['dc_options'] = $update['dc_options'];
-            yield $this->parseConfig();
+            yield from $this->parseConfig();
             return;
         }
         if ($update['_'] === 'updatePhoneCall') {
@@ -357,13 +357,13 @@ trait UpdateHandler
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']] = $controller;
                     break;
                 case 'phoneCallAccepted':
-                    if (!yield $this->confirmCall($update['phone_call'])) {
+                    if (!(yield from $this->confirmCall($update['phone_call']))) {
                         return;
                     }
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']];
                     break;
                 case 'phoneCall':
-                    if (!yield $this->completeCall($update['phone_call'])) {
+                    if (!(yield from $this->completeCall($update['phone_call']))) {
                         return;
                     }
                     $update['phone_call'] = $this->calls[$update['phone_call']['id']];
@@ -393,7 +393,7 @@ trait UpdateHandler
                 $this->logger->logger('Applying qts: ' . $update['qts'] . ' over current qts ' . $cur_state->qts() . ', chat id: ' . $update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
                 yield $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             }
-            yield $this->handleEncryptedUpdate($update);
+            yield from $this->handleEncryptedUpdate($update);
             return;
         }
         /*
@@ -409,7 +409,7 @@ trait UpdateHandler
                     }
                     $this->logger->logger('Accepting secret chat ' . $update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
                     try {
-                        yield $this->acceptSecretChat($update['chat']);
+                        yield from $this->acceptSecretChat($update['chat']);
                     } catch (RPCErrorException $e) {
                         $this->logger->logger("Error while accepting secret chat: {$e}", Logger::FATAL_ERROR);
                     }
@@ -428,7 +428,7 @@ trait UpdateHandler
                     break;
                 case 'encryptedChat':
                     $this->logger->logger('Completing creation of secret chat ' . $update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
-                    yield $this->completeSecretChat($update['chat']);
+                    yield from $this->completeSecretChat($update['chat']);
                     break;
             }
             //$this->logger->logger($update, \danog\MadelineProto\Logger::NOTICE);

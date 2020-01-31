@@ -96,7 +96,7 @@ class WriteLoop extends ResumableSignalLoop
                 Tools::callForkDefer((function () use ($API, $connection, $datacenter, $e): \Generator {
                     $API->logger->logger($e);
                     $API->logger->logger("Got nothing in the socket in DC {$datacenter}, reconnecting...", Logger::ERROR);
-                    yield $connection->reconnect();
+                    yield from $connection->reconnect();
                 })());
                 return;
             } finally {
@@ -162,7 +162,7 @@ class WriteLoop extends ResumableSignalLoop
             $temporary_keys = [];
             if (\count($to_ack = $connection->ack_queue)) {
                 foreach (\array_chunk($connection->ack_queue, 8192) as $acks) {
-                    $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msgs_ack', 'serialized_body' => yield $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'msgs_ack', 'msg_ids' => $acks], 'msgs_ack'), 'contentRelated' => false, 'unencrypted' => false, 'method' => false];
+                    $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msgs_ack', 'serialized_body' => yield from $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'msgs_ack', 'msg_ids' => $acks], 'msgs_ack'), 'contentRelated' => false, 'unencrypted' => false, 'method' => false];
                     $temporary_keys[$connection->pending_outgoing_key] = true;
                     $API->logger->logger("Adding msgs_ack {$connection->pending_outgoing_key}", Logger::ULTRA_VERBOSE);
                     $connection->pending_outgoing_key++;
@@ -180,7 +180,7 @@ class WriteLoop extends ResumableSignalLoop
                 }
                 if (!$has_http_wait) {
                     $API->logger->logger("Adding http_wait {$connection->pending_outgoing_key}", Logger::ULTRA_VERBOSE);
-                    $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'http_wait', 'serialized_body' => yield $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'contentRelated' => true, 'unencrypted' => false, 'method' => true];
+                    $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'http_wait', 'serialized_body' => yield from $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'http_wait', 'max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'http_wait'), 'contentRelated' => true, 'unencrypted' => false, 'method' => true];
                     $temporary_keys[$connection->pending_outgoing_key] = true;
                     $connection->pending_outgoing_key++;
                 }
@@ -216,13 +216,13 @@ class WriteLoop extends ResumableSignalLoop
                     if (!$shared->getTempAuthKey()->isInited() && $message['_'] !== 'auth.bindTempAuthKey' && !$inited) {
                         $inited = true;
                         $API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $message['_']), \danog\MadelineProto\Logger::NOTICE);
-                        $MTmessage['body'] = yield $API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $API->settings['tl_schema']['layer'], 'query' => yield $API->getTL()->serializeMethod('initConnection', ['api_id' => $API->settings['app_info']['api_id'], 'api_hash' => $API->settings['app_info']['api_hash'], 'device_model' => !$connection->isCDN() ? $API->settings['app_info']['device_model'] : 'n/a', 'system_version' => !$connection->isCDN() ? $API->settings['app_info']['system_version'] : 'n/a', 'app_version' => $API->settings['app_info']['app_version'], 'system_lang_code' => $API->settings['app_info']['lang_code'], 'lang_code' => $API->settings['app_info']['lang_code'], 'lang_pack' => $API->settings['app_info']['lang_pack'], 'proxy' => $connection->getCtx()->getInputClientProxy(), 'query' => $MTmessage['body']])]);
+                        $MTmessage['body'] = (yield from $API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $API->settings['tl_schema']['layer'], 'query' => yield from $API->getTL()->serializeMethod('initConnection', ['api_id' => $API->settings['app_info']['api_id'], 'api_hash' => $API->settings['app_info']['api_hash'], 'device_model' => !$connection->isCDN() ? $API->settings['app_info']['device_model'] : 'n/a', 'system_version' => !$connection->isCDN() ? $API->settings['app_info']['system_version'] : 'n/a', 'app_version' => $API->settings['app_info']['app_version'], 'system_lang_code' => $API->settings['app_info']['lang_code'], 'lang_code' => $API->settings['app_info']['lang_code'], 'lang_pack' => $API->settings['app_info']['lang_pack'], 'proxy' => $connection->getCtx()->getInputClientProxy(), 'query' => $MTmessage['body']])]));
                     } else {
                         if (isset($message['queue'])) {
                             if (!isset($connection->call_queue[$message['queue']])) {
                                 $connection->call_queue[$message['queue']] = [];
                             }
-                            $MTmessage['body'] = yield $API->getTL()->serializeMethod('invokeAfterMsgs', ['msg_ids' => $connection->call_queue[$message['queue']], 'query' => $MTmessage['body']]);
+                            $MTmessage['body'] = (yield from $API->getTL()->serializeMethod('invokeAfterMsgs', ['msg_ids' => $connection->call_queue[$message['queue']], 'query' => $MTmessage['body']]));
                             $connection->call_queue[$message['queue']][$message_id] = $message_id;
                             if (\count($connection->call_queue[$message['queue']]) > $API->settings['msg_array_limit']['call_queue']) {
                                 \reset($connection->call_queue[$message['queue']]);
@@ -266,7 +266,7 @@ class WriteLoop extends ResumableSignalLoop
                 $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msg_container', 'container' => \array_values($keys), 'contentRelated' => false, 'method' => false, 'unencrypted' => false];
                 //var_dumP("container ".bin2hex($message_id));
                 $keys[$connection->pending_outgoing_key++] = $message_id;
-                $message_data = yield $API->getTL()->serializeObject(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'container');
+                $message_data = (yield from $API->getTL()->serializeObject(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'container'));
                 $message_data_length = \strlen($message_data);
                 $seq_no = $connection->generateOutSeqNo(false);
             } elseif ($count) {

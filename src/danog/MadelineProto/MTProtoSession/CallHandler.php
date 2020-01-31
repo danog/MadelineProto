@@ -142,8 +142,8 @@ trait CallHandler
             if (isset($args['multiple'])) {
                 $aargs['multiple'] = true;
             }
-            if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > (yield $this->API->getConfig())['message_length_max'] && \mb_strlen((yield $this->API->parseMode($args))['message'], 'UTF-8') > (yield $this->API->getConfig())['message_length_max']) {
-                $args = yield $this->API->splitToChunks($args);
+            if (isset($args['message']) && \is_string($args['message']) && \mb_strlen($args['message'], 'UTF-8') > (yield from $this->API->getConfig())['message_length_max'] && \mb_strlen((yield from $this->API->parseMode($args))['message'], 'UTF-8') > (yield from $this->API->getConfig())['message_length_max']) {
+                $args = (yield from $this->API->splitToChunks($args));
                 $promises = [];
                 $aargs['queue'] = $method;
                 $aargs['multiple'] = true;
@@ -163,7 +163,7 @@ trait CallHandler
                 }
                 return yield all($promises);
             }
-            $args = yield $this->API->botAPIToMTProto($args);
+            $args = (yield from $this->API->botAPIToMTProto($args));
             if (isset($args['ping_id']) && \is_int($args['ping_id'])) {
                 $args['ping_id'] = Tools::packSignedLong($args['ping_id']);
             }
@@ -179,7 +179,7 @@ trait CallHandler
             $message['user_related'] = true;
         }
         $aargs['postpone'] = $aargs['postpone'] ?? false;
-        $deferred = yield $this->sendMessage($message, !$aargs['postpone']);
+        $deferred = (yield from $this->sendMessage($message, !$aargs['postpone']));
         $this->checker->resume();
         return $deferred;
     }

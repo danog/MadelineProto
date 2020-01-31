@@ -143,7 +143,7 @@ class CheckLoop extends ResumableSignalLoop
                             $list .= $connection->outgoing_messages[$message_id]['_'] . ', ';
                         }
                         $API->logger->logger("Still missing {$list} on DC {$datacenter}, sending state request", \danog\MadelineProto\Logger::ERROR);
-                        yield $connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], ['promise' => $deferred]);
+                        yield from $connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], ['promise' => $deferred]);
                     }
                 } else {
                     foreach ($connection->new_outgoing as $message_id) {

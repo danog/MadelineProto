@@ -185,7 +185,7 @@ class API extends InternalDoc
                     $this->APIFactory();
                     $unserialized->oldInstance = true;
                     $deferred->resolve();
-                    yield $this->API->initAsynchronously();
+                    yield from $this->API->initAsynchronously();
                     $this->APIFactory();
                     //\danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
                     $this->asyncInitPromise = null;
@@ -199,7 +199,7 @@ class API extends InternalDoc
         }
         Logger::constructorFromSettings($settings);
         if (!isset($params['app_info']['api_id']) || !$params['app_info']['api_id']) {
-            $app = yield $this->APIStart($params);
+            $app = (yield from $this->APIStart($params));
             $params['app_info']['api_id'] = $app['api_id'];
             $params['app_info']['api_hash'] = $app['api_hash'];
         }
@@ -207,7 +207,7 @@ class API extends InternalDoc
         $this->APIFactory();
         $deferred->resolve();
         Logger::log(\danog\MadelineProto\Lang::$current_lang['apifactory_start'], Logger::VERBOSE);
-        yield $this->API->initAsynchronously();
+        yield from $this->API->initAsynchronously();
         $this->APIFactory();
         $this->asyncInitPromise = null;
         //\danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
@@ -370,7 +370,7 @@ class API extends InternalDoc
                 return false;
             }
             if ($this->API && $this->API->asyncInitPromise) {
-                yield $this->API->initAsynchronously();
+                yield from $this->API->initAsynchronously();
             }
             $this->serialized = \time();
             $realpaths = Serialization::realpaths($filename);

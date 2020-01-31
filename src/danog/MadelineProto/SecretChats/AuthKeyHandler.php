@@ -55,7 +55,7 @@ trait AuthKeyHandler
             $this->logger->logger("I've already accepted secret chat " . $params['id']);
             return false;
         }
-        $dh_config = yield $this->getDhConfig();
+        $dh_config = (yield from $this->getDhConfig());
         $this->logger->logger('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
         $b = new \tgseclib\Math\BigInteger(\danog\MadelineProto\Tools::random(256), 256);
         $params['g_a'] = new \tgseclib\Math\BigInteger((string) $params['g_a'], 256);
@@ -81,13 +81,13 @@ trait AuthKeyHandler
      */
     public function requestSecretChat($user): \Generator
     {
-        $user = yield $this->getInfo($user);
+        $user = (yield from $this->getInfo($user));
         if (!isset($user['InputUser'])) {
             throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
         }
         $user = $user['InputUser'];
         $this->logger->logger('Creating secret chat with ' . $user['user_id'] . '...', \danog\MadelineProto\Logger::VERBOSE);
-        $dh_config = yield $this->getDhConfig();
+        $dh_config = (yield from $this->getDhConfig());
         $this->logger->logger('Generating a...', \danog\MadelineProto\Logger::VERBOSE);
         $a = new \tgseclib\Math\BigInteger(\danog\MadelineProto\Tools::random(256), 256);
         $this->logger->logger('Generating g_a...', \danog\MadelineProto\Logger::VERBOSE);
@@ -113,7 +113,7 @@ trait AuthKeyHandler
             $this->logger->logger('Could not find and complete secret chat ' . $params['id']);
             return false;
         }
-        $dh_config = yield $this->getDhConfig();
+        $dh_config = (yield from $this->getDhConfig());
         $params['g_a_or_b'] = new \tgseclib\Math\BigInteger((string) $params['g_a_or_b'], 256);
         $this->checkG($params['g_a_or_b'], $dh_config['p']);
         $key = ['auth_key' => \str_pad($params['g_a_or_b']->powMod($this->temp_requested_secret_chats[$params['id']], $dh_config['p'])->toBytes(), 256, \chr(0), \STR_PAD_LEFT)];
@@ -153,7 +153,7 @@ trait AuthKeyHandler
             return;
         }
         $this->logger->logger('Rekeying secret chat ' . $chat . '...', \danog\MadelineProto\Logger::VERBOSE);
-        $dh_config = yield $this->getDhConfig();
+        $dh_config = (yield from $this->getDhConfig());
         $this->logger->logger('Generating a...', \danog\MadelineProto\Logger::VERBOSE);
         $a = new \tgseclib\Math\BigInteger(\danog\MadelineProto\Tools::random(256), 256);
         $this->logger->logger('Generating g_a...', \danog\MadelineProto\Logger::VERBOSE);
@@ -189,7 +189,7 @@ trait AuthKeyHandler
             }
         }
         $this->logger->logger('Accepting rekeying of secret chat ' . $chat . '...', \danog\MadelineProto\Logger::VERBOSE);
-        $dh_config = yield $this->getDhConfig();
+        $dh_config = (yield from $this->getDhConfig());
         $this->logger->logger('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
         $b = new \tgseclib\Math\BigInteger(\danog\MadelineProto\Tools::random(256), 256);
         $params['g_a'] = new \tgseclib\Math\BigInteger((string) $params['g_a'], 256);
@@ -220,7 +220,7 @@ trait AuthKeyHandler
             return;
         }
         $this->logger->logger('Committing rekeying of secret chat ' . $chat . '...', \danog\MadelineProto\Logger::VERBOSE);
-        $dh_config = yield $this->getDhConfig();
+        $dh_config = (yield from $this->getDhConfig());
         $params['g_b'] = new \tgseclib\Math\BigInteger((string) $params['g_b'], 256);
         $this->checkG($params['g_b'], $dh_config['p']);
         $key = ['auth_key' => \str_pad($params['g_b']->powMod($this->temp_rekeyed_secret_chats[$params['exchange_id']], $dh_config['p'])->toBytes(), 256, \chr(0), \STR_PAD_LEFT)];

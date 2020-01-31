@@ -80,13 +80,13 @@ trait AuthKeyHandler
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw \danog\MadelineProto\Exception::extension('libtgvoip');
         }
-        $user = yield $this->getInfo($user);
+        $user = (yield from $this->getInfo($user));
         if (!isset($user['InputUser']) || $user['InputUser']['_'] === 'inputUserSelf') {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
         }
         $user = $user['InputUser'];
         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['calling_user'], $user['user_id']), \danog\MadelineProto\Logger::VERBOSE);
-        $dh_config = yield $this->getDhConfig();
+        $dh_config = (yield from $this->getDhConfig());
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['generating_a'], \danog\MadelineProto\Logger::VERBOSE);
         $a = \tgseclib\Math\BigInteger::randomRange(\danog\MadelineProto\Magic::$two, $dh_config['p']->subtract(\danog\MadelineProto\Magic::$two));
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['generating_g_a'], \danog\MadelineProto\Logger::VERBOSE);
@@ -117,7 +117,7 @@ trait AuthKeyHandler
             return false;
         }
         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['accepting_call'], $this->calls[$call['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
-        $dh_config = yield $this->getDhConfig();
+        $dh_config = (yield from $this->getDhConfig());
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['generating_b'], \danog\MadelineProto\Logger::VERBOSE);
         $b = \tgseclib\Math\BigInteger::randomRange(\danog\MadelineProto\Magic::$two, $dh_config['p']->subtract(\danog\MadelineProto\Magic::$two));
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
@@ -157,7 +157,7 @@ trait AuthKeyHandler
             return false;
         }
         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_confirming'], $this->calls[$params['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
-        $dh_config = yield $this->getDhConfig();
+        $dh_config = (yield from $this->getDhConfig());
         $params['g_b'] = new \tgseclib\Math\BigInteger((string) $params['g_b'], 256);
         $this->checkG($params['g_b'], $dh_config['p']);
         $key = \str_pad($params['g_b']->powMod($this->calls[$params['id']]->storage['a'], $dh_config['p'])->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
@@ -205,7 +205,7 @@ trait AuthKeyHandler
             return false;
         }
         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_completing'], $this->calls[$params['id']]->getOtherID()), \danog\MadelineProto\Logger::VERBOSE);
-        $dh_config = yield $this->getDhConfig();
+        $dh_config = (yield from $this->getDhConfig());
         if (\hash('sha256', $params['g_a_or_b'], true) != $this->calls[$params['id']]->storage['g_a_hash']) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['invalid_g_a']);
         }

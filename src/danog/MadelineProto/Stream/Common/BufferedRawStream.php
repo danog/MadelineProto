@@ -51,7 +51,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      */
     public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = yield $ctx->getStream($header);
+        $this->stream = (yield from $ctx->getStream($header));
         $this->memory_stream = \fopen('php://memory', 'r+');
         return true;
     }

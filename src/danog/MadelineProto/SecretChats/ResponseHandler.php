@@ -34,18 +34,18 @@ trait ResponseHandler
             case 'decryptedMessageService':
                 switch ($update['message']['decrypted_message']['action']['_']) {
                     case 'decryptedMessageActionRequestKey':
-                        yield $this->acceptRekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
+                        yield from $this->acceptRekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
                         return;
                     case 'decryptedMessageActionAcceptKey':
-                        yield $this->commitRekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
+                        yield from $this->commitRekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
                         return;
                     case 'decryptedMessageActionCommitKey':
-                        yield $this->completeRekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
+                        yield from $this->completeRekey($update['message']['chat_id'], $update['message']['decrypted_message']['action']);
                         return;
                     case 'decryptedMessageActionNotifyLayer':
                         $this->secret_chats[$update['message']['chat_id']]['layer'] = $update['message']['decrypted_message']['action']['layer'];
                         if ($update['message']['decrypted_message']['action']['layer'] >= 17 && \time() - $this->secret_chats[$update['message']['chat_id']]['created'] > 15) {
-                            yield $this->notifyLayer($update['message']['chat_id']);
+                            yield from $this->notifyLayer($update['message']['chat_id']);
                         }
                         if ($update['message']['decrypted_message']['action']['layer'] >= 73) {
                             $this->secret_chats[$update['message']['chat_id']]['mtproto'] = 2;
@@ -53,7 +53,7 @@ trait ResponseHandler
                         return;
                     case 'decryptedMessageActionSetMessageTTL':
                         $this->secret_chats[$update['message']['chat_id']]['ttl'] = $update['message']['decrypted_message']['action']['ttl_seconds'];
-                        yield $this->saveUpdate($update);
+                        yield from $this->saveUpdate($update);
                         return;
                     case 'decryptedMessageActionNoop':
                         return;
@@ -72,19 +72,19 @@ trait ResponseHandler
                         return;
                     default:
                         //                yield $this->saveUpdate(['_' => 'updateNewDecryptedMessage', 'peer' => $this->secret_chats[$update['message']['chat_id']]['InputEncryptedChat'], 'in_seq_no' => $this->get_in_seq_no($update['message']['chat_id']), 'out_seq_no' => $this->get_out_seq_no($update['message']['chat_id']), 'message' => $update['message']['decrypted_message']]);
-                        yield $this->saveUpdate($update);
+                        yield from $this->saveUpdate($update);
                 }
                 break;
             case 'decryptedMessage':
-                yield $this->saveUpdate($update);
+                yield from $this->saveUpdate($update);
                 break;
             case 'decryptedMessageLayer':
-                if (yield $this->checkSecretOutSeqNo($update['message']['chat_id'], $update['message']['decrypted_message']['out_seq_no']) && yield $this->checkSecretInSeqNo($update['message']['chat_id'], $update['message']['decrypted_message']['in_seq_no'])) {
+                if (yield from $this->checkSecretOutSeqNo($update['message']['chat_id'], $update['message']['decrypted_message']['out_seq_no']) && (yield from $this->checkSecretInSeqNo($update['message']['chat_id'], $update['message']['decrypted_message']['in_seq_no']))) {
                     $this->secret_chats[$update['message']['chat_id']]['in_seq_no']++;
                     if ($update['message']['decrypted_message']['layer'] >= 17) {
                         $this->secret_chats[$update['message']['chat_id']]['layer'] = $update['message']['decrypted_message']['layer'];
                         if ($update['message']['decrypted_message']['layer'] >= 17 && \time() - $this->secret_chats[$update['message']['chat_id']]['created'] > 15) {
-                            yield $this->notifyLayer($update['message']['chat_id']);
+                            yield from $this->notifyLayer($update['message']['chat_id']);
                         }
                     }
                     $update['message']['decrypted_message'] = $update['message']['decrypted_message']['message'];

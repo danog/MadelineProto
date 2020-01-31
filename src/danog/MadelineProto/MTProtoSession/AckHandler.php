@@ -33,12 +33,12 @@ trait AckHandler
         }
         //$this->logger->logger("Ack-ed ".$this->outgoing_messages[$message_id]['_']." with message ID $message_id on DC $datacenter");
         /*
-                                        if (isset($this->outgoing_messages[$message_id]['body'])) {
-                                            unset($this->outgoing_messages[$message_id]['body']);
-                                        }
-                                        if (isset($this->new_outgoing[$message_id])) {
-                                            unset($this->new_outgoing[$message_id]);
-                                        }*/
+                                                        if (isset($this->outgoing_messages[$message_id]['body'])) {
+                                                            unset($this->outgoing_messages[$message_id]['body']);
+                                                        }
+                                                        if (isset($this->new_outgoing[$message_id])) {
+                                                            unset($this->new_outgoing[$message_id]);
+                                                        }*/
         return true;
     }
     public function gotResponseForOutgoingMessageId($message_id): bool

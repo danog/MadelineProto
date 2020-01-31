@@ -72,6 +72,6 @@ trait TOS
     public function declineTos(): \Generator
     {
         yield $this->methodCallAsyncRead('account.deleteAccount', ['reason' => 'Decline ToS update'], ['datacenter' => $this->datacenter->curdc]);
-        yield $this->logout();
+        yield from $this->logout();
     }
 }

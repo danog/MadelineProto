@@ -164,7 +164,7 @@ trait Loop
                 $callback = $this->loop_callback;
                 Tools::callForkDefer($callback());
             }
-            yield $this->waitUpdate();
+            yield from $this->waitUpdate();
         } while (!$this->stopLoop);
         $this->stopLoop = false;
     }
