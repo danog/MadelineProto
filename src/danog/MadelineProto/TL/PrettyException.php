@@ -113,7 +113,7 @@ trait PrettyException
 
         if ($previous_trace) {
             $this->tl_trace .= $eol.$eol;
-            $this->tl_trace .= "Previous TL trace$eol";
+            $this->tl_trace .= "Previous TL trace:$eol";
             $this->tl_trace .= $previous_trace;
         }
     }
