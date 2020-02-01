@@ -822,7 +822,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                     yield from $this->notifyLayer($chat);
                 }
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-            }
+            } catch (\danog\MadelineProto\Exception $e){}
         }
     }
     /**
