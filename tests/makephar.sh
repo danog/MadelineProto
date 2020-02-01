@@ -117,24 +117,24 @@ export MTPROTO_SETTINGS='{"logger":{"logger_level":5}}'
 php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" $TRAVIS_COMMIT
 
 cp tests/testing.php tests/testingBackup.php
-set +e
-tests/testing.php <<EOF
-m
-$API_ID
-$API_HASH
-b
-$BOT_TOKEN
-n
-n
-n
+#set +e
+#tests/testing.php <<EOF
+#m
+#$API_ID
+#$API_HASH
+#b
+#$BOT_TOKEN
+#n
+#n
+#n
+#
+#EOF
+#export TRAVIS_PHAR="madeline$php$branch.phar"
+#set -e
+#tests/testing.php
 
-EOF
-export TRAVIS_PHAR="madeline$php$branch.phar"
-set -e
-tests/testing.php
-
-cp tests/testingBackup.php tests/testing.php
-rm testing.madeline
+#cp tests/testingBackup.php tests/testing.php
+#rm testing.madeline
 
 tests/testing.php <<EOF
 m
