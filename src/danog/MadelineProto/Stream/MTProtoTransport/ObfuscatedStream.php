@@ -19,7 +19,6 @@
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
-use danog\MadelineProto\Stream\Async\Stream;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\Common\CtrStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -33,7 +32,6 @@ use danog\MadelineProto\Stream\ConnectionContext;
  */
 class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
 {
-    use Stream;
     private $stream;
     private $extra;
     /**
@@ -47,7 +45,7 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
     {
         if (isset($this->extra['address'])) {
             $ctx = $ctx->getCtx();
-            $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port']);
+            $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port']);
         }
         do {
             $random = \danog\MadelineProto\Tools::random(64);
@@ -55,14 +53,14 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
         if (\strlen($header) === 1) {
             $header = \str_repeat($header, 4);
         }
-        $random = \substr_replace($random, $header . \substr($random, 56 + \strlen($header)), 56);
-        $random = \substr_replace($random, \pack('s', $ctx->getIntDc()) . \substr($random, 60 + 2), 60);
+        $random = \substr_replace($random, $header.\substr($random, 56 + \strlen($header)), 56);
+        $random = \substr_replace($random, \pack('s', $ctx->getIntDc()).\substr($random, 60 + 2), 60);
         $reversed = \strrev($random);
         $key = \substr($random, 8, 32);
         $keyRev = \substr($reversed, 8, 32);
         if (isset($this->extra['secret'])) {
-            $key = \hash('sha256', $key . $this->extra['secret'], true);
-            $keyRev = \hash('sha256', $keyRev . $this->extra['secret'], true);
+            $key = \hash('sha256', $key.$this->extra['secret'], true);
+            $keyRev = \hash('sha256', $keyRev.$this->extra['secret'], true);
         }
         $iv = \substr($random, 40, 16);
         $ivRev = \substr($reversed, 40, 16);
