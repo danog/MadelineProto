@@ -30,7 +30,6 @@ use Amp\Promise;
  */
 trait RawStream
 {
-    use Stream;
     public function read(): Promise
     {
         return \danog\MadelineProto\Tools::call($this->readGenerator());

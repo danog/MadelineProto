@@ -189,7 +189,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @return \Generator
      */
-    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $this->write_hash = null;
         $this->write_check_after = 0;
@@ -197,7 +197,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
         $this->read_hash = null;
         $this->read_check_after = 0;
         $this->read_check_pos = 0;
-        $this->stream = (yield $ctx->getStream($header));
+        $this->stream = (yield from $ctx->getStream($header));
     }
     /**
      * Async close.

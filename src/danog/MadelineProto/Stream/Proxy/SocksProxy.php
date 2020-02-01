@@ -45,7 +45,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @return \Generator
      */
-    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
@@ -58,7 +58,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         if (isset($this->extra['username']) && isset($this->extra['password'])) {
             $methods .= \chr(2);
         }
-        $this->stream = (yield $ctx->getStream(\chr(5) . \chr(\strlen($methods)) . $methods));
+        $this->stream = (yield from $ctx->getStream(\chr(5) . \chr(\strlen($methods)) . $methods));
         $l = 2;
         $buffer = yield $this->stream->getReadBuffer($l);
         $version = \ord(yield $buffer->bufferRead(1));

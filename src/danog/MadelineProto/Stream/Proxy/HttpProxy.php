@@ -44,7 +44,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      *
      * @return \Generator
      */
-    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();
@@ -53,7 +53,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
             $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
         $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port'])->secure(false);
-        $this->stream = (yield $ctx->getStream());
+        $this->stream = (yield from $ctx->getStream());
         $address = $uri->getHost();
         $port = $uri->getPort();
         try {

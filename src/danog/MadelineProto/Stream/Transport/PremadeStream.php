@@ -50,7 +50,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     {
         return $this->stream;
     }
-    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
         if ($header !== '') {
             yield $this->stream->write($header);

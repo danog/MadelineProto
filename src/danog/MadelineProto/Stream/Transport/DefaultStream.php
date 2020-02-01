@@ -60,7 +60,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     {
         return $this->stream;
     }
-    public function connectGenerator(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(\danog\MadelineProto\Stream\ConnectionContext $ctx, string $header = ''): \Generator
     {
         $ctx = $ctx->getCtx();
         $uri = $ctx->getUri();

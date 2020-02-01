@@ -421,7 +421,7 @@ class ConnectionContext
         if ($obj instanceof ProxyStreamInterface) {
             $obj->setExtra($extra);
         }
-        yield $obj->connect($this, $buffer);
+        yield from $obj->connect($this, $buffer);
         return $obj;
     }
     /**

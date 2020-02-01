@@ -35,9 +35,9 @@ interface StreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      *
-     * @return Promise
+     * @return \Generator
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Promise;
+    public function connect(ConnectionContext $ctx, string $header = ''): \Generator;
     /**
      * Disconnect from the server.
      *

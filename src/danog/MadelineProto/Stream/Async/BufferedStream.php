@@ -30,7 +30,6 @@ use Amp\Promise;
  */
 trait BufferedStream
 {
-    use Stream;
     /**
      * Get read buffer asynchronously.
      *

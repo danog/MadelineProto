@@ -55,7 +55,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @return \Generator
      */
-    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $this->encrypt = new \tgseclib\Crypt\AES('ctr');
         $this->encrypt->enableContinuousBuffer();
@@ -65,7 +65,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
         $this->decrypt->enableContinuousBuffer();
         $this->decrypt->setKey($this->extra['decrypt']['key']);
         $this->decrypt->setIV($this->extra['decrypt']['iv']);
-        $this->stream = (yield $ctx->getStream($header));
+        $this->stream = (yield from $ctx->getStream($header));
     }
     /**
      * Async close.

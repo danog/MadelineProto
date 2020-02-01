@@ -62,7 +62,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @return \Generator
      */
-    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
         if (!\class_exists(Connector::class)) {
             throw new \danog\MadelineProto\Exception('Please install amphp/websocket-client by running "composer require amphp/websocket-client:dev-master"');

@@ -37,9 +37,9 @@ class HttpsStream extends HttpStream implements MTProtoBufferInterface
      *
      * @return \Generator
      */
-    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        return parent::connectGenerator($ctx->getCtx()->secure(true), $header);
+        return parent::connect($ctx->getCtx()->secure(true), $header);
     }
     /**
      * {@inheritDoc}

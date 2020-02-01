@@ -45,9 +45,9 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @return \Generator
      */
-    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = (yield $ctx->getStream(\str_repeat(\chr(221), 4) . $header));
+        $this->stream = (yield from $ctx->getStream(\str_repeat(\chr(221), 4) . $header));
     }
     /**
      * Async close.

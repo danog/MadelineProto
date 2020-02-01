@@ -43,9 +43,9 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @return \Generator
      */
-    public function connectGenerator(ConnectionContext $ctx, string $header = ''): \Generator
+    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = (yield $ctx->getStream(\chr(239) . $header));
+        $this->stream = (yield from $ctx->getStream(\chr(239) . $header));
     }
     /**
      * Async close.
