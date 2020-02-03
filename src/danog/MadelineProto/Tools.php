@@ -300,7 +300,8 @@ trait Tools
                     });
                 });
             } catch (\Throwable $throwable) {
-                throw new \Error('Loop exceptionally stopped without resolving the promise', 0, $throwable);
+                Logger::log('Loop exceptionally stopped without resolving the promise', Logger::FATAL_ERROR);
+                throw $throwable;
             }
         } while (!$resolved && !(Magic::$signaled && !$ignoreSignal));
         if ($exception) {

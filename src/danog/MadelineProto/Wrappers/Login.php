@@ -50,6 +50,7 @@ trait Login
     public function botLogin(string $token): \Generator
     {
         if ($this->authorized === self::LOGGED_IN) {
+            return;
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
             yield from $this->logout();
         }
