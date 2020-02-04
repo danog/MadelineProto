@@ -466,7 +466,7 @@ class Connection extends Session
      *
      * @return void
      */
-    public function setExtra(DataCenterConnection $extra, int $id)
+    public function setExtra($extra, int $id)
     {
         $this->shared = $extra;
         $this->id = $id;
@@ -478,7 +478,7 @@ class Connection extends Session
      *
      * @return MTProto
      */
-    public function getExtra(): MTProto
+    public function getExtra()
     {
         return $this->API;
     }

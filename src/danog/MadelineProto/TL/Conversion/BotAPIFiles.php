@@ -111,7 +111,7 @@ trait BotAPIFiles
                 return $res;
             case THUMBNAIL:
                 $res['InputFileLocation'] = [
-                    '_' => $photoSize->getThumbFileType() <= PHOTO ? 'inputPhotoFileLocation' : 'inputDocumentFileLocation',
+                    '_' => $photoSize->getThumbFileType() <= PHOTO ? 'inputDocumentFileLocation' : 'inputPhotoFileLocation',
                     'id' => $fileId->getId(),
                     'access_hash' => $fileId->getAccessHash(),
                     'file_reference' => $fileId->getFileReference(),
@@ -204,7 +204,7 @@ trait BotAPIFiles
             'file_reference' => $fileId->getFileReference(),
             'dc_id' => $fileId->getDcId(),
             'mime_type' => '',
-            'attributes' => [$attribute]
+            'attributes' => $attribute ? [$attribute] : []
         ];
         $res['MessageMedia'] = ['_' => 'messageMediaDocument', 'document' => $constructor, 'caption' => ''];
         return $res;

@@ -64,7 +64,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        if (!\class_exists(Connector::class)) {
+        if (!\class_exists(Handshake::class)) {
             throw new \danog\MadelineProto\Exception('Please install amphp/websocket-client by running "composer require amphp/websocket-client:dev-master"');
         }
         $this->dc = $ctx->getIntDc();

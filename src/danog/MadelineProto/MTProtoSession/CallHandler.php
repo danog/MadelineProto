@@ -87,20 +87,21 @@ trait CallHandler
     public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
     {
         $deferred = new Deferred();
-        $this->methodCallAsyncWrite($method, $args, $aargs)->onResolve(function ($e, $read_deferred) use ($deferred) {
-            if ($e) {
-                $deferred->fail($e);
-            } else {
-                if (\is_array($read_deferred)) {
-                    $read_deferred = \array_map(function ($value) {
-                        return $value->promise();
-                    }, $read_deferred);
-                    $deferred->resolve(all($read_deferred));
+        $this->methodCallAsyncWrite($method, $args, $aargs)->onResolve(
+            static function (\Throwable $e, $readDeferred) use ($deferred): void {
+                if ($e) {
+                    $deferred->fail($e);
                 } else {
-                    $deferred->resolve($read_deferred->promise());
+                    if (\is_array($readDeferred)) {
+                        $readDeferred = \array_map(fn (Deferred $value) => $value->promise(), $readDeferred);
+                        $deferred->resolve(all($readDeferred));
+                    } else {
+                        $readDeferred->promise()->onResolve(fn(\Throwable $e, $res) => var_dump($e, $res));
+                        $deferred->resolve($readDeferred->promise());
+                    }
                 }
             }
-        });
+        );
         return $aargs['noResponse'] ?? false ? new Success() : $deferred->promise();
     }
     /**

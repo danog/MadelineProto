@@ -597,7 +597,7 @@ class DataCenterConnection implements JsonSerializable
      *
      * @return void
      */
-    public function setExtra(MTProto $API)
+    public function setExtra($API)
     {
         $this->API = $API;
     }
@@ -606,7 +606,7 @@ class DataCenterConnection implements JsonSerializable
      *
      * @return MTProto
      */
-    public function getExtra(): MTProto
+    public function getExtra()
     {
         return $this->API;
     }

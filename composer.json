@@ -40,6 +40,8 @@
         "phpunit/phpunit": "^8",
         "amphp/php-cs-fixer-config": "dev-master",
         "haydenpierce/class-finder": "^0.4",
+        "amphp/websocket-client": "dev-master as 1",
+        "amphp/websocket": "dev-master as 1",
         "ext-ctype": "*",
         "danog/7to70": "^1",
         "danog/7to5": "^1"
@@ -62,6 +64,11 @@
             "src/polyfill.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "danog\\MadelineProto\\Test\\": "tests/danog/"
+        }
+    },
     "repositories": [{
         "type": "git",
         "url": "https://github.com/danog/dns"
@@ -80,6 +87,6 @@
         "cs": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff --dry-run",
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff",
         "docs": "php tools/build_docs.php",
-        "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text"
+        "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text --config tests/phpunit.xml"
     }
 }

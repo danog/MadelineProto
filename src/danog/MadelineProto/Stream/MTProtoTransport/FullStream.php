@@ -46,9 +46,9 @@ class FullStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param ConnectionContext $ctx
      *
-     * @return Promise
+     * @return \Generator
      */
-    public function connect(ConnectionContext $ctx, string $header = ''): Promise
+    public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
         $this->in_seq_no = -1;
         $this->out_seq_no = -1;
