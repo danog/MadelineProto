@@ -19,7 +19,6 @@
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
 use Amp\Socket\Socket;
 

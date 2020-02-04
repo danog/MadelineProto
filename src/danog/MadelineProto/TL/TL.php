@@ -273,7 +273,7 @@ class TL
                 }
             }
             if (empty($TL_dict) || empty($TL_dict['constructors']) || !isset($TL_dict['methods'])) {
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['src_file_invalid'] . $file);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['src_file_invalid'].$file);
             }
             $this->API->logger->logger(\danog\MadelineProto\Lang::$current_lang['translating_obj'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
@@ -420,6 +420,9 @@ class TL
                 if (\is_string($object) && \strlen($object) === 9 && $object[0] === 'a') {
                     return \substr($object, 1);
                 }
+                if (\is_array($object) && \count($object) === 2) {
+                    return \pack('l2', ...$object); // For bot API on 32bit
+                }
                 if (!\is_numeric($object)) {
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['not_numeric']);
                 }
@@ -454,18 +457,18 @@ class TL
                 if (!\is_string($object)) {
                     throw new Exception("You didn't provide a valid string");
                 }
-                $object = \pack('C*', ...\unpack('C*', $object));
+                //$object = \pack('C*', ...\unpack('C*', $object));
                 $l = \strlen($object);
                 $concat = '';
                 if ($l <= 253) {
                     $concat .= \chr($l);
                     $concat .= $object;
-                    $concat .= \pack('@' . \danog\MadelineProto\Tools::posmod(-$l - 1, 4));
+                    $concat .= \pack('@'.\danog\MadelineProto\Tools::posmod(-$l - 1, 4));
                 } else {
                     $concat .= \chr(254);
                     $concat .= \substr(\danog\MadelineProto\Tools::packSignedInt($l), 0, 3);
                     $concat .= $object;
-                    $concat .= \pack('@' . \danog\MadelineProto\Tools::posmod(-$l, 4));
+                    $concat .= \pack('@'.\danog\MadelineProto\Tools::posmod(-$l, 4));
                 }
                 return $concat;
             case 'bytes':
@@ -480,12 +483,12 @@ class TL
                 if ($l <= 253) {
                     $concat .= \chr($l);
                     $concat .= $object;
-                    $concat .= \pack('@' . \danog\MadelineProto\Tools::posmod(-$l - 1, 4));
+                    $concat .= \pack('@'.\danog\MadelineProto\Tools::posmod(-$l - 1, 4));
                 } else {
                     $concat .= \chr(254);
                     $concat .= \substr(\danog\MadelineProto\Tools::packSignedInt($l), 0, 3);
                     $concat .= $object;
-                    $concat .= \pack('@' . \danog\MadelineProto\Tools::posmod(-$l, 4));
+                    $concat .= \pack('@'.\danog\MadelineProto\Tools::posmod(-$l, 4));
                 }
                 return $concat;
             case 'Bool':
@@ -499,7 +502,7 @@ class TL
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['array_invalid']);
                 }
                 if (isset($object['_'])) {
-                    throw new Exception('You must provide an array of ' . $type['subtype'] . ' objects, not a ' . $type['subtype'] . " object. Example: [['_' => " . $type['subtype'] . ', ... ]]');
+                    throw new Exception('You must provide an array of '.$type['subtype'].' objects, not a '.$type['subtype']." object. Example: [['_' => ".$type['subtype'].', ... ]]');
                 }
                 $concat = $this->constructors->findByPredicate('vector')['id'];
                 $concat .= \danog\MadelineProto\Tools::packUnsignedInt(\count($object));
@@ -560,7 +563,7 @@ class TL
             $constructorData = $this->constructors->findByPredicate('inputMessageEntityMentionName');
         }
         $concat = $bare ? '' : $constructorData['id'];
-        return $concat . (yield from $this->serializeParams($constructorData, $object, '', $layer));
+        return $concat.(yield from $this->serializeParams($constructorData, $object, '', $layer));
     }
     /**
      * Serialize method.
@@ -637,9 +640,9 @@ class TL
         }
         $tl = $this->methods->findByMethod($method);
         if ($tl === false) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'] . $method);
+            throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'].$method);
         }
-        return $tl['id'] . (yield from $this->serializeParams($tl, $arguments, $method));
+        return $tl['id'].(yield from $this->serializeParams($tl, $arguments, $method));
     }
     /**
      * Serialize parameters.
@@ -724,11 +727,11 @@ class TL
                     $serialized .= \pack('@4');
                     continue;
                 }
-                if (($id = $this->constructors->findByPredicate(\lcfirst($current_argument['type']) . 'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
+                if (($id = $this->constructors->findByPredicate(\lcfirst($current_argument['type']).'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
                     $serialized .= $id['id'];
                     continue;
                 }
-                if (($id = $this->constructors->findByPredicate('input' . $current_argument['type'] . 'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
+                if (($id = $this->constructors->findByPredicate('input'.$current_argument['type'].'Empty', isset($tl['layer']) ? $tl['layer'] : -1)) && $id['type'] === $current_argument['type']) {
                     $serialized .= $id['id'];
                     continue;
                 }
@@ -831,7 +834,7 @@ class TL
                     throw new Exception(\danog\MadelineProto\Lang::$current_lang['length_too_big']);
                 }
                 if ($l === 254) {
-                    $long_len = \unpack('V', \stream_get_contents($stream, 3) . \chr(0))[1];
+                    $long_len = \unpack('V', \stream_get_contents($stream, 3).\chr(0))[1];
                     $x = \stream_get_contents($stream, $long_len);
                     $resto = \danog\MadelineProto\Tools::posmod(-$long_len, 4);
                     if ($resto > 0) {
@@ -853,7 +856,7 @@ class TL
                 $constructorData = $this->constructors->findById($id);
                 if ($constructorData === false) {
                     $constructorData = $this->methods->findById($id);
-                    $constructorData['predicate'] = 'method_' . $constructorData['method'];
+                    $constructorData['predicate'] = 'method_'.$constructorData['method'];
                 }
                 if ($constructorData === false) {
                     throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error_id'], $type['type'], \bin2hex(\strrev($id))));
@@ -865,7 +868,7 @@ class TL
                     case 'vector':
                         break;
                     default:
-                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['vector_invalid'] . $constructorData['predicate']);
+                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['vector_invalid'].$constructorData['predicate']);
                 }
             // no break
             case 'vector':
@@ -881,7 +884,7 @@ class TL
             $checkType = \substr($type['type'], 1);
             $constructorData = $this->constructors->findByType($checkType);
             if ($constructorData === false) {
-                throw new Exception(\danog\MadelineProto\Lang::$current_lang['constructor_not_found'] . $checkType);
+                throw new Exception(\danog\MadelineProto\Lang::$current_lang['constructor_not_found'].$checkType);
             }
         } else {
             $constructorData = $this->constructors->findByPredicate($type['type']);
@@ -893,7 +896,7 @@ class TL
                     if ($constructorData === false) {
                         throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['type_extract_error_id'], $type['type'], \bin2hex(\strrev($id))));
                     }
-                    $constructorData['predicate'] = 'method_' . $constructorData['method'];
+                    $constructorData['predicate'] = 'method_'.$constructorData['method'];
                 }
             }
         }
