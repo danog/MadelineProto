@@ -74,7 +74,11 @@ final class DataCenterTest extends TestCase
 
         $API->getLogger()->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6' : 'IPv4'));
 
-        Tools::wait($datacenter->dcConnect(2));
+        try {
+            Tools::wait($datacenter->dcConnect(2));
+        } finally {
+            Tools::wait($datacenter->getDataCenterConnection(2)->disconnect());
+        }
         $this->assertTrue(true);
     }
 
@@ -93,6 +97,9 @@ final class DataCenterTest extends TestCase
                         }
                         foreach (['abridged', 'intermediate', 'intermediate_padded', 'full'] as $protocol) {
                             if ($protocol === 'full' && $obfuscated) {
+                                continue;
+                            }
+                            if ($protocol === 'intermediate' && $obfuscated && getenv('TRAVIS_COMMIT')) {
                                 continue;
                             }
                             yield [$transport, $obfuscated, $protocol, $test_mode, $ipv6];

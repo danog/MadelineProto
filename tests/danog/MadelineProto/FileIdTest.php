@@ -141,7 +141,7 @@ class FileIdTest extends TestCase
             'animation' => 'https://github.com/danog/MadelineProto/blob/master/tests/pony.mp4?raw=true',
             'document' => 'https://github.com/danog/danog.github.io/raw/master/lol/index_htm_files/0.gif',
             'voice' => 'https://daniil.it/audio_2020-02-01_18-09-08.ogg',
-            //'video_note' => 'https://daniil.it/round.mp4'
+            'video_note' => 'https://daniil.it/round.mp4'
         ];
     }
 }
