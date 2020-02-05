@@ -141,7 +141,7 @@ trait CallHandler
                 if (!isset($aargs['postpone'])) {
                     $this->writer->resume();
                 }
-                return yield all($promises);
+                return $promises;
             }
             $args = (yield from $this->API->botAPIToMTProto($args));
             if (isset($args['ping_id']) && \is_int($args['ping_id'])) {
