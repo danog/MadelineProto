@@ -37,9 +37,6 @@ if (!\function_exists('error_clear_last')) {
         @\trigger_error("");
     }
 }
-if (!\defined('MADELINEPROTO_TEST')) {
-    \define('MADELINEPROTO_TEST', 'NOT PONY');
-}
 trait MyCallableMaker
 {
     use \Amp\CallableMaker {

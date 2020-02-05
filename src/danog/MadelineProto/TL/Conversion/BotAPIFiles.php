@@ -111,7 +111,7 @@ trait BotAPIFiles
                 return $res;
             case THUMBNAIL:
                 $res['InputFileLocation'] = [
-                    '_' => $photoSize->getThumbFileType() <= PHOTO ? 'inputDocumentFileLocation' : 'inputPhotoFileLocation',
+                    '_' => $photoSize->getThumbFileType() === THUMBNAIL ? 'inputDocumentFileLocation' : 'inputPhotoFileLocation',
                     'id' => $fileId->getId(),
                     'access_hash' => $fileId->getAccessHash(),
                     'file_reference' => $fileId->getFileReference(),
@@ -121,14 +121,28 @@ trait BotAPIFiles
                 $res['ext'] = 'jpg';
                 $res['mime'] = 'image/jpeg';
                 $res['InputMedia'] = [
-                    '_' => $photoSize->getThumbFileType() <= PHOTO ? 'inputMediaPhoto' : 'inputMediaDocument',
+                    '_' => $photoSize->getThumbFileType() === THUMBNAIL ? 'inputMediaDocument' : 'inputMediaPhoto',
                     'id' => [
-                        '_' => $photoSize->getThumbFileType() <= PHOTO ? 'inputPhoto' : 'inputDocument',
+                        '_' => $photoSize->getThumbFileType() === THUMBNAIL ? 'inputDocument' : 'inputPhoto',
                         'id' => $fileId->getId(),
                         'access_hash' => $fileId->getAccessHash(),
                         'file_reference' => $fileId->getFileReference(),
                     ]
                 ];
+                if ($res['InputMedia']['id'] === 'inputPhoto') {
+                    $res['InputMedia']['id']['sizes'] = [
+                        [
+                            '_' => 'photoSize',
+                            'type' => $photoSize->getThumbType(),
+                            'location' => [
+                                '_' => 'fileLocationToBeDeprecated',
+                                'dc_id' => $fileId->getDcId(),
+                                'local_id' => $fileId->getLocalId(),
+                                'volume_id' => $fileId->getVolumeId()
+                            ]
+                        ]
+                    ];
+                }
                 return $res;
             case PHOTO:
                 $constructor = [

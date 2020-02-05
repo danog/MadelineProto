@@ -26,6 +26,10 @@ use function Amp\File\get;
 use function Amp\File\put;
 use function Amp\File\rename as renameAsync;
 
+if (!\defined('MADELINEPROTO_TEST')) {
+    \define('MADELINEPROTO_TEST', 'NOT PONY');
+}
+
 /**
  * Main API wrapper for MadelineProto.
  */

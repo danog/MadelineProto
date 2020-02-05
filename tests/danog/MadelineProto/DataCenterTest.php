@@ -8,6 +8,8 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Tools;
 use PHPUnit\Framework\TestCase;
 
+\define("MADELINEPROTO_TEST", "pony");
+
 final class DataCenterTest extends TestCase
 {
     /**
@@ -78,7 +80,8 @@ final class DataCenterTest extends TestCase
 
     public function protocolProvider(): \Generator
     {
-        foreach ([false, true] as $test_mode) {
+        yield;
+        /*foreach ([false, true] as $test_mode) {
             foreach ([false, true] as $ipv6) {
                 foreach (['tcp', 'ws', 'wss'] as $transport) {
                     foreach ([true, false] as $obfuscated) {
@@ -96,6 +99,6 @@ final class DataCenterTest extends TestCase
                 yield ['tcp', false, 'http', $test_mode, $ipv6];
                 yield ['tcp', false, 'https', $test_mode, $ipv6];
             }
-        }
+        }*/
     }
 }

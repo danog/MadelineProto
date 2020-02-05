@@ -43,10 +43,11 @@ class FileIdTest extends TestCase
     /**
      * @param string $fileId File ID
      * @param string $type   Expected type
+     * @param string $type   Original type
      *
      * @dataProvider provideFileIdsAndType
      */
-    public function testDownload(string $type, string $fileIdStr, string $uniqueFileIdStr)
+    public function testDownload(string $type, string $fileIdStr, string $origType)
     {
         self::$MadelineProto->logger("Trying to download $fileIdStr");
         self::$MadelineProto->downloadToFile($fileIdStr, '/dev/null');
@@ -55,10 +56,11 @@ class FileIdTest extends TestCase
     /**
      * @param string $fileId File ID
      * @param string $type   Expected type
+     * @param string $type   Original type
      *
      * @dataProvider provideFileIdsAndType
      */
-    public function testResend(string $type, string $fileIdStr, string $uniqueFileIdStr)
+    public function testResend(string $type, string $fileIdStr, string $origType)
     {
         self::$MadelineProto->logger("Trying to resend $fileIdStr");
         self::$MadelineProto->messages->sendMedia(
@@ -79,12 +81,12 @@ class FileIdTest extends TestCase
             yield [
                 'profile_photo',
                 $result['small_file_id'],
-                $result['small_file_unique_id'],
+                'profile_photo',
             ];
             yield [
                 'profile_photo',
                 $result['big_file_id'],
-                $result['big_file_unique_id'],
+                'profile_photo',
             ];
         }
         foreach ($this->provideUrls() as $type => $url) {
@@ -112,13 +114,13 @@ class FileIdTest extends TestCase
                 yield [
                     $type,
                     $subResult['file_id'],
-                    $subResult['file_unique_id']
+                    $type,
                 ];
                 if (isset($subResult['thumb'])) {
                     yield [
                         'thumbnail',
                         $subResult['thumb']['file_id'],
-                        $subResult['thumb']['file_unique_id']
+                        $type,
                     ];
                 }
             }
