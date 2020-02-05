@@ -85,6 +85,7 @@ final class DataCenterTest extends TestCase
 
     public function protocolProvider(): \Generator
     {
+        return yield;
         $ipv6Pair = [false];
         if (@\file_get_contents('https://ipv6.google.com')) {
             $ipv6Pair []= true;
