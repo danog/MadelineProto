@@ -5,7 +5,6 @@ namespace danog\MadelineProto\Test;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Tools;
 use PHPUnit\Framework\TestCase;
 
@@ -36,14 +35,19 @@ final class DataCenterTest extends TestCase
                         'obfuscated' => $obfuscated,
                         'transport'  => $transport
                     ],
+                ],
+                'logger' => [
+                    'logger' => Logger::FILE_LOGGER,
+                    'logger_param' => getcwd().'/MadelineProto.log',
+                    'logger_level' => Logger::ULTRA_VERBOSE
                 ]
             ]
         );
         $datacenter = new DataCenter(
-            new class($settings) {
+            $API = new class($settings) {
                 /**
                  * Constructor.
-                 * 
+                 *
                  * @param array $settings Logger settings
                  */
                 public function __construct(array $settings)
@@ -64,6 +68,7 @@ final class DataCenterTest extends TestCase
             $settings['connection'],
             $settings['connection_settings'],
         );
+        $API->datacenter = $datacenter;
 
         Tools::wait($datacenter->dcConnect(2));
         $this->assertTrue(true);

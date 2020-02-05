@@ -88,7 +88,7 @@ trait CallHandler
     {
         $deferred = new Deferred();
         $this->methodCallAsyncWrite($method, $args, $aargs)->onResolve(
-            static function (\Throwable $e, $readDeferred) use ($deferred): void {
+            static function (?\Throwable $e, $readDeferred) use ($deferred, $method): void {
                 if ($e) {
                     $deferred->fail($e);
                 } else {
@@ -96,13 +96,12 @@ trait CallHandler
                         $readDeferred = \array_map(fn (Deferred $value) => $value->promise(), $readDeferred);
                         $deferred->resolve(all($readDeferred));
                     } else {
-                        $readDeferred->promise()->onResolve(fn(\Throwable $e, $res) => var_dump($e, $res));
                         $deferred->resolve($readDeferred->promise());
                     }
                 }
             }
         );
-        return $aargs['noResponse'] ?? false ? new Success() : $deferred->promise();
+        return ($aargs['noResponse'] ?? false) ? new Success() : $deferred->promise();
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -130,12 +129,12 @@ trait CallHandler
     {
         if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID' && $this->datacenter !== $args['id']['dc_id']) {
             $aargs['datacenter'] = $args['id']['dc_id'];
-            return $this->API->methodCallAsyncWriteGenerator($method, $args, $aargs);
+            return $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
         if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has($this->datacenter.'_media')) {
             $this->logger->logger('Using media DC');
             $aargs['datacenter'] = $this->datacenter.'_media';
-            return $this->API->methodCallAsyncWriteGenerator($method, $args, $aargs);
+            return $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
         if (\in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) {
             $aargs['queue'] = 'secret';
@@ -158,7 +157,7 @@ trait CallHandler
                     unset($args['multiple']);
                 }
                 foreach ($args as $single_args) {
-                    $promises[] = $this->methodCallAsyncWrite($method, $single_args, $new_aargs);
+                    $promises[] = yield from $this->methodCallAsyncWriteGenerator($method, $single_args, $new_aargs);
                 }
                 if (!isset($aargs['postpone'])) {
                     $this->writer->resume();

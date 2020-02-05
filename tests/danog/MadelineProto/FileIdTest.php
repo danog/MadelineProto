@@ -31,7 +31,8 @@ class FileIdTest extends TestCase
                     'api_hash' => \getenv('API_HASH'),
                 ],
                 'logger' => [
-                    'logger' => Logger::ECHO_LOGGER,
+                    'logger' => Logger::FILE_LOGGER,
+                    'logger_param' => getcwd().'/MadelineProto.log',
                     'logger_level' => Logger::ULTRA_VERBOSE
                 ]
             ]
@@ -47,7 +48,9 @@ class FileIdTest extends TestCase
      */
     public function testDownload(string $type, string $fileIdStr, string $uniqueFileIdStr)
     {
+        self::$MadelineProto->logger("Trying to download $fileIdStr");
         self::$MadelineProto->downloadToFile($fileIdStr, '/dev/null');
+        $this->assertTrue(true);
     }
     /**
      * @param string $fileId File ID
@@ -57,12 +60,15 @@ class FileIdTest extends TestCase
      */
     public function testResend(string $type, string $fileIdStr, string $uniqueFileIdStr)
     {
+        self::$MadelineProto->logger("Trying to resend $fileIdStr");
         self::$MadelineProto->messages->sendMedia(
             [
                 'peer' => \getenv('DEST'),
                 'media' => $fileIdStr
             ]
         );
+        $this->assertTrue(true);
+
     }
 
     public function provideFileIdsAndType(): \Generator

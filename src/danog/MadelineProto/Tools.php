@@ -183,6 +183,9 @@ trait Tools
         if (\is_int($value)) {
             return (string) $value;
         }
+        if (\is_array($value) && count($value) === 2) {
+            $value = pack('l2', $value);
+        }
         if (\strlen($value) !== 8) {
             throw new TL\Exception(\danog\MadelineProto\Lang::$current_lang['length_not_8']);
         }

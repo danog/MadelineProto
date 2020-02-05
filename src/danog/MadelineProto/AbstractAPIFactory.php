@@ -69,7 +69,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     protected $methods = [];
     public function __construct($namespace, &$API, &$async)
     {
-        $this->namespace = $namespace . '.';
+        $this->namespace = $namespace.'.';
         $this->API =& $API;
         $this->async =& $async;
     }
@@ -153,14 +153,15 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         }
         $lower_name = \strtolower($name);
         if ($this->namespace !== '' || !isset($this->methods[$lower_name])) {
-            $name = $this->namespace . $name;
+            $name = $this->namespace.$name;
             $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
             $aargs['apifactory'] = true;
             $aargs['datacenter'] = $this->API->datacenter->curdc;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
             return yield $this->API->methodCallAsyncRead($name, $args, $aargs);
         }
-        return yield $this->methods[$lower_name](...$arguments);
+        $res = yield $this->methods[$lower_name](...$arguments);
+        return $res instanceof \Generator ? yield from $res : yield $res;
     }
     /**
      * Get attribute.

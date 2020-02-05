@@ -21,6 +21,7 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Deferred;
 use Amp\Promise;
+use danog\MadelineProto\Connection;
 
 /**
  * Manages method and object calls.
@@ -54,9 +55,10 @@ trait CallHandler
     public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
     {
         $deferred = new Deferred();
-        $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->onResolve(static function ($e, $res) use (&$method, &$args, &$aargs, &$deferred) {
+        $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->onResolve(static function (?\Throwable $e, ?Connection $res) use (&$method, &$args, &$aargs, &$deferred): void {
             if ($e) {
-                throw $e;
+                $deferred->fail($e);
+                return;
             }
             $deferred->resolve($res->methodCallAsyncRead($method, $args, $aargs));
         });

@@ -39,6 +39,7 @@ use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\Tools;
 use function Amp\File\exists;
 use function Amp\File\open;
+use function Amp\Filestat;
 use function Amp\Promise\all;
 
 /**
@@ -80,7 +81,7 @@ trait Files
             $fileName = \basename($file);
         }
         StatCache::clear($file);
-        $size = (yield \stat($file))['size'];
+        $size = (yield stat($file))['size'];
         if ($size > 512 * 1024 * 3000) {
             throw new \danog\MadelineProto\Exception('Given file is too big!');
         }
@@ -939,7 +940,7 @@ trait Files
         $file = \realpath($file);
         $message_media = (yield from $this->getDownloadInfo($message_media));
         StatCache::clear($file);
-        $size = (yield \stat($file))['size'];
+        $size = (yield stat($file))['size'];
         $stream = yield open($file, 'cb');
         $this->logger->logger('Waiting for lock of file to download...');
         $unlock = yield \danog\MadelineProto\Tools::flock($file, LOCK_EX);
@@ -1090,6 +1091,7 @@ trait Files
             $origCb(100, 0, 0);
             return true;
         }
+        $parallel_chunks = 1;
         if ($params) {
             $previous_promise = new Success(true);
             $promises = [];
@@ -1232,7 +1234,7 @@ trait Files
                 $res['bytes'] = \substr($res['bytes'], $offset['part_start_at'], $offset['part_end_at'] - $offset['part_start_at']);
             }
             if (!$seekable) {
-                yield from $offset['previous_promise'];
+                yield $offset['previous_promise'];
             }
             $res = yield $callable($res['bytes'], $offset['offset'] + $offset['part_start_at']);
             $cb();

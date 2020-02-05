@@ -123,3 +123,4 @@ vendor
 coverage
 tempConv
 extracted.json
+.phpunit.result.cache

@@ -161,7 +161,7 @@ final class Coroutine implements Promise, \ArrayAccess
      *
      * @internal
      *
-     * @return void
+     * @return mixed
      */
     public function throw(\Throwable $reason)
     {
@@ -172,7 +172,7 @@ final class Coroutine implements Promise, \ArrayAccess
                 $reason->yieldedFrames = $this->getTrace();
             }
         }
-        $this->generator->throw($reason);
+        return $this->generator->throw($reason);
     }
     /**
      * @param \Throwable $reason Failure reason.
