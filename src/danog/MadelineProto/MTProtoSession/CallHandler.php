@@ -51,7 +51,7 @@ trait CallHandler
         foreach ($message_ids as $message_id) {
             if (isset($this->outgoing_messages[$message_id]['body'])) {
                 if ($datacenter) {
-                    $res = $this->API->datacenter->waitGetConnection($datacenter)->onResolve(function ($e, $r) use ($message_id) {
+                    $res = Tools::call($this->API->datacenter->waitGetConnection($datacenter))->onResolve(function ($e, $r) use ($message_id) {
                         return $r->sendMessage($this->outgoing_messages[$message_id], false);
                     });
                 } else {
