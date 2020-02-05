@@ -454,7 +454,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->datacenter->curdc = 2;
         if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->hasTempAuthKey()) {
             try {
-                $nearest_dc = yield $this->methodCallAsyncRead('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
+                $nearest_dc = yield from $this->methodCallAsyncRead('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
                 $this->logger->logger(\sprintf(Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
                 if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
                     $this->settings['connection_settings']['default_dc'] = $this->datacenter->curdc = (int) $nearest_dc['nearest_dc'];
@@ -1531,7 +1531,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         if ($this->authorized === self::LOGGED_IN && \class_exists(VoIPServerConfigInternal::class) && !$this->authorization['user']['bot'] && $this->datacenter->getDataCenterConnection($this->settings['connection_settings']['default_dc'])->hasTempAuthKey()) {
             $this->logger->logger('Fetching phone config...');
-            VoIPServerConfig::updateDefault(yield $this->methodCallAsyncRead('phone.getCallConfig', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]));
+            VoIPServerConfig::updateDefault(yield from $this->methodCallAsyncRead('phone.getCallConfig', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]));
         } else {
             $this->logger->logger('Not fetching phone config');
         }
@@ -1546,7 +1546,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function getCdnConfig(string $datacenter): \Generator
     {
         try {
-            foreach ((yield $this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
+            foreach ((yield from $this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $datacenter]))['public_keys'] as $curkey) {
                 $curkey = (yield from (new RSA())->load($this->TL, $curkey['public_key']));
                 $this->cdn_rsa_keys[$curkey->fp] = $curkey;
             }
@@ -1576,7 +1576,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->config['expires'] > \time()) {
             return $this->config;
         }
-        $this->config = empty($config) ? yield $this->methodCallAsyncRead('help.getConfig', $config, empty($options) ? ['datacenter' => $this->settings['connection_settings']['default_dc']] : $options) : $config;
+        $this->config = empty($config) ? yield from $this->methodCallAsyncRead('help.getConfig', $config, $options ?: ['datacenter' => $this->settings['connection_settings']['default_dc']]) : $config;
         yield from $this->parseConfig();
         return $this->config;
     }
@@ -1637,7 +1637,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function getSelf(): \Generator
     {
         try {
-            $this->authorization = ['user' => (yield $this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc]))[0]];
+            $this->authorization = ['user' => (yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc]))[0]];
         } catch (RPCErrorException $e) {
             $this->logger->logger($e->getMessage());
             return false;

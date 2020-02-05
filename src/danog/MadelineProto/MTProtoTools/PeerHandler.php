@@ -474,12 +474,12 @@ trait PeerHandler
                     $this->caching_simple[$id] = true;
                     if ($id < 0) {
                         if ($this->isSupergroup($id)) {
-                            yield $this->methodCallAsyncRead('channels.getChannels', ['id' => [['access_hash' => 0, 'channel_id' => $this->fromSupergroup($id), '_' => 'inputChannel']]], ['datacenter' => $this->datacenter->curdc]);
+                            yield from $this->methodCallAsyncRead('channels.getChannels', ['id' => [['access_hash' => 0, 'channel_id' => $this->fromSupergroup($id), '_' => 'inputChannel']]], ['datacenter' => $this->datacenter->curdc]);
                         } else {
-                            yield $this->methodCallAsyncRead('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);
+                            yield from $this->methodCallAsyncRead('messages.getFullChat', ['chat_id' => -$id], ['datacenter' => $this->datacenter->curdc]);
                         }
                     } else {
-                        yield $this->methodCallAsyncRead('users.getUsers', ['id' => [['access_hash' => 0, 'user_id' => $id, '_' => 'inputUser']]], ['datacenter' => $this->datacenter->curdc]);
+                        yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [['access_hash' => 0, 'user_id' => $id, '_' => 'inputUser']]], ['datacenter' => $this->datacenter->curdc]);
                     }
                 } catch (\danog\MadelineProto\Exception $e) {
                     $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
@@ -498,9 +498,9 @@ trait PeerHandler
                     $this->logger->logger("Only have min peer for {$id} in database, trying to fetch full info");
                     try {
                         if ($id < 0) {
-                            yield $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll($this->chats[$id], $folder_id)['InputChannel']]], ['datacenter' => $this->datacenter->curdc]);
+                            yield from $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll($this->chats[$id], $folder_id)['InputChannel']]], ['datacenter' => $this->datacenter->curdc]);
                         } else {
-                            yield $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll($this->chats[$id], $folder_id)['InputUser']]], ['datacenter' => $this->datacenter->curdc]);
+                            yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll($this->chats[$id], $folder_id)['InputUser']]], ['datacenter' => $this->datacenter->curdc]);
                         }
                     } catch (\danog\MadelineProto\Exception $e) {
                         $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
@@ -544,7 +544,7 @@ trait PeerHandler
             if ($matches[1] === '') {
                 $id = $matches[2];
             } else {
-                $invite = yield $this->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $matches[2]], ['datacenter' => $this->datacenter->curdc]);
+                $invite = yield from $this->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $matches[2]], ['datacenter' => $this->datacenter->curdc]);
                 if (isset($invite['chat'])) {
                     return yield from $this->getInfo($invite['chat']);
                 }
@@ -557,7 +557,7 @@ trait PeerHandler
         }
         if ($id === 'support') {
             if (!$this->supportUser) {
-                yield $this->methodCallAsyncRead('help.getSupport', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+                yield from $this->methodCallAsyncRead('help.getSupport', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             }
             return yield from $this->getInfo($this->supportUser);
         }
@@ -568,9 +568,9 @@ trait PeerHandler
                     $this->logger->logger("Only have min peer for {$bot_api_id} in database, trying to fetch full info");
                     try {
                         if ($bot_api_id < 0) {
-                            yield $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll($this->chats[$bot_api_id], $folder_id)['InputChannel']]], ['datacenter' => $this->datacenter->curdc]);
+                            yield from $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll($this->chats[$bot_api_id], $folder_id)['InputChannel']]], ['datacenter' => $this->datacenter->curdc]);
                         } else {
-                            yield $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll($this->chats[$bot_api_id], $folder_id)['InputUser']]], ['datacenter' => $this->datacenter->curdc]);
+                            yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll($this->chats[$bot_api_id], $folder_id)['InputUser']]], ['datacenter' => $this->datacenter->curdc]);
                         }
                     } catch (\danog\MadelineProto\Exception $e) {
                         $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
@@ -679,14 +679,14 @@ trait PeerHandler
         switch ($partial['type']) {
             case 'user':
             case 'bot':
-                $full = yield $this->methodCallAsyncRead('users.getFullUser', ['id' => $partial['InputUser']], ['datacenter' => $this->datacenter->curdc]);
+                $full = yield from $this->methodCallAsyncRead('users.getFullUser', ['id' => $partial['InputUser']], ['datacenter' => $this->datacenter->curdc]);
                 break;
             case 'chat':
-                $full = (yield $this->methodCallAsyncRead('messages.getFullChat', $partial, ['datacenter' => $this->datacenter->curdc]))['full_chat'];
+                $full = (yield from $this->methodCallAsyncRead('messages.getFullChat', $partial, ['datacenter' => $this->datacenter->curdc]))['full_chat'];
                 break;
             case 'channel':
             case 'supergroup':
-                $full = (yield $this->methodCallAsyncRead('channels.getFullChannel', ['channel' => $partial['InputChannel']], ['datacenter' => $this->datacenter->curdc]))['full_chat'];
+                $full = (yield from $this->methodCallAsyncRead('channels.getFullChannel', ['channel' => $partial['InputChannel']], ['datacenter' => $this->datacenter->curdc]))['full_chat'];
                 break;
         }
         $res = [];
@@ -857,7 +857,7 @@ trait PeerHandler
         $last_count = -1;
         do {
             try {
-                $gres = yield $this->methodCallAsyncRead('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset, 'limit' => $limit, 'hash' => $hash = $this->getParticipantsHash($channel, $filter, $q, $offset, $limit)], ['datacenter' => $this->datacenter->curdc, 'heavy' => true]);
+                $gres = yield from $this->methodCallAsyncRead('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset, 'limit' => $limit, 'hash' => $hash = $this->getParticipantsHash($channel, $filter, $q, $offset, $limit)], ['datacenter' => $this->datacenter->curdc, 'heavy' => true]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if ($e->rpc === 'CHAT_ADMIN_REQUIRED') {
                     $this->logger->logger($e->rpc);
@@ -992,7 +992,7 @@ trait PeerHandler
     {
         try {
             $this->caching_simple_username[$username] = true;
-            $res = yield $this->methodCallAsyncRead('contacts.resolveUsername', ['username' => \str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
+            $res = yield from $this->methodCallAsyncRead('contacts.resolveUsername', ['username' => \str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             $this->logger->logger('Username resolution failed with error ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0 || $e->rpc === 'AUTH_KEY_UNREGISTERED' || $e->rpc === 'USERNAME_INVALID') {

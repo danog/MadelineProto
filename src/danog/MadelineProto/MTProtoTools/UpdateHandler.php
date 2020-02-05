@@ -227,7 +227,7 @@ trait UpdateHandler
      */
     public function getUpdatesState(): \Generator
     {
-        $data = yield $this->methodCallAsyncRead('updates.getState', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+        $data = yield from $this->methodCallAsyncRead('updates.getState', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
         yield from $this->getCdnConfig($this->settings['connection_settings']['default_dc']);
         return $data;
     }
@@ -391,7 +391,7 @@ trait UpdateHandler
                     return false;
                 }
                 $this->logger->logger('Applying qts: ' . $update['qts'] . ' over current qts ' . $cur_state->qts() . ', chat id: ' . $update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
-                yield $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+                yield from $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             }
             yield from $this->handleEncryptedUpdate($update);
             return;
@@ -475,7 +475,7 @@ trait UpdateHandler
             $result = \json_decode($result, true);
             if (\is_array($result) && isset($result['method']) && $result['method'] != '' && \is_string($result['method'])) {
                 try {
-                    $this->logger->logger('Reverse webhook command returned', yield $this->methodCallAsyncRead($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
+                    $this->logger->logger('Reverse webhook command returned', yield from $this->methodCallAsyncRead($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
                 } catch (\Throwable $e) {
                     $this->logger->logger("Reverse webhook command returned: {$e}");
                 }

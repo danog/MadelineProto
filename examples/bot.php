@@ -81,7 +81,6 @@ $settings = [
     ],
     'serialization' => [
         'serialization_interval' => 30,
-        'cleanup_before_serialization' => true
     ],
 ];
 

@@ -416,10 +416,10 @@ class ReferenceDatabase implements TLCallback
                         $origin['peer'] = $this->API->getId($origin['peer']);
                     }
                     if ($origin['peer'] < 0) {
-                        yield $this->API->methodCallAsyncRead('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                        yield from $this->API->methodCallAsyncRead('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                         break;
                     }
-                    yield $this->API->methodCallAsyncRead('messages.getMessages', ['id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield from $this->API->methodCallAsyncRead('messages.getMessages', ['id' => [$origin['msg_id']]], ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 // Peer + photo ID
                 case self::PEER_PHOTO_ORIGIN:
@@ -430,25 +430,25 @@ class ReferenceDatabase implements TLCallback
                     break;
                 // Peer (default photo ID)
                 case self::USER_PHOTO_ORIGIN:
-                    yield $this->API->methodCallAsyncRead('photos.getUserPhotos', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield from $this->API->methodCallAsyncRead('photos.getUserPhotos', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 case self::SAVED_GIFS_ORIGIN:
-                    yield $this->API->methodCallAsyncRead('messages.getSavedGifs', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield from $this->API->methodCallAsyncRead('messages.getSavedGifs', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 case self::STICKER_SET_ID_ORIGIN:
-                    yield $this->API->methodCallAsyncRead('messages.getStickerSet', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield from $this->API->methodCallAsyncRead('messages.getStickerSet', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 case self::STICKER_SET_RECENT_ORIGIN:
-                    yield $this->API->methodCallAsyncRead('messages.getRecentStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield from $this->API->methodCallAsyncRead('messages.getRecentStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 case self::STICKER_SET_FAVED_ORIGIN:
-                    yield $this->API->methodCallAsyncRead('messages.getFavedStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield from $this->API->methodCallAsyncRead('messages.getFavedStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 case self::STICKER_SET_EMOTICON_ORIGIN:
-                    yield $this->API->methodCallAsyncRead('messages.getStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield from $this->API->methodCallAsyncRead('messages.getStickers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 case self::WALLPAPER_ORIGIN:
-                    yield $this->API->methodCallAsyncRead('account.getWallPapers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
+                    yield from $this->API->methodCallAsyncRead('account.getWallPapers', $origin, ['datacenter' => $this->API->settings['connection_settings']['default_dc']]);
                     break;
                 default:
                     throw new \danog\MadelineProto\Exception("Unknown origin type {$originType}");

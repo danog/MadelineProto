@@ -63,7 +63,7 @@ trait DialogHandler
         $dialogs = [];
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['getting_dialogs']);
         while ($this->dialog_params['count'] < $res['count']) {
-            $res = yield $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
+            $res = yield from $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params, ['datacenter' => $datacenter, 'FloodWaitLimit' => 100]);
             $last_peer = 0;
             $last_date = 0;
             $last_id = 0;

@@ -73,7 +73,7 @@ class PingLoop extends ResumableSignalLoop
             if (\time() - $connection->getLastChunk() >= $timeout) {
                 $API->logger->logger("Ping DC {$datacenter}");
                 try {
-                    yield $connection->methodCallAsyncRead('ping', ['ping_id' => \random_bytes(8)]);
+                    yield from $connection->methodCallAsyncRead('ping', ['ping_id' => \random_bytes(8)]);
                 } catch (\Throwable $e) {
                     $API->logger->logger("Error while pinging DC {$datacenter}");
                     $API->logger->logger((string) $e);
