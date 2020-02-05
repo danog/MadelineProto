@@ -39,7 +39,7 @@ if ($loader) {
         if (\in_array($class, ['Amp\\Sync\\Internal\\MutexStorage', 'Amp\\Sync\\Internal\\SemaphoreStorage', 'Amp\\Parallel\\Sync\\Internal\\ParcelStorage', 'Amp\\Parallel\\Context\\Internal\\Thread'])) {
             continue;
         }
-        echo "Requiring $class => $file\n";
+        //echo "Requiring $class => $file\n";
         require_once($file);
     }
 }
