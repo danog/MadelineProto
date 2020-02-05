@@ -80,9 +80,12 @@ final class DataCenterTest extends TestCase
 
     public function protocolProvider(): \Generator
     {
-        yield;
-        /*foreach ([false, true] as $test_mode) {
-            foreach ([false, true] as $ipv6) {
+        $ipv6Pair = [false];
+        if (@\file_get_contents('https://ipv6.google.com')) {
+            $ipv6Pair []= true;
+        }
+        foreach ([false, true] as $test_mode) {
+            foreach ($ipv6Pair as $ipv6) {
                 foreach (['tcp', 'ws', 'wss'] as $transport) {
                     foreach ([true, false] as $obfuscated) {
                         if ($transport !== 'tcp' && !$obfuscated) {
@@ -99,6 +102,6 @@ final class DataCenterTest extends TestCase
                 yield ['tcp', false, 'http', $test_mode, $ipv6];
                 yield ['tcp', false, 'https', $test_mode, $ipv6];
             }
-        }*/
+        }
     }
 }

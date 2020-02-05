@@ -359,7 +359,6 @@ trait ResponseHandler
                         case 303:
                             $this->API->datacenter->curdc = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
                             if (isset($request['file']) && $request['file'] && $this->API->datacenter->has($datacenter . '_media')) {
-                                \danog\MadelineProto\Logger::log('Using media DC');
                                 $datacenter .= '_media';
                             }
                             if (isset($request['user_related']) && $request['user_related']) {

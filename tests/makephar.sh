@@ -1,12 +1,5 @@
 #!/bin/bash -e
 
-composer update
-composer test || {
-    cat tests/MadelineProto.log
-    exit 1
-}
-cat tests/MadelineProto.log
-
 # Configure
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
@@ -14,6 +7,19 @@ PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 [ "$(git rev-list --tags --max-count=1)" == "$TRAVIS_COMMIT" ] && IS_RELEASE=y || IS_RELEASE=n
 
 echo "Is release: $IS_RELEASE"
+
+skip=n
+[ $PHP_MAJOR_VERSION -eq 7 ] && [ $PHP_MINOR_VERSION -ge 4 ] && {
+    composer update
+    composer test || {
+        cat tests/MadelineProto.log
+        exit 1
+    }
+    cat tests/MadelineProto.log
+} || {
+    skip=y
+    echo "Skip"
+}
 
 # Clean up
 rm -rf phar7 phar5 MadelineProtoPhar
