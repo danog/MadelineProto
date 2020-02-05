@@ -24,7 +24,6 @@ use Amp\Promise;
 use danog\MadelineProto\Async\AsyncParameters;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
-use function Amp\Promise\all;
 
 /**
  * Manages method and object calls.

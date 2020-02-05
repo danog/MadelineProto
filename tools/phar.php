@@ -82,18 +82,23 @@ function ___install_madeline()
         $phar = \file_get_contents(\sprintf($phar_template, $release_branch));
 
         if ($phar) {
-            $extractVersions = static function () {
-                if (!\file_exists('phar://madeline.phar/vendor/composer/installed.json')) {
+            $extractVersions = static function ($ext = '') {
+                if (!\file_exists("phar://madeline.phar$ext/vendor/composer/installed.json")) {
                     return [];
                 }
-                $composer = \json_decode(\file_get_contents('phar://madeline.phar/vendor/composer/installed.json'), true);
+                $composer = \json_decode(\file_get_contents("phar://madeline.phar$ext/vendor/composer/installed.json"), true) ?: [];
                 $packages = [];
                 foreach ($composer as $dep) {
                     $packages[$dep['name']] = $dep['version_normalized'];
                 }
                 return $packages;
             };
-            $previous = $extractVersions();
+            $previous = [];
+            if (\file_exists('madeline.phar')) {
+                \copy('madeline.phar', 'madeline.phar.old');
+                $previous = $extractVersions('.old');
+                \unlink('madeline.phar.old');
+            }
             $previous['danog/madelineproto'] = 'old';
 
             \file_put_contents('madeline.phar', $phar);
