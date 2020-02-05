@@ -99,7 +99,7 @@ final class DataCenterTest extends TestCase
                             if ($protocol === 'full' && $obfuscated) {
                                 continue;
                             }
-                            if ($protocol === 'intermediate' && $obfuscated && getenv('TRAVIS_COMMIT')) {
+                            if (in_array($protocol, ['intermediate', 'intermediate_padded']) && $obfuscated && getenv('TRAVIS_COMMIT')) {
                                 continue;
                             }
                             yield [$transport, $obfuscated, $protocol, $test_mode, $ipv6];
