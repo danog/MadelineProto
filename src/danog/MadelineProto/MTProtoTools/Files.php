@@ -276,7 +276,7 @@ trait Files
         $exception = null;
         $start = \microtime(true);
         while ($part_num < $part_total_num) {
-            $writePromise = $this->methodCallAsyncWrite($method, $callable($part_num), ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]);
+            $writePromise = Tools::call($this->methodCallAsyncWrite($method, $callable($part_num), ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]));
             if (!$seekable) {
                 yield $writePromise;
             }

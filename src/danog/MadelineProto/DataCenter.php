@@ -549,9 +549,9 @@ class DataCenter
      *
      * @param string $dc DC ID
      *
-     * @return Promise<Connection>
+     * @return \Generator<Connection>
      */
-    public function waitGetConnection(string $dc): Promise
+    public function waitGetConnection(string $dc): \Generator
     {
         return $this->sockets[$dc]->waitGetConnection();
     }

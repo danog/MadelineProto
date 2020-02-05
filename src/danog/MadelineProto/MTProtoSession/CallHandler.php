@@ -82,39 +82,17 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return Promise
+     * @return \Generator
      */
-    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
+    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
-        $deferred = new Deferred();
-        $this->methodCallAsyncWrite($method, $args, $aargs)->onResolve(
-            static function (?\Throwable $e, $readDeferred) use ($deferred, $method): void {
-                if ($e) {
-                    $deferred->fail($e);
-                } else {
-                    if (\is_array($readDeferred)) {
-                        $readDeferred = \array_map(fn (Deferred $value) => $value->promise(), $readDeferred);
-                        $deferred->resolve(all($readDeferred));
-                    } else {
-                        $deferred->resolve($readDeferred->promise());
-                    }
-                }
-            }
-        );
-        return ($aargs['noResponse'] ?? false) ? new Success() : $deferred->promise();
-    }
-    /**
-     * Call method and make sure it is asynchronously sent.
-     *
-     * @param string $method Method name
-     * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
-     *
-     * @return Promise
-     */
-    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
-    {
-        return \danog\MadelineProto\Tools::call($this->methodCallAsyncWriteGenerator($method, $args, $aargs));
+        $readDeferred = yield from $this->methodCallAsyncWrite($method, $args, $aargs);
+        if (\is_array($readDeferred)) {
+            $readDeferred = Tools::all(\array_map(fn (Deferred $value) => $value->promise(), $readDeferred));
+        } else {
+            $readDeferred = $readDeferred->promise();
+        }
+        return ($aargs['noResponse'] ?? false) ? new Success() : $readDeferred;
     }
     /**
      * Call method and make sure it is asynchronously sent (generator).
@@ -125,16 +103,16 @@ trait CallHandler
      *
      * @return Generator
      */
-    public function methodCallAsyncWriteGenerator(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
+    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
         if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID' && $this->datacenter !== $args['id']['dc_id']) {
             $aargs['datacenter'] = $args['id']['dc_id'];
-            return $this->API->methodCallAsyncWrite($method, $args, $aargs);
+            return yield from $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
         if (($aargs['file'] ?? false) && !$this->isMedia() && $this->API->datacenter->has($this->datacenter.'_media')) {
             $this->logger->logger('Using media DC');
             $aargs['datacenter'] = $this->datacenter.'_media';
-            return $this->API->methodCallAsyncWrite($method, $args, $aargs);
+            return yield from $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
         if (\in_array($method, ['messages.setEncryptedTyping', 'messages.readEncryptedHistory', 'messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService', 'messages.receivedQueue'])) {
             $aargs['queue'] = 'secret';
@@ -157,7 +135,7 @@ trait CallHandler
                     unset($args['multiple']);
                 }
                 foreach ($args as $single_args) {
-                    $promises[] = yield from $this->methodCallAsyncWriteGenerator($method, $single_args, $new_aargs);
+                    $promises[] = yield from $this->methodCallAsyncWrite($method, $single_args, $new_aargs);
                 }
                 if (!isset($aargs['postpone'])) {
                     $this->writer->resume();

@@ -506,18 +506,14 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Get best socket in round robin, asynchronously.
      *
-     * @return Promise<Connection>
+     * @return \Generator<Connection>
      */
-    public function waitGetConnection(): Promise
+    public function waitGetConnection(): \Generator
     {
         if (empty($this->availableConnections)) {
-            $deferred = new Deferred();
-            $this->connectionsPromise->onResolve(function ($e, $v) use ($deferred) {
-                $deferred->resolve($this->getConnection());
-            });
-            return $deferred->promise();
+            yield $this->connectionsPromise;
         }
-        return new Success($this->getConnection());
+        return $this->getConnection();
     }
     /**
      * Get best socket in round robin.

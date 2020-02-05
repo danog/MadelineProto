@@ -35,7 +35,7 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return array
+     * @return mixed
      */
     public function methodCall(string $method, $args = [], array $aargs = ['msg_id' => null])
     {
@@ -50,19 +50,11 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return Promise
+     * @return \Generator
      */
-    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
+    public function methodCallAsyncRead(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
-        $deferred = new Deferred();
-        $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->onResolve(static function (?\Throwable $e, ?Connection $res) use (&$method, &$args, &$aargs, &$deferred): void {
-            if ($e) {
-                $deferred->fail($e);
-                return;
-            }
-            $deferred->resolve($res->methodCallAsyncRead($method, $args, $aargs));
-        });
-        return $deferred->promise();
+        return yield from (yield from $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncRead($method, $args, $aargs);
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -71,17 +63,10 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return Promise
+     * @return \Generator
      */
-    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): Promise
+    public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
-        $deferred = new Deferred();
-        $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc)->onResolve(static function ($e, $res) use (&$method, &$args, &$aargs, &$deferred) {
-            if ($e) {
-                throw $e;
-            }
-            $deferred->resolve($res->methodCallAsyncWrite($method, $args, $aargs));
-        });
-        return $deferred->promise();
+        return yield from (yield from $this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->curdc))->methodCallAsyncWrite($method, $args, $aargs);
     }
 }
