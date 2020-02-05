@@ -32,7 +32,7 @@ class FileIdTest extends TestCase
                 ],
                 'logger' => [
                     'logger' => Logger::FILE_LOGGER,
-                    'logger_param' => getcwd().'/MadelineProto.log',
+                    'logger_param' => __DIR__.'/../../MadelineProto.log',
                     'logger_level' => Logger::ULTRA_VERBOSE
                 ]
             ]
@@ -68,7 +68,6 @@ class FileIdTest extends TestCase
             ]
         );
         $this->assertTrue(true);
-
     }
 
     public function provideFileIdsAndType(): \Generator

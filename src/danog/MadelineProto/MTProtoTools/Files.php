@@ -26,7 +26,7 @@ use Amp\ByteStream\StreamException;
 use Amp\Deferred;
 use Amp\File\BlockingFile;
 use Amp\File\Handle;
-use Amp\File\StatCache;
+use Amp\File\StatCache as StatCacheAsync;
 use Amp\Http\Client\Request;
 use Amp\Promise;
 use Amp\Success;
@@ -39,7 +39,7 @@ use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\Tools;
 use function Amp\File\exists;
 use function Amp\File\open;
-use function Amp\Filestat;
+use function Amp\File\stat as statAsync;
 use function Amp\Promise\all;
 
 /**
@@ -80,8 +80,8 @@ trait Files
         if (empty($fileName)) {
             $fileName = \basename($file);
         }
-        StatCache::clear($file);
-        $size = (yield stat($file))['size'];
+        StatCacheAsync::clear($file);
+        $size = (yield statAsync($file))['size'];
         if ($size > 512 * 1024 * 3000) {
             throw new \danog\MadelineProto\Exception('Given file is too big!');
         }
@@ -116,7 +116,7 @@ trait Files
         $request->setBodySizeLimit(512 * 1024 * 3000);
         $response = yield $this->datacenter->getHTTPClient()->request($request);
         if (200 !== ($status = $response->getStatus())) {
-            throw new Exception("Wrong status code: {$status} " . $response->getReason());
+            throw new Exception("Wrong status code: {$status} ".$response->getReason());
         }
         $mime = \trim(\explode(';', $response->getHeader('content-type') ?? 'application/octet-stream')[0]);
         $size = $response->getHeader('content-length') ?? $size;
@@ -229,11 +229,11 @@ trait Files
         }
         if ($cb === null) {
             $cb = function ($percent) {
-                $this->logger->logger('Upload status: ' . $percent . '%', \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger('Upload status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
             };
         }
         $datacenter = $this->settings['connection_settings']['default_dc'];
-        if ($this->datacenter->has($datacenter . '_media')) {
+        if ($this->datacenter->has($datacenter.'_media')) {
             $datacenter .= '_media';
         }
         $part_size = $this->settings['upload']['part_size'];
@@ -241,13 +241,13 @@ trait Files
         $part_total_num = (int) \ceil($size / $part_size);
         $part_num = 0;
         $method = $size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
-        $constructor = 'input' . ($encrypted === true ? 'Encrypted' : '') . ($size > 10 * 1024 * 1024 ? 'FileBig' : 'File') . ($encrypted === true ? 'Uploaded' : '');
+        $constructor = 'input'.($encrypted === true ? 'Encrypted' : '').($size > 10 * 1024 * 1024 ? 'FileBig' : 'File').($encrypted === true ? 'Uploaded' : '');
         $file_id = \danog\MadelineProto\Tools::random(8);
         $ige = null;
         if ($encrypted === true) {
             $key = \danog\MadelineProto\Tools::random(32);
             $iv = \danog\MadelineProto\Tools::random(32);
-            $digest = \hash('md5', $key . $iv, true);
+            $digest = \hash('md5', $key.$iv, true);
             $fingerprint = \danog\MadelineProto\Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
             $ige = new \tgseclib\Crypt\AES('ige');
             $ige->setIV($iv);
@@ -290,7 +290,7 @@ trait Files
                 try {
                     // Wrote chunk!
                     if (!yield Tools::call($readDeferred->promise())) {
-                        throw new \danog\MadelineProto\Exception('Upload of part ' . $part_num . ' failed');
+                        throw new \danog\MadelineProto\Exception('Upload of part '.$part_num.' failed');
                     }
                     // Got OK from server for chunk!
                     $cb();
@@ -628,7 +628,7 @@ trait Files
                 if (isset($message_media['decrypted_message']['media']['file_name'])) {
                     $pathinfo = \pathinfo($message_media['decrypted_message']['media']['file_name']);
                     if (isset($pathinfo['extension'])) {
-                        $res['ext'] = '.' . $pathinfo['extension'];
+                        $res['ext'] = '.'.$pathinfo['extension'];
                     }
                     $res['name'] = $pathinfo['filename'];
                 }
@@ -643,7 +643,7 @@ trait Files
                             case 'documentAttributeFilename':
                                 $pathinfo = \pathinfo($attribute['file_name']);
                                 if (isset($pathinfo['extension'])) {
-                                    $res['ext'] = '.' . $pathinfo['extension'];
+                                    $res['ext'] = '.'.$pathinfo['extension'];
                                 }
                                 $res['name'] = $pathinfo['filename'];
                                 break;
@@ -656,7 +656,7 @@ trait Files
                 if (isset($audio) && isset($audio['title']) && !isset($res['name'])) {
                     $res['name'] = $audio['title'];
                     if (isset($audio['performer'])) {
-                        $res['name'] .= ' - ' . $audio['performer'];
+                        $res['name'] .= ' - '.$audio['performer'];
                     }
                 }
                 if (!isset($res['ext']) || $res['ext'] === '') {
@@ -717,7 +717,7 @@ trait Files
                 //$res['thumb_size'] = $res['data'];
                 $res['thumb_size'] = $message_media['type'];
                 if ($message_media['location']['_'] === 'fileLocationUnavailable') {
-                    $res['name'] = Tools::unpackSignedLongString($message_media['volume_id']) . '_' . $message_media['local_id'];
+                    $res['name'] = Tools::unpackSignedLongString($message_media['volume_id']).'_'.$message_media['local_id'];
                     $res['mime'] = $this->getMimeFromBuffer($res['data']);
                     $res['ext'] = $this->getExtensionFromMime($res['mime']);
                 } else {
@@ -735,13 +735,13 @@ trait Files
             case 'fileLocationUnavailable':
                 throw new \danog\MadelineProto\Exception('File location unavailable');
             case 'fileLocation':
-                $res['name'] = Tools::unpackSignedLongString($message_media['volume_id']) . '_' . $message_media['local_id'];
+                $res['name'] = Tools::unpackSignedLongString($message_media['volume_id']).'_'.$message_media['local_id'];
                 $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $message_media['volume_id'], 'local_id' => $message_media['local_id'], 'secret' => $message_media['secret'], 'dc_id' => $message_media['dc_id'], 'file_reference' => yield $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION_LOCATION, $message_media)];
                 $res['ext'] = $this->getExtensionFromLocation($res['InputFileLocation'], '.jpg');
                 $res['mime'] = $this->getMimeFromExtension($res['ext'], 'image/jpeg');
                 return $res;
             case 'fileLocationToBeDeprecated':
-                $res['name'] = Tools::unpackSignedLongString($message_media['volume_id']) . '_' . $message_media['local_id'];
+                $res['name'] = Tools::unpackSignedLongString($message_media['volume_id']).'_'.$message_media['local_id'];
                 $res['ext'] = '.jpg';
                 $res['mime'] = $this->getMimeFromExtension($res['ext'], 'image/jpeg');
                 $res['InputFileLocation'] = [
@@ -763,7 +763,7 @@ trait Files
                         case 'documentAttributeFilename':
                             $pathinfo = \pathinfo($attribute['file_name']);
                             if (isset($pathinfo['extension'])) {
-                                $res['ext'] = '.' . $pathinfo['extension'];
+                                $res['ext'] = '.'.$pathinfo['extension'];
                             }
                             $res['name'] = $pathinfo['filename'];
                             break;
@@ -775,7 +775,7 @@ trait Files
                 if (isset($audio) && isset($audio['title']) && !isset($res['name'])) {
                     $res['name'] = $audio['title'];
                     if (isset($audio['performer'])) {
-                        $res['name'] .= ' - ' . $audio['performer'];
+                        $res['name'] .= ' - '.$audio['performer'];
                     }
                 }
                 $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $message_media['document']['id'], 'access_hash' => $message_media['document']['access_hash'], 'version' => isset($message_media['document']['version']) ? $message_media['document']['version'] : 0, 'dc_id' => $message_media['document']['dc_id'], 'file_reference' => yield $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $message_media['document'])];
@@ -788,11 +788,11 @@ trait Files
                 if (isset($message_media['document']['size'])) {
                     $res['size'] = $message_media['document']['size'];
                 }
-                $res['name'] .= '_' . $message_media['document']['id'];
+                $res['name'] .= '_'.$message_media['document']['id'];
                 $res['mime'] = $message_media['document']['mime_type'];
                 return $res;
             default:
-                throw new \danog\MadelineProto\Exception('Invalid constructor provided: ' . $message_media['_']);
+                throw new \danog\MadelineProto\Exception('Invalid constructor provided: '.$message_media['_']);
         }
     }
     /*
@@ -916,7 +916,7 @@ trait Files
             $dir = $dir->getFile();
         }
         $message_media = (yield from $this->getDownloadInfo($message_media));
-        return yield from $this->downloadToFile($message_media, $dir . '/' . $message_media['name'] . $message_media['ext'], $cb);
+        return yield from $this->downloadToFile($message_media, $dir.'/'.$message_media['name'].$message_media['ext'], $cb);
     }
     /**
      * Download file.
@@ -939,8 +939,8 @@ trait Files
         }
         $file = \realpath($file);
         $message_media = (yield from $this->getDownloadInfo($message_media));
-        StatCache::clear($file);
-        $size = (yield stat($file))['size'];
+        StatCacheAsync::clear($file);
+        $size = (yield statAsync($file))['size'];
         $stream = yield open($file, 'cb');
         $this->logger->logger('Waiting for lock of file to download...');
         $unlock = yield \danog\MadelineProto\Tools::flock($file, LOCK_EX);
@@ -950,7 +950,7 @@ trait Files
         } finally {
             $unlock();
             yield $stream->close();
-            StatCache::clear($file);
+            StatCacheAsync::clear($file);
         }
         return $file;
     }
@@ -1025,7 +1025,7 @@ trait Files
         }
         if ($cb === null) {
             $cb = function ($percent) {
-                $this->logger->logger('Download status: ' . $percent . '%', \danog\MadelineProto\Logger::NOTICE);
+                $this->logger->logger('Download status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
             };
         }
         if ($end === -1 && isset($message_media['size'])) {
@@ -1034,11 +1034,11 @@ trait Files
         $part_size = $part_size ?? $this->settings['download']['part_size'];
         $parallel_chunks = $this->settings['download']['parallel_chunks'] ? $this->settings['download']['parallel_chunks'] : 3000;
         $datacenter = isset($message_media['InputFileLocation']['dc_id']) ? $message_media['InputFileLocation']['dc_id'] : $this->settings['connection_settings']['default_dc'];
-        if ($this->datacenter->has($datacenter . '_media')) {
+        if ($this->datacenter->has($datacenter.'_media')) {
             $datacenter .= '_media';
         }
         if (isset($message_media['key'])) {
-            $digest = \hash('md5', $message_media['key'] . $message_media['iv'], true);
+            $digest = \hash('md5', $message_media['key'].$message_media['iv'], true);
             $fingerprint = \danog\MadelineProto\Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
             if ($fingerprint !== $message_media['key_fingerprint']) {
                 throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
@@ -1189,7 +1189,7 @@ trait Files
                 $message_media['cdn_key'] = $res['encryption_key'];
                 $message_media['cdn_iv'] = $res['encryption_iv'];
                 $old_dc = $datacenter;
-                $datacenter = $res['dc_id'] . '_cdn';
+                $datacenter = $res['dc_id'].'_cdn';
                 if (!$this->datacenter->has($datacenter)) {
                     $this->config['expires'] = -1;
                     yield from $this->getConfig([], ['datacenter' => $this->datacenter->curdc]);
@@ -1223,7 +1223,7 @@ trait Files
                 return 0;
             }
             if (isset($message_media['cdn_key'])) {
-                $ivec = \substr($message_media['cdn_iv'], 0, 12) . \pack('N', $offset['offset'] >> 4);
+                $ivec = \substr($message_media['cdn_iv'], 0, 12).\pack('N', $offset['offset'] >> 4);
                 $res['bytes'] = $this->ctrEncrypt($res['bytes'], $message_media['cdn_key'], $ivec);
                 $this->checkCdnHash($message_media['file_token'], $offset['offset'], $res['bytes'], $old_dc);
             }
@@ -1258,10 +1258,10 @@ trait Files
                 $this->addCdnHashes($file, yield from $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => $datacenter]));
             }
             if (!isset($this->cdn_hashes[$file][$offset])) {
-                throw new \danog\MadelineProto\Exception('Could not fetch CDN hashes for offset ' . $offset);
+                throw new \danog\MadelineProto\Exception('Could not fetch CDN hashes for offset '.$offset);
             }
             if (\hash('sha256', \substr($data, 0, $this->cdn_hashes[$file][$offset]['limit']), true) !== $this->cdn_hashes[$file][$offset]['hash']) {
-                throw new \danog\MadelineProto\SecurityException('CDN hash mismatch for offset ' . $offset);
+                throw new \danog\MadelineProto\SecurityException('CDN hash mismatch for offset '.$offset);
             }
             $data = \substr($data, $this->cdn_hashes[$file][$offset]['limit']);
             $offset += $this->cdn_hashes[$file][$offset]['limit'];

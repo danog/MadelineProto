@@ -21,7 +21,6 @@ namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\Deferred;
 use Amp\Promise;
-use Amp\Success;
 use danog\MadelineProto\Async\AsyncParameters;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
@@ -92,7 +91,9 @@ trait CallHandler
         } else {
             $readDeferred = $readDeferred->promise();
         }
-        return ($aargs['noResponse'] ?? false) ? new Success() : $readDeferred;
+        if (!($aargs['noResponse'] ?? false)) {
+            return yield $readDeferred;
+        }
     }
     /**
      * Call method and make sure it is asynchronously sent (generator).

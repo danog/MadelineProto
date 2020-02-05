@@ -19,10 +19,6 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Deferred;
-use Amp\Promise;
-use danog\MadelineProto\Connection;
-
 /**
  * Manages method and object calls.
  */

@@ -431,7 +431,7 @@ class Connection extends Session
         if ($flush && isset($this->writer)) {
             $this->writer->resume();
         }
-        return $deferred->promise();
+        return yield $deferred->promise();
     }
     /**
      * Flush pending packets.

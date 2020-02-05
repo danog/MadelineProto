@@ -38,7 +38,7 @@ final class DataCenterTest extends TestCase
                 ],
                 'logger' => [
                     'logger' => Logger::FILE_LOGGER,
-                    'logger_param' => getcwd().'/MadelineProto.log',
+                    'logger_param' => __DIR__.'/../../MadelineProto.log',
                     'logger_level' => Logger::ULTRA_VERBOSE
                 ]
             ]
@@ -69,6 +69,8 @@ final class DataCenterTest extends TestCase
             $settings['connection_settings'],
         );
         $API->datacenter = $datacenter;
+
+        $API->getLogger()->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6' : 'IPv4'));
 
         Tools::wait($datacenter->dcConnect(2));
         $this->assertTrue(true);

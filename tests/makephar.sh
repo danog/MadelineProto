@@ -1,5 +1,12 @@
 #!/bin/bash -e
 
+composer update
+composer test || {
+    cat tests/MadelineProto.log
+    exit 1
+}
+cat tests/MadelineProto.log
+
 # Configure
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
