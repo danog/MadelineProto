@@ -135,12 +135,12 @@ trait CallHandler
                     unset($args['multiple']);
                 }
                 foreach ($args as $single_args) {
-                    $promises[] = yield from $this->methodCallAsyncWrite($method, $single_args, $new_aargs);
+                    $promises[] = Tools::call($this->methodCallAsyncWrite($method, $single_args, $new_aargs));
                 }
                 if (!isset($aargs['postpone'])) {
                     $this->writer->resume();
                 }
-                return $promises;
+                return yield Tools::all($promises);
             }
             $args = (yield from $this->API->botAPIToMTProto($args));
             if (isset($args['ping_id']) && \is_int($args['ping_id'])) {
