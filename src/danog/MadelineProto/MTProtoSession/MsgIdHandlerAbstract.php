@@ -48,7 +48,7 @@ abstract class MsgIdHandlerAbstract
      *
      * @return void
      */
-    abstract public function checkMessageId(string $newMessageId, array $aargs): void;
+    abstract public function checkMessageId($newMessageId, array $aargs): void;
     /**
      * Generate outgoing message ID.
      *
