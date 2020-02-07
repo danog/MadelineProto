@@ -134,6 +134,7 @@ trait CallHandler
                 if (isset($args['multiple'])) {
                     unset($args['multiple']);
                 }
+                $promises = [];
                 foreach ($args as $single_args) {
                     $promises[] = Tools::call($this->methodCallAsyncWrite($method, $single_args, $new_aargs));
                 }

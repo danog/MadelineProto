@@ -131,11 +131,11 @@ class ADNLConnection
                 $buffer = yield $this->stream->getReadBuffer($length);
                 if ($length) {
                     $data = yield $buffer->bufferRead($length);
-                    $data = yield $this->TL->deserialize($data);
+                    $data = $this->TL->deserialize($data);
                     if ($data['_'] !== 'adnl.message.answer') {
                         throw new Exception('Wrong answer type: ' . $data['_']);
                     }
-                    $this->requests[$data['query_id']]->resolve(yield $this->TL->deserialize((string) $data['answer']));
+                    $this->requests[$data['query_id']]->resolve($this->TL->deserialize((string) $data['answer']));
                 }
             }
         })());

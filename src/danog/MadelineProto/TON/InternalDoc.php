@@ -108,6 +108,22 @@ interface liteServer
      *
      *
      * Parameters:
+     * * `#`                    **mode**      -
+     * * `tonNode.blockIdExt`   **id**        -
+     * * `liteServer.accountId` **account**   -
+     * * `long`                 **method_id** -
+     * * `bytes`                **params**    -.
+     *
+     * @param array $params Parameters
+     *
+     * @return liteServer.RunMethodResult
+     */
+    public function runSmcMethod($params);
+
+    /**
+     *
+     *
+     * Parameters:
      * * `tonNode.blockIdExt` **id**        -
      * * `int`                **workchain** -
      * * `long`               **shard**     -
@@ -861,6 +877,39 @@ interface engine
     public function validator($params);
 }
 
+interface http
+{
+    /**
+     *
+     *
+     * Parameters:
+     * * `int256`        **id**           -
+     * * `string`        **method**       -
+     * * `string`        **url**          -
+     * * `string`        **http_version** -
+     * * `[http.header]` **headers**      -.
+     *
+     * @param array $params Parameters
+     *
+     * @return http.Response
+     */
+    public function request($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `int256` **id**             -
+     * * `int`    **seqno**          -
+     * * `int`    **max_chunk_size** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return http.PayloadPart
+     */
+    public function getNextPayloadPart($params);
+}
+
 class InternalDoc extends APIFactory
 {
     /**
@@ -917,11 +966,11 @@ class InternalDoc extends APIFactory
      *
      * @param array $parameters Parameters
      *
-     * @return array
+     * @return \Generator
      */
-    public function botAPItoMTProto(array $parameters): array
+    public function botAPItoMTProto(array $parameters, array $extra = [])
     {
-        return $this->API->botAPItoMTProto($parameters);
+        return $this->__call(__FUNCTION__, [$parameters, $extra]);
     }
     /**
      * Get TL method namespaces.

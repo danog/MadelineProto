@@ -73,7 +73,7 @@ class CheckLoop extends ResumableSignalLoop
                 }
             }
             if ($connection->hasPendingCalls()) {
-                $last_msgid = $connection->getMaxId(true);
+                $last_msgid = $connection->msgIdHandler->getMaxId(true);
                 $last_chunk = $connection->getLastChunk();
                 if ($shared->hasTempAuthKey()) {
                     $full_message_ids = $connection->getPendingCalls();
@@ -157,7 +157,7 @@ class CheckLoop extends ResumableSignalLoop
                 if (yield $this->waitSignal($this->pause($timeout))) {
                     return;
                 }
-                if ($connection->getMaxId(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {
+                if ($connection->msgIdHandler->getMaxId(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {
                     $API->logger->logger("We did not receive a response for {$timeout} seconds: reconnecting and exiting check loop on DC {$datacenter}");
                     //$this->exitedLoop();
                     Tools::callForkDefer($connection->reconnect());

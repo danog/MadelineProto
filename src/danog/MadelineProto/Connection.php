@@ -21,7 +21,6 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ClosedException;
 use Amp\Deferred;
-use Amp\Promise;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
 use danog\MadelineProto\Loop\Connection\PingLoop;
@@ -116,7 +115,7 @@ class Connection extends Session
      *
      * @var MTProto
      */
-    protected $API;
+    public $API;
     /**
      * Shared connection instance.
      *

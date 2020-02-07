@@ -4224,7 +4224,7 @@ class InternalDoc extends APIFactory
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return Promise
+     * @return \Generator
      */
     public function methodCall(string $method, $args = [
     ], array $aargs = [
@@ -4240,7 +4240,7 @@ class InternalDoc extends APIFactory
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return Promise
+     * @return \Generator
      */
     public function methodCallWrite(string $method, $args = [
     ], array $aargs = [
@@ -4725,13 +4725,13 @@ class InternalDoc extends APIFactory
     /**
      * Unpack bot API file ID.
      *
-     * @param string $file_id Bot API file ID
+     * @param string $fileId Bot API file ID
      *
      * @return array Unpacked file ID
      */
-    public function unpackFileId(string $file_id): array
+    public function unpackFileId(string $fileId): array
     {
-        return $this->API->unpackFileId($file_id);
+        return $this->API->unpackFileId($fileId);
     }
     /**
      * Get mime type from file extension.
@@ -5310,7 +5310,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator
      */
-    public function discardCall(array $call, string $reason, array $rating = [
+    public function discardCall(array $call, array $reason, array $rating = [
     ], bool $need_debug = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug, $extra]);
@@ -5584,6 +5584,17 @@ class InternalDoc extends APIFactory
     public function stop(): void
     {
         $this->API->stop();
+    }
+    /**
+     * Start MadelineProto's update handling loop in background, or run the provided async callable.
+     *
+     * @param callable $callback Async callable to run
+     *
+     * @return mixed
+     */
+    public function loopFork($callback = null): void
+    {
+        $this->API->loopFork($callback);
     }
     /**
      * Close connection with client, connected via web.

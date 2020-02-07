@@ -119,7 +119,7 @@ trait ResponseHandler
                     unset($this->new_incoming[$current_msg_id]);
                     $only_updates = false;
                     foreach ($this->incoming_messages[$current_msg_id]['content']['messages'] as $message) {
-                        $this->checkMessageId($message['msg_id'], ['outgoing' => false, 'container' => true]);
+                        $this->msgIdHandler->checkMessageId($message['msg_id'], ['outgoing' => false, 'container' => true]);
                         $this->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body'], 'from_container' => true];
                         $this->new_incoming[$message['msg_id']] = $message['msg_id'];
                     }
@@ -139,7 +139,7 @@ trait ResponseHandler
                     // Acknowledge that I received the server's response
                     } else {
                         $message = $this->incoming_messages[$current_msg_id]['content'];
-                        $this->checkMessageId($message['orig_message']['msg_id'], ['outgoing' => false, 'container' => true]);
+                        $this->msgIdHandler->checkMessageId($message['orig_message']['msg_id'], ['outgoing' => false, 'container' => true]);
                         $this->incoming_messages[$message['orig_message']['msg_id']] = ['content' => $this->incoming_messages[$current_msg_id]['content']['orig_message']];
                         $this->new_incoming[$message['orig_message']['msg_id']] = $message['orig_message']['msg_id'];
                     }

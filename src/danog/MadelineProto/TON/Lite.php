@@ -84,7 +84,7 @@ class Lite
         $config['_'] = 'liteclient.config.global';
         $config = Tools::convertJsonTL($config);
         $config['validator']['init_block'] = $config['validator']['init_block'] ?? $config['validator']['zero_state'];
-        $this->config = yield $this->TL->deserialize(yield from $this->TL->serializeObject(['type' => ''], $config, 'cleanup'));
+        $this->config = $this->TL->deserialize(yield from $this->TL->serializeObject(['type' => ''], $config, 'cleanup'));
         foreach ($this->config['liteservers'] as $lite) {
             $this->connections[] = $connection = new ADNLConnection($this->TL);
             yield from $connection->connect($lite);
@@ -136,11 +136,12 @@ class Lite
      *
      * @param array $parameters Parameters
      *
-     * @return array
+     * @return \Generator
      */
-    public function botAPItoMTProto(array $parameters): array
+    public function botAPItoMTProto(array $parameters): \Generator
     {
         return $parameters;
+        yield;
     }
     /**
      * Get TL method namespaces.

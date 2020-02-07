@@ -122,7 +122,7 @@ class WriteLoop extends ResumableSignalLoop
                 }
                 $skipped_all = false;
                 $API->logger->logger("Sending {$message['_']} as unencrypted message to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                $message_id = isset($message['msg_id']) ? $message['msg_id'] : $connection->generateMessageId();
+                $message_id = isset($message['msg_id']) ? $message['msg_id'] : $connection->msgIdHandler->generateMessageId();
                 $length = \strlen($message['serialized_body']);
                 $pad_length = -$length & 15;
                 $pad_length += 16 * \danog\MadelineProto\Tools::randomInt($modulus = 16);
@@ -209,7 +209,7 @@ class WriteLoop extends ResumableSignalLoop
                     $API->logger->logger('Length overflow, postponing part of payload', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     break;
                 }
-                $message_id = isset($message['msg_id']) ? $message['msg_id'] : $connection->generateMessageId();
+                $message_id = isset($message['msg_id']) ? $message['msg_id'] : $connection->msgIdHandler->generateMessageId();
                 $API->logger->logger("Sending {$message['_']} as encrypted message to DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 $MTmessage = ['_' => 'MTmessage', 'msg_id' => $message_id, 'body' => $message['serialized_body'], 'seqno' => $connection->generateOutSeqNo($message['contentRelated'])];
                 if (isset($message['method']) && $message['method'] && $message['_'] !== 'http_wait') {
@@ -262,7 +262,7 @@ class WriteLoop extends ResumableSignalLoop
             $MTmessage = null;
             if ($count > 1) {
                 $API->logger->logger("Wrapping in msg_container ({$count} messages of total size {$total_length}) as encrypted message for DC {$datacenter}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                $message_id = $connection->generateMessageId();
+                $message_id = $connection->msgIdHandler->generateMessageId();
                 $connection->pending_outgoing[$connection->pending_outgoing_key] = ['_' => 'msg_container', 'container' => \array_values($keys), 'contentRelated' => false, 'method' => false, 'unencrypted' => false];
                 //var_dumP("container ".bin2hex($message_id));
                 $keys[$connection->pending_outgoing_key++] = $message_id;

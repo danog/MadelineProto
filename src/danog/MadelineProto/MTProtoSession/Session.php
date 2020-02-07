@@ -25,7 +25,6 @@ namespace danog\MadelineProto\MTProtoSession;
 abstract class Session
 {
     use AckHandler;
-    use MsgIdHandler;
     use ResponseHandler;
     use SeqNoHandler;
     use CallHandler;
@@ -39,29 +38,32 @@ abstract class Session
     public $call_queue = [];
     public $ack_queue = [];
     /**
+     * Message ID handler.
+     *
+     * @var MsgIdHandlerAbstract
+     */
+    public $msgIdHandler;
+    /**
      * Reset MTProto session.
      *
      * @return void
      */
-    public function resetSession()
+    public function resetSession(): void
     {
         $this->session_id = \danog\MadelineProto\Tools::random(8);
         $this->session_in_seq_no = 0;
         $this->session_out_seq_no = 0;
-        $this->max_incoming_id = null;
-        $this->max_outgoing_id = null;
+        $this->msgIdHandler = new MsgIdHandler($this);
     }
     /**
      * Create MTProto session if needed.
      *
      * @return void
      */
-    public function createSession()
+    public function createSession(): void
     {
         if ($this->session_id === null) {
-            $this->session_id = \danog\MadelineProto\Tools::random(8);
-            $this->session_in_seq_no = 0;
-            $this->session_out_seq_no = 0;
+            $this->resetSession();
         }
     }
     /**

@@ -1,13 +1,13 @@
 {
   "liteservers": [
-    {
+     {
       "ip": 861606190,
       "port": 9999,
-      "id": {
-        "@type": "pub.ed25519",
+       "id": {
+         "@type": "pub.ed25519",
         "key": "T10NJq2tgx6LpTHj734fSNYJ6S2w1hTdFRXJaj5st80"
-      }
-    }
+       }
+     }
   ],
   "validator": {
     "@type": "validator.config.global",

@@ -179,6 +179,17 @@ trait Loop
         $this->signalUpdate();
     }
     /**
+     * Start MadelineProto's update handling loop in background, or run the provided async callable.
+     *
+     * @param callable $callback Async callable to run
+     *
+     * @return mixed
+     */
+    public function loopFork($callback = null): void
+    {
+        Tools::callFork($this->loop($callback));
+    }
+    /**
      * Close connection with client, connected via web.
      *
      * @param string $message Message
