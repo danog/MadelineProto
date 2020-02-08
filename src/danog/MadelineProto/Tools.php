@@ -515,22 +515,6 @@ trait Tools
         return $deferred->promise();
     }
     /**
-     * Asynchronously send noCache headers.
-     *
-     * @param integer $status  HTTP status code to send
-     * @param string  $message Message to print
-     *
-     * @return Promise
-     */
-    public static function noCache(int $status, string $message): Promise
-    {
-        \header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-        \header('Cache-Control: post-check=0, pre-check=0', false);
-        \header('Pragma: no-cache');
-        \http_response_code($status);
-        return self::echo($message);
-    }
-    /**
      * Asynchronously lock a file
      * Resolves with a callbable that MUST eventually be called in order to release the lock.
      *
