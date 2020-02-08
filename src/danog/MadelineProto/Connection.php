@@ -327,6 +327,7 @@ class Connection extends Session
         $this->datacenter = $ctx->getDc();
         $this->datacenterId = $this->datacenter . '.' . $this->id;
         $this->API->logger->logger("Connecting to DC {$this->datacenterId}", \danog\MadelineProto\Logger::WARNING);
+        $this->createSession();
         $ctx->setReadCallback([$this, 'haveRead']);
         $this->stream = (yield from $ctx->getStream());
         $this->API->logger->logger("Connected to DC {$this->datacenterId}!", \danog\MadelineProto\Logger::WARNING);
