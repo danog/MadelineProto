@@ -206,7 +206,8 @@ trait BotAPI
                 }
                 return $newd;
             case 'updates':
-                $data = array_values(array_filter($data['updates'], fn(array $update) => $update['_'] !== 'updateMessageID'))[0];
+                $data = \array_values(\array_filter($data['updates'], fn (array $update) => $update['_'] !== 'updateMessageID'))[0];
+                // no break
             case 'updateNewChannelMessage':
             case 'updateNewMessage':
                 return yield from $this->MTProtoToBotAPI($data['message']);

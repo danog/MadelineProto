@@ -2,7 +2,6 @@
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\TON\API;
-use danog\MadelineProto\Tools;
 
 require 'vendor/autoload.php';
 

@@ -42,6 +42,9 @@ use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\Tools;
+
+use const danog\Decoder\TYPES;
+
 use function Amp\File\exists;
 use function Amp\File\open;
 use function Amp\File\stat as statAsync;
@@ -549,7 +552,7 @@ trait Files
                 $constructor = $constructor['MessageMedia'];
             } elseif (isset($constructor['InputMedia'])) {
                 return $constructor;
-            } else if (isset($constructor['Chat']) || isset($constructor['User'])) {
+            } elseif (isset($constructor['Chat']) || isset($constructor['User'])) {
                 throw new Exception("Chat photo file IDs can't be reused to resend chat photos, please use getPwrChat()['photo'], instead");
             }
         }
@@ -583,6 +586,31 @@ trait Files
         return yield from $this->getDownloadInfo($this->chats[(yield from $this->getInfo($data))['bot_api_id']]);
     }
     /**
+     * Extract file info from bot API message.
+     *
+     * @param array $info Bot API message object
+     *
+     * @return ?array
+     */
+    public static function extractBotAPIFile(array $info): ?array
+    {
+        foreach (TYPES as $type) {
+            if (isset($info[$type]) && \is_array($info[$type])) {
+                $method = $type;
+                break;
+            }
+        }
+        if (!isset($method)) {
+            return null;
+        }
+        $info = $info[$method];
+        if ($method === 'photo') {
+            $info = $info[0];
+        }
+        $info['file_type'] = $method;
+        return $info;
+    }
+    /**
      * Get download info of file
      * Returns an array with the following structure:.
      *
@@ -605,6 +633,21 @@ trait Files
             $messageMedia = $messageMedia['MessageMedia'] ?? $messageMedia['User'] ?? $messageMedia['Chat'];
         }
         if (!isset($messageMedia['_'])) {
+            if (!isset($messageMedia['InputFileLocation']) && !isset($messageMedia['file_id'])) {
+                $messageMedia = self::extractBotAPIFile($messageMedia) ?? $messageMedia;
+            }
+            if (isset($messageMedia['file_id'])) {
+                $res = yield from $this->getDownloadInfo($messageMedia['file_id']);
+                $res['size'] = $messageMedia['file_size'] ?? 0;
+                $res['mime'] = $messageMedia['mime_type'] ?? 'application/octet-stream';
+
+                $pathinfo = \pathinfo($messageMedia['file_name']);
+                if (isset($pathinfo['extension'])) {
+                    $res['ext'] = '.'.$pathinfo['extension'];
+                }
+                $res['name'] = $pathinfo['filename'];
+                return $res;
+            }
             return $messageMedia;
         }
         $res = [];
@@ -915,6 +958,8 @@ trait Files
      * @param string $method       HTTP method
      * @param array  $headers      HTTP headers
      * @param array  $messageMedia Media info
+     *
+     * @internal
      *
      * @return array Info about headers
      */

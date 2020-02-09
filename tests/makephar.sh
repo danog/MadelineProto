@@ -59,6 +59,7 @@ echo '{
 composer config platform.php "7.4"
 composer clearcache
 composer update
+composer require amphp/mysql
 [ $PHP_MAJOR_VERSION -eq 5 ] && composer require dstuecken/php7ify
 composer dumpautoload --optimize
 cp -a $madelinePath/src vendor/danog/madelineproto

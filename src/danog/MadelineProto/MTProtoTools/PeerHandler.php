@@ -23,7 +23,6 @@ use Amp\Http\Client\Request;
 use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 
-use const danog\Decoder\PHOTO;
 use const danog\Decoder\PROFILE_PHOTO;
 
 /**
@@ -846,7 +845,7 @@ trait PeerHandler
             $photo = [];
             foreach ([
                 'small' => $res['photo']['sizes'][0],
-                'big' => end($res['photo']['sizes']),
+                'big' => \end($res['photo']['sizes']),
             ] as $type => $size) {
                 $fileId = new FileId;
                 $fileId->setId($res['photo']['id'] ?? 0);

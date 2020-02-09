@@ -53,10 +53,10 @@ class Exception extends \Exception
         }
     }
     /**
-     * Complain about missing extensions
+     * Complain about missing extensions.
      *
      * @param string $extensionName Extension name
-     * 
+     *
      * @return self
      */
     public static function extension(string $extensionName): self

@@ -65,10 +65,10 @@ trait BotAPIFiles
         return [
             'file_id' => (string) $fileId,
             'file_unique_id' => $fileId->getUniqueBotAPI(),
-            'width' => $photoSize['w'], 
-            'height' => $photoSize['h'], 
-            'file_size' => $photoSize['size'] ?? \strlen($photoSize['bytes']), 
-            'mime_type' => 'image/jpeg', 
+            'width' => $photoSize['w'],
+            'height' => $photoSize['h'],
+            'file_size' => $photoSize['size'] ?? \strlen($photoSize['bytes']),
+            'mime_type' => 'image/jpeg',
             'file_name' => $photoSize['location']['volume_id'].'_'.$photoSize['location']['local_id'].'.jpg'
         ];
     }

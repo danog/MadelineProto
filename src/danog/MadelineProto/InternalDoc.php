@@ -4373,7 +4373,7 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator<array> Chat object
      */
-    public function getPwrChat($id, $fullfetch = true, $send = true, array $extra = [])
+    public function getPwrChat($id, bool $fullfetch = true, bool $send = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$id, $fullfetch, $send, $extra]);
     }
@@ -4499,13 +4499,24 @@ class InternalDoc extends APIFactory
      * `$info['mime']` - The file mime type
      * `$info['size']` - The file size
      *
-     * @param mixed $message_media File ID
+     * @param mixed $messageMedia File ID
      *
      * @return \Generator<array>
      */
     public function getPropicInfo($data, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$data, $extra]);
+    }
+    /**
+     * Extract file info from bot API message.
+     *
+     * @param array $info Bot API message object
+     *
+     * @return ?array
+     */
+    public function extractBotAPIFile(array $info): ?array
+    {
+        return \danog\MadelineProto\MTProto::extractBotAPIFile($info);
     }
     /**
      * Get download info of file
@@ -4516,44 +4527,84 @@ class InternalDoc extends APIFactory
      * `$info['mime']` - The file mime type
      * `$info['size']` - The file size
      *
-     * @param mixed $message_media File ID
+     * @param mixed $messageMedia File ID
      *
      * @return \Generator<array>
      */
-    public function getDownloadInfo($message_media, array $extra = [])
+    public function getDownloadInfo($messageMedia, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_media, $extra]);
+        return $this->__call(__FUNCTION__, [$messageMedia, $extra]);
+    }
+    /**
+     * Download file to browser.
+     *
+     * Supports HEAD requests and content-ranges for parallel and resumed downloads.
+     *
+     * @param array|string $messageMedia File to download
+     * @param callable     $cb           Status callback (can also use FileCallback)
+     *
+     * @return \Generator
+     */
+    public function downloadToBrowser($messageMedia, ?callable $cb = null, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$messageMedia, $cb, $extra]);
+    }
+    /**
+     * Download file to amphp/http-server response.
+     *
+     * Supports HEAD requests and content-ranges for parallel and resumed downloads.
+     *
+     * @param array|string  $messageMedia File to download
+     * @param ServerRequest $request      Request
+     * @param callable      $cb           Status callback (can also use FileCallback)
+     *
+     * @return \Generator<Response> Returned response
+     */
+    public function downloadToResponse($messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$messageMedia, $request, $cb, $extra]);
+    }
+    /**
+     * Get explanation for HTTP error.
+     *
+     * @param integer $code HTTP error code
+     *
+     * @return string
+     */
+    public function getExplanation(int $code): string
+    {
+        return \danog\MadelineProto\MTProto::getExplanation($code);
     }
     /**
      * Download file to directory.
      *
-     * @param mixed                        $message_media File to download
+     * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      *
      * @return \Generator<string> Downloaded file path
      */
-    public function downloadToDir($message_media, $dir, $cb = null, array $extra = [])
+    public function downloadToDir($messageMedia, $dir, $cb = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_media, $dir, $cb, $extra]);
+        return $this->__call(__FUNCTION__, [$messageMedia, $dir, $cb, $extra]);
     }
     /**
      * Download file.
      *
-     * @param mixed                        $message_media File to download
+     * @param mixed                        $messageMedia File to download
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      *
      * @return \Generator<string> Downloaded file path
      */
-    public function downloadToFile($message_media, $file, $cb = null, array $extra = [])
+    public function downloadToFile($messageMedia, $file, $cb = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_media, $file, $cb, $extra]);
+        return $this->__call(__FUNCTION__, [$messageMedia, $file, $cb, $extra]);
     }
     /**
      * Download file to stream.
      *
-     * @param mixed                       $message_media File to download
+     * @param mixed                       $messageMedia File to download
      * @param mixed|FileCallbackInterface $stream        Stream where to download file
      * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
      * @param int                         $offset        Offset where to start downloading
@@ -4561,9 +4612,9 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator<bool>
      */
-    public function downloadToStream($message_media, $stream, $cb = null, int $offset = 0, int $end = -1, array $extra = [])
+    public function downloadToStream($messageMedia, $stream, $cb = null, int $offset = 0, int $end = -1, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_media, $stream, $cb, $offset, $end, $extra]);
+        return $this->__call(__FUNCTION__, [$messageMedia, $stream, $cb, $offset, $end, $extra]);
     }
     /**
      * Download file to callable.
@@ -4571,7 +4622,7 @@ class InternalDoc extends APIFactory
      * The callable will be called (possibly out of order, depending on the value of $seekable).
      * The callable should return the number of written bytes.
      *
-     * @param mixed                          $message_media File to download
+     * @param mixed                          $messageMedia File to download
      * @param callable|FileCallbackInterface $callable      Chunk callback
      * @param callable                       $cb            Status callback (DEPRECATED, use FileCallbackInterface)
      * @param bool                           $seekable      Whether the callable can be called out of order
@@ -4581,9 +4632,9 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator<bool>
      */
-    public function downloadToCallable($message_media, $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null, array $extra = [])
+    public function downloadToCallable($messageMedia, callable $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message_media, $callable, $cb, $seekable, $offset, $end, $part_size, $extra]);
+        return $this->__call(__FUNCTION__, [$messageMedia, $callable, $cb, $seekable, $offset, $end, $part_size, $extra]);
     }
     /**
      * Accept secret chat.
@@ -4701,15 +4752,13 @@ class InternalDoc extends APIFactory
     /**
      * Convert MTProto parameters to bot API parameters.
      *
-     * @param array $data           Data
-     * @param array $sent_arguments Sent arguments
+     * @param array $data Data
      *
      * @return \Generator<array>
      */
-    public function MTProtoToBotAPI(array $data, array $sent_arguments = [
-    ], array $extra = [])
+    public function MTProtoToBotAPI(array $data, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$data, $sent_arguments, $extra]);
+        return $this->__call(__FUNCTION__, [$data, $extra]);
     }
     /**
      * Convert bot API parameters to MTProto parameters.
@@ -5108,18 +5157,6 @@ class InternalDoc extends APIFactory
     public function after($a, $b)
     {
         return $this->__call(__FUNCTION__, [$a, $b]);
-    }
-    /**
-     * Asynchronously send noCache headers.
-     *
-     * @param integer $status  HTTP status code to send
-     * @param string  $message Message to print
-     *
-     * @return Promise
-     */
-    public function noCache(int $status, string $message)
-    {
-        return $this->__call(__FUNCTION__, [$status, $message]);
     }
     /**
      * Asynchronously lock a file

@@ -40,16 +40,16 @@ class MsgIdHandler64 extends MsgIdHandlerAbstract
      */
     private $maxOutgoingId = 0;
     /**
-     * Check validity of given message ID
+     * Check validity of given message ID.
      *
      * @param string $newMessageId New message ID
      * @param array  $aargs        Params
-     * 
+     *
      * @return void
      */
     public function checkMessageId($newMessageId, array $aargs): void
     {
-        $newMessageId = is_integer($newMessageId) ? $newMessageId : Tools::unpackSignedLong($newMessageId);
+        $newMessageId = \is_integer($newMessageId) ? $newMessageId : Tools::unpackSignedLong($newMessageId);
         $minMessageId = (\time() + $this->session->time_delta - 300) << 32;
         if ($newMessageId < $minMessageId) {
             $this->session->API->logger->logger('Given message id ('.$newMessageId.') is too old compared to the min value ('.$minMessageId.').', \danog\MadelineProto\Logger::WARNING);

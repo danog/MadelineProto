@@ -22,7 +22,9 @@
 use Amp\Http\Server\HttpServer;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProtoTools\Files;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\Tools;
 use League\Uri\Contracts\UriException;
 
 /*
@@ -99,16 +101,17 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             if ($this->UPLOAD && $update['message']['message'] === '/getUrl') {
                 yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a file: ', 'reply_to_msg_id' => $messageId]);
                 $this->states[$peerId] = $this->UPLOAD;
+                return;
             }
             if ($update['message']['message'] === '/start') {
                 return $this->messages->sendMessage(['peer' => $peerId, 'message' => self::START, 'parse_mode' => 'Markdown', 'reply_to_msg_id' => $messageId]);
             }
             if (isset($update['message']['media']['_']) && $update['message']['media']['_'] !== 'messageMediaWebPage') {
                 if ($this->UPLOAD && ($this->states[$peerId] ?? false) === $this->UPLOAD) {
-                    $media = yield $this->getDownloadInfo($this->states[$peerId]);
-                    unset($media['MessageMedia']);
-                    $media = yield 
                     unset($this->states[$peerId]);
+                    $update = Files::extractBotAPIFile(yield $this->MTProtoToBotAPI($update));
+                    $file = [$update['file_size'], $update['mime_type']];
+                    \var_dump($update['file_id'].'.'.Tools::base64urlEncode(json_encode($file))."/".$update['file_name']);
                     return;
                 }
                 yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a new name for this file: ', 'reply_to_msg_id' => $messageId]);
