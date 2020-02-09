@@ -19,6 +19,8 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
+use Amp\Http\Server\HttpServer;
+use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\RPCErrorException;
 use League\Uri\Contracts\UriException;
@@ -48,16 +50,31 @@ class EventHandler extends \danog\MadelineProto\EventHandler
     const ADMIN = 'danogentili';
 
     /**
+     * Whether to allow uploads.
+     */
+    private $UPLOAD;
+
+    /**
      * Array of media objects.
      *
      * @var array
      */
     private $states = [];
+    /**
+     * Constructor.
+     *
+     * @param API $API API
+     */
+    public function __construct($API)
+    {
+        $this->UPLOAD = \class_exists(HttpServer::class);
+        parent::__construct($API);
+    }
     public function onUpdateNewChannelMessage($update)
     {
         //yield $this->onUpdateNewMessage($update);
     }
-    public function report($message)
+    public function report(string $message)
     {
         try {
             $this->messages->sendMessage(['peer' => self::ADMIN, 'message' => $message]);
@@ -79,10 +96,21 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             $peerId = $peer['bot_api_id'];
             $messageId = $update['message']['id'];
 
+            if ($this->UPLOAD && $update['message']['message'] === '/getUrl') {
+                yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a file: ', 'reply_to_msg_id' => $messageId]);
+                $this->states[$peerId] = $this->UPLOAD;
+            }
             if ($update['message']['message'] === '/start') {
                 return $this->messages->sendMessage(['peer' => $peerId, 'message' => self::START, 'parse_mode' => 'Markdown', 'reply_to_msg_id' => $messageId]);
             }
             if (isset($update['message']['media']['_']) && $update['message']['media']['_'] !== 'messageMediaWebPage') {
+                if ($this->UPLOAD && ($this->states[$peerId] ?? false) === $this->UPLOAD) {
+                    $media = yield $this->getDownloadInfo($this->states[$peerId]);
+                    unset($media['MessageMedia']);
+                    $media = yield 
+                    unset($this->states[$peerId]);
+                    return;
+                }
                 yield $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a new name for this file: ', 'reply_to_msg_id' => $messageId]);
                 $this->states[$peerId] = $update['message']['media'];
 
@@ -184,7 +212,7 @@ $settings = [
        ]
     ],
     'upload' => [
-        'allow_automatic_upload' => false, // IMPORTANT: for security reasons, upload by URL will still be allowed
+        'allow_automatic_upload' => false // IMPORTANT: for security reasons, upload by URL will still be allowed
     ],
 ];
 

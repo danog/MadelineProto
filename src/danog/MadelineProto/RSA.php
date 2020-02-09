@@ -83,7 +83,6 @@ class RSA
      */
     public function encrypt($data): string
     {
-        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_encrypting'], Logger::VERBOSE);
         return (new \tgseclib\Math\BigInteger((string) $data, 256))->powMod($this->e, $this->n)->toBytes();
     }
 }

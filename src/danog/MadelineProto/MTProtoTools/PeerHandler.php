@@ -20,6 +20,11 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Http\Client\Request;
+use danog\Decoder\FileId;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
+
+use const danog\Decoder\PHOTO;
+use const danog\Decoder\PROFILE_PHOTO;
 
 /**
  * Manages peers.
@@ -705,7 +710,7 @@ trait PeerHandler
      *
      * @return \Generator<array> Chat object
      */
-    public function getPwrChat($id, $fullfetch = true, $send = true): \Generator
+    public function getPwrChat($id, bool $fullfetch = true, bool $send = true): \Generator
     {
         $full = $fullfetch ? yield from $this->getFullInfo($id) : (yield from $this->getInfo($id));
         $res = ['id' => $full['bot_api_id'], 'type' => $full['type']];
@@ -836,6 +841,34 @@ trait PeerHandler
         }
         if ($fullfetch || $send) {
             $this->storeDb($res);
+        }
+        if (isset($res['photo'])) {
+            $photo = [];
+            foreach ([
+                'small' => $res['photo']['sizes'][0],
+                'big' => end($res['photo']['sizes']),
+            ] as $type => $size) {
+                $fileId = new FileId;
+                $fileId->setId($res['photo']['id'] ?? 0);
+                $fileId->setAccessHash($res['photo']['access_hash'] ?? 0);
+                $fileId->setFileReference($res['photo']['file_reference'] ?? '');
+                $fileId->setDcId($res['photo']['dc_id']);
+                $fileId->setType(PROFILE_PHOTO);
+
+                $fileId->setLocalId($size['location']['local_id']);
+                $fileId->setVolumeId($size['location']['volume_id']);
+
+                $photoSize = new PhotoSizeSourceDialogPhoto;
+                $photoSize->setDialogId($res['id']);
+                $photoSize->setDialogPhotoSmall($type === 'small');
+                $photoSize->setDialogAccessHash($res['access_hash'] ?? 0);
+
+                $fileId->setPhotoSizeSource($photoSize);
+
+                $photo[$type.'_file_id'] = (string) $fileId;
+                $photo[$type.'_file_unique_id'] = $fileId->getUniqueBotAPI();
+            }
+            $res['photo'] += $photo;
         }
         return $res;
     }

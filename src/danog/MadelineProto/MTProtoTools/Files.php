@@ -549,9 +549,8 @@ trait Files
                 $constructor = $constructor['MessageMedia'];
             } elseif (isset($constructor['InputMedia'])) {
                 return $constructor;
-            } else {
-                $constructor = (yield from $this->getPwrChat($constructor['Chat'] ?? $constructor['User']));
-                $constructor = $constructor['photo'];
+            } else if (isset($constructor['Chat']) || isset($constructor['User'])) {
+                throw new Exception("Chat photo file IDs can't be reused to resend chat photos, please use getPwrChat()['photo'], instead");
             }
         }
         switch ($constructor['_']) {
@@ -800,9 +799,6 @@ trait Files
                 throw new \danog\MadelineProto\Exception('Invalid constructor provided: '.$messageMedia['_']);
         }
     }
-
-    private const POWERED_BY = "<p><small>Powered by <a href='https://docs.madelineproto.xyz'>MadelineProto</a></small></p>";
-
     /**
      * Download file to browser.
      *
@@ -841,7 +837,7 @@ trait Files
                 \header("$key: $subValue");
             }
         }
-        http_response_code($result['code']);
+        \http_response_code($result['code']);
 
         if (!\in_array($result['code'], [Status::OK, Status::PARTIAL_CONTENT])) {
             yield Tools::echo(self::getExplanation($result['code']));
@@ -913,10 +909,6 @@ trait Files
         $body .= "</body></html>";
         return $body;
     }
-    private const NO_CACHE = [
-        'Cache-Control' => ['no-store, no-cache, must-revalidate, max-age=0', 'post-check=0, pre-check=0'],
-        'Pragma' => 'no-cache'
-    ];
     /**
      * Parse headers.
      *

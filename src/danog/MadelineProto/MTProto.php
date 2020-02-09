@@ -194,6 +194,13 @@ class MTProto extends AsyncConstruct implements TLCallback
         'msg_resend_ans_req',
     ];
     const DEFAULT_GETUPDATES_PARAMS = ['offset' => 0, 'limit' => null, 'timeout' => 0];
+
+
+    const POWERED_BY = "<p><small>Powered by <a href='https://docs.madelineproto.xyz'>MadelineProto</a></small></p>";
+    const NO_CACHE = [
+        'Cache-Control' => ['no-store, no-cache, must-revalidate, max-age=0', 'post-check=0, pre-check=0'],
+        'Pragma' => 'no-cache'
+    ];
     /**
      * Instance of wrapper API.
      *

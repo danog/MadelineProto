@@ -41,13 +41,61 @@ class FileIdTest extends TestCase
     }
 
     /**
+     * Strip file reference from file ID.
+     *
+     * @param string $fileId File ID
+     *
+     * @return string
+     */
+    public static function stripFileReference(string $fileId): string
+    {
+        return FileId::fromBotAPI($fileId)->setFileReference('');
+    }
+    /**
+     * Strip access hash (and possibly ID) from file ID.
+     *
+     * @param string $fileId File ID
+     *
+     * @return string
+     */
+    public static function stripForChat(string $fileId): string
+    {
+        $file = FileId::fromBotAPI($fileId)->setAccessHash(0);
+        if ($file->getPhotoSizeSource()->getDialogId() < 0) {
+            $file->setId(0);
+        }
+        return $file;
+    }
+
+    /**
+     * Asserts that two file IDs are equal.
+     *
+     * @param string $fileIdAstr File ID A
+     * @param string $fileIdBstr File ID B
+     * @param string $message    Message
+     *
+     * @throws PHPUnit\Framework\AssertionFailedError
+     *
+     * @return void
+     */
+    public static function assertFileIdEquals(string $fileIdAstr, string $fileIdBstr, $message = '')
+    {
+        $fileIdAstr = self::stripFileReference($fileIdAstr);
+        $fileIdBstr = self::stripFileReference($fileIdBstr);
+        if ($fileIdAstr !== $fileIdBstr) {
+            \var_dump(FileId::fromBotAPI($fileIdAstr), FileId::fromBotAPI($fileIdBstr));
+        }
+        self::assertEquals($fileIdAstr, $fileIdBstr, $message);
+    }
+
+    /**
      * @param string $fileId File ID
      * @param string $type   Expected type
      * @param string $type   Original type
      *
      * @dataProvider provideFileIdsAndType
      */
-    public function testDownload(string $type, string $fileIdStr, string $origType)
+    public function testDownload(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo)
     {
         self::$MadelineProto->logger("Trying to download $fileIdStr");
         self::$MadelineProto->downloadToFile($fileIdStr, '/dev/null');
@@ -60,16 +108,62 @@ class FileIdTest extends TestCase
      *
      * @dataProvider provideFileIdsAndType
      */
-    public function testResend(string $type, string $fileIdStr, string $origType)
+    public function testResendConvert(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo)
     {
-        self::$MadelineProto->logger("Trying to resend $fileIdStr");
-        self::$MadelineProto->messages->sendMedia(
+        self::$MadelineProto->logger("Trying to resend and then reconvert $fileIdStr");
+        if ($type === 'profile_photo') {
+            $chat = self::$MadelineProto->getPwrChat($fullInfo['chat']);
+            $this->assertArrayHasKey('photo', $chat);
+            $chat = $chat['photo'];
+            $this->assertArrayHasKey($fullInfo['type'].'_file_id', $chat);
+            $this->assertArrayHasKey($fullInfo['type'].'_file_unique_id', $chat);
+
+            $chat[$fullInfo['type'].'_file_id'] = self::stripForChat($chat[$fullInfo['type'].'_file_id']);
+
+            $this->assertFileIdEquals($fileIdStr, $chat[$fullInfo['type'].'_file_id']);
+            $this->assertEquals($uniqueFileIdStr, $chat[$fullInfo['type'].'_file_unique_id']);
+
+            $this->expectExceptionMessage("Chat photo file IDs can't be reused to resend chat photos, please use getPwrChat()['photo'], instead");
+        }
+        $res = self::$MadelineProto->messages->sendMedia(
             [
                 'peer' => \getenv('DEST'),
                 'media' => $fileIdStr
+            ],
+            [
+                'botAPI' => true
             ]
         );
-        $this->assertTrue(true);
+        if ($type === 'thumbnail') {
+            $this->assertArrayHasKey($fullInfo[0], $res);
+            $res = $res[$fullInfo[0]];
+            $this->assertArrayHasKey('thumb', $res);
+            $this->assertFileIdEquals($fileIdStr, $res['thumb']['file_id']);
+            $this->assertEquals($uniqueFileIdStr, $res['thumb']['file_unique_id']);
+
+            list($type, $fileIdStr, $uniqueFileIdStr) = $fullInfo;
+        } else {
+            $this->assertArrayHasKey($type, $res);
+            $res = $res[$type];
+        }
+
+        $hasFileId = false;
+        $hasFileUniqueId = false;
+        $res = $type === 'photo' ? $res : [$res];
+        foreach ($res as $subRes) {
+            $this->assertArrayHasKey('file_id', $subRes);
+            $this->assertArrayHasKey('file_unique_id', $subRes);
+            $hasFileId |= self::stripFileReference($fileIdStr) === self::stripFileReference($subRes['file_id']);
+            $hasFileUniqueId |= $uniqueFileIdStr === $subRes['file_unique_id'];
+        }
+
+        if (\count($res) === 1) {
+            $this->assertFileIdEquals($fileIdStr, $res[0]['file_id']);
+            $this->assertEquals($uniqueFileIdStr, $res[0]['file_unique_id']);
+        } else {
+            $this->assertTrue((bool) $hasFileUniqueId);
+            $this->assertTrue((bool) $hasFileId);
+        }
     }
 
     public function provideFileIdsAndType(): \Generator
@@ -77,16 +171,21 @@ class FileIdTest extends TestCase
         $dest = \getenv('DEST');
         $token = \getenv('BOT_TOKEN');
         foreach ($this->provideChats() as $chat) {
-            $result = \json_decode(\file_get_contents("https://api.telegram.org/bot$token/getChat?chat_id=$chat"), true)['result']['photo'];
+            $result = \json_decode(\file_get_contents("https://api.telegram.org/bot$token/getChat?chat_id=$chat"), true)['result']['photo'] ?? [];
+            if (!$result) {
+                continue;
+            }
             yield [
                 'profile_photo',
                 $result['small_file_id'],
-                'profile_photo',
+                $result['small_file_unique_id'],
+                ['chat' => $chat, 'type' => 'small'],
             ];
             yield [
                 'profile_photo',
                 $result['big_file_id'],
-                'profile_photo',
+                $result['big_file_unique_id'],
+                ['chat' => $chat, 'type' => 'big'],
             ];
         }
         foreach ($this->provideUrls() as $type => $url) {
@@ -111,16 +210,18 @@ class FileIdTest extends TestCase
                 $botResult = [$botResult];
             }
             foreach ($botResult as $subResult) {
-                yield [
+                yield $full = [
                     $type,
                     $subResult['file_id'],
-                    $type,
+                    $subResult['file_unique_id'],
+                    [],
                 ];
                 if (isset($subResult['thumb'])) {
                     yield [
                         'thumbnail',
                         $subResult['thumb']['file_id'],
-                        $type,
+                        $subResult['thumb']['file_unique_id'],
+                        $full,
                     ];
                 }
             }
@@ -129,11 +230,11 @@ class FileIdTest extends TestCase
     }
     public function provideChats(): array
     {
-        return [\getenv('DEST'), '@MadelineProto'];
+        return [\getenv('DEST'), '@MadelineProto', -382346236];
     }
     public function provideUrls(): array
     {
-        return [
+        $res = [
             'sticker' => 'https://github.com/danog/MadelineProto/blob/master/tests/lel.webp?raw=true',
             'photo' => 'https://github.com/danog/MadelineProto/blob/master/tests/faust.jpg',
             'audio' => 'https://github.com/danog/MadelineProto/blob/master/tests/mosconi.mp3?raw=true',
@@ -141,7 +242,10 @@ class FileIdTest extends TestCase
             'animation' => 'https://github.com/danog/MadelineProto/blob/master/tests/pony.mp4?raw=true',
             'document' => 'https://github.com/danog/danog.github.io/raw/master/lol/index_htm_files/0.gif',
             'voice' => 'https://daniil.it/audio_2020-02-01_18-09-08.ogg',
-            'video_note' => 'https://daniil.it/round.mp4'
         ];
+        if (\getenv('TRAVIS_COMMIT')) {
+            $res['video_note'] = 'https://daniil.it/round.mp4';
+        }
+        return $res;
     }
 }

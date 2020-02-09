@@ -25,7 +25,7 @@ class Exception extends \Exception
     public static $rollbar = true;
     public function __toString()
     {
-        return $this->file === 'MadelineProto' ? $this->message : '\\danog\\MadelineProto\\Exception' . ($this->message !== '' ? ': ' : '') . $this->message . ' in ' . $this->file . ':' . $this->line . PHP_EOL . \danog\MadelineProto\Magic::$revision . PHP_EOL . 'TL Trace:' . PHP_EOL . $this->getTLTrace();
+        return $this->file === 'MadelineProto' ? $this->message : '\\danog\\MadelineProto\\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.\danog\MadelineProto\Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.$this->getTLTrace();
     }
     public function __construct($message = null, $code = 0, self $previous = null, $file = null, $line = null)
     {
@@ -37,8 +37,10 @@ class Exception extends \Exception
             $this->line = $line;
         }
         parent::__construct($message, $code, $previous);
-        if (\strpos($message, 'socket_accept') === false) {
-            \danog\MadelineProto\Logger::log($message . ' in ' . \basename($this->file) . ':' . $this->line, \danog\MadelineProto\Logger::FATAL_ERROR);
+        if (\strpos($message, 'socket_accept') === false
+            && !\in_array(\basename($this->file), ['PKCS8.php', 'PSS.php'])
+        ) {
+            \danog\MadelineProto\Logger::log($message.' in '.\basename($this->file).':'.$this->line, \danog\MadelineProto\Logger::FATAL_ERROR);
         }
         if (\in_array($message, ['The session is corrupted!', 'Re-executing query...', 'I had to recreate the temporary authorization key', 'This peer is not present in the internal peer database', "Couldn't get response", 'Chat forbidden', 'The php-libtgvoip extension is required to accept and manage calls. See daniil.it/MadelineProto for more info.', 'File does not exist', 'Please install this fork of phpseclib: https://github.com/danog/tgseclib'])) {
             return;
@@ -50,17 +52,24 @@ class Exception extends \Exception
             \Rollbar\Rollbar::log(\Rollbar\Payload\Level::error(), $this, \debug_backtrace(0));
         }
     }
-    public static function extension(string $extensionName)
+    /**
+     * Complain about missing extensions
+     *
+     * @param string $extensionName Extension name
+     * 
+     * @return self
+     */
+    public static function extension(string $extensionName): self
     {
-        $additional = 'Try running sudo apt-get install php' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '-' . $extensionName . '.';
+        $additional = 'Try running sudo apt-get install php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$extensionName.'.';
         if ($extensionName === 'libtgvoip') {
             $additional = 'Follow the instructions @ https://voip.madelineproto.xyz to install it.';
         } elseif ($extensionName === 'prime') {
             $additional = 'Follow the instructions @ https://prime.madelineproto.xyz to install it.';
         }
-        $message = 'MadelineProto requires the ' . $extensionName . ' extension to run. ' . $additional;
+        $message = 'MadelineProto requires the '.$extensionName.' extension to run. '.$additional;
         if (PHP_SAPI !== 'cli') {
-            echo $message . '<br>';
+            echo $message.'<br>';
         }
         $file = 'MadelineProto';
         $line = 1;

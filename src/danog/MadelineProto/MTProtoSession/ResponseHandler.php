@@ -513,7 +513,7 @@ trait ResponseHandler
             $r = isset($response['_']) ? $response['_'] : \json_encode($response);
             $this->logger->logger("Deferred: sent {$r} to deferred", Logger::ULTRA_VERBOSE);
             if ($botAPI) {
-                $response = (yield from $this->MTProtoToBotAPI($response));
+                $response = (yield from $this->API->MTProtoToBotAPI($response));
             }
             if (isset($this->outgoing_messages[$request_id]['promise'])) {
                 // This should not happen but happens, should debug

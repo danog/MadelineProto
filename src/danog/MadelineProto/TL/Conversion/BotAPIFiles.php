@@ -39,17 +39,38 @@ use const danog\Decoder\VOICE;
 
 trait BotAPIFiles
 {
-    private function photosizeToBotAPI($photoSize, $photo, $thumbnail = false): \Generator
+    private function photosizeToBotAPI($photoSize, $photo, $thumbnail = false): array
     {
-        $ext = '.jpg';
-        //$this->getExtensionFromLocation(['_' => 'inputFileLocation', 'volume_id' => $photoSize['location']['volume_id'], 'local_id' => $photoSize['location']['local_id'], 'secret' => $photoSize['location']['secret'], 'dc_id' => $photoSize['location']['dc_id']], '.jpg');
-        $photoSize['location']['access_hash'] = $photo['access_hash'] ?? 0;
-        $photoSize['location']['id'] = $photo['id'] ?? 0;
-        $photoSize['location']['secret'] = $photo['location']['secret'] ?? 0;
-        $photoSize['location']['dc_id'] = $photo['dc_id'] ?? 0;
-        $photoSize['location']['_'] = $thumbnail ? 'bot_thumbnail' : 'bot_photo';
-        $data = (yield from $this->TL->serializeObject(['type' => 'File'], $photoSize['location'], 'File')).\chr(2);
-        return ['file_id' => \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode($data)), 'width' => $photoSize['w'], 'height' => $photoSize['h'], 'file_size' => isset($photoSize['size']) ? $photoSize['size'] : \strlen($photoSize['bytes']), 'mime_type' => 'image/jpeg', 'file_name' => $photoSize['location']['volume_id'].'_'.$photoSize['location']['local_id'].$ext];
+        $fileId = new FileId;
+        $fileId->setId($photo['id'] ?? 0);
+        $fileId->setAccessHash($photo['access_hash'] ?? 0);
+        $fileId->setFileReference($photo['file_reference'] ?? '');
+        $fileId->setDcId($photo['dc_id'] ?? 0);
+
+        $fileId->setLocalId($photoSize['location']['local_id']);
+        $fileId->setVolumeId($photoSize['location']['volume_id']);
+
+        $photoSizeSource = new PhotoSizeSourceThumbnail;
+        $photoSizeSource->setThumbType($photoSize['type']);
+
+        if ($photo['_'] === 'photo') {
+            $photoSizeSource->setThumbFileType(PHOTO);
+            $fileId->setType(PHOTO);
+        } else {
+            $photoSizeSource->setThumbFileType(THUMBNAIL);
+            $fileId->setType(THUMBNAIL);
+        }
+        $fileId->setPhotoSizeSource($photoSizeSource);
+
+        return [
+            'file_id' => (string) $fileId,
+            'file_unique_id' => $fileId->getUniqueBotAPI(),
+            'width' => $photoSize['w'], 
+            'height' => $photoSize['h'], 
+            'file_size' => $photoSize['size'] ?? \strlen($photoSize['bytes']), 
+            'mime_type' => 'image/jpeg', 
+            'file_name' => $photoSize['location']['volume_id'].'_'.$photoSize['location']['local_id'].'.jpg'
+        ];
     }
     /**
      * Unpack bot API file ID.

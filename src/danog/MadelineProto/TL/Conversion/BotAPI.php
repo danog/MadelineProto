@@ -19,7 +19,10 @@
 
 namespace danog\MadelineProto\TL\Conversion;
 
+use danog\Decoder\FileId;
 use danog\MadelineProto\Logger;
+
+use const danog\Decoder\TYPES_IDS;
 
 trait BotAPI
 {
@@ -173,17 +176,16 @@ trait BotAPI
     /**
      * Convert MTProto parameters to bot API parameters.
      *
-     * @param array $data           Data
-     * @param array $sent_arguments Sent arguments
+     * @param array $data Data
      *
      * @return \Generator<array>
      */
-    public function MTProtoToBotAPI(array $data, array $sent_arguments = []): \Generator
+    public function MTProtoToBotAPI(array $data): \Generator
     {
         $newd = [];
         if (!isset($data['_'])) {
             foreach ($data as $key => $element) {
-                $newd[$key] = (yield from $this->MTProtoToBotAPI($element, $sent_arguments));
+                $newd[$key] = (yield from $this->MTProtoToBotAPI($element));
             }
             return $newd;
         }
@@ -191,18 +193,20 @@ trait BotAPI
             case 'updateShortSentMessage':
                 $newd['message_id'] = $data['id'];
                 $newd['date'] = $data['date'];
-                $newd['text'] = $sent_arguments['message'];
+                $newd['text'] = $data['request']['message'];
                 if ($data['out']) {
                     $newd['from'] = (yield from $this->getPwrChat($this->authorization['user']));
                 }
-                $newd['chat'] = (yield from $this->getPwrChat($sent_arguments['peer']));
+                $newd['chat'] = yield from $this->getPwrChat($data['request']['peer']);
                 if (isset($data['entities'])) {
-                    $newd['entities'] = (yield from $this->MTProtoToBotAPI($data['entities'], $sent_arguments));
+                    $newd['entities'] = yield from $this->MTProtoToBotAPI($data['entities']);
                 }
                 if (isset($data['media'])) {
-                    $newd = \array_merge($newd, yield from $this->MTProtoToBotAPI($data['media'], $sent_arguments));
+                    $newd += yield from $this->MTProtoToBotAPI($data['media']);
                 }
                 return $newd;
+            case 'updates':
+                $data = array_values(array_filter($data['updates'], fn(array $update) => $update['_'] !== 'updateMessageID'))[0];
             case 'updateNewChannelMessage':
             case 'updateNewMessage':
                 return yield from $this->MTProtoToBotAPI($data['message']);
@@ -217,7 +221,7 @@ trait BotAPI
                 }
                 $newd['chat'] = (yield from $this->getPwrChat($data['to_id']));
                 if (isset($data['entities'])) {
-                    $newd['entities'] = (yield from $this->MTProtoToBotAPI($data['entities'], $sent_arguments));
+                    $newd['entities'] = (yield from $this->MTProtoToBotAPI($data['entities']));
                 }
                 if (isset($data['views'])) {
                     $newd['views'] = $data['views'];
@@ -241,7 +245,7 @@ trait BotAPI
                     $newd['forward_from_message_id'] = $data['fwd_from']['channel_post'];
                 }
                 if (isset($data['media'])) {
-                    $newd = \array_merge($newd, yield from $this->MTProtoToBotAPI($data['media'], $sent_arguments));
+                    $newd = \array_merge($newd, yield from $this->MTProtoToBotAPI($data['media']));
                 }
                 return $newd;
             case 'messageEntityMention':
@@ -297,7 +301,7 @@ trait BotAPI
                 $res['photo'] = [];
                 foreach ($data['photo']['sizes'] as $key => $photo) {
                     if (\in_array($photo['_'], ['photoCachedSize', 'photoSize'])) {
-                        $res['photo'][$key] = (yield from $this->photosizeToBotAPI($photo, $data['photo']));
+                        $res['photo'][$key] = $this->photosizeToBotAPI($photo, $data['photo']);
                     }
                 }
                 return $res;
@@ -307,21 +311,18 @@ trait BotAPI
                 $type_name = 'document';
                 $res = [];
                 if (isset($data['document']['thumbs']) && $data['document']['thumbs'] && \in_array(\end($data['document']['thumbs'])['_'], ['photoCachedSize', 'photoSize'])) {
-                    $res['thumb'] = (yield from $this->photosizeToBotAPI(\end($data['document']['thumbs']), [], true));
+                    $res['thumb'] = $this->photosizeToBotAPI(\end($data['document']['thumbs']), $data['document'], true);
                 }
                 foreach ($data['document']['attributes'] as $attribute) {
                     switch ($attribute['_']) {
                         case 'documentAttributeFilename':
                             $pathinfo = \pathinfo($attribute['file_name']);
-                            $res['ext'] = isset($pathinfo['extension']) ? '.' . $pathinfo['extension'] : '';
+                            $res['ext'] = isset($pathinfo['extension']) ? '.'.$pathinfo['extension'] : '';
                             $res['file_name'] = $pathinfo['filename'];
                             break;
                         case 'documentAttributeAudio':
                             $audio = $attribute;
-                            $type_name = 'audio';
-                            if ($attribute['voice']) {
-                                $type_name = 'voice';
-                            }
+                            $type_name = $attribute['voice'] ? 'voice' :'audio';
                             $res['duration'] = $attribute['duration'];
                             if (isset($attribute['performer'])) {
                                 $res['performer'] = $attribute['performer'];
@@ -344,7 +345,7 @@ trait BotAPI
                             $res['height'] = $attribute['h'];
                             break;
                         case 'documentAttributeAnimated':
-                            $type_name = 'gif';
+                            $type_name = 'animation';
                             $res['animated'] = true;
                             break;
                         case 'documentAttributeHasStickers':
@@ -364,24 +365,32 @@ trait BotAPI
                 if (isset($audio) && isset($audio['title']) && !isset($res['file_name'])) {
                     $res['file_name'] = $audio['title'];
                     if (isset($audio['performer'])) {
-                        $res['file_name'] .= ' - ' . $audio['performer'];
+                        $res['file_name'] .= ' - '.$audio['performer'];
                     }
                 }
                 if (!isset($res['file_name'])) {
                     $res['file_name'] = $data['document']['access_hash'];
                 }
-                $res['file_name'] .= '_' . $data['document']['id'];
+                $res['file_name'] .= '_'.$data['document']['id'];
                 if (isset($res['ext'])) {
                     $res['file_name'] .= $res['ext'];
                     unset($res['ext']);
                 } else {
                     $res['file_name'] .= $this->getExtensionFromMime($data['document']['mime_type']);
                 }
-                $data['document']['_'] = 'bot_' . $type_name;
                 $res['file_size'] = $data['document']['size'];
                 $res['mime_type'] = $data['document']['mime_type'];
-                $res['file_id'] = \danog\MadelineProto\Tools::base64urlEncode(\danog\MadelineProto\Tools::rleEncode(yield from $this->TL->serializeObject(['type' => 'File'], $data['document'], 'File') . \chr(2)));
-                return [$type_name => $res, 'caption' => isset($data['caption']) ? $data['caption'] : ''];
+
+                $fileId = new FileId;
+                $fileId->setId($data['document']['id']);
+                $fileId->setAccessHash($data['document']['access_hash']);
+                $fileId->setFileReference($data['document']['file_reference'] ?? '');
+                $fileId->setDcId($data['document']['dc_id']);
+                $fileId->setType(TYPES_IDS[$type_name]);
+
+                $res['file_id'] = (string) $fileId;
+                $res['file_unique_id'] = $fileId->getUniqueBotAPI();
+                return [$type_name => $res, 'caption' => $data['caption'] ?? ''];
             default:
                 throw new Exception(\sprintf(\danog\MadelineProto\Lang::$current_lang['botapi_conversion_error'], $data['_']));
         }
@@ -586,7 +595,7 @@ trait BotAPI
         $multiple_args = [$multiple_args_base];
         $i = 0;
         foreach ($text_arr as $word) {
-            if ($this->mbStrlen($multiple_args[$i]['message'] . $word) <= $max_length) {
+            if ($this->mbStrlen($multiple_args[$i]['message'].$word) <= $max_length) {
                 $multiple_args[$i]['message'] .= $word;
             } else {
                 $i++;
@@ -670,7 +679,7 @@ trait BotAPI
         foreach ($initialArray as $item) {
             $delimOffset += $this->mbStrlen($item);
             //if ($this->mbStrlen($item) > 0) {
-            $finalArray[] = $item . ($delimOffset < $this->mbStrlen($string) ? $string[$delimOffset] : '');
+            $finalArray[] = $item.($delimOffset < $this->mbStrlen($string) ? $string[$delimOffset] : '');
             //}
             $delimOffset++;
         }
