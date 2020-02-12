@@ -37,6 +37,7 @@ use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -949,11 +950,12 @@ trait Files
      */
     private static function getExplanation(int $code): string
     {
-        $body = "<html><body><h1>$code ${Status::getReason($code)}</h1><br>";
+        $reason = Status::getReason($code);
+        $body = "<html><body><h1>$code $reason</h1><br>";
         if ($code === Status::RANGE_NOT_SATISFIABLE) {
             $body .= "<p>Could not use selected range.</p>";
         }
-        $body .= self::POWERED_BY;
+        $body .= MTProto::POWERED_BY;
         $body .= "</body></html>";
         return $body;
     }
