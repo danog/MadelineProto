@@ -105,7 +105,7 @@ class FeedLoop extends ResumableSignalLoop
                     $mid = isset($update['message']['id']) ? $update['message']['id'] : '-';
                     $mypts = $this->state->pts();
                     $computed = $mypts + $pts_count;
-                    $this->API->logger->logger("{$msg}. My pts: {$mypts}, remote pts: {$update['pts']}, computed pts: {$computed}, msg id: {$mid}, channel id: {$this->channelId}", \danog\MadelineProto\Logger::ERROR);
+                    $this->API->logger->logger("{$msg}. My pts: {$mypts}, remote pts: {$update['pts']}, computed pts: {$computed}, msg id: {$mid}, channel id: {$this->channelId}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 };
                 $result = $this->state->checkPts($update);
                 if ($result < 0) {
