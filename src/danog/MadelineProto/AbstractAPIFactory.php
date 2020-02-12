@@ -97,7 +97,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     public function __call(string $name, array $arguments)
     {
         $yielded = Tools::call($this->__call_async($name, $arguments));
-        $async = !$this->lua && (\end($arguments)['async'] ?? ($this->async && $name !== 'loop'));
+        $async = !$this->lua && ((is_array(\end($arguments)) ? \end($arguments) : [])['async'] ?? ($this->async && $name !== 'loop'));
         if ($async) {
             return $yielded;
         }
