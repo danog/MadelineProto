@@ -21,6 +21,7 @@ namespace danog\MadelineProto\TL\Conversion;
 
 use danog\Decoder\FileId;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProtoTools\PeerHandler;
 
 use const danog\Decoder\TYPES_IDS;
 
@@ -237,7 +238,9 @@ trait BotAPI
                     $newd['forward_from'] = (yield from $this->getPwrChat($data['fwd_from']['from_id']));
                 }
                 if (isset($data['fwd_from']['channel_id'])) {
-                    $newd['forward_from_chat'] = (yield from $this->getPwrChat($data['fwd_from']['channel_id']));
+                    try {
+                        $newd['forward_from_chat'] = yield from $this->getPwrChat(PeerHandler::toSupergroup($data['fwd_from']['channel_id']));
+                    } catch (\Throwable $e) {}
                 }
                 if (isset($data['fwd_from']['date'])) {
                     $newd['forward_date'] = $data['fwd_from']['date'];

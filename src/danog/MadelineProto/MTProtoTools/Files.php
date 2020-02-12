@@ -861,7 +861,7 @@ trait Files
 
         $headers = [];
         if (isset($_SERVER['HTTP_RANGE'])) {
-            $headers['content-range'] = $_SERVER['HTTP_RANGE'];
+            $headers['range'] = $_SERVER['HTTP_RANGE'];
         }
 
         $messageMedia = yield from $this->getDownloadInfo($messageMedia);
@@ -909,6 +909,7 @@ trait Files
         }
 
         $messageMedia = yield from $this->getDownloadInfo($messageMedia);
+
         $result = self::parseHeaders(
             $request->getMethod(),
             \array_map(fn (array $headers) => $headers[0], $request->getHeaders()),
@@ -920,6 +921,10 @@ trait Files
             $body = new IteratorStream(
                 new Producer(
                     function (callable $emit) use (&$messageMedia, &$cb, &$result) {
+                        $emit = static function (string $payload) use ($emit): \Generator {
+                            yield $emit($payload);
+                            return \strlen($payload);
+                        };
                         yield Tools::call($this->downloadToCallable($messageMedia, $emit, $cb, false, ...$result['serve']));
                     }
                 )
@@ -965,8 +970,8 @@ trait Files
      */
     private static function parseHeaders(string $method, array $headers, array $messageMedia): array
     {
-        if (isset($headers['content-range'])) {
-            $range = \explode('=', $headers['content-range'], 2);
+        if (isset($headers['range'])) {
+            $range = \explode('=', $headers['range'], 2);
             if (\count($range) == 1) {
                 $range[1] = '';
             }
@@ -1011,12 +1016,12 @@ trait Files
             'code' => Status::OK,
             'headers' => []
         ];
-        if ($seek_start > 0 || $seek_end < $messageMedia['file_size'] - 1) {
+        if ($seek_start > 0 || $seek_end < $messageMedia['size'] - 1) {
             $result['code'] = Status::PARTIAL_CONTENT;
-            $result['headers']['Content-Range'] = "bytes ${seek_start}-${seek_end}/${messageMedia['file_size']}";
+            $result['headers']['Content-Range'] = "bytes ${seek_start}-${seek_end}/${messageMedia['size']}";
             $result['headers']['Content-Length'] = $seek_end - $seek_start + 1;
         } else {
-            $result['headers']['Content-Length'] = $messageMedia['file_size'];
+            $result['headers']['Content-Length'] = $messageMedia['size'];
         }
         $result['headers']['Content-Type'] = $messageMedia['mime'];
         $result['headers']['Cache-Control'] = 'max-age=31556926';
@@ -1214,7 +1219,7 @@ trait Files
         $cdn = false;
         $params[0]['previous_promise'] = new Success(true);
         $start = \microtime(true);
-        $size = (yield from $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = \array_shift($params), $callable, $seekable));
+        $size = yield from $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = \array_shift($params), $callable, $seekable);
         if ($initParam['part_end_at'] - $initParam['part_start_at'] !== $size) {
             // Premature end for undefined length files
             $origCb(100, 0, 0);
@@ -1312,6 +1317,7 @@ trait Files
                     }
                 }
             }
+
             if ($res['_'] === 'upload.fileCdnRedirect') {
                 $cdn = true;
                 $messageMedia['file_token'] = $res['file_token'];
