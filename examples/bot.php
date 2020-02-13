@@ -42,13 +42,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
     }
     public function onUpdateNewMessage($update)
     {
-        if (isset($update['message']['out']) && $update['message']['out']) {
-            return;
-        }
-        if ($update['_'] === 'updateReadChannelOutbox') {
-            return;
-        }
-        if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') {
+        if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
             return;
         }
         $res = \json_encode($update, JSON_PRETTY_PRINT);
