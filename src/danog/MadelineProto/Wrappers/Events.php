@@ -86,6 +86,23 @@ trait Events
         }
     }
     /**
+      * Unset event handler.
+      *
+      * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
+      *
+      * @return void
+      */
+    public function unsetEventHandler(bool $disableUpdateHandling = false): void
+    {
+        $this->event_handler = null;
+        $this->event_handler_instance = null;
+        $this->event_handler_methods = [];
+        $this->setNoop();
+        if ($disableUpdateHandling) {
+            $this->settings['updates']['handle_updates'] = false;
+        }
+    }
+    /**
      * Get event handler.
      *
      * @return EventHandler
