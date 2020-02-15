@@ -23,6 +23,7 @@ use Amp\ByteStream\InputStream;
 use Amp\ByteStream\IteratorStream;
 use Amp\ByteStream\OutputStream;
 use Amp\ByteStream\ResourceOutputStream;
+use Amp\ByteStream\ResourceInputStream;
 use Amp\ByteStream\StreamException;
 use Amp\Deferred;
 use Amp\File\BlockingFile;
