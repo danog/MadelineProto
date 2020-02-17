@@ -4,7 +4,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\TL\TL;
 
 /*
-Copyright 2016-2019 Daniil Gentili
+Copyright 2016-2020 Daniil Gentili
 (https://daniil.it)
 This file is part of MadelineProto.
 MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

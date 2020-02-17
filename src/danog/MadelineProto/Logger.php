@@ -11,7 +11,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2019 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
@@ -248,7 +248,7 @@ class Logger
             self::$printed = true;
             $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
             $this->logger('MadelineProto');
-            $this->logger('Copyright (C) 2016-2019 Daniil Gentili');
+            $this->logger('Copyright (C) 2016-2020 Daniil Gentili');
             $this->logger('Licensed under AGPLv3');
             $this->logger('https://github.com/danog/MadelineProto');
             $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
