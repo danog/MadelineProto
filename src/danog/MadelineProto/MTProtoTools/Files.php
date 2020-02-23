@@ -11,7 +11,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2019 Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2020 Daniil Gentili <daniil@daniil.it>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
@@ -23,6 +23,7 @@ use Amp\ByteStream\InputStream;
 use Amp\ByteStream\IteratorStream;
 use Amp\ByteStream\OutputStream;
 use Amp\ByteStream\ResourceOutputStream;
+use Amp\ByteStream\ResourceInputStream;
 use Amp\ByteStream\StreamException;
 use Amp\Deferred;
 use Amp\File\BlockingFile;
