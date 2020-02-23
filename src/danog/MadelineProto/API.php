@@ -405,4 +405,35 @@ class API extends InternalDoc
             return $wrote;
         })());
     }
+
+    /**
+     * Start MadelineProto and the event handler (enables async).
+     *
+     * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
+     *
+     * @param string $eventHandler Event handler class name
+     *
+     * @return void
+     */
+    public function startAndLoop(string $eventHandler): void
+    {
+        $this->async(true);
+        do {
+            $thrown = false;
+            try {
+                $this->loop(function () use ($eventHandler) {
+                    yield $this->start();
+                    yield $this->setEventHandler($eventHandler);
+                });
+                $this->loop();
+            } catch (\Throwable $e) {
+                $thrown = true;
+                try {
+                    $this->report("Surfaced: $e");
+                } catch (\Throwable $e) {
+                    $this->logger((string) $e, Logger::FATAL_ERROR);
+                }
+            }
+        } while ($thrown);
+    }
 }

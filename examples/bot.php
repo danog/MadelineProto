@@ -19,7 +19,12 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
- /*
+use danog\MadelineProto\API;
+use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\RPCErrorException;
+
+/*
  * Various ways to load MadelineProto
  */
 if (\file_exists('vendor/autoload.php')) {
@@ -34,13 +39,40 @@ if (\file_exists('vendor/autoload.php')) {
 /**
  * Event handler class.
  */
-class EventHandler extends \danog\MadelineProto\EventHandler
+class MyEventHandler extends EventHandler
 {
-    public function onUpdateNewChannelMessage($update)
+    /**
+     * @var int|string Username or ID of bot admin
+     */
+    const ADMIN = "danogentili"; // Change this
+    /**
+     * Get peer(s) where to report errors.
+     *
+     * @return int|string|array
+     */
+    public function getReportPeers()
     {
-        yield $this->onUpdateNewMessage($update);
+        return [self::ADMIN];
     }
-    public function onUpdateNewMessage($update)
+    /**
+     * Handle updates from supergroups and channels.
+     *
+     * @param array $update Update
+     *
+     * @return void
+     */
+    public function onUpdateNewChannelMessage(array $update): \Generator
+    {
+        return $this->onUpdateNewMessage($update);
+    }
+    /**
+     * Handle updates from users.
+     *
+     * @param array $update Update
+     *
+     * @return \Generator
+     */
+    public function onUpdateNewMessage(array $update): \Generator
     {
         if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
             return;
@@ -51,21 +83,13 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
             if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
                 yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
-                /*    '_' => 'inputMediaUploadedDocument',
-                    'file' => $update,
-                    'attributes' => [
-                        ['_' => 'documentAttributeFilename', 'file_name' => 'document.txt']
-                    ]
-                ],]);*/
-                //yield $this->downloadToDir($update, '/tmp');
             }
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (RPCErrorException $e) {
+            $this->report("Surfaced: $e");
+        } catch (Exception $e) {
             if (\stripos($e->getMessage(), 'invalid constructor given') === false) {
-                $this->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
+                $this->report("Surfaced: $e");
             }
-            //$this->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
         }
     }
 }
@@ -78,11 +102,8 @@ $settings = [
     ],
 ];
 
-$MadelineProto = new \danog\MadelineProto\API('bot.madeline', $settings);
-$MadelineProto->async(true);
-$MadelineProto->loop(function () use ($MadelineProto) {
-    yield $MadelineProto->start();
-    yield $MadelineProto->setEventHandler('\EventHandler');
-});
+$MadelineProto = new API('bot.madeline', $settings);
 
-$MadelineProto->loop();
+// Reduce boilerplate with new wrapper method.
+// Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
+$MadelineProto->startAndLoop(MyEventHandler::class);

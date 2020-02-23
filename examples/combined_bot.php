@@ -19,7 +19,12 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-\set_include_path(\get_include_path().':'.\realpath(\dirname(__FILE__).'/MadelineProto/'));
+use danog\MadelineProto\API;
+use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\Tools;
 
 /*
  * Various ways to load MadelineProto
@@ -34,54 +39,89 @@ if (\file_exists(__DIR__.'/vendor/autoload.php')) {
 }
 
 /**
- * Combined event handler class.
+ * Event handler class.
  */
-class EventHandler extends \danog\MadelineProto\CombinedEventHandler
+class MyEventHandler extends EventHandler
 {
-    public function onUpdateNewChannelMessage($update, $path)
+    /**
+     * @var int|string Username or ID of bot admin
+     */
+    const ADMIN = "danogentili"; // Change this
+    /**
+     * Get peer(s) where to report errors.
+     *
+     * @return int|string|array
+     */
+    public function getReportPeers()
     {
-        yield $this->onUpdateNewMessage($update, $path);
+        return [self::ADMIN];
     }
-    public function onUpdateNewMessage($update, $path)
+    /**
+     * Handle updates from supergroups and channels.
+     *
+     * @param array $update Update
+     *
+     * @return void
+     */
+    public function onUpdateNewChannelMessage(array $update): \Generator
     {
-        if (isset($update['message']['out']) && $update['message']['out']) {
+        return $this->onUpdateNewMessage($update);
+    }
+    /**
+     * Handle updates from users.
+     *
+     * @param array $update Update
+     *
+     * @return \Generator
+     */
+    public function onUpdateNewMessage(array $update): \Generator
+    {
+        if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
             return;
         }
-        $MadelineProto = $this->{$path};
-
-        if (isset($update['message']['media'])) {
-            yield $MadelineProto->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
-        }
-
         $res = \json_encode($update, JSON_PRETTY_PRINT);
-        if ($res == '') {
-            $res = \var_export($update, true);
-        }
-        yield $MadelineProto->sleep(3);
 
         try {
-            yield $MadelineProto->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>\n\nDopo 3 secondi, in modo asincrono", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']); //'entities' => [['_' => 'messageEntityPre', 'offset' => 0, 'length' => strlen($res), 'language' => 'json']]]);
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
-            \danog\MadelineProto\Logger::log((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
-        } catch (\danog\MadelineProto\Exception $e) {
-            \danog\MadelineProto\Logger::log((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
-            //$MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => $e->getCode().': '.$e->getMessage().PHP_EOL.$e->getTraceAsString()]);
+            yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
+            if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
+                yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
+            }
+        } catch (RPCErrorException $e) {
+            $this->report("Surfaced: $e");
+        } catch (Exception $e) {
+            if (\stripos($e->getMessage(), 'invalid constructor given') === false) {
+                $this->report("Surfaced: $e");
+            }
         }
     }
 }
 
-$settings = ['logger' => ['logger_level' => 5]];
-$CombinedMadelineProto = new \danog\MadelineProto\CombinedAPI('combined_session.madeline', ['bot.madeline' => $settings, 'user.madeline' => $settings]);
+$MadelineProtos = [];
+foreach ([
+    'bot.madeline' => 'Bot Login',
+    'user.madeline' => 'Userbot login',
+    'user2.madeline' => 'Userbot login (2)'
+] as $session => $message) {
+    Logger::log($message, Logger::WARNING);
+    $MadelineProto = new API($session);
+    $MadelineProto->async(true);
+    $MadelineProto->loop(function () use ($MadelineProto) {
+        yield $MadelineProto->start();
+        yield $MadelineProto->setEventHandler(MyEventHandler::class);
+    });
+    $MadelineProtos []= $MadelineProto->loopFork();
+}
 
-\danog\MadelineProto\Logger::log('Bot login', \danog\MadelineProto\Logger::WARNING);
-$CombinedMadelineProto->instances['bot.madeline']->start();
-
-\danog\MadelineProto\Logger::log('Userbot login');
-$CombinedMadelineProto->instances['user.madeline']->start();
-
-$CombinedMadelineProto->setEventHandler('\EventHandler');
-$CombinedMadelineProto->loop();
-
-$CombinedMadelineProto->async(true);
-$CombinedMadelineProto->setEventHandler('\EventHandler');
-$CombinedMadelineProto->loop();
+do {
+    $thrown = false;
+    try {
+        Tools::wait(Tools::all($MadelineProtos));
+    } catch (\Throwable $e) {
+        $thrown = true;
+        try {
+            $MadelineProto->report("Surfaced: $e");
+        } catch (\Throwable $e) {
+            $MadelineProto->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
+        }
+    }
+} while ($thrown);

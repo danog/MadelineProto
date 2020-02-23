@@ -19,7 +19,7 @@
 
 namespace danog\MadelineProto\Wrappers;
 
-use EventHandler;
+use danog\MadelineProto\EventHandler;
 
 /**
  * Event handler.
@@ -35,7 +35,7 @@ trait Events
     /**
      * Event handler instance.
      *
-     * @var \danog\MadelineProto\EventHandler
+     * @var EventHandler
      */
     private $event_handler_instance;
     /**
@@ -78,6 +78,7 @@ trait Events
                 $this->event_handler_methods[$method_name] = [$this->event_handler_instance, $method];
             }
         }
+        $this->setReportPeers($this->event_handler_instance->getReportPeers());
         $this->settings['updates']['callback'] = [$this, 'eventUpdateHandler'];
         $this->settings['updates']['handle_updates'] = true;
         $this->settings['updates']['run_callback'] = true;
@@ -86,12 +87,12 @@ trait Events
         }
     }
     /**
-      * Unset event handler.
-      *
-      * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
-      *
-      * @return void
-      */
+     * Unset event handler.
+     *
+     * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
+     *
+     * @return void
+     */
     public function unsetEventHandler(bool $disableUpdateHandling = false): void
     {
         $this->event_handler = null;
@@ -107,9 +108,18 @@ trait Events
      *
      * @return EventHandler
      */
-    public function getEventHandler(): \danog\MadelineProto\EventHandler
+    public function getEventHandler(): EventHandler
     {
         return $this->event_handler_instance;
+    }
+    /**
+     * Check if an event handler instance is present.
+     *
+     * @return boolean
+     */
+    public function hasEventHandler(): bool
+    {
+        return isset($this->event_handler_instance);
     }
     /**
      * Event update handler.

@@ -739,10 +739,10 @@ trait Tools
         return $new;
     }
     /**
-     * Inflate stripped photosize to full JPG payload
+     * Inflate stripped photosize to full JPG payload.
      *
      * @param string $stripped Stripped photosize
-     * 
+     *
      * @return string JPG payload
      */
     public static function inflateStripped(string $stripped): string

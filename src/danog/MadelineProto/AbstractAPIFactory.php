@@ -97,15 +97,15 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     public function __call(string $name, array $arguments)
     {
         $yielded = Tools::call($this->__call_async($name, $arguments));
-        $async = !$this->lua && ((is_array(\end($arguments)) ? \end($arguments) : [])['async'] ?? ($this->async && $name !== 'loop'));
+        $async = !$this->lua && ((\is_array(\end($arguments)) ? \end($arguments) : [])['async'] ?? ($this->async && $name !== 'loop'));
         if ($async) {
             return $yielded;
         }
+        $yielded = Tools::wait($yielded);
         if (!$this->lua) {
-            return Tools::wait($yielded);
+            return $yielded;
         }
         try {
-            $yielded = Tools::wait($yielded);
             Lua::convertObjects($yielded);
             return $yielded;
         } catch (\Throwable $e) {
@@ -127,9 +127,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         if ($this->asyncInitPromise) {
             yield from $this->initAsynchronously();
             $this->API->logger->logger('Finished init asynchronously');
-        }
-        if (Magic::isFork() && !Magic::$processed_fork) {
-            throw new Exception('Forking not supported, use async logic, instead: https://docs.madelineproto.xyz/docs/ASYNC.html');
         }
         if (!$this->API) {
             throw new Exception('API did not init!');
@@ -160,7 +157,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
             return yield from $this->API->methodCallAsyncRead($name, $args, $aargs);
         }
-        $res = yield $this->methods[$lower_name](...$arguments);
+        $res = $this->methods[$lower_name](...$arguments);
         return $res instanceof \Generator ? yield from $res : yield $res;
     }
     /**

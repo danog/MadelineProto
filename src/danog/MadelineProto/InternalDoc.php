@@ -4216,6 +4216,37 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
+     * Check if has report peers.
+     *
+     * @return boolean
+     */
+    public function hasReportPeers(): bool
+    {
+        return $this->API->hasReportPeers();
+    }
+    /**
+     * Set peer(s) where to send errors occurred in the event loop.
+     *
+     * @param int|string $userOrId Username(s) or peer ID(s)
+     *
+     * @return \Generator
+     */
+    public function setReportPeers($userOrId, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$userOrId, $extra]);
+    }
+    /**
+     * Report an error to the previously set peer.
+     *
+     * @param string $message Error to report
+     *
+     * @return \Generator
+     */
+    public function report(string $message, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$message, $extra]);
+    }
+    /**
      * Call method and wait asynchronously for response.
      *
      * If the $aargs['noResponse'] is true, will not wait for a response.
@@ -5294,6 +5325,17 @@ class InternalDoc extends APIFactory
         return \danog\MadelineProto\MTProto::rleEncode($string);
     }
     /**
+     * Inflate stripped photosize to full JPG payload.
+     *
+     * @param string $stripped Stripped photosize
+     *
+     * @return string JPG payload
+     */
+    public function inflateStripped(string $stripped): string
+    {
+        return \danog\MadelineProto\MTProto::inflateStripped($stripped);
+    }
+    /**
      * Get final element of array.
      *
      * @param array $what Array
@@ -5461,6 +5503,17 @@ class InternalDoc extends APIFactory
         $this->API->setEventHandler($event_handler);
     }
     /**
+     * Unset event handler.
+     *
+     * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
+     *
+     * @return void
+     */
+    public function unsetEventHandler(bool $disableUpdateHandling = false): void
+    {
+        $this->API->unsetEventHandler($disableUpdateHandling);
+    }
+    /**
      * Get event handler.
      *
      * @return EventHandler
@@ -5468,6 +5521,15 @@ class InternalDoc extends APIFactory
     public function getEventHandler(): \danog\MadelineProto\EventHandler
     {
         return $this->API->getEventHandler();
+    }
+    /**
+     * Check if an event handler instance is present.
+     *
+     * @return boolean
+     */
+    public function hasEventHandler(): bool
+    {
+        return $this->API->hasEventHandler();
     }
     /**
      * Set webhook update handler.
@@ -5592,17 +5654,6 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$params, $extra]);
     }
     /**
-     * Set loop callback (DEPRECATED).
-     *
-     * @param callable $callback Callback
-     *
-     * @return void
-     */
-    public function setLoopCallback($callback): void
-    {
-        $this->API->setLoopCallback($callback);
-    }
-    /**
      * Start MadelineProto's update handling loop, or run the provided async callable.
      *
      * @param callable $callback Async callable to run
@@ -5623,15 +5674,22 @@ class InternalDoc extends APIFactory
         $this->API->stop();
     }
     /**
-     * Start MadelineProto's update handling loop in background, or run the provided async callable.
+     * Restart update loop.
      *
-     * @param callable $callback Async callable to run
-     *
-     * @return mixed
+     * @return void
      */
-    public function loopFork($callback = null): void
+    public function restart(): void
     {
-        $this->API->loopFork($callback);
+        $this->API->restart();
+    }
+    /**
+     * Start MadelineProto's update handling loop in background.
+     *
+     * @return Promise
+     */
+    public function loopFork(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Close connection with client, connected via web.

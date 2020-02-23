@@ -41,4 +41,13 @@ class EventHandler extends InternalDoc
             $this->{$namespace} = new APIFactory($namespace, $this->API, $this->async);
         }
     }
+    /**
+     * Get peers where to send error reports.
+     *
+     * @return array|string|int
+     */
+    public function getReportPeers()
+    {
+        return [];
+    }
 }

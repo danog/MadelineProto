@@ -33,11 +33,48 @@ if (\file_exists(__DIR__.'/../vendor/autoload.php')) {
     include 'madeline.php';
 }
 
-class EventHandler extends \danog\MadelineProto\EventHandler
+class SecretHandler extends \danog\MadelineProto\EventHandler
 {
     private $sent = [-440592694 => true];
-
-    public function onUpdateNewEncryptedMessage($update)
+    public function __construct($API)
+    {
+        parent::__construct($API);
+        $this->sent = [];
+    }
+    /**
+     * @var int|string Username or ID of bot admin
+     */
+    const ADMIN = "danogentili"; // Change this
+    /**
+     * Get peer(s) where to report errors.
+     *
+     * @return int|string|array
+     */
+    public function getReportPeers()
+    {
+        return [self::ADMIN];
+    }
+    /**
+     * Handle updates from users.
+     *
+     * @param array $update Update
+     *
+     * @return \Generator
+     */
+    public function onUpdateNewMessage(array $update): \Generator
+    {
+        if ($update['message']['message'] === 'request') {
+            yield $this->requestSecretChat($update);
+        }
+    }
+    /**
+     * Handle secret chat messages.
+     *
+     * @param array $update Update
+     *
+     * @return \Generator
+     */
+    public function onUpdateNewEncryptedMessage(array $update): \Generator
     {
         try {
             if (isset($update['message']['decrypted_message']['media'])) {
@@ -72,14 +109,14 @@ class EventHandler extends \danog\MadelineProto\EventHandler
             $secret_media['voice'] = ['peer' => $update, 'file' => 'tests/mosconi.mp3', 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => '', 'media' => ['_' => 'decryptedMessageMediaDocument', 'thumb' => \file_get_contents('tests/faust.preview.jpg'), 'thumb_w' => 90, 'thumb_h' => 90, 'mime_type' => \mime_content_type('tests/mosconi.mp3'), 'caption' => 'test', 'file_name' => 'mosconi.mp3', 'size' => \filesize('tests/mosconi.mp3'), 'attributes' => [['_' => 'documentAttributeAudio', 'voice' => true, 'duration' => 1, 'title' => 'AH NON LO SO IO', 'performer' => 'IL DIO GERMANO MOSCONI']]]]];
 
             foreach ($secret_media as $type => $smessage) {
-                yield $this->messages->sendEncryptedFile($smessage);
+                $promises = $this->messages->sendEncryptedFile($smessage);
             }
+            yield $promises;
 
             $i = 0;
             while ($i < 10) {
                 $this->logger("SENDING MESSAGE $i TO ".$update['message']['chat_id']);
                 // You can also use the sendEncrypted parameter for more options in secret chats
-                //yield $this->messages->sendEncrypted(['peer' => $update, 'message' => ['_' => 'decryptedMessage', 'ttl' => 0, 'message' => (string) ($i++)]]);
                 yield $this->messages->sendMessage(['peer' => $update, 'message' => (string) ($i++)]);
             }
             $this->sent[$update['message']['chat_id']] = true;
@@ -102,7 +139,5 @@ $settings = \json_decode(\getenv('MTPROTO_SETTINGS'), true) ?: [];
 
 $MadelineProto = new \danog\MadelineProto\API('s.madeline', $settings);
 
-$MadelineProto->start();
-$MadelineProto->setEventHandler('\EventHandler');
-$MadelineProto->async(true);
-$MadelineProto->loop();
+// Reduce boilerplate with new wrapper method
+$MadelineProto->startAndLoop(MyEventHandler::class);

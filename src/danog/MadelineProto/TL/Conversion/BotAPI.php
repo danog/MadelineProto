@@ -240,7 +240,8 @@ trait BotAPI
                 if (isset($data['fwd_from']['channel_id'])) {
                     try {
                         $newd['forward_from_chat'] = yield from $this->getPwrChat(PeerHandler::toSupergroup($data['fwd_from']['channel_id']));
-                    } catch (\Throwable $e) {}
+                    } catch (\Throwable $e) {
+                    }
                 }
                 if (isset($data['fwd_from']['date'])) {
                     $newd['forward_date'] = $data['fwd_from']['date'];

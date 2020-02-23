@@ -79,7 +79,7 @@ trait Files
         } elseif (\is_array($file)) {
             return yield from $this->uploadFromTgfile($file, $cb, $encrypted);
         }
-        if (\is_resource($file) || (is_object($file) && $file instanceof InputStream)) {
+        if (\is_resource($file) || (\is_object($file) && $file instanceof InputStream)) {
             return yield from $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted);
         }
         if (!$this->settings['upload']['allow_automatic_upload']) {
@@ -212,7 +212,7 @@ trait Files
             yield $stream->seek(0, \SEEK_END);
             $size = yield $stream->tell();
             yield $stream->seek(0);
-        } else if (!$size) {
+        } elseif (!$size) {
             $this->logger->logger("No content length for stream, caching first");
             $body = $stream;
             $stream = new BlockingFile(\fopen('php://temp', 'r+b'), 'php://temp', 'r+b');
