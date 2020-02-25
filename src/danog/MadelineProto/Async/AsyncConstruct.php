@@ -35,7 +35,7 @@ class AsyncConstruct
      *
      * @var Promise
      */
-    public $asyncInitPromise;
+    private $asyncInitPromise;
     /**
      * Blockingly init.
      *
@@ -59,9 +59,29 @@ class AsyncConstruct
         }
     }
     /**
+     * Check if we've already inited.
+     *
+     * @return boolean
+     */
+    public function inited(): bool
+    {
+        return !$this->asyncInitPromise;
+    }
+    /**
+     * Mark instance as (de)inited forcefully
+     *
+     * @param boolean $inited Whether to mark the instance as inited or deinited
+     * 
+     * @return void
+     */
+    public function forceInit(bool $inited): void
+    {
+        $this->asyncInitPromise = $inited ? null : true;
+    }
+    /**
      * Set init promise.
      *
-     * @param Promise $promise Promise
+     * @param Promise|\Generator $promise Promise
      *
      * @internal
      *
@@ -69,12 +89,14 @@ class AsyncConstruct
      */
     public function setInitPromise($promise): void
     {
-        $this->asyncInitPromise = Tools::callFork($promise);
-        $this->asyncInitPromise->onResolve(function ($error, $result) {
-            if ($error) {
-                throw $error;
+        $this->asyncInitPromise = Tools::call($promise);
+        $this->asyncInitPromise->onResolve(
+            function (?\Throwable $error, $result): void {
+                if ($error) {
+                    throw $error;
+                }
+                $this->asyncInitPromise = null;
             }
-            $this->asyncInitPromise = null;
-        });
+        );
     }
 }

@@ -540,6 +540,9 @@ trait BotAPI
         if (($arguments['message'] ?? '') === '' || !isset($arguments['parse_mode'])) {
             return $arguments;
         }
+        if (!(\is_string($arguments['message']) || \is_object($arguments['message']) && \method_exists($arguments['message'], '__toString'))) {
+            throw new Exception('Messages can only be strings');
+        }
         if (isset($arguments['parse_mode']['_'])) {
             $arguments['parse_mode'] = \str_replace('textParseMode', '', $arguments['parse_mode']['_']);
         }

@@ -17,29 +17,29 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Wrappers;
+namespace danog\MadelineProto\ApiWrappers;
 
 use function Amp\ByteStream\getOutputBufferStream;
 
-trait ApiTemplates
+trait Templates
 {
-    private $web_api_template = '<!DOCTYPE html>
-        <html>
-        <head>
-        <title>MadelineProto</title>
-        </head>
-        <body>
-        <h1>MadelineProto</h1>
-        <p>%s</p>
-        <form method="POST">
-        %s
-        <button type="submit"/>Go</button>
-        </form>
-        </body>
-        </html>';
-    private function webAPIEchoTemplate($message, $form)
+    /**
+     * API template.
+     *
+     * @var string
+     */
+    private $webApiTemplate = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><p>%s</p><form method="POST">%s<button type="submit"/>Go</button></form></body></html>';
+    /**
+     * Generate page from template.
+     *
+     * @param string $message Message
+     * @param string $form    Form
+     *
+     * @return string
+     */
+    private function webAPIEchoTemplate(string $message, string $form): string
     {
-        return \sprintf($this->web_api_template, $message, $form);
+        return \sprintf($this->webApiTemplate, $message, $form);
     }
     /**
      * Get web API login HTML template string.
@@ -48,24 +48,31 @@ trait ApiTemplates
      */
     public function getWebAPITemplate(): string
     {
-        return $this->web_template;
+        return $this->webApiTemplate;
     }
     /**
      * Set web API login HTML template string.
      *
      * @return string
      */
-    public function setWebAPITemplate(string $template)
+    public function setWebAPITemplate(string $template): void
     {
-        $this->web_template = $template;
+        $this->webApiTemplate = $template;
     }
+    /**
+     * Echo to browser.
+     *
+     * @param string $message Message to echo
+     *
+     * @return \Generator
+     */
     private function webAPIEcho(string $message = ''): \Generator
     {
         $stdout = getOutputBufferStream();
-        if (!isset($this->my_telegram_org_wrapper)) {
+        if (!isset($this->myTelegramOrgWrapper)) {
             if (isset($_POST['type'])) {
                 if ($_POST['type'] === 'manual') {
-                    yield $stdout->write($this->webAPIEchoTemplate('Enter your API ID and API hash<br><b>' . $message . '</b><ol>
+                    yield $stdout->write($this->webAPIEchoTemplate('Enter your API ID and API hash<br><b>'.$message.'</b><ol>
 <li>Login to my.telegram.org</li>
 <li>Go to API development tools</li>
 <li>
@@ -79,19 +86,19 @@ trait ApiTemplates
 <li>Click on create application</li>
 </ol>', '<input type="string" name="api_id" placeholder="API ID" required/><input type="string" name="api_hash" placeholder="API hash" required/>'));
                 } else {
-                    yield $stdout->write($this->webAPIEchoTemplate('Enter a phone number that is <b>already registered</b> on telegram to get the API ID<br><b>' . $message . '</b>', '<input type="text" name="phone_number" placeholder="Phone number" required/>'));
+                    yield $stdout->write($this->webAPIEchoTemplate('Enter a phone number that is <b>already registered</b> on telegram to get the API ID<br><b>'.$message.'</b>', '<input type="text" name="phone_number" placeholder="Phone number" required/>'));
                 }
             } else {
                 if ($message) {
-                    $message = '<br><br>' . $message;
+                    $message = '<br><br>'.$message;
                 }
-                yield $stdout->write($this->webAPIEchoTemplate('Do you want to enter the API id and the API hash manually or automatically?<br>Note that you can also provide it directly in the code using the <a href="https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id">settings</a>.<b>' . $message . '</b>', '<select name="type"><option value="automatic">Automatically</option><option value="manual">Manually</option></select>'));
+                yield $stdout->write($this->webAPIEchoTemplate('Do you want to enter the API id and the API hash manually or automatically?<br>Note that you can also provide it directly in the code using the <a href="https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id">settings</a>.<b>'.$message.'</b>', '<select name="type"><option value="automatic">Automatically</option><option value="manual">Manually</option></select>'));
             }
         } else {
-            if (!$this->my_telegram_org_wrapper->loggedIn()) {
-                yield $stdout->write($this->webAPIEchoTemplate('Enter your code<br><b>' . $message . '</b>', '<input type="text" name="code" placeholder="Code" required/>'));
+            if (!$this->myTelegramOrgWrapper->loggedIn()) {
+                yield $stdout->write($this->webAPIEchoTemplate('Enter your code<br><b>'.$message.'</b>', '<input type="text" name="code" placeholder="Code" required/>'));
             } else {
-                yield $stdout->write($this->webAPIEchoTemplate('Enter the API info<br><b>' . $message . '</b>', '<input type="hidden" name="creating_app" value="yes" required/>
+                yield $stdout->write($this->webAPIEchoTemplate('Enter the API info<br><b>'.$message.'</b>', '<input type="hidden" name="creating_app" value="yes" required/>
                     Enter the app name, can be anything: <br><input type="text" name="app_title" required/><br>
                     <br>Enter the app&apos;s short name, alphanumeric, 5-32 chars: <br><input type="text" name="app_shortname" required/><br>
                     <br>Enter the app/website URL, or https://t.me/yourusername: <br><input type="text" name="app_url" required/><br>

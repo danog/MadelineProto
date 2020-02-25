@@ -4135,6 +4135,18 @@ class InternalDoc extends APIFactory
         return \danog\MadelineProto\MTProto::getSettings($settings, $previousSettings);
     }
     /**
+     * Parse, update and store settings.
+     *
+     * @param array $settings Settings
+     * @param bool  $reinit   Whether to reinit the instance
+     *
+     * @return void
+     */
+    public function updateSettings(array $settings, bool $reinit = true, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$settings, $reinit, $extra]);
+    }
+    /**
      * Setup logger.
      *
      * @return void
@@ -4207,11 +4219,20 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$config, $options, $extra]);
     }
     /**
-     * Get info about the logged-in user.
+     * Get info about the logged-in user, cached.
      *
-     * @return \Generator<array>
+     * @return array|bool
      */
     public function getSelf(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Get info about the logged-in user, not cached.
+     *
+     * @return \Generator<array|bool>
+     */
+    public function fullGetSelf(array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
@@ -4245,6 +4266,15 @@ class InternalDoc extends APIFactory
     public function report(string $message, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$message, $extra]);
+    }
+    /**
+     * Get full list of MTProto and API methods.
+     *
+     * @return array
+     */
+    public function getAllMethods(): array
+    {
+        return $this->API->getAllMethods();
     }
     /**
      * Call method and wait asynchronously for response.
@@ -5250,24 +5280,24 @@ class InternalDoc extends APIFactory
     /**
      * Convert to camelCase.
      *
-     * @param string $input
+     * @param string $input String
      *
      * @return string
      */
-    public function fromSnakeCase(string $input): string
+    public function toCamelCase(string $input): string
     {
-        return \danog\MadelineProto\MTProto::fromSnakeCase($input);
+        return \danog\MadelineProto\MTProto::toCamelCase($input);
     }
     /**
      * Convert to snake_case.
      *
-     * @param string $input
+     * @param string $input String
      *
      * @return string
      */
-    public function fromCamelCase(string $input): string
+    public function toSnakeCase(string $input): string
     {
-        return \danog\MadelineProto\MTProto::fromCamelCase($input);
+        return \danog\MadelineProto\MTProto::toSnakeCase($input);
     }
     /**
      * Create array.

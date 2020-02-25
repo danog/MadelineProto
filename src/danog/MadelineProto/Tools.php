@@ -30,6 +30,7 @@ use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;
 use function Amp\ByteStream\getStdout;
 use function Amp\File\exists;
+use function Amp\File\get;
 use function Amp\Promise\all;
 use function Amp\Promise\any;
 use function Amp\Promise\first;
@@ -304,6 +305,7 @@ trait Tools
                 });
             } catch (\Throwable $throwable) {
                 Logger::log('Loop exceptionally stopped without resolving the promise', Logger::FATAL_ERROR);
+                Logger::log((string) $throwable, Logger::FATAL_ERROR);
                 throw $throwable;
             }
         } while (!$resolved && !(Magic::$signaled && !$ignoreSignal));
@@ -411,15 +413,6 @@ trait Tools
     {
         if ($actual) {
             $promise = $actual;
-        } else {
-            $trace = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
-            $file = '';
-            if (isset($trace['file'])) {
-                $file .= \basename($trace['file'], '.php');
-            }
-            if (isset($trace['line'])) {
-                $file .= ":{$trace['line']}";
-            }
         }
         if ($promise instanceof \Generator) {
             $promise = new Coroutine($promise);
@@ -632,22 +625,22 @@ trait Tools
     /**
      * Convert to camelCase.
      *
-     * @param string $input
+     * @param string $input String
      *
      * @return string
      */
-    public static function fromSnakeCase(string $input): string
+    public static function toCamelCase(string $input): string
     {
         return \lcfirst(\str_replace('_', '', \ucwords($input, '_')));
     }
     /**
      * Convert to snake_case.
      *
-     * @param string $input
+     * @param string $input String
      *
      * @return string
      */
-    public static function fromCamelCase(string $input): string
+    public static function toSnakeCase(string $input): string
     {
         \preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
         $ret = $matches[0];
@@ -831,11 +824,34 @@ trait Tools
      * @return mixed
      * @access public
      */
-    public static function getVar($obj, string $var)
+    public static function &getVar($obj, string $var)
     {
-        $reflection = new \ReflectionClass(\get_class($obj));
-        $prop = $reflection->getProperty($var);
-        $prop->setAccessible(true);
-        return $prop->getValue($obj);
+        return \Closure::bind(
+            function & () use ($var) {
+                return $this->{$var};
+            },
+            $obj,
+            \get_class($obj)
+        )->__invoke();
+    }
+    /**
+     * Sets a private variable in an object.
+     *
+     * @param object $obj Object
+     * @param string $var Attribute name
+     * @param mixed  $val Attribute value
+     *
+     * @return mixed
+     * @access public
+     */
+    public static function setVar($obj, string $var, &$val): void
+    {
+        \Closure::bind(
+            function () use ($var, &$val) {
+                $this->{$var} =& $val;
+            },
+            $obj,
+            \get_class($obj)
+        )->__invoke();
     }
 }

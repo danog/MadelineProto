@@ -36,7 +36,7 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
     use Tools;
     private $resume;
     private $pause;
-    private $resumeWatcher;
+    protected $resumeWatcher;
     public function pause($time = null): Promise
     {
         if (!\is_null($time)) {
@@ -79,5 +79,14 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
     {
         Loop::defer([$this, 'resume']);
         return $this->pause ? $this->pause->promise() : null;
+    }
+
+    public function exitedLoop()
+    {
+        parent::exitedLoop();
+        if ($this->resumeWatcher) {
+            Loop::cancel($this->resumeWatcher);
+            $this->resumeWatcher = null;
+        }
     }
 }

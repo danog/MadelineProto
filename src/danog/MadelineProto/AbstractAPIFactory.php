@@ -30,7 +30,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      *
      * @var string
      */
-    public $namespace = '';
+    private string $namespace = '';
     /**
      * MTProto instance.
      *
@@ -46,7 +46,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      *
      * @var boolean
      */
-    public $lua = false;
+    public bool $lua = false;
     /**
      * Whether async is enabled.
      *
@@ -54,24 +54,43 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      *
      * @var boolean
      */
-    public $async = false;
-    /**
-     * Async init promise.
-     *
-     * @var Promise
-     */
-    public $asyncAPIPromise;
+    private bool $async = false;
     /**
      * Method list.
      *
      * @var string[]
      */
-    protected $methods = [];
-    public function __construct($namespace, &$API, &$async)
+    protected array $methods = [];
+    /**
+     * Export APIFactory instance with the specified namespace.
+     *
+     * @param string $namespace Namespace
+     *
+     * @return self
+     */
+    protected function exportNamespace(string $namespace = ''): self
     {
-        $this->namespace = $namespace.'.';
-        $this->API =& $API;
-        $this->async =& $async;
+        $class = array_reverse(array_values(class_parents(static::class)))[3];
+        $instance = new $class;
+        $instance->namespace = $namespace.'.';
+        self::link($instance, $this);
+
+        return $instance;
+    }
+    /**
+     * Link two APIFactory instances
+     *
+     * @param self $a First instance
+     * @param self $b Second instance
+     * 
+     * @return void
+     */
+    protected static function link(self $a, self $b): void
+    {
+        $a->API =& $b->API;
+        $a->lua =& $b->lua;
+        $a->async =& $b->async;
+        $a->methods =& $b->methods;
     }
     /**
      * Enable or disable async.
@@ -101,7 +120,9 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         if ($async) {
             return $yielded;
         }
+
         $yielded = Tools::wait($yielded);
+
         if (!$this->lua) {
             return $yielded;
         }
@@ -124,30 +145,8 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      */
     public function __call_async(string $name, array $arguments): \Generator
     {
-        if ($this->asyncInitPromise) {
-            yield from $this->initAsynchronously();
-            $this->API->logger->logger('Finished init asynchronously');
-        }
-        if (!$this->API) {
-            throw new Exception('API did not init!');
-        }
-        if ($this->API->asyncInitPromise) {
-            yield from $this->API->initAsynchronously();
-            $this->API->logger->logger('Finished init asynchronously');
-        }
-        if (isset($this->session) && !\is_null($this->session) && \time() - $this->serialized > $this->API->settings['serialization']['serialization_interval']) {
-            Logger::log("Didn't serialize in a while, doing that now...");
-            $this->serialize($this->session);
-        }
-        if ($this->API->flushSettings) {
-            $this->API->flushSettings = false;
-            $this->API->__construct($this->API->settings);
-            yield from $this->API->initAsynchronously();
-        }
-        if ($this->API->asyncInitPromise) {
-            yield from $this->API->initAsynchronously();
-            $this->API->logger->logger('Finished init asynchronously');
-        }
+        yield from $this->initAsynchronously();
+
         $lower_name = \strtolower($name);
         if ($this->namespace !== '' || !isset($this->methods[$lower_name])) {
             $name = $this->namespace.$name;
@@ -161,6 +160,61 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         return $res instanceof \Generator ? yield from $res : yield $res;
     }
     /**
+     * Get fully resolved method list for object, including snake_case and camelCase variants.
+     *
+     * @param API $value Value
+     *
+     * @return array
+     */
+    protected static function getInternalMethodList($value): array
+    {
+        static $cache = [];
+        $class = \get_class($value);
+        if (isset($cache[$class])) {
+            return \array_map(
+                static function ($v) use ($value) {
+                    return [$value, $v];
+                },
+                $cache[$class]
+            );
+        }
+
+        $methods = \get_class_methods($value);
+        foreach ($methods as $method) {
+            if ($method == 'methodCallAsyncRead') {
+                unset($methods[\array_search('methodCall', $methods)]);
+            } elseif (\stripos($method, 'async') !== false) {
+                if (\strpos($method, '_async') !== false) {
+                    unset($methods[\array_search(\str_ireplace('_async', '', $method), $methods)]);
+                } else {
+                    unset($methods[\array_search(\str_ireplace('async', '', $method), $methods)]);
+                }
+            }
+        }
+        $finalMethods = [];
+        foreach ($methods as $method) {
+            $actual_method = $method;
+            if ($method == 'methodCallAsyncRead') {
+                $method = 'methodCall';
+            } elseif (\stripos($method, 'async') !== false) {
+                if (\strpos($method, '_async') !== false) {
+                    $method = \str_ireplace('_async', '', $method);
+                } else {
+                    $method = \str_ireplace('async', '', $method);
+                }
+            }
+            $finalMethods[\strtolower($method)] = $actual_method;
+            if (\strpos($method, '_') !== false) {
+                $finalMethods[\strtolower(\str_replace('_', '', $method))] = $actual_method;
+            } else {
+                $finalMethods[\strtolower(Tools::toSnakeCase($method))] = $actual_method;
+            }
+        }
+
+        $cache[$class] = $finalMethods;
+        return self::getInternalMethodList($value);
+    }
+    /**
      * Get attribute.
      *
      * @param string $name Attribute nam
@@ -171,17 +225,13 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      */
     public function &__get(string $name)
     {
-        if ($this->asyncAPIPromise) {
-            Tools::wait($this->asyncAPIPromise);
-        }
-        if ($name === 'settings') {
-            $this->API->flushSettings = true;
-            return $this->API->settings;
-        }
         if ($name === 'logger') {
-            return $this->API->logger;
+            if (isset($this->API)) {
+                return $this->API->logger;
+            }
+            return Logger::$default;
         }
-        return $this->API->storage[$name];
+        return $this->storage[$name];
     }
     /**
      * Set an attribute.
@@ -195,16 +245,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      */
     public function __set(string $name, $value)
     {
-        if ($this->asyncAPIPromise) {
-            Tools::wait($this->asyncAPIPromise);
-        }
-        if ($name === 'settings') {
-            if ($this->API->asyncInitPromise) {
-                $this->API->init();
-            }
-            return $this->API->__construct(\array_replace_recursive($this->API->settings, $value));
-        }
-        return $this->API->storage[$name] = $value;
+        return $this->storage[$name] = $value;
     }
     /**
      * Whether an attribute exists.
@@ -215,10 +256,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      */
     public function __isset(string $name): bool
     {
-        if ($this->asyncAPIPromise) {
-            Tools::wait($this->asyncAPIPromise);
-        }
-        return isset($this->API->storage[$name]);
+        return isset($this->storage[$name]);
     }
     /**
      * Unset attribute.
@@ -229,9 +267,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      */
     public function __unset(string $name): void
     {
-        if ($this->asyncAPIPromise) {
-            Tools::wait($this->asyncAPIPromise);
-        }
-        unset($this->API->storage[$name]);
+        unset($this->storage[$name]);
     }
 }

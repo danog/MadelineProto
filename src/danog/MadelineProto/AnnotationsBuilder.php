@@ -184,7 +184,7 @@ class AnnotationsBuilder
                     $name = \str_ireplace('async', '', $name);
                 }
             }
-            $name = Tools::fromSnakeCase($name);
+            $name = Tools::toCamelCase($name);
             $name = \str_ireplace(['mtproto', 'api'], ['MTProto', 'API'], $name);
             $doc = 'public function ';
             $doc .= $name;

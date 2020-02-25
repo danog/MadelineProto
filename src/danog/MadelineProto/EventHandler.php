@@ -27,18 +27,17 @@ class EventHandler extends InternalDoc
     /**
      * Constructor.
      *
-     * @param API|null $MadelineProto MadelineProto instance
+     * @param APIWrapper|null $MadelineProto MadelineProto instance
      */
-    public function __construct(?API $MadelineProto)
+    public function __construct(?APIWrapper $MadelineProto)
     {
         if (!$MadelineProto) {
             return;
         }
-        $this->API = $MadelineProto->API;
-        $this->async =& $MadelineProto->async;
-        $this->methods =& $MadelineProto->methods;
+        self::link($this, $MadelineProto->getFactory());
+        $this->API =& $MadelineProto->getAPI();
         foreach ($this->API->getMethodNamespaces() as $namespace) {
-            $this->{$namespace} = new APIFactory($namespace, $this->API, $this->async);
+            $this->{$namespace} = $this->exportNamespace($namespace);
         }
     }
     /**

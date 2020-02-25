@@ -54,7 +54,6 @@ abstract class Loop implements LoopInterface
     }
     private function loopImpl(): \Generator
     {
-        //yield ['my_trace' => debug_backtrace(0, 1)[0], (string) $this];
         $this->startedLoop();
         $this->API->logger->logger("Entered {$this}", Logger::ULTRA_VERBOSE);
         try {
@@ -62,7 +61,6 @@ abstract class Loop implements LoopInterface
         } finally {
             $this->exitedLoop();
             $this->API->logger->logger("Physically exited {$this}", Logger::ULTRA_VERBOSE);
-            //return null;
         }
     }
     public function exitedLoop()

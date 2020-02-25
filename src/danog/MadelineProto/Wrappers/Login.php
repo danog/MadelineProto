@@ -170,7 +170,7 @@ trait Login
         $this->authorized = self::LOGGED_IN;
         yield from $this->initAuthorization();
         yield from $this->getPhoneConfig();
-        $res = (yield from $this->getSelf());
+        $res = (yield from $this->fullGetSelf());
         $callbacks = [$this, $this->referenceDatabase];
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks[] = $this->minDatabase;
@@ -189,7 +189,7 @@ trait Login
         if ($this->authorized !== self::LOGGED_IN) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['not_loggedIn']);
         }
-        yield from $this->getSelf();
+        yield from $this->fullGetSelf();
         $this->authorized_dc = $this->datacenter->curdc;
         return [$this->datacenter->curdc, $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->getPermAuthKey()->getAuthKey()];
     }

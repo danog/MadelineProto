@@ -82,7 +82,7 @@ trait Events
         $this->settings['updates']['callback'] = [$this, 'eventUpdateHandler'];
         $this->settings['updates']['handle_updates'] = true;
         $this->settings['updates']['run_callback'] = true;
-        if (!$this->asyncInitPromise) {
+        if ($this->inited()) {
             $this->startUpdateSystem();
         }
     }

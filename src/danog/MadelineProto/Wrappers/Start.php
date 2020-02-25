@@ -34,7 +34,7 @@ trait Start
     public function start(): \Generator
     {
         if ($this->authorized === self::LOGGED_IN) {
-            return yield from $this->getSelf();
+            return yield from $this->fullGetSelf();
         }
         if (PHP_SAPI === 'cli') {
             if (\strpos(yield Tools::readLine('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
@@ -50,7 +50,7 @@ trait Start
                 }
             }
             $this->serialize();
-            return yield from $this->getSelf();
+            return yield from $this->fullGetSelf();
         }
         if ($this->authorized === self::NOT_LOGGED_IN) {
             if (isset($_POST['phone_number'])) {
@@ -81,7 +81,7 @@ trait Start
         }
         if ($this->authorized === self::LOGGED_IN) {
             $this->serialize();
-            return yield from $this->getSelf();
+            return yield from $this->fullGetSelf();
         }
         exit;
     }

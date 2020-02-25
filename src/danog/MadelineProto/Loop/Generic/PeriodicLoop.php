@@ -29,18 +29,33 @@ use danog\MadelineProto\MTProto;
  */
 class PeriodicLoop extends ResumableSignalLoop
 {
+    /**
+     * Callback
+     *
+     * @var callable
+     */
     private $callback;
-    private $name;
+    /**
+     * Loop name
+     *
+     * @var string
+     */
+    private string $name;
+    /**
+     * Loop timeeout
+     *
+     * @var int
+     */
     private $timeout;
     /**
      * Constructor.
      *
-     * @param \danog\MadelineProto\MTProto $API      Instance of MTProto class
-     * @param callable                     $callback Callback to call
-     * @param string                       $name     Loop name
-     * @param int                          $timeout  Loop timeout
+     * @param \danog\MadelineProto\API $API      Instance of MTProto class
+     * @param callable                 $callback Callback to call
+     * @param string                   $name     Loop name
+     * @param int|float                $timeout  Loop timeout
      */
-    public function __construct(MTProto $API, $callback, string $name, $timeout)
+    public function __construct($API, callable $callback, string $name, $timeout)
     {
         $this->API = $API;
         $this->callback = $callback;
