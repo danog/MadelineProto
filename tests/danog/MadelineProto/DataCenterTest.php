@@ -20,12 +20,13 @@ final class DataCenterTest extends TestCase
      * @param string  $protocol   Protocol name
      * @param boolean $test_mode  Test mode
      * @param boolean $ipv6       IPv6
+     * @param boolean $doh        DNS over HTTPS?
      *
      * @dataProvider protocolProvider
      *
      * @return void
      */
-    public function testCanUseProtocol(string $transport, bool $obfuscated, string $protocol, bool $test_mode, bool $ipv6): void
+    public function testCanUseProtocol(string $transport, bool $obfuscated, string $protocol, bool $test_mode, bool $ipv6, bool $doh): void
     {
         $settings = MTProto::getSettings(
             [
@@ -72,7 +73,7 @@ final class DataCenterTest extends TestCase
         );
         $API->datacenter = $datacenter;
 
-        $API->getLogger()->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6' : 'IPv4'));
+        $API->getLogger()->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6 ' : 'IPv4 ').($doh ? "DNS over HTTPS" : "DNS");
 
         \sleep(1);
         try {
@@ -91,22 +92,26 @@ final class DataCenterTest extends TestCase
             $ipv6Pair []= true;
         }
         foreach ([false, true] as $test_mode) {
-            foreach ($ipv6Pair as $ipv6) {
-                foreach (['tcp', 'ws', 'wss'] as $transport) {
-                    foreach ([true, false] as $obfuscated) {
-                        if ($transport !== 'tcp' && !$obfuscated) {
-                            continue;
-                        }
-                        foreach (['abridged', 'intermediate', 'intermediate_padded', 'full'] as $protocol) {
-                            if ($protocol === 'full' && $obfuscated) {
+            foreach ([false, true] as $doh) {
+                foreach ($ipv6Pair as $ipv6) {
+                    foreach (['tcp', 'ws', 'wss'] as $transport) {
+                        foreach ([true, false] as $obfuscated) {
+                            if ($transport !== 'tcp' && !$obfuscated) {
                                 continue;
                             }
-                            yield [$transport, $obfuscated, $protocol, $test_mode, $ipv6];
+                            foreach (['abridged', 'intermediate', 'intermediate_padded', 'full'] as $protocol) {
+                                if ($protocol === 'full' && $obfuscated) {
+                                    continue;
+                                }
+                                yield [$transport, $obfuscated, $protocol, $test_mode, $ipv6, $doh];
+                            }
                         }
                     }
+                    yield ['tcp', false, 'http', $test_mode, $ipv6, true];
+                    yield ['tcp', false, 'https', $test_mode, $ipv6, true];
+                    yield ['tcp', false, 'http', $test_mode, $ipv6, false];
+                    yield ['tcp', false, 'https', $test_mode, $ipv6, false];
                 }
-                yield ['tcp', false, 'http', $test_mode, $ipv6];
-                yield ['tcp', false, 'https', $test_mode, $ipv6];
             }
         }
     }

@@ -162,17 +162,6 @@ class API extends InternalDoc
     }
 
     /**
-     * Enable or disable async.
-     *
-     * @param bool $async Whether to enable or disable async
-     *
-     * @return void
-     */
-    public function async(bool $async): void
-    {
-        parent::async($async);
-    }
-    /**
      * Destruct function.
      *
      * @internal
@@ -200,17 +189,6 @@ class API extends InternalDoc
     public function __wakeup(): void
     {
         $this->oldInstance = true;
-    }
-    /**
-     * Sleep function.
-     *
-     * @internal
-     *
-     * @return array
-     */
-    public function __sleep(): array
-    {
-        return APIWrapper::__sleep();
     }
     /**
      * Init API wrapper.

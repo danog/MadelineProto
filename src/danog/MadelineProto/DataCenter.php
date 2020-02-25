@@ -33,6 +33,7 @@ use Amp\Http\Client\DelegateHttpClient;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\Socket\ConnectContext;
+use Amp\Socket\DnsConnector;
 use Amp\Websocket\Client\Rfc6455Connector;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
@@ -113,6 +114,12 @@ class DataCenter
      * @var \Amp\Http\Client\Cookie\CookieJar
      */
     private $CookieJar;
+    /**
+     * DNS connector
+     *
+     * @var DNSConnector
+     */
+    private $dnsConnector;
     public function __sleep()
     {
         return ['sockets', 'curdc', 'dclist', 'settings'];
@@ -200,7 +207,7 @@ class DataCenter
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
             if ($socket instanceof DataCenterConnection && !\strpos($key, '_bk')) {
-                //$this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
+                //$this->API->logger->logger(\sprintf(Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
                 if ($reconnectAll || isset($changed[$id])) {
                     $this->API->logger->logger("Disconnecting all before reconnect!");
                     $socket->needReconnect(true);
@@ -219,6 +226,8 @@ class DataCenter
             $nonProxiedDoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')]);
             $this->DoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($DoHConfig);
             $this->nonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($nonProxiedDoHConfig);
+            
+            $this->dnsConnector = new DnsConnector(new Rfc1035StubResolver());
         }
     }
     public function dcConnect(string $dc_number, int $id = -1): \Generator
@@ -253,7 +262,7 @@ class DataCenter
                 $this->API->logger->logger("Connection failed ({$dc_number}): " . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             }
         }
-        throw new \danog\MadelineProto\Exception("Could not connect to DC {$dc_number}");
+        throw new Exception("Could not connect to DC {$dc_number}");
     }
     public function generateContexts($dc_number = 0, string $uri = '', ConnectContext $context = null)
     {
@@ -348,7 +357,7 @@ class DataCenter
                 }
                 $extra = $proxy_extras[$key];
                 if (!isset(\class_implements($proxy)[StreamInterface::class])) {
-                    throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['proxy_class_invalid']);
+                    throw new Exception(Lang::$current_lang['proxy_class_invalid']);
                 }
                 if ($proxy === ObfuscatedStream::getName() && \in_array(\strlen($extra['secret']), [17, 34])) {
                     $combos[] = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [$proxy, $extra], [IntermediatePaddedStream::getName(), []]];
@@ -390,67 +399,72 @@ class DataCenter
         foreach ($combos as $combo) {
             $ipv6 = [$this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4', $this->settings[$dc_config_number]['ipv6'] ? 'ipv4' : 'ipv6'];
             foreach ($ipv6 as $ipv6) {
-                // This is only for non-MTProto connections
-                if (!$dc_number) {
-                    /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
-                    $ctx = (new ConnectionContext())->setSocketContext($context)->setUri($uri)->setIpv6($ipv6 === 'ipv6');
-                    foreach ($combo as $stream) {
-                        if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
-                            $stream[1] = new DoHConnector($this, $ctx);
+                foreach ([true, false] as $useDoH) {
+                    // This is only for non-MTProto connections
+                    if (!$dc_number) {
+                        /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
+                        $ctx = (new ConnectionContext())->setSocketContext($context)->setUri($uri)->setIpv6($ipv6 === 'ipv6');
+                        foreach ($combo as $stream) {
+                            if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
+                                $stream[1] = $useDoH ? new DoHConnector($this, $ctx) : $this->dnsConnector;
+                            }
+                            $ctx->addStream(...$stream);
                         }
-                        $ctx->addStream(...$stream);
+                        $ctxs[] = $ctx;
+                        continue;
                     }
-                    $ctxs[] = $ctx;
-                    continue;
-                }
-                // This is only for MTProto connections
-                if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
-                    continue;
-                }
-                $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
-                $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
-                foreach (\array_unique([$port, 443, 80, 88, 5222]) as $port) {
-                    $stream = \end($combo)[0];
-                    if ($stream === HttpsStream::getName()) {
-                        $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\\D+/', '', $dc_number)];
-                        if (\strpos($dc_number, '_media') !== false) {
-                            $subdomain .= '-1';
-                        }
-                        $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
-                        $uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
-                    } elseif ($stream === HttpStream::getName()) {
-                        $uri = 'tcp://' . $address . ':' . $port . '/api';
-                    } else {
-                        $uri = 'tcp://' . $address . ':' . $port;
+
+
+
+                    // This is only for MTProto connections
+                    if (!isset($this->dclist[$test][$ipv6][$dc_number]['ip_address'])) {
+                        continue;
                     }
-                    if ($combo[1][0] === WssStream::getName()) {
-                        $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\\D+/', '', $dc_number)];
-                        if (\strpos($dc_number, '_media') !== false) {
-                            $subdomain .= '-1';
+                    $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
+                    $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
+                    foreach (\array_unique([$port, 443, 80, 88, 5222]) as $port) {
+                        $stream = \end($combo)[0];
+                        if ($stream === HttpsStream::getName()) {
+                            $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\\D+/', '', $dc_number)];
+                            if (\strpos($dc_number, '_media') !== false) {
+                                $subdomain .= '-1';
+                            }
+                            $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
+                            $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
+                        } elseif ($stream === HttpStream::getName()) {
+                            $uri = 'tcp://'.$address.':'.$port.'/api';
+                        } else {
+                            $uri = 'tcp://'.$address.':'.$port;
                         }
-                        $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
-                        $uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
-                    } elseif ($combo[1][0] === WsStream::getName()) {
-                        $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\\D+/', '', $dc_number)];
-                        if (\strpos($dc_number, '_media') !== false) {
-                            $subdomain .= '-1';
+                        if ($combo[1][0] === WssStream::getName()) {
+                            $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\\D+/', '', $dc_number)];
+                            if (\strpos($dc_number, '_media') !== false) {
+                                $subdomain .= '-1';
+                            }
+                            $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
+                            $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
+                        } elseif ($combo[1][0] === WsStream::getName()) {
+                            $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\\D+/', '', $dc_number)];
+                            if (\strpos($dc_number, '_media') !== false) {
+                                $subdomain .= '-1';
+                            }
+                            $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
+                            //$uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
+                            $uri = 'tcp://'.$address.':'.$port.'/'.$path;
                         }
-                        $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
-                        //$uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
-                        $uri = 'tcp://' . $address . ':' . $port . '/' . $path;
+                        /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
+                        $ctx = (new ConnectionContext())->setDc($dc_number)->setTest($this->settings[$dc_config_number]['test_mode'])->setSocketContext($context)->setUri($uri)->setIpv6($ipv6 === 'ipv6');
+                        foreach ($combo as $stream) {
+                            if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
+                                $stream[1] = $useDoH ? new DoHConnector($this, $ctx) : $this->dnsConnector;
+                            }
+                            if (\in_array($stream[0], [WsStream::class, WssStream::class]) && $stream[1] === []) {
+                                $stream[1] = new Rfc6455Connector($this->HTTPClient);
+                            }
+                            $ctx->addStream(...$stream);
+                        }
+                        $ctxs[] = $ctx;
                     }
-                    /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
-                    $ctx = (new ConnectionContext())->setDc($dc_number)->setTest($this->settings[$dc_config_number]['test_mode'])->setSocketContext($context)->setUri($uri)->setIpv6($ipv6 === 'ipv6');
-                    foreach ($combo as $stream) {
-                        if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
-                            $stream[1] = new DoHConnector($this, $ctx);
-                        }
-                        if (\in_array($stream[0], [WsStream::class, WssStream::class]) && $stream[1] === []) {
-                            $stream[1] = new Rfc6455Connector($this->HTTPClient);
-                        }
-                        $ctx->addStream(...$stream);
-                    }
-                    $ctxs[] = $ctx;
                 }
             }
         }
