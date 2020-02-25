@@ -134,7 +134,6 @@ class API extends InternalDoc
             $unserialized->session = $session;
             APIWrapper::link($this, $unserialized);
             APIWrapper::link($this->wrapper, $this);
-            var_dump($this, $unserialized);
             if (isset($this->API)) {
                 $this->storage = $this->API->storage ?? $this->storage;
 
@@ -172,11 +171,6 @@ class API extends InternalDoc
     public function async(bool $async): void
     {
         parent::async($async);
-        if ($this->API) {
-            if ($this->API->event_handler && \class_exists($this->API->event_handler) && \is_subclass_of($this->API->event_handler, EventHandler::class)) {
-                $this->API->setEventHandler($this->API->event_handler);
-            }
-        }
     }
     /**
      * Destruct function.

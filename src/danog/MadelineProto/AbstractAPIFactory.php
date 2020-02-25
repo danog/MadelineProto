@@ -117,6 +117,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     {
         $yielded = Tools::call($this->__call_async($name, $arguments));
         $async = !$this->lua && ((\is_array(\end($arguments)) ? \end($arguments) : [])['async'] ?? ($this->async && $name !== 'loop'));
+
         if ($async) {
             return $yielded;
         }
@@ -132,6 +133,20 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         } catch (\Throwable $e) {
             return ['error_code' => $e->getCode(), 'error' => $e->getMessage()];
         }
+    }
+    /**
+     * Info to dump
+     *
+     * @return array
+     */
+    public function __debugInfo(): array
+    {
+        $keys = APIWrapper::__sleep();
+        $res = [];
+        foreach ($keys as $key) {
+            $res[$key] = Tools::getVar($this, $key);
+        }
+        return $res;
     }
     /**
      * Call async wrapper function.

@@ -21,6 +21,7 @@
 
 use Amp\Http\Server\HttpServer;
 use danog\MadelineProto\API;
+use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\MTProtoTools\Files;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Tools;
@@ -80,7 +81,7 @@ class EventHandler extends \danog\MadelineProto\EventHandler
      *
      * @param ?API $API API
      */
-    public function __construct(?API $API)
+    public function __construct(?APIWrapper $API)
     {
         $this->UPLOAD = \class_exists(HttpServer::class);
         parent::__construct($API);

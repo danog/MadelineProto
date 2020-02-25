@@ -23,6 +23,13 @@ use function Amp\ByteStream\getOutputBufferStream;
 
 trait Templates
 {
+    /**
+     * Echo page to console
+     *
+     * @param string $message Error message
+     * 
+     * @return \Generator
+     */
     private function webEcho(string $message = ''): \Generator
     {
         $stdout = getOutputBufferStream();
@@ -49,21 +56,21 @@ trait Templates
                 break;
         }
     }
-    private $web_template = '<!DOCTYPE html>
-        <html>
-        <head>
-        <title>MadelineProto</title>
-        </head>
-        <body>
-        <h1>MadelineProto</h1>
-        <form method="POST">
-        %s
-        <button type="submit"/>Go</button>
-        </form>
-        <p>%s</p>
-        </body>
-        </html>';
-    private function webEchoTemplate($message, $form): string
+    /**
+     * Web template
+     *
+     * @var string
+     */
+    private $web_template = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><form method="POST">%s<button type="submit"/>Go</button></form><p>%s</p></body></html>';
+    /**
+     * Format message according to template
+     *
+     * @param string $message Message
+     * @param string $form    Form contents
+     * 
+     * @return string
+     */
+    private function webEchoTemplate(string $message, string $form): string
     {
         return \sprintf($this->web_template, $form, $message);
     }

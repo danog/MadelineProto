@@ -43,7 +43,7 @@ trait Events
      *
      * @var array<string>
      */
-    private $event_handler_methods = [];
+    private $eventHandlerMethods = [];
     /**
      * Set event handler.
      *
@@ -63,19 +63,21 @@ trait Events
         } elseif ($this->wrapper) {
             $this->event_handler_instance->__construct($this->wrapper);
         }
-        $this->event_handler_methods = [];
+        $this->eventHandlerMethods = [];
         foreach (\get_class_methods($this->event_handler) as $method) {
             if ($method === 'onLoop') {
                 $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
             } elseif ($method === 'onAny') {
                 foreach ($this->getTL()->getConstructors()->by_id as $id => $constructor) {
-                    if ($constructor['type'] === 'Update' && !isset($this->event_handler_methods[$constructor['predicate']])) {
-                        $this->event_handler_methods[$constructor['predicate']] = [$this->event_handler_instance, 'onAny'];
+                    if ($constructor['type'] === 'Update' && !isset($this->eventHandlerMethods[$constructor['predicate']])) {
+                        $this->eventHandlerMethods[$constructor['predicate']] = [$this->event_handler_instance, 'onAny'];
                     }
                 }
             } else {
                 $method_name = \lcfirst(\substr($method, 2));
-                $this->event_handler_methods[$method_name] = [$this->event_handler_instance, $method];
+                if (($constructor = $this->getTL()->getConstructors()->findByPredicate($method_name)) && $constructor['type'] === 'Update') {
+                    $this->eventHandlerMethods[$method_name] = [$this->event_handler_instance, $method];
+                }
             }
         }
         $this->setReportPeers($this->event_handler_instance->getReportPeers());
@@ -97,7 +99,7 @@ trait Events
     {
         $this->event_handler = null;
         $this->event_handler_instance = null;
-        $this->event_handler_methods = [];
+        $this->eventHandlerMethods = [];
         $this->setNoop();
         if ($disableUpdateHandling) {
             $this->settings['updates']['handle_updates'] = false;
@@ -132,8 +134,8 @@ trait Events
      */
     public function eventUpdateHandler(array $update)
     {
-        if (isset($this->event_handler_methods[$update['_']])) {
-            return $this->event_handler_methods[$update['_']]($update);
+        if (isset($this->eventHandlerMethods[$update['_']])) {
+            return $this->eventHandlerMethods[$update['_']]($update);
         }
     }
 }

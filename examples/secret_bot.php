@@ -19,6 +19,8 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
+use danog\MadelineProto\APIWrapper;
+
 \set_include_path(\get_include_path().':'.\realpath(\dirname(__FILE__).'/MadelineProto/'));
 
 /*
@@ -36,7 +38,7 @@ if (\file_exists(__DIR__.'/../vendor/autoload.php')) {
 class SecretHandler extends \danog\MadelineProto\EventHandler
 {
     private $sent = [-440592694 => true];
-    public function __construct($API)
+    public function __construct(?APIWrapper $API)
     {
         parent::__construct($API);
         $this->sent = [];

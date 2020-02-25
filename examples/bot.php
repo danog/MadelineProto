@@ -19,6 +19,7 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
+use Amp\Loop;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Exception;
@@ -95,7 +96,7 @@ class MyEventHandler extends EventHandler
 }
 $settings = [
     'logger' => [
-        'logger_level' => 5
+        'logger_level' => 4
     ],
     'serialization' => [
         'serialization_interval' => 30,
