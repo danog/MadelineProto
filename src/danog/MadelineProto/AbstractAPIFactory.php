@@ -70,7 +70,8 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      */
     protected function exportNamespace(string $namespace = ''): self
     {
-        $class = \array_reverse(\array_values(\class_parents(static::class)))[3];
+        $class = \array_reverse(\array_values(\class_parents(static::class)))[$namespace ? 2 : 3];
+
         $instance = new $class;
         $instance->namespace = $namespace ? $namespace.'.' : '';
         self::link($instance, $this);
