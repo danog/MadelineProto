@@ -225,21 +225,45 @@ class API extends InternalDoc
      */
     public function startAndLoop(string $eventHandler): void
     {
-        Tools::wait($this->startAndLoopAsync($eventHandler));
+        while (true) {
+            try {
+                Tools::wait($this->startAndLoopAsync($eventHandler));
+                return;
+            } catch (\Throwable $e) {
+                $this->logger((string) $e, Logger::FATAL_ERROR);
+                $this->report("Surfaced: $e");
+            }
+        }
     }
     /**
-     * Start MadelineProto and the event handler in background (enables async).
+     * Start multiple instances of MadelineProto and the event handlers (enables async).
      *
-     * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
+     * @param API[]           $instances    Instances of madeline
+     * @param string[]|string $eventHandler Event handler(s)
      *
-     * @param string $eventHandler Event handler class name
-     *
-     * @return void
+     * @return Promise
      */
-    public function startAndLoopBackground(string $eventHandler): Promise
+    public static function startAndLoopMulti(array $instances, $eventHandler): void
     {
-        $this->start(['async' => false]);
-        return Tools::call($this->startAndLoopAsync($eventHandler));
+        if (\is_string($eventHandler)) {
+            $eventHandler = \array_fill_keys(\array_keys($instances), $eventHandler);
+        }
+
+        $instanceOne = array_values($instances)[0];
+        while (true) {
+            try {
+                $promises = [];
+                foreach ($instances as $k => $instance) {
+                    $instance->start(['async' => false]);
+                    $promises []= Tools::call($instance->startAndLoopAsync($eventHandler[$k]));
+                }
+                Tools::wait(Tools::all($promises));
+                return;
+            } catch (\Throwable $e) {
+                $instanceOne->logger((string) $e, Logger::FATAL_ERROR);
+                $instanceOne->report("Surfaced: $e");
+            }
+        }
     }
     /**
      * Start MadelineProto and the event handler (enables async).
@@ -253,17 +277,15 @@ class API extends InternalDoc
     private function startAndLoopAsync(string $eventHandler): \Generator
     {
         $this->async(true);
-        do {
-            $thrown = false;
+        while (true) {
             try {
                 yield $this->start();
                 yield $this->setEventHandler($eventHandler);
-                yield from $this->API->loop();
+                return yield from $this->API->loop();
             } catch (\Throwable $e) {
-                $thrown = true;
                 $this->logger((string) $e, Logger::FATAL_ERROR);
                 $this->report("Surfaced: $e");
             }
-        } while ($thrown);
+        }
     }
 }

@@ -103,7 +103,7 @@ foreach ([
     'user2.madeline' => 'Userbot login (2)'
 ] as $session => $message) {
     Logger::log($message, Logger::WARNING);
-    $MadelineProtos []= (new API($session))->startAndLoopBackground(MyEventHandler::class);
+    $MadelineProtos []= new API($session);
 }
 
-Tools::wait(Tools::all($MadelineProtos));
+API::startAndLoopMulti($MadelineProtos, MyEventHandler::class);

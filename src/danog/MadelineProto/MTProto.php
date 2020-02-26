@@ -1730,8 +1730,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             return;
         }
         $file = null;
-        if ($this->settings['logger']['logger'] === Logger::FILE_LOGGER) {
-            $path = $this->settings['logger']['logger_param'];
+        if ($this->settings['logger']['logger'] === Logger::FILE_LOGGER && $path = $this->settings['logger']['logger_param']) {
             StatCache::clear($path);
             if (!yield exists($path)) {
                 $message = "!!! WARNING !!!\nThe logfile does not exist, please DO NOT delete the logfile to avoid errors in MadelineProto!\n\n$message";
@@ -1757,7 +1756,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         foreach ($this->reportDest as $id) {
             try {
                 yield from $this->methodCallAsyncRead('messages.sendMessage', ['peer' => $id, 'message' => $message]);
-                yield from $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'media' => $file]);
+                if ($file) {
+                    yield from $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'media' => $file]);
+                }
                 $sent &= true;
             } catch (\Throwable $e) {
                 $sent &= false;
