@@ -976,9 +976,11 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @param array $settings         Current settings array
      * @param array $previousSettings Previous settings array
      *
+     * @internal
+     *
      * @return array
      */
-    public static function getSettings(array $settings, array $previousSettings = []): array
+    public static function parseSettings(array $settings, array $previousSettings = []): array
     {
         Magic::classExists();
         $settings = \array_replace_recursive($previousSettings, $settings);
@@ -1296,7 +1298,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function updateSettings(array $settings, bool $reinit = true): \Generator
     {
-        $settings = self::getSettings($settings, $this->settings);
+        $settings = self::parseSettings($settings, $this->settings);
         if ($settings['app_info'] === null) {
             throw new \danog\MadelineProto\Exception(Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
         }
@@ -1311,6 +1313,15 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->__construct();
             yield from $this->initAsynchronously();
         }
+    }
+    /**
+     * Return current settings array.
+     *
+     * @return array
+     */
+    public function getSettings(): array
+    {
+        return $this->settings;
     }
     /**
      * Setup logger.

@@ -42,7 +42,7 @@ class MyTelegramOrgWrapper
     }
     public function __construct($settings = [])
     {
-        $this->settings = MTProto::getSettings($settings, $this->settings);
+        $this->settings = MTProto::parseSettings($settings, $this->settings);
         $this->__wakeup();
     }
     public function __wakeup()
@@ -53,7 +53,7 @@ class MyTelegramOrgWrapper
         if (!$this->jar || !$this->jar instanceof InMemoryCookieJar) {
             $this->jar = new InMemoryCookieJar();
         }
-        $this->settings = MTProto::getSettings($this->settings);
+        $this->settings = MTProto::parseSettings($this->settings);
         $this->datacenter = new DataCenter(new class($this->settings) {
             public function __construct($settings)
             {

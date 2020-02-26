@@ -110,7 +110,7 @@ class Logger
     {
         if (!self::$default) {
             // The getLogger function will automatically init the static logger, but we'll do it again anyway
-            self::$default = self::getLoggerFromSettings(MTProto::getSettings($settings));
+            self::$default = self::getLoggerFromSettings(MTProto::parseSettings($settings));
         }
     }
     /**

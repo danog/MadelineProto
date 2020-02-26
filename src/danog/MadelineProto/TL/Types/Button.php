@@ -19,74 +19,147 @@
 
 namespace danog\MadelineProto\TL\Types;
 
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Tools;
+
 class Button implements \JsonSerializable, \ArrayAccess
 {
-    use \danog\Serializable;
-    use \danog\MadelineProto\Tools;
-    private $info = [];
-    private $data = [];
-    public function __magic_construct($API, $message, $button)
+    /**
+     * Button data.
+     */
+    private array $button;
+    /**
+     * MTProto instance.
+     */
+    private MTProto $API;
+    /**
+     * Message ID.
+     */
+    private int $id;
+    /**
+     * Peer ID.
+     *
+     * @var array|int
+     */
+    private $peer;
+    /**
+     * Constructor function.
+     *
+     * @param MTProto $API     API instance
+     * @param array   $message Message
+     * @param array   $button  Button info
+     */
+    public function __construct(MTProto $API, array $message, array $button)
     {
-        $this->data = $button;
-        $this->info['peer'] = $message['to_id'] === ['_' => 'peerUser', 'user_id' => $API->authorization['user']['id']] ? $message['from_id'] : $message['to_id'];
-        $this->info['id'] = $message['id'];
-        $this->info['API'] = $API;
+        $this->button = $button;
+        $this->peer = $message['to_id'] === ['_' => 'peerUser', 'user_id' => $API->authorization['user']['id']] ? $message['from_id'] : $message['to_id'];
+        $this->id = $message['id'];
+        $this->API = $API;
     }
-    public function __sleep()
+    /**
+     * Sleep function.
+     *
+     * @return array
+     */
+    public function __sleep(): array
     {
-        return ['data', 'info'];
+        return ['button', 'peer', 'id', 'API'];
     }
-    public function click($donotwait = false, $params = [])
+    /**
+     * Click on button.
+     *
+     * @param boolean $donotwait Whether to wait for the result of the method
+     *
+     * @return mixed
+     */
+    public function click(bool $donotwait = true)
     {
-        if (\is_array($donotwait)) {
-            $params = $donotwait;
-            $donotwait = false;
-        }
-        $async = $params['async'] ?? (isset($this->info['API']->wrapper) ? $this->info['API']->wrapper->async : true);
+        $async = isset($this->API->wrapper) ? $this->API->wrapper->isAsync() : true;
         $method = $donotwait ? 'methodCallAsyncWrite' : 'methodCallAsyncRead';
-        switch ($this->data['_']) {
+        switch ($this->button['_']) {
             default:
                 return false;
             case 'keyboardButtonUrl':
-                return $this->data['url'];
+                return $this->button['url'];
             case 'keyboardButton':
-                $res = $this->info['API']->methodCallAsyncRead('messages.sendMessage', ['peer' => $this->info['peer'], 'message' => $this->data['text'], 'reply_to_msg_id' => $this->info['id']], ['datacenter' => $this->info['API']->datacenter->curdc]);
+                $res = $this->API->methodCallAsyncRead('messages.sendMessage', ['peer' => $this->peer, 'message' => $this->button['text'], 'reply_to_msg_id' => $this->id], ['datacenter' => $this->API->datacenter->curdc]);
                 break;
             case 'keyboardButtonCallback':
-                $res = $this->info['API']->{$method}('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'data' => $this->data['data']], ['datacenter' => $this->info['API']->datacenter->curdc]);
+                $res = $this->API->{$method}('messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'data' => $this->button['data']], ['datacenter' => $this->API->datacenter->curdc]);
                 break;
             case 'keyboardButtonGame':
-                $res = $this->info['API']->{$method}('messages.getBotCallbackAnswer', ['peer' => $this->info['peer'], 'msg_id' => $this->info['id'], 'game' => true], ['datacenter' => $this->info['API']->datacenter->curdc]);
+                $res = $this->API->{$method}('messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true], ['datacenter' => $this->API->datacenter->curdc]);
                 break;
         }
-        return $async ? $res : \danog\MadelineProto\Tools::wait($res);
+        return $async ? $res : Tools::wait($res);
     }
-    public function __debugInfo()
+    /**
+     * Get debug info.
+     *
+     * @return array
+     */
+    public function __debugInfo(): array
     {
-        return ['data' => $this->data, 'info' => ['peer' => $this->info['peer'], 'id' => $this->info['id']]];
+        $res = \get_object_vars($this);
+        unset($res['API']);
+        return $res;
     }
-    public function jsonSerialize()
+    /**
+     * Serialize button.
+     *
+     * @return array
+     */
+    public function jsonSerialize(): array
     {
-        return (array) $this->data;
+        return $this->button;
     }
-    public function offsetSet($name, $value)
+    /**
+     * Set button info.
+     *
+     * @param $name  Offset
+     * @param mixed  $value Value
+     *
+     * @return void
+     */
+    public function offsetSet($name, $value): void
     {
         if ($name === null) {
-            $this->data[] = $value;
+            $this->button[] = $value;
         } else {
-            $this->data[$name] = $value;
+            $this->button[$name] = $value;
         }
     }
+    /**
+     * Get button info.
+     *
+     * @param $name Field name
+     *
+     * @return void
+     */
     public function offsetGet($name)
     {
-        return $this->data[$name];
+        return $this->button[$name];
     }
-    public function offsetUnset($name)
+    /**
+     * Unset button info.
+     *
+     * @param $name Offset
+     *
+     * @return void
+     */
+    public function offsetUnset($name): void
     {
-        unset($this->data[$name]);
+        unset($this->button[$name]);
     }
-    public function offsetExists($name)
+    /**
+     * Check if button field exists.
+     *
+     * @param $name Offset
+     *
+     * @return boolean
+     */
+    public function offsetExists($name): bool
     {
-        return isset($this->data[$name]);
+        return isset($this->button[$name]);
     }
 }

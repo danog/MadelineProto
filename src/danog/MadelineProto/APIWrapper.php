@@ -67,6 +67,22 @@ final class APIWrapper
      * @var integer
      */
     private int $serialized = 0;
+    /**
+     * Whether lua is being used.
+     *
+     * @internal
+     *
+     * @var boolean
+     */
+    private bool $lua = false;
+    /**
+     * Whether async is enabled.
+     *
+     * @internal
+     *
+     * @var boolean
+     */
+    private bool $async = false;
 
     /**
      * AbstractAPIFactory instance.
@@ -111,7 +127,7 @@ final class APIWrapper
      */
     public static function __sleep(): array
     {
-        return ['API', 'webApiTemplate', 'gettingApiId', 'myTelegramOrgWrapper', 'storage'];
+        return ['API', 'webApiTemplate', 'gettingApiId', 'myTelegramOrgWrapper', 'storage', 'lua', 'async'];
     }
 
     /**
@@ -122,6 +138,16 @@ final class APIWrapper
     public function &getAPI(): ?MTProto
     {
         return $this->API;
+    }
+
+    /**
+     * Whether async is being used.
+     *
+     * @return boolean
+     */
+    public function isAsync(): bool
+    {
+        return $this->async;
     }
 
     /**

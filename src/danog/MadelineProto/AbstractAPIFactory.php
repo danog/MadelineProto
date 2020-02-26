@@ -54,7 +54,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      *
      * @var boolean
      */
-    private bool $async = false;
+    protected bool $async = false;
     /**
      * Method list.
      *

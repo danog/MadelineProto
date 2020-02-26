@@ -21,42 +21,95 @@ namespace danog\MadelineProto\TL\Types;
 
 class Bytes implements \JsonSerializable, \ArrayAccess
 {
-    use \danog\Serializable;
-    private $bytes = [];
-    public function __magic_construct($bytes)
+    /**
+     * Bytes.
+     *
+     * @var string Bytes
+     */
+    private string $bytes;
+    /**
+     * Constructor function.
+     *
+     * @param string $bytes Contents
+     */
+    public function __construct(string $bytes)
     {
         $this->bytes = $bytes;
     }
-    public function __sleep()
+    /**
+     * Sleep function.
+     *
+     * @return array
+     */
+    public function __sleep(): array
     {
         return ['bytes'];
     }
-    public function __toString()
+    /**
+     * Cast bytes to string.
+     *
+     * @return string
+     */
+    public function __toString(): string
     {
         return $this->bytes;
     }
-    public function jsonSerialize()
+    /**
+     * Obtain values for JSON-encoding.
+     *
+     * @return array
+     */
+    public function jsonSerialize(): array
     {
         return ['_' => 'bytes', 'bytes' => \base64_encode($this->bytes)];
     }
-    public function offsetSet($name, $value)
+    /**
+     * Set char at offset.
+     *
+     * @param integer|null $offset Offset
+     * @param string       $value  Char
+     *
+     * @return void
+     */
+    public function offsetSet($offset, $value): void
     {
-        if ($name === null) {
+        if ($offset === null) {
             $this->bytes .= $value;
         } else {
-            $this->bytes[$name] = $value;
+            $this->bytes[$offset] = $value;
         }
     }
-    public function offsetGet($name)
+    /**
+     * Get char at offset.
+     *
+     * @param integer $offset Name
+     *
+     * @return string
+     */
+    public function offsetGet($offset): string
     {
-        return $this->bytes[$name];
+        return $this->bytes[$offset];
     }
-    public function offsetUnset($name)
+    /**
+     * Unset char at offset.
+     *
+     * @param integer $offset Offset
+     *
+     * @return void
+     */
+    public function offsetUnset($offset): void
     {
-        unset($this->bytes[$name]);
+        unset($this->bytes[$offset]);
     }
-    public function offsetExists($name)
+    /**
+     * Check if char at offset exists.
+     *
+     * @param integer $offset Offset
+     *
+     * @return boolean
+     */
+    public function offsetExists($offset): bool
     {
-        return isset($this->bytes[$name]);
+        return isset($this->bytes[$offset]);
     }
 }

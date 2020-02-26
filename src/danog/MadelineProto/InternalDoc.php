@@ -4122,19 +4122,6 @@ class InternalDoc extends APIFactory
         return $this->API->getDataCenterConnections();
     }
     /**
-     * Get correct settings array for the latest version.
-     *
-     * @param array $settings         Current settings array
-     * @param array $previousSettings Previous settings array
-     *
-     * @return array
-     */
-    public function getSettings(array $settings, array $previousSettings = [
-    ]): array
-    {
-        return \danog\MadelineProto\MTProto::getSettings($settings, $previousSettings);
-    }
-    /**
      * Parse, update and store settings.
      *
      * @param array $settings Settings
@@ -4145,6 +4132,15 @@ class InternalDoc extends APIFactory
     public function updateSettings(array $settings, bool $reinit = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$settings, $reinit, $extra]);
+    }
+    /**
+     * Return current settings array.
+     *
+     * @return array
+     */
+    public function getSettings(): array
+    {
+        return $this->API->getSettings();
     }
     /**
      * Setup logger.
