@@ -176,10 +176,10 @@ class API extends InternalDoc
             $this->logger->logger('Shutting down MadelineProto (API)');
             if ($this->API) {
                 $this->API->destructing = true;
+                $this->API->unreference();
             }
             $this->destructing = true;
             Tools::wait($this->wrapper->serialize(), true);
-            $this->API->unreference();
         } else {
             $this->logger->logger('Shutting down MadelineProto (old deserialized instance of API)');
         }
