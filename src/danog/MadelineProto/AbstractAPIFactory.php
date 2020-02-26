@@ -72,7 +72,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     {
         $class = \array_reverse(\array_values(\class_parents(static::class)))[3];
         $instance = new $class;
-        $instance->namespace = $namespace.'.';
+        $instance->namespace = $namespace ? $namespace.'.' : '';
         self::link($instance, $this);
 
         return $instance;
