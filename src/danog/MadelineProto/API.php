@@ -139,6 +139,7 @@ class API extends InternalDoc
             if (isset($this->API)) {
                 $this->storage = $this->API->storage ?? $this->storage;
 
+                $unserialized->oldInstance = true;
                 unset($unserialized);
 
                 yield from $this->API->initAsynchronously();
@@ -172,7 +173,7 @@ class API extends InternalDoc
     {
         $this->init();
         if (!$this->oldInstance) {
-            $this->logger('Shutting down MadelineProto (API)');
+            $this->logger->logger('Shutting down MadelineProto (API)');
             if ($this->API) {
                 $this->API->destructing = true;
             }
@@ -180,17 +181,8 @@ class API extends InternalDoc
             Tools::wait($this->wrapper->serialize(), true);
             $this->API->unreference();
         } else {
-            $this->logger('Shutting down MadelineProto (old deserialized instance of API)');
+            $this->logger->logger('Shutting down MadelineProto (old deserialized instance of API)');
         }
-    }
-    /**
-     * Wakeup function.
-     *
-     * @return void
-     */
-    public function __wakeup(): void
-    {
-        $this->oldInstance = true;
     }
     /**
      * Init API wrapper.
@@ -230,7 +222,7 @@ class API extends InternalDoc
                 Tools::wait($this->startAndLoopAsync($eventHandler));
                 return;
             } catch (\Throwable $e) {
-                $this->logger((string) $e, Logger::FATAL_ERROR);
+                $this->logger->logger((string) $e, Logger::FATAL_ERROR);
                 $this->report("Surfaced: $e");
             }
         }
@@ -249,7 +241,7 @@ class API extends InternalDoc
             $eventHandler = \array_fill_keys(\array_keys($instances), $eventHandler);
         }
 
-        $instanceOne = array_values($instances)[0];
+        $instanceOne = \array_values($instances)[0];
         while (true) {
             try {
                 $promises = [];
@@ -283,7 +275,7 @@ class API extends InternalDoc
                 yield $this->setEventHandler($eventHandler);
                 return yield from $this->API->loop();
             } catch (\Throwable $e) {
-                $this->logger((string) $e, Logger::FATAL_ERROR);
+                $this->logger->logger((string) $e, Logger::FATAL_ERROR);
                 $this->report("Surfaced: $e");
             }
         }

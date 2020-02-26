@@ -18,7 +18,7 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-require 'vendor/autoload.php';
+require '../vendor/autoload.php';
 
 $MadelineProto = new \danog\MadelineProto\API('session.madeline');
 $me = $MadelineProto->start();
