@@ -49,9 +49,9 @@ trait Events
      *
      * @param string|EventHandler $event_handler Event handler
      *
-     * @return void
+     * @return \Generator
      */
-    public function setEventHandler($event_handler): void
+    public function setEventHandler($event_handler): \Generator
     {
         if (!\class_exists($event_handler) || !\is_subclass_of($event_handler, '\\danog\\MadelineProto\\EventHandler')) {
             throw new \danog\MadelineProto\Exception('Wrong event handler was defined');
@@ -80,7 +80,7 @@ trait Events
                 }
             }
         }
-        $this->setReportPeers($this->event_handler_instance->getReportPeers());
+        yield from $this->setReportPeers($this->event_handler_instance->getReportPeers());
         $this->settings['updates']['callback'] = [$this, 'eventUpdateHandler'];
         $this->settings['updates']['handle_updates'] = true;
         $this->settings['updates']['run_callback'] = true;

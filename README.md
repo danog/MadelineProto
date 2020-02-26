@@ -86,7 +86,7 @@ You can find examples for nearly every MadelineProto function in
 * [Handling updates (new messages)](https://docs.madelineproto.xyz/docs/UPDATES.html)
   * [Self-restart on webhosts](https://docs.madelineproto.xyz/docs/UPDATES.html#self-restart-on-webhosts)
   * [Async Event driven](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven)
-  * [Multi-account: Async Combined Event driven update handling](https://docs.madelineproto.xyz/docs/UPDATES.html#async-combined-event-driven)
+  * [Multi-account: Async Event driven](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven)
   * [Async Callback](https://docs.madelineproto.xyz/docs/UPDATES.html#async-callback)
   * [Noop (default)](https://docs.madelineproto.xyz/docs/UPDATES.html#noop)
   * [Fetch all updates from the beginning](https://docs.madelineproto.xyz/docs/UPDATES.html#fetch-all-updates-from-the-beginning)

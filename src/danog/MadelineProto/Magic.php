@@ -267,14 +267,14 @@ class Magic
             self::$altervista = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
             self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
             self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
-            self::$revision = @\file_get_contents(__DIR__ . '/../../../.git/refs/heads/master');
+            self::$revision = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/master');
             if (self::$revision) {
                 self::$revision = \trim(self::$revision);
                 $latest = @\file_get_contents('https://phar.madelineproto.xyz/release');
                 if ($latest) {
                     $latest = self::$revision === \trim($latest) ? '' : ' (AN UPDATE IS REQUIRED)';
                 }
-                self::$revision = 'Revision: ' . self::$revision . $latest;
+                self::$revision = 'Revision: '.self::$revision.$latest;
             }
             self::$can_parallel = false;
             if (PHP_SAPI === 'cli' && !(\class_exists(\Phar::class) && \Phar::running())) {
@@ -332,7 +332,7 @@ class Magic
                 try {
                     \error_reporting(E_ALL);
                     \ini_set('log_errors', 1);
-                    \ini_set('error_log', Magic::$script_cwd . '/MadelineProto.log');
+                    \ini_set('error_log', Magic::$script_cwd.'/MadelineProto.log');
                     \error_log('Enabled PHP logging');
                 } catch (\danog\MadelineProto\Exception $e) {
                     //$this->logger->logger('Could not enable PHP logging');

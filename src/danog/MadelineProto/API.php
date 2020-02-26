@@ -128,7 +128,7 @@ class API extends InternalDoc
     public function __construct_async(string $session, array $settings = []): \Generator
     {
         Logger::constructorFromSettings($settings);
-        $session = Absolute::absolute($session);
+        $this->session = $session = Absolute::absolute($session);
         if ($unserialized = yield from Serialization::legacyUnserialize($session)) {
             $unserialized->storage = $unserialized->storage ?? [];
             $unserialized->session = $session;
@@ -235,10 +235,7 @@ class API extends InternalDoc
             } catch (\Throwable $e) {
                 $thrown = true;
                 $this->logger((string) $e, Logger::FATAL_ERROR);
-                try {
-                    $this->report("Surfaced: $e");
-                } catch (\Throwable $e) {
-                }
+                $this->report("Surfaced: $e");
             }
         } while ($thrown);
     }

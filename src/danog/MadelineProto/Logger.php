@@ -71,6 +71,12 @@ class Logger
      */
     public $newline = "\n";
     /**
+     * Logfile
+     *
+     * @var ResourceOutputStream
+     */
+    public $stdout;
+    /**
      * Default logger instance.
      *
      * @var self

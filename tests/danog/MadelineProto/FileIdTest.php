@@ -25,6 +25,7 @@ class FileIdTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         self::$MadelineProto = new API(
+            'testing.madeline',
             [
                 'app_info' => [
                     'api_id' => \getenv('API_ID'),

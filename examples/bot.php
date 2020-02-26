@@ -19,7 +19,6 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-use Amp\Loop;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Exception;

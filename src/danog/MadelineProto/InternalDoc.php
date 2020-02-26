@@ -5540,11 +5540,11 @@ class InternalDoc extends APIFactory
      *
      * @param string|EventHandler $event_handler Event handler
      *
-     * @return void
+     * @return \Generator
      */
-    public function setEventHandler($event_handler): void
+    public function setEventHandler($event_handler, array $extra = [])
     {
-        $this->API->setEventHandler($event_handler);
+        return $this->__call(__FUNCTION__, [$event_handler, $extra]);
     }
     /**
      * Unset event handler.
