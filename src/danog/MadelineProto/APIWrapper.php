@@ -48,14 +48,14 @@ final class APIWrapper
     private bool $gettingApiId = false;
 
     /**
-     * Web API template
-     * 
+     * Web API template.
+     *
      * @var string
      */
     private string $webApiTemplate = '';
 
     /**
-     * My.telegram.org wrapper
+     * My.telegram.org wrapper.
      *
      * @var ?MyTelegramOrgWrapper
      */
@@ -69,13 +69,13 @@ final class APIWrapper
     private int $serialized = 0;
 
     /**
-     * AbstractAPIFactory instance
-     * 
+     * AbstractAPIFactory instance.
+     *
      * @var AbstractAPIFactory
      */
     private AbstractAPIFactory $factory;
     /**
-     * API wrapper
+     * API wrapper.
      *
      * @param API                $API     API instance to wrap
      * @param AbstractAPIFactory $factory Factory
@@ -87,11 +87,11 @@ final class APIWrapper
     }
 
     /**
-     * Link two APIWrapper and API instances
+     * Link two APIWrapper and API instances.
      *
      * @param API|APIWrapper $a Instance to which link
      * @param API|APIWrapper $b Instance from which link
-     * 
+     *
      * @return void
      */
     public static function link($a, $b): void
@@ -115,7 +115,7 @@ final class APIWrapper
     }
 
     /**
-     * Get MTProto instance
+     * Get MTProto instance.
      *
      * @return MTProto|null
      */
@@ -125,7 +125,7 @@ final class APIWrapper
     }
 
     /**
-     * Get API factory
+     * Get API factory.
      *
      * @return AbstractAPIFactory
      */

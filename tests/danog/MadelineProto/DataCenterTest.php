@@ -73,7 +73,7 @@ final class DataCenterTest extends TestCase
         );
         $API->datacenter = $datacenter;
 
-        $API->getLogger()->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6 ' : 'IPv4 ').($doh ? "DNS over HTTPS" : "DNS");
+        $API->getLogger()->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6 ' : 'IPv4 ').($doh ? "DNS over HTTPS" : "DNS"));
 
         \sleep(1);
         try {

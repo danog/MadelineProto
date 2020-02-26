@@ -115,7 +115,7 @@ class DataCenter
      */
     private $CookieJar;
     /**
-     * DNS connector
+     * DNS connector.
      *
      * @var DNSConnector
      */
@@ -226,7 +226,7 @@ class DataCenter
             $nonProxiedDoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')]);
             $this->DoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($DoHConfig);
             $this->nonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($nonProxiedDoHConfig);
-            
+
             $this->dnsConnector = new DnsConnector(new Rfc1035StubResolver());
         }
     }

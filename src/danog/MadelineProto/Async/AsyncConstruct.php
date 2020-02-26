@@ -68,10 +68,10 @@ class AsyncConstruct
         return !$this->asyncInitPromise;
     }
     /**
-     * Mark instance as (de)inited forcefully
+     * Mark instance as (de)inited forcefully.
      *
      * @param boolean $inited Whether to mark the instance as inited or deinited
-     * 
+     *
      * @return void
      */
     public function forceInit(bool $inited): void

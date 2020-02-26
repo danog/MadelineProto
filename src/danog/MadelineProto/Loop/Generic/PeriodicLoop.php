@@ -30,19 +30,19 @@ use danog\MadelineProto\MTProto;
 class PeriodicLoop extends ResumableSignalLoop
 {
     /**
-     * Callback
+     * Callback.
      *
      * @var callable
      */
     private $callback;
     /**
-     * Loop name
+     * Loop name.
      *
      * @var string
      */
     private string $name;
     /**
-     * Loop timeeout
+     * Loop timeeout.
      *
      * @var int
      */

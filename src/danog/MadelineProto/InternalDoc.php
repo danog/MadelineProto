@@ -5410,6 +5410,20 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$obj, $var]);
     }
     /**
+     * Sets a private variable in an object.
+     *
+     * @param object $obj Object
+     * @param string $var Attribute name
+     * @param mixed  $val Attribute value
+     *
+     * @return mixed
+     * @access public
+     */
+    public function setVar($obj, string $var, &$val): void
+    {
+        \danog\MadelineProto\MTProto::setVar($obj, $var, $val);
+    }
+    /**
      * Discard call.
      *
      * @param array   $call       Call

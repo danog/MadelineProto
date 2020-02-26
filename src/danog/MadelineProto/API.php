@@ -138,7 +138,7 @@ class API extends InternalDoc
                 $this->storage = $this->API->storage ?? $this->storage;
 
                 unset($unserialized);
-                
+
                 yield from $this->API->initAsynchronously();
                 $this->APIFactory();
                 $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
@@ -182,7 +182,7 @@ class API extends InternalDoc
         }
     }
     /**
-     * Wakeup function
+     * Wakeup function.
      *
      * @return void
      */

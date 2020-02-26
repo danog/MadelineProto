@@ -70,7 +70,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      */
     protected function exportNamespace(string $namespace = ''): self
     {
-        $class = array_reverse(array_values(class_parents(static::class)))[3];
+        $class = \array_reverse(\array_values(\class_parents(static::class)))[3];
         $instance = new $class;
         $instance->namespace = $namespace.'.';
         self::link($instance, $this);
@@ -78,11 +78,11 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         return $instance;
     }
     /**
-     * Link two APIFactory instances
+     * Link two APIFactory instances.
      *
      * @param self $a First instance
      * @param self $b Second instance
-     * 
+     *
      * @return void
      */
     protected static function link(self $a, self $b): void
@@ -135,7 +135,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         }
     }
     /**
-     * Info to dump
+     * Info to dump.
      *
      * @return array
      */
