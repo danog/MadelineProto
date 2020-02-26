@@ -22,6 +22,7 @@
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\RPCErrorException;
 
 /*
@@ -95,7 +96,7 @@ class MyEventHandler extends EventHandler
 }
 $settings = [
     'logger' => [
-        'logger_level' => 4
+        'logger_level' => Logger::VERBOSE
     ],
     'serialization' => [
         'serialization_interval' => 30,

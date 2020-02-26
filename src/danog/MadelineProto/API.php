@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Promise;
+
 if (!\defined('MADELINEPROTO_TEST')) {
     \define('MADELINEPROTO_TEST', 'NOT PONY');
 }
@@ -223,15 +225,40 @@ class API extends InternalDoc
      */
     public function startAndLoop(string $eventHandler): void
     {
+        Tools::wait($this->startAndLoopAsync($eventHandler));
+    }
+    /**
+     * Start MadelineProto and the event handler in background (enables async).
+     *
+     * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
+     *
+     * @param string $eventHandler Event handler class name
+     *
+     * @return void
+     */
+    public function startAndLoopBackground(string $eventHandler): Promise
+    {
+        $this->start(['async' => false]);
+        return Tools::call($this->startAndLoopAsync($eventHandler));
+    }
+    /**
+     * Start MadelineProto and the event handler (enables async).
+     *
+     * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
+     *
+     * @param string $eventHandler Event handler class name
+     *
+     * @return \Generator
+     */
+    private function startAndLoopAsync(string $eventHandler): \Generator
+    {
         $this->async(true);
         do {
             $thrown = false;
             try {
-                $this->loop(function () use ($eventHandler) {
-                    yield $this->start();
-                    yield $this->setEventHandler($eventHandler);
-                });
-                $this->loop();
+                yield $this->start();
+                yield $this->setEventHandler($eventHandler);
+                yield from $this->API->loop();
             } catch (\Throwable $e) {
                 $thrown = true;
                 $this->logger((string) $e, Logger::FATAL_ERROR);

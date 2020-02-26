@@ -71,7 +71,7 @@ class Logger
      */
     public $newline = "\n";
     /**
-     * Logfile
+     * Logfile.
      *
      * @var ResourceOutputStream
      */

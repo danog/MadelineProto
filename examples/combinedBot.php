@@ -29,7 +29,7 @@ use danog\MadelineProto\Tools;
 /*
  * Various ways to load MadelineProto
  */
-if (\file_exists(__DIR__.'/vendor/autoload.php')) {
+if (\file_exists('vendor/autoload.php')) {
     include 'vendor/autoload.php';
 } else {
     if (!\file_exists('madeline.php')) {
@@ -103,25 +103,7 @@ foreach ([
     'user2.madeline' => 'Userbot login (2)'
 ] as $session => $message) {
     Logger::log($message, Logger::WARNING);
-    $MadelineProto = new API($session);
-    $MadelineProto->async(true);
-    $MadelineProto->loop(function () use ($MadelineProto) {
-        yield $MadelineProto->start();
-        yield $MadelineProto->setEventHandler(MyEventHandler::class);
-    });
-    $MadelineProtos []= $MadelineProto->loopFork();
+    $MadelineProtos []= (new API($session))->startAndLoopBackground(MyEventHandler::class);
 }
 
-do {
-    $thrown = false;
-    try {
-        Tools::wait(Tools::all($MadelineProtos));
-    } catch (\Throwable $e) {
-        $thrown = true;
-        try {
-            $MadelineProto->report("Surfaced: $e");
-        } catch (\Throwable $e) {
-            $MadelineProto->logger((string) $e, \danog\MadelineProto\Logger::FATAL_ERROR);
-        }
-    }
-} while ($thrown);
+Tools::wait(Tools::all($MadelineProtos));

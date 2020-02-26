@@ -37,7 +37,6 @@ use danog\MadelineProto\TL\TLCallback;
 
 use function Amp\File\exists;
 use function Amp\File\size;
-use function Amp\File\unlink as unlinkAsync;
 
 /**
  * Manages all of the mtproto stuff.
@@ -1740,9 +1739,9 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $message = "!!! WARNING !!!\nThe logfile is empty, please DO NOT delete the logfile to avoid errors in MadelineProto!\n\n$message";
             } else {
                 $file = yield from $this->methodCallAsyncRead(
-                    'messages.uploadMedia', 
+                    'messages.uploadMedia',
                     [
-                        'peer' => $this->reportDest[0], 
+                        'peer' => $this->reportDest[0],
                         'media' => [
                             '_' => 'inputMediaUploadedDocument',
                             'file' => $path,
@@ -1766,7 +1765,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
         }
         if ($sent && $file) {
-            ftruncate($this->logger->stdout->getResource(), 0);
+            \ftruncate($this->logger->stdout->getResource(), 0);
             $this->logger->logger("Reported!");
         }
     }
