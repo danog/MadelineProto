@@ -25,18 +25,7 @@ function __destructure($list, $value)
     }
     return $res;
 }
-if (!\function_exists('is_iterable')) {
-    function is_iterable($var)
-    {
-        return \is_array($var) || $var instanceof Traversable;
-    }
-}
-if (!\function_exists('error_clear_last')) {
-    function error_clear_last()
-    {
-        @\trigger_error("");
-    }
-}
+
 trait MyCallableMaker
 {
     use \Amp\CallableMaker {

@@ -36,7 +36,8 @@ final class DataCenterTest extends TestCase
                         'protocol'   => $protocol,
                         'obfuscated' => $obfuscated,
                         'transport'  => $transport,
-                        'do_not_retry' => true
+                        'do_not_retry' => true,
+                        'timeout' => 10
                     ],
                 ],
                 'logger' => [

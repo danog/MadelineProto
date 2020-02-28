@@ -60,7 +60,12 @@ composer config platform.php "7.4"
 composer clearcache
 composer update
 composer require amphp/mysql
-[ $PHP_MAJOR_VERSION -eq 5 ] && composer require dstuecken/php7ify
+[ $PHP_MAJOR_VERSION -eq 5 ] && composer require dstuecken/php7ify && composer require symfony/polyfill-php70
+[ $PHP_MAJOR_VERSION -eq 7 ] && [ $PHP_MINOR_VERSION -eq 0 ] && {
+    composer require symfony/polyfill-php71
+    composer require symfony/polyfill-php72
+    composer require symfony/polyfill-php73
+}
 composer dumpautoload --optimize
 cp -a $madelinePath/src vendor/danog/madelineproto
 cd ..

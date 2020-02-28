@@ -16,13 +16,11 @@
  *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
-
 namespace danog\MadelineProto\Wrappers;
 
 use Amp\Promise;
 use danog\MadelineProto\Shutdown;
 use danog\MadelineProto\Tools;
-
 /**
  * Manages logging in and out.
  */
@@ -35,7 +33,6 @@ trait Loop
      * @var boolean
      */
     private $stopLoop = false;
-
     /**
      * Start MadelineProto's update handling loop, or run the provided async callable.
      *
@@ -43,15 +40,15 @@ trait Loop
      *
      * @return mixed
      */
-    public function loop($callback = null): \Generator
+    public function loop($callback = null) : \Generator
     {
         if (\is_callable($callback)) {
             $this->logger->logger('Running async callable');
-            return yield $callback();
+            return (yield $callback());
         }
         if ($callback instanceof Promise) {
             $this->logger->logger('Resolving async promise');
-            return yield $callback;
+            return (yield $callback);
         }
         if (!$this->authorized) {
             $this->logger->logger('Not authorized, not starting event loop', \danog\MadelineProto\Logger::FATAL_ERROR);
@@ -65,7 +62,6 @@ trait Loop
         if (!\is_callable($this->loop_callback) || \is_array($this->loop_callback) && $this->loop_callback[1] === 'onLoop' && !\method_exists(...$this->loop_callback)) {
             $this->loop_callback = null;
         }
-
         static $inited = false;
         if (PHP_SAPI !== 'cli' && !$inited) {
             $needs_restart = true;
@@ -75,11 +71,11 @@ trait Loop
                 $needs_restart = true;
             }
             if (isset($_REQUEST['MadelineSelfRestart'])) {
-                $this->logger->logger("Self-restarted, restart token ".$_REQUEST['MadelineSelfRestart']);
+                $this->logger->logger("Self-restarted, restart token " . $_REQUEST['MadelineSelfRestart']);
             }
             $this->logger->logger($needs_restart ? 'Will self-restart' : 'Will not self-restart');
             $backtrace = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-            $lockfile = \dirname(\end($backtrace)['file']).'/bot'.$this->authorization['user']['id'].'.lock';
+            $lockfile = \dirname(\end($backtrace)['file']) . '/bot' . $this->authorization['user']['id'] . '.lock';
             unset($backtrace);
             $try_locking = true;
             if (!\file_exists($lockfile)) {
@@ -92,6 +88,7 @@ trait Loop
                 $lock = \fopen($lockfile, 'r+');
             }
             if ($try_locking) {
+                $this->logger->logger('Will try locking');
                 $try = 1;
                 $locked = false;
                 while (!$locked) {
@@ -104,15 +101,21 @@ trait Loop
                         \sleep(1);
                     }
                 }
+                $this->logger->logger('Locked!');
             }
-            Shutdown::addCallback(static function () use ($lock) {
+            $this->logger->logger("Adding unlock callback!");
+            $logger =& $this->logger;
+            $id = Shutdown::addCallback(static function () use ($lock, $logger) {
+                $logger->logger("Unlocking lock!");
                 \flock($lock, LOCK_UN);
                 \fclose($lock);
+                $logger->logger("Unlocked lock!");
             });
+            $this->logger->logger("Added unlock callback with id $id!");
             if ($needs_restart) {
-                $logger =& $this->logger;
-                Shutdown::addCallback(static function () use (&$logger) {
-                    $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
+                $this->logger->logger("Adding restart callback!");
+                $id = Shutdown::addCallback(static function () use(&$logger) {
+                    $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp') . '://' . $_SERVER['SERVER_NAME'];
                     $port = $_SERVER['SERVER_PORT'];
                     $uri = $_SERVER['REQUEST_URI'];
                     $params = $_GET;
@@ -120,7 +123,7 @@ trait Loop
                     $url = \explode('?', $uri, 2)[0] ?? '';
                     $query = \http_build_query($params);
                     $uri = \implode('?', [$url, $query]);
-                    $payload = $_SERVER['REQUEST_METHOD'].' '.$uri.' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n";
+                    $payload = $_SERVER['REQUEST_METHOD'] . ' ' . $uri . ' ' . $_SERVER['SERVER_PROTOCOL'] . "\r\n" . 'Host: ' . $_SERVER['SERVER_NAME'] . "\r\n\r\n";
                     $logger->logger("Connecting to {$address}:{$port}");
                     $a = \fsockopen($address, $port);
                     $logger->logger("Sending self-restart payload");
@@ -129,8 +132,11 @@ trait Loop
                     $logger->logger("Payload sent with token {$params['MadelineSelfRestart']}, waiting for self-restart");
                     \sleep(10);
                     \fclose($a);
+                    $logger->logger("Shutdown of self-restart callback");
                 }, 'restarter');
+                $this->logger->logger("Added restart callback with ID $id!");
             }
+            $this->logger->logger("Done webhost init process!");
             $this->closeConnection('Bot was started');
             $inited = true;
         }
@@ -166,7 +172,7 @@ trait Loop
      *
      * @return void
      */
-    public function stop(): void
+    public function stop()
     {
         $this->stopLoop = true;
         $this->signalUpdate();
@@ -176,7 +182,7 @@ trait Loop
      *
      * @return void
      */
-    public function restart(): void
+    public function restart()
     {
         $this->stop();
     }
@@ -185,7 +191,7 @@ trait Loop
      *
      * @return Promise
      */
-    public function loopFork(): Promise
+    public function loopFork() : Promise
     {
         return Tools::callFork($this->loop());
     }
@@ -196,14 +202,14 @@ trait Loop
      *
      * @return void
      */
-    public function closeConnection($message = 'OK!'): void
+    public function closeConnection($message = 'OK!')
     {
         if (PHP_SAPI === 'cli' || isset($GLOBALS['exited']) || \headers_sent()) {
             return;
         }
         $this->logger->logger($message);
         $buffer = @\ob_get_clean() ?: '';
-        $buffer .= '<html><body><h1>'.\htmlentities($message).'</h1></body></html>';
+        $buffer .= '<html><body><h1>' . \htmlentities($message) . '</h1></body></html>';
         \ignore_user_abort(true);
         \header('Connection: close');
         \header('Content-Type: text/html');
