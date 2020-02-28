@@ -42,6 +42,16 @@ class FileIdTest extends TestCase
     }
 
     /**
+     * Teardown
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass(): void
+    {
+        self::$MadelineProto = null;
+    }
+
+    /**
      * Strip file reference from file ID.
      *
      * @param string $fileId File ID
