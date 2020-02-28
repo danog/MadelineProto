@@ -138,7 +138,7 @@ class FeedLoop extends ResumableSignalLoop
         foreach ($updates as $update) {
             $res = $this->feedSingle($update);
             if ($res instanceof \Generator) {
-                $res = yield $res;
+                $res = yield from $res;
             }
             $result[$res] = true;
         }

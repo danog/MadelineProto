@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\Tools;
 
 /**
  * Event handler.
@@ -84,6 +85,9 @@ trait Events
         $this->settings['updates']['callback'] = [$this, 'eventUpdateHandler'];
         $this->settings['updates']['handle_updates'] = true;
         $this->settings['updates']['run_callback'] = true;
+        if (method_exists($this->event_handler_instance, 'onStart')) {
+            Tools::callFork($this->event_handler_instance->onStart());
+        }
         if ($this->inited()) {
             $this->startUpdateSystem();
         }

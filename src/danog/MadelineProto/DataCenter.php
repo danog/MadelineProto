@@ -34,6 +34,7 @@ use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\DnsConnector;
+use Amp\Websocket\Client\Handshake;
 use Amp\Websocket\Client\Rfc6455Connector;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
@@ -233,7 +234,9 @@ class DataCenter
             $this->nonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($nonProxiedDoHConfig);
 
             $this->dnsConnector = new DnsConnector(new Rfc1035StubResolver());
-            $this->webSocketConnnector = new Rfc6455Connector($this->HTTPClient);
+            if (\class_exists(Rfc6455Connector::class)) {
+                $this->webSocketConnnector = new Rfc6455Connector($this->HTTPClient);
+            }
         }
     }
     public function dcConnect(string $dc_number, int $id = -1): \Generator
@@ -265,7 +268,7 @@ class DataCenter
                 if (\MADELINEPROTO_TEST === 'pony') {
                     throw $e;
                 }
-                $this->API->logger->logger("Connection failed ({$dc_number}): " . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger("Connection failed ({$dc_number}): ".$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             }
         }
         throw new Exception("Could not connect to DC {$dc_number}");
@@ -468,6 +471,9 @@ class DataCenter
                                 $stream[1] = $useDoH ? new DoHConnector($this, $ctx) : $this->dnsConnector;
                             }
                             if (\in_array($stream[0], [WsStream::class, WssStream::class]) && $stream[1] === []) {
+                                if (!\class_exists(Handshake::class)) {
+                                    throw new Exception('Please install amphp/websocket-client by running "composer require amphp/websocket-client:dev-master"');
+                                }
                                 $stream[1] = $this->webSocketConnnector;
                             }
                             $ctx->addStream(...$stream);
@@ -477,8 +483,8 @@ class DataCenter
                 }
             }
         }
-        if (isset($this->dclist[$test][$ipv6][$dc_number . '_bk']['ip_address'])) {
-            $ctxs = \array_merge($ctxs, $this->generateContexts($dc_number . '_bk'));
+        if (isset($this->dclist[$test][$ipv6][$dc_number.'_bk']['ip_address'])) {
+            $ctxs = \array_merge($ctxs, $this->generateContexts($dc_number.'_bk'));
         }
         if (empty($ctxs)) {
             unset($this->sockets[$dc_number]);

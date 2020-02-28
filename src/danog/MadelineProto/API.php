@@ -136,6 +136,7 @@ class API extends InternalDoc
             $unserialized->session = $session;
             APIWrapper::link($this, $unserialized);
             APIWrapper::link($this->wrapper, $this);
+            AbstractAPIFactory::link($this->wrapper->getFactory(), $this);
             if (isset($this->API)) {
                 $this->storage = $this->API->storage ?? $this->storage;
 
