@@ -27,6 +27,7 @@ use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
+use Psr\Http\Message\UriInterface;
 
 /**
  * HTTP stream wrapper.
@@ -42,10 +43,8 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     private $header = '';
     /**
      * URI of the HTTP API.
-     *
-     * @var \Amp\Uri\Uri
      */
-    private $uri;
+    private UriInterface $uri;
     /**
      * Connect to stream.
      *

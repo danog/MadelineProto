@@ -68,8 +68,10 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
             throw new \danog\MadelineProto\Exception('Please install amphp/websocket-client by running "composer require amphp/websocket-client:dev-master"');
         }
         $this->dc = $ctx->getIntDc();
-        $handshake = new Handshake(\str_replace('tcp://', $ctx->isSecure() ? 'wss://' : 'ws://', $ctx->getStringUri()));
-        $this->stream = (yield ($this->connector ?? connector())->connect($handshake, $ctx->getCancellationToken()));
+        $uri = $ctx->getStringUri();
+        $uri = \str_replace('tcp://', $ctx->isSecure() ? 'wss://' : 'ws://', $uri);
+        $handshake = new Handshake($uri);
+        $this->stream = yield ($this->connector ?? connector())->connect($handshake, $ctx->getCancellationToken());
         if (\strlen($header)) {
             yield $this->write($header);
         }

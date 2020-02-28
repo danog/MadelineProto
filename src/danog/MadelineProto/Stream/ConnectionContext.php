@@ -21,10 +21,11 @@ namespace danog\MadelineProto\Stream;
 
 use Amp\CancellationToken;
 use Amp\Socket\ConnectContext;
-use Amp\Uri\Uri;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
+use League\Uri\Http;
+use Psr\Http\Message\UriInterface;
 
 /**
  * Connection context class.
@@ -63,7 +64,7 @@ class ConnectionContext
     /**
      * The connection URI.
      *
-     * @var \Amp\Uri\Uri
+     * @var UriInterface
      */
     private $uri;
     /**
@@ -138,13 +139,13 @@ class ConnectionContext
     /**
      * Set the connection URI.
      *
-     * @param string|\Amp\Uri\Uri $uri
+     * @param string|UriInterface $uri
      *
      * @return self
      */
     public function setUri($uri): self
     {
-        $this->uri = $uri instanceof Uri ? $uri : new Uri($uri);
+        $this->uri = $uri instanceof UriInterface ? $uri : Http::createFromString($uri);
         return $this;
     }
     /**
@@ -159,9 +160,9 @@ class ConnectionContext
     /**
      * Get the URI.
      *
-     * @return \Amp\Uri\Uri
+     * @return UriInterface
      */
-    public function getUri(): Uri
+    public function getUri(): UriInterface
     {
         return $this->uri;
     }
@@ -463,7 +464,7 @@ class ConnectionContext
             }
             $string .= \preg_replace('/.*\\\\/', '', $stream[0]);
             if ($stream[1] && $stream[0] !== DefaultStream::getName()) {
-                $string .= ' (' . \json_encode($stream[1]) . ')';
+                $string .= ' ('.\json_encode($stream[1]).')';
             }
         }
         return $string;

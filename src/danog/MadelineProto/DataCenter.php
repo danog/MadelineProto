@@ -120,6 +120,11 @@ class DataCenter
      * @var DNSConnector
      */
     private $dnsConnector;
+    /**
+     * DoH connector.
+     */
+    private Rfc6455Connector $webSocketConnnector;
+
     public function __sleep()
     {
         return ['sockets', 'curdc', 'dclist', 'settings'];
@@ -228,6 +233,7 @@ class DataCenter
             $this->nonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($nonProxiedDoHConfig);
 
             $this->dnsConnector = new DnsConnector(new Rfc1035StubResolver());
+            $this->webSocketConnnector = new Rfc6455Connector($this->HTTPClient);
         }
     }
     public function dcConnect(string $dc_number, int $id = -1): \Generator
@@ -421,6 +427,9 @@ class DataCenter
                         continue;
                     }
                     $address = $this->dclist[$test][$ipv6][$dc_number]['ip_address'];
+                    if ($ipv6 === 'ipv6') {
+                        $address = "[$address]";
+                    }
                     $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
                     foreach (\array_unique([$port, 443, 80, 88, 5222]) as $port) {
                         $stream = \end($combo)[0];
@@ -459,7 +468,7 @@ class DataCenter
                                 $stream[1] = $useDoH ? new DoHConnector($this, $ctx) : $this->dnsConnector;
                             }
                             if (\in_array($stream[0], [WsStream::class, WssStream::class]) && $stream[1] === []) {
-                                $stream[1] = new Rfc6455Connector($this->HTTPClient);
+                                $stream[1] = $this->webSocketConnnector;
                             }
                             $ctx->addStream(...$stream);
                         }

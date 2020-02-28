@@ -29,9 +29,9 @@
         "amphp/byte-stream": "^1",
         "danog/dns-over-https": "^0.2",
         "amphp/http-client-cookies": "^1",
-        "amphp/uri": "^0.1",
         "danog/tg-file-decoder": "^0.1",
-        "danog/magicalserializer": "^1.0"
+        "danog/magicalserializer": "^1.0",
+        "league/uri": "^6"
     },
     "require-dev": {
         "vlucas/phpdotenv": "^3",

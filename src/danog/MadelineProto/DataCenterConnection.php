@@ -438,7 +438,7 @@ class DataCenterConnection implements JsonSerializable
      *
      * @return void
      */
-    public function disconnect()
+    public function disconnect(): void
     {
         $this->connectionsDeferred = new Deferred();
         $this->connectionsPromise = $this->connectionsDeferred->promise();

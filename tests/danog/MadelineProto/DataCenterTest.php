@@ -20,15 +20,14 @@ final class DataCenterTest extends TestCase
      * @param string  $protocol   Protocol name
      * @param boolean $test_mode  Test mode
      * @param boolean $ipv6       IPv6
-     * @param boolean $doh        DNS over HTTPS?
      *
      * @dataProvider protocolProvider
      *
      * @return void
      */
-    public function testCanUseProtocol(string $transport, bool $obfuscated, string $protocol, bool $test_mode, bool $ipv6, bool $doh): void
+    public function testCanUseProtocol(string $transport, bool $obfuscated, string $protocol, bool $test_mode, bool $ipv6): void
     {
-        $settings = MTProto::getSettings(
+        $settings = MTProto::parseSettings(
             [
                 'connection_settings' => [
                     'all' => [
@@ -36,7 +35,8 @@ final class DataCenterTest extends TestCase
                         'test_mode'  => $test_mode,
                         'protocol'   => $protocol,
                         'obfuscated' => $obfuscated,
-                        'transport'  => $transport
+                        'transport'  => $transport,
+                        'do_not_retry' => true
                     ],
                 ],
                 'logger' => [
@@ -73,45 +73,44 @@ final class DataCenterTest extends TestCase
         );
         $API->datacenter = $datacenter;
 
-        $API->getLogger()->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6 ' : 'IPv4 ').($doh ? "DNS over HTTPS" : "DNS"));
+        $API->getLogger()->logger("Testing protocol $protocol using transport $transport, ".($obfuscated ? 'obfuscated ' : 'not obfuscated ').($test_mode ? 'test DC ' : 'main DC ').($ipv6 ? 'IPv6 ' : 'IPv4 '));
 
         \sleep(1);
         try {
             Tools::wait($datacenter->dcConnect(2));
+        } catch (\Throwable $e) {
+            if (!$test_mode) {
+                throw $e;
+            }
         } finally {
-            Tools::wait($datacenter->getDataCenterConnection(2)->disconnect());
+            $datacenter->getDataCenterConnection(2)->disconnect();
         }
         $this->assertTrue(true);
     }
 
     public function protocolProvider(): \Generator
     {
-        return yield;
         $ipv6Pair = [false];
         if (@\file_get_contents('https://ipv6.google.com')) {
             $ipv6Pair []= true;
         }
         foreach ([false, true] as $test_mode) {
-            foreach ([false, true] as $doh) {
-                foreach ($ipv6Pair as $ipv6) {
-                    foreach (['tcp', 'ws', 'wss'] as $transport) {
-                        foreach ([true, false] as $obfuscated) {
-                            if ($transport !== 'tcp' && !$obfuscated) {
+            foreach ($ipv6Pair as $ipv6) {
+                foreach (['tcp', 'ws', 'wss'] as $transport) {
+                    foreach ([true, false] as $obfuscated) {
+                        if ($transport !== 'tcp' && !$obfuscated) {
+                            continue;
+                        }
+                        foreach (['abridged', 'intermediate', 'intermediate_padded', 'full'] as $protocol) {
+                            if ($protocol === 'full' && $obfuscated) {
                                 continue;
                             }
-                            foreach (['abridged', 'intermediate', 'intermediate_padded', 'full'] as $protocol) {
-                                if ($protocol === 'full' && $obfuscated) {
-                                    continue;
-                                }
-                                yield [$transport, $obfuscated, $protocol, $test_mode, $ipv6, $doh];
-                            }
+                            yield [$transport, $obfuscated, $protocol, $test_mode, $ipv6];
                         }
                     }
-                    yield ['tcp', false, 'http', $test_mode, $ipv6, true];
-                    yield ['tcp', false, 'https', $test_mode, $ipv6, true];
-                    yield ['tcp', false, 'http', $test_mode, $ipv6, false];
-                    yield ['tcp', false, 'https', $test_mode, $ipv6, false];
                 }
+                yield ['tcp', false, 'http', $test_mode, $ipv6];
+                yield ['tcp', false, 'https', $test_mode, $ipv6];
             }
         }
     }
