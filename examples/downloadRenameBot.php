@@ -42,7 +42,7 @@ if (\file_exists('vendor/autoload.php')) {
 /**
  * Event handler class.
  */
-class EventHandler extends \danog\MadelineProto\EventHandler
+class MyEventHandler extends \danog\MadelineProto\EventHandler
 {
     const START = "Send me a file URL and I will download it and send it to you!\n\n".
                 "Usage: `https://example.com`\n".
