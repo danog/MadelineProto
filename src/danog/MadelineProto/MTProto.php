@@ -827,6 +827,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->resetMTProtoSession(true, true);
         $this->config = ['expires' => -1];
         $this->dh_config = ['version' => 0];
+        $this->settings = $settings;
         yield from $this->__construct_async($settings);
         foreach ($this->secret_chats as $chat => $data) {
             try {
