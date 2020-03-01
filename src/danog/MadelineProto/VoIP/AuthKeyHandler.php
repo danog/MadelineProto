@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\VoIP;
 
+use danog\MadelineProto\Tools;
+
 /**
  * Manages the creation of the authorization key.
  *
@@ -29,44 +31,50 @@ trait AuthKeyHandler
 {
     private $calls = [];
     /**
-     * Request call (synchronous).
+     * Accept call from VoIP instance.
      *
-     * @param mixed $user User info
+     * @param \danog\MadelineProto\VoIP $instance Call instance
+     * @param array                     $user     User
      *
-     * @internal
-     *
-     * @return \danog\MadelineProto\VoIPController
+     * @return mixed
      */
-    public function requestCall($user)
+    public function acceptCallFrom($instance, $user)
     {
-        return \danog\MadelineProto\Tools::wait($this->requestCallAsync($user));
+        $promise = Tools::call((function () use ($instance, $user) {
+            if (!$res = yield from $this->acceptCall($user)) {
+                $instance->discard();
+                return false;
+            }
+            return $instance;
+        })());
+        if ($this->wrapper && $this->wrapper->isAsync()) {
+            return $promise;
+        }
+        return Tools::wait($promise);
     }
     /**
-     * Accept call (synchronous).
+     * Undocumented function.
      *
-     * @param array $user Accept call
+     * @param \danog\MadelineProto\VoIP $instance   Call instance
+     * @param array                     $call       Call info
+     * @param array                     $reason     Discard reason
+     * @param array                     $rating     Rating
+     * @param boolean                   $need_debug Needs debug?
      *
-     * @internal
-     *
-     * @return bool
+     * @return mixed
      */
-    public function acceptCall(array $user): bool
+    public function discardCallFrom($instance, $call, $reason, $rating = [], $need_debug = true)
     {
-        return \danog\MadelineProto\Tools::wait($this->acceptCallAsync($user));
-    }
-    /**
-     * Discard call (synchronous).
-     *
-     * @param array   $call       Call
-     * @param string  $reason     Discard reason
-     * @param array   $rating     Rating
-     * @param boolean $need_debug Need debug?
-     *
-     * @return array
-     */
-    public function discardCall(array $call, array $reason, array $rating = [], bool $need_debug = true): void
-    {
-        \danog\MadelineProto\Tools::wait($this->discardCallAsync($call, $reason, $rating, $need_debug));
+        $promise = Tools::call(function () use ($instance, $call, $reason, $rating, $need_debug) {
+            if (!$res = yield from $this->discardCall($call, $reason, $rating, $need_debug)) {
+                return false;
+            }
+            return $instance;
+        });
+        if ($this->wrapper && $this->wrapper->isAsync()) {
+            return $promise;
+        }
+        return Tools::wait($promise);
     }
     /**
      * Request VoIP call.
@@ -75,7 +83,7 @@ trait AuthKeyHandler
      *
      * @return void
      */
-    public function requestCallAsync($user): \Generator
+    public function requestCall($user): \Generator
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw \danog\MadelineProto\Exception::extension('libtgvoip');
@@ -107,7 +115,7 @@ trait AuthKeyHandler
      *
      * @return \Generator
      */
-    public function acceptCallAsync(array $call): \Generator
+    public function acceptCall(array $call): \Generator
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw new \danog\MadelineProto\Exception();
@@ -131,7 +139,7 @@ trait AuthKeyHandler
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['call_already_declined']);
-                yield from $this->discardCallAsync($call['id'], ['_' => 'phoneCallDiscardReasonHangup']);
+                yield from $this->discardCall($call['id'], ['_' => 'phoneCallDiscardReasonHangup']);
                 return false;
             }
             throw $e;
@@ -170,14 +178,14 @@ trait AuthKeyHandler
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['call_already_declined']);
-                yield from $this->discardCallAsync($call['id'], ['_' => 'phoneCallDiscardReasonHangup']);
+                yield from $this->discardCall($call['id'], ['_' => 'phoneCallDiscardReasonHangup']);
                 return false;
             }
             throw $e;
         }
         $visualization = [];
         $length = new \tgseclib\Math\BigInteger(\count(\danog\MadelineProto\Magic::$emojis));
-        foreach (\str_split(\hash('sha256', $key . \str_pad($this->calls[$params['id']]->storage['g_a'], 256, \chr(0), \STR_PAD_LEFT), true), 8) as $number) {
+        foreach (\str_split(\hash('sha256', $key.\str_pad($this->calls[$params['id']]->storage['g_a'], 256, \chr(0), \STR_PAD_LEFT), true), 8) as $number) {
             $number[0] = \chr(\ord($number[0]) & 0x7f);
             $visualization[] = \danog\MadelineProto\Magic::$emojis[(int) (new \tgseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
         }
@@ -217,7 +225,7 @@ trait AuthKeyHandler
         }
         $visualization = [];
         $length = new \tgseclib\Math\BigInteger(\count(\danog\MadelineProto\Magic::$emojis));
-        foreach (\str_split(\hash('sha256', $key . \str_pad($params['g_a_or_b']->toBytes(), 256, \chr(0), \STR_PAD_LEFT), true), 8) as $number) {
+        foreach (\str_split(\hash('sha256', $key.\str_pad($params['g_a_or_b']->toBytes(), 256, \chr(0), \STR_PAD_LEFT), true), 8) as $number) {
             $number[0] = \chr(\ord($number[0]) & 0x7f);
             $visualization[] = \danog\MadelineProto\Magic::$emojis[(int) (new \tgseclib\Math\BigInteger($number, 256))->divide($length)[1]->toString()];
         }
@@ -268,7 +276,7 @@ trait AuthKeyHandler
      *
      * @return \Generator
      */
-    public function discardCallAsync(array $call, array $reason, array $rating = [], bool $need_debug = true): \Generator
+    public function discardCall(array $call, array $reason, array $rating = [], bool $need_debug = true): \Generator
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw \danog\MadelineProto\Exception::extension('libtgvoip');
