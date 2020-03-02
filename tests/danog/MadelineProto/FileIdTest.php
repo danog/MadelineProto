@@ -42,7 +42,7 @@ class FileIdTest extends TestCase
     }
 
     /**
-     * Teardown
+     * Teardown.
      *
      * @return void
      */

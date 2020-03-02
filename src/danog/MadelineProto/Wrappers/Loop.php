@@ -16,11 +16,13 @@
  *
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
+
 namespace danog\MadelineProto\Wrappers;
 
 use Amp\Promise;
 use danog\MadelineProto\Shutdown;
 use danog\MadelineProto\Tools;
+
 /**
  * Manages logging in and out.
  */
@@ -40,7 +42,7 @@ trait Loop
      *
      * @return mixed
      */
-    public function loop($callback = null) : \Generator
+    public function loop($callback = null): \Generator
     {
         if (\is_callable($callback)) {
             $this->logger->logger('Running async callable');
@@ -114,7 +116,7 @@ trait Loop
             $this->logger->logger("Added unlock callback with id $id!");
             if ($needs_restart) {
                 $this->logger->logger("Adding restart callback!");
-                $id = Shutdown::addCallback(static function () use(&$logger) {
+                $id = Shutdown::addCallback(static function () use (&$logger) {
                     $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp') . '://' . $_SERVER['SERVER_NAME'];
                     $port = $_SERVER['SERVER_PORT'];
                     $uri = $_SERVER['REQUEST_URI'];
@@ -191,7 +193,7 @@ trait Loop
      *
      * @return Promise
      */
-    public function loopFork() : Promise
+    public function loopFork(): Promise
     {
         return Tools::callFork($this->loop());
     }

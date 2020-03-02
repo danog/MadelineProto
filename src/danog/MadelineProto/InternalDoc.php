@@ -5420,21 +5420,6 @@ class InternalDoc extends APIFactory
         \danog\MadelineProto\MTProto::setVar($obj, $var, $val);
     }
     /**
-     * Discard call.
-     *
-     * @param array   $call       Call
-     * @param string  $reason     Discard reason
-     * @param array   $rating     Rating
-     * @param boolean $need_debug Need debug?
-     *
-     * @return \Generator
-     */
-    public function discardCall(array $call, array $reason, array $rating = [
-    ], bool $need_debug = true, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug, $extra]);
-    }
-    /**
      * Request VoIP call.
      *
      * @param mixed $user User
@@ -5499,6 +5484,21 @@ class InternalDoc extends APIFactory
     public function getCall(int $call): array
     {
         return $this->API->getCall($call);
+    }
+    /**
+     * Discard call.
+     *
+     * @param array   $call       Call
+     * @param string  $reason     Discard reason
+     * @param array   $rating     Rating
+     * @param boolean $need_debug Need debug?
+     *
+     * @return \Generator
+     */
+    public function discardCall(array $call, array $reason, array $rating = [
+    ], bool $need_debug = true, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug, $extra]);
     }
     /**
      * Check state of calls.
@@ -5709,18 +5709,18 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function stop(): void
+    public function stop(array $extra = [])
     {
-        $this->API->stop();
+        return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Restart update loop.
      *
      * @return void
      */
-    public function restart(): void
+    public function restart(array $extra = [])
     {
-        $this->API->restart();
+        return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Start MadelineProto's update handling loop in background.
@@ -5738,9 +5738,9 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function closeConnection($message = 'OK!'): void
+    public function closeConnection($message = 'OK!', array $extra = [])
     {
-        $this->API->closeConnection($message);
+        return $this->__call(__FUNCTION__, [$message, $extra]);
     }
     /**
      * Set NOOP update handler, ignoring all updates.
