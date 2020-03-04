@@ -110,7 +110,7 @@ trait AuthKeyHandler
                  */
                 $pq = new \tgseclib\Math\BigInteger((string) $pq_bytes, 256);
                 $q = new \tgseclib\Math\BigInteger(0);
-                $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::auto_single($pq->__toString()));
+                $p = new \tgseclib\Math\BigInteger(@\danog\PrimeModule::auto_single($pq->__toString()));
                 if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                     $q = $pq->divide($p)[0];
                     if ($p->compare($q) > 0) {
@@ -119,7 +119,7 @@ trait AuthKeyHandler
                 }
                 if (!$pq->equals($p->multiply($q))) {
                     $this->logger->logger('Automatic factorization failed, trying native CPP module', \danog\MadelineProto\Logger::ERROR);
-                    $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::native_single_cpp($pq->__toString()));
+                    $p = new \tgseclib\Math\BigInteger(@\danog\PrimeModule::native_single_cpp($pq->__toString()));
                     if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                         $q = $pq->divide($p)[0];
                         if ($p->compare($q) > 0) {
@@ -128,7 +128,7 @@ trait AuthKeyHandler
                     }
                     if (!$pq->equals($p->multiply($q))) {
                         $this->logger->logger('Automatic factorization failed, trying alt py module', \danog\MadelineProto\Logger::ERROR);
-                        $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::python_single_alt($pq->__toString()));
+                        $p = new \tgseclib\Math\BigInteger(@\danog\PrimeModule::python_single_alt($pq->__toString()));
                         if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                             $q = $pq->divide($p)[0];
                             if ($p->compare($q) > 0) {
@@ -137,7 +137,7 @@ trait AuthKeyHandler
                         }
                         if (!$pq->equals($p->multiply($q))) {
                             $this->logger->logger('Automatic factorization failed, trying py module', \danog\MadelineProto\Logger::ERROR);
-                            $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::python_single($pq->__toString()));
+                            $p = new \tgseclib\Math\BigInteger(@\danog\PrimeModule::python_single($pq->__toString()));
                             if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                                 $q = $pq->divide($p)[0];
                                 if ($p->compare($q) > 0) {
@@ -146,7 +146,7 @@ trait AuthKeyHandler
                             }
                             if (!$pq->equals($p->multiply($q))) {
                                 $this->logger->logger('Automatic factorization failed, trying native module', \danog\MadelineProto\Logger::ERROR);
-                                $p = new \tgseclib\Math\BigInteger(\danog\PrimeModule::native_single($pq->__toString()));
+                                $p = new \tgseclib\Math\BigInteger(@\danog\PrimeModule::native_single($pq->__toString()));
                                 if (!$p->equals(\danog\MadelineProto\Magic::$zero)) {
                                     $q = $pq->divide($p)[0];
                                     if ($p->compare($q) > 0) {
