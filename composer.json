@@ -31,7 +31,9 @@
         "amphp/http-client-cookies": "^1",
         "danog/tg-file-decoder": "^0.1",
         "danog/magicalserializer": "^1.0",
-        "league/uri": "^6"
+        "league/uri": "^6",
+        "danog/ipc": "^0.1",
+        "tivie/htaccess-parser": "^0.2.3"
     },
     "require-dev": {
         "vlucas/phpdotenv": "^3",

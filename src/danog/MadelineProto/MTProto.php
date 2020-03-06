@@ -821,9 +821,6 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $connection['obfuscated'] = true;
             }
         }
-        if ($settings['app_info']['api_id'] === 6) {
-            unset($settings['app_info']);
-        }
         $this->resetMTProtoSession(true, true);
         $this->config = ['expires' => -1];
         $this->dh_config = ['version' => 0];
