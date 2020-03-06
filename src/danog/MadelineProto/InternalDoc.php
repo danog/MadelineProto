@@ -5544,34 +5544,6 @@ class InternalDoc extends APIFactory
         \danog\MadelineProto\MTProto::setVar($obj, $var, $val);
     }
     /**
-     * Accept call from VoIP instance.
-     *
-     * @param \danog\MadelineProto\VoIP $instance Call instance
-     * @param array                     $user     User
-     *
-     * @return mixed
-     */
-    public function acceptCallFrom($instance, $user, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$instance, $user, $extra]);
-    }
-    /**
-     * Undocumented function.
-     *
-     * @param \danog\MadelineProto\VoIP $instance   Call instance
-     * @param array                     $call       Call info
-     * @param array                     $reason     Discard reason
-     * @param array                     $rating     Rating
-     * @param boolean                   $need_debug Needs debug?
-     *
-     * @return mixed
-     */
-    public function discardCallFrom($instance, $call, $reason, $rating = [
-    ], $need_debug = true, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$instance, $call, $reason, $rating, $need_debug, $extra]);
-    }
-    /**
      * Request VoIP call.
      *
      * @param mixed $user User

@@ -36,6 +36,8 @@ trait AuthKeyHandler
      * @param \danog\MadelineProto\VoIP $instance Call instance
      * @param array                     $user     User
      *
+     * @internal
+     *
      * @return mixed
      */
     public function acceptCallFrom($instance, $user)
@@ -60,6 +62,8 @@ trait AuthKeyHandler
      * @param array                     $reason     Discard reason
      * @param array                     $rating     Rating
      * @param boolean                   $need_debug Needs debug?
+     *
+     * @internal
      *
      * @return mixed
      */

@@ -372,7 +372,7 @@ trait UpdateHandler
                     if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    return $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'], [], $update['phone_call']['need_debug']);
+                    return $this->calls[$update['phone_call']['id']]->discard($update['phone_call']['reason'] ?? [], [], $update['phone_call']['need_debug'] ?? false);
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
