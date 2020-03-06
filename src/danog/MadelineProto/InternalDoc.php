@@ -191,6 +191,44 @@ interface auth
      * @return bool
      */
     public function dropTempAuthKeys($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `int`    **api_id**     -
+     * * `string` **api_hash**   -
+     * * `[int]`  **except_ids** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return auth.LoginToken
+     */
+    public function exportLoginToken($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `bytes` **token** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return auth.LoginToken
+     */
+    public function importLoginToken($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `bytes` **token** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Authorization
+     */
+    public function acceptLoginToken($params);
 }
 
 interface account
@@ -858,9 +896,10 @@ interface account
      * Create a theme.
      *
      * Parameters:
-     * * `string`        **slug**     - Unique theme ID
-     * * `string`        **title**    - Theme name
-     * * `InputDocument` **document** - Theme file
+     * * `string`             **slug**     - Unique theme ID
+     * * `string`             **title**    - Theme name
+     * * `InputDocument`      **document** - Optional: Theme file
+     * * `InputThemeSettings` **settings** - Optional:
      *
      * @param array $params Parameters
      *
@@ -872,11 +911,12 @@ interface account
      * Update theme.
      *
      * Parameters:
-     * * `string`        **format**   - Theme format, a string that identifies the theming engines supported by the client
-     * * `InputTheme`    **theme**    - Theme to update
-     * * `string`        **slug**     - Optional: Unique theme ID
-     * * `string`        **title**    - Optional: Theme name
-     * * `InputDocument` **document** - Optional: Theme file
+     * * `string`             **format**   - Theme format, a string that identifies the theming engines supported by the client
+     * * `InputTheme`         **theme**    - Theme to update
+     * * `string`             **slug**     - Optional: Unique theme ID
+     * * `string`             **title**    - Optional: Theme name
+     * * `InputDocument`      **document** - Optional: Theme file
+     * * `InputThemeSettings` **settings** - Optional:
      *
      * @param array $params Parameters
      *
@@ -937,6 +977,37 @@ interface account
      * @return account.Themes
      */
     public function getThemes($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean` **sensitive_enabled** - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function setContentSettings($params);
+
+    /**
+     *
+     *
+     * @return account.ContentSettings
+     */
+    public function getContentSettings();
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `[InputWallPaper]` **wallpapers** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return  of WallPaper[]
+     */
+    public function getMultiWallPapers($params);
 }
 
 interface users
@@ -1205,7 +1276,9 @@ interface contacts
      * Get contacts near you.
      *
      * Parameters:
-     * * `InputGeoPoint` **geo_point** - Geolocation
+     * * `boolean`       **background**   - Optional:
+     * * `InputGeoPoint` **geo_point**    - Geolocation
+     * * `int`           **self_expires** - Optional:
      *
      * @param array $params Parameters
      *
@@ -2802,6 +2875,37 @@ interface messages
      * @return Updates
      */
     public function deleteScheduledMessages($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**   -
+     * * `int`       **id**     -
+     * * `bytes`     **option** - Optional:
+     * * `string`    **offset** - Optional:
+     * * `int`       **limit**  -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.VotesList
+     */
+    public function getPollVotes($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`           **uninstall**   - Optional:
+     * * `boolean`           **archive**     - Optional:
+     * * `boolean`           **unarchive**   - Optional:
+     * * `[InputStickerSet]` **stickersets** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function toggleStickerSets($params);
 }
 
 interface updates
@@ -2919,10 +3023,11 @@ interface upload
      * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
      *
      * Parameters:
-     * * `boolean`           **precise**  - Optional: You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `InputFileLocation` **location** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`               **offset**   - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`               **limit**    - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `boolean`           **precise**       - Optional: You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `boolean`           **cdn_supported** - Optional:
+     * * `InputFileLocation` **location**      - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`               **offset**        - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `int`               **limit**         - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
      *
      * @param array $params Parameters
      *
@@ -3652,6 +3757,13 @@ interface channels
      * @return Updates
      */
     public function toggleSlowMode($params);
+
+    /**
+     *
+     *
+     * @return messages.InactiveChats
+     */
+    public function getInactiveChannels();
 }
 
 interface bots
@@ -3757,6 +3869,18 @@ interface payments
      * @return bool
      */
     public function clearSavedInfo($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string` **number** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return payments.BankCardData
+     */
+    public function getBankCardData($params);
 }
 
 interface stickers
@@ -5420,19 +5544,32 @@ class InternalDoc extends APIFactory
         \danog\MadelineProto\MTProto::setVar($obj, $var, $val);
     }
     /**
-     * Discard call.
+     * Accept call from VoIP instance.
      *
-     * @param array   $call       Call
-     * @param string  $reason     Discard reason
-     * @param array   $rating     Rating
-     * @param boolean $need_debug Need debug?
+     * @param \danog\MadelineProto\VoIP $instance Call instance
+     * @param array                     $user     User
      *
-     * @return \Generator
+     * @return mixed
      */
-    public function discardCall(array $call, array $reason, array $rating = [
-    ], bool $need_debug = true, array $extra = [])
+    public function acceptCallFrom($instance, $user, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug, $extra]);
+        return $this->__call(__FUNCTION__, [$instance, $user, $extra]);
+    }
+    /**
+     * Undocumented function.
+     *
+     * @param \danog\MadelineProto\VoIP $instance   Call instance
+     * @param array                     $call       Call info
+     * @param array                     $reason     Discard reason
+     * @param array                     $rating     Rating
+     * @param boolean                   $need_debug Needs debug?
+     *
+     * @return mixed
+     */
+    public function discardCallFrom($instance, $call, $reason, $rating = [
+    ], $need_debug = true, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$instance, $call, $reason, $rating, $need_debug, $extra]);
     }
     /**
      * Request VoIP call.
@@ -5499,6 +5636,21 @@ class InternalDoc extends APIFactory
     public function getCall(int $call): array
     {
         return $this->API->getCall($call);
+    }
+    /**
+     * Discard call.
+     *
+     * @param array   $call       Call
+     * @param string  $reason     Discard reason
+     * @param array   $rating     Rating
+     * @param boolean $need_debug Need debug?
+     *
+     * @return \Generator
+     */
+    public function discardCall(array $call, array $reason, array $rating = [
+    ], bool $need_debug = true, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug, $extra]);
     }
     /**
      * Check state of calls.
@@ -5709,18 +5861,18 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function stop(): void
+    public function stop(array $extra = [])
     {
-        $this->API->stop();
+        return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Restart update loop.
      *
      * @return void
      */
-    public function restart(): void
+    public function restart(array $extra = [])
     {
-        $this->API->restart();
+        return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Start MadelineProto's update handling loop in background.
@@ -5738,9 +5890,9 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function closeConnection($message = 'OK!'): void
+    public function closeConnection($message = 'OK!', array $extra = [])
     {
-        $this->API->closeConnection($message);
+        return $this->__call(__FUNCTION__, [$message, $extra]);
     }
     /**
      * Set NOOP update handler, ignoring all updates.

@@ -38,6 +38,30 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
 '.\str_replace('<img', '<amp-img', \file_get_contents('README.md')));
 
+$layer_list = '';
+$tempRes = \glob("$d/src/danog/MadelineProto/TL_telegram_*");
+$res = [];
+foreach ($tempRes as $file) {
+    $layer = \preg_replace(['/.*telegram_v/', '/\..+/'], '', $file);
+    $res[$layer] = $file;
+}
+\ksort($res);
+
+foreach (\array_slice($res, 0, -1) as $layer => $file) {
+    $layer = "v$layer";
+    $docs[] = [
+        'tl_schema'   => ['telegram' => $file],
+        'title'       => 'MadelineProto API documentation (layer '.$layer.')',
+        'description' => 'MadelineProto API documentation (layer '.$layer.')',
+        'output_dir'  => "$d/docs/old_docs/API_docs_".$layer,
+        'readme'      => true,
+    ];
+    $layer_list .= '[Layer '.$layer.'](API_docs_'.$layer.'/)  
+';
+}
+$layer = \array_keys($res);
+$layer = \end($layer);
+
 $docs = [
 /*    [
         'tl_schema'   => ['td' => "$d/src/danog/MadelineProto/TL_td.tl"],
@@ -55,27 +79,17 @@ $docs = [
         'readme'      => false,
     ],
     [
-        'tl_schema'   => ['telegram' => "$d/src/danog/MadelineProto/TL_telegram_v105.tl", 'calls' => "$d/src/danog/MadelineProto/TL_calls.tl", 'secret' => "$d/src/danog/MadelineProto/TL_secret.tl", 'td' => "$d/src/danog/MadelineProto/TL_td.tl"],
-        'title'       => 'MadelineProto API documentation (layer 105)',
-        'description' => 'MadelineProto API documentation (layer 105)',
+        'tl_schema'   => ['telegram' => "$d/src/danog/MadelineProto/TL_telegram_v$layer.tl", 'calls' => "$d/src/danog/MadelineProto/TL_calls.tl", 'secret' => "$d/src/danog/MadelineProto/TL_secret.tl", 'td' => "$d/src/danog/MadelineProto/TL_td.tl"],
+        'title'       => "MadelineProto API documentation (layer $layer)",
+        'description' => "MadelineProto API documentation (layer $layer)",
         'output_dir'  => "$d/docs/docs/API_docs",
         'readme'      => false,
     ],
 ];
 
-$layer_list = '';
-foreach (\array_slice(\glob("$d/src/danog/MadelineProto/TL_telegram_*"), 0, -1) as $file) {
-    $layer = \preg_replace(['/.*telegram_/', '/\..+/'], '', $file);
-    $docs[] = [
-        'tl_schema'   => ['telegram' => $file],
-        'title'       => 'MadelineProto API documentation (layer '.$layer.')',
-        'description' => 'MadelineProto API documentation (layer '.$layer.')',
-        'output_dir'  => "$d/docs/old_docs/API_docs_".$layer,
-        'readme'      => true,
-    ];
-    $layer_list = '[Layer '.$layer.'](API_docs_'.$layer.'/)  
-';
-}
+$doc = \file_get_contents('docs/docs/docs/USING_METHODS.md');
+$doc = \preg_replace('|here \(layer \d+\)|', "here (layer $layer)", $doc);
+\file_put_contents('docs/docs/docs/USING_METHODS.md', $doc);
 
 \file_put_contents('docs/old_docs/README.md', '---
 title: Documentations of old mtproto layers

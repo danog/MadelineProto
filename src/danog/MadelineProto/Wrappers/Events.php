@@ -85,7 +85,7 @@ trait Events
         $this->settings['updates']['callback'] = [$this, 'eventUpdateHandler'];
         $this->settings['updates']['handle_updates'] = true;
         $this->settings['updates']['run_callback'] = true;
-        if (method_exists($this->event_handler_instance, 'onStart')) {
+        if (\method_exists($this->event_handler_instance, 'onStart')) {
             Tools::callFork($this->event_handler_instance->onStart());
         }
         if ($this->inited()) {

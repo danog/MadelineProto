@@ -177,6 +177,7 @@ You can find examples for nearly every MadelineProto function in
         * [SignalLoop](https://docs.madelineproto.xyz/docs/ASYNC.html#signalloop)
         * [ResumableSignalLoop](https://docs.madelineproto.xyz/docs/ASYNC.html#resumablesignalloop)
         * [GenericLoop](https://docs.madelineproto.xyz/docs/ASYNC.html#genericloop)
+        * [PeriodicLoop](https://docs.madelineproto.xyz/docs/ASYNC.html#periodicloop)
 * [Using methods](https://docs.madelineproto.xyz/docs/USING_METHODS.html)
   * [FULL API Documentation with descriptions](https://docs.madelineproto.xyz/API_docs/methods/)
     * [Logout](https://docs.madelineproto.xyz/logout.html)

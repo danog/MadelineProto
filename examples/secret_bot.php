@@ -142,4 +142,4 @@ $settings = \json_decode(\getenv('MTPROTO_SETTINGS'), true) ?: [];
 $MadelineProto = new \danog\MadelineProto\API('s.madeline', $settings);
 
 // Reduce boilerplate with new wrapper method
-$MadelineProto->startAndLoop(MyEventHandler::class);
+$MadelineProto->startAndLoop(SecretHandler::class);
