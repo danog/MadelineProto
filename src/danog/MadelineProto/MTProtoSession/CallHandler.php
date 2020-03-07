@@ -101,7 +101,7 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return Generator
+     * @return \Generator
      */
     public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {

@@ -28,6 +28,12 @@ use function Amp\File\get;
 class Serialization
 {
     /**
+     * List of session paths.
+     *
+     * @var array
+     */
+    private $paths = [];
+    /**
      * Extract path components for serialization.
      *
      * @param string $file Session path
@@ -60,7 +66,7 @@ class Serialization
             } finally {
                 $unlock();
             }
-            \danog\MadelineProto\Magic::classExists();
+            Magic::classExists();
             try {
                 $unserialized = \unserialize($tounserialize);
             } catch (\danog\MadelineProto\Bug74586Exception $e) {

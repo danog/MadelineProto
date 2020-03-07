@@ -17,11 +17,68 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
+namespace danog\MadelineProto\MTProtoSession;
+
 use danog\MadelineProto\MTProtoSession\MsgIdHandler\MsgIdHandler32;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler\MsgIdHandler64;
 
-if (PHP_INT_SIZE === 8) {
-    \class_alias(MsgIdHandler64::class, \danog\MadelineProto\MTProtoSession\MsgIdHandler::class);
-} else {
-    \class_alias(MsgIdHandler32::class, \danog\MadelineProto\MTProtoSession\MsgIdHandler::class);
+/**
+ * Manages message ids.
+ */
+abstract class MsgIdHandler
+{
+    /**
+     * Session instance.
+     *
+     * @var Session
+     */
+    protected $session;
+    /**
+     * Constructor.
+     *
+     * @param Session $session Session
+     */
+    private function __construct(Session $session)
+    {
+        $this->session = $session;
+    }
+
+    /**
+     * Create MsgIdHandler instance.
+     *
+     * @param Session $session Session
+     *
+     * @return self
+     */
+    public static function createInstance(Session $session): self
+    {
+        if (PHP_INT_SIZE === 8) {
+            return new MsgIdHandler64($session);
+        }
+        return new MsgIdHandler32($session);
+    }
+
+    /**
+     * Check validity of given message ID.
+     *
+     * @param string $newMessageId New message ID
+     * @param array  $aargs        Params
+     *
+     * @return void
+     */
+    abstract public function checkMessageId($newMessageId, array $aargs): void;
+    /**
+     * Generate outgoing message ID.
+     *
+     * @return string
+     */
+    abstract public function generateMessageId(): string;
+    /**
+     * Get maximum message ID.
+     *
+     * @param boolean $incoming Incoming or outgoing message ID
+     *
+     * @return mixed
+     */
+    abstract public function getMaxId(bool $incoming);
 }

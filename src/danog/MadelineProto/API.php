@@ -140,7 +140,6 @@ class API extends InternalDoc
             if (isset($this->API)) {
                 $this->storage = $this->API->storage ?? $this->storage;
 
-                $unserialized->oldInstance = true;
                 unset($unserialized);
 
                 yield from $this->API->initAsynchronously();
@@ -165,6 +164,15 @@ class API extends InternalDoc
         $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 
+    /**
+     * Wakeup function.
+     *
+     * @return void
+     */
+    public function __wakeup(): void
+    {
+        $this->oldInstance = true;
+    }
     /**
      * Destruct function.
      *
@@ -248,7 +256,7 @@ class API extends InternalDoc
                 $promises = [];
                 foreach ($instances as $k => $instance) {
                     $instance->start(['async' => false]);
-                    $promises []= Tools::call($instance->startAndLoopAsync($eventHandler[$k]));
+                    $promises []= $instance->startAndLoopAsync($eventHandler[$k]);
                 }
                 Tools::wait(Tools::all($promises));
                 return;

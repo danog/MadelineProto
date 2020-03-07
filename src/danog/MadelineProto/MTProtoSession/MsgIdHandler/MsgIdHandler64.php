@@ -19,13 +19,13 @@
 
 namespace danog\MadelineProto\MTProtoSession\MsgIdHandler;
 
-use danog\MadelineProto\MTProtoSession\MsgIdHandlerAbstract;
+use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 use danog\MadelineProto\Tools;
 
 /**
  * Manages message ids.
  */
-class MsgIdHandler64 extends MsgIdHandlerAbstract
+class MsgIdHandler64 extends MsgIdHandler
 {
     /**
      * Maximum incoming ID.

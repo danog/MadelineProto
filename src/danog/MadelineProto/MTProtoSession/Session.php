@@ -53,7 +53,7 @@ abstract class Session
         $this->session_id = \danog\MadelineProto\Tools::random(8);
         $this->session_in_seq_no = 0;
         $this->session_out_seq_no = 0;
-        $this->msgIdHandler = new MsgIdHandler($this);
+        $this->msgIdHandler = MsgIdHandler::createInstance($this);
     }
     /**
      * Create MTProto session if needed.

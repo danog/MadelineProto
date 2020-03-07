@@ -48,7 +48,8 @@
         "amphp/websocket": "dev-master as 1",
         "ext-ctype": "*",
         "danog/7to70": "^1",
-        "danog/7to5": "^1"
+        "danog/7to5": "^1",
+        "vimeo/psalm": "dev-master"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)"
@@ -64,7 +65,6 @@
         "files": [
             "src/BigIntegor.php",
             "src/YieldReturnValue.php",
-            "src/ReflectionGenerator.php",
             "src/polyfill.php"
         ]
     },
