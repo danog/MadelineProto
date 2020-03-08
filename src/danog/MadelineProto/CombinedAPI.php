@@ -102,9 +102,6 @@ class CombinedAPI
     }
     public function __destruct()
     {
-        if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread()) || Magic::isFork()) {
-            return;
-        }
         $this->serialize();
     }
     public function serialize($filename = '')

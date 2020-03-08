@@ -41,5 +41,5 @@ interface ResumableLoopInterface extends LoopInterface
      *
      * @return void
      */
-    public function resume();
+    public function resume(): void;
 }

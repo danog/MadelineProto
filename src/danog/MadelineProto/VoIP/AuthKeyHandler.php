@@ -177,12 +177,12 @@ trait AuthKeyHandler
             $res = (yield from $this->methodCallAsyncRead('phone.confirmCall', ['key_fingerprint' => \substr(\sha1($key, true), -8), 'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'], 'g_a' => $this->calls[$params['id']]->storage['g_a'], 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => \danog\MadelineProto\VoIP::getConnectionMaxLayer()]], ['datacenter' => $this->datacenter->curdc]))['phone_call'];
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
-                $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_already_accepted'], $call['id']));
+                $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_already_accepted'], $params['id']));
                 return true;
             }
             if ($e->rpc === 'CALL_ALREADY_DECLINED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['call_already_declined']);
-                yield from $this->discardCall($call['id'], ['_' => 'phoneCallDiscardReasonHangup']);
+                yield from $this->discardCall($params['id'], ['_' => 'phoneCallDiscardReasonHangup']);
                 return false;
             }
             throw $e;

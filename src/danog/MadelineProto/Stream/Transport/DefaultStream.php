@@ -23,6 +23,7 @@ use Amp\ByteStream\ClosedException;
 use Amp\CancellationToken;
 use Amp\Promise;
 use Amp\Socket\ClientTlsContext;
+use Amp\Socket\Connector;
 use Amp\Socket\EncryptableSocket;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Stream\Async\RawStream;

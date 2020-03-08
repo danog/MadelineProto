@@ -900,7 +900,7 @@ trait Files
                     \header("$key: $subValue", false);
                 }
             } else {
-                \header("$key: $subValue");
+                \header("$key: $value");
             }
         }
         \http_response_code($result['code']);

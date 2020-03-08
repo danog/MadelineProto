@@ -21,7 +21,7 @@ namespace danog\MadelineProto;
 
 use Amp\Dns\Resolver;
 use Amp\File\StatCache;
-use Amp\Http\Client\DelegateHttpClient;
+use Amp\Http\Client\HttpClient;
 use Amp\Loop;
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Loop\Generic\PeriodicLoop;
@@ -346,31 +346,31 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * TOS check loop.
      *
-     * @var \danog\MadelineProto\Loop\Update\PeriodicLoop
+     * @var PeriodicLoop
      */
     public $checkTosLoop;
     /**
      * Phone config loop.
      *
-     * @var \danog\MadelineProto\Loop\Update\PeriodicLoop
+     * @var PeriodicLoop
      */
     public $phoneConfigLoop;
     /**
      * Config loop.
      *
-     * @var \danog\MadelineProto\Loop\Update\PeriodicLoop
+     * @var PeriodicLoop
      */
     public $configLoop;
     /**
      * Call checker loop.
      *
-     * @var \danog\MadelineProto\Loop\Update\PeriodicLoop
+     * @var PeriodicLoop
      */
     private $callCheckerLoop;
     /**
      * Autoserialization loop.
      *
-     * @var \danog\MadelineProto\Loop\Update\PeriodicLoop
+     * @var PeriodicLoop
      */
     private $serializeLoop;
     /**
@@ -610,9 +610,9 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Get async HTTP client.
      *
-     * @return \Amp\Http\Client\DelegateHttpClient
+     * @return \Amp\Http\Client\HttpClient
      */
-    public function getHTTPClient(): DelegateHttpClient
+    public function getHTTPClient(): HttpClient
     {
         return $this->datacenter->getHTTPClient();
     }

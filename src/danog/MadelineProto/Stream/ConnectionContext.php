@@ -100,7 +100,7 @@ class ConnectionContext
     /**
      * An array of arrays containing an array with the stream name and the extra parameter to pass to it.
      *
-     * @var array<array<string, any>>
+     * @var array<array<string, mixed>>
      */
     private $nextStreams = [];
     /**
@@ -344,7 +344,7 @@ class ConnectionContext
      * Add a stream to the stream chain.
      *
      * @param string $streamName
-     * @param any    $extra
+     * @param mixed    $extra
      *
      * @return self
      */
@@ -357,11 +357,11 @@ class ConnectionContext
     /**
      * Set read callback, called every time the socket reads at least a byte.
      *
-     * @param callback $callable Read callback
+     * @param callable $callable Read callback
      *
      * @return void
      */
-    public function setReadCallback($callable)
+    public function setReadCallback(callable $callable)
     {
         $this->readCallback = $callable;
     }
@@ -379,7 +379,7 @@ class ConnectionContext
      *
      * @return callable
      */
-    public function getReadCallback()
+    public function getReadCallback(): callable
     {
         return $this->readCallback;
     }

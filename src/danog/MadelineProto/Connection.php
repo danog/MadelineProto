@@ -30,6 +30,7 @@ use danog\MadelineProto\MTProtoSession\Session;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
 
@@ -77,7 +78,7 @@ class Connection extends Session
     /**
      * The actual socket.
      *
-     * @var Stream
+     * @var StreamInterface
      */
     public $stream;
     /**

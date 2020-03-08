@@ -82,7 +82,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async close.
      *
-     * @return Generator
+     * @return \Generator
      */
     public function disconnect()
     {

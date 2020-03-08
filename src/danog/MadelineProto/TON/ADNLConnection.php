@@ -28,6 +28,7 @@ use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\CtrStream;
 use danog\MadelineProto\Stream\Common\HashedBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;

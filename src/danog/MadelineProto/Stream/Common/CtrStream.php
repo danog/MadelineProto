@@ -81,7 +81,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      *
-     * @return Generator
+     * @return \Generator
      */
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
@@ -97,7 +97,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Generator
+     * @return \Generator
      */
     public function getReadBufferGenerator(&$length): \Generator
     {
@@ -111,7 +111,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @throws PendingReadError Thrown if another read operation is still pending.
      *
-     * @return Generator That resolves with a string when the provided promise is resolved and the data is decrypted
+     * @return \Generator That resolves with a string when the provided promise is resolved and the data is decrypted
      */
     public function bufferReadGenerator(int $length): \Generator
     {

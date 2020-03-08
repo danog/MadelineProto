@@ -21,8 +21,10 @@ namespace danog\MadelineProto\Stream\Transport;
 
 use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
+use Amp\Websocket\Client\Connection;
 use Amp\Websocket\Client\Connector;
 use Amp\Websocket\Client\Handshake;
+use Amp\Websocket\Message;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ProxyStreamInterface;

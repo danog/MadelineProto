@@ -85,7 +85,7 @@ trait BotAPIFiles
 
         $this->logger("Got file ID with version {$fileId->getVersion()}.{$fileId->getSubVersion()}");
         if (!\in_array($fileId->getVersion(), [2, 4])) {
-            throw new Exception("Invalid bot API file ID version {$version}");
+            throw new Exception("Invalid bot API file ID version {$fileId->getVersion()}");
         }
 
         $photoSize = $fileId->hasPhotoSizeSource() ? $fileId->getPhotoSizeSource() : null;

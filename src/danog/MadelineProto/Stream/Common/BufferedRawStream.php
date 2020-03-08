@@ -84,7 +84,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     /**
      * Async close.
      *
-     * @return Generator
+     * @return \Generator
      */
     public function disconnect()
     {

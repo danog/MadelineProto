@@ -80,7 +80,7 @@ class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Generator
+     * @return \Generator
      */
     public function getReadBufferGenerator(&$length): \Generator
     {

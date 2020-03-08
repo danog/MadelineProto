@@ -39,9 +39,9 @@ interface SignalLoopInterface extends LoopInterface
     /**
      * Send a signal to the the loop.
      *
-     * @param Exception|any $data Signal to send
+     * @param \Throwable|any $data Signal to send
      *
      * @return void
      */
-    public function signal($data);
+    public function signal($data): void;
 }

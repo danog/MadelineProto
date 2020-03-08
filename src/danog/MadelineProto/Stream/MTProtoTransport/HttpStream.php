@@ -85,7 +85,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      *
-     * @return Generator
+     * @return \Generator
      */
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
@@ -99,7 +99,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Generator
+     * @return \Generator
      */
     public function getReadBufferGenerator(&$length): \Generator
     {

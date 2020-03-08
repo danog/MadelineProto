@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\Async;
 
+use Amp\Promise;
 use danog\MadelineProto\Tools;
 
 /**

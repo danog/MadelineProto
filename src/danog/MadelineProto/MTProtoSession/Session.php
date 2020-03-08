@@ -40,7 +40,7 @@ abstract class Session
     /**
      * Message ID handler.
      *
-     * @var MsgIdHandlerAbstract
+     * @var MsgIdHandler
      */
     public $msgIdHandler;
     /**

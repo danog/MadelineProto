@@ -142,7 +142,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @throws PendingReadError Thrown if another read operation is still pending.
      *
-     * @return Generator That resolves with a string when the provided promise is resolved and the data is added to the hashing context
+     * @return \Generator That resolves with a string when the provided promise is resolved and the data is added to the hashing context
      */
     public function bufferReadGenerator(int $length): \Generator
     {
@@ -213,7 +213,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Generator
+     * @return \Generator
      */
     public function getReadBufferGenerator(&$length): \Generator
     {
@@ -228,7 +228,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param int $length Length of data that is going to be written to the write buffer
      *
-     * @return Generator
+     * @return \Generator
      */
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {

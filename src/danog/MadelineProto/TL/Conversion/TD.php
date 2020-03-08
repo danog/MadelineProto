@@ -58,7 +58,7 @@ trait TD
      */
     public function tdToMTProto(array $params): \Generator
     {
-        $newparams = ['_' => self::REVERSE[$params['_']]];
+        $newparams = ['_' => self::TD_REVERSE[$params['_']]];
         foreach (self::TD_PARAMS_CONVERSION[$newparams['_']] as $td => $mtproto) {
             if (\is_array($mtproto)) {
                 switch (\end($mtproto)) {

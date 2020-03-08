@@ -141,7 +141,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      *
-     * @return Generator
+     * @return \Generator
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
@@ -152,7 +152,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Generator
+     * @return \Generator
      */
     public function getReadBuffer(&$length): Promise
     {

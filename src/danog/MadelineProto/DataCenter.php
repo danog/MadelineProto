@@ -29,7 +29,8 @@ use Amp\Http\Client\Connection\UnlimitedConnectionPool;
 use Amp\Http\Client\Cookie\CookieInterceptor;
 use Amp\Http\Client\Cookie\CookieJar;
 use Amp\Http\Client\Cookie\InMemoryCookieJar;
-use Amp\Http\Client\DelegateHttpClient;
+use Amp\Http\Client\HttpClient;
+use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\Socket\ConnectContext;
@@ -94,7 +95,7 @@ class DataCenter
     /**
      * HTTP client.
      *
-     * @var \Amp\Http\Client\DelegateHttpClient
+     * @var \Amp\Http\Client\HttpClient
      */
     private $HTTPClient;
     /**
@@ -506,9 +507,9 @@ class DataCenter
     /**
      * Get async HTTP client.
      *
-     * @return \Amp\Http\Client\DelegateHttpClient
+     * @return \Amp\Http\Client\HttpClient
      */
-    public function getHTTPClient(): DelegateHttpClient
+    public function getHTTPClient(): HttpClient
     {
         return $this->HTTPClient;
     }

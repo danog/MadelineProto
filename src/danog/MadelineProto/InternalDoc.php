@@ -4210,9 +4210,9 @@ class InternalDoc extends APIFactory
     /**
      * Get async HTTP client.
      *
-     * @return \Amp\Http\Client\DelegateHttpClient
+     * @return \Amp\Http\Client\HttpClient
      */
-    public function getHTTPClient(): \Amp\Http\Client\DelegateHttpClient
+    public function getHTTPClient(): \Amp\Http\Client\HttpClient
     {
         return $this->API->getHTTPClient();
     }
