@@ -58,7 +58,7 @@ abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopIn
         }
         return $this->resume->promise();
     }
-    public function resume($watcherId = null, $expected = 0): void
+    public function resume($watcherId = null, $expected = 0)
     {
         if ($this->resumeWatcher) {
             $storedWatcherId = $this->resumeWatcher;

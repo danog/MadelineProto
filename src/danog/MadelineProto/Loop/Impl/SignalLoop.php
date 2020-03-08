@@ -32,7 +32,7 @@ use danog\MadelineProto\Loop\SignalLoopInterface;
 abstract class SignalLoop extends Loop implements SignalLoopInterface
 {
     private $signalDeferred;
-    public function signal($what)
+    public function signal($what): void
     {
         if ($this->signalDeferred) {
             $deferred = $this->signalDeferred;

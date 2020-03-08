@@ -39,7 +39,7 @@ interface ResumableLoopInterface extends LoopInterface
     /**
      * Resume the loop.
      *
-     * @return void
+     * @return ?Promise
      */
-    public function resume(): void;
+    public function resume();
 }
