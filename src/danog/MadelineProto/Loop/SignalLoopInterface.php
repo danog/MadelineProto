@@ -39,7 +39,7 @@ interface SignalLoopInterface extends LoopInterface
     /**
      * Send a signal to the the loop.
      *
-     * @param \Throwable|any $data Signal to send
+     * @param \Throwable|mixed $data Signal to send
      *
      * @return void
      */
