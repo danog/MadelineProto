@@ -105,7 +105,7 @@ trait CallHandler
      */
     public function methodCallAsyncWrite(string $method, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
-        if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID' && $this->datacenter !== $args['id']['dc_id']) {
+        if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && $args['id']['_'] === 'inputBotInlineMessageID' && $this->datacenter != $args['id']['dc_id']) {
             $aargs['datacenter'] = $args['id']['dc_id'];
             return yield from $this->API->methodCallAsyncWrite($method, $args, $aargs);
         }
