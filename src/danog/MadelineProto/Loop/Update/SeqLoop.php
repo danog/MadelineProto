@@ -71,7 +71,7 @@ class SeqLoop extends ResumableSignalLoop
                 \reset($this->pendingWakeups);
                 $channelId = \key($this->pendingWakeups);
                 unset($this->pendingWakeups[$channelId]);
-                $this->API->feeders[$channelId]->resume();
+                if (isset($this->API->feeders[$channelId])) $this->API->feeders[$channelId]->resume();
             }
         }
     }
