@@ -858,7 +858,7 @@ trait Files
                 if (isset($messageMedia['document']['size'])) {
                     $res['size'] = $messageMedia['document']['size'];
                 }
-                $res['name'] .= '_'.$messageMedia['document']['id'];
+                $res['name'] .= '_'.Tools::unpackSignedLongString($messageMedia['document']['id']);
                 $res['mime'] = $messageMedia['document']['mime_type'];
                 return $res;
             default:
