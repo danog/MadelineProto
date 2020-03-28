@@ -187,6 +187,7 @@ trait AuthKeyHandler
             }
             throw $e;
         }
+        $this->calls[$params['id']]->setCall($res);
         $visualization = [];
         $length = new \tgseclib\Math\BigInteger(\count(\danog\MadelineProto\Magic::$emojis));
         foreach (\str_split(\hash('sha256', $key.\str_pad($this->calls[$params['id']]->storage['g_a'], 256, \chr(0), \STR_PAD_LEFT), true), 8) as $number) {
