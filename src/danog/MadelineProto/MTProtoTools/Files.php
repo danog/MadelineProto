@@ -536,6 +536,9 @@ trait Files
                     $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
                 }
                 break;
+            case 'messageMediaDice':
+                $res['InputMedia'] = ['_' => 'inputMediaDice'];
+                break;
             case 'poll':
                 $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
                 break;
