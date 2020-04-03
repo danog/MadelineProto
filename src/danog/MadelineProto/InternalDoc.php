@@ -2906,6 +2906,45 @@ interface messages
      * @return bool
      */
     public function toggleStickerSets($params);
+
+    /**
+     *
+     *
+     * @return  of DialogFilter[]
+     */
+    public function getDialogFilters();
+
+    /**
+     *
+     *
+     * @return  of DialogFilterSuggested[]
+     */
+    public function getSuggestedDialogFilters();
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `int`          **id**     -
+     * * `DialogFilter` **filter** - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function updateDialogFilter($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `[int]` **order** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function updateDialogFiltersOrder($params);
 }
 
 interface updates
@@ -4144,6 +4183,35 @@ interface folders
      * @return Updates
      */
     public function deleteFolder($params);
+}
+
+interface stats
+{
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`      **dark**    - Optional:
+     * * `InputChannel` **channel** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return stats.BroadcastStats
+     */
+    public function getBroadcastStats($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string` **token** -
+     * * `long`   **x**     - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return StatsGraph
+     */
+    public function loadAsyncGraph($params);
 }
 
 class InternalDoc extends APIFactory
