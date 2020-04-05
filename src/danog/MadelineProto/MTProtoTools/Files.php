@@ -1247,6 +1247,7 @@ trait Files
         $cdn = false;
         $params[0]['previous_promise'] = new Success(true);
         $start = \microtime(true);
+        $old_dc = null;
         $size = yield from $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = \array_shift($params), $callable, $seekable);
         if ($initParam['part_end_at'] - $initParam['part_start_at'] !== $size) {
             // Premature end for undefined length files

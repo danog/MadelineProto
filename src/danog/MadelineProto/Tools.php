@@ -406,8 +406,10 @@ abstract class Tools
      * @param \Generator|Promise  $promise Promise to resolve
      * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
      * @param string              $file    File
-     *
-     * @return Promise
+     * 
+     * @psalm-suppress InvalidScope
+     * 
+     * @return Promise|mixed
      */
     public static function callFork($promise, $actual = null, $file = '')
     {
@@ -447,6 +449,8 @@ abstract class Tools
      * @param \Throwable $e    Exception
      * @param string     $file File where the strand started
      *
+     * @psalm-suppress InvalidScope
+     * 
      * @return void
      */
     public static function rethrow(\Throwable $e, $file = ''): void
@@ -477,6 +481,8 @@ abstract class Tools
      * @param \Generator|Promise $a Promise A
      * @param \Generator|Promise $b Promise B
      *
+     * @psalm-suppress InvalidScope
+     * 
      * @return Promise
      */
     public static function after($a, $b): Promise
@@ -821,6 +827,8 @@ abstract class Tools
      * @param object $obj Object
      * @param string $var Attribute name
      *
+     * @psalm-suppress InvalidScope
+     * 
      * @return mixed
      * @access public
      */
@@ -841,6 +849,8 @@ abstract class Tools
      * @param string $var Attribute name
      * @param mixed  $val Attribute value
      *
+     * @psalm-suppress InvalidScope
+     * 
      * @return mixed
      * @access public
      */

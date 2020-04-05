@@ -913,15 +913,240 @@ interface http
 class InternalDoc extends APIFactory
 {
     /**
-         * Connect to the lite endpoints specified in the config file.
+         * Call promise $b after promise $a.
          *
-         * @param string $config Path to config file
+         * @param \Generator|Promise $a Promise A
+         * @param \Generator|Promise $b Promise B
          *
-         * @return \Generator
+         * @return Promise
          */
+    public function after($a, $b)
+    {
+        return \danog\MadelineProto\Tools::after($a, $b);
+    }
+    /**
+     * Returns a promise that succeeds when all promises succeed, and fails if any promise fails.
+     * Returned promise succeeds with an array of values used to succeed each contained promise, with keys corresponding to the array of promises.
+     *
+     * @param array<\Generator|Promise> $promises Promises
+     *
+     * @return Promise
+     */
+    public function all(array $promises)
+    {
+        return \danog\MadelineProto\Tools::all($promises);
+    }
+    /**
+     * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
+     *
+     * @param array<Promise|\Generator> $promises Promises
+     *
+     * @return Promise
+     */
+    public function any(array $promises)
+    {
+        return \danog\MadelineProto\Tools::any($promises);
+    }
+    /**
+     * Create array.
+     *
+     * @param mixed ...$params Params
+     *
+     * @return array
+     */
+    public function arr(...$params): array
+    {
+        return \danog\MadelineProto\Tools::arr(...$params);
+    }
+    /**
+     * base64URL decode.
+     *
+     * @param string $data Data to decode
+     *
+     * @return string
+     */
+    public function base64urlDecode(string $data): string
+    {
+        return \danog\MadelineProto\Tools::base64urlDecode($data);
+    }
+    /**
+     * Base64URL encode.
+     *
+     * @param string $data Data to encode
+     *
+     * @return string
+     */
+    public function base64urlEncode(string $data): string
+    {
+        return \danog\MadelineProto\Tools::base64urlEncode($data);
+    }
+    /**
+     * Convert parameters.
+     *
+     * @param array $parameters Parameters
+     *
+     * @return \Generator
+     */
+    public function botAPItoMTProto(array $parameters, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$parameters, $extra]);
+    }
+    /**
+     * Convert generator, promise or any other value to a promise.
+     *
+     * @param \Generator|Promise|mixed $promise
+     *
+     * @return Promise
+     */
+    public function call($promise)
+    {
+        return \danog\MadelineProto\Tools::call($promise);
+    }
+    /**
+     * Call promise in background.
+     *
+     * @param \Generator|Promise  $promise Promise to resolve
+     * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
+     * @param string              $file    File
+     *
+     * @return Promise|mixed
+     */
+    public function callFork($promise, $actual = null, $file = '')
+    {
+        return \danog\MadelineProto\Tools::callFork($promise, $actual, $file);
+    }
+    /**
+     * Call promise in background, deferring execution.
+     *
+     * @param \Generator|Promise $promise Promise to resolve
+     *
+     * @return void
+     */
+    public function callForkDefer($promise): void
+    {
+        \danog\MadelineProto\Tools::callForkDefer($promise);
+    }
+    /**
+     * Connect to the lite endpoints specified in the config file.
+     *
+     * @param string $config Path to config file
+     *
+     * @return \Generator
+     */
     public function connect(string $config, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$config, $extra]);
+    }
+    /**
+     * Asynchronously write to stdout/browser.
+     *
+     * @param string $string Message to echo
+     *
+     * @return Promise
+     */
+    public function echo(string $string)
+    {
+        return \danog\MadelineProto\Tools::echo($string);
+    }
+    /**
+     * Get final element of array.
+     *
+     * @param array $what Array
+     *
+     * @return mixed
+     */
+    public function end(array $what)
+    {
+        return \danog\MadelineProto\Tools::end($what);
+    }
+    /**
+     * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
+     *
+     * @param array<Promise|\Generator> $promises Promises
+     *
+     * @return Promise
+     */
+    public function first(array $promises)
+    {
+        return \danog\MadelineProto\Tools::first($promises);
+    }
+    /**
+     * Asynchronously lock a file
+     * Resolves with a callbable that MUST eventually be called in order to release the lock.
+     *
+     * @param string  $file      File to lock
+     * @param integer $operation Locking mode
+     * @param float  $polling   Polling interval
+     *
+     * @return Promise
+     */
+    public function flock(string $file, int $operation, float $polling = 0.1)
+    {
+        return \danog\MadelineProto\Tools::flock($file, $operation, $polling);
+    }
+    /**
+     * Generate MTProto vector hash.
+     *
+     * @param array $ints IDs
+     *
+     * @return int Vector hash
+     */
+    public function genVectorHash(array $ints): int
+    {
+        return \danog\MadelineProto\Tools::genVectorHash($ints);
+    }
+    /**
+     * Get TL method namespaces.
+     *
+     * @return array
+     */
+    public function getMethodNamespaces(): array
+    {
+        return $this->API->getMethodNamespaces();
+    }
+    /**
+     * Accesses a private variable from an object.
+     *
+     * @param object $obj Object
+     * @param string $var Attribute name
+     *
+     * @return mixed
+     * @access public
+     */
+    public function getVar($obj, string $var)
+    {
+        return \danog\MadelineProto\Tools::getVar($obj, $var);
+    }
+    /**
+     * Inflate stripped photosize to full JPG payload.
+     *
+     * @param string $stripped Stripped photosize
+     *
+     * @return string JPG payload
+     */
+    public function inflateStripped(string $stripped): string
+    {
+        return \danog\MadelineProto\Tools::inflateStripped($stripped);
+    }
+    /**
+     * Whether this is altervista.
+     *
+     * @return boolean
+     */
+    public function isAltervista(): bool
+    {
+        return \danog\MadelineProto\Tools::isAltervista();
+    }
+    /**
+     * Check if is array or similar (traversable && countable && arrayAccess).
+     *
+     * @param mixed $var Value to check
+     *
+     * @return boolean
+     */
+    public function isArrayOrAlike($var): bool
+    {
+        return \danog\MadelineProto\Tools::isArrayOrAlike($var);
     }
     /**
      * Logger.
@@ -935,6 +1160,28 @@ class InternalDoc extends APIFactory
     public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = ''): void
     {
         $this->API->logger($param, $level, $file);
+    }
+    /**
+     * Asynchronously run async callable.
+     *
+     * @param callable $func Function
+     *
+     * @return \Generator
+     */
+    public function loop(callable $func, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$func, $extra]);
+    }
+    /**
+     * Escape string for markdown.
+     *
+     * @param string $hwat String to escape
+     *
+     * @return void
+     */
+    public function markdownEscape(string $hwat): string
+    {
+        return \danog\MadelineProto\Tools::markdownEscape($hwat);
     }
     /**
      * Call lite method.
@@ -951,34 +1198,254 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$methodName, $args, $aargs, $extra]);
     }
     /**
-     * Asynchronously run async callable.
+     * Convert double to binary version.
      *
-     * @param callable $func Function
+     * @param float $value Value to convert
      *
-     * @return \Generator
+     * @return string
      */
-    public function loop(callable $func, array $extra = [])
+    public function packDouble(float $value): string
     {
-        return $this->__call(__FUNCTION__, [$func, $extra]);
+        return \danog\MadelineProto\Tools::packDouble($value);
     }
     /**
-     * Convert parameters.
+     * Convert integer to base256 signed int.
      *
-     * @param array $parameters Parameters
+     * @param integer $value Value to convert
      *
-     * @return \Generator
+     * @return string
      */
-    public function botAPItoMTProto(array $parameters, array $extra = [])
+    public function packSignedInt(int $value): string
     {
-        return $this->__call(__FUNCTION__, [$parameters, $extra]);
+        return \danog\MadelineProto\Tools::packSignedInt($value);
     }
     /**
-     * Get TL method namespaces.
+     * Convert integer to base256 long.
      *
-     * @return array
+     * @param int $value Value to convert
+     *
+     * @return string
      */
-    public function getMethodNamespaces(): array
+    public function packSignedLong(int $value): string
     {
-        return $this->API->getMethodNamespaces();
+        return \danog\MadelineProto\Tools::packSignedLong($value);
+    }
+    /**
+     * Convert value to unsigned base256 int.
+     *
+     * @param int $value Value
+     *
+     * @return string
+     */
+    public function packUnsignedInt(int $value): string
+    {
+        return \danog\MadelineProto\Tools::packUnsignedInt($value);
+    }
+    /**
+     * Positive modulo
+     * Works just like the % (modulus) operator, only returns always a postive number.
+     *
+     * @param int $a A
+     * @param int $b B
+     *
+     * @return int Modulo
+     */
+    public function posmod(int $a, int $b): int
+    {
+        return \danog\MadelineProto\Tools::posmod($a, $b);
+    }
+    /**
+     * Get random string of specified length.
+     *
+     * @param integer $length Length
+     *
+     * @return string Random string
+     */
+    public function random(int $length): string
+    {
+        return \danog\MadelineProto\Tools::random($length);
+    }
+    /**
+     * Get random integer.
+     *
+     * @param integer $modulus Modulus
+     *
+     * @return int
+     */
+    public function randomInt(int $modulus = 0): int
+    {
+        return \danog\MadelineProto\Tools::randomInt($modulus);
+    }
+    /**
+     * Asynchronously read line.
+     *
+     * @param string $prompt Prompt
+     *
+     * @return Promise
+     */
+    public function readLine(string $prompt = '')
+    {
+        return \danog\MadelineProto\Tools::readLine($prompt);
+    }
+    /**
+     * Rethrow error catched in strand.
+     *
+     * @param \Throwable $e    Exception
+     * @param string     $file File where the strand started
+     *
+     * @return void
+     */
+    public function rethrow(\Throwable $e, $file = ''): void
+    {
+        \danog\MadelineProto\Tools::rethrow($e, $file);
+    }
+    /**
+     * null-byte RLE decode.
+     *
+     * @param string $string Data to decode
+     *
+     * @return string
+     */
+    public function rleDecode(string $string): string
+    {
+        return \danog\MadelineProto\Tools::rleDecode($string);
+    }
+    /**
+     * null-byte RLE encode.
+     *
+     * @param string $string Data to encode
+     *
+     * @return string
+     */
+    public function rleEncode(string $string): string
+    {
+        return \danog\MadelineProto\Tools::rleEncode($string);
+    }
+    /**
+     * Sets a private variable in an object.
+     *
+     * @param object $obj Object
+     * @param string $var Attribute name
+     * @param mixed  $val Attribute value
+     *
+     * @return mixed
+     * @access public
+     */
+    public function setVar($obj, string $var, &$val): void
+    {
+        \danog\MadelineProto\Tools::setVar($obj, $var, $val);
+    }
+    /**
+     * Asynchronously sleep.
+     *
+     * @param int $time Number of seconds to sleep for
+     *
+     * @return Promise
+     */
+    public function sleep(int $time)
+    {
+        return \danog\MadelineProto\Tools::sleep($time);
+    }
+    /**
+     * Resolves with a two-item array delineating successful and failed Promise results.
+     * The returned promise will only fail if the given number of required promises fail.
+     *
+     * @param array<Promise|\Generator> $promises Promises
+     *
+     * @return Promise
+     */
+    public function some(array $promises)
+    {
+        return \danog\MadelineProto\Tools::some($promises);
+    }
+    /**
+     * Create an artificial timeout for any \Generator or Promise.
+     *
+     * @param \Generator|Promise $promise
+     * @param integer $timeout
+     *
+     * @return Promise
+     */
+    public function timeout($promise, int $timeout)
+    {
+        return \danog\MadelineProto\Tools::timeout($promise, $timeout);
+    }
+    /**
+     * Convert to camelCase.
+     *
+     * @param string $input String
+     *
+     * @return string
+     */
+    public function toCamelCase(string $input): string
+    {
+        return \danog\MadelineProto\Tools::toCamelCase($input);
+    }
+    /**
+     * Convert to snake_case.
+     *
+     * @param string $input String
+     *
+     * @return string
+     */
+    public function toSnakeCase(string $input): string
+    {
+        return \danog\MadelineProto\Tools::toSnakeCase($input);
+    }
+    /**
+     * Unpack binary double.
+     *
+     * @param string $value Value to unpack
+     *
+     * @return float
+     */
+    public function unpackDouble(string $value): float
+    {
+        return \danog\MadelineProto\Tools::unpackDouble($value);
+    }
+    /**
+     * Unpack base256 signed int.
+     *
+     * @param string $value base256 int
+     *
+     * @return integer
+     */
+    public function unpackSignedInt(string $value): int
+    {
+        return \danog\MadelineProto\Tools::unpackSignedInt($value);
+    }
+    /**
+     * Unpack base256 signed long.
+     *
+     * @param string $value base256 long
+     *
+     * @return integer
+     */
+    public function unpackSignedLong(string $value): int
+    {
+        return \danog\MadelineProto\Tools::unpackSignedLong($value);
+    }
+    /**
+     * Unpack base256 signed long to string.
+     *
+     * @param string $value base256 long
+     *
+     * @return string
+     */
+    public function unpackSignedLongString($value): string
+    {
+        return \danog\MadelineProto\Tools::unpackSignedLongString($value);
+    }
+    /**
+     * Synchronously wait for a promise|generator.
+     *
+     * @param \Generator|Promise $promise      The promise to wait for
+     * @param boolean            $ignoreSignal Whether to ignore shutdown signals
+     *
+     * @return mixed
+     */
+    public function wait($promise, $ignoreSignal = false)
+    {
+        return \danog\MadelineProto\Tools::wait($promise, $ignoreSignal);
     }
 }

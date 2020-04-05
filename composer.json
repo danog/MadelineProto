@@ -81,7 +81,8 @@
     "scripts": {
         "build": [
             "@docs",
-            "@cs-fix"
+            "@cs-fix",
+            "@psalm"
         ],
         "check": [
             "@cs",
@@ -91,6 +92,7 @@
         "test-php56": "tests/test-conversion.sh 5",
         "cs": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff --dry-run",
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff",
+        "psalm": "psalm",
         "docs": "php tools/build_docs.php",
         "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text --config tests/phpunit.xml"
     }

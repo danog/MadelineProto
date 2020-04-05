@@ -4217,27 +4217,800 @@ interface stats
 class InternalDoc extends APIFactory
 {
     /**
-         * Cleanup memory and session file.
+         * Convert MTProto parameters to bot API parameters.
          *
-         * @return self
+         * @param array $data Data
+         *
+         * @return \Generator<array>
          */
+    public function MTProtoToBotAPI(array $data, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$data, $extra]);
+    }
+    /**
+     * MTProto to TD params.
+     *
+     * @param mixed $params Params
+     *
+     * @return \Generator
+     */
+    public function MTProtoToTd(&$params, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$params, $extra]);
+    }
+    /**
+     * MTProto to TDCLI params.
+     *
+     * @param mixed $params Params
+     *
+     * @return \Generator
+     */
+    public function MTProtoToTdcli($params, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$params, $extra]);
+    }
+    /**
+     * Accept call.
+     *
+     * @param array $call Call
+     *
+     * @return \Generator
+     */
+    public function acceptCall(array $call, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$call, $extra]);
+    }
+    /**
+     * Accept secret chat.
+     *
+     * @param array $params Secret chat ID
+     *
+     * @return \Generator
+     */
+    public function acceptSecretChat($params, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$params, $extra]);
+    }
+    /**
+     * Accept terms of service update.
+     *
+     * @return \Generator
+     */
+    public function acceptTos(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Add user info.
+     *
+     * @param array $user User info
+     *
+     * @return void
+     */
+    public function addUser(array $user): void
+    {
+        $this->API->addUser($user);
+    }
+    /**
+     * Call promise $b after promise $a.
+     *
+     * @param \Generator|Promise $a Promise A
+     * @param \Generator|Promise $b Promise B
+     *
+     * @return Promise
+     */
+    public function after($a, $b)
+    {
+        return \danog\MadelineProto\Tools::after($a, $b);
+    }
+    /**
+     * Returns a promise that succeeds when all promises succeed, and fails if any promise fails.
+     * Returned promise succeeds with an array of values used to succeed each contained promise, with keys corresponding to the array of promises.
+     *
+     * @param array<\Generator|Promise> $promises Promises
+     *
+     * @return Promise
+     */
+    public function all(array $promises)
+    {
+        return \danog\MadelineProto\Tools::all($promises);
+    }
+    /**
+     * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
+     *
+     * @param array<Promise|\Generator> $promises Promises
+     *
+     * @return Promise
+     */
+    public function any(array $promises)
+    {
+        return \danog\MadelineProto\Tools::any($promises);
+    }
+    /**
+     * Create array.
+     *
+     * @param mixed ...$params Params
+     *
+     * @return array
+     */
+    public function arr(...$params): array
+    {
+        return \danog\MadelineProto\Tools::arr(...$params);
+    }
+    /**
+     * base64URL decode.
+     *
+     * @param string $data Data to decode
+     *
+     * @return string
+     */
+    public function base64urlDecode(string $data): string
+    {
+        return \danog\MadelineProto\Tools::base64urlDecode($data);
+    }
+    /**
+     * Base64URL encode.
+     *
+     * @param string $data Data to encode
+     *
+     * @return string
+     */
+    public function base64urlEncode(string $data): string
+    {
+        return \danog\MadelineProto\Tools::base64urlEncode($data);
+    }
+    /**
+     * Convert bot API parameters to MTProto parameters.
+     *
+     * @param array $arguments Arguments
+     *
+     * @return \Generator<array>
+     */
+    public function botAPIToMTProto(array $arguments, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$arguments, $extra]);
+    }
+    /**
+     * Login as bot.
+     *
+     * @param string $token Bot token
+     *
+     * @return \Generator
+     */
+    public function botLogin(string $token, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$token, $extra]);
+    }
+    /**
+     * Convert generator, promise or any other value to a promise.
+     *
+     * @param \Generator|Promise|mixed $promise
+     *
+     * @return Promise
+     */
+    public function call($promise)
+    {
+        return \danog\MadelineProto\Tools::call($promise);
+    }
+    /**
+     * Call promise in background.
+     *
+     * @param \Generator|Promise  $promise Promise to resolve
+     * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
+     * @param string              $file    File
+     *
+     * @return Promise|mixed
+     */
+    public function callFork($promise, $actual = null, $file = '')
+    {
+        return \danog\MadelineProto\Tools::callFork($promise, $actual, $file);
+    }
+    /**
+     * Call promise in background, deferring execution.
+     *
+     * @param \Generator|Promise $promise Promise to resolve
+     *
+     * @return void
+     */
+    public function callForkDefer($promise): void
+    {
+        \danog\MadelineProto\Tools::callForkDefer($promise);
+    }
+    /**
+     * Get call status.
+     *
+     * @param int $id Call ID
+     *
+     * @return integer
+     */
+    public function callStatus(int $id): int
+    {
+        return $this->API->callStatus($id);
+    }
+    /**
+     * Check state of calls.
+     *
+     * @return void
+     */
+    public function checkCalls(): void
+    {
+        $this->API->checkCalls();
+    }
+    /**
+     * Check for terms of service update.
+     *
+     * @return \Generator
+     */
+    public function checkTos(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Cleanup memory and session file.
+     *
+     * @return self
+     */
     public function cleanup(): \danog\MadelineProto\API
     {
         $this->API->cleanup();
         return $this;
     }
     /**
-     * Logger.
+     * Close connection with client, connected via web.
      *
-     * @param string $param Parameter
-     * @param int    $level Logging level
-     * @param string $file  File where the message originated
+     * @param string $message Message
      *
      * @return void
      */
-    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = ''): void
+    public function closeConnection($message = 'OK!', array $extra = [])
     {
-        $this->API->logger($param, $level, $file);
+        return $this->__call(__FUNCTION__, [$message, $extra]);
+    }
+    /**
+     * Complete 2FA login.
+     *
+     * @param string $password Password
+     *
+     * @return \Generator
+     */
+    public function complete2faLogin(string $password, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$password, $extra]);
+    }
+    /**
+     * Complete call handshake.
+     *
+     * @param array $params Params
+     *
+     * @return \Generator
+     */
+    public function completeCall(array $params, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$params, $extra]);
+    }
+    /**
+     * Complet user login using login code.
+     *
+     * @param string $code Login code
+     *
+     * @return \Generator
+     */
+    public function completePhoneLogin($code, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$code, $extra]);
+    }
+    /**
+     * Complete signup to Telegram.
+     *
+     * @param string $first_name First name
+     * @param string $last_name  Last name
+     *
+     * @return \Generator
+     */
+    public function completeSignup(string $first_name, string $last_name = '', array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$first_name, $last_name, $extra]);
+    }
+    /**
+     * Confirm call.
+     *
+     * @param array $params Params
+     *
+     * @return \Generator
+     */
+    public function confirmCall(array $params, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$params, $extra]);
+    }
+    /**
+     * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info.
+     *
+     * @param boolean $reconnectAll Whether to reconnect to all DCs
+     *
+     * @return \Generator
+     */
+    public function connectToAllDcs(bool $reconnectAll = true, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$reconnectAll, $extra]);
+    }
+    /**
+     * Decline terms of service update.
+     *
+     * THIS WILL DELETE YOUR ACCOUNT!
+     *
+     * @return \Generator
+     */
+    public function declineTos(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Discard call.
+     *
+     * @param array   $call       Call
+     * @param string  $reason     Discard reason
+     * @param array   $rating     Rating
+     * @param boolean $need_debug Need debug?
+     *
+     * @return \Generator
+     */
+    public function discardCall(array $call, array $reason, array $rating = [
+    ], bool $need_debug = true, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug, $extra]);
+    }
+    /**
+     * Discard secret chat.
+     *
+     * @param int $chat Secret chat ID
+     *
+     * @return \Generator
+     */
+    public function discardSecretChat(int $chat, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$chat, $extra]);
+    }
+    /**
+     * Download file to browser.
+     *
+     * Supports HEAD requests and content-ranges for parallel and resumed downloads.
+     *
+     * @param array|string $messageMedia File to download
+     * @param callable     $cb           Status callback (can also use FileCallback)
+     *
+     * @return \Generator
+     */
+    public function downloadToBrowser($messageMedia, ?callable $cb = null, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$messageMedia, $cb, $extra]);
+    }
+    /**
+     * Download file to callable.
+     * The callable must accept two parameters: string $payload, int $offset
+     * The callable will be called (possibly out of order, depending on the value of $seekable).
+     * The callable should return the number of written bytes.
+     *
+     * @param mixed                          $messageMedia File to download
+     * @param callable|FileCallbackInterface $callable      Chunk callback
+     * @param callable                       $cb            Status callback (DEPRECATED, use FileCallbackInterface)
+     * @param bool                           $seekable      Whether the callable can be called out of order
+     * @param int                            $offset        Offset where to start downloading
+     * @param int                            $end           Offset where to stop downloading (inclusive)
+     * @param int                            $part_size     Size of each chunk
+     *
+     * @return \Generator<bool>
+     */
+    public function downloadToCallable($messageMedia, callable $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$messageMedia, $callable, $cb, $seekable, $offset, $end, $part_size, $extra]);
+    }
+    /**
+     * Download file to directory.
+     *
+     * @param mixed                        $messageMedia File to download
+     * @param string|FileCallbackInterface $dir           Directory where to download the file
+     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     *
+     * @return \Generator<string> Downloaded file path
+     */
+    public function downloadToDir($messageMedia, $dir, $cb = null, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$messageMedia, $dir, $cb, $extra]);
+    }
+    /**
+     * Download file.
+     *
+     * @param mixed                        $messageMedia File to download
+     * @param string|FileCallbackInterface $file          Downloaded file path
+     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     *
+     * @return \Generator<string> Downloaded file path
+     */
+    public function downloadToFile($messageMedia, $file, $cb = null, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$messageMedia, $file, $cb, $extra]);
+    }
+    /**
+     * Download file to amphp/http-server response.
+     *
+     * Supports HEAD requests and content-ranges for parallel and resumed downloads.
+     *
+     * @param array|string  $messageMedia File to download
+     * @param ServerRequest $request      Request
+     * @param callable      $cb           Status callback (can also use FileCallback)
+     *
+     * @return \Generator<Response> Returned response
+     */
+    public function downloadToResponse($messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$messageMedia, $request, $cb, $extra]);
+    }
+    /**
+     * Download file to stream.
+     *
+     * @param mixed                       $messageMedia File to download
+     * @param mixed|FileCallbackInterface $stream        Stream where to download file
+     * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     * @param int                         $offset        Offset where to start downloading
+     * @param int                         $end           Offset where to end download
+     *
+     * @return \Generator<bool>
+     */
+    public function downloadToStream($messageMedia, $stream, $cb = null, int $offset = 0, int $end = -1, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$messageMedia, $stream, $cb, $offset, $end, $extra]);
+    }
+    /**
+     * Asynchronously write to stdout/browser.
+     *
+     * @param string $string Message to echo
+     *
+     * @return Promise
+     */
+    public function echo(string $string)
+    {
+        return \danog\MadelineProto\Tools::echo($string);
+    }
+    /**
+     * Get final element of array.
+     *
+     * @param array $what Array
+     *
+     * @return mixed
+     */
+    public function end(array $what)
+    {
+        return \danog\MadelineProto\Tools::end($what);
+    }
+    /**
+     * Export authorization.
+     *
+     * @return \Generator<array>
+     */
+    public function exportAuthorization(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Extract file info from bot API message.
+     *
+     * @param array $info Bot API message object
+     *
+     * @return ?array
+     */
+    public function extractBotAPIFile(array $info): ?array
+    {
+        return \danog\MadelineProto\MTProto::extractBotAPIFile($info);
+    }
+    /**
+     * Get contents of remote file asynchronously.
+     *
+     * @param string $url URL
+     *
+     * @return \Generator<string>
+     */
+    public function fileGetContents(string $url, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$url, $extra]);
+    }
+    /**
+     * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
+     *
+     * @param array<Promise|\Generator> $promises Promises
+     *
+     * @return Promise
+     */
+    public function first(array $promises)
+    {
+        return \danog\MadelineProto\Tools::first($promises);
+    }
+    /**
+     * Asynchronously lock a file
+     * Resolves with a callbable that MUST eventually be called in order to release the lock.
+     *
+     * @param string  $file      File to lock
+     * @param integer $operation Locking mode
+     * @param float  $polling   Polling interval
+     *
+     * @return Promise
+     */
+    public function flock(string $file, int $operation, float $polling = 0.1)
+    {
+        return \danog\MadelineProto\Tools::flock($file, $operation, $polling);
+    }
+    /**
+     * Convert bot API channel ID to MTProto channel ID.
+     *
+     * @param int $id Bot API channel ID
+     *
+     * @return int
+     */
+    public function fromSupergroup($id): int
+    {
+        return \danog\MadelineProto\MTProto::fromSupergroup($id);
+    }
+    /**
+     * When were full info for this chat last cached.
+     *
+     * @param mixed $id Chat ID
+     *
+     * @return integer
+     */
+    public function fullChatLastUpdated($id): int
+    {
+        return $this->API->fullChatLastUpdated($id);
+    }
+    /**
+     * Get info about the logged-in user, not cached.
+     *
+     * @return \Generator<array|bool>
+     */
+    public function fullGetSelf(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Generate MTProto vector hash.
+     *
+     * @param array $ints IDs
+     *
+     * @return int Vector hash
+     */
+    public function genVectorHash(array $ints): int
+    {
+        return \danog\MadelineProto\Tools::genVectorHash($ints);
+    }
+    /**
+     * Get full list of MTProto and API methods.
+     *
+     * @return array
+     */
+    public function getAllMethods(): array
+    {
+        return $this->API->getAllMethods();
+    }
+    /**
+     * Get cached server-side config.
+     *
+     * @return array
+     */
+    public function getCachedConfig(): array
+    {
+        return $this->API->getCachedConfig();
+    }
+    /**
+     * Get call info.
+     *
+     * @param int $call Call ID
+     *
+     * @return array
+     */
+    public function getCall(int $call): array
+    {
+        return $this->API->getCall($call);
+    }
+    /**
+     * Store RSA keys for CDN datacenters.
+     *
+     * @param string $datacenter DC ID
+     *
+     * @return \Generator
+     */
+    public function getCdnConfig(string $datacenter, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$datacenter, $extra]);
+    }
+    /**
+     * Get cached (or eventually re-fetch) server-side config.
+     *
+     * @param array $config  Current config
+     * @param array $options Options for method call
+     *
+     * @return \Generator
+     */
+    public function getConfig(array $config = [
+    ], array $options = [
+    ], array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$config, $options, $extra]);
+    }
+    /**
+     * Get async DNS client.
+     *
+     * @return \Amp\Dns\Resolver
+     */
+    public function getDNSClient(): \Amp\Dns\Resolver
+    {
+        return $this->API->getDNSClient();
+    }
+    /**
+     * Get all datacenter connections.
+     *
+     * @return array<DataCenterConnection>
+     */
+    public function getDataCenterConnections(): array
+    {
+        return $this->API->getDataCenterConnections();
+    }
+    /**
+     * Get dialog peers.
+     *
+     * @param boolean $force Whether to refetch all dialogs ignoring cache
+     *
+     * @return \Generator<array<array>>
+     */
+    public function getDialogs(bool $force = true, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$force, $extra]);
+    }
+    /**
+     * Get download info of file
+     * Returns an array with the following structure:.
+     *
+     * `$info['ext']` - The file extension
+     * `$info['name']` - The file name, without the extension
+     * `$info['mime']` - The file mime type
+     * `$info['size']` - The file size
+     *
+     * @param mixed $messageMedia File ID
+     *
+     * @return \Generator<array>
+     */
+    public function getDownloadInfo($messageMedia, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$messageMedia, $extra]);
+    }
+    /**
+     * Get event handler.
+     *
+     * @return EventHandler
+     */
+    public function getEventHandler(): \danog\MadelineProto\EventHandler
+    {
+        return $this->API->getEventHandler();
+    }
+    /**
+     * Get explanation for HTTP error.
+     *
+     * @param integer $code HTTP error code
+     *
+     * @return string
+     */
+    public function getExplanation(int $code): string
+    {
+        return \danog\MadelineProto\MTProto::getExplanation($code);
+    }
+    /**
+     * Get extension from file location.
+     *
+     * @param mixed  $location File location
+     * @param string $default  Default extension
+     *
+     * @return string
+     */
+    public function getExtensionFromLocation($location, string $default): string
+    {
+        return \danog\MadelineProto\MTProto::getExtensionFromLocation($location, $default);
+    }
+    /**
+     * Get extension from mime type.
+     *
+     * @param string $mime MIME type
+     *
+     * @return string
+     */
+    public function getExtensionFromMime(string $mime): string
+    {
+        return \danog\MadelineProto\MTProto::getExtensionFromMime($mime);
+    }
+    /**
+     * Get info about file.
+     *
+     * @param mixed $constructor File ID
+     *
+     * @return \Generator<array>
+     */
+    public function getFileInfo($constructor, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$constructor, $extra]);
+    }
+    /**
+     * Get folder ID from object.
+     *
+     * @param mixed $id Object
+     *
+     * @return ?int
+     */
+    public function getFolderId($id): ?int
+    {
+        return \danog\MadelineProto\MTProto::getFolderId($id);
+    }
+    /**
+     * Get full info of all dialogs.
+     *
+     * @param boolean $force Whether to refetch all dialogs ignoring cache
+     *
+     * @return \Generator
+     */
+    public function getFullDialogs(bool $force = true, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$force, $extra]);
+    }
+    /**
+     * Get full info about peer, returns an FullInfo object.
+     *
+     * @param mixed $id Peer
+     *
+     * @see https://docs.madelineproto.xyz/FullInfo.html
+     *
+     * @return \Generator<array> FullInfo object
+     */
+    public function getFullInfo($id, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$id, $extra]);
+    }
+    /**
+     * Get async HTTP client.
+     *
+     * @return \Amp\Http\Client\HttpClient
+     */
+    public function getHTTPClient(): \Amp\Http\Client\HttpClient
+    {
+        return $this->API->getHTTPClient();
+    }
+    /**
+     * Get bot API ID from peer object.
+     *
+     * @param mixed $id Peer
+     *
+     * @return int
+     */
+    public function getId($id, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$id, $extra]);
+    }
+    /**
+     * Get info about peer, returns an Info object.
+     *
+     * @param mixed   $id        Peer
+     * @param boolean $recursive Internal
+     *
+     * @see https://docs.madelineproto.xyz/Info.html
+     *
+     * @return \Generator<array> Info object
+     */
+    public function getInfo($id, $recursive = true, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$id, $recursive, $extra]);
+    }
+    /**
+     * Get logger.
+     *
+     * @return Logger
+     */
+    public function getLogger(): \danog\MadelineProto\Logger
+    {
+        return $this->API->getLogger();
     }
     /**
      * Get TL namespaces.
@@ -4258,153 +5031,79 @@ class InternalDoc extends APIFactory
         return $this->API->getMethodsNamespaced();
     }
     /**
-     * Get TL serializer.
+     * Get mime type from buffer.
      *
-     * @return TL
+     * @param string $buffer Buffer
+     *
+     * @return string
      */
-    public function getTL(): \danog\MadelineProto\TL\TL
+    public function getMimeFromBuffer(string $buffer): string
     {
-        return $this->API->getTL();
+        return \danog\MadelineProto\MTProto::getMimeFromBuffer($buffer);
     }
     /**
-     * Get logger.
+     * Get mime type from file extension.
      *
-     * @return Logger
+     * @param string $extension File extension
+     * @param string $default   Default mime type
+     *
+     * @return string
      */
-    public function getLogger(): \danog\MadelineProto\Logger
+    public function getMimeFromExtension(string $extension, string $default): string
     {
-        return $this->API->getLogger();
+        return \danog\MadelineProto\MTProto::getMimeFromExtension($extension, $default);
     }
     /**
-     * Get async HTTP client.
+     * Get mime type of file.
      *
-     * @return \Amp\Http\Client\HttpClient
+     * @param string $file File
+     *
+     * @return string
      */
-    public function getHTTPClient(): \Amp\Http\Client\HttpClient
+    public function getMimeFromFile(string $file): string
     {
-        return $this->API->getHTTPClient();
+        return \danog\MadelineProto\MTProto::getMimeFromFile($file);
     }
     /**
-     * Get async DNS client.
+     * Get download info of the propic of a user
+     * Returns an array with the following structure:.
      *
-     * @return \Amp\Dns\Resolver
+     * `$info['ext']` - The file extension
+     * `$info['name']` - The file name, without the extension
+     * `$info['mime']` - The file mime type
+     * `$info['size']` - The file size
+     *
+     * @param mixed $messageMedia File ID
+     *
+     * @return \Generator<array>
      */
-    public function getDNSClient(): \Amp\Dns\Resolver
+    public function getPropicInfo($data, array $extra = [])
     {
-        return $this->API->getDNSClient();
+        return $this->__call(__FUNCTION__, [$data, $extra]);
     }
     /**
-     * Get contents of remote file asynchronously.
+     * Get full info about peer (including full list of channel members), returns a Chat object.
      *
-     * @param string $url URL
+     * @param mixed $id Peer
      *
-     * @return \Generator<string>
+     * @see https://docs.madelineproto.xyz/Chat.html
+     *
+     * @return \Generator<array> Chat object
      */
-    public function fileGetContents(string $url, array $extra = [])
+    public function getPwrChat($id, bool $fullfetch = true, bool $send = true, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$url, $extra]);
+        return $this->__call(__FUNCTION__, [$id, $fullfetch, $send, $extra]);
     }
     /**
-     * Get all datacenter connections.
+     * Get secret chat.
      *
-     * @return array<DataCenterConnection>
-     */
-    public function getDataCenterConnections(): array
-    {
-        return $this->API->getDataCenterConnections();
-    }
-    /**
-     * Parse, update and store settings.
-     *
-     * @param array $settings Settings
-     * @param bool  $reinit   Whether to reinit the instance
-     *
-     * @return void
-     */
-    public function updateSettings(array $settings, bool $reinit = true, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$settings, $reinit, $extra]);
-    }
-    /**
-     * Return current settings array.
+     * @param array|int $chat Secret chat ID
      *
      * @return array
      */
-    public function getSettings(): array
+    public function getSecretChat($chat): array
     {
-        return $this->API->getSettings();
-    }
-    /**
-     * Setup logger.
-     *
-     * @return void
-     */
-    public function setupLogger(): void
-    {
-        $this->API->setupLogger();
-    }
-    /**
-     * Checks whether all datacenters are authorized.
-     *
-     * @return boolean
-     */
-    public function hasAllAuth(): bool
-    {
-        return $this->API->hasAllAuth();
-    }
-    /**
-     * Connects to all datacenters and if necessary creates authorization keys, binds them and writes client info.
-     *
-     * @param boolean $reconnectAll Whether to reconnect to all DCs
-     *
-     * @return \Generator
-     */
-    public function connectToAllDcs(bool $reconnectAll = true, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$reconnectAll, $extra]);
-    }
-    /**
-     * Reset the update state and fetch all updates from the beginning.
-     *
-     * @return void
-     */
-    public function resetUpdateState(): void
-    {
-        $this->API->resetUpdateState();
-    }
-    /**
-     * Store RSA keys for CDN datacenters.
-     *
-     * @param string $datacenter DC ID
-     *
-     * @return \Generator
-     */
-    public function getCdnConfig(string $datacenter, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$datacenter, $extra]);
-    }
-    /**
-     * Get cached server-side config.
-     *
-     * @return array
-     */
-    public function getCachedConfig(): array
-    {
-        return $this->API->getCachedConfig();
-    }
-    /**
-     * Get cached (or eventually re-fetch) server-side config.
-     *
-     * @param array $config  Current config
-     * @param array $options Options for method call
-     *
-     * @return \Generator
-     */
-    public function getConfig(array $config = [
-    ], array $options = [
-    ], array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$config, $options, $extra]);
+        return $this->API->getSecretChat($chat);
     }
     /**
      * Get info about the logged-in user, cached.
@@ -4416,13 +5115,62 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
-     * Get info about the logged-in user, not cached.
+     * Return current settings array.
      *
-     * @return \Generator<array|bool>
+     * @return array
      */
-    public function fullGetSelf(array $extra = [])
+    public function getSettings(): array
     {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return $this->API->getSettings();
+    }
+    /**
+     * Get TL serializer.
+     *
+     * @return TL
+     */
+    public function getTL(): \danog\MadelineProto\TL\TL
+    {
+        return $this->API->getTL();
+    }
+    /**
+     * Accesses a private variable from an object.
+     *
+     * @param object $obj Object
+     * @param string $var Attribute name
+     *
+     * @return mixed
+     * @access public
+     */
+    public function getVar($obj, string $var)
+    {
+        return \danog\MadelineProto\Tools::getVar($obj, $var);
+    }
+    /**
+     * Get web template.
+     *
+     * @return string
+     */
+    public function getWebTemplate(): string
+    {
+        return $this->API->getWebTemplate();
+    }
+    /**
+     * Checks whether all datacenters are authorized.
+     *
+     * @return boolean
+     */
+    public function hasAllAuth(): bool
+    {
+        return $this->API->hasAllAuth();
+    }
+    /**
+     * Check if an event handler instance is present.
+     *
+     * @return boolean
+     */
+    public function hasEventHandler(): bool
+    {
+        return $this->API->hasEventHandler();
     }
     /**
      * Check if has report peers.
@@ -4434,35 +5182,157 @@ class InternalDoc extends APIFactory
         return $this->API->hasReportPeers();
     }
     /**
-     * Set peer(s) where to send errors occurred in the event loop.
+     * Check whether secret chat exists.
      *
-     * @param int|string $userOrId Username(s) or peer ID(s)
+     * @param array|int $chat Secret chat ID
+     *
+     * @return boolean
+     */
+    public function hasSecretChat($chat): bool
+    {
+        return $this->API->hasSecretChat($chat);
+    }
+    /**
+     * Import authorization.
+     *
+     * @param mixed $authorization Authorization info
      *
      * @return \Generator
      */
-    public function setReportPeers($userOrId, array $extra = [])
+    public function importAuthorization($authorization, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$userOrId, $extra]);
+        return $this->__call(__FUNCTION__, [$authorization, $extra]);
     }
     /**
-     * Report an error to the previously set peer.
+     * Inflate stripped photosize to full JPG payload.
      *
-     * @param string $message Error to report
+     * @param string $stripped Stripped photosize
+     *
+     * @return string JPG payload
+     */
+    public function inflateStripped(string $stripped): string
+    {
+        return \danog\MadelineProto\Tools::inflateStripped($stripped);
+    }
+    /**
+     * Whether this is altervista.
+     *
+     * @return boolean
+     */
+    public function isAltervista(): bool
+    {
+        return \danog\MadelineProto\Tools::isAltervista();
+    }
+    /**
+     * Check if is array or similar (traversable && countable && arrayAccess).
+     *
+     * @param mixed $var Value to check
+     *
+     * @return boolean
+     */
+    public function isArrayOrAlike($var): bool
+    {
+        return \danog\MadelineProto\Tools::isArrayOrAlike($var);
+    }
+    /**
+     * Check whether provided bot API ID is a channel.
+     *
+     * @param int $id Bot API ID
+     *
+     * @return boolean
+     */
+    public function isSupergroup($id): bool
+    {
+        return \danog\MadelineProto\MTProto::isSupergroup($id);
+    }
+    /**
+     * Logger.
+     *
+     * @param string $param Parameter
+     * @param int    $level Logging level
+     * @param string $file  File where the message originated
+     *
+     * @return void
+     */
+    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = ''): void
+    {
+        $this->API->logger($param, $level, $file);
+    }
+    /**
+     * Log out currently logged in user.
      *
      * @return \Generator
      */
-    public function report(string $message, array $extra = [])
+    public function logout(array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message, $extra]);
+        return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
-     * Get full list of MTProto and API methods.
+     * Start MadelineProto's update handling loop, or run the provided async callable.
+     *
+     * @param callable $callback Async callable to run
+     *
+     * @return mixed
+     */
+    public function loop($callback = null, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$callback, $extra]);
+    }
+    /**
+     * Start MadelineProto's update handling loop in background.
+     *
+     * @return Promise
+     */
+    public function loopFork(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Escape string for markdown.
+     *
+     * @param string $hwat String to escape
+     *
+     * @return void
+     */
+    public function markdownEscape(string $hwat): string
+    {
+        return \danog\MadelineProto\Tools::markdownEscape($hwat);
+    }
+    /**
+     * Telegram UTF-8 multibyte split.
+     *
+     * @param string  $text   Text
+     * @param integer $length Length
      *
      * @return array
      */
-    public function getAllMethods(): array
+    public function mbStrSplit(string $text, int $length): array
     {
-        return $this->API->getAllMethods();
+        return \danog\MadelineProto\MTProto::mbStrSplit($text, $length);
+    }
+    /**
+     * Get Telegram UTF-8 length of string.
+     *
+     * @param string $text Text
+     *
+     * @return int
+     */
+    public function mbStrlen(string $text): int
+    {
+        return \danog\MadelineProto\MTProto::mbStrlen($text);
+    }
+    /**
+     * Telegram UTF-8 multibyte substring.
+     *
+     * @param string  $text   Text to substring
+     * @param integer $offset Offset
+     * @param ?int    $length Length
+     *
+     * @return string
+     */
+    public function mbSubstr(string $text, int $offset, $length = null): string
+    {
+        return \danog\MadelineProto\MTProto::mbSubstr($text, $offset, $length);
     }
     /**
      * Call method and wait asynchronously for response.
@@ -4499,48 +5369,48 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$method, $args, $aargs, $extra]);
     }
     /**
-     * Convert MTProto channel ID to bot API channel ID.
+     * Convert double to binary version.
      *
-     * @param int $id MTProto channel ID
+     * @param float $value Value to convert
      *
-     * @return int
+     * @return string
      */
-    public function toSupergroup($id)
+    public function packDouble(float $value): string
     {
-        return $this->__call(__FUNCTION__, [$id]);
+        return \danog\MadelineProto\Tools::packDouble($value);
     }
     /**
-     * Convert bot API channel ID to MTProto channel ID.
+     * Convert integer to base256 signed int.
      *
-     * @param int $id Bot API channel ID
+     * @param integer $value Value to convert
      *
-     * @return int
+     * @return string
      */
-    public function fromSupergroup($id): int
+    public function packSignedInt(int $value): string
     {
-        return \danog\MadelineProto\MTProto::fromSupergroup($id);
+        return \danog\MadelineProto\Tools::packSignedInt($value);
     }
     /**
-     * Check whether provided bot API ID is a channel.
+     * Convert integer to base256 long.
      *
-     * @param int $id Bot API ID
+     * @param int $value Value to convert
      *
-     * @return boolean
+     * @return string
      */
-    public function isSupergroup($id): bool
+    public function packSignedLong(int $value): string
     {
-        return \danog\MadelineProto\MTProto::isSupergroup($id);
+        return \danog\MadelineProto\Tools::packSignedLong($value);
     }
     /**
-     * Add user info.
+     * Convert value to unsigned base256 int.
      *
-     * @param array $user User info
+     * @param int $value Value
      *
-     * @return void
+     * @return string
      */
-    public function addUser(array $user): void
+    public function packUnsignedInt(int $value): string
     {
-        $this->API->addUser($user);
+        return \danog\MadelineProto\Tools::packUnsignedInt($value);
     }
     /**
      * Check if peer is present in internal peer database.
@@ -4554,77 +5424,115 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$id, $extra]);
     }
     /**
-     * Get folder ID from object.
+     * Login as user.
      *
-     * @param mixed $id Object
+     * @param string  $number   Phone number
+     * @param integer $sms_type SMS type
      *
-     * @return ?int
+     * @return \Generator
      */
-    public function getFolderId($id): ?int
+    public function phoneLogin($number, $sms_type = 5, array $extra = [])
     {
-        return \danog\MadelineProto\MTProto::getFolderId($id);
+        return $this->__call(__FUNCTION__, [$number, $sms_type, $extra]);
     }
     /**
-     * Get bot API ID from peer object.
+     * Positive modulo
+     * Works just like the % (modulus) operator, only returns always a postive number.
      *
-     * @param mixed $id Peer
+     * @param int $a A
+     * @param int $b B
+     *
+     * @return int Modulo
+     */
+    public function posmod(int $a, int $b): int
+    {
+        return \danog\MadelineProto\Tools::posmod($a, $b);
+    }
+    /**
+     * Get random string of specified length.
+     *
+     * @param integer $length Length
+     *
+     * @return string Random string
+     */
+    public function random(int $length): string
+    {
+        return \danog\MadelineProto\Tools::random($length);
+    }
+    /**
+     * Get random integer.
+     *
+     * @param integer $modulus Modulus
      *
      * @return int
      */
-    public function getId($id, array $extra = [])
+    public function randomInt(int $modulus = 0): int
     {
-        return $this->__call(__FUNCTION__, [$id, $extra]);
+        return \danog\MadelineProto\Tools::randomInt($modulus);
     }
     /**
-     * Get info about peer, returns an Info object.
+     * Asynchronously read line.
      *
-     * @param mixed   $id        Peer
-     * @param boolean $recursive Internal
+     * @param string $prompt Prompt
      *
-     * @see https://docs.madelineproto.xyz/Info.html
-     *
-     * @return \Generator<array> Info object
+     * @return Promise
      */
-    public function getInfo($id, $recursive = true, array $extra = [])
+    public function readLine(string $prompt = '')
     {
-        return $this->__call(__FUNCTION__, [$id, $recursive, $extra]);
+        return \danog\MadelineProto\Tools::readLine($prompt);
     }
     /**
-     * When were full info for this chat last cached.
+     * Rekey secret chat.
      *
-     * @param mixed $id Chat ID
+     * @param int $chat Secret chat to rekey
      *
-     * @return integer
+     * @return \Generator
      */
-    public function fullChatLastUpdated($id): int
+    public function rekey(int $chat, array $extra = [])
     {
-        return $this->API->fullChatLastUpdated($id);
+        return $this->__call(__FUNCTION__, [$chat, $extra]);
     }
     /**
-     * Get full info about peer, returns an FullInfo object.
+     * Report an error to the previously set peer.
      *
-     * @param mixed $id Peer
+     * @param string $message Error to report
      *
-     * @see https://docs.madelineproto.xyz/FullInfo.html
-     *
-     * @return \Generator<array> FullInfo object
+     * @return \Generator
      */
-    public function getFullInfo($id, array $extra = [])
+    public function report(string $message, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id, $extra]);
+        return $this->__call(__FUNCTION__, [$message, $extra]);
     }
     /**
-     * Get full info about peer (including full list of channel members), returns a Chat object.
+     * Request VoIP call.
      *
-     * @param mixed $id Peer
+     * @param mixed $user User
      *
-     * @see https://docs.madelineproto.xyz/Chat.html
-     *
-     * @return \Generator<array> Chat object
+     * @return void
      */
-    public function getPwrChat($id, bool $fullfetch = true, bool $send = true, array $extra = [])
+    public function requestCall($user, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id, $fullfetch, $send, $extra]);
+        return $this->__call(__FUNCTION__, [$user, $extra]);
+    }
+    /**
+     * Request secret chat.
+     *
+     * @param mixed $user User to start secret chat with
+     *
+     * @return \Generator
+     */
+    public function requestSecretChat($user, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$user, $extra]);
+    }
+    /**
+     * Reset the update state and fetch all updates from the beginning.
+     *
+     * @return void
+     */
+    public function resetUpdateState(): void
+    {
+        $this->API->resetUpdateState();
     }
     /**
      * Resolve username (use getInfo instead).
@@ -4636,6 +5544,359 @@ class InternalDoc extends APIFactory
     public function resolveUsername(string $username, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$username, $extra]);
+    }
+    /**
+     * Restart update loop.
+     *
+     * @return void
+     */
+    public function restart(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Rethrow error catched in strand.
+     *
+     * @param \Throwable $e    Exception
+     * @param string     $file File where the strand started
+     *
+     * @return void
+     */
+    public function rethrow(\Throwable $e, $file = ''): void
+    {
+        \danog\MadelineProto\Tools::rethrow($e, $file);
+    }
+    /**
+     * null-byte RLE decode.
+     *
+     * @param string $string Data to decode
+     *
+     * @return string
+     */
+    public function rleDecode(string $string): string
+    {
+        return \danog\MadelineProto\Tools::rleDecode($string);
+    }
+    /**
+     * null-byte RLE encode.
+     *
+     * @param string $string Data to encode
+     *
+     * @return string
+     */
+    public function rleEncode(string $string): string
+    {
+        return \danog\MadelineProto\Tools::rleEncode($string);
+    }
+    /**
+     * Get secret chat status.
+     *
+     * @param int $chat Chat ID
+     *
+     * @return int One of MTProto::SECRET_EMPTY, MTProto::SECRET_REQUESTED, MTProto::SECRET_READY
+     */
+    public function secretChatStatus(int $chat): int
+    {
+        return $this->API->secretChatStatus($chat);
+    }
+    /**
+     * Set update handling callback.
+     *
+     * @param callable $callback Callback
+     *
+     * @return void
+     */
+    public function setCallback($callback): void
+    {
+        $this->API->setCallback($callback);
+    }
+    /**
+     * Set event handler.
+     *
+     * @param string|EventHandler $event_handler Event handler
+     *
+     * @return \Generator
+     */
+    public function setEventHandler($event_handler, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$event_handler, $extra]);
+    }
+    /**
+     * Set NOOP update handler, ignoring all updates.
+     *
+     * @return void
+     */
+    public function setNoop(): void
+    {
+        $this->API->setNoop();
+    }
+    /**
+     * Set peer(s) where to send errors occurred in the event loop.
+     *
+     * @param int|string $userOrId Username(s) or peer ID(s)
+     *
+     * @return \Generator
+     */
+    public function setReportPeers($userOrId, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$userOrId, $extra]);
+    }
+    /**
+     * Sets a private variable in an object.
+     *
+     * @param object $obj Object
+     * @param string $var Attribute name
+     * @param mixed  $val Attribute value
+     *
+     * @return mixed
+     * @access public
+     */
+    public function setVar($obj, string $var, &$val): void
+    {
+        \danog\MadelineProto\Tools::setVar($obj, $var, $val);
+    }
+    /**
+     * Set web template.
+     *
+     * @param string $template Template
+     *
+     * @return void
+     */
+    public function setWebTemplate(string $template): void
+    {
+        $this->API->setWebTemplate($template);
+    }
+    /**
+     * Set webhook update handler.
+     *
+     * @param string $hook_url Webhook URL
+     * @param string $pem_path PEM path for self-signed certificate
+     *
+     * @return void
+     */
+    public function setWebhook(string $hook_url, string $pem_path = ''): void
+    {
+        $this->API->setWebhook($hook_url, $pem_path);
+    }
+    /**
+     * Setup logger.
+     *
+     * @return void
+     */
+    public function setupLogger(): void
+    {
+        $this->API->setupLogger();
+    }
+    /**
+     * Asynchronously sleep.
+     *
+     * @param int $time Number of seconds to sleep for
+     *
+     * @return Promise
+     */
+    public function sleep(int $time)
+    {
+        return \danog\MadelineProto\Tools::sleep($time);
+    }
+    /**
+     * Resolves with a two-item array delineating successful and failed Promise results.
+     * The returned promise will only fail if the given number of required promises fail.
+     *
+     * @param array<Promise|\Generator> $promises Promises
+     *
+     * @return Promise
+     */
+    public function some(array $promises)
+    {
+        return \danog\MadelineProto\Tools::some($promises);
+    }
+    /**
+     * Log in to telegram (via CLI or web).
+     *
+     * @return \Generator
+     */
+    public function start(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Stop update loop.
+     *
+     * @return void
+     */
+    public function stop(array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$extra]);
+    }
+    /**
+     * Convert TD to MTProto parameters.
+     *
+     * @param array $params Parameters
+     *
+     * @return \Generator<array>
+     */
+    public function tdToMTProto(array $params, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$params, $extra]);
+    }
+    /**
+     * Convert TD parameters to tdcli.
+     *
+     * @param mixed $params Parameters
+     *
+     * @return mixed
+     */
+    public function tdToTdcli($params, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$params, $extra]);
+    }
+    /**
+     * Convert tdcli parameters to tdcli.
+     *
+     * @param array $params Params
+     * @param array $key    Key
+     *
+     * @return array
+     */
+    public function tdcliToTd(&$params, $key = null): array
+    {
+        return $this->API->tdcliToTd($params, $key);
+    }
+    /**
+     * Create an artificial timeout for any \Generator or Promise.
+     *
+     * @param \Generator|Promise $promise
+     * @param integer $timeout
+     *
+     * @return Promise
+     */
+    public function timeout($promise, int $timeout)
+    {
+        return \danog\MadelineProto\Tools::timeout($promise, $timeout);
+    }
+    /**
+     * Convert to camelCase.
+     *
+     * @param string $input String
+     *
+     * @return string
+     */
+    public function toCamelCase(string $input): string
+    {
+        return \danog\MadelineProto\Tools::toCamelCase($input);
+    }
+    /**
+     * Convert to snake_case.
+     *
+     * @param string $input String
+     *
+     * @return string
+     */
+    public function toSnakeCase(string $input): string
+    {
+        return \danog\MadelineProto\Tools::toSnakeCase($input);
+    }
+    /**
+     * Convert MTProto channel ID to bot API channel ID.
+     *
+     * @param int $id MTProto channel ID
+     *
+     * @return int
+     */
+    public function toSupergroup($id)
+    {
+        return $this->__call(__FUNCTION__, [$id]);
+    }
+    /**
+     * Unpack binary double.
+     *
+     * @param string $value Value to unpack
+     *
+     * @return float
+     */
+    public function unpackDouble(string $value): float
+    {
+        return \danog\MadelineProto\Tools::unpackDouble($value);
+    }
+    /**
+     * Unpack bot API file ID.
+     *
+     * @param string $fileId Bot API file ID
+     *
+     * @return array Unpacked file ID
+     */
+    public function unpackFileId(string $fileId): array
+    {
+        return $this->API->unpackFileId($fileId);
+    }
+    /**
+     * Unpack base256 signed int.
+     *
+     * @param string $value base256 int
+     *
+     * @return integer
+     */
+    public function unpackSignedInt(string $value): int
+    {
+        return \danog\MadelineProto\Tools::unpackSignedInt($value);
+    }
+    /**
+     * Unpack base256 signed long.
+     *
+     * @param string $value base256 long
+     *
+     * @return integer
+     */
+    public function unpackSignedLong(string $value): int
+    {
+        return \danog\MadelineProto\Tools::unpackSignedLong($value);
+    }
+    /**
+     * Unpack base256 signed long to string.
+     *
+     * @param string $value base256 long
+     *
+     * @return string
+     */
+    public function unpackSignedLongString($value): string
+    {
+        return \danog\MadelineProto\Tools::unpackSignedLongString($value);
+    }
+    /**
+     * Unset event handler.
+     *
+     * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
+     *
+     * @return void
+     */
+    public function unsetEventHandler(bool $disableUpdateHandling = false): void
+    {
+        $this->API->unsetEventHandler($disableUpdateHandling);
+    }
+    /**
+     * Update the 2FA password.
+     *
+     * The params array can contain password, new_password, email and hint params.
+     *
+     * @param array $params The params
+     *
+     * @return \Generator
+     */
+    public function update2fa(array $params, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$params, $extra]);
+    }
+    /**
+     * Parse, update and store settings.
+     *
+     * @param array $settings Settings
+     * @param bool  $reinit   Whether to reinit the instance
+     *
+     * @return void
+     */
+    public function updateSettings(array $settings, bool $reinit = true, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$settings, $reinit, $extra]);
     }
     /**
      * Upload file.
@@ -4652,35 +5913,17 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$file, $fileName, $cb, $encrypted, $extra]);
     }
     /**
-     * Upload file from URL.
+     * Upload file to secret chat.
      *
-     * @param string|FileCallbackInterface $url       URL of file
-     * @param integer                      $size      Size of file
-     * @param string                       $fileName  File name
-     * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
-     * @param boolean                      $encrypted Whether to encrypt file for secret chats
+     * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
+     * @param string                             $fileName  File name
+     * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      *
-     * @return array
+     * @return \Generator<array>
      */
-    public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
+    public function uploadEncrypted($file, string $fileName = '', $cb = null, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$url, $size, $fileName, $cb, $encrypted, $extra]);
-    }
-    /**
-     * Upload file from stream.
-     *
-     * @param mixed    $stream    PHP resource or AMPHP async stream
-     * @param integer  $size      File size
-     * @param string   $mime      Mime type
-     * @param string   $fileName  File name
-     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
-     * @param boolean  $encrypted Whether to encrypt file for secret chats
-     *
-     * @return array
-     */
-    public function uploadFromStream($stream, int $size, string $mime, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$stream, $size, $mime, $fileName, $cb, $encrypted, $extra]);
+        return $this->__call(__FUNCTION__, [$file, $fileName, $cb, $extra]);
     }
     /**
      * Upload file from callable.
@@ -4703,17 +5946,20 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $extra]);
     }
     /**
-     * Upload file to secret chat.
+     * Upload file from stream.
      *
-     * @param FileCallbackInterface|string|array $file      File, URL or Telegram file to upload
-     * @param string                             $fileName  File name
-     * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param mixed    $stream    PHP resource or AMPHP async stream
+     * @param integer  $size      File size
+     * @param string   $mime      Mime type
+     * @param string   $fileName  File name
+     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator<array>
+     * @return array
      */
-    public function uploadEncrypted($file, string $fileName = '', $cb = null, array $extra = [])
+    public function uploadFromStream($stream, int $size, string $mime, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$file, $fileName, $cb, $extra]);
+        return $this->__call(__FUNCTION__, [$stream, $size, $mime, $fileName, $cb, $encrypted, $extra]);
     }
     /**
      * Reupload telegram file.
@@ -4729,554 +5975,19 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$media, $cb, $encrypted, $extra]);
     }
     /**
-     * Get info about file.
+     * Upload file from URL.
      *
-     * @param mixed $constructor File ID
-     *
-     * @return \Generator<array>
-     */
-    public function getFileInfo($constructor, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$constructor, $extra]);
-    }
-    /**
-     * Get download info of the propic of a user
-     * Returns an array with the following structure:.
-     *
-     * `$info['ext']` - The file extension
-     * `$info['name']` - The file name, without the extension
-     * `$info['mime']` - The file mime type
-     * `$info['size']` - The file size
-     *
-     * @param mixed $messageMedia File ID
-     *
-     * @return \Generator<array>
-     */
-    public function getPropicInfo($data, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$data, $extra]);
-    }
-    /**
-     * Extract file info from bot API message.
-     *
-     * @param array $info Bot API message object
-     *
-     * @return ?array
-     */
-    public function extractBotAPIFile(array $info): ?array
-    {
-        return \danog\MadelineProto\MTProto::extractBotAPIFile($info);
-    }
-    /**
-     * Get download info of file
-     * Returns an array with the following structure:.
-     *
-     * `$info['ext']` - The file extension
-     * `$info['name']` - The file name, without the extension
-     * `$info['mime']` - The file mime type
-     * `$info['size']` - The file size
-     *
-     * @param mixed $messageMedia File ID
-     *
-     * @return \Generator<array>
-     */
-    public function getDownloadInfo($messageMedia, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$messageMedia, $extra]);
-    }
-    /**
-     * Download file to browser.
-     *
-     * Supports HEAD requests and content-ranges for parallel and resumed downloads.
-     *
-     * @param array|string $messageMedia File to download
-     * @param callable     $cb           Status callback (can also use FileCallback)
-     *
-     * @return \Generator
-     */
-    public function downloadToBrowser($messageMedia, ?callable $cb = null, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$messageMedia, $cb, $extra]);
-    }
-    /**
-     * Download file to amphp/http-server response.
-     *
-     * Supports HEAD requests and content-ranges for parallel and resumed downloads.
-     *
-     * @param array|string  $messageMedia File to download
-     * @param ServerRequest $request      Request
-     * @param callable      $cb           Status callback (can also use FileCallback)
-     *
-     * @return \Generator<Response> Returned response
-     */
-    public function downloadToResponse($messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$messageMedia, $request, $cb, $extra]);
-    }
-    /**
-     * Get explanation for HTTP error.
-     *
-     * @param integer $code HTTP error code
-     *
-     * @return string
-     */
-    public function getExplanation(int $code): string
-    {
-        return \danog\MadelineProto\MTProto::getExplanation($code);
-    }
-    /**
-     * Download file to directory.
-     *
-     * @param mixed                        $messageMedia File to download
-     * @param string|FileCallbackInterface $dir           Directory where to download the file
-     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     *
-     * @return \Generator<string> Downloaded file path
-     */
-    public function downloadToDir($messageMedia, $dir, $cb = null, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$messageMedia, $dir, $cb, $extra]);
-    }
-    /**
-     * Download file.
-     *
-     * @param mixed                        $messageMedia File to download
-     * @param string|FileCallbackInterface $file          Downloaded file path
-     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     *
-     * @return \Generator<string> Downloaded file path
-     */
-    public function downloadToFile($messageMedia, $file, $cb = null, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$messageMedia, $file, $cb, $extra]);
-    }
-    /**
-     * Download file to stream.
-     *
-     * @param mixed                       $messageMedia File to download
-     * @param mixed|FileCallbackInterface $stream        Stream where to download file
-     * @param callable                    $cb            Callback (DEPRECATED, use FileCallbackInterface)
-     * @param int                         $offset        Offset where to start downloading
-     * @param int                         $end           Offset where to end download
-     *
-     * @return \Generator<bool>
-     */
-    public function downloadToStream($messageMedia, $stream, $cb = null, int $offset = 0, int $end = -1, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$messageMedia, $stream, $cb, $offset, $end, $extra]);
-    }
-    /**
-     * Download file to callable.
-     * The callable must accept two parameters: string $payload, int $offset
-     * The callable will be called (possibly out of order, depending on the value of $seekable).
-     * The callable should return the number of written bytes.
-     *
-     * @param mixed                          $messageMedia File to download
-     * @param callable|FileCallbackInterface $callable      Chunk callback
-     * @param callable                       $cb            Status callback (DEPRECATED, use FileCallbackInterface)
-     * @param bool                           $seekable      Whether the callable can be called out of order
-     * @param int                            $offset        Offset where to start downloading
-     * @param int                            $end           Offset where to stop downloading (inclusive)
-     * @param int                            $part_size     Size of each chunk
-     *
-     * @return \Generator<bool>
-     */
-    public function downloadToCallable($messageMedia, callable $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$messageMedia, $callable, $cb, $seekable, $offset, $end, $part_size, $extra]);
-    }
-    /**
-     * Accept secret chat.
-     *
-     * @param array $params Secret chat ID
-     *
-     * @return \Generator
-     */
-    public function acceptSecretChat($params, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$params, $extra]);
-    }
-    /**
-     * Request secret chat.
-     *
-     * @param mixed $user User to start secret chat with
-     *
-     * @return \Generator
-     */
-    public function requestSecretChat($user, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$user, $extra]);
-    }
-    /**
-     * Rekey secret chat.
-     *
-     * @param int $chat Secret chat to rekey
-     *
-     * @return \Generator
-     */
-    public function rekey(int $chat, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$chat, $extra]);
-    }
-    /**
-     * Get secret chat status.
-     *
-     * @param int $chat Chat ID
-     *
-     * @return int One of MTProto::SECRET_EMPTY, MTProto::SECRET_REQUESTED, MTProto::SECRET_READY
-     */
-    public function secretChatStatus(int $chat): int
-    {
-        return $this->API->secretChatStatus($chat);
-    }
-    /**
-     * Get secret chat.
-     *
-     * @param array|int $chat Secret chat ID
+     * @param string|FileCallbackInterface $url       URL of file
+     * @param integer                      $size      Size of file
+     * @param string                       $fileName  File name
+     * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean                      $encrypted Whether to encrypt file for secret chats
      *
      * @return array
      */
-    public function getSecretChat($chat): array
+    public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
-        return $this->API->getSecretChat($chat);
-    }
-    /**
-     * Check whether secret chat exists.
-     *
-     * @param array|int $chat Secret chat ID
-     *
-     * @return boolean
-     */
-    public function hasSecretChat($chat): bool
-    {
-        return $this->API->hasSecretChat($chat);
-    }
-    /**
-     * Discard secret chat.
-     *
-     * @param int $chat Secret chat ID
-     *
-     * @return \Generator
-     */
-    public function discardSecretChat(int $chat, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$chat, $extra]);
-    }
-    /**
-     * Get Telegram UTF-8 length of string.
-     *
-     * @param string $text Text
-     *
-     * @return int
-     */
-    public function mbStrlen(string $text): int
-    {
-        return \danog\MadelineProto\MTProto::mbStrlen($text);
-    }
-    /**
-     * Telegram UTF-8 multibyte substring.
-     *
-     * @param string  $text   Text to substring
-     * @param integer $offset Offset
-     * @param ?int    $length Length
-     *
-     * @return string
-     */
-    public function mbSubstr(string $text, int $offset, $length = null): string
-    {
-        return \danog\MadelineProto\MTProto::mbSubstr($text, $offset, $length);
-    }
-    /**
-     * Telegram UTF-8 multibyte split.
-     *
-     * @param string  $text   Text
-     * @param integer $length Length
-     *
-     * @return array
-     */
-    public function mbStrSplit(string $text, int $length): array
-    {
-        return \danog\MadelineProto\MTProto::mbStrSplit($text, $length);
-    }
-    /**
-     * Convert MTProto parameters to bot API parameters.
-     *
-     * @param array $data Data
-     *
-     * @return \Generator<array>
-     */
-    public function MTProtoToBotAPI(array $data, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$data, $extra]);
-    }
-    /**
-     * Convert bot API parameters to MTProto parameters.
-     *
-     * @param array $arguments Arguments
-     *
-     * @return \Generator<array>
-     */
-    public function botAPIToMTProto(array $arguments, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$arguments, $extra]);
-    }
-    /**
-     * Unpack bot API file ID.
-     *
-     * @param string $fileId Bot API file ID
-     *
-     * @return array Unpacked file ID
-     */
-    public function unpackFileId(string $fileId): array
-    {
-        return $this->API->unpackFileId($fileId);
-    }
-    /**
-     * Get mime type from file extension.
-     *
-     * @param string $extension File extension
-     * @param string $default   Default mime type
-     *
-     * @return string
-     */
-    public function getMimeFromExtension(string $extension, string $default): string
-    {
-        return \danog\MadelineProto\MTProto::getMimeFromExtension($extension, $default);
-    }
-    /**
-     * Get extension from mime type.
-     *
-     * @param string $mime MIME type
-     *
-     * @return string
-     */
-    public function getExtensionFromMime(string $mime): string
-    {
-        return \danog\MadelineProto\MTProto::getExtensionFromMime($mime);
-    }
-    /**
-     * Get extension from file location.
-     *
-     * @param mixed  $location File location
-     * @param string $default  Default extension
-     *
-     * @return string
-     */
-    public function getExtensionFromLocation($location, string $default): string
-    {
-        return \danog\MadelineProto\MTProto::getExtensionFromLocation($location, $default);
-    }
-    /**
-     * Get mime type of file.
-     *
-     * @param string $file File
-     *
-     * @return string
-     */
-    public function getMimeFromFile(string $file): string
-    {
-        return \danog\MadelineProto\MTProto::getMimeFromFile($file);
-    }
-    /**
-     * Get mime type from buffer.
-     *
-     * @param string $buffer Buffer
-     *
-     * @return string
-     */
-    public function getMimeFromBuffer(string $buffer): string
-    {
-        return \danog\MadelineProto\MTProto::getMimeFromBuffer($buffer);
-    }
-    /**
-     * Convert tdcli parameters to tdcli.
-     *
-     * @param array $params Params
-     * @param array $key    Key
-     *
-     * @return array
-     */
-    public function tdcliToTd(&$params, $key = null): array
-    {
-        return $this->API->tdcliToTd($params, $key);
-    }
-    /**
-     * Convert TD to MTProto parameters.
-     *
-     * @param array $params Parameters
-     *
-     * @return \Generator<array>
-     */
-    public function tdToMTProto(array $params, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$params, $extra]);
-    }
-    /**
-     * MTProto to TDCLI params.
-     *
-     * @param mixed $params Params
-     *
-     * @return \Generator
-     */
-    public function MTProtoToTdcli($params, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$params, $extra]);
-    }
-    /**
-     * MTProto to TD params.
-     *
-     * @param mixed $params Params
-     *
-     * @return \Generator
-     */
-    public function MTProtoToTd(&$params, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$params, $extra]);
-    }
-    /**
-     * Convert TD parameters to tdcli.
-     *
-     * @param mixed $params Parameters
-     *
-     * @return mixed
-     */
-    public function tdToTdcli($params, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$params, $extra]);
-    }
-    /**
-     * Generate MTProto vector hash.
-     *
-     * @param array $ints IDs
-     *
-     * @return int Vector hash
-     */
-    public function genVectorHash(array $ints): int
-    {
-        return \danog\MadelineProto\MTProto::genVectorHash($ints);
-    }
-    /**
-     * Get random integer.
-     *
-     * @param integer $modulus Modulus
-     *
-     * @return int
-     */
-    public function randomInt(int $modulus = 0): int
-    {
-        return \danog\MadelineProto\MTProto::randomInt($modulus);
-    }
-    /**
-     * Get random string of specified length.
-     *
-     * @param integer $length Length
-     *
-     * @return string Random string
-     */
-    public function random(int $length): string
-    {
-        return \danog\MadelineProto\MTProto::random($length);
-    }
-    /**
-     * Positive modulo
-     * Works just like the % (modulus) operator, only returns always a postive number.
-     *
-     * @param int $a A
-     * @param int $b B
-     *
-     * @return int Modulo
-     */
-    public function posmod(int $a, int $b): int
-    {
-        return \danog\MadelineProto\MTProto::posmod($a, $b);
-    }
-    /**
-     * Unpack base256 signed int.
-     *
-     * @param string $value base256 int
-     *
-     * @return integer
-     */
-    public function unpackSignedInt(string $value): int
-    {
-        return \danog\MadelineProto\MTProto::unpackSignedInt($value);
-    }
-    /**
-     * Unpack base256 signed long.
-     *
-     * @param string $value base256 long
-     *
-     * @return integer
-     */
-    public function unpackSignedLong(string $value): int
-    {
-        return \danog\MadelineProto\MTProto::unpackSignedLong($value);
-    }
-    /**
-     * Unpack base256 signed long to string.
-     *
-     * @param string $value base256 long
-     *
-     * @return string
-     */
-    public function unpackSignedLongString($value): string
-    {
-        return \danog\MadelineProto\MTProto::unpackSignedLongString($value);
-    }
-    /**
-     * Convert integer to base256 signed int.
-     *
-     * @param integer $value Value to convert
-     *
-     * @return string
-     */
-    public function packSignedInt(int $value): string
-    {
-        return \danog\MadelineProto\MTProto::packSignedInt($value);
-    }
-    /**
-     * Convert integer to base256 long.
-     *
-     * @param int $value Value to convert
-     *
-     * @return string
-     */
-    public function packSignedLong(int $value): string
-    {
-        return \danog\MadelineProto\MTProto::packSignedLong($value);
-    }
-    /**
-     * Convert value to unsigned base256 int.
-     *
-     * @param int $value Value
-     *
-     * @return string
-     */
-    public function packUnsignedInt(int $value): string
-    {
-        return \danog\MadelineProto\MTProto::packUnsignedInt($value);
-    }
-    /**
-     * Convert double to binary version.
-     *
-     * @param float $value Value to convert
-     *
-     * @return string
-     */
-    public function packDouble(float $value): string
-    {
-        return \danog\MadelineProto\MTProto::packDouble($value);
-    }
-    /**
-     * Unpack binary double.
-     *
-     * @param string $value Value to unpack
-     *
-     * @return float
-     */
-    public function unpackDouble(string $value): float
-    {
-        return \danog\MadelineProto\MTProto::unpackDouble($value);
+        return $this->__call(__FUNCTION__, [$url, $size, $fileName, $cb, $encrypted, $extra]);
     }
     /**
      * Synchronously wait for a promise|generator.
@@ -5288,717 +5999,6 @@ class InternalDoc extends APIFactory
      */
     public function wait($promise, $ignoreSignal = false)
     {
-        return $this->__call(__FUNCTION__, [$promise, $ignoreSignal]);
-    }
-    /**
-     * Returns a promise that succeeds when all promises succeed, and fails if any promise fails.
-     * Returned promise succeeds with an array of values used to succeed each contained promise, with keys corresponding to the array of promises.
-     *
-     * @param array<\Generator|Promise> $promises Promises
-     *
-     * @return Promise
-     */
-    public function all(array $promises)
-    {
-        return $this->__call(__FUNCTION__, [$promises]);
-    }
-    /**
-     * Returns a promise that is resolved when all promises are resolved. The returned promise will not fail.
-     *
-     * @param array<Promise|\Generator> $promises Promises
-     *
-     * @return Promise
-     */
-    public function any(array $promises)
-    {
-        return $this->__call(__FUNCTION__, [$promises]);
-    }
-    /**
-     * Resolves with a two-item array delineating successful and failed Promise results.
-     * The returned promise will only fail if the given number of required promises fail.
-     *
-     * @param array<Promise|\Generator> $promises Promises
-     *
-     * @return Promise
-     */
-    public function some(array $promises)
-    {
-        return $this->__call(__FUNCTION__, [$promises]);
-    }
-    /**
-     * Returns a promise that succeeds when the first promise succeeds, and fails only if all promises fail.
-     *
-     * @param array<Promise|\Generator> $promises Promises
-     *
-     * @return Promise
-     */
-    public function first(array $promises)
-    {
-        return $this->__call(__FUNCTION__, [$promises]);
-    }
-    /**
-     * Create an artificial timeout for any \Generator or Promise.
-     *
-     * @param \Generator|Promise $promise
-     * @param integer $timeout
-     *
-     * @return Promise
-     */
-    public function timeout($promise, int $timeout)
-    {
-        return $this->__call(__FUNCTION__, [$promise, $timeout]);
-    }
-    /**
-     * Convert generator, promise or any other value to a promise.
-     *
-     * @param \Generator|Promise|mixed $promise
-     *
-     * @return Promise
-     */
-    public function call($promise)
-    {
-        return $this->__call(__FUNCTION__, [$promise]);
-    }
-    /**
-     * Call promise in background.
-     *
-     * @param \Generator|Promise  $promise Promise to resolve
-     * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
-     * @param string              $file    File
-     *
-     * @return Promise
-     */
-    public function callFork($promise, $actual = null, $file = '')
-    {
-        return $this->__call(__FUNCTION__, [$promise, $actual, $file]);
-    }
-    /**
-     * Call promise in background, deferring execution.
-     *
-     * @param \Generator|Promise $promise Promise to resolve
-     *
-     * @return void
-     */
-    public function callForkDefer($promise): void
-    {
-        \danog\MadelineProto\MTProto::callForkDefer($promise);
-    }
-    /**
-     * Rethrow error catched in strand.
-     *
-     * @param \Throwable $e    Exception
-     * @param string     $file File where the strand started
-     *
-     * @return void
-     */
-    public function rethrow(\Throwable $e, $file = ''): void
-    {
-        \danog\MadelineProto\MTProto::rethrow($e, $file);
-    }
-    /**
-     * Call promise $b after promise $a.
-     *
-     * @param \Generator|Promise $a Promise A
-     * @param \Generator|Promise $b Promise B
-     *
-     * @return Promise
-     */
-    public function after($a, $b)
-    {
-        return $this->__call(__FUNCTION__, [$a, $b]);
-    }
-    /**
-     * Asynchronously lock a file
-     * Resolves with a callbable that MUST eventually be called in order to release the lock.
-     *
-     * @param string  $file      File to lock
-     * @param integer $operation Locking mode
-     * @param float  $polling   Polling interval
-     *
-     * @return Promise
-     */
-    public function flock(string $file, int $operation, float $polling = 0.1)
-    {
-        return $this->__call(__FUNCTION__, [$file, $operation, $polling]);
-    }
-    /**
-     * Asynchronously sleep.
-     *
-     * @param int $time Number of seconds to sleep for
-     *
-     * @return Promise
-     */
-    public function sleep(int $time)
-    {
-        return $this->__call(__FUNCTION__, [$time]);
-    }
-    /**
-     * Asynchronously read line.
-     *
-     * @param string $prompt Prompt
-     *
-     * @return Promise
-     */
-    public function readLine(string $prompt = '')
-    {
-        return $this->__call(__FUNCTION__, [$prompt]);
-    }
-    /**
-     * Asynchronously write to stdout/browser.
-     *
-     * @param string $string Message to echo
-     *
-     * @return Promise
-     */
-    public function echo(string $string)
-    {
-        return $this->__call(__FUNCTION__, [$string]);
-    }
-    /**
-     * Check if is array or similar (traversable && countable && arrayAccess).
-     *
-     * @param arraylike $var Value to check
-     *
-     * @return boolean
-     */
-    public function isArrayOrAlike($var): bool
-    {
-        return \danog\MadelineProto\MTProto::isArrayOrAlike($var);
-    }
-    /**
-     * Convert to camelCase.
-     *
-     * @param string $input String
-     *
-     * @return string
-     */
-    public function toCamelCase(string $input): string
-    {
-        return \danog\MadelineProto\MTProto::toCamelCase($input);
-    }
-    /**
-     * Convert to snake_case.
-     *
-     * @param string $input String
-     *
-     * @return string
-     */
-    public function toSnakeCase(string $input): string
-    {
-        return \danog\MadelineProto\MTProto::toSnakeCase($input);
-    }
-    /**
-     * Create array.
-     *
-     * @param mixed ...$params Params
-     *
-     * @return array
-     */
-    public function arr(...$params): array
-    {
-        return \danog\MadelineProto\MTProto::arr(...$params);
-    }
-    /**
-     * base64URL decode.
-     *
-     * @param string $data Data to decode
-     *
-     * @return string
-     */
-    public function base64urlDecode(string $data): string
-    {
-        return \danog\MadelineProto\MTProto::base64urlDecode($data);
-    }
-    /**
-     * Base64URL encode.
-     *
-     * @param string $data Data to encode
-     *
-     * @return string
-     */
-    public function base64urlEncode(string $data): string
-    {
-        return \danog\MadelineProto\MTProto::base64urlEncode($data);
-    }
-    /**
-     * null-byte RLE decode.
-     *
-     * @param string $string Data to decode
-     *
-     * @return string
-     */
-    public function rleDecode(string $string): string
-    {
-        return \danog\MadelineProto\MTProto::rleDecode($string);
-    }
-    /**
-     * null-byte RLE encode.
-     *
-     * @param string $string Data to encode
-     *
-     * @return string
-     */
-    public function rleEncode(string $string): string
-    {
-        return \danog\MadelineProto\MTProto::rleEncode($string);
-    }
-    /**
-     * Inflate stripped photosize to full JPG payload.
-     *
-     * @param string $stripped Stripped photosize
-     *
-     * @return string JPG payload
-     */
-    public function inflateStripped(string $stripped): string
-    {
-        return \danog\MadelineProto\MTProto::inflateStripped($stripped);
-    }
-    /**
-     * Get final element of array.
-     *
-     * @param array $what Array
-     *
-     * @return mixed
-     */
-    public function end(array $what)
-    {
-        return $this->__call(__FUNCTION__, [$what]);
-    }
-    /**
-     * Escape string for markdown.
-     *
-     * @param string $hwat String to escape
-     *
-     * @return void
-     */
-    public function markdownEscape(string $hwat): string
-    {
-        return \danog\MadelineProto\MTProto::markdownEscape($hwat);
-    }
-    /**
-     * Whether this is altervista.
-     *
-     * @return boolean
-     */
-    public function isAltervista(): bool
-    {
-        return \danog\MadelineProto\MTProto::isAltervista();
-    }
-    /**
-     * Accesses a private variable from an object.
-     *
-     * @param object $obj Object
-     * @param string $var Attribute name
-     *
-     * @return mixed
-     * @access public
-     */
-    public function getVar($obj, string $var)
-    {
-        return $this->__call(__FUNCTION__, [$obj, $var]);
-    }
-    /**
-     * Sets a private variable in an object.
-     *
-     * @param object $obj Object
-     * @param string $var Attribute name
-     * @param mixed  $val Attribute value
-     *
-     * @return mixed
-     * @access public
-     */
-    public function setVar($obj, string $var, &$val): void
-    {
-        \danog\MadelineProto\MTProto::setVar($obj, $var, $val);
-    }
-    /**
-     * Request VoIP call.
-     *
-     * @param mixed $user User
-     *
-     * @return void
-     */
-    public function requestCall($user, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$user, $extra]);
-    }
-    /**
-     * Accept call.
-     *
-     * @param array $call Call
-     *
-     * @return \Generator
-     */
-    public function acceptCall(array $call, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$call, $extra]);
-    }
-    /**
-     * Confirm call.
-     *
-     * @param array $params Params
-     *
-     * @return \Generator
-     */
-    public function confirmCall(array $params, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$params, $extra]);
-    }
-    /**
-     * Complete call handshake.
-     *
-     * @param array $params Params
-     *
-     * @return \Generator
-     */
-    public function completeCall(array $params, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$params, $extra]);
-    }
-    /**
-     * Get call status.
-     *
-     * @param int $id Call ID
-     *
-     * @return integer
-     */
-    public function callStatus(int $id): int
-    {
-        return $this->API->callStatus($id);
-    }
-    /**
-     * Get call info.
-     *
-     * @param int $call Call ID
-     *
-     * @return array
-     */
-    public function getCall(int $call): array
-    {
-        return $this->API->getCall($call);
-    }
-    /**
-     * Discard call.
-     *
-     * @param array   $call       Call
-     * @param string  $reason     Discard reason
-     * @param array   $rating     Rating
-     * @param boolean $need_debug Need debug?
-     *
-     * @return \Generator
-     */
-    public function discardCall(array $call, array $reason, array $rating = [
-    ], bool $need_debug = true, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$call, $reason, $rating, $need_debug, $extra]);
-    }
-    /**
-     * Check state of calls.
-     *
-     * @return void
-     */
-    public function checkCalls(): void
-    {
-        $this->API->checkCalls();
-    }
-    /**
-     * Get dialog peers.
-     *
-     * @param boolean $force Whether to refetch all dialogs ignoring cache
-     *
-     * @return \Generator<array<Peer>>
-     */
-    public function getDialogs(bool $force = true, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$force, $extra]);
-    }
-    /**
-     * Get full info of all dialogs.
-     *
-     * @param boolean $force Whether to refetch all dialogs ignoring cache
-     *
-     * @return \Generator
-     */
-    public function getFullDialogs(bool $force = true, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$force, $extra]);
-    }
-    /**
-     * Set event handler.
-     *
-     * @param string|EventHandler $event_handler Event handler
-     *
-     * @return \Generator
-     */
-    public function setEventHandler($event_handler, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$event_handler, $extra]);
-    }
-    /**
-     * Unset event handler.
-     *
-     * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
-     *
-     * @return void
-     */
-    public function unsetEventHandler(bool $disableUpdateHandling = false): void
-    {
-        $this->API->unsetEventHandler($disableUpdateHandling);
-    }
-    /**
-     * Get event handler.
-     *
-     * @return EventHandler
-     */
-    public function getEventHandler(): \danog\MadelineProto\EventHandler
-    {
-        return $this->API->getEventHandler();
-    }
-    /**
-     * Check if an event handler instance is present.
-     *
-     * @return boolean
-     */
-    public function hasEventHandler(): bool
-    {
-        return $this->API->hasEventHandler();
-    }
-    /**
-     * Set webhook update handler.
-     *
-     * @param string $hook_url Webhook URL
-     * @param string $pem_path PEM path for self-signed certificate
-     *
-     * @return void
-     */
-    public function setWebhook(string $hook_url, string $pem_path = ''): void
-    {
-        $this->API->setWebhook($hook_url, $pem_path);
-    }
-    /**
-     * Set update handling callback.
-     *
-     * @param callable $callback Callback
-     *
-     * @return void
-     */
-    public function setCallback($callback): void
-    {
-        $this->API->setCallback($callback);
-    }
-    /**
-     * Log out currently logged in user.
-     *
-     * @return \Generator
-     */
-    public function logout(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Login as bot.
-     *
-     * @param string $token Bot token
-     *
-     * @return \Generator
-     */
-    public function botLogin(string $token, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$token, $extra]);
-    }
-    /**
-     * Login as user.
-     *
-     * @param string  $number   Phone number
-     * @param integer $sms_type SMS type
-     *
-     * @return \Generator
-     */
-    public function phoneLogin($number, $sms_type = 5, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$number, $sms_type, $extra]);
-    }
-    /**
-     * Complet user login using login code.
-     *
-     * @param string $code Login code
-     *
-     * @return \Generator
-     */
-    public function completePhoneLogin($code, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$code, $extra]);
-    }
-    /**
-     * Import authorization.
-     *
-     * @param mixed $authorization Authorization info
-     *
-     * @return \Generator
-     */
-    public function importAuthorization($authorization, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$authorization, $extra]);
-    }
-    /**
-     * Export authorization.
-     *
-     * @return \Generator<array>
-     */
-    public function exportAuthorization(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Complete signup to Telegram.
-     *
-     * @param string $first_name First name
-     * @param string $last_name  Last name
-     *
-     * @return \Generator
-     */
-    public function completeSignup(string $first_name, string $last_name = '', array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$first_name, $last_name, $extra]);
-    }
-    /**
-     * Complete 2FA login.
-     *
-     * @param string $password Password
-     *
-     * @return \Generator
-     */
-    public function complete2faLogin(string $password, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$password, $extra]);
-    }
-    /**
-     * Update the 2FA password.
-     *
-     * The params array can contain password, new_password, email and hint params.
-     *
-     * @param array $params The params
-     *
-     * @return \Generator
-     */
-    public function update2fa(array $params, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$params, $extra]);
-    }
-    /**
-     * Start MadelineProto's update handling loop, or run the provided async callable.
-     *
-     * @param callable $callback Async callable to run
-     *
-     * @return mixed
-     */
-    public function loop($callback = null, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$callback, $extra]);
-    }
-    /**
-     * Stop update loop.
-     *
-     * @return void
-     */
-    public function stop(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Restart update loop.
-     *
-     * @return void
-     */
-    public function restart(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Start MadelineProto's update handling loop in background.
-     *
-     * @return Promise
-     */
-    public function loopFork(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Close connection with client, connected via web.
-     *
-     * @param string $message Message
-     *
-     * @return void
-     */
-    public function closeConnection($message = 'OK!', array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$message, $extra]);
-    }
-    /**
-     * Set NOOP update handler, ignoring all updates.
-     *
-     * @return void
-     */
-    public function setNoop(): void
-    {
-        $this->API->setNoop();
-    }
-    /**
-     * Log in to telegram (via CLI or web).
-     *
-     * @return \Generator
-     */
-    public function start(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Get web template.
-     *
-     * @return string
-     */
-    public function getWebTemplate(): string
-    {
-        return $this->API->getWebTemplate();
-    }
-    /**
-     * Set web template.
-     *
-     * @param string $template Template
-     *
-     * @return void
-     */
-    public function setWebTemplate(string $template): void
-    {
-        $this->API->setWebTemplate($template);
-    }
-    /**
-     * Check for terms of service update.
-     *
-     * @return \Generator
-     */
-    public function checkTos(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Accept terms of service update.
-     *
-     * @return \Generator
-     */
-    public function acceptTos(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
-    }
-    /**
-     * Decline terms of service update.
-     *
-     * THIS WILL DELETE YOUR ACCOUNT!
-     *
-     * @return \Generator
-     */
-    public function declineTos(array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$extra]);
+        return \danog\MadelineProto\Tools::wait($promise, $ignoreSignal);
     }
 }

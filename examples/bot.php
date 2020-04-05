@@ -34,6 +34,9 @@ if (\file_exists('vendor/autoload.php')) {
     if (!\file_exists('madeline.php')) {
         \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
+    /**
+     * @psalm-suppress MissingFile
+     */
     include 'madeline.php';
 }
 
