@@ -24,7 +24,6 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Loop\ResumableLoopInterface;
-use danog\MadelineProto\Tools;
 
 /**
  * Resumable signal loop helper trait.
@@ -33,7 +32,6 @@ use danog\MadelineProto\Tools;
  */
 abstract class ResumableSignalLoop extends SignalLoop implements ResumableLoopInterface
 {
-    use Tools;
     private $resume;
     private $pause;
     protected $resumeWatcher;

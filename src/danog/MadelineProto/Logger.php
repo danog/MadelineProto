@@ -29,7 +29,6 @@ use function Amp\ByteStream\getStdout;
  */
 class Logger
 {
-    use Tools;
     const FOREGROUND = ['default' => 39, 'black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'magenta' => 35, 'cyan' => 36, 'light_gray' => 37, 'dark_gray' => 90, 'light_red' => 91, 'light_green' => 92, 'light_yellow' => 93, 'light_blue' => 94, 'light_magenta' => 95, 'light_cyan' => 96, 'white' => 97];
     const BACKGROUND = ['default' => 49, 'black' => 40, 'red' => 41, 'magenta' => 45, 'yellow' => 43, 'green' => 42, 'blue' => 44, 'cyan' => 46, 'light_gray' => 47, 'dark_gray' => 100, 'light_red' => 101, 'light_green' => 102, 'light_yellow' => 103, 'light_blue' => 104, 'light_magenta' => 105, 'light_cyan' => 106, 'white' => 107];
     const SET = ['bold' => 1, 'dim' => 2, 'underlined' => 3, 'blink' => 4, 'reverse' => 5, 'hidden' => 6];
@@ -123,12 +122,6 @@ class Logger
      */
     public static function getLoggerFromSettings(array $settings, string $prefix = ''): self
     {
-        if (isset($settings['logger']['rollbar_token']) && $settings['logger']['rollbar_token'] !== '' && \class_exists(\Rollbar\Rollbar::class)) {
-            @\Rollbar\Rollbar::init(['environment' => 'production', 'root' => __DIR__, 'access_token' => isset($settings['logger']['rollbar_token']) && !\in_array($settings['logger']['rollbar_token'], ['f9fff6689aea4905b58eec73f66c791d', '300afd7ccef346ea84d0c185ae831718', '11a8c2fe4c474328b40a28193f8d63f5', 'beef2d426496462ba34dcaad33d44a14']) || $settings['pwr']['pwr'] ? $settings['logger']['rollbar_token'] : 'c07d9b2f73c2461297b0beaef6c1662f'], false, false);
-        } else {
-            Exception::$rollbar = false;
-            RPCErrorException::$rollbar = false;
-        }
         if (!isset($settings['logger']['logger_param']) && isset($settings['logger']['param'])) {
             $settings['logger']['logger_param'] = $settings['logger']['param'];
         }
@@ -264,9 +257,6 @@ class Logger
             return;
         }
         $prefix = $this->prefix;
-        if (\danog\MadelineProto\Magic::$has_thread && \is_object(\Thread::getCurrentThread())) {
-            $prefix .= ' (t)';
-        }
         if ($param instanceof \Throwable) {
             $param = (string) $param;
         } elseif (!\is_string($param)) {

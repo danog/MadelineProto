@@ -44,7 +44,6 @@ use danog\MadelineProto\Stream\Transport\WsStream;
 class Connection extends Session
 {
     use \danog\Serializable;
-    use Tools;
     /**
      * Writer loop.
      *

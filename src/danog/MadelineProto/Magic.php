@@ -25,7 +25,6 @@ use Amp\DoH\Rfc8484StubResolver;
 use Amp\Loop;
 use Amp\Loop\Driver;
 use ReflectionClass;
-use function Amp\ByteStream\getInputBufferStream;
 use function Amp\ByteStream\getStdin;
 use function Amp\Dns\resolver;
 use function Amp\Promise\wait;
@@ -236,7 +235,7 @@ class Magic
                     throw Exception::extension($extension);
                 }
             }
-            self::$has_thread = \class_exists('\\Thread') && \method_exists('\\Thread', 'getCurrentThread');
+            self::$has_thread = \class_exists(\Thread::class) && \method_exists(\Thread::class, 'getCurrentThread');
             self::$BIG_ENDIAN = \pack('L', 1) === \pack('N', 1);
             self::$bigint = PHP_INT_SIZE < 8;
             self::$ipv6 = (bool) \strlen(@\file_get_contents('http://ipv6.google.com', false, \stream_context_create(['http' => ['timeout' => 1]]))) > 0;
@@ -390,10 +389,9 @@ class Magic
     public static function shutdown(int $code = 0)
     {
         self::$signaled = true;
-        if (\defined(STDIN::class)) {
+        if (\defined('STDIN')) {
             getStdin()->unreference();
         }
-        getInputBufferStream()->unreference();
         if ($code !== 0) {
             $driver = Loop::get();
             $reflectionClass = new ReflectionClass(Driver::class);

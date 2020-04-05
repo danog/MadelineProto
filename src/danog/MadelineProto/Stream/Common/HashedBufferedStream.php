@@ -140,8 +140,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      *
      * @param int $length Read and hash $length bytes
      *
-     * @throws PendingReadError Thrown if another read operation is still pending.
-     *
      * @return \Generator That resolves with a string when the provided promise is resolved and the data is added to the hashing context
      */
     public function bufferReadGenerator(int $length): \Generator
@@ -241,8 +239,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
     /**
      * Reads data from the stream.
      *
-     * @throws PendingReadError Thrown if another read operation is still pending.
-     *
      * @return Promise Resolves with a string when new data is available or `null` if the stream has closed.
      */
     public function bufferRead(int $length): Promise
@@ -256,8 +252,6 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
      * Writes data to the stream.
      *
      * @param string $data Bytes to write.
-     *
-     * @throws ClosedException If the stream has already been closed.
      *
      * @return Promise Succeeds once the data has been successfully written to the stream.
      */

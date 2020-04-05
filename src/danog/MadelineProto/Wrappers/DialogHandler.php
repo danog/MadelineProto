@@ -26,7 +26,7 @@ trait DialogHandler
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
      *
-     * @return \Generator<array<Peer>>
+     * @return \Generator<array<array>>
      */
     public function getDialogs(bool $force = true): \Generator
     {

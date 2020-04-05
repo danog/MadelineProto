@@ -59,7 +59,6 @@ use danog\MadelineProto\Stream\Transport\WsStream;
  */
 class DataCenter
 {
-    use \danog\MadelineProto\Tools;
     use \danog\Serializable;
     /**
      * All socket connections to DCs.
@@ -265,7 +264,7 @@ class DataCenter
                 $this->API->logger->logger('OK!', \danog\MadelineProto\Logger::WARNING);
                 return true;
             } catch (\Throwable $e) {
-                if (\MADELINEPROTO_TEST === 'pony') {
+                if (\constant("MADELINEPROTO_TEST")  === 'pony') {
                     throw $e;
                 }
                 $this->API->logger->logger("Connection failed ({$dc_number}): ".$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
@@ -489,7 +488,7 @@ class DataCenter
         if (empty($ctxs)) {
             unset($this->sockets[$dc_number]);
             $this->API->logger->logger("No info for DC {$dc_number}", \danog\MadelineProto\Logger::ERROR);
-        } elseif (\MADELINEPROTO_TEST === 'pony') {
+        } elseif (\constant("MADELINEPROTO_TEST")  === 'pony') {
             return [$ctxs[0]];
         }
         return $ctxs;

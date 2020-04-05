@@ -28,7 +28,6 @@ use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
  */
 class SeqLoop extends ResumableSignalLoop
 {
-    use \danog\MadelineProto\Tools;
     private $incomingUpdates = [];
     private $feeder;
     private $pendingWakeups = [];

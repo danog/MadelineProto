@@ -22,7 +22,6 @@ namespace danog\MadelineProto\TL;
 class TLConstructors
 {
     use \danog\Serializable;
-    use \danog\MadelineProto\Tools;
     use TLParams;
     public $by_id = [];
     public $by_predicate_and_layer = [];
@@ -36,8 +35,8 @@ class TLConstructors
         if (isset($this->by_id[$json_dict['id']]) && (!isset($this->by_id[$json_dict['id']]['layer']) || $this->by_id[$json_dict['id']]['layer'] > $json_dict['layer'])) {
             return false;
         }
-        $predicate = (string) (($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message' ? 'MT' : '') . $json_dict['predicate']);
-        $this->by_id[$json_dict['id']] = ['predicate' => $predicate, 'params' => $json_dict['params'], 'type' => ($scheme_type === 'mtproto' && $json_dict['type'] === 'Message' ? 'MT' : '') . $json_dict['type']];
+        $predicate = (string) (($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message' ? 'MT' : '').$json_dict['predicate']);
+        $this->by_id[$json_dict['id']] = ['predicate' => $predicate, 'params' => $json_dict['params'], 'type' => ($scheme_type === 'mtproto' && $json_dict['type'] === 'Message' ? 'MT' : '').$json_dict['type']];
         if ($scheme_type === 'secret') {
             $this->by_id[$json_dict['id']]['layer'] = $json_dict['layer'];
             $this->layers[$json_dict['layer']] = $json_dict['layer'];
@@ -45,7 +44,7 @@ class TLConstructors
         } else {
             $json_dict['layer'] = '';
         }
-        $this->by_predicate_and_layer[$predicate . $json_dict['layer']] = $json_dict['id'];
+        $this->by_predicate_and_layer[$predicate.$json_dict['layer']] = $json_dict['id'];
         $this->parseParams($json_dict['id'], $scheme_type === 'mtproto');
     }
     public function findByType($type)
@@ -61,13 +60,14 @@ class TLConstructors
     public function findByPredicate($predicate, $layer = -1)
     {
         if ($layer !== -1) {
+            $chosenid = null;
             foreach ($this->layers as $alayer) {
                 if ($alayer <= $layer) {
-                    if (isset($this->by_predicate_and_layer[$predicate . $alayer])) {
-                        $chosenid = $this->by_predicate_and_layer[$predicate . $alayer];
+                    if (isset($this->by_predicate_and_layer[$predicate.$alayer])) {
+                        $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
                     }
                 } elseif (!isset($chosenid)) {
-                    $chosenid = $this->by_predicate_and_layer[$predicate . $alayer];
+                    $chosenid = $this->by_predicate_and_layer[$predicate.$alayer];
                 }
             }
             if (!isset($chosenid)) {

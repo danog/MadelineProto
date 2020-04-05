@@ -26,7 +26,6 @@ use Amp\Websocket\ClosedException;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\SignalLoop;
-use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Tools;
 
@@ -37,8 +36,6 @@ use danog\MadelineProto\Tools;
  */
 class ReadLoop extends SignalLoop
 {
-    use Tools;
-    use Crypt;
     /**
      * Connection instance.
      *
@@ -140,14 +137,14 @@ class ReadLoop extends SignalLoop
             $API->logger->logger($e->getReason());
             if (\strpos($e->getReason(), '       ') === 0) {
                 $payload = -\substr($e->getReason(), 7);
-                $API->logger->logger("Received {$payload} from DC " . $datacenter, \danog\MadelineProto\Logger::ERROR);
+                $API->logger->logger("Received {$payload} from DC ".$datacenter, \danog\MadelineProto\Logger::ERROR);
                 return $payload;
             }
             throw $e;
         }
         if ($payload_length === 4) {
             $payload = \danog\MadelineProto\Tools::unpackSignedInt(yield $buffer->bufferRead(4));
-            $API->logger->logger("Received {$payload} from DC " . $datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $API->logger->logger("Received {$payload} from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             return $payload;
         }
         $connection->reading(true);
@@ -210,7 +207,7 @@ class ReadLoop extends SignalLoop
                     throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
                 }
                 $message_data = \substr($decrypted_data, 32, $message_data_length);
-                if ($message_key != \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 96, 32) . $decrypted_data, true), 8, 16)) {
+                if ($message_key != \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
                     throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
                 }
                 $connection->incoming_messages[$message_id] = ['seq_no' => $seq_no];
@@ -224,7 +221,7 @@ class ReadLoop extends SignalLoop
             $connection->incoming_messages[$message_id]['response'] = -1;
             $connection->new_incoming[$message_id] = $message_id;
             //$connection->last_http_wait = 0;
-            $API->logger->logger('Received payload from DC ' . $datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $API->logger->logger('Received payload from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         } finally {
             $connection->reading(false);
         }

@@ -31,7 +31,6 @@ use danog\MadelineProto\RPCErrorException;
  */
 class UpdateLoop extends ResumableSignalLoop
 {
-    use \danog\MadelineProto\Tools;
     private $toPts;
     private $channelId;
     private $feeder;

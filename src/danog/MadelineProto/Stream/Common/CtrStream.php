@@ -109,8 +109,6 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param Promise $promise Promise that resolves with a string when new data is available or `null` if the stream has closed.
      *
-     * @throws PendingReadError Thrown if another read operation is still pending.
-     *
      * @return \Generator That resolves with a string when the provided promise is resolved and the data is decrypted
      */
     public function bufferReadGenerator(int $length): \Generator
@@ -121,8 +119,6 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      * Writes data to the stream.
      *
      * @param string $data Bytes to write.
-     *
-     * @throws ClosedException If the stream has already been closed.
      *
      * @return Promise Succeeds once the data has been successfully written to the stream.
      */

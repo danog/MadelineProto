@@ -42,6 +42,9 @@ class Lua
     }
     public function __wakeup()
     {
+        if (!\class_exists(\Lua::class)) {
+            throw Exception::extension('lua');
+        }
         $this->Lua = new \Lua($this->script);
         $this->madelineproto_lua = 1;
         $this->Lua->registerCallback('tdcliFunction', [$this, 'tdcliFunction']);

@@ -28,14 +28,59 @@ abstract class Session
     use ResponseHandler;
     use SeqNoHandler;
     use CallHandler;
+    /**
+     * Incoming message array.
+     *
+     * @var array
+     */
     public $incoming_messages = [];
+    /**
+     * Outgoing message array.
+     *
+     * @var array
+     */
     public $outgoing_messages = [];
+    /**
+     * New incoming message ID array.
+     *
+     * @var array
+     */
     public $new_incoming = [];
+    /**
+     * New outgoing message ID array.
+     *
+     * @var array
+     */
     public $new_outgoing = [];
+    /**
+     * Pending outgoing messages.
+     *
+     * @var array
+     */
     public $pending_outgoing = [];
+    /**
+     * Pending outgoing key.
+     *
+     * @var string
+     */
     public $pending_outgoing_key = 'a';
+    /**
+     * Time delta with server.
+     *
+     * @var integer
+     */
     public $time_delta = 0;
+    /**
+     * Call queue.
+     *
+     * @var array
+     */
     public $call_queue = [];
+    /**
+     * Ack queue.
+     *
+     * @var array
+     */
     public $ack_queue = [];
     /**
      * Message ID handler.

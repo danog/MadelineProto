@@ -21,14 +21,12 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
-use danog\MadelineProto\Tools;
 
 /**
  * Manages min peers.
  */
 class MinDatabase implements TLCallback
 {
-    use Tools;
     const SWITCH_CONSTRUCTORS = ['inputChannel', 'inputUser', 'inputPeerUser', 'inputPeerChannel'];
     const CATCH_PEERS = ['message', 'messageService', 'peerUser', 'peerChannel', 'messageEntityMentionName', 'messageFwdHeader', 'messageActionChatCreate', 'messageActionChatAddUser', 'messageActionChatDeleteUser', 'messageActionChatJoinedByLink'];
     const ORIGINS = ['message', 'messageService'];

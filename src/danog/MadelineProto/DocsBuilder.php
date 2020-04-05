@@ -26,7 +26,6 @@ class DocsBuilder
 {
     use \danog\MadelineProto\DocsBuilder\Methods;
     use \danog\MadelineProto\DocsBuilder\Constructors;
-    use Tools;
     public $td = false;
     public function __construct($logger, $settings)
     {

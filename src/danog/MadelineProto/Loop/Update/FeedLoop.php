@@ -29,7 +29,6 @@ use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
  */
 class FeedLoop extends ResumableSignalLoop
 {
-    use \danog\MadelineProto\Tools;
     private $incomingUpdates = [];
     private $parsedUpdates = [];
     private $channelId;

@@ -44,6 +44,7 @@ use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\Tools;
+use tgseclib\Crypt\AES;
 
 use const danog\Decoder\TYPES;
 
@@ -744,7 +745,7 @@ trait Files
                 return $res;
             // Wallpapers
             case 'wallPaper':
-                return $this->getDownloadInfo($res['document']);
+                return $this->getDownloadInfo($messageMedia['document']);
             // Photos
             case 'photo':
             case 'messageMediaPhoto':
@@ -1204,7 +1205,7 @@ trait Files
             if ($fingerprint !== $messageMedia['key_fingerprint']) {
                 throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
             }
-            $ige = new \tgseclib\Crypt\AES('ige');
+            $ige = new AES('ige');
             $ige->setIV($messageMedia['iv']);
             $ige->setKey($messageMedia['key']);
             $ige->enableContinuousBuffer();

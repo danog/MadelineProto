@@ -32,7 +32,6 @@ use danog\MadelineProto\Loop\LoopInterface;
  */
 abstract class Loop implements LoopInterface
 {
-    use \danog\MadelineProto\Tools;
     private $count = 0;
     /**
      * MTProto instance.

@@ -25,7 +25,6 @@ use function Amp\Promise\all;
 class CombinedAPI
 {
     use \danog\Serializable;
-    use Tools;
     public $session;
     public $instance_paths = [];
     public $instances = [];

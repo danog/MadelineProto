@@ -27,7 +27,6 @@ use Amp\Http\Client\Request;
  */
 class MyTelegramOrgWrapper
 {
-    use Tools;
     private $logged = false;
     private $hash = '';
     private $number;

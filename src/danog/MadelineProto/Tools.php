@@ -41,7 +41,7 @@ use function Amp\Promise\wait;
 /**
  * Some tools.
  */
-trait Tools
+abstract class Tools
 {
     /**
      * Sanify TL obtained from JSON for TL serialization.
@@ -614,7 +614,7 @@ trait Tools
     /**
      * Check if is array or similar (traversable && countable && arrayAccess).
      *
-     * @param arraylike $var Value to check
+     * @param mixed $var Value to check
      *
      * @return boolean
      */

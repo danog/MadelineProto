@@ -59,7 +59,7 @@ class Shutdown
      * @param callable $callback The callback to set
      * @param null|string $id The optional callback ID
      *
-     * @return The callback ID
+     * @return int The callback ID
      */
     public static function addCallback($callback, $id = null)
     {

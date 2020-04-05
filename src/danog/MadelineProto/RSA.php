@@ -26,7 +26,6 @@ use danog\MadelineProto\TL\TL;
  */
 class RSA
 {
-    use \danog\MadelineProto\Tools;
     use \danog\Serializable;
     /**
      * Exponent.

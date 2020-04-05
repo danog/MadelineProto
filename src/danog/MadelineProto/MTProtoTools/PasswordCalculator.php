@@ -22,7 +22,6 @@ namespace danog\MadelineProto\MTProtoTools;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SecurityException;
-use danog\MadelineProto\Tools;
 use tgseclib\Math\BigInteger;
 
 /**
@@ -34,7 +33,7 @@ use tgseclib\Math\BigInteger;
 class PasswordCalculator
 {
     use AuthKeyHandler;
-    use Tools;
+
     /**
      * The algorithm to use for calculating the hash of new passwords (a PasswordKdfAlgo object).
      *

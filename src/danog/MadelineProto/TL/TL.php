@@ -648,10 +648,10 @@ class TL
     /**
      * Serialize parameters.
      *
-     * @param array     $tl        TL object definition
-     * @param arrayLike $arguments Arguments
-     * @param string    $ctx       Context
-     * @param integer   $layer     Layer
+     * @param array   $tl        TL object definition
+     * @param array   $arguments Arguments
+     * @param string  $ctx       Context
+     * @param integer $layer     Layer
      *
      * @return \Generator<string>
      */

@@ -22,7 +22,6 @@ namespace danog\MadelineProto\TL;
 class TLMethods
 {
     use \danog\Serializable;
-    use \danog\MadelineProto\Tools;
     use TLParams;
     public $by_id = [];
     public $by_method = [];

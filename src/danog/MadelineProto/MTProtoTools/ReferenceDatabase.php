@@ -22,14 +22,13 @@ namespace danog\MadelineProto\MTProtoTools;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
-use danog\MadelineProto\Tools;
 
 /**
  * Manages upload and download of files.
  */
 class ReferenceDatabase implements TLCallback
 {
-    use Tools;
+
     // Reference from a document
     const DOCUMENT_LOCATION = 0;
     // Reference from a photo

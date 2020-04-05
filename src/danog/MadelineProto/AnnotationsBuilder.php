@@ -26,7 +26,6 @@ use phpDocumentor\Reflection\DocBlockFactory;
 
 class AnnotationsBuilder
 {
-    use Tools;
     public function __construct(Logger $logger, array $settings, string $output, array $reflectionClasses, string $namespace)
     {
         $this->reflectionClasses = $reflectionClasses;
@@ -145,6 +144,8 @@ class AnnotationsBuilder
         }
         $class = new \ReflectionClass($this->reflectionClasses['MTProto']);
         $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
+        $class = new \ReflectionClass(Tools::class);
+        $methods = \array_merge($methods, $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC));
         foreach ($methods as $key => $method) {
             $name = $method->getName();
             if ($method == 'methodCallAsyncRead') {

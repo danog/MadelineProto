@@ -46,7 +46,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     use \danog\Serializable;
     use \danog\MadelineProto\MTProtoTools\AuthKeyHandler;
     use \danog\MadelineProto\MTProtoTools\CallHandler;
-    use \danog\MadelineProto\MTProtoTools\Crypt;
     use \danog\MadelineProto\MTProtoTools\PeerHandler;
     use \danog\MadelineProto\MTProtoTools\UpdateHandler;
     use \danog\MadelineProto\MTProtoTools\Files;
@@ -58,7 +57,6 @@ class MTProto extends AsyncConstruct implements TLCallback
     use \danog\MadelineProto\TL\Conversion\BotAPIFiles;
     use \danog\MadelineProto\TL\Conversion\Extension;
     use \danog\MadelineProto\TL\Conversion\TD;
-    use \danog\MadelineProto\Tools;
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Events;
@@ -858,10 +856,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         Magic::classExists();
         // Setup logger
         $this->setupLogger();
-        // We don't like threads
-        if (Magic::$has_thread && \is_object(\Thread::getCurrentThread())) {
-            return;
-        }
         // Setup language
         Lang::$current_lang =& Lang::$lang['en'];
         if (Lang::$lang[$this->settings['app_info']['lang_code'] ?? 'en'] ?? false) {
@@ -1218,7 +1212,6 @@ class MTProto extends AsyncConstruct implements TLCallback
             'logger_level' => Logger::VERBOSE,
             'max_size' => 100 * 1024 * 1024,
             // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
-            'rollbar_token' => '',
         ], 'max_tries' => [
             'query' => 5,
             // How many times should I try to call a method or send an object before throwing an exception

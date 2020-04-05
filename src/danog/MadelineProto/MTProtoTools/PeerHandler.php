@@ -188,9 +188,6 @@ trait PeerHandler
                     }
                 }
                 break;
-            default:
-                throw new \danog\MadelineProto\Exception('Invalid chat provided at key ' . $key . ': ' . \var_export($chat, true));
-                break;
         }
     }
     private function cachePwrChat($id, $full_fetch, $send)
@@ -199,9 +196,9 @@ trait PeerHandler
             try {
                 yield from $this->getPwrChat($id, $full_fetch, $send);
             } catch (\danog\MadelineProto\Exception $e) {
-                $this->logger->logger('While caching: ' . $e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger('While caching: '.$e->getMessage(), \danog\MadelineProto\Logger::WARNING);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
-                $this->logger->logger('While caching: ' . $e->getMessage(), \danog\MadelineProto\Logger::WARNING);
+                $this->logger->logger('While caching: '.$e->getMessage(), \danog\MadelineProto\Logger::WARNING);
             }
         })());
     }
@@ -409,7 +406,7 @@ trait PeerHandler
                 case 'updateEditChannelMessage':
                     return $this->getId($id['message']);
                 default:
-                    throw new \danog\MadelineProto\Exception('Invalid constructor given ' . \var_export($id, true));
+                    throw new \danog\MadelineProto\Exception('Invalid constructor given '.\var_export($id, true));
             }
         }
         if (\is_string($id)) {
@@ -418,7 +415,7 @@ trait PeerHandler
                     return $this->toSupergroup($matches[1]);
                 }
                 if (\preg_match('/^chat#(\\d*)/', $id, $matches)) {
-                    $id = '-' . $matches[1];
+                    $id = '-'.$matches[1];
                 }
                 if (\preg_match('/^user#(\\d*)/', $id, $matches)) {
                     return $matches[1];
@@ -527,12 +524,12 @@ trait PeerHandler
             if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true && $recursive) {
                 $dbres = [];
                 try {
-                    $dbres = \json_decode(yield from $this->datacenter->fileGetContents('https://id.pwrtelegram.xyz/db/getusername?id=' . $id), true);
+                    $dbres = \json_decode(yield from $this->datacenter->fileGetContents('https://id.pwrtelegram.xyz/db/getusername?id='.$id), true);
                 } catch (\Throwable $e) {
                     $this->logger->logger($e);
                 }
                 if (isset($dbres['ok']) && $dbres['ok']) {
-                    yield from $this->resolveUsername('@' . $dbres['result']);
+                    yield from $this->resolveUsername('@'.$dbres['result']);
                     return yield from $this->getInfo($id, false);
                 }
             }
@@ -646,7 +643,7 @@ trait PeerHandler
             case 'channelForbidden':
                 throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
             default:
-                throw new \danog\MadelineProto\Exception('Invalid constructor given ' . \var_export($constructor, true));
+                throw new \danog\MadelineProto\Exception('Invalid constructor given '.\var_export($constructor, true));
         }
         if ($folder_id) {
             $res['FolderPeer'] = ['_' => 'folderPeer', 'peer' => $res['Peer'], 'folder_id' => $folder_id];
@@ -832,7 +829,7 @@ trait PeerHandler
             foreach ($filters as $filter) {
                 yield from $this->recurseAlphabetSearchParticipants($full['InputChannel'], $filter, $q, $total_count, $res);
             }
-            $this->logger->logger('Fetched ' . \count($res['participants']) . " out of {$total_count}");
+            $this->logger->logger('Fetched '.\count($res['participants'])." out of {$total_count}");
             $res['participants'] = \array_values($res['participants']);
         }
         if (!$fullfetch) {
@@ -877,7 +874,7 @@ trait PeerHandler
             return false;
         }
         for ($x = 'a'; $x !== 'aa' && $total_count > \count($res['participants']); $x++) {
-            yield from $this->recurseAlphabetSearchParticipants($channel, $filter, $q . $x, $total_count, $res);
+            yield from $this->recurseAlphabetSearchParticipants($channel, $filter, $q.$x, $total_count, $res);
         }
     }
     private function fetchParticipants($channel, $filter, $q, $total_count, &$res): \Generator
@@ -925,15 +922,15 @@ trait PeerHandler
                 if (isset($participant['rank'])) {
                     $newres['rank'] = $participant['rank'];
                 }
+                if (isset($participant['admin_rights'])) {
+                    $newres['admin_rights'] = $participant['admin_rights'];
+                }
+                if (isset($participant['banned_rights'])) {
+                    $newres['banned_rights'] = $participant['banned_rights'];
+                }
                 switch ($participant['_']) {
                     case 'channelParticipantSelf':
                         $newres['role'] = 'user';
-                        if (isset($newres['admin_rights'])) {
-                            $newres['admin_rights'] = $full['Chat']['admin_rights'];
-                        }
-                        if (isset($newres['banned_rights'])) {
-                            $newres['banned_rights'] = $full['Chat']['banned_rights'];
-                        }
                         break;
                     case 'channelParticipant':
                         $newres['role'] = 'user';
@@ -950,7 +947,7 @@ trait PeerHandler
                 }
                 $res['participants'][$participant['user_id']] = $newres;
             }
-            $this->logger->logger('Fetched ' . \count($gres['participants']) . " channel participants with filter {$filter}, query {$q}, offset {$offset}, limit {$limit}, hash {$hash}: " . ($cached ? 'cached' : 'not cached') . ', ' . ($offset + \count($gres['participants'])) . ' participants out of ' . $gres['count'] . ', in total fetched ' . \count($res['participants']) . ' out of ' . $total_count);
+            $this->logger->logger('Fetched '.\count($gres['participants'])." channel participants with filter {$filter}, query {$q}, offset {$offset}, limit {$limit}, hash {$hash}: ".($cached ? 'cached' : 'not cached').', '.($offset + \count($gres['participants'])).' participants out of '.$gres['count'].', in total fetched '.\count($res['participants']).' out of '.$total_count);
             $offset += \count($gres['participants']);
         } while (\count($gres['participants']));
         if ($offset === $limit) {
@@ -1002,7 +999,7 @@ trait PeerHandler
             //$path = '/tmp/ids'.hash('sha256', $payload);
             //file_put_contents($path, $payload);
             $id = isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'];
-            $request = new Request('https://id.pwrtelegram.xyz/db' . $this->settings['pwr']['db_token'] . '/addnewmadeline?d=pls&from=' . $id, 'POST');
+            $request = new Request('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id, 'POST');
             $request->setHeader('content-type', 'application/json');
             $request->setBody($payload);
             $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();
@@ -1010,7 +1007,7 @@ trait PeerHandler
             $this->qres = [];
             $this->last_stored = \time() + 10;
         } catch (\danog\MadelineProto\Exception $e) {
-            $this->logger->logger('======= COULD NOT STORE IN DB DUE TO ' . $e->getMessage() . ' =============', \danog\MadelineProto\Logger::VERBOSE);
+            $this->logger->logger('======= COULD NOT STORE IN DB DUE TO '.$e->getMessage().' =============', \danog\MadelineProto\Logger::VERBOSE);
         }
     }
     /**
@@ -1026,7 +1023,7 @@ trait PeerHandler
             $this->caching_simple_username[$username] = true;
             $res = yield from $this->methodCallAsyncRead('contacts.resolveUsername', ['username' => \str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $this->logger->logger('Username resolution failed with error ' . $e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+            $this->logger->logger('Username resolution failed with error '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0 || $e->rpc === 'AUTH_KEY_UNREGISTERED' || $e->rpc === 'USERNAME_INVALID') {
                 throw $e;
             }

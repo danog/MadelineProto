@@ -21,10 +21,6 @@ namespace danog\MadelineProto;
 
 use Amp\Promise;
 
-if (!\defined('MADELINEPROTO_TEST')) {
-    \define('MADELINEPROTO_TEST', 'NOT PONY');
-}
-
 /**
  * Main API wrapper for MadelineProto.
  */

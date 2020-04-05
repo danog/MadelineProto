@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\MTProtoSession\MsgIdHandler;
 
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
+use tgseclib\Math\BigInteger;
 
 /**
  * Manages message ids.
@@ -48,13 +49,13 @@ class MsgIdHandler32 extends MsgIdHandler
      */
     public function checkMessageId($newMessageId, array $aargs): void
     {
-        $newMessageId = \is_object($newMessageId) ? $newMessageId : new \tgseclib\Math\BigInteger(\strrev($newMessageId), 256);
+        $newMessageId = \is_object($newMessageId) ? $newMessageId : new BigInteger(\strrev($newMessageId), 256);
 
-        $minMessageId = (new \tgseclib\Math\BigInteger(\time() + $this->session->time_delta - 300))->bitwise_leftShift(32);
+        $minMessageId = (new BigInteger(\time() + $this->session->time_delta - 300))->bitwise_leftShift(32);
         if ($minMessageId->compare($newMessageId) > 0) {
             $this->session->API->logger->logger('Given message id ('.$newMessageId.') is too old compared to the min value ('.$minMessageId.').', \danog\MadelineProto\Logger::WARNING);
         }
-        $maxMessageId = (new \tgseclib\Math\BigInteger(\time() + $this->session->time_delta + 30))->bitwise_leftShift(32);
+        $maxMessageId = (new BigInteger(\time() + $this->session->time_delta + 30))->bitwise_leftShift(32);
         if ($maxMessageId->compare($newMessageId) < 0) {
             throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is too new compared to the max value ('.$maxMessageId.'). Consider syncing your date.');
         }
@@ -106,7 +107,7 @@ class MsgIdHandler32 extends MsgIdHandler
      */
     public function generateMessageId(): string
     {
-        $message_id = (new \tgseclib\Math\BigInteger(\time() + $this->session->time_delta))->bitwise_leftShift(32);
+        $message_id = (new BigInteger(\time() + $this->session->time_delta))->bitwise_leftShift(32);
         if ($message_id->compare($key = $this->getMaxId($incoming = false)) <= 0) {
             $message_id = $key->add(\danog\MadelineProto\Magic::$four);
         }
