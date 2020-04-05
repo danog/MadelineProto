@@ -23,6 +23,7 @@ use Amp\ByteStream\StreamException;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
 
 /**
@@ -284,8 +285,8 @@ class WriteLoop extends ResumableSignalLoop
             }
             $padding = \danog\MadelineProto\Tools::random($padding);
             $message_key = \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 88, 32).$plaintext.$padding, true), 8, 16);
-            list($aes_key, $aes_iv) = $this->aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey());
-            $message = $shared->getTempAuthKey()->getID().$message_key.$this->igeEncrypt($plaintext.$padding, $aes_key, $aes_iv);
+            list($aes_key, $aes_iv) = Crypt::aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey());
+            $message = $shared->getTempAuthKey()->getID().$message_key.Crypt::igeEncrypt($plaintext.$padding, $aes_key, $aes_iv);
             $buffer = yield $connection->stream->getWriteBuffer($len = \strlen($message));
             //$t = \microtime(true);
             yield $buffer->bufferWrite($message);

@@ -55,13 +55,13 @@ class ContextConnector implements Connector
                     $this->logger->logger('OK!', \danog\MadelineProto\Logger::WARNING);
                     return $result->getSocket();
                 } catch (\Throwable $e) {
-                    if (\constant("MADELINEPROTO_TEST")  === 'pony') {
+                    if (@\constant("MADELINEPROTO_TEST")  === 'pony') {
                         throw $e;
                     }
-                    $this->logger->logger('Connection failed: ' . $e, \danog\MadelineProto\Logger::ERROR);
+                    $this->logger->logger('Connection failed: '.$e, \danog\MadelineProto\Logger::ERROR);
                     if ($e instanceof MultiReasonException) {
                         foreach ($e->getReasons() as $reason) {
-                            $this->logger->logger('Multireason: ' . $reason, \danog\MadelineProto\Logger::ERROR);
+                            $this->logger->logger('Multireason: '.$reason, \danog\MadelineProto\Logger::ERROR);
                         }
                     }
                 }

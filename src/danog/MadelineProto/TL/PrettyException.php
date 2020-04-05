@@ -80,13 +80,13 @@ trait PrettyException
         $this->tl_trace = '';
         $eol = PHP_EOL;
         if (PHP_SAPI !== 'cli') {
-            $eol = '<br>' . PHP_EOL;
+            $eol = '<br>'.PHP_EOL;
         }
         $tl = false;
         foreach (\array_reverse($trace ?? $this->getTrace()) as $k => $frame) {
             if (isset($frame['function']) && \in_array($frame['function'], ['serializeParams', 'serializeObject'])) {
                 if (($frame['args'][2] ?? '') !== '') {
-                    $this->tl_trace .= $tl ? "['" . $frame['args'][2] . "']" : "While serializing:  \t" . $frame['args'][2];
+                    $this->tl_trace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:  \t".$frame['args'][2];
                     $tl = true;
                 }
             } else {
@@ -96,18 +96,18 @@ trait PrettyException
                 if (isset($frame['function']) && ($frame['function'] === 'handle_rpc_error' && $k === \count($this->getTrace()) - 1) || $frame['function'] === 'unserialize') {
                     continue;
                 }
-                $this->tl_trace .= isset($frame['file']) ? \str_pad(\basename($frame['file']) . '(' . $frame['line'] . '):', 20) . "\t" : '';
-                $this->tl_trace .= isset($frame['function']) ? $frame['function'] . '(' : '';
+                $this->tl_trace .= isset($frame['file']) ? \str_pad(\basename($frame['file']).'('.$frame['line'].'):', 20)."\t" : '';
+                $this->tl_trace .= isset($frame['function']) ? $frame['function'].'(' : '';
                 $this->tl_trace .= isset($frame['args']) ? \substr(\json_encode($frame['args']), 1, -1) : '';
                 $this->tl_trace .= ')';
                 $this->tl_trace .= $eol;
                 $tl = false;
             }
         }
-        $this->tl_trace .= $init !== '' ? "['" . $init . "']" : '';
+        $this->tl_trace .= $init !== '' ? "['".$init."']" : '';
         $this->tl_trace = \implode($eol, \array_reverse(\explode($eol, $this->tl_trace)));
         if ($previous_trace) {
-            $this->tl_trace .= $eol . $eol;
+            $this->tl_trace .= $eol.$eol;
             $this->tl_trace .= "Previous TL trace:{$eol}";
             $this->tl_trace .= $previous_trace;
         }

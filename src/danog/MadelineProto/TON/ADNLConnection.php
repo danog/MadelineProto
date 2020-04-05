@@ -114,8 +114,8 @@ class ADNLConnection
         $secret = DH::computeSecret($private, $peerPublic);
         // Encrypting random with obf keys
         $digest = \hash('sha256', $random, true);
-        $key = \substr($secret, 0, 16) . \substr($digest, 16, 16);
-        $iv = \substr($digest, 0, 4) . \substr($secret, 20, 12);
+        $key = \substr($secret, 0, 16).\substr($digest, 16, 16);
+        $iv = \substr($digest, 0, 4).\substr($secret, 20, 12);
         $encryptedRandom = Crypt::ctrEncrypt($random, $key, $iv);
         // Generating plaintext init payload
         $payload = \hash('sha256', yield from $this->TL->serializeObject(['type' => ''], $endpoint['id'], 'key'), true);
@@ -134,7 +134,7 @@ class ADNLConnection
                     $data = yield $buffer->bufferRead($length);
                     $data = $this->TL->deserialize($data);
                     if ($data['_'] !== 'adnl.message.answer') {
-                        throw new Exception('Wrong answer type: ' . $data['_']);
+                        throw new Exception('Wrong answer type: '.$data['_']);
                     }
                     $this->requests[$data['query_id']]->resolve($this->TL->deserialize((string) $data['answer']));
                 }

@@ -30,10 +30,10 @@ class TLConstructors
     {
         return ['by_predicate_and_layer', 'by_id', 'layers'];
     }
-    public function add($json_dict, $scheme_type)
+    public function add(array $json_dict, string $scheme_type): void
     {
         if (isset($this->by_id[$json_dict['id']]) && (!isset($this->by_id[$json_dict['id']]['layer']) || $this->by_id[$json_dict['id']]['layer'] > $json_dict['layer'])) {
-            return false;
+            return;
         }
         $predicate = (string) (($scheme_type === 'mtproto' && $json_dict['predicate'] === 'message' ? 'MT' : '').$json_dict['predicate']);
         $this->by_id[$json_dict['id']] = ['predicate' => $predicate, 'params' => $json_dict['params'], 'type' => ($scheme_type === 'mtproto' && $json_dict['type'] === 'Message' ? 'MT' : '').$json_dict['type']];
@@ -47,7 +47,7 @@ class TLConstructors
         $this->by_predicate_and_layer[$predicate.$json_dict['layer']] = $json_dict['id'];
         $this->parseParams($json_dict['id'], $scheme_type === 'mtproto');
     }
-    public function findByType($type)
+    public function findByType(string $type)
     {
         foreach ($this->by_id as $id => $constructor) {
             if ($constructor['type'] === $type) {
@@ -57,7 +57,7 @@ class TLConstructors
         }
         return false;
     }
-    public function findByPredicate($predicate, $layer = -1)
+    public function findByPredicate(string $predicate, int $layer = -1)
     {
         if ($layer !== -1) {
             $chosenid = null;

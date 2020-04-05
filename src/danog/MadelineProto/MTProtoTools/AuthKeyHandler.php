@@ -213,7 +213,7 @@ trait AuthKeyHandler
                 $encrypted_answer = $server_dh_params['encrypted_answer'];
                 $tmp_aes_key = \sha1($new_nonce.$server_nonce, true).\substr(\sha1($server_nonce.$new_nonce, true), 0, 12);
                 $tmp_aes_iv = \substr(\sha1($server_nonce.$new_nonce, true), 12, 8).\sha1($new_nonce.$new_nonce, true).\substr($new_nonce, 0, 4);
-                $answer_with_hash = $this->igeDecrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
+                $answer_with_hash = Crypt::igeDecrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
                 /*
                  * ***********************************************************************
                  * Separate answer and hash
@@ -294,7 +294,7 @@ trait AuthKeyHandler
                      */
                     $data_with_sha = \sha1($data, true).$data;
                     $data_with_sha_padded = $data_with_sha.\danog\MadelineProto\Tools::random(\danog\MadelineProto\Tools::posmod(-\strlen($data_with_sha), 16));
-                    $encrypted_data = $this->igeEncrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
+                    $encrypted_data = Crypt::igeEncrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
                     $this->logger->logger('Executing set_client_DH_params...', \danog\MadelineProto\Logger::VERBOSE);
                     /*
                      * ***********************************************************************
@@ -519,8 +519,8 @@ trait AuthKeyHandler
                 $encrypted_data = \danog\MadelineProto\Tools::random(16).$message_id.\pack('VV', $seq_no, \strlen($message_data)).$message_data;
                 $message_key = \substr(\sha1($encrypted_data, true), -16);
                 $padding = \danog\MadelineProto\Tools::random(\danog\MadelineProto\Tools::posmod(-\strlen($encrypted_data), 16));
-                list($aes_key, $aes_iv) = $this->oldAesCalculate($message_key, $datacenterConnection->getPermAuthKey()->getAuthKey());
-                $encrypted_message = $datacenterConnection->getPermAuthKey()->getID().$message_key.$this->igeEncrypt($encrypted_data.$padding, $aes_key, $aes_iv);
+                list($aes_key, $aes_iv) = Crypt::oldAesCalculate($message_key, $datacenterConnection->getPermAuthKey()->getAuthKey());
+                $encrypted_message = $datacenterConnection->getPermAuthKey()->getID().$message_key.Crypt::igeEncrypt($encrypted_data.$padding, $aes_key, $aes_iv);
                 $res = yield from $connection->methodCallAsyncRead('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message], ['msg_id' => $message_id]);
                 if ($res === true) {
                     $this->logger->logger('Bound temporary and permanent authorization keys, DC '.$datacenter, \danog\MadelineProto\Logger::NOTICE);

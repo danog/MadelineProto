@@ -125,7 +125,7 @@ class ReferenceDatabase implements TLCallback
     public function reset()
     {
         if ($this->cacheContexts) {
-            $this->API->logger->logger('Found ' . \count($this->cacheContexts) . ' pending contexts', \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger('Found '.\count($this->cacheContexts).' pending contexts', \danog\MadelineProto\Logger::ERROR);
             $this->cacheContexts = [];
         }
         if ($this->cache) {
@@ -162,7 +162,7 @@ class ReferenceDatabase implements TLCallback
             $frames = \array_reverse($frames);
             $tl_trace = \array_shift($frames);
             foreach ($frames as $frame) {
-                $tl_trace .= "['" . $frame . "']";
+                $tl_trace .= "['".$frame."']";
             }
             $this->API->logger->logger($tl_trace, \danog\MadelineProto\Logger::ERROR);
             return false;
@@ -183,7 +183,7 @@ class ReferenceDatabase implements TLCallback
                 $locationType = self::PHOTO_LOCATION_LOCATION;
                 break;
             default:
-                throw new Exception('Unknown location type provided: ' . $location['_']);
+                throw new Exception('Unknown location type provided: '.$location['_']);
         }
         $this->API->logger->logger("Caching reference from location of type {$locationType} from {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         if (!isset($this->cache[$key])) {
@@ -266,7 +266,7 @@ class ReferenceDatabase implements TLCallback
                     foreach ($cache as $location => $reference) {
                         $this->cache[$key][$location] = $reference;
                     }
-                    $this->API->logger->logger("Skipped origin {$originType} ({$data['_']}) for " . \count($cache) . ' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $this->API->logger->logger("Skipped origin {$originType} ({$data['_']}) for ".\count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     return;
                 }
                 break;
@@ -279,7 +279,7 @@ class ReferenceDatabase implements TLCallback
         foreach ($cache as $location => $reference) {
             $this->storeReference($location, $reference, $originType, $origin);
         }
-        $this->API->logger->logger("Added origin {$originType} ({$data['_']}) to " . \count($cache) . ' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Added origin {$originType} ({$data['_']}) to ".\count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
     }
     public function addOriginMethodContext(string $type)
     {
@@ -359,7 +359,7 @@ class ReferenceDatabase implements TLCallback
         foreach ($cache as $location => $reference) {
             $this->storeReference($location, $reference, $originType, $origin);
         }
-        $this->API->logger->logger("Added origin {$originType} ({$data['_']}) to " . \count($cache) . ' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Added origin {$originType} ({$data['_']}) to ".\count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
     }
     public function storeReference(string $location, string $reference, int $originType, array $origin)
     {
@@ -376,7 +376,7 @@ class ReferenceDatabase implements TLCallback
             $this->cache[$key][$location] = $reference;
         }
     }
-    public function refreshNext($refresh = false)
+    public function refreshNext(bool $refresh = false)
     {
         if ($this->refreshCount === 1 && !$refresh) {
             $this->refreshed = [];
@@ -488,16 +488,16 @@ class ReferenceDatabase implements TLCallback
         switch ($locationType) {
             case self::DOCUMENT_LOCATION:
             case self::PHOTO_LOCATION:
-                return $locationType . (\is_int($location['id']) ? \danog\MadelineProto\Tools::packSignedLong($location['id']) : $location['id']);
+                return $locationType.(\is_int($location['id']) ? \danog\MadelineProto\Tools::packSignedLong($location['id']) : $location['id']);
             case self::PHOTO_LOCATION_LOCATION:
                 $dc_id = \danog\MadelineProto\Tools::packSignedInt($location['dc_id']);
                 $volume_id = \is_int($location['volume_id']) ? \danog\MadelineProto\Tools::packSignedLong($location['volume_id']) : $location['volume_id'];
                 $local_id = \danog\MadelineProto\Tools::packSignedInt($location['local_id']);
-                return $locationType . $dc_id . $volume_id . $local_id;
+                return $locationType.$dc_id.$volume_id.$local_id;
         }
     }
     public function __debugInfo()
     {
-        return ['ReferenceDatabase instance ' . \spl_object_hash($this)];
+        return ['ReferenceDatabase instance '.\spl_object_hash($this)];
     }
 }

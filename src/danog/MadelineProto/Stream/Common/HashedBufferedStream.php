@@ -266,7 +266,7 @@ class HashedBufferedStream implements BufferedProxyStreamInterface, BufferInterf
                 throw new \danog\MadelineProto\Exception('Too much out of frame data was sent, cannot check hash');
             }
             \hash_update($this->write_hash, $data);
-            return $this->write_buffer->bufferWrite($data . $this->getWriteHash());
+            return $this->write_buffer->bufferWrite($data.$this->getWriteHash());
         }
         if ($this->write_check_after) {
             $this->write_check_pos += $length;

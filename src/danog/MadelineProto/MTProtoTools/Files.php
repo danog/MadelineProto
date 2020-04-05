@@ -87,7 +87,7 @@ trait Files
         if (!$this->settings['upload']['allow_automatic_upload']) {
             return yield from $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
         }
-        $file = \danog\MadelineProto\Absolute::absolute($file);
+        $file = Tools::absolute($file);
         if (!yield exists($file)) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['file_not_exist']);
         }
@@ -1095,7 +1095,7 @@ trait Files
             $cb = $file;
             $file = $file->getFile();
         }
-        $file = \danog\MadelineProto\Absolute::absolute(\preg_replace('|/+|', '/', $file));
+        $file = Tools::absolute(\preg_replace('|/+|', '/', $file));
         if (!yield exists($file)) {
             yield \touch($file);
         }
@@ -1388,7 +1388,7 @@ trait Files
             }
             if (isset($messageMedia['cdn_key'])) {
                 $ivec = \substr($messageMedia['cdn_iv'], 0, 12).\pack('N', $offset['offset'] >> 4);
-                $res['bytes'] = $this->ctrEncrypt($res['bytes'], $messageMedia['cdn_key'], $ivec);
+                $res['bytes'] = Crypt::ctrEncrypt($res['bytes'], $messageMedia['cdn_key'], $ivec);
                 $this->checkCdnHash($messageMedia['file_token'], $offset['offset'], $res['bytes'], $old_dc);
             }
             if (isset($messageMedia['key'])) {

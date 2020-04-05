@@ -39,7 +39,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 '.\str_replace('<img', '<amp-img', \file_get_contents('README.md')));
 
 $layer_list = '';
-$tempRes = \glob("$d/src/danog/MadelineProto/TL_telegram_*");
+$tempRes = \glob("$d/schemas/TL_telegram_*");
 $res = [];
 foreach ($tempRes as $file) {
     $layer = \preg_replace(['/.*telegram_v/', '/\..+/'], '', $file);
@@ -64,7 +64,7 @@ $layer = \end($layer);
 
 $docs = [
 /*    [
-        'tl_schema'   => ['td' => "$d/src/danog/MadelineProto/TL_td.tl"],
+        'tl_schema'   => ['td' => "$d/schemas/TL_td.tl"],
         'title'       => 'MadelineProto API documentation (td-lib)',
         'description' => 'MadelineProto API documentation (td-lib)',
         'output_dir'  => "$d/docs/docs/TD_docs",
@@ -72,14 +72,14 @@ $docs = [
         'td'          => true,
     ],*/
     [
-        'tl_schema'   => ['mtproto' => "$d/src/danog/MadelineProto/TL_mtproto_v1.json"],
+        'tl_schema'   => ['mtproto' => "$d/schemas/TL_mtproto_v1.json"],
         'title'       => 'MadelineProto API documentation (mtproto)',
         'description' => 'MadelineProto API documentation (mtproto)',
         'output_dir'  => "$d/docs/docs/MTProto_docs",
         'readme'      => false,
     ],
     [
-        'tl_schema'   => ['telegram' => "$d/src/danog/MadelineProto/TL_telegram_v$layer.tl", 'calls' => "$d/src/danog/MadelineProto/TL_calls.tl", 'secret' => "$d/src/danog/MadelineProto/TL_secret.tl", 'td' => "$d/src/danog/MadelineProto/TL_td.tl"],
+        'tl_schema'   => ['telegram' => "$d/schemas/TL_telegram_v$layer.tl", 'calls' => "$d/schemas/TL_calls.tl", 'secret' => "$d/schemas/TL_secret.tl", 'td' => "$d/schemas/TL_td.tl"],
         'title'       => "MadelineProto API documentation (layer $layer)",
         'description' => "MadelineProto API documentation (layer $layer)",
         'output_dir'  => "$d/docs/docs/API_docs",
@@ -114,9 +114,9 @@ $doc->mkAnnotations();
 
 $ton = [
     'tl_schema' => [
-        'lite_api' => "$d/src/danog/MadelineProto/TON/schemes/lite_api.tl",
-        'ton_api' => "$d/src/danog/MadelineProto/TON/schemes/ton_api.tl",
-        //'tonlib_api' => "$d/src/danog/MadelineProto/TON/schemes/tonlib_api.tl",
+        'lite_api' => "$d/schemas/TON/lite_api.tl",
+        'ton_api' => "$d/schemas/TON/ton_api.tl",
+        //'tonlib_api' => "$d/schemas/TON/tonlib_api.tl",
     ]
 ];
 

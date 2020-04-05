@@ -69,7 +69,7 @@ class Lite
         $this->settings = $settings;
         $this->logger = Logger::getLoggerFromSettings($this->settings);
         $this->TL = new TL($this);
-        $this->TL->init(['lite_api' => __DIR__ . '/schemes/lite_api.tl', 'ton_api' => __DIR__ . '/schemes/ton_api.tl']);
+        $this->TL->init(['lite_api' => __DIR__.'/../../../../schemas/TON/lite_api.tl', 'ton_api' => __DIR__.'/../../../../schemas/TON/ton_api.tl']);
     }
     /**
      * Connect to the lite endpoints specified in the config file.

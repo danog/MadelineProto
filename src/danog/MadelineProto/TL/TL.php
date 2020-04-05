@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\TL;
 
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Tools;
 
 /**
  * TL serialization.
@@ -142,7 +143,7 @@ class TL
         $this->tdDescriptions = ['types' => [], 'constructors' => [], 'methods' => []];
         foreach ($files as $scheme_type => $file) {
             $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['file_parsing'], \basename($file)), \danog\MadelineProto\Logger::VERBOSE);
-            $filec = \file_get_contents(\danog\MadelineProto\Absolute::absolute($file));
+            $filec = \file_get_contents(Tools::absolute($file));
             $TL_dict = \json_decode($filec, true);
             if ($TL_dict === null) {
                 $TL_dict = ['methods' => [], 'constructors' => []];
@@ -793,8 +794,8 @@ class TL
     /**
      * Deserialize TL object.
      *
-     * @param resource $stream Stream
-     * @param array    $type   Type identifier
+     * @param string|resource $stream Stream
+     * @param array           $type   Type identifier
      *
      * @return mixed
      */

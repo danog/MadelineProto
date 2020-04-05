@@ -126,7 +126,7 @@ class Logger
             $settings['logger']['logger_param'] = $settings['logger']['param'];
         }
         if (PHP_SAPI !== 'cli' && isset($settings['logger']['logger_param']) && $settings['logger']['logger_param'] === 'MadelineProto.log') {
-            $settings['logger']['logger_param'] = Magic::$script_cwd . '/MadelineProto.log';
+            $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
         }
         $logger = new self($settings['logger']['logger'], $settings['logger']['logger_param'] ?? '', $prefix, $settings['logger']['logger_level'] ?? Logger::VERBOSE, $settings['logger']['max_size'] ?? 100 * 1024 * 1024);
         if (!self::$default) {
@@ -136,7 +136,7 @@ class Logger
             try {
                 \error_reporting(E_ALL);
                 \ini_set('log_errors', 1);
-                \ini_set('error_log', $settings['logger']['logger'] === self::FILE_LOGGER ? $settings['logger']['logger_param'] : Magic::$script_cwd . '/MadelineProto.log');
+                \ini_set('error_log', $settings['logger']['logger'] === self::FILE_LOGGER ? $settings['logger']['logger_param'] : Magic::$script_cwd.'/MadelineProto.log');
                 \error_log('Enabled PHP logging');
             } catch (\danog\MadelineProto\Exception $e) {
                 $logger->logger('Could not enable PHP logging');
@@ -176,11 +176,11 @@ class Logger
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['no_mode_specified']);
         }
         $this->mode = $mode;
-        $this->optional = $mode == 2 ? Absolute::absolute($optional) : $optional;
-        $this->prefix = $prefix === '' ? '' : ', ' . $prefix;
+        $this->optional = $mode == 2 ? Tools::absolute($optional) : $optional;
+        $this->prefix = $prefix === '' ? '' : ', '.$prefix;
         $this->level = $level;
         if ($this->mode === 2 && !\file_exists(\pathinfo($this->optional, PATHINFO_DIRNAME))) {
-            $this->optional = Magic::$script_cwd . '/MadelineProto.log';
+            $this->optional = Magic::$script_cwd.'/MadelineProto.log';
         }
         if ($this->mode === 2 && !\preg_match('/\\.log$/', $this->optional)) {
             $this->optional .= '.log';
@@ -198,7 +198,7 @@ class Logger
         if ($this->mode === 3) {
             $this->stdout = getStdout();
             if (PHP_SAPI !== 'cli') {
-                $this->newline = '<br>' . $this->newline;
+                $this->newline = '<br>'.$this->newline;
             }
         } elseif ($this->mode === 2) {
             $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a+'));
@@ -226,7 +226,7 @@ class Logger
         if (!\is_null(self::$default)) {
             self::$default->logger($param, $level, \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php'));
         } else {
-            echo $param . PHP_EOL;
+            echo $param.PHP_EOL;
         }
     }
     /**
@@ -265,15 +265,15 @@ class Logger
         if (empty($file)) {
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
-        $param = \str_pad($file . $prefix . ': ', 16 + \strlen($prefix)) . "\t" . $param;
+        $param = \str_pad($file.$prefix.': ', 16 + \strlen($prefix))."\t".$param;
         switch ($this->mode) {
             case 1:
-                if ($this->stdout->write($param . $this->newline) instanceof Failure) {
+                if ($this->stdout->write($param.$this->newline) instanceof Failure) {
                     \error_log($param);
                 }
                 break;
             default:
-                $param = Magic::$isatty ? "\33[" . $this->colors[$level] . 'm' . $param . "\33[0m" . $this->newline : $param . $this->newline;
+                $param = Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
                 if ($this->stdout->write($param) instanceof Failure) {
                     switch ($this->mode) {
                         case 3:

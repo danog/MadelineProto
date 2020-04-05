@@ -131,7 +131,7 @@ class FeedLoop extends ResumableSignalLoop
             $this->save($update);
         }
     }
-    public function feed($updates): \Generator
+    public function feed(array $updates): \Generator
     {
         $result = [];
         foreach ($updates as $update) {
@@ -143,7 +143,7 @@ class FeedLoop extends ResumableSignalLoop
         }
         return $result;
     }
-    public function feedSingle($update): \Generator
+    public function feedSingle(array $update): \Generator
     {
         $channelId = false;
         switch ($update['_']) {
@@ -191,13 +191,13 @@ class FeedLoop extends ResumableSignalLoop
                         $log .= "from_id {$update['message']['from_id']}, ";
                     }
                     if ($to) {
-                        $log .= 'to_id ' . \json_encode($update['message']['to_id']) . ', ';
+                        $log .= 'to_id '.\json_encode($update['message']['to_id']).', ';
                     }
                     if ($via_bot) {
                         $log .= "via_bot {$update['message']['via_bot_id']}, ";
                     }
                     if ($entities) {
-                        $log .= 'entities ' . \json_encode($update['message']['entities']) . ', ';
+                        $log .= 'entities '.\json_encode($update['message']['entities']).', ';
                     }
                     $this->API->logger->logger("Not enough data: for message update {$log}, getting difference...", \danog\MadelineProto\Logger::VERBOSE);
                     $update = ['_' => 'updateChannelTooLong'];
@@ -208,7 +208,7 @@ class FeedLoop extends ResumableSignalLoop
                 break;
             default:
                 if ($channelId && !(yield from $this->API->peerIsset($this->API->toSupergroup($channelId)))) {
-                    $this->API->logger->logger('Skipping update, I do not have the channel id ' . $channelId, \danog\MadelineProto\Logger::ERROR);
+                    $this->API->logger->logger('Skipping update, I do not have the channel id '.$channelId, \danog\MadelineProto\Logger::ERROR);
                     return false;
                 }
                 break;
@@ -220,7 +220,7 @@ class FeedLoop extends ResumableSignalLoop
                 return yield from $this->API->feeders[false]->feedSingle($update);
             }
         }
-        $this->API->logger->logger('Was fed an update of type ' . $update['_'] . " in {$this}...", \danog\MadelineProto\Logger::VERBOSE);
+        $this->API->logger->logger('Was fed an update of type '.$update['_']." in {$this}...", \danog\MadelineProto\Logger::VERBOSE);
         $this->incomingUpdates[] = $update;
         return $this->channelId;
     }
@@ -236,7 +236,7 @@ class FeedLoop extends ResumableSignalLoop
                 continue;
             }
             if ($message['_'] !== 'messageEmpty') {
-                $this->API->logger->logger('Getdiff fed me message of type ' . $message['_'] . " in {$this}...", \danog\MadelineProto\Logger::VERBOSE);
+                $this->API->logger->logger('Getdiff fed me message of type '.$message['_']." in {$this}...", \danog\MadelineProto\Logger::VERBOSE);
             }
             $this->parsedUpdates[] = ['_' => $this->channelId === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
         }

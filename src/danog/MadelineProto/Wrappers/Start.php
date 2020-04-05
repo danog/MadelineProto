@@ -43,7 +43,7 @@ trait Start
                 yield from $this->phoneLogin(yield Tools::readLine('Enter your phone number: '));
                 $authorization = (yield from $this->completePhoneLogin(yield Tools::readLine('Enter the phone code: ')));
                 if ($authorization['_'] === 'account.password') {
-                    $authorization = (yield from $this->complete2faLogin(yield Tools::readLine('Please enter your password (hint ' . $authorization['hint'] . '): ')));
+                    $authorization = (yield from $this->complete2faLogin(yield Tools::readLine('Please enter your password (hint '.$authorization['hint'].'): ')));
                 }
                 if ($authorization['_'] === 'account.needSignup') {
                     $authorization = (yield from $this->completeSignup(yield Tools::readLine('Please enter your first name: '), yield Tools::readLine('Please enter your last name (can be empty): ')));
@@ -91,9 +91,9 @@ trait Start
             yield from $this->phoneLogin($_POST['phone_number']);
             yield from $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
     private function webCompletePhoneLogin(): \Generator
@@ -102,9 +102,9 @@ trait Start
             yield from $this->completePhoneLogin($_POST['phone_code']);
             yield from $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
     private function webComplete2faLogin(): \Generator
@@ -113,9 +113,9 @@ trait Start
             yield from $this->complete2faLogin($_POST['password']);
             yield from $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
     private function webCompleteSignup(): \Generator
@@ -124,9 +124,9 @@ trait Start
             yield from $this->completeSignup($_POST['first_name'], isset($_POST['last_name']) ? $_POST['last_name'] : '');
             yield from $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
     private function webBotLogin(): \Generator
@@ -135,9 +135,9 @@ trait Start
             yield from $this->botLogin($_POST['token']);
             yield from $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
 }

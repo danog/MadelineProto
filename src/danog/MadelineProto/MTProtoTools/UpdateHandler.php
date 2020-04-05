@@ -249,7 +249,7 @@ trait UpdateHandler
         if ($actual_updates) {
             $updates = $actual_updates;
         }
-        $this->logger->logger('Parsing updates (' . $updates['_'] . ') received via the socket...', \danog\MadelineProto\Logger::VERBOSE);
+        $this->logger->logger('Parsing updates ('.$updates['_'].') received via the socket...', \danog\MadelineProto\Logger::VERBOSE);
         switch ($updates['_']) {
             case 'updates':
             case 'updatesCombined':
@@ -311,7 +311,7 @@ trait UpdateHandler
                 $this->updaters[false]->resume();
                 break;
             default:
-                throw new \danog\MadelineProto\ResponseException('Unrecognized update received: ' . \var_export($updates, true));
+                throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.\var_export($updates, true));
                 break;
         }
     }
@@ -382,15 +382,15 @@ trait UpdateHandler
                     $cur_state->qts($update['qts']);
                 }
                 if ($update['qts'] < $cur_state->qts()) {
-                    $this->logger->logger('Duplicate update. update qts: ' . $update['qts'] . ' <= current qts ' . $cur_state->qts() . ', chat id: ' . $update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
+                    $this->logger->logger('Duplicate update. update qts: '.$update['qts'].' <= current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
                     return false;
                 }
                 if ($update['qts'] > $cur_state->qts() + 1) {
-                    $this->logger->logger('Qts hole. Fetching updates manually: update qts: ' . $update['qts'] . ' > current qts ' . $cur_state->qts() . '+1, chat id: ' . $update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
+                    $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
                     $this->updaters[false]->resumeDefer();
                     return false;
                 }
-                $this->logger->logger('Applying qts: ' . $update['qts'] . ' over current qts ' . $cur_state->qts() . ', chat id: ' . $update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
+                $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
                 yield from $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
             }
             yield from $this->handleEncryptedUpdate($update);
@@ -407,7 +407,7 @@ trait UpdateHandler
                     if ($this->settings['secret_chats']['accept_chats'] === false || \is_array($this->settings['secret_chats']['accept_chats']) && !\in_array($update['chat']['admin_id'], $this->settings['secret_chats']['accept_chats'])) {
                         return;
                     }
-                    $this->logger->logger('Accepting secret chat ' . $update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
+                    $this->logger->logger('Accepting secret chat '.$update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
                     try {
                         yield from $this->acceptSecretChat($update['chat']);
                     } catch (RPCErrorException $e) {
@@ -415,7 +415,7 @@ trait UpdateHandler
                     }
                     break;
                 case 'encryptedChatDiscarded':
-                    $this->logger->logger('Deleting secret chat ' . $update['chat']['id'] . ' because it was revoked by the other user', \danog\MadelineProto\Logger::NOTICE);
+                    $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user', \danog\MadelineProto\Logger::NOTICE);
                     if (isset($this->secret_chats[$update['chat']['id']])) {
                         unset($this->secret_chats[$update['chat']['id']]);
                     }
@@ -427,7 +427,7 @@ trait UpdateHandler
                     }
                     break;
                 case 'encryptedChat':
-                    $this->logger->logger('Completing creation of secret chat ' . $update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
+                    $this->logger->logger('Completing creation of secret chat '.$update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
                     yield from $this->completeSecretChat($update['chat']);
                     break;
             }
@@ -471,7 +471,7 @@ trait UpdateHandler
             $request->setHeader('content-type', 'application/json');
             $request->setBody($payload);
             $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();
-            $this->logger->logger('Result of webhook query is ' . $result, \danog\MadelineProto\Logger::NOTICE);
+            $this->logger->logger('Result of webhook query is '.$result, \danog\MadelineProto\Logger::NOTICE);
             $result = \json_decode($result, true);
             if (\is_array($result) && isset($result['method']) && $result['method'] != '' && \is_string($result['method'])) {
                 try {

@@ -406,9 +406,9 @@ abstract class Tools
      * @param \Generator|Promise  $promise Promise to resolve
      * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
      * @param string              $file    File
-     * 
+     *
      * @psalm-suppress InvalidScope
-     * 
+     *
      * @return Promise|mixed
      */
     public static function callFork($promise, $actual = null, $file = '')
@@ -450,7 +450,7 @@ abstract class Tools
      * @param string     $file File where the strand started
      *
      * @psalm-suppress InvalidScope
-     * 
+     *
      * @return void
      */
     public static function rethrow(\Throwable $e, $file = ''): void
@@ -482,7 +482,7 @@ abstract class Tools
      * @param \Generator|Promise $b Promise B
      *
      * @psalm-suppress InvalidScope
-     * 
+     *
      * @return Promise
      */
     public static function after($a, $b): Promise
@@ -521,7 +521,7 @@ abstract class Tools
      * @param integer $operation Locking mode
      * @param float  $polling   Polling interval
      *
-     * @return Promise
+     * @return Promise<callable>
      */
     public static function flock(string $file, int $operation, float $polling = 0.1): Promise
     {
@@ -576,7 +576,7 @@ abstract class Tools
      *
      * @param string $prompt Prompt
      *
-     * @return Promise
+     * @return Promise<string>
      */
     public static function readLine(string $prompt = ''): Promise
     {
@@ -589,7 +589,7 @@ abstract class Tools
      *
      * @internal Generator function
      *
-     * @return \Generator
+     * @return \Generator<string>
      */
     public static function readLineGenerator(string $prompt = ''): \Generator
     {
@@ -828,7 +828,7 @@ abstract class Tools
      * @param string $var Attribute name
      *
      * @psalm-suppress InvalidScope
-     * 
+     *
      * @return mixed
      * @access public
      */
@@ -850,7 +850,7 @@ abstract class Tools
      * @param mixed  $val Attribute value
      *
      * @psalm-suppress InvalidScope
-     * 
+     *
      * @return mixed
      * @access public
      */
@@ -863,5 +863,21 @@ abstract class Tools
             $obj,
             \get_class($obj)
         )->__invoke();
+    }
+    /**
+     * Get absolute path to file, related to session path.
+     *
+     * @param string $file File
+     *
+     * @internal
+     *
+     * @return string
+     */
+    public static function absolute(string $file): string
+    {
+        if (($file[0] ?? '') !== '/' && ($file[1] ?? '') !== ':' && !\in_array(\substr($file, 0, 4), ['phar', 'http'])) {
+            $file = Magic::getcwd().'/'.$file;
+        }
+        return $file;
     }
 }

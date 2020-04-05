@@ -32,6 +32,13 @@ use danog\MadelineProto\Loop\SignalLoopInterface;
 abstract class SignalLoop extends Loop implements SignalLoopInterface
 {
     private $signalDeferred;
+    /**
+     * Send signal to loop.
+     *
+     * @param mixed $what Data to signal
+     *
+     * @return void
+     */
     public function signal($what): void
     {
         if ($this->signalDeferred) {

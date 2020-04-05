@@ -117,7 +117,7 @@ class DoHConnector implements Connector
                 try {
                     $streamContext = \stream_context_create($socketContext->withoutTlsContext()->toStreamContextArray());
                     if (!($socket = @\stream_socket_client($builtUri, $errno, $errstr, null, $flags, $streamContext))) {
-                        throw new ConnectException(\sprintf('Connection to %s failed: [Error #%d] %s%s', $uri, $errno, $errstr, $failures ? '; previous attempts: ' . \implode($failures) : ''), $errno);
+                        throw new ConnectException(\sprintf('Connection to %s failed: [Error #%d] %s%s', $uri, $errno, $errstr, $failures ? '; previous attempts: '.\implode($failures) : ''), $errno);
                     }
                     \stream_set_blocking($socket, false);
                     $deferred = new Deferred();
@@ -126,7 +126,7 @@ class DoHConnector implements Connector
                     try {
                         yield Promise\timeout($deferred->promise(), $timeout);
                     } catch (TimeoutException $e) {
-                        throw new ConnectException(\sprintf('Connecting to %s failed: timeout exceeded (%d ms)%s', $uri, $timeout, $failures ? '; previous attempts: ' . \implode($failures) : ''), 110);
+                        throw new ConnectException(\sprintf('Connecting to %s failed: timeout exceeded (%d ms)%s', $uri, $timeout, $failures ? '; previous attempts: '.\implode($failures) : ''), 110);
                         // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno
                     } finally {
                         Loop::cancel($watcher);
@@ -135,7 +135,7 @@ class DoHConnector implements Connector
                     // The following hack looks like the only way to detect connection refused errors with PHP's stream sockets.
                     if (\stream_socket_get_name($socket, true) === false) {
                         \fclose($socket);
-                        throw new ConnectException(\sprintf('Connection to %s refused%s', $uri, $failures ? '; previous attempts: ' . \implode($failures) : ''), 111);
+                        throw new ConnectException(\sprintf('Connection to %s refused%s', $uri, $failures ? '; previous attempts: '.\implode($failures) : ''), 111);
                         // See ECONNREFUSED in http://www.virtsync.com/c-error-codes-include-errno
                     }
                 } catch (ConnectException $e) {
@@ -143,7 +143,7 @@ class DoHConnector implements Connector
                     // In fact, this might show a confusing error message on OS families that return 110 or 111 by itself.
                     $knownReasons = [110 => 'connection timeout', 111 => 'connection refused'];
                     $code = $e->getCode();
-                    $reason = $knownReasons[$code] ?? 'Error #' . $code;
+                    $reason = $knownReasons[$code] ?? 'Error #'.$code;
                     if (++$attempt === $socketContext->getMaxAttempts()) {
                         break;
                     }

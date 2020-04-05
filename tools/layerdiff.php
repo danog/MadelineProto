@@ -33,7 +33,7 @@ if ($argc !== 3) {
  */
 function getTL($layer)
 {
-    $layer = __DIR__."/../src/danog/MadelineProto/TL_telegram_v$layer.tl";
+    $layer = __DIR__."/../schemas/TL_telegram_v$layer.tl";
     $layer = new class($layer) {
         use TL;
 

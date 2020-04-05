@@ -155,7 +155,7 @@ class PasswordCalculator
      */
     public function createSalt(string $prefix = ''): string
     {
-        return $prefix . \danog\MadelineProto\Tools::random(32);
+        return $prefix.\danog\MadelineProto\Tools::random(32);
     }
     /**
      * Hash specified data using the salt with SHA256.
@@ -168,7 +168,7 @@ class PasswordCalculator
      */
     public function hashSha256(string $data, string $salt): string
     {
-        return \hash('sha256', $salt . $data . $salt, true);
+        return \hash('sha256', $salt.$data.$salt, true);
     }
     /**
      * Hashes the specified password.
@@ -207,14 +207,14 @@ class PasswordCalculator
         $id = $this->srp_id;
         $x = new BigInteger($this->hashPassword($password, $client_salt, $server_salt), 256);
         $g_x = $g->powMod($x, $p);
-        $k = new BigInteger(\hash('sha256', $pForHash . $gForHash, true), 256);
+        $k = new BigInteger(\hash('sha256', $pForHash.$gForHash, true), 256);
         $kg_x = $k->multiply($g_x)->powMod(Magic::$one, $p);
         $a = new BigInteger(\danog\MadelineProto\Tools::random(2048 / 8), 256);
         $A = $g->powMod($a, $p);
         $this->checkG($A, $p);
         $AForHash = \str_pad($A->toBytes(), 256, \chr(0), \STR_PAD_LEFT);
         $b_kg_x = $B->powMod(Magic::$one, $p)->subtract($kg_x);
-        $u = new BigInteger(\hash('sha256', $AForHash . $BForHash, true), 256);
+        $u = new BigInteger(\hash('sha256', $AForHash.$BForHash, true), 256);
         $ux = $u->multiply($x);
         $a_ux = $a->add($ux);
         $S = $b_kg_x->powMod($a_ux, $p);
@@ -223,7 +223,7 @@ class PasswordCalculator
         $h1 = \hash('sha256', $pForHash, true);
         $h2 = \hash('sha256', $gForHash, true);
         $h1 ^= $h2;
-        $M1 = \hash('sha256', $h1 . \hash('sha256', $client_salt, true) . \hash('sha256', $server_salt, true) . $AForHash . $BForHash . $K, true);
+        $M1 = \hash('sha256', $h1.\hash('sha256', $client_salt, true).\hash('sha256', $server_salt, true).$AForHash.$BForHash.$K, true);
         return ['_' => 'inputCheckPasswordSRP', 'srp_id' => $id, 'A' => $AForHash, 'M1' => $M1];
     }
     /**

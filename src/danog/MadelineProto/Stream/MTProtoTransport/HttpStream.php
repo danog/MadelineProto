@@ -68,7 +68,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     public function setExtra($extra)
     {
         if (isset($extra['user']) && isset($extra['password'])) {
-            $this->header = \base64_encode($extra['user'] . ':' . $extra['password']) . "\r\n";
+            $this->header = \base64_encode($extra['user'].':'.$extra['password'])."\r\n";
         }
     }
     /**
@@ -89,7 +89,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      */
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
-        $headers = 'POST ' . $this->uri->getPath() . " HTTP/1.1\r\nHost: " . $this->uri->getHost() . ':' . $this->uri->getPort() . "\r\n" . "Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: " . $length . $this->header . "\r\n\r\n";
+        $headers = 'POST '.$this->uri->getPath()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length.$this->header."\r\n\r\n";
         $buffer = yield $this->stream->getWriteBuffer(\strlen($headers) + $length, $append);
         yield $buffer->bufferWrite($headers);
         return $buffer;
@@ -127,7 +127,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
         }
         $code = (int) $code;
         unset($headers[0]);
-        if (\array_pop($headers) . \array_pop($headers) !== '') {
+        if (\array_pop($headers).\array_pop($headers) !== '') {
             throw new \danog\MadelineProto\Exception('Wrong last header');
         }
         foreach ($headers as $key => $current_header) {

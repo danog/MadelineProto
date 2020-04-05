@@ -126,7 +126,7 @@ class API extends InternalDoc
     public function __construct_async(string $session, array $settings = []): \Generator
     {
         Logger::constructorFromSettings($settings);
-        $this->session = $session = Absolute::absolute($session);
+        $this->session = $session = Tools::absolute($session);
         if ($unserialized = yield from Serialization::legacyUnserialize($session)) {
             $unserialized->storage = $unserialized->storage ?? [];
             $unserialized->session = $session;

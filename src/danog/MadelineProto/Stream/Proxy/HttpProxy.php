@@ -52,17 +52,17 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         if ($secure) {
             $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
-        $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port'])->secure(false);
+        $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
         $this->stream = (yield from $ctx->getStream());
         $address = $uri->getHost();
         $port = $uri->getPort();
         try {
             if (\strlen(\inet_pton($address) === 16)) {
-                $address = '[' . $address . ']';
+                $address = '['.$address.']';
             }
         } catch (\danog\MadelineProto\Exception $e) {
         }
-        yield $this->stream->write("CONNECT {$address}:{$port} HTTP/1.1\r\nHost: {$address}:{$port}\r\nAccept: */*\r\n" . $this->getProxyAuthHeader() . "Connection: keep-Alive\r\n\r\n");
+        yield $this->stream->write("CONNECT {$address}:{$port} HTTP/1.1\r\nHost: {$address}:{$port}\r\nAccept: */*\r\n".$this->getProxyAuthHeader()."Connection: keep-Alive\r\n\r\n");
         $buffer = yield $this->stream->getReadBuffer($l);
         $headers = '';
         $was_crlf = false;
@@ -87,7 +87,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         }
         $code = (int) $code;
         unset($headers[0]);
-        if (\array_pop($headers) . \array_pop($headers) !== '') {
+        if (\array_pop($headers).\array_pop($headers) !== '') {
             throw new \danog\MadelineProto\Exception('Wrong last header');
         }
         foreach ($headers as $key => $current_header) {
@@ -122,7 +122,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         if ($secure) {
             yield $this->getSocket()->setupTls();
         }
-        \danog\MadelineProto\Logger::log('Connected to ' . $address . ':' . $port . ' via http');
+        \danog\MadelineProto\Logger::log('Connected to '.$address.':'.$port.' via http');
         if (\strlen($header)) {
             yield (yield $this->stream->getWriteBuffer(\strlen($header)))->bufferWrite($header);
         }
@@ -171,7 +171,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
         if (!isset($this->extra['username']) || !isset($this->extra['password'])) {
             return '';
         }
-        return 'Proxy-Authorization: Basic ' . \base64_encode($this->extra['username'] . ':' . $this->extra['password']) . "\r\n";
+        return 'Proxy-Authorization: Basic '.\base64_encode($this->extra['username'].':'.$this->extra['password'])."\r\n";
     }
     /**
      * Sets proxy data.

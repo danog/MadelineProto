@@ -89,7 +89,7 @@ class SeqLoop extends ResumableSignalLoop
             $seq_end = $options['seq_end'];
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
-                $this->API->logger->logger('Seq hole. seq_start: ' . $seq_start . ' != cur seq: ' . ($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
                 yield $this->pause(1.0);
                 if (!$this->incomingUpdates) {
                     yield $this->API->updaters[false]->resume();
@@ -98,7 +98,7 @@ class SeqLoop extends ResumableSignalLoop
                 continue;
             }
             if ($result < 0) {
-                $this->API->logger->logger('Seq too old. seq_start: ' . $seq_start . ' != cur seq: ' . ($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger('Seq too old. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
                 continue;
             }
             $this->state->seq($seq_end);
@@ -110,7 +110,7 @@ class SeqLoop extends ResumableSignalLoop
     }
     public function feed($updates)
     {
-        $this->API->logger->logger('Was fed updates of type ' . $updates['_'] . '...', \danog\MadelineProto\Logger::VERBOSE);
+        $this->API->logger->logger('Was fed updates of type '.$updates['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
         $this->incomingUpdates[] = $updates;
     }
     public function save($updates): \Generator

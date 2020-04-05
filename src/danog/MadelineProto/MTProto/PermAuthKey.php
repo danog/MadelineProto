@@ -69,7 +69,7 @@ class PermAuthKey extends AuthKey
      */
     public function jsonSerialize(): array
     {
-        return ['auth_key' => 'pony' . \base64_encode($this->authKey), 'server_salt' => $this->serverSalt, 'authorized' => $this->authorized];
+        return ['auth_key' => 'pony'.\base64_encode($this->authKey), 'server_salt' => $this->serverSalt, 'authorized' => $this->authorized];
     }
     /**
      * Sleep function.

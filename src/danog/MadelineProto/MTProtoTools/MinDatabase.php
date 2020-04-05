@@ -96,7 +96,7 @@ class MinDatabase implements TLCallback
     public function reset()
     {
         if ($this->cache) {
-            $this->API->logger->logger('Found ' . \count($this->cache) . ' pending contexts', \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger('Found '.\count($this->cache).' pending contexts', \danog\MadelineProto\Logger::ERROR);
             $this->cache = [];
         }
     }
@@ -130,7 +130,7 @@ class MinDatabase implements TLCallback
             $frames = \array_reverse($frames);
             $tl_trace = \array_shift($frames);
             foreach ($frames as $frame) {
-                $tl_trace .= "['" . $frame . "']";
+                $tl_trace .= "['".$frame."']";
             }
             $this->API->logger->logger($tl_trace, \danog\MadelineProto\Logger::ERROR);
             return false;
@@ -194,7 +194,7 @@ class MinDatabase implements TLCallback
             }
             $this->db[$id] = $origin;
         }
-        $this->API->logger->logger("Added origin ({$data['_']}) to " . \count($cache) . ' peer locations', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Added origin ({$data['_']}) to ".\count($cache).' peer locations', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
     }
     public function populateFrom(array $object): \Generator
     {
@@ -228,6 +228,6 @@ class MinDatabase implements TLCallback
     }
     public function __debugInfo()
     {
-        return ['MinDatabase instance ' . \spl_object_hash($this)];
+        return ['MinDatabase instance '.\spl_object_hash($this)];
     }
 }

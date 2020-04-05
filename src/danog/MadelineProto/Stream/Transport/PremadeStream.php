@@ -94,7 +94,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
                 $this->stream = null;
             }
         } catch (\Throwable $e) {
-            \danog\MadelineProto\Logger::log('Got exception while closing stream: ' . $e->getMessage());
+            \danog\MadelineProto\Logger::log('Got exception while closing stream: '.$e->getMessage());
         }
     }
     public function close()

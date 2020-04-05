@@ -48,7 +48,7 @@ trait Extension
     {
         foreach (self::ALL_MIMES as $key => $value) {
             if (\array_search($mime, $value) !== false) {
-                return '.' . $key;
+                return '.'.$key;
             }
         }
         return '';

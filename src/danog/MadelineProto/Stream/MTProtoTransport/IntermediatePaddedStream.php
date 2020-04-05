@@ -47,7 +47,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
      */
     public function connect(ConnectionContext $ctx, string $header = ''): \Generator
     {
-        $this->stream = (yield from $ctx->getStream(\str_repeat(\chr(221), 4) . $header));
+        $this->stream = (yield from $ctx->getStream(\str_repeat(\chr(221), 4).$header));
     }
     /**
      * Async close.
@@ -68,7 +68,7 @@ class IntermediatePaddedStream implements BufferedStreamInterface, MTProtoBuffer
     public function getWriteBufferGenerator(int $length, string $append = ''): \Generator
     {
         $padding_length = \danog\MadelineProto\Tools::randomInt($modulus = 16);
-        $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append . \danog\MadelineProto\Tools::random($padding_length));
+        $buffer = yield $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.\danog\MadelineProto\Tools::random($padding_length));
         yield $buffer->bufferWrite(\pack('V', $padding_length + $length));
         return $buffer;
     }

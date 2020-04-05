@@ -53,12 +53,12 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         if ($secure) {
             $ctx->setSocketContext($ctx->getSocketContext()->withTlsContext(new ClientTlsContext($uri->getHost())));
         }
-        $ctx->setUri('tcp://' . $this->extra['address'] . ':' . $this->extra['port'])->secure(false);
+        $ctx->setUri('tcp://'.$this->extra['address'].':'.$this->extra['port'])->secure(false);
         $methods = \chr(0);
         if (isset($this->extra['username']) && isset($this->extra['password'])) {
             $methods .= \chr(2);
         }
-        $this->stream = (yield from $ctx->getStream(\chr(5) . \chr(\strlen($methods)) . $methods));
+        $this->stream = (yield from $ctx->getStream(\chr(5).\chr(\strlen($methods)).$methods));
         $l = 2;
         $buffer = yield $this->stream->getReadBuffer($l);
         $version = \ord(yield $buffer->bufferRead(1));
@@ -67,7 +67,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
             throw new \danog\MadelineProto\Exception("Wrong SOCKS5 version: {$version}");
         }
         if ($method === 2) {
-            $auth = \chr(1) . \chr(\strlen($this->extra['username'])) . $this->extra['username'] . \chr(\strlen($this->extra['password'])) . $this->extra['password'];
+            $auth = \chr(1).\chr(\strlen($this->extra['username'])).$this->extra['username'].\chr(\strlen($this->extra['password'])).$this->extra['password'];
             yield $this->stream->write($auth);
             $buffer = yield $this->stream->getReadBuffer($l);
             $version = \ord(yield $buffer->bufferRead(1));
@@ -84,9 +84,9 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $payload = \pack('C3', 0x5, 0x1, 0x0);
         try {
             $ip = \inet_pton($uri->getHost());
-            $payload .= $ip ? \pack('C1', \strlen($ip) === 4 ? 0x1 : 0x4) . $ip : \pack('C2', 0x3, \strlen($uri->getHost())) . $uri->getHost();
+            $payload .= $ip ? \pack('C1', \strlen($ip) === 4 ? 0x1 : 0x4).$ip : \pack('C2', 0x3, \strlen($uri->getHost())).$uri->getHost();
         } catch (\danog\MadelineProto\Exception $e) {
-            $payload .= \pack('C2', 0x3, \strlen($uri->getHost())) . $uri->getHost();
+            $payload .= \pack('C2', 0x3, \strlen($uri->getHost())).$uri->getHost();
         }
         $payload .= \pack('n', $uri->getPort());
         yield $this->stream->write($payload);
@@ -126,7 +126,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
         $l = 2;
         $buffer = yield $this->stream->getReadBuffer($l);
         $port = \unpack('n', yield $buffer->bufferRead(2))[1];
-        \danog\MadelineProto\Logger::log(['Connected to ' . $ip . ':' . $port . ' via socks5']);
+        \danog\MadelineProto\Logger::log(['Connected to '.$ip.':'.$port.' via socks5']);
         if ($secure) {
             yield $this->getSocket()->setupTls();
         }

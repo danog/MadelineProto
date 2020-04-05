@@ -73,11 +73,11 @@ trait Loop
                 $needs_restart = true;
             }
             if (isset($_REQUEST['MadelineSelfRestart'])) {
-                $this->logger->logger("Self-restarted, restart token " . $_REQUEST['MadelineSelfRestart']);
+                $this->logger->logger("Self-restarted, restart token ".$_REQUEST['MadelineSelfRestart']);
             }
             $this->logger->logger($needs_restart ? 'Will self-restart' : 'Will not self-restart');
             $backtrace = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-            $lockfile = \dirname(\end($backtrace)['file']) . '/bot' . $this->authorization['user']['id'] . '.lock';
+            $lockfile = \dirname(\end($backtrace)['file']).'/bot'.$this->authorization['user']['id'].'.lock';
             unset($backtrace);
             $try_locking = true;
             if (!\file_exists($lockfile)) {
@@ -117,7 +117,7 @@ trait Loop
             if ($needs_restart) {
                 $this->logger->logger("Adding restart callback!");
                 $id = Shutdown::addCallback(static function () use (&$logger) {
-                    $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp') . '://' . $_SERVER['SERVER_NAME'];
+                    $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
                     $port = $_SERVER['SERVER_PORT'];
                     $uri = $_SERVER['REQUEST_URI'];
                     $params = $_GET;
@@ -125,7 +125,7 @@ trait Loop
                     $url = \explode('?', $uri, 2)[0] ?? '';
                     $query = \http_build_query($params);
                     $uri = \implode('?', [$url, $query]);
-                    $payload = $_SERVER['REQUEST_METHOD'] . ' ' . $uri . ' ' . $_SERVER['SERVER_PROTOCOL'] . "\r\n" . 'Host: ' . $_SERVER['SERVER_NAME'] . "\r\n\r\n";
+                    $payload = $_SERVER['REQUEST_METHOD'].' '.$uri.' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n";
                     $logger->logger("Connecting to {$address}:{$port}");
                     $a = \fsockopen($address, $port);
                     $logger->logger("Sending self-restart payload");
@@ -211,7 +211,7 @@ trait Loop
         }
         $this->logger->logger($message);
         $buffer = @\ob_get_clean() ?: '';
-        $buffer .= '<html><body><h1>' . \htmlentities($message) . '</h1></body></html>';
+        $buffer .= '<html><body><h1>'.\htmlentities($message).'</h1></body></html>';
         \ignore_user_abort(true);
         \header('Connection: close');
         \header('Content-Type: text/html');

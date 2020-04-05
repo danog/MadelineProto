@@ -264,7 +264,7 @@ class DataCenter
                 $this->API->logger->logger('OK!', \danog\MadelineProto\Logger::WARNING);
                 return true;
             } catch (\Throwable $e) {
-                if (\constant("MADELINEPROTO_TEST")  === 'pony') {
+                if (@\constant("MADELINEPROTO_TEST")  === 'pony') {
                     throw $e;
                 }
                 $this->API->logger->logger("Connection failed ({$dc_number}): ".$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
@@ -272,6 +272,9 @@ class DataCenter
         }
         throw new Exception("Could not connect to DC {$dc_number}");
     }
+    /**
+     * @param int|string $dc_number
+     */
     public function generateContexts($dc_number = 0, string $uri = '', ConnectContext $context = null)
     {
         $ctxs = [];
@@ -488,7 +491,7 @@ class DataCenter
         if (empty($ctxs)) {
             unset($this->sockets[$dc_number]);
             $this->API->logger->logger("No info for DC {$dc_number}", \danog\MadelineProto\Logger::ERROR);
-        } elseif (\constant("MADELINEPROTO_TEST")  === 'pony') {
+        } elseif (@\constant("MADELINEPROTO_TEST")  === 'pony') {
             return [$ctxs[0]];
         }
         return $ctxs;

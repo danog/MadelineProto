@@ -42,7 +42,7 @@ class Serialization
      */
     public static function realpaths(string $file): array
     {
-        $file = Absolute::absolute($file);
+        $file = Tools::absolute($file);
         return ['file' => $file, 'lockfile' => $file.'.lock', 'tempfile' => $file.'.temp.session'];
     }
     /**
@@ -80,7 +80,7 @@ class Serialization
                 if ($e->getFile() === 'MadelineProto' && $e->getLine() === 1) {
                     throw $e;
                 }
-                if (\constant("MADELINEPROTO_TEST") === 'pony') {
+                if (@\constant("MADELINEPROTO_TEST") === 'pony') {
                     throw $e;
                 }
                 \class_exists('\\Volatile');

@@ -26,6 +26,7 @@ use Amp\Websocket\ClosedException;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Impl\SignalLoop;
+use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Tools;
 
@@ -168,13 +169,13 @@ class ReadLoop extends SignalLoop
                 $connection->incoming_messages[$message_id] = [];
             } elseif ($auth_key_id === $shared->getTempAuthKey()->getID()) {
                 $message_key = yield $buffer->bufferRead(16);
-                list($aes_key, $aes_iv) = $this->aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey(), false);
+                list($aes_key, $aes_iv) = Crypt::aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey(), false);
                 $encrypted_data = yield $buffer->bufferRead($payload_length - 24);
                 $protocol_padding = \strlen($encrypted_data) % 16;
                 if ($protocol_padding) {
                     $encrypted_data = \substr($encrypted_data, 0, -$protocol_padding);
                 }
-                $decrypted_data = $this->igeDecrypt($encrypted_data, $aes_key, $aes_iv);
+                $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
                 /*
                                 $server_salt = substr($decrypted_data, 0, 8);
                                 if ($server_salt != $shared->getTempAuthKey()->getServerSalt()) {

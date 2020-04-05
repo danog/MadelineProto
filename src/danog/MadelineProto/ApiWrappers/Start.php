@@ -40,7 +40,7 @@ trait Start
         if (PHP_SAPI === 'cli') {
             $stdout = getStdout();
             yield $stdout->write('You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a)
-Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id' . PHP_EOL);
+Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id'.PHP_EOL);
             if (\strpos(yield Tools::readLine('Your choice (m/a): '), 'm') !== false) {
                 yield $stdout->write('1) Login to my.telegram.org
 2) Go to API development tools
@@ -49,7 +49,7 @@ Note that you can also provide the API parameters directly in the code using the
     URL: your app/website\'s URL, or t.me/yourusername
     Platform: anything
     Description: Describe your app here
-4) Click on create application' . PHP_EOL);
+4) Click on create application'.PHP_EOL);
                 $app['api_id'] = yield Tools::readLine('5) Enter your API ID: ');
                 $app['api_hash'] = yield Tools::readLine('6) Enter your API hash: ');
                 return $app;
@@ -115,7 +115,7 @@ Note that you can also provide the API parameters directly in the code using the
             yield from $this->myTelegramOrgWrapper->login($_POST['phone_number']);
             yield from $this->webAPIEcho();
         } catch (\Throwable $e) {
-            yield from $this->webAPIEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webAPIEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
     private function webAPICompleteLogin(): \Generator
@@ -123,9 +123,9 @@ Note that you can also provide the API parameters directly in the code using the
         try {
             yield from $this->myTelegramOrgWrapper->completeLogin($_POST['code']);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webAPIEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webAPIEcho('ERROR: '.$e->getMessage().'. Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webAPIEcho('ERROR: ' . $e->getMessage() . '. Try again.');
+            yield from $this->webAPIEcho('ERROR: '.$e->getMessage().'. Try again.');
         }
     }
     private function webAPICreateApp(): \Generator
@@ -136,9 +136,9 @@ Note that you can also provide the API parameters directly in the code using the
             $app = (yield from $this->myTelegramOrgWrapper->createApp($params));
             return $app;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webAPIEcho('ERROR: ' . $e->getMessage() . ' Try again.');
+            yield from $this->webAPIEcho('ERROR: '.$e->getMessage().' Try again.');
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webAPIEcho('ERROR: ' . $e->getMessage() . ' Try again.');
+            yield from $this->webAPIEcho('ERROR: '.$e->getMessage().' Try again.');
         }
     }
 }

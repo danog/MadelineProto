@@ -27,24 +27,71 @@ use Amp\Http\Client\Request;
  */
 class MyTelegramOrgWrapper
 {
-    private $logged = false;
-    private $hash = '';
-    private $number;
-    private $creation_hash;
-    private $settings = [];
-    private $async = true;
+    /**
+     * Whether we're logged in.
+     */
+    private bool $logged = false;
+    /**
+     * Login hash.
+     */
+    private string $hash = '';
+    /**
+     * Phone number.
+     *
+     * @var string
+     */
+    private string $number = '';
+    /**
+     * Creation hash.
+     */
+    private string $creation_hash = '';
+    /**
+     * Settings.
+     */
+    private array $settings = [];
+    /**
+     * Async setting.
+     */
+    private bool $async = true;
+    /**
+     * Datacenter instance.
+     */
+    private DataCenter $datacenter;
+    /**
+     * Cooke jar.
+     *
+     * @var InMemoryCookieJar
+     */
     private $jar;
+    /**
+     * Endpoint.
+     */
     const MY_TELEGRAM_URL = 'https://my.telegram.org';
-    public function __sleep()
+    /**
+     * Sleep function.
+     *
+     * @return array
+     */
+    public function __sleep(): array
     {
         return ['logged', 'hash', 'number', 'creation_hash', 'settings', 'async', 'jar'];
     }
-    public function __construct($settings = [])
+    /**
+     * Constructor.
+     *
+     * @param array $settings
+     */
+    public function __construct(array $settings = [])
     {
         $this->settings = MTProto::parseSettings($settings, $this->settings);
         $this->__wakeup();
     }
-    public function __wakeup()
+    /**
+     * Wakeup function.
+     *
+     * @return void
+     */
+    public function __wakeup(): void
     {
         if ($this->settings === null) {
             $this->settings = [];
@@ -64,10 +111,17 @@ class MyTelegramOrgWrapper
             }
         }, [], $this->settings['connection_settings'], true, $this->jar);
     }
-    public function login($number): \Generator
+    /**
+     * Login.
+     *
+     * @param string $number Phone number
+     *
+     * @return \Generator
+     */
+    public function login(string $number): \Generator
     {
         $this->number = $number;
-        $request = new Request(self::MY_TELEGRAM_URL . '/auth/send_password', 'POST');
+        $request = new Request(self::MY_TELEGRAM_URL.'/auth/send_password', 'POST');
         $request->setBody(\http_build_query(['phone' => $number]));
         $request->setHeaders($this->getHeaders('origin'));
         $response = yield $this->datacenter->getHTTPClient()->request($request);
@@ -78,12 +132,19 @@ class MyTelegramOrgWrapper
         }
         $this->hash = $resulta['random_hash'];
     }
-    public function completeLogin($password): \Generator
+    /**
+     * Complete login.
+     *
+     * @param string $password Password
+     *
+     * @return \Generator
+     */
+    public function completeLogin(string $password): \Generator
     {
         if ($this->logged) {
             throw new Exception('Already logged in!');
         }
-        $request = new Request(self::MY_TELEGRAM_URL . '/auth/login', 'POST');
+        $request = new Request(self::MY_TELEGRAM_URL.'/auth/login', 'POST');
         $request->setBody(\http_build_query(['phone' => $this->number, 'random_hash' => $this->hash, 'password' => $password]));
         $request->setHeaders($this->getHeaders('origin'));
         $request->setHeader('user-agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
@@ -98,16 +159,26 @@ class MyTelegramOrgWrapper
         }
         return $this->logged = true;
     }
-    public function loggedIn()
+    /**
+     * Whether we are logged in.
+     *
+     * @return boolean
+     */
+    public function loggedIn(): bool
     {
         return $this->logged;
     }
+    /**
+     * Check if an app was already created.
+     *
+     * @return \Generator
+     */
     public function hasApp(): \Generator
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
         }
-        $request = new Request(self::MY_TELEGRAM_URL . '/apps');
+        $request = new Request(self::MY_TELEGRAM_URL.'/apps');
         $request->setHeaders($this->getHeaders('refer'));
         $response = yield $this->datacenter->getHTTPClient()->request($request);
         $result = yield $response->getBody()->buffer();
@@ -122,12 +193,17 @@ class MyTelegramOrgWrapper
         $this->logged = false;
         throw new Exception($title);
     }
+    /**
+     * Get the currently created app.
+     *
+     * @return \Generator
+     */
     public function getApp(): \Generator
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
         }
-        $request = new Request(self::MY_TELEGRAM_URL . '/apps');
+        $request = new Request(self::MY_TELEGRAM_URL.'/apps');
         $request->setHeaders($this->getHeaders('refer'));
         $response = yield $this->datacenter->getHTTPClient()->request($request);
         $result = yield $response->getBody()->buffer();
@@ -143,7 +219,14 @@ class MyTelegramOrgWrapper
         $api_hash = $asd[0];
         return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
     }
-    public function createApp($settings): \Generator
+    /**
+     * Create an app.
+     *
+     * @param array $settings App parameters
+     *
+     * @return \Generator
+     */
+    public function createApp(array $settings): \Generator
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
@@ -151,7 +234,7 @@ class MyTelegramOrgWrapper
         if (yield from $this->hasApp()) {
             throw new Exception('The app was already created!');
         }
-        $request = new Request(self::MY_TELEGRAM_URL . '/apps/create', 'POST');
+        $request = new Request(self::MY_TELEGRAM_URL.'/apps/create', 'POST');
         $request->setHeaders($this->getHeaders('app'));
         $request->setBody(\http_build_query(['hash' => $this->creation_hash, 'app_title' => $settings['app_title'], 'app_shortname' => $settings['app_shortname'], 'app_url' => $settings['app_url'], 'app_platform' => $settings['app_platform'], 'app_desc' => $settings['app_desc']]));
         $response = yield $this->datacenter->getHTTPClient()->request($request);
@@ -159,7 +242,7 @@ class MyTelegramOrgWrapper
         if ($result) {
             throw new Exception(\html_entity_decode($result));
         }
-        $request = new Request(self::MY_TELEGRAM_URL . '/apps');
+        $request = new Request(self::MY_TELEGRAM_URL.'/apps');
         $request->setHeaders($this->getHeaders('refer'));
         $response = yield $this->datacenter->getHTTPClient()->request($request);
         $result = yield $response->getBody()->buffer();
@@ -182,8 +265,12 @@ class MyTelegramOrgWrapper
     }
     /**
      * Function for generating curl request headers.
+     *
+     * @param string $httpType Origin
+     *
+     * @return array
      */
-    private function getHeaders($httpType)
+    private function getHeaders(string $httpType): array
     {
         // Common header flags.
         $headers = [];
@@ -194,26 +281,26 @@ class MyTelegramOrgWrapper
         // Add additional headers based on the type of request.
         switch ($httpType) {
             case 'origin':
-                $headers[] = 'Origin: ' . self::MY_TELEGRAM_URL;
+                $headers[] = 'Origin: '.self::MY_TELEGRAM_URL;
                 //$headers[] = 'Accept-Encoding: gzip, deflate, br';
                 $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
                 $headers[] = 'Accept: application/json, text/javascript, */*; q=0.01';
-                $headers[] = 'Referer: ' . self::MY_TELEGRAM_URL . '/auth';
+                $headers[] = 'Referer: '.self::MY_TELEGRAM_URL.'/auth';
                 $headers[] = 'X-Requested-With: XMLHttpRequest';
                 break;
             case 'refer':
                 //$headers[] = 'Accept-Encoding: gzip, deflate, sdch, br';
                 $headers[] = 'Upgrade-Insecure-Requests: 1';
                 $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
-                $headers[] = 'Referer: ' . self::MY_TELEGRAM_URL;
+                $headers[] = 'Referer: '.self::MY_TELEGRAM_URL;
                 $headers[] = 'Cache-Control: max-age=0';
                 break;
             case 'app':
-                $headers[] = 'Origin: ' . self::MY_TELEGRAM_URL;
+                $headers[] = 'Origin: '.self::MY_TELEGRAM_URL;
                 //$headers[] = 'Accept-Encoding: gzip, deflate, br';
                 $headers[] = 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8';
                 $headers[] = 'Accept: */*';
-                $headers[] = 'Referer: ' . self::MY_TELEGRAM_URL . '/apps';
+                $headers[] = 'Referer: '.self::MY_TELEGRAM_URL.'/apps';
                 $headers[] = 'X-Requested-With: XMLHttpRequest';
                 break;
         }
@@ -224,15 +311,37 @@ class MyTelegramOrgWrapper
         }
         return $final_headers;
     }
-    public function async($async)
+    /**
+     * Enable or disable async.
+     *
+     * @param boolean $async Async
+     *
+     * @return void
+     */
+    public function async(bool $async): void
     {
         $this->async = $async;
     }
-    public function loop($callable)
+    /**
+     * Run specified callable synchronously.
+     *
+     * @param callable $callable Callable
+     *
+     * @return mixed
+     */
+    public function loop(callable $callable)
     {
         return Tools::wait($callable());
     }
-    public function __call($name, $arguments)
+    /**
+     * Call function.
+     *
+     * @param string $name      Function name
+     * @param array  $arguments Arguments
+     *
+     * @return void
+     */
+    public function __call(string $name, array $arguments)
     {
         $name .= '_async';
         $async = \is_array(\end($arguments)) && isset(\end($arguments)['async']) ? \end($arguments)['async'] : $this->async;

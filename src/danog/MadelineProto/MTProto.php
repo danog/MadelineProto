@@ -872,7 +872,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 yield from $this->updateSettings($backtrace['args'][1], false);
             }
         }
-        if (($this->settings['tl_schema']['src']['botAPI'] ?? '') !== __DIR__.'/TL_botAPI.tl') {
+        if (($this->settings['tl_schema']['src']['botAPI'] ?? '') !== __DIR__.'/../../../schemas/TL_botAPI.tl') {
             unset($this->v);
         }
         if (!\file_exists($this->settings['tl_schema']['src']['telegram'])) {
@@ -1183,16 +1183,15 @@ class MTProto extends AsyncConstruct implements TLCallback
             'layer' => 111,
             // layer version
             'src' => [
-                'mtproto' => __DIR__.'/TL_mtproto_v1.tl',
+                'mtproto' => __DIR__.'/../../../schemas/TL_mtproto_v1.tl',
                 // mtproto TL scheme
-                'telegram' => __DIR__.'/TL_telegram_v111.tl',
+                'telegram' => __DIR__.'/../../../schemas/TL_telegram_v111.tl',
                 // telegram TL scheme
-                'secret' => __DIR__.'/TL_secret.tl',
+                'secret' => __DIR__.'/../../../schemas/TL_secret.tl',
                 // secret chats TL scheme
-                'calls' => __DIR__.'/TL_calls.tl',
+                'calls' => __DIR__.'/../../../schemas/TL_calls.tl',
                 // calls TL scheme
-                //'td'           => __DIR__.'/TL_td.tl', // telegram-cli TL scheme
-                'botAPI' => __DIR__.'/TL_botAPI.tl',
+                'botAPI' => __DIR__.'/../../../schemas/TL_botAPI.tl',
             ],
         ], 'logger' => [
             // Logger settings

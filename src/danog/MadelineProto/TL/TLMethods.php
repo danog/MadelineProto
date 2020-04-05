@@ -26,11 +26,11 @@ class TLMethods
     public $by_id = [];
     public $by_method = [];
     public $method_namespace = [];
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['by_id', 'by_method', 'method_namespace'];
     }
-    public function add($json_dict)
+    public function add(array $json_dict): void
     {
         $this->by_id[$json_dict['id']] = ['method' => $json_dict['method'], 'type' => $json_dict['type'], 'params' => $json_dict['params']];
         $this->by_method[$json_dict['method']] = $json_dict['id'];
@@ -40,7 +40,7 @@ class TLMethods
         }
         $this->parseParams($json_dict['id']);
     }
-    public function findById($id)
+    public function findById(string $id)
     {
         if (isset($this->by_id[$id])) {
             $method = $this->by_id[$id];
@@ -49,7 +49,7 @@ class TLMethods
         }
         return false;
     }
-    public function findByMethod($method_name)
+    public function findByMethod(string $method_name)
     {
         if (isset($this->by_method[$method_name])) {
             $method = $this->by_id[$this->by_method[$method_name]];
