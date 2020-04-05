@@ -7,3 +7,6 @@
 [submodule "examples/pipesbot"]
 	path = examples/pipesbot
 	url = git@github.com:danog/pipesbot
+[submodule "schemas"]
+	path = schemas
+	url = git@github.com:danog/schemas
