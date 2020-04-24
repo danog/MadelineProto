@@ -501,6 +501,7 @@ trait Files
         list($res) = yield \danog\MadelineProto\Tools::all([$read, $write]);
         return $res;
     }
+
     private function genAllFile($media): \Generator
     {
         $res = [$this->TL->getConstructors()->findByPredicate($media['_'])['type'] => $media];
@@ -508,11 +509,25 @@ trait Files
             case 'messageMediaPoll':
                 $res['Poll'] = $media['poll'];
                 $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
+                if ($res['Poll']['quiz']) {
+                    foreach ($media['results']['results'] as $answer) {
+                        if ($answer['correct']) {
+                            $res['InputMedia']['correct_answers'][] = $answer['option'];
+                        }
+                    }
+                }
                 break;
             case 'updateMessagePoll':
                 $res['Poll'] = $media['poll'];
                 $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
                 $res['MessageMedia'] = ['_' => 'messageMediaPoll', 'poll' => $res['Poll'], 'results' => $media['results']];
+                if ($res['Poll']['quiz']) {
+                    foreach ($media['results']['results'] as $answer) {
+                        if ($answer['correct']) {
+                            $res['InputMedia']['correct_answers'][] = $answer['option'];
+                        }
+                    }
+                }
                 break;
             case 'messageMediaPhoto':
                 if (!isset($media['photo']['access_hash'])) {
@@ -537,7 +552,7 @@ trait Files
                 }
                 break;
             case 'messageMediaDice':
-                $res['InputMedia'] = ['_' => 'inputMediaDice'];
+                $res['InputMedia'] = ['_' => 'inputMediaDice', 'emoticon' => $media['emoticon']];
                 break;
             case 'poll':
                 $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
