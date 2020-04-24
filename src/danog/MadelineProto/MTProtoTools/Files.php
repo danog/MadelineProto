@@ -526,7 +526,8 @@ trait Files
                 if (isset($media['results']['solution_entities'])) {
                     $res['InputMedia']['solution_entities'] = $media['results']['solution_entities'];
                 }
-                break;            case 'updateMessagePoll':
+                break;
+            case 'updateMessagePoll':
                 $res['Poll'] = $media['poll'];
                 $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
                 $res['MessageMedia'] = ['_' => 'messageMediaPoll', 'poll' => $res['Poll'], 'results' => $media['results']];
