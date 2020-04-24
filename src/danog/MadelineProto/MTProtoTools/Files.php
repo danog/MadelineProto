@@ -509,24 +509,44 @@ trait Files
             case 'messageMediaPoll':
                 $res['Poll'] = $media['poll'];
                 $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
-                if ($res['Poll']['quiz']) {
+                if (isset($res['Poll']['quiz']) && $res['Poll']['quiz']) {
+                    if (empty($media['results']['results'])) {
+                        //quizzes need a correct answer
+                        throw new \danog\MadelineProto\Exception('No poll results');
+                    }
                     foreach ($media['results']['results'] as $answer) {
                         if ($answer['correct']) {
                             $res['InputMedia']['correct_answers'][] = $answer['option'];
                         }
                     }
                 }
+                if (isset($media['results']['solution'])) {
+                    $res['InputMedia']['solution'] = $media['results']['solution'];
+                }
+                if (isset($media['results']['solution_entities'])) {
+                    $res['InputMedia']['solution_entities'] = $media['results']['solution_entities'];
+                }
                 break;
             case 'updateMessagePoll':
                 $res['Poll'] = $media['poll'];
                 $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
                 $res['MessageMedia'] = ['_' => 'messageMediaPoll', 'poll' => $res['Poll'], 'results' => $media['results']];
-                if ($res['Poll']['quiz']) {
+                if (isset($res['Poll']['quiz']) && $res['Poll']['quiz']) {
+                    if (empty($media['results']['results'])) {
+                        //quizzes need a correct answer
+                        throw new \danog\MadelineProto\Exception('No poll results');
+                    }
                     foreach ($media['results']['results'] as $answer) {
                         if ($answer['correct']) {
                             $res['InputMedia']['correct_answers'][] = $answer['option'];
                         }
                     }
+                }
+                if (isset($media['results']['solution'])) {
+                    $res['InputMedia']['solution'] = $media['results']['solution'];
+                }
+                if (isset($media['results']['solution_entities'])) {
+                    $res['InputMedia']['solution_entities'] = $media['results']['solution_entities'];
                 }
                 break;
             case 'messageMediaPhoto':
