@@ -41,7 +41,7 @@ class API extends InternalDoc
     /**
      * Instance of MadelineProto.
      *
-     * @var ?MTProto
+     * @var null|MTProto
      */
     public $API;
 
@@ -66,7 +66,7 @@ class API extends InternalDoc
      *
      * @internal
      *
-     * @var ?MyTelegramOrgWrapper
+     * @var null|MyTelegramOrgWrapper
      */
     private $myTelegramOrgWrapper;
 

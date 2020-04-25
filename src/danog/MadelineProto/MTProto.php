@@ -206,7 +206,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Instance of wrapper API.
      *
-     * @var ?APIWrapper
+     * @var null|APIWrapper
      */
     public $wrapper;
     /**
