@@ -27,6 +27,7 @@
         "amphp/dns": "^1",
         "amphp/byte-stream": "^1",
         "amphp/file": "^1",
+        "amphp/mysql": "^2.0",
         "danog/dns-over-https": "^0.2",
         "amphp/http-client-cookies": "^1",
         "danog/tg-file-decoder": "^0.1",
