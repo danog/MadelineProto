@@ -2,9 +2,14 @@
 
 namespace danog\MadelineProto\Db;
 
-class SharedMemoryArray extends DbArray
+class SharedMemoryArray extends \ArrayIterator implements DbArray
 {
     private static SharedMemoryArray $instance;
+
+    protected function __construct($array = [], $flags = 0)
+    {
+        parent::__construct((array) $array, $flags | self::STD_PROP_LIST);
+    }
 
     public static function getInstance(array $settings, string $name, $value = []): DbArray
     {

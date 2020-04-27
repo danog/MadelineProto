@@ -423,7 +423,9 @@ class ReferenceDatabase implements TLCallback
                 // Peer + photo ID
                 case self::PEER_PHOTO_ORIGIN:
                     if (isset($this->API->full_chats[$origin['peer']]['last_update'])) {
-                        $this->API->full_chats[$origin['peer']]['last_update'] = 0;
+                        $chat = $this->API->full_chats[$origin['peer']];
+                        $chat['last_update'] = 0;
+                        $this->API->full_chats[$origin['peer']] = $chat;
                     }
                     $this->API->getFullInfo($origin['peer']);
                     break;

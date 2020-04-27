@@ -2,8 +2,12 @@
 
 namespace danog\MadelineProto\Db;
 
-class MemoryArray extends DbArray
+class MemoryArray extends \ArrayIterator implements DbArray
 {
+    protected function __construct($array = [], $flags = 0)
+    {
+        parent::__construct((array) $array, $flags | self::STD_PROP_LIST);
+    }
 
     static function getInstance(array $settings, string $name, $value = []): DbArray
     {

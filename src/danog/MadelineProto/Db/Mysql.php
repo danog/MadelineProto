@@ -2,7 +2,6 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Loop;
 use Amp\Mysql\ConnectionConfig;
 use Amp\Mysql\Pool;
 use function Amp\Mysql\Pool;
@@ -40,6 +39,13 @@ class Mysql
         }
 
         return static::$connections[$dbKey];
+    }
+
+    public function __destruct()
+    {
+        foreach (static::$connections as $connection) {
+            $connection->close();
+        }
     }
 
 }

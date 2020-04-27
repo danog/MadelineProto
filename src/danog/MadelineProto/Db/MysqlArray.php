@@ -7,18 +7,18 @@ use Amp\Sql\ResultSet;
 use danog\MadelineProto\Tools;
 use function Amp\call;
 
-class MysqlArray extends DbArray
+class MysqlArray implements DbArray
 {
     private string $table;
     private array $settings;
     private Pool $db;
     private ?string $key = null;
+    private $current;
 
     public function __serialize(): array
     {
         return [
             'table' => $this->table,
-            'key' => $this->key,
             'settings' => $this->settings
         ];
     }
@@ -71,8 +71,7 @@ class MysqlArray extends DbArray
             ['index' => $index]
         );
 
-        $row = reset($row);
-        return !empty($row['count']);
+        return !empty($row[0]['count']);
     }
 
     /**
@@ -93,11 +92,7 @@ class MysqlArray extends DbArray
             "SELECT `value` FROM {$this->table} WHERE `key` = :index LIMIT 1",
             ['index' => $index]
         );
-        $row = reset($row);
-        if ($row) {
-            return unserialize($row['value']);
-        }
-        return null;
+        return $this->getValue($row);
 
     }
 
@@ -151,19 +146,6 @@ class MysqlArray extends DbArray
     }
 
     /**
-     * Append an element
-     * @link https://php.net/manual/en/arrayiterator.append.php
-     * @param mixed $value <p>
-     * The value to append.
-     * </p>
-     * @return void
-     */
-    public function append($value)
-    {
-        throw new \BadMethodCallException('Append operation does not supported');
-    }
-
-    /**
      * Get array copy
      *
      * @link https://php.net/manual/en/arrayiterator.getarraycopy.php
@@ -178,6 +160,7 @@ class MysqlArray extends DbArray
         foreach ($rows as $row) {
             $result[$row['key']] = unserialize($row['value']);
         }
+
         return $result;
     }
 
@@ -191,73 +174,8 @@ class MysqlArray extends DbArray
      */
     public function count(): int
     {
-        return $this->syncRequest("SELECT count(`key`) as `count` FROM {$this->table}")['count'] ?? 0;
-    }
-
-    /**
-     * Sort array by values
-     * @link https://php.net/manual/en/arrayiterator.asort.php
-     * @return void
-     */
-    public function asort()
-    {
-        throw new \BadMethodCallException('Sort operation does not supported');
-    }
-
-    /**
-     * Sort array by keys
-     * @link https://php.net/manual/en/arrayiterator.ksort.php
-     * @return void
-     */
-    public function ksort()
-    {
-        throw new \BadMethodCallException('Sort operation does not supported');
-    }
-
-    /**
-     * User defined sort
-     * @link https://php.net/manual/en/arrayiterator.uasort.php
-     * @param string $cmp_function <p>
-     * The compare function used for the sort.
-     * </p>
-     * @return void
-     */
-    public function uasort($cmp_function)
-    {
-        throw new \BadMethodCallException('Sort operation does not supported');
-    }
-
-    /**
-     * User defined sort
-     * @link https://php.net/manual/en/arrayiterator.uksort.php
-     * @param string $cmp_function <p>
-     * The compare function used for the sort.
-     * </p>
-     * @return void
-     */
-    public function uksort($cmp_function)
-    {
-        throw new \BadMethodCallException('Sort operation does not supported');
-    }
-
-    /**
-     * Sort an array naturally
-     * @link https://php.net/manual/en/arrayiterator.natsort.php
-     * @return void
-     */
-    public function natsort()
-    {
-        throw new \BadMethodCallException('Sort operation does not supported');
-    }
-
-    /**
-     * Sort an array naturally, case insensitive
-     * @link https://php.net/manual/en/arrayiterator.natcasesort.php
-     * @return void
-     */
-    public function natcasesort()
-    {
-        throw new \BadMethodCallException('Sort operation does not supported');
+        $row = $this->syncRequest("SELECT count(`key`) as `count` FROM {$this->table}");
+        return $row[0]['count'] ?? 0;
     }
 
     /**
@@ -271,6 +189,7 @@ class MysqlArray extends DbArray
     {
         $this->key = null;
         $this->key();
+        $this->current = null;
     }
 
     /**
@@ -282,7 +201,16 @@ class MysqlArray extends DbArray
      */
     public function current()
     {
-        return $this->offsetGet($this->key());
+        return $this->current ?: $this->offsetGet($this->key());
+    }
+
+    private function getValue(array $row)
+    {
+        if ($row) {
+            $row = reset($row);
+            return unserialize($row['value']);
+        }
+        return null;
     }
 
     /**
@@ -298,11 +226,7 @@ class MysqlArray extends DbArray
             $row = $this->syncRequest(
                 "SELECT `key` FROM {$this->table} ORDER BY `key` LIMIT 1"
             );
-            if ($row) {
-                $row = reset($row);
-                $this->key = $row['key'] ?? null;
-            }
-
+            $this->key = $row[0]['key'] ?? null;
         }
         return $this->key;
     }
@@ -314,13 +238,15 @@ class MysqlArray extends DbArray
      * @return void
      * @throws \Throwable
      */
-    public function next() {
+    public function next()
+    {
         $row = $this->syncRequest(
-            "SELECT `key` FROM {$this->table} WHERE `key` > :key LIMIT 1",
+            "SELECT `key`, `value` FROM {$this->table} WHERE `key` > :key ORDER BY `key` LIMIT 1",
             ['key' => $this->key()]
         );
-        $row = reset($row);
-        $this->key = $row['key'] ?? null;
+
+        $this->key = $row[0]['key'] ?? null;
+        $this->current = $this->getValue($row);
     }
 
     /**
@@ -330,17 +256,9 @@ class MysqlArray extends DbArray
      * @return bool
      * @throws \Throwable
      */
-    public function valid() {
-        if ($this->key() === null) {
-            return false;
-        }
-
-        $row = $this->syncRequest(
-            "SELECT `key` FROM {$this->table} WHERE `key` > :key LIMIT 1",
-            ['key' => $this->key()]
-        );
-
-        return $row !== null;
+    public function valid():bool
+    {
+        return $this->key !== null;
     }
 
     /**
@@ -357,14 +275,12 @@ class MysqlArray extends DbArray
             "SELECT `key` FROM {$this->table} ORDER BY `key` LIMIT 1, :position",
             ['offset' => $position]
         );
-        $row = reset($row);
-        if (isset($row['key'])) {
-            $this->key = $row['key'];
-        }
+        $this->key = $row[0]['key'] ?? $this->key;
     }
 
     private function initDbConnection()
     {
+        //TODO Use MtProto::$settings
         $this->db = Mysql::getConnection(
             $this->settings['host'],
             $this->settings['port'],
@@ -386,7 +302,7 @@ class MysqlArray extends DbArray
             CREATE TABLE IF NOT EXISTS `{$this->table}`
             (
                 `key` VARCHAR(255) NOT NULL,
-                `value` LONGTEXT NULL,
+                `value` MEDIUMBLOB NULL,
                 `ts` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY (`key`)
             )
@@ -411,13 +327,7 @@ class MysqlArray extends DbArray
                     $result = [];
                     if ($request instanceof ResultSet) {
                         while (yield $request->advance()) {
-                            $row = $request->getCurrent();
-                            if (isset($row['key'])) {
-                                $result[$row['key']] = $row;
-                            } else {
-                                $result[] = $row;
-                            }
-
+                            $result[] = $request->getCurrent();
                         }
                     }
                     return $result;
@@ -425,5 +335,4 @@ class MysqlArray extends DbArray
             )
         );
     }
-
 }

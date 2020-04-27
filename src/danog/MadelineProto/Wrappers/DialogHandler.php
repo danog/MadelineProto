@@ -33,7 +33,12 @@ trait DialogHandler
         if ($this->authorization['user']['bot']) {
             $res = [];
             foreach ($this->chats as $chat) {
-                $res[] = $this->genAll($chat)['Peer'];
+                try {
+                    $res[] = $this->genAll($chat)['Peer'];
+                } catch (\Throwable $e) {
+                    continue;
+                }
+
             }
             return $res;
         }

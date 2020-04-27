@@ -24,7 +24,6 @@ use Amp\File\StatCache;
 use Amp\Http\Client\HttpClient;
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Db\DbArray;
-use danog\MadelineProto\Db\DbType;
 use danog\MadelineProto\Db\Engines\DbInterface;
 use danog\MadelineProto\Db\DbPropertiesFabric;
 use danog\MadelineProto\Db\Mysql;
@@ -422,7 +421,12 @@ class MTProto extends AsyncConstruct implements TLCallback
     private array $dbProperies = [
         'chats' => 'array',
         'full_chats' => 'array',
-        'channel_participants' => 'array'
+        'channel_participants' => 'array',
+        'caching_simple' => 'array',
+        'caching_simple_username' => 'array',
+        'caching_possible_username' => 'array',
+        'caching_full_info' => 'array',
+        'caching_username_id' => 'array',
     ];
 
     /**
@@ -567,6 +571,16 @@ class MTProto extends AsyncConstruct implements TLCallback
             } else {
                 $this->{$property} = DbPropertiesFabric::get($this->settings['db'], $type, $property, $this->{$property});
             }
+        }
+
+        if (!$reset && count($this->caching_username_id) === 0) {
+            $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
+            foreach ($this->chats as $id => $chat) {
+                if (isset($chat['username'])) {
+                    $this->caching_username_id[$chat['username']] = $id;
+                }
+            }
+            $this->logger('Cache filled.', Logger::WARNING);
         }
     }
 

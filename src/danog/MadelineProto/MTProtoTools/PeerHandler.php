@@ -34,6 +34,8 @@ trait PeerHandler
     public $caching_simple_username = [];
     public $caching_possible_username = [];
     public $caching_full_info = [];
+    public $caching_username_id = [];
+
     /**
      * Convert MTProto channel ID to bot API channel ID.
      *
@@ -562,7 +564,19 @@ trait PeerHandler
             }
             return yield from $this->getInfo($this->supportUser);
         }
+        if ($bot_api_id = $this->caching_username_id[$id] ?? null) {
+            $chat = $this->chats[$bot_api_id];
+            if (empty($chat['username']) || $chat['username'] !== $id) {
+                unset($this->caching_username_id[$id]);
+            } else {
+                return $this->genAll($this->chats[$bot_api_id], $folder_id);
+            }
+        }
+
         foreach ($this->chats as $bot_api_id => $chat) {
+            if (isset($chat['username'])) {
+                $this->caching_username_id[$id] = $bot_api_id;
+            }
             if (isset($chat['username']) && \strtolower($chat['username']) === $id) {
                 if ($chat['min'] ?? false && !isset($this->caching_full_info[$bot_api_id])) {
                     $this->caching_full_info[$bot_api_id] = true;
@@ -969,7 +983,9 @@ trait PeerHandler
         }
         \sort($ids, SORT_NUMERIC);
         $gres['hash'] = \danog\MadelineProto\Tools::genVectorHash($ids);
-        $this->channel_participants[$channel['channel_id']][$filter][$q][$offset][$limit] = $gres;
+        $participant = $this->channel_participants[$channel['channel_id']];
+        $participant[$filter][$q][$offset][$limit] = $gres;
+        $this->channel_participants[$channel['channel_id']] = $participant;
     }
     private function getParticipantsHash($channel, $filter, $q, $offset, $limit)
     {
