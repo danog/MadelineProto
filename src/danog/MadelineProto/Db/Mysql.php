@@ -41,11 +41,4 @@ class Mysql
         return static::$connections[$dbKey];
     }
 
-    public function __destruct()
-    {
-        foreach (static::$connections as $connection) {
-            $connection->close();
-        }
-    }
-
 }

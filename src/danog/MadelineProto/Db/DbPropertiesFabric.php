@@ -2,10 +2,13 @@
 
 namespace danog\MadelineProto\Db;
 
+use danog\MadelineProto\API;
+use danog\MadelineProto\MTProto;
+
 class DbPropertiesFabric
 {
     /**
-     * @param array $dbSettings
+     * @param MTProto $madelineProto
      * @param string $propertyType
      * @param string $name
      * @param $value
@@ -16,15 +19,13 @@ class DbPropertiesFabric
      * @uses \danog\MadelineProto\Db\SharedMemoryArray
      * @uses \danog\MadelineProto\Db\MysqlArray
      */
-    public static function get(array $dbSettings, string $propertyType, string $name, $value = null): DbType
+    public static function get(MTProto $madelineProto, string $propertyType, string $name, $value = null): DbType
     {
         $class = __NAMESPACE__;
+        $dbSettings = $madelineProto->settings['db'];
         switch (strtolower($dbSettings['type'])) {
             case 'memory':
                 $class .= '\Memory';
-                break;
-            case 'sharedmemory':
-                $class .= '\SharedMemory';
                 break;
             case 'mysql':
                 $class .= '\Mysql';
@@ -34,6 +35,7 @@ class DbPropertiesFabric
 
         }
 
+        /** @var DbType $class */
         switch (strtolower($propertyType)){
             case 'array':
                 $class .= 'Array';
@@ -42,8 +44,8 @@ class DbPropertiesFabric
                 throw new \InvalidArgumentException("Unknown $propertyType: {$propertyType}");
         }
 
-        /** @var DbType $class */
-        return $class::getInstance($dbSettings, $name, $value);
+        $prefix = (string) ($madelineProto->getSelf()['id'] ?? 'tmp');
+        return $class::getInstance($name, $value, $prefix, $dbSettings[$dbSettings['type']]??[]);
     }
 
 }

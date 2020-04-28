@@ -24,10 +24,8 @@ use Amp\File\StatCache;
 use Amp\Http\Client\HttpClient;
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Db\DbArray;
-use danog\MadelineProto\Db\Engines\DbInterface;
 use danog\MadelineProto\Db\DbPropertiesFabric;
 use danog\MadelineProto\Db\Mysql;
-use danog\MadelineProto\Db\Types\ArrayType;
 use danog\MadelineProto\Loop\Generic\PeriodicLoop;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
@@ -286,6 +284,13 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @var DbArray
      */
     public $chats;
+
+    /**
+     * Cache of usernames for chats
+     *
+     * @var DbArray
+     */
+    public $usernames;
     /**
      * Cached parameters for fetching channel participants.
      *
@@ -422,11 +427,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         'chats' => 'array',
         'full_chats' => 'array',
         'channel_participants' => 'array',
-        'caching_simple' => 'array',
-        'caching_simple_username' => 'array',
-        'caching_possible_username' => 'array',
-        'caching_full_info' => 'array',
-        'caching_username_id' => 'array',
+        'usernames' => 'array',
     ];
 
     /**
@@ -507,6 +508,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             'referenceDatabase',
             'minDatabase',
             'channel_participants',
+            'usernames',
 
             // Misc caching
             'dialog_params',
@@ -569,18 +571,22 @@ class MTProto extends AsyncConstruct implements TLCallback
             if ($reset) {
                 unset($this->{$property});
             } else {
-                $this->{$property} = DbPropertiesFabric::get($this->settings['db'], $type, $property, $this->{$property});
+                $this->{$property} = DbPropertiesFabric::get($this, $type, $property, $this->{$property});
             }
         }
 
-        if (!$reset && count($this->caching_username_id) === 0) {
-            $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
-            foreach ($this->chats as $id => $chat) {
-                if (isset($chat['username'])) {
-                    $this->caching_username_id[$chat['username']] = $id;
+        if (!$reset && count($this->usernames) === 0) {
+            \Amp\Loop::run(function() {
+                $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
+                $iterator = $this->chats->getIterator();
+                while (yield $iterator->advance()) {
+                    $chat = $iterator->getCurrent();
+                    if (isset($chat['username'])) {
+                        $this->usernames->offsetSetAsync(\strtolower($chat['username']), $this->getId($chat));
+                    }
                 }
-            }
-            $this->logger('Cache filled.', Logger::WARNING);
+                $this->logger('Cache filled.', Logger::WARNING);
+            });
         }
     }
 
@@ -1298,8 +1304,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         /**
          * Where internal database will be stored?
          *      memory - session file
-         *      sharedMemory - multiples instances share db if run in single process
-         *      mysql - mysql database, shared by all instances in all processes.
+         *      mysql - mysql database
          */
         'db' => [
             'type' => 'memory',

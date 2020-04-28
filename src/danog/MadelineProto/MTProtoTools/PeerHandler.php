@@ -34,7 +34,6 @@ trait PeerHandler
     public $caching_simple_username = [];
     public $caching_possible_username = [];
     public $caching_full_info = [];
-    public $caching_username_id = [];
 
     /**
      * Convert MTProto channel ID to bot API channel ID.
@@ -122,6 +121,7 @@ trait PeerHandler
                         }
                     }
                     $this->chats[$user['id']] = $user;
+                    $this->cacheChatUsername($user['id'], $user);
                     $this->cachePwrChat($user['id'], false, true);
                 }
                 break;
@@ -149,6 +149,7 @@ trait PeerHandler
                 if (!isset($this->chats[-$chat['id']]) || $this->chats[-$chat['id']] !== $chat) {
                     $this->logger->logger("Updated chat -{$chat['id']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     $this->chats[-$chat['id']] = $chat;
+                    $this->cacheChatUsername(-$chat['id'], $chat);
                     $this->cachePwrChat(-$chat['id'], $this->settings['peer']['full_fetch'], true);
                 }
                 break;
@@ -185,6 +186,7 @@ trait PeerHandler
                         $chat = $newchat;
                     }
                     $this->chats[$bot_api_id] = $chat;
+                    $this->cacheChatUsername($bot_api_id, $chat);
                     if ($this->settings['peer']['full_fetch'] && (!isset($this->full_chats[$bot_api_id]) || $this->full_chats[$bot_api_id]['full']['participants_count'] !== (yield from $this->getFullInfo($bot_api_id))['full']['participants_count'])) {
                         $this->cachePwrChat($bot_api_id, $this->settings['peer']['full_fetch'], true);
                     }
@@ -192,6 +194,14 @@ trait PeerHandler
                 break;
         }
     }
+
+    private function cacheChatUsername(int $id, array $chat)
+    {
+        if (!empty($chat['username'])) {
+            $this->usernames[strtolower($chat['username'])] = $id;
+        }
+    }
+
     private function cachePwrChat($id, $full_fetch, $send)
     {
         \danog\MadelineProto\Tools::callFork((function () use ($id, $full_fetch, $send): \Generator {
@@ -564,19 +574,12 @@ trait PeerHandler
             }
             return yield from $this->getInfo($this->supportUser);
         }
-        if ($bot_api_id = $this->caching_username_id[$id] ?? null) {
+        if ($bot_api_id = $this->usernames[$id] ?? null) {
             $chat = $this->chats[$bot_api_id];
-            if (empty($chat['username']) || $chat['username'] !== $id) {
-                unset($this->caching_username_id[$id]);
-            } else {
-                return $this->genAll($this->chats[$bot_api_id], $folder_id);
+            if (empty($chat['username']) || \strtolower($chat['username']) !== $id) {
+                unset($this->usernames[$id]);
             }
-        }
 
-        foreach ($this->chats as $bot_api_id => $chat) {
-            if (isset($chat['username'])) {
-                $this->caching_username_id[$id] = $bot_api_id;
-            }
             if (isset($chat['username']) && \strtolower($chat['username']) === $id) {
                 if ($chat['min'] ?? false && !isset($this->caching_full_info[$bot_api_id])) {
                     $this->caching_full_info[$bot_api_id] = true;
@@ -598,6 +601,7 @@ trait PeerHandler
                 return $this->genAll($this->chats[$bot_api_id], $folder_id);
             }
         }
+
         if ($recursive) {
             yield from $this->resolveUsername($id);
             return yield from $this->getInfo($id, false);

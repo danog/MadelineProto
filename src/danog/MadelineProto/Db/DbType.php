@@ -4,5 +4,5 @@ namespace danog\MadelineProto\Db;
 
 interface DbType
 {
-    static function getInstance(array $settings, string $name, $value): self;
+    static function getInstance(string $name, $value, string $tablePrefix, array $settings): self;
 }

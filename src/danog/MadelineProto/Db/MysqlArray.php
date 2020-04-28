@@ -2,10 +2,15 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Loop;
 use Amp\Mysql\Pool;
+use Amp\Producer;
+use Amp\Promise;
 use Amp\Sql\ResultSet;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Tools;
 use function Amp\call;
+use function Amp\Promise\wait;
 
 class MysqlArray implements DbArray
 {
@@ -28,25 +33,51 @@ class MysqlArray implements DbArray
         foreach ($data as $property => $value) {
             $this->{$property} = $value;
         }
-        $this->initDbConnection();
+        try {
+            $this->db = static::getDbConnection($this->settings);
+        } catch (\Throwable $e) {
+            Logger::log($e->getMessage(), Logger::ERROR);
+        }
+
     }
 
-    public static function getInstance(array $settings, string $name, $value = []): DbType
+    public static function getInstance(string $name, $value, string $tablePrefix, array $settings): DbType
     {
         $instance = new static();
-        $instance->table = $name;
-        $instance->settings = $settings['mysql'];
-        $instance->initDbConnection();
-        $instance->prepareTable();
 
-        if (!empty($value) && !$value instanceof static) {
-            if ($value instanceof DbArray) {
-                $value = $value->getArrayCopy();
-            }
-            foreach ((array) $value as $key => $item) {
-                $instance[$key] = $item;
+        $instance->table = "{$tablePrefix}_{$name}";
+        $instance->settings = $settings;
+        $instance->db = static::getDbConnection($settings);
+
+        if ($value instanceof static) {
+            if ($instance->table !== $value->table) {
+                $instance->renameTable($value->table, $instance->table);
             }
         }
+        $instance->prepareTable();
+
+        Loop::defer(function() use($value, $instance){
+            if (!empty($value) && !$value instanceof static) {
+                Logger::log('Converting database.', Logger::ERROR);
+                if ($value instanceof DbArray) {
+                    $value = $value->getArrayCopy();
+                }
+                $value = (array) $value;
+                $counter = 0;
+                $total = count($value);
+                foreach ((array) $value as $key => $item) {
+                    $counter++;
+                    if ($counter % 100 === 0) {
+                        yield $instance->offsetSetAsync($key, $item);
+                        Logger::log("Converting database. $counter/$total", Logger::WARNING);
+                    } else {
+                        $instance->offsetSetAsync($key, $item);
+                    }
+
+                }
+                Logger::log('Converting database done.', Logger::ERROR);
+            }
+        });
 
 
         return $instance;
@@ -88,12 +119,19 @@ class MysqlArray implements DbArray
      */
     public function offsetGet($index)
     {
-        $row = $this->syncRequest(
-            "SELECT `value` FROM {$this->table} WHERE `key` = :index LIMIT 1",
-            ['index' => $index]
-        );
-        return $this->getValue($row);
+        return wait($this->offsetGetAsync($index));
+    }
 
+
+    public function offsetGetAsync(string $offset): Promise
+    {
+        return call(function() use($offset) {
+            $row = yield $this->request(
+                "SELECT `value` FROM {$this->table} WHERE `key` = :index LIMIT 1",
+                ['index' => $offset]
+            );
+            return $this->getValue($row);
+        });
     }
 
     /**
@@ -112,6 +150,20 @@ class MysqlArray implements DbArray
     public function offsetSet($index, $value)
     {
         $this->syncRequest("
+                INSERT INTO `{$this->table}` 
+                SET `key` = :index, `value` = :value 
+                ON DUPLICATE KEY UPDATE `value` = :value
+            ",
+            [
+                'index' => $index,
+                'value' => serialize($value),
+            ]
+        );
+    }
+
+    public function offsetSetAsync($index, $value): Promise
+    {
+        return $this->request("
                 INSERT INTO `{$this->table}` 
                 SET `key` = :index, `value` = :value 
                 ON DUPLICATE KEY UPDATE `value` = :value
@@ -164,6 +216,19 @@ class MysqlArray implements DbArray
         return $result;
     }
 
+    public function getIterator(): Producer
+    {
+        return new Producer(function (callable $emit) {
+            $request = yield $this->db->execute("SELECT `key`, `value` FROM {$this->table}");
+
+            while (yield $request->advance()) {
+                $row = $request->getCurrent();
+
+                yield $emit($this->getValue($row));
+            }
+        });
+    }
+
     /**
      * Count elements
      *
@@ -207,7 +272,9 @@ class MysqlArray implements DbArray
     private function getValue(array $row)
     {
         if ($row) {
-            $row = reset($row);
+            if (!empty($row[0]['value'])) {
+                $row = reset($row);
+            }
             return unserialize($row['value']);
         }
         return null;
@@ -272,21 +339,20 @@ class MysqlArray implements DbArray
     public function seek($position)
     {
         $row = $this->syncRequest(
-            "SELECT `key` FROM {$this->table} ORDER BY `key` LIMIT 1, :position",
+            "SELECT `key` FROM {$this->table} ORDER BY `key` LIMIT 1 OFFSET :position",
             ['offset' => $position]
         );
         $this->key = $row[0]['key'] ?? $this->key;
     }
 
-    private function initDbConnection()
+    public static function getDbConnection(array $settings): Pool
     {
-        //TODO Use MtProto::$settings
-        $this->db = Mysql::getConnection(
-            $this->settings['host'],
-            $this->settings['port'],
-            $this->settings['user'],
-            $this->settings['password'],
-            $this->settings['database'],
+        return Mysql::getConnection(
+            $settings['host'],
+            $settings['port'],
+            $settings['user'],
+            $settings['password'],
+            $settings['database'],
         );
     }
 
@@ -309,6 +375,18 @@ class MysqlArray implements DbArray
         ");
     }
 
+    private function renameTable(string $from, string $to)
+    {
+        try {
+            $this->syncRequest("
+                ALTER TABLE {$from} RENAME TO {$to};
+            ");
+        } catch (\Throwable $e) {
+            Logger::log("Cant rename table {$from} to {$to}", Logger::WARNING);
+        }
+
+    }
+
     /**
      * Perform blocking request to db
      *
@@ -320,19 +398,35 @@ class MysqlArray implements DbArray
      */
     private function syncRequest(string $query, array $params = []): array
     {
-        return Tools::wait(
-            call(
-                function() use($query, $params) {
-                    $request = yield $this->db->execute($query, $params);
-                    $result = [];
-                    if ($request instanceof ResultSet) {
-                        while (yield $request->advance()) {
-                            $result[] = $request->getCurrent();
-                        }
-                    }
-                    return $result;
+        return Tools::wait($this->request($query, $params));
+    }
+
+    /**
+     * Perform blocking request to db
+     *
+     * @param string $query
+     * @param array $params
+     *
+     * @return Promise
+     * @throws \Throwable
+     */
+    private function request(string $query, array $params = []): Promise
+    {
+        return call(function() use($query, $params) {
+            if (empty($this->db)) {
+                return [];
+            }
+
+            $request = yield $this->db->execute($query, $params);
+            $result = [];
+            if ($request instanceof ResultSet) {
+                while (yield $request->advance()) {
+                    $result[] = $request->getCurrent();
                 }
-            )
-        );
+            }
+            return $result;
+        });
+
+
     }
 }
