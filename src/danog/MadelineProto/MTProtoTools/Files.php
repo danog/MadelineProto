@@ -502,6 +502,7 @@ trait Files
         list($res) = yield \danog\MadelineProto\Tools::all([$read, $write]);
         return $res;
     }
+
     private function genAllFile($media): \Generator
     {
         $res = [$this->TL->getConstructors()->findByPredicate($media['_'])['type'] => $media];
@@ -509,11 +510,45 @@ trait Files
             case 'messageMediaPoll':
                 $res['Poll'] = $media['poll'];
                 $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
+                if (isset($res['Poll']['quiz']) && $res['Poll']['quiz']) {
+                    if (empty($media['results']['results'])) {
+                        //quizzes need a correct answer
+                        throw new \danog\MadelineProto\Exception('No poll results');
+                    }
+                    foreach ($media['results']['results'] as $answer) {
+                        if ($answer['correct']) {
+                            $res['InputMedia']['correct_answers'][] = $answer['option'];
+                        }
+                    }
+                }
+                if (isset($media['results']['solution'])) {
+                    $res['InputMedia']['solution'] = $media['results']['solution'];
+                }
+                if (isset($media['results']['solution_entities'])) {
+                    $res['InputMedia']['solution_entities'] = $media['results']['solution_entities'];
+                }
                 break;
             case 'updateMessagePoll':
                 $res['Poll'] = $media['poll'];
                 $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
                 $res['MessageMedia'] = ['_' => 'messageMediaPoll', 'poll' => $res['Poll'], 'results' => $media['results']];
+                if (isset($res['Poll']['quiz']) && $res['Poll']['quiz']) {
+                    if (empty($media['results']['results'])) {
+                        //quizzes need a correct answer
+                        throw new \danog\MadelineProto\Exception('No poll results');
+                    }
+                    foreach ($media['results']['results'] as $answer) {
+                        if ($answer['correct']) {
+                            $res['InputMedia']['correct_answers'][] = $answer['option'];
+                        }
+                    }
+                }
+                if (isset($media['results']['solution'])) {
+                    $res['InputMedia']['solution'] = $media['results']['solution'];
+                }
+                if (isset($media['results']['solution_entities'])) {
+                    $res['InputMedia']['solution_entities'] = $media['results']['solution_entities'];
+                }
                 break;
             case 'messageMediaPhoto':
                 if (!isset($media['photo']['access_hash'])) {
@@ -538,7 +573,7 @@ trait Files
                 }
                 break;
             case 'messageMediaDice':
-                $res['InputMedia'] = ['_' => 'inputMediaDice'];
+                $res['InputMedia'] = ['_' => 'inputMediaDice', 'emoticon' => $media['emoticon']];
                 break;
             case 'poll':
                 $res['InputMedia'] = ['_' => 'inputMediaPoll', 'poll' => $res['Poll']];
