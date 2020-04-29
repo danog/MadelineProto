@@ -110,7 +110,8 @@ trait AuthKeyHandler
                  * ***********************************************************************
                  * Compute p and q
                  */
-                $pq = (string) new BigInteger((string) $pq_bytes, 256);
+                $pq = new BigInteger((string) $pq_bytes, 256);
+                $pqStr = (string) $pq;
                 foreach ([
                     'auto_single',
                     'native_single_cpp',
@@ -124,9 +125,9 @@ trait AuthKeyHandler
                     $q = new BigInteger(0);
                     try {
                         if ($method === 'wolfram') {
-                            $p = new BigInteger(yield from $this->wolframSingle($pq));
+                            $p = new BigInteger(yield from $this->wolframSingle($pqStr));
                         } else {
-                            $p = new BigInteger(@PrimeModule::$method($pq));
+                            $p = new BigInteger(@PrimeModule::$method($pqStr));
                         }
                     } catch (\Throwable $e) {
                         $this->logger->logger("While factorizing with $method: $e");

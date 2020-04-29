@@ -19,6 +19,11 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
+
+if (function_exists('memprof_enable')) {
+    memprof_enable();
+}
+
 use Amp\Http\Server\HttpServer;
 use danog\MadelineProto\API;
 use danog\MadelineProto\APIWrapper;
@@ -86,6 +91,10 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
         $this->UPLOAD = \class_exists(HttpServer::class);
         parent::__construct($API);
     }
+    public function onStart()
+    {
+        $this->adminId = yield $this->getInfo(self::ADMIN)['bot_api_id'];
+    }
     /**
      * Handle updates from channels and supergroups.
      *
@@ -125,6 +134,13 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
             }
             if ($update['message']['message'] === '/start') {
                 return $this->messages->sendMessage(['peer' => $peerId, 'message' => self::START, 'parse_mode' => 'Markdown', 'reply_to_msg_id' => $messageId]);
+            }
+            if ($update['message']['message'] === '/report' && $peerId === $this->adminId) {
+                memprof_dump_callgrind($stm = fopen("php://memory", "w"));
+                fseek($stm, 0);
+                yield $this->messages->sendMedia(['peer' => $peerId, 'media' => ['_' => 'inputMediaUploadedDocument', 'file' => $stm, 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'callgrind.out']]]]);
+                fclose($stm);
+                return;
             }
             if (isset($update['message']['media']['_']) && $update['message']['media']['_'] !== 'messageMediaWebPage') {
                 if ($this->UPLOAD && ($this->states[$peerId] ?? false) === $this->UPLOAD) {
