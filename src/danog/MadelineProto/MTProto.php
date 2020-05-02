@@ -1314,7 +1314,8 @@ class MTProto extends AsyncConstruct implements TLCallback
                 'port' => 3306,
                 'user' => 'root',
                 'password' => '',
-                'database' => 'MadelineProto'
+                'database' => 'MadelineProto',
+                'cache_ttl' => '+1 day',
             ]
         ],
         'upload' => ['allow_automatic_upload' => true, 'part_size' => 512 * 1024, 'parallel_chunks' => 20], 'download' => ['report_broken_media' => true, 'part_size' => 1024 * 1024, 'parallel_chunks' => 20], 'pwr' => [

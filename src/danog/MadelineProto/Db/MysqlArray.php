@@ -8,12 +8,13 @@ use Amp\Producer;
 use Amp\Promise;
 use Amp\Sql\ResultSet;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Tools;
 use function Amp\call;
 use function Amp\Promise\wait;
 
 class MysqlArray implements DbArray
 {
+    use ArrayCacheTrait;
+
     private string $table;
     private array $settings;
     private Pool $db;
@@ -48,6 +49,7 @@ class MysqlArray implements DbArray
         $instance->table = "{$tablePrefix}_{$name}";
         $instance->settings = $settings;
         $instance->db = static::getDbConnection($settings);
+        $instance->ttl = $settings['cache_ttl'] ?? $instance->ttl;
 
         if ($value instanceof static) {
             if ($instance->table !== $value->table) {
@@ -97,12 +99,7 @@ class MysqlArray implements DbArray
      */
     public function offsetExists($index)
     {
-        $row = $this->syncRequest(
-            "SELECT count(`key`) as `count` FROM {$this->table} WHERE `key` = :index LIMIT 1",
-            ['index' => $index]
-        );
-
-        return !empty($row[0]['count']);
+        return $this->offsetGet($index) !== null;
     }
 
     /**
@@ -126,11 +123,20 @@ class MysqlArray implements DbArray
     public function offsetGetAsync(string $offset): Promise
     {
         return call(function() use($offset) {
+            if ($cached = $this->getCache($offset)) {
+                return $cached;
+            }
+
             $row = yield $this->request(
                 "SELECT `value` FROM {$this->table} WHERE `key` = :index LIMIT 1",
                 ['index' => $offset]
             );
-            return $this->getValue($row);
+
+            if ($value = $this->getValue($row)) {
+                $this->setCache($offset, $value);
+            }
+
+            return $value;
         });
     }
 
@@ -149,20 +155,13 @@ class MysqlArray implements DbArray
      */
     public function offsetSet($index, $value)
     {
-        $this->syncRequest("
-                INSERT INTO `{$this->table}` 
-                SET `key` = :index, `value` = :value 
-                ON DUPLICATE KEY UPDATE `value` = :value
-            ",
-            [
-                'index' => $index,
-                'value' => serialize($value),
-            ]
-        );
+        wait($this->offsetSetAsync($index, $value));
     }
 
     public function offsetSetAsync($index, $value): Promise
     {
+        $this->setCache($index, $value);
+
         return $this->request("
                 INSERT INTO `{$this->table}` 
                 SET `key` = :index, `value` = :value 
@@ -189,6 +188,8 @@ class MysqlArray implements DbArray
      */
     public function offsetUnset($index)
     {
+        $this->unsetCache($index);
+
         $this->syncRequest("
                     DELETE FROM `{$this->table}`
                     WHERE `key` = :index
@@ -398,7 +399,7 @@ class MysqlArray implements DbArray
      */
     private function syncRequest(string $query, array $params = []): array
     {
-        return Tools::wait($this->request($query, $params));
+        return wait($this->request($query, $params));
     }
 
     /**
@@ -426,7 +427,5 @@ class MysqlArray implements DbArray
             }
             return $result;
         });
-
-
     }
 }
