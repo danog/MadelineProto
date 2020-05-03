@@ -4,6 +4,7 @@ namespace danog\MadelineProto\Db;
 
 use Amp\Mysql\ConnectionConfig;
 use Amp\Mysql\Pool;
+use function Amp\call;
 use function Amp\Mysql\Pool;
 use function Amp\Promise\wait;
 
@@ -52,12 +53,17 @@ class Mysql
      * @throws \Amp\Sql\FailureException
      * @throws \Throwable
      */
-    private static function createDb(ConnectionConfig $config) {
-        $db = $config->getDatabase();
-        wait(pool($config->withDatabase(null))->query("
-            CREATE DATABASE IF NOT EXISTS `{$db}`
-            CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
-        "));
+    private static function createDb(ConnectionConfig $config)
+    {
+        wait(call(function() use($config) {
+            $db = $config->getDatabase();
+            $connection = pool($config->withDatabase(null));
+            yield $connection->query("
+                CREATE DATABASE IF NOT EXISTS `{$db}`
+                CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
+            ");
+            $connection->close();
+        }));
 
     }
 

@@ -5,10 +5,13 @@ namespace danog\MadelineProto\Db;
 use Amp\Producer;
 use Amp\Promise;
 
-interface DbArray extends DbType, \ArrayAccess, \Countable, \Iterator, \SeekableIterator
+interface DbArray extends DbType, \ArrayAccess, \Countable
 {
-    public function getArrayCopy();
-    public function offsetGetAsync(string $offset): Promise;
-    public function offsetSetAsync(string $offset, $value): Promise;
+    public function getArrayCopy(): array;
+    public function offsetExists($offset): Promise;
+    public function offsetGet($offset): Promise;
+    public function offsetSet($offset, $value);
+    public function offsetUnset($offset): Promise;
+    public function count(): Promise;
     public function getIterator(): Producer;
 }

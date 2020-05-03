@@ -2,7 +2,6 @@
 
 namespace danog\MadelineProto\Db;
 
-use danog\MadelineProto\API;
 use danog\MadelineProto\MTProto;
 
 class DbPropertiesFabric
@@ -13,7 +12,7 @@ class DbPropertiesFabric
      * @param string $name
      * @param $value
      *
-     * @return mixed
+     * @return DbType
      *
      * @uses \danog\MadelineProto\Db\MemoryArray
      * @uses \danog\MadelineProto\Db\SharedMemoryArray
@@ -44,8 +43,18 @@ class DbPropertiesFabric
                 throw new \InvalidArgumentException("Unknown $propertyType: {$propertyType}");
         }
 
-        $prefix = (string) ($madelineProto->getSelf()['id'] ?? 'tmp');
+        $prefix = static::getSessionId($madelineProto);
         return $class::getInstance($name, $value, $prefix, $dbSettings[$dbSettings['type']]??[]);
+    }
+
+    private static function getSessionId(MTProto $madelineProto): string
+    {
+        $result = $madelineProto->getSelf()['id'] ?? null;
+        if (!$result) {
+            $result = 'tmp_';
+            $result .= str_replace('0','', spl_object_hash($madelineProto));
+        }
+        return (string) $result;
     }
 
 }

@@ -13,7 +13,7 @@ class MemoryArray extends \ArrayIterator implements DbArray
         parent::__construct((array) $array, $flags | self::STD_PROP_LIST);
     }
 
-    public static function getInstance(string $name, $value, string $tablePrefix, array $settings): DbArray
+    public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): DbArray
     {
         if ($value instanceof DbArray) {
             $value = $value->getArrayCopy();
@@ -21,26 +21,36 @@ class MemoryArray extends \ArrayIterator implements DbArray
         return new static($value);
     }
 
-    public static function getDbConnection(array $settings)
+    public function offsetExists($offset): Promise
     {
-        return null;
+        return call(fn() => parent::offsetExists($offset));
     }
 
-    public function offsetGetAsync(string $offset): Promise
+    public function offsetGet($offset): Promise
     {
-        return call(fn() => $this->offsetGet($offset));
+        return call(fn() => parent::offsetGet($offset));
     }
 
-    public function offsetSetAsync(string $offset, $value): Promise
+    public function offsetUnset($offset): Promise
     {
-        return call(fn() => $this->offsetSet($offset, $value));
+        return call(fn() => parent::offsetUnset($offset));
+    }
+
+    public function count(): Promise
+    {
+        return call(fn() => parent::count());
+    }
+
+    public function getArrayCopy(): array
+    {
+        return parent::getArrayCopy();
     }
 
     public function getIterator(): Producer
     {
         return new Producer(function (callable $emit) {
-            foreach ($this as $value) {
-                yield $emit($value);
+            foreach ($this as $key => $value) {
+                yield $emit([$key, $value]);
             }
         });
     }

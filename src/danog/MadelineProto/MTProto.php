@@ -22,6 +22,7 @@ namespace danog\MadelineProto;
 use Amp\Dns\Resolver;
 use Amp\File\StatCache;
 use Amp\Http\Client\HttpClient;
+use Amp\Promise;
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFabric;
@@ -288,13 +289,13 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Cache of usernames for chats
      *
-     * @var DbArray
+     * @var DbArray|Promise[]
      */
     public $usernames;
     /**
      * Cached parameters for fetching channel participants.
      *
-     * @var DbArray
+     * @var DbArray|Promise[]
      */
     public $channel_participants;
     /**
@@ -312,7 +313,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Full chat info database.
      *
-     * @var DbArray
+     * @var DbArray|Promise[]
      */
     public $full_chats;
     /**
@@ -454,7 +455,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         // Parse and store settings
         yield from $this->updateSettings($settings, false);
         $this->logger->logger(Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
-        $this->cleanupProperties();
+        yield from $this->cleanupProperties();
         // Load rsa keys
         $this->logger->logger(Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);
         $this->rsa_keys = [];
@@ -565,7 +566,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         ];
     }
 
-    public function initDb(bool $reset = false): void
+    public function initDb(bool $reset = false): \Generator
     {
         foreach ($this->dbProperies as $property => $type) {
             if ($reset) {
@@ -575,18 +576,16 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
         }
 
-        if (!$reset && count($this->usernames) === 0) {
-            \Amp\Loop::run(function() {
-                $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
-                $iterator = $this->chats->getIterator();
-                while (yield $iterator->advance()) {
-                    $chat = $iterator->getCurrent();
-                    if (isset($chat['username'])) {
-                        $this->usernames->offsetSetAsync(\strtolower($chat['username']), $this->getId($chat));
-                    }
+        if (!$reset && yield $this->usernames->count() === 0) {
+            $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
+            $iterator = $this->chats->getIterator();
+            while (yield $iterator->advance()) {
+                [$id, $chat] = $iterator->getCurrent();
+                if (isset($chat['username'])) {
+                    $this->usernames[\strtolower($chat['username'])] = $this->getId($chat);
                 }
-                $this->logger('Cache filled.', Logger::WARNING);
-            });
+            }
+            $this->logger('Cache filled.', Logger::WARNING);
         }
     }
 
@@ -802,13 +801,17 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->TL->init($this->settings['tl_schema']['src'], $callbacks);
         }
 
-        $this->initDb();
+        yield from $this->initDb();
 
     }
+
     /**
      * Upgrade MadelineProto instance.
      *
      * @return \Generator
+     * @throws Exception
+     * @throws RPCErrorException
+     * @throws \Throwable
      */
     private function upgradeMadelineProto(): \Generator
     {
@@ -831,16 +834,19 @@ class MTProto extends AsyncConstruct implements TLCallback
             unset($settings['authorization']['rsa_key']);
         }
 
-        $this->initDb();
+        yield from $this->initDb();
 
         if (!isset($this->secret_chats)) {
             $this->secret_chats = [];
         }
-        foreach ($this->full_chats as $id => $full) {
+        $iterator = $this->full_chats->getIterator();
+        while (yield $iterator->advance()) {
+            [$id, $full] = $iterator->getCurrent();
             if (isset($full['full'], $full['last_update'])) {
                 $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
             }
         }
+
         foreach ($this->secret_chats as $key => &$chat) {
             if (!\is_array($chat)) {
                 unset($this->secret_chats[$key]);
@@ -942,7 +948,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             $force = true;
         }
         // Cleanup old properties, init new stuffs
-        $this->cleanupProperties();
+        yield from $this->cleanupProperties();
         // Update TL callbacks
         $callbacks = [$this, $this->referenceDatabase];
         if (!($this->authorization['user']['bot'] ?? false)) {
@@ -1509,9 +1515,9 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @internal
      *
-     * @return void
+     * @return \Generator<void>
      */
-    public function resetSession(): void
+    public function resetSession(): \Generator
     {
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->signal(true);
@@ -1544,7 +1550,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->updates = [];
         $this->secret_chats = [];
 
-        $this->initDb(true);
+        yield from $this->initDb(true);
 
         $this->tos = ['expires' => 0, 'accepted' => true];
         $this->referenceDatabase = new ReferenceDatabase($this);

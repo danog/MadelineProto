@@ -32,13 +32,15 @@ trait DialogHandler
     {
         if ($this->authorization['user']['bot']) {
             $res = [];
-            foreach ($this->chats as $chat) {
+            /** @uses  DbArray::getIterator() */
+            $iterator = $this->chats->getIterator();
+            while (yield $iterator->advance()) {
+                [$id, $chat] = $iterator->getCurrent();
                 try {
                     $res[] = $this->genAll($chat)['Peer'];
                 } catch (\Throwable $e) {
                     continue;
                 }
-
             }
             return $res;
         }

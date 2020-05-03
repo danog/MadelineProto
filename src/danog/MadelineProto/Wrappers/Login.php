@@ -35,7 +35,7 @@ trait Login
     public function logout(): \Generator
     {
         yield from $this->methodCallAsyncRead('auth.logOut', [], ['datacenter' => $this->datacenter->curdc]);
-        $this->resetSession();
+        yield from $this->resetSession();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['logout_ok'], \danog\MadelineProto\Logger::NOTICE);
         $this->startUpdateSystem();
         return true;
