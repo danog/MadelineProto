@@ -7,6 +7,7 @@ use Amp\Mysql\Pool;
 use Amp\Producer;
 use Amp\Promise;
 use Amp\Sql\ResultSet;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use function Amp\call;
 use function Amp\Promise\wait;
@@ -49,7 +50,7 @@ class MysqlArray implements DbArray
         $instance->db = static::getDbConnection($settings);
         $instance->ttl = $settings['cache_ttl'] ?? $instance->ttl;
 
-        if ($value instanceof static) {
+        if ($value instanceof static && $value->table) {
             if (
                 mb_strpos($value->table, 'tmp') === 0 &&
                 mb_strpos($instance->table, 'tmp') !== 0
@@ -270,22 +271,12 @@ class MysqlArray implements DbArray
 
     private function renameTable(string $from, string $to)
     {
-        try {
-            $this->syncRequest("
-                ALTER TABLE {$from} RENAME TO {$to};
-            ");
-        } catch (\Throwable $e) {
-            Logger::log("Cant rename table {$from} to {$to}", Logger::WARNING);
-
-            try {
-                $this->syncRequest("
-                    DROP TABLE {$from};
-                ");
-            } catch (\Throwable $e) {
-                Logger::log("Cant drop table {$from}", Logger::WARNING);
-            }
-        }
-
+        $this->syncRequest("
+            ALTER TABLE {$from} RENAME TO {$to};
+        ");
+        $this->syncRequest("
+            DROP TABLE IF EXISTS {$from};
+        ");
     }
 
     /**
@@ -318,7 +309,13 @@ class MysqlArray implements DbArray
                 return [];
             }
 
-            $request = yield $this->db->execute($query, $params);
+            try {
+                $request = yield $this->db->execute($query, $params);
+            } catch (\Throwable $e) {
+                Logger::log($e, Logger::ERROR);
+                return [];
+            }
+
             $result = [];
             if ($request instanceof ResultSet) {
                 while (yield $request->advance()) {
