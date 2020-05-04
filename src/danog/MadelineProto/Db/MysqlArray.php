@@ -247,6 +247,8 @@ class MysqlArray implements DbArray
             $settings['user'],
             $settings['password'],
             $settings['database'],
+            $settings['max_connections'],
+            $settings['idle_timeout']
         );
     }
 

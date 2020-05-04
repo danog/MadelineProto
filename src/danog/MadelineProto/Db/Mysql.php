@@ -4,6 +4,7 @@ namespace danog\MadelineProto\Db;
 
 use Amp\Mysql\ConnectionConfig;
 use Amp\Mysql\Pool;
+use Amp\Sql\Common\ConnectionPool;
 use function Amp\call;
 use function Amp\Mysql\Pool;
 use function Amp\Promise\wait;
@@ -20,6 +21,9 @@ class Mysql
      * @param string $password
      * @param string $db
      *
+     * @param int $maxConnections
+     * @param int $idleTimeout
+     *
      * @return Pool
      * @throws \Amp\Sql\ConnectionException
      * @throws \Amp\Sql\FailureException
@@ -30,7 +34,9 @@ class Mysql
         int $port = 3306,
         string $user = 'root',
         string $password = '',
-        string $db = 'MadelineProto'
+        string $db = 'MadelineProto',
+        int $maxConnections = ConnectionPool::DEFAULT_MAX_CONNECTIONS,
+        int $idleTimeout = ConnectionPool::DEFAULT_IDLE_TIMEOUT
     ): Pool
     {
         $dbKey = "$host:$port:$db";
@@ -40,7 +46,7 @@ class Mysql
             );
 
             static::createDb($config);
-            static::$connections[$dbKey] = pool($config);
+            static::$connections[$dbKey] = pool($config, $maxConnections, $idleTimeout);
         }
 
         return static::$connections[$dbKey];
