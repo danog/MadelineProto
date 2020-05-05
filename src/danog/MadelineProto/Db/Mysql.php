@@ -61,12 +61,13 @@ class Mysql
      */
     private static function createDb(ConnectionConfig $config)
     {
-        wait(call(function() use($config) {
+        wait(call(static function() use($config) {
             $db = $config->getDatabase();
             $connection = pool($config->withDatabase(null));
             yield $connection->query("
                 CREATE DATABASE IF NOT EXISTS `{$db}`
-                CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
+                CHARACTER SET 'utf8mb4' 
+                COLLATE 'utf8mb4_general_ci'
             ");
             $connection->close();
         }));

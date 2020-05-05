@@ -268,6 +268,9 @@ class MysqlArray implements DbArray
                 `ts` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY (`key`)
             )
+            ENGINE = InnoDB
+            CHARACTER SET 'utf8mb4' 
+            COLLATE 'utf8mb4_general_ci'
         ");
     }
 
