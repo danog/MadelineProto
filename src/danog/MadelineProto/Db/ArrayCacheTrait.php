@@ -17,12 +17,15 @@ trait ArrayCacheTrait
      */
     protected array $cache = [];
     protected string $ttl = '+1 day';
-    private string $ttlCheckInterval = '+1 second';
+    private string $ttlCheckInterval = '+1 minute';
     private int $nextTtlCheckTs = 0;
 
     protected function getCache(string $key, $default = null)
     {
-        if ($cacheItem = $this->cache[$key] ?? null) {
+        $cacheItem = $this->cache[$key] ?? null;
+        $this->cleanupCache();
+
+        if ($cacheItem) {
             $this->cache[$key]['ttl'] = strtotime($this->ttl);
         } else {
             return $default;
@@ -39,20 +42,12 @@ trait ArrayCacheTrait
      */
     protected function setCache(string $key, $value): void
     {
-        $now = time();
         $this->cache[$key] = [
             'value' => $value,
-            'ttl' => $now,
+            'ttl' => strtotime($this->ttl),
         ];
 
-        if ($this->nextTtlCheckTs < $now) {
-            $this->nextTtlCheckTs = strtotime($this->ttlCheckInterval, $now);
-            foreach ($this->cache as $cacheKey => $cacheValue) {
-                if ($cacheValue['ttl'] < $now) {
-                    $this->unsetCache($cacheKey);
-                }
-            }
-        }
+        $this->cleanupCache();
     }
 
     /**
@@ -71,6 +66,22 @@ trait ArrayCacheTrait
     protected function clearCache(): void
     {
         $this->cache = [];
+    }
+
+    /**
+     * Remove all keys from cache
+     */
+    protected function cleanupCache(): void
+    {
+        $now = time();
+        if ($this->nextTtlCheckTs < $now) {
+            $this->nextTtlCheckTs = strtotime($this->ttlCheckInterval, $now);
+            foreach ($this->cache as $cacheKey => $cacheValue) {
+                if ($cacheValue['ttl'] < $now) {
+                    $this->unsetCache($cacheKey);
+                }
+            }
+        }
     }
 
 }

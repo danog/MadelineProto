@@ -142,6 +142,9 @@ class MysqlArray implements DbArray
 
     public function offsetSet($index, $value): void
     {
+        if ($this->getCache($index) === $value) {
+            return;
+        }
         $this->setCache($index, $value);
 
         $this->request("

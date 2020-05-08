@@ -95,6 +95,9 @@ trait PeerHandler
     public function addUser(array $user): \Generator
     {
         $existingChat = yield $this->chats[$user['id']];
+        if ($existingChat) {
+            $this->cacheChatUsername($user['id'], $user);
+        }
         if (!isset($user['access_hash']) && !($user['min'] ?? false)) {
             if (!empty($existingChat['access_hash'])) {
                 $this->logger->logger("No access hash with user {$user['id']}, using backup");
@@ -125,9 +128,9 @@ trait PeerHandler
                         }
                     }
                     $this->chats[$user['id']] = $user;
-                    $this->cacheChatUsername($user['id'], $user);
                     $this->cachePwrChat($user['id'], false, true);
                 }
+                $this->cacheChatUsername($user['id'], $user);
                 break;
             case 'userEmpty':
                 break;
@@ -154,9 +157,9 @@ trait PeerHandler
                 if (!$existingChat || $existingChat !== $chat) {
                     $this->logger->logger("Updated chat -{$chat['id']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     $this->chats[-$chat['id']] = $chat;
-                    $this->cacheChatUsername(-$chat['id'], $chat);
                     $this->cachePwrChat(-$chat['id'], $this->settings['peer']['full_fetch'], true);
                 }
+                $this->cacheChatUsername(-$chat['id'], $chat);
                 break;
             case 'channelEmpty':
                 break;
@@ -192,19 +195,19 @@ trait PeerHandler
                         $chat = $newchat;
                     }
                     $this->chats[$bot_api_id] = $chat;
-                    $this->cacheChatUsername($bot_api_id, $chat);
                     $fullChat = yield $this->full_chats[$bot_api_id];
                     if ($this->settings['peer']['full_fetch'] && (!$fullChat || $fullChat['full']['participants_count'] !== (yield from $this->getFullInfo($bot_api_id))['full']['participants_count'])) {
                         $this->cachePwrChat($bot_api_id, $this->settings['peer']['full_fetch'], true);
                     }
                 }
+                $this->cacheChatUsername($bot_api_id, $chat);
                 break;
         }
     }
 
     private function cacheChatUsername(int $id, array $chat)
     {
-        if (!empty($chat['username'])) {
+        if ($id && !empty($chat['username'])) {
             $this->usernames[strtolower($chat['username'])] = $id;
         }
     }
