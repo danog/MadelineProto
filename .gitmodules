@@ -1,12 +1,12 @@
 [submodule "docs"]
 	path = docs
-	url = git@github.com:danog/MadelineProtoDocs
+	url = https://github.com/danog/MadelineProtoDocs.git
 [submodule "examples/magnaluna"]
 	path = examples/magnaluna
-	url = git@github.com:danog/magnaluna
+	url = https://github.com/danog/magnaluna.git
 [submodule "examples/pipesbot"]
 	path = examples/pipesbot
-	url = git@github.com:danog/pipesbot
+	url = https://github.com/danog/pipesbot.git
 [submodule "schemas"]
 	path = schemas
-	url = git@github.com:danog/schemas
+	url = https://github.com/danog/schemas.git
