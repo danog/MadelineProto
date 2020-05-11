@@ -28,7 +28,7 @@ class MemoryArray extends \ArrayIterator implements DbArray
 
     public function offsetGet($offset): Promise
     {
-        return call(fn() => parent::offsetGet($offset));
+        return call(fn() => parent::offsetExists($offset) ? parent::offsetGet($offset) : null);
     }
 
     public function offsetUnset($offset): Promise
