@@ -320,7 +320,7 @@ class MysqlArray implements DbArray
             try {
                 $request = yield $this->db->execute($query, $params);
             } catch (\Throwable $e) {
-                Logger::log($e, Logger::ERROR);
+                Logger::log($e->getMessage(), Logger::ERROR);
                 return [];
             }
 
