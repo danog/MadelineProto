@@ -74,10 +74,10 @@ class MysqlArray implements DbArray
                 foreach ((array) $value as $key => $item) {
                     $counter++;
                     if ($counter % 100 === 0) {
-                        yield $instance->offsetSetAsync($key, $item);
+                        yield from $instance->offsetSet($key, $item);
                         Logger::log("Converting database. $counter/$total", Logger::WARNING);
                     } else {
-                        $instance->offsetSetAsync($key, $item);
+                        $instance->offsetSet($key, $item);
                     }
 
                 }
@@ -136,18 +136,18 @@ class MysqlArray implements DbArray
      * </p>
      * @param $value
      *
-     * @return Promise
+     * @return void
      * @throws \Throwable
      */
 
-    public function offsetSet($index, $value): void
+    public function offsetSet($index, $value)
     {
         if ($this->getCache($index) === $value) {
             return;
         }
         $this->setCache($index, $value);
 
-        $this->request("
+        yield $this->request("
                 INSERT INTO `{$this->table}` 
                 SET `key` = :index, `value` = :value 
                 ON DUPLICATE KEY UPDATE `value` = :value
