@@ -114,7 +114,7 @@ class MysqlArray implements DbArray
             }
 
             $row = yield $this->request(
-                "SELECT `value` FROM {$this->table} WHERE `key` = :index LIMIT 1",
+                "SELECT `value` FROM `{$this->table}` WHERE `key` = :index LIMIT 1",
                 ['index' => $offset]
             );
 
@@ -192,7 +192,7 @@ class MysqlArray implements DbArray
      */
     public function getArrayCopy(): array
     {
-        $rows = $this->syncRequest("SELECT `key`, `value` FROM {$this->table}");
+        $rows = $this->syncRequest("SELECT `key`, `value` FROM `{$this->table}`");
         $result = [];
         foreach ($rows as $row) {
             $result[$row['key']] = $this->getValue($row);
@@ -204,7 +204,7 @@ class MysqlArray implements DbArray
     public function getIterator(): Producer
     {
         return new Producer(function (callable $emit) {
-            $request = yield $this->db->execute("SELECT `key`, `value` FROM {$this->table}");
+            $request = yield $this->db->execute("SELECT `key`, `value` FROM `{$this->table}`");
 
             while (yield $request->advance()) {
                 $row = $request->getCurrent();
@@ -225,7 +225,7 @@ class MysqlArray implements DbArray
     public function count(): Promise
     {
         return call(function(){
-            $row = yield $this->request("SELECT count(`key`) as `count` FROM {$this->table}");
+            $row = yield $this->request("SELECT count(`key`) as `count` FROM `{$this->table}`");
             return $row[0]['count'] ?? 0;
         });
     }
@@ -279,11 +279,11 @@ class MysqlArray implements DbArray
     private function renameTable(string $from, string $to)
     {
         yield $this->request("
-            ALTER TABLE {$from} RENAME TO {$to};
+            ALTER TABLE `{$from}` RENAME TO `{$to}`;
         ");
 
         yield $this->request("
-            DROP TABLE IF EXISTS {$from};
+            DROP TABLE IF EXISTS `{$from}`;
         ");
     }
 
