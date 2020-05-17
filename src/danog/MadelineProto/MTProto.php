@@ -572,7 +572,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             if ($reset) {
                 unset($this->{$property});
             } else {
-                $this->{$property} = DbPropertiesFabric::get($this, $type, $property, $this->{$property});
+                $this->{$property} = yield DbPropertiesFabric::get($this, $type, $property, $this->{$property});
             }
         }
 

@@ -40,7 +40,7 @@ class MysqlArray implements DbArray
 
     }
 
-    public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): DbType
+    public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise
     {
         $instance = new static();
 
@@ -49,43 +49,51 @@ class MysqlArray implements DbArray
         $instance->db = static::getDbConnection($settings);
         $instance->ttl = $settings['cache_ttl'] ?? $instance->ttl;
 
-        Loop::defer(static function() use($value, $instance) {
-            if ($value instanceof static && $value->table) {
-                if (
-                    mb_strpos($value->table, 'tmp') === 0 &&
-                    mb_strpos($instance->table, 'tmp') !== 0
-                ) {
-                    yield from $instance->renameTable($value->table, $instance->table);
-                } elseif (mb_strpos($instance->table, 'tmp') === 0){
-                    $instance->table = $value->table;
-                }
-            }
-
+        return call(static function() use($instance, $value) {
+            yield from static::renameTmpTable($instance, $value);
             yield from $instance->prepareTable();
+            Loop::defer(fn() => static::migrateDataToDb($instance, $value));
 
-            if (!empty($value) && !$value instanceof static) {
-                Logger::log('Converting database.', Logger::ERROR);
-                if ($value instanceof DbArray) {
-                    $value = $value->getArrayCopy();
-                }
-                $value = (array) $value;
-                $counter = 0;
-                $total = count($value);
-                foreach ((array) $value as $key => $item) {
-                    $counter++;
-                    if ($counter % 100 === 0) {
-                        yield $instance->offsetSet($key, $item);
-                        Logger::log("Converting database. $counter/$total", Logger::WARNING);
-                    } else {
-                        $instance->offsetSet($key, $item);
-                    }
-
-                }
-                Logger::log('Converting database done.', Logger::ERROR);
-            }
+            return $instance;
         });
+    }
 
-        return $instance;
+    private static function renameTmpTable(MysqlArray $instance, ?DbArray $value): \Generator
+    {
+        if ($value instanceof static && $value->table) {
+            if (
+                mb_strpos($value->table, 'tmp') === 0 &&
+                mb_strpos($instance->table, 'tmp') !== 0
+            ) {
+                yield from $instance->renameTable($value->table, $instance->table);
+            } elseif (mb_strpos($instance->table, 'tmp') === 0) {
+                $instance->table = $value->table;
+            }
+        }
+    }
+
+    private static function migrateDataToDb(MysqlArray $instance, ?DbArray $value): \Generator
+    {
+        if (!empty($value) && !$value instanceof static) {
+            Logger::log('Converting database.', Logger::ERROR);
+            if ($value instanceof DbArray) {
+                $value = $value->getArrayCopy();
+            }
+            $value = (array) $value;
+            $counter = 0;
+            $total = count($value);
+            foreach ((array) $value as $key => $item) {
+                $counter++;
+                if ($counter % 100 === 0) {
+                    yield $instance->offsetSet($key, $item);
+                    Logger::log("Converting database. $counter/$total", Logger::WARNING);
+                } else {
+                    $instance->offsetSet($key, $item);
+                }
+
+            }
+            Logger::log('Converting database done.', Logger::ERROR);
+        }
     }
 
     /**
@@ -262,6 +270,7 @@ class MysqlArray implements DbArray
      */
     private function prepareTable()
     {
+        Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
         return yield $this->request("
             CREATE TABLE IF NOT EXISTS `{$this->table}`
             (
@@ -278,6 +287,7 @@ class MysqlArray implements DbArray
 
     private function renameTable(string $from, string $to)
     {
+        Logger::log("Renaming table {$from} to {$to}", Logger::WARNING);
         yield $this->request("
             ALTER TABLE `{$from}` RENAME TO `{$to}`;
         ");

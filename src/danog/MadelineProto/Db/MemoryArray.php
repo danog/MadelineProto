@@ -13,12 +13,14 @@ class MemoryArray extends \ArrayIterator implements DbArray
         parent::__construct((array) $array, $flags | self::STD_PROP_LIST);
     }
 
-    public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): DbArray
+    public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise
     {
-        if ($value instanceof DbArray) {
-            $value = $value->getArrayCopy();
-        }
-        return new static($value);
+        return call(function() use ($value) {
+            if ($value instanceof DbArray) {
+                $value = $value->getArrayCopy();
+            }
+            return new static($value);
+        });
     }
 
     public function offsetExists($offset): Promise

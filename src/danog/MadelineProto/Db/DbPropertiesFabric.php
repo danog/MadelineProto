@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Promise;
 use danog\MadelineProto\MTProto;
 
 class DbPropertiesFabric
@@ -12,13 +13,13 @@ class DbPropertiesFabric
      * @param string $name
      * @param $value
      *
-     * @return DbType
+     * @return Promise<DbType>
      *
      * @uses \danog\MadelineProto\Db\MemoryArray
      * @uses \danog\MadelineProto\Db\SharedMemoryArray
      * @uses \danog\MadelineProto\Db\MysqlArray
      */
-    public static function get(MTProto $madelineProto, string $propertyType, string $name, $value = null): DbType
+    public static function get(MTProto $madelineProto, string $propertyType, string $name, $value = null): Promise
     {
         $class = __NAMESPACE__;
         $dbSettings = $madelineProto->settings['db'];
