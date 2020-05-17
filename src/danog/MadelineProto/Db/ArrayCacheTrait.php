@@ -16,7 +16,7 @@ trait ArrayCacheTrait
      * @var array
      */
     protected array $cache = [];
-    protected string $ttl = '+1 day';
+    protected string $ttl = '+5 minutes';
     private string $ttlCheckInterval = '+1 minute';
     private int $nextTtlCheckTs = 0;
 
