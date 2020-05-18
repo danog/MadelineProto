@@ -23,15 +23,16 @@ trait ArrayCacheTrait
     protected function getCache(string $key, $default = null)
     {
         $cacheItem = $this->cache[$key] ?? null;
-        $this->cleanupCache();
+        $result = $default;
 
-        if ($cacheItem) {
+        if (\is_array($cacheItem)) {
+            $result = $cacheItem['value'];
             $this->cache[$key]['ttl'] = strtotime($this->ttl);
-        } else {
-            return $default;
         }
 
-        return $cacheItem['value'];
+        $this->cleanupCache();
+
+        return $result;
     }
 
     /**
@@ -74,13 +75,19 @@ trait ArrayCacheTrait
     protected function cleanupCache(): void
     {
         $now = time();
-        if ($this->nextTtlCheckTs < $now) {
-            $this->nextTtlCheckTs = strtotime($this->ttlCheckInterval, $now);
-            foreach ($this->cache as $cacheKey => $cacheValue) {
-                if ($cacheValue['ttl'] < $now) {
-                    $this->unsetCache($cacheKey);
-                }
+        if ($this->nextTtlCheckTs > $now) {
+            return;
+        }
+
+        $this->nextTtlCheckTs = strtotime($this->ttlCheckInterval, $now);
+        $oldKeys = [];
+        foreach ($this->cache as $cacheKey => $cacheValue) {
+            if ($cacheValue['ttl'] < $now) {
+                $oldKeys[] = $cacheKey;
             }
+        }
+        foreach ($oldKeys as $oldKey) {
+            $this->unsetCache($oldKey);
         }
     }
 
