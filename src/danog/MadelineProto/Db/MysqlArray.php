@@ -40,6 +40,14 @@ class MysqlArray implements DbArray
 
     }
 
+	/**
+	 * @param string $name
+	 * @param DbArray|array|null $value
+	 * @param string $tablePrefix
+	 * @param array $settings
+	 *
+	 * @return Promise
+	 */
     public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise
     {
         $instance = new static();
@@ -58,7 +66,13 @@ class MysqlArray implements DbArray
         });
     }
 
-    private static function renameTmpTable(MysqlArray $instance, ?DbArray $value): \Generator
+	/**
+	 * @param MysqlArray $instance
+	 * @param DbArray|array|null $value
+	 *
+	 * @return \Generator
+	 */
+    private static function renameTmpTable(MysqlArray $instance, $value): \Generator
     {
         if ($value instanceof static && $value->table) {
             if (
@@ -72,13 +86,18 @@ class MysqlArray implements DbArray
         }
     }
 
-    private static function migrateDataToDb(MysqlArray $instance, ?DbArray $value): \Generator
+	/**
+	 * @param MysqlArray $instance
+	 * @param DbArray|array|null $value
+	 *
+	 * @return \Generator
+	 * @throws \Throwable
+	 */
+    private static function migrateDataToDb(MysqlArray $instance, $value): \Generator
     {
         if (!empty($value) && !$value instanceof static) {
             Logger::log('Converting database.', Logger::ERROR);
-            if ($value instanceof DbArray) {
-                $value = $value->getArrayCopy();
-            }
+
             $value = (array) $value;
             $counter = 0;
             $total = count($value);
