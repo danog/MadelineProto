@@ -22,12 +22,12 @@ namespace danog\MadelineProto;
 use Amp\Dns\Resolver;
 use Amp\File\StatCache;
 use Amp\Http\Client\HttpClient;
-use Amp\Loop;
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Loop\Generic\PeriodicLoop;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
+use danog\MadelineProto\MTProtoTools\GarbageCollector;
 use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
 use danog\MadelineProto\MTProtoTools\MinDatabase;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
@@ -465,6 +465,8 @@ class MTProto extends AsyncConstruct implements TLCallback
         yield from $this->getConfig([], ['datacenter' => $this->datacenter->curdc]);
         $this->startUpdateSystem(true);
         $this->v = self::V;
+
+        GarbageCollector::start();
     }
     /**
      * Sleep function.
@@ -921,6 +923,8 @@ class MTProto extends AsyncConstruct implements TLCallback
             yield $this->updaters[false]->resume();
         }
         $this->updaters[false]->start();
+
+        GarbageCollector::start();
     }
     /**
      * Unreference instance, allowing destruction.
