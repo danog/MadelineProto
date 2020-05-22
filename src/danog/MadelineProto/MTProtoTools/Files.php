@@ -499,7 +499,7 @@ trait Files
         $cb = [$bridge, 'callback'];
         $read = $this->uploadFromCallable($reader, $size, $mime, '', $cb, true, $encrypted);
         $write = $this->downloadToCallable($media, $writer, null, true, 0, -1, $chunk_size);
-        list($res) = yield \danog\MadelineProto\Tools::all([$read, $write]);
+        [$res] = yield \danog\MadelineProto\Tools::all([$read, $write]);
         return $res;
     }
 
@@ -1038,7 +1038,7 @@ trait Files
             if (\count($range) == 1) {
                 $range[1] = '';
             }
-            list($size_unit, $range_orig) = $range;
+            [$size_unit, $range_orig] = $range;
             if ($size_unit == 'bytes') {
                 //multiple ranges could be specified at the same time, but for simplicity only serve the first range
                 //http://tools.ietf.org/id/draft-ietf-http-range-retrieval-00.txt
@@ -1046,7 +1046,7 @@ trait Files
                 if (\count($list) == 1) {
                     $list[1] = '';
                 }
-                list($range, $extra_ranges) = $list;
+                [$range, $extra_ranges] = $list;
             } else {
                 return [
                     'serve' => false,
@@ -1061,7 +1061,7 @@ trait Files
         if (\count($listseek) == 1) {
             $listseek[1] = '';
         }
-        list($seek_start, $seek_end) = $listseek;
+        [$seek_start, $seek_end] = $listseek;
 
         $seek_end = empty($seek_end) ? ($messageMedia['size'] - 1) : \min(\abs(\intval($seek_end)), $messageMedia['size'] - 1);
 
@@ -1274,7 +1274,7 @@ trait Files
         $time = 0;
         $speed = 0;
         $origCb = $cb;
-        $cb = function () use ($cb, $count, &$time, &$speed) {
+        $cb = static function () use ($cb, $count, &$time, &$speed) {
             static $cur = 0;
             $cur++;
             \danog\MadelineProto\Tools::callFork($cb($cur * 100 / $count, $time, $speed));
