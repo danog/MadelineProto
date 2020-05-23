@@ -996,7 +996,7 @@ trait Files
         }
 
         $response = new Response($result['code'], $result['headers'], $body);
-        if ($result['serve']) {
+        if ($result['serve'] && !empty($result['headers']['Content-Length'])) {
             $response->setHeader('content-length', $result['headers']['Content-Length']);
         }
 
@@ -1063,7 +1063,8 @@ trait Files
         }
         [$seek_start, $seek_end] = $listseek;
 
-        $seek_end = empty($seek_end) ? ($messageMedia['size'] - 1) : \min(\abs(\intval($seek_end)), $messageMedia['size'] - 1);
+        $size = $messageMedia['size'] ?? 0;
+        $seek_end = empty($seek_end) ? ($size - 1) : \min(\abs(\intval($seek_end)), $size - 1);
 
         if (!empty($seek_start) && $seek_end < \abs(\intval($seek_start))) {
             return [
@@ -1079,12 +1080,12 @@ trait Files
             'code' => Status::OK,
             'headers' => []
         ];
-        if ($seek_start > 0 || $seek_end < $messageMedia['size'] - 1) {
+        if ($seek_start > 0 || $seek_end < $size - 1) {
             $result['code'] = Status::PARTIAL_CONTENT;
-            $result['headers']['Content-Range'] = "bytes ${seek_start}-${seek_end}/${messageMedia['size']}";
+            $result['headers']['Content-Range'] = "bytes ${seek_start}-${seek_end}/${$size}";
             $result['headers']['Content-Length'] = $seek_end - $seek_start + 1;
-        } else {
-            $result['headers']['Content-Length'] = $messageMedia['size'];
+        } elseif ($size > 0) {
+            $result['headers']['Content-Length'] = $size;
         }
         $result['headers']['Content-Type'] = $messageMedia['mime'];
         $result['headers']['Cache-Control'] = 'max-age=31556926';
@@ -1092,7 +1093,11 @@ trait Files
         $result['headers']['Accept-Ranges'] = 'bytes';
 
         if ($result['serve']) {
-            $result['serve'] = [$seek_start, $seek_end + 1];
+            if ($seek_start === 0 && $seek_end === -1) {
+                $result['serve'] = [0, -1];
+            } else {
+                $result['serve'] = [$seek_start, $seek_end + 1];
+            }
         }
 
         return $result;
