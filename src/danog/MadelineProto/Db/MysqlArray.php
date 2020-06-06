@@ -60,7 +60,7 @@ class MysqlArray implements DbArray
         return call(static function() use($instance, $value) {
             yield from static::renameTmpTable($instance, $value);
             yield from $instance->prepareTable();
-            Loop::defer(fn() => static::migrateDataToDb($instance, $value));
+            yield from static::migrateDataToDb($instance, $value);
 
             return $instance;
         });
@@ -76,11 +76,11 @@ class MysqlArray implements DbArray
     {
         if ($value instanceof static && $value->table) {
             if (
-                mb_strpos($value->table, 'tmp') === 0 &&
+                $value->table !== $instance->table &&
                 mb_strpos($instance->table, 'tmp') !== 0
             ) {
                 yield from $instance->renameTable($value->table, $instance->table);
-            } elseif (mb_strpos($instance->table, 'tmp') === 0) {
+            } else {
                 $instance->table = $value->table;
             }
         }
@@ -95,17 +95,21 @@ class MysqlArray implements DbArray
 	 */
     private static function migrateDataToDb(MysqlArray $instance, $value): \Generator
     {
-        if (!empty($value) && !$value instanceof static) {
+        if (!empty($value) && !$value instanceof MysqlArray) {
             Logger::log('Converting database.', Logger::ERROR);
 
-            $value = (array) $value;
+            if ($value instanceof DbArray) {
+                $value = yield $value->getArrayCopy();
+            } else {
+                $value = (array) $value;
+            }
             $counter = 0;
             $total = count($value);
-            foreach ((array) $value as $key => $item) {
+            foreach ($value as $key => $item) {
                 $counter++;
                 if ($counter % 100 === 0) {
                     yield $instance->offsetSet($key, $item);
-                    Logger::log("Converting database. $counter/$total", Logger::WARNING);
+                    Logger::log("Loading data to table {$instance->table}: $counter/$total", Logger::WARNING);
                 } else {
                     $instance->offsetSet($key, $item);
                 }
@@ -212,20 +216,20 @@ class MysqlArray implements DbArray
     /**
      * Get array copy
      *
-     * @link https://php.net/manual/en/arrayiterator.getarraycopy.php
-     * @return array A copy of the array, or array of public properties
-     * if ArrayIterator refers to an object.
+     * @return Promise<array>
      * @throws \Throwable
      */
-    public function getArrayCopy(): array
+    public function getArrayCopy(): Promise
     {
-        $rows = $this->syncRequest("SELECT `key`, `value` FROM `{$this->table}`");
-        $result = [];
-        foreach ($rows as $row) {
-            $result[$row['key']] = $this->getValue($row);
-        }
-
-        return $result;
+        return call(function(){
+            $iterator = $this->getIterator();
+            $result = [];
+            while (yield $iterator->advance()) {
+                [$key, $value] = $iterator->getCurrent();
+                $result[$key] = $value;
+            }
+            return $result;
+        });
     }
 
     public function getIterator(): Producer
@@ -235,7 +239,6 @@ class MysqlArray implements DbArray
 
             while (yield $request->advance()) {
                 $row = $request->getCurrent();
-
                 yield $emit([$row['key'], $this->getValue($row)]);
             }
         });
@@ -317,21 +320,7 @@ class MysqlArray implements DbArray
     }
 
     /**
-     * Perform blocking request to db
-     *
-     * @param string $query
-     * @param array $params
-     *
-     * @return array|null
-     * @throws \Throwable
-     */
-    private function syncRequest(string $query, array $params = []): array
-    {
-        return wait($this->request($query, $params));
-    }
-
-    /**
-     * Perform blocking request to db
+     * Perform async request to db
      *
      * @param string $query
      * @param array $params

@@ -7,7 +7,7 @@ use Amp\Promise;
 
 interface DbArray extends DbType, \ArrayAccess, \Countable
 {
-    public function getArrayCopy(): array;
+    public function getArrayCopy(): Promise;
     public function offsetExists($offset): Promise;
     public function offsetGet($offset): Promise;
     public function offsetSet($offset, $value);

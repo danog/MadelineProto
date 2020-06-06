@@ -3,12 +3,12 @@
 namespace danog\MadelineProto\Db;
 
 use Amp\Promise;
-use danog\MadelineProto\MTProto;
 
 class DbPropertiesFabric
 {
     /**
-     * @param MTProto $madelineProto
+     * @param array $dbSettings
+     * @param string $namePrefix
      * @param string $propertyType
      * @param string $name
      * @param $value
@@ -19,10 +19,10 @@ class DbPropertiesFabric
      * @uses \danog\MadelineProto\Db\SharedMemoryArray
      * @uses \danog\MadelineProto\Db\MysqlArray
      */
-    public static function get(MTProto $madelineProto, string $propertyType, string $name, $value = null): Promise
+    public static function get(array $dbSettings, string $namePrefix, string $propertyType, string $name, $value = null): Promise
     {
         $class = __NAMESPACE__;
-        $dbSettings = $madelineProto->settings['db'];
+
         switch (strtolower($dbSettings['type'])) {
             case 'memory':
                 $class .= '\Memory';
@@ -44,18 +44,7 @@ class DbPropertiesFabric
                 throw new \InvalidArgumentException("Unknown $propertyType: {$propertyType}");
         }
 
-        $prefix = static::getSessionId($madelineProto);
-        return $class::getInstance($name, $value, $prefix, $dbSettings[$dbSettings['type']]??[]);
-    }
-
-    private static function getSessionId(MTProto $madelineProto): string
-    {
-        $result = $madelineProto->getSelf()['id'] ?? null;
-        if (!$result) {
-            $result = 'tmp_';
-            $result .= str_replace('0','', spl_object_hash($madelineProto));
-        }
-        return (string) $result;
+        return $class::getInstance($name, $value, $namePrefix, $dbSettings[$dbSettings['type']]??[]);
     }
 
 }

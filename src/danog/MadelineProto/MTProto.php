@@ -26,6 +26,7 @@ use Amp\Promise;
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFabric;
+use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Db\Mysql;
 use danog\MadelineProto\Loop\Generic\PeriodicLoop;
 use danog\MadelineProto\Loop\Update\FeedLoop;
@@ -72,6 +73,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     use \danog\MadelineProto\Wrappers\Start;
     use \danog\MadelineProto\Wrappers\Templates;
     use \danog\MadelineProto\Wrappers\TOS;
+    use DbPropertiesTrait;
     /**
      * Old internal version of MadelineProto.
      *
@@ -424,7 +426,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @see DbPropertiesFabric
      * @var array
      */
-    private array $dbProperies = [
+    protected array $dbProperies = [
         'chats' => 'array',
         'full_chats' => 'array',
         'channel_participants' => 'array',
@@ -564,29 +566,6 @@ class MTProto extends AsyncConstruct implements TLCallback
             // Report URI
             'reportDest'
         ];
-    }
-
-    public function initDb(bool $reset = false): \Generator
-    {
-        foreach ($this->dbProperies as $property => $type) {
-            if ($reset) {
-                unset($this->{$property});
-            } else {
-                $this->{$property} = yield DbPropertiesFabric::get($this, $type, $property, $this->{$property});
-            }
-        }
-
-        if (!$reset && yield $this->usernames->count() === 0) {
-            $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
-            $iterator = $this->chats->getIterator();
-            while (yield $iterator->advance()) {
-                [$id, $chat] = $iterator->getCurrent();
-                if (isset($chat['username'])) {
-                    $this->usernames[\strtolower($chat['username'])] = $this->getId($chat);
-                }
-            }
-            $this->logger('Cache filled.', Logger::WARNING);
-        }
     }
 
     /**
@@ -801,7 +780,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->TL->init($this->settings['tl_schema']['src'], $callbacks);
         }
 
-        yield from $this->initDb();
+        yield from $this->initDb($this);
 
     }
 
@@ -834,7 +813,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             unset($settings['authorization']['rsa_key']);
         }
 
-        yield from $this->initDb();
+        yield from $this->initDb($this);
 
         if (!isset($this->secret_chats)) {
             $this->secret_chats = [];
@@ -1552,7 +1531,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->updates = [];
         $this->secret_chats = [];
 
-        yield from $this->initDb(true);
+        yield from $this->initDb($this,true);
 
         $this->tos = ['expires' => 0, 'accepted' => true];
         $this->referenceDatabase = new ReferenceDatabase($this);

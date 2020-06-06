@@ -4,6 +4,7 @@ namespace danog\MadelineProto\Db;
 
 use Amp\Producer;
 use Amp\Promise;
+use danog\MadelineProto\Logger;
 use function Amp\call;
 
 class MemoryArray extends \ArrayIterator implements DbArray
@@ -15,9 +16,13 @@ class MemoryArray extends \ArrayIterator implements DbArray
 
     public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise
     {
-        return call(function() use ($value) {
+        return call(static function() use ($value) {
+            if ($value instanceof MemoryArray) {
+                return $value;
+            }
             if ($value instanceof DbArray) {
-                $value = $value->getArrayCopy();
+                Logger::log("Loading database to memory. Please wait.", Logger::WARNING);
+                $value = yield $value->getArrayCopy();
             }
             return new static($value);
         });
@@ -43,9 +48,9 @@ class MemoryArray extends \ArrayIterator implements DbArray
         return call(fn() => parent::count());
     }
 
-    public function getArrayCopy(): array
+    public function getArrayCopy(): Promise
     {
-        return parent::getArrayCopy();
+        return call(fn() => parent::getArrayCopy());
     }
 
     public function getIterator(): Producer
