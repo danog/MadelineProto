@@ -916,7 +916,7 @@ trait PeerHandler
         $last_count = -1;
         do {
             try {
-                $gres = yield from $this->methodCallAsyncRead('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset, 'limit' => $limit, 'hash' => $hash = $this->getParticipantsHash($channel, $filter, $q, $offset, $limit)], ['datacenter' => $this->datacenter->curdc, 'heavy' => true]);
+                $gres = yield from $this->methodCallAsyncRead('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset, 'limit' => $limit, 'hash' => $hash = yield from $this->getParticipantsHash($channel, $filter, $q, $offset, $limit)], ['datacenter' => $this->datacenter->curdc, 'heavy' => true]);
             } catch (\danog\MadelineProto\RPCErrorException $e) {
                 if ($e->rpc === 'CHAT_ADMIN_REQUIRED') {
                     $this->logger->logger($e->rpc);
@@ -1002,7 +1002,7 @@ trait PeerHandler
         $participant[$filter][$q][$offset][$limit] = $gres;
         $this->channel_participants[$channel['channel_id']] = $participant;
     }
-    private function getParticipantsHash($channel, $filter, $q, $offset, $limit)
+    private function getParticipantsHash($channel, $filter, $q, $offset, $limit): \Generator
     {
         return (yield $this->channel_participants[$channel['channel_id']])[$filter][$q][$offset][$limit]['hash'] ?? 0;
     }
