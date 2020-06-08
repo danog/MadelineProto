@@ -57,6 +57,8 @@ class MysqlArray implements DbArray
         $instance->db = static::getDbConnection($settings);
         $instance->ttl = $settings['cache_ttl'] ?? $instance->ttl;
 
+        $instance->startCacheCleanupLoop();
+
         return call(static function() use($instance, $value) {
             yield from static::renameTmpTable($instance, $value);
             yield from $instance->prepareTable();

@@ -2,6 +2,9 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Loop;
+use danog\MadelineProto\Logger;
+
 trait ArrayCacheTrait
 {
     /**
@@ -18,7 +21,6 @@ trait ArrayCacheTrait
     protected array $cache = [];
     protected string $ttl = '+5 minutes';
     private string $ttlCheckInterval = '+1 minute';
-    private int $nextTtlCheckTs = 0;
 
     protected function getCache(string $key, $default = null)
     {
@@ -29,8 +31,6 @@ trait ArrayCacheTrait
             $result = $cacheItem['value'];
             $this->cache[$key]['ttl'] = strtotime($this->ttl);
         }
-
-        $this->cleanupCache();
 
         return $result;
     }
@@ -47,8 +47,6 @@ trait ArrayCacheTrait
             'value' => $value,
             'ttl' => strtotime($this->ttl),
         ];
-
-        $this->cleanupCache();
     }
 
     /**
@@ -61,12 +59,9 @@ trait ArrayCacheTrait
         unset($this->cache[$key]);
     }
 
-    /**
-     * Remove all keys from cache
-     */
-    protected function clearCache(): void
+    protected function startCacheCleanupLoop(): void
     {
-        $this->cache = [];
+        Loop::repeat(strtotime($this->ttlCheckInterval, 0) * 1000, fn() => $this->cleanupCache());
     }
 
     /**
@@ -75,11 +70,6 @@ trait ArrayCacheTrait
     protected function cleanupCache(): void
     {
         $now = time();
-        if ($this->nextTtlCheckTs > $now) {
-            return;
-        }
-
-        $this->nextTtlCheckTs = strtotime($this->ttlCheckInterval, $now);
         $oldKeys = [];
         foreach ($this->cache as $cacheKey => $cacheValue) {
             if ($cacheValue['ttl'] < $now) {
@@ -89,6 +79,14 @@ trait ArrayCacheTrait
         foreach ($oldKeys as $oldKey) {
             $this->unsetCache($oldKey);
         }
+
+        Logger::log(
+            sprintf(
+                "cache for table:%s; keys left: %s; keys removed: %s",
+                $this->table, \count($this->cache), \count($oldKeys)
+            ),
+            Logger::VERBOSE
+        );
     }
 
 }
