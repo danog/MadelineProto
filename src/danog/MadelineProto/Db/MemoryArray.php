@@ -28,9 +28,14 @@ class MemoryArray extends \ArrayIterator implements DbArray
         });
     }
 
-    public function offsetExists($offset): Promise
+    public function offsetExists($offset)
     {
-        return call(fn() => parent::offsetExists($offset));
+        throw new \RuntimeException('Native isset not support promises. Use isset method');
+    }
+
+    public function isset($key): Promise
+    {
+        return call(fn() => parent::offsetExists($key));
     }
 
     public function offsetGet($offset): Promise

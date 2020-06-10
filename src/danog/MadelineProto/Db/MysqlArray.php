@@ -2,14 +2,12 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Loop;
 use Amp\Mysql\Pool;
 use Amp\Producer;
 use Amp\Promise;
 use Amp\Sql\ResultSet;
 use danog\MadelineProto\Logger;
 use function Amp\call;
-use function Amp\Promise\wait;
 
 class MysqlArray implements DbArray
 {
@@ -50,9 +48,14 @@ class MysqlArray implements DbArray
 	 */
     public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise
     {
-        $instance = new static();
+        $tableName = "{$tablePrefix}_{$name}";
+        if ($value instanceof self && $value->table === $tableName) {
+            $instance = &$value;
+        } else {
+            $instance = new static();
+            $instance->table = $tableName;
+        }
 
-        $instance->table = "{$tablePrefix}_{$name}";
         $instance->settings = $settings;
         $instance->db = static::getDbConnection($settings);
         $instance->ttl = $settings['cache_ttl'] ?? $instance->ttl;
@@ -60,9 +63,13 @@ class MysqlArray implements DbArray
         $instance->startCacheCleanupLoop();
 
         return call(static function() use($instance, $value) {
-            yield from static::renameTmpTable($instance, $value);
             yield from $instance->prepareTable();
-            yield from static::migrateDataToDb($instance, $value);
+
+            //Skip migrations if its same object
+            if ($instance !== $value) {
+                yield from static::renameTmpTable($instance, $value);
+                yield from static::migrateDataToDb($instance, $value);
+            }
 
             return $instance;
         });
@@ -109,7 +116,7 @@ class MysqlArray implements DbArray
             $total = count($value);
             foreach ($value as $key => $item) {
                 $counter++;
-                if ($counter % 100 === 0) {
+                if ($counter % 500 === 0) {
                     yield $instance->offsetSet($key, $item);
                     Logger::log("Loading data to table {$instance->table}: $counter/$total", Logger::WARNING);
                 } else {
@@ -121,21 +128,21 @@ class MysqlArray implements DbArray
         }
     }
 
+    public function offsetExists($index): bool
+    {
+        throw new \RuntimeException('Native isset not support promises. Use isset method');
+    }
+
     /**
-     * Check if offset exists
+     * Check if key isset
      *
-     * @link https://php.net/manual/en/arrayiterator.offsetexists.php
-     *
-     * @param string $index <p>
-     * The offset being checked.
-     * </p>
+     * @param $key
      *
      * @return Promise<bool> true if the offset exists, otherwise false
-     * @throws \Throwable
      */
-    public function offsetExists($index): Promise
+    public function isset($key): Promise
     {
-        return call(fn() => yield $this->offsetGet($index) !== null);
+        return call(fn() => yield $this->offsetGet($key) !== null);
     }
 
 
@@ -177,18 +184,24 @@ class MysqlArray implements DbArray
         if ($this->getCache($index) === $value) {
             return call(fn()=>null);
         }
+
         $this->setCache($index, $value);
 
-        return $this->request("
-                INSERT INTO `{$this->table}` 
-                SET `key` = :index, `value` = :value 
-                ON DUPLICATE KEY UPDATE `value` = :value
-            ",
+        $request = $this->request("
+            INSERT INTO `{$this->table}` 
+            SET `key` = :index, `value` = :value 
+            ON DUPLICATE KEY UPDATE `value` = :value
+        ",
             [
                 'index' => $index,
                 'value' => serialize($value),
             ]
         );
+
+        //Ensure that cache is synced with latest insert in case of concurrent requests.
+        $request->onResolve(fn() => $this->setCache($index, $value));
+
+        return $request;
     }
 
     /**
