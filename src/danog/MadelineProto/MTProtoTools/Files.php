@@ -645,7 +645,7 @@ trait Files
      */
     public function getPropicInfo($data): \Generator
     {
-        return yield from $this->getDownloadInfo($this->chats[(yield from $this->getInfo($data))['bot_api_id']]);
+        return yield from $this->getDownloadInfo(yield $this->chats[(yield from $this->getInfo($data))['bot_api_id']]);
     }
     /**
      * Extract file info from bot API message.

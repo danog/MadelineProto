@@ -332,7 +332,9 @@ trait UpdateHandler
         }
         if (\in_array($update['_'], ['updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'])) {
             $id = $this->getId($update);
-            $this->full_chats[$id]['last_update'] = 0;
+            $chat = yield $this->full_chats[$id];
+            $chat['last_update'] = 0;
+            $this->full_chats[$id] = $chat;
             yield from $this->getFullInfo($id);
         }
         if ($update['_'] === 'updateDcOptions') {
