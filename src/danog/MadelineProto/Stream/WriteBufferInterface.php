@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Buffered stream interface.
+ * Buffer interface.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -22,40 +22,18 @@ namespace danog\MadelineProto\Stream;
 use Amp\Promise;
 
 /**
- * Buffered stream interface.
+ * Write buffer interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-interface BufferedStreamInterface extends StreamInterface
+interface WriteBufferInterface
 {
     /**
-     * Get read buffer asynchronously.
+     * Write data asynchronously.
      *
-     * @param int $length Length of payload, as detected by this layer
-     *
-     * @return Promise<BufferInterface>
-     */
-    public function getReadBuffer(&$length): Promise;
-    /**
-     * Get write buffer asynchronously.
-     *
-     * @param int $length Total length of data that is going to be piped in the buffer
+     * @param string $data Data to write
      *
      * @return Promise
      */
-    public function getWriteBuffer(int $length, string $append = ''): Promise;
-    /**
-     * Get stream name.
-     *
-     * Is supposed to return __CLASS__
-     *
-     * @return string
-     */
-    public static function getName(): string;
-    /**
-     * Get underlying stream resource.
-     *
-     * @return RawStreamInterface
-     */
-    public function getStream(): RawStreamInterface;
+    public function bufferWrite(string $data): Promise;
 }

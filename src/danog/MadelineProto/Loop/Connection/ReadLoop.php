@@ -87,7 +87,7 @@ class ReadLoop extends SignalLoop
                 Tools::callForkDefer((function () use ($error, $shared, $connection, $datacenter, $API): \Generator {
                     if ($error === -404) {
                         if ($shared->hasTempAuthKey()) {
-                            $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", \danog\MadelineProto\Logger::WARNING);
+                            $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", Logger::WARNING);
                             $shared->setTempAuthKey(null);
                             $shared->resetSession();
                             foreach ($connection->new_outgoing as $message_id) {
@@ -99,13 +99,13 @@ class ReadLoop extends SignalLoop
                             yield from $connection->reconnect();
                         }
                     } elseif ($error === -1) {
-                        $API->logger->logger("WARNING: Got quick ack from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
+                        $API->logger->logger("WARNING: Got quick ack from DC {$datacenter}", Logger::WARNING);
                         yield from $connection->reconnect();
                     } elseif ($error === 0) {
-                        $API->logger->logger("Got NOOP from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
+                        $API->logger->logger("Got NOOP from DC {$datacenter}", Logger::WARNING);
                         yield from $connection->reconnect();
                     } elseif ($error === -429) {
-                        $API->logger->logger("Got -429 from DC {$datacenter}", \danog\MadelineProto\Logger::WARNING);
+                        $API->logger->logger("Got -429 from DC {$datacenter}", Logger::WARNING);
                         yield Tools::sleep(1);
                         yield from $connection->reconnect();
                     } else {
@@ -138,14 +138,14 @@ class ReadLoop extends SignalLoop
             $API->logger->logger($e->getReason());
             if (\strpos($e->getReason(), '       ') === 0) {
                 $payload = -\substr($e->getReason(), 7);
-                $API->logger->logger("Received {$payload} from DC ".$datacenter, \danog\MadelineProto\Logger::ERROR);
+                $API->logger->logger("Received {$payload} from DC ".$datacenter, Logger::ERROR);
                 return $payload;
             }
             throw $e;
         }
         if ($payload_length === 4) {
             $payload = \danog\MadelineProto\Tools::unpackSignedInt(yield $buffer->bufferRead(4));
-            $API->logger->logger("Received {$payload} from DC ".$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $API->logger->logger("Received {$payload} from DC ".$datacenter, Logger::ULTRA_VERBOSE);
             return $payload;
         }
         $connection->reading(true);
@@ -160,9 +160,9 @@ class ReadLoop extends SignalLoop
                 $message_data = yield $buffer->bufferRead($message_length);
                 $left = $payload_length - $message_length - 4 - 8 - 8;
                 if ($left) {
-                    $API->logger->logger('Padded unencrypted message', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    $API->logger->logger('Padded unencrypted message', Logger::ULTRA_VERBOSE);
                     if ($left < (-$message_length & 15)) {
-                        $API->logger->logger('Protocol padded unencrypted message', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                        $API->logger->logger('Protocol padded unencrypted message', Logger::ULTRA_VERBOSE);
                     }
                     yield $buffer->bufferRead($left);
                 }
@@ -179,7 +179,7 @@ class ReadLoop extends SignalLoop
                 /*
                                 $server_salt = substr($decrypted_data, 0, 8);
                                 if ($server_salt != $shared->getTempAuthKey()->getServerSalt()) {
-                                $API->logger->logger('WARNING: Server salt mismatch (my server salt '.$shared->getTempAuthKey()->getServerSalt().' is not equal to server server salt '.$server_salt.').', \danog\MadelineProto\Logger::WARNING);
+                                $API->logger->logger('WARNING: Server salt mismatch (my server salt '.$shared->getTempAuthKey()->getServerSalt().' is not equal to server server salt '.$server_salt.').', Logger::WARNING);
                                 }
                 */
                 $session_id = \substr($decrypted_data, 8, 8);
@@ -213,16 +213,18 @@ class ReadLoop extends SignalLoop
                 }
                 $connection->incoming_messages[$message_id] = ['seq_no' => $seq_no];
             } else {
-                $API->logger->logger('Got unknown auth_key id', \danog\MadelineProto\Logger::ERROR);
+                $API->logger->logger('Got unknown auth_key id', Logger::ERROR);
                 return -404;
             }
             $deserialized = $API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $connection]);
-            $API->referenceDatabase->reset();
+            if (isset($API->referenceDatabase)) {
+                $API->referenceDatabase->reset();
+            }
             $connection->incoming_messages[$message_id]['content'] = $deserialized;
             $connection->incoming_messages[$message_id]['response'] = -1;
             $connection->new_incoming[$message_id] = $message_id;
             //$connection->last_http_wait = 0;
-            $API->logger->logger('Received payload from DC '.$datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $API->logger->logger('Received payload from DC '.$datacenter, Logger::ULTRA_VERBOSE);
         } finally {
             $connection->reading(false);
         }

@@ -411,9 +411,7 @@ class ConnectionContext
     /**
      * Get a stream from the stream chain.
      *
-     * @internal Generator func
-     *
-     * @return \Generator
+     * @return \Generator<StreamInterface>
      */
     public function getStream(string $buffer = ''): \Generator
     {

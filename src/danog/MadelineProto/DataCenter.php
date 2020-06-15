@@ -39,6 +39,7 @@ use Amp\Websocket\Client\Rfc6455Connector;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
+use danog\MadelineProto\Stream\Common\UdpBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
 use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
@@ -212,7 +213,7 @@ class DataCenter
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
             if ($socket instanceof DataCenterConnection && !\strpos($key, '_bk')) {
-                //$this->API->logger->logger(\sprintf(Lang::$current_lang['dc_con_stop'], $key), \danog\MadelineProto\Logger::VERBOSE);
+                //$this->API->logger->logger(\sprintf(Lang::$current_lang['dc_con_stop'], $key), Logger::VERBOSE);
                 if ($reconnectAll || isset($changed[$id])) {
                     $this->API->logger->logger("Disconnecting all before reconnect!");
                     $socket->needReconnect(true);
@@ -238,6 +239,24 @@ class DataCenter
             }
         }
     }
+    /**
+     * Set VoIP endpoints.
+     *
+     * @param array $endpoints Endpoints
+     *
+     * @return void
+     */
+    public function setVoIPEndpoints(array $endpoints): void
+    {
+    }
+    /**
+     * Connect to specified DC.
+     *
+     * @param string  $dc_number DC to connect to
+     * @param integer $id        Connection ID to re-establish (optional)
+     *
+     * @return \Generator<bool>
+     */
     public function dcConnect(string $dc_number, int $id = -1): \Generator
     {
         $old = isset($this->sockets[$dc_number]) && ($this->sockets[$dc_number]->shouldReconnect() || $id !== -1 && $this->sockets[$dc_number]->hasConnection($id) && $this->sockets[$dc_number]->getConnection($id)->shouldReconnect());
@@ -252,30 +271,36 @@ class DataCenter
         foreach ($ctxs as $ctx) {
             try {
                 if ($old) {
-                    $this->API->logger->logger("Reconnecting to DC {$dc_number} ({$id}) from existing", \danog\MadelineProto\Logger::WARNING);
+                    $this->API->logger->logger("Reconnecting to DC {$dc_number} ({$id}) from existing", Logger::WARNING);
                     $this->sockets[$dc_number]->setExtra($this->API);
                     yield from $this->sockets[$dc_number]->connect($ctx, $id);
                 } else {
-                    $this->API->logger->logger("Connecting to DC {$dc_number} from scratch", \danog\MadelineProto\Logger::WARNING);
+                    $this->API->logger->logger("Connecting to DC {$dc_number} from scratch", Logger::WARNING);
                     $this->sockets[$dc_number] = new DataCenterConnection();
                     $this->sockets[$dc_number]->setExtra($this->API);
                     yield from $this->sockets[$dc_number]->connect($ctx);
                 }
-                $this->API->logger->logger('OK!', \danog\MadelineProto\Logger::WARNING);
+                $this->API->logger->logger('OK!', Logger::WARNING);
                 return true;
             } catch (\Throwable $e) {
                 if (@\constant("MADELINEPROTO_TEST")  === 'pony') {
                     throw $e;
                 }
-                $this->API->logger->logger("Connection failed ({$dc_number}): ".$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
+                $this->API->logger->logger("Connection failed ({$dc_number}): ".$e->getMessage(), Logger::ERROR);
             }
         }
         throw new Exception("Could not connect to DC {$dc_number}");
     }
     /**
-     * @param int|string $dc_number
+     * Generate contexts.
+     *
+     * @param integer        $dc_number DC ID to generate contexts for
+     * @param string         $uri       URI
+     * @param ConnectContext $context   Connection context
+     *
+     * @return array
      */
-    public function generateContexts($dc_number = 0, string $uri = '', ConnectContext $context = null)
+    public function generateContexts($dc_number = 0, string $uri = '', ConnectContext $context = null): array
     {
         $ctxs = [];
         $combos = [];
@@ -308,6 +333,9 @@ class DataCenter
                 break;
             case 'https':
                 $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [HttpsStream::getName(), []]];
+                break;
+            case 'udp':
+                $default = [[DefaultStream::getName(), []], [UdpBufferedStream::getName(), []]];
                 break;
             default:
                 throw new Exception(Lang::$current_lang['protocol_invalid']);
@@ -490,7 +518,7 @@ class DataCenter
         }
         if (empty($ctxs)) {
             unset($this->sockets[$dc_number]);
-            $this->API->logger->logger("No info for DC {$dc_number}", \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger("No info for DC {$dc_number}", Logger::ERROR);
         } elseif (@\constant("MADELINEPROTO_TEST")  === 'pony') {
             return [$ctxs[0]];
         }

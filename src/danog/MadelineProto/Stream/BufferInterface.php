@@ -19,29 +19,11 @@
 
 namespace danog\MadelineProto\Stream;
 
-use Amp\Promise;
-
 /**
  * Buffer interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-interface BufferInterface
+interface BufferInterface extends ReadBufferInterface, WriteBufferInterface
 {
-    /**
-     * Read data asynchronously.
-     *
-     * @param int $length How much data to read
-     *
-     * @return Promise
-     */
-    public function bufferRead(int $length): Promise;
-    /**
-     * Write data asynchronously.
-     *
-     * @param string $data Data to write
-     *
-     * @return Promise
-     */
-    public function bufferWrite(string $data): Promise;
 }

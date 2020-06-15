@@ -46,7 +46,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @var EncryptableSocket
      */
-    private $stream;
+    protected $stream;
     /**
      * Connector.
      *

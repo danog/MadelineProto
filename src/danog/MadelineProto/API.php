@@ -271,7 +271,7 @@ class API extends InternalDoc
      *
      * @return \Generator
      */
-    private function startAndLoopAsync(string $eventHandler): \Generator
+    public function startAndLoopAsync(string $eventHandler): \Generator
     {
         $this->async(true);
         while (true) {

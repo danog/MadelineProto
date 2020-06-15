@@ -102,7 +102,7 @@ $settings = [
     ],
     'serialization' => [
         'serialization_interval' => 30,
-    ],
+    ]
 ];
 
 $MadelineProto = new API('bot.madeline', $settings);

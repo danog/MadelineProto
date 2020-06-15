@@ -33,7 +33,8 @@
         "danog/magicalserializer": "^1.0",
         "league/uri": "^6",
         "danog/ipc": "^0.1",
-        "tivie/htaccess-parser": "^0.2.3"
+        "tivie/htaccess-parser": "^0.2.3",
+        "amphp/log": "^1.1"
     },
     "require-dev": {
         "vlucas/phpdotenv": "^3",

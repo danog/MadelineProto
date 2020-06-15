@@ -621,7 +621,7 @@ class Lang
     {
         if (!isset(\danog\MadelineProto\Lang::$lang['en'][$key]) || $force) {
             \danog\MadelineProto\Lang::$lang['en'][$key] = $value;
-            \file_put_contents(__DIR__.'/Lang.php', \sprintf(self::$template, \var_export(\danog\MadelineProto\Lang::$lang, true), \var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
+            //\file_put_contents(__DIR__.'/Lang.php', \sprintf(self::$template, \var_export(\danog\MadelineProto\Lang::$lang, true), \var_export(\danog\MadelineProto\Lang::$lang['en'], true)));
         }
     }
 }

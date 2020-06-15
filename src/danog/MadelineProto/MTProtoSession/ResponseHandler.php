@@ -349,7 +349,7 @@ trait ResponseHandler
                                 $this->methodRecall('', ['message_id' => $request_id, 'postpone' => true]);
                                 return;
                             }
-                            if (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'HISTORY_GET_FAILED', 'RPC_CALL_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running', 'No workers running'])) {
+                            if (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'HISTORY_GET_FAILED', 'RPC_CONNECT_FAILED', 'RPC_CALL_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running', 'No workers running'])) {
                                 Loop::delay(1 * 1000, [$this, 'methodRecall'], ['message_id' => $request_id]);
                                 return;
                             }
