@@ -4285,11 +4285,12 @@ class InternalDoc extends APIFactory
      *
      * @param array $user User info
      *
-     * @return void
+     * @return \Generator<void>
+     * @throws Exception
      */
-    public function addUser(array $user): void
+    public function addUser(array $user): \Generator
     {
-        $this->API->addUser($user);
+        yield from $this->API->addUser($user);
     }
     /**
      * Call promise $b after promise $a.
@@ -4754,11 +4755,11 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $id Chat ID
      *
-     * @return integer
+     * @return \Generator<integer>
      */
-    public function fullChatLastUpdated($id): int
+    public function fullChatLastUpdated($id): \Generator
     {
-        return $this->API->fullChatLastUpdated($id);
+        return yield from $this->API->fullChatLastUpdated($id);
     }
     /**
      * Get info about the logged-in user, not cached.

@@ -499,7 +499,7 @@ trait Files
         $cb = [$bridge, 'callback'];
         $read = $this->uploadFromCallable($reader, $size, $mime, '', $cb, true, $encrypted);
         $write = $this->downloadToCallable($media, $writer, null, true, 0, -1, $chunk_size);
-        list($res) = yield \danog\MadelineProto\Tools::all([$read, $write]);
+        [$res] = yield \danog\MadelineProto\Tools::all([$read, $write]);
         return $res;
     }
 
@@ -645,7 +645,7 @@ trait Files
      */
     public function getPropicInfo($data): \Generator
     {
-        return yield from $this->getDownloadInfo($this->chats[(yield from $this->getInfo($data))['bot_api_id']]);
+        return yield from $this->getDownloadInfo(yield $this->chats[(yield from $this->getInfo($data))['bot_api_id']]);
     }
     /**
      * Extract file info from bot API message.
@@ -996,7 +996,7 @@ trait Files
         }
 
         $response = new Response($result['code'], $result['headers'], $body);
-        if ($result['serve']) {
+        if ($result['serve'] && !empty($result['headers']['Content-Length'])) {
             $response->setHeader('content-length', $result['headers']['Content-Length']);
         }
 
@@ -1038,7 +1038,7 @@ trait Files
             if (\count($range) == 1) {
                 $range[1] = '';
             }
-            list($size_unit, $range_orig) = $range;
+            [$size_unit, $range_orig] = $range;
             if ($size_unit == 'bytes') {
                 //multiple ranges could be specified at the same time, but for simplicity only serve the first range
                 //http://tools.ietf.org/id/draft-ietf-http-range-retrieval-00.txt
@@ -1046,7 +1046,7 @@ trait Files
                 if (\count($list) == 1) {
                     $list[1] = '';
                 }
-                list($range, $extra_ranges) = $list;
+                [$range, $extra_ranges] = $list;
             } else {
                 return [
                     'serve' => false,
@@ -1061,9 +1061,10 @@ trait Files
         if (\count($listseek) == 1) {
             $listseek[1] = '';
         }
-        list($seek_start, $seek_end) = $listseek;
+        [$seek_start, $seek_end] = $listseek;
 
-        $seek_end = empty($seek_end) ? ($messageMedia['size'] - 1) : \min(\abs(\intval($seek_end)), $messageMedia['size'] - 1);
+        $size = $messageMedia['size'] ?? 0;
+        $seek_end = empty($seek_end) ? ($size - 1) : \min(\abs(\intval($seek_end)), $size - 1);
 
         if (!empty($seek_start) && $seek_end < \abs(\intval($seek_start))) {
             return [
@@ -1079,12 +1080,12 @@ trait Files
             'code' => Status::OK,
             'headers' => []
         ];
-        if ($seek_start > 0 || $seek_end < $messageMedia['size'] - 1) {
+        if ($seek_start > 0 || $seek_end < $size - 1) {
             $result['code'] = Status::PARTIAL_CONTENT;
-            $result['headers']['Content-Range'] = "bytes ${seek_start}-${seek_end}/${messageMedia['size']}";
+            $result['headers']['Content-Range'] = "bytes ${seek_start}-${seek_end}/${$size}";
             $result['headers']['Content-Length'] = $seek_end - $seek_start + 1;
-        } else {
-            $result['headers']['Content-Length'] = $messageMedia['size'];
+        } elseif ($size > 0) {
+            $result['headers']['Content-Length'] = $size;
         }
         $result['headers']['Content-Type'] = $messageMedia['mime'];
         $result['headers']['Cache-Control'] = 'max-age=31556926';
@@ -1092,7 +1093,11 @@ trait Files
         $result['headers']['Accept-Ranges'] = 'bytes';
 
         if ($result['serve']) {
-            $result['serve'] = [$seek_start, $seek_end + 1];
+            if ($seek_start === 0 && $seek_end === -1) {
+                $result['serve'] = [0, -1];
+            } else {
+                $result['serve'] = [$seek_start, $seek_end + 1];
+            }
         }
 
         return $result;
@@ -1274,7 +1279,7 @@ trait Files
         $time = 0;
         $speed = 0;
         $origCb = $cb;
-        $cb = function () use ($cb, $count, &$time, &$speed) {
+        $cb = static function () use ($cb, $count, &$time, &$speed) {
             static $cur = 0;
             $cur++;
             \danog\MadelineProto\Tools::callFork($cb($cur * 100 / $count, $time, $speed));
