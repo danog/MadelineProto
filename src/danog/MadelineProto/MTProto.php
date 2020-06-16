@@ -1227,9 +1227,9 @@ class MTProto extends AsyncConstruct implements TLCallback
                 // telegram TL scheme
                 'telegram' => __DIR__.'/TL_telegram_v113.tl',
                 // secret chats TL scheme
-                'secret' => __DIR__.'/schemas/TL_secret.tl',
+                'secret' => __DIR__.'/TL_secret.tl',
                 // bot API TL scheme
-                'botAPI' => __DIR__.'/schemas/TL_botAPI.tl',
+                'botAPI' => __DIR__.'/TL_botAPI.tl',
             ],
         ], 'logger' => [
             // Logger settings
