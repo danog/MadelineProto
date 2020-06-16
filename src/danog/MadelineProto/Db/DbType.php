@@ -14,5 +14,5 @@ interface DbType
      *
      * @return Promise<self>
      */
-    static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise;
+    public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise;
 }

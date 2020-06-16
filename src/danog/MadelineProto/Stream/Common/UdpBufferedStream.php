@@ -30,7 +30,6 @@ use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
 use danog\MadelineProto\Stream\ReadBufferInterface;
-use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\WriteBufferInterface;
 
@@ -135,7 +134,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
             private RawStreamInterface $stream;
             private string $data = '';
             /**
-             * Constructor function
+             * Constructor function.
              *
              * @param integer $length
              * @param string $append
@@ -172,7 +171,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
                         throw new Exception('Tried to send too much out of frame data, cannot append');
                     }
                 }
-                return new Success(strlen($data));
+                return new Success(\strlen($data));
             }
         });
     }

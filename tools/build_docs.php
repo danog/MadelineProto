@@ -13,6 +13,8 @@
 
 use danog\MadelineProto\API;
 use danog\MadelineProto\APIFactory;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TON\API as TONAPI;
 use danog\MadelineProto\TON\APIFactory as TONAPIFactory;
@@ -22,83 +24,43 @@ use danog\MadelineProto\TON\Lite;
 
 require 'vendor/autoload.php';
 
-$param = 1;
-\danog\MadelineProto\Magic::classExists();
-\danog\MadelineProto\Logger::constructor($param);
-$logger = \danog\MadelineProto\Logger::$default;
-
+Magic::classExists();
+Logger::constructor(1);
+$logger = Logger::$default;
 \set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
-\danog\MadelineProto\Logger::log('Copying readme...', \danog\MadelineProto\Logger::NOTICE);
+$logger->logger('Merging constructor localization...', Logger::NOTICE);
+mergeExtracted();
 
-\file_put_contents('docs/docs/index.md', '---
-title: MadelineProto documentation
-description: PHP client/server for the telegram MTProto protocol (a better tg-cli)
-image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
----
-'.\str_replace('<img', '<amp-img', \file_get_contents('README.md')));
+$logger->logger('Loading schemas...', Logger::NOTICE);
+$schemas = loadSchemas();
 
-$layer_list = '';
-$tempRes = \glob("$d/schemas/TL_telegram_*");
-$res = [];
-foreach ($tempRes as $file) {
-    $layer = \preg_replace(['/.*telegram_v/', '/\..+/'], '', $file);
-    $res[$layer] = $file;
-}
-\ksort($res);
+$logger->logger('Upgrading layer...', Logger::NOTICE);
+$layer = maxLayer($schemas);
+layerUpgrade($layer);
 
-foreach (\array_slice($res, 0, -1) as $layer => $file) {
-    $layer = "v$layer";
-    $docs[] = [
-        'tl_schema'   => ['telegram' => $file],
-        'title'       => 'MadelineProto API documentation (layer '.$layer.')',
-        'description' => 'MadelineProto API documentation (layer '.$layer.')',
-        'output_dir'  => "$d/docs/old_docs/API_docs_".$layer,
-        'readme'      => true,
-    ];
-    $layer_list .= '[Layer '.$layer.'](API_docs_'.$layer.'/)  
-';
-}
-$layer = \array_keys($res);
-$layer = \end($layer);
-
+$logger->logger('Initing docs...', Logger::NOTICE);
 $docs = [
-/*    [
-        'tl_schema'   => ['td' => "$d/schemas/TL_td.tl"],
-        'title'       => 'MadelineProto API documentation (td-lib)',
-        'description' => 'MadelineProto API documentation (td-lib)',
-        'output_dir'  => "$d/docs/docs/TD_docs",
-        'readme'      => false,
-        'td'          => true,
-    ],*/
     [
-        'tl_schema'   => ['mtproto' => "$d/schemas/TL_mtproto_v1.json"],
+        'tl_schema'   => ['mtproto' => "$d/schemas/TL_mtproto_v1.tl"],
         'title'       => 'MadelineProto API documentation (mtproto)',
         'description' => 'MadelineProto API documentation (mtproto)',
         'output_dir'  => "$d/docs/docs/MTProto_docs",
+        'template'    => "$d/docs/template",
         'readme'      => false,
     ],
     [
-        'tl_schema'   => ['telegram' => "$d/schemas/TL_telegram_v$layer.tl", 'calls' => "$d/schemas/TL_calls.tl", 'secret' => "$d/schemas/TL_secret.tl", 'td' => "$d/schemas/TL_td.tl"],
+        'tl_schema'   => ['telegram' => "$d/schemas/TL_telegram_v$layer.tl", 'secret' => "$d/schemas/TL_secret.tl", 'td' => "$d/schemas/TL_td.tl"],
         'title'       => "MadelineProto API documentation (layer $layer)",
         'description' => "MadelineProto API documentation (layer $layer)",
         'output_dir'  => "$d/docs/docs/API_docs",
+        'template'    => "$d/docs/template",
         'readme'      => false,
     ],
 ];
+$docs = \array_merge($docs, initDocs($schemas));
 
-$doc = \file_get_contents('docs/docs/docs/USING_METHODS.md');
-$doc = \preg_replace('|here \(layer \d+\)|', "here (layer $layer)", $doc);
-\file_put_contents('docs/docs/docs/USING_METHODS.md', $doc);
-
-\file_put_contents('docs/old_docs/README.md', '---
-title: Documentations of old mtproto layers
-description: Documentation of old mtproto layers
----
-# Documentation of old mtproto layers  
-
-'.$layer_list);
-
+$logger->logger('Creating annotations...', Logger::NOTICE);
 $doc = new \danog\MadelineProto\AnnotationsBuilder(
     $logger,
     $docs[1],
@@ -112,17 +74,15 @@ $doc = new \danog\MadelineProto\AnnotationsBuilder(
 );
 $doc->mkAnnotations();
 
-$ton = [
-    'tl_schema' => [
-        'lite_api' => "$d/schemas/TON/lite_api.tl",
-        'ton_api' => "$d/schemas/TON/ton_api.tl",
-        //'tonlib_api' => "$d/schemas/TON/tonlib_api.tl",
-    ]
-];
-
 $doc = new \danog\MadelineProto\AnnotationsBuilder(
     $logger,
-    $ton,
+    [
+        'tl_schema' => [
+            'lite_api' => "$d/schemas/TON/lite_api.tl",
+            'ton_api' => "$d/schemas/TON/ton_api.tl",
+            //'tonlib_api' => "$d/schemas/TON/tonlib_api.tl",
+        ]
+    ],
     \dirname(__FILE__).'/../src/danog/MadelineProto/TON/InternalDoc.php',
     [
         'API' => TONAPI::class,
@@ -132,6 +92,10 @@ $doc = new \danog\MadelineProto\AnnotationsBuilder(
     'danog\\MadelineProto\\TON'
 );
 $doc->mkAnnotations();
+
+
+
+$logger->logger('Creating docs...', Logger::NOTICE);
 foreach ($docs as $settings) {
     $doc = new \danog\MadelineProto\DocsBuilder($logger, $settings);
     $doc->mkDocs();
@@ -139,6 +103,7 @@ foreach ($docs as $settings) {
 
 \chdir(__DIR__.'/..');
 
+$logger->logger('Fixing readme...', Logger::NOTICE);
 $orderedfiles = [];
 $order = [
     'CREATING_A_CLIENT',
@@ -228,6 +193,7 @@ foreach ($orderedfiles as $key => $filename) {
     }
 }
 
+$logger->logger('Fixing readme...', Logger::NOTICE);
 $readme = \explode('## ', \file_get_contents('README.md'));
 foreach ($readme as &$section) {
     if (\explode("\n", $section)[0] === 'Documentation') {

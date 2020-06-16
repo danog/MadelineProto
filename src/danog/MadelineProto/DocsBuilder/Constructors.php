@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\DocsBuilder;
 
+use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
 
 trait Constructors
@@ -41,15 +42,11 @@ trait Constructors
                 $data['layer'] = '';
             }
             $got[$id] = '';
-            /*
-                                                                                                if (preg_match('/%/', $type)) {
-                                                                                                    $type = $this->TL->getConstructors($this->td)->findByType(str_replace('%', '', $type))['predicate'];
-                                                                                                }*/
             $layer = isset($data['layer']) && $data['layer'] !== '' ? '_'.$data['layer'] : '';
-            $type = \str_replace(['<', '>'], ['_of_', ''], $data['type']);
-            $php_type = \preg_replace('/.*_of_/', '', $type);
-            $constructor = \str_replace(['<', '>'], ['_of_', ''], $data['predicate']);
-            $php_constructor = \preg_replace('/.*_of_/', '', $constructor);
+            $type = $data['type'];
+            $constructor = $data['predicate'];
+            $php_type = Tools::typeEscape($type);
+            $php_constructor = Tools::typeEscape($constructor);
             if (!isset($this->types[$php_type])) {
                 $this->types[$php_type] = ['constructors' => [], 'methods' => []];
             }
@@ -78,7 +75,7 @@ trait Constructors
                 $param[$type_or_subtype] = '['.Tools::markdownEscape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $params .= (isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
-            $md_constructor = \str_replace('_', '\\_', $constructor.$layer);
+            $md_constructor = StrTools::markdownEscape($constructor.$layer);
             $this->docs_constructors[$constructor] = '[$'.$md_constructor.'](../constructors/'.$php_constructor.$layer.'.md) = \\['.$params.'\\];<a name="'.$constructor.$layer.'"></a>  
 
 ';
@@ -87,13 +84,13 @@ trait Constructors
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 ';
-            if (!isset($this->TL->getDescriptions()['constructors'][$data['predicate']])) {
-                $this->addToLang('object_'.$data['predicate']);
-                if (\danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate']] !== '') {
-                    $this->TL->getDescriptions()['constructors'][$data['predicate']]['description'] = \danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate']];
+            if (!isset($this->TL->getDescriptions()['constructors'][$constructor])) {
+                $this->addToLang('object_'.$constructor);
+                if (\danog\MadelineProto\Lang::$lang['en']['object_'.$constructor] !== '') {
+                    $this->TL->getDescriptions()['constructors'][$constructor]['description'] = \danog\MadelineProto\Lang::$lang['en']['object_'.$constructor];
                 }
             }
-            if (isset($this->TL->getDescriptions()['constructors'][$data['predicate']]) && !empty($data['params'])) {
+            if (isset($this->TL->getDescriptions()['constructors'][$constructor]) && !empty($data['params'])) {
                 $table = '### Attributes:
 
 | Name     |    Type       | Required | Description |
@@ -114,16 +111,10 @@ trait Constructors
                     $param['type'] = 'DecryptedMessage';
                 }
                 if ($type === 'DecryptedMessageMedia' && \in_array($param['name'], ['key', 'iv'])) {
-                    unset(\danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']]);
+                    unset(\danog\MadelineProto\Lang::$lang['en']['object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']]);
                     continue;
                 }
                 $ptype = $param[isset($param['subtype']) ? 'subtype' : 'type'];
-                //$type_or_bare_type = 'types';
-                /*if (isset($param['subtype'])) {
-                      if ($param['type'] === 'vector') {
-                          $type_or_bare_type = 'constructors';
-                      }
-                  }*/
                 if (\preg_match('/%/', $ptype)) {
                     $ptype = $this->TL->getConstructors($this->td)->findByType(\str_replace('%', '', $ptype))['predicate'];
                 }
@@ -155,15 +146,15 @@ trait Constructors
                 if (\in_array($ptype, ['InputEncryptedFile']) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $table .= '|'.\str_replace('_', '\\_', $param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.\str_replace('_', '\\_', $human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration']) ? 'Optional' : 'Yes').'|';
-                if (!isset($this->TL->getDescriptions()['constructors'][$data['predicate']]['params'][$param['name']])) {
-                    $this->addToLang('object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']);
-                    if (isset($this->TL->getDescriptions()['constructors'][$data['predicate']]['description'])) {
-                        $this->TL->getDescriptions()['constructors'][$data['predicate']]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['object_'.$data['predicate'].'_param_'.$param['name'].'_type_'.$param['type']];
+                $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty') || $data['type'] === 'InputMedia' && $param['name'] === 'mime_type' || $data['type'] === 'DocumentAttribute' && \in_array($param['name'], ['w', 'h', 'duration']) ? 'Optional' : 'Yes').'|';
+                if (!isset($this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']])) {
+                    $this->addToLang('object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']);
+                    if (isset($this->TL->getDescriptions()['constructors'][$constructor]['description'])) {
+                        $this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']];
                     }
                 }
-                if (isset($this->TL->getDescriptions()['constructors'][$data['predicate']]['params'][$param['name']])) {
-                    $table .= $this->TL->getDescriptions()['constructors'][$data['predicate']]['params'][$param['name']].'|';
+                if (isset($this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']]) && $this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']]) {
+                    $table .= $this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']].'|';
                 }
                 $table .= PHP_EOL;
                 $pptype = \in_array($ptype, ['string', 'bytes']) ? "'".$ptype."'" : $ptype;
@@ -178,18 +169,18 @@ trait Constructors
                     $hasreplymarkup = true;
                 }
             }
-            $params = "['_' => '".$data['predicate']."'".$params.']';
-            $lua_params = "{_='".$data['predicate']."'".$lua_params.'}';
-            $pwr_params = '{"_": "'.$data['predicate'].'"'.$pwr_params.'}';
-            $description = isset($this->TL->getDescriptions()['constructors'][$data['predicate']]) ? $this->TL->getDescriptions()['constructors'][$data['predicate']]['description'] : $constructor.' attributes, type and example';
+            $params = "['_' => '".$constructor."'".$params.']';
+            $lua_params = "{_='".$constructor."'".$lua_params.'}';
+            $pwr_params = '{"_": "'.$constructor.'"'.$pwr_params.'}';
+            $description = isset($this->TL->getDescriptions()['constructors'][$constructor]) ? $this->TL->getDescriptions()['constructors'][$constructor]['description'] : $constructor.' attributes, type and example';
             $symFile = \str_replace('.', '_', $constructor.$layer);
             $redir = $symFile !== $constructor.$layer ? "\nredirect_from: /API_docs/constructors/{$symFile}.html" : '';
             $header = '---
-title: '.$data['predicate'].'
+title: '.$constructor.'
 description: '.$description.'
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redir.'
 ---
-# Constructor: '.\str_replace('_', '\\_', $data['predicate'].$layer).'  
+# Constructor: '.StrTools::markdownEscape($constructor.$layer).'  
 [Back to constructors index](index.md)
 
 
@@ -199,73 +190,21 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redi
 
 
 ';
-            if (isset($this->TL->getDescriptions()['constructors'][$data['predicate']])) {
-                $header .= $this->TL->getDescriptions()['constructors'][$data['predicate']]['description'].PHP_EOL.PHP_EOL;
+            if (isset($this->TL->getDescriptions()['constructors'][$constructor])) {
+                $header .= $this->TL->getDescriptions()['constructors'][$constructor]['description'].PHP_EOL.PHP_EOL;
             }
-            $type = '### Type: ['.\str_replace('_', '\\_', $php_type).'](../types/'.$php_type.'.md)
+            $type = '### Type: ['.StrTools::markdownEscape($php_type).'](../types/'.$php_type.'.md)
 
 
 ';
             $example = '';
             if (!isset($this->settings['td'])) {
-                $example = '### Example:
-
-```php
-$'.$constructor.$layer.' = '.$params.';
-```  
-
-
-Or, if you\'re into Lua:
-
-```lua
-'.$constructor.$layer.'='.$lua_params.'
-
-```
-
-
-';
+                $example = $this->template('constructor-example', $constructor.$layer, $params, $lua_params);
                 if ($hasreplymarkup) {
-                    $example .= '
-## Usage of reply_markup
-
-You can provide bot API reply_markup objects here.  
-
-
-';
+                    $example .= $this->template('reply_markup');
                 }
                 if ($hasentities) {
-                    $example .= '
-## Usage of parseMode:
-
-Set parseMode to html to enable HTML parsing of the message.  
-
-Set parseMode to Markdown to enable markown AND html parsing of the message.  
-
-The following tags are currently supported:
-
-```html
-<br>a newline
-<b><i>bold works ok, internal tags are stripped</i> </b>
-<strong>bold</strong>
-<em>italic</em>
-<i>italic</i>
-<code>inline fixed-width code</code>
-<pre>pre-formatted fixed-width code block</pre>
-<a href="https://github.com">URL</a>
-<a href="mention:@danogentili">Mention by username</a>
-<a href="mention:186785362">Mention by user id</a>
-<pre language="json">Pre tags can have a language attribute</pre>
-```
-
-You can also use normal markdown, note that to create mentions you must use the `mention:` syntax like in html:  
-
-```markdown
-[Mention by username](mention:@danogentili)
-[Mention by user id](mention:186785362)
-```
-
-MadelineProto supports all html entities supported by [html_entity_decode](http://php.net/manual/en/function.html-entity-decode.php).
-';
+                    $example .= $this->template('parse_mode');
                 }
             }
             \file_put_contents('constructors/'.$constructor.$layer.'.md', $header.$table.$type.$example);
@@ -275,19 +214,10 @@ MadelineProto supports all html entities supported by [html_entity_decode](http:
         $last_namespace = '';
         foreach ($this->docs_constructors as $constructor => &$value) {
             $new_namespace = \preg_replace('/_.*/', '', $constructor);
-            $br = $new_namespace != $last_namespace ? '***
-<br><br>' : '';
+            $br = $new_namespace != $last_namespace ? "***\n<br><br>" : '';
             $value = $br.$value;
             $last_namespace = $new_namespace;
         }
-        \file_put_contents('constructors/'.$this->index, '---
-title: Constructors
-description: List of constructors
-image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
----
-# Constructors  
-[Back to API documentation index](..)
-
-'.\implode('', $this->docs_constructors));
+        \file_put_contents('constructors/'.$this->index, $this->template('constructors-index', \implode('', $this->docs_constructors)));
     }
 }

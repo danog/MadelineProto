@@ -105,7 +105,7 @@ class AnnotationsBuilder
             if (!\in_array($namespace, $this->TL->getMethodNamespaces())) {
                 continue;
             }
-            $internalDoc[$namespace][$method]['title'] = \str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], Lang::$current_lang["method_{$data['method']}"] ?? '');
+            $internalDoc[$namespace][$method]['title'] = \str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], Lang::$lang['en']["method_{$data['method']}"] ?? '');
             $type = \str_ireplace(['vector<', '>'], [' of ', '[]'], $data['type']);
             foreach ($data['params'] as $param) {
                 if (\in_array($param['name'], ['flags', 'random_id', 'random_bytes'])) {
@@ -135,7 +135,7 @@ class AnnotationsBuilder
                 }
                 $ptype = $stype === 'type' ? $ptype : "[{$ptype}]";
                 $opt = $param['pow'] ?? false ? 'Optional: ' : '';
-                $internalDoc[$namespace][$method]['attr'][$param['name']] = ['type' => $ptype, 'description' => \str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], $opt.(Lang::$current_lang["method_{$data['method']}_param_{$param['name']}_type_{$param['type']}"] ?? ''))];
+                $internalDoc[$namespace][$method]['attr'][$param['name']] = ['type' => $ptype, 'description' => \str_replace(['](../', '.md'], ['](https://docs.madelineproto.xyz/API_docs/', '.html'], $opt.(Lang::$lang['en']["method_{$data['method']}_param_{$param['name']}_type_{$param['type']}"] ?? ''))];
             }
             if ($type === 'Bool') {
                 $type = \strtolower($type);
@@ -193,7 +193,7 @@ class AnnotationsBuilder
                     $name = \str_ireplace('async', '', $name);
                 }
             }
-            $name = Tools::toCamelCase($name);
+            $name = StrTools::toCamelCase($name);
             $name = \str_ireplace(['mtproto', 'api'], ['MTProto', 'API'], $name);
             $doc = 'public function ';
             $doc .= $name;

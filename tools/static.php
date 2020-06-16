@@ -47,8 +47,8 @@ foreach (new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryI
 }
 $filename = 'README.md';
 
+$new = \str_replace($findDocs, $replaceDocs, $old = \file_get_contents($filename));
+do {
+    \file_put_contents($filename, $new);
     $new = \str_replace($findDocs, $replaceDocs, $old = \file_get_contents($filename));
-    do {
-        \file_put_contents($filename, $new);
-        $new = \str_replace($findDocs, $replaceDocs, $old = \file_get_contents($filename));
-    } while ($old !== $new);
+} while ($old !== $new);

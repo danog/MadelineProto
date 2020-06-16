@@ -74,7 +74,12 @@
     "autoload-dev": {
         "psr-4": {
             "danog\\MadelineProto\\Test\\": "tests/danog/"
-        }
+        },
+        "files": [
+            "tools/build_docs/schemas.php",
+            "tools/build_docs/merge.php",
+            "tools/build_docs/layerUpgrade.php"
+        ]
     },
     "repositories": [{
         "type": "git",

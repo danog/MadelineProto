@@ -223,7 +223,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
             if (\strpos($method, '_') !== false) {
                 $finalMethods[\strtolower(\str_replace('_', '', $method))] = $actual_method;
             } else {
-                $finalMethods[\strtolower(Tools::toSnakeCase($method))] = $actual_method;
+                $finalMethods[\strtolower(StrTools::toSnakeCase($method))] = $actual_method;
             }
         }
 

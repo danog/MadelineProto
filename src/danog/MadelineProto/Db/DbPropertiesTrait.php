@@ -7,7 +7,6 @@ use danog\MadelineProto\MTProto;
 
 trait DbPropertiesTrait
 {
-
     public function initDb(MTProto $MadelineProto, bool $reset = false): \Generator
     {
         if (empty($this->dbProperies)) {
@@ -42,11 +41,11 @@ trait DbPropertiesTrait
         $result = $madelineProto->getSelf()['id'] ?? null;
         if (!$result) {
             $result = 'tmp_';
-            $result .= str_replace('0','', spl_object_hash($madelineProto));
+            $result .= \str_replace('0', '', \spl_object_hash($madelineProto));
         }
 
-        $className = explode('\\',__CLASS__);
-        $result .= '_' . end($className);
+        $className = \explode('\\', __CLASS__);
+        $result .= '_' . \end($className);
         return $result;
     }
 }

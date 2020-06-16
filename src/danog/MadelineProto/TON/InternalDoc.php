@@ -918,6 +918,8 @@ class InternalDoc extends APIFactory
          * @param \Generator|Promise $a Promise A
          * @param \Generator|Promise $b Promise B
          *
+         * @psalm-suppress InvalidScope
+         *
          * @return Promise
          */
     public function after($a, $b)
@@ -1009,6 +1011,8 @@ class InternalDoc extends APIFactory
      * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
      * @param string              $file    File
      *
+     * @psalm-suppress InvalidScope
+     *
      * @return Promise|mixed
      */
     public function callFork($promise, $actual = null, $file = '')
@@ -1078,7 +1082,7 @@ class InternalDoc extends APIFactory
      * @param integer $operation Locking mode
      * @param float  $polling   Polling interval
      *
-     * @return Promise
+     * @return Promise<callable>
      */
     public function flock(string $file, int $operation, float $polling = 0.1)
     {
@@ -1109,6 +1113,8 @@ class InternalDoc extends APIFactory
      *
      * @param object $obj Object
      * @param string $var Attribute name
+     *
+     * @psalm-suppress InvalidScope
      *
      * @return mixed
      * @access public
@@ -1177,11 +1183,11 @@ class InternalDoc extends APIFactory
      *
      * @param string $hwat String to escape
      *
-     * @return void
+     * @return string
      */
     public function markdownEscape(string $hwat): string
     {
-        return \danog\MadelineProto\Tools::markdownEscape($hwat);
+        return \danog\MadelineProto\StrTools::markdownEscape($hwat);
     }
     /**
      * Call lite method.
@@ -1196,6 +1202,17 @@ class InternalDoc extends APIFactory
     ], array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$methodName, $args, $aargs, $extra]);
+    }
+    /**
+     * Escape method name.
+     *
+     * @param string $method Method name
+     *
+     * @return string
+     */
+    public function methodEscape(string $method): string
+    {
+        return \danog\MadelineProto\StrTools::methodEscape($method);
     }
     /**
      * Convert double to binary version.
@@ -1281,7 +1298,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $prompt Prompt
      *
-     * @return Promise
+     * @return Promise<string>
      */
     public function readLine(string $prompt = '')
     {
@@ -1292,6 +1309,8 @@ class InternalDoc extends APIFactory
      *
      * @param \Throwable $e    Exception
      * @param string     $file File where the strand started
+     *
+     * @psalm-suppress InvalidScope
      *
      * @return void
      */
@@ -1327,6 +1346,8 @@ class InternalDoc extends APIFactory
      * @param object $obj Object
      * @param string $var Attribute name
      * @param mixed  $val Attribute value
+     *
+     * @psalm-suppress InvalidScope
      *
      * @return mixed
      * @access public
@@ -1379,7 +1400,7 @@ class InternalDoc extends APIFactory
      */
     public function toCamelCase(string $input): string
     {
-        return \danog\MadelineProto\Tools::toCamelCase($input);
+        return \danog\MadelineProto\StrTools::toCamelCase($input);
     }
     /**
      * Convert to snake_case.
@@ -1390,7 +1411,18 @@ class InternalDoc extends APIFactory
      */
     public function toSnakeCase(string $input): string
     {
-        return \danog\MadelineProto\Tools::toSnakeCase($input);
+        return \danog\MadelineProto\StrTools::toSnakeCase($input);
+    }
+    /**
+     * Escape type name.
+     *
+     * @param string $type String to escape
+     *
+     * @return string
+     */
+    public function typeEscape(string $type): string
+    {
+        return \danog\MadelineProto\StrTools::typeEscape($type);
     }
     /**
      * Unpack binary double.

@@ -41,7 +41,7 @@ use function Amp\Promise\wait;
 /**
  * Some tools.
  */
-abstract class Tools
+abstract class Tools extends StrTools
 {
     /**
      * Sanify TL obtained from JSON for TL serialization.
@@ -629,33 +629,6 @@ abstract class Tools
         return \is_array($var) || $var instanceof \ArrayAccess && $var instanceof \Traversable && $var instanceof \Countable;
     }
     /**
-     * Convert to camelCase.
-     *
-     * @param string $input String
-     *
-     * @return string
-     */
-    public static function toCamelCase(string $input): string
-    {
-        return \lcfirst(\str_replace('_', '', \ucwords($input, '_')));
-    }
-    /**
-     * Convert to snake_case.
-     *
-     * @param string $input String
-     *
-     * @return string
-     */
-    public static function toSnakeCase(string $input): string
-    {
-        \preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
-        $ret = $matches[0];
-        foreach ($ret as &$match) {
-            $match = $match == \strtoupper($match) ? \strtolower($match) : \lcfirst($match);
-        }
-        return \implode('_', $ret);
-    }
-    /**
      * Create array.
      *
      * @param mixed ...$params Params
@@ -800,17 +773,6 @@ abstract class Tools
     public static function end(array $what)
     {
         return \end($what);
-    }
-    /**
-     * Escape string for markdown.
-     *
-     * @param string $hwat String to escape
-     *
-     * @return void
-     */
-    public static function markdownEscape(string $hwat): string
-    {
-        return \str_replace('_', '\\_', $hwat);
     }
     /**
      * Whether this is altervista.

@@ -21,9 +21,7 @@
 
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\RPCErrorException;
 
 /*
  * Various ways to load MadelineProto

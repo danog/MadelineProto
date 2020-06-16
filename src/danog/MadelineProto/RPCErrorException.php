@@ -23,7 +23,7 @@ class RPCErrorException extends \Exception
 {
     use TL\PrettyException;
     /**
-     * RPC error code
+     * RPC error code.
      */
     public string $rpc = '';
     private $fetched = false;

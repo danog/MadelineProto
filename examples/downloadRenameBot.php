@@ -20,8 +20,8 @@
  */
 
 
-if (function_exists('memprof_enable')) {
-    memprof_enable();
+if (\function_exists('memprof_enable')) {
+    \memprof_enable();
 }
 
 use Amp\Http\Server\HttpServer;
@@ -136,10 +136,10 @@ class MyEventHandler extends \danog\MadelineProto\EventHandler
                 return $this->messages->sendMessage(['peer' => $peerId, 'message' => self::START, 'parse_mode' => 'Markdown', 'reply_to_msg_id' => $messageId]);
             }
             if ($update['message']['message'] === '/report' && $peerId === $this->adminId) {
-                memprof_dump_callgrind($stm = fopen("php://memory", "w"));
-                fseek($stm, 0);
+                \memprof_dump_callgrind($stm = \fopen("php://memory", "w"));
+                \fseek($stm, 0);
                 yield $this->messages->sendMedia(['peer' => $peerId, 'media' => ['_' => 'inputMediaUploadedDocument', 'file' => $stm, 'attributes' => [['_' => 'documentAttributeFilename', 'file_name' => 'callgrind.out']]]]);
-                fclose($stm);
+                \fclose($stm);
                 return;
             }
             if (isset($update['message']['media']['_']) && $update['message']['media']['_'] !== 'messageMediaWebPage') {

@@ -16,7 +16,7 @@ class MemoryArray extends \ArrayIterator implements DbArray
 
     public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise
     {
-        return call(static function() use ($value) {
+        return call(static function () use ($value) {
             if ($value instanceof MemoryArray) {
                 return $value;
             }
@@ -35,27 +35,27 @@ class MemoryArray extends \ArrayIterator implements DbArray
 
     public function isset($key): Promise
     {
-        return call(fn() => parent::offsetExists($key));
+        return call(fn () => parent::offsetExists($key));
     }
 
     public function offsetGet($offset): Promise
     {
-        return call(fn() => parent::offsetExists($offset) ? parent::offsetGet($offset) : null);
+        return call(fn () => parent::offsetExists($offset) ? parent::offsetGet($offset) : null);
     }
 
     public function offsetUnset($offset): Promise
     {
-        return call(fn() => parent::offsetUnset($offset));
+        return call(fn () => parent::offsetUnset($offset));
     }
 
     public function count(): Promise
     {
-        return call(fn() => parent::count());
+        return call(fn () => parent::count());
     }
 
     public function getArrayCopy(): Promise
     {
-        return call(fn() => parent::getArrayCopy());
+        return call(fn () => parent::getArrayCopy());
     }
 
     public function getIterator(): Producer

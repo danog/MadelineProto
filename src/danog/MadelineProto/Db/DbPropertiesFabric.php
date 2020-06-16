@@ -23,7 +23,7 @@ class DbPropertiesFabric
     {
         $class = __NAMESPACE__;
 
-        switch (strtolower($dbSettings['type'])) {
+        switch (\strtolower($dbSettings['type'])) {
             case 'memory':
                 $class .= '\Memory';
                 break;
@@ -36,7 +36,7 @@ class DbPropertiesFabric
         }
 
         /** @var DbType $class */
-        switch (strtolower($propertyType)){
+        switch (\strtolower($propertyType)) {
             case 'array':
                 $class .= 'Array';
                 break;
@@ -46,5 +46,4 @@ class DbPropertiesFabric
 
         return $class::getInstance($name, $value, $namePrefix, $dbSettings[$dbSettings['type']]??[]);
     }
-
 }

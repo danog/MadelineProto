@@ -208,7 +208,7 @@ trait PeerHandler
     private function cacheChatUsername(int $id, array $chat)
     {
         if ($id && !empty($chat['username'])) {
-            $this->usernames[strtolower($chat['username'])] = $id;
+            $this->usernames[\strtolower($chat['username'])] = $id;
         }
     }
 

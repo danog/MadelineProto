@@ -32,8 +32,8 @@ use danog\MadelineProto\Loop\Generic\PeriodicLoop;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
-use danog\MadelineProto\MTProtoTools\GarbageCollector;
 use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
+use danog\MadelineProto\MTProtoTools\GarbageCollector;
 use danog\MadelineProto\MTProtoTools\MinDatabase;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
@@ -91,7 +91,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 139;
+    const V = 141;
     /**
      * String release version.
      *
@@ -128,12 +128,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @var int
      */
     const LOGGED_IN = 3;
-    /**
-     * Disallowed methods.
-     *
-     * @var array
-     */
-    const DISALLOWED_METHODS = ['account.updatePasswordSettings' => 'You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info)', 'account.getPasswordSettings' => 'You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info)', 'messages.receivedQueue' => 'You cannot use this method directly', 'messages.getDhConfig' => 'You cannot use this method directly, instead use $MadelineProto->getDhConfig();', 'auth.bindTempAuthKey' => 'You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info', 'auth.exportAuthorization' => 'You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.importAuthorization' => 'You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html', 'auth.logOut' => 'You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info)', 'auth.importBotAuthorization' => 'You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)', 'auth.sendCode' => 'You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signIn' => 'You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)', 'auth.checkPassword' => 'You cannot use this method directly, use the complete2falogin method instead (see https://docs.madelineproto.xyz for more info)', 'auth.signUp' => 'You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)', 'users.getFullUser' => 'You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)', 'channels.getFullChannel' => 'You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.getFullChat' => 'You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)', 'contacts.resolveUsername' => 'You cannot use this method directly, use the resolveUsername, getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)', 'messages.acceptEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.discardEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'messages.requestEncryption' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats', 'phone.requestCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.acceptCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.confirmCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'phone.discardCall' => 'You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls', 'updates.getChannelDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getDifference' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'updates.getState' => 'You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates', 'upload.getCdnFile' => 'You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFileHashes' => 'You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getCdnFileHashes' => 'You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.reuploadCdnFile' => 'You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.getFile' => 'You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveFilePart' => 'You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info', 'upload.saveBigFilePart' => 'You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info'];
     /**
      * Bad message error codes.
      *
@@ -289,7 +283,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public $chats;
 
     /**
-     * Cache of usernames for chats
+     * Cache of usernames for chats.
      *
      * @var DbArray|Promise[]
      */
@@ -422,7 +416,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     private $TL;
 
     /**
-     * List of properties stored in database (memory or external)
+     * List of properties stored in database (memory or external).
      * @see DbPropertiesFabric
      * @var array
      */
@@ -781,7 +775,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
 
         yield from $this->initDb($this);
-
     }
 
     /**
@@ -1226,18 +1219,17 @@ class MTProto extends AsyncConstruct implements TLCallback
             'lang_pack' => $lang_pack,
         ], 'tl_schema' => [
             // TL scheme files
-            'layer' => 112,
+            'layer' => 113,
             // layer version
             'src' => [
-                'mtproto' => __DIR__.'/../../../schemas/TL_mtproto_v1.tl',
                 // mtproto TL scheme
-                'telegram' => __DIR__.'/../../../schemas/TL_telegram_v112.tl',
+                'mtproto' => __DIR__.'/TL_mtproto_v1.tl',
                 // telegram TL scheme
-                'secret' => __DIR__.'/../../../schemas/TL_secret.tl',
+                'telegram' => __DIR__.'/TL_telegram_v113.tl',
                 // secret chats TL scheme
-                'calls' => __DIR__.'/../../../schemas/TL_calls.tl',
-                // calls TL scheme
-                'botAPI' => __DIR__.'/../../../schemas/TL_botAPI.tl',
+                'secret' => __DIR__.'/schemas/TL_secret.tl',
+                // bot API TL scheme
+                'botAPI' => __DIR__.'/schemas/TL_botAPI.tl',
             ],
         ], 'logger' => [
             // Logger settings
@@ -1289,7 +1281,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         /**
          * Where internal database will be stored?
          *      memory - session file
-         *      mysql - mysql database
+         *      mysql - mysql database.
          */
         'db' => [
             'type' => 'memory',
@@ -1531,7 +1523,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->updates = [];
         $this->secret_chats = [];
 
-        yield from $this->initDb($this,true);
+        yield from $this->initDb($this, true);
 
         $this->tos = ['expires' => 0, 'accepted' => true];
         $this->referenceDatabase = new ReferenceDatabase($this);

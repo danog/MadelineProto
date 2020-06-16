@@ -35,17 +35,16 @@ class MysqlArray implements DbArray
         } catch (\Throwable $e) {
             Logger::log($e->getMessage(), Logger::ERROR);
         }
-
     }
 
-	/**
-	 * @param string $name
-	 * @param DbArray|array|null $value
-	 * @param string $tablePrefix
-	 * @param array $settings
-	 *
-	 * @return Promise
-	 */
+    /**
+     * @param string $name
+     * @param DbArray|array|null $value
+     * @param string $tablePrefix
+     * @param array $settings
+     *
+     * @return Promise
+     */
     public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise
     {
         $tableName = "{$tablePrefix}_{$name}";
@@ -62,7 +61,7 @@ class MysqlArray implements DbArray
 
         $instance->startCacheCleanupLoop();
 
-        return call(static function() use($instance, $value) {
+        return call(static function () use ($instance, $value) {
             yield from $instance->prepareTable();
 
             //Skip migrations if its same object
@@ -75,18 +74,18 @@ class MysqlArray implements DbArray
         });
     }
 
-	/**
-	 * @param MysqlArray $instance
-	 * @param DbArray|array|null $value
-	 *
-	 * @return \Generator
-	 */
+    /**
+     * @param MysqlArray $instance
+     * @param DbArray|array|null $value
+     *
+     * @return \Generator
+     */
     private static function renameTmpTable(MysqlArray $instance, $value): \Generator
     {
         if ($value instanceof static && $value->table) {
             if (
                 $value->table !== $instance->table &&
-                mb_strpos($instance->table, 'tmp') !== 0
+                \mb_strpos($instance->table, 'tmp') !== 0
             ) {
                 yield from $instance->renameTable($value->table, $instance->table);
             } else {
@@ -95,13 +94,13 @@ class MysqlArray implements DbArray
         }
     }
 
-	/**
-	 * @param MysqlArray $instance
-	 * @param DbArray|array|null $value
-	 *
-	 * @return \Generator
-	 * @throws \Throwable
-	 */
+    /**
+     * @param MysqlArray $instance
+     * @param DbArray|array|null $value
+     *
+     * @return \Generator
+     * @throws \Throwable
+     */
     private static function migrateDataToDb(MysqlArray $instance, $value): \Generator
     {
         if (!empty($value) && !$value instanceof MysqlArray) {
@@ -113,7 +112,7 @@ class MysqlArray implements DbArray
                 $value = (array) $value;
             }
             $counter = 0;
-            $total = count($value);
+            $total = \count($value);
             foreach ($value as $key => $item) {
                 $counter++;
                 if ($counter % 500 === 0) {
@@ -122,7 +121,6 @@ class MysqlArray implements DbArray
                 } else {
                     $instance->offsetSet($key, $item);
                 }
-
             }
             Logger::log('Converting database done.', Logger::ERROR);
         }
@@ -134,7 +132,7 @@ class MysqlArray implements DbArray
     }
 
     /**
-     * Check if key isset
+     * Check if key isset.
      *
      * @param $key
      *
@@ -142,13 +140,13 @@ class MysqlArray implements DbArray
      */
     public function isset($key): Promise
     {
-        return call(fn() => yield $this->offsetGet($key) !== null);
+        return call(fn () => yield $this->offsetGet($key) !== null);
     }
 
 
     public function offsetGet($offset): Promise
     {
-        return call(function() use($offset) {
+        return call(function () use ($offset) {
             if ($cached = $this->getCache($offset)) {
                 return $cached;
             }
@@ -167,7 +165,7 @@ class MysqlArray implements DbArray
     }
 
     /**
-     * Set value for an offset
+     * Set value for an offset.
      *
      * @link https://php.net/manual/en/arrayiterator.offsetset.php
      *
@@ -182,30 +180,31 @@ class MysqlArray implements DbArray
     public function offsetSet($index, $value): Promise
     {
         if ($this->getCache($index) === $value) {
-            return call(fn()=>null);
+            return call(fn () =>null);
         }
 
         $this->setCache($index, $value);
 
-        $request = $this->request("
+        $request = $this->request(
+            "
             INSERT INTO `{$this->table}` 
             SET `key` = :index, `value` = :value 
             ON DUPLICATE KEY UPDATE `value` = :value
         ",
             [
                 'index' => $index,
-                'value' => serialize($value),
+                'value' => \serialize($value),
             ]
         );
 
         //Ensure that cache is synced with latest insert in case of concurrent requests.
-        $request->onResolve(fn() => $this->setCache($index, $value));
+        $request->onResolve(fn () => $this->setCache($index, $value));
 
         return $request;
     }
 
     /**
-     * Unset value for an offset
+     * Unset value for an offset.
      *
      * @link https://php.net/manual/en/arrayiterator.offsetunset.php
      *
@@ -220,7 +219,8 @@ class MysqlArray implements DbArray
     {
         $this->unsetCache($index);
 
-        return $this->request("
+        return $this->request(
+            "
                     DELETE FROM `{$this->table}`
                     WHERE `key` = :index
                 ",
@@ -229,14 +229,14 @@ class MysqlArray implements DbArray
     }
 
     /**
-     * Get array copy
+     * Get array copy.
      *
      * @return Promise<array>
      * @throws \Throwable
      */
     public function getArrayCopy(): Promise
     {
-        return call(function(){
+        return call(function () {
             $iterator = $this->getIterator();
             $result = [];
             while (yield $iterator->advance()) {
@@ -260,7 +260,7 @@ class MysqlArray implements DbArray
     }
 
     /**
-     * Count elements
+     * Count elements.
      *
      * @link https://php.net/manual/en/arrayiterator.count.php
      * @return Promise<int> The number of elements or public properties in the associated
@@ -269,7 +269,7 @@ class MysqlArray implements DbArray
      */
     public function count(): Promise
     {
-        return call(function(){
+        return call(function () {
             $row = yield $this->request("SELECT count(`key`) as `count` FROM `{$this->table}`");
             return $row[0]['count'] ?? 0;
         });
@@ -279,9 +279,9 @@ class MysqlArray implements DbArray
     {
         if ($row) {
             if (!empty($row[0]['value'])) {
-                $row = reset($row);
+                $row = \reset($row);
             }
-            return unserialize($row['value']);
+            return \unserialize($row['value']);
         }
         return null;
     }
@@ -300,7 +300,7 @@ class MysqlArray implements DbArray
     }
 
     /**
-     * Create table for property
+     * Create table for property.
      *
      * @return array|null
      * @throws \Throwable
@@ -335,7 +335,7 @@ class MysqlArray implements DbArray
     }
 
     /**
-     * Perform async request to db
+     * Perform async request to db.
      *
      * @param string $query
      * @param array $params
@@ -345,8 +345,7 @@ class MysqlArray implements DbArray
      */
     private function request(string $query, array $params = []): Promise
     {
-        return call(function() use($query, $params) {
-
+        return call(function () use ($query, $params) {
             Logger::log([$query, $params], Logger::VERBOSE);
 
             if (empty($this->db) || !$this->db->isAlive()) {

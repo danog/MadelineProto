@@ -208,7 +208,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         return $this->write($data);
     }
     /**
-     * Get remaining data from buffer
+     * Get remaining data from buffer.
      *
      * @return string
      */
@@ -217,8 +217,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
         $size = \fstat($this->memory_stream)['size'];
         $offset = \ftell($this->memory_stream);
         $buffer_length = $size - $offset;
-        $data = fread($this->memory_stream, $buffer_length);
-        fclose($this->memory_stream);
+        $data = \fread($this->memory_stream, $buffer_length);
+        \fclose($this->memory_stream);
         $this->memory_stream = null;
         return $data;
     }

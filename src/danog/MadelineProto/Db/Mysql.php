@@ -38,8 +38,7 @@ class Mysql
         string $db = 'MadelineProto',
         int $maxConnections = ConnectionPool::DEFAULT_MAX_CONNECTIONS,
         int $idleTimeout = ConnectionPool::DEFAULT_IDLE_TIMEOUT
-    ): Pool
-    {
+    ): Pool {
         $dbKey = "$host:$port:$db";
         if (empty(static::$connections[$dbKey])) {
             $config = ConnectionConfig::fromString(
@@ -62,7 +61,7 @@ class Mysql
      */
     private static function createDb(ConnectionConfig $config)
     {
-        wait(call(static function() use($config) {
+        wait(call(static function () use ($config) {
             try {
                 $db = $config->getDatabase();
                 $connection = pool($config->withDatabase(null));
@@ -76,7 +75,5 @@ class Mysql
                 Logger::log($e->getMessage(), Logger::ERROR);
             }
         }));
-
     }
-
 }

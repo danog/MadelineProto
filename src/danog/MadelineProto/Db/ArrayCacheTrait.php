@@ -15,7 +15,7 @@ trait ArrayCacheTrait
      *          'ttl' => int
      *      ],
      *      ...
-     * ]
+     * ].
      * @var array
      */
     protected array $cache = [];
@@ -29,14 +29,14 @@ trait ArrayCacheTrait
 
         if (\is_array($cacheItem)) {
             $result = $cacheItem['value'];
-            $this->cache[$key]['ttl'] = strtotime($this->ttl);
+            $this->cache[$key]['ttl'] = \strtotime($this->ttl);
         }
 
         return $result;
     }
 
     /**
-     * Save item in cache
+     * Save item in cache.
      *
      * @param string $key
      * @param $value
@@ -45,12 +45,12 @@ trait ArrayCacheTrait
     {
         $this->cache[$key] = [
             'value' => $value,
-            'ttl' => strtotime($this->ttl),
+            'ttl' => \strtotime($this->ttl),
         ];
     }
 
     /**
-     * Remove key from cache
+     * Remove key from cache.
      *
      * @param string $key
      */
@@ -61,15 +61,15 @@ trait ArrayCacheTrait
 
     protected function startCacheCleanupLoop(): void
     {
-        Loop::repeat(strtotime($this->ttlCheckInterval, 0) * 1000, fn() => $this->cleanupCache());
+        Loop::repeat(\strtotime($this->ttlCheckInterval, 0) * 1000, fn () => $this->cleanupCache());
     }
 
     /**
-     * Remove all keys from cache
+     * Remove all keys from cache.
      */
     protected function cleanupCache(): void
     {
-        $now = time();
+        $now = \time();
         $oldKeys = [];
         foreach ($this->cache as $cacheKey => $cacheValue) {
             if ($cacheValue['ttl'] < $now) {
@@ -81,12 +81,13 @@ trait ArrayCacheTrait
         }
 
         Logger::log(
-            sprintf(
+            \sprintf(
                 "cache for table:%s; keys left: %s; keys removed: %s",
-                $this->table, \count($this->cache), \count($oldKeys)
+                $this->table,
+                \count($this->cache),
+                \count($oldKeys)
             ),
             Logger::VERBOSE
         );
     }
-
 }

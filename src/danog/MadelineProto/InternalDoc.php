@@ -10,13 +10,13 @@ namespace danog\MadelineProto;
 interface auth
 {
     /**
-     * You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info).
+     * Send the verification code for login.
      *
      * Parameters:
-     * * `string`       **phone_number** - You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info)
-     * * `int`          **api_id**       - You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string`       **api_hash**     - You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info)
-     * * `CodeSettings` **settings**     - You cannot use this method directly, use the phoneLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string`       **phone_number** - Phone number in international format
+     * * `int`          **api_id**       - Application identifier (see [App configuration](https://core.telegram.org/myapp))
+     * * `string`       **api_hash**     - Application secret hash (see [App configuration](https://core.telegram.org/myapp))
+     * * `CodeSettings` **settings**     - Settings for the code type to send
      *
      * @param array $params Parameters
      *
@@ -25,13 +25,13 @@ interface auth
     public function sendCode($params);
 
     /**
-     * You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info).
+     * Registers a validated phone number in the system.
      *
      * Parameters:
-     * * `string` **phone_number**    - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **phone_code_hash** - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **first_name**      - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **last_name**       - You cannot use this method directly, use the completeSignup method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_number**    - Phone number in the international format
+     * * `string` **phone_code_hash** - SMS-message ID
+     * * `string` **first_name**      - New user first name
+     * * `string` **last_name**       - New user last name
      *
      * @param array $params Parameters
      *
@@ -40,12 +40,12 @@ interface auth
     public function signUp($params);
 
     /**
-     * You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info).
+     * Signs in a user with a validated phone number.
      *
      * Parameters:
-     * * `string` **phone_number**    - You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **phone_code_hash** - You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **phone_code**      - You cannot use this method directly, use the completePhoneLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **phone_number**    - Phone number in the international format
+     * * `string` **phone_code_hash** - SMS-message ID, obtained from [auth.sendCode](https://docs.madelineproto.xyz/API_docs/methods/auth.sendCode.html)
+     * * `string` **phone_code**      - Valid numerical code from the SMS-message
      *
      * @param array $params Parameters
      *
@@ -54,7 +54,7 @@ interface auth
     public function signIn($params);
 
     /**
-     * You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info).
+     * Logs out the user.
      *
      * @return bool
      */
@@ -70,10 +70,10 @@ interface auth
     public function resetAuthorizations();
 
     /**
-     * You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html.
+     * Returns data for copying authorization to another data-centre.
      *
      * Parameters:
-     * * `int` **dc_id** - You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * * `int` **dc_id** - Number of a target data-centre
      *
      * @param array $params Parameters
      *
@@ -82,11 +82,11 @@ interface auth
     public function exportAuthorization($params);
 
     /**
-     * You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html.
+     * Logs in a user using a key transmitted from his native data-centre.
      *
      * Parameters:
-     * * `int`   **id**    - You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
-     * * `bytes` **bytes** - You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html
+     * * `int`   **id**    - User ID
+     * * `bytes` **bytes** - Authorization key
      *
      * @param array $params Parameters
      *
@@ -95,13 +95,15 @@ interface auth
     public function importAuthorization($params);
 
     /**
-     * You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info.
+     * Binds a temporary authorization key `temp_auth_key_id` to the permanent authorization key `perm_auth_key_id`. Each permanent key may only be bound to one temporary key at a time, binding a new temporary key overwrites the previous one.
+     *
+     * For more information, see [Perfect Forward Secrecy](https://core.telegram.org/api/pfs).
      *
      * Parameters:
-     * * `long`  **perm_auth_key_id**  - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
-     * * `long`  **nonce**             - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
-     * * `int`   **expires_at**        - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
-     * * `bytes` **encrypted_message** - You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info
+     * * `long`  **perm_auth_key_id**  - Permanent auth\_key\_id to bind to
+     * * `long`  **nonce**             - Random long from [Binding message contents](#binding-message-contents)
+     * * `int`   **expires_at**        - Unix timestamp to invalidate temporary key, see [Binding message contents](#binding-message-contents)
+     * * `bytes` **encrypted_message** - See [Generating encrypted\_message](#generating-encrypted-message)
      *
      * @param array $params Parameters
      *
@@ -110,12 +112,12 @@ interface auth
     public function bindTempAuthKey($params);
 
     /**
-     * You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info).
+     * Login as a bot.
      *
      * Parameters:
-     * * `int`    **api_id**         - You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **api_hash**       - You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)
-     * * `string` **bot_auth_token** - You cannot use this method directly, use the botLogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `int`    **api_id**         - Application identifier (see. [App configuration](https://core.telegram.org/myapp))
+     * * `string` **api_hash**       - Application identifier hash (see. [App configuration](https://core.telegram.org/myapp))
+     * * `string` **bot_auth_token** - Bot token (see [bots](https://core.telegram.org/bots))
      *
      * @param array $params Parameters
      *
@@ -124,10 +126,10 @@ interface auth
     public function importBotAuthorization($params);
 
     /**
-     * You cannot use this method directly, use the complete2falogin method instead (see https://docs.madelineproto.xyz for more info).
+     * Try logging to an account protected by a [2FA password](https://core.telegram.org/api/srp).
      *
      * Parameters:
-     * * `InputCheckPasswordSRP` **password** - You cannot use this method directly, use the complete2falogin method instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputCheckPasswordSRP` **password** - The account's password (see [SRP](https://core.telegram.org/api/srp))
      *
      * @param array $params Parameters
      *
@@ -184,7 +186,7 @@ interface auth
      * Delete all temporary authorization keys **except for** the ones specified.
      *
      * Parameters:
-     * * `[long]` **except_auth_keys** - The temporary authorization keys to keep
+     * * `[long]` **except_auth_keys** - The auth keys that **shouldn't** be dropped.
      *
      * @param array $params Parameters
      *
@@ -193,12 +195,15 @@ interface auth
     public function dropTempAuthKeys($params);
 
     /**
+     * Generate a login token, for [login via QR code](https://core.telegram.org/api/qr-login).
+     * The generated login token should be encoded using base64url, then shown as a `tg://login?token=base64encodedtoken` URL in the QR code.
      *
+     * For more info, see [login via QR code](https://core.telegram.org/api/qr-login).
      *
      * Parameters:
-     * * `int`    **api_id**     -
-     * * `string` **api_hash**   -
-     * * `[int]`  **except_ids** -.
+     * * `int`    **api_id**     - Application identifier (see. [App configuration](https://core.telegram.org/myapp))
+     * * `string` **api_hash**   - Application identifier hash (see. [App configuration](https://core.telegram.org/myapp))
+     * * `[int]`  **except_ids** - List of already logged-in user IDs, to prevent logging in twice with the same user
      *
      * @param array $params Parameters
      *
@@ -207,10 +212,12 @@ interface auth
     public function exportLoginToken($params);
 
     /**
+     * Login using a redirected login token, generated in case of DC mismatch during [QR code login](https://core.telegram.org/api/qr-login).
      *
+     * For more info, see [login via QR code](https://core.telegram.org/api/qr-login).
      *
      * Parameters:
-     * * `bytes` **token** -.
+     * * `bytes` **token** - Login token
      *
      * @param array $params Parameters
      *
@@ -219,10 +226,14 @@ interface auth
     public function importLoginToken($params);
 
     /**
+     * Accept QR code login token, logging in the app that generated it.
      *
+     * Returns info about the new session.
+     *
+     * For more info, see [login via QR code](https://core.telegram.org/api/qr-login).
      *
      * Parameters:
-     * * `bytes` **token** -.
+     * * `bytes` **token** - Login token embedded in QR code, for more info, see [login via QR code](https://core.telegram.org/api/qr-login).
      *
      * @param array $params Parameters
      *
@@ -242,7 +253,7 @@ interface account
      * * `string`  **token**       - Device token
      * * `Bool`    **app_sandbox** - If [(boolTrue)](https://docs.madelineproto.xyz/API_docs/constructors/boolTrue.html) is transmitted, a sandbox-certificate will be used during transmission.
      * * `bytes`   **secret**      - For FCM and APNS VoIP, optional encryption key used to encrypt push notifications
-     * * `[int]`   **other_uids**  - Other UIDs
+     * * `[int]`   **other_uids**  - List of user identifiers of other users currently using the client
      *
      * @param array $params Parameters
      *
@@ -256,7 +267,7 @@ interface account
      * Parameters:
      * * `int`    **token_type** - Device token type.<br>**Possible values**:<br>`1` \- APNS (device token for apple push)<br>`2` \- FCM (firebase token for google firebase)<br>`3` \- MPNS (channel URI for microsoft push)<br>`4` \- Simple push (endpoint for firefox's simple push API)<br>`5` \- Ubuntu phone (token for ubuntu push)<br>`6` \- Blackberry (token for blackberry push)<br>`7` \- Unused<br>`8` \- WNS (windows push)<br>`9` \- APNS VoIP (token for apple push VoIP)<br>`10` \- Web push (web push, see below)<br>`11` \- MPNS VoIP (token for microsoft push VoIP)<br>`12` \- Tizen (token for tizen push)<br><br>For `10` web push, the token must be a JSON-encoded object containing the keys described in [PUSH updates](https://core.telegram.org/api/push-updates)
      * * `string` **token**      - Device token
-     * * `[int]`  **other_uids** - Other UIDs
+     * * `[int]`  **other_uids** - List of user identifiers of other users currently using the client
      *
      * @param array $params Parameters
      *
@@ -326,7 +337,7 @@ interface account
      * Returns a list of available wallpapers.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: IDs of previously fetched wallpapers
+     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -351,7 +362,7 @@ interface account
      * Validates a username and checks availability.
      *
      * Parameters:
-     * * `string` **username** - Username<br>Accepted characters: A-z (case-insensitive), 0-9 and underscores.<br>Length: 5-32 characters.
+     * * `string` **username** - username<br>Accepted characters: A-z (case-insensitive), 0-9 and underscores.<br>Length: 5-32 characters.
      *
      * @param array $params Parameters
      *
@@ -363,7 +374,7 @@ interface account
      * Changes username for the current user.
      *
      * Parameters:
-     * * `string` **username** - Username or empty string if username is to be removed<br>Accepted characters: a-z (case-insensitive), 0-9 and underscores.<br>Length: 5-32 characters.
+     * * `string` **username** - username or empty string if username is to be removed<br>Accepted characters: a-z (case-insensitive), 0-9 and underscores.<br>Length: 5-32 characters.
      *
      * @param array $params Parameters
      *
@@ -388,7 +399,7 @@ interface account
      *
      * Parameters:
      * * `InputPrivacyKey`    **key**   - Peers to which the privacy rules apply
-     * * `[InputPrivacyRule]` **rules** - Privacy settings
+     * * `[InputPrivacyRule]` **rules** - New privacy rules
      *
      * @param array $params Parameters
      *
@@ -493,10 +504,10 @@ interface account
     public function getPassword();
 
     /**
-     * You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info).
+     * Get private info associated to the password info (recovery email, telegram [passport](https://core.telegram.org/passport) info &amp; so on).
      *
      * Parameters:
-     * * `InputCheckPasswordSRP` **password** - You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputCheckPasswordSRP` **password** - The password (see [SRP](https://core.telegram.org/api/srp))
      *
      * @param array $params Parameters
      *
@@ -505,11 +516,11 @@ interface account
     public function getPasswordSettings($params);
 
     /**
-     * You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info).
+     * Set a new 2FA password.
      *
      * Parameters:
-     * * `InputCheckPasswordSRP`         **password**     - You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info)
-     * * `account.PasswordInputSettings` **new_settings** - You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputCheckPasswordSRP`         **password**     - The old password (see [SRP](https://core.telegram.org/api/srp))
+     * * `account.PasswordInputSettings` **new_settings** - The new password (see [SRP](https://core.telegram.org/api/srp))
      *
      * @param array $params Parameters
      *
@@ -593,7 +604,7 @@ interface account
      * Get saved [Telegram Passport](https://core.telegram.org/passport) document, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption).
      *
      * Parameters:
-     * * `[SecureValueType]` **types** - Get telegram passport secure parameters
+     * * `[SecureValueType]` **types** - Requested value types
      *
      * @param array $params Parameters
      *
@@ -618,7 +629,7 @@ interface account
      * Delete stored [Telegram Passport](https://core.telegram.org/passport) documents, [for more info see the passport docs »](https://core.telegram.org/passport/encryption#encryption).
      *
      * Parameters:
-     * * `[SecureValueType]` **types** - The values to delete
+     * * `[SecureValueType]` **types** - Document types to delete
      *
      * @param array $params Parameters
      *
@@ -647,7 +658,7 @@ interface account
      * * `int`                        **bot_id**       - Bot ID
      * * `string`                     **scope**        - Telegram Passport element types requested by the service
      * * `string`                     **public_key**   - Service's public key
-     * * `[SecureValueHash]`          **value_hashes** - Hashes of the encrypted credentials
+     * * `[SecureValueHash]`          **value_hashes** - Types of values sent and their hashes
      * * `SecureCredentialsEncrypted` **credentials**  - Encrypted values
      *
      * @param array $params Parameters
@@ -899,7 +910,7 @@ interface account
      * * `string`             **slug**     - Unique theme ID
      * * `string`             **title**    - Theme name
      * * `InputDocument`      **document** - Optional: Theme file
-     * * `InputThemeSettings` **settings** - Optional:
+     * * `InputThemeSettings` **settings** - Optional: Theme settings
      *
      * @param array $params Parameters
      *
@@ -916,7 +927,7 @@ interface account
      * * `string`             **slug**     - Optional: Unique theme ID
      * * `string`             **title**    - Optional: Theme name
      * * `InputDocument`      **document** - Optional: Theme file
-     * * `InputThemeSettings` **settings** - Optional:
+     * * `InputThemeSettings` **settings** - Optional: Theme settings
      *
      * @param array $params Parameters
      *
@@ -970,7 +981,7 @@ interface account
      *
      * Parameters:
      * * `string` **format** - Theme format, a string that identifies the theming engines supported by the client
-     * * `[int]`  **hash**   - Optional: Hash for pagination
+     * * `[int]`  **hash**   - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -979,10 +990,10 @@ interface account
     public function getThemes($params);
 
     /**
-     *
+     * Set sensitive content settings (for viewing or hiding NSFW content).
      *
      * Parameters:
-     * * `boolean` **sensitive_enabled** - Optional:.
+     * * `boolean` **sensitive_enabled** - Optional: Enable NSFW content
      *
      * @param array $params Parameters
      *
@@ -991,17 +1002,17 @@ interface account
     public function setContentSettings($params);
 
     /**
-     *
+     * Get sensitive content settings.
      *
      * @return account.ContentSettings
      */
     public function getContentSettings();
 
     /**
-     *
+     * Get info about multiple wallpapers.
      *
      * Parameters:
-     * * `[InputWallPaper]` **wallpapers** -.
+     * * `[InputWallPaper]` **wallpapers** - Wallpapers to fetch info about
      *
      * @param array $params Parameters
      *
@@ -1016,7 +1027,7 @@ interface users
      * Returns basic user info according to their identifiers.
      *
      * Parameters:
-     * * `[InputUser]` **id** - The ids of the users
+     * * `[InputUser]` **id** - List of user identifiers
      *
      * @param array $params Parameters
      *
@@ -1025,10 +1036,10 @@ interface users
     public function getUsers($params);
 
     /**
-     * You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
+     * Returns extended user info by ID.
      *
      * Parameters:
-     * * `InputUser` **id** - You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputUser` **id** - User ID
      *
      * @param array $params Parameters
      *
@@ -1043,7 +1054,7 @@ interface users
      *
      * Parameters:
      * * `InputUser`          **id**     - The user
-     * * `[SecureValueError]` **errors** - The errors
+     * * `[SecureValueError]` **errors** - Errors
      *
      * @param array $params Parameters
      *
@@ -1058,7 +1069,7 @@ interface contacts
      * Get contact by telegram IDs.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: Previously fetched IDs
+     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -1077,7 +1088,7 @@ interface contacts
      * Returns the current user's contact list.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: User IDs of previously cached contacts
+     * * `[int]` **hash** - Optional: If there already is a full contact list on the client, a [hash](https://core.telegram.org/api/offsets#hash-generation) of a the list of contact IDs in ascending order may be passed in this parameter. If the contact set was not changed, [(contacts.contactsNotModified)](https://docs.madelineproto.xyz/API_docs/constructors/contacts.contactsNotModified.html) will be returned.
      *
      * @param array $params Parameters
      *
@@ -1088,8 +1099,10 @@ interface contacts
     /**
      * Imports contacts: saves a full list on the server, adds already registered contacts to the contact list, returns added contacts and their info.
      *
+     * Use [contacts.addContact](https://docs.madelineproto.xyz/API_docs/methods/contacts.addContact.html) to add Telegram contacts without actually using their phone number.
+     *
      * Parameters:
-     * * `[InputContact]` **contacts** - The numbers to import
+     * * `[InputContact]` **contacts** - List of contacts to import
      *
      * @param array $params Parameters
      *
@@ -1101,7 +1114,7 @@ interface contacts
      * Deletes several contacts from the list.
      *
      * Parameters:
-     * * `[InputUser]` **id** - The contacts to delete
+     * * `[InputUser]` **id** - User ID list
      *
      * @param array $params Parameters
      *
@@ -1113,7 +1126,7 @@ interface contacts
      * Delete contacts by phone number.
      *
      * Parameters:
-     * * `[string]` **phones** - Phones
+     * * `[string]` **phones** - Phone numbers
      *
      * @param array $params Parameters
      *
@@ -1172,10 +1185,10 @@ interface contacts
     public function search($params);
 
     /**
-     * You cannot use this method directly, use the resolveUsername, getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
+     * Resolve a @username to get peer info.
      *
      * Parameters:
-     * * `string` **username** - You cannot use this method directly, use the resolveUsername, getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
+     * * `string` **username** - @username to resolve
      *
      * @param array $params Parameters
      *
@@ -1197,7 +1210,7 @@ interface contacts
      * * `boolean` **channels**       - Optional: Most frequently visited channels
      * * `int`     **offset**         - Offset for [pagination](https://core.telegram.org/api/offsets)
      * * `int`     **limit**          - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
-     * * `[int]`   **hash**           - Optional: Peer IDs of previously cached peers
+     * * `[int]`   **hash**           - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -1247,6 +1260,8 @@ interface contacts
     /**
      * Add an existing telegram user as contact.
      *
+     * Use [contacts.importContacts](https://docs.madelineproto.xyz/API_docs/methods/contacts.importContacts.html) to add contacts by phone number, without knowing their Telegram ID.
+     *
      * Parameters:
      * * `boolean`   **add_phone_privacy_exception** - Optional: Allow the other user to see our phone number?
      * * `InputUser` **id**                          - Telegram ID of the other user
@@ -1276,9 +1291,9 @@ interface contacts
      * Get contacts near you.
      *
      * Parameters:
-     * * `boolean`       **background**   - Optional:
+     * * `boolean`       **background**   - Optional: While the geolocation of the current user is public, clients should update it in the background every half-an-hour or so, while setting this flag. <br>Do this only if the new location is more than 1 KM away from the previous one, or if the previous location is unknown.
      * * `InputGeoPoint` **geo_point**    - Geolocation
-     * * `int`           **self_expires** - Optional:
+     * * `int`           **self_expires** - Optional: If set, the geolocation of the current user will be public for the specified number of seconds; pass 0x7fffffff to disable expiry, 0 to make the current geolocation private; if the flag isn't set, no changes will be applied.
      *
      * @param array $params Parameters
      *
@@ -1293,7 +1308,7 @@ interface messages
      * Returns the list of messages by their IDs.
      *
      * Parameters:
-     * * `[InputMessage]` **id** - The IDs of messages to fetch (only for users and normal groups)
+     * * `[InputMessage]` **id** - Message ID list
      *
      * @param array $params Parameters
      *
@@ -1306,12 +1321,12 @@ interface messages
      *
      * Parameters:
      * * `boolean`   **exclude_pinned** - Optional: Exclude pinned dialogs
-     * * `int`       **folder_id**      - Optional: Folder ID
+     * * `int`       **folder_id**      - Optional: [Peer folder ID, for more info click here](https://core.telegram.org/api/folders#peer-folders)
      * * `int`       **offset_date**    - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      * * `int`       **offset_id**      - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      * * `InputPeer` **offset_peer**    - [Offset peer for pagination](https://core.telegram.org/api/offsets)
      * * `int`       **limit**          - Number of list elements to be returned
-     * * `[int]`     **hash**           - Optional: IDs of previously fetched dialogs
+     * * `[int]`     **hash**           - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -1325,12 +1340,12 @@ interface messages
      * Parameters:
      * * `InputPeer` **peer**        - Target peer
      * * `int`       **offset_id**   - Only return messages starting from the specified message ID
-     * * `int`       **offset_date** - Only return messages sent after the specified date
+     * * `int`       **offset_date** - Only return messages sent before the specified date
      * * `int`       **add_offset**  - Number of list elements to be skipped, negative values are also accepted.
      * * `int`       **limit**       - Number of results to return
      * * `int`       **max_id**      - If a positive value was transferred, the method will return only messages with IDs less than **max\_id**
      * * `int`       **min_id**      - If a positive value was transferred, the method will return only messages with IDs more than **min\_id**
-     * * `[int]`     **hash**        - Optional: IDs of messages you already fetched
+     * * `[int]`     **hash**        - Optional: [Result hash](https://core.telegram.org/api/offsets)
      *
      * @param array $params Parameters
      *
@@ -1353,7 +1368,7 @@ interface messages
      * * `int`            **limit**      - [Number of results to return](https://core.telegram.org/api/offsets)
      * * `int`            **max_id**     - [Maximum message ID to return](https://core.telegram.org/api/offsets)
      * * `int`            **min_id**     - [Minimum message ID to return](https://core.telegram.org/api/offsets)
-     * * `[int]`          **hash**       - Optional: The IDs of messages you already fetched
+     * * `[int]`          **hash**       - Optional: [Hash](https://core.telegram.org/api/offsets)
      *
      * @param array $params Parameters
      *
@@ -1394,7 +1409,7 @@ interface messages
      *
      * Parameters:
      * * `boolean` **revoke** - Optional: Whether to delete messages for all participants of the chat
-     * * `[int]`   **id**     - IDs of messages to delete, use channels->deleteMessages for supergroups
+     * * `[int]`   **id**     - Message ID list
      *
      * @param array $params Parameters
      *
@@ -1439,7 +1454,7 @@ interface messages
      * * `int`             **reply_to_msg_id** - Optional: The message ID to which this message will reply to
      * * `string`          **message**         - The message
      * * `ReplyMarkup`     **reply_markup**    - Optional: Reply markup for sending bot buttons
-     * * `[MessageEntity]` **entities**        - Optional: Entities to send (for styled text)
+     * * `[MessageEntity]` **entities**        - Optional: Message [entities](https://core.telegram.org/api/entities) for sending styled text
      * * `int`             **schedule_date**   - Optional: Scheduled message date for scheduled messages
      *
      * @param array $params Parameters
@@ -1460,7 +1475,7 @@ interface messages
      * * `InputMedia`      **media**           - Attached media
      * * `string`          **message**         - Caption
      * * `ReplyMarkup`     **reply_markup**    - Optional: Reply markup for bot keyboards
-     * * `[MessageEntity]` **entities**        - Optional: Entities for styled text
+     * * `[MessageEntity]` **entities**        - Optional: Message [entities](https://core.telegram.org/api/entities) for styled text
      * * `int`             **schedule_date**   - Optional: Scheduled message date for scheduled messages
      *
      * @param array $params Parameters
@@ -1478,7 +1493,7 @@ interface messages
      * * `boolean`   **with_my_score** - Optional: When forwarding games, whether to include your score in the game
      * * `boolean`   **grouped**       - Optional: Whether the specified messages represent an album (grouped media)
      * * `InputPeer` **from_peer**     - Source of messages
-     * * `[int]`     **id**            - The message IDs
+     * * `[int]`     **id**            - IDs of messages
      * * `InputPeer` **to_peer**       - Destination peer
      * * `int`       **schedule_date** - Optional: Scheduled message date for scheduled messages
      *
@@ -1517,7 +1532,7 @@ interface messages
      *
      * Parameters:
      * * `InputPeer`    **peer**   - Peer
-     * * `[int]`        **id**     - The messages to report
+     * * `[int]`        **id**     - IDs of messages to report
      * * `ReportReason` **reason** - Why are these messages being reported
      *
      * @param array $params Parameters
@@ -1530,7 +1545,7 @@ interface messages
      * Returns chat basic info on their IDs.
      *
      * Parameters:
-     * * `[int]` **id** - The MTProto IDs of chats to fetch info about
+     * * `[int]` **id** - List of chat IDs
      *
      * @param array $params Parameters
      *
@@ -1539,10 +1554,10 @@ interface messages
     public function getChats($params);
 
     /**
-     * You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
+     * Returns full chat info according to its ID.
      *
      * Parameters:
-     * * `InputPeer` **chat_id** - You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputPeer` **chat_id** -
      *
      * @param array $params Parameters
      *
@@ -1554,7 +1569,7 @@ interface messages
      * Chanages chat name and sends a service message on it.
      *
      * Parameters:
-     * * `InputPeer` **chat_id** - The ID of the chat
+     * * `InputPeer` **chat_id** -
      * * `string`    **title**   - New chat name, different from the old one
      *
      * @param array $params Parameters
@@ -1567,7 +1582,7 @@ interface messages
      * Changes chat photo and sends a service message on it.
      *
      * Parameters:
-     * * `InputPeer`      **chat_id** - The ID of the chat
+     * * `InputPeer`      **chat_id** -
      * * `InputChatPhoto` **photo**   - Photo to be set
      *
      * @param array $params Parameters
@@ -1580,7 +1595,7 @@ interface messages
      * Adds a user to a chat and sends a service message on it.
      *
      * Parameters:
-     * * `InputPeer` **chat_id**   - The chat where to invite users
+     * * `InputPeer` **chat_id**   -
      * * `InputUser` **user_id**   - User ID to be added
      * * `int`       **fwd_limit** - Number of last messages to be forwarded
      *
@@ -1594,7 +1609,7 @@ interface messages
      * Deletes a user from a chat and sends a service message on it.
      *
      * Parameters:
-     * * `InputPeer` **chat_id** - The ID of the chat
+     * * `InputPeer` **chat_id** -
      * * `InputUser` **user_id** - User ID to be deleted
      *
      * @param array $params Parameters
@@ -1607,7 +1622,7 @@ interface messages
      * Creates a new chat.
      *
      * Parameters:
-     * * `[InputUser]` **users** - The users to add to the chat
+     * * `[InputUser]` **users** - List of user IDs to be invited
      * * `string`      **title** - Chat name
      *
      * @param array $params Parameters
@@ -1617,11 +1632,11 @@ interface messages
     public function createChat($params);
 
     /**
-     * You cannot use this method directly, instead use $MadelineProto->getDhConfig();.
+     * Returns configuration parameters for Diffie-Hellman key generation. Can also return a random sequence of bytes of required length.
      *
      * Parameters:
-     * * `int` **version**       - You cannot use this method directly, instead use $MadelineProto->getDhConfig();
-     * * `int` **random_length** - You cannot use this method directly, instead use $MadelineProto->getDhConfig();
+     * * `int` **version**       - Value of the **version** parameter from [messages.dhConfig](https://docs.madelineproto.xyz/API_docs/constructors/messages.dhConfig.html), avialable at the client
+     * * `int` **random_length** - Length of the required random sequence
      *
      * @param array $params Parameters
      *
@@ -1630,11 +1645,11 @@ interface messages
     public function getDhConfig($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats.
+     * Sends a request to start a secret chat to the user.
      *
      * Parameters:
-     * * `InputUser` **user_id** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
-     * * `bytes`     **g_a**     - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * * `InputUser` **user_id** - User ID
+     * * `bytes`     **g_a**     - `A = g ^ a mod p`, see [Wikipedia](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange)
      *
      * @param array $params Parameters
      *
@@ -1643,12 +1658,12 @@ interface messages
     public function requestEncryption($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats.
+     * Confirms creation of a secret chat.
      *
      * Parameters:
-     * * `InputEncryptedChat` **peer**            - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
-     * * `bytes`              **g_b**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
-     * * `long`               **key_fingerprint** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * * `InputEncryptedChat` **peer**            - Secret chat ID
+     * * `bytes`              **g_b**             - `B = g ^ b mod p`, see [Wikipedia](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange)
+     * * `long`               **key_fingerprint** - 64-bit fingerprint of the received key
      *
      * @param array $params Parameters
      *
@@ -1657,10 +1672,10 @@ interface messages
     public function acceptEncryption($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats.
+     * Cancels a request for creation and/or delete info on secret chat.
      *
      * Parameters:
-     * * `int` **chat_id** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling secret chats
+     * * `int` **chat_id** - Secret chat ID
      *
      * @param array $params Parameters
      *
@@ -1699,7 +1714,7 @@ interface messages
      *
      * Parameters:
      * * `InputEncryptedChat` **peer**    - Secret chat ID
-     * * `DecryptedMessage`   **message** - The message to send
+     * * `DecryptedMessage`   **message** -
      *
      * @param array $params Parameters
      *
@@ -1712,7 +1727,7 @@ interface messages
      *
      * Parameters:
      * * `InputEncryptedChat` **peer**    - Secret chat ID
-     * * `DecryptedMessage`   **message** - The message with the file
+     * * `DecryptedMessage`   **message** -
      * * `InputEncryptedFile` **file**    - File attachment for the secret chat
      *
      * @param array $params Parameters
@@ -1726,7 +1741,7 @@ interface messages
      *
      * Parameters:
      * * `InputEncryptedChat` **peer**    - Secret chat ID
-     * * `DecryptedMessage`   **message** - The service message
+     * * `DecryptedMessage`   **message** -
      *
      * @param array $params Parameters
      *
@@ -1735,10 +1750,10 @@ interface messages
     public function sendEncryptedService($params);
 
     /**
-     * You cannot use this method directly.
+     * Confirms receipt of messages in a secret chat by client, cancels push notifications.
      *
      * Parameters:
-     * * `int` **max_qts** - You cannot use this method directly
+     * * `int` **max_qts** - Maximum qts value available at the client
      *
      * @param array $params Parameters
      *
@@ -1762,7 +1777,7 @@ interface messages
      * Notifies the sender about the recipient having listened a voice message or watched a video.
      *
      * Parameters:
-     * * `[int]` **id** - The messages to mark as read (only users and normal chats, not supergroups)
+     * * `[int]` **id** - Message ID list
      *
      * @param array $params Parameters
      *
@@ -1775,7 +1790,7 @@ interface messages
      *
      * Parameters:
      * * `string` **emoticon** - The emoji
-     * * `[int]`  **hash**     - Optional:  the hash parameter of the previous result of this method
+     * * `[int]`  **hash**     - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -1787,7 +1802,7 @@ interface messages
      * Get all installed stickers.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: The hash parameter of the previous result of this method
+     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -1800,7 +1815,7 @@ interface messages
      *
      * Parameters:
      * * `string`          **message**  - Message from which to extract the preview
-     * * `[MessageEntity]` **entities** - Optional: Entities for styled text
+     * * `[MessageEntity]` **entities** - Optional: [Message entities for styled text](https://core.telegram.org/api/entities)
      *
      * @param array $params Parameters
      *
@@ -1900,7 +1915,7 @@ interface messages
      *
      * Parameters:
      * * `InputPeer` **peer**      - Peer where the message was found
-     * * `[int]`     **id**        - The IDs messages to get
+     * * `[int]`     **id**        - ID of message
      * * `Bool`      **increment** - Whether to mark the message as viewed and increment the view counter
      *
      * @param array $params Parameters
@@ -1913,7 +1928,7 @@ interface messages
      * Make a user admin in a [legacy group](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputPeer` **chat_id**  - The chat ID (no supergroups)
+     * * `InputPeer` **chat_id**  -
      * * `InputUser` **user_id**  - The user to make admin
      * * `Bool`      **is_admin** - Whether to make him admin
      *
@@ -1927,7 +1942,7 @@ interface messages
      * Turn a [legacy group into a supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `InputPeer` **chat_id** - The chat to convert
+     * * `InputPeer` **chat_id** -
      *
      * @param array $params Parameters
      *
@@ -1939,7 +1954,7 @@ interface messages
      * Search for messages and peers globally.
      *
      * Parameters:
-     * * `int`       **folder_id**   - Optional: Folder where to search
+     * * `int`       **folder_id**   - Optional: [Peer folder ID, for more info click here](https://core.telegram.org/api/folders#peer-folders)
      * * `string`    **q**           - Query
      * * `int`       **offset_rate** - Initially 0, then set to the [`next_rate` parameter of messages.messagesSlice](https://docs.madelineproto.xyz/API_docs/constructors/messages.messagesSlice.html)
      * * `InputPeer` **offset_peer** - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
@@ -1957,7 +1972,7 @@ interface messages
      *
      * Parameters:
      * * `boolean` **masks** - Optional: Reorder mask stickersets
-     * * `[long]`  **order** - The order
+     * * `[long]`  **order** - New stickerset order by stickerset IDs
      *
      * @param array $params Parameters
      *
@@ -1996,7 +2011,7 @@ interface messages
      * Get saved GIFs.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
+     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -2040,7 +2055,7 @@ interface messages
      * * `boolean`                **gallery**     - Optional: Set this flag if the results are composed of media files
      * * `boolean`                **private**     - Optional: Set this flag if results may be cached on the server side only for the user that sent the query. By default, results may be returned to any user who sends the same query
      * * `long`                   **query_id**    - Unique identifier for the answered query
-     * * `[InputBotInlineResult]` **results**     - Results
+     * * `[InputBotInlineResult]` **results**     - Vector of results for the inline query
      * * `int`                    **cache_time**  - The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300.
      * * `string`                 **next_offset** - Optional: Pass the offset that a client should send in the next query with the same text to receive more results. Pass an empty string if there are no more results or if you don‘t support pagination. Offset length can’t exceed 64 bytes.
      * * `InlineBotSwitchPM`      **switch_pm**   - Optional: If passed, clients will display a button with specified text that switches the user to a private chat with the bot and sends the bot a start message with a certain parameter.
@@ -2094,7 +2109,7 @@ interface messages
      * * `string`          **message**       - Optional: New message
      * * `InputMedia`      **media**         - Optional: New attached media
      * * `ReplyMarkup`     **reply_markup**  - Optional: Reply markup for inline keyboards
-     * * `[MessageEntity]` **entities**      - Optional: The new entities (for styled text)
+     * * `[MessageEntity]` **entities**      - Optional: [Message entities for styled text](https://core.telegram.org/api/entities)
      * * `int`             **schedule_date** - Optional: Scheduled message date for scheduled messages
      *
      * @param array $params Parameters
@@ -2112,7 +2127,7 @@ interface messages
      * * `string`                  **message**      - Optional: Message
      * * `InputMedia`              **media**        - Optional: Media
      * * `ReplyMarkup`             **reply_markup** - Optional: Reply markup for inline keyboards
-     * * `[MessageEntity]`         **entities**     - Optional: The new entities (for styled text)
+     * * `[MessageEntity]`         **entities**     - Optional: [Message entities for styled text](https://core.telegram.org/api/entities)
      *
      * @param array $params Parameters
      *
@@ -2155,7 +2170,7 @@ interface messages
      * Get dialog info of specified peers.
      *
      * Parameters:
-     * * `[InputDialogPeer]` **peers** - The peers
+     * * `[InputDialogPeer]` **peers** - Peers
      *
      * @param array $params Parameters
      *
@@ -2171,7 +2186,7 @@ interface messages
      * * `int`             **reply_to_msg_id** - Optional: Message ID the message should reply to
      * * `InputPeer`       **peer**            - Destination of the message that should be sent
      * * `string`          **message**         - The draft
-     * * `[MessageEntity]` **entities**        - Optional: The entities (for styled text)
+     * * `[MessageEntity]` **entities**        - Optional: Message [entities](https://core.telegram.org/api/entities) for styled text
      *
      * @param array $params Parameters
      *
@@ -2190,7 +2205,7 @@ interface messages
      * Get featured stickers.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
+     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -2202,7 +2217,7 @@ interface messages
      * Mark new featured stickers as read.
      *
      * Parameters:
-     * * `[long]` **id** - The stickers to mark as read
+     * * `[long]` **id** - IDs of stickersets to mark as read
      *
      * @param array $params Parameters
      *
@@ -2215,7 +2230,7 @@ interface messages
      *
      * Parameters:
      * * `boolean` **attached** - Optional: Get stickers recently attached to photo or video files
-     * * `[int]`   **hash**     - Optional: IDs the hash parameter of the previous result of this method
+     * * `[int]`   **hash**     - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -2267,7 +2282,7 @@ interface messages
      * Get installed mask stickers.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
+     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -2365,7 +2380,7 @@ interface messages
      * Get all chats, channels and supergroups.
      *
      * Parameters:
-     * * `[int]` **except_ids** - Do not fetch these chats (MTProto id)
+     * * `[int]` **except_ids** - Except these chats/channels/supergroups
      *
      * @param array $params Parameters
      *
@@ -2378,7 +2393,7 @@ interface messages
      *
      * Parameters:
      * * `string` **url**  - URL of IV page to fetch
-     * * `[int]`  **hash** - Optional:  the hash parameter of the previous result of this method
+     * * `[int]`  **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -2404,8 +2419,8 @@ interface messages
      *
      * Parameters:
      * * `boolean`           **force**     - Optional: If set, dialogs pinned server-side but not present in the `order` field will be unpinned.
-     * * `int`               **folder_id** - Folder ID
-     * * `[InputDialogPeer]` **order**     - New order
+     * * `int`               **folder_id** - [Peer folder ID, for more info click here](https://core.telegram.org/api/folders#peer-folders)
+     * * `[InputDialogPeer]` **order**     - New dialog order
      *
      * @param array $params Parameters
      *
@@ -2417,7 +2432,7 @@ interface messages
      * Get pinned dialogs.
      *
      * Parameters:
-     * * `int` **folder_id** - Folder ID
+     * * `int` **folder_id** - [Peer folder ID, for more info click here](https://core.telegram.org/api/folders#peer-folders)
      *
      * @param array $params Parameters
      *
@@ -2431,7 +2446,7 @@ interface messages
      * Parameters:
      * * `long`             **query_id**         - Unique identifier for the query to be answered
      * * `string`           **error**            - Optional: Error message in human readable form that explains why it is impossible to complete the order (e.g. "Sorry, delivery to your desired address is unavailable'). Telegram will display this message to the user.
-     * * `[ShippingOption]` **shipping_options** - Optional: Shipping options
+     * * `[ShippingOption]` **shipping_options** - Optional: A vector of available shipping options.
      *
      * @param array $params Parameters
      *
@@ -2485,7 +2500,7 @@ interface messages
      * Get faved stickers.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional:  the hash parameter of the previous result of this method
+     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -2541,7 +2556,7 @@ interface messages
      * Parameters:
      * * `InputPeer` **peer**  - User
      * * `int`       **limit** - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
-     * * `[int]`     **hash**  - Optional: IDs of locations you already fetched
+     * * `[int]`     **hash**  - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -2558,7 +2573,7 @@ interface messages
      * * `boolean`            **clear_draft**     - Optional: Whether to clear [drafts](https://core.telegram.org/api/drafts)
      * * `InputPeer`          **peer**            - The destination chat
      * * `int`                **reply_to_msg_id** - Optional: The message to reply to
-     * * `[InputSingleMedia]` **multi_media**     - The album
+     * * `[InputSingleMedia]` **multi_media**     - The medias to send
      * * `int`                **schedule_date**   - Optional: Scheduled message date for scheduled messages
      *
      * @param array $params Parameters
@@ -2586,7 +2601,7 @@ interface messages
      * Parameters:
      * * `boolean` **exclude_featured** - Optional: Exclude featured stickersets from results
      * * `string`  **q**                - Query string
-     * * `[int]`   **hash**             - Optional: The IDs of stickersets you already fetched
+     * * `[int]`   **hash**             - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -2648,7 +2663,7 @@ interface messages
      * Parameters:
      * * `InputPeer` **peer**    - The chat where the poll was sent
      * * `int`       **msg_id**  - The message ID of the poll
-     * * `[bytes]`   **options** - Options
+     * * `[bytes]`   **options** - The options that were chosen
      *
      * @param array $params Parameters
      *
@@ -2775,7 +2790,7 @@ interface messages
      *
      * Parameters:
      * * `InputPeer`        **peer**    - Peer where to search
-     * * `[MessagesFilter]` **filters** - Filters
+     * * `[MessagesFilter]` **filters** - Search filters
      *
      * @param array $params Parameters
      *
@@ -2829,7 +2844,7 @@ interface messages
      *
      * Parameters:
      * * `InputPeer` **peer** - Peer
-     * * `[int]`     **hash** - Optional: Hash
+     * * `[int]`     **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -2842,7 +2857,7 @@ interface messages
      *
      * Parameters:
      * * `InputPeer` **peer** - Peer
-     * * `[int]`     **id**   - ID
+     * * `[int]`     **id**   - IDs of scheduled messages
      *
      * @param array $params Parameters
      *
@@ -2855,7 +2870,7 @@ interface messages
      *
      * Parameters:
      * * `InputPeer` **peer** - Peer
-     * * `[int]`     **id**   - ID
+     * * `[int]`     **id**   - Scheduled message IDs
      *
      * @param array $params Parameters
      *
@@ -2868,7 +2883,7 @@ interface messages
      *
      * Parameters:
      * * `InputPeer` **peer** - Peer
-     * * `[int]`     **id**   - ID
+     * * `[int]`     **id**   - Scheduled message IDs
      *
      * @param array $params Parameters
      *
@@ -2877,14 +2892,14 @@ interface messages
     public function deleteScheduledMessages($params);
 
     /**
-     *
+     * Get poll results for non-anonymous polls.
      *
      * Parameters:
-     * * `InputPeer` **peer**   -
-     * * `int`       **id**     -
-     * * `bytes`     **option** - Optional:
-     * * `string`    **offset** - Optional:
-     * * `int`       **limit**  -.
+     * * `InputPeer` **peer**   - Chat where the poll was sent
+     * * `int`       **id**     - Message ID
+     * * `bytes`     **option** - Optional: Get only results for the specified poll `option`
+     * * `string`    **offset** - Optional: Offset for results, taken from the `next_offset` field of [messages.votesList](https://docs.madelineproto.xyz/API_docs/constructors/messages.votesList.html), initially an empty string. <br>Note: if no more results are available, the method call will return an empty `next_offset`; thus, avoid providing the `next_offset` returned in [messages.votesList](https://docs.madelineproto.xyz/API_docs/constructors/messages.votesList.html) if it is empty, to avoid an infinite loop.
+     * * `int`       **limit**  - Number of results to return
      *
      * @param array $params Parameters
      *
@@ -2893,13 +2908,13 @@ interface messages
     public function getPollVotes($params);
 
     /**
-     *
+     * Apply changes to multiple stickersets.
      *
      * Parameters:
-     * * `boolean`           **uninstall**   - Optional:
-     * * `boolean`           **archive**     - Optional:
-     * * `boolean`           **unarchive**   - Optional:
-     * * `[InputStickerSet]` **stickersets** -.
+     * * `boolean`           **uninstall**   - Optional: Uninstall the specified stickersets
+     * * `boolean`           **archive**     - Optional: Archive the specified stickersets
+     * * `boolean`           **unarchive**   - Optional: Unarchive the specified stickersets
+     * * `[InputStickerSet]` **stickersets** - Stickersets to act upon
      *
      * @param array $params Parameters
      *
@@ -2908,25 +2923,25 @@ interface messages
     public function toggleStickerSets($params);
 
     /**
-     *
+     * Get [folders](https://core.telegram.org/api/folders).
      *
      * @return  of DialogFilter[]
      */
     public function getDialogFilters();
 
     /**
-     *
+     * Get [suggested folders](https://core.telegram.org/api/folders).
      *
      * @return  of DialogFilterSuggested[]
      */
     public function getSuggestedDialogFilters();
 
     /**
-     *
+     * Update [folder](https://core.telegram.org/api/folders).
      *
      * Parameters:
-     * * `int`          **id**     -
-     * * `DialogFilter` **filter** - Optional:.
+     * * `int`          **id**     - [Folder](https://core.telegram.org/api/folders) ID
+     * * `DialogFilter` **filter** - Optional: [Folder](https://core.telegram.org/api/folders) info
      *
      * @param array $params Parameters
      *
@@ -2935,35 +2950,49 @@ interface messages
     public function updateDialogFilter($params);
 
     /**
-     *
+     * Reorder [folders](https://core.telegram.org/api/folders).
      *
      * Parameters:
-     * * `[int]` **order** -.
+     * * `[int]` **order** - New [folder](https://core.telegram.org/api/folders) order
      *
      * @param array $params Parameters
      *
      * @return bool
      */
     public function updateDialogFiltersOrder($params);
+
+    /**
+     * Method for fetching previously featured stickers.
+     *
+     * Parameters:
+     * * `int`   **offset** - Offset
+     * * `int`   **limit**  - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
+     * * `[int]` **hash**   - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.FeaturedStickers
+     */
+    public function getOldFeaturedStickers($params);
 }
 
 interface updates
 {
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
+     * Returns a current state of updates.
      *
      * @return updates.State
      */
     public function getState();
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
+     * Get new [updates](https://core.telegram.org/api/updates).
      *
      * Parameters:
-     * * `int` **pts**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `int` **pts_total_limit** - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `int` **date**            - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `int` **qts**             - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `int` **pts**             - PTS, see [updates](https://core.telegram.org/api/updates).
+     * * `int` **pts_total_limit** - Optional: For fast updating: if provided and `pts + pts_total_limit < remote pts`, [updates.differenceTooLong](https://docs.madelineproto.xyz/API_docs/constructors/updates.differenceTooLong.html) will be returned.<br>Simply tells the server to not return the difference if it is bigger than `pts_total_limit`<br>If the remote pts is too big (&gt; ~4000000), this field will default to 1000000
+     * * `int` **date**            - date, see [updates](https://core.telegram.org/api/updates).
+     * * `int` **qts**             - QTS, see [updates](https://core.telegram.org/api/updates).
      *
      * @param array $params Parameters
      *
@@ -2972,14 +3001,14 @@ interface updates
     public function getDifference($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
+     * Returns the difference between the current state of updates of a certain channel and transmitted.
      *
      * Parameters:
-     * * `boolean`               **force**   - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `InputChannel`          **channel** - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `ChannelMessagesFilter` **filter**  - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `int`                   **pts**     - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
-     * * `int`                   **limit**   - You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates
+     * * `boolean`               **force**   - Optional: Set to true to skip some possibly unneeded updates and reduce server-side load
+     * * `InputChannel`          **channel** - The channel
+     * * `ChannelMessagesFilter` **filter**  - Messsage filter
+     * * `int`                   **pts**     - Persistent timestamp (see [updates](https://core.telegram.org/api/updates))
+     * * `int`                   **limit**   - How many updates to fetch, max `100000`<br>Ordinary (non-bot) users are supposed to pass `10-100`
      *
      * @param array $params Parameters
      *
@@ -3018,7 +3047,7 @@ interface photos
      * Deletes profile photos.
      *
      * Parameters:
-     * * `[InputPhoto]` **id** - The profile photos to delete
+     * * `[InputPhoto]` **id** - Input photos to delete
      *
      * @param array $params Parameters
      *
@@ -3045,12 +3074,12 @@ interface photos
 interface upload
 {
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Saves a part of file for futher sending to one of the methods.
      *
      * Parameters:
-     * * `long`  **file_id**   - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **file_part** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `bytes` **bytes**     - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `long`  **file_id**   - Random file identifier created by the client
+     * * `int`   **file_part** - Numerical order of a part
+     * * `bytes` **bytes**     - Binary data, contend of a part
      *
      * @param array $params Parameters
      *
@@ -3059,14 +3088,14 @@ interface upload
     public function saveFilePart($params);
 
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Returns content of a whole file or its part.
      *
      * Parameters:
-     * * `boolean`           **precise**       - Optional: You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `boolean`           **cdn_supported** - Optional:
-     * * `InputFileLocation` **location**      - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`               **offset**        - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`               **limit**         - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `boolean`           **precise**       - Optional: Disable some checks on limit and offset values, useful for example to stream videos by keyframes
+     * * `boolean`           **cdn_supported** - Optional: Whether the current client supports [CDN downloads](https://core.telegram.org/cdn)
+     * * `InputFileLocation` **location**      - File location
+     * * `int`               **offset**        - Number of bytes to be skipped
+     * * `int`               **limit**         - Number of bytes to be returned
      *
      * @param array $params Parameters
      *
@@ -3075,13 +3104,13 @@ interface upload
     public function getFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Saves a part of a large file (over 10Mb in size) to be later passed to one of the methods.
      *
      * Parameters:
-     * * `long`  **file_id**          - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **file_part**        - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **file_total_parts** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `bytes` **bytes**            - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `long`  **file_id**          - Random file id, created by the client
+     * * `int`   **file_part**        - Part sequence number
+     * * `int`   **file_total_parts** - Total number of parts
+     * * `bytes` **bytes**            - Binary data, part contents
      *
      * @param array $params Parameters
      *
@@ -3104,12 +3133,12 @@ interface upload
     public function getWebFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Download a [CDN](https://core.telegram.org/cdn) file.
      *
      * Parameters:
-     * * `bytes` **file_token** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **offset**     - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **limit**      - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **file_token** - File token
+     * * `int`   **offset**     - Offset of chunk to download
+     * * `int`   **limit**      - Length of chunk to download
      *
      * @param array $params Parameters
      *
@@ -3118,11 +3147,11 @@ interface upload
     public function getCdnFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Request a reupload of a certain file to a [CDN DC](https://core.telegram.org/cdn).
      *
      * Parameters:
-     * * `bytes` **file_token**    - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `bytes` **request_token** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **file_token**    - File token
+     * * `bytes` **request_token** - Request token
      *
      * @param array $params Parameters
      *
@@ -3131,11 +3160,11 @@ interface upload
     public function reuploadCdnFile($params);
 
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Get SHA256 hashes for verifying downloaded [CDN](https://core.telegram.org/cdn) files.
      *
      * Parameters:
-     * * `bytes` **file_token** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`   **offset**     - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `bytes` **file_token** - File
+     * * `int`   **offset**     - Offset from which to start getting hashes
      *
      * @param array $params Parameters
      *
@@ -3144,11 +3173,11 @@ interface upload
     public function getCdnFileHashes($params);
 
     /**
-     * You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info.
+     * Get SHA256 hashes for verifying downloaded files.
      *
      * Parameters:
-     * * `InputFileLocation` **location** - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
-     * * `int`               **offset**   - You cannot use this method directly, use the upload, downloadToStream, downloadToFile, downloadToDir methods instead; see https://docs.madelineproto.xyz for more info
+     * * `InputFileLocation` **location** - File
+     * * `int`               **offset**   - Offset from which to get file hashes
      *
      * @param array $params Parameters
      *
@@ -3160,7 +3189,7 @@ interface upload
 interface help
 {
     /**
-     * Returns current configuration, icluding data center configuration.
+     * Returns current configuration, including data center configuration.
      *
      * @return Config
      */
@@ -3186,7 +3215,7 @@ interface help
     public function getAppUpdate($params);
 
     /**
-     * Returns text of a text message with an invitation.
+     * Returns localized text of a text message with an invitation.
      *
      * @return help.InviteText
      */
@@ -3201,6 +3230,7 @@ interface help
 
     /**
      * Get changelog of current app.
+     * Typically, an [updates](https://docs.madelineproto.xyz/API_docs/constructors/updates.html) constructor will be returned, containing one or more [updateServiceNotification](https://docs.madelineproto.xyz/API_docs/constructors/updateServiceNotification.html) updates with app-specific changelogs.
      *
      * Parameters:
      * * `string` **prev_app_version** - Previous app version
@@ -3244,13 +3274,6 @@ interface help
     public function getRecentMeUrls($params);
 
     /**
-     * Get promotion info of the currently-used MTProxy.
-     *
-     * @return help.ProxyData
-     */
-    public function getProxyData();
-
-    /**
      * Look for updates of telegram's terms of service.
      *
      * @return help.TermsOfServiceUpdate
@@ -3282,7 +3305,7 @@ interface help
     public function getDeepLinkInfo($params);
 
     /**
-     * Get app-specific configuration.
+     * Get app-specific configuration, see [client configuration](https://core.telegram.org/api/config#client-configuration) for more info on the result.
      *
      * @return JSONValue
      */
@@ -3292,7 +3315,7 @@ interface help
      * Saves logs of application on the server.
      *
      * Parameters:
-     * * `[InputAppEvent]` **events** - Event list
+     * * `[InputAppEvent]` **events** - List of input events
      *
      * @param array $params Parameters
      *
@@ -3304,7 +3327,7 @@ interface help
      * Get [passport](https://core.telegram.org/passport) configuration.
      *
      * Parameters:
-     * * `[int]` **hash** - Optional: Hash
+     * * `[int]` **hash** - Optional: [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      *
      * @param array $params Parameters
      *
@@ -3337,13 +3360,32 @@ interface help
      * Parameters:
      * * `InputUser`       **user_id**  - User
      * * `string`          **message**  - Message
-     * * `[MessageEntity]` **entities** - Entities
+     * * `[MessageEntity]` **entities** - [Message entities for styled text](https://core.telegram.org/api/entities)
      *
      * @param array $params Parameters
      *
      * @return help.UserInfo
      */
     public function editUserInfo($params);
+
+    /**
+     * Get MTProxy/Public Service Announcement information.
+     *
+     * @return help.PromoData
+     */
+    public function getPromoData();
+
+    /**
+     * Hide MTProxy/Public Service Announcement information.
+     *
+     * Parameters:
+     * * `InputPeer` **peer** - Peer to hide
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function hidePromoData($params);
 }
 
 interface channels
@@ -3366,7 +3408,7 @@ interface channels
      *
      * Parameters:
      * * `InputChannel` **channel** - [Channel/supergroup](https://core.telegram.org/api/channel)
-     * * `[int]`        **id**      - The IDs of messages to delete
+     * * `[int]`        **id**      - IDs of messages to delete
      *
      * @param array $params Parameters
      *
@@ -3393,7 +3435,7 @@ interface channels
      * Parameters:
      * * `InputChannel` **channel** - Supergroup
      * * `InputUser`    **user_id** - ID of the user that sent the spam messages
-     * * `[int]`        **id**      - The IDs of messages to report
+     * * `[int]`        **id**      - IDs of spam messages
      *
      * @param array $params Parameters
      *
@@ -3406,7 +3448,7 @@ interface channels
      *
      * Parameters:
      * * `InputChannel`   **channel** - Channel/supergroup
-     * * `[InputMessage]` **id**      - The message IDs
+     * * `[InputMessage]` **id**      - IDs of messages to get
      *
      * @param array $params Parameters
      *
@@ -3422,7 +3464,7 @@ interface channels
      * * `ChannelParticipantsFilter` **filter**  - Which participant types to fetch
      * * `int`                       **offset**  - [Offset](https://core.telegram.org/api/offsets)
      * * `int`                       **limit**   - [Limit](https://core.telegram.org/api/offsets)
-     * * `[int]`                     **hash**    - Optional: IDs of previously fetched participants
+     * * `[int]`                     **hash**    - Optional: [Hash](https://core.telegram.org/api/offsets)
      *
      * @param array $params Parameters
      *
@@ -3447,7 +3489,7 @@ interface channels
      * Get info about [channels/supergroups](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `[InputChannel]` **id** - The channel/supergroup MTProto IDs
+     * * `[InputChannel]` **id** - IDs of channels/supergroups to get info about
      *
      * @param array $params Parameters
      *
@@ -3456,10 +3498,10 @@ interface channels
     public function getChannels($params);
 
     /**
-     * You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info).
+     * Get full info about a channel.
      *
      * Parameters:
-     * * `InputChannel` **channel** - You cannot use this method directly, use the getPwrChat, getInfo, getFullInfo methods instead (see https://docs.madelineproto.xyz for more info)
+     * * `InputChannel` **channel** - The channel to get info about
      *
      * @param array $params Parameters
      *
@@ -3580,7 +3622,7 @@ interface channels
      *
      * Parameters:
      * * `InputChannel` **channel** - Channel/supergroup
-     * * `[InputUser]`  **users**   - The users to add
+     * * `[InputUser]`  **users**   - Users to invite
      *
      * @param array $params Parameters
      *
@@ -3661,7 +3703,7 @@ interface channels
      * * `InputChannel`                **channel**       - Channel
      * * `string`                      **q**             - Search query, can be empty
      * * `ChannelAdminLogEventsFilter` **events_filter** - Optional: Event filter
-     * * `[InputUser]`                 **admins**        - Optional: Fetch only actions from these admins
+     * * `[InputUser]`                 **admins**        - Optional: Only show events from these admins
      * * `long`                        **max_id**        - Maximum ID of message to return (see [pagination](https://core.telegram.org/api/offsets))
      * * `long`                        **min_id**        - Minimum ID of message to return (see [pagination](https://core.telegram.org/api/offsets))
      * * `int`                         **limit**         - Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
@@ -3690,7 +3732,7 @@ interface channels
      *
      * Parameters:
      * * `InputChannel` **channel** - [Channel/supergroup](https://core.telegram.org/api/channel)
-     * * `[int]`        **id**      - List of message IDs
+     * * `[int]`        **id**      - IDs of messages whose contents should be marked as read
      *
      * @param array $params Parameters
      *
@@ -3798,7 +3840,7 @@ interface channels
     public function toggleSlowMode($params);
 
     /**
-     *
+     * Get inactive channels and supergroups.
      *
      * @return messages.InactiveChats
      */
@@ -3832,6 +3874,18 @@ interface bots
      * @return bool
      */
     public function answerWebhookJSONQuery($params);
+
+    /**
+     * Set bot command list.
+     *
+     * Parameters:
+     * * `[BotCommand]` **commands** - Bot commands
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function setBotCommands($params);
 }
 
 interface payments
@@ -3910,10 +3964,10 @@ interface payments
     public function clearSavedInfo($params);
 
     /**
-     *
+     * Get info about a credit card.
      *
      * Parameters:
-     * * `string` **number** -.
+     * * `string` **number** - Credit card number
      *
      * @param array $params Parameters
      *
@@ -3929,10 +3983,12 @@ interface stickers
      *
      * Parameters:
      * * `boolean`               **masks**      - Optional: Whether this is a mask stickerset
+     * * `boolean`               **animated**   - Optional: Whether this is an animated stickerset
      * * `InputUser`             **user_id**    - Stickerset owner
      * * `string`                **title**      - Stickerset name, `1-64` chars
      * * `string`                **short_name** - Sticker set name. Can contain only English letters, digits and underscores. Must end with *"*by*<bot username="">"</bot>* (*<bot_username></bot_username>* is case insensitive); 1-64 characters
-     * * `[InputStickerSetItem]` **stickers**   - The stickers to add
+     * * `InputDocument`         **thumb**      - Optional: Thumbnail
+     * * `[InputStickerSetItem]` **stickers**   - Stickers
      *
      * @param array $params Parameters
      *
@@ -3977,6 +4033,19 @@ interface stickers
      * @return messages.StickerSet
      */
     public function addStickerToSet($params);
+
+    /**
+     * Set stickerset thumbnail.
+     *
+     * Parameters:
+     * * `InputStickerSet` **stickerset** - Stickerset
+     * * `InputDocument`   **thumb**      - Thumbnail
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.StickerSet
+     */
+    public function setStickerSetThumb($params);
 }
 
 interface phone
@@ -3989,13 +4058,13 @@ interface phone
     public function getCallConfig();
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
+     * Start a telegram phone call.
      *
      * Parameters:
-     * * `boolean`           **video**    - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `InputUser`         **user_id**  - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `bytes`             **g_a_hash** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `PhoneCallProtocol` **protocol** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `boolean`           **video**    - Optional: Whether to start a video call
+     * * `InputUser`         **user_id**  - Destination of the phone call
+     * * `bytes`             **g_a_hash** - [Parameter for E2E encryption key exchange »](https://core.telegram.org/api/end-to-end/voice-calls)
+     * * `PhoneCallProtocol` **protocol** - Phone call settings
      *
      * @param array $params Parameters
      *
@@ -4004,12 +4073,12 @@ interface phone
     public function requestCall($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
+     * Accept incoming call.
      *
      * Parameters:
-     * * `InputPhoneCall`    **peer**     - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `bytes`             **g_b**      - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `PhoneCallProtocol` **protocol** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `InputPhoneCall`    **peer**     - The call to accept
+     * * `bytes`             **g_b**      - [Parameter for E2E encryption key exchange »](https://core.telegram.org/api/end-to-end/voice-calls)
+     * * `PhoneCallProtocol` **protocol** - Phone call settings
      *
      * @param array $params Parameters
      *
@@ -4018,13 +4087,13 @@ interface phone
     public function acceptCall($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
+     * [Complete phone call E2E encryption key exchange »](https://core.telegram.org/api/end-to-end/voice-calls).
      *
      * Parameters:
-     * * `InputPhoneCall`    **peer**            - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `bytes`             **g_a**             - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `long`              **key_fingerprint** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `PhoneCallProtocol` **protocol**        - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `InputPhoneCall`    **peer**            - The phone call
+     * * `bytes`             **g_a**             - [Parameter for E2E encryption key exchange »](https://core.telegram.org/api/end-to-end/voice-calls)
+     * * `long`              **key_fingerprint** - Key fingerprint
+     * * `PhoneCallProtocol` **protocol**        - Phone call settings
      *
      * @param array $params Parameters
      *
@@ -4045,14 +4114,14 @@ interface phone
     public function receivedCall($params);
 
     /**
-     * You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls.
+     * Refuse or end running call.
      *
      * Parameters:
-     * * `boolean`                **video**         - Optional: You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `InputPhoneCall`         **peer**          - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `int`                    **duration**      - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `PhoneCallDiscardReason` **reason**        - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
-     * * `long`                   **connection_id** - You cannot use this method directly, see https://docs.madelineproto.xyz#calls for more info on handling calls
+     * * `boolean`                **video**         - Optional: Whether this is a video call
+     * * `InputPhoneCall`         **peer**          - The phone call
+     * * `int`                    **duration**      - Call duration
+     * * `PhoneCallDiscardReason` **reason**        - Why was the call discarded
+     * * `long`                   **connection_id** - Preferred libtgvoip relay ID
      *
      * @param array $params Parameters
      *
@@ -4110,7 +4179,7 @@ interface langpack
      * Parameters:
      * * `string`   **lang_pack** - Language pack name
      * * `string`   **lang_code** - Language code
-     * * `[string]` **keys**      - Keys
+     * * `[string]` **keys**      - Strings to get
      *
      * @param array $params Parameters
      *
@@ -4161,10 +4230,10 @@ interface langpack
 interface folders
 {
     /**
-     * Edit peers in folder.
+     * Edit peers in [peer folder](https://core.telegram.org/api/folders#peer-folders).
      *
      * Parameters:
-     * * `[InputFolderPeer]` **folder_peers** - New folder peers
+     * * `[InputFolderPeer]` **folder_peers** - New peer list
      *
      * @param array $params Parameters
      *
@@ -4173,10 +4242,10 @@ interface folders
     public function editPeerFolders($params);
 
     /**
-     * Delete a folder.
+     * Delete a [peer folder](https://core.telegram.org/api/folders#peer-folders).
      *
      * Parameters:
-     * * `int` **folder_id** - Folder to delete
+     * * `int` **folder_id** - [Peer folder ID, for more info click here](https://core.telegram.org/api/folders#peer-folders)
      *
      * @param array $params Parameters
      *
@@ -4188,11 +4257,11 @@ interface folders
 interface stats
 {
     /**
-     *
+     * Get [channel statistics](https://core.telegram.org/api/stats).
      *
      * Parameters:
-     * * `boolean`      **dark**    - Optional:
-     * * `InputChannel` **channel** -.
+     * * `boolean`      **dark**    - Optional: Whether to enable dark theme for graph colors
+     * * `InputChannel` **channel** - The channel
      *
      * @param array $params Parameters
      *
@@ -4201,11 +4270,11 @@ interface stats
     public function getBroadcastStats($params);
 
     /**
-     *
+     * Load [channel statistics graph](https://core.telegram.org/api/stats) asynchronously.
      *
      * Parameters:
-     * * `string` **token** -
-     * * `long`   **x**     - Optional:.
+     * * `string` **token** - Graph token from [statsGraphAsync](https://docs.madelineproto.xyz/API_docs/constructors/statsGraphAsync.html) constructor
+     * * `long`   **x**     - Optional: Zoom value, if required
      *
      * @param array $params Parameters
      *
@@ -4285,18 +4354,20 @@ class InternalDoc extends APIFactory
      *
      * @param array $user User info
      *
-     * @return \Generator<void>
-     * @throws Exception
+     * @return \Generator
+     * @throws \danog\MadelineProto\Exception
      */
-    public function addUser(array $user): \Generator
+    public function addUser(array $user, array $extra = [])
     {
-        yield from $this->API->addUser($user);
+        return $this->__call(__FUNCTION__, [$user, $extra]);
     }
     /**
      * Call promise $b after promise $a.
      *
      * @param \Generator|Promise $a Promise A
      * @param \Generator|Promise $b Promise B
+     *
+     * @psalm-suppress InvalidScope
      *
      * @return Promise
      */
@@ -4399,6 +4470,8 @@ class InternalDoc extends APIFactory
      * @param \Generator|Promise  $promise Promise to resolve
      * @param ?\Generator|Promise $actual  Promise to resolve instead of $promise
      * @param string              $file    File
+     *
+     * @psalm-suppress InvalidScope
      *
      * @return Promise|mixed
      */
@@ -4733,7 +4806,7 @@ class InternalDoc extends APIFactory
      * @param integer $operation Locking mode
      * @param float  $polling   Polling interval
      *
-     * @return Promise
+     * @return Promise<callable>
      */
     public function flock(string $file, int $operation, float $polling = 0.1)
     {
@@ -4757,9 +4830,9 @@ class InternalDoc extends APIFactory
      *
      * @return \Generator<integer>
      */
-    public function fullChatLastUpdated($id): \Generator
+    public function fullChatLastUpdated($id, array $extra = [])
     {
-        return yield from $this->API->fullChatLastUpdated($id);
+        return $this->__call(__FUNCTION__, [$id, $extra]);
     }
     /**
      * Get info about the logged-in user, not cached.
@@ -5115,6 +5188,11 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
+
+    public function getSessionId(\danog\MadelineProto\MTProto $madelineProto): string
+    {
+        return \danog\MadelineProto\MTProto::getSessionId($madelineProto);
+    }
     /**
      * Return current settings array.
      *
@@ -5138,6 +5216,8 @@ class InternalDoc extends APIFactory
      *
      * @param object $obj Object
      * @param string $var Attribute name
+     *
+     * @psalm-suppress InvalidScope
      *
      * @return mixed
      * @access public
@@ -5214,6 +5294,11 @@ class InternalDoc extends APIFactory
     public function inflateStripped(string $stripped): string
     {
         return \danog\MadelineProto\Tools::inflateStripped($stripped);
+    }
+
+    public function initDb(\danog\MadelineProto\MTProto $MadelineProto, bool $reset = false, array $extra = [])
+    {
+        return $this->__call(__FUNCTION__, [$MadelineProto, $reset, $extra]);
     }
     /**
      * Whether this is altervista.
@@ -5293,11 +5378,11 @@ class InternalDoc extends APIFactory
      *
      * @param string $hwat String to escape
      *
-     * @return void
+     * @return string
      */
     public function markdownEscape(string $hwat): string
     {
-        return \danog\MadelineProto\Tools::markdownEscape($hwat);
+        return \danog\MadelineProto\StrTools::markdownEscape($hwat);
     }
     /**
      * Telegram UTF-8 multibyte split.
@@ -5368,6 +5453,17 @@ class InternalDoc extends APIFactory
     ], array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$method, $args, $aargs, $extra]);
+    }
+    /**
+     * Escape method name.
+     *
+     * @param string $method Method name
+     *
+     * @return string
+     */
+    public function methodEscape(string $method): string
+    {
+        return \danog\MadelineProto\StrTools::methodEscape($method);
     }
     /**
      * Convert double to binary version.
@@ -5476,7 +5572,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $prompt Prompt
      *
-     * @return Promise
+     * @return Promise<string>
      */
     public function readLine(string $prompt = '')
     {
@@ -5560,6 +5656,8 @@ class InternalDoc extends APIFactory
      *
      * @param \Throwable $e    Exception
      * @param string     $file File where the strand started
+     *
+     * @psalm-suppress InvalidScope
      *
      * @return void
      */
@@ -5648,6 +5746,8 @@ class InternalDoc extends APIFactory
      * @param object $obj Object
      * @param string $var Attribute name
      * @param mixed  $val Attribute value
+     *
+     * @psalm-suppress InvalidScope
      *
      * @return mixed
      * @access public
@@ -5784,7 +5884,7 @@ class InternalDoc extends APIFactory
      */
     public function toCamelCase(string $input): string
     {
-        return \danog\MadelineProto\Tools::toCamelCase($input);
+        return \danog\MadelineProto\StrTools::toCamelCase($input);
     }
     /**
      * Convert to snake_case.
@@ -5795,7 +5895,7 @@ class InternalDoc extends APIFactory
      */
     public function toSnakeCase(string $input): string
     {
-        return \danog\MadelineProto\Tools::toSnakeCase($input);
+        return \danog\MadelineProto\StrTools::toSnakeCase($input);
     }
     /**
      * Convert MTProto channel ID to bot API channel ID.
@@ -5807,6 +5907,17 @@ class InternalDoc extends APIFactory
     public function toSupergroup($id)
     {
         return $this->__call(__FUNCTION__, [$id]);
+    }
+    /**
+     * Escape type name.
+     *
+     * @param string $type String to escape
+     *
+     * @return string
+     */
+    public function typeEscape(string $type): string
+    {
+        return \danog\MadelineProto\StrTools::typeEscape($type);
     }
     /**
      * Unpack binary double.
