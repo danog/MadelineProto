@@ -285,4 +285,59 @@ class API extends InternalDoc
             }
         }
     }
+    /**
+     * Get attribute.
+     *
+     * @param string $name Attribute nam
+     *
+     * @internal
+     *
+     * @return mixed
+     */
+    public function &__get(string $name)
+    {
+        if ($name === 'logger') {
+            if (isset($this->API)) {
+                return $this->API->logger;
+            }
+            return Logger::$default;
+        }
+        return $this->storage[$name];
+    }
+    /**
+     * Set an attribute.
+     *
+     * @param string $name  Name
+     * @param mixed  $value Value
+     *
+     * @internal
+     *
+     * @return mixed
+     */
+    public function __set(string $name, $value)
+    {
+        return $this->storage[$name] = $value;
+    }
+    /**
+     * Whether an attribute exists.
+     *
+     * @param string $name Attribute name
+     *
+     * @return boolean
+     */
+    public function __isset(string $name): bool
+    {
+        return isset($this->storage[$name]);
+    }
+    /**
+     * Unset attribute.
+     *
+     * @param string $name Attribute name
+     *
+     * @return void
+     */
+    public function __unset(string $name): void
+    {
+        unset($this->storage[$name]);
+    }
 }

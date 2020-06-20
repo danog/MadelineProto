@@ -37,7 +37,7 @@ function ___install_madeline()
     if (\file_exists($file)) {
         $contents = \file_get_contents($file);
 
-        if (\strpos($contents, 'new \danog\MadelineProto\Server') && \in_array($contents, [\file_get_contents('https://github.com/danog/MadelineProtoPhar/raw/2270bd9a94d168a5e6731ffd7e61821ea244beff/mtproxyd'), \file_get_contents('https://github.com/danog/MadelineProtoPhar/raw/7cabb718ec3ccb79e3c8e3d34f5bccbe3f63b0fd/mtproxyd')]) && ($mtproxyd = \file_get_contents('https://phar.madelineproto.xyz/mtproxyd?v=new'))) {
+        if (\strpos($contents, 'new \danog\MadelineProto\Server') && \in_array($contents, [@\file_get_contents('https://github.com/danog/MadelineProtoPhar/raw/2270bd9a94d168a5e6731ffd7e61821ea244beff/mtproxyd'), @\file_get_contents('https://github.com/danog/MadelineProtoPhar/raw/7cabb718ec3ccb79e3c8e3d34f5bccbe3f63b0fd/mtproxyd')]) && ($mtproxyd = @\file_get_contents('https://phar.madelineproto.xyz/mtproxyd?v=new'))) {
             \file_put_contents($file, $mtproxyd);
 
             return;
@@ -116,15 +116,31 @@ function ___install_madeline()
                 ];
             }
 
+            if (defined('HHVM_VERSION')) {
+                $phpVersion = 'HHVM ' . HHVM_VERSION;
+            } else {
+                $phpVersion = 'PHP ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '.' . PHP_RELEASE_VERSION;
+            }
             $opts = ['http' =>
                 [
                     'method' => 'POST',
-                    'header' => ['Content-Type: application/json'],
+                    'header' => [
+                        'Content-Type: application/json', 
+                        sprintf(
+                            'User-Agent: Composer/%s (%s; %s; %s; %s%s)',
+                            'MadelineProto',
+                            function_exists('php_uname') ? @php_uname('s') : 'Unknown',
+                            function_exists('php_uname') ? @php_uname('r') : 'Unknown',
+                            $phpVersion,
+                            'streams',
+                            getenv('CI') ? '; CI' : ''
+                        )
+                     ],
                     'content' => \json_encode($postData),
                     'timeout' => 6,
                 ],
             ];
-            @\file_get_contents("https://packagist.org/downloads/", false, \stream_context_create($opts));
+            //@\file_get_contents("https://packagist.org/downloads/", false, \stream_context_create($opts));
         }
     }
 }
