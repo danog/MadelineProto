@@ -83,6 +83,18 @@ abstract class Session
      */
     public $ack_queue = [];
     /**
+     * State request queue.
+     *
+     * @var array
+     */
+    public $state_queue = [];
+    /**
+     * Resend request queue.
+     *
+     * @var array
+     */
+    public $resend_queue = [];
+    /**
      * Message ID handler.
      *
      * @var MsgIdHandler

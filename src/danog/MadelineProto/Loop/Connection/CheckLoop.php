@@ -72,33 +72,37 @@ class CheckLoop extends ResumableSignalLoop
                     return;
                 }
             }
-            if ($connection->hasPendingCalls()) {
-                $last_msgid = $connection->msgIdHandler->getMaxId(true);
-                $last_chunk = $connection->getLastChunk();
-                if ($shared->hasTempAuthKey()) {
-                    $full_message_ids = $connection->getPendingCalls();
-                    //array_values($connection->new_outgoing);
-                    foreach (\array_chunk($full_message_ids, 8192) as $message_ids) {
-                        $deferred = new Deferred();
-                        $deferred->promise()->onResolve(function ($e, $result) use ($message_ids, $API, $connection, $datacenter, $timeoutResend) {
-                            if ($e) {
-                                $API->logger("Got exception in check loop for DC {$datacenter}");
-                                $API->logger((string) $e);
-                                return;
+            if (!$connection->hasPendingCalls()) {
+                if (yield $this->waitSignal($this->pause($timeout))) {
+                    return;
+                }
+                continue;
+            }
+            $last_msgid = $connection->msgIdHandler->getMaxId(true);
+            $last_chunk = $connection->getLastChunk();
+            if ($shared->hasTempAuthKey()) {
+                $full_message_ids = $connection->getPendingCalls();
+                foreach (\array_chunk($full_message_ids, 8192) as $message_ids) {
+                    $deferred = new Deferred();
+                    $deferred->promise()->onResolve(function ($e, $result) use ($message_ids, $API, $connection, $datacenter, $timeoutResend) {
+                        if ($e) {
+                            $API->logger("Got exception in check loop for DC {$datacenter}");
+                            $API->logger((string) $e);
+                            return;
+                        }
+                        $reply = [];
+                        foreach (\str_split($result['info']) as $key => $chr) {
+                            $message_id = $message_ids[$key];
+                            if (!isset($connection->outgoing_messages[$message_id])) {
+                                $API->logger->logger('Already got response for and forgot about message ID '.$message_id);
+                                continue;
                             }
-                            $reply = [];
-                            foreach (\str_split($result['info']) as $key => $chr) {
-                                $message_id = $message_ids[$key];
-                                if (!isset($connection->outgoing_messages[$message_id])) {
-                                    $API->logger->logger('Already got response for and forgot about message ID '.$message_id);
-                                    continue;
-                                }
-                                if (!isset($connection->new_outgoing[$message_id])) {
-                                    $API->logger->logger('Already got response for '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.$message_id);
-                                    continue;
-                                }
-                                $chr = \ord($chr);
-                                switch ($chr & 7) {
+                            if (!isset($connection->new_outgoing[$message_id])) {
+                                $API->logger->logger('Already got response for '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.$message_id);
+                                continue;
+                            }
+                            $chr = \ord($chr);
+                            switch ($chr & 7) {
                                     case 0:
                                         $API->logger->logger('Wrong message status 0 for '.$connection->outgoing_messages[$message_id]['_'], \danog\MadelineProto\Logger::FATAL_ERROR);
                                         break;
@@ -131,42 +135,37 @@ class CheckLoop extends ResumableSignalLoop
                                             $reply[] = $message_id;
                                         }
                                 }
-                            }
-                            if ($reply) {
-                                \danog\MadelineProto\Tools::callFork($connection->objectCall('msg_resend_ans_req', ['msg_ids' => $reply], ['postpone' => true]));
-                            }
-                            $connection->flush();
-                        });
-                        $list = '';
-                        // Don't edit this here pls
-                        foreach ($message_ids as $message_id) {
-                            $list .= $connection->outgoing_messages[$message_id]['_'].', ';
                         }
-                        $API->logger->logger("Still missing {$list} on DC {$datacenter}, sending state request", \danog\MadelineProto\Logger::ERROR);
-                        yield from $connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], ['promise' => $deferred]);
-                    }
-                } else {
-                    foreach ($connection->new_outgoing as $message_id) {
-                        if (isset($connection->outgoing_messages[$message_id]['sent']) && $connection->outgoing_messages[$message_id]['sent'] + $timeout < \time() && $connection->outgoing_messages[$message_id]['unencrypted']) {
-                            $API->logger->logger('Still missing '.$connection->outgoing_messages[$message_id]['_'].' with message id '.$message_id." on DC {$datacenter}, resending", \danog\MadelineProto\Logger::ERROR);
-                            $connection->methodRecall('', ['message_id' => $message_id, 'postpone' => true]);
+                        if ($reply) {
+                            \danog\MadelineProto\Tools::callFork($connection->objectCall('msg_resend_ans_req', ['msg_ids' => $reply], ['postpone' => true]));
                         }
+                        $connection->flush();
+                    });
+                    $list = '';
+                    // Don't edit this here pls
+                    foreach ($message_ids as $message_id) {
+                        $list .= $connection->outgoing_messages[$message_id]['_'].', ';
                     }
-                    $connection->flush();
-                }
-                if (yield $this->waitSignal($this->pause($timeout))) {
-                    return;
-                }
-                if ($connection->msgIdHandler->getMaxId(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {
-                    $API->logger->logger("We did not receive a response for {$timeout} seconds: reconnecting and exiting check loop on DC {$datacenter}");
-                    //$this->exitedLoop();
-                    Tools::callForkDefer($connection->reconnect());
-                    return;
+                    $API->logger->logger("Still missing {$list} on DC {$datacenter}, sending state request", \danog\MadelineProto\Logger::ERROR);
+                    yield from $connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], ['promise' => $deferred]);
                 }
             } else {
-                if (yield $this->waitSignal($this->pause($timeout))) {
-                    return;
+                foreach ($connection->new_outgoing as $message_id) {
+                    if (isset($connection->outgoing_messages[$message_id]['sent']) && $connection->outgoing_messages[$message_id]['sent'] + $timeout < \time() && $connection->outgoing_messages[$message_id]['unencrypted']) {
+                        $API->logger->logger('Still missing '.$connection->outgoing_messages[$message_id]['_'].' with message id '.$message_id." on DC {$datacenter}, resending", \danog\MadelineProto\Logger::ERROR);
+                        $connection->methodRecall('', ['message_id' => $message_id, 'postpone' => true]);
+                    }
                 }
+                $connection->flush();
+            }
+            if (yield $this->waitSignal($this->pause($timeout))) {
+                return;
+            }
+            if ($connection->msgIdHandler->getMaxId(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {
+                $API->logger->logger("We did not receive a response for {$timeout} seconds: reconnecting and exiting check loop on DC {$datacenter}");
+                //$this->exitedLoop();
+                Tools::callForkDefer($connection->reconnect());
+                return;
             }
         }
     }

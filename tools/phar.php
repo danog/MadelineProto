@@ -116,7 +116,7 @@ function ___install_madeline()
                 ];
             }
 
-            if (defined('HHVM_VERSION')) {
+            if (\defined('HHVM_VERSION')) {
                 $phpVersion = 'HHVM ' . HHVM_VERSION;
             } else {
                 $phpVersion = 'PHP ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '.' . PHP_RELEASE_VERSION;
@@ -125,15 +125,15 @@ function ___install_madeline()
                 [
                     'method' => 'POST',
                     'header' => [
-                        'Content-Type: application/json', 
-                        sprintf(
+                        'Content-Type: application/json',
+                        \sprintf(
                             'User-Agent: Composer/%s (%s; %s; %s; %s%s)',
                             'MadelineProto',
-                            function_exists('php_uname') ? @php_uname('s') : 'Unknown',
-                            function_exists('php_uname') ? @php_uname('r') : 'Unknown',
+                            \function_exists('php_uname') ? @\php_uname('s') : 'Unknown',
+                            \function_exists('php_uname') ? @\php_uname('r') : 'Unknown',
                             $phpVersion,
                             'streams',
-                            getenv('CI') ? '; CI' : ''
+                            \getenv('CI') ? '; CI' : ''
                         )
                      ],
                     'content' => \json_encode($postData),

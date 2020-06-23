@@ -1870,7 +1870,11 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function getConstructorCallbacks(): array
     {
-        return \array_merge(\array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [[$this, 'addChat']]), \array_fill_keys(['user', 'userEmpty'], [[$this, 'addUser']]), ['help.support' => [[$this, 'addSupport']]]);
+        return \array_merge(
+            \array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [[$this, 'addChat']]),
+            \array_fill_keys(['user', 'userEmpty'], [[$this, 'addUser']]),
+            ['help.support' => [[$this, 'addSupport']]]
+        );
     }
     /**
      * Called right before deserialization of object.

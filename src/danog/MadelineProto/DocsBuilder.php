@@ -137,7 +137,7 @@ class DocsBuilder
         foreach (['string', 'bytes', 'int', 'int53', 'long', 'int128', 'int256', 'int512', 'double', 'Bool', 'DataJSON'] as $type) {
             \file_put_contents("types/$type.md", $this->templates[$type]);
         }
-        foreach (['boolFalse', 'boolTrue', 'null'] as $constructor) {
+        foreach (['boolFalse', 'boolTrue', 'null', 'photoStrippedSize'] as $constructor) {
             \file_put_contents("constructors/$constructor.md", $this->templates[$constructor]);
         }
         \danog\MadelineProto\Logger::log('Done!', \danog\MadelineProto\Logger::NOTICE);

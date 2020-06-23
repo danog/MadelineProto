@@ -223,7 +223,6 @@ class ReadLoop extends SignalLoop
             $connection->incoming_messages[$message_id]['content'] = $deserialized;
             $connection->incoming_messages[$message_id]['response'] = -1;
             $connection->new_incoming[$message_id] = $message_id;
-            //$connection->last_http_wait = 0;
             $API->logger->logger('Received payload from DC '.$datacenter, Logger::ULTRA_VERBOSE);
         } finally {
             $connection->reading(false);
