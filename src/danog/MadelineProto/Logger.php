@@ -21,6 +21,8 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\Failure;
+use Amp\Loop;
+
 use function Amp\ByteStream\getStderr;
 use function Amp\ByteStream\getStdout;
 
@@ -87,12 +89,17 @@ class Logger
      * @var boolean
      */
     public static $printed = false;
+    /**
+     * Log rotation loop ID.
+     */
+    private string $rotateId;
     const ULTRA_VERBOSE = 5;
     const VERBOSE = 4;
     const NOTICE = 3;
     const WARNING = 2;
     const ERROR = 1;
     const FATAL_ERROR = 0;
+
     const NO_LOGGER = 0;
     const DEFAULT_LOGGER = 1;
     const FILE_LOGGER = 2;
@@ -125,14 +132,14 @@ class Logger
         if (!isset($settings['logger']['logger_param']) && isset($settings['logger']['param'])) {
             $settings['logger']['logger_param'] = $settings['logger']['param'];
         }
-        if (PHP_SAPI !== 'cli' && isset($settings['logger']['logger_param']) && $settings['logger']['logger_param'] === 'MadelineProto.log') {
+        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && isset($settings['logger']['logger_param']) && $settings['logger']['logger_param'] === 'MadelineProto.log') {
             $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
         }
         $logger = new self($settings['logger']['logger'], $settings['logger']['logger_param'] ?? '', $prefix, $settings['logger']['logger_level'] ?? Logger::VERBOSE, $settings['logger']['max_size'] ?? 100 * 1024 * 1024);
         if (!self::$default) {
             self::$default = $logger;
         }
-        if (PHP_SAPI !== 'cli') {
+        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             try {
                 \error_reporting(E_ALL);
                 \ini_set('log_errors', 1);
@@ -170,22 +177,28 @@ class Logger
      *
      * @return void
      */
-    public function __construct(int $mode, $optional = null, string $prefix = '', int $level = self::NOTICE, int $max_size = 100 * 1024 * 1024)
+    public function __construct(int $mode, $optional = null, string $prefix = '', int $level = self::NOTICE, int $max_size = 10 * 1024 * 1024)
     {
         if ($mode === null) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['no_mode_specified']);
         }
+        if ($mode === self::NO_LOGGER) {
+            $mode = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') ? Logger::ECHO_LOGGER : Logger::FILE_LOGGER;
+        }
+        $level = \max($level, self::NOTICE);
+        $max_size = \max($max_size, 100 * 1024);
+
         $this->mode = $mode;
-        $this->optional = $mode == 2 ? Tools::absolute($optional) : $optional;
+        $this->optional = $mode == self::FILE_LOGGER ? Tools::absolute($optional) : $optional;
         $this->prefix = $prefix === '' ? '' : ', '.$prefix;
         $this->level = $level;
-        if ($this->mode === 2 && !\file_exists(\pathinfo($this->optional, PATHINFO_DIRNAME))) {
+        if ($this->mode === self::FILE_LOGGER && !\file_exists(\pathinfo($this->optional, PATHINFO_DIRNAME))) {
             $this->optional = Magic::$script_cwd.'/MadelineProto.log';
         }
-        if ($this->mode === 2 && !\preg_match('/\\.log$/', $this->optional)) {
+        if ($this->mode === self::FILE_LOGGER && !\preg_match('/\\.log$/', $this->optional)) {
             $this->optional .= '.log';
         }
-        if ($mode === 2 && $max_size !== -1 && \file_exists($this->optional) && \filesize($this->optional) > $max_size) {
+        if ($mode === self::FILE_LOGGER && $max_size !== -1 && \file_exists($this->optional) && \filesize($this->optional) > $max_size) {
             \unlink($this->optional);
         }
         $this->colors[self::ULTRA_VERBOSE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['dim']]);
@@ -195,14 +208,30 @@ class Logger
         $this->colors[self::ERROR] = \implode(';', [self::FOREGROUND['white'], self::SET['bold'], self::BACKGROUND['red']]);
         $this->colors[self::FATAL_ERROR] = \implode(';', [self::FOREGROUND['red'], self::SET['bold'], self::BACKGROUND['light_gray']]);
         $this->newline = PHP_EOL;
-        if ($this->mode === 3) {
+        if ($this->mode === self::ECHO_LOGGER) {
             $this->stdout = getStdout();
-            if (PHP_SAPI !== 'cli') {
+            if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
                 $this->newline = '<br>'.$this->newline;
             }
-        } elseif ($this->mode === 2) {
-            $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a+'));
-        } elseif ($this->mode === 1) {
+        } elseif ($this->mode === self::FILE_LOGGER) {
+            Snitch::logFile($this->optional);
+            $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a'));
+            if ($max_size !== -1) {
+                $this->rotateId = Loop::repeat(
+                    10*1000,
+                    function () use ($max_size) {
+                        \clearstatcache(true, $this->optional);
+                        if (\filesize($this->optional) >= $max_size) {
+                            $this->stdout = null;
+                            \unlink($this->optional);
+                            $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a'));
+                        }
+                        $this->logger("Automatically truncated logfile to $max_size");
+                    }
+                );
+                Loop::unreference($this->rotateId);
+            }
+        } elseif ($this->mode === self::DEFAULT_LOGGER) {
             $result = @\ini_get('error_log');
             if ($result === 'syslog') {
                 $this->stdout = getStderr();
@@ -211,6 +240,15 @@ class Logger
             } else {
                 $this->stdout = getStderr();
             }
+        }
+    }
+    /**
+     * Destructor function.
+     */
+    public function __destruct(): void
+    {
+        if ($this->rotateId) {
+            Loop::cancel($this->rotateId);
         }
     }
     /**
@@ -240,7 +278,7 @@ class Logger
      */
     public function logger($param, int $level = self::NOTICE, string $file = ''): void
     {
-        if ($level > $this->level || $this->mode === 0) {
+        if ($level > $this->level || $this->mode === self::NO_LOGGER) {
             return;
         }
         if (!self::$printed) {
@@ -252,7 +290,7 @@ class Logger
             $this->logger('https://github.com/danog/MadelineProto');
             $this->colors[self::NOTICE] = \implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
         }
-        if ($this->mode === 4) {
+        if ($this->mode === self::CALLABLE_LOGGER) {
             \call_user_func_array($this->optional, [$param, $level]);
             return;
         }
@@ -266,25 +304,22 @@ class Logger
             $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
         $param = \str_pad($file.$prefix.': ', 16 + \strlen($prefix))."\t".$param;
-        switch ($this->mode) {
-            case 1:
-                if ($this->stdout->write($param.$this->newline) instanceof Failure) {
-                    \error_log($param);
-                }
-                break;
-            default:
-                $param = Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
-                if ($this->stdout->write($param) instanceof Failure) {
-                    switch ($this->mode) {
-                        case 3:
-                            echo $param;
-                            break;
-                        case 2:
-                            \file_put_contents($this->optional, $param, FILE_APPEND);
-                            break;
-                    }
-                }
-                break;
+        if ($this->mode === self::DEFAULT_LOGGER) {
+            if ($this->stdout->write($param.$this->newline) instanceof Failure) {
+                \error_log($param);
+            }
+            return;
+        }
+        $param = Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
+        if ($this->stdout->write($param) instanceof Failure) {
+            switch ($this->mode) {
+                case self::ECHO_LOGGER:
+                    echo $param;
+                    break;
+                case self::FILE_LOGGER:
+                    \file_put_contents($this->optional, $param, FILE_APPEND);
+                    break;
+            }
         }
     }
 }

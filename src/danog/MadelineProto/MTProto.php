@@ -422,6 +422,11 @@ class MTProto extends AsyncConstruct implements TLCallback
     private $TL;
 
     /**
+     * Snitch.
+     */
+    private Snitch $snitch;
+
+    /**
      * List of properties stored in database (memory or external).
      * @see DbPropertiesFabric
      * @var array
@@ -564,7 +569,10 @@ class MTProto extends AsyncConstruct implements TLCallback
             'temp_rekeyed_secret_chats',
 
             // Report URI
-            'reportDest'
+            'reportDest',
+
+            // Packagist install report state
+            'packagistReported'
         ];
     }
 
@@ -824,6 +832,9 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     private function upgradeMadelineProto(): \Generator
     {
+        if (!isset($this->snitch)) {
+            $this->snitch = new Snitch;
+        }
         $this->logger->logger(Lang::$current_lang['serialization_ofd'], Logger::WARNING);
         foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
             if ($this->authorized === self::LOGGED_IN && \strpos($dc_id, '_') === false && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
@@ -1281,10 +1292,10 @@ class MTProto extends AsyncConstruct implements TLCallback
              */
             // write to
             'logger_param' => Magic::$script_cwd.'/MadelineProto.log',
-            'logger' => PHP_SAPI === 'cli' ? 3 : 2,
+            'logger' => (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') ? Logger::ECHO_LOGGER : Logger::FILE_LOGGER,
             // overwrite previous setting and echo logs
             'logger_level' => Logger::VERBOSE,
-            'max_size' => 100 * 1024 * 1024,
+            'max_size' => 10 * 1024 * 1024,
             // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
         ], 'max_tries' => [
             'query' => 5,

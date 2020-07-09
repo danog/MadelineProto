@@ -37,7 +37,7 @@ trait Start
      */
     private function APIStart(array $settings): \Generator
     {
-        if (PHP_SAPI === 'cli') {
+        if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             $stdout = getStdout();
             yield $stdout->write('You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a)
 Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id'.PHP_EOL);

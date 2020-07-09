@@ -54,7 +54,7 @@ class RPCErrorException extends \Exception
     public function __toString()
     {
         $result = \sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], self::localizeMessage($this->caller, $this->code, $this->message)." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, \danog\MadelineProto\Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
-        if (PHP_SAPI !== 'cli') {
+        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             $result = \str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
         }
         return $result;

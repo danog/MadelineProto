@@ -65,7 +65,7 @@ trait Loop
             $this->loop_callback = null;
         }
         static $inited = false;
-        if (PHP_SAPI !== 'cli' && !$inited) {
+        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && !$inited) {
             $needs_restart = true;
             try {
                 \set_time_limit(-1);
@@ -206,7 +206,7 @@ trait Loop
      */
     public function closeConnection($message = 'OK!')
     {
-        if (PHP_SAPI === 'cli' || isset($GLOBALS['exited']) || \headers_sent()) {
+        if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || isset($GLOBALS['exited']) || \headers_sent()) {
             return;
         }
         $this->logger->logger($message);

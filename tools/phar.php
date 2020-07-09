@@ -78,6 +78,8 @@ function ___install_madeline()
         $release_branch = $release_fallback_branch;
     }
 
+    \define('HAD_MADELINE_PHAR', \file_exists('madeline.phar'));
+
     if (!\file_exists('madeline.phar') || !\file_exists('madeline.phar.version') || \file_get_contents('madeline.phar.version') !== $release) {
         $phar = \file_get_contents(\sprintf($phar_template, $release_branch));
 
@@ -117,9 +119,9 @@ function ___install_madeline()
             }
 
             if (\defined('HHVM_VERSION')) {
-                $phpVersion = 'HHVM ' . HHVM_VERSION;
+                $phpVersion = 'HHVM '.HHVM_VERSION;
             } else {
-                $phpVersion = 'PHP ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '.' . PHP_RELEASE_VERSION;
+                $phpVersion = 'PHP '.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
             }
             $opts = ['http' =>
                 [
@@ -140,7 +142,7 @@ function ___install_madeline()
                     'timeout' => 6,
                 ],
             ];
-            //@\file_get_contents("https://packagist.org/downloads/", false, \stream_context_create($opts));
+            @\file_get_contents("https://packagist.org/downloads/", false, \stream_context_create($opts));
         }
     }
 }

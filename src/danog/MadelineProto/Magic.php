@@ -276,7 +276,7 @@ class Magic
                 self::$revision = 'Revision: '.self::$revision.$latest;
             }
             self::$can_parallel = false;
-            if (PHP_SAPI === 'cli' && !(\class_exists(\Phar::class) && \Phar::running())) {
+            if ((PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') && !(\class_exists(\Phar::class) && \Phar::running())) {
                 try {
                     $back = \debug_backtrace(0);
                     \define('AMP_WORKER', 1);
@@ -330,7 +330,7 @@ class Magic
                   );
                   resolver(new Rfc8484StubResolver($DohConfig));
               }*/
-            if (PHP_SAPI !== 'cli') {
+            if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
                 try {
                     \error_reporting(E_ALL);
                     \ini_set('log_errors', 1);

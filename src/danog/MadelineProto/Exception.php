@@ -64,7 +64,7 @@ class Exception extends \Exception
             $additional = 'Follow the instructions @ https://prime.madelineproto.xyz to install it.';
         }
         $message = 'MadelineProto requires the '.$extensionName.' extension to run. '.$additional;
-        if (PHP_SAPI !== 'cli') {
+        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             echo $message.'<br>';
         }
         $file = 'MadelineProto';
