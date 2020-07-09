@@ -570,9 +570,6 @@ class MTProto extends AsyncConstruct implements TLCallback
 
             // Report URI
             'reportDest',
-
-            // Packagist install report state
-            'packagistReported'
         ];
     }
 

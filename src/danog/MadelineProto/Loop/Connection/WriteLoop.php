@@ -275,7 +275,7 @@ class WriteLoop extends ResumableSignalLoop
 
             $acks = \array_slice($connection->ack_queue, 0, self::MAX_COUNT);
             if ($ackCount = \count($acks)) {
-                $API->logger->logger("Adding msgs_ack", Logger::ERROR);
+                $API->logger->logger("Adding msgs_ack", Logger::ULTRA_VERBOSE);
 
                 $body = yield from $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'msgs_ack', 'msg_ids' => $acks], 'msgs_ack');
                 $messages []= [

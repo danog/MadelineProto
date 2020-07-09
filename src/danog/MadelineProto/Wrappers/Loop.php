@@ -76,44 +76,6 @@ trait Loop
                 $this->logger->logger("Self-restarted, restart token ".$_REQUEST['MadelineSelfRestart']);
             }
             $this->logger->logger($needs_restart ? 'Will self-restart' : 'Will not self-restart');
-            $backtrace = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-            $lockfile = \dirname(\end($backtrace)['file']).'/bot'.$this->authorization['user']['id'].'.lock';
-            unset($backtrace);
-            $try_locking = true;
-            if (!\file_exists($lockfile)) {
-                \touch($lockfile);
-                $lock = \fopen($lockfile, 'r+');
-            } elseif (isset($GLOBALS['lock'])) {
-                $try_locking = false;
-                $lock = $GLOBALS['lock'];
-            } else {
-                $lock = \fopen($lockfile, 'r+');
-            }
-            if ($try_locking) {
-                $this->logger->logger('Will try locking');
-                $try = 1;
-                $locked = false;
-                while (!$locked) {
-                    $locked = \flock($lock, LOCK_EX | LOCK_NB);
-                    if (!$locked) {
-                        $this->closeConnection('Bot is already running');
-                        if ($try++ >= 30) {
-                            exit;
-                        }
-                        \sleep(1);
-                    }
-                }
-                $this->logger->logger('Locked!');
-            }
-            $this->logger->logger("Adding unlock callback!");
-            $logger =& $this->logger;
-            $id = Shutdown::addCallback(static function () use ($lock, $logger) {
-                $logger->logger("Unlocking lock!");
-                \flock($lock, LOCK_UN);
-                \fclose($lock);
-                $logger->logger("Unlocked lock!");
-            });
-            $this->logger->logger("Added unlock callback with id $id!");
             if ($needs_restart) {
                 $this->logger->logger("Adding restart callback!");
                 $id = Shutdown::addCallback(static function () use (&$logger) {

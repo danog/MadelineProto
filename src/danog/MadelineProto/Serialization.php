@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Loop;
+
 use function Amp\File\exists;
 use function Amp\File\get;
 
@@ -43,7 +45,7 @@ class Serialization
     public static function realpaths(string $file): array
     {
         $file = Tools::absolute($file);
-        return ['file' => $file, 'lockfile' => $file.'.lock', 'tempfile' => $file.'.temp.session'];
+        return ['file' => $file, 'lockfile' => $file.'.lock', 'tempfile' => $file.'.temp.session', 'session_lockfile' => $file.'.slock', ];
     }
     /**
      * Unserialize legacy session.
@@ -58,6 +60,23 @@ class Serialization
     {
         $realpaths = self::realpaths($session);
         if (yield exists($realpaths['file'])) {
+            Logger::log('Waiting for exclusive session lock...');
+            $warningId = Loop::delay(1000, static function () use (&$warningId) {
+                Logger::log("It seems like the session is busy.");
+                Logger::log("Telegram does not support starting multiple instances of the same session, make sure no other instance of the session is running.");
+                $warningId = Loop::repeat(5000, fn () => Logger::log('Still waiting for exclusive session lock...'));
+                Loop::unreference($warningId);
+            });
+            Loop::unreference($warningId);
+            $unlock = yield Tools::flock($realpaths['session_lockfile'], LOCK_EX, 1);
+            Loop::cancel($warningId);
+            Shutdown::addCallback(static function () use ($unlock) {
+                Logger::log("Unlocking exclusive session lock!");
+                $unlock();
+                Logger::log("Unlocked exclusive session lock!");
+            });
+            Logger::log("Got exclusive session lock!");
+
             Logger::log('Waiting for shared lock of serialization lockfile...');
             $unlock = yield Tools::flock($realpaths['lockfile'], LOCK_SH);
             Logger::log('Shared lock acquired, deserializing...');

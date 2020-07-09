@@ -92,7 +92,7 @@ class Logger
     /**
      * Log rotation loop ID.
      */
-    private string $rotateId;
+    private string $rotateId = '';
     const ULTRA_VERBOSE = 5;
     const VERBOSE = 4;
     const NOTICE = 3;
@@ -245,7 +245,7 @@ class Logger
     /**
      * Destructor function.
      */
-    public function __destruct(): void
+    public function __destruct()
     {
         if ($this->rotateId) {
             Loop::cancel($this->rotateId);
