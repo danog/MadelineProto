@@ -28,32 +28,6 @@ use danog\MadelineProto\MTProto;
  */
 trait ResponseHandler
 {
-    public function sendMsgsStateInfo($req_msg_id, $msg_ids): \Generator
-    {
-        $this->logger->logger('Sending state info for '.\count($msg_ids).' message IDs');
-        $info = '';
-        foreach ($msg_ids as $msg_id) {
-            $cur_info = 0;
-            if (!isset($this->incoming_messages[$msg_id])) {
-                $msg_id = new \tgseclib\Math\BigInteger(\strrev($msg_id), 256);
-                if ((new \tgseclib\Math\BigInteger(\time() + $this->time_delta + 30))->bitwise_leftShift(32)->compare($msg_id) < 0) {
-                    $this->logger->logger("Do not know anything about {$msg_id} and it is too small");
-                    $cur_info |= 3;
-                } elseif ((new \tgseclib\Math\BigInteger(\time() + $this->time_delta - 300))->bitwise_leftShift(32)->compare($msg_id) > 0) {
-                    $this->logger->logger("Do not know anything about {$msg_id} and it is too big");
-                    $cur_info |= 1;
-                } else {
-                    $this->logger->logger("Do not know anything about {$msg_id}");
-                    $cur_info |= 2;
-                }
-            } else {
-                $this->logger->logger("Know about {$msg_id}");
-                $cur_info |= 4;
-            }
-            $info .= \chr($cur_info);
-        }
-        $this->outgoing_messages[yield from $this->objectCall('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['postpone' => true])]['response'] = $req_msg_id;
-    }
     public $n = 0;
     public function handleMessages()
     {
@@ -271,7 +245,6 @@ trait ResponseHandler
         if ($this->pending_outgoing) {
             $this->writer->resume();
         }
-        //$this->n--;
         return $only_updates;
     }
     /**

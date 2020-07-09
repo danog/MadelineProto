@@ -56,8 +56,8 @@ trait CallHandler
                 } else {
                     Tools::callFork($this->sendMessage($this->outgoing_messages[$message_id], false));
                 }
-                $this->ackOutgoingMessageId($message_id);
-                $this->gotResponseForOutgoingMessageId($message_id);
+                //$this->ackOutgoingMessageId($message_id);
+                //$this->gotResponseForOutgoingMessageId($message_id);
             } else {
                 $this->logger->logger('Could not resend '.(isset($this->outgoing_messages[$message_id]['_']) ? $this->outgoing_messages[$message_id]['_'] : $message_id));
             }

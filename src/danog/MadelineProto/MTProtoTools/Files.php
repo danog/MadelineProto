@@ -96,7 +96,7 @@ trait Files
         }
         StatCacheAsync::clear($file);
         $size = (yield statAsync($file))['size'];
-        if ($size > 512 * 1024 * 3000) {
+        if ($size > 512 * 1024 * 4000) {
             throw new \danog\MadelineProto\Exception('Given file is too big!');
         }
         $stream = yield open($file, 'rb');
@@ -127,7 +127,7 @@ trait Files
         /** @var $response \Amp\Http\Client\Response */
         $request = new Request($url);
         $request->setTransferTimeout(10 * 1000 * 3600);
-        $request->setBodySizeLimit(512 * 1024 * 3000);
+        $request->setBodySizeLimit(512 * 1024 * 4000);
         $response = yield $this->datacenter->getHTTPClient()->request($request);
         if (200 !== ($status = $response->getStatus())) {
             throw new Exception("Wrong status code: {$status} ".$response->getReason());
@@ -269,7 +269,7 @@ trait Files
             $datacenter .= '_media';
         }
         $part_size = $this->settings['upload']['part_size'];
-        $parallel_chunks = $this->settings['upload']['parallel_chunks'] ? $this->settings['upload']['parallel_chunks'] : 3000;
+        $parallel_chunks = $this->settings['upload']['parallel_chunks'] ? $this->settings['upload']['parallel_chunks'] : 4000;
         $part_total_num = (int) \ceil($size / $part_size);
         $part_num = 0;
         $method = $size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
@@ -1234,7 +1234,7 @@ trait Files
             $end = $messageMedia['size'];
         }
         $part_size = $part_size ?? $this->settings['download']['part_size'];
-        $parallel_chunks = $this->settings['download']['parallel_chunks'] ? $this->settings['download']['parallel_chunks'] : 3000;
+        $parallel_chunks = $this->settings['download']['parallel_chunks'] ? $this->settings['download']['parallel_chunks'] : 4000;
         $datacenter = isset($messageMedia['InputFileLocation']['dc_id']) ? $messageMedia['InputFileLocation']['dc_id'] : $this->settings['connection_settings']['default_dc'];
         if ($this->datacenter->has($datacenter.'_media')) {
             $datacenter .= '_media';
@@ -1257,7 +1257,7 @@ trait Files
         }
         $params = [];
         $start_at = $offset % $part_size;
-        $probable_end = $end !== -1 ? $end : 512 * 1024 * 3000;
+        $probable_end = $end !== -1 ? $end : 512 * 1024 * 4000;
         $breakOut = false;
         for ($x = $offset - $start_at; $x < $probable_end; $x += $part_size) {
             $end_at = $part_size;

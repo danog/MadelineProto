@@ -45,7 +45,7 @@ class GarbageCollector
                 \gc_collect_cycles();
                 static::$memoryConsumption = static::getMemoryConsumption();
                 $cleanedMemory = $currentMemory - static::$memoryConsumption;
-                Logger::log("gc_collect_cycles done. Cleaned memory: $cleanedMemory Mb", Logger::NOTICE);
+                Logger::log("gc_collect_cycles done. Cleaned memory: $cleanedMemory Mb", Logger::VERBOSE);
             }
         });
     }
@@ -53,7 +53,7 @@ class GarbageCollector
     private static function getMemoryConsumption(): int
     {
         $memory = \round(\memory_get_usage()/1024/1024, 1);
-        Logger::log("Memory consumption: $memory Mb", Logger::VERBOSE);
+        Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
         return (int) $memory;
     }
 }

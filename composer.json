@@ -53,7 +53,8 @@
         "danog/7to5": "^1",
         "vimeo/psalm": "dev-master",
         "phpstan/phpstan": "^0.12.14",
-        "friendsofphp/php-cs-fixer": "^2.16"
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "squizlabs/php_codesniffer": "^3.5"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)"

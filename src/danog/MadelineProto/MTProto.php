@@ -91,7 +91,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 141;
+    const V = 143;
     /**
      * String release version.
      *
@@ -378,6 +378,12 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @var PeriodicLoop
      */
     private $serializeLoop;
+    /**
+     * RPC reporting loop.
+     *
+     * @var PeriodicLoop
+     */
+    private $rpcLoop;
     /**
      * Feeder loops.
      *
@@ -702,11 +708,15 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!$this->configLoop) {
             $this->configLoop = new PeriodicLoop($this, [$this, 'getConfig'], 'config', 24 * 3600);
         }
+        if (!$this->rpcLoop) {
+            $this->rpcLoop = new PeriodicLoop($this, [$this, 'rpcReport'], 'config', 60);
+        }
         $this->callCheckerLoop->start();
         $this->serializeLoop->start();
         $this->phoneConfigLoop->start();
         $this->configLoop->start();
         $this->checkTosLoop->start();
+        $this->rpcLoop->start();
     }
     /**
      * Stop all internal loops.
@@ -734,6 +744,33 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->checkTosLoop) {
             $this->checkTosLoop->signal(true);
             $this->checkTosLoop = null;
+        }
+        if ($this->rpcLoop) {
+            $this->rpcLoop->signal(true);
+            $this->rpcLoop = null;
+        }
+    }
+    /**
+     * Report RPC errors.
+     *
+     * @internal
+     *
+     * @return \Generator
+     */
+    public function rpcReport(): \Generator
+    {
+        $toReport = RPCErrorException::$toReport;
+        RPCErrorException::$toReport = [];
+        foreach ($toReport as [$method, $code, $error, $time]) {
+            try {
+                $res = \json_decode(yield from $this->fileGetContents('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error.'&t='.$time), true);
+                if (isset($res['ok']) && $res['ok'] && isset($res['result'])) {
+                    $description = $res['result'];
+                    RPCErrorException::$descriptions[$error] = $description;
+                    RPCErrorException::$errorMethodMap[$code][$method][$error] = $error;
+                }
+            } catch (\Throwable $e) {
+            }
         }
     }
     /**
@@ -909,7 +946,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 yield from $this->updateSettings($backtrace['args'][1], false);
             }
         }
-        if (($this->settings['tl_schema']['src']['botAPI'] ?? '') !== __DIR__.'/../../../schemas/TL_botAPI.tl') {
+        if (($this->settings['tl_schema']['src']['botAPI'] ?? '') !== __DIR__.'/TL_botAPI.tl') {
             unset($this->v);
         }
         if (!\file_exists($this->settings['tl_schema']['src']['telegram'])) {
@@ -944,8 +981,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->startLoops();
         if (yield from $this->fullGetSelf()) {
             $this->authorized = self::LOGGED_IN;
-        }
-        if ($this->authorized === self::LOGGED_IN) {
             yield from $this->getCdnConfig($this->datacenter->curdc);
             $this->setupLogger();
         }
@@ -1194,6 +1229,8 @@ class MTProto extends AsyncConstruct implements TLCallback
                 'ipv6' => Magic::$ipv6,
                 // decides whether to use ipv6, ipv6 attribute of API attribute of API class contains autodetected boolean
                 'timeout' => 2,
+                // RPC timeout
+                'drop_timeout' => 5*60,
                 // timeout for sockets
                 'proxy' => Magic::$altervista ? '\\HttpProxy' : '\\Socket',
                 // The proxy class to use
@@ -1667,6 +1704,8 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         $this->config = empty($config) ? yield from $this->methodCallAsyncRead('help.getConfig', $config, $options ?: ['datacenter' => $this->settings['connection_settings']['default_dc']]) : $config;
         yield from $this->parseConfig();
+        $this->logger->logger(Lang::$current_lang['config_updated'], Logger::NOTICE);
+        $this->logger->logger($this->config, Logger::NOTICE);
         return $this->config;
     }
     /**
@@ -1681,8 +1720,6 @@ class MTProto extends AsyncConstruct implements TLCallback
             unset($this->config['dc_options']);
             yield from $this->parseDcOptions($options);
         }
-        $this->logger->logger(Lang::$current_lang['config_updated'], Logger::NOTICE);
-        $this->logger->logger($this->config, Logger::NOTICE);
     }
     /**
      * Parse DC options from config.
@@ -1705,7 +1742,6 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
             $id .= $dc['media_only'] ? '_media' : '';
             $ipv6 = $dc['ipv6'] ? 'ipv6' : 'ipv4';
-            //$id .= isset($this->settings['connection'][$test][$ipv6][$id]) && $this->settings['connection'][$test][$ipv6][$id]['ip_address'] != $dc['ip_address'] ? '_bk' : '';
             if (\is_numeric($id)) {
                 $id = (int) $id;
             }

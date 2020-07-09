@@ -131,14 +131,17 @@ class CheckLoop extends ResumableSignalLoop
                                             $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.$message_id.' received by server and was already sent, requesting reply...', \danog\MadelineProto\Logger::ERROR);
                                             $reply[] = $message_id;
                                         } else {
-                                            $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.$message_id.' received by server, requesting reply...', \danog\MadelineProto\Logger::ERROR);
+                                            $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.$message_id.' received by server, waiting...', \danog\MadelineProto\Logger::ERROR);
                                             $reply[] = $message_id;
                                         }
                                 }
                         }
+                        /*
                         if ($reply) {
-                            \danog\MadelineProto\Tools::callFork($connection->objectCall('msg_resend_ans_req', ['msg_ids' => $reply], ['postpone' => true]));
-                        }
+                            $deferred= new Deferred;
+                            $deferred->promise()->onResolve(fn($e, $res) => var_dump(ord($res['info'][0])));
+                            \danog\MadelineProto\Tools::callFork($connection->objectCall('msg_resend_req', ['msg_ids' => $reply], ['postpone' => true, 'promise' => $deferred]));
+                        }*/
                         $connection->flush();
                     });
                     $list = '';

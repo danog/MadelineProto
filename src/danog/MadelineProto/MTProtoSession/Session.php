@@ -28,6 +28,7 @@ abstract class Session
     use ResponseHandler;
     use SeqNoHandler;
     use CallHandler;
+    use Reliable;
     /**
      * Incoming message array.
      *

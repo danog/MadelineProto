@@ -184,9 +184,9 @@ final class APIWrapper
             }
             $this->serialized = \time();
             $realpaths = Serialization::realpaths($this->session);
-            //Logger::log('Waiting for exclusive lock of serialization lockfile...');
+            Logger::log('Waiting for exclusive lock of serialization lockfile...');
             $unlock = yield Tools::flock($realpaths['lockfile'], LOCK_EX);
-            //Logger::log('Lock acquired, serializing');
+            Logger::log('Lock acquired, serializing');
             try {
                 if (!$this->gettingApiId) {
                     $update_closure = $this->API->settings['updates']['callback'];
@@ -207,7 +207,7 @@ final class APIWrapper
                 }
                 $unlock();
             }
-            //Logger::log('Done serializing');
+            Logger::log('Done serializing');
             return $wrote;
         })());
     }

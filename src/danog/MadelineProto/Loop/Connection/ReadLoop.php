@@ -106,7 +106,7 @@ class ReadLoop extends SignalLoop
                         yield from $connection->reconnect();
                     } elseif ($error === -429) {
                         $API->logger->logger("Got -429 from DC {$datacenter}", Logger::WARNING);
-                        yield Tools::sleep(1);
+                        yield Tools::sleep(3);
                         yield from $connection->reconnect();
                     } else {
                         yield from $connection->reconnect();

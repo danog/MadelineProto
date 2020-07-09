@@ -19,11 +19,22 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use Amp\Deferred;
+use Amp\Promise;
+use danog\MadelineProto\Loop\Connection\WriteLoop;
+
 /**
  * Manages acknowledgement of messages.
  */
 trait AckHandler
 {
+    /**
+     * Acknowledge outgoing message ID
+     *
+     * @param string|int $message_id Message Id
+     * 
+     * @return boolean
+     */
     public function ackOutgoingMessageId($message_id): bool
     {
         // The server acknowledges that it received my message
@@ -31,16 +42,15 @@ trait AckHandler
             $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
             return false;
         }
-        //$this->logger->logger("Ack-ed ".$this->outgoing_messages[$message_id]['_']." with message ID $message_id on DC $datacenter");
-        /*
-                                                        if (isset($this->outgoing_messages[$message_id]['body'])) {
-                                                            unset($this->outgoing_messages[$message_id]['body']);
-                                                        }
-                                                        if (isset($this->new_outgoing[$message_id])) {
-                                                            unset($this->new_outgoing[$message_id]);
-                                                        }*/
         return true;
     }
+    /**
+     * We have gotten response for outgoing message ID
+     *
+     * @param string|int $message_id Message ID
+     * 
+     * @return boolean
+     */
     public function gotResponseForOutgoingMessageId($message_id): bool
     {
         // The server acknowledges that it received my message
@@ -59,19 +69,23 @@ trait AckHandler
         }
         return true;
     }
+    /**
+     * Acknowledge incoming message ID 
+     *
+     * @param string|int $message_id Message ID
+     * 
+     * @return boolean
+     */
     public function ackIncomingMessageId($message_id): bool
     {
         // I let the server know that I received its message
         if (!isset($this->incoming_messages[$message_id])) {
             $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of incoming messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
         }
-        /*if ($this->temp_auth_key['id'] === null || $this->temp_auth_key['id'] === "\0\0\0\0\0\0\0\0") {
-          // || (isset($this->incoming_messages[$message_id]['ack']) && $this->incoming_messages[$message_id]['ack'])) {
-          return;
-          }*/
         $this->ack_queue[$message_id] = $message_id;
         return true;
     }
+
     /**
      * Check if there are some pending calls.
      *
@@ -103,6 +117,7 @@ trait AckHandler
     public function getPendingCalls(): array
     {
         $settings = $this->shared->getSettings();
+        $dropTimeout = $settings['drop_timeout'];
         $timeout = $settings['timeout'];
         $pfs = $settings['pfs'];
         $unencrypted = !$this->shared->hasTempAuthKey();
@@ -116,6 +131,11 @@ trait AckHandler
                 }
                 if ($this->outgoing_messages[$message_id]['_'] === 'msgs_state_req') {
                     unset($this->new_outgoing[$k], $this->outgoing_messages[$message_id]);
+                    continue;
+                }
+                if ($this->outgoing_messages[$message_id]['sent'] + $dropTimeout < \time()) {
+                    $this->gotResponseForOutgoingMessageId($message_id);
+                    $this->handleReject($this->outgoing_messages[$message_id], new \danog\MadelineProto\Exception("Request timeout"));
                     continue;
                 }
                 $result[] = $message_id;

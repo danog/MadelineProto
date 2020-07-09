@@ -409,8 +409,7 @@ class Connection extends Session
         $deferred = new Deferred();
         if (!isset($message['serialized_body'])) {
             $body = \is_object($message['body']) ? yield from $message['body'] : $message['body'];
-            $refreshNext = isset($message['refreshNext']) && $message['refreshNext'];
-            //$refreshNext = true;
+            $refreshNext = $message['refreshReferences'] ?? false;
             if ($refreshNext) {
                 $this->API->referenceDatabase->refreshNext(true);
             }

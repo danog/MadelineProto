@@ -84,7 +84,6 @@ class MyEventHandler extends EventHandler
         if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
             yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
         }
-        yield $this->ping(['multiple' => true] + \array_map(fn ($v) => ['ping_id' => $v], \range(0, 1020)));
     }
 }
 $settings = [
