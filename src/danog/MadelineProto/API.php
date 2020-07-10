@@ -91,6 +91,13 @@ class API extends InternalDoc
      */
     private $wrapper;
 
+    /**
+     * Global session unlock callback
+     *
+     * @var callback
+     */
+    private $unlock;
+
 
     /**
      * Magic constructor function.
@@ -127,7 +134,8 @@ class API extends InternalDoc
     {
         Logger::constructorFromSettings($settings);
         $this->session = $session = Tools::absolute($session);
-        if ($unserialized = yield from Serialization::legacyUnserialize($session)) {
+        [$unserialized, $this->unlock] = yield from Serialization::legacyUnserialize($session);
+        if ($unserialized) {
             $unserialized->storage = $unserialized->storage ?? [];
             $unserialized->session = $session;
             APIWrapper::link($this, $unserialized);
@@ -185,6 +193,7 @@ class API extends InternalDoc
             }
             $this->destructing = true;
             Tools::wait($this->wrapper->serialize());
+            if ($this->unlock) ($this->unlock)();
         } else {
             $this->logger->logger('Shutting down MadelineProto (old deserialized instance of API)');
         }

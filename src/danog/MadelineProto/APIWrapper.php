@@ -161,7 +161,7 @@ final class APIWrapper
     }
 
     /**
-     * Serialie session.
+     * Serialize session.
      *
      * @return Promise
      */

@@ -68,11 +68,11 @@ class Serialization
                 Loop::unreference($warningId);
             });
             Loop::unreference($warningId);
-            $unlock = yield Tools::flock($realpaths['session_lockfile'], LOCK_EX, 1);
+            $unlockGlobal = yield Tools::flock($realpaths['session_lockfile'], LOCK_EX, 1);
             Loop::cancel($warningId);
-            Shutdown::addCallback(static function () use ($unlock) {
+            $tempId = Shutdown::addCallback($unlockGlobal = static function () use ($unlockGlobal) {
                 Logger::log("Unlocking exclusive session lock!");
-                $unlock();
+                $unlockGlobal();
                 Logger::log("Unlocked exclusive session lock!");
             });
             Logger::log("Got exclusive session lock!");
@@ -146,7 +146,8 @@ class Serialization
             if ($unserialized === false) {
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialization_error']);
             }
-            return $unserialized;
+            Shutdown::removeCallback($tempId);
+            return [$unserialized, $unlockGlobal];
         }
     }
 }
