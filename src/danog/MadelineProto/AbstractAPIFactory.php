@@ -177,24 +177,29 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     /**
      * Get fully resolved method list for object, including snake_case and camelCase variants.
      *
-     * @param API $value Value
+     * @param API    $value Value
+     * @param string $class Custom class name
      *
      * @return array
      */
-    protected static function getInternalMethodList($value): array
+    protected static function getInternalMethodList($value, string $class = null): array
+    {
+        return \array_map(fn ($method) => [$value, $method], self::getInternalMethodListClass($class ?? \get_class($value)));
+    }
+    /**
+     * Get fully resolved method list for object, including snake_case and camelCase variants.
+     *
+     * @param string $class Class name
+     *
+     * @return array
+     */
+    protected static function getInternalMethodListClass(string $class): array
     {
         static $cache = [];
-        $class = \get_class($value);
         if (isset($cache[$class])) {
-            return \array_map(
-                static function ($v) use ($value) {
-                    return [$value, $v];
-                },
-                $cache[$class]
-            );
+            return $cache[$class];
         }
-
-        $methods = \get_class_methods($value);
+        $methods = \get_class_methods($class);
         foreach ($methods as $method) {
             if ($method == 'methodCallAsyncRead') {
                 unset($methods[\array_search('methodCall', $methods)]);
@@ -227,6 +232,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         }
 
         $cache[$class] = $finalMethods;
-        return self::getInternalMethodList($value);
+        return $finalMethods;
     }
 }

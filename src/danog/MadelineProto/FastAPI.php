@@ -84,6 +84,7 @@ class FastAPI extends API
         }
         $this->API = new Client($session->getIpcPath(), $this->logger);
         yield from $this->API->initAsynchronously();
+        $this->methods = self::getInternalMethodList($this->API, MTProto::class);
         $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
     /**
