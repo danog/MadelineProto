@@ -59,16 +59,11 @@ abstract class RunnerAbstract
         return $scriptPath;
     }
     /**
-     * Constructor.
+     * Runner.
      *
-     * @param string $session Sessio path
-     */
-    abstract public function __construct(string $session);
-
-    /**
-     * Starts the execution process.
+     * @param string $session Session path
      *
-     * @return Promise<int> Resolves with the PID
+     * @return void
      */
-    abstract public function start(): Promise;
+    abstract public static function start(string $session): void;
 }

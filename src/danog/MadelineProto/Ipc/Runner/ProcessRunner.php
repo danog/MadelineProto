@@ -11,14 +11,12 @@ final class ProcessRunner extends RunnerAbstract
     /** @var string|null Cached path to located PHP binary. */
     private static $binaryPath;
 
-    /** @var \Amp\Process\Process */
-    private $process;
     /**
-     * Constructor.
+     * Runner.
      *
      * @param string $session Session path
      */
-    public function __construct(string $session)
+    public static function start(string $session): void
     {
         if (\PHP_SAPI === "cli") {
             $binary = \PHP_BINARY;
@@ -41,11 +39,9 @@ final class ProcessRunner extends RunnerAbstract
             $runner,
             'madeline-ipc',
             \escapeshellarg($session),
-            '&'
+            '&>/dev/null &'
         ]);
-        var_dump($command);
-
-        $this->process = new BaseProcess($command, Magic::getcwd());
+        shell_exec($command);
     }
     private static function locateBinary(): string
     {
@@ -74,15 +70,5 @@ final class ProcessRunner extends RunnerAbstract
         }
 
         return \implode(" ", $result);
-    }
-
-    /**
-     * Starts the process.
-     *
-     * @return Promise<int> Resolved with the PID
-     */
-    public function start(): Promise
-    {
-        return $this->process->start();
     }
 }

@@ -25,11 +25,11 @@ final class WebRunner extends RunnerAbstract
      */
     private $res;
     /**
-     * Constructor.
+     * Start.
      *
      * @param string $session Session path
      */
-    public function __construct(string $session)
+    public static function start(string $session): void
     {
         if (!isset($_SERVER['SERVER_NAME'])) {
             throw new ContextException("Could not initialize web runner!");
@@ -83,15 +83,7 @@ final class WebRunner extends RunnerAbstract
             'argv' => ['pony', 'madeline-ipc', $session],
             'cwd' => Magic::getcwd()
         ];
-    }
 
-    /**
-     * Start process.
-     *
-     * @return Promise
-     */
-    public function start(): Promise
-    {
         $params = \http_build_query($this->params);
 
         $address = ($_SERVER['HTTPS'] ?? false ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
@@ -103,7 +95,7 @@ final class WebRunner extends RunnerAbstract
 
         // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
         // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
-        $this->res = new ResourceOutputStream(\fsockopen($address, $port));
-        return $this->res->write($payload);
+        fwrite($res = \fsockopen($address, $port), $payload);
+        fclose($res);
     }
 }

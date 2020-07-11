@@ -59,19 +59,19 @@ class Server extends SignalLoop
      *
      * @param string $session Session path
      *
-     * @return \Generator
+     * @return void
      */
-    public static function startMe(string $session): \Generator
+    public static function startMe(string $session): void
     {
         try {
             Logger::log("Starting IPC server $session (process)");
-            yield (new ProcessRunner($session))->start();
+            ProcessRunner::start($session);
             return;
         } catch (\Throwable $e) {
             Logger::log($e);
         }
         Logger::log("Starting IPC server $session (web)");
-        yield (new WebRunner($session))->start();
+        WebRunner::start($session);
     }
     /**
      * Main loop.
@@ -97,9 +97,11 @@ class Server extends SignalLoop
         $this->API->logger("Accepted IPC client connection!");
 
         $id = 0;
-        while ($payload = yield $socket->receive()) {
-            Tools::callFork($this->clientRequest($socket, $id++, $payload));
-        }
+        try {
+            while ($payload = yield $socket->receive()) {
+               Tools::callFork($this->clientRequest($socket, $id++, $payload));
+            }
+        } catch (\Throwable $e) {}
     }
     /**
      * Handle client request.

@@ -34,7 +34,7 @@ trait Start
      */
     public function start(): \Generator
     {
-        if (yield $this->getAuthorization() === MTProto::LOGGED_IN) {
+        if ((yield $this->getAuthorization()) === MTProto::LOGGED_IN) {
             return yield from $this->fullGetSelf();
         }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {

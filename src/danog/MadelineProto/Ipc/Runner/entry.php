@@ -78,6 +78,7 @@ use danog\MadelineProto\Tools;
             Magic::classExists();
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
             $API = new API($ipcPath);
+            $API->init();
             if ($API->hasEventHandler()) {
                 unset($API);
                 \gc_collect_cycles();

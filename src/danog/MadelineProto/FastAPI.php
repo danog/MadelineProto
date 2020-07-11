@@ -74,17 +74,17 @@ class FastAPI extends API
             } catch (\Throwable $e) {
             }
             StatCache::clear($session->getIpcPath());
-            yield from Server::startMe($session);
+            Server::startMe($session);
             $inited = false;
-            for ($x = 0; $x < 3; $x++) {
-                $this->logger->logger("Waiting for IPC server to start...");
+            $this->logger->logger("Waiting for IPC server to start...");
+            for ($x = 0; $x < 30; $x++) {
                 yield Tools::sleep(1);
                 StatCache::clear($session->getIpcPath());
                 if ($client = yield from $this->checkInit($session, $settings)) {
                     $inited = true;
                     break;
                 }
-                yield from Server::startMe($session);
+                Server::startMe($session);
             }
             if (!$client) {
                 throw new Exception("The IPC server isn't running, please check logs!");

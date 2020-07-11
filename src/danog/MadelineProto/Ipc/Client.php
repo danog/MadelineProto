@@ -122,7 +122,7 @@ class Client
     {
         $this->requests []= $deferred = new Deferred;
         yield $this->server->send([$function, $arguments]);
-        return $deferred->promise();
+        return yield $deferred->promise();
     }
     /**
      * Placeholder.
