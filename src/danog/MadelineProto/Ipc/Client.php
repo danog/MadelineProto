@@ -21,12 +21,9 @@ namespace danog\MadelineProto\Ipc;
 use Amp\Deferred;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\API;
-use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Tools;
-
-use function Amp\Ipc\connect;
 
 /**
  * IPC client.

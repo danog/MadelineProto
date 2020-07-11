@@ -112,6 +112,14 @@ abstract class Session
         $this->session_in_seq_no = 0;
         $this->session_out_seq_no = 0;
         $this->msgIdHandler = MsgIdHandler::createInstance($this);
+        foreach ($this->outgoing_messages as &$msg) {
+            if (isset($msg['msg_id'])) {
+                unset($msg['msg_id']);
+            }
+            if (isset($msg['seqno'])) {
+                unset($msg['seqno']);
+            }
+        }
     }
     /**
      * Create MTProto session if needed.

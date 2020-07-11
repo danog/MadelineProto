@@ -2,10 +2,6 @@
 
 namespace danog\MadelineProto\Ipc\Runner;
 
-use Amp\Process\Process as BaseProcess;
-use Amp\Promise;
-use danog\MadelineProto\Magic;
-
 final class ProcessRunner extends RunnerAbstract
 {
     /** @var string|null Cached path to located PHP binary. */
@@ -41,7 +37,7 @@ final class ProcessRunner extends RunnerAbstract
             \escapeshellarg($session),
             '&>/dev/null &'
         ]);
-        shell_exec($command);
+        \shell_exec($command);
     }
     private static function locateBinary(): string
     {

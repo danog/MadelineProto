@@ -4,7 +4,6 @@ namespace danog\MadelineProto\Ipc\Runner;
 
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\Parallel\Context\ContextException;
-use Amp\Promise;
 use danog\MadelineProto\Magic;
 
 final class WebRunner extends RunnerAbstract
@@ -95,7 +94,7 @@ final class WebRunner extends RunnerAbstract
 
         // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
         // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
-        fwrite($res = \fsockopen($address, $port), $payload);
-        fclose($res);
+        \fwrite($res = \fsockopen($address, $port), $payload);
+        \fclose($res);
     }
 }

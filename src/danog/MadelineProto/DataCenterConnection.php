@@ -479,6 +479,12 @@ class DataCenterConnection implements JsonSerializable
         $count = \count($backup);
         $this->API->logger->logger("Restoring {$count} messages to DC {$this->datacenter}");
         foreach ($backup as $message) {
+            if (isset($message['seqno'])) {
+                unset($message['seqno']);
+            }
+            if (isset($message['msg_id'])) {
+                unset($message['msg_id']);
+            }
             if (isset($message['body'])) {
                 Tools::callFork($this->getConnection()->sendMessage($message, false));
             }

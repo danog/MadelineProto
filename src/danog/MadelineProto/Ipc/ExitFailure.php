@@ -35,7 +35,7 @@ final class ExitFailure
         $this->message = $exception->getMessage();
         $this->code = $exception->getCode();
         $this->trace = flattenThrowableBacktrace($exception);
-        if (method_exists($exception, 'getTLTrace')) {
+        if (\method_exists($exception, 'getTLTrace')) {
             $this->tlTrace = $exception->getTLTrace();
         }
 

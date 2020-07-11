@@ -275,7 +275,9 @@ class Magic
             }
             self::$initedLight = true;
             if ($light) {
-                if (!\defined(\AMP_WORKER::class)) \define(\AMP_WORKER::class, true);
+                if (!\defined(\AMP_WORKER::class)) {
+                    \define(\AMP_WORKER::class, true);
+                }
                 return;
             }
         }
@@ -327,7 +329,9 @@ class Magic
         if ((PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') && !(\class_exists(\Phar::class) && \Phar::running())) {
             try {
                 $back = \debug_backtrace(0);
-                if (!defined('AMP_WORKER')) \define('AMP_WORKER', 1);
+                if (!\defined('AMP_WORKER')) {
+                    \define('AMP_WORKER', 1);
+                }
                 $promise = \Amp\File\get(\end($back)['file']);
                 do {
                     try {

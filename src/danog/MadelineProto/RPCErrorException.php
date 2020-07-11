@@ -61,7 +61,7 @@ class RPCErrorException extends \Exception
         return $result;
     }
     /**
-     * Get localized error name
+     * Get localized error name.
      *
      * @return string
      */
@@ -71,7 +71,7 @@ class RPCErrorException extends \Exception
         return $this->localized;
     }
     /**
-     * Set localized error name
+     * Set localized error name.
      *
      * @param string $localization
      * @return void

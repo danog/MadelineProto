@@ -50,8 +50,8 @@ trait CallHandler
         foreach ($message_ids as $message_id) {
             if (isset($this->outgoing_messages[$message_id]['body'])) {
                 if ($datacenter) {
-                    unset($this->outgoing_messages[$message_id]['msg_id']);
-                    unset($this->outgoing_messages[$message_id]['seqno']);
+                    unset($this->outgoing_messages[$message_id]['msg_id'], $this->outgoing_messages[$message_id]['seqno']);
+
                     Tools::call($this->API->datacenter->waitGetConnection($datacenter))->onResolve(function ($e, $r) use ($message_id) {
                         Tools::callFork($r->sendMessage($this->outgoing_messages[$message_id], false));
                     });

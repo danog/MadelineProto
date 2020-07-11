@@ -2,8 +2,6 @@
 
 namespace danog\MadelineProto\Ipc\Runner;
 
-use Amp\Promise;
-
 abstract class RunnerAbstract
 {
     const SCRIPT_PATH = __DIR__."/entry.php";
