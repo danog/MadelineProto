@@ -51,7 +51,6 @@ trait CallHandler
             if (isset($this->outgoing_messages[$message_id]['body'])) {
                 if ($datacenter) {
                     unset($this->outgoing_messages[$message_id]['msg_id'], $this->outgoing_messages[$message_id]['seqno']);
-
                     Tools::call($this->API->datacenter->waitGetConnection($datacenter))->onResolve(function ($e, $r) use ($message_id) {
                         Tools::callFork($r->sendMessage($this->outgoing_messages[$message_id], false));
                     });
@@ -59,6 +58,10 @@ trait CallHandler
                     $this->gotResponseForOutgoingMessageId($message_id);
                 } else {
                     Tools::callFork($this->sendMessage($this->outgoing_messages[$message_id], false));
+                    if (!isset($this->outgoing_messages[$message_id]['seqno'])) {
+                        $this->ackOutgoingMessageId($message_id);
+                        $this->gotResponseForOutgoingMessageId($message_id);
+                    }
                 }
             } else {
                 $this->logger->logger('Could not resend '.(isset($this->outgoing_messages[$message_id]['_']) ? $this->outgoing_messages[$message_id]['_'] : $message_id));
