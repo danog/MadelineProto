@@ -20,12 +20,15 @@
 namespace danog\MadelineProto;
 
 use Amp\File\StatCache;
+use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
 
 use function Amp\File\exists;
 use function Amp\File\get;
 use function Amp\File\isfile;
+use function Amp\File\unlink;
+use function Amp\Ipc\connect;
 
 /**
  * IPC API wrapper for MadelineProto.
@@ -65,25 +68,29 @@ class FastAPI extends API
     {
         $this->logger = Logger::constructorFromSettings($settings);
         $session = new SessionPaths($session);
-        yield from $this->checkInit($session, $settings);
-        if (!(yield exists($session->getIpcPath()))) {
+        if (!$client = yield from $this->checkInit($session, $settings)) {
+            try {
+                yield unlink($session->getIpcPath());
+            } catch (\Throwable $e) {
+            }
+            StatCache::clear($session->getIpcPath());
             yield from Server::startMe($session);
             $inited = false;
             for ($x = 0; $x < 3; $x++) {
                 $this->logger->logger("Waiting for IPC server to start...");
-                yield Tools::sleep(0.1);
-                if (yield from $this->checkInit($session, $settings)) {
+                yield Tools::sleep(1);
+                StatCache::clear($session->getIpcPath());
+                if ($client = yield from $this->checkInit($session, $settings)) {
                     $inited = true;
                     break;
                 }
                 yield from Server::startMe($session);
             }
-            if (!$inited) {
+            if (!$client) {
                 throw new Exception("The IPC server isn't running, please check logs!");
             }
         }
-        $this->API = new Client($session->getIpcPath(), $this->logger);
-        yield from $this->API->initAsynchronously();
+        $this->API = new Client($client, $this->logger);
         $this->methods = self::getInternalMethodList($this->API, MTProto::class);
         $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
@@ -102,15 +109,34 @@ class FastAPI extends API
         if (!(yield exists($session->getSessionPath()))
             || (yield exists($session->getIpcPath())
             && yield isfile($session->getIpcPath())
-            && yield get($session->getIpcPath()) === 'not inited')
+            && yield get($session->getIpcPath()) === Server::NOT_INITED)
         ) { // Should init API ID|session
             Logger::log("Session not initialized, initializing it now...");
             $API = new API($session->getSessionPath(), $settings);
             yield from $API->initAsynchronously();
             unset($API);
-            return false; // Should start IPC server
+            while (\gc_collect_cycles());
+            return null; // Should start IPC server
         }
-        return true; // All good, IPC server is running
+        return yield from $this->tryConnect($session->getIpcPath());
+    }
+    /**
+     * Try connecting to IPC socket.
+     *
+     * @param string $ipcPath IPC path
+     *
+     * @return \Generator<ChannelledSocket|null>
+     */
+    private function tryConnect(string $ipcPath): \Generator
+    {
+        Logger::log("Trying to connect to IPC socket...");
+        try {
+            return yield connect($ipcPath);
+        } catch (\Throwable $e) {
+            $e = $e->getMessage();
+            Logger::log("$e while connecting to IPC socket");
+            return null;
+        }
     }
     /**
      * Start MadelineProto and the event handler (enables async).

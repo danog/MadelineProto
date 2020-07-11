@@ -18,7 +18,9 @@
 
 use Amp\Deferred;
 use danog\MadelineProto\API;
+use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
 
@@ -64,12 +66,25 @@ use danog\MadelineProto\Tools;
             \trigger_error("IPC session $ipcPath does not exist!", E_USER_ERROR);
             exit(1);
         }
+        if (\function_exists(\cli_set_process_title::class)) {
+            @\cli_set_process_title("MadelineProto worker $ipcPath");
+        }
+        if (isset($_GET['cwd'])) {
+            @\chdir($_GET['cwd']);
+        }
         \define(\MADELINE_WORKER::class, 1);
 
         try {
+            Magic::classExists();
+            Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
             $API = new API($ipcPath);
             if ($API->hasEventHandler()) {
-                $API->startAndLoop(\get_class($API->getEventHandler()));
+                unset($API);
+                \gc_collect_cycles();
+                Logger::log("Session has event handler, can't start IPC server like this!");
+                $ipc = (new SessionPaths($ipcPath))->getIpcPath();
+                @\unlink($ipc);
+                \file_put_contents($ipc, Server::EVENT_HANDLER);
             } else {
                 $API->initSelfRestart();
                 Tools::wait((new Deferred)->promise());
@@ -80,7 +95,7 @@ use danog\MadelineProto\Tools;
             if ($e->getMessage() === 'Not inited!') {
                 $ipc = (new SessionPaths($ipcPath))->getIpcPath();
                 @\unlink($ipc);
-                \file_put_contents($ipc, 'not inited');
+                \file_put_contents($ipc, Server::NOT_INITED);
             }
         }
     }

@@ -32,6 +32,14 @@ use danog\MadelineProto\Tools;
 class Server extends SignalLoop
 {
     /**
+     * Session not initialized, should initialize
+     */
+    const NOT_INITED = 'not inited';
+    /**
+     * Session uses event handler, should start from main event handler file
+     */
+    const EVENT_HANDLER = 'event';
+    /**
      * IPC server.
      */
     private IpcServer $server;

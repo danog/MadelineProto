@@ -5,6 +5,7 @@ namespace danog\MadelineProto\Ipc\Runner;
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\Parallel\Context\ContextException;
 use Amp\Promise;
+use danog\MadelineProto\Magic;
 
 final class WebRunner extends RunnerAbstract
 {
@@ -79,7 +80,8 @@ final class WebRunner extends RunnerAbstract
         }
 
         $this->params = [
-            'argv' => ['pony', 'madeline-ipc', $session]
+            'argv' => ['pony', 'madeline-ipc', $session],
+            'cwd' => Magic::getcwd()
         ];
     }
 

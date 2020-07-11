@@ -88,7 +88,7 @@ class MyEventHandler extends EventHandler
 }
 $settings = [
     'logger' => [
-        'logger_level' => Logger::VERBOSE
+        'logger_level' => Logger::ULTRA_VERBOSE
     ],
     'serialization' => [
         'serialization_interval' => 30,

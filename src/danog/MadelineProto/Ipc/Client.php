@@ -31,7 +31,7 @@ use function Amp\Ipc\connect;
 /**
  * IPC client.
  */
-class Client extends AsyncConstruct
+class Client
 {
     use \danog\MadelineProto\Wrappers\Start;
     use \danog\MadelineProto\Wrappers\Templates;
@@ -51,27 +51,13 @@ class Client extends AsyncConstruct
     /**
      * Constructor function.
      *
-     * @param string $ipcPath IPC socket path
-     * @param Logger $logger  Logger
+     * @param ChannelledSocket $socket IPC client socket
+     * @param Logger           $logger Logger
      */
-    public function __construct(string $ipcPath, Logger $logger)
-    {
-        $this->setInitPromise($this->__construct_async($ipcPath, $logger));
-    }
-    /**
-     * Constructor function.
-     *
-     * @param string $ipcPath IPC socket path
-     * @param Logger $logger  Logger
-     *
-     * @return \Generator
-     */
-    public function __construct_async(string $ipcPath, Logger $logger): \Generator
+    public function __construct(ChannelledSocket $server, Logger $logger)
     {
         $this->logger = $logger;
-        $this->logger("Connecting to IPC server...");
-        $this->server = yield connect($ipcPath);
-        $this->logger("Connected to IPC server!");
+        $this->server = $server;
         Tools::callFork($this->loop());
     }
     /**

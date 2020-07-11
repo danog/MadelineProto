@@ -4,6 +4,7 @@ namespace danog\MadelineProto\Ipc\Runner;
 
 use Amp\Process\Process as BaseProcess;
 use Amp\Promise;
+use danog\MadelineProto\Magic;
 
 final class ProcessRunner extends RunnerAbstract
 {
@@ -42,9 +43,9 @@ final class ProcessRunner extends RunnerAbstract
             \escapeshellarg($session),
             '&'
         ]);
-        \var_dumP($command);
+        var_dump($command);
 
-        $this->process = new BaseProcess($command);
+        $this->process = new BaseProcess($command, Magic::getcwd());
     }
     private static function locateBinary(): string
     {
