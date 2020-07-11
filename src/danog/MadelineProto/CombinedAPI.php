@@ -36,25 +36,25 @@ class CombinedAPI
     {
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
         \danog\MadelineProto\Magic::classExists();
-        $realpaths = Serialization::realpaths($session);
-        $this->session = $realpaths['file'];
+        $realpaths = new SessionPaths($session);
+        $this->session = $realpaths->getSessionPath();
         foreach ($paths as $path => $settings) {
             $this->addInstance($path, $settings);
         }
-        if (\file_exists($realpaths['file'])) {
-            if (!\file_exists($realpaths['lockfile'])) {
-                \touch($realpaths['lockfile']);
+        if (\file_exists($realpaths->getSessionPath())) {
+            if (!\file_exists($realpaths->getLockPath())) {
+                \touch($realpaths->getLockPath());
                 \clearstatcache();
             }
-            $realpaths['lockfile'] = \fopen($realpaths['lockfile'], 'r');
+            $lock = \fopen($realpaths->getLockPath(), 'r');
             \danog\MadelineProto\Logger::log('Waiting for shared lock of serialization lockfile...');
-            \flock($realpaths['lockfile'], LOCK_SH);
+            \flock($lock, LOCK_SH);
             \danog\MadelineProto\Logger::log('Shared lock acquired, deserializing...');
             try {
-                $tounserialize = \file_get_contents($realpaths['file']);
+                $tounserialize = \file_get_contents($realpaths->getSessionPath());
             } finally {
-                \flock($realpaths['lockfile'], LOCK_UN);
-                \fclose($realpaths['lockfile']);
+                \flock($lock, LOCK_UN);
+                \fclose($lock);
             }
             $deserialized = \unserialize($tounserialize);
             /*foreach ($deserialized['instance_paths'] as $path) {
@@ -115,21 +115,21 @@ class CombinedAPI
             $filename = $this->session;
         }
         Logger::log(\danog\MadelineProto\Lang::$current_lang['serializing_madelineproto']);
-        $realpaths = Serialization::realpaths($filename);
-        if (!\file_exists($realpaths['lockfile'])) {
-            \touch($realpaths['lockfile']);
+        $realpaths = new SessionPaths($filename);
+        if (!\file_exists($realpaths->getLockPath())) {
+            \touch($realpaths->getLockPath());
             \clearstatcache();
         }
-        $realpaths['lockfile'] = \fopen($realpaths['lockfile'], 'w');
+        $lock = \fopen($realpaths->getLockPath(), 'w');
         \danog\MadelineProto\Logger::log('Waiting for exclusive lock of serialization lockfile...');
-        \flock($realpaths['lockfile'], LOCK_EX);
+        \flock($lock, LOCK_EX);
         \danog\MadelineProto\Logger::log('Lock acquired, serializing');
         try {
-            $wrote = \file_put_contents($realpaths['tempfile'], \serialize(['event_handler' => $this->event_handler, 'event_handler_instance' => $this->event_handler_instance, 'instance_paths' => $this->instance_paths]));
-            \rename($realpaths['tempfile'], $realpaths['file']);
+            $wrote = \file_put_contents($realpaths->getTempPath(), \serialize(['event_handler' => $this->event_handler, 'event_handler_instance' => $this->event_handler_instance, 'instance_paths' => $this->instance_paths]));
+            \rename($realpaths->getTempPath(), $realpaths->getSessionPath());
         } finally {
-            \flock($realpaths['lockfile'], LOCK_UN);
-            \fclose($realpaths['lockfile']);
+            \flock($lock, LOCK_UN);
+            \fclose($lock);
         }
         $this->serialized = \time();
         return $wrote;

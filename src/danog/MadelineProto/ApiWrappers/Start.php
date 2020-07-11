@@ -37,6 +37,9 @@ trait Start
      */
     private function APIStart(array $settings): \Generator
     {
+        if (\defined(\MADELINE_WORKER::class)) {
+            throw new \danog\MadelineProto\Exception('Not inited!');
+        }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             $stdout = getStdout();
             yield $stdout->write('You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a)

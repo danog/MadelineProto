@@ -19,20 +19,16 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
-use Amp\Deferred;
-use Amp\Promise;
-use danog\MadelineProto\Loop\Connection\WriteLoop;
-
 /**
  * Manages acknowledgement of messages.
  */
 trait AckHandler
 {
     /**
-     * Acknowledge outgoing message ID
+     * Acknowledge outgoing message ID.
      *
      * @param string|int $message_id Message Id
-     * 
+     *
      * @return boolean
      */
     public function ackOutgoingMessageId($message_id): bool
@@ -45,10 +41,10 @@ trait AckHandler
         return true;
     }
     /**
-     * We have gotten response for outgoing message ID
+     * We have gotten response for outgoing message ID.
      *
      * @param string|int $message_id Message ID
-     * 
+     *
      * @return boolean
      */
     public function gotResponseForOutgoingMessageId($message_id): bool
@@ -70,10 +66,10 @@ trait AckHandler
         return true;
     }
     /**
-     * Acknowledge incoming message ID 
+     * Acknowledge incoming message ID.
      *
      * @param string|int $message_id Message ID
-     * 
+     *
      * @return boolean
      */
     public function ackIncomingMessageId($message_id): bool

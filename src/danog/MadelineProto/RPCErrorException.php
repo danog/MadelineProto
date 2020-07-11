@@ -43,7 +43,7 @@ class RPCErrorException extends \Exception
                 self::$toReport = \array_slice(self::$toReport, -100);
             }
             self::$toReport []= [
-                $method, $code, $error, time()
+                $method, $code, $error, \time()
             ];
         }
         if (!$description) {
@@ -53,24 +53,47 @@ class RPCErrorException extends \Exception
     }
     public function __toString()
     {
-        $result = \sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], self::localizeMessage($this->caller, $this->code, $this->message)." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, \danog\MadelineProto\Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
+        $this->localized ??= self::localizeMessage($this->caller, $this->code, $this->message);
+        $result = \sprintf(\danog\MadelineProto\Lang::$current_lang['rpc_tg_error'], $this->localized." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, \danog\MadelineProto\Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             $result = \str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
         }
         return $result;
     }
+    /**
+     * Get localized error name
+     *
+     * @return string
+     */
+    public function getLocalization(): string
+    {
+        $this->localized ??= self::localizeMessage($this->caller, $this->code, $this->message);
+        return $this->localized;
+    }
+    /**
+     * Set localized error name
+     *
+     * @param string $localization
+     * @return void
+     */
+    public function setLocalization(string $localization): void
+    {
+        $this->localized = $localization;
+    }
     public function __construct($message = null, $code = 0, $caller = '', Exception $previous = null)
     {
         $this->rpc = $message;
         parent::__construct($message, $code, $previous);
-        $this->prettifyTL($caller);
-        $this->caller = $caller;
-        $additional = [];
-        foreach ($this->getTrace() as $level) {
-            if (isset($level['function']) && $level['function'] === 'methodCall') {
-                $this->line = $level['line'];
-                $this->file = $level['file'];
-                $additional = $level['args'];
+        if (\is_string($caller)) {
+            $this->prettifyTL($caller);
+            $this->caller = $caller;
+            $additional = [];
+            foreach ($this->getTrace() as $level) {
+                if (isset($level['function']) && $level['function'] === 'methodCall') {
+                    $this->line = $level['line'];
+                    $this->file = $level['file'];
+                    $additional = $level['args'];
+                }
             }
         }
         /*

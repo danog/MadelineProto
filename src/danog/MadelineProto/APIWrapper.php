@@ -161,6 +161,18 @@ final class APIWrapper
     }
 
     /**
+     * Get IPC path.
+     *
+     * @internal
+     *
+     * @return string
+     */
+    public function getIpcPath(): string
+    {
+        return (new SessionPaths($this->session))->getIpcPath();
+    }
+
+    /**
      * Serialize session.
      *
      * @return Promise
@@ -169,6 +181,10 @@ final class APIWrapper
     {
         if (!$this->session) {
             Logger::log("Not serializing, no session");
+            return new Success();
+        }
+        if ($this->API instanceof FastAPI) {
+            Logger::log("Not serializing, IPC client");
             return new Success();
         }
         return Tools::callFork((function (): \Generator {
@@ -183,9 +199,9 @@ final class APIWrapper
                 yield from $this->API->initAsynchronously();
             }
             $this->serialized = \time();
-            $realpaths = Serialization::realpaths($this->session);
+            $realpaths = new SessionPaths($this->session);
             Logger::log('Waiting for exclusive lock of serialization lockfile...');
-            $unlock = yield Tools::flock($realpaths['lockfile'], LOCK_EX);
+            $unlock = yield Tools::flock($realpaths->getLockPath(), LOCK_EX);
             Logger::log('Lock acquired, serializing');
             try {
                 if (!$this->gettingApiId) {
@@ -198,8 +214,8 @@ final class APIWrapper
                         $this->API->settings['logger']['logger_param'] = [$this->API, 'noop'];
                     }
                 }
-                $wrote = yield put($realpaths['tempfile'], \serialize($this));
-                yield renameAsync($realpaths['tempfile'], $realpaths['file']);
+                $wrote = yield put($realpaths->getTempPath(), \serialize($this));
+                yield renameAsync($realpaths->getTempPath(), $realpaths->getSessionPath());
             } finally {
                 if (!$this->gettingApiId) {
                     $this->API->settings['updates']['callback'] = $update_closure;

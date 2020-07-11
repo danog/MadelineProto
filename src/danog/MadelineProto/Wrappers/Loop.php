@@ -36,34 +36,12 @@ trait Loop
      */
     private $stopLoop = false;
     /**
-     * Start MadelineProto's update handling loop, or run the provided async callable.
+     * Initialize self-restart hack.
      *
-     * @param callable $callback Async callable to run
-     *
-     * @return mixed
+     * @return void
      */
-    public function loop($callback = null): \Generator
+    public function initSelfRestart(): void
     {
-        if (\is_callable($callback)) {
-            $this->logger->logger('Running async callable');
-            return (yield $callback());
-        }
-        if ($callback instanceof Promise) {
-            $this->logger->logger('Resolving async promise');
-            return (yield $callback);
-        }
-        if (!$this->authorized) {
-            $this->logger->logger('Not authorized, not starting event loop', \danog\MadelineProto\Logger::FATAL_ERROR);
-            return false;
-        }
-        if (\in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'getUpdatesUpdateHandler'], 'getUpdatesUpdateHandler'])) {
-            $this->logger->logger('Getupdates event handler is enabled, exiting from loop', \danog\MadelineProto\Logger::FATAL_ERROR);
-            return false;
-        }
-        $this->logger->logger('Starting event loop');
-        if (!\is_callable($this->loop_callback)) {
-            $this->loop_callback = null;
-        }
         static $inited = false;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && !$inited) {
             $needs_restart = true;
@@ -104,12 +82,43 @@ trait Loop
             $this->closeConnection('Bot was started');
             $inited = true;
         }
+    }
+    /**
+     * Start MadelineProto's update handling loop, or run the provided async callable.
+     *
+     * @param callable $callback Async callable to run
+     *
+     * @return mixed
+     */
+    public function loop($callback = null): \Generator
+    {
+        if (\is_callable($callback)) {
+            $this->logger->logger('Running async callable');
+            return (yield $callback());
+        }
+        if ($callback instanceof Promise) {
+            $this->logger->logger('Resolving async promise');
+            return (yield $callback);
+        }
+        if (!$this->authorized) {
+            $this->logger->logger('Not authorized, not starting event loop', \danog\MadelineProto\Logger::FATAL_ERROR);
+            return false;
+        }
+        if (\in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'getUpdatesUpdateHandler'], 'getUpdatesUpdateHandler'])) {
+            $this->logger->logger('Getupdates event handler is enabled, exiting from loop', \danog\MadelineProto\Logger::FATAL_ERROR);
+            return false;
+        }
+        $this->logger->logger('Starting event loop');
+        if (!\is_callable($this->loop_callback)) {
+            $this->loop_callback = null;
+        }
         if (!$this->settings['updates']['handle_updates']) {
             $this->settings['updates']['handle_updates'] = true;
         }
         if (!$this->settings['updates']['run_callback']) {
             $this->settings['updates']['run_callback'] = true;
         }
+        $this->initSelfRestart();
         $this->startUpdateSystem();
         $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
         $this->stopLoop = false;

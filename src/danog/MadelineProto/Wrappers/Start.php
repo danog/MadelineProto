@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Tools;
 
 /**
@@ -33,7 +34,7 @@ trait Start
      */
     public function start(): \Generator
     {
-        if ($this->authorized === self::LOGGED_IN) {
+        if (yield $this->getAuthorization() === MTProto::LOGGED_IN) {
             return yield from $this->fullGetSelf();
         }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
@@ -52,7 +53,7 @@ trait Start
             $this->serialize();
             return yield from $this->fullGetSelf();
         }
-        if ($this->authorized === self::NOT_LOGGED_IN) {
+        if ($this->authorized === MTProto::NOT_LOGGED_IN) {
             if (isset($_POST['phone_number'])) {
                 yield from $this->webPhoneLogin();
             } elseif (isset($_POST['token'])) {
@@ -60,26 +61,26 @@ trait Start
             } else {
                 yield from $this->webEcho();
             }
-        } elseif ($this->authorized === self::WAITING_CODE) {
+        } elseif ($this->authorized === MTProto::WAITING_CODE) {
             if (isset($_POST['phone_code'])) {
                 yield from $this->webCompletePhoneLogin();
             } else {
                 yield from $this->webEcho("You didn't provide a phone code!");
             }
-        } elseif ($this->authorized === self::WAITING_PASSWORD) {
+        } elseif ($this->authorized === MTProto::WAITING_PASSWORD) {
             if (isset($_POST['password'])) {
                 yield from $this->webComplete2faLogin();
             } else {
                 yield from $this->webEcho("You didn't provide the password!");
             }
-        } elseif ($this->authorized === self::WAITING_SIGNUP) {
+        } elseif ($this->authorized === MTProto::WAITING_SIGNUP) {
             if (isset($_POST['first_name'])) {
                 yield from $this->webCompleteSignup();
             } else {
                 yield from $this->webEcho("You didn't provide the first name!");
             }
         }
-        if ($this->authorized === self::LOGGED_IN) {
+        if ($this->authorized === MTProto::LOGGED_IN) {
             $this->serialize();
             return yield from $this->fullGetSelf();
         }

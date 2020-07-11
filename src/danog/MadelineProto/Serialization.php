@@ -30,24 +30,6 @@ use function Amp\File\get;
 class Serialization
 {
     /**
-     * List of session paths.
-     *
-     * @var array
-     */
-    private $paths = [];
-    /**
-     * Extract path components for serialization.
-     *
-     * @param string $file Session path
-     *
-     * @return array
-     */
-    public static function realpaths(string $file): array
-    {
-        $file = Tools::absolute($file);
-        return ['file' => $file, 'lockfile' => $file.'.lock', 'tempfile' => $file.'.temp.session', 'session_lockfile' => $file.'.slock', ];
-    }
-    /**
      * Unserialize legacy session.
      *
      * @param string $session Session name
@@ -58,8 +40,8 @@ class Serialization
      */
     public static function legacyUnserialize(string $session): \Generator
     {
-        $realpaths = self::realpaths($session);
-        if (yield exists($realpaths['file'])) {
+        $realpaths = new SessionPaths($session);
+        if (yield exists($realpaths->getSessionPath())) {
             Logger::log('Waiting for exclusive session lock...');
             $warningId = Loop::delay(1000, static function () use (&$warningId) {
                 Logger::log("It seems like the session is busy.");
@@ -68,7 +50,7 @@ class Serialization
                 Loop::unreference($warningId);
             });
             Loop::unreference($warningId);
-            $unlockGlobal = yield Tools::flock($realpaths['session_lockfile'], LOCK_EX, 1);
+            $unlockGlobal = yield Tools::flock($realpaths->getSessionLockPath(), LOCK_EX, 1);
             Loop::cancel($warningId);
             $tempId = Shutdown::addCallback($unlockGlobal = static function () use ($unlockGlobal) {
                 Logger::log("Unlocking exclusive session lock!");
@@ -78,10 +60,10 @@ class Serialization
             Logger::log("Got exclusive session lock!");
 
             Logger::log('Waiting for shared lock of serialization lockfile...');
-            $unlock = yield Tools::flock($realpaths['lockfile'], LOCK_SH);
+            $unlock = yield Tools::flock($realpaths->getLockPath(), LOCK_SH);
             Logger::log('Shared lock acquired, deserializing...');
             try {
-                $tounserialize = yield get($realpaths['file']);
+                $tounserialize = yield get($realpaths->getSessionPath());
             } finally {
                 $unlock();
             }

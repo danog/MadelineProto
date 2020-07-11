@@ -28,6 +28,7 @@ use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFabric;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Db\Mysql;
+use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoop;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
@@ -385,6 +386,12 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     private $rpcLoop;
     /**
+     * IPC server.
+     *
+     * @var Server
+     */
+    private $ipcServer;
+    /**
      * Feeder loops.
      *
      * @var array<\danog\MadelineProto\Loop\Update\FeedLoop>
@@ -679,6 +686,15 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->datacenter->getDataCenterConnections();
     }
     /**
+     * Get main DC ID.
+     *
+     * @return int
+     */
+    public function getDataCenterId(): int
+    {
+        return $this->datacenter->curdc;
+    }
+    /**
      * Prompt serialization of instance.
      *
      * @internal
@@ -716,12 +732,17 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!$this->rpcLoop) {
             $this->rpcLoop = new PeriodicLoop($this, [$this, 'rpcReport'], 'config', 60);
         }
+        if (!$this->ipcServer) {
+            $this->ipcServer = new Server($this);
+            $this->ipcServer->setIpcPath($this->wrapper->getIpcPath());
+        }
         $this->callCheckerLoop->start();
         $this->serializeLoop->start();
         $this->phoneConfigLoop->start();
         $this->configLoop->start();
         $this->checkTosLoop->start();
         $this->rpcLoop->start();
+        $this->ipcServer->start();
     }
     /**
      * Stop all internal loops.
@@ -753,6 +774,10 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->rpcLoop) {
             $this->rpcLoop->signal(true);
             $this->rpcLoop = null;
+        }
+        if ($this->ipcServer) {
+            $this->ipcServer->signal(null);
+            $this->ipcServer = null;
         }
     }
     /**
@@ -1056,7 +1081,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public static function parseSettings(array $settings, array $previousSettings = []): array
     {
-        Magic::classExists();
+        //Magic::classExists();
         $settings = \array_replace_recursive($previousSettings, $settings);
         if (isset($previousSettings['connection_settings']['default_dc'])) {
             $settings['connection_settings']['default_dc'] = $previousSettings['connection_settings']['default_dc'];
@@ -1786,6 +1811,15 @@ class MTProto extends AsyncConstruct implements TLCallback
             return false;
         }
         return $this->authorization['user'];
+    }
+    /**
+     * Get authorization info.
+     *
+     * @return int
+     */
+    public function getAuthorization(): int
+    {
+        return $this->authorized;
     }
     /**
      * IDs of peers where to report errors.

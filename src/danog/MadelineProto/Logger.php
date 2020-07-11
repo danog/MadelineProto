@@ -185,6 +185,9 @@ class Logger
         if ($mode === self::NO_LOGGER) {
             $mode = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') ? Logger::ECHO_LOGGER : Logger::FILE_LOGGER;
         }
+        if (\defined(\MADELINE_WORKER::class)) {
+            $mode = Logger::FILE_LOGGER;
+        }
         $level = \max($level, self::NOTICE);
         $max_size = \max($max_size, 100 * 1024);
 

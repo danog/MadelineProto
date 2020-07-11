@@ -92,7 +92,7 @@ class API extends InternalDoc
     private $wrapper;
 
     /**
-     * Global session unlock callback
+     * Global session unlock callback.
      *
      * @var callback
      */
@@ -146,6 +146,7 @@ class API extends InternalDoc
 
                 unset($unserialized);
 
+                $this->API->wrapper = $this->wrapper;
                 yield from $this->API->initAsynchronously();
                 $this->APIFactory();
                 $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
@@ -163,6 +164,7 @@ class API extends InternalDoc
             $settings['app_info']['api_hash'] = $app['api_hash'];
         }
         $this->API = new MTProto($settings);
+        $this->API->wrapper = $this->wrapper;
         yield from $this->API->initAsynchronously();
         $this->APIFactory();
         $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
@@ -186,14 +188,18 @@ class API extends InternalDoc
     {
         $this->init();
         if (!$this->oldInstance) {
-            $this->logger->logger('Shutting down MadelineProto (API)');
+            $this->logger->logger('Shutting down MadelineProto ('.\explode('\\', \get_class($this))[2].')');
             if ($this->API) {
                 $this->API->destructing = true;
                 $this->API->unreference();
             }
             $this->destructing = true;
-            Tools::wait($this->wrapper->serialize());
-            if ($this->unlock) ($this->unlock)();
+            if (isset($this->wrapper)) {
+                Tools::wait($this->wrapper->serialize());
+            }
+            if ($this->unlock) {
+                ($this->unlock)();
+            }
         } else {
             $this->logger->logger('Shutting down MadelineProto (old deserialized instance of API)');
         }

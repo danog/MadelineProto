@@ -1,9 +1,22 @@
 <?php
 
+\define('MADELINE_PHP', __FILE__);
+
 function ___install_madeline()
 {
     if (\count(\debug_backtrace(0)) === 1) {
-        die('You must include this file in another PHP script'.PHP_EOL);
+        if (isset($GLOBALS['argv']) && !empty($GLOBALS['argv'])) {
+            $arguments = $GLOBALS['argv'];
+        } elseif (isset($_GET['argv']) && !empty($_GET['argv'])) {
+            $arguments = $_GET['argv'];
+        } else {
+            $arguments = [];
+        }
+        if (isset($arguments[1]) && $arguments[1] === 'madeline-ipc') {
+            \define(\MADELINE_WORKER_START::class, $arguments[2]);
+        } else {
+            die('You must include this file in another PHP script'.PHP_EOL);
+        }
     }
     $old = false;
     if (PHP_MAJOR_VERSION === 5) {

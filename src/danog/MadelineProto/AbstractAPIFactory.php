@@ -168,7 +168,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
             $name = $this->namespace.$name;
             $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
             $aargs['apifactory'] = true;
-            $aargs['datacenter'] = $this->API->datacenter->curdc;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
             return yield from $this->API->methodCallAsyncRead($name, $args, $aargs);
         }

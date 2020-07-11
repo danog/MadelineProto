@@ -29,7 +29,7 @@ trait PrettyException
      *
      * @var string
      */
-    public $tl_trace = '';
+    public $tlTrace = '';
     /**
      * Method name.
      *
@@ -63,7 +63,18 @@ trait PrettyException
      */
     public function getTLTrace(): string
     {
-        return $this->tl_trace;
+        return $this->tlTrace;
+    }
+    /**
+     * Set TL trace.
+     *
+     * @param string $tlTrace TL trace
+     *
+     * @return void
+     */
+    public function setTLTrace(string $tlTrace): void
+    {
+        $this->tlTrace = $tlTrace;
     }
     /**
      * Generate async trace.
@@ -76,8 +87,8 @@ trait PrettyException
     public function prettifyTL(string $init = '', array $trace = null)
     {
         $this->method = $init;
-        $previous_trace = $this->tl_trace;
-        $this->tl_trace = '';
+        $previous_trace = $this->tlTrace;
+        $this->tlTrace = '';
         $eol = PHP_EOL;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             $eol = '<br>'.PHP_EOL;
@@ -86,30 +97,30 @@ trait PrettyException
         foreach (\array_reverse($trace ?? $this->getTrace()) as $k => $frame) {
             if (isset($frame['function']) && \in_array($frame['function'], ['serializeParams', 'serializeObject'])) {
                 if (($frame['args'][2] ?? '') !== '') {
-                    $this->tl_trace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:  \t".$frame['args'][2];
+                    $this->tlTrace .= $tl ? "['".$frame['args'][2]."']" : "While serializing:  \t".$frame['args'][2];
                     $tl = true;
                 }
             } else {
                 if ($tl) {
-                    $this->tl_trace .= $eol;
+                    $this->tlTrace .= $eol;
                 }
                 if (isset($frame['function']) && ($frame['function'] === 'handle_rpc_error' && $k === \count($this->getTrace()) - 1) || $frame['function'] === 'unserialize') {
                     continue;
                 }
-                $this->tl_trace .= isset($frame['file']) ? \str_pad(\basename($frame['file']).'('.$frame['line'].'):', 20)."\t" : '';
-                $this->tl_trace .= isset($frame['function']) ? $frame['function'].'(' : '';
-                $this->tl_trace .= isset($frame['args']) ? \substr(\json_encode($frame['args']), 1, -1) : '';
-                $this->tl_trace .= ')';
-                $this->tl_trace .= $eol;
+                $this->tlTrace .= isset($frame['file']) ? \str_pad(\basename($frame['file']).'('.$frame['line'].'):', 20)."\t" : '';
+                $this->tlTrace .= isset($frame['function']) ? $frame['function'].'(' : '';
+                $this->tlTrace .= isset($frame['args']) ? \substr(\json_encode($frame['args']), 1, -1) : '';
+                $this->tlTrace .= ')';
+                $this->tlTrace .= $eol;
                 $tl = false;
             }
         }
-        $this->tl_trace .= $init !== '' ? "['".$init."']" : '';
-        $this->tl_trace = \implode($eol, \array_reverse(\explode($eol, $this->tl_trace)));
+        $this->tlTrace .= $init !== '' ? "['".$init."']" : '';
+        $this->tlTrace = \implode($eol, \array_reverse(\explode($eol, $this->tlTrace)));
         if ($previous_trace) {
-            $this->tl_trace .= $eol.$eol;
-            $this->tl_trace .= "Previous TL trace:{$eol}";
-            $this->tl_trace .= $previous_trace;
+            $this->tlTrace .= $eol.$eol;
+            $this->tlTrace .= "Previous TL trace:{$eol}";
+            $this->tlTrace .= $previous_trace;
         }
     }
 }

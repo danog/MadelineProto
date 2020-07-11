@@ -108,6 +108,9 @@ class Snitch
      */
     private function die(): void
     {
-        die('Please do not remove madeline.phar, madeline.php and MadelineProto.log, or else MadelineProto will crash. If you have any problem with MadelineProto, report it to https://github.com/danog/MadelineProto or https://t.me/pwrtelegramgroup');
+        Shutdown::removeCallback('restarter');
+        $message = "Please do not remove madeline.phar, madeline.php and MadelineProto.log, or else MadelineProto will crash. If you have any problem with MadelineProto, report it to https://github.com/danog/MadelineProto or https://t.me/pwrtelegramgroup";
+        Logger::log($message, Logger::FATAL_ERROR);
+        die("$message\n");
     }
 }

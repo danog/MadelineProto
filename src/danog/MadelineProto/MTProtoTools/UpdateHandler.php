@@ -95,7 +95,7 @@ trait UpdateHandler
             if (!$params['timeout']) {
                 $params['timeout'] = 0.001;
             }
-            yield \danog\MadelineProto\Tools::first([$this->waitUpdate(), \danog\MadelineProto\Tools::sleep($params['timeout'])]);
+            yield $this->waitUpdate();
         }
         if (empty($this->updates)) {
             return [];

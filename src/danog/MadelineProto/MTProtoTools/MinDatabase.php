@@ -128,11 +128,11 @@ class MinDatabase implements TLCallback
                 }
             }
             $frames = \array_reverse($frames);
-            $tl_trace = \array_shift($frames);
+            $tlTrace = \array_shift($frames);
             foreach ($frames as $frame) {
-                $tl_trace .= "['".$frame."']";
+                $tlTrace .= "['".$frame."']";
             }
-            $this->API->logger->logger($tl_trace, \danog\MadelineProto\Logger::ERROR);
+            $this->API->logger->logger($tlTrace, \danog\MadelineProto\Logger::ERROR);
             return false;
         }
         $peers = [];

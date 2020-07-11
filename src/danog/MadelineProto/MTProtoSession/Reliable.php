@@ -19,21 +19,17 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
-use Amp\Loop;
-use danog\MadelineProto\Logger;
-use danog\MadelineProto\MTProto;
-
 /**
  * Manages responses.
  */
 trait Reliable
 {
     /**
-     * Send state info for message IDs
+     * Send state info for message IDs.
      *
      * @param string|int $req_msg_id Message ID of msgs_state_req that initiated this
      * @param array      $msg_ids    Message IDs to send info about
-     * 
+     *
      * @return \Generator
      */
     public function sendMsgsStateInfo($req_msg_id, array $msg_ids): \Generator
