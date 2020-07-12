@@ -224,7 +224,7 @@ class Logger
                     10*1000,
                     function () use ($max_size) {
                         \clearstatcache(true, $this->optional);
-                        if (\filesize($this->optional) >= $max_size) {
+                        if (\file_exists($this->optional) && \filesize($this->optional) >= $max_size) {
                             $this->stdout = null;
                             \unlink($this->optional);
                             $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a'));

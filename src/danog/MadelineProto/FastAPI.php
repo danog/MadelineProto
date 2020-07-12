@@ -115,7 +115,9 @@ class FastAPI extends API
             $API = new API($session->getSessionPath(), $settings);
             yield from $API->initAsynchronously();
             unset($API);
+            Logger::log("Destroying temporary MadelineProto...");
             while (\gc_collect_cycles());
+            Logger::log("Destroyed temporary MadelineProto!");
             return null; // Should start IPC server
         }
         return yield from $this->tryConnect($session->getIpcPath());
