@@ -6,16 +6,17 @@ function ___install_madeline()
 {
     if (\count(\debug_backtrace(0)) === 1) {
         if (isset($GLOBALS['argv']) && !empty($GLOBALS['argv'])) {
-            $arguments = $GLOBALS['argv'];
+            $arguments = array_slice($GLOBALS['argv'], 1);
         } elseif (isset($_GET['argv']) && !empty($_GET['argv'])) {
             $arguments = $_GET['argv'];
         } else {
             $arguments = [];
         }
-        if (isset($arguments[1]) && $arguments[1] === 'madeline-ipc') {
-            \define(\MADELINE_WORKER_START::class, $arguments[2]);
+        if (count($arguments) >= 2) {
+            \define(\MADELINE_WORKER_TYPE::class, array_shift($arguments));
+            \define(\MADELINE_WORKER_ARGS::class, $arguments);
         } else {
-            die('You must include this file in another PHP script'.PHP_EOL);
+            die('MadelineProto loader: you must include this file in another PHP script, see https://docs.madelineproto.xyz for more info.'.PHP_EOL);
         }
     }
     $old = false;

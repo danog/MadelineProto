@@ -70,6 +70,7 @@
         "files": [
             "src/BigIntegor.php",
             "src/YieldReturnValue.php",
+            "src/danog/MadelineProto/Ipc/Runner/entry.php",
             "src/polyfill.php"
         ]
     },

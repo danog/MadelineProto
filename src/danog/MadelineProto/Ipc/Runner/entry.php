@@ -24,23 +24,31 @@ use danog\MadelineProto\Magic;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
 
-(static function () use (&$argv): void {
-    $ipcPath = null;
-    if (\defined(\MADELINE_WORKER_START::class)) {
-        $ipcPath = \MADELINE_WORKER_START;
-    } elseif (\count(\debug_backtrace(0)) === 1) {
+(static function (): void {
+    if (\defined(\MADELINE_ENTRY::class)) {
+        // Already called
+        return;
+    }
+    \define(\MADELINE_ENTRY::class, 1);
+    if (!\defined(\MADELINE_WORKER_TYPE::class)) {
+        if (\count(\debug_backtrace(0)) !== 1) {
+            // We're not being included directly
+            return;
+        }
+        $arguments = [];
         if (isset($GLOBALS['argv']) && !empty($GLOBALS['argv'])) {
-            $arguments = $GLOBALS['argv'];
+            $arguments = \array_slice($GLOBALS['argv'], 1);
         } elseif (isset($_GET['argv']) && !empty($_GET['argv'])) {
             $arguments = $_GET['argv'];
-        } else {
-            return;
         }
-        if (isset($arguments[1]) && $arguments[1] === 'madeline-ipc') {
-            $ipcPath = $arguments[2];
-        } else {
-            return;
+        if (\count($arguments) < 2) {
+            \trigger_error("Not enough arguments!", E_USER_ERROR);
+            exit(1);
         }
+        \define(\MADELINE_WORKER_TYPE::class, \array_shift($arguments));
+        \define(\MADELINE_WORKER_ARGS::class, $arguments);
+    }
+    if (!\class_exists(API::class)) {
         $paths = [
             \dirname(__DIR__, 7)."/autoload.php",
             \dirname(__DIR__, 5)."/vendor/autoload.php",
@@ -60,8 +68,8 @@ use danog\MadelineProto\Tools;
 
         include $autoloadPath;
     }
-
-    if ($ipcPath) {
+    if (\MADELINE_WORKER_TYPE === 'madeline-ipc') {
+        $ipcPath = \MADELINE_WORKER_ARGS[0];
         if (!\file_exists($ipcPath)) {
             \trigger_error("IPC session $ipcPath does not exist!", E_USER_ERROR);
             exit(1);

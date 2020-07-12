@@ -56,6 +56,7 @@ trait Loop
             $this->logger->logger($needs_restart ? 'Will self-restart' : 'Will not self-restart');
             if ($needs_restart) {
                 $this->logger->logger("Adding restart callback!");
+                $logger = $this->logger;
                 $id = Shutdown::addCallback(static function () use (&$logger) {
                     $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
                     $port = $_SERVER['SERVER_PORT'];

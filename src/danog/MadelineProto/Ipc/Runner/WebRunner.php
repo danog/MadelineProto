@@ -10,13 +10,11 @@ final class WebRunner extends RunnerAbstract
 {
     /** @var string|null Cached path to the runner script. */
     private static $runPath;
-    /**
-     * Initialization payload.
-     *
-     * @var array
-     */
-    private $params;
 
+    /**
+     * Resources
+     */
+    private static array $resources = [];
     /**
      * Socket.
      *
@@ -46,7 +44,7 @@ final class WebRunner extends RunnerAbstract
             if (!$rootDir) {
                 throw new ContextException('Could not get entry file!');
             }
-            $rootDir = \dirname($rootDir);
+            $rootDir = \dirname($rootDir).DIRECTORY_SEPARATOR;
             $uriDir = \dirname($uri);
 
             if (\substr($rootDir, -\strlen($uriDir)) !== $uriDir) {
@@ -78,12 +76,12 @@ final class WebRunner extends RunnerAbstract
             self::$runPath = \str_replace('//', '/', self::$runPath);
         }
 
-        $this->params = [
-            'argv' => ['pony', 'madeline-ipc', $session],
+        $params = [
+            'argv' => ['madeline-ipc', $session],
             'cwd' => Magic::getcwd()
         ];
 
-        $params = \http_build_query($this->params);
+        $params = \http_build_query($params);
 
         $address = ($_SERVER['HTTPS'] ?? false ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
         $port = $_SERVER['SERVER_PORT'];
@@ -95,6 +93,6 @@ final class WebRunner extends RunnerAbstract
         // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
         // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
         \fwrite($res = \fsockopen($address, $port), $payload);
-        \fclose($res);
+        self::$resources []= $res;
     }
 }

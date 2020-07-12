@@ -188,7 +188,7 @@ class API extends InternalDoc
     {
         $this->init();
         if (!$this->oldInstance) {
-            $this->logger->logger('Shutting down MadelineProto ('.\explode('\\', \get_class($this))[2].')');
+            $this->logger->logger('Shutting down MadelineProto ('.static::class.')');
             if ($this->API) {
                 $this->API->destructing = true;
                 $this->API->unreference();
