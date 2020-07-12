@@ -35,7 +35,7 @@ trait Start
     public function start(): \Generator
     {
         if ((yield $this->getAuthorization()) === MTProto::LOGGED_IN) {
-            return yield from $this->fullGetSelf();
+            return $this instanceof \danog\MadelineProto\Ipc\Client ? yield from $this->getSelf() : yield from $this->fullGetSelf();
         }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             if (\strpos(yield Tools::readLine('Do you want to login as user or bot (u/b)? '), 'b') !== false) {

@@ -133,6 +133,7 @@ class FastAPI extends API
     {
         Logger::log("Trying to connect to IPC socket...");
         try {
+            \clearstatcache(true, $ipcPath);
             return yield connect($ipcPath);
         } catch (\Throwable $e) {
             $e = $e->getMessage();

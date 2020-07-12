@@ -37,7 +37,7 @@ final class ProcessRunner extends RunnerAbstract
             \escapeshellarg($session),
             '&>/dev/null &'
         ]);
-        \shell_exec($command);
+        \proc_close(\proc_open($command, [], $foo));
     }
     private static function locateBinary(): string
     {
