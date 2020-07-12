@@ -228,8 +228,8 @@ class Logger
                             $this->stdout = null;
                             \unlink($this->optional);
                             $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a'));
+                            $this->logger("Automatically truncated logfile to $max_size");
                         }
-                        $this->logger("Automatically truncated logfile to $max_size");
                     }
                 );
                 Loop::unreference($this->rotateId);

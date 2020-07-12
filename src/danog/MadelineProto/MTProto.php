@@ -1317,7 +1317,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             'logger' => (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') ? Logger::ECHO_LOGGER : Logger::FILE_LOGGER,
             // overwrite previous setting and echo logs
             'logger_level' => Logger::VERBOSE,
-            'max_size' => 10 * 1024 * 1024,
+            'max_size' => 1 * 1024 * 1024,
             // Logging level, available logging levels are: ULTRA_VERBOSE, VERBOSE, NOTICE, WARNING, ERROR, FATAL_ERROR. Can be provided as last parameter to the logging function.
         ], 'max_tries' => [
             'query' => 5,
