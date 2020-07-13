@@ -1082,7 +1082,7 @@ trait Files
         ];
         if ($seek_start > 0 || $seek_end < $size - 1) {
             $result['code'] = Status::PARTIAL_CONTENT;
-            $result['headers']['Content-Range'] = "bytes ${seek_start}-${seek_end}/${$size}";
+            $result['headers']['Content-Range'] = "bytes ${seek_start}-${seek_end}/${size}";
             $result['headers']['Content-Length'] = $seek_end - $seek_start + 1;
         } elseif ($size > 0) {
             $result['headers']['Content-Length'] = $size;
