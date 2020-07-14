@@ -38,7 +38,6 @@ use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -927,13 +926,13 @@ trait Files
         }
 
         $messageMedia = yield from $this->getDownloadInfo($messageMedia);
-        $result = self::parseHeaders(
+        $result = ResponseInfo::parseHeaders(
             $_SERVER['REQUEST_METHOD'],
             $headers,
             $messageMedia
         );
 
-        foreach ($result['headers'] as $key => $value) {
+        foreach ($result->getHeaders() as $key => $value) {
             if (\is_array($value)) {
                 foreach ($value as $subValue) {
                     \header("$key: $subValue", false);
@@ -942,14 +941,14 @@ trait Files
                 \header("$key: $value");
             }
         }
-        \http_response_code($result['code']);
+        \http_response_code($result->getCode());
 
-        if (!\in_array($result['code'], [Status::OK, Status::PARTIAL_CONTENT])) {
-            yield Tools::echo(self::getExplanation($result['code']));
-        } elseif ($result['serve']) {
+        if (!\in_array($result->getCode(), [Status::OK, Status::PARTIAL_CONTENT])) {
+            yield Tools::echo($result->getCodeExplanation());
+        } elseif ($result->shouldServe()) {
             \ob_end_flush();
             \ob_implicit_flush();
-            yield from $this->downloadToStream($messageMedia, \fopen('php://output', 'w'), $cb, ...$result['serve']);
+            yield from $this->downloadToStream($messageMedia, \fopen('php://output', 'w'), $cb, ...$result->getServeRange());
         }
     }
     /**
@@ -972,14 +971,14 @@ trait Files
 
         $messageMedia = yield from $this->getDownloadInfo($messageMedia);
 
-        $result = self::parseHeaders(
+        $result = ResponseInfo::parseHeaders(
             $request->getMethod(),
             \array_map(fn (array $headers) => $headers[0], $request->getHeaders()),
             $messageMedia
         );
 
         $body = null;
-        if ($result['serve']) {
+        if ($result->shouldServe()) {
             $body = new IteratorStream(
                 new Producer(
                     function (callable $emit) use (&$messageMedia, &$cb, &$result) {
@@ -987,120 +986,20 @@ trait Files
                             yield $emit($payload);
                             return \strlen($payload);
                         };
-                        yield Tools::call($this->downloadToCallable($messageMedia, $emit, $cb, false, ...$result['serve']));
+                        yield Tools::call($this->downloadToCallable($messageMedia, $emit, $cb, false, ...$result->getServeRange()));
                     }
                 )
             );
-        } elseif (!\in_array($result['code'], [Status::OK, Status::PARTIAL_CONTENT])) {
-            $body = self::getExplanation($result['code']);
+        } elseif (!\in_array($result->getCode(), [Status::OK, Status::PARTIAL_CONTENT])) {
+            $body = $result->getCodeExplanation();
         }
 
-        $response = new Response($result['code'], $result['headers'], $body);
-        if ($result['serve'] && !empty($result['headers']['Content-Length'])) {
-            $response->setHeader('content-length', $result['headers']['Content-Length']);
+        $response = new Response($result->getCode(), $result->getHeaders(), $body);
+        if ($result->shouldServe() && !empty($result->getHeaders()['Content-Length'])) {
+            $response->setHeader('content-length', $result->getHeaders()['Content-Length']);
         }
 
         return $response;
-    }
-    /**
-     * Get explanation for HTTP error.
-     *
-     * @param integer $code HTTP error code
-     *
-     * @return string
-     */
-    private static function getExplanation(int $code): string
-    {
-        $reason = Status::getReason($code);
-        $body = "<html><body><h1>$code $reason</h1><br>";
-        if ($code === Status::RANGE_NOT_SATISFIABLE) {
-            $body .= "<p>Could not use selected range.</p>";
-        }
-        $body .= MTProto::POWERED_BY;
-        $body .= "</body></html>";
-        return $body;
-    }
-    /**
-     * Parse headers.
-     *
-     * @param string $method       HTTP method
-     * @param array  $headers      HTTP headers
-     * @param array  $messageMedia Media info
-     *
-     * @internal
-     *
-     * @return array Info about headers
-     */
-    private static function parseHeaders(string $method, array $headers, array $messageMedia): array
-    {
-        if (isset($headers['range'])) {
-            $range = \explode('=', $headers['range'], 2);
-            if (\count($range) == 1) {
-                $range[1] = '';
-            }
-            [$size_unit, $range_orig] = $range;
-            if ($size_unit == 'bytes') {
-                //multiple ranges could be specified at the same time, but for simplicity only serve the first range
-                //http://tools.ietf.org/id/draft-ietf-http-range-retrieval-00.txt
-                $list = \explode(',', $range_orig, 2);
-                if (\count($list) == 1) {
-                    $list[1] = '';
-                }
-                [$range, $extra_ranges] = $list;
-            } else {
-                return [
-                    'serve' => false,
-                    'code' => Status::RANGE_NOT_SATISFIABLE,
-                    'headers' => self::NO_CACHE
-                ];
-            }
-        } else {
-            $range = '';
-        }
-        $listseek = \explode('-', $range, 2);
-        if (\count($listseek) == 1) {
-            $listseek[1] = '';
-        }
-        [$seek_start, $seek_end] = $listseek;
-
-        $size = $messageMedia['size'] ?? 0;
-        $seek_end = empty($seek_end) ? ($size - 1) : \min(\abs(\intval($seek_end)), $size - 1);
-
-        if (!empty($seek_start) && $seek_end < \abs(\intval($seek_start))) {
-            return [
-                'serve' => false,
-                'code' => Status::RANGE_NOT_SATISFIABLE,
-                'headers' => self::NO_CACHE
-            ];
-        }
-        $seek_start = empty($seek_start) ? 0 : \abs(\intval($seek_start));
-
-        $result = [
-            'serve' => $method !== 'HEAD',
-            'code' => Status::OK,
-            'headers' => []
-        ];
-        if ($seek_start > 0 || $seek_end < $size - 1) {
-            $result['code'] = Status::PARTIAL_CONTENT;
-            $result['headers']['Content-Range'] = "bytes ${seek_start}-${seek_end}/${$size}";
-            $result['headers']['Content-Length'] = $seek_end - $seek_start + 1;
-        } elseif ($size > 0) {
-            $result['headers']['Content-Length'] = $size;
-        }
-        $result['headers']['Content-Type'] = $messageMedia['mime'];
-        $result['headers']['Cache-Control'] = 'max-age=31556926';
-        $result['headers']['Content-Transfer-Encoding'] = 'Binary';
-        $result['headers']['Accept-Ranges'] = 'bytes';
-
-        if ($result['serve']) {
-            if ($seek_start === 0 && $seek_end === -1) {
-                $result['serve'] = [0, -1];
-            } else {
-                $result['serve'] = [$seek_start, $seek_end + 1];
-            }
-        }
-
-        return $result;
     }
     /**
      * Download file to directory.
