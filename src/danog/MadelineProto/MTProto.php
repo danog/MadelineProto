@@ -1007,8 +1007,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->startLoops();
         if (yield from $this->fullGetSelf()) {
             $this->authorized = self::LOGGED_IN;
-            yield from $this->getCdnConfig($this->datacenter->curdc);
             $this->setupLogger();
+            yield from $this->getCdnConfig($this->datacenter->curdc);
+            yield from $this->initAuthorization();
         }
         $this->startUpdateSystem(true);
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings['peer']['cache_all_peers_on_startup']) {
@@ -1164,7 +1165,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             $lang_pack = 'android';
         }
         // Detect app version
-        $app_version = self::RELEASE.' ('.self::V.', '.Magic::$revision.')';
+        $app_version = self::RELEASE.' ('.self::V.', '.str_replace(' (AN UPDATE IS REQUIRED)', '', Magic::$revision).')';
         if (($settings['app_info']['api_id'] ?? 0) === 6) {
             // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
             // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
@@ -1490,7 +1491,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             return false;
         }
         foreach ($this->datacenter->getDataCenterConnections() as $dc) {
-            if (!$dc->isAuthorized() || !$dc->hasTempAuthKey()) {
+            if ((!$dc->isAuthorized() || !$dc->hasTempAuthKey()) && !$dc->isCDN()) {
                 return false;
             }
         }

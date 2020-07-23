@@ -102,6 +102,10 @@ trait AuthKeyHandler
                     }
                 }
                 if (!isset($key)) {
+                    if ($cdn) {
+                        $this->logger->logger("Could not find required CDN public key, postponing CDN handshake...");
+                        return;
+                    }
                     throw new \danog\MadelineProto\SecurityException("Couldn't find any of our keys in the server_public_key_fingerprints vector.");
                 }
                 $pq_bytes = $ResPQ['pq'];

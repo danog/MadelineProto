@@ -436,9 +436,9 @@ class DataCenter
         /* @var $context \Amp\ConnectContext */
         $context = $context ?? (new ConnectContext())->withMaxAttempts(1)->withConnectTimeout(1000 * $this->settings[$dc_config_number]['timeout']);
         foreach ($combos as $combo) {
-            $ipv6 = [$this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4', $this->settings[$dc_config_number]['ipv6'] ? 'ipv4' : 'ipv6'];
-            foreach ($ipv6 as $ipv6) {
-                foreach ([true, false] as $useDoH) {
+            foreach ([true, false] as $useDoH) {
+                $ipv6Combos = [$this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4', $this->settings[$dc_config_number]['ipv6'] ? 'ipv4' : 'ipv6'];
+                foreach ($ipv6Combos as $ipv6) {
                     // This is only for non-MTProto connections
                     if (!$dc_number) {
                         /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
@@ -467,6 +467,9 @@ class DataCenter
                     foreach (\array_unique([$port, 443, 80, 88, 5222]) as $port) {
                         $stream = \end($combo)[0];
                         if ($stream === HttpsStream::getName()) {
+                            if (\strpos($dc_number, '_cdn') !== false) {
+                                continue;
+                            }
                             $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\\D+/', '', $dc_number)];
                             if (\strpos($dc_number, '_media') !== false) {
                                 $subdomain .= '-1';
@@ -512,9 +515,6 @@ class DataCenter
                     }
                 }
             }
-        }
-        if (isset($this->dclist[$test][$ipv6][$dc_number.'_bk']['ip_address'])) {
-            $ctxs = \array_merge($ctxs, $this->generateContexts($dc_number.'_bk'));
         }
         if (empty($ctxs)) {
             unset($this->sockets[$dc_number]);
