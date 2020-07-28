@@ -85,10 +85,6 @@ class FeedLoop extends ResumableSignalLoop
                 return;
             }
         }
-        yield (function (): \Generator {
-            yield delay(1);
-            return 1;
-        })();
         $this->state = $this->channelId === self::GENERIC ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
