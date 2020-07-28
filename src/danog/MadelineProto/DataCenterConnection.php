@@ -22,7 +22,7 @@ namespace danog\MadelineProto;
 use Amp\Deferred;
 use Amp\Promise;
 use Amp\Success;
-use danog\MadelineProto\Loop\Generic\PeriodicLoop;
+use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\MTProto\AuthKey;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
@@ -99,10 +99,8 @@ class DataCenterConnection implements JsonSerializable
     private $linked;
     /**
      * Loop to keep weights at sane value.
-     *
-     * @var \danog\MadelineProto\Loop\Generic\PeriodicLoop
      */
-    private $robinLoop;
+    private ?PeriodicLoopInternal $robinLoop = null;
     /**
      * Decrement roundrobin weight by this value if busy reading.
      *
@@ -366,7 +364,7 @@ class DataCenterConnection implements JsonSerializable
         $count = $media ? $this->API->settings['connection_settings']['media_socket_count']['min'] : 1;
         if ($count > 1) {
             if (!$this->robinLoop) {
-                $this->robinLoop = new PeriodicLoop($this->API, [$this, 'even'], "robin loop DC {$this->datacenter}", $this->API->settings['connection_settings']['robin_period']);
+                $this->robinLoop = new PeriodicLoopInternal($this->API, [$this, 'even'], "robin loop DC {$this->datacenter}", $this->API->settings['connection_settings']['robin_period'] * 1000);
             }
             $this->robinLoop->start();
         }

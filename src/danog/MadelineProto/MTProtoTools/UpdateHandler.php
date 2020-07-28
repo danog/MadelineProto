@@ -23,6 +23,8 @@ use Amp\Deferred;
 use Amp\Http\Client\Request;
 use Amp\Loop;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Loop\Update\FeedLoop;
+use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\RPCErrorException;
 
 /**
@@ -189,9 +191,9 @@ trait UpdateHandler
     {
         if (!$this->got_state) {
             $this->got_state = true;
-            $this->channels_state->get(false, yield from $this->getUpdatesState());
+            $this->channels_state->get(0, yield from $this->getUpdatesState());
         }
-        return $this->channels_state->get(false);
+        return $this->channels_state->get(0);
     }
     /**
      * Load channel state.
@@ -256,7 +258,7 @@ trait UpdateHandler
                 $result = [];
                 foreach ($updates['updates'] as $key => $update) {
                     if ($update['_'] === 'updateNewMessage' || $update['_'] === 'updateReadMessagesContents' || $update['_'] === 'updateEditMessage' || $update['_'] === 'updateDeleteMessages' || $update['_'] === 'updateReadHistoryInbox' || $update['_'] === 'updateReadHistoryOutbox' || $update['_'] === 'updateWebPage' || $update['_'] === 'updateMessageID') {
-                        $result[yield from $this->feeders[false]->feedSingle($update)] = true;
+                        $result[yield from $this->feeders[FeedLoop::GENERIC]->feedSingle($update)] = true;
                         unset($updates['updates'][$key]);
                     }
                 }
@@ -272,7 +274,7 @@ trait UpdateHandler
                 $this->seqUpdater->resume();
                 break;
             case 'updateShort':
-                $this->feeders[yield from $this->feeders[false]->feedSingle($updates['update'])]->resume();
+                $this->feeders[yield from $this->feeders[FeedLoop::GENERIC]->feedSingle($updates['update'])]->resume();
                 break;
             case 'updateShortSentMessage':
                 if (!isset($updates['request']['body'])) {
@@ -287,7 +289,7 @@ trait UpdateHandler
                 $from_id = isset($updates['from_id']) ? $updates['from_id'] : ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 if (!((yield from $this->peerIsset($from_id)) || !((yield from $this->peerIsset($to_id)) || isset($updates['via_bot_id']) && !((yield from $this->peerIsset($updates['via_bot_id'])) || isset($updates['entities']) && !((yield from $this->entitiesPeerIsset($updates['entities'])) || isset($updates['fwd_from']) && !(yield from $this->fwdPeerIsset($updates['fwd_from']))))))) {
-                    yield $this->updaters[false]->resume();
+                    yield $this->updaters[FeedLoop::GENERIC]->resume();
                     return;
                 }
                 $message = $updates;
@@ -305,10 +307,10 @@ trait UpdateHandler
                     break;
                 }
                 $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
-                $this->feeders[yield from $this->feeders[false]->feedSingle($update)]->resume();
+                $this->feeders[yield from $this->feeders[FeedLoop::GENERIC]->feedSingle($update)]->resume();
                 break;
             case 'updatesTooLong':
-                $this->updaters[false]->resume();
+                $this->updaters[UpdateLoop::GENERIC]->resume();
                 break;
             default:
                 throw new \danog\MadelineProto\ResponseException('Unrecognized update received: '.\var_export($updates, true));
@@ -389,7 +391,7 @@ trait UpdateHandler
                 }
                 if ($update['qts'] > $cur_state->qts() + 1) {
                     $this->logger->logger('Qts hole. Fetching updates manually: update qts: '.$update['qts'].' > current qts '.$cur_state->qts().'+1, chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::ERROR);
-                    $this->updaters[false]->resumeDefer();
+                    $this->updaters[UpdateLoop::GENERIC]->resumeDefer();
                     return false;
                 }
                 $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);

@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\SecretChats;
 
+use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
 
 /**
@@ -95,7 +96,7 @@ trait AuthKeyHandler
         $this->checkG($g_a, $dh_config['p']);
         $res = yield from $this->methodCallAsyncRead('messages.requestEncryption', ['user_id' => $user, 'g_a' => $g_a->toBytes()], ['datacenter' => $this->datacenter->curdc]);
         $this->temp_requested_secret_chats[$res['id']] = $a;
-        $this->updaters[false]->resume();
+        $this->updaters[UpdateLoop::GENERIC]->resume();
         $this->logger->logger('Secret chat '.$res['id'].' requested successfully!', \danog\MadelineProto\Logger::NOTICE);
         return $res['id'];
     }
@@ -163,7 +164,7 @@ trait AuthKeyHandler
         $this->temp_rekeyed_secret_chats[$e] = $a;
         $this->secret_chats[$chat]['rekeying'] = [1, $e];
         yield from $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionRequestKey', 'g_a' => $g_a->toBytes(), 'exchange_id' => $e]]], ['datacenter' => $this->datacenter->curdc]);
-        $this->updaters[false]->resume();
+        $this->updaters[UpdateLoop::GENERIC]->resume();
         return $e;
     }
     /**
@@ -203,7 +204,7 @@ trait AuthKeyHandler
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         $this->checkG($g_b, $dh_config['p']);
         yield from $this->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $chat, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAcceptKey', 'g_b' => $g_b->toBytes(), 'exchange_id' => $params['exchange_id'], 'key_fingerprint' => $key['fingerprint']]]], ['datacenter' => $this->datacenter->curdc]);
-        $this->updaters[false]->resume();
+        $this->updaters[UpdateLoop::GENERIC]->resume();
     }
     /**
      * Commit rekeying of secret chat.
@@ -238,7 +239,7 @@ trait AuthKeyHandler
         $this->secret_chats[$chat]['key'] = $key;
         $this->secret_chats[$chat]['ttr'] = 100;
         $this->secret_chats[$chat]['updated'] = \time();
-        $this->updaters[false]->resume();
+        $this->updaters[UpdateLoop::GENERIC]->resume();
     }
     /**
      * Complete rekeying.

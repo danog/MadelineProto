@@ -19,30 +19,60 @@
 
 namespace danog\MadelineProto\Loop\Update;
 
-use Amp\Loop;
-use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use danog\Loop\ResumableSignalLoop;
+use danog\MadelineProto\Loop\InternalLoop;
+use danog\MadelineProto\MTProto;
+
+use function Amp\delay;
 
 /**
- * update feed loop.
+ * Update feed loop.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 class FeedLoop extends ResumableSignalLoop
 {
-    private $incomingUpdates = [];
-    private $parsedUpdates = [];
-    private $channelId;
+    use InternalLoop {
+        __construct as private init;
+    }
+    /**
+     * Main loop ID.
+     */
+    const GENERIC = 0;
+    /**
+     * Incoming updates array.
+     */
+    private array $incomingUpdates = [];
+    /**
+     * Parsed updates array.
+     */
+    private array $parsedUpdates = [];
+    /**
+     * Channel ID.
+     */
+    private int $channelId;
     /**
      * Update loop.
      *
      * @var UpdateLoop
      */
-    private $updater;
-    public function __construct($API, $channelId = false)
+    private ?UpdateLoop $updater = null;
+    /**
+     * Constructor.
+     *
+     * @param MTProto $API       API instance
+     * @param integer $channelId Constructor
+     */
+    public function __construct(MTProto $API, int $channelId = 0)
     {
-        $this->API = $API;
+        $this->init($API);
         $this->channelId = $channelId;
     }
+    /**
+     * Main loop.
+     *
+     * @return \Generator
+     */
     public function loop(): \Generator
     {
         $API = $this->API;
@@ -55,7 +85,11 @@ class FeedLoop extends ResumableSignalLoop
                 return;
             }
         }
-        $this->state = $this->channelId === false ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
+        yield (function (): \Generator {
+            yield delay(1);
+            return 1;
+        })();
+        $this->state = $this->channelId === self::GENERIC ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
         while (true) {
             while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
                 if (yield $this->waitSignal($this->pause())) {
@@ -145,11 +179,11 @@ class FeedLoop extends ResumableSignalLoop
     }
     public function feedSingle(array $update): \Generator
     {
-        $channelId = false;
+        $channelId = self::GENERIC;
         switch ($update['_']) {
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
-                $channelId = isset($update['message']['to_id']['channel_id']) ? $update['message']['to_id']['channel_id'] : false;
+                $channelId = isset($update['message']['to_id']['channel_id']) ? $update['message']['to_id']['channel_id'] : self::GENERIC;
                 if (!$channelId) {
                     return false;
                 }
@@ -159,7 +193,7 @@ class FeedLoop extends ResumableSignalLoop
                 $channelId = $update['channel_id'];
                 break;
             case 'updateChannelTooLong':
-                $channelId = isset($update['channel_id']) ? $update['channel_id'] : false;
+                $channelId = isset($update['channel_id']) ? $update['channel_id'] : self::GENERIC;
                 if (!isset($update['pts'])) {
                     $update['pts'] = 1;
                 }
@@ -202,7 +236,7 @@ class FeedLoop extends ResumableSignalLoop
                     $this->API->logger->logger("Not enough data: for message update {$log}, getting difference...", \danog\MadelineProto\Logger::VERBOSE);
                     $update = ['_' => 'updateChannelTooLong'];
                     if ($channelId && $to) {
-                        $channelId = false;
+                        $channelId = self::GENERIC;
                     }
                 }
                 break;
@@ -217,7 +251,7 @@ class FeedLoop extends ResumableSignalLoop
             if (isset($this->API->feeders[$channelId])) {
                 return yield from $this->API->feeders[$channelId]->feedSingle($update);
             } elseif ($this->channelId) {
-                return yield from $this->API->feeders[false]->feedSingle($update);
+                return yield from $this->API->feeders[self::GENERIC]->feedSingle($update);
             }
         }
         $this->API->logger->logger('Was fed an update of type '.$update['_']." in {$this}...", \danog\MadelineProto\Logger::VERBOSE);
@@ -238,7 +272,7 @@ class FeedLoop extends ResumableSignalLoop
             if ($message['_'] !== 'messageEmpty') {
                 $this->API->logger->logger('Getdiff fed me message of type '.$message['_']." in {$this}...", \danog\MadelineProto\Logger::VERBOSE);
             }
-            $this->parsedUpdates[] = ['_' => $this->channelId === false ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
+            $this->parsedUpdates[] = ['_' => $this->channelId === self::GENERIC ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
         }
     }
     public function __toString(): string

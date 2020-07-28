@@ -20,10 +20,10 @@ namespace danog\MadelineProto\Ipc;
 
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
+use danog\Loop\SignalLoop;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Loop\Impl\SignalLoop;
 use danog\MadelineProto\Tools;
 
 /**

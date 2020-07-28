@@ -609,7 +609,7 @@ trait AuthKeyHandler
                     }
                     continue;
                 }
-                yield $socket->waitGetConnection();
+                yield from $socket->waitGetConnection();
                 if (isset($this->init_auth_dcs[$id])) {
                     $this->pending_auth = true;
                     continue;
@@ -620,7 +620,7 @@ trait AuthKeyHandler
             }
             if ($dcs) {
                 $first = \array_shift($dcs)();
-                yield $first;
+                yield from $first;
             }
             foreach ($dcs as $id => &$dc) {
                 $dc = $dc();

@@ -21,9 +21,8 @@ namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\ByteStream\StreamException;
 use Amp\Loop;
-use danog\MadelineProto\Connection;
+use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
 
@@ -38,32 +37,12 @@ class WriteLoop extends ResumableSignalLoop
     const MAX_SIZE = 1 << 15;
     const MAX_IDS = 8192;
 
+    use Common;
     /**
-     * Connection instance.
+     * Main loop.
      *
-     * @var \danog\MadelineProto\Connection
+     * @return \Generator
      */
-    protected $connection;
-    /**
-     * DataCenterConnection instance.
-     *
-     * @var \danog\MadelineProto\DataCenterConnection
-     */
-    protected $datacenterConnection;
-    /**
-     * DC ID.
-     *
-     * @var string
-     */
-    protected $datacenter;
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
-        $this->datacenterConnection = $connection->getShared();
-        $this->API = $connection->getExtra();
-        $ctx = $connection->getCtx();
-        $this->datacenter = $connection->getDatacenterID();
-    }
     public function loop(): \Generator
     {
         $API = $this->API;
@@ -91,7 +70,7 @@ class WriteLoop extends ResumableSignalLoop
             }
             $connection->writing(true);
             try {
-                $please_wait = yield $this->{$shared->hasTempAuthKey() ? 'encryptedWriteLoop' : 'unencryptedWriteLoop'}();
+                $please_wait = yield from $this->{$shared->hasTempAuthKey() ? 'encryptedWriteLoop' : 'unencryptedWriteLoop'}();
             } catch (StreamException $e) {
                 if ($connection->shouldReconnect()) {
                     return;
@@ -358,6 +337,11 @@ class WriteLoop extends ResumableSignalLoop
         }
         return $skipped;
     }
+    /**
+     * Get loop name.
+     *
+     * @return string
+     */
     public function __toString(): string
     {
         return "write loop in DC {$this->datacenter}";

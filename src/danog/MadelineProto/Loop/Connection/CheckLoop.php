@@ -21,8 +21,7 @@ namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\Deferred;
 use Amp\Loop;
-use danog\MadelineProto\Connection;
-use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Tools;
 
 /**
@@ -32,31 +31,12 @@ use danog\MadelineProto\Tools;
  */
 class CheckLoop extends ResumableSignalLoop
 {
+    use Common;
     /**
-     * Connection instance.
+     * Main loop.
      *
-     * @var \danog\MadelineProto\Connection
+     * @return \Generator
      */
-    protected $connection;
-    /**
-     * DC ID.
-     *
-     * @var string
-     */
-    protected $datacenter;
-    /**
-     * DataCenterConnection instance.
-     *
-     * @var \danog\MadelineProto\DataCenterConnection
-     */
-    protected $datacenterConnection;
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
-        $this->API = $connection->getExtra();
-        $this->datacenter = $connection->getDatacenterID();
-        $this->datacenterConnection = $connection->getShared();
-    }
     public function loop(): \Generator
     {
         $API = $this->API;
@@ -64,6 +44,7 @@ class CheckLoop extends ResumableSignalLoop
         $connection = $this->connection;
         $shared = $this->datacenterConnection;
         $timeout = $shared->getSettings()['timeout'];
+        $timeoutMs = $timeout * 1000;
         $timeoutResend = $timeout * $timeout;
         // Typically 25 seconds, good enough
         while (true) {
@@ -73,7 +54,7 @@ class CheckLoop extends ResumableSignalLoop
                 }
             }
             if (!$connection->hasPendingCalls()) {
-                if (yield $this->waitSignal($this->pause($timeout))) {
+                if (yield $this->waitSignal($this->pause($timeoutMs))) {
                     return;
                 }
                 continue;
@@ -161,7 +142,7 @@ class CheckLoop extends ResumableSignalLoop
                 }
                 $connection->flush();
             }
-            if (yield $this->waitSignal($this->pause($timeout))) {
+            if (yield $this->waitSignal($this->pause($timeoutMs))) {
                 return;
             }
             if ($connection->msgIdHandler->getMaxId(true) === $last_msgid && $connection->getLastChunk() === $last_chunk) {
@@ -172,6 +153,11 @@ class CheckLoop extends ResumableSignalLoop
             }
         }
     }
+    /**
+     * Loop name.
+     *
+     * @return string
+     */
     public function __toString(): string
     {
         return "check loop in DC {$this->datacenter}";

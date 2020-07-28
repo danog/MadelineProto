@@ -19,8 +19,8 @@
 
 namespace danog\MadelineProto\Wrappers;
 
-use function Amp\ByteStream\getOutputBufferStream;
 use \danog\MadelineProto\MTProto;
+use function Amp\ByteStream\getOutputBufferStream;
 
 trait Templates
 {

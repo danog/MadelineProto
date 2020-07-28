@@ -19,7 +19,8 @@
 
 namespace danog\MadelineProto\Loop\Update;
 
-use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use danog\Loop\ResumableSignalLoop;
+use danog\MadelineProto\Loop\InternalLoop;
 
 /**
  * update feed loop.
@@ -28,17 +29,28 @@ use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
  */
 class SeqLoop extends ResumableSignalLoop
 {
-    private $incomingUpdates = [];
-    private $feeder;
-    private $pendingWakeups = [];
-    public function __construct($API)
-    {
-        $this->API = $API;
-    }
+    use InternalLoop;
+    /**
+     * Incoming updates.
+     */
+    private array $incomingUpdates = [];
+    /**
+     * Update feeder.
+     */
+    private ?FeedLoop $feeder = null;
+    /**
+     * Pending updates.
+     */
+    private array $pendingWakeups = [];
+    /**
+     * Main loop.
+     *
+     * @return \Generator
+     */
     public function loop(): \Generator
     {
         $API = $this->API;
-        $this->feeder = $API->feeders[false];
+        $this->feeder = $API->feeders[FeedLoop::GENERIC];
         if (!$this->API->settings['updates']['handle_updates']) {
             return false;
         }
@@ -90,9 +102,9 @@ class SeqLoop extends ResumableSignalLoop
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
                 $this->API->logger->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), \danog\MadelineProto\Logger::ERROR);
-                yield $this->pause(1.0);
+                yield $this->pause(1000);
                 if (!$this->incomingUpdates) {
-                    yield $this->API->updaters[false]->resume();
+                    yield $this->API->updaters[UpdateLoop::GENERIC]->resume();
                 }
                 $this->incomingUpdates = \array_merge($this->incomingUpdates, [$update], $updates);
                 continue;

@@ -26,47 +26,37 @@ class UpdatesState
 {
     /**
      * PTS.
-     *
-     * @var int
      */
-    private $pts = 1;
+    private int $pts = 1;
     /**
      * QTS.
-     *
-     * @var int
      */
-    private $qts = -1;
+    private int $qts = -1;
     /**
      * Seq.
-     *
-     * @var int
      */
-    private $seq = 0;
+    private int $seq = 0;
     /**
      * Date.
-     *
-     * @var int
      */
-    private $date = 1;
+    private int $date = 1;
     /**
      * Channel ID.
      *
-     * @var int|bool
+     * @var int
      */
     private $channelId;
     /**
      * Is busy?
-     *
-     * @var bool
      */
-    private $syncLoading = false;
+    private bool $syncLoading = false;
     /**
      * Init function.
      *
      * @param array $init      Initial parameters
-     * @param bool  $channelId Channel ID
+     * @param int   $channelId Channel ID
      */
-    public function __construct($init = [], $channelId = false)
+    public function __construct(array $init = [], int $channelId = 0)
     {
         $this->channelId = $channelId;
         $this->update($init);
@@ -81,6 +71,16 @@ class UpdatesState
         return $this->channelId ? ['pts', 'channelId'] : ['pts', 'qts', 'seq', 'date', 'channelId'];
     }
     /**
+     * Wakeup function.
+     */
+    public function __wakeup()
+    {
+        /** @psalm-suppress DocblockTypeContradiction */
+        if ($this->channelId === false) {
+            $this->channelId = 0;
+        }
+    }
+    /**
      * Is this state relative to a channel?
      *
      * @return bool
@@ -92,9 +92,9 @@ class UpdatesState
     /**
      * Get the channel ID.
      *
-     * @return int|null
+     * @return int
      */
-    public function getChannel()
+    public function getChannel(): int
     {
         return $this->channelId;
     }

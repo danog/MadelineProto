@@ -19,8 +19,7 @@
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use danog\MadelineProto\Connection;
-use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use danog\Loop\ResumableSignalLoop;
 
 /**
  * HttpWait loop.
@@ -29,31 +28,12 @@ use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
  */
 class HttpWaitLoop extends ResumableSignalLoop
 {
+    use Common;
     /**
-     * Connection instance.
+     * Main loop.
      *
-     * @var \danog\MadelineProto\Connection
+     * @return \Generator
      */
-    protected $connection;
-    /**
-     * DC ID.
-     *
-     * @var string
-     */
-    protected $datacenter;
-    /**
-     * DataCenterConnection instance.
-     *
-     * @var \danog\MadelineProto\DataCenterConnection
-     */
-    protected $datacenterConnection;
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
-        $this->API = $connection->getExtra();
-        $this->datacenter = $connection->getDatacenterID();
-        $this->datacenterConnection = $connection->getShared();
-    }
     public function loop(): \Generator
     {
         $API = $this->API;
@@ -82,6 +62,11 @@ class HttpWaitLoop extends ResumableSignalLoop
             $API->logger->logger("DC {$datacenter}: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
         }
     }
+    /**
+     * Loop name.
+     *
+     * @return string
+     */
     public function __toString(): string
     {
         return "HTTP wait loop in DC {$this->datacenter}";

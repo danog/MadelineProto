@@ -35,7 +35,8 @@
         "league/uri": "^6",
         "danog/ipc": "^0.1",
         "tivie/htaccess-parser": "^0.2.3",
-        "amphp/log": "^1.1"
+        "amphp/log": "^1.1",
+        "danog/loop": "^0.1.0"
     },
     "require-dev": {
         "vlucas/phpdotenv": "^3",

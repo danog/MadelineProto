@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Loop interface.
+ * Internal loop trait.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,29 +18,29 @@
 
 namespace danog\MadelineProto\Loop;
 
+use danog\MadelineProto\InternalDoc;
+
 /**
- * Loop interface.
- *
- * @author Daniil Gentili <daniil@daniil.it>
+ * API loop trait.
  */
-interface LoopInterface
+trait APILoop
 {
+    use LoggerLoop {
+        __construct as private setLogger;
+    }
+
     /**
-     * Start the loop.
-     *
-     * @return void
+     * API instance.
      */
-    public function start();
+    protected InternalDoc $API;
     /**
-     * The actual loop.
+     * Constructor.
      *
-     * @return void
+     * @param InternalDoc $API API instance
      */
-    public function loop();
-    /**
-     * Get name of the loop.
-     *
-     * @return string
-     */
-    public function __toString(): string;
+    public function __construct(InternalDoc $API)
+    {
+        $this->API = $API;
+        $this->setLogger($API->getLogger());
+    }
 }

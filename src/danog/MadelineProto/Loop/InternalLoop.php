@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Update feeder loop.
+ * Internal loop trait.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -17,33 +16,28 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Loop\Generic;
+namespace danog\MadelineProto\Loop;
 
-use danog\Loop\Generic\PeriodicLoop as GenericPeriodicLoop;
-use danog\MadelineProto\InternalDoc;
-use danog\MadelineProto\Loop\APILoop;
+use danog\MadelineProto\MTProto;
 
-/**
- * {@inheritDoc}
- *
- * @deprecated Use the danog/loop API instead
- */
-class PeriodicLoop extends GenericPeriodicLoop
+trait InternalLoop
 {
-    use APILoop {
-        __construct as private init;
+    use LoggerLoop {
+        __construct as private setLogger;
     }
+
+    /**
+     * API instance.
+     */
+    protected MTProto $API;
     /**
      * Constructor.
      *
-     * @param InternalDoc $API      API instance
-     * @param callable    $callable Method
-     * @param string      $name     Loop name
-     * @param ?int        $interval Interval
+     * @param MTProto $API API instance
      */
-    public function __construct(InternalDoc $API, callable $callable, string $name, ?int $interval)
+    public function __construct(MTProto $API)
     {
-        $this->init($API);
-        parent::__construct($callable, $name, $interval === null ? $interval : $interval * 1000);
+        $this->API = $API;
+        $this->setLogger($API->getLogger());
     }
 }

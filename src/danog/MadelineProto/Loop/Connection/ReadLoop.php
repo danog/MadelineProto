@@ -23,9 +23,8 @@ use Amp\ByteStream\PendingReadError;
 use Amp\ByteStream\StreamException;
 use Amp\Loop;
 use Amp\Websocket\ClosedException;
-use danog\MadelineProto\Connection;
+use danog\Loop\SignalLoop;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Loop\Impl\SignalLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Tools;
@@ -37,31 +36,12 @@ use danog\MadelineProto\Tools;
  */
 class ReadLoop extends SignalLoop
 {
+    use Common;
     /**
-     * Connection instance.
+     * Main loop.
      *
-     * @var \danog\MadelineProto\Connection
+     * @return \Generator
      */
-    protected $connection;
-    /**
-     * DataCenterConnection instance.
-     *
-     * @var \danog\MadelineProto\DataCenterConnection
-     */
-    protected $datacenterConnection;
-    /**
-     * DC ID.
-     *
-     * @var string
-     */
-    protected $datacenter;
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
-        $this->API = $connection->getExtra();
-        $this->datacenter = $connection->getDatacenterID();
-        $this->datacenterConnection = $connection->getShared();
-    }
     public function loop(): \Generator
     {
         $API = $this->API;
@@ -229,6 +209,11 @@ class ReadLoop extends SignalLoop
         }
         return true;
     }
+    /**
+     * Get loop name.
+     *
+     * @return string
+     */
     public function __toString(): string
     {
         return "read loop in DC {$this->datacenter}";

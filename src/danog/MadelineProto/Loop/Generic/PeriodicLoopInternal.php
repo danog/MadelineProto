@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Resumable loop interface.
+ * Update feeder loop.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -17,29 +17,33 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Loop;
+namespace danog\MadelineProto\Loop\Generic;
 
-use Amp\Promise;
+use danog\Loop\Generic\PeriodicLoop as GenericPeriodicLoop;
+use danog\MadelineProto\Loop\InternalLoop;
+use danog\MadelineProto\MTProto;
 
 /**
- * Resumable loop interface.
+ * {@inheritDoc}
  *
- * @author Daniil Gentili <daniil@daniil.it>
+ * @internal For internal use
  */
-interface ResumableLoopInterface extends LoopInterface
+class PeriodicLoopInternal extends GenericPeriodicLoop
 {
+    use InternalLoop {
+        __construct as private init;
+    }
     /**
-     * Pause the loop.
+     * Constructor.
      *
-     * @param int $time For how long to pause the loop, if null will pause forever (until resume is called from outside of the loop)
-     *
-     * @return Promise
+     * @param MTProto  $API      API instance
+     * @param callable $callable Method
+     * @param string   $name     Loop name
+     * @param int|null $interval Interval
      */
-    public function pause($time = null): Promise;
-    /**
-     * Resume the loop.
-     *
-     * @return ?Promise
-     */
-    public function resume();
+    public function __construct(MTProto $API, callable $callable, string $name, ?int $interval)
+    {
+        $this->init($API);
+        parent::__construct($callable, $name, $interval);
+    }
 }

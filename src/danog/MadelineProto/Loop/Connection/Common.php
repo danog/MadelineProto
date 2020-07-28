@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Signal loop interface.
+ * Common abstract class for all connection loops.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -17,31 +16,46 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Loop;
+namespace danog\MadelineProto\Loop\Connection;
 
-use Amp\Promise;
+use danog\MadelineProto\Connection;
+use danog\MadelineProto\DataCenterConnection;
+use danog\MadelineProto\Loop\InternalLoop;
 
 /**
- * Signal loop interface.
+ * RPC call status check loop.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-interface SignalLoopInterface extends LoopInterface
+trait Common
 {
+    use InternalLoop {
+        __construct as private init;
+    }
     /**
-     * Resolve the promise or return|throw the signal.
-     *
-     * @param Promise $promise The origin promise
-     *
-     * @return Promise
+     * Connection instance.
      */
-    public function waitSignal($promise): Promise;
+    protected Connection $connection;
     /**
-     * Send a signal to the the loop.
+     * DC ID.
      *
-     * @param \Throwable|mixed $data Signal to send
-     *
-     * @return void
+     * @var string
      */
-    public function signal($data): void;
+    protected string $datacenter;
+    /**
+     * DataCenterConnection instance.
+     */
+    protected DataCenterConnection $datacenterConnection;
+    /**
+     * Constructor function.
+     *
+     * @param Connection $connection Connection
+     */
+    public function __construct(Connection $connection)
+    {
+        $this->init($connection->getExtra());
+        $this->connection = $connection;
+        $this->datacenter = $connection->getDatacenterID();
+        $this->datacenterConnection = $connection->getShared();
+    }
 }

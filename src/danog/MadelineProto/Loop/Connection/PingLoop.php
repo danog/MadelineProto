@@ -19,8 +19,7 @@
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use danog\MadelineProto\Connection;
-use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use danog\Loop\ResumableSignalLoop;
 
 /**
  * Ping loop.
@@ -29,31 +28,12 @@ use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
  */
 class PingLoop extends ResumableSignalLoop
 {
+    use Common;
     /**
-     * Connection instance.
+     * Main loop.
      *
-     * @var \danog\MadelineProto\Connection
+     * @return \Generator
      */
-    protected $connection;
-    /**
-     * DC ID.
-     *
-     * @var string
-     */
-    protected $datacenter;
-    /**
-     * DataCenterConnection instance.
-     *
-     * @var \danog\MadelineProto\DataCenterConnection
-     */
-    protected $datacenterConnection;
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
-        $this->API = $connection->getExtra();
-        $this->datacenter = $connection->getDatacenterID();
-        $this->datacenterConnection = $connection->getShared();
-    }
     public function loop(): \Generator
     {
         $API = $this->API;
@@ -61,13 +41,14 @@ class PingLoop extends ResumableSignalLoop
         $connection = $this->connection;
         $shared = $this->datacenterConnection;
         $timeout = $shared->getSettings()['timeout'];
+        $timeoutMs = $timeout * 1000;
         while (true) {
             while (!$shared->hasTempAuthKey()) {
                 if (yield $this->waitSignal($this->pause())) {
                     return;
                 }
             }
-            if (yield $this->waitSignal($this->pause($timeout))) {
+            if (yield $this->waitSignal($this->pause($timeoutMs))) {
                 return;
             }
             if (\time() - $connection->getLastChunk() >= $timeout) {
@@ -81,6 +62,11 @@ class PingLoop extends ResumableSignalLoop
             }
         }
     }
+    /**
+     * Get loop name.
+     *
+     * @return string
+     */
     public function __toString(): string
     {
         return "Ping loop in DC {$this->datacenter}";

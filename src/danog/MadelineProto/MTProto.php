@@ -29,7 +29,7 @@ use danog\MadelineProto\Db\DbPropertiesFabric;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Db\Mysql;
 use danog\MadelineProto\Ipc\Server;
-use danog\MadelineProto\Loop\Generic\PeriodicLoop;
+use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
@@ -344,46 +344,32 @@ class MTProto extends AsyncConstruct implements TLCallback
     public $minDatabase;
     /**
      * TOS check loop.
-     *
-     * @var PeriodicLoop
      */
-    public $checkTosLoop;
+    public ?PeriodicLoopInternal $checkTosLoop = null;
     /**
      * Phone config loop.
-     *
-     * @var PeriodicLoop
      */
-    public $phoneConfigLoop;
+    public ?PeriodicLoopInternal $phoneConfigLoop = null;
     /**
      * Config loop.
-     *
-     * @var PeriodicLoop
      */
-    public $configLoop;
+    public ?PeriodicLoopInternal  $configLoop = null;
     /**
      * Call checker loop.
-     *
-     * @var PeriodicLoop
      */
-    private $callCheckerLoop;
+    private ?PeriodicLoopInternal $callCheckerLoop = null;
     /**
      * Autoserialization loop.
-     *
-     * @var PeriodicLoop
      */
-    private $serializeLoop;
+    private ?PeriodicLoopInternal $serializeLoop = null;
     /**
      * RPC reporting loop.
-     *
-     * @var PeriodicLoop
      */
-    private $rpcLoop;
+    private ?PeriodicLoopInternal $rpcLoop = null;
     /**
      * IPC server.
-     *
-     * @var Server
      */
-    private $ipcServer;
+    private ?Server $ipcServer = null;
     /**
      * Feeder loops.
      *
@@ -401,7 +387,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var boolean
      */
-    public $destructing = false;
+    public bool $destructing = false;
     /**
      * DataCenter instance.
      *
@@ -454,7 +440,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param array $settings Settings
      *
-     * @return void
+     * @return \Generator
      */
     public function __construct_async($settings = []): \Generator
     {
@@ -708,22 +694,22 @@ class MTProto extends AsyncConstruct implements TLCallback
     private function startLoops()
     {
         if (!$this->callCheckerLoop) {
-            $this->callCheckerLoop = new PeriodicLoop($this, [$this, 'checkCalls'], 'call check', 10);
+            $this->callCheckerLoop = new PeriodicLoopInternal($this, [$this, 'checkCalls'], 'call check', 10 * 1000);
         }
         if (!$this->serializeLoop) {
-            $this->serializeLoop = new PeriodicLoop($this, [$this, 'serialize'], 'serialize', $this->settings['serialization']['serialization_interval']);
+            $this->serializeLoop = new PeriodicLoopInternal($this, [$this, 'serialize'], 'serialize', $this->settings['serialization']['serialization_interval'] * 1000);
         }
         if (!$this->phoneConfigLoop) {
-            $this->phoneConfigLoop = new PeriodicLoop($this, [$this, 'getPhoneConfig'], 'phone config', 24 * 3600);
+            $this->phoneConfigLoop = new PeriodicLoopInternal($this, [$this, 'getPhoneConfig'], 'phone config', 24 * 3600 * 1000);
         }
         if (!$this->checkTosLoop) {
-            $this->checkTosLoop = new PeriodicLoop($this, [$this, 'checkTos'], 'TOS', 24 * 3600);
+            $this->checkTosLoop = new PeriodicLoopInternal($this, [$this, 'checkTos'], 'TOS', 24 * 3600 * 1000);
         }
         if (!$this->configLoop) {
-            $this->configLoop = new PeriodicLoop($this, [$this, 'getConfig'], 'config', 24 * 3600);
+            $this->configLoop = new PeriodicLoopInternal($this, [$this, 'getConfig'], 'config', 24 * 3600 * 1000);
         }
         if (!$this->rpcLoop) {
-            $this->rpcLoop = new PeriodicLoop($this, [$this, 'rpcReport'], 'config', 60);
+            $this->rpcLoop = new PeriodicLoopInternal($this, [$this, 'rpcReport'], 'config', 60 * 1000);
         }
         if (!$this->ipcServer) {
             $this->ipcServer = new Server($this);
@@ -812,7 +798,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             if (!$this->updates_state instanceof UpdatesState) {
                 $this->updates_state = new UpdatesState($this->updates_state);
             }
-            $this->channels_state->__construct([false => $this->updates_state]);
+            $this->channels_state->__construct([UpdateLoop::GENERIC => $this->updates_state]);
             unset($this->updates_state);
         }
         if (!isset($this->datacenter)) {
@@ -1017,9 +1003,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         if ($this->authorized === self::LOGGED_IN && $this->settings['updates']['handle_updates']) {
             $this->logger->logger(Lang::$current_lang['getupdates_deserialization'], Logger::NOTICE);
-            yield $this->updaters[false]->resume();
+            yield $this->updaters[UpdateLoop::GENERIC]->resume();
         }
-        $this->updaters[false]->start();
+        $this->updaters[UpdateLoop::GENERIC]->start();
 
         GarbageCollector::start();
     }
@@ -1165,7 +1151,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             $lang_pack = 'android';
         }
         // Detect app version
-        $app_version = self::RELEASE.' ('.self::V.', '.str_replace(' (AN UPDATE IS REQUIRED)', '', Magic::$revision).')';
+        $app_version = self::RELEASE.' ('.self::V.', '.\str_replace(' (AN UPDATE IS REQUIRED)', '', Magic::$revision).')';
         if (($settings['app_info']['api_id'] ?? 0) === 6) {
             // TG DEV NOTICE: these app info spoofing measures were implemented for NON-MALICIOUS purposes.
             // All accounts registered with a custom API ID require manual verification through recover@telegram.org, to avoid instant permabans.
@@ -1441,7 +1427,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function setupLogger(): void
     {
-        $this->logger = Logger::getLoggerFromSettings($this->settings, isset($this->authorization['user']) ? isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'] : '');
+        $this->logger = Logger::getLoggerFromSettings($this->settings, isset($this->authorization['user']) ? (isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id']) : '');
     }
     /**
      * Reset all MTProto sessions.
@@ -1517,7 +1503,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function connectToAllDcs(bool $reconnectAll = true): \Generator
     {
-        $this->channels_state->get(false);
+        $this->channels_state->get(FeedLoop::GENERIC);
         foreach ($this->channels_state->get() as $state) {
             $channelId = $state->getChannel();
             if (!isset($this->feeders[$channelId])) {
@@ -1644,7 +1630,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!isset($this->seqUpdater)) {
             $this->seqUpdater = new SeqLoop($this);
         }
-        $this->channels_state->get(false);
+        $this->channels_state->get(FeedLoop::GENERIC);
         $channelIds = [];
         foreach ($this->channels_state->get() as $state) {
             $channelIds[] = $state->getChannel();

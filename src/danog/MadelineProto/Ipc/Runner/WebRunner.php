@@ -12,7 +12,7 @@ final class WebRunner extends RunnerAbstract
     private static $runPath;
 
     /**
-     * Resources
+     * Resources.
      */
     private static array $resources = [];
     /**
@@ -46,7 +46,9 @@ final class WebRunner extends RunnerAbstract
             }
             $rootDir = \dirname($rootDir).DIRECTORY_SEPARATOR;
             $uriDir = \dirname($uri);
-            if ($uriDir !== '/') $uriDir .= DIRECTORY_SEPARATOR;
+            if ($uriDir !== '/') {
+                $uriDir .= DIRECTORY_SEPARATOR;
+            }
 
             if (\substr($rootDir, -\strlen($uriDir)) !== $uriDir) {
                 throw new ContextException("Mismatch between absolute root dir ($rootDir) and URI dir ($uriDir)");

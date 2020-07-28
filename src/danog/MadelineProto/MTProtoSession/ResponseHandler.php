@@ -21,6 +21,7 @@ namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\Loop;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
 
 /**
@@ -84,8 +85,8 @@ trait ResponseHandler
                     $this->shared->getTempAuthKey()->setServerSalt($this->incoming_messages[$current_msg_id]['content']['server_salt']);
                     $this->ackIncomingMessageId($current_msg_id);
                     // Acknowledge that I received the server's response
-                    if ($this->API->authorized === MTProto::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->curdc)->hasTempAuthKey() && isset($this->API->updaters[false])) {
-                        $this->API->updaters[false]->resumeDefer();
+                    if ($this->API->authorized === MTProto::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->curdc)->hasTempAuthKey() && isset($this->API->updaters[UpdateLoop::GENERIC])) {
+                        $this->API->updaters[UpdateLoop::GENERIC]->resumeDefer();
                     }
                     unset($this->incoming_messages[$current_msg_id]['content']);
                     break;

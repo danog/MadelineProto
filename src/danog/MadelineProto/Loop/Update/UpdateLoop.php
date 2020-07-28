@@ -19,9 +19,10 @@
 
 namespace danog\MadelineProto\Loop\Update;
 
-use Amp\Loop;
+use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\Loop\Impl\ResumableSignalLoop;
+use danog\MadelineProto\Loop\InternalLoop;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
 
 /**
@@ -31,14 +32,39 @@ use danog\MadelineProto\RPCErrorException;
  */
 class UpdateLoop extends ResumableSignalLoop
 {
+    use InternalLoop {
+        __construct as private init;
+    }
+    /**
+     * Main loop ID.
+     */
+    const GENERIC = 0;
+
     private $toPts;
-    private $channelId;
-    private $feeder;
-    public function __construct($API, $channelId)
+    /**
+     * Loop name.
+     */
+    private int $channelId;
+    /**
+     * Feed loop.
+     */
+    private ?FeedLoop $feeder = null;
+    /**
+     * Constructor.
+     *
+     * @param MTProto $API
+     * @param integer $channelId
+     */
+    public function __construct(MTProto $API, int $channelId)
     {
-        $this->API = $API;
+        $this->init($API);
         $this->channelId = $channelId;
     }
+    /**
+     * Main loop.
+     *
+     * @return \Generator
+     */
     public function loop(): \Generator
     {
         $API = $this->API;
@@ -49,8 +75,8 @@ class UpdateLoop extends ResumableSignalLoop
                 return;
             }
         }
-        $this->state = $state = $this->channelId === false ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
-        $timeout = $API->settings['updates']['getdifference_interval'];
+        $this->state = $state = $this->channelId === self::GENERIC ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
+        $timeout = $API->settings['updates']['getdifference_interval'] * 1000;
         $first = true;
         while (true) {
             while (!$API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
@@ -184,18 +210,25 @@ class UpdateLoop extends ResumableSignalLoop
             $API->signalUpdate();
             $API->logger->logger("Finished signaling updates in {$this}, pausing");
             $first = false;
-            if (yield $this->waitSignal($this->pause($timeout))) {
+            if (yield $this->waitSignal($this->pause($timeout * 1000))) {
                 $API->logger->logger("Exiting {$this} due to signal");
                 return;
             }
         }
     }
-    public function setLimit($toPts)
+    public function setLimit($toPts): void
     {
         $this->toPts = $toPts;
     }
+    /**
+     * Get loop name.
+     *
+     * @return string
+     */
     public function __toString(): string
     {
-        return !$this->channelId ? 'getUpdate loop generic' : "getUpdate loop channel {$this->channelId}";
+        return $this->channelId ?
+            "getUpdate loop channel {$this->channelId}" :
+            'getUpdate loop generic';
     }
 }

@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\VoIP;
 
+use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\Tools;
 
 /**
@@ -109,7 +110,7 @@ trait AuthKeyHandler
         $res = yield from $this->methodCallAsyncRead('phone.requestCall', ['user_id' => $user, 'g_a_hash' => \hash('sha256', $g_a->toBytes(), true), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_p2p' => true, 'udp_reflector' => true, 'min_layer' => 65, 'max_layer' => \danog\MadelineProto\VoIP::getConnectionMaxLayer()]], ['datacenter' => $this->datacenter->curdc]);
         $controller->setCall($res['phone_call']);
         $this->calls[$res['phone_call']['id']] = $controller;
-        yield $this->updaters[false]->resume();
+        yield $this->updaters[UpdateLoop::GENERIC]->resume();
         return $controller;
     }
     /**
@@ -149,7 +150,7 @@ trait AuthKeyHandler
             throw $e;
         }
         $this->calls[$res['phone_call']['id']]->storage['b'] = $b;
-        yield $this->updaters[false]->resume();
+        yield $this->updaters[UpdateLoop::GENERIC]->resume();
         return true;
     }
     /**
