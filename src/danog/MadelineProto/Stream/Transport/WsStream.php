@@ -100,7 +100,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
                 $this->message = null;
             }
         } catch (\Throwable $e) {
-            if ($e->getReason() !== 'Client closed the underlying TCP connection') {
+            if ($e instanceof Amp\Websocket\ClosedException && $e->getReason() !== 'Client closed the underlying TCP connection') {
                 throw $e;
             }
             return null;

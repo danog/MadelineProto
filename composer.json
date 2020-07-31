@@ -11,7 +11,6 @@
     "require": {
         "php": ">=7.4.0",
         "danog/primemodule": "^1",
-        "danog/tgseclib": "^3",
         "erusev/parsedown": "^1.7",
         "ext-mbstring": "*",
         "ext-json": "*",
@@ -55,7 +54,8 @@
         "vimeo/psalm": "dev-master",
         "phpstan/phpstan": "^0.12.14",
         "friendsofphp/php-cs-fixer": "^2.16",
-        "squizlabs/php_codesniffer": "^3.5"
+        "squizlabs/php_codesniffer": "^3.5",
+        "danog/tgseclib": "^3"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)"
