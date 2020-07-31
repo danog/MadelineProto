@@ -18,6 +18,7 @@ class DbPropertiesFabric
      * @uses \danog\MadelineProto\Db\MemoryArray
      * @uses \danog\MadelineProto\Db\SharedMemoryArray
      * @uses \danog\MadelineProto\Db\MysqlArray
+     * @uses \danog\MadelineProto\Db\PostgresArray
      */
     public static function get(array $dbSettings, string $namePrefix, string $propertyType, string $name, $value = null): Promise
     {
@@ -29,6 +30,9 @@ class DbPropertiesFabric
                 break;
             case 'mysql':
                 $class .= '\Mysql';
+                break;
+            case 'postgres':
+                $class .= '\Postgres';
                 break;
             default:
                 throw new \InvalidArgumentException("Unknown dbType: {$dbSettings['type']}");

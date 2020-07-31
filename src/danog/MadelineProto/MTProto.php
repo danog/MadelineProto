@@ -28,6 +28,7 @@ use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFabric;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Db\Mysql;
+use danog\MadelineProto\Db\Pgsql;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\Loop\Update\FeedLoop;
@@ -1345,7 +1346,18 @@ class MTProto extends AsyncConstruct implements TLCallback
                 'max_connections' => 10,
                 'idle_timeout' => 60,
                 'cache_ttl' => '+5 minutes', //keep records in memory after last read
-            ]
+            ],
+            /** @see Postgres */
+            'postgres' => [
+                'host' => '127.0.0.1',
+                'port' => 5432,
+                'user' => 'root',
+                'password' => '',
+                'database' => 'MadelineProto', //will be created automatically
+                'max_connections' => 10,
+                'idle_timeout' => 60,
+                'cache_ttl' => '+5 minutes', //keep records in memory after last read
+            ],
         ],
         'upload' => ['allow_automatic_upload' => true, 'part_size' => 512 * 1024, 'parallel_chunks' => 20], 'download' => ['report_broken_media' => true, 'part_size' => 1024 * 1024, 'parallel_chunks' => 20], 'pwr' => [
             'pwr' => false,
