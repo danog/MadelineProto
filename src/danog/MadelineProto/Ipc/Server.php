@@ -24,6 +24,7 @@ use danog\Loop\SignalLoop;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\Tools;
 
 /**
@@ -31,6 +32,7 @@ use danog\MadelineProto\Tools;
  */
 class Server extends SignalLoop
 {
+    use InternalLoop;
     /**
      * Session not initialized, should initialize.
      */
