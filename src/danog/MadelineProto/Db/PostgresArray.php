@@ -9,7 +9,6 @@ use Amp\Sql\ResultSet;
 use danog\MadelineProto\Logger;
 use function Amp\call;
 
-
 class PostgresArray implements DbArray
 {
     use ArrayCacheTrait;
@@ -39,7 +38,8 @@ class PostgresArray implements DbArray
 
         $this->setCache($index, $value);
 
-        $request = $this->request("
+        $request = $this->request(
+            "
             INSERT INTO \"{$this->table}\"
             (key,value)
             VALUES (:index, :value)
@@ -79,7 +79,7 @@ class PostgresArray implements DbArray
     private function prepareTable()
     {
         Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
-        
+
         yield $this->request("
             CREATE TABLE IF NOT EXISTS \"{$this->table}\"
             (

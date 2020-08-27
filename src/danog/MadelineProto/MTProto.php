@@ -28,7 +28,6 @@ use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFabric;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Db\Mysql;
-use danog\MadelineProto\Db\Pgsql;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\Loop\Update\FeedLoop;

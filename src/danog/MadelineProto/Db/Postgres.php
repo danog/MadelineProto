@@ -71,8 +71,7 @@ class Postgres
 
                 while (yield $result->advance()) {
                     $row = $result->getCurrent();
-                    if ($row===false)
-                    {
+                    if ($row===false) {
                         yield $connection->query("
                             CREATE DATABASE {$db}
                             OWNER {$user}
@@ -92,7 +91,7 @@ class Postgres
                        END IF;
                     END;
                     $$ language 'plpgsql'
-                ");                        
+                ");
                 $connection->close();
             } catch (\Throwable $e) {
                 Logger::log($e->getMessage(), Logger::ERROR);

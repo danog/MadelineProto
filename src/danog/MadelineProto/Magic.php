@@ -262,6 +262,8 @@ class Magic
             if (\defined(\SIGINT::class)) {
                 //if (function_exists('pcntl_async_signals')) pcntl_async_signals(true);
                 try {
+                    \pcntl_signal(SIGINT, fn () => null);
+                    \pcntl_signal(SIGINT, SIG_DFL);
                     Loop::unreference(Loop::onSignal(SIGINT, static function () {
                         Logger::log('Got sigint', Logger::FATAL_ERROR);
                         Magic::shutdown(1);

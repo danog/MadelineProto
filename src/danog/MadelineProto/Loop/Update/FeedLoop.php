@@ -23,8 +23,6 @@ use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 
-use function Amp\delay;
-
 /**
  * Update feed loop.
  *
