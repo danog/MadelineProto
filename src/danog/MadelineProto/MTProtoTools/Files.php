@@ -268,18 +268,18 @@ trait Files
             $datacenter .= '_media';
         }
         $part_size = $this->settings['upload']['part_size'];
-        $parallel_chunks = $this->settings['upload']['parallel_chunks'] ? $this->settings['upload']['parallel_chunks'] : 4000;
+        $parallel_chunks = $this->settings['upload']['parallel_chunks'] ?? 4000;
         $part_total_num = (int) \ceil($size / $part_size);
         $part_num = 0;
         $method = $size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
         $constructor = 'input'.($encrypted === true ? 'Encrypted' : '').($size > 10 * 1024 * 1024 ? 'FileBig' : 'File').($encrypted === true ? 'Uploaded' : '');
-        $file_id = \danog\MadelineProto\Tools::random(8);
+        $file_id = Tools::random(8);
         $ige = null;
         if ($encrypted === true) {
-            $key = \danog\MadelineProto\Tools::random(32);
-            $iv = \danog\MadelineProto\Tools::random(32);
+            $key = Tools::random(32);
+            $iv = Tools::random(32);
             $digest = \hash('md5', $key.$iv, true);
-            $fingerprint = \danog\MadelineProto\Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
+            $fingerprint = Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
             $ige = new \tgseclib\Crypt\AES('ige');
             $ige->setIV($iv);
             $ige->setKey($key);
@@ -293,7 +293,7 @@ trait Files
         $cb = function () use ($cb, $part_total_num, &$speed, &$time) {
             static $cur = 0;
             $cur++;
-            \danog\MadelineProto\Tools::callFork($cb($cur * 100 / $part_total_num, $speed, $time));
+            Tools::callFork($cb($cur * 100 / $part_total_num, $speed, $time));
         };
         $callable = static function (int $part_num) use ($file_id, $part_total_num, $part_size, $callable, $ige): \Generator {
             $bytes = yield $callable($part_num * $part_size, $part_size);
@@ -498,7 +498,7 @@ trait Files
         $cb = [$bridge, 'callback'];
         $read = $this->uploadFromCallable($reader, $size, $mime, '', $cb, true, $encrypted);
         $write = $this->downloadToCallable($media, $writer, null, true, 0, -1, $chunk_size);
-        [$res] = yield \danog\MadelineProto\Tools::all([$read, $write]);
+        [$res] = yield Tools::all([$read, $write]);
         return $res;
     }
 
@@ -1044,7 +1044,7 @@ trait Files
         $size = (yield statAsync($file))['size'];
         $stream = yield open($file, 'cb');
         $this->logger->logger('Waiting for lock of file to download...');
-        $unlock = yield \danog\MadelineProto\Tools::flock($file, LOCK_EX);
+        $unlock = yield Tools::flock($file, LOCK_EX);
         $this->logger->logger('Got lock of file to download');
         try {
             yield from $this->downloadToStream($messageMedia, $stream, $cb, $size, -1);
@@ -1133,14 +1133,14 @@ trait Files
             $end = $messageMedia['size'];
         }
         $part_size = $part_size ?? $this->settings['download']['part_size'];
-        $parallel_chunks = $this->settings['download']['parallel_chunks'] ? $this->settings['download']['parallel_chunks'] : 4000;
-        $datacenter = isset($messageMedia['InputFileLocation']['dc_id']) ? $messageMedia['InputFileLocation']['dc_id'] : $this->settings['connection_settings']['default_dc'];
+        $parallel_chunks = $this->settings['download']['parallel_chunks'] ?? 4000;
+        $datacenter = $messageMedia['InputFileLocation']['dc_id'] ?? $this->settings['connection_settings']['default_dc'];
         if ($this->datacenter->has($datacenter.'_media')) {
             $datacenter .= '_media';
         }
         if (isset($messageMedia['key'])) {
             $digest = \hash('md5', $messageMedia['key'].$messageMedia['iv'], true);
-            $fingerprint = \danog\MadelineProto\Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
+            $fingerprint = Tools::unpackSignedInt(\substr($digest, 0, 4) ^ \substr($digest, 4, 4));
             if ($fingerprint !== $messageMedia['key_fingerprint']) {
                 throw new \danog\MadelineProto\Exception('Fingerprint mismatch!');
             }
@@ -1181,7 +1181,7 @@ trait Files
         $cb = static function () use ($cb, $count, &$time, &$speed) {
             static $cur = 0;
             $cur++;
-            \danog\MadelineProto\Tools::callFork($cb($cur * 100 / $count, $time, $speed));
+            Tools::callFork($cb($cur * 100 / $count, $time, $speed));
         };
         $cdn = false;
         $params[0]['previous_promise'] = new Success(true);
@@ -1193,13 +1193,13 @@ trait Files
             $origCb(100, 0, 0);
             return true;
         }
-        $parallel_chunks = 1;
+        $parallel_chunks = $seekable ? $parallel_chunks : 1;
         if ($params) {
             $previous_promise = new Success(true);
             $promises = [];
             foreach ($params as $key => $param) {
                 $param['previous_promise'] = $previous_promise;
-                $previous_promise = \danog\MadelineProto\Tools::call($this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable));
+                $previous_promise = Tools::call($this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable));
                 $previous_promise->onResolve(static function ($e, $res) use (&$size) {
                     if ($res) {
                         $size += $res;
@@ -1208,7 +1208,7 @@ trait Files
                 $promises[] = $previous_promise;
                 if (!($key % $parallel_chunks)) {
                     // 20 mb at a time, for a typical bandwidth of 1gbps
-                    $res = yield \danog\MadelineProto\Tools::all($promises);
+                    $res = yield Tools::all($promises);
                     $promises = [];
                     foreach ($res as $r) {
                         if (!$r) {
@@ -1222,7 +1222,7 @@ trait Files
                 }
             }
             if ($promises) {
-                yield \danog\MadelineProto\Tools::all($promises);
+                yield Tools::all($promises);
             }
         }
         $time = \microtime(true) - $start;

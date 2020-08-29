@@ -1317,7 +1317,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             // Should madeline fetch the full member list of every group it meets?
             'cache_all_peers_on_startup' => false,
         ], 'requests' => ['gzip_encode_if_gt' => 1024 * 1024], 'updates' => [
-            'handle_updates' => false,
+            'handle_updates' => true,
             // Should I handle updates?
             'handle_old_updates' => true,
             // Should I handle old updates on startup?
@@ -1325,7 +1325,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             // Getdifference manual polling interval
             'callback' => 'getUpdatesUpdateHandler',
             // Update callback
-            'run_callback' => true,
+            'run_callback' => false,
         ], 'secret_chats' => ['accept_chats' => true],
         'serialization' => ['serialization_interval' => 30, 'cleanup_before_serialization' => false],
         /**

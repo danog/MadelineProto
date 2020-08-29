@@ -41,7 +41,7 @@ trait Noop
      *
      * @return void
      */
-    public function noop(): void
+    public static function noop(): void
     {
     }
 }
