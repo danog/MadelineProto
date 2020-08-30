@@ -272,7 +272,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Internal peer database.
      *
-     * @var DbArray
+     * @var DbArray|Promise[]
      */
     public $chats;
 
@@ -492,7 +492,10 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function __sleep(): array
     {
-        if ($this->settings['serialization']['cleanup_before_serialization']) {
+        if (
+            $this->settings['serialization']['cleanup_before_serialization']
+            && $this->settings['db']['type'] === 'memory'
+        ) {
             $this->cleanup();
         }
         return [
@@ -562,9 +565,9 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Cleanup memory and session file.
      *
-     * @return self
+     * @return void
      */
-    public function cleanup(): self
+    public function cleanup(): void
     {
         $this->referenceDatabase = new ReferenceDatabase($this);
         $callbacks = [$this, $this->referenceDatabase];
@@ -572,8 +575,23 @@ class MTProto extends AsyncConstruct implements TLCallback
             $callbacks[] = $this->minDatabase;
         }
         $this->TL->updateCallbacks($callbacks);
-        return $this;
     }
+
+    private function fillUsernamesCache(): \Generator
+    {
+        if (yield $this->usernames->count() === 0) {
+            $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
+            $iterator = $this->chats->getIterator();
+            while (yield $iterator->advance()) {
+                [$id, $chat] = $iterator->getCurrent();
+                if (isset($chat['username'])) {
+                    $this->usernames[\strtolower($chat['username'])] = $this->getId($chat);
+                }
+            }
+            $this->logger('Cache filled.', Logger::WARNING);
+        }
+    }
+
     /**
      * Logger.
      *
@@ -821,6 +839,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
 
         yield from $this->initDb($this);
+        yield from $this->fillUsernamesCache();
     }
 
     /**

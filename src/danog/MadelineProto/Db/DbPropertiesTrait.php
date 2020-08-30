@@ -22,18 +22,6 @@ trait DbPropertiesTrait
                 $this->{$property} = yield DbPropertiesFabric::get($dbSettings, $prefix, $type, $property, $this->{$property});
             }
         }
-
-        if (!$reset && yield $this->usernames->count() === 0) {
-            $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
-            $iterator = $this->chats->getIterator();
-            while (yield $iterator->advance()) {
-                [$id, $chat] = $iterator->getCurrent();
-                if (isset($chat['username'])) {
-                    $this->usernames[\strtolower($chat['username'])] = $this->getId($chat);
-                }
-            }
-            $this->logger('Cache filled.', Logger::WARNING);
-        }
     }
 
     private static function getSessionId(MTProto $madelineProto): string

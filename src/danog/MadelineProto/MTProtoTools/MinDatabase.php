@@ -19,23 +19,30 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Loop;
+use Amp\Promise;
+use danog\MadelineProto\Db\DbArray;
+use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
+use danog\MadelineProto\Tools;
 
 /**
  * Manages min peers.
  */
 class MinDatabase implements TLCallback
 {
+    use DbPropertiesTrait;
+
     const SWITCH_CONSTRUCTORS = ['inputChannel', 'inputUser', 'inputPeerUser', 'inputPeerChannel'];
     const CATCH_PEERS = ['message', 'messageService', 'peerUser', 'peerChannel', 'messageEntityMentionName', 'messageFwdHeader', 'messageActionChatCreate', 'messageActionChatAddUser', 'messageActionChatDeleteUser', 'messageActionChatJoinedByLink'];
     const ORIGINS = ['message', 'messageService'];
     /**
      * References indexed by location.
      *
-     * @var array
+     * @var DbArray|Promise[]
      */
-    private $db = [];
+    private $db;
     /**
      * Temporary cache during deserialization.
      *
@@ -48,6 +55,16 @@ class MinDatabase implements TLCallback
      * @var \danog\MadelineProto\MTProto
      */
     private $API;
+
+    /**
+     * List of properties stored in database (memory or external).
+     * @see DbPropertiesFabric
+     * @var array
+     */
+    protected array $dbProperies = [
+        'db' => 'array',
+    ];
+
     public function __construct(MTProto $API)
     {
         $this->API = $API;
@@ -63,11 +80,16 @@ class MinDatabase implements TLCallback
     }
     public function init()
     {
-        foreach ($this->db as $id => $origin) {
-            if (!isset($origin['peer']) || $origin['peer'] === $id) {
-                unset($this->db[$id]);
+        Tools::wait($this->initDb($this->API));
+        Loop::defer(function() {
+            $iterator = $this->db->getIterator();
+            while (yield $iterator->advance()) {
+                [$id, $origin] = $iterator->getCurrent();
+                if (!isset($origin['peer']) || $origin['peer'] === $id) {
+                    $this->db->offsetUnset($id);
+                }
             }
-        }
+        });
     }
     public function getMethodCallbacks(): array
     {
@@ -202,7 +224,7 @@ class MinDatabase implements TLCallback
             return $object;
         }
         $id = $this->API->getId($object);
-        if (isset($this->db[$id])) {
+        if (yield $this->db[$id]) {
             $new = \array_merge($object, $this->db[$id]);
             $new['_'] .= 'FromMessage';
             $new['peer'] = (yield from $this->API->getInfo($new['peer']))['InputPeer'];
@@ -215,16 +237,17 @@ class MinDatabase implements TLCallback
         $this->API->logger->logger("Don't have origin info with min peer {$id}, this may fail");
         return $object;
     }
+
     /**
      * Check if location info is available for peer.
      *
      * @param float|int $id Peer ID
      *
-     * @return boolean
+     * @return boolean<Promise>
      */
-    public function hasPeer($id): bool
+    public function hasPeer($id): Promise
     {
-        return isset($this->db[$id]);
+        return $this->db->isset($id);
     }
     public function __debugInfo()
     {

@@ -19,15 +19,21 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Loop;
+use Amp\Promise;
+use danog\MadelineProto\Db\DbArray;
+use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
+use danog\MadelineProto\Tools;
 
 /**
  * Manages upload and download of files.
  */
 class ReferenceDatabase implements TLCallback
 {
+    use DbPropertiesTrait;
 
     // Reference from a document
     const DOCUMENT_LOCATION = 0;
@@ -65,15 +71,25 @@ class ReferenceDatabase implements TLCallback
     /**
      * References indexed by location.
      *
-     * @var array
+     * @var DbArray|Promise[]
      */
-    private $db = [];
+    private $db;
     private $cache = [];
     private $cacheContexts = [];
     private $refreshed = [];
     private $API;
     private $refresh = false;
     private $refreshCount = 0;
+
+    /**
+     * List of properties stored in database (memory or external).
+     * @see DbPropertiesFabric
+     * @var array
+     */
+    protected array $dbProperies = [
+        'db' => 'array',
+    ];
+
     public function __construct(MTProto $API)
     {
         $this->API = $API;
@@ -89,6 +105,7 @@ class ReferenceDatabase implements TLCallback
     }
     public function init()
     {
+        Tools::wait($this->initDb($this->API));
     }
     public function getMethodCallbacks(): array
     {
@@ -355,11 +372,14 @@ class ReferenceDatabase implements TLCallback
     }
     public function storeReference(string $location, string $reference, int $originType, array $origin)
     {
-        if (!isset($this->db[$location])) {
-            $this->db[$location] = ['origins' => []];
+        $locationValue = Tools::wait($this->db[$location]);
+        if (!$locationValue) {
+            $locationValue = ['origins' => []];
         }
-        $this->db[$location]['reference'] = $reference;
-        $this->db[$location]['origins'][$originType] = $origin;
+        $locationValue['reference'] = $reference;
+        $locationValue['origins'][$originType] = $origin;
+        $this->db[$location] = $locationValue;
+
         if ($this->refresh) {
             $this->refreshed[$location] = true;
         }
@@ -393,11 +413,13 @@ class ReferenceDatabase implements TLCallback
     {
         if (isset($this->refreshed[$location])) {
             $this->API->logger->logger('Reference already refreshed!', \danog\MadelineProto\Logger::VERBOSE);
-            return $this->db[$location]['reference'];
+            return (yield $this->db[$location])['reference'];
         }
-        \ksort($this->db[$location]['origins']);
+        $locationValue = yield $this->db[$location];
+        \ksort($locationValue['origins']);
+        $this->db[$location] = $locationValue;
         $count = 0;
-        foreach ($this->db[$location]['origins'] as $originType => &$origin) {
+        foreach ((yield $this->db[$location]['origins']) as $originType => &$origin) {
             $count++;
             $this->API->logger->logger("Try {$count} refreshing file reference with origin type {$originType}", \danog\MadelineProto\Logger::VERBOSE);
             switch ($originType) {
@@ -447,7 +469,7 @@ class ReferenceDatabase implements TLCallback
                     throw new \danog\MadelineProto\Exception("Unknown origin type {$originType}");
             }
             if (isset($this->refreshed[$location])) {
-                return $this->db[$location]['reference'];
+                return (yield $this->db[$location])['reference'];
             }
         }
         throw new Exception('Did not refresh reference');
@@ -460,7 +482,7 @@ class ReferenceDatabase implements TLCallback
     public function getReference(int $locationType, array $location)
     {
         $locationString = $this->serializeLocation($locationType, $location);
-        if (!isset($this->db[$locationString]['reference'])) {
+        if (!isset((yield $this->db[$locationString])['reference'])) {
             if (isset($location['file_reference'])) {
                 $this->API->logger->logger("Using outdated file reference for location of type {$locationType} object {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 return $location['file_reference'];
@@ -475,7 +497,7 @@ class ReferenceDatabase implements TLCallback
         if ($this->refresh) {
             return $this->refreshReferenceInternal($locationString);
         }
-        return $this->db[$locationString]['reference'];
+        return (yield $this->db[$locationString])['reference'];
     }
     private function serializeLocation(int $locationType, array $location)
     {
