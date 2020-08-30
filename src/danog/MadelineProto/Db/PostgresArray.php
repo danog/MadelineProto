@@ -365,6 +365,13 @@ class PostgresArray implements DbArray
                 return [];
             }
 
+            if (
+                !empty($params['index'])
+                && !mb_check_encoding($params['index'], 'UTF-8')
+            ) {
+                $params['index'] = mb_convert_encoding($params['index'], 'UTF-8');
+            }
+
             try {
                 $request = yield $this->db->execute($query, $params);
             } catch (\Throwable $e) {
