@@ -35,8 +35,6 @@ class ReferenceDatabase implements TLCallback
     const PHOTO_LOCATION = 1;
     // Reference from a photo location (can only be photo location)
     const PHOTO_LOCATION_LOCATION = 2;
-    // DEPRECATED: Reference from a location (can only be document location)
-    const DOCUMENT_LOCATION_LOCATION = 0;
     // Peer + photo ID
     const USER_PHOTO_ORIGIN = 0;
     // Peer (default photo ID)
@@ -91,12 +89,6 @@ class ReferenceDatabase implements TLCallback
     }
     public function init()
     {
-        foreach ($this->db as $key => $value) {
-            if ($key[0] === "0") {
-                // Unsetting deprecated DOCUMENT_LOCATION_LOCATION
-                unset($this->db[$key]);
-            }
-        }
     }
     public function getMethodCallbacks(): array
     {
