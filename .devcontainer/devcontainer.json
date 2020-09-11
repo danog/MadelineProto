@@ -4,7 +4,7 @@
 		"dockerfile": "Dockerfile",
 		"args": { 
 			// Update VARIANT to pick a PHP version: 7, 7.4, 7.3
-			"VARIANT": "7",
+			"VARIANT": "7.4",
 			"INSTALL_NODE": "true",
 			"NODE_VERSION": "lts/*"
 		}
@@ -18,7 +18,9 @@
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"felixfbecker.php-debug",
-		"felixfbecker.php-intellisense"
+		"felixfbecker.php-intellisense",
+                "getpsalm.psalm-vscode-plugin",
+                "junstyle.php-cs-fixer"
 	]
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

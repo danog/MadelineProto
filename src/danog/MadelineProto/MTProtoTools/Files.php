@@ -946,8 +946,10 @@ trait Files
         if (!\in_array($result->getCode(), [Status::OK, Status::PARTIAL_CONTENT])) {
             yield Tools::echo($result->getCodeExplanation());
         } elseif ($result->shouldServe()) {
-            \ob_end_flush();
-            \ob_implicit_flush();
+            if (\ob_get_level()) {
+                \ob_end_flush();
+                \ob_implicit_flush();
+            }
             yield from $this->downloadToStream($messageMedia, \fopen('php://output', 'w'), $cb, ...$result->getServeRange());
         }
     }
