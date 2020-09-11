@@ -248,7 +248,7 @@ trait AuthKeyHandler
      *
      * @return integer
      */
-    public function callStatus(int $id): int
+    public function callStatus($id): int
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw \danog\MadelineProto\Exception::extension('libtgvoip');
@@ -265,7 +265,7 @@ trait AuthKeyHandler
      *
      * @return array
      */
-    public function getCall(int $call): array
+    public function getCall($call): array
     {
         if (!\class_exists('\\danog\\MadelineProto\\VoIP')) {
             throw \danog\MadelineProto\Exception::extension('libtgvoip');
