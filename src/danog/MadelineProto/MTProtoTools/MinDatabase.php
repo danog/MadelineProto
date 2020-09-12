@@ -19,13 +19,11 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Loop;
 use Amp\Promise;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
-use danog\MadelineProto\Tools;
 
 /**
  * Manages min peers.
@@ -58,7 +56,7 @@ class MinDatabase implements TLCallback
 
     /**
      * List of properties stored in database (memory or external).
-     * @see DbPropertiesFabric
+     * @see DbPropertiesFactory
      * @var array
      */
     protected array $dbProperies = [
@@ -68,28 +66,21 @@ class MinDatabase implements TLCallback
     public function __construct(MTProto $API)
     {
         $this->API = $API;
-        $this->init();
-    }
-    public function __wakeup()
-    {
-        $this->init();
     }
     public function __sleep()
     {
         return ['db', 'API'];
     }
-    public function init()
+    public function init(): \Generator
     {
-        Tools::wait($this->initDb($this->API));
-        Loop::defer(function() {
-            $iterator = $this->db->getIterator();
-            while (yield $iterator->advance()) {
-                [$id, $origin] = $iterator->getCurrent();
-                if (!isset($origin['peer']) || $origin['peer'] === $id) {
-                    $this->db->offsetUnset($id);
-                }
+        yield from $this->initDb($this->API);
+        $iterator = $this->db->getIterator();
+        while (yield $iterator->advance()) {
+            [$id, $origin] = $iterator->getCurrent();
+            if (!isset($origin['peer']) || $origin['peer'] === $id) {
+                $this->db->offsetUnset($id);
             }
-        });
+        }
     }
     public function getMethodCallbacks(): array
     {
@@ -115,48 +106,15 @@ class MinDatabase implements TLCallback
     {
         return [];
     }
-    public function reset()
+    public function reset(): void
     {
         if ($this->cache) {
             $this->API->logger->logger('Found '.\count($this->cache).' pending contexts', \danog\MadelineProto\Logger::ERROR);
             $this->cache = [];
         }
     }
-    public function addPeer(array $location)
+    public function addPeer(array $location): bool
     {
-        if (!$this->cache) {
-            return;
-            $this->API->logger->logger('Trying to add peer out of context, report the following message to @danogentili!', \danog\MadelineProto\Logger::ERROR);
-            $frames = [];
-            $previous = '';
-            foreach (\debug_backtrace(0) as $k => $frame) {
-                if (isset($frame['function']) && $frame['function'] === 'deserialize') {
-                    if (isset($frame['args'][1]['subtype'])) {
-                        if ($frame['args'][1]['subtype'] === $previous) {
-                            continue;
-                        }
-                        $frames[] = $frame['args'][1]['subtype'];
-                        $previous = $frame['args'][1]['subtype'];
-                    } elseif (isset($frame['args'][1]['type'])) {
-                        if ($frame['args'][1]['type'] === '') {
-                            break;
-                        }
-                        if ($frame['args'][1]['type'] === $previous) {
-                            continue;
-                        }
-                        $frames[] = $frame['args'][1]['type'];
-                        $previous = $frame['args'][1]['type'];
-                    }
-                }
-            }
-            $frames = \array_reverse($frames);
-            $tlTrace = \array_shift($frames);
-            foreach ($frames as $frame) {
-                $tlTrace .= "['".$frame."']";
-            }
-            $this->API->logger->logger($tlTrace, \danog\MadelineProto\Logger::ERROR);
-            return false;
-        }
         $peers = [];
         switch ($location['_']) {
             case 'messageFwdHeader':
@@ -189,12 +147,12 @@ class MinDatabase implements TLCallback
         }
         return true;
     }
-    public function addOriginContext(string $type)
+    public function addOriginContext(string $type): void
     {
         $this->API->logger->logger("Adding peer origin context for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->cache[] = [];
     }
-    public function addOrigin(array $data = [])
+    public function addOrigin(array $data = []): void
     {
         $cache = \array_pop($this->cache);
         if ($cache === null) {

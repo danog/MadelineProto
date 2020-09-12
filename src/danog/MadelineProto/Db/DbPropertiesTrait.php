@@ -19,7 +19,7 @@ trait DbPropertiesTrait
             if ($reset) {
                 unset($this->{$property});
             } else {
-                $this->{$property} = yield DbPropertiesFabric::get($dbSettings, $prefix, $type, $property, $this->{$property});
+                $this->{$property} = yield DbPropertiesFactory::get($dbSettings, $prefix, $type, $property, $this->{$property});
             }
         }
     }

@@ -4,7 +4,7 @@ namespace danog\MadelineProto\Db;
 
 use Amp\Promise;
 
-class DbPropertiesFabric
+class DbPropertiesFactory
 {
     /**
      * @param array $dbSettings

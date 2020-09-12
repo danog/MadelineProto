@@ -25,7 +25,7 @@ use Amp\Http\Client\HttpClient;
 use Amp\Promise;
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Db\DbArray;
-use danog\MadelineProto\Db\DbPropertiesFabric;
+use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Db\Mysql;
 use danog\MadelineProto\Ipc\Server;
@@ -414,7 +414,7 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     /**
      * List of properties stored in database (memory or external).
-     * @see DbPropertiesFabric
+     * @see DbPropertiesFactory
      * @var array
      */
     protected array $dbProperies = [
@@ -569,12 +569,14 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function cleanup(): void
     {
+        /*
+        // :)
         $this->referenceDatabase = new ReferenceDatabase($this);
         $callbacks = [$this, $this->referenceDatabase];
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks[] = $this->minDatabase;
         }
-        $this->TL->updateCallbacks($callbacks);
+        $this->TL->updateCallbacks($callbacks);*/
     }
 
     private function fillUsernamesCache(): \Generator
@@ -824,9 +826,15 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         if (!isset($this->referenceDatabase)) {
             $this->referenceDatabase = new ReferenceDatabase($this);
+            yield from $this->referenceDatabase->init();
+        } else {
+            yield from $this->referenceDatabase->init();
         }
         if (!isset($this->minDatabase)) {
             $this->minDatabase = new MinDatabase($this);
+            yield from $this->minDatabase->init();
+        } else {
+            yield from $this->minDatabase->init();
         }
         if (!isset($this->TL)) {
             $this->TL = new TL($this);
@@ -1606,9 +1614,13 @@ class MTProto extends AsyncConstruct implements TLCallback
         yield from $this->initDb($this, true);
 
         $this->tos = ['expires' => 0, 'accepted' => true];
-        $this->referenceDatabase = new ReferenceDatabase($this);
-        $this->minDatabase = new MinDatabase($this);
         $this->dialog_params = ['_' => 'MadelineProto.dialogParams', 'limit' => 0, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0];
+
+        $this->referenceDatabase = new ReferenceDatabase($this);
+        yield from $this->referenceDatabase->init();
+
+        $this->minDatabase = new MinDatabase($this);
+        yield from $this->minDatabase->init();
     }
     /**
      * Reset the update state and fetch all updates from the beginning.
