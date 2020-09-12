@@ -1019,6 +1019,25 @@ interface account
      * @return  of WallPaper[]
      */
     public function getMultiWallPapers($params);
+
+    /**
+     *
+     *
+     * @return GlobalPrivacySettings
+     */
+    public function getGlobalPrivacySettings();
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `GlobalPrivacySettings` **settings** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return GlobalPrivacySettings
+     */
+    public function setGlobalPrivacySettings($params);
 }
 
 interface users
@@ -1993,19 +2012,6 @@ interface messages
      * @return Document
      */
     public function getDocumentByHash($params);
-
-    /**
-     * Search for GIFs.
-     *
-     * Parameters:
-     * * `string` **q**      - Text query
-     * * `int`    **offset** - Offset for [pagination »](https://core.telegram.org/api/offsets)
-     *
-     * @param array $params Parameters
-     *
-     * @return messages.FoundGifs
-     */
-    public function searchGifs($params);
 
     /**
      * Get saved GIFs.
@@ -3027,7 +3033,7 @@ interface photos
      *
      * @param array $params Parameters
      *
-     * @return UserProfilePhoto
+     * @return photos.Photo
      */
     public function updateProfilePhoto($params);
 
@@ -3035,7 +3041,9 @@ interface photos
      * Updates current user profile photo.
      *
      * Parameters:
-     * * `InputFile` **file** - File saved in parts by means of [upload.saveFilePart](https://docs.madelineproto.xyz/API_docs/methods/upload.saveFilePart.html) method
+     * * `InputFile` **file**           - Optional: File saved in parts by means of [upload.saveFilePart](https://docs.madelineproto.xyz/API_docs/methods/upload.saveFilePart.html) method
+     * * `InputFile` **video**          - Optional:
+     * * `double`    **video_start_ts** - Optional:
      *
      * @param array $params Parameters
      *
@@ -3386,6 +3394,18 @@ interface help
      * @return bool
      */
     public function hidePromoData($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string` **suggestion** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function dismissSuggestion($params);
 }
 
 interface channels
@@ -4156,6 +4176,19 @@ interface phone
      * @return bool
      */
     public function saveCallDebug($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPhoneCall` **peer** -
+     * * `bytes`          **data** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function sendSignalingData($params);
 }
 
 interface langpack
@@ -4281,6 +4314,19 @@ interface stats
      * @return StatsGraph
      */
     public function loadAsyncGraph($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`      **dark**    - Optional:
+     * * `InputChannel` **channel** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return stats.MegagroupStats
+     */
+    public function getMegagroupStats($params);
 }
 
 class InternalDoc extends APIFactory
@@ -4497,7 +4543,7 @@ class InternalDoc extends APIFactory
      *
      * @return integer
      */
-    public function callStatus(int $id): int
+    public function callStatus($id): int
     {
         return $this->API->callStatus($id);
     }
@@ -4864,6 +4910,15 @@ class InternalDoc extends APIFactory
         return $this->API->getAllMethods();
     }
     /**
+     * Get authorization info.
+     *
+     * @return int
+     */
+    public function getAuthorization(): int
+    {
+        return $this->API->getAuthorization();
+    }
+    /**
      * Get cached server-side config.
      *
      * @return array
@@ -4879,7 +4934,7 @@ class InternalDoc extends APIFactory
      *
      * @return array
      */
-    public function getCall(int $call): array
+    public function getCall($call): array
     {
         return $this->API->getCall($call);
     }
@@ -4927,6 +4982,15 @@ class InternalDoc extends APIFactory
         return $this->API->getDataCenterConnections();
     }
     /**
+     * Get main DC ID.
+     *
+     * @return int
+     */
+    public function getDataCenterId(): int
+    {
+        return $this->API->getDataCenterId();
+    }
+    /**
      * Get dialog peers.
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
@@ -4962,17 +5026,6 @@ class InternalDoc extends APIFactory
     public function getEventHandler(): \danog\MadelineProto\EventHandler
     {
         return $this->API->getEventHandler();
-    }
-    /**
-     * Get explanation for HTTP error.
-     *
-     * @param integer $code HTTP error code
-     *
-     * @return string
-     */
-    public function getExplanation(int $code): string
-    {
-        return \danog\MadelineProto\MTProto::getExplanation($code);
     }
     /**
      * Get extension from file location.
@@ -5299,6 +5352,15 @@ class InternalDoc extends APIFactory
     public function initDb(\danog\MadelineProto\MTProto $MadelineProto, bool $reset = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$MadelineProto, $reset, $extra]);
+    }
+    /**
+     * Initialize self-restart hack.
+     *
+     * @return void
+     */
+    public function initSelfRestart(): void
+    {
+        $this->API->initSelfRestart();
     }
     /**
      * Whether this is altervista.
