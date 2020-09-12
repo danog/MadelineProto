@@ -815,7 +815,7 @@ trait Files
                 $res['InputFileLocation']['dc_id'] = $messageMedia['dc_id'];
                 return $res;
             case 'photoStrippedSize':
-                $res['size'] = \strlen($messageMedia['bytes']);
+                $res['size'] = \strlen($messageMedia['bytes']['bytes'] ?? $messageMedia['bytes']);
                 $res['data'] = $messageMedia['bytes'];
                 $res['thumb_size'] = 'JPG';
                 return $res;
