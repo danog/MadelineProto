@@ -27,7 +27,10 @@ class RedisArray extends SqlArray
     protected function renameTable(string $from, string $to): \Generator
     {
         Logger::log("Renaming table {$from} to {$to}", Logger::WARNING);
-        $request = $this->db->scan($this->itKey());
+        $from = "va:$from";
+        $to = "va:$to";
+
+        $request = $this->db->scan($from.'*');
 
         $lenK = \strlen($from);
         while (yield $request->advance()) {
