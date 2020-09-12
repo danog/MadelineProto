@@ -7,109 +7,19 @@ use Amp\Producer;
 use Amp\Promise;
 use Amp\Sql\ResultSet;
 use Amp\Success;
+use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Logger;
 use function Amp\call;
 
-class MysqlArray implements DbArray
+class MysqlArray extends SqlArray
 {
-    use ArrayCacheTrait;
-
-    private string $table;
-    private array $settings;
+    protected string $table;
+    protected array $settings;
     private Pool $db;
 
     public function __sleep(): array
     {
         return ['table', 'settings'];
-    }
-
-    /**
-     * @param string $name
-     * @param DbArray|array|null $value
-     * @param string $tablePrefix
-     * @param array $settings
-     *
-     * @return Promise
-     */
-    public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise
-    {
-        $tableName = "{$tablePrefix}_{$name}";
-        if ($value instanceof self && $value->table === $tableName) {
-            $instance = &$value;
-        } else {
-            $instance = new static();
-            $instance->table = $tableName;
-        }
-
-        $instance->settings = $settings;
-        $instance->ttl = $settings['cache_ttl'] ?? $instance->ttl;
-
-        $instance->startCacheCleanupLoop();
-
-        return call(static function () use ($instance, $value, $settings) {
-            $instance->db = yield from static::getDbConnection($settings);
-            yield from $instance->prepareTable();
-
-            //Skip migrations if its same object
-            if ($instance !== $value) {
-                yield from static::renameTmpTable($instance, $value);
-                yield from static::migrateDataToDb($instance, $value);
-            }
-
-            return $instance;
-        });
-    }
-
-    /**
-     * @param MysqlArray $instance
-     * @param DbArray|array|null $value
-     *
-     * @return \Generator
-     */
-    private static function renameTmpTable(MysqlArray $instance, $value): \Generator
-    {
-        if ($value instanceof static && $value->table) {
-            if (
-                $value->table !== $instance->table &&
-                \mb_strpos($instance->table, 'tmp') !== 0
-            ) {
-                yield from $instance->renameTable($value->table, $instance->table);
-            } else {
-                $instance->table = $value->table;
-            }
-        }
-    }
-
-    /**
-     * @param MysqlArray $instance
-     * @param DbArray|array|null $value
-     *
-     * @return \Generator
-     * @throws \Throwable
-     */
-    private static function migrateDataToDb(MysqlArray $instance, $value): \Generator
-    {
-        if (!empty($value) && !$value instanceof MysqlArray) {
-            Logger::log('Converting database.', Logger::ERROR);
-
-            if ($value instanceof DbArray) {
-                $value = yield $value->getArrayCopy();
-            } else {
-                $value = (array) $value;
-            }
-            $counter = 0;
-            $total = \count($value);
-            foreach ($value as $key => $item) {
-                $counter++;
-                if ($counter % 500 === 0) {
-                    yield $instance->offsetSet($key, $item);
-                    Logger::log("Loading data to table {$instance->table}: $counter/$total", Logger::WARNING);
-                } else {
-                    $instance->offsetSet($key, $item);
-                }
-            }
-            Logger::log('Converting database done.', Logger::ERROR);
-        }
     }
 
     public function offsetExists($index): bool
@@ -272,17 +182,19 @@ class MysqlArray implements DbArray
         return null;
     }
 
-    public static function getDbConnection(array $settings): \Generator
+    protected function initConnection(array $settings): \Generator
     {
-        return Mysql::getConnection(
-            $settings['host'],
-            $settings['port'],
-            $settings['user'],
-            $settings['password'],
-            $settings['database'],
-            $settings['max_connections'],
-            $settings['idle_timeout']
-        );
+        if (!isset($this->db)) {
+            $this->db = yield from Mysql::getConnection(
+                $settings['host'],
+                $settings['port'],
+                $settings['user'],
+                $settings['password'],
+                $settings['database'],
+                $settings['max_connections'],
+                $settings['idle_timeout']
+            );
+        }
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace danog\MadelineProto\Db;
+namespace danog\MadelineProto\Db\Driver;
 
 use Amp\Mysql\ConnectionConfig;
 use Amp\Mysql\Pool;

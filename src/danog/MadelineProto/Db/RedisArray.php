@@ -5,13 +5,18 @@ namespace danog\MadelineProto\Db;
 use Amp\Postgres\Pool;
 use Amp\Producer;
 use Amp\Promise;
+use Amp\Redis\Redis;
 use Amp\Sql\ResultSet;
-use danog\MadelineProto\Db\Driver\Postgres;
+use danog\MadelineProto\Db\Driver\Redis as DriverRedis;
 use danog\MadelineProto\Logger;
+use Generator;
+
 use function Amp\call;
 
-class PostgresArray extends SqlArray
+class RedisArray extends DriverArray
 {
+    use ArrayCacheTrait;
+
     private string $table;
     private array $settings;
     private Pool $db;
@@ -56,50 +61,8 @@ class PostgresArray extends SqlArray
         return $request;
     }
 
-    protected static function getDbConnection(array $settings): \Generator
+    protected function initConnection(array $settings): \Generator
     {
-        return Postgres::getConnection(
-            $settings['host'],
-            $settings['port'],
-            $settings['user'],
-            $settings['password'],
-            $settings['database'],
-            $settings['max_connections'],
-            $settings['idle_timeout']
-        );
-    }
-
-    /**
-     * Create table for property.
-     *
-     * @return array|null
-     * @throws \Throwable
-     */
-    protected function prepareTable()
-    {
-        Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
-
-        yield $this->request("
-            CREATE TABLE IF NOT EXISTS \"{$this->table}\"
-            (
-                \"key\" VARCHAR(255) NOT NULL,
-                \"value\" BYTEA NULL,
-                \"ts\" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT \"{$this->table}_pkey\" PRIMARY KEY(\"key\")
-            );
-
-            
-
-            
-        ");
-
-        yield $this->request("
-            DROP TRIGGER IF exists \"{$this->table}_update_ts_trigger\" ON \"{$this->table}\";
-        ");
-
-        yield $this->request("
-            CREATE TRIGGER \"{$this->table}_update_ts_trigger\" BEFORE UPDATE ON \"{$this->table}\" FOR EACH ROW EXECUTE PROCEDURE update_ts();
-        ");
     }
 
     public function __sleep()
@@ -107,6 +70,92 @@ class PostgresArray extends SqlArray
         return ['table', 'settings'];
     }
 
+    /**
+     * @param string $name
+     * @param DbArray|array|null $value
+     * @param string $tablePrefix
+     * @param array $settings
+     *
+     * @return Promise
+     */
+    public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise
+    {
+        $tableName = "{$tablePrefix}_{$name}";
+        if ($value instanceof self && $value->table === $tableName) {
+            $instance = &$value;
+        } else {
+            $instance = new static();
+            $instance->table = $tableName;
+        }
+
+        $instance->settings = $settings;
+        $instance->db = static::getDbConnection($settings);
+        $instance->ttl = $settings['cache_ttl'] ?? $instance->ttl;
+
+        $instance->startCacheCleanupLoop();
+
+        return call(static function () use ($instance, $value, $settings) {
+            //Skip migrations if its same object
+            if ($instance !== $value) {
+                yield from static::renameTmpTable($instance, $value);
+                yield from static::migrateDataToDb($instance, $value);
+            }
+
+            return $instance;
+        });
+    }
+
+    /**
+     * @param PostgresArray $instance
+     * @param DbArray|array|null $value
+     *
+     * @return \Generator
+     */
+    private static function renameTmpTable(self $instance, $value): \Generator
+    {
+        if ($value instanceof static && $value->table) {
+            if (
+                $value->table !== $instance->table &&
+                \mb_strpos($instance->table, 'tmp') !== 0
+            ) {
+                yield from $instance->renameTable($value->table, $instance->table);
+            } else {
+                $instance->table = $value->table;
+            }
+        }
+    }
+
+    /**
+     * @param PostgresArray $instance
+     * @param DbArray|array|null $value
+     *
+     * @return \Generator
+     * @throws \Throwable
+     */
+    private static function migrateDataToDb(self $instance, $value): \Generator
+    {
+        if (!empty($value) && !$value instanceof PostgresArray) {
+            Logger::log('Converting database.', Logger::ERROR);
+
+            if ($value instanceof DbArray) {
+                $value = yield $value->getArrayCopy();
+            } else {
+                $value = (array) $value;
+            }
+            $counter = 0;
+            $total = \count($value);
+            foreach ($value as $key => $item) {
+                $counter++;
+                if ($counter % 500 === 0) {
+                    yield $instance->offsetSet($key, $item);
+                    Logger::log("Loading data to table {$instance->table}: $counter/$total", Logger::WARNING);
+                } else {
+                    $instance->offsetSet($key, $item);
+                }
+            }
+            Logger::log('Converting database done.', Logger::ERROR);
+        }
+    }
 
     public function offsetExists($index): bool
     {
@@ -230,7 +279,7 @@ class PostgresArray extends SqlArray
     }
 
 
-    protected function renameTable(string $from, string $to)
+    private function renameTable(string $from, string $to)
     {
         Logger::log("Renaming table {$from} to {$to}", Logger::WARNING);
         yield $this->request("

@@ -8,31 +8,27 @@ use danog\MadelineProto\Logger;
 trait ArrayCacheTrait
 {
     /**
-     * Values stored in this format:
-     * [
-     *      [
-     *          'value' => mixed,
-     *          'ttl' => int
-     *      ],
-     *      ...
-     * ].
-     * @var array
+     * @var array<mixed>
      */
     protected array $cache = [];
+    /**
+     * @var array<int>
+     */
+    protected array $ttlValues = [];
+
+
     protected string $ttl = '+5 minutes';
     private string $ttlCheckInterval = '+1 minute';
 
+    private ?string $cacheCleanupId = null;
+
     protected function getCache(string $key, $default = null)
     {
-        $cacheItem = $this->cache[$key] ?? null;
-        $result = $default;
-
-        if (\is_array($cacheItem)) {
-            $result = $cacheItem['value'];
-            $this->cache[$key]['ttl'] = \strtotime($this->ttl);
+        if (!isset($this->ttlValues[$key])) {
+            return $default;
         }
-
-        return $result;
+        $this->ttlValues[$key] = \strtotime($this->ttl);
+        return $this->cache[$key];
     }
 
     /**
@@ -43,10 +39,8 @@ trait ArrayCacheTrait
      */
     protected function setCache(string $key, $value): void
     {
-        $this->cache[$key] = [
-            'value' => $value,
-            'ttl' => \strtotime($this->ttl),
-        ];
+        $this->cache[$key] = $value;
+        $this->ttlValues[$key] = \strtotime($this->ttl);
     }
 
     /**
@@ -56,12 +50,19 @@ trait ArrayCacheTrait
      */
     protected function unsetCache(string $key): void
     {
-        unset($this->cache[$key]);
+        unset($this->cache[$key], $this->ttlValues[$key]);
     }
 
     protected function startCacheCleanupLoop(): void
     {
-        Loop::repeat(\strtotime($this->ttlCheckInterval, 0) * 1000, fn () => $this->cleanupCache());
+        $this->cacheCleanupId = Loop::repeat(\strtotime($this->ttlCheckInterval, 0) * 1000, [$this, 'cleanupCache']);
+    }
+    protected function stopCacheCleanupLoop(): void
+    {
+        if ($this->cacheCleanupId) {
+            Loop::cancel($this->cacheCleanupId);
+            $this->cacheCleanupId = null;
+        }
     }
 
     /**
@@ -70,14 +71,12 @@ trait ArrayCacheTrait
     protected function cleanupCache(): void
     {
         $now = \time();
-        $oldKeys = [];
-        foreach ($this->cache as $cacheKey => $cacheValue) {
-            if ($cacheValue['ttl'] < $now) {
-                $oldKeys[] = $cacheKey;
+        $oldCount = 0;
+        foreach ($this->ttlValues as $cacheKey => $ttl) {
+            if ($ttl < $now) {
+                $this->unsetCache($cacheKey);
+                $oldCount++;
             }
-        }
-        foreach ($oldKeys as $oldKey) {
-            $this->unsetCache($oldKey);
         }
 
         Logger::log(
@@ -85,7 +84,7 @@ trait ArrayCacheTrait
                 "cache for table:%s; keys left: %s; keys removed: %s",
                 $this->table,
                 \count($this->cache),
-                \count($oldKeys)
+                $oldCount
             ),
             Logger::VERBOSE
         );

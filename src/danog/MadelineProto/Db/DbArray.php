@@ -15,6 +15,8 @@ interface DbArray extends DbType, \ArrayAccess, \Countable
     public function count(): Promise;
     public function getIterator(): Producer;
 
+    public function init(): Promise;
+    
     /**
      * @deprecated
      * @internal
