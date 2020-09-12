@@ -26,23 +26,22 @@ class Redis
      * @throws \Amp\Sql\FailureException
      * @throws \Throwable
      *
-     * @return RedisRedis
+     * @return \Generator<RedisRedis>
      */
     public static function getConnection(
         string $host = '127.0.0.1',
         int $port = 6379,
         string $password = '',
-        int $db = 0,
-        int $maxConnections = ConnectionPool::DEFAULT_MAX_CONNECTIONS,
-        int $idleTimeout = ConnectionPool::DEFAULT_IDLE_TIMEOUT
-    ): RedisRedis {
+        int $db = 0
+    ): \Generator {
         $dbKey = "$host:$port:$db";
         if (empty(static::$connections[$dbKey])) {
             $config = Config::fromUri(
-                "host={$host} port={$port} password={$password} db={$db}"
+                "{$host}:{$port}?password={$password}&db={$db}"
             );
 
             static::$connections[$dbKey] = new RedisRedis((new RemoteExecutorFactory($config))->createQueryExecutor());
+            yield static::$connections[$dbKey]->ping();
         }
 
         return static::$connections[$dbKey];

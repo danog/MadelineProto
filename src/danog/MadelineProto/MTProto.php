@@ -27,6 +27,7 @@ use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\MadelineProto\Db\Driver\Redis;
 use danog\MadelineProto\Db\Mysql;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
@@ -92,7 +93,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 145;
+    const V = 147;
     /**
      * String release version.
      *
@@ -1380,6 +1381,14 @@ class MTProto extends AsyncConstruct implements TLCallback
                 'database' => 'MadelineProto', //will be created automatically
                 'max_connections' => 10,
                 'idle_timeout' => 60,
+                'cache_ttl' => '+5 minutes', //keep records in memory after last read
+            ],
+            /** @see Redis */
+            'redis' => [
+                'host' => 'redis://127.0.0.1',
+                'port' => 6379,
+                'password' => '',
+                'database' => 0, //will be created automatically
                 'cache_ttl' => '+5 minutes', //keep records in memory after last read
             ],
         ],

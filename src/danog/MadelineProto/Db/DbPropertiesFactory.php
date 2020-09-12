@@ -26,13 +26,16 @@ class DbPropertiesFactory
 
         switch (\strtolower($dbSettings['type'])) {
             case 'memory':
-                $class .= '\Memory';
+                $class .= '\\Memory';
                 break;
             case 'mysql':
-                $class .= '\Mysql';
+                $class .= '\\Mysql';
                 break;
             case 'postgres':
-                $class .= '\Postgres';
+                $class .= '\\Postgres';
+                break;
+            case 'redis':
+                $class .= '\\Redis';
                 break;
             default:
                 throw new \InvalidArgumentException("Unknown dbType: {$dbSettings['type']}");

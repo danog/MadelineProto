@@ -55,7 +55,7 @@ trait ArrayCacheTrait
 
     protected function startCacheCleanupLoop(): void
     {
-        $this->cacheCleanupId = Loop::repeat(\strtotime($this->ttlCheckInterval, 0) * 1000, [$this, 'cleanupCache']);
+        $this->cacheCleanupId = Loop::repeat(\strtotime($this->ttlCheckInterval, 0) * 1000, fn () => $this->cleanupCache());
     }
     protected function stopCacheCleanupLoop(): void
     {

@@ -21,12 +21,7 @@ class MysqlArray extends SqlArray
     {
         return ['table', 'settings'];
     }
-
-    public function offsetExists($index): bool
-    {
-        throw new \RuntimeException('Native isset not support promises. Use isset method');
-    }
-
+    
     /**
      * Check if key isset.
      *
@@ -203,7 +198,7 @@ class MysqlArray extends SqlArray
      * @return array|null
      * @throws \Throwable
      */
-    private function prepareTable()
+    protected function prepareTable(): \Generator
     {
         Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
         return yield $this->request("
@@ -220,7 +215,7 @@ class MysqlArray extends SqlArray
         ");
     }
 
-    private function renameTable(string $from, string $to)
+    protected function renameTable(string $from, string $to): \Generator
     {
         Logger::log("Renaming table {$from} to {$to}", Logger::WARNING);
         yield $this->request("

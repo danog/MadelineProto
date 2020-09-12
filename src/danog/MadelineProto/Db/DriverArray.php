@@ -13,6 +13,12 @@ abstract class DriverArray implements DbArray
         $this->stopCacheCleanupLoop();
     }
 
+
+    public function offsetExists($index): bool
+    {
+        throw new \RuntimeException('Native isset not support promises. Use isset method');
+    }
+    
     abstract protected function initConnection(array $settings): \Generator;
 
     /**

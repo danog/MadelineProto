@@ -2,6 +2,8 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Promise;
+
 use function Amp\call;
 
 abstract class SqlArray extends DriverArray
@@ -12,9 +14,9 @@ abstract class SqlArray extends DriverArray
      * @return array|null
      * @throws \Throwable
      */
-    abstract protected function prepareTable();
+    abstract protected function prepareTable(): \Generator;
 
-    abstract protected function renameTable(string $from, string $to);
+    abstract protected function renameTable(string $from, string $to): \Generator;
 
     /**
      * @param string $name
@@ -57,7 +59,7 @@ abstract class SqlArray extends DriverArray
     }
 
     /**
-     * Rename table of old database, if is a temporary table name.
+     * Rename table of old database, if the new one is not a temporary table name.
      *
      * Otherwise, change name of table in new database to match old table name.
      *

@@ -6,15 +6,31 @@ use Amp\Postgres\Pool;
 use Amp\Producer;
 use Amp\Promise;
 use Amp\Sql\ResultSet;
+use Amp\Success;
 use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Logger;
 use function Amp\call;
 
 class PostgresArray extends SqlArray
 {
-    private string $table;
-    private array $settings;
+    protected string $table;
+    protected array $settings;
     private Pool $db;
+
+    protected function initConnection(array $settings): \Generator
+    {
+        if (!isset($this->db)) {
+            $this->db = yield from Postgres::getConnection(
+                $settings['host'],
+                $settings['port'],
+                $settings['user'],
+                $settings['password'],
+                $settings['database'],
+                $settings['max_connections'],
+                $settings['idle_timeout']
+            );
+        }
+    }
 
     /**
      * Set value for an offset.
@@ -32,7 +48,7 @@ class PostgresArray extends SqlArray
     public function offsetSet($index, $value): Promise
     {
         if ($this->getCache($index) === $value) {
-            return call(fn () =>null);
+            return new Success();
         }
 
         $this->setCache($index, $value);
@@ -56,26 +72,13 @@ class PostgresArray extends SqlArray
         return $request;
     }
 
-    protected static function getDbConnection(array $settings): \Generator
-    {
-        return Postgres::getConnection(
-            $settings['host'],
-            $settings['port'],
-            $settings['user'],
-            $settings['password'],
-            $settings['database'],
-            $settings['max_connections'],
-            $settings['idle_timeout']
-        );
-    }
-
     /**
      * Create table for property.
      *
      * @return array|null
      * @throws \Throwable
      */
-    protected function prepareTable()
+    protected function prepareTable(): \Generator
     {
         Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
 
@@ -105,12 +108,6 @@ class PostgresArray extends SqlArray
     public function __sleep()
     {
         return ['table', 'settings'];
-    }
-
-
-    public function offsetExists($index): bool
-    {
-        throw new \RuntimeException('Native isset not support promises. Use isset method');
     }
 
     /**
@@ -230,7 +227,7 @@ class PostgresArray extends SqlArray
     }
 
 
-    protected function renameTable(string $from, string $to)
+    protected function renameTable(string $from, string $to): \Generator
     {
         Logger::log("Renaming table {$from} to {$to}", Logger::WARNING);
         yield $this->request("

@@ -92,7 +92,8 @@ $settings = [
     ],
     'serialization' => [
         'serialization_interval' => 30,
-    ]
+    ],
+    'db' => ['type' => 'redis']
 ];
 
 $MadelineProto = new API('bot.madeline', $settings);

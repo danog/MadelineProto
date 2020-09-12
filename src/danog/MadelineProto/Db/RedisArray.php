@@ -2,25 +2,86 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Postgres\Pool;
 use Amp\Producer;
 use Amp\Promise;
-use Amp\Redis\Redis;
-use Amp\Sql\ResultSet;
-use danog\MadelineProto\Db\Driver\Redis as DriverRedis;
+use Amp\Redis\Redis as RedisRedis;
+use Amp\Success;
+use danog\MadelineProto\Db\Driver\Redis as Redis;
 use danog\MadelineProto\Logger;
 use Generator;
 
 use function Amp\call;
 
-class RedisArray extends DriverArray
+class RedisArray extends SqlArray
 {
-    use ArrayCacheTrait;
+    protected string $table;
+    protected array $settings;
+    private RedisRedis $db;
 
-    private string $table;
-    private array $settings;
-    private Pool $db;
+    protected function prepareTable(): Generator
+    {
+        yield new Success;
+    }
 
+
+    protected function renameTable(string $from, string $to): \Generator
+    {
+        Logger::log("Renaming table {$from} to {$to}", Logger::WARNING);
+        $request = $this->db->scan($this->itKey());
+
+        $lenK = \strlen($from);
+        while (yield $request->advance()) {
+            $key = $request->getCurrent();
+            yield $this->db->rename($key, $to.\substr($key, $lenK));
+        }
+    }
+
+    protected function initConnection(array $settings): \Generator
+    {
+        if (!isset($this->db)) {
+            $this->db = yield from Redis::getConnection(
+                $settings['host'],
+                $settings['port'],
+                $settings['password'],
+                $settings['database']
+            );
+        }
+    }
+
+    public function __sleep()
+    {
+        return ['table', 'settings'];
+    }
+    /**
+     * Get redis key name.
+     *
+     * @param string $key
+     * @return string
+     */
+    private function rKey(string $key): string
+    {
+        return 'va:'.$this->table.':'.$key;
+    }
+    /**
+     * Get redis ts name.
+     *
+     * @param string $key
+     * @return string
+     */
+    private function tsKey(string $key): string
+    {
+        return 'ts:'.$this->table.$key;
+    }
+
+    /**
+     * Get iterator key.
+     *
+     * @return string
+     */
+    private function itKey(): string
+    {
+        return 'va:'.$this->table.'*';
+    }
     /**
      * Set value for an offset.
      *
@@ -37,129 +98,24 @@ class RedisArray extends DriverArray
     public function offsetSet($index, $value): Promise
     {
         if ($this->getCache($index) === $value) {
-            return call(fn () =>null);
+            return new Success();
         }
 
         $this->setCache($index, $value);
 
-        $request = $this->request(
-            "
-            INSERT INTO \"{$this->table}\"
-            (key,value)
-            VALUES (:index, :value)
-            ON CONFLICT (key) DO UPDATE SET value = :value
-        ",
+        /*
+        $request = $this->db->setMultiple(
             [
-                'index' => $index,
-                'value' => \serialize($value),
+                $this->rKey($index) => \serialize($value),
+                $this->tsKey($index) => \time()
             ]
-        );
+        );*/
+        $request = $this->db->set($this->rKey($index), \serialize($value));
 
         //Ensure that cache is synced with latest insert in case of concurrent requests.
         $request->onResolve(fn () => $this->setCache($index, $value));
 
         return $request;
-    }
-
-    protected function initConnection(array $settings): \Generator
-    {
-    }
-
-    public function __sleep()
-    {
-        return ['table', 'settings'];
-    }
-
-    /**
-     * @param string $name
-     * @param DbArray|array|null $value
-     * @param string $tablePrefix
-     * @param array $settings
-     *
-     * @return Promise
-     */
-    public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise
-    {
-        $tableName = "{$tablePrefix}_{$name}";
-        if ($value instanceof self && $value->table === $tableName) {
-            $instance = &$value;
-        } else {
-            $instance = new static();
-            $instance->table = $tableName;
-        }
-
-        $instance->settings = $settings;
-        $instance->db = static::getDbConnection($settings);
-        $instance->ttl = $settings['cache_ttl'] ?? $instance->ttl;
-
-        $instance->startCacheCleanupLoop();
-
-        return call(static function () use ($instance, $value, $settings) {
-            //Skip migrations if its same object
-            if ($instance !== $value) {
-                yield from static::renameTmpTable($instance, $value);
-                yield from static::migrateDataToDb($instance, $value);
-            }
-
-            return $instance;
-        });
-    }
-
-    /**
-     * @param PostgresArray $instance
-     * @param DbArray|array|null $value
-     *
-     * @return \Generator
-     */
-    private static function renameTmpTable(self $instance, $value): \Generator
-    {
-        if ($value instanceof static && $value->table) {
-            if (
-                $value->table !== $instance->table &&
-                \mb_strpos($instance->table, 'tmp') !== 0
-            ) {
-                yield from $instance->renameTable($value->table, $instance->table);
-            } else {
-                $instance->table = $value->table;
-            }
-        }
-    }
-
-    /**
-     * @param PostgresArray $instance
-     * @param DbArray|array|null $value
-     *
-     * @return \Generator
-     * @throws \Throwable
-     */
-    private static function migrateDataToDb(self $instance, $value): \Generator
-    {
-        if (!empty($value) && !$value instanceof PostgresArray) {
-            Logger::log('Converting database.', Logger::ERROR);
-
-            if ($value instanceof DbArray) {
-                $value = yield $value->getArrayCopy();
-            } else {
-                $value = (array) $value;
-            }
-            $counter = 0;
-            $total = \count($value);
-            foreach ($value as $key => $item) {
-                $counter++;
-                if ($counter % 500 === 0) {
-                    yield $instance->offsetSet($key, $item);
-                    Logger::log("Loading data to table {$instance->table}: $counter/$total", Logger::WARNING);
-                } else {
-                    $instance->offsetSet($key, $item);
-                }
-            }
-            Logger::log('Converting database done.', Logger::ERROR);
-        }
-    }
-
-    public function offsetExists($index): bool
-    {
-        throw new \RuntimeException('Native isset not support promises. Use isset method');
     }
 
     /**
@@ -171,7 +127,7 @@ class RedisArray extends DriverArray
      */
     public function isset($key): Promise
     {
-        return call(fn () => yield $this->offsetGet($key) !== null);
+        return $this->db->has($this->rKey($key));
     }
 
 
@@ -182,12 +138,9 @@ class RedisArray extends DriverArray
                 return $cached;
             }
 
-            $row = yield $this->request(
-                "SELECT value FROM \"{$this->table}\" WHERE key = :index LIMIT 1",
-                ['index' => $offset]
-            );
+            $value = yield $this->db->get($this->rKey($offset));
 
-            if ($value = $this->getValue($row)) {
+            if ($value = \unserialize($value)) {
                 $this->setCache($offset, $value);
             }
 
@@ -211,13 +164,7 @@ class RedisArray extends DriverArray
     {
         $this->unsetCache($index);
 
-        return $this->request(
-            "
-                    DELETE FROM \"{$this->table}\"
-                    WHERE key = :index
-                ",
-            ['index' => $index]
-        );
+        return $this->db->delete($this->rkey($index));
     }
 
     /**
@@ -242,11 +189,10 @@ class RedisArray extends DriverArray
     public function getIterator(): Producer
     {
         return new Producer(function (callable $emit) {
-            $request = yield $this->db->execute("SELECT key, value FROM \"{$this->table}\"");
+            $request = $this->db->scan($this->itKey());
 
             while (yield $request->advance()) {
-                $row = $request->getCurrent();
-                yield $emit([$row['key'], $this->getValue($row)]);
+                yield $emit([$key = $request->getCurrent(), \unserialize(yield $this->db->get($key))]);
             }
         });
     }
@@ -262,75 +208,14 @@ class RedisArray extends DriverArray
     public function count(): Promise
     {
         return call(function () {
-            $row = yield $this->request("SELECT count(key) as count FROM \"{$this->table}\"");
-            return $row[0]['count'] ?? 0;
-        });
-    }
+            $request = $this->db->scan($this->itKey());
+            $count = 0;
 
-    private function getValue(array $row)
-    {
-        if ($row) {
-            if (!empty($row[0]['value'])) {
-                $row = \reset($row);
-            }
-            return \unserialize($row['value']);
-        }
-        return null;
-    }
-
-
-    private function renameTable(string $from, string $to)
-    {
-        Logger::log("Renaming table {$from} to {$to}", Logger::WARNING);
-        yield $this->request("
-            ALTER TABLE \"{$from}\" RENAME TO \"{$to}\";
-        ");
-
-        yield $this->request("
-            DROP TABLE IF EXISTS \"{$from}\";
-        ");
-    }
-
-    /**
-     * Perform async request to db.
-     *
-     * @param string $query
-     * @param array $params
-     *
-     * @return Promise
-     * @throws \Throwable
-     */
-    private function request(string $query, array $params = []): Promise
-    {
-        return call(function () use ($query, $params) {
-            Logger::log([$query, $params], Logger::VERBOSE);
-
-            if (empty($this->db) || !$this->db->isAlive()) {
-                Logger::log('No database connection', Logger::WARNING);
-                return [];
+            while (yield $request->advance()) {
+                $count++;
             }
 
-            if (
-                !empty($params['index'])
-                && !\mb_check_encoding($params['index'], 'UTF-8')
-            ) {
-                $params['index'] = \mb_convert_encoding($params['index'], 'UTF-8');
-            }
-
-            try {
-                $request = yield $this->db->execute($query, $params);
-            } catch (\Throwable $e) {
-                Logger::log($e->getMessage(), Logger::ERROR);
-                return [];
-            }
-
-            $result = [];
-            if ($request instanceof ResultSet) {
-                while (yield $request->advance()) {
-                    $result[] = $request->getCurrent();
-                }
-            }
-            return $result;
+            return $count;
         });
     }
 }
