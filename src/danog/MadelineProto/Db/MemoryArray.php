@@ -4,6 +4,7 @@ namespace danog\MadelineProto\Db;
 
 use Amp\Producer;
 use Amp\Promise;
+use Amp\Success;
 use danog\MadelineProto\Logger;
 use function Amp\call;
 
@@ -35,27 +36,27 @@ class MemoryArray extends \ArrayIterator implements DbArray
 
     public function isset($key): Promise
     {
-        return call(fn () => parent::offsetExists($key));
+        return new Success(parent::offsetExists($key));
     }
 
     public function offsetGet($offset): Promise
     {
-        return call(fn () => parent::offsetExists($offset) ? parent::offsetGet($offset) : null);
+        return new Success(parent::offsetExists($offset) ? parent::offsetGet($offset) : null);
     }
 
     public function offsetUnset($offset): Promise
     {
-        return call(fn () => parent::offsetUnset($offset));
+        return new Success(parent::offsetUnset($offset));
     }
 
     public function count(): Promise
     {
-        return call(fn () => parent::count());
+        return new Success(parent::count());
     }
 
     public function getArrayCopy(): Promise
     {
-        return call(fn () => parent::getArrayCopy());
+        return new Success(parent::getArrayCopy());
     }
 
     public function getIterator(): Producer

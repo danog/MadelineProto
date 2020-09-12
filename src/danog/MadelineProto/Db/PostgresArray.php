@@ -57,7 +57,7 @@ class PostgresArray implements DbArray
         return $request;
     }
 
-    public static function getDbConnection(array $settings): Pool
+    public static function getDbConnection(array $settings): \Generator
     {
         return Postgres::getConnection(
             $settings['host'],
@@ -103,24 +103,9 @@ class PostgresArray implements DbArray
         ");
     }
 
-    public function __serialize(): array
+    public function __sleep()
     {
-        return [
-            'table' => $this->table,
-            'settings' => $this->settings
-        ];
-    }
-
-    public function __unserialize($data): void
-    {
-        foreach ($data as $property => $value) {
-            $this->{$property} = $value;
-        }
-        try {
-            $this->db = static::getDbConnection($this->settings);
-        } catch (\Throwable $e) {
-            Logger::log($e->getMessage(), Logger::ERROR);
-        }
+        return ['table', 'settings'];
     }
 
     /**
@@ -142,12 +127,13 @@ class PostgresArray implements DbArray
         }
 
         $instance->settings = $settings;
-        $instance->db = static::getDbConnection($settings);
         $instance->ttl = $settings['cache_ttl'] ?? $instance->ttl;
 
         $instance->startCacheCleanupLoop();
 
-        return call(static function () use ($instance, $value) {
+        return call(static function () use ($instance, $value, $settings) {
+            $instance->db = yield from static::getDbConnection($settings);
+
             yield from $instance->prepareTable();
 
             //Skip migrations if its same object
@@ -367,9 +353,9 @@ class PostgresArray implements DbArray
 
             if (
                 !empty($params['index'])
-                && !mb_check_encoding($params['index'], 'UTF-8')
+                && !\mb_check_encoding($params['index'], 'UTF-8')
             ) {
-                $params['index'] = mb_convert_encoding($params['index'], 'UTF-8');
+                $params['index'] = \mb_convert_encoding($params['index'], 'UTF-8');
             }
 
             try {

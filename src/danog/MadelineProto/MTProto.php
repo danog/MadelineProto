@@ -417,7 +417,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @see DbPropertiesFactory
      * @var array
      */
-    protected array $dbProperies = [
+    protected static array $dbProperties = [
         'chats' => 'array',
         'full_chats' => 'array',
         'channel_participants' => 'array',
@@ -569,14 +569,12 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function cleanup(): void
     {
-        /*
-        // :)
         $this->referenceDatabase = new ReferenceDatabase($this);
         $callbacks = [$this, $this->referenceDatabase];
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks[] = $this->minDatabase;
         }
-        $this->TL->updateCallbacks($callbacks);*/
+        $this->TL->updateCallbacks($callbacks);
     }
 
     private function fillUsernamesCache(): \Generator

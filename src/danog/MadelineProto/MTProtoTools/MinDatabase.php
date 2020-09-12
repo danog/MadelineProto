@@ -59,7 +59,7 @@ class MinDatabase implements TLCallback
      * @see DbPropertiesFactory
      * @var array
      */
-    protected array $dbProperies = [
+    protected static array $dbProperties = [
         'db' => 'array',
     ];
 

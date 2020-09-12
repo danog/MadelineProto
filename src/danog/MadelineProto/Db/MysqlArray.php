@@ -6,6 +6,7 @@ use Amp\Mysql\Pool;
 use Amp\Producer;
 use Amp\Promise;
 use Amp\Sql\ResultSet;
+use Amp\Success;
 use danog\MadelineProto\Logger;
 use function Amp\call;
 
@@ -17,24 +18,9 @@ class MysqlArray implements DbArray
     private array $settings;
     private Pool $db;
 
-    public function __serialize(): array
+    public function __sleep(): array
     {
-        return [
-            'table' => $this->table,
-            'settings' => $this->settings
-        ];
-    }
-
-    public function __unserialize($data): void
-    {
-        foreach ($data as $property => $value) {
-            $this->{$property} = $value;
-        }
-        try {
-            $this->db = static::getDbConnection($this->settings);
-        } catch (\Throwable $e) {
-            Logger::log($e->getMessage(), Logger::ERROR);
-        }
+        return ['table', 'settings'];
     }
 
     /**
@@ -56,12 +42,12 @@ class MysqlArray implements DbArray
         }
 
         $instance->settings = $settings;
-        $instance->db = static::getDbConnection($settings);
         $instance->ttl = $settings['cache_ttl'] ?? $instance->ttl;
 
         $instance->startCacheCleanupLoop();
 
-        return call(static function () use ($instance, $value) {
+        return call(static function () use ($instance, $value, $settings) {
+            $instance->db = yield from static::getDbConnection($settings);
             yield from $instance->prepareTable();
 
             //Skip migrations if its same object
@@ -180,7 +166,7 @@ class MysqlArray implements DbArray
     public function offsetSet($index, $value): Promise
     {
         if ($this->getCache($index) === $value) {
-            return call(fn () =>null);
+            return new Success();
         }
 
         $this->setCache($index, $value);
@@ -286,7 +272,7 @@ class MysqlArray implements DbArray
         return null;
     }
 
-    public static function getDbConnection(array $settings): Pool
+    public static function getDbConnection(array $settings): \Generator
     {
         return Mysql::getConnection(
             $settings['host'],
@@ -355,9 +341,9 @@ class MysqlArray implements DbArray
 
             if (
                 !empty($params['index'])
-                && !mb_check_encoding($params['index'], 'UTF-8')
+                && !\mb_check_encoding($params['index'], 'UTF-8')
             ) {
-                $params['index'] = mb_convert_encoding($params['index'], 'UTF-8');
+                $params['index'] = \mb_convert_encoding($params['index'], 'UTF-8');
             }
 
             try {

@@ -6,14 +6,12 @@ use Amp\Mysql\ConnectionConfig;
 use Amp\Mysql\Pool;
 use Amp\Sql\Common\ConnectionPool;
 use danog\MadelineProto\Logger;
-use function Amp\call;
 use function Amp\Mysql\Pool;
-use function Amp\Promise\wait;
 
 class Mysql
 {
     /** @var Pool[] */
-    private static array $connections;
+    private static array $connections = [];
 
     /**
      * @param string $host
@@ -25,10 +23,11 @@ class Mysql
      * @param int $maxConnections
      * @param int $idleTimeout
      *
-     * @return Pool
      * @throws \Amp\Sql\ConnectionException
      * @throws \Amp\Sql\FailureException
      * @throws \Throwable
+     *
+     * @return \Generator<Pool>
      */
     public static function getConnection(
         string $host = '127.0.0.1',
@@ -38,14 +37,14 @@ class Mysql
         string $db = 'MadelineProto',
         int $maxConnections = ConnectionPool::DEFAULT_MAX_CONNECTIONS,
         int $idleTimeout = ConnectionPool::DEFAULT_IDLE_TIMEOUT
-    ): Pool {
+    ): \Generator {
         $dbKey = "$host:$port:$db";
         if (empty(static::$connections[$dbKey])) {
             $config = ConnectionConfig::fromString(
                 "host={$host} port={$port} user={$user} password={$password} db={$db}"
             );
 
-            static::createDb($config);
+            yield from static::createDb($config);
             static::$connections[$dbKey] = pool($config, $maxConnections, $idleTimeout);
         }
 
@@ -58,22 +57,22 @@ class Mysql
      * @throws \Amp\Sql\ConnectionException
      * @throws \Amp\Sql\FailureException
      * @throws \Throwable
+     *
+     * @return \Generator
      */
-    private static function createDb(ConnectionConfig $config)
+    private static function createDb(ConnectionConfig $config): \Generator
     {
-        wait(call(static function () use ($config) {
-            try {
-                $db = $config->getDatabase();
-                $connection = pool($config->withDatabase(null));
-                yield $connection->query("
+        try {
+            $db = $config->getDatabase();
+            $connection = pool($config->withDatabase(null));
+            yield $connection->query("
                     CREATE DATABASE IF NOT EXISTS `{$db}`
                     CHARACTER SET 'utf8mb4' 
                     COLLATE 'utf8mb4_general_ci'
                 ");
-                $connection->close();
-            } catch (\Throwable $e) {
-                Logger::log($e->getMessage(), Logger::ERROR);
-            }
-        }));
+            $connection->close();
+        } catch (\Throwable $e) {
+            Logger::log($e->getMessage(), Logger::ERROR);
+        }
     }
 }

@@ -2,20 +2,26 @@
 
 namespace danog\MadelineProto\Db;
 
-use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 
 trait DbPropertiesTrait
 {
+    /**
+     * Initialize database instance.
+     *
+     * @param MTProto $MadelineProto
+     * @param boolean $reset
+     * @return \Generator
+     */
     public function initDb(MTProto $MadelineProto, bool $reset = false): \Generator
     {
-        if (empty($this->dbProperies)) {
-            throw new \LogicException(__CLASS__ . ' must have a $dbProperies');
+        if (empty(static::$dbProperties)) {
+            throw new \LogicException(static::class.' must have $dbProperties');
         }
         $dbSettings = $MadelineProto->settings['db'];
         $prefix = static::getSessionId($MadelineProto);
 
-        foreach ($this->dbProperies as $property => $type) {
+        foreach (static::$dbProperties as $property => $type) {
             if ($reset) {
                 unset($this->{$property});
             } else {
@@ -32,8 +38,8 @@ trait DbPropertiesTrait
             $result .= \str_replace('0', '', \spl_object_hash($madelineProto));
         }
 
-        $className = \explode('\\', __CLASS__);
-        $result .= '_' . \end($className);
+        $className = \explode('\\', static::class);
+        $result .= '_'.\end($className);
         return $result;
     }
 }
