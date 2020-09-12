@@ -469,7 +469,7 @@ class ReferenceDatabase implements TLCallback
     }
     public function populateReference(array $object): \Generator
     {
-        $object['file_reference'] = yield $this->getReference(self::LOCATION_CONTEXT[$object['_']], $object);
+        $object['file_reference'] = yield from $this->getReference(self::LOCATION_CONTEXT[$object['_']], $object);
         return $object;
     }
     public function getReference(int $locationType, array $location): \Generator
