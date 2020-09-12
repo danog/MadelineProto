@@ -518,7 +518,7 @@ trait PeerHandler
                 }
             }
             if (yield $this->chats[$id]) {
-                if (((yield $this->chats[$id])['min'] ?? false) && $this->minDatabase->hasPeer($id) && !isset($this->caching_full_info[$id])) {
+                if (((yield $this->chats[$id])['min'] ?? false) && yield $this->minDatabase->hasPeer($id) && !isset($this->caching_full_info[$id])) {
                     $this->caching_full_info[$id] = true;
                     $this->logger->logger("Only have min peer for {$id} in database, trying to fetch full info");
                     try {
