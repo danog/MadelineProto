@@ -115,7 +115,7 @@ trait MessageHandler
                 $this->secret_chats[$message['message']['chat_id']]['mtproto'] = 2;
             }
         }
-        $deserialized = $this->TL->deserialize($message_data, ['type' => '']);
+        $deserialized = yield from $this->TL->deserialize($message_data, ['type' => '']);
         $this->secret_chats[$message['message']['chat_id']]['ttr']--;
         if (($this->secret_chats[$message['message']['chat_id']]['ttr'] <= 0 || \time() - $this->secret_chats[$message['message']['chat_id']]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$message['message']['chat_id']]['rekeying'][0] === 0) {
             yield from $this->rekey($message['message']['chat_id']);

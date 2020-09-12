@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\TL;
 
+use Amp\Promise;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Tools;
 
@@ -788,7 +789,8 @@ class TL
         } elseif (!\is_resource($stream)) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['stream_handle_invalid']);
         }
-        $this->deserialize($stream, $type);
+        $promises = [];
+        $this->deserializeInternal($stream, $promises, $type);
         return \ftell($stream);
     }
     /**
@@ -797,9 +799,28 @@ class TL
      * @param string|resource $stream Stream
      * @param array           $type   Type identifier
      *
+     * @return \Generator<mixed>
+     */
+    public function deserialize($stream, $type = ['type' => '']): \Generator
+    {
+        $promises = [];
+        $result = $this->deserializeInternal($stream, $promises, $type);
+        if ($promises) {
+            yield $promises;
+        }
+        return $result;
+    }
+
+    /**
+     * Deserialize TL object.
+     *
+     * @param string|resource $stream    Stream
+     * @param Promise[]       &$promises Promise array
+     * @param array           $type      Type identifier
+     *
      * @return mixed
      */
-    public function deserialize($stream, $type = ['type' => ''])
+    private function deserializeInternal($stream, array &$promises, array $type)
     {
         if (\is_string($stream)) {
             $res = \fopen('php://memory', 'rw+b');
@@ -865,7 +886,17 @@ class TL
                 }
                 switch ($constructorData['predicate']) {
                     case 'gzip_packed':
-                        return $this->deserialize(\gzdecode($this->deserialize($stream, ['type' => 'bytes', 'connection' => $type['connection']])), ['type' => '', 'connection' => $type['connection']]);
+                        return $this->deserializeInternal(
+                            \gzdecode(
+                                $this->deserializeInternal(
+                                    $stream,
+                                    $promises,
+                                    ['type' => 'bytes', 'connection' => $type['connection']]
+                                )
+                            ),
+                            $promises,
+                            ['type' => '', 'connection' => $type['connection']]
+                        );
                     case 'Vector t':
                     case 'vector':
                         break;
@@ -878,7 +909,7 @@ class TL
                 $result = [];
                 $type['type'] = $type['subtype'];
                 for ($i = 0; $i < $count; $i++) {
-                    $result[] = $this->deserialize($stream, $type);
+                    $result[] = $this->deserializeInternal($stream, $promises, $type);
                 }
                 return $result;
         }
@@ -907,13 +938,23 @@ class TL
             if (!isset($type['subtype'])) {
                 $type['subtype'] = '';
             }
-            return $this->deserialize(\gzdecode($this->deserialize($stream, ['type' => 'bytes'])), ['type' => '', 'connection' => $type['connection'], 'subtype' => $type['subtype']]);
+            return $this->deserializeInternal(
+                \gzdecode(
+                    $this->deserializeInternal(
+                        $stream,
+                        $promises,
+                        ['type' => 'bytes']
+                    )
+                ),
+                $promises,
+                ['type' => '', 'connection' => $type['connection'], 'subtype' => $type['subtype']]
+            );
         }
         if ($constructorData['type'] === 'Vector t') {
             $constructorData['connection'] = $type['connection'];
             $constructorData['subtype'] = $type['subtype'] ?? '';
             $constructorData['type'] = 'vector';
-            return $this->deserialize($stream, $constructorData);
+            return $this->deserializeInternal($stream, $promises, $constructorData);
         }
         if ($constructorData['predicate'] === 'boolTrue') {
             return true;
@@ -968,7 +1009,7 @@ class TL
             if (isset($type['connection'])) {
                 $arg['connection'] = $type['connection'];
             }
-            $x[$arg['name']] = $this->deserialize($stream, $arg);
+            $x[$arg['name']] = $this->deserializeInternal($stream, $promises, $arg);
             if ($arg['name'] === 'random_bytes') {
                 if (\strlen($x[$arg['name']]) < 15) {
                     throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['rand_bytes_too_small']);
@@ -1000,7 +1041,10 @@ class TL
         }
         if (isset($this->callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
             foreach ($this->callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) {
-                \danog\MadelineProto\Tools::callFork($callback($x));
+                $promise = \danog\MadelineProto\Tools::callFork($callback($x));
+                if ($promise instanceof Promise) {
+                    $promises []= $promise;
+                }
             }
         } elseif ($x['_'] === 'rpc_result' && isset($type['connection']->outgoing_messages[$x['req_msg_id']]['_']) && isset($this->callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']])) {
             foreach ($this->callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {

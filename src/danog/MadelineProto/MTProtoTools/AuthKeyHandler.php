@@ -237,7 +237,7 @@ trait AuthKeyHandler
                  *         int            $server_time
                  * ]
                  */
-                $server_DH_inner_data = $this->TL->deserialize($answer, ['type' => '']);
+                $server_DH_inner_data = yield from $this->TL->deserialize($answer, ['type' => '']);
                 /*
                  * ***********************************************************************
                  * Do some checks

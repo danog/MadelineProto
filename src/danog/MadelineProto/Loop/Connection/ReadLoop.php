@@ -196,7 +196,7 @@ class ReadLoop extends SignalLoop
                 $API->logger->logger('Got unknown auth_key id', Logger::ERROR);
                 return -404;
             }
-            $deserialized = $API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $connection]);
+            $deserialized = yield from $API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $connection]);
             if (isset($API->referenceDatabase)) {
                 $API->referenceDatabase->reset();
             }
