@@ -21,7 +21,7 @@ class MysqlArray extends SqlArray
     {
         return ['table', 'settings'];
     }
-    
+
     /**
      * Check if key isset.
      *

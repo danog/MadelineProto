@@ -194,11 +194,11 @@ trait BotAPI
             case 'updateShortSentMessage':
                 $newd['message_id'] = $data['id'];
                 $newd['date'] = $data['date'];
-                $newd['text'] = $data['request']['message'];
+                $newd['text'] = $data['request']['body']['message'];
                 if ($data['out']) {
                     $newd['from'] = (yield from $this->getPwrChat($this->authorization['user']));
                 }
-                $newd['chat'] = yield from $this->getPwrChat($data['request']['peer']);
+                $newd['chat'] = yield from $this->getPwrChat($data['request']['body']['peer']);
                 if (isset($data['entities'])) {
                     $newd['entities'] = yield from $this->MTProtoToBotAPI($data['entities']);
                 }

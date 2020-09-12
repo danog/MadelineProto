@@ -1037,7 +1037,7 @@ class TL
                     return $x['value'];
             }
         } elseif ($x['_'] === 'photoStrippedSize') {
-            $x['inflated'] = Tools::inflateStripped($x['bytes']);
+            $x['inflated'] = new Types\Bytes(Tools::inflateStripped($x['bytes']));
         }
         if (isset($this->callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']])) {
             foreach ($this->callbacks[TLCallback::CONSTRUCTOR_CALLBACK][$x['_']] as $callback) {

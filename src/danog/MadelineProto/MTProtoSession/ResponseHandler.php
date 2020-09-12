@@ -476,7 +476,14 @@ trait ResponseHandler
         }
         $botAPI = isset($request['botAPI']) && $request['botAPI'];
         if (isset($response['_']) && !$this->isCdn() && $this->API->getTL()->getConstructors()->findByPredicate($response['_'])['type'] === 'Updates') {
-            $response['request'] = ['_' => $request['_'], 'body' => $request['body'] ?? []];
+            $body = [];
+            if (isset($request['body']['peer'])) {
+                $body['peer'] = $this->API->getID($request['body']['peer']);
+            }
+            if (isset($request['body']['message'])) {
+                $body['message'] = (string) $request['body']['message'];
+            }
+            $response['request'] = ['_' => $request['_'], 'body' => $body];
             \danog\MadelineProto\Tools::callForkDefer($this->API->handleUpdates($response));
         }
         unset($request);

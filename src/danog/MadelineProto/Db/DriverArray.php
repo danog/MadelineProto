@@ -18,7 +18,7 @@ abstract class DriverArray implements DbArray
     {
         throw new \RuntimeException('Native isset not support promises. Use isset method');
     }
-    
+
     abstract protected function initConnection(array $settings): \Generator;
 
     /**

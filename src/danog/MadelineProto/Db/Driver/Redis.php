@@ -5,7 +5,6 @@ namespace danog\MadelineProto\Db\Driver;
 use Amp\Redis\Config;
 use Amp\Redis\Redis as RedisRedis;
 use Amp\Redis\RemoteExecutorFactory;
-use Amp\Sql\Common\ConnectionPool;
 
 class Redis
 {
