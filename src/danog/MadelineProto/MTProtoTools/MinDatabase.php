@@ -182,8 +182,9 @@ class MinDatabase implements TLCallback
             return $object;
         }
         $id = $this->API->getId($object);
-        if (yield $this->db[$id]) {
-            $new = \array_merge($object, $this->db[$id]);
+        $dbObject = yield $this->db[$id];
+        if ($dbObject) {
+            $new = \array_merge($object, $dbObject);
             $new['_'] .= 'FromMessage';
             $new['peer'] = (yield from $this->API->getInfo($new['peer']))['InputPeer'];
             if ($new['peer']['min']) {
