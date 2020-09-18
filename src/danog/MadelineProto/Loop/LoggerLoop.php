@@ -80,6 +80,7 @@ trait LoggerLoop
      */
     protected function startedLoop(): void
     {
+        $this->started = true;
         parent::startedLoop();
         $this->logger->logger("Entered $this", Logger::ULTRA_VERBOSE);
     }
@@ -91,6 +92,7 @@ trait LoggerLoop
      */
     protected function exitedLoop(): void
     {
+        $this->started = false;
         parent::exitedLoop();
         $this->logger->logger("Exited $this", Logger::ULTRA_VERBOSE);
     }
