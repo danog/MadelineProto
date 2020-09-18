@@ -239,7 +239,7 @@ class MysqlArray extends SqlArray
     private function request(string $query, array $params = []): Promise
     {
         return call(function () use ($query, $params) {
-            Logger::log([$query, $params], Logger::VERBOSE);
+            //Logger::log([$query, $params], Logger::VERBOSE);
 
             if (empty($this->db) || !$this->db->isAlive()) {
                 Logger::log('No database connection', Logger::WARNING);
