@@ -73,8 +73,12 @@ class Server extends SignalLoop
         } catch (\Throwable $e) {
             Logger::log($e);
         }
-        Logger::log("Starting IPC server $session (web)");
-        WebRunner::start($session);
+        try {
+            Logger::log("Starting IPC server $session (web)");
+            WebRunner::start($session);
+        } catch (\Throwable $e) {
+            Logger::log($e);
+        }
     }
     /**
      * Main loop.

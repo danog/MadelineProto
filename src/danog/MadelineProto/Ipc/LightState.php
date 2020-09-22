@@ -18,8 +18,8 @@
 
 namespace danog\MadelineProto\Ipc;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\MTProto;
 
 /**
  * Light state.
@@ -33,7 +33,7 @@ final class LightState
      *
      * @var null|class-string<EventHandler>
      */
-    private ?string $eventHandler;
+    private ?string $eventHandler = null;
 
     public function __construct(MTProto $API)
     {
