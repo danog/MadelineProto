@@ -582,9 +582,11 @@ abstract class Tools extends StrTools
                     Tools::callFork($failureCb());
                     $failureCb = null;
                 }
+                if ($token->isRequested()) {
+                    return null;
+                }
                 yield self::sleep($polling);
                 if ($token->isRequested()) {
-                    var_dump("was requested pap");
                     return null;
                 }
             }

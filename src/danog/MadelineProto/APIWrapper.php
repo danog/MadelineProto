@@ -20,6 +20,7 @@ namespace danog\MadelineProto;
 
 use Amp\Promise;
 use Amp\Success;
+use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\LightState;
 
 use function Amp\File\open;
@@ -179,6 +180,9 @@ final class APIWrapper
     public function serialize(): Promise
     {
         if ($this->API === null && !$this->gettingApiId) {
+            return new Success(false);
+        }
+        if ($this->API instanceof Client) {
             return new Success(false);
         }
         return Tools::callFork((function (): \Generator {

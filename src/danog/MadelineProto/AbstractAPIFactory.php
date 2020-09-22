@@ -92,6 +92,9 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         $a->lua =& $b->lua;
         $a->async =& $b->async;
         $a->methods =& $b->methods;
+        if (!$b->inited()) {
+            $a->setInitPromise($b->initAsynchronously());
+        }
     }
     /**
      * Enable or disable async.
@@ -162,7 +165,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     public function __call_async(string $name, array $arguments): \Generator
     {
         yield from $this->initAsynchronously();
-
         $lower_name = \strtolower($name);
         if ($this->namespace !== '' || !isset($this->methods[$lower_name])) {
             $name = $this->namespace.$name;

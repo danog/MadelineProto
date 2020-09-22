@@ -117,7 +117,7 @@ abstract class Serialization
             return [null, yield Tools::flock($session->getLockPath(), LOCK_EX, 1)];
         }
 
-        Logger::log('Waiting for exclusive session lock...');
+        //Logger::log('Waiting for exclusive session lock...');
         $warningId = Loop::delay(1000, static function () use (&$warningId) {
             Logger::log("It seems like the session is busy.");
             if (\defined(\MADELINE_WORKER::class)) {
@@ -143,19 +143,21 @@ abstract class Serialization
                         $canContinue = false;
                         $cancelFlock->cancel();
                     }
+                } else {
+                    $lightState = false;
                 }
             });
         });
         Loop::cancel($warningId);
 
         if (!$unlock) { // Canceled, don't have lock
-            return [yield $ipcSocket, null];
+            return $ipcSocket;
         }
-        if (!$canContinue) { // Canceled, but have lock already
+        if (!$canContinue) { // Have lock, can't use it
             Logger::log("IPC WARNING: Session has event handler, but it's not started, and we don't have access to the class, so we can't start it.", Logger::ERROR);
             Logger::log("IPC WARNING: Please start the event handler or unset it to use the IPC server.", Logger::ERROR);
             $unlock();
-            return [yield $ipcSocket, null];
+            return $ipcSocket;
         }
 
         try {
@@ -169,9 +171,11 @@ abstract class Serialization
                 // Unlock and fork
                 $unlock();
                 Server::startMe($session);
-                return [$ipcSocket ?? yield from self::tryConnect($session->getIpcPath()), null];
+                return $ipcSocket ?? yield from self::tryConnect($session->getIpcPath());
             } elseif (!\class_exists($class)) {
-                return [$ipcSocket ?? yield from self::tryConnect($session->getIpcPath()), null];
+                Logger::log("IPC WARNING: Session has event handler, but it's not started, and we don't have access to the class, so we can't start it.", Logger::ERROR);
+                Logger::log("IPC WARNING: Please start the event handler or unset it to use the IPC server.", Logger::ERROR);
+                return $ipcSocket ?? yield from self::tryConnect($session->getIpcPath());
             }
         }
 
@@ -185,7 +189,7 @@ abstract class Serialization
         if ($isNew) {
             $unserialized = yield from self::newUnserialize($session->getSessionPath());
         } else {
-            $unserialized = yield from self::legacyUnserialize($session);
+            $unserialized = yield from self::legacyUnserialize($session->getLegacySessionPath());
         }
 
         if ($unserialized === false) {
@@ -214,7 +218,7 @@ abstract class Serialization
                 if ($cancel) {
                     $cancel->cancel();
                 }
-                return $socket;
+                return [$socket, null];
             } catch (\Throwable $e) {
                 $e = $e->getMessage();
                 Logger::log("$e while connecting to IPC socket");
@@ -247,12 +251,12 @@ abstract class Serialization
     /**
      * Deserialize legacy session.
      *
-     * @param SessionPaths $session
+     * @param string $session
      * @return \Generator
      */
-    private static function legacyUnserialize(SessionPaths $session): \Generator
+    private static function legacyUnserialize(string $session): \Generator
     {
-        $tounserialize = yield get($session->getLegacySessionPath());
+        $tounserialize = yield get($session);
 
         try {
             $unserialized = \unserialize($tounserialize);
