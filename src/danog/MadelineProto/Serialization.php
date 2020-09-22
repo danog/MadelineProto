@@ -32,16 +32,15 @@ class Serialization
     /**
      * Unserialize legacy session.
      *
-     * @param string $session Session name
+     * @param SessionPaths $session Session name
      *
      * @internal
      *
      * @return \Generator
      */
-    public static function legacyUnserialize(string $session): \Generator
+    public static function legacyUnserialize(SessionPaths $session): \Generator
     {
-        $realpaths = new SessionPaths($session);
-        if (yield exists($realpaths->getSessionPath())) {
+        if (yield exists($session->getSessionPath())) {
             Logger::log('Waiting for exclusive session lock...');
             $warningId = Loop::delay(1000, static function () use (&$warningId) {
                 Logger::log("It seems like the session is busy.");
@@ -54,23 +53,17 @@ class Serialization
                 Loop::unreference($warningId);
             });
             Loop::unreference($warningId);
-            $unlockGlobal = yield Tools::flock($realpaths->getSessionLockPath(), LOCK_EX, 1);
+            $unlock = yield Tools::flock($session->getLockPath(), LOCK_EX, 1);
             Loop::cancel($warningId);
-            $tempId = Shutdown::addCallback($unlockGlobal = static function () use ($unlockGlobal) {
+            $tempId = Shutdown::addCallback($unlock = static function () use ($unlock) {
                 Logger::log("Unlocking exclusive session lock!");
-                $unlockGlobal();
+                $unlock();
                 Logger::log("Unlocked exclusive session lock!");
             });
             Logger::log("Got exclusive session lock!");
 
-            Logger::log('Waiting for shared lock of serialization lockfile...');
-            $unlock = yield Tools::flock($realpaths->getLockPath(), LOCK_SH);
-            Logger::log('Shared lock acquired, deserializing...');
-            try {
-                $tounserialize = yield get($realpaths->getSessionPath());
-            } finally {
-                $unlock();
-            }
+            $tounserialize = yield get($session->getSessionPath());
+
             Magic::classExists();
             try {
                 $unserialized = \unserialize($tounserialize);
@@ -133,7 +126,7 @@ class Serialization
                 throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialization_error']);
             }
             Shutdown::removeCallback($tempId);
-            return [$unserialized, $unlockGlobal];
+            return [$unserialized, $unlock];
         }
     }
 }

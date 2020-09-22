@@ -49,7 +49,7 @@ class RedisArray extends SqlArray
      * @param DatabaseRedis $settings
      * @return \Generator
      */
-    protected function initConnection($settings): \Generator
+    public function initConnection($settings): \Generator
     {
         if (!isset($this->db)) {
             $this->db = yield from Redis::getConnection($settings);
