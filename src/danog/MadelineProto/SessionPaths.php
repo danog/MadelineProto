@@ -19,11 +19,18 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Promise;
+use danog\MadelineProto\Ipc\LightState;
+
 /**
  * Session path information.
  */
 class SessionPaths
 {
+    /**
+     * Legacy session path.
+     */
+    private string $legacySessionPath;
     /**
      * Session path.
      */
@@ -37,6 +44,10 @@ class SessionPaths
      */
     private string $ipcPath;
     /**
+     * IPC light state path.
+     */
+    private string $ipcStatePath;
+    /**
      * Temporary serialization path.
      */
     private string $tempPath;
@@ -48,10 +59,12 @@ class SessionPaths
     public function __construct(string $session)
     {
         $session = Tools::absolute($session);
-        $this->sessionPath = $session;
+        $this->legacySessionPath = $session;
+        $this->sessionPath = "$session.safe.php";
         $this->lockPath = "$session.lock";
         $this->ipcPath = "$session.ipc";
-        $this->tempPath = "$session.temp.session";
+        $this->ipcStatePath = "$session.ipcState.php";
+        $this->tempPath = "$session.temp.php";
     }
     /**
      * Get session path.
@@ -60,7 +73,17 @@ class SessionPaths
      */
     public function __toString(): string
     {
-        return $this->sessionPath;
+        return $this->legacySessionPath;
+    }
+
+    /**
+     * Get legacy session path.
+     *
+     * @return string
+     */
+    public function getLegacySessionPath(): string
+    {
+        return $this->legacySessionPath;
     }
 
     /**
@@ -101,5 +124,25 @@ class SessionPaths
     public function getTempPath(): string
     {
         return $this->tempPath;
+    }
+
+    /**
+     * Get IPC light state path.
+     *
+     * @return string
+     */
+    public function getIpcStatePath(): string
+    {
+        return $this->ipcStatePath;
+    }
+
+    /**
+     * Get IPC state.
+     *
+     * @return Promise<LightState>
+     */
+    public function getIpcState(): Promise
+    {
+        return Tools::call(Serialization::newUnserialize($this->ipcStatePath));
     }
 }

@@ -156,14 +156,14 @@ class Logger
      *
      * @param SettingsLogger $settings Settings instance
      *
-     * @return void
+     * @return self
      */
-    public static function constructorFromSettings(SettingsLogger $settings): void
+    public static function constructorFromSettings(SettingsLogger $settings): self
     {
         if (!self::$default) {
-            // The getLogger function will automatically init the static logger, but we'll do it again anyway
             self::$default = new self($settings);
         }
+        return self::$default;
     }
 
     /**

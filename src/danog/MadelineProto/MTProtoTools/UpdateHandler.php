@@ -28,6 +28,7 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
 
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Tools;
 
 /**
  * Manages updates.
@@ -59,13 +60,11 @@ trait UpdateHandler
     public function getUpdates($params = []): \Generator
     {
         $this->updateHandler = MTProto::GETUPDATES_HANDLER;
-        $params = \array_merge(MTProto::DEFAULT_GETUPDATES_PARAMS, $params);
+        $params = MTProto::DEFAULT_GETUPDATES_PARAMS + $params;
         if (empty($this->updates)) {
             $this->update_deferred = new Deferred();
-            if (!$params['timeout']) {
-                $params['timeout'] = 0.001;
-            }
-            yield from $this->waitUpdate();
+            $params['timeout'] *= 1000;
+            yield Tools::timeoutWithDefault($this->waitUpdate(), $params['timeout'] ?: 100000);
         }
         if (empty($this->updates)) {
             return $this->updates;

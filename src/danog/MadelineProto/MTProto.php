@@ -199,7 +199,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         'msg_resend_req',
         'msg_resend_ans_req',
     ];
-    const DEFAULT_GETUPDATES_PARAMS = ['offset' => 0, 'limit' => null, 'timeout' => 0];
+    const DEFAULT_GETUPDATES_PARAMS = ['offset' => 0, 'limit' => null, 'timeout' => 100];
     /**
      * Instance of wrapper API.
      *

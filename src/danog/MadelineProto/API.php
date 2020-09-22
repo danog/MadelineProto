@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Failure;
+use Amp\Ipc\Sync\ChannelledSocket;
+use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 
 /**
@@ -39,7 +42,7 @@ class API extends InternalDoc
     /**
      * Instance of MadelineProto.
      *
-     * @var null|MTProto
+     * @var null|MTProto|Client
      */
     public $API;
 
@@ -107,11 +110,11 @@ class API extends InternalDoc
      */
     public function __magic_construct(string $session, $settings = []): void
     {
+        Magic::classExists(true);
         $settings = Settings::parseFromLegacy($settings);
         $this->session = new SessionPaths($session);
         $this->wrapper = new APIWrapper($this, $this->exportNamespace());
 
-        Magic::classExists(true);
         $this->setInitPromise($this->internalInitAPI($settings));
         foreach (\get_class_vars(APIFactory::class) as $key => $var) {
             if (\in_array($key, ['namespace', 'API', 'lua', 'async', 'asyncAPIPromise', 'methods'])) {
@@ -135,8 +138,16 @@ class API extends InternalDoc
             ? new SettingsLogger
             : $settings->getLogger());
 
-        [$unserialized, $this->unlock] = yield from Serialization::legacyUnserialize($this->session);
-        if ($unserialized) {
+        [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(
+            Serialization::unserialize($this->session),
+            30000,
+            new Failure(new \RuntimeException("Could not connect to MadelineProto, please check the logs for more details."))
+        );
+        if ($unserialized instanceof ChannelledSocket) {
+            $this->API = new Client($unserialized, Logger::$default);
+            $this->APIFactory();
+            return;
+        } elseif ($unserialized) {
             $unserialized->storage = $unserialized->storage ?? [];
             $unserialized->session = $this->session;
             APIWrapper::link($this, $unserialized);
@@ -216,9 +227,11 @@ class API extends InternalDoc
     private function APIFactory(): void
     {
         if ($this->API && $this->API->inited()) {
-            foreach ($this->API->getMethodNamespaces() as $namespace) {
-                if (!$this->{$namespace}) {
-                    $this->{$namespace} = $this->exportNamespace($namespace);
+            if ($this->API instanceof MTProto) {
+                foreach ($this->API->getMethodNamespaces() as $namespace) {
+                    if (!$this->{$namespace}) {
+                        $this->{$namespace} = $this->exportNamespace($namespace);
+                    }
                 }
             }
             $this->methods = self::getInternalMethodList($this->API);
