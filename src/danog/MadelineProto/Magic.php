@@ -23,6 +23,7 @@ use Amp\Loop;
 use Amp\Loop\Driver;
 use ReflectionClass;
 use function Amp\ByteStream\getStdin;
+use function Amp\Log\hasColorSupport;
 use function Amp\Promise\wait;
 
 class Magic
@@ -247,7 +248,7 @@ class Magic
             }
             // Check if we're in a console, for colorful log output
             try {
-                self::$isatty = \defined(\STDOUT::class) && \function_exists('posix_isatty') && \posix_isatty(\STDOUT);
+                self::$isatty = \defined(\STDOUT::class) && hasColorSupport();
             } catch (\danog\MadelineProto\Exception $e) {
             }
             // Important, obtain root relative to caller script

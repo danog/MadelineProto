@@ -21,6 +21,7 @@ namespace danog\MadelineProto\TL;
 
 use Amp\Promise;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\Tools;
 
 /**
@@ -128,12 +129,12 @@ class TL
     /**
      * Initialize TL parser.
      *
-     * @param array        $files   Scheme files
+     * @param TLSchema     $files   Scheme files
      * @param TLCallback[] $objects TL Callback objects
      *
      * @return void
      */
-    public function init(array $files, array $objects = [])
+    public function init(TLSchema $files, array $objects = [])
     {
         $this->API->logger->logger(\danog\MadelineProto\Lang::$current_lang['TL_loading'], \danog\MadelineProto\Logger::VERBOSE);
         $this->updateCallbacks($objects);
@@ -142,7 +143,12 @@ class TL
         $this->tdConstructors = new TLConstructors();
         $this->tdMethods = new TLMethods();
         $this->tdDescriptions = ['types' => [], 'constructors' => [], 'methods' => []];
-        foreach ($files as $scheme_type => $file) {
+        foreach ([
+            'api' => $files->getAPISchema(),
+            'mtproto' => $files->getMTProtoSchema(),
+            'secret' => $files->getSecretSchema(),
+            ...$files->getOther()
+        ] as $scheme_type => $file) {
             $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['file_parsing'], \basename($file)), \danog\MadelineProto\Logger::VERBOSE);
             $filec = \file_get_contents(Tools::absolute($file));
             $TL_dict = \json_decode($filec, true);
@@ -156,7 +162,7 @@ class TL
                 $class = null;
                 $dparams = [];
                 $lineBuf = '';
-                foreach ($tl_file as $line_number => $line) {
+                foreach ($tl_file as $line) {
                     $line = \rtrim($line);
                     if (\preg_match('|^//@|', $line)) {
                         $list = \explode(' @', \str_replace('//', ' ', $line));
@@ -232,7 +238,7 @@ class TL
                     $id = \hash('crc32b', $clean);
                     if (\preg_match('/^[^\\s]+#([a-f0-9]*)/i', $line, $matches)) {
                         $nid = \str_pad($matches[1], 8, '0', \STR_PAD_LEFT);
-                        if ($id !== $nid && $scheme_type !== 'botAPI') {
+                        if ($id !== $nid) {
                             $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['crc32_mismatch'], $id, $nid, $line), \danog\MadelineProto\Logger::ERROR);
                         }
                         $id = $nid;
@@ -293,7 +299,7 @@ class TL
                 }
             }
         }
-        if (isset($files['td']) && isset($files['telegram'])) {
+        if (isset($files->getOther()['td'])) {
             foreach ($this->tdConstructors->by_id as $id => $data) {
                 $name = $data['predicate'];
                 if ($this->constructors->findById($id) === false) {
@@ -318,6 +324,7 @@ class TL
                 }
             }
         }
+        $files->upgrade();
     }
     /**
      * Get TL namespaces.
@@ -606,7 +613,7 @@ class TL
             }
         } elseif ($method === 'messages.sendEncryptedFile') {
             if (isset($arguments['file'])) {
-                if ((!\is_array($arguments['file']) || !(isset($arguments['file']['_']) && $this->constructors->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')) && $this->API->settings['upload']['allow_automatic_upload']) {
+                if ((!\is_array($arguments['file']) || !(isset($arguments['file']['_']) && $this->constructors->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')) && $this->API->getSettings()->getFiles()->getAllowAutomaticUpload()) {
                     $arguments['file'] = (yield from $this->API->uploadEncrypted($arguments['file']));
                 }
                 if (isset($arguments['file']['key'])) {

@@ -5249,9 +5249,9 @@ class InternalDoc extends APIFactory
     /**
      * Return current settings array.
      *
-     * @return array
+     * @return Settings
      */
-    public function getSettings(): array
+    public function getSettings(): Settings
     {
         return $this->API->getSettings();
     }

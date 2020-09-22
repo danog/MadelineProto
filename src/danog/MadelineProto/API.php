@@ -20,6 +20,7 @@
 namespace danog\MadelineProto;
 
 use Amp\Promise;
+use danog\MadelineProto\Settings\Logger as SettingsLogger;
 
 /**
  * Main API wrapper for MadelineProto.
@@ -94,7 +95,7 @@ class API extends InternalDoc
     /**
      * Global session unlock callback.
      *
-     * @var callback
+     * @var callable
      */
     private $unlock;
 
@@ -102,13 +103,14 @@ class API extends InternalDoc
     /**
      * Magic constructor function.
      *
-     * @param string $session  Session name
-     * @param array  $settings Settings
+     * @param string         $session  Session name
+     * @param array|Settings $settings Settings
      *
      * @return void
      */
-    public function __magic_construct(string $session, array $settings = []): void
+    public function __magic_construct(string $session, $settings = []): void
     {
+        $settings = Settings::parseFromLegacy($settings);
         $this->wrapper = new APIWrapper($this, $this->exportNamespace());
 
         Magic::classExists();
@@ -125,14 +127,16 @@ class API extends InternalDoc
     /**
      * Async constructor function.
      *
-     * @param string $session  Session name
-     * @param array  $settings Settings
+     * @param string                 $session  Session name
+     * @param Settings|SettingsEmpty $settings Settings
      *
      * @return \Generator
      */
-    public function __construct_async(string $session, array $settings = []): \Generator
+    public function __construct_async(string $session, SettingsAbstract $settings): \Generator
     {
-        Logger::constructorFromSettings($settings);
+        Logger::constructorFromSettings($settings instanceof SettingsEmpty
+            ? new SettingsLogger
+            : $settings->getLogger());
         $this->session = $session = Tools::absolute($session);
         [$unserialized, $this->unlock] = yield from Serialization::legacyUnserialize($session);
         if ($unserialized) {
@@ -146,25 +150,28 @@ class API extends InternalDoc
 
                 unset($unserialized);
 
-                $this->API->wrapper = $this->wrapper;
-                yield from $this->API->initAsynchronously();
+                yield from $this->API->wakeup($settings, $this->wrapper);
                 $this->APIFactory();
                 $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
                 return;
             }
         }
 
-        if (!isset($settings['app_info']['api_id']) || !$settings['app_info']['api_id']) {
-            $app = (yield from $this->APIStart($settings));
+        if ($settings instanceof SettingsEmpty) {
+            $settings = new Settings;
+        }
+
+        $appInfo = $settings->getAppInfo();
+        if (!$appInfo->hasApiInfo()) {
+            $app = yield from $this->APIStart($settings);
             if (!$app) {
                 $this->forceInit(true);
                 die();
             }
-            $settings['app_info']['api_id'] = $app['api_id'];
-            $settings['app_info']['api_hash'] = $app['api_hash'];
+            $appInfo->setApiId($app['api_id']);
+            $appInfo->setApiHash($app['api_hash']);
         }
-        $this->API = new MTProto($settings);
-        $this->API->wrapper = $this->wrapper;
+        $this->API = new MTProto($settings, $this->wrapper);
         yield from $this->API->initAsynchronously();
         $this->APIFactory();
         $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
@@ -218,10 +225,6 @@ class API extends InternalDoc
                 }
             }
             $this->methods = self::getInternalMethodList($this->API);
-            $this->API->wrapper = $this->wrapper;
-            if ($this->API->event_handler && \class_exists($this->API->event_handler) && \is_subclass_of($this->API->event_handler, EventHandler::class)) {
-                $this->API->setEventHandler($this->API->event_handler);
-            }
         }
     }
 
@@ -288,6 +291,7 @@ class API extends InternalDoc
      */
     public function startAndLoopAsync(string $eventHandler): \Generator
     {
+        $errors = [];
         $this->async(true);
         while (true) {
             try {
@@ -295,6 +299,13 @@ class API extends InternalDoc
                 yield $this->setEventHandler($eventHandler);
                 return yield from $this->API->loop();
             } catch (\Throwable $e) {
+                $errors = [\time() => $errors[\time()] ?? 0];
+                $errors[\time()]++;
+                if ($errors[\time()] > 100 && !$this->inited()) {
+                    $this->logger->logger("More than 100 errors in a second and not inited, exiting!", Logger::FATAL_ERROR);
+                    return;
+                }
+                echo $e;
                 $this->logger->logger((string) $e, Logger::FATAL_ERROR);
                 $this->report("Surfaced: $e");
             }

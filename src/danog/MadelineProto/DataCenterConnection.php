@@ -26,6 +26,7 @@ use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\MTProto\AuthKey;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
+use danog\MadelineProto\Settings\Connection as ConnectionSettings;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
@@ -361,10 +362,10 @@ class DataCenterConnection implements JsonSerializable
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
         $media = $ctx->isMedia() || $ctx->isCDN();
-        $count = $media ? $this->API->settings['connection_settings']['media_socket_count']['min'] : 1;
+        $count = $media ? $this->API->getSettings()->getConnection()->getMinMediaSocketCount() : 1;
         if ($count > 1) {
             if (!$this->robinLoop) {
-                $this->robinLoop = new PeriodicLoopInternal($this->API, [$this, 'even'], "robin loop DC {$this->datacenter}", $this->API->settings['connection_settings']['robin_period'] * 1000);
+                $this->robinLoop = new PeriodicLoopInternal($this->API, [$this, 'even'], "robin loop DC {$this->datacenter}", $this->API->getSettings()->getConnection()->getRobinPeriod() * 1000);
             }
             $this->robinLoop->start();
         }
@@ -558,7 +559,7 @@ class DataCenterConnection implements JsonSerializable
                 $count += 50;
             }
         } elseif ($min < 100) {
-            $max = $this->isMedia() || $this->isCDN() ? $this->API->settings['connection_settings']['media_socket_count']['max'] : 1;
+            $max = $this->isMedia() || $this->isCDN() ? $this->API->getSettings()->getConnection()->getMaxMediaSocketCount() : 1;
             if (\count($this->availableConnections) < $max) {
                 $this->connectMore(2);
             } else {
@@ -619,7 +620,7 @@ class DataCenterConnection implements JsonSerializable
      */
     public function isHttp(): bool
     {
-        return \in_array($this->ctx->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
+        return \in_array($this->ctx->getStreamName(), [HttpStream::class, HttpsStream::class]);
     }
     /**
      * Check if is connected directly by IP address.
@@ -628,7 +629,7 @@ class DataCenterConnection implements JsonSerializable
      */
     public function byIPAddress(): bool
     {
-        return !$this->ctx->hasStreamName(WssStream::getName()) && !$this->ctx->hasStreamName(HttpsStream::getName());
+        return !$this->ctx->hasStreamName(WssStream::class) && !$this->ctx->hasStreamName(HttpsStream::class);
     }
     /**
      * Check if is a media connection.
@@ -651,12 +652,20 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Get DC-specific settings.
      *
-     * @return array
+     * @return ConnectionSettings
      */
-    public function getSettings(): array
+    public function getSettings(): ConnectionSettings
     {
-        $dc_config_number = isset($this->API->settings['connection_settings'][$this->datacenter]) ? $this->datacenter : 'all';
-        return $this->API->settings['connection_settings'][$dc_config_number];
+        return $this->API->getSettings()->getConnection();
+    }
+    /**
+     * Get global settings.
+     *
+     * @return Settings
+     */
+    public function getGenericSettings(): Settings
+    {
+        return $this->API->getSettings();
     }
     /**
      * JSON serialize function.

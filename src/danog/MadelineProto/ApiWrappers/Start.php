@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\ApiWrappers;
 
 use danog\MadelineProto\MyTelegramOrgWrapper;
+use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 use function Amp\ByteStream\getStdout;
 
@@ -31,11 +32,11 @@ trait Start
     /**
      * Start API ID generation process.
      *
-     * @param array $settings Settings
+     * @param Settings $settings Settings
      *
      * @return \Generator
      */
-    private function APIStart(array $settings): \Generator
+    private function APIStart(Settings $settings): \Generator
     {
         if (\defined(\MADELINE_WORKER::class)) {
             throw new \danog\MadelineProto\Exception('Not inited!');
@@ -111,7 +112,7 @@ Note that you can also provide the API parameters directly in the code using the
         }
         return null;
     }
-    private function webAPIPhoneLogin(array $settings): \Generator
+    private function webAPIPhoneLogin(Settings $settings): \Generator
     {
         try {
             $this->myTelegramOrgWrapper = new MyTelegramOrgWrapper($settings);

@@ -19,8 +19,12 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use danog\MadelineProto\Settings;
+
 /**
  * Manages method and object calls.
+ *
+ * @property Settings $settings Settings
  */
 trait CallHandler
 {

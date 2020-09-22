@@ -18,7 +18,7 @@ trait DbPropertiesTrait
         if (empty(static::$dbProperties)) {
             throw new \LogicException(static::class.' must have $dbProperties');
         }
-        $dbSettings = $MadelineProto->settings['db'];
+        $dbSettings = $MadelineProto->settings->getDb();
         $prefix = static::getSessionId($MadelineProto);
 
         foreach (static::$dbProperties as $property => $type) {

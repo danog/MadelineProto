@@ -38,6 +38,7 @@ use Amp\Websocket\Client\Handshake;
 use Amp\Websocket\Client\Rfc6455Connector;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
+use danog\MadelineProto\Settings\Connection as ConnectionSettings;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\UdpBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -48,9 +49,6 @@ use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\MTProtoTransport\IntermediatePaddedStream;
 use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
-use danog\MadelineProto\Stream\Proxy\HttpProxy;
-use danog\MadelineProto\Stream\Proxy\SocksProxy;
-use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
@@ -70,7 +68,7 @@ class DataCenter
     /**
      * Current DC ID.
      *
-     * @var string
+     * @var string|int
      */
     public $curdc = 0;
     /**
@@ -88,9 +86,9 @@ class DataCenter
     /**
      * Settings.
      *
-     * @var array
+     * @var ConnectionSettings
      */
-    private $settings = [];
+    private $settings;
     /**
      * HTTP client.
      *
@@ -132,9 +130,14 @@ class DataCenter
     }
     public function __wakeup()
     {
+        if (\is_array($this->settings)) {
+            $settings = new ConnectionSettings;
+            $settings->mergeArray(['connection_settings' => $this->settings]);
+            $this->settings = $settings;
+        }
         $array = [];
         foreach ($this->sockets as $id => $socket) {
-            if ($socket instanceof Connection) {
+            if ($socket instanceof \danog\MadelineProto\Connection) {
                 if ($socket->temp_auth_key) {
                     $array[$id]['tempAuthKey'] = $socket->temp_auth_key;
                 }
@@ -185,19 +188,19 @@ class DataCenter
     /**
      * Constructor function.
      *
-     * @param MTProto   $API          Main MTProto instance
-     * @param array     $dclist       DC IP list
-     * @param array     $settings     Settings
-     * @param boolean   $reconnectAll Whether to reconnect to all DCs or just to changed ones
-     * @param CookieJar $jar          Cookie jar
+     * @param MTProto     $API          Main MTProto instance
+     * @param array       $dclist       DC IP list
+     * @param ConnectionSettings $settings     Settings
+     * @param boolean     $reconnectAll Whether to reconnect to all DCs or just to changed ones
+     * @param CookieJar   $jar          Cookie jar
      *
      * @return void
      */
-    public function __magic_construct($API, array $dclist, array $settings, bool $reconnectAll = true, CookieJar $jar = null)
+    public function __magic_construct($API, array $dclist, ConnectionSettings $settings, bool $reconnectAll = true, CookieJar $jar = null)
     {
         $this->API = $API;
         $changed = [];
-        $changedSettings = $this->settings !== $settings;
+        $changedSettings = $settings->haveChanged();
         if (!$reconnectAll) {
             $changed = [];
             $test = $API->getCachedConfig()['test_mode'] ?? false ? 'test' : 'main';
@@ -238,6 +241,7 @@ class DataCenter
                 $this->webSocketConnnector = new Rfc6455Connector($this->HTTPClient);
             }
         }
+        $this->settings->applyChanges();
     }
     /**
      * Set VoIP endpoints.
@@ -304,147 +308,116 @@ class DataCenter
     {
         $ctxs = [];
         $combos = [];
-        $dc_config_number = isset($this->settings[$dc_number]) ? $dc_number : 'all';
-        $test = $this->settings[$dc_config_number]['test_mode'] ? 'test' : 'main';
-        $ipv6 = $this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4';
-        switch ($this->settings[$dc_config_number]['protocol']) {
-            case 'abridged':
-            case 'tcp_abridged':
-                $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [AbridgedStream::getName(), []]];
+        $test = $this->settings->getTestMode() ? 'test' : 'main';
+        $ipv6 = $this->settings->getIpv6() ? 'ipv6' : 'ipv4';
+        switch ($this->settings->getProtocol()) {
+            case AbridgedStream::class:
+                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [AbridgedStream::class, []]];
                 break;
-            case 'intermediate':
-            case 'tcp_intermediate':
-                $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [IntermediateStream::getName(), []]];
+            case IntermediateStream::class:
+                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [IntermediateStream::class, []]];
                 break;
-            case 'obfuscated2':
-                $this->settings[$dc_config_number]['protocol'] = 'tcp_intermediate_padded';
-                $this->settings[$dc_config_number]['obfuscated'] = true;
-            // no break
-            case 'intermediate_padded':
-            case 'tcp_intermediate_padded':
-                $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [IntermediatePaddedStream::getName(), []]];
+            case IntermediatePaddedStream::class:
+                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [IntermediatePaddedStream::class, []]];
                 break;
-            case 'full':
-            case 'tcp_full':
-                $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [FullStream::getName(), []]];
+            case FullStream::class:
+                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [FullStream::class, []]];
                 break;
-            case 'http':
-                $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [HttpStream::getName(), []]];
+            case HttpStream::class:
+                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpStream::class, []]];
                 break;
-            case 'https':
-                $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [HttpsStream::getName(), []]];
+            case HttpsStream::class:
+                $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
                 break;
-            case 'udp':
-                $default = [[DefaultStream::getName(), []], [UdpBufferedStream::getName(), []]];
+            case UdpBufferedStream::class:
+                $default = [[DefaultStream::class, []], [UdpBufferedStream::class, []]];
                 break;
             default:
                 throw new Exception(Lang::$current_lang['protocol_invalid']);
         }
-        if ($this->settings[$dc_config_number]['obfuscated'] && !\in_array($default[2][0], [HttpsStream::getName(), HttpStream::getName()])) {
-            $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], \end($default)];
+        if ($this->settings->getObfuscated() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class])) {
+            $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
         }
-        if ($this->settings[$dc_config_number]['transport'] && !\in_array($default[2][0], [HttpsStream::getName(), HttpStream::getName()])) {
-            switch ($this->settings[$dc_config_number]['transport']) {
-                case 'tcp':
-                    if ($this->settings[$dc_config_number]['obfuscated']) {
-                        $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], \end($default)];
+        if ($this->settings->getTransport() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class])) {
+            switch ($this->settings->getTransport()) {
+                case DefaultStream::class:
+                    if ($this->settings->getObfuscated()) {
+                        $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
                     }
                     break;
-                case 'wss':
-                    $default = [[DefaultStream::getName(), []], [WssStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], \end($default)];
+                case WssStream::class:
+                    $default = [[DefaultStream::class, []], [WssStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
                     break;
-                case 'ws':
-                    $default = [[DefaultStream::getName(), []], [WsStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), []], \end($default)];
+                case WsStream::class:
+                    $default = [[DefaultStream::class, []], [WsStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], \end($default)];
                     break;
             }
         }
         if (!$dc_number) {
-            $default = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []]];
+            $default = [[DefaultStream::class, []], [BufferedRawStream::class, []]];
         }
         $combos[] = $default;
-        if (!isset($this->settings[$dc_config_number]['do_not_retry'])) {
+        if (!$this->settings->getRetry()) {
             if (isset($this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) && $this->dclist[$test][$ipv6][$dc_number]['tcpo_only'] || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
                 $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];
-                $combos[] = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [ObfuscatedStream::getName(), $extra], [IntermediatePaddedStream::getName(), []]];
+                $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, $extra], [IntermediatePaddedStream::class, []]];
             }
-            if (\is_iterable($this->settings[$dc_config_number]['proxy'])) {
-                $proxies = $this->settings[$dc_config_number]['proxy'];
-                $proxy_extras = $this->settings[$dc_config_number]['proxy_extra'];
-            } else {
-                $proxies = [$this->settings[$dc_config_number]['proxy']];
-                $proxy_extras = [$this->settings[$dc_config_number]['proxy_extra']];
-            }
-            foreach ($proxies as $key => $proxy) {
-                // Convert old settings
-                if ($proxy === '\\Socket') {
-                    $proxy = DefaultStream::getName();
-                }
-                if ($proxy === '\\SocksProxy') {
-                    $proxy = SocksProxy::getName();
-                }
-                if ($proxy === '\\HttpProxy') {
-                    $proxy = HttpProxy::getName();
-                }
-                if ($proxy === '\\MTProxySocket') {
-                    $proxy = ObfuscatedStream::getName();
-                }
-                if ($proxy === DefaultStream::getName()) {
+            foreach ($this->settings->getProxies() as $proxy => $extras) {
+                if (!$dc_number && $proxy === ObfuscatedStream::class) {
                     continue;
                 }
-                if (!$dc_number && $proxy === ObfuscatedStream::getName()) {
-                    continue;
-                }
-                $extra = $proxy_extras[$key];
-                if (!isset(\class_implements($proxy)[StreamInterface::class])) {
-                    throw new Exception(Lang::$current_lang['proxy_class_invalid']);
-                }
-                if ($proxy === ObfuscatedStream::getName() && \in_array(\strlen($extra['secret']), [17, 34])) {
-                    $combos[] = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [$proxy, $extra], [IntermediatePaddedStream::getName(), []]];
-                }
-                foreach ($combos as $k => $orig) {
-                    $combo = [];
-                    if ($proxy === ObfuscatedStream::getName()) {
-                        $combo = $orig;
-                        if ($combo[\count($combo) - 2][0] === ObfuscatedStream::getName()) {
-                            $combo[\count($combo) - 2][1] = $extra;
-                        } else {
-                            $mtproto = \end($combo);
-                            $combo[\count($combo) - 1] = [$proxy, $extra];
-                            $combo[] = $mtproto;
-                        }
-                    } else {
-                        if ($orig[1][0] === BufferedRawStream::getName()) {
-                            list($first, $second) = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
-                            $first[] = [$proxy, $extra];
-                            $combo = \array_merge($first, $second);
-                        } elseif (\in_array($orig[1][0], [WsStream::getName(), WssStream::getName()])) {
-                            list($first, $second) = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
-                            $first[] = [BufferedRawStream::getName(), []];
-                            $first[] = [$proxy, $extra];
-                            $combo = \array_merge($first, $second);
-                        }
+                foreach ($extras as $extra) {
+                    if ($proxy === ObfuscatedStream::class && \in_array(\strlen($extra['secret']), [17, 34])) {
+                        $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
                     }
-                    \array_unshift($combos, $combo);
-                    //unset($combos[$k]);
+                    foreach ($combos as $k => $orig) {
+                        $combo = [];
+                        if ($proxy === ObfuscatedStream::class) {
+                            $combo = $orig;
+                            if ($combo[\count($combo) - 2][0] === ObfuscatedStream::class) {
+                                $combo[\count($combo) - 2][1] = $extra;
+                            } else {
+                                $mtproto = \end($combo);
+                                $combo[\count($combo) - 1] = [$proxy, $extra];
+                                $combo[] = $mtproto;
+                            }
+                        } else {
+                            if ($orig[1][0] === BufferedRawStream::class) {
+                                list($first, $second) = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
+                                $first[] = [$proxy, $extra];
+                                $combo = \array_merge($first, $second);
+                            } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class])) {
+                                list($first, $second) = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
+                                $first[] = [BufferedRawStream::class, []];
+                                $first[] = [$proxy, $extra];
+                                $combo = \array_merge($first, $second);
+                            }
+                        }
+                        \array_unshift($combos, $combo);
+                        //unset($combos[$k]);
+                    }
                 }
             }
             if ($dc_number) {
-                $combos[] = [[DefaultStream::getName(), []], [BufferedRawStream::getName(), []], [HttpsStream::getName(), []]];
+                $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
             }
             $combos = \array_unique($combos, SORT_REGULAR);
         }
         /* @var $context \Amp\ConnectContext */
-        $context = $context ?? (new ConnectContext())->withMaxAttempts(1)->withConnectTimeout(1000 * $this->settings[$dc_config_number]['timeout']);
+        $context = $context ?? (new ConnectContext())->withMaxAttempts(1)->withConnectTimeout(1000 * $this->settings->getTimeout());
         foreach ($combos as $combo) {
             foreach ([true, false] as $useDoH) {
-                $ipv6Combos = [$this->settings[$dc_config_number]['ipv6'] ? 'ipv6' : 'ipv4', $this->settings[$dc_config_number]['ipv6'] ? 'ipv4' : 'ipv6'];
+                $ipv6Combos = [
+                    $this->settings->getIpv6() ? 'ipv6' : 'ipv4',
+                    $this->settings->getIpv6() ? 'ipv4' : 'ipv6'
+                ];
                 foreach ($ipv6Combos as $ipv6) {
                     // This is only for non-MTProto connections
                     if (!$dc_number) {
                         /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
                         $ctx = (new ConnectionContext())->setSocketContext($context)->setUri($uri)->setIpv6($ipv6 === 'ipv6');
                         foreach ($combo as $stream) {
-                            if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
+                            if ($stream[0] === DefaultStream::class && $stream[1] === []) {
                                 $stream[1] = $useDoH ? new DoHConnector($this, $ctx) : $this->dnsConnector;
                             }
                             $ctx->addStream(...$stream);
@@ -466,7 +439,7 @@ class DataCenter
                     $port = $this->dclist[$test][$ipv6][$dc_number]['port'];
                     foreach (\array_unique([$port, 443, 80, 88, 5222]) as $port) {
                         $stream = \end($combo)[0];
-                        if ($stream === HttpsStream::getName()) {
+                        if ($stream === HttpsStream::class) {
                             if (\strpos($dc_number, '_cdn') !== false) {
                                 continue;
                             }
@@ -474,33 +447,33 @@ class DataCenter
                             if (\strpos($dc_number, '_media') !== false) {
                                 $subdomain .= '-1';
                             }
-                            $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiw_test1' : 'apiw1';
+                            $path = $this->settings->getTestMode() ? 'apiw_test1' : 'apiw1';
                             $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
-                        } elseif ($stream === HttpStream::getName()) {
+                        } elseif ($stream === HttpStream::class) {
                             $uri = 'tcp://'.$address.':'.$port.'/api';
                         } else {
                             $uri = 'tcp://'.$address.':'.$port;
                         }
-                        if ($combo[1][0] === WssStream::getName()) {
+                        if ($combo[1][0] === WssStream::class) {
                             $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\\D+/', '', $dc_number)];
                             if (\strpos($dc_number, '_media') !== false) {
                                 $subdomain .= '-1';
                             }
-                            $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
+                            $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
                             $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
-                        } elseif ($combo[1][0] === WsStream::getName()) {
+                        } elseif ($combo[1][0] === WsStream::class) {
                             $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\\D+/', '', $dc_number)];
                             if (\strpos($dc_number, '_media') !== false) {
                                 $subdomain .= '-1';
                             }
-                            $path = $this->settings[$dc_config_number]['test_mode'] ? 'apiws_test' : 'apiws';
+                            $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
                             //$uri = 'tcp://' . $subdomain . '.web.telegram.org:' . $port . '/' . $path;
                             $uri = 'tcp://'.$address.':'.$port.'/'.$path;
                         }
                         /* @var $ctx \danog\MadelineProto\Stream\ConnectionContext */
-                        $ctx = (new ConnectionContext())->setDc($dc_number)->setTest($this->settings[$dc_config_number]['test_mode'])->setSocketContext($context)->setUri($uri)->setIpv6($ipv6 === 'ipv6');
+                        $ctx = (new ConnectionContext())->setDc($dc_number)->setTest($this->settings->getTestMode())->setSocketContext($context)->setUri($uri)->setIpv6($ipv6 === 'ipv6');
                         foreach ($combo as $stream) {
-                            if ($stream[0] === DefaultStream::getName() && $stream[1] === []) {
+                            if ($stream[0] === DefaultStream::class && $stream[1] === []) {
                                 $stream[1] = $useDoH ? new DoHConnector($this, $ctx) : $this->dnsConnector;
                             }
                             if (\in_array($stream[0], [WsStream::class, WssStream::class]) && $stream[1] === []) {
@@ -675,8 +648,8 @@ class DataCenter
      */
     public function getDcs($all = true): array
     {
-        $test = $this->settings['all']['test_mode'] ? 'test' : 'main';
-        $ipv6 = $this->settings['all']['ipv6'] ? 'ipv6' : 'ipv4';
+        $test = $this->settings->getTestMode() ? 'test' : 'main';
+        $ipv6 = $this->settings->getIpv6() ? 'ipv6' : 'ipv4';
         return $all ? \array_keys((array) $this->dclist[$test][$ipv6]) : \array_keys((array) $this->sockets);
     }
 }

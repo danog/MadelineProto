@@ -165,7 +165,7 @@ class WriteLoop extends ResumableSignalLoop
                     unset($connection->pending_outgoing[$k]);
                     continue;
                 }
-                if ($shared->getSettings()['pfs'] && !$shared->isBound() && !$connection->isCDN() && !\in_array($message['_'], ['http_wait', 'auth.bindTempAuthKey']) && $message['method']) {
+                if ($shared->getGenericSettings()->getAuth()->getPfs() && !$shared->isBound() && !$connection->isCDN() && !\in_array($message['_'], ['http_wait', 'auth.bindTempAuthKey']) && $message['method']) {
                     $API->logger->logger("Skipping {$message['_']} due to unbound keys in DC {$datacenter}");
                     $skipped = true;
                     continue;
@@ -210,7 +210,7 @@ class WriteLoop extends ResumableSignalLoop
                     if (!$shared->getTempAuthKey()->isInited() && $message['_'] !== 'auth.bindTempAuthKey' && !$inited) {
                         $inited = true;
                         $API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['write_client_info'], $message['_']), \danog\MadelineProto\Logger::NOTICE);
-                        $MTmessage['body'] = (yield from $API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $API->settings['tl_schema']['layer'], 'query' => yield from $API->getTL()->serializeMethod('initConnection', ['api_id' => $API->settings['app_info']['api_id'], 'api_hash' => $API->settings['app_info']['api_hash'], 'device_model' => !$connection->isCDN() ? $API->settings['app_info']['device_model'] : 'n/a', 'system_version' => !$connection->isCDN() ? $API->settings['app_info']['system_version'] : 'n/a', 'app_version' => $API->settings['app_info']['app_version'], 'system_lang_code' => $API->settings['app_info']['lang_code'], 'lang_code' => $API->settings['app_info']['lang_code'], 'lang_pack' => $API->settings['app_info']['lang_pack'], 'proxy' => $connection->getCtx()->getInputClientProxy(), 'query' => $MTmessage['body']])]));
+                        $MTmessage['body'] = (yield from $API->getTL()->serializeMethod('invokeWithLayer', ['layer' => $API->settings->getSchema()->getLayer(), 'query' => yield from $API->getTL()->serializeMethod('initConnection', ['api_id' => $API->settings->getAppInfo()->getApiId(), 'api_hash' => $API->settings->getAppInfo()->getApiHash(), 'device_model' => !$connection->isCDN() ? $API->settings->getAppInfo()->getDeviceModel() : 'n/a', 'system_version' => !$connection->isCDN() ? $API->settings->getAppInfo()->getSystemVersion() : 'n/a', 'app_version' => $API->settings->getAppInfo()->getAppVersion(), 'system_lang_code' => $API->settings->getAppInfo()->getLangCode(), 'lang_code' => $API->settings->getAppInfo()->getLangCode(), 'lang_pack' => $API->settings->getAppInfo()->getLangPack(), 'proxy' => $connection->getCtx()->getInputClientProxy(), 'query' => $MTmessage['body']])]));
                     } else {
                         if (isset($message['queue'])) {
                             if (!isset($connection->call_queue[$message['queue']])) {
@@ -218,7 +218,7 @@ class WriteLoop extends ResumableSignalLoop
                             }
                             $MTmessage['body'] = (yield from $API->getTL()->serializeMethod('invokeAfterMsgs', ['msg_ids' => $connection->call_queue[$message['queue']], 'query' => $MTmessage['body']]));
                             $connection->call_queue[$message['queue']][$message_id] = $message_id;
-                            if (\count($connection->call_queue[$message['queue']]) > $API->settings['msg_array_limit']['call_queue']) {
+                            if (\count($connection->call_queue[$message['queue']]) > $API->settings->getRpc()->getLimitCallQueue()) {
                                 \reset($connection->call_queue[$message['queue']]);
                                 $key = \key($connection->call_queue[$message['queue']]);
                                 unset($connection->call_queue[$message['queue']][$key]);

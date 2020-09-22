@@ -48,7 +48,7 @@ class MyTelegramOrgWrapper
     /**
      * Settings.
      */
-    private array $settings = [];
+    private Settings $settings;
     /**
      * Async setting.
      */
@@ -79,11 +79,11 @@ class MyTelegramOrgWrapper
     /**
      * Constructor.
      *
-     * @param array $settings
+     * @param array|Settings $settings
      */
-    public function __construct(array $settings = [])
+    public function __construct($settings)
     {
-        $this->settings = MTProto::parseSettings($settings, $this->settings);
+        $this->settings = Settings::parseFromLegacy($settings);
         $this->__wakeup();
     }
     /**
@@ -93,23 +93,24 @@ class MyTelegramOrgWrapper
      */
     public function __wakeup(): void
     {
-        if ($this->settings === null) {
-            $this->settings = [];
+        if (!$this->settings) {
+            $this->settings = new Settings;
+        } elseif (\is_array($this->settings)) {
+            $this->settings = Settings::parseFromLegacy($this->settings);
         }
         if (!$this->jar || !$this->jar instanceof InMemoryCookieJar) {
             $this->jar = new InMemoryCookieJar();
         }
-        $this->settings = MTProto::parseSettings($this->settings);
-        $this->datacenter = new DataCenter(new class($this->settings) {
-            public function __construct($settings)
+        $this->datacenter = new DataCenter(new class(new Logger($this->settings->getLogger())) {
+            public function __construct(Logger $logger)
             {
-                $this->logger = Logger::getLoggerFromSettings($settings);
+                $this->logger = $logger;
             }
             public function getLogger()
             {
                 return $this->logger;
             }
-        }, [], $this->settings['connection_settings'], true, $this->jar);
+        }, [], $this->settings->getConnection(), true, $this->jar);
     }
     /**
      * Login.

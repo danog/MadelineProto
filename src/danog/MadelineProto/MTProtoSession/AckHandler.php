@@ -19,8 +19,12 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use danog\MadelineProto\DataCenterConnection;
+
 /**
  * Manages acknowledgement of messages.
+ *
+ * @property DataCenterConnection $shared
  */
 trait AckHandler
 {
@@ -89,9 +93,8 @@ trait AckHandler
      */
     public function hasPendingCalls(): bool
     {
-        $settings = $this->shared->getSettings();
-        $timeout = $settings['timeout'];
-        $pfs = $settings['pfs'];
+        $timeout = $this->shared->getSettings()->getTimeout();
+        $pfs = $this->shared->getGenericSettings()->getAuth()->getPfs();
         $unencrypted = !$this->shared->hasTempAuthKey();
         $notBound = !$this->shared->isBound();
         $pfsNotBound = $pfs && $notBound;
@@ -113,9 +116,10 @@ trait AckHandler
     public function getPendingCalls(): array
     {
         $settings = $this->shared->getSettings();
-        $dropTimeout = $settings['drop_timeout'];
-        $timeout = $settings['timeout'];
-        $pfs = $settings['pfs'];
+        $global = $this->shared->getGenericSettings();
+        $dropTimeout = $global->getRpc()->getRpcTimeout();
+        $timeout = $settings->getTimeout();
+        $pfs = $global->getAuth()->getPfs();
         $unencrypted = !$this->shared->hasTempAuthKey();
         $notBound = !$this->shared->isBound();
         $pfsNotBound = $pfs && $notBound;

@@ -6,6 +6,8 @@ use Amp\Producer;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\Database\Memory;
+
 use function Amp\call;
 
 class MemoryArray extends \ArrayIterator implements DbArray
@@ -15,7 +17,16 @@ class MemoryArray extends \ArrayIterator implements DbArray
         parent::__construct((array) $array, $flags | self::STD_PROP_LIST);
     }
 
-    public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise
+    /**
+     * Get instance.
+     *
+     * @param string $name
+     * @param mixed  $value
+     * @param string $tablePrefix
+     * @param Memory $settings
+     * @return Promise
+     */
+    public static function getInstance(string $name, $value = null, string $tablePrefix = '', $settings): Promise
     {
         return call(static function () use ($value) {
             if ($value instanceof MemoryArray) {
@@ -23,6 +34,9 @@ class MemoryArray extends \ArrayIterator implements DbArray
             }
             if ($value instanceof DbArray) {
                 Logger::log("Loading database to memory. Please wait.", Logger::WARNING);
+                if ($value instanceof DriverArray) {
+                    yield from $value->initConnection($value->dbSettings);
+                }
                 $value = yield $value->getArrayCopy();
             }
             return new static($value);

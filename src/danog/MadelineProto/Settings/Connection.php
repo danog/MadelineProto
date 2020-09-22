@@ -1,0 +1,620 @@
+<?php
+
+namespace danog\MadelineProto\Settings;
+
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\Magic;
+use danog\MadelineProto\SettingsAbstract;
+use danog\MadelineProto\Stream\Common\UdpBufferedStream;
+use danog\MadelineProto\Stream\MTProtoBufferInterface;
+use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
+use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
+use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
+use danog\MadelineProto\Stream\MTProtoTransport\IntermediatePaddedStream;
+use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
+use danog\MadelineProto\Stream\Proxy\HttpProxy;
+use danog\MadelineProto\Stream\Proxy\SocksProxy;
+use danog\MadelineProto\Stream\RawStreamInterface;
+use danog\MadelineProto\Stream\StreamInterface;
+use danog\MadelineProto\Stream\Transport\DefaultStream;
+use danog\MadelineProto\Stream\Transport\WssStream;
+use danog\MadelineProto\Stream\Transport\WsStream;
+
+class Connection extends SettingsAbstract
+{
+    /**
+     * Minimum media socket count.
+     */
+    protected int $minMediaSocketCount = 5;
+    /**
+     * Maximum media socket count.
+     */
+    protected int $maxMediaSocketCount = 10;
+    /**
+     * Robin period (seconds).
+     */
+    protected int $robinPeriod = 10;
+    /**
+     * Default DC ID.
+     */
+    protected int $defaultDc = 2;
+    /**
+     * Default DC params.
+     */
+    private array $defaultDcParams = ['datacenter' => 2];
+    /**
+     * Protocol identifier.
+     *
+     * @var class-string<MTProtoBufferInterface>
+     */
+    protected string $protocol = AbridgedStream::class;
+    /**
+     * Transport identifier.
+     *
+     * @var class-string<RawStreamInterface>
+     */
+    protected string $transport = DefaultStream::class;
+    /**
+     * Proxy identifiers.
+     *
+     * @var array<class-string<StreamInterface>, array>
+     */
+    protected array $proxy = [];
+    /**
+     * Whether to use the obfuscated protocol.
+     */
+    protected bool $obfuscated = false;
+
+    /**
+     * Whether we're in test mode.
+     */
+    protected bool $testMode = false;
+
+    /**
+     * Whether to use ipv6.
+     */
+    protected bool $ipv6;
+
+    /**
+     * Connection timeout.
+     */
+    protected int $timeout = 2;
+
+    /**
+     * Whether to retry connection.
+     */
+    protected bool $retry = true;
+
+    /**
+     * Whether the connection settings changed.
+     */
+    private bool $changed = true;
+    /**
+     * Subdomains of web.telegram.org for https protocol.
+     */
+    protected array $sslSubdomains = [
+        1 => 'pluto',
+        2 => 'venus',
+        3 => 'aurora',
+        4 => 'vesta',
+        5 => 'flora',
+    ];
+
+    public function mergeArray(array $settings): void
+    {
+        if (isset($settings['connection']['ssl_subdomains'])) {
+            $this->setSslSubdomains($settings['connection']['ssl_subdomains']);
+        }
+        $settings = $settings['connection_settings'] ?? [];
+        if (isset($settings['media_socket_count']['min'])) {
+            $this->setMinMediaSocketCount($settings['media_socket_count']['min']);
+        }
+        if (isset($settings['media_socket_count']['max'])) {
+            $this->setMaxMediaSocketCount($settings['media_socket_count']['max']);
+        }
+        foreach (self::toCamel([
+            'robin_period',
+            'default_dc',
+            'pfs'
+        ]) as $object => $array) {
+            if (isset($settings[$array])) {
+                $this->{$object}($settings[$array]);
+            }
+        }
+
+        $settings = $settings['all'] ?? [];
+        foreach (self::toCamel([
+            'test_mode',
+            'ipv6',
+            'timeout',
+            'obfuscated',
+        ]) as $object => $array) {
+            if (isset($settings[$array])) {
+                $this->{$object}($settings[$array]);
+            }
+        }
+
+        if (isset($settings['do_not_retry'])) {
+            $this->setRetry(false);
+        }
+        if (isset($settings['proxy'])) {
+            foreach (\is_iterable($settings['proxy']) ? $settings['proxy'] : [$settings['proxy']] as $key => $proxy) {
+                if ($proxy === '\\Socket') {
+                    $proxy = DefaultStream::class;
+                } elseif ($proxy === '\\SocksProxy') {
+                    $proxy = SocksProxy::class;
+                } elseif ($proxy === '\\HttpProxy') {
+                    $proxy = HttpProxy::class;
+                } elseif ($proxy === '\\MTProxySocket') {
+                    $proxy = ObfuscatedStream::class;
+                }
+                if ($proxy !== DefaultStream::class) {
+                    $this->addProxy($proxy, $settings['proxy_extra'][$key]);
+                }
+            }
+        }
+        if (isset($settings['transport'])) {
+            $transport = $settings['transport'];
+            if ($transport === 'tcp') {
+                $transport = DefaultStream::class;
+            } elseif ($transport === 'ws') {
+                $transport = WsStream::class;
+            } elseif ($transport === 'wss') {
+                $transport = WssStream::class;
+            }
+            $this->setTransport($transport);
+        }
+        if (isset($settings['protocol'])) {
+            $protocol = $settings['protocol'];
+            switch ($protocol) {
+                case 'abridged':
+                case 'tcp_abridged':
+                    $protocol = AbridgedStream::class;
+                    break;
+                case 'intermediate':
+                case 'tcp_intermediate':
+                    $protocol = AbridgedStream::class;
+                    break;
+                case 'obfuscated2':
+                    $this->setObfuscated(true);
+                // no break
+                case 'intermediate_padded':
+                case 'tcp_intermediate_padded':
+                    $protocol = IntermediatePaddedStream::class;
+                    break;
+                case 'full':
+                case 'tcp_full':
+                    $protocol = FullStream::class;
+                    break;
+                case 'http':
+                    $protocol = HttpStream::class;
+                    break;
+                case 'https':
+                    $protocol = HttpsStream::class;
+                    break;
+                case 'udp':
+                    $protocol = UdpBufferedStream::class;
+                    break;
+            }
+            $this->setProtocol($protocol);
+        }
+    }
+
+    public function __construct()
+    {
+        $this->init();
+    }
+    public function __wakeup()
+    {
+        $this->init();
+    }
+    public function init(): void
+    {
+        Magic::classExists(true);
+
+        if (Magic::$altervista) {
+            $this->addProxy(HttpProxy::class, ['address' => 'localhost', 'port' => 80]);
+        }
+    }
+    /**
+     * Whether the settings have changed.
+     *
+     * @return boolean
+     */
+    public function haveChanged(): bool
+    {
+        return $this->changed;
+    }
+    /**
+     * Signal that changes have been applied.
+     *
+     * @return void
+     */
+    public function applyChanges(): void
+    {
+        $this->changed = false;
+    }
+    /**
+     * Get protocol identifier.
+     *
+     * @return string
+     */
+    public function getProtocol(): string
+    {
+        return $this->protocol;
+    }
+
+    /**
+     * Set protocol identifier.
+     *
+     * @param class-string<MTProtoBufferInterface> $protocol Protocol identifier
+     *
+     * @return self
+     */
+    public function setProtocol(string $protocol): self
+    {
+        if (!isset(\class_implements($protocol)[MTProtoBufferInterface::class])) {
+            throw new Exception("An invalid protocol was specified!");
+        }
+        $this->changed = true;
+        $this->protocol = $protocol;
+
+        return $this;
+    }
+
+    /**
+     * Get whether to use ipv6.
+     *
+     * @return bool
+     */
+    public function getIpv6(): bool
+    {
+        return $this->ipv6 ?? Magic::$ipv6;
+    }
+
+    /**
+     * Set whether to use ipv6.
+     *
+     * @param bool $ipv6 Whether to use ipv6
+     *
+     * @return self
+     */
+    public function setIpv6(bool $ipv6): self
+    {
+        $this->changed = true;
+        $this->ipv6 = $ipv6;
+
+        return $this;
+    }
+
+    /**
+     * Get subdomains of web.telegram.org for https protocol.
+     *
+     * @return array
+     */
+    public function getSslSubdomains(): array
+    {
+        return $this->sslSubdomains;
+    }
+
+    /**
+     * Set subdomains of web.telegram.org for https protocol.
+     *
+     * @param array $sslSubdomains Subdomains of web.telegram.org for https protocol.
+     *
+     * @return self
+     */
+    public function setSslSubdomains(array $sslSubdomains): self
+    {
+        $this->changed = true;
+        $this->sslSubdomains = $sslSubdomains;
+
+        return $this;
+    }
+
+    /**
+     * Get minimum media socket count.
+     *
+     * @return int
+     */
+    public function getMinMediaSocketCount(): int
+    {
+        return $this->minMediaSocketCount;
+    }
+
+    /**
+     * Set minimum media socket count.
+     *
+     * @param int $minMediaSocketCount Minimum media socket count.
+     *
+     * @return self
+     */
+    public function setMinMediaSocketCount(int $minMediaSocketCount): self
+    {
+        $this->changed = true;
+        $this->minMediaSocketCount = $minMediaSocketCount;
+
+        return $this;
+    }
+
+    /**
+     * Get maximum media socket count.
+     *
+     * @return int
+     */
+    public function getMaxMediaSocketCount(): int
+    {
+        return $this->maxMediaSocketCount;
+    }
+
+    /**
+     * Set maximum media socket count.
+     *
+     * @param int $maxMediaSocketCount Maximum media socket count.
+     *
+     * @return self
+     */
+    public function setMaxMediaSocketCount(int $maxMediaSocketCount): self
+    {
+        $this->changed = true;
+        $this->maxMediaSocketCount = $maxMediaSocketCount;
+
+        return $this;
+    }
+
+    /**
+     * Get robin period (seconds).
+     *
+     * @return int
+     */
+    public function getRobinPeriod(): int
+    {
+        return $this->robinPeriod;
+    }
+
+    /**
+     * Set robin period (seconds).
+     *
+     * @param int $robinPeriod Robin period (seconds).
+     *
+     * @return self
+     */
+    public function setRobinPeriod(int $robinPeriod): self
+    {
+        $this->changed = true;
+        $this->robinPeriod = $robinPeriod;
+
+        return $this;
+    }
+
+    /**
+     * Get default DC ID.
+     *
+     * @return int
+     */
+    public function getDefaultDc(): int
+    {
+        return $this->defaultDc;
+    }
+    /**
+     * Get default DC params.
+     *
+     * @return array
+     */
+    public function getDefaultDcParams(): array
+    {
+        return $this->defaultDcParams;
+    }
+
+    /**
+     * Set default DC ID.
+     *
+     * @param int $defaultDc Default DC ID.
+     *
+     * @return self
+     */
+    public function setDefaultDc(int $defaultDc): self
+    {
+        $this->changed = true;
+        $this->defaultDc = $defaultDc;
+        $this->defaultDcParams = ['datacenter' => $defaultDc];
+
+        return $this;
+    }
+
+    /**
+     * Get proxy identifiers.
+     *
+     * @return array<class-string<StreamInterface>, array>
+     */
+    public function getProxies(): array
+    {
+        return $this->proxy;
+    }
+
+    /**
+     * Add proxy identifier to list.
+     *
+     * @param class-string<StreamInterface> $proxy Proxy identifier
+     * @param array                         $extra Extra
+     *
+     * @return self
+     */
+    public function addProxy(string $proxy, array $extra = []): self
+    {
+        if (!isset(\class_implements($proxy)[StreamInterface::class])) {
+            throw new Exception("An invalid proxy class was specified!");
+        }
+        if (!isset($this->proxy[$proxy])) {
+            $this->proxy[$proxy] = [];
+        }
+        $this->changed = true;
+        $this->proxy[$proxy][] = $extra;
+
+        return $this;
+    }
+
+    /**
+     * Clear proxies.
+     *
+     * @return self
+     */
+    public function clearProxies(): self
+    {
+        $this->proxy = [];
+
+        return $this;
+    }
+
+    /**
+     * Remove specific proxy pair.
+     *
+     * @param string $proxy
+     * @param array $extra
+     *
+     * @return self
+     */
+    public function removeProxy(string $proxy, array $extra): self
+    {
+        if (!isset($this->proxy[$proxy])) {
+            return $this;
+        }
+        if (false === $index = \array_search($extra, $this->proxy[$proxy])) {
+            return $this;
+        }
+        $this->changed = true;
+        unset($this->proxy[$proxy][$index]);
+        if (empty($this->proxy[$proxy])) {
+            unset($this->proxy[$proxy]);
+        }
+        return $this;
+    }
+    /**
+     * Get whether to use the obfuscated protocol.
+     *
+     * @return bool
+     */
+    public function getObfuscated(): bool
+    {
+        return $this->obfuscated;
+    }
+
+    /**
+     * Set whether to use the obfuscated protocol.
+     *
+     * @param bool $obfuscated Whether to use the obfuscated protocol.
+     *
+     * @return self
+     */
+    public function setObfuscated(bool $obfuscated): self
+    {
+        $this->changed = true;
+        $this->obfuscated = $obfuscated;
+
+        return $this;
+    }
+
+    /**
+     * Get whether we're in test mode.
+     *
+     * @return bool
+     */
+    public function getTestMode(): bool
+    {
+        return $this->testMode;
+    }
+
+    /**
+     * Set whether we're in test mode.
+     *
+     * @param bool $testMode Whether we're in test mode.
+     *
+     * @return self
+     */
+    public function setTestMode(bool $testMode): self
+    {
+        $this->changed = true;
+        $this->testMode = $testMode;
+
+        return $this;
+    }
+
+    /**
+     * Get transport identifier.
+     *
+     * @return class-string<RawStreamInterface>
+     */
+    public function getTransport(): string
+    {
+        return $this->transport;
+    }
+
+    /**
+     * Set transport identifier.
+     *
+     * @param class-string<RawStreamInterface> $transport Transport identifier.
+     *
+     * @return self
+     */
+    public function setTransport(string $transport): self
+    {
+        if (!isset(\class_implements($transport)[RawStreamInterface::class])) {
+            throw new Exception("An invalid transport was specified!");
+        }
+        $this->changed = true;
+        $this->transport = $transport;
+
+        return $this;
+    }
+
+    /**
+     * Get whether to retry connection.
+     *
+     * @return bool
+     */
+    public function getRetry(): bool
+    {
+        return $this->retry;
+    }
+
+    /**
+     * Set whether to retry connection.
+     *
+     * @param bool $retry Whether to retry connection.
+     *
+     * @return self
+     */
+    public function setRetry(bool $retry): self
+    {
+        $this->changed = true;
+        $this->retry = $retry;
+
+        return $this;
+    }
+
+    /**
+     * Get connection timeout.
+     *
+     * @return int
+     */
+    public function getTimeout(): int
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * Set connection timeout.
+     *
+     * @param int $timeout Connection timeout.
+     *
+     * @return self
+     */
+    public function setTimeout(int $timeout): self
+    {
+        $this->changed = true;
+        $this->timeout = $timeout;
+
+        return $this;
+    }
+}

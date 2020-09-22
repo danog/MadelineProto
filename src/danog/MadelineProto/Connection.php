@@ -294,7 +294,7 @@ class Connection extends Session
      */
     public function isHttp(): bool
     {
-        return \in_array($this->ctx->getStreamName(), [HttpStream::getName(), HttpsStream::getName()]);
+        return \in_array($this->ctx->getStreamName(), [HttpStream::class, HttpsStream::class]);
     }
     /**
      * Check if is a media connection.
@@ -348,7 +348,7 @@ class Connection extends Session
         if (!isset($this->waiter)) {
             $this->waiter = new HttpWaitLoop($this);
         }
-        if (!isset($this->pinger) && ($this->ctx->hasStreamName(WssStream::getName()) || $this->ctx->hasStreamName(WsStream::getName()))) {
+        if (!isset($this->pinger) && ($this->ctx->hasStreamName(WssStream::class) || $this->ctx->hasStreamName(WsStream::class))) {
             $this->pinger = new PingLoop($this);
         }
         foreach ($this->new_outgoing as $message_id) {

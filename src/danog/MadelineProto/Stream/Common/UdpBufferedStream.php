@@ -28,6 +28,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\Async\BufferedStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
 use danog\MadelineProto\Stream\ReadBufferInterface;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
@@ -38,7 +39,7 @@ use danog\MadelineProto\Stream\WriteBufferInterface;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
+class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     use BufferedStream;
     private RawStreamInterface $stream;

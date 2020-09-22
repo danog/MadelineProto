@@ -20,59 +20,33 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Deferred;
-use Amp\Http\Client\Request;
 use Amp\Loop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
+
+use danog\MadelineProto\Settings;
 
 /**
  * Manages updates.
+ *
+ * @property Settings $settings Settings
  */
 trait UpdateHandler
 {
+    /**
+     * Update handler callback.
+     *
+     * @var ?callable
+     */
+    private $updateHandler;
     private $got_state = false;
     private $channels_state;
     public $updates = [];
     public $updates_key = 0;
-    /**
-     * PWR update handler.
-     *
-     * @param array $update Update
-     *
-     * @internal
-     *
-     * @return void
-     */
-    public function pwrUpdateHandler($update)
-    {
-        if (isset($this->settings['pwr']['updateHandler'])) {
-            if (\is_array($this->settings['pwr']['updateHandler']) && $this->settings['pwr']['updateHandler'][0] === false) {
-                $this->settings['pwr']['updateHandler'] = $this->settings['pwr']['updateHandler'][1];
-            }
-            if (\is_string($this->settings['pwr']['updateHandler'])) {
-                return $this->{$this->settings['pwr']['updateHandler']}($update);
-            }
-            \in_array($this->settings['pwr']['updateHandler'], [['danog\\MadelineProto\\API', 'getUpdatesUpdateHandler'], 'getUpdatesUpdateHandler']) ? $this->getUpdatesUpdateHandler($update) : $this->settings['pwr']['updateHandler']($update);
-        }
-    }
-    /**
-     * Getupdates update handler.
-     *
-     * @param array $update Update
-     *
-     * @internal
-     *
-     * @return void
-     */
-    public function getUpdatesUpdateHandler(array $update): void
-    {
-        if (!$this->settings['updates']['handle_updates']) {
-            return;
-        }
-        $this->updates[$this->updates_key++] = $update;
-    }
+
     /**
      * Get updates.
      *
@@ -84,23 +58,17 @@ trait UpdateHandler
      */
     public function getUpdates($params = []): \Generator
     {
-        if (!$this->settings['updates']['handle_updates']) {
-            $this->settings['updates']['handle_updates'] = true;
-            $this->startUpdateSystem();
-        }
-        if (!$this->settings['updates']['run_callback']) {
-            $this->settings['updates']['run_callback'] = true;
-        }
-        $params = \array_merge(self::DEFAULT_GETUPDATES_PARAMS, $params);
+        $this->updateHandler = MTProto::GETUPDATES_HANDLER;
+        $params = \array_merge(MTProto::DEFAULT_GETUPDATES_PARAMS, $params);
         if (empty($this->updates)) {
             $this->update_deferred = new Deferred();
             if (!$params['timeout']) {
                 $params['timeout'] = 0.001;
             }
-            yield $this->waitUpdate();
+            yield from $this->waitUpdate();
         }
         if (empty($this->updates)) {
-            return [];
+            return $this->updates;
         }
         if ($params['offset'] < 0) {
             $params['offset'] = \array_reverse(\array_keys((array) $this->updates))[\abs($params['offset']) - 1];
@@ -229,8 +197,8 @@ trait UpdateHandler
      */
     public function getUpdatesState(): \Generator
     {
-        $data = yield from $this->methodCallAsyncRead('updates.getState', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
-        yield from $this->getCdnConfig($this->settings['connection_settings']['default_dc']);
+        $data = yield from $this->methodCallAsyncRead('updates.getState', [], $this->settings->getDefaultDcParams());
+        yield from $this->getCdnConfig($this->settings->getDefaultDc());
         return $data;
     }
     /**
@@ -245,9 +213,6 @@ trait UpdateHandler
      */
     public function handleUpdates($updates, $actual_updates = null): \Generator
     {
-        if (!$this->settings['updates']['handle_updates']) {
-            return;
-        }
         if ($actual_updates) {
             $updates = $actual_updates;
         }
@@ -395,7 +360,7 @@ trait UpdateHandler
                     return false;
                 }
                 $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
-                yield from $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+                yield from $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], $this->settings->getDefaultDcParams());
             }
             yield from $this->handleEncryptedUpdate($update);
             return;
@@ -408,7 +373,7 @@ trait UpdateHandler
         if ($update['_'] === 'updateEncryption') {
             switch ($update['chat']['_']) {
                 case 'encryptedChatRequested':
-                    if ($this->settings['secret_chats']['accept_chats'] === false || \is_array($this->settings['secret_chats']['accept_chats']) && !\in_array($update['chat']['admin_id'], $this->settings['secret_chats']['accept_chats'])) {
+                    if (!$this->settings->getSecretChats()->canAccept($update['chat']['admin_id'])) {
                         return;
                     }
                     $this->logger->logger('Accepting secret chat '.$update['chat']['id'], \danog\MadelineProto\Logger::NOTICE);
@@ -439,7 +404,7 @@ trait UpdateHandler
         }
         //if ($update['_'] === 'updateServiceNotification' && strpos($update['type'], 'AUTH_KEY_DROP_') === 0) {
         //}
-        if (!$this->settings['updates']['handle_updates']) {
+        if (!$this->updateHandler) {
             return;
         }
         if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') {
@@ -448,42 +413,7 @@ trait UpdateHandler
         if (isset($update['message']['from_id']) && $update['message']['from_id'] === $this->authorization['user']['id']) {
             $update['message']['out'] = true;
         }
-        //$this->logger->logger('Saving an update of type '.$update['_'].'...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-        if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict'] && isset($this->settings['pwr']['updateHandler'])) {
-            $this->pwrUpdateHandler($update);
-        } elseif ($this->settings['updates']['run_callback']) {
-            $this->getUpdatesUpdateHandler($update);
-        }
-    }
-    /**
-     * Send update to webhook.
-     *
-     * @param array $update Update
-     *
-     * @return void
-     */
-    private function pwrWebhook(array $update): void
-    {
-        $payload = \json_encode($update);
-        //$this->logger->logger($update, $payload, json_last_error());
-        if ($payload === '') {
-            $this->logger->logger('EMPTY UPDATE');
-            return;
-        }
-        \danog\MadelineProto\Tools::callFork((function () use ($payload): \Generator {
-            $request = new Request($this->hook_url, 'POST');
-            $request->setHeader('content-type', 'application/json');
-            $request->setBody($payload);
-            $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();
-            $this->logger->logger('Result of webhook query is '.$result, \danog\MadelineProto\Logger::NOTICE);
-            $result = \json_decode($result, true);
-            if (\is_array($result) && isset($result['method']) && $result['method'] != '' && \is_string($result['method'])) {
-                try {
-                    $this->logger->logger('Reverse webhook command returned', yield from $this->methodCallAsyncRead($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
-                } catch (\Throwable $e) {
-                    $this->logger->logger("Reverse webhook command returned: {$e}");
-                }
-            }
-        })());
+        // First save to array, then once the feed loop signals resumal of loop, resume and handle
+        $this->updates[$this->updates_key++] = $update;
     }
 }

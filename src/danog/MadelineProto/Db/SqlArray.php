@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\Db;
 
 use Amp\Promise;
+use danog\MadelineProto\Settings\Database\DatabaseAbstract;
 
 use function Amp\call;
 
@@ -22,11 +23,11 @@ abstract class SqlArray extends DriverArray
      * @param string $name
      * @param DbArray|array|null $value
      * @param string $tablePrefix
-     * @param array $settings
+     * @param DatabaseAbstract $settings
      *
      * @return Promise
      */
-    public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise
+    public static function getInstance(string $name, $value = null, string $tablePrefix = '', $settings): Promise
     {
         $tableName = "{$tablePrefix}_{$name}";
         if ($value instanceof static && $value->table === $tableName) {
@@ -36,8 +37,8 @@ abstract class SqlArray extends DriverArray
             $instance->table = $tableName;
         }
 
-        $instance->settings = $settings;
-        $instance->ttl = $settings['cache_ttl'] ?? $instance->ttl;
+        $instance->dbSettings = $settings;
+        $instance->ttl = $settings->getCacheTtl();
 
         $instance->startCacheCleanupLoop();
 
@@ -48,7 +49,7 @@ abstract class SqlArray extends DriverArray
             // Skip migrations if its same object
             if ($instance !== $value) {
                 if ($value instanceof DriverArray) {
-                    yield from $value->initConnection($value->settings);
+                    yield from $value->initConnection($value->dbSettings);
                 }
                 yield from static::renameTmpTable($instance, $value);
                 yield from static::migrateDataToDb($instance, $value);

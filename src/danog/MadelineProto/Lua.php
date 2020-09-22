@@ -22,7 +22,7 @@ namespace danog\MadelineProto;
 class Lua
 {
     use \danog\Serializable;
-    public $MadelineProto;
+    public API $MadelineProto;
     protected $Lua;
     protected $script;
     public function __magic_construct($script, $MadelineProto)
@@ -31,8 +31,7 @@ class Lua
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['script_not_exist']);
         }
         $this->MadelineProto = $MadelineProto;
-        $this->MadelineProto->settings['updates']['handle_updates'] = true;
-        $this->MadelineProto->API->datacenter->sockets[$this->MadelineProto->settings['connection_settings']['default_dc']]->startUpdateLoop();
+        $this->MadelineProto->API->datacenter->sockets[$this->MadelineProto->getSettings()->getConnection()->getDefaultDc()]->startUpdateLoop();
         $this->script = $script;
         $this->__wakeup();
     }

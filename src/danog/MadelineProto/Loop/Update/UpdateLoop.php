@@ -69,17 +69,17 @@ class UpdateLoop extends ResumableSignalLoop
     {
         $API = $this->API;
         $feeder = $this->feeder = $API->feeders[$this->channelId];
-        while (!$API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
+        while (!$API->hasAllAuth()) {
             if (yield $this->waitSignal($this->pause())) {
                 $API->logger->logger("Exiting {$this} due to signal");
                 return;
             }
         }
         $this->state = $state = $this->channelId === self::GENERIC ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
-        $timeout = $API->settings['updates']['getdifference_interval'] * 1000;
+        $timeout = 30 * 1000;
         $first = true;
         while (true) {
-            while (!$API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
+            while (!$API->hasAllAuth()) {
                 if (yield $this->waitSignal($this->pause())) {
                     $API->logger->logger("Exiting {$this} due to signal");
                     return;
@@ -160,7 +160,7 @@ class UpdateLoop extends ResumableSignalLoop
                     }
                 } else {
                     $API->logger->logger('Resumed and fetching normal difference...', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                    $difference = yield from $API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $API->settings['connection_settings']['default_dc']]);
+                    $difference = yield from $API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], $API->settings->getDefaultDcParams());
                     $API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     switch ($difference['_']) {
                         case 'updates.differenceEmpty':

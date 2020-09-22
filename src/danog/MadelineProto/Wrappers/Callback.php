@@ -33,9 +33,7 @@ trait Callback
      */
     public function setCallback($callback): void
     {
-        $this->settings['updates']['callback'] = $callback;
-        $this->settings['updates']['run_callback'] = true;
-        $this->settings['updates']['handle_updates'] = true;
+        $this->updateHandler = $callback;
         $this->startUpdateSystem();
     }
 }

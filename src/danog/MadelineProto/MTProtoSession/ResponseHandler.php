@@ -336,7 +336,7 @@ trait ResponseHandler
                                 $datacenter .= '_media';
                             }
                             if (isset($request['user_related']) && $request['user_related']) {
-                                $this->API->settings['connection_settings']['default_dc'] = $this->API->authorized_dc = $this->API->datacenter->curdc;
+                                $this->API->settings->setDefaultDc($this->API->authorized_dc = $this->API->datacenter->curdc);
                             }
                             Loop::defer([$this, 'methodRecall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
                             //$this->API->methodRecall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
@@ -422,7 +422,7 @@ trait ResponseHandler
                             return;
                         case 420:
                             $seconds = \preg_replace('/[^0-9]+/', '', $response['error_message']);
-                            $limit = $request['FloodWaitLimit'] ?? $this->API->settings['flood_timeout']['wait_if_lt'];
+                            $limit = $request['FloodWaitLimit'] ?? $this->API->settings->getRPC()->getFloodTimeout();
                             if (\is_numeric($seconds) && $seconds < $limit) {
                                 //$this->gotResponseForOutgoingMessageId($request_id);
                                 $this->logger->logger('Flood, waiting '.$seconds.' seconds before repeating async call of '.($request['_'] ?? '').'...', \danog\MadelineProto\Logger::NOTICE);
@@ -447,6 +447,9 @@ trait ResponseHandler
                     switch ($response['error_code']) {
                         case 48:
                             $this->shared->getTempAuthKey()->setServerSalt($response['new_server_salt']);
+                            $this->methodRecall('', ['message_id' => $request_id, 'postpone' => true]);
+                            return;
+                        case 20:
                             $this->methodRecall('', ['message_id' => $request_id, 'postpone' => true]);
                             return;
                         case 16:

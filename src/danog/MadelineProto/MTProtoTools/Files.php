@@ -38,22 +38,26 @@ use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
+use danog\MadelineProto\Settings;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\Tools;
+
 use tgseclib\Crypt\AES;
 
 use const danog\Decoder\TYPES;
-
 use function Amp\File\exists;
 use function Amp\File\open;
 use function Amp\File\stat as statAsync;
+
 use function Amp\Promise\all;
 
 /**
  * Manages upload and download of files.
+ *
+ * @property Settings $settings Settings
  */
 trait Files
 {
@@ -83,7 +87,7 @@ trait Files
         if (\is_resource($file) || (\is_object($file) && $file instanceof InputStream)) {
             return yield from $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted);
         }
-        if (!$this->settings['upload']['allow_automatic_upload']) {
+        if (!$this->settings->getFiles()->getAllowAutomaticUpload()) {
             return yield from $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
         }
         $file = Tools::absolute($file);
@@ -194,7 +198,7 @@ trait Files
             };
         } else {
             if (!$stream instanceof BufferedRawStream) {
-                $ctx = (new ConnectionContext())->addStream(PremadeStream::getName(), $stream)->addStream(SimpleBufferedRawStream::getName());
+                $ctx = (new ConnectionContext())->addStream(PremadeStream::class, $stream)->addStream(SimpleBufferedRawStream::class);
                 $stream = (yield from $ctx->getStream());
                 $created = true;
             }
@@ -263,12 +267,12 @@ trait Files
                 $this->logger->logger('Upload status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
             };
         }
-        $datacenter = $this->settings['connection_settings']['default_dc'];
+        $datacenter = $this->settings->getDefaultDc();
         if ($this->datacenter->has($datacenter.'_media')) {
             $datacenter .= '_media';
         }
-        $part_size = $this->settings['upload']['part_size'];
-        $parallel_chunks = $this->settings['upload']['parallel_chunks'] ?? 4000;
+        $part_size = 512 * 1024;
+        $parallel_chunks = $this->settings->getFiles()->getUploadParallelChunks();
         $part_total_num = (int) \ceil($size / $part_size);
         $part_num = 0;
         $method = $size > 10 * 1024 * 1024 ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
@@ -395,7 +399,7 @@ trait Files
         }
         $size = $media['size'];
         $mime = $media['mime'];
-        $chunk_size = $this->settings['upload']['part_size'];
+        $chunk_size = 512 * 1024;
         $bridge = new class($size, $chunk_size, $cb) {
             /**
              * Read promises.
@@ -1134,9 +1138,9 @@ trait Files
         if ($end === -1 && isset($messageMedia['size'])) {
             $end = $messageMedia['size'];
         }
-        $part_size = $part_size ?? $this->settings['download']['part_size'];
-        $parallel_chunks = $this->settings['download']['parallel_chunks'] ?? 4000;
-        $datacenter = $messageMedia['InputFileLocation']['dc_id'] ?? $this->settings['connection_settings']['default_dc'];
+        $part_size = $part_size ?? 1024 * 1024;
+        $parallel_chunks = $this->settings->getFiles()->getDownloadParallelChunks();
+        $datacenter = $messageMedia['InputFileLocation']['dc_id'] ?? $this->settings->getDefaultDc();
         if ($this->datacenter->has($datacenter.'_media')) {
             $datacenter .= '_media';
         }

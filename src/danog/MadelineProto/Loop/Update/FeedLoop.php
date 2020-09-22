@@ -75,25 +75,19 @@ class FeedLoop extends ResumableSignalLoop
     {
         $API = $this->API;
         $this->updater = $API->updaters[$this->channelId];
-        if (!$this->API->settings['updates']['handle_updates']) {
-            return false;
-        }
-        while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
+        while (!$API->hasAllAuth()) {
             if (yield $this->waitSignal($this->pause())) {
                 return;
             }
         }
         $this->state = $this->channelId === self::GENERIC ? yield from $API->loadUpdateState() : $API->loadChannelState($this->channelId);
         while (true) {
-            while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
+            while (!$API->hasAllAuth()) {
                 if (yield $this->waitSignal($this->pause())) {
                     return;
                 }
             }
             if (yield $this->waitSignal($this->pause())) {
-                return;
-            }
-            if (!$this->API->settings['updates']['handle_updates']) {
                 return;
             }
             $API->logger->logger("Resumed {$this}");

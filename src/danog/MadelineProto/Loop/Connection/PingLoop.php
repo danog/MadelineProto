@@ -40,7 +40,7 @@ class PingLoop extends ResumableSignalLoop
         $datacenter = $this->datacenter;
         $connection = $this->connection;
         $shared = $this->datacenterConnection;
-        $timeout = $shared->getSettings()['timeout'];
+        $timeout = $shared->getSettings()->getTimeout();
         $timeoutMs = $timeout * 1000;
         while (true) {
             while (!$shared->hasTempAuthKey()) {

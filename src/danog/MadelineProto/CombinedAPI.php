@@ -78,7 +78,7 @@ class CombinedAPI
             }
             return;
         }
-        \danog\MadelineProto\Logger::constructor(3);
+        //\danog\MadelineProto\Logger::constructor(3);
         \danog\MadelineProto\Logger::log("INSTANTIATING {$path}...");
         $instance = new \danog\MadelineProto\API($path, $settings);
         $this->instance_paths[$path] = $path;
@@ -200,10 +200,6 @@ class CombinedAPI
             \danog\MadelineProto\Tools::wait($instance->initAsynchronously());
             if ($instance->API->authorized !== MTProto::LOGGED_IN) {
                 continue;
-            }
-            if (!$instance->API->settings['updates']['handle_updates']) {
-                $instance->API->settings['updates']['handle_updates'] = true;
-                $instance->API->startUpdateSystem();
             }
             $instance->setCallback(function ($update) use ($path) {
                 return $this->eventUpdateHandler($update, $path);

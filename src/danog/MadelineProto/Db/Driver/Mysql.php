@@ -4,8 +4,9 @@ namespace danog\MadelineProto\Db\Driver;
 
 use Amp\Mysql\ConnectionConfig;
 use Amp\Mysql\Pool;
-use Amp\Sql\Common\ConnectionPool;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
+
 use function Amp\Mysql\Pool;
 
 class Mysql
@@ -29,23 +30,17 @@ class Mysql
      *
      * @return \Generator<Pool>
      */
-    public static function getConnection(
-        string $host = '127.0.0.1',
-        int $port = 3306,
-        string $user = 'root',
-        string $password = '',
-        string $db = 'MadelineProto',
-        int $maxConnections = ConnectionPool::DEFAULT_MAX_CONNECTIONS,
-        int $idleTimeout = ConnectionPool::DEFAULT_IDLE_TIMEOUT
-    ): \Generator {
-        $dbKey = "$host:$port:$db";
+    public static function getConnection(DatabaseMysql $settings): \Generator
+    {
+        $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {
-            $config = ConnectionConfig::fromString(
-                "host={$host} port={$port} user={$user} password={$password} db={$db}"
-            );
+            $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()))
+                ->withUser($settings->getUsername())
+                ->withPassword($settings->getPassword())
+                ->withDatabase($settings->getDatabase());
 
             yield from static::createDb($config);
-            static::$connections[$dbKey] = pool($config, $maxConnections, $idleTimeout);
+            static::$connections[$dbKey] = pool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
         }
 
         return static::$connections[$dbKey];
