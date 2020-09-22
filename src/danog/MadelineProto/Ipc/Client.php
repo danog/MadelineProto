@@ -55,7 +55,7 @@ class Client
     {
         $this->logger = $logger;
         $this->server = $server;
-        Tools::callFork($this->loop());
+        Tools::callFork($this->loopInternal());
     }
     /**
      * Logger.
@@ -78,7 +78,7 @@ class Client
      *
      * @return \Generator
      */
-    private function loop(): \Generator
+    private function loopInternal(): \Generator
     {
         while ($payload = yield $this->server->receive()) {
             [$id, $payload] = $payload;
@@ -95,6 +95,17 @@ class Client
                 unset($promise);
             }
         }
+    }
+    /**
+     * Run the provided async callable.
+     *
+     * @param callable $callback Async callable to run
+     *
+     * @return mixed
+     */
+    public function loop(callable $callback): \Generator
+    {
+        return yield $callback();
     }
     /**
      * Unreference.

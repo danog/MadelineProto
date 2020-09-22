@@ -20,17 +20,21 @@
 namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\Settings;
+
 use danog\MadelineProto\Tools;
 
 /**
  * Event handler.
+ *
+ * @property Settings $settings Settings
  */
 trait Events
 {
     /**
      * Event handler class name.
      *
-     * @var string
+     * @var class-string<EventHandler>
      */
     public $event_handler;
     /**
@@ -46,30 +50,53 @@ trait Events
      */
     private $eventHandlerMethods = [];
     /**
-     * Set event handler.
+     * Initialize existing event handler.
      *
-     * @param string|EventHandler $event_handler Event handler
+     * @internal
      *
-     * @return \Generator
+     * @return void
      */
-    public function setEventHandler($event_handler): \Generator
+    public function initExistingEventHandler(): void
     {
-        if (!\class_exists($event_handler) || !\is_subclass_of($event_handler, '\\danog\\MadelineProto\\EventHandler')) {
-            throw new \danog\MadelineProto\Exception('Wrong event handler was defined');
+        if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->API->event_handler, EventHandler::class)) {
+            $this->initEventHandler($this->API->event_handler);
         }
-        $this->event_handler = $event_handler;
+    }
+    /**
+     * Initialize event handler.
+     *
+     * @param class-string<EventHandler> $eventHandler
+     *
+     * @return void
+     */
+    private function initEventHandler(string $eventHandler): void
+    {
+        $this->event_handler = $eventHandler;
         if (!$this->event_handler_instance instanceof $this->event_handler) {
             $class_name = $this->event_handler;
             $this->event_handler_instance = new $class_name($this->wrapper);
-        } elseif ($this->wrapper) {
-            $this->event_handler_instance->__construct($this->wrapper);
         }
+        $this->event_handler_instance->initInternal($this->wrapper);
+    }
+    /**
+     * Set event handler.
+     *
+     * @param class-string<EventHandler> $eventHandler Event handler
+     *
+     * @return \Generator
+     */
+    public function setEventHandler(string $eventHandler): \Generator
+    {
+        if (!\is_subclass_of($eventHandler, EventHandler::class)) {
+            throw new \danog\MadelineProto\Exception('Wrong event handler was defined');
+        }
+        $this->initEventHandler($eventHandler);
         $this->eventHandlerMethods = [];
         foreach (\get_class_methods($this->event_handler) as $method) {
             if ($method === 'onLoop') {
                 $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
             } elseif ($method === 'onAny') {
-                foreach ($this->getTL()->getConstructors()->by_id as $id => $constructor) {
+                foreach ($this->getTL()->getConstructors()->by_id as $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($this->eventHandlerMethods[$constructor['predicate']])) {
                         $this->eventHandlerMethods[$constructor['predicate']] = [$this->event_handler_instance, 'onAny'];
                     }
@@ -82,12 +109,10 @@ trait Events
             }
         }
         yield from $this->setReportPeers($this->event_handler_instance->getReportPeers());
-        $this->settings['updates']['callback'] = [$this, 'eventUpdateHandler'];
-        $this->settings['updates']['handle_updates'] = true;
-        $this->settings['updates']['run_callback'] = true;
         if (\method_exists($this->event_handler_instance, 'onStart')) {
             Tools::callFork($this->event_handler_instance->onStart());
         }
+        $this->updateHandler = [$this, 'eventUpdateHandler'];
         if ($this->inited()) {
             $this->startUpdateSystem();
         }
@@ -105,9 +130,6 @@ trait Events
         $this->event_handler_instance = null;
         $this->eventHandlerMethods = [];
         $this->setNoop();
-        if ($disableUpdateHandling) {
-            $this->settings['updates']['handle_updates'] = false;
-        }
     }
     /**
      * Get event handler.

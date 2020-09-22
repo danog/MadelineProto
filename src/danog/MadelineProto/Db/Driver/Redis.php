@@ -5,6 +5,7 @@ namespace danog\MadelineProto\Db\Driver;
 use Amp\Redis\Config;
 use Amp\Redis\Redis as RedisRedis;
 use Amp\Redis\RemoteExecutorFactory;
+use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
 
 class Redis
 {
@@ -27,17 +28,13 @@ class Redis
      *
      * @return \Generator<RedisRedis>
      */
-    public static function getConnection(
-        string $host = '127.0.0.1',
-        int $port = 6379,
-        string $password = '',
-        int $db = 0
-    ): \Generator {
-        $dbKey = "$host:$port:$db";
+    public static function getConnection(DatabaseRedis $settings): \Generator
+    {
+        $dbKey = $settings->getKey();
         if (empty(static::$connections[$dbKey])) {
-            $config = Config::fromUri(
-                "{$host}:{$port}?password={$password}&db={$db}"
-            );
+            $config = Config::fromUri($settings->getUri())
+                ->withPassword($settings->getPassword())
+                ->withDatabase($settings->getDatabase());
 
             static::$connections[$dbKey] = new RedisRedis((new RemoteExecutorFactory($config))->createQueryExecutor());
             yield static::$connections[$dbKey]->ping();

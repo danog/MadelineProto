@@ -3,6 +3,8 @@
 namespace danog\MadelineProto\Db;
 
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\SettingsAbstract;
+use ReflectionClass;
 
 abstract class DriverArray implements DbArray
 {
@@ -14,12 +16,22 @@ abstract class DriverArray implements DbArray
     }
 
 
+    public function __wakeup()
+    {
+        if (isset($this->settings) && \is_array($this->settings)) {
+            $clazz = (new ReflectionClass($this))->getProperty('dbSettings')->getType()->getName();
+            /** @var SettingsAbstract */
+            $this->dbSettings = new $clazz;
+            $this->dbSettings->mergeArray($this->settings);
+            unset($this->settings);
+        }
+    }
     public function offsetExists($index): bool
     {
         throw new \RuntimeException('Native isset not support promises. Use isset method');
     }
 
-    abstract protected function initConnection(array $settings): \Generator;
+    abstract protected function initConnection($settings): \Generator;
 
     /**
      * @param self $new

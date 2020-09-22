@@ -20,10 +20,13 @@
 namespace danog\MadelineProto\MTProtoSession\MsgIdHandler;
 
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
+use danog\MadelineProto\MTProtoSession\Session;
 use tgseclib\Math\BigInteger;
 
 /**
  * Manages message ids.
+ *
+ * @property Session $session
  */
 class MsgIdHandler32 extends MsgIdHandler
 {
@@ -66,7 +69,7 @@ class MsgIdHandler32 extends MsgIdHandler
             if ($newMessageId->compare($key = $this->getMaxId($incoming = false)) <= 0) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', 1);
             }
-            if (\count($this->session->outgoing_messages) > $this->session->API->settings['msg_array_limit']['outgoing']) {
+            if (\count($this->session->outgoing_messages) > $this->session->API->settings->getRpc()->getLimitOutgoing()) {
                 \reset($this->session->outgoing_messages);
                 $key = \key($this->session->outgoing_messages);
                 if (!isset($this->session->outgoing_messages[$key]['promise'])) {
@@ -89,7 +92,7 @@ class MsgIdHandler32 extends MsgIdHandler
                     $this->session->API->logger->logger('WARNING: Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::WARNING);
                 }
             }
-            if (\count($this->session->incoming_messages) > $this->session->API->settings['msg_array_limit']['incoming']) {
+            if (\count($this->session->incoming_messages) > $this->session->API->settings->getRpc()->getLimitIncoming()) {
                 \reset($this->session->incoming_messages);
                 $key = \key($this->session->incoming_messages);
                 if (!isset($this->session->incoming_messages[$key]['promise'])) {

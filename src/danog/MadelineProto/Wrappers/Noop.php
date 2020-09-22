@@ -28,9 +28,7 @@ trait Noop
      */
     public function setNoop(): void
     {
-        $this->settings['updates']['callback'] = [$this, 'noop'];
-        $this->settings['updates']['run_callback'] = false;
-        $this->settings['updates']['handle_updates'] = true;
+        $this->updateHandler = null;
         $this->updates = [];
         $this->startUpdateSystem();
     }

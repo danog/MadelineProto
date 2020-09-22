@@ -43,7 +43,7 @@ class CheckLoop extends ResumableSignalLoop
         $datacenter = $this->datacenter;
         $connection = $this->connection;
         $shared = $this->datacenterConnection;
-        $timeout = $shared->getSettings()['timeout'];
+        $timeout = $shared->getSettings()->getTimeout();
         $timeoutMs = $timeout * 1000;
         $timeoutResend = $timeout * $timeout;
         // Typically 25 seconds, good enough

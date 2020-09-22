@@ -19,8 +19,13 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use Amp\Http\Client\Request;
+use danog\MadelineProto\Settings;
+
 /**
  * Manages logging in and out.
+ *
+ * @property Settings $settings
  */
 trait Webhook
 {
@@ -36,9 +41,38 @@ trait Webhook
     {
         $this->pem_path = $pem_path;
         $this->hook_url = $hook_url;
-        $this->settings['updates']['callback'] = [$this, 'pwrWebhook'];
-        $this->settings['updates']['run_callback'] = true;
-        $this->settings['updates']['handle_updates'] = true;
+        $this->updateHandler = [$this, 'pwrWebhook'];
         $this->startUpdateSystem();
+    }
+    /**
+     * Send update to webhook.
+     *
+     * @param array $update Update
+     *
+     * @return void
+     */
+    private function pwrWebhook(array $update): void
+    {
+        $payload = \json_encode($update);
+        if ($payload === '') {
+            $this->logger->logger($update, $payload, \json_last_error_msg());
+            $this->logger->logger('EMPTY UPDATE');
+            return;
+        }
+        \danog\MadelineProto\Tools::callFork((function () use ($payload): \Generator {
+            $request = new Request($this->hook_url, 'POST');
+            $request->setHeader('content-type', 'application/json');
+            $request->setBody($payload);
+            $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();
+            $this->logger->logger('Result of webhook query is '.$result, \danog\MadelineProto\Logger::NOTICE);
+            $result = \json_decode($result, true);
+            if (\is_array($result) && isset($result['method']) && $result['method'] != '' && \is_string($result['method'])) {
+                try {
+                    $this->logger->logger('Reverse webhook command returned', yield from $this->methodCallAsyncRead($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
+                } catch (\Throwable $e) {
+                    $this->logger->logger("Reverse webhook command returned: {$e}");
+                }
+            }
+        })());
     }
 }

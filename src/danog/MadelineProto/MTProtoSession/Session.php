@@ -21,6 +21,8 @@ namespace danog\MadelineProto\MTProtoSession;
 
 /**
  * Manages MTProto session-specific data.
+ *
+ * @property MTProto $API
  */
 abstract class Session
 {

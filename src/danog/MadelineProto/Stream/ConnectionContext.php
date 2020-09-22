@@ -432,7 +432,7 @@ class ConnectionContext
     {
         foreach ($this->nextStreams as $couple) {
             list($streamName, $extra) = $couple;
-            if ($streamName === ObfuscatedStream::getName() && isset($extra['address'])) {
+            if ($streamName === ObfuscatedStream::class && isset($extra['address'])) {
                 $extra['_'] = 'inputClientProxy';
                 return $extra;
             }
@@ -461,7 +461,7 @@ class ConnectionContext
                 $string .= ' => ';
             }
             $string .= \preg_replace('/.*\\\\/', '', $stream[0]);
-            if ($stream[1] && $stream[0] !== DefaultStream::getName()) {
+            if ($stream[1] && $stream[0] !== DefaultStream::class) {
                 $string .= ' ('.\json_encode($stream[1]).')';
             }
         }

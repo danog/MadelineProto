@@ -307,11 +307,7 @@ trait AuthKeyHandler
             yield from $this->methodCallAsyncRead('phone.saveCallDebug', ['peer' => $call, 'debug' => $this->calls[$call['id']]->getDebugLog()], ['datacenter' => $this->datacenter->curdc]);
         }
         $update = ['_' => 'updatePhoneCall', 'phone_call' => $this->calls[$call['id']]];
-        if (isset($this->settings['pwr']['strict']) && $this->settings['pwr']['strict']) {
-            $this->pwrUpdateHandler($update);
-        } else {
-            \in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'getUpdatesUpdateHandler'], 'getUpdatesUpdateHandler']) ? $this->getUpdatesUpdateHandler($update) : $this->settings['updates']['callback']($update);
-        }
+        $this->updates[$this->updates_key++] = $update;
         unset($this->calls[$call['id']]);
     }
     /**

@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\Db;
 
 use Amp\Promise;
+use danog\MadelineProto\Settings\DatabaseAbstract;
 
 interface DbType
 {
@@ -10,9 +11,9 @@ interface DbType
      * @param string $name
      * @param null $value
      * @param string $tablePrefix
-     * @param array $settings
+     * @param DatabaseAbstract $settings
      *
      * @return Promise<self>
      */
-    public static function getInstance(string $name, $value = null, string $tablePrefix = '', array $settings = []): Promise;
+    public static function getInstance(string $name, $value = null, string $tablePrefix = '', $settings): Promise;
 }

@@ -124,7 +124,7 @@ class ADNLConnection
         $payload .= $encryptedRandom;
         $ip = \long2ip(\unpack('V', Tools::packSignedInt($endpoint['ip']))[1]);
         $port = $endpoint['port'];
-        $ctx = (new ConnectionContext())->setSocketContext(new ConnectContext())->setUri("tcp://{$ip}:{$port}")->addStream(DefaultStream::getName())->addStream(BufferedRawStream::getName())->addStream(CtrStream::getName(), $obf)->addStream(HashedBufferedStream::getName(), 'sha256')->addStream(ADNLStream::getName());
+        $ctx = (new ConnectionContext())->setSocketContext(new ConnectContext())->setUri("tcp://{$ip}:{$port}")->addStream(DefaultStream::class)->addStream(BufferedRawStream::class)->addStream(CtrStream::class, $obf)->addStream(HashedBufferedStream::class, 'sha256')->addStream(ADNLStream::class);
         $this->stream = (yield from $ctx->getStream($payload));
         Tools::callFork((function (): \Generator {
             //yield Tools::sleep(1);

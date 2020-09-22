@@ -20,10 +20,14 @@
 namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Settings;
+
 use danog\MadelineProto\Tools;
 
 /**
  * Manages simple logging in and out.
+ *
+ * @property Settings $settings Settings
  */
 trait Start
 {

@@ -8,6 +8,7 @@ use Amp\Redis\Redis as RedisRedis;
 use Amp\Success;
 use danog\MadelineProto\Db\Driver\Redis as Redis;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
 use Generator;
 
 use function Amp\call;
@@ -15,8 +16,11 @@ use function Amp\call;
 class RedisArray extends SqlArray
 {
     protected string $table;
-    protected array $settings;
+    public DatabaseRedis $dbSettings;
     private RedisRedis $db;
+
+    // Legacy
+    protected array $settings;
 
     protected function prepareTable(): Generator
     {
@@ -39,22 +43,24 @@ class RedisArray extends SqlArray
         }
     }
 
-    protected function initConnection(array $settings): \Generator
+    /**
+     * Initialize connection.
+     *
+     * @param DatabaseRedis $settings
+     * @return \Generator
+     */
+    protected function initConnection($settings): \Generator
     {
         if (!isset($this->db)) {
-            $this->db = yield from Redis::getConnection(
-                $settings['host'],
-                $settings['port'],
-                $settings['password'],
-                $settings['database']
-            );
+            $this->db = yield from Redis::getConnection($settings);
         }
     }
 
     public function __sleep()
     {
-        return ['table', 'settings'];
+        return ['table', 'dbSettings'];
     }
+
     /**
      * Get redis key name.
      *

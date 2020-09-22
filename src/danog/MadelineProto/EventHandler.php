@@ -22,18 +22,19 @@ namespace danog\MadelineProto;
 /**
  * Event handler.
  */
-class EventHandler extends InternalDoc
+abstract class EventHandler extends InternalDoc
 {
     /**
-     * Constructor.
+     * Internal constructor.
      *
-     * @param APIWrapper|null $MadelineProto MadelineProto instance
+     * @internal
+     *
+     * @param APIWrapper $MadelineProto MadelineProto instance
+     *
+     * @return void
      */
-    public function __construct(?APIWrapper $MadelineProto)
+    public function initInternal(APIWrapper $MadelineProto): void
     {
-        if (!$MadelineProto) {
-            return;
-        }
         self::link($this, $MadelineProto->getFactory());
         $this->API =& $MadelineProto->getAPI();
         foreach ($this->API->getMethodNamespaces() as $namespace) {

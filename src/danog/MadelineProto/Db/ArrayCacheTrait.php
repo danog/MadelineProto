@@ -16,10 +16,18 @@ trait ArrayCacheTrait
      */
     protected array $ttlValues = [];
 
+    /**
+     * TTL interval.
+     */
+    protected int $ttl = 5 * 60;
+    /**
+     * TTL cleanup interval.
+     */
+    private int $ttlCheckInterval = 60;
 
-    protected string $ttl = '+5 minutes';
-    private string $ttlCheckInterval = '+1 minute';
-
+    /**
+     * Cache cleanup watcher ID.
+     */
     private ?string $cacheCleanupId = null;
 
     protected function getCache(string $key, $default = null)
@@ -55,7 +63,7 @@ trait ArrayCacheTrait
 
     protected function startCacheCleanupLoop(): void
     {
-        $this->cacheCleanupId = Loop::repeat(\strtotime($this->ttlCheckInterval, 0) * 1000, fn () => $this->cleanupCache());
+        $this->cacheCleanupId = Loop::repeat($this->ttlCheckInterval * 1000, fn () => $this->cleanupCache());
     }
     protected function stopCacheCleanupLoop(): void
     {

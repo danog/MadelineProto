@@ -9,17 +9,22 @@ use Amp\Sql\ResultSet;
 use Amp\Success;
 use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
+
 use function Amp\call;
 
 class MysqlArray extends SqlArray
 {
     protected string $table;
-    protected array $settings;
+    protected DatabaseMysql $dbSettings;
     private Pool $db;
+
+    // Legacy
+    protected array $settings;
 
     public function __sleep(): array
     {
-        return ['table', 'settings'];
+        return ['table', 'dbSettings'];
     }
 
     /**
@@ -177,18 +182,16 @@ class MysqlArray extends SqlArray
         return null;
     }
 
-    protected function initConnection(array $settings): \Generator
+    /**
+     * Initialize connection.
+     *
+     * @param DatabaseMysql $settings
+     * @return \Generator
+     */
+    protected function initConnection($settings): \Generator
     {
         if (!isset($this->db)) {
-            $this->db = yield from Mysql::getConnection(
-                $settings['host'],
-                $settings['port'],
-                $settings['user'],
-                $settings['password'],
-                $settings['database'],
-                $settings['max_connections'],
-                $settings['idle_timeout']
-            );
+            $this->db = yield from Mysql::getConnection($settings);
         }
     }
 
@@ -239,7 +242,7 @@ class MysqlArray extends SqlArray
     private function request(string $query, array $params = []): Promise
     {
         return call(function () use ($query, $params) {
-            Logger::log([$query, $params], Logger::VERBOSE);
+            //Logger::log([$query, $params], Logger::VERBOSE);
 
             if (empty($this->db) || !$this->db->isAlive()) {
                 Logger::log('No database connection', Logger::WARNING);

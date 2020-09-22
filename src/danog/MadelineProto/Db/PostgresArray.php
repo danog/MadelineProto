@@ -9,26 +9,29 @@ use Amp\Sql\ResultSet;
 use Amp\Success;
 use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
+
 use function Amp\call;
 
 class PostgresArray extends SqlArray
 {
     protected string $table;
-    protected array $settings;
+    public DatabasePostgres $dbSettings;
     private Pool $db;
 
-    protected function initConnection(array $settings): \Generator
+    // Legacy
+    protected array $settings;
+
+    /**
+     * Initialize connection.
+     *
+     * @param DatabasePostgres $settings
+     * @return \Generator
+     */
+    protected function initConnection($settings): \Generator
     {
         if (!isset($this->db)) {
-            $this->db = yield from Postgres::getConnection(
-                $settings['host'],
-                $settings['port'],
-                $settings['user'],
-                $settings['password'],
-                $settings['database'],
-                $settings['max_connections'],
-                $settings['idle_timeout']
-            );
+            $this->db = yield from Postgres::getConnection($settings);
         }
     }
 
@@ -107,7 +110,7 @@ class PostgresArray extends SqlArray
 
     public function __sleep()
     {
-        return ['table', 'settings'];
+        return ['table', 'dbSettings'];
     }
 
     /**

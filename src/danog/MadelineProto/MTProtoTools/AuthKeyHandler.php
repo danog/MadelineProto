@@ -25,7 +25,9 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\AuthKey;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
+use danog\MadelineProto\Settings;
 use danog\PrimeModule;
+
 use tgseclib\Math\BigInteger;
 
 /**
@@ -33,6 +35,8 @@ use tgseclib\Math\BigInteger;
  *
  * https://core.telegram.org/mtproto/auth_key
  * https://core.telegram.org/mtproto/samples-auth_key
+ *
+ * @property Settings $settings Settings
  */
 trait AuthKeyHandler
 {
@@ -63,7 +67,7 @@ trait AuthKeyHandler
         $connection = $this->datacenter->getAuthConnection($datacenter);
         $cdn = $connection->isCDN();
         $req_pq = $cdn ? 'req_pq' : 'req_pq_multi';
-        for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
+        for ($retry_id_total = 1; $retry_id_total <= $this->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
             try {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['req_pq'], \danog\MadelineProto\Logger::VERBOSE);
                 /**
@@ -264,7 +268,7 @@ trait AuthKeyHandler
                 $this->logger->logger(\sprintf('Server-client time delta = %.1f s', $connection->time_delta), \danog\MadelineProto\Logger::VERBOSE);
                 $this->checkPG($dh_prime, $g);
                 $this->checkG($g_a, $dh_prime);
-                for ($retry_id = 0; $retry_id <= $this->settings['max_tries']['authorization']; $retry_id++) {
+                for ($retry_id = 0; $retry_id <= $this->settings->getAuth()->getMaxAuthTries(); $retry_id++) {
                     $this->logger->logger('Generating b...', \danog\MadelineProto\Logger::VERBOSE);
                     $b = new BigInteger(\danog\MadelineProto\Tools::random(256), 256);
                     $this->logger->logger('Generating g_b...', \danog\MadelineProto\Logger::VERBOSE);
@@ -510,7 +514,7 @@ trait AuthKeyHandler
     {
         $datacenterConnection = $this->datacenter->getDataCenterConnection($datacenter);
         $connection = $datacenterConnection->getAuthConnection();
-        for ($retry_id_total = 1; $retry_id_total <= $this->settings['max_tries']['authorization']; $retry_id_total++) {
+        for ($retry_id_total = 1; $retry_id_total <= $this->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
             try {
                 $this->logger->logger('Binding authorization keys...', \danog\MadelineProto\Logger::VERBOSE);
                 $nonce = \danog\MadelineProto\Tools::random(8);
@@ -669,19 +673,19 @@ trait AuthKeyHandler
                         return;
                     }
                 }
-                if ($this->datacenter->getDataCenterConnection($id)->getSettings()['pfs']) {
+                if ($this->getSettings()->getAuth()->getPfs()) {
                     if (!$cdn) {
                         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
                         //$authorized = $socket->authorized;
                         //$socket->authorized = false;
                         $socket->setTempAuthKey(null);
-                        $socket->setTempAuthKey(yield from $this->createAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
-                        yield from $this->bindTempAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id);
+                        $socket->setTempAuthKey(yield from $this->createAuthKey($this->settings->getAuth()->getDefaultTempAuthKeyExpiresIn(), $id));
+                        yield from $this->bindTempAuthKey($this->settings->getAuth()->getDefaultTempAuthKeyExpiresIn(), $id);
                         $this->config = yield from $connection->methodCallAsyncRead('help.getConfig', []);
                         yield from $this->syncAuthorization($id);
                     } elseif (!$socket->hasTempAuthKey()) {
                         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                        $socket->setTempAuthKey(yield from $this->createAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
+                        $socket->setTempAuthKey(yield from $this->createAuthKey($this->settings->getAuth()->getDefaultTempAuthKeyExpiresIn(), $id));
                     }
                 } else {
                     if (!$cdn) {
@@ -690,7 +694,7 @@ trait AuthKeyHandler
                         yield from $this->syncAuthorization($id);
                     } elseif (!$socket->hasTempAuthKey()) {
                         $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['gen_temp_auth_key'], $id), \danog\MadelineProto\Logger::NOTICE);
-                        $socket->setTempAuthKey(yield from $this->createAuthKey($this->settings['authorization']['default_temp_auth_key_expires_in'], $id));
+                        $socket->setTempAuthKey(yield from $this->createAuthKey($this->settings->getAuth()->getDefaultTempAuthKeyExpiresIn(), $id));
                     }
                 }
             } elseif (!$cdn) {

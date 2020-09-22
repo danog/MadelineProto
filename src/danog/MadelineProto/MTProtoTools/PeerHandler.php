@@ -23,11 +23,14 @@ use Amp\Http\Client\Request;
 use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 use danog\MadelineProto\Db\DbArray;
+use danog\MadelineProto\Settings;
 
 use const danog\Decoder\PROFILE_PHOTO;
 
 /**
  * Manages peers.
+ *
+ * @property Settings $settings Settings
  */
 trait PeerHandler
 {
@@ -157,7 +160,7 @@ trait PeerHandler
                 if (!$existingChat || $existingChat !== $chat) {
                     $this->logger->logger("Updated chat -{$chat['id']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     $this->chats[-$chat['id']] = $chat;
-                    $this->cachePwrChat(-$chat['id'], $this->settings['peer']['full_fetch'], true);
+                    $this->cachePwrChat(-$chat['id'], $this->getSettings()->getPeer()->getFullFetch(), true);
                 }
                 $this->cacheChatUsername(-$chat['id'], $chat);
                 break;
@@ -196,8 +199,8 @@ trait PeerHandler
                     }
                     $this->chats[$bot_api_id] = $chat;
                     $fullChat = yield $this->full_chats[$bot_api_id];
-                    if ($this->settings['peer']['full_fetch'] && (!$fullChat || $fullChat['full']['participants_count'] !== (yield from $this->getFullInfo($bot_api_id))['full']['participants_count'])) {
-                        $this->cachePwrChat($bot_api_id, $this->settings['peer']['full_fetch'], true);
+                    if ($this->getSettings()->getPeer()->getFullFetch() && (!$fullChat || $fullChat['full']['participants_count'] !== (yield from $this->getFullInfo($bot_api_id))['full']['participants_count'])) {
+                        $this->cachePwrChat($bot_api_id, $this->getSettings()->getPeer()->getFullFetch(), true);
                     }
                 }
                 $this->cacheChatUsername($bot_api_id, $chat);
@@ -545,7 +548,7 @@ trait PeerHandler
                     }
                 }
             }
-            if (!isset($this->settings['pwr']['requests']) || $this->settings['pwr']['requests'] === true && $recursive) {
+            if ($this->settings->getPwr()->getRequests() && $recursive) {
                 $dbres = [];
                 try {
                     $dbres = \json_decode(yield from $this->datacenter->fileGetContents('https://id.pwrtelegram.xyz/db/getusername?id='.$id), true);
@@ -582,7 +585,7 @@ trait PeerHandler
         }
         if ($id === 'support') {
             if (!$this->supportUser) {
-                yield from $this->methodCallAsyncRead('help.getSupport', [], ['datacenter' => $this->settings['connection_settings']['default_dc']]);
+                yield from $this->methodCallAsyncRead('help.getSupport', [], $this->settings->getDefaultDcParams());
             }
             return yield from $this->getInfo($this->supportUser);
         }
@@ -704,7 +707,7 @@ trait PeerHandler
     public function getFullInfo($id): \Generator
     {
         $partial = (yield from $this->getInfo($id));
-        if (\time() - (yield from $this->fullChatLastUpdated($partial['bot_api_id'])) < (isset($this->settings['peer']['full_info_cache_time']) ? $this->settings['peer']['full_info_cache_time'] : 0)) {
+        if (\time() - (yield from $this->fullChatLastUpdated($partial['bot_api_id'])) < $this->getSettings()->getPeer()->getFullInfoCacheTime()) {
             return \array_merge($partial, yield $this->full_chats[$partial['bot_api_id']]);
         }
         switch ($partial['type']) {
@@ -1008,8 +1011,7 @@ trait PeerHandler
     }
     private function storeDb($res, $force = false): \Generator
     {
-        $settings = isset($this->settings['connection_settings'][$this->datacenter->curdc]) ? $this->settings['connection_settings'][$this->datacenter->curdc] : $this->settings['connection_settings']['all'];
-        if (!isset($this->settings['pwr']) || $this->settings['pwr']['pwr'] === false || $settings['test_mode']) {
+        if (!$this->settings->getPwr()->getDbToken() || $this->settings->getConnection()->getTestMode()) {
             return;
         }
         if (!empty($res)) {
@@ -1030,7 +1032,7 @@ trait PeerHandler
             //$path = '/tmp/ids'.hash('sha256', $payload);
             //file_put_contents($path, $payload);
             $id = isset($this->authorization['user']['username']) ? $this->authorization['user']['username'] : $this->authorization['user']['id'];
-            $request = new Request('https://id.pwrtelegram.xyz/db'.$this->settings['pwr']['db_token'].'/addnewmadeline?d=pls&from='.$id, 'POST');
+            $request = new Request('https://id.pwrtelegram.xyz/db'.$this->settings->getPwr()->getDbToken().'/addnewmadeline?d=pls&from='.$id, 'POST');
             $request->setHeader('content-type', 'application/json');
             $request->setBody($payload);
             $result = yield (yield $this->datacenter->getHTTPClient()->request($request))->getBody()->buffer();

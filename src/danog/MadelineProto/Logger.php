@@ -22,6 +22,7 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\ResourceOutputStream;
 use Amp\Failure;
 use Amp\Loop;
+use danog\MadelineProto\Settings\Logger as SettingsLogger;
 
 use function Amp\ByteStream\getStderr;
 use function Amp\ByteStream\getStdout;
@@ -44,7 +45,7 @@ class Logger
     /**
      * Optional logger parameter.
      *
-     * @var mixed
+     * @var null|string|callable
      */
     public $optional = null;
     /**
@@ -80,7 +81,7 @@ class Logger
     /**
      * Default logger instance.
      *
-     * @var self
+     * @var ?self
      */
     public static $default;
     /**
@@ -93,116 +94,104 @@ class Logger
      * Log rotation loop ID.
      */
     private string $rotateId = '';
+    /**
+     * Ultra verbose logging.
+     */
     const ULTRA_VERBOSE = 5;
+    /**
+     * Verbose logging.
+     */
     const VERBOSE = 4;
+    /**
+     * Notice logging.
+     */
     const NOTICE = 3;
+    /**
+     * Warning logging.
+     */
     const WARNING = 2;
+    /**
+     * Error logging.
+     */
     const ERROR = 1;
+    /**
+     * Log only fatal errors.
+     */
     const FATAL_ERROR = 0;
 
+    /**
+     * Disable logger (DEPRECATED).
+     */
     const NO_LOGGER = 0;
+    /**
+     * Default logger (syslog).
+     */
     const DEFAULT_LOGGER = 1;
+    /**
+     * File logger.
+     */
     const FILE_LOGGER = 2;
+    /**
+     * Echo logger.
+     */
     const ECHO_LOGGER = 3;
+    /**
+     * Callable logger.
+     */
     const CALLABLE_LOGGER = 4;
+
+    const LEVEL_ULTRA_VERBOSE = self::ULTRA_VERBOSE;
+    const LEVEL_VERBOSE = self::VERBOSE;
+    const LEVEL_NOTICE = self::NOTICE;
+    const LEVEL_WARNING = self::WARNING;
+    const LEVEL_ERROR = self::ERROR;
+    const LEVEL_FATAL = self::FATAL_ERROR;
+
+    const LOGGER_DEFAULT = self::DEFAULT_LOGGER;
+    const LOGGER_ECHO = self::ECHO_LOGGER;
+    const LOGGER_FILE = self::FILE_LOGGER;
+    const LOGGER_CALLABLE = self::CALLABLE_LOGGER;
     /**
      * Construct global static logger from MadelineProto settings.
      *
-     * @param array $settings Settings array
+     * @param SettingsLogger $settings Settings instance
      *
      * @return void
      */
-    public static function constructorFromSettings(array $settings)
+    public static function constructorFromSettings(SettingsLogger $settings): void
     {
         if (!self::$default) {
             // The getLogger function will automatically init the static logger, but we'll do it again anyway
-            self::$default = self::getLoggerFromSettings(MTProto::parseSettings($settings));
+            self::$default = new self($settings);
         }
     }
-    /**
-     * Get logger from MadelineProto settings.
-     *
-     * @param array  $settings Settings array
-     * @param string $prefix   Optional prefix for log messages
-     *
-     * @return self
-     */
-    public static function getLoggerFromSettings(array $settings, string $prefix = ''): self
-    {
-        if (!isset($settings['logger']['logger_param']) && isset($settings['logger']['param'])) {
-            $settings['logger']['logger_param'] = $settings['logger']['param'];
-        }
-        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && isset($settings['logger']['logger_param']) && $settings['logger']['logger_param'] === 'MadelineProto.log') {
-            $settings['logger']['logger_param'] = Magic::$script_cwd.'/MadelineProto.log';
-        }
-        $logger = new self($settings['logger']['logger'], $settings['logger']['logger_param'] ?? '', $prefix, $settings['logger']['logger_level'] ?? Logger::VERBOSE, $settings['logger']['max_size'] ?? 100 * 1024 * 1024);
-        if (!self::$default) {
-            self::$default = $logger;
-        }
-        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
-            try {
-                \error_reporting(E_ALL);
-                \ini_set('log_errors', 1);
-                \ini_set('error_log', $settings['logger']['logger'] === self::FILE_LOGGER ? $settings['logger']['logger_param'] : Magic::$script_cwd.'/MadelineProto.log');
-                \error_log('Enabled PHP logging');
-            } catch (\danog\MadelineProto\Exception $e) {
-                $logger->logger('Could not enable PHP logging');
-            }
-        }
-        return $logger;
-    }
-    /**
-     * Construct global logger.
-     *
-     * @param int    $mode     One of the logger constants
-     * @param mixed  $optional Optional parameter for logger
-     * @param string $prefix   Prefix for log messages
-     * @param int    $level    Default logging level
-     * @param int    $max_size Maximum size for logfile
-     *
-     * @return void
-     */
-    public static function constructor(int $mode, $optional = null, string $prefix = '', int $level = self::NOTICE, int $max_size = 100 * 1024 * 1024)
-    {
-        self::$default = new self($mode, $optional, $prefix, $level, $max_size);
-    }
-    /**
-     * Construct global logger.
-     *
-     * @param int    $mode     One of the logger constants
-     * @param mixed  $optional Optional parameter for logger
-     * @param string $prefix   Prefix for log messages
-     * @param int    $level    Default logging level
-     * @param int    $max_size Maximum size for logfile
-     *
-     * @return void
-     */
-    public function __construct(int $mode, $optional = null, string $prefix = '', int $level = self::NOTICE, int $max_size = 10 * 1024 * 1024)
-    {
-        if ($mode === null) {
-            throw new Exception(\danog\MadelineProto\Lang::$current_lang['no_mode_specified']);
-        }
-        if ($mode === self::NO_LOGGER) {
-            $mode = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') ? Logger::ECHO_LOGGER : Logger::FILE_LOGGER;
-        }
-        if (\defined(\MADELINE_WORKER::class)) {
-            $mode = Logger::FILE_LOGGER;
-        }
-        $level = \max($level, self::NOTICE);
-        $max_size = \max($max_size, 100 * 1024);
 
-        $this->mode = $mode;
-        $this->optional = $mode == self::FILE_LOGGER ? Tools::absolute($optional) : $optional;
+    /**
+     * Construct logger.
+     *
+     * @param SettingsLogger $settings
+     * @param string $prefix
+     */
+    public function __construct(SettingsLogger $settings, string $prefix = '')
+    {
         $this->prefix = $prefix === '' ? '' : ', '.$prefix;
-        $this->level = $level;
-        if ($this->mode === self::FILE_LOGGER && !\file_exists(\pathinfo($this->optional, PATHINFO_DIRNAME))) {
-            $this->optional = Magic::$script_cwd.'/MadelineProto.log';
-        }
-        if ($this->mode === self::FILE_LOGGER && !\preg_match('/\\.log$/', $this->optional)) {
-            $this->optional .= '.log';
-        }
-        if ($mode === self::FILE_LOGGER && $max_size !== -1 && \file_exists($this->optional) && \filesize($this->optional) > $max_size) {
-            \unlink($this->optional);
+
+        $this->mode = $settings->getType();
+        $this->optional = $settings->getExtra();
+        $this->level = $settings->getLevel();
+
+        $maxSize = $settings->getMaxSize();
+
+        if ($this->mode === self::FILE_LOGGER) {
+            if (!\file_exists(\pathinfo($this->optional, PATHINFO_DIRNAME))) {
+                $this->optional = Magic::$script_cwd.'/MadelineProto.log';
+            }
+            if (!str_ends_with($this->optional, '.log')) {
+                $this->optional .= '.log';
+            }
+            if ($maxSize !== -1 && \file_exists($this->optional) && \filesize($this->optional) > $maxSize) {
+                \unlink($this->optional);
+            }
         }
         $this->colors[self::ULTRA_VERBOSE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['dim']]);
         $this->colors[self::VERBOSE] = \implode(';', [self::FOREGROUND['green'], self::SET['bold']]);
@@ -219,16 +208,16 @@ class Logger
         } elseif ($this->mode === self::FILE_LOGGER) {
             Snitch::logFile($this->optional);
             $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a'));
-            if ($max_size !== -1) {
+            if ($maxSize !== -1) {
                 $this->rotateId = Loop::repeat(
                     10*1000,
-                    function () use ($max_size) {
+                    function () use ($maxSize) {
                         \clearstatcache(true, $this->optional);
-                        if (\file_exists($this->optional) && \filesize($this->optional) >= $max_size) {
+                        if (\file_exists($this->optional) && \filesize($this->optional) >= $maxSize) {
                             $this->stdout = null;
                             \unlink($this->optional);
                             $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a'));
-                            $this->logger("Automatically truncated logfile to $max_size");
+                            $this->logger("Automatically truncated logfile to $maxSize");
                         }
                     }
                 );
@@ -242,6 +231,22 @@ class Logger
                 $this->stdout = new ResourceOutputStream(\fopen($result, 'a+'));
             } else {
                 $this->stdout = getStderr();
+            }
+        }
+
+        if (!self::$default) {
+            self::$default = $this;
+        }
+        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
+            try {
+                \error_reporting(E_ALL);
+                \ini_set('log_errors', 1);
+                \ini_set('error_log', $this->mode === self::FILE_LOGGER
+                    ? $this->optional
+                    : Magic::$script_cwd.'/MadelineProto.log');
+                \error_log('Enabled PHP logging');
+            } catch (\danog\MadelineProto\Exception $e) {
+                $this->logger('Could not enable PHP logging');
             }
         }
     }

@@ -19,11 +19,16 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 
+use danog\MadelineProto\Settings;
+
 /**
  * Manages logging in and out.
+ *
+ * @property Settings $settings Settings
  */
 trait Login
 {
@@ -34,7 +39,7 @@ trait Login
      */
     public function logout(): \Generator
     {
-        yield from $this->methodCallAsyncRead('auth.logOut', [], ['datacenter' => $this->datacenter->curdc]);
+        yield from $this->methodCallAsyncRead('auth.logOut', []);
         yield from $this->resetSession();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['logout_ok'], \danog\MadelineProto\Logger::NOTICE);
         $this->startUpdateSystem();
@@ -49,16 +54,21 @@ trait Login
      */
     public function botLogin(string $token): \Generator
     {
-        if ($this->authorized === self::LOGGED_IN) {
+        if ($this->authorized === MTProto::LOGGED_IN) {
             return;
-            $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
-            yield from $this->logout();
         }
         $callbacks = [$this, $this->referenceDatabase];
         $this->TL->updateCallbacks($callbacks);
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_bot'], \danog\MadelineProto\Logger::NOTICE);
-        $this->authorization = yield from $this->methodCallAsyncRead('auth.importBotAuthorization', ['bot_auth_token' => $token, 'api_id' => $this->settings['app_info']['api_id'], 'api_hash' => $this->settings['app_info']['api_hash']], ['datacenter' => $this->datacenter->curdc]);
-        $this->authorized = self::LOGGED_IN;
+        $this->authorization = yield from $this->methodCallAsyncRead(
+            'auth.importBotAuthorization',
+            [
+                'bot_auth_token' => $token,
+                'api_id' => $this->settings->getAppInfo()->getApiId(),
+                'api_hash' => $this->settings->getAppInfo()->getApiHash(),
+            ]
+        );
+        $this->authorized = MTProto::LOGGED_IN;
         $this->authorized_dc = $this->datacenter->curdc;
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
         $this->updates = [];
@@ -78,16 +88,26 @@ trait Login
      */
     public function phoneLogin($number, $sms_type = 5): \Generator
     {
-        if ($this->authorized === self::LOGGED_IN) {
+        if ($this->authorized === MTProto::LOGGED_IN) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
             yield from $this->logout();
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_code_sending'], \danog\MadelineProto\Logger::NOTICE);
-        $this->authorization = yield from $this->methodCallAsyncRead('auth.sendCode', ['settings' => ['_' => 'codeSettings'], 'phone_number' => $number, 'sms_type' => $sms_type, 'api_id' => $this->settings['app_info']['api_id'], 'api_hash' => $this->settings['app_info']['api_hash'], 'lang_code' => $this->settings['app_info']['lang_code']], ['datacenter' => $this->datacenter->curdc]);
+        $this->authorization = yield from $this->methodCallAsyncRead(
+            'auth.sendCode',
+            [
+                'settings' => ['_' => 'codeSettings'],
+                'phone_number' => $number,
+                'sms_type' => $sms_type,
+                'api_id' => $this->settings->getAppInfo()->getApiId(),
+                'api_hash' => $this->settings->getAppInfo()->getApiHash(),
+                'lang_code' => $this->settings->getAppInfo()->getLangCode()
+            ]
+        );
         $this->authorized_dc = $this->datacenter->curdc;
         $this->authorization['phone_number'] = $number;
         //$this->authorization['_'] .= 'MP';
-        $this->authorized = self::WAITING_CODE;
+        $this->authorized = MTProto::WAITING_CODE;
         $this->updates = [];
         $this->updates_key = 0;
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_code_sent'], \danog\MadelineProto\Logger::NOTICE);
@@ -102,26 +122,26 @@ trait Login
      */
     public function completePhoneLogin($code): \Generator
     {
-        if ($this->authorized !== self::WAITING_CODE) {
+        if ($this->authorized !== MTProto::WAITING_CODE) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['login_code_uncalled']);
         }
-        $this->authorized = self::NOT_LOGGED_IN;
+        $this->authorized = MTProto::NOT_LOGGED_IN;
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_user'], \danog\MadelineProto\Logger::NOTICE);
         try {
-            $authorization = yield from $this->methodCallAsyncRead('auth.signIn', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => (string) $code], ['datacenter' => $this->datacenter->curdc]);
+            $authorization = yield from $this->methodCallAsyncRead('auth.signIn', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => (string) $code]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_2fa_enabled'], \danog\MadelineProto\Logger::NOTICE);
-                $this->authorization = yield from $this->methodCallAsyncRead('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]);
+                $this->authorization = yield from $this->methodCallAsyncRead('account.getPassword', []);
                 if (!isset($this->authorization['hint'])) {
                     $this->authorization['hint'] = '';
                 }
-                $this->authorized = self::WAITING_PASSWORD;
+                $this->authorized = MTProto::WAITING_PASSWORD;
                 return $this->authorization;
             }
             if ($e->rpc === 'PHONE_NUMBER_UNOCCUPIED') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_need_signup'], \danog\MadelineProto\Logger::NOTICE);
-                $this->authorized = self::WAITING_SIGNUP;
+                $this->authorized = MTProto::WAITING_SIGNUP;
                 $this->authorization['phone_code'] = $code;
                 return ['_' => 'account.needSignup'];
             }
@@ -129,12 +149,12 @@ trait Login
         }
         if ($authorization['_'] === 'auth.authorizationSignUpRequired') {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_need_signup'], \danog\MadelineProto\Logger::NOTICE);
-            $this->authorized = self::WAITING_SIGNUP;
+            $this->authorized = MTProto::WAITING_SIGNUP;
             $this->authorization['phone_code'] = $code;
             $authorization['_'] = 'account.needSignup';
             return $authorization;
         }
-        $this->authorized = self::LOGGED_IN;
+        $this->authorized = MTProto::LOGGED_IN;
         $this->authorization = $authorization;
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
         yield from $this->initAuthorization();
@@ -152,7 +172,7 @@ trait Login
      */
     public function importAuthorization($authorization): \Generator
     {
-        if ($this->authorized === self::LOGGED_IN) {
+        if ($this->authorized === MTProto::LOGGED_IN) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
             yield from $this->logout();
         }
@@ -167,7 +187,7 @@ trait Login
         $dataCenterConnection->resetSession();
         $dataCenterConnection->setPermAuthKey($auth_key);
         $dataCenterConnection->authorized(true);
-        $this->authorized = self::LOGGED_IN;
+        $this->authorized = MTProto::LOGGED_IN;
         yield from $this->initAuthorization();
         yield from $this->getPhoneConfig();
         $res = (yield from $this->fullGetSelf());
@@ -186,7 +206,7 @@ trait Login
      */
     public function exportAuthorization(): \Generator
     {
-        if ($this->authorized !== self::LOGGED_IN) {
+        if ($this->authorized !== MTProto::LOGGED_IN) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['not_loggedIn']);
         }
         yield from $this->fullGetSelf();
@@ -203,13 +223,13 @@ trait Login
      */
     public function completeSignup(string $first_name, string $last_name = ''): \Generator
     {
-        if ($this->authorized !== self::WAITING_SIGNUP) {
+        if ($this->authorized !== MTProto::WAITING_SIGNUP) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['signup_uncalled']);
         }
-        $this->authorized = self::NOT_LOGGED_IN;
+        $this->authorized = MTProto::NOT_LOGGED_IN;
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['signing_up'], \danog\MadelineProto\Logger::NOTICE);
-        $this->authorization = yield from $this->methodCallAsyncRead('auth.signUp', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => $this->authorization['phone_code'], 'first_name' => $first_name, 'last_name' => $last_name], ['datacenter' => $this->datacenter->curdc]);
-        $this->authorized = self::LOGGED_IN;
+        $this->authorization = yield from $this->methodCallAsyncRead('auth.signUp', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => $this->authorization['phone_code'], 'first_name' => $first_name, 'last_name' => $last_name]);
+        $this->authorized = MTProto::LOGGED_IN;
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
         yield from $this->initAuthorization();
         yield from $this->getPhoneConfig();
@@ -226,15 +246,15 @@ trait Login
      */
     public function complete2faLogin(string $password): \Generator
     {
-        if ($this->authorized !== self::WAITING_PASSWORD) {
+        if ($this->authorized !== MTProto::WAITING_PASSWORD) {
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['2fa_uncalled']);
         }
-        $this->authorized = self::NOT_LOGGED_IN;
+        $this->authorized = MTProto::NOT_LOGGED_IN;
         $hasher = new PasswordCalculator($this->logger);
         $hasher->addInfo($this->authorization);
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_user'], \danog\MadelineProto\Logger::NOTICE);
-        $this->authorization = yield from $this->methodCallAsyncRead('auth.checkPassword', ['password' => $hasher->getCheckPassword($password)], ['datacenter' => $this->datacenter->curdc]);
-        $this->authorized = self::LOGGED_IN;
+        $this->authorization = yield from $this->methodCallAsyncRead('auth.checkPassword', ['password' => $hasher->getCheckPassword($password)]);
+        $this->authorized = MTProto::LOGGED_IN;
         $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->authorized(true);
         yield from $this->initAuthorization();
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_ok'], \danog\MadelineProto\Logger::NOTICE);
@@ -254,7 +274,7 @@ trait Login
     public function update2fa(array $params): \Generator
     {
         $hasher = new PasswordCalculator($this->logger);
-        $hasher->addInfo(yield from $this->methodCallAsyncRead('account.getPassword', [], ['datacenter' => $this->datacenter->curdc]));
-        return yield from $this->methodCallAsyncRead('account.updatePasswordSettings', $hasher->getPassword($params), ['datacenter' => $this->datacenter->curdc]);
+        $hasher->addInfo(yield from $this->methodCallAsyncRead('account.getPassword', []));
+        return yield from $this->methodCallAsyncRead('account.updatePasswordSettings', $hasher->getPassword($params));
     }
 }

@@ -20,11 +20,15 @@
 namespace danog\MadelineProto\Wrappers;
 
 use Amp\Promise;
+use danog\MadelineProto\Settings;
 use danog\MadelineProto\Shutdown;
+
 use danog\MadelineProto\Tools;
 
 /**
  * Manages logging in and out.
+ *
+ * @property Settings $settings Settings
  */
 trait Loop
 {
@@ -87,7 +91,7 @@ trait Loop
     /**
      * Start MadelineProto's update handling loop, or run the provided async callable.
      *
-     * @param callable $callback Async callable to run
+     * @param callable|null $callback Async callable to run
      *
      * @return mixed
      */
@@ -105,7 +109,7 @@ trait Loop
             $this->logger->logger('Not authorized, not starting event loop', \danog\MadelineProto\Logger::FATAL_ERROR);
             return false;
         }
-        if (\in_array($this->settings['updates']['callback'], [['danog\\MadelineProto\\API', 'getUpdatesUpdateHandler'], 'getUpdatesUpdateHandler'])) {
+        if ($this->updateHandler === self::GETUPDATES_HANDLER) {
             $this->logger->logger('Getupdates event handler is enabled, exiting from loop', \danog\MadelineProto\Logger::FATAL_ERROR);
             return false;
         }
@@ -113,21 +117,19 @@ trait Loop
         if (!\is_callable($this->loop_callback)) {
             $this->loop_callback = null;
         }
-        if (!$this->settings['updates']['handle_updates']) {
-            $this->settings['updates']['handle_updates'] = true;
-        }
-        if (!$this->settings['updates']['run_callback']) {
-            $this->settings['updates']['run_callback'] = true;
-        }
         $this->initSelfRestart();
         $this->startUpdateSystem();
         $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
         $this->stopLoop = false;
         do {
+            if (!$this->updateHandler) {
+                yield from $this->waitUpdate();
+                continue;
+            }
             $updates = $this->updates;
             $this->updates = [];
             foreach ($updates as $update) {
-                $r = $this->settings['updates']['callback']($update);
+                $r = ($this->updateHandler)($update);
                 if (\is_object($r)) {
                     \danog\MadelineProto\Tools::callFork($r);
                 }

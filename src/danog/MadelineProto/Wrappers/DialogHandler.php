@@ -19,6 +19,13 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use danog\MadelineProto\Settings;
+
+/**
+ * Dialog handler.
+ *
+ * @property Settings $settings Settings
+ */
 trait DialogHandler
 {
     /**

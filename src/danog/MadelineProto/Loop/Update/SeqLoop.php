@@ -51,25 +51,19 @@ class SeqLoop extends ResumableSignalLoop
     {
         $API = $this->API;
         $this->feeder = $API->feeders[FeedLoop::GENERIC];
-        if (!$this->API->settings['updates']['handle_updates']) {
-            return false;
-        }
-        while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
+        while (!$API->hasAllAuth()) {
             if (yield $this->waitSignal($this->pause())) {
                 return;
             }
         }
         $this->state = (yield from $API->loadUpdateState());
         while (true) {
-            while (!$this->API->settings['updates']['handle_updates'] || !$API->hasAllAuth()) {
+            while (!$API->hasAllAuth()) {
                 if (yield $this->waitSignal($this->pause())) {
                     return;
                 }
             }
             if (yield $this->waitSignal($this->pause())) {
-                return;
-            }
-            if (!$this->API->settings['updates']['handle_updates']) {
                 return;
             }
             while ($this->incomingUpdates) {

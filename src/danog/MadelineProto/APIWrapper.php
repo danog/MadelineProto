@@ -204,23 +204,9 @@ final class APIWrapper
             $unlock = yield Tools::flock($realpaths->getLockPath(), LOCK_EX);
             Logger::log('Lock acquired, serializing');
             try {
-                if (!$this->gettingApiId) {
-                    $update_closure = $this->API->settings['updates']['callback'];
-                    if ($this->API->settings['updates']['callback'] instanceof \Closure) {
-                        $this->API->settings['updates']['callback'] = [$this->API, 'noop'];
-                    }
-                    $logger_closure = $this->API->settings['logger']['logger_param'];
-                    if ($this->API->settings['logger']['logger_param'] instanceof \Closure) {
-                        $this->API->settings['logger']['logger_param'] = [$this->API, 'noop'];
-                    }
-                }
                 $wrote = yield put($realpaths->getTempPath(), \serialize($this));
                 yield renameAsync($realpaths->getTempPath(), $realpaths->getSessionPath());
             } finally {
-                if (!$this->gettingApiId) {
-                    $this->API->settings['updates']['callback'] = $update_closure;
-                    $this->API->settings['logger']['logger_param'] = $logger_closure;
-                }
                 $unlock();
             }
             Logger::log('Done serializing');
