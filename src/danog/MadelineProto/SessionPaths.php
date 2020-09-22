@@ -29,10 +29,6 @@ class SessionPaths
      */
     private string $sessionPath;
     /**
-     * Global session lock path.
-     */
-    private string $slockPath;
-    /**
      * Session lock path.
      */
     private string $lockPath;
@@ -53,7 +49,6 @@ class SessionPaths
     {
         $session = Tools::absolute($session);
         $this->sessionPath = $session;
-        $this->slockPath = "$session.slock";
         $this->lockPath = "$session.lock";
         $this->ipcPath = "$session.ipc";
         $this->tempPath = "$session.temp.session";
@@ -76,16 +71,6 @@ class SessionPaths
     public function getSessionPath(): string
     {
         return $this->sessionPath;
-    }
-
-    /**
-     * Get global session lock path.
-     *
-     * @return string
-     */
-    public function getSessionLockPath(): string
-    {
-        return $this->slockPath;
     }
 
     /**

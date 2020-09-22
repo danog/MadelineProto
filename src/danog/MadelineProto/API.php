@@ -19,7 +19,6 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Promise;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 
 /**
@@ -31,13 +30,11 @@ class API extends InternalDoc
     use \danog\MadelineProto\ApiWrappers\Start;
     use \danog\MadelineProto\ApiWrappers\Templates;
     /**
-     * Session path.
+     * Session paths.
      *
      * @internal
-     *
-     * @var string
      */
-    public string $session = '';
+    public SessionPaths $session;
 
     /**
      * Instance of MadelineProto.
@@ -95,7 +92,7 @@ class API extends InternalDoc
     /**
      * Global session unlock callback.
      *
-     * @var callable
+     * @var ?callable
      */
     private $unlock;
 
@@ -111,10 +108,11 @@ class API extends InternalDoc
     public function __magic_construct(string $session, $settings = []): void
     {
         $settings = Settings::parseFromLegacy($settings);
+        $this->session = new SessionPaths($session);
         $this->wrapper = new APIWrapper($this, $this->exportNamespace());
 
-        Magic::classExists();
-        $this->setInitPromise($this->__construct_async($session, $settings));
+        Magic::classExists(true);
+        $this->setInitPromise($this->internalInitAPI($settings));
         foreach (\get_class_vars(APIFactory::class) as $key => $var) {
             if (\in_array($key, ['namespace', 'API', 'lua', 'async', 'asyncAPIPromise', 'methods'])) {
                 continue;
@@ -127,21 +125,20 @@ class API extends InternalDoc
     /**
      * Async constructor function.
      *
-     * @param string                 $session  Session name
      * @param Settings|SettingsEmpty $settings Settings
      *
      * @return \Generator
      */
-    public function __construct_async(string $session, SettingsAbstract $settings): \Generator
+    private function internalInitAPI(SettingsAbstract $settings): \Generator
     {
         Logger::constructorFromSettings($settings instanceof SettingsEmpty
             ? new SettingsLogger
             : $settings->getLogger());
-        $this->session = $session = Tools::absolute($session);
-        [$unserialized, $this->unlock] = yield from Serialization::legacyUnserialize($session);
+
+        [$unserialized, $this->unlock] = yield from Serialization::legacyUnserialize($this->session);
         if ($unserialized) {
             $unserialized->storage = $unserialized->storage ?? [];
-            $unserialized->session = $session;
+            $unserialized->session = $this->session;
             APIWrapper::link($this, $unserialized);
             APIWrapper::link($this->wrapper, $this);
             AbstractAPIFactory::link($this->wrapper->getFactory(), $this);
@@ -256,7 +253,7 @@ class API extends InternalDoc
      * @param API[]           $instances    Instances of madeline
      * @param string[]|string $eventHandler Event handler(s)
      *
-     * @return Promise
+     * @return void
      */
     public static function startAndLoopMulti(array $instances, $eventHandler): void
     {

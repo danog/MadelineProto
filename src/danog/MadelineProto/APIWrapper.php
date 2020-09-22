@@ -35,10 +35,8 @@ final class APIWrapper
 
     /**
      * Session path.
-     *
-     * @var string
      */
-    public string $session = '';
+    public SessionPaths $session;
 
     /**
      * Getting API ID flag.
@@ -169,7 +167,7 @@ final class APIWrapper
      */
     public function getIpcPath(): string
     {
-        return (new SessionPaths($this->session))->getIpcPath();
+        return $this->session->getIpcPath();
     }
 
     /**
@@ -179,37 +177,18 @@ final class APIWrapper
      */
     public function serialize(): Promise
     {
-        if (!$this->session) {
-            Logger::log("Not serializing, no session");
-            return new Success();
-        }
-        if ($this->API instanceof FastAPI) {
-            Logger::log("Not serializing, IPC client");
-            return new Success();
+        if ($this->API === null && !$this->gettingApiId) {
+            return new Success(false);
         }
         return Tools::callFork((function (): \Generator {
-            if (isset($this->API->flushSettings) && $this->API->flushSettings) {
-                $this->API->flushSettings = false;
-                $this->API->__construct($this->API->settings);
-            }
-            if ($this->API === null && !$this->gettingApiId) {
-                return false;
-            }
             if ($this->API) {
                 yield from $this->API->initAsynchronously();
             }
-            $this->serialized = \time();
-            $realpaths = new SessionPaths($this->session);
-            Logger::log('Waiting for exclusive lock of serialization lockfile...');
-            $unlock = yield Tools::flock($realpaths->getLockPath(), LOCK_EX);
-            Logger::log('Lock acquired, serializing');
-            try {
-                $wrote = yield put($realpaths->getTempPath(), \serialize($this));
-                yield renameAsync($realpaths->getTempPath(), $realpaths->getSessionPath());
-            } finally {
-                $unlock();
-            }
-            Logger::log('Done serializing');
+
+            $wrote = yield put($this->session->getTempPath(), \serialize($this));
+            yield renameAsync($this->session->getTempPath(), $this->session->getSessionPath());
+
+            Logger::log('Saved session!');
             return $wrote;
         })());
     }

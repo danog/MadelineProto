@@ -784,6 +784,27 @@ abstract class Tools extends StrTools
         return Magic::$altervista;
     }
     /**
+     * Checks private property exists in an object.
+     *
+     * @param object $obj Object
+     * @param string $var Attribute name
+     *
+     * @psalm-suppress InvalidScope
+     *
+     * @return bool
+     * @access public
+     */
+    public static function hasVar($obj, string $var): bool
+    {
+        return \Closure::bind(
+            function () use ($var) {
+                return isset($this->{$var});
+            },
+            $obj,
+            \get_class($obj)
+        )->__invoke();
+    }
+    /**
      * Accesses a private variable from an object.
      *
      * @param object $obj Object

@@ -28,7 +28,7 @@ class PostgresArray extends SqlArray
      * @param DatabasePostgres $settings
      * @return \Generator
      */
-    protected function initConnection($settings): \Generator
+    public function initConnection($settings): \Generator
     {
         if (!isset($this->db)) {
             $this->db = yield from Postgres::getConnection($settings);

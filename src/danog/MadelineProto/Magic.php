@@ -35,12 +35,6 @@ class Magic
      */
     public static $storage = [];
     /**
-     * Whether has threads.
-     *
-     * @var boolean
-     */
-    public static $has_thread = false;
-    /**
      * Whether this system is bigendian.
      *
      * @var boolean
@@ -292,10 +286,9 @@ class Magic
                 throw Exception::extension($extension);
             }
         }
-        self::$has_thread = \class_exists(\Thread::class) && \method_exists(\Thread::class, 'getCurrentThread');
         self::$BIG_ENDIAN = \pack('L', 1) === \pack('N', 1);
         self::$bigint = PHP_INT_SIZE < 8;
-        self::$ipv6 = (bool) \strlen(@\file_get_contents('http://ipv6.google.com', false, \stream_context_create(['http' => ['timeout' => 1]]))) > 0;
+        self::$ipv6 = (bool) \strlen(@\file_get_contents('http://ipv6.google.com/', false, \stream_context_create(['http' => ['timeout' => 1]]))) > 0;
         \preg_match('/const V = (\\d+);/', @\file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
         if (isset($matches[1]) && \danog\MadelineProto\MTProto::V < (int) $matches[1]) {
             throw new \danog\MadelineProto\Exception(\hex2bin(\danog\MadelineProto\Lang::$current_lang['v_error']), 0, null, 'MadelineProto', 1);

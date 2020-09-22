@@ -6,7 +6,8 @@
     "homepage": "https://docs.madelineproto.xyz",
     "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
     "conflict": {
-        "krakjoe/pthreads-polyfill": "*"
+        "krakjoe/pthreads-polyfill": "*",
+        "ext-pthreads": "*"
     },
     "require": {
         "php": ">=7.4.0",
