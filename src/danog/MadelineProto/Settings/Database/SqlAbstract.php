@@ -43,6 +43,7 @@ abstract class SqlAbstract extends DatabaseAbstract
         if (isset($settings['user'])) {
             $this->setUsername($settings['user']);
         }
+        parent::mergeArray($settings);
     }
 
     /**
