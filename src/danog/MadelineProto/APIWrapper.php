@@ -20,8 +20,9 @@ namespace danog\MadelineProto;
 
 use Amp\Promise;
 use Amp\Success;
+use danog\MadelineProto\Ipc\LightState;
 
-use function Amp\File\put;
+use function Amp\File\open;
 use function Amp\File\rename as renameAsync;
 
 final class APIWrapper
@@ -29,9 +30,9 @@ final class APIWrapper
     /**
      * MTProto instance.
      *
-     * @var ?MTProto
+     * @var MTProto|null|Client
      */
-    private ?MTProto $API = null;
+    private $API = null;
 
     /**
      * Session path.
@@ -173,7 +174,7 @@ final class APIWrapper
     /**
      * Serialize session.
      *
-     * @return Promise
+     * @return Promise<bool>
      */
     public function serialize(): Promise
     {
@@ -185,11 +186,30 @@ final class APIWrapper
                 yield from $this->API->initAsynchronously();
             }
 
-            $wrote = yield put($this->session->getTempPath(), \serialize($this));
+            $file = yield open($this->session->getTempPath(), 'bw+');
+            yield $file->write(Serialization::PHP_HEADER);
+            yield $file->write(\chr(Serialization::VERSION));
+            yield $file->write(\serialize($this));
+            yield $file->close();
+
             yield renameAsync($this->session->getTempPath(), $this->session->getSessionPath());
 
+            if ($this->API) {
+                $file = yield open($this->session->getTempPath(), 'bw+');
+                yield $file->write(Serialization::PHP_HEADER);
+                yield $file->write(\chr(Serialization::VERSION));
+                yield $file->write(\serialize(new LightState($this->API)));
+                yield $file->close();
+
+                yield renameAsync($this->session->getTempPath(), $this->session->getIpcStatePath());
+            }
+
+
+            // Truncate legacy session
+            yield (yield open($this->session->getLegacySessionPath(), 'w'))->close();
+
             Logger::log('Saved session!');
-            return $wrote;
+            return true;
         })());
     }
 }

@@ -21,6 +21,7 @@ namespace danog\MadelineProto;
 
 use Amp\File\StatCache;
 use Amp\Ipc\Sync\ChannelledSocket;
+use Amp\Promise;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
 
@@ -127,7 +128,7 @@ class FastAPI extends API
      *
      * @param string $ipcPath IPC path
      *
-     * @return \Generator<ChannelledSocket|null>
+     * @return \Generator<int, Promise<ChannelledSocket>, mixed, ChannelledSocket|null>
      */
     private function tryConnect(string $ipcPath): \Generator
     {

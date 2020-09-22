@@ -39,7 +39,8 @@
         "amphp/log": "^1.1",
         "danog/loop": "^0.1.0",
         "danog/tgseclib": "^3",
-        "amphp/redis": "^1.0"
+        "amphp/redis": "^1.0",
+        "symfony/polyfill-php80": "^1.18"
     },
     "require-dev": {
         "vlucas/phpdotenv": "^3",

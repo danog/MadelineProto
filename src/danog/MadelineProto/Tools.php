@@ -19,10 +19,12 @@
 
 namespace danog\MadelineProto;
 
+use Amp\CancellationToken;
 use Amp\Deferred;
 use Amp\Failure;
 use Amp\File\StatCache;
 use Amp\Loop;
+use Amp\NullCancellationToken;
 use Amp\Promise;
 use Amp\Success;
 use tgseclib\Math\BigInteger;
@@ -36,6 +38,7 @@ use function Amp\Promise\any;
 use function Amp\Promise\first;
 use function Amp\Promise\some;
 use function Amp\Promise\timeout;
+use function Amp\Promise\timeoutWithDefault;
 use function Amp\Promise\wait;
 
 /**
@@ -385,6 +388,27 @@ abstract class Tools extends StrTools
         return timeout(self::call($promise), $timeout);
     }
     /**
+     * Creates an artificial timeout for any `Promise`.
+     *
+     * If the promise is resolved before the timeout expires, the result is returned
+     *
+     * If the timeout expires before the promise is resolved, a default value is returned
+     *
+     * @template TReturn
+     *
+     * @param Promise<TReturn>|\Generator $promise Promise to which the timeout is applied.
+     * @param int                         $timeout Timeout in milliseconds.
+     * @param TReturn                     $default
+     *
+     * @return Promise<TReturn>
+     *
+     * @throws \TypeError If $promise is not an instance of \Amp\Promise or \React\Promise\PromiseInterface.
+     */
+    public static function timeoutWithDefault($promise, int $timeout, $default = null): Promise
+    {
+        return timeoutWithDefault(self::call($promise), $timeout, $default);
+    }
+    /**
      * Convert generator, promise or any other value to a promise.
      *
      * @param \Generator|Promise|mixed $promise
@@ -517,29 +541,34 @@ abstract class Tools extends StrTools
      * Asynchronously lock a file
      * Resolves with a callbable that MUST eventually be called in order to release the lock.
      *
-     * @param string  $file      File to lock
-     * @param integer $operation Locking mode
-     * @param float  $polling   Polling interval
+     * @param string            $file      File to lock
+     * @param integer           $operation Locking mode
+     * @param float             $polling   Polling interval
+     * @param CancellationToken $token     Cancellation token
+     * @param ?callable         $failureCb Failure callback, called only once if the first locking attempt fails.
      *
-     * @return Promise<callable>
+     * @return Promise<?callable>
      */
-    public static function flock(string $file, int $operation, float $polling = 0.1): Promise
+    public static function flock(string $file, int $operation, float $polling = 0.1, $token = null, $failureCb = null): Promise
     {
-        return self::call(Tools::flockGenerator($file, $operation, $polling));
+        return self::call(Tools::flockGenerator($file, $operation, $polling, $token, $failureCb));
     }
     /**
      * Asynchronously lock a file (internal generator function).
      *
-     * @param string  $file      File to lock
-     * @param integer $operation Locking mode
-     * @param float  $polling   Polling interval
+     * @param string            $file      File to lock
+     * @param integer           $operation Locking mode
+     * @param float             $polling   Polling interval
+     * @param CancellationToken $token     Cancellation token
+     * @param ?callable         $failureCb Failure callback, called only once if the first locking attempt fails.
      *
      * @internal Generator function
      *
      * @return \Generator
      */
-    public static function flockGenerator(string $file, int $operation, float $polling): \Generator
+    public static function flockGenerator(string $file, int $operation, float $polling, $token = null, $failureCb = null): \Generator
     {
+        $token = $token ?? new NullCancellationToken;
         if (!yield exists($file)) {
             yield \touch($file);
             StatCache::clear($file);
@@ -549,7 +578,15 @@ abstract class Tools extends StrTools
         do {
             $result = \flock($res, $operation);
             if (!$result) {
+                if ($failureCb) {
+                    Tools::callFork($failureCb());
+                    $failureCb = null;
+                }
                 yield self::sleep($polling);
+                if ($token->isRequested()) {
+                    var_dump("was requested pap");
+                    return null;
+                }
             }
         } while (!$result);
         return static function () use (&$res) {
@@ -563,13 +600,13 @@ abstract class Tools extends StrTools
     /**
      * Asynchronously sleep.
      *
-     * @param int $time Number of seconds to sleep for
+     * @param int|float $time Number of seconds to sleep for
      *
      * @return Promise
      */
-    public static function sleep(int $time): Promise
+    public static function sleep($time): Promise
     {
-        return new \Amp\Delayed($time * 1000);
+        return new \Amp\Delayed((int) ($time * 1000));
     }
     /**
      * Asynchronously read line.
