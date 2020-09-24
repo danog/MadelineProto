@@ -20,6 +20,8 @@ namespace danog\MadelineProto\Ipc;
 
 use Amp\Deferred;
 use Amp\Ipc\Sync\ChannelledSocket;
+use Amp\Promise;
+use Amp\Success;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -117,6 +119,25 @@ class Client
         if (isset($this->server)) {
             Tools::wait($this->server->disconnect());
         }
+    }
+    /**
+     * Disconnect cleanly from main instance.
+     *
+     * @return Promise
+     */
+    public function disconnect(): Promise
+    {
+        return isset($this->server) ? $this->server->disconnect() : new Success();
+    }
+    /**
+     * Stop IPC server instance.
+     *
+     * @internal
+     */
+    public function stopIpcServer(): \Generator
+    {
+        yield $this->server->send(Server::SHUTDOWN);
+        //yield $this->disconnect();
     }
     /**
      * Call function.

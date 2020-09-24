@@ -19,18 +19,18 @@
 
 namespace danog\MadelineProto;
 
-use Amp\CancellationToken;
 use Amp\Deferred;
 use Amp\Failure;
 use Amp\File\StatCache;
 use Amp\Loop;
-use Amp\NullCancellationToken;
 use Amp\Promise;
 use Amp\Success;
+use Amp\TimeoutException;
 use tgseclib\Math\BigInteger;
 use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;
 use function Amp\ByteStream\getStdout;
+use function Amp\delay;
 use function Amp\File\exists;
 use function Amp\File\get;
 use function Amp\Promise\all;
@@ -385,7 +385,25 @@ abstract class Tools extends StrTools
      */
     public static function timeout($promise, int $timeout): Promise
     {
-        return timeout(self::call($promise), $timeout);
+        $promise = self::call($promise);
+
+        $deferred = new Deferred;
+
+        $watcher = Loop::delay($timeout, static function () use (&$deferred) {
+            $temp = $deferred; // prevent double resolve
+            $deferred = null;
+            $temp->fail(new TimeoutException);
+        });
+        Loop::unreference($watcher);
+
+        $promise->onResolve(function () use (&$deferred, $promise, $watcher) {
+            if ($deferred !== null) {
+                Loop::cancel($watcher);
+                $deferred->resolve($promise);
+            }
+        });
+
+        return $deferred->promise();
     }
     /**
      * Creates an artificial timeout for any `Promise`.
@@ -406,7 +424,25 @@ abstract class Tools extends StrTools
      */
     public static function timeoutWithDefault($promise, int $timeout, $default = null): Promise
     {
-        return timeoutWithDefault(self::call($promise), $timeout, $default);
+        $promise = self::call($promise);
+
+        $deferred = new Deferred;
+
+        $watcher = Loop::delay($timeout, static function () use (&$deferred, $default) {
+            $temp = $deferred; // prevent double resolve
+            $deferred = null;
+            $temp->resolve($default);
+        });
+        Loop::unreference($watcher);
+
+        $promise->onResolve(function () use (&$deferred, $promise, $watcher) {
+            if ($deferred !== null) {
+                Loop::cancel($watcher);
+                $deferred->resolve($promise);
+            }
+        });
+
+        return $deferred->promise();
     }
     /**
      * Convert generator, promise or any other value to a promise.
@@ -541,34 +577,35 @@ abstract class Tools extends StrTools
      * Asynchronously lock a file
      * Resolves with a callbable that MUST eventually be called in order to release the lock.
      *
-     * @param string            $file      File to lock
-     * @param integer           $operation Locking mode
-     * @param float             $polling   Polling interval
-     * @param CancellationToken $token     Cancellation token
-     * @param ?callable         $failureCb Failure callback, called only once if the first locking attempt fails.
+     * @param string    $file      File to lock
+     * @param integer   $operation Locking mode
+     * @param float     $polling   Polling interval
+     * @param ?Promise  $token     Cancellation token
+     * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
      *
      * @return Promise<?callable>
      */
-    public static function flock(string $file, int $operation, float $polling = 0.1, $token = null, $failureCb = null): Promise
+    public static function flock(string $file, int $operation, float $polling = 0.1, ?Promise $token = null, $failureCb = null): Promise
     {
         return self::call(Tools::flockGenerator($file, $operation, $polling, $token, $failureCb));
     }
     /**
      * Asynchronously lock a file (internal generator function).
      *
-     * @param string            $file      File to lock
-     * @param integer           $operation Locking mode
-     * @param float             $polling   Polling interval
-     * @param CancellationToken $token     Cancellation token
-     * @param ?callable         $failureCb Failure callback, called only once if the first locking attempt fails.
+     * @param string    $file      File to lock
+     * @param integer   $operation Locking mode
+     * @param float     $polling   Polling interval
+     * @param ?Promise  $token     Cancellation token
+     * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
      *
      * @internal Generator function
      *
      * @return \Generator
      */
-    public static function flockGenerator(string $file, int $operation, float $polling, $token = null, $failureCb = null): \Generator
+    public static function flockGenerator(string $file, int $operation, float $polling, ?Promise $token = null, $failureCb = null): \Generator
     {
-        $token = $token ?? new NullCancellationToken;
+        $polling *= 1000;
+        $polling = (int) $polling;
         if (!yield exists($file)) {
             yield \touch($file);
             StatCache::clear($file);
@@ -579,15 +616,15 @@ abstract class Tools extends StrTools
             $result = \flock($res, $operation);
             if (!$result) {
                 if ($failureCb) {
-                    Tools::callFork($failureCb());
+                    $failureCb();
                     $failureCb = null;
                 }
-                if ($token->isRequested()) {
-                    return null;
-                }
-                yield self::sleep($polling);
-                if ($token->isRequested()) {
-                    return null;
+                if ($token) {
+                    if (yield Tools::timeoutWithDefault($token, $polling, false)) {
+                        return;
+                    }
+                } else {
+                    yield delay($polling);
                 }
             }
         } while (!$result);
@@ -898,7 +935,7 @@ abstract class Tools extends StrTools
     public static function absolute(string $file): string
     {
         if (($file[0] ?? '') !== '/' && ($file[1] ?? '') !== ':' && !\in_array(\substr($file, 0, 4), ['phar', 'http'])) {
-            $file = Magic::getcwd().'/'.$file;
+            $file = Magic::getcwd().DIRECTORY_SEPARATOR.$file;
         }
         return $file;
     }

@@ -18,13 +18,16 @@
 
 namespace danog\MadelineProto\Ipc;
 
+use Amp\Deferred;
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
+use Amp\Promise;
 use danog\Loop\SignalLoop;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
+use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
 
 /**
@@ -34,13 +37,17 @@ class Server extends SignalLoop
 {
     use InternalLoop;
     /**
-     * Session not initialized, should initialize.
+     * Shutdown server.
      */
-    const NOT_INITED = 'not inited';
+    const SHUTDOWN = 0;
     /**
-     * Session uses event handler, should start from main event handler file.
+     * Boolean to shut down worker, if started.
      */
-    const EVENT_HANDLER = 'event';
+    private static bool $shutdown = false;
+    /**
+     * Deferred to shut down worker, if started.
+     */
+    private static ?Deferred $shutdownDeferred = null;
     /**
      * IPC server.
      */
@@ -54,31 +61,67 @@ class Server extends SignalLoop
      */
     public function setIpcPath(string $path): void
     {
+        self::$shutdownDeferred = new Deferred;
         $this->server = new IpcServer($path);
     }
     /**
      * Start IPC server in background.
      *
-     * @param string $session Session path
+     * @param SessionPaths $session   Session path
      *
-     * @return void
+     * @return Promise
      */
-    public static function startMe(string $session): void
+    public static function startMe(SessionPaths $session): Promise
     {
+        $id = Tools::randomInt();
         try {
             Logger::log("Starting IPC server $session (process)");
-            ProcessRunner::start($session);
-            WebRunner::start($session);
-            return;
+            ProcessRunner::start($session, $id);
+            WebRunner::start($session, $id);
+            return Tools::call(self::monitor($session, $id));
         } catch (\Throwable $e) {
             Logger::log($e);
         }
         try {
             Logger::log("Starting IPC server $session (web)");
-            WebRunner::start($session);
+            WebRunner::start($session, $id);
         } catch (\Throwable $e) {
             Logger::log($e);
         }
+        return Tools::call(self::monitor($session, $id));
+    }
+    /**
+     * Monitor session.
+     *
+     * @param SessionPaths $session
+     * @param int          $id
+     *
+     * @return \Generator
+     */
+    private static function monitor(SessionPaths $session, int $id): \Generator
+    {
+        while (true) {
+            $state = yield $session->getIpcState();
+            if ($state && $state->getStartupId() === $id) {
+                if ($e = $state->getException()) {
+                    Logger::log("IPC server got exception $e");
+                    return $e;
+                }
+                Logger::log("IPC server started successfully!");
+                return true;
+            }
+            yield Tools::sleep(1);
+        }
+        return false;
+    }
+    /**
+     * Wait for shutdown.
+     *
+     * @return Promise
+     */
+    public static function waitShutdown(): Promise
+    {
+        return self::$shutdownDeferred->promise();
     }
     /**
      * Main loop.
@@ -104,11 +147,19 @@ class Server extends SignalLoop
         $this->API->logger("Accepted IPC client connection!");
 
         $id = 0;
+        $payload = null;
         try {
             while ($payload = yield $socket->receive()) {
                 Tools::callFork($this->clientRequest($socket, $id++, $payload));
             }
-        } catch (\Throwable $e) {
+        } finally {
+            yield $socket->disconnect();
+            if ($payload === self::SHUTDOWN) {
+                $this->signal(null);
+                if (self::$shutdownDeferred) {
+                    self::$shutdownDeferred->resolve();
+                }
+            }
         }
     }
     /**

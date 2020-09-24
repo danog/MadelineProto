@@ -2,7 +2,6 @@
 
 namespace danog\MadelineProto\Ipc\Runner;
 
-use Amp\ByteStream\ResourceOutputStream;
 use Amp\Parallel\Context\ContextException;
 use danog\MadelineProto\Magic;
 
@@ -15,21 +14,18 @@ final class WebRunner extends RunnerAbstract
      * Resources.
      */
     private static array $resources = [];
-    /**
-     * Socket.
-     *
-     * @var ResourceOutputStream
-     */
-    private $res;
+
     /**
      * Start.
      *
      * @param string $session Session path
+     *
+     * @return void
      */
-    public static function start(string $session): void
+    public static function start(string $session, int $id): void
     {
         if (!isset($_SERVER['SERVER_NAME'])) {
-            throw new ContextException("Could not initialize web runner!");
+            return;
         }
 
         if (!self::$runPath) {
@@ -79,7 +75,7 @@ final class WebRunner extends RunnerAbstract
         }
 
         $params = [
-            'argv' => ['madeline-ipc', $session],
+            'argv' => ['madeline-ipc', $session, $id],
             'cwd' => Magic::getcwd()
         ];
 

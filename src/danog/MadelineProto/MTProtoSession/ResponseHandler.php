@@ -481,7 +481,7 @@ trait ResponseHandler
         if (isset($response['_']) && !$this->isCdn() && $this->API->getTL()->getConstructors()->findByPredicate($response['_'])['type'] === 'Updates') {
             $body = [];
             if (isset($request['body']['peer'])) {
-                $body['peer'] = $this->API->getID($request['body']['peer']);
+                $body['peer'] = \is_string($request['body']['peer']) ? $request['body']['peer'] : $this->API->getId($request['body']['peer']);
             }
             if (isset($request['body']['message'])) {
                 $body['message'] = (string) $request['body']['message'];

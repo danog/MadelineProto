@@ -16,10 +16,7 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Ipc;
-
-use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\MTProto;
+namespace danog\MadelineProto;
 
 /**
  * Light state.

@@ -22,6 +22,7 @@ namespace danog\MadelineProto;
 use Amp\Dns\Resolver;
 use Amp\File\StatCache;
 use Amp\Http\Client\HttpClient;
+use Amp\Loop;
 use Amp\Promise;
 use Closure;
 use danog\MadelineProto\Async\AsyncConstruct;
@@ -1604,11 +1605,12 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Report an error to the previously set peer.
      *
-     * @param string $message Error to report
+     * @param string $message   Error to report
+     * @param string $parseMode Parse mode
      *
      * @return \Generator
      */
-    public function report(string $message): \Generator
+    public function report(string $message, string $parseMode = ''): \Generator
     {
         if (!$this->reportDest) {
             return;
@@ -1640,7 +1642,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $sent = true;
         foreach ($this->reportDest as $id) {
             try {
-                yield from $this->methodCallAsyncRead('messages.sendMessage', ['peer' => $id, 'message' => $message]);
+                yield from $this->methodCallAsyncRead('messages.sendMessage', ['peer' => $id, 'message' => $message, 'parse_mode' => $parseMode]);
                 if ($file) {
                     yield from $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'media' => $file]);
                 }

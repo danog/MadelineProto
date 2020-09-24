@@ -20,6 +20,7 @@
 namespace danog\MadelineProto;
 
 use danog\MadelineProto\Async\AsyncConstruct;
+use danog\MadelineProto\Ipc\Client;
 
 abstract class AbstractAPIFactory extends AsyncConstruct
 {
@@ -36,7 +37,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      *
      * @internal
      *
-     * @var MTProto
+     * @var MTProto|Client
      */
     public $API;
     /**
@@ -61,6 +62,12 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      * @var string[]
      */
     protected array $methods = [];
+
+    /**
+     * Main API instance.
+     */
+    private API $mainAPI;
+
     /**
      * Export APIFactory instance with the specified namespace.
      *
@@ -92,6 +99,11 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         $a->lua =& $b->lua;
         $a->async =& $b->async;
         $a->methods =& $b->methods;
+        if ($b instanceof API) {
+            $a->mainAPI = $b;
+        } else {
+            $a->mainAPI =& $b->mainAPI;
+        }
         if (!$b->inited()) {
             $a->setInitPromise($b->initAsynchronously());
         }
@@ -172,6 +184,18 @@ abstract class AbstractAPIFactory extends AsyncConstruct
             $aargs['apifactory'] = true;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
             return yield from $this->API->methodCallAsyncRead($name, $args, $aargs);
+        }
+        if ($this->API instanceof Client
+            && ($lower_name === 'seteventhandler'
+            || ($lower_name === 'loop' && !isset($arguments[0])))
+        ) {
+            yield $this->API->stopIpcServer();
+            yield $this->API->disconnect();
+            if ($this instanceof API) {
+                yield from $this->connectToMadelineProto(new SettingsEmpty, true);
+            } else {
+                yield from $this->mainAPI->connectToMadelineProto(new SettingsEmpty, true);
+            }
         }
         $res = $this->methods[$lower_name](...$arguments);
         return $res instanceof \Generator ? yield from $res : yield $res;

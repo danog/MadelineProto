@@ -16,12 +16,13 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-use Amp\Deferred;
 use danog\MadelineProto\API;
+use danog\MadelineProto\Ipc\IpcState;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SessionPaths;
+use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 
 (static function (): void {
@@ -47,6 +48,13 @@ use danog\MadelineProto\Tools;
         }
         \define(\MADELINE_WORKER_TYPE::class, \array_shift($arguments));
         \define(\MADELINE_WORKER_ARGS::class, $arguments);
+    }
+
+    if (\defined(\SIGHUP::class)) {
+        try {
+            \pcntl_signal(SIGHUP, fn () => null);
+        } catch (\Throwable $e) {
+        }
     }
     if (!\class_exists(API::class)) {
         $paths = [
@@ -82,29 +90,32 @@ use danog\MadelineProto\Tools;
         }
         \define(\MADELINE_WORKER::class, 1);
 
+        $runnerId = \MADELINE_WORKER_ARGS[1];
+        $session = new SessionPaths($ipcPath);
+
         try {
             Magic::classExists();
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
-            $API = new API($ipcPath);
+            $API = new API($ipcPath, (new Settings)->getSerialization()->setForceFull(true));
             $API->init();
-            if ($API->hasEventHandler()) {
-                unset($API);
-                \gc_collect_cycles();
-                Logger::log("Session has event handler, can't start IPC server like this!");
-                $ipc = (new SessionPaths($ipcPath))->getIpcPath();
-                @\unlink($ipc);
-                \file_put_contents($ipc, Server::EVENT_HANDLER);
-            } else {
-                $API->initSelfRestart();
-                Tools::wait((new Deferred)->promise());
+            $API->initSelfRestart();
+            Tools::wait($session->storeIpcState(new IpcState($runnerId)));
+
+            while (true) {
+                try {
+                    Tools::wait(Server::waitShutdown());
+                    return;
+                } catch (\Throwable $e) {
+                    Logger::log((string) $e, Logger::FATAL_ERROR);
+                    Tools::wait($API->report("Surfaced: $e"));
+                }
             }
         } catch (\Throwable $e) {
             Logger::log("Got exception $e in IPC server, exiting...", Logger::FATAL_ERROR);
             \trigger_error("Got exception $e in IPC server, exiting...", E_USER_ERROR);
-            if ($e->getMessage() === 'Not inited!') {
-                $ipc = (new SessionPaths($ipcPath))->getIpcPath();
-                @\unlink($ipc);
-                \file_put_contents($ipc, Server::NOT_INITED);
+            $ipc = Tools::wait($session->getIpcState());
+            if (!($ipc && $ipc->getRunnerId() === $runnerId && !$ipc->getException())) {
+                Tools::wait($session->storeIpcState(new IpcState($runnerId, $e)));
             }
         }
     }
