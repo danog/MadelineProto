@@ -155,6 +155,29 @@ class Settings extends SettingsAbstract
     public function merge(SettingsAbstract $settings): void
     {
         if (!$settings instanceof self) {
+            if ($settings instanceof AppInfo) {
+                $this->appInfo->merge($settings);
+            } elseif ($settings instanceof Auth) {
+                $this->auth->merge($settings);
+            } elseif ($settings instanceof Connection) {
+                $this->connection->merge($settings);
+            } elseif ($settings instanceof Files) {
+                $this->files->merge($settings);
+            } elseif ($settings instanceof Logger) {
+                $this->logger->merge($settings);
+            } elseif ($settings instanceof Peer) {
+                $this->peer->merge($settings);
+            } elseif ($settings instanceof Pwr) {
+                $this->pwr->merge($settings);
+            } elseif ($settings instanceof RPC) {
+                $this->rpc->merge($settings);
+            } elseif ($settings instanceof SecretChats) {
+                $this->secretChats->merge($settings);
+            } elseif ($settings instanceof Serialization) {
+                $this->serialization->merge($settings);
+            } elseif ($settings instanceof TLSchema) {
+                $this->schema->merge($settings);
+            }
             return;
         }
         $this->appInfo->merge($settings->appInfo);

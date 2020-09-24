@@ -112,7 +112,7 @@ abstract class Serialization
             $isNew = false;
         } else {
             // No session exists yet, lock for when we create it
-            return [null, yield Tools::flock($session->getLockPath(), LOCK_EX, 1)];
+            return [null, yield from Tools::flockGenerator($session->getLockPath(), LOCK_EX, 1)];
         }
 
         //Logger::log('Waiting for exclusive session lock...');

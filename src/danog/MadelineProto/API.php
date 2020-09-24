@@ -85,7 +85,6 @@ class API extends InternalDoc
      */
     private bool $destructing = false;
 
-
     /**
      * API wrapper (to avoid circular references).
      *
@@ -93,6 +92,12 @@ class API extends InternalDoc
      */
     private $wrapper;
 
+    /**
+     * Unlock callback.
+     *
+     * @var ?callable
+     */
+    private $unlock = null;
 
     /**
      * Magic constructor function.
@@ -154,7 +159,19 @@ class API extends InternalDoc
         $this->APIFactory();
         $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
-
+    /**
+     * Reconnect to full instance.
+     *
+     * @return \Generator
+     */
+    protected function reconnectFull(): \Generator
+    {
+        if ($this->API instanceof Client) {
+            yield $this->API->stopIpcServer();
+            yield $this->API->disconnect();
+            yield from $this->connectToMadelineProto(new SettingsEmpty, true);
+        }
+    }
     /**
      * Connect to MadelineProto.
      *
@@ -184,7 +201,7 @@ class API extends InternalDoc
             return yield from $this->connectToMadelineProto($settings, true);
         } elseif ($unserialized instanceof ChannelledSocket) {
             // Success, IPC client
-            $this->API = new Client($unserialized, Logger::$default);
+            $this->API = new Client($unserialized, $this->session->getIpcPath(), Logger::$default);
             $this->APIFactory();
             return true;
         } elseif ($unserialized) {

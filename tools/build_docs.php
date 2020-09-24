@@ -16,6 +16,7 @@ use danog\MadelineProto\APIFactory;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\TON\API as TONAPI;
 use danog\MadelineProto\TON\APIFactory as TONAPIFactory;
 use danog\MadelineProto\TON\Lite;
@@ -25,7 +26,7 @@ use danog\MadelineProto\TON\Lite;
 require 'vendor/autoload.php';
 
 Magic::classExists();
-Logger::constructor(1);
+Logger::constructorFromSettings(new SettingsLogger);
 $logger = Logger::$default;
 \set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
@@ -78,8 +79,8 @@ $doc = new \danog\MadelineProto\AnnotationsBuilder(
     $logger,
     [
         'tl_schema' => [
-            'lite_api' => "$d/schemas/TON/lite_api.tl",
-            'ton_api' => "$d/schemas/TON/ton_api.tl",
+            'telegram' => "$d/schemas/TON/lite_api.tl",
+            'mtproto' => "$d/schemas/TON/ton_api.tl",
             //'tonlib_api' => "$d/schemas/TON/tonlib_api.tl",
         ]
     ],

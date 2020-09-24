@@ -21,11 +21,12 @@ namespace danog\MadelineProto\Ipc;
 use Amp\Deferred;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Promise;
-use Amp\Success;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Tools;
+
+use function Amp\Ipc\connect;
 
 /**
  * IPC client.
@@ -44,19 +45,29 @@ class Client
      */
     private array $requests = [];
     /**
+     * Whether to run loop.
+     */
+    private bool $run = true;
+    /**
+     * IPC path.
+     */
+    private string $ipcPath;
+    /**
      * Logger instance.
      */
     public Logger $logger;
     /**
      * Constructor function.
      *
-     * @param ChannelledSocket $socket IPC client socket
-     * @param Logger           $logger Logger
+     * @param ChannelledSocket $socket  IPC client socket
+     * @param string           $ipcPath IPC socket path
+     * @param Logger           $logger  Logger
      */
-    public function __construct(ChannelledSocket $server, Logger $logger)
+    public function __construct(ChannelledSocket $server, string $ipcPath, Logger $logger)
     {
         $this->logger = $logger;
         $this->server = $server;
+        $this->ipcPath = $ipcPath;
         Tools::callFork($this->loopInternal());
     }
     /**
@@ -82,19 +93,26 @@ class Client
      */
     private function loopInternal(): \Generator
     {
-        while ($payload = yield $this->server->receive()) {
-            [$id, $payload] = $payload;
-            if (!isset($this->requests[$id])) {
-                Logger::log("Got response for non-existing ID $id!");
-            } else {
-                $promise = $this->requests[$id];
-                unset($this->requests[$id]);
-                if ($payload instanceof ExitFailure) {
-                    $promise->fail($payload->getException());
+        while ($this->run) {
+            while ($payload = yield $this->server->receive()) {
+                [$id, $payload] = $payload;
+                if (!isset($this->requests[$id])) {
+                    Logger::log("Got response for non-existing ID $id!");
                 } else {
-                    $promise->resolve($payload);
+                    $promise = $this->requests[$id];
+                    unset($this->requests[$id]);
+                    if ($payload instanceof ExitFailure) {
+                        $promise->fail($payload->getException());
+                    } else {
+                        $promise->resolve($payload);
+                    }
+                    unset($promise);
                 }
-                unset($promise);
+            }
+            if ($this->run) {
+                $this->logger("Reconnecting to IPC server!");
+                yield $this->server->disconnect();
+                $this->server = yield connect($this->ipcPath);
             }
         }
     }
@@ -116,9 +134,8 @@ class Client
      */
     public function unreference(): void
     {
-        if (isset($this->server)) {
-            Tools::wait($this->server->disconnect());
-        }
+        $this->run = false;
+        Tools::wait($this->server->disconnect());
     }
     /**
      * Disconnect cleanly from main instance.
@@ -127,7 +144,8 @@ class Client
      */
     public function disconnect(): Promise
     {
-        return isset($this->server) ? $this->server->disconnect() : new Success();
+        $this->run = false;
+        return $this->server->disconnect();
     }
     /**
      * Stop IPC server instance.
@@ -137,7 +155,6 @@ class Client
     public function stopIpcServer(): \Generator
     {
         yield $this->server->send(Server::SHUTDOWN);
-        //yield $this->disconnect();
     }
     /**
      * Call function.

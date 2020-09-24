@@ -18,27 +18,22 @@ function layerUpgrade(int $layer): void
         \copy("schemas/$schema.tl", "src/danog/MadelineProto/$schema.tl");
     }
 
-    $doc = \file_get_contents('src/danog/MadelineProto/MTProto.php');
-    \preg_match("/'layer' => (\d+)/", $doc, $matches);
+    $doc = \file_get_contents('src/danog/MadelineProto/Settings/TLSchema.php');
+    \preg_match("/layer = (\d+)/", $doc, $matches);
     $prevLayer = (int) $matches[1];
 
     if ($prevLayer === $layer) {
         return;
     }
-    \preg_match_all("/const V = (\d+)/", $doc, $matches);
-    $prevVersion = $matches[1][1];
-    $version = $prevVersion + 1;
 
     $doc = \str_replace(
         [
-            "'layer' => $prevLayer",
+            "layer = $prevLayer",
             "TL_telegram_$prevLayer",
-            "const V = $prevVersion"
         ],
         [
-            "'layer' => $layer",
+            "layer = $layer",
             "TL_telegram_$layer",
-            "const V = $version"
         ],
         $doc
     );

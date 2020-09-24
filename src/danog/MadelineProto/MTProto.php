@@ -1148,7 +1148,12 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
         } else {
             if (!isset($this->settings)) {
-                $this->settings = $settings;
+                if ($settings instanceof Settings) {
+                    $this->settings = $settings;
+                } else {
+                    $this->settings = new Settings;
+                    $this->settings->merge($settings);
+                }
             } else {
                 $this->settings->merge($settings);
             }
