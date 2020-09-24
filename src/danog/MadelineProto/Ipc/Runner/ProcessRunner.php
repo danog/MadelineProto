@@ -38,8 +38,14 @@ final class ProcessRunner extends RunnerAbstract
 
         $runner = self::getScriptPath();
 
+        if (\strtolower(\substr(PHP_OS, 0, 3)) === 'win') {
+            $binary = \str_replace("Program Files", "PROGRA~1", $binary);
+        // Pray there are no spaces in the name, escapeshellarg would help but windows doesn't want quotes in the program name
+        } else {
+            $binary = \escapeshellarg($binary);
+        }
         $command = \implode(" ", [
-            \escapeshellarg($binary),
+            $binary,
             self::formatOptions($options),
             $runner,
             'madeline-ipc',
