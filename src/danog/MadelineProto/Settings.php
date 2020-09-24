@@ -177,6 +177,12 @@ class Settings extends SettingsAbstract
                 $this->serialization->merge($settings);
             } elseif ($settings instanceof TLSchema) {
                 $this->schema->merge($settings);
+            } elseif ($settings instanceof DatabaseAbstract) {
+                if (!$this->db instanceof $settings) {
+                    $this->db = $settings;
+                } else {
+                    $this->db->merge($settings);
+                }
             }
             return;
         }

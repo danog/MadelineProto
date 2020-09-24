@@ -5405,6 +5405,15 @@ class InternalDoc extends APIFactory
         return \danog\MadelineProto\Tools::isArrayOrAlike($var);
     }
     /**
+     * Whether we're an IPC client instance.
+     *
+     * @return boolean
+     */
+    public function isIpc(): bool
+    {
+        return $this->API->isIpc();
+    }
+    /**
      * Check whether provided bot API ID is a channel.
      *
      * @param int $id Bot API ID

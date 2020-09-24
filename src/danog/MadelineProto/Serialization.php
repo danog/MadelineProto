@@ -22,6 +22,8 @@ namespace danog\MadelineProto;
 use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
+use danog\MadelineProto\Db\DbArray;
+use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\MTProtoSession\Session;
 
@@ -191,6 +193,10 @@ abstract class Serialization
 
         if ($isNew) {
             $unserialized = yield from $session->unserialize();
+            if ($unserialized instanceof DriverArray) {
+                yield from $unserialized->initConnection($unserialized->dbSettings);
+                $unserialized = \unserialize(yield $unserialized['data']);
+            }
         } else {
             $unserialized = yield from self::legacyUnserialize($session->getLegacySessionPath());
         }

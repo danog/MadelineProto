@@ -188,7 +188,10 @@ final class APIWrapper
                 yield from $this->API->initAsynchronously();
             }
 
-            yield from $this->session->serialize($this, $this->session->getSessionPath());
+            yield from $this->session->serialize(
+                yield from $this->API->serializeSession($this),
+                $this->session->getSessionPath()
+            );
 
             if ($this->API) {
                 yield from $this->session->storeLightState($this->API);
