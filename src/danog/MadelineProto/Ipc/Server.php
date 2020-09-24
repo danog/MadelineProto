@@ -154,12 +154,12 @@ class Server extends SignalLoop
             }
         } finally {
             yield $socket->disconnect();
-            /*if ($payload === self::SHUTDOWN) {
+            if ($payload === self::SHUTDOWN) {
                 $this->signal(null);
                 if (self::$shutdownDeferred) {
                     self::$shutdownDeferred->resolve();
                 }
-            }*/
+            }
         }
     }
     /**
