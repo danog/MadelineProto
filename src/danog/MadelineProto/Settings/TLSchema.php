@@ -36,17 +36,15 @@ class TLSchema extends SettingsAbstract
         if (isset($settings['layer'])) {
             $this->setLayer($settings['layer']);
         }
-        if (isset($settings['src'])) {
-            $src = $settings['src'];
-            if (isset($src['mtproto'])) {
-                $this->setMTProtoSchema($src['mtproto']);
-            }
-            if (isset($src['telegram'])) {
-                $this->setAPISchema($src['telegram']);
-            }
-            if (isset($src['secret'])) {
-                $this->setSecretSchema($src['secret']);
-            }
+        $src = $settings['src'] ?? $settings;
+        if (isset($src['mtproto'])) {
+            $this->setMTProtoSchema($src['mtproto']);
+        }
+        if (isset($src['telegram'])) {
+            $this->setAPISchema($src['telegram']);
+        }
+        if (isset($src['secret'])) {
+            $this->setSecretSchema($src['secret']);
         }
     }
 

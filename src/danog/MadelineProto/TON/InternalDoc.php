@@ -1078,15 +1078,17 @@ class InternalDoc extends APIFactory
      * Asynchronously lock a file
      * Resolves with a callbable that MUST eventually be called in order to release the lock.
      *
-     * @param string  $file      File to lock
-     * @param integer $operation Locking mode
-     * @param float  $polling   Polling interval
+     * @param string    $file      File to lock
+     * @param integer   $operation Locking mode
+     * @param float     $polling   Polling interval
+     * @param ?Promise  $token     Cancellation token
+     * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
      *
-     * @return Promise<callable>
+     * @return Promise<?callable>
      */
-    public function flock(string $file, int $operation, float $polling = 0.1)
+    public function flock(string $file, int $operation, float $polling = 0.1, ?\Amp\Promise $token = null, $failureCb = null)
     {
-        return \danog\MadelineProto\Tools::flock($file, $operation, $polling);
+        return \danog\MadelineProto\Tools::flock($file, $operation, $polling, $token, $failureCb);
     }
     /**
      * Generate MTProto vector hash.
@@ -1122,6 +1124,21 @@ class InternalDoc extends APIFactory
     public function getVar($obj, string $var)
     {
         return \danog\MadelineProto\Tools::getVar($obj, $var);
+    }
+    /**
+     * Checks private property exists in an object.
+     *
+     * @param object $obj Object
+     * @param string $var Attribute name
+     *
+     * @psalm-suppress InvalidScope
+     *
+     * @return bool
+     * @access public
+     */
+    public function hasVar($obj, string $var): bool
+    {
+        return \danog\MadelineProto\Tools::hasVar($obj, $var);
     }
     /**
      * Inflate stripped photosize to full JPG payload.
@@ -1359,11 +1376,11 @@ class InternalDoc extends APIFactory
     /**
      * Asynchronously sleep.
      *
-     * @param int $time Number of seconds to sleep for
+     * @param int|float $time Number of seconds to sleep for
      *
      * @return Promise
      */
-    public function sleep(int $time)
+    public function sleep($time)
     {
         return \danog\MadelineProto\Tools::sleep($time);
     }
@@ -1390,6 +1407,27 @@ class InternalDoc extends APIFactory
     public function timeout($promise, int $timeout)
     {
         return \danog\MadelineProto\Tools::timeout($promise, $timeout);
+    }
+    /**
+     * Creates an artificial timeout for any `Promise`.
+     *
+     * If the promise is resolved before the timeout expires, the result is returned
+     *
+     * If the timeout expires before the promise is resolved, a default value is returned
+     *
+     * @template TReturn
+     *
+     * @param Promise<TReturn>|\Generator $promise Promise to which the timeout is applied.
+     * @param int                         $timeout Timeout in milliseconds.
+     * @param TReturn                     $default
+     *
+     * @return Promise<TReturn>
+     *
+     * @throws \TypeError If $promise is not an instance of \Amp\Promise or \React\Promise\PromiseInterface.
+     */
+    public function timeoutWithDefault($promise, int $timeout, $default = null)
+    {
+        return \danog\MadelineProto\Tools::timeoutWithDefault($promise, $timeout, $default);
     }
     /**
      * Convert to camelCase.

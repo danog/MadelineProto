@@ -50,7 +50,7 @@ class DocsBuilder
             }
         });
         $new = new TLSchema;
-        $new->mergeArray($settings['tl_schema']);
+        $new->mergeArray($settings);
         $this->TL->init($new);
         if (isset($settings['tl_schema']['td']) && !isset($settings['tl_schema']['telegram'])) {
             $this->td = true;

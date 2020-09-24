@@ -20,6 +20,7 @@
 namespace danog\MadelineProto;
 
 use Amp\Promise;
+use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
 use phpDocumentor\Reflection\DocBlockFactory;
@@ -37,7 +38,9 @@ class AnnotationsBuilder
                 $this->logger = $logger;
             }
         });
-        $this->TL->init($settings['tl_schema']);
+        $tlSchema = new TLSchema;
+        $tlSchema->mergeArray($settings);
+        $this->TL->init($tlSchema);
         $this->settings = $settings;
         $this->output = $output;
     }

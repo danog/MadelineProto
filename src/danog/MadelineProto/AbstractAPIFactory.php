@@ -101,6 +101,10 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         $a->methods =& $b->methods;
         if ($b instanceof API) {
             $a->mainAPI = $b;
+            $b->mainAPI = $b;
+        } elseif ($a instanceof API) {
+            $a->mainAPI = $a;
+            $b->mainAPI = $a;
         } else {
             $a->mainAPI =& $b->mainAPI;
         }
@@ -185,17 +189,10 @@ abstract class AbstractAPIFactory extends AsyncConstruct
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
             return yield from $this->API->methodCallAsyncRead($name, $args, $aargs);
         }
-        if ($this->API instanceof Client
-            && ($lower_name === 'seteventhandler'
-            || ($lower_name === 'loop' && !isset($arguments[0])))
+        if ($lower_name === 'seteventhandler'
+            || ($lower_name === 'loop' && !isset($arguments[0]))
         ) {
-            yield $this->API->stopIpcServer();
-            yield $this->API->disconnect();
-            if ($this instanceof API) {
-                yield from $this->connectToMadelineProto(new SettingsEmpty, true);
-            } else {
-                yield from $this->mainAPI->connectToMadelineProto(new SettingsEmpty, true);
-            }
+            yield from $this->mainAPI->reconnectFull();
         }
         $res = $this->methods[$lower_name](...$arguments);
         return $res instanceof \Generator ? yield from $res : yield $res;

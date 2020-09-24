@@ -4568,12 +4568,11 @@ class InternalDoc extends APIFactory
     /**
      * Cleanup memory and session file.
      *
-     * @return self
+     * @return void
      */
-    public function cleanup(): \danog\MadelineProto\API
+    public function cleanup(): void
     {
         $this->API->cleanup();
-        return $this;
     }
     /**
      * Close connection with client, connected via web.
@@ -4848,15 +4847,17 @@ class InternalDoc extends APIFactory
      * Asynchronously lock a file
      * Resolves with a callbable that MUST eventually be called in order to release the lock.
      *
-     * @param string  $file      File to lock
-     * @param integer $operation Locking mode
-     * @param float  $polling   Polling interval
+     * @param string    $file      File to lock
+     * @param integer   $operation Locking mode
+     * @param float     $polling   Polling interval
+     * @param ?Promise  $token     Cancellation token
+     * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
      *
-     * @return Promise<callable>
+     * @return Promise<?callable>
      */
-    public function flock(string $file, int $operation, float $polling = 0.1)
+    public function flock(string $file, int $operation, float $polling = 0.1, ?\Amp\Promise $token = null, $failureCb = null)
     {
-        return \danog\MadelineProto\Tools::flock($file, $operation, $polling);
+        return \danog\MadelineProto\Tools::flock($file, $operation, $polling, $token, $failureCb);
     }
     /**
      * Convert bot API channel ID to MTProto channel ID.
@@ -5247,11 +5248,11 @@ class InternalDoc extends APIFactory
         return \danog\MadelineProto\MTProto::getSessionId($madelineProto);
     }
     /**
-     * Return current settings array.
+     * Return current settings.
      *
      * @return Settings
      */
-    public function getSettings(): Settings
+    public function getSettings(): \danog\MadelineProto\Settings
     {
         return $this->API->getSettings();
     }
@@ -5327,6 +5328,21 @@ class InternalDoc extends APIFactory
         return $this->API->hasSecretChat($chat);
     }
     /**
+     * Checks private property exists in an object.
+     *
+     * @param object $obj Object
+     * @param string $var Attribute name
+     *
+     * @psalm-suppress InvalidScope
+     *
+     * @return bool
+     * @access public
+     */
+    public function hasVar($obj, string $var): bool
+    {
+        return \danog\MadelineProto\Tools::hasVar($obj, $var);
+    }
+    /**
      * Import authorization.
      *
      * @param mixed $authorization Authorization info
@@ -5348,7 +5364,13 @@ class InternalDoc extends APIFactory
     {
         return \danog\MadelineProto\Tools::inflateStripped($stripped);
     }
-
+    /**
+     * Initialize database instance.
+     *
+     * @param MTProto $MadelineProto
+     * @param boolean $reset
+     * @return \Generator
+     */
     public function initDb(\danog\MadelineProto\MTProto $MadelineProto, bool $reset = false, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$MadelineProto, $reset, $extra]);
@@ -5418,7 +5440,7 @@ class InternalDoc extends APIFactory
     /**
      * Start MadelineProto's update handling loop, or run the provided async callable.
      *
-     * @param callable $callback Async callable to run
+     * @param callable|null $callback Async callable to run
      *
      * @return mixed
      */
@@ -5654,13 +5676,14 @@ class InternalDoc extends APIFactory
     /**
      * Report an error to the previously set peer.
      *
-     * @param string $message Error to report
+     * @param string $message   Error to report
+     * @param string $parseMode Parse mode
      *
      * @return \Generator
      */
-    public function report(string $message, array $extra = [])
+    public function report(string $message, string $parseMode = '', array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$message, $extra]);
+        return $this->__call(__FUNCTION__, [$message, $parseMode, $extra]);
     }
     /**
      * Request VoIP call.
@@ -5774,13 +5797,13 @@ class InternalDoc extends APIFactory
     /**
      * Set event handler.
      *
-     * @param string|EventHandler $event_handler Event handler
+     * @param class-string<EventHandler> $eventHandler Event handler
      *
      * @return \Generator
      */
-    public function setEventHandler($event_handler, array $extra = [])
+    public function setEventHandler(string $eventHandler, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$event_handler, $extra]);
+        return $this->__call(__FUNCTION__, [$eventHandler, $extra]);
     }
     /**
      * Set NOOP update handler, ignoring all updates.
@@ -5842,6 +5865,13 @@ class InternalDoc extends APIFactory
         $this->API->setWebhook($hook_url, $pem_path);
     }
     /**
+     * Set API wrapper needed for triggering serialization functions.
+     */
+    public function setWrapper(\danog\MadelineProto\APIWrapper $wrapper): void
+    {
+        $this->API->setWrapper($wrapper);
+    }
+    /**
      * Setup logger.
      *
      * @return void
@@ -5853,11 +5883,11 @@ class InternalDoc extends APIFactory
     /**
      * Asynchronously sleep.
      *
-     * @param int $time Number of seconds to sleep for
+     * @param int|float $time Number of seconds to sleep for
      *
      * @return Promise
      */
-    public function sleep(int $time)
+    public function sleep($time)
     {
         return \danog\MadelineProto\Tools::sleep($time);
     }
@@ -5936,6 +5966,27 @@ class InternalDoc extends APIFactory
     public function timeout($promise, int $timeout)
     {
         return \danog\MadelineProto\Tools::timeout($promise, $timeout);
+    }
+    /**
+     * Creates an artificial timeout for any `Promise`.
+     *
+     * If the promise is resolved before the timeout expires, the result is returned
+     *
+     * If the timeout expires before the promise is resolved, a default value is returned
+     *
+     * @template TReturn
+     *
+     * @param Promise<TReturn>|\Generator $promise Promise to which the timeout is applied.
+     * @param int                         $timeout Timeout in milliseconds.
+     * @param TReturn                     $default
+     *
+     * @return Promise<TReturn>
+     *
+     * @throws \TypeError If $promise is not an instance of \Amp\Promise or \React\Promise\PromiseInterface.
+     */
+    public function timeoutWithDefault($promise, int $timeout, $default = null)
+    {
+        return \danog\MadelineProto\Tools::timeoutWithDefault($promise, $timeout, $default);
     }
     /**
      * Convert to camelCase.
@@ -6063,12 +6114,12 @@ class InternalDoc extends APIFactory
     /**
      * Parse, update and store settings.
      *
-     * @param array $settings Settings
-     * @param bool  $reinit   Whether to reinit the instance
+     * @param Settings|SettingsEmpty $settings Settings
+     * @param bool                   $reinit   Whether to reinit the instance
      *
-     * @return void
+     * @return \Generator
      */
-    public function updateSettings(array $settings, bool $reinit = true, array $extra = [])
+    public function updateSettings(\danog\MadelineProto\SettingsAbstract $settings, bool $reinit = true, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$settings, $reinit, $extra]);
     }
