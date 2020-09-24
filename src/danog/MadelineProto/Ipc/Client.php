@@ -160,6 +160,24 @@ class Client
         return $this->server->send(Server::SHUTDOWN);
     }
     /**
+     * Restart IPC server instance.
+     *
+     * @internal
+     */
+    public function restartIpcServer(): Promise
+    {
+        return $this->server->send(Server::SHUTDOWN);
+    }
+    /**
+     * Whether we're an IPC client instance.
+     *
+     * @return boolean
+     */
+    public function isIpc(): bool
+    {
+        return true;
+    }
+    /**
      * Call function.
      *
      * @param string $function  Function name

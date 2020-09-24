@@ -20,6 +20,7 @@
 namespace danog\MadelineProto;
 
 use Amp\Ipc\Sync\ChannelledSocket;
+use Amp\Loop;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
@@ -159,6 +160,7 @@ class API extends InternalDoc
         $this->APIFactory();
         $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
+
     /**
      * Reconnect to full instance.
      *
@@ -276,7 +278,7 @@ class API extends InternalDoc
                     }
                 }
             }
-            $this->methods = self::getInternalMethodList($this->API);
+            $this->methods = self::getInternalMethodList($this->API, MTProto::class);
         }
     }
 

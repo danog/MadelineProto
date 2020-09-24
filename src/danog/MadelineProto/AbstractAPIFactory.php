@@ -200,8 +200,8 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     /**
      * Get fully resolved method list for object, including snake_case and camelCase variants.
      *
-     * @param API|MTProto $value Value
-     * @param string      $class Custom class name
+     * @param API|MTProto|Client $value Value
+     * @param string             $class Custom class name
      *
      * @return array
      */

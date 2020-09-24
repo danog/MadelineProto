@@ -24,11 +24,13 @@ use Amp\File\StatCache;
 use Amp\Http\Client\HttpClient;
 use Amp\Loop;
 use Amp\Promise;
+use Amp\Success;
 use Closure;
 use danog\MadelineProto\Async\AsyncConstruct;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\MadelineProto\Db\MemoryArray;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\Loop\Update\FeedLoop;
@@ -469,6 +471,13 @@ class MTProto extends AsyncConstruct implements TLCallback
     ];
 
     /**
+     * Nullcache array for storing main session file to DB.
+     *
+     * @var DbArray|Promise[]
+     */
+    public $session;
+
+    /**
      * List of properties stored in database (memory or external).
      * @see DbPropertiesFactory
      * @var array
@@ -478,7 +487,22 @@ class MTProto extends AsyncConstruct implements TLCallback
         'full_chats' => 'array',
         'channel_participants' => 'array',
         'usernames' => 'array',
+        'session' => 'arrayNullCache'
     ];
+
+    /**
+     * Serialize session, returning object to serialize to db.
+     *
+     * @return \Generator
+     */
+    public function serializeSession(object $data): \Generator
+    {
+        if ($this->session instanceof MemoryArray) {
+            return $data;
+        }
+        yield $this->session['data'] = \serialize($data);
+        return $this->session;
+    }
 
     /**
      * Constructor function.
@@ -1131,6 +1155,24 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->logger("Successfully destroyed MadelineProto");
     }
     /**
+     * Restart IPC server instance.
+     *
+     * @internal
+     */
+    public function restartIpcServer(): Promise
+    {
+        return new Success(); // Can only be called from client
+    }
+    /**
+     * Whether we're an IPC client instance.
+     *
+     * @return boolean
+     */
+    public function isIpc(): bool
+    {
+        return false;
+    }
+    /**
      * Parse, update and store settings.
      *
      * @param Settings|SettingsEmpty $settings Settings
@@ -1166,8 +1208,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->setupLogger();
 
         if ($reinit) {
-            $this->__construct();
-            yield from $this->initAsynchronously();
+            yield from $this->__construct_async($this->settings);
         }
     }
     /**
