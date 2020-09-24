@@ -160,10 +160,7 @@ class Logger
      */
     public static function constructorFromSettings(SettingsLogger $settings): self
     {
-        if (!self::$default) {
-            self::$default = new self($settings);
-        }
-        return self::$default;
+        return self::$default = new self($settings);
     }
 
     /**

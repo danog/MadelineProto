@@ -21,10 +21,8 @@ namespace danog\MadelineProto;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Ipc\Client;
-use danog\MadelineProto\Ipc\LightState;
 
 use function Amp\File\open;
-use function Amp\File\rename as renameAsync;
 
 final class APIWrapper
 {
@@ -190,22 +188,10 @@ final class APIWrapper
                 yield from $this->API->initAsynchronously();
             }
 
-            $file = yield open($this->session->getTempPath(), 'bw+');
-            yield $file->write(Serialization::PHP_HEADER);
-            yield $file->write(\chr(Serialization::VERSION));
-            yield $file->write(\serialize($this));
-            yield $file->close();
-
-            yield renameAsync($this->session->getTempPath(), $this->session->getSessionPath());
+            yield from $this->session->serialize($this, $this->session->getSessionPath());
 
             if ($this->API) {
-                $file = yield open($this->session->getTempPath(), 'bw+');
-                yield $file->write(Serialization::PHP_HEADER);
-                yield $file->write(\chr(Serialization::VERSION));
-                yield $file->write(\serialize(new LightState($this->API)));
-                yield $file->close();
-
-                yield renameAsync($this->session->getTempPath(), $this->session->getIpcStatePath());
+                yield from $this->session->storeLightState($this->API);
             }
 
 

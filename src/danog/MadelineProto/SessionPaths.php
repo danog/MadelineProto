@@ -19,8 +19,14 @@
 
 namespace danog\MadelineProto;
 
+use Amp\File\StatCache;
 use Amp\Promise;
-use danog\MadelineProto\Ipc\LightState;
+use Amp\Success;
+use danog\MadelineProto\Ipc\IpcState;
+
+use function Amp\File\exists;
+use function Amp\File\open;
+use function Amp\File\rename;
 
 /**
  * Session path information.
@@ -48,9 +54,14 @@ class SessionPaths
      */
     private string $ipcStatePath;
     /**
-     * Temporary serialization path.
+     * Light state path.
      */
-    private string $tempPath;
+    private string $lightStatePath;
+    /**
+     * Light state.
+     */
+    private ?LightState $lightState = null;
+
     /**
      * Construct session info from session name.
      *
@@ -61,11 +72,57 @@ class SessionPaths
         $session = Tools::absolute($session);
         $this->legacySessionPath = $session;
         $this->sessionPath = "$session.safe.php";
+        $this->lightStatePath = "$session.lightState.php";
         $this->lockPath = "$session.lock";
         $this->ipcPath = "$session.ipc";
         $this->ipcStatePath = "$session.ipcState.php";
-        $this->tempPath = "$session.temp.php";
     }
+    /**
+     * Serialize object to file.
+     *
+     * @param object $object
+     * @param string $path
+     * @return \Generator
+     */
+    public function serialize(object $object, string $path): \Generator
+    {
+        $file = yield open("$path.temp.php", 'bw+');
+        yield $file->write(Serialization::PHP_HEADER);
+        yield $file->write(\chr(Serialization::VERSION));
+        yield $file->write(\serialize($object));
+        yield $file->close();
+
+        yield rename("$path.temp.php", $path);
+    }
+
+    /**
+     * Deserialize new object.
+     *
+     * @param string $path Object path, defaults to session path
+     *
+     * @return \Generator
+     */
+    public function unserialize(string $path = ''): \Generator
+    {
+        $path = $path ?: $this->sessionPath;
+
+        StatCache::clear($path);
+        if (!yield exists($path)) {
+            return null;
+        }
+        $headerLen = \strlen(Serialization::PHP_HEADER) + 1;
+
+        $file = yield open($path, 'rb');
+        $size = yield \stat($path);
+        $size = $size['size'] ?? $headerLen;
+
+        yield $file->seek($headerLen); // Skip version for now
+        $unserialized = \unserialize((yield $file->read($size - $headerLen)) ?? '');
+        yield $file->close();
+
+        return $unserialized;
+    }
+
     /**
      * Get session path.
      *
@@ -117,16 +174,6 @@ class SessionPaths
     }
 
     /**
-     * Get temporary serialization path.
-     *
-     * @return string
-     */
-    public function getTempPath(): string
-    {
-        return $this->tempPath;
-    }
-
-    /**
      * Get IPC light state path.
      *
      * @return string
@@ -139,10 +186,61 @@ class SessionPaths
     /**
      * Get IPC state.
      *
-     * @return Promise<LightState>
+     * @return Promise<?IpcState>
      */
     public function getIpcState(): Promise
     {
-        return Tools::call(Serialization::newUnserialize($this->ipcStatePath));
+        return Tools::call($this->unserialize($this->ipcStatePath));
+    }
+
+    /**
+     * Store IPC state.
+     *
+     * @return \Generator
+     */
+    public function storeIpcState(IpcState $state): \Generator
+    {
+        return $this->serialize($state, $this->getIpcStatePath());
+    }
+
+
+    /**
+     * Get light state path.
+     *
+     * @return string
+     */
+    public function getLightStatePath(): string
+    {
+        return $this->lightStatePath;
+    }
+
+    /**
+     * Get light state.
+     *
+     * @return Promise<LightState>
+     */
+    public function getLightState(): Promise
+    {
+        if ($this->lightState) {
+            return new Success($this->lightState);
+        }
+        $promise = Tools::call($this->unserialize($this->lightStatePath));
+        $promise->onResolve(function (?\Throwable $e, ?LightState $res) {
+            if ($res) {
+                $this->lightState = $res;
+            }
+        });
+        return $promise;
+    }
+
+    /**
+     * Store light state.
+     *
+     * @return \Generator
+     */
+    public function storeLightState(MTProto $state): \Generator
+    {
+        $this->lightState = new LightState($state);
+        return $this->serialize($this->lightState, $this->getLightStatePath());
     }
 }

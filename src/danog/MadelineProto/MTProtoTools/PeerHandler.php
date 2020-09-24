@@ -1052,9 +1052,13 @@ trait PeerHandler
      */
     public function resolveUsername(string $username): \Generator
     {
+        $username = \str_replace('@', '', $username);
+        if (!$username) {
+            return false;
+        }
         try {
             $this->caching_simple_username[$username] = true;
-            $res = yield from $this->methodCallAsyncRead('contacts.resolveUsername', ['username' => \str_replace('@', '', $username)], ['datacenter' => $this->datacenter->curdc]);
+            $res = yield from $this->methodCallAsyncRead('contacts.resolveUsername', ['username' => $username], ['datacenter' => $this->datacenter->curdc]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             $this->logger->logger('Username resolution failed with error '.$e->getMessage(), \danog\MadelineProto\Logger::ERROR);
             if (\strpos($e->rpc, 'FLOOD_WAIT_') === 0 || $e->rpc === 'AUTH_KEY_UNREGISTERED' || $e->rpc === 'USERNAME_INVALID') {

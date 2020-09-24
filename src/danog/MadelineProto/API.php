@@ -19,10 +19,11 @@
 
 namespace danog\MadelineProto;
 
-use Amp\Failure;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Ipc\Client;
+use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
+use danog\MadelineProto\Settings\Serialization as SettingsSerialization;
 
 /**
  * Main API wrapper for MadelineProto.
@@ -92,13 +93,6 @@ class API extends InternalDoc
      */
     private $wrapper;
 
-    /**
-     * Global session unlock callback.
-     *
-     * @var ?callable
-     */
-    private $unlock;
-
 
     /**
      * Magic constructor function.
@@ -128,44 +122,20 @@ class API extends InternalDoc
     /**
      * Async constructor function.
      *
-     * @param Settings|SettingsEmpty $settings Settings
+     * @param Settings|SettingsEmpty|SettingsSerialization $settings Settings
      *
      * @return \Generator
      */
     private function internalInitAPI(SettingsAbstract $settings): \Generator
     {
-        Logger::constructorFromSettings($settings instanceof SettingsEmpty
-            ? new SettingsLogger
-            : $settings->getLogger());
+        Logger::constructorFromSettings($settings instanceof Settings
+            ? $settings->getLogger()
+            : new SettingsLogger);
 
-        [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(
-            Serialization::unserialize($this->session),
-            30000,
-            new Failure(new \RuntimeException("Could not connect to MadelineProto, please check the logs for more details."))
-        );
-        if ($unserialized instanceof ChannelledSocket) {
-            $this->API = new Client($unserialized, Logger::$default);
-            $this->APIFactory();
-            return;
-        } elseif ($unserialized) {
-            $unserialized->storage = $unserialized->storage ?? [];
-            $unserialized->session = $this->session;
-            APIWrapper::link($this, $unserialized);
-            APIWrapper::link($this->wrapper, $this);
-            AbstractAPIFactory::link($this->wrapper->getFactory(), $this);
-            if (isset($this->API)) {
-                $this->storage = $this->API->storage ?? $this->storage;
-
-                unset($unserialized);
-
-                yield from $this->API->wakeup($settings, $this->wrapper);
-                $this->APIFactory();
-                $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
-                return;
-            }
+        if (yield from $this->connectToMadelineProto($settings)) {
+            return; // OK
         }
-
-        if ($settings instanceof SettingsEmpty) {
+        if (!$settings instanceof Settings) {
             $settings = new Settings;
         }
 
@@ -185,6 +155,61 @@ class API extends InternalDoc
         $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 
+    /**
+     * Connect to MadelineProto.
+     *
+     * @param Settings|SettingsEmpty $settings Settings
+     * @param bool $forceFull Whether to force full initialization
+     *
+     * @return \Generator
+     */
+    protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false): \Generator
+    {
+        if ($settings instanceof SettingsSerialization) {
+            $forceFull = $forceFull || $settings->getForceFull();
+        } elseif ($settings instanceof Settings) {
+            $forceFull = $forceFull || $settings->getSerialization()->getForceFull();
+        }
+
+        [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(
+            Serialization::unserialize($this->session, $forceFull),
+            30000,
+            [0, null]
+        );
+        if ($unserialized === 0) {
+            // Timeout
+            throw new \RuntimeException("Could not connect to MadelineProto, please check the logs for more details.");
+        } elseif ($unserialized instanceof \Throwable) {
+            // IPC server error, try fetching full session
+            return yield from $this->connectToMadelineProto($settings, true);
+        } elseif ($unserialized instanceof ChannelledSocket) {
+            // Success, IPC client
+            $this->API = new Client($unserialized, Logger::$default);
+            $this->APIFactory();
+            return true;
+        } elseif ($unserialized) {
+            // Success, full session
+            $unserialized->storage = $unserialized->storage ?? [];
+            $unserialized->session = $this->session;
+            APIWrapper::link($this, $unserialized);
+            APIWrapper::link($this->wrapper, $this);
+            AbstractAPIFactory::link($this->wrapper->getFactory(), $this);
+            if (isset($this->API)) {
+                $this->storage = $this->API->storage ?? $this->storage;
+
+                unset($unserialized);
+
+                if ($settings instanceof SettingsSerialization) {
+                    $settings = new SettingsEmpty;
+                }
+                yield from $this->API->wakeup($settings, $this->wrapper);
+                $this->APIFactory();
+                $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * Wakeup function.
      *
@@ -303,15 +328,24 @@ class API extends InternalDoc
     {
         $errors = [];
         $this->async(true);
+
+        if ($this->API instanceof Client) {
+            yield $this->API->stopIpcServer();
+            yield $this->API->disconnect();
+            yield from $this->connectToMadelineProto(new SettingsEmpty, true);
+        }
+
+        $started = false;
         while (true) {
             try {
                 yield $this->start();
+                $started = true;
                 yield $this->setEventHandler($eventHandler);
                 return yield from $this->API->loop();
             } catch (\Throwable $e) {
                 $errors = [\time() => $errors[\time()] ?? 0];
                 $errors[\time()]++;
-                if ($errors[\time()] > 100 && !$this->inited()) {
+                if ($errors[\time()] > 100 && (!$this->inited() || !$started)) {
                     $this->logger->logger("More than 100 errors in a second and not inited, exiting!", Logger::FATAL_ERROR);
                     return;
                 }

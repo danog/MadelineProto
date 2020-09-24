@@ -19,17 +19,14 @@
 
 namespace danog\MadelineProto;
 
-use Amp\CancellationTokenSource;
-use Amp\Ipc\Sync\ChannelledSocket;
+use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
-use danog\MadelineProto\Ipc\LightState;
 use danog\MadelineProto\Ipc\Server;
+use danog\MadelineProto\MTProtoSession\Session;
 
 use function Amp\File\exists;
 use function Amp\File\get;
-use function Amp\File\open;
-use function Amp\File\stat;
 use function Amp\Ipc\connect;
 
 /**
@@ -98,13 +95,14 @@ abstract class Serialization
      *   - Start IPC server
      *   - Store IPC state
      *
-     * @param SessionPaths $session Session name
+     * @param SessionPaths $session   Session name
+     * @param bool         $forceFull Whether to force full session deserialization
      *
      * @internal
      *
      * @return \Generator
      */
-    public static function unserialize(SessionPaths $session): \Generator
+    public static function unserialize(SessionPaths $session, bool $forceFull = false): \Generator
     {
         if (yield exists($session->getSessionPath())) {
             // Is new session
@@ -131,17 +129,18 @@ abstract class Serialization
         Loop::unreference($warningId);
 
         $lightState = null;
-        $cancelFlock = new CancellationTokenSource;
+        $cancelFlock = new Deferred;
+        $cancelIpc = new Deferred;
         $canContinue = true;
         $ipcSocket = null;
-        $unlock = yield Tools::flock($session->getLockPath(), LOCK_EX, 1, $cancelFlock->getToken(), static function () use ($session, $cancelFlock, &$canContinue, &$ipcSocket, &$lightState) {
-            $ipcSocket = Tools::call(self::tryConnect($session->getIpcPath(), $cancelFlock));
-            $session->getIpcState()->onResolve(static function (?\Throwable $e, ?LightState $res) use ($cancelFlock, &$canContinue, &$lightState) {
+        $unlock = yield from Tools::flockGenerator($session->getLockPath(), LOCK_EX, 1, $cancelFlock->promise(), $forceFull ? null : static function () use ($session, $cancelFlock, $cancelIpc, &$canContinue, &$ipcSocket, &$lightState) {
+            $ipcSocket = Tools::call(self::tryConnect($session->getIpcPath(), $cancelIpc->promise(), $cancelFlock));
+            $session->getLightState()->onResolve(static function (?\Throwable $e, ?LightState $res) use ($cancelFlock, &$canContinue, &$lightState) {
                 if ($res) {
                     $lightState = $res;
                     if (!$res->canStartIpc()) {
                         $canContinue = false;
-                        $cancelFlock->cancel();
+                        $cancelFlock->resolve(true);
                     }
                 } else {
                     $lightState = false;
@@ -154,28 +153,32 @@ abstract class Serialization
             return $ipcSocket;
         }
         if (!$canContinue) { // Have lock, can't use it
-            Logger::log("IPC WARNING: Session has event handler, but it's not started, and we don't have access to the class, so we can't start it.", Logger::ERROR);
-            Logger::log("IPC WARNING: Please start the event handler or unset it to use the IPC server.", Logger::ERROR);
+            Logger::log("Session has event handler, but it's not started.", Logger::ERROR);
+            Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
+            Logger::log("Please start the event handler or unset it to use the IPC server.", Logger::ERROR);
             $unlock();
             return $ipcSocket;
         }
 
         try {
             /** @var LightState */
-            $lightState ??= yield $session->getIpcState();
+            $lightState ??= yield $session->getLightState();
         } catch (\Throwable $e) {
         }
 
-        if ($lightState) {
+        if ($lightState && !$forceFull) {
             if (!$class = $lightState->getEventHandler()) {
                 // Unlock and fork
                 $unlock();
-                Server::startMe($session);
-                return $ipcSocket ?? yield from self::tryConnect($session->getIpcPath());
+                $cancelIpc->resolve(Server::startMe($session));
+                return $ipcSocket ?? yield from self::tryConnect($session->getIpcPath(), $cancelIpc->promise());
             } elseif (!\class_exists($class)) {
-                Logger::log("IPC WARNING: Session has event handler, but it's not started, and we don't have access to the class, so we can't start it.", Logger::ERROR);
-                Logger::log("IPC WARNING: Please start the event handler or unset it to use the IPC server.", Logger::ERROR);
-                return $ipcSocket ?? yield from self::tryConnect($session->getIpcPath());
+                // Have lock, can't use it
+                $unlock();
+                Logger::log("Session has event handler, but it's not started.", Logger::ERROR);
+                Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
+                Logger::log("Please start the event handler or unset it to use the IPC server.", Logger::ERROR);
+                return $ipcSocket ?? yield from self::tryConnect($session->getIpcPath(), $cancelIpc->promise());
             }
         }
 
@@ -187,7 +190,7 @@ abstract class Serialization
         Logger::log("Got exclusive session lock!");
 
         if ($isNew) {
-            $unserialized = yield from self::newUnserialize($session->getSessionPath());
+            $unserialized = yield from $session->unserialize();
         } else {
             $unserialized = yield from self::legacyUnserialize($session->getLegacySessionPath());
         }
@@ -203,49 +206,34 @@ abstract class Serialization
     /**
      * Try connecting to IPC socket.
      *
-     * @param string $ipcPath IPC path
-     * @param ?CancellationTokenSource $cancel Cancelation token
+     * @param string    $ipcPath       IPC path
+     * @param Promise   $cancelConnect Cancelation token (triggers cancellation of connection)
+     * @param ?Deferred $cancelFull    Cancelation token source (can trigger cancellation of full unserialization)
      *
-     * @return \Generator<int, Promise|Promise<ChannelledSocket>, mixed, void>
+     * @return \Generator
      */
-    private static function tryConnect(string $ipcPath, ?CancellationTokenSource $cancel = null): \Generator
+    private static function tryConnect(string $ipcPath, Promise $cancelConnect, ?Deferred $cancelFull = null): \Generator
     {
         for ($x = 0; $x < 30; $x++) {
             Logger::log("Trying to connect to IPC socket...");
             try {
                 \clearstatcache(true, $ipcPath);
                 $socket = yield connect($ipcPath);
-                if ($cancel) {
-                    $cancel->cancel();
+                if ($cancelFull) {
+                    $cancelFull->resolve(true);
                 }
                 return [$socket, null];
             } catch (\Throwable $e) {
                 $e = $e->getMessage();
                 Logger::log("$e while connecting to IPC socket");
             }
-            yield Tools::sleep(1);
+            if ($res = yield Tools::timeoutWithDefault($cancelConnect, 1000, null)) {
+                if ($res instanceof \Throwable) {
+                    return [$res, null];
+                }
+                $cancelConnect = (new Deferred)->promise();
+            }
         }
-    }
-
-    /**
-     * @internal Deserialize new object
-     *
-     * @param string $path
-     * @return \Generator
-     */
-    public static function newUnserialize(string $path): \Generator
-    {
-        $headerLen = \strlen(self::PHP_HEADER) + 1;
-
-        $file = yield open($path, 'rb');
-        $size = yield stat($path);
-        $size = $size['size'] ?? $headerLen;
-
-        yield $file->seek($headerLen); // Skip version for now
-        $unserialized = \unserialize((yield $file->read($size - $headerLen)) ?? '');
-        yield $file->close();
-
-        return $unserialized;
     }
 
     /**
