@@ -97,12 +97,12 @@ use danog\MadelineProto\Tools;
             Magic::classExists();
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
             $API = new API($ipcPath, (new Settings)->getSerialization()->setForceFull(true));
-            $API->init();
-            $API->initSelfRestart();
-            Tools::wait($session->storeIpcState(new IpcState($runnerId)));
 
             while (true) {
                 try {
+                    $API->init();
+                    $API->initSelfRestart();
+                    Tools::wait($session->storeIpcState(new IpcState($runnerId)));
                     Tools::wait(Server::waitShutdown());
                     return;
                 } catch (\Throwable $e) {

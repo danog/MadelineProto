@@ -24,6 +24,7 @@ use Amp\Promise;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
 
 use function Amp\Ipc\connect;
@@ -49,9 +50,9 @@ class Client
      */
     private bool $run = true;
     /**
-     * IPC path.
+     * Session.
      */
-    private string $ipcPath;
+    private SessionPaths $session;
     /**
      * Logger instance.
      */
@@ -60,14 +61,14 @@ class Client
      * Constructor function.
      *
      * @param ChannelledSocket $socket  IPC client socket
-     * @param string           $ipcPath IPC socket path
+     * @param SessionPaths     $session Session paths
      * @param Logger           $logger  Logger
      */
-    public function __construct(ChannelledSocket $server, string $ipcPath, Logger $logger)
+    public function __construct(ChannelledSocket $server, SessionPaths $session, Logger $logger)
     {
         $this->logger = $logger;
         $this->server = $server;
-        $this->ipcPath = $ipcPath;
+        $this->session = $session;
         Tools::callFork($this->loopInternal());
     }
     /**
@@ -112,7 +113,8 @@ class Client
             if ($this->run) {
                 $this->logger("Reconnecting to IPC server!");
                 yield $this->server->disconnect();
-                $this->server = yield connect($this->ipcPath);
+                Server::startMe($this->session);
+                $this->server = yield connect($this->session->getIpcPath());
             }
         }
     }
@@ -152,9 +154,10 @@ class Client
      *
      * @internal
      */
-    public function stopIpcServer(): \Generator
+    public function stopIpcServer(): Promise
     {
-        yield $this->server->send(Server::SHUTDOWN);
+        $this->run = false;
+        return $this->server->send(Server::SHUTDOWN);
     }
     /**
      * Call function.
