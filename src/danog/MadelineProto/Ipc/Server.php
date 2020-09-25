@@ -144,7 +144,9 @@ class Server extends SignalLoop
             Tools::callFork($this->clientLoop($socket));
         }
         $this->server->close();
-        if (isset($this->callback)) $this->callback->signal(null);
+        if (isset($this->callback)) {
+            $this->callback->signal(null);
+        }
     }
     /**
      * Client handler loop.
