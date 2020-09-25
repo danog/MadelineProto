@@ -14,7 +14,7 @@ class DbPropertiesFactory
     /**
      * @param DatabaseAbstract $dbSettings
      * @param string $namePrefix
-     * @param string $propertyType
+     * @param string|array $propertyType
      * @param string $name
      * @param $value
      *
@@ -25,7 +25,7 @@ class DbPropertiesFactory
      * @uses \danog\MadelineProto\Db\PostgresArray
      * @uses \danog\MadelineProto\Db\RedisArray
      */
-    public static function get(DatabaseAbstract $dbSettings, string $namePrefix, string $propertyType, string $name, $value = null): Promise
+    public static function get(DatabaseAbstract $dbSettings, string $namePrefix, $propertyType, string $name, $value = null): Promise
     {
         $config = $propertyType['config'] ?? [];
         $propertyType = \is_array($propertyType) ? $propertyType['type'] : $propertyType;
