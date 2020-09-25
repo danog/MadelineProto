@@ -118,10 +118,11 @@ abstract class ClientAbstract
      *
      * @return Promise
      */
-    public function disconnect(): Promise
+    public function disconnect(): \Generator
     {
         $this->run = false;
-        return $this->server->disconnect();
+        yield $this->server->disconnect();
+        yield \array_map(fn (ChannelledSocket $w): Promise => $w->disconnect(), $this->wrappers);
     }
     /**
      * Call function.
