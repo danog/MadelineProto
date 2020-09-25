@@ -122,7 +122,9 @@ abstract class ClientAbstract
     {
         $this->run = false;
         yield $this->server->disconnect();
-        foreach ($this->wrappers as $w) { yield from $w->disconnect(); }
+        foreach ($this->wrappers as $w) {
+            yield from $w->disconnect();
+        }
     }
     /**
      * Call function.

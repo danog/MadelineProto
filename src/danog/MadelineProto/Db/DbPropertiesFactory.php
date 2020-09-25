@@ -27,10 +27,12 @@ class DbPropertiesFactory
      */
     public static function get(DatabaseAbstract $dbSettings, string $namePrefix, string $propertyType, string $name, $value = null): Promise
     {
+        $config = $propertyType['config'] ?? [];
+        $propertyType = \is_array($propertyType) ? $propertyType['type'] : $propertyType;
         $propertyType = \strtolower($propertyType);
-        $class = $propertyType === 'arraynullcache' && !$dbSettings instanceof Memory
-            ? __NAMESPACE__.'\\NullCache'
-            : __NAMESPACE__ ;
+        $class = $config['enableCache'] ?? true && !$dbSettings instanceof Memory
+            ? __NAMESPACE__
+            : __NAMESPACE__.'\\NullCache';
 
         switch (true) {
             case $dbSettings instanceof Memory:
@@ -52,7 +54,6 @@ class DbPropertiesFactory
 
         /** @var DbType $class */
         switch (\strtolower($propertyType)) {
-            case 'arraynullcache':
             case 'array':
                 $class .= 'Array';
                 break;

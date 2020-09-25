@@ -487,7 +487,10 @@ class MTProto extends AsyncConstruct implements TLCallback
         'full_chats' => 'array',
         'channel_participants' => 'array',
         'usernames' => 'array',
-        'session' => 'arrayNullCache'
+        'session' => [
+            'type' => 'array',
+            'config' => ['enableCache' => false]
+        ]
     ];
 
     /**
