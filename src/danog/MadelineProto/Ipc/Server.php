@@ -73,7 +73,7 @@ class Server extends SignalLoop
      */
     public static function startMe(SessionPaths $session): Promise
     {
-        $id = Tools::randomInt();
+        $id = Tools::randomInt(2000000000);
         try {
             Logger::log("Starting IPC server $session (process)");
             ProcessRunner::start($session, $id);
