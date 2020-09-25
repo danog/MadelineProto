@@ -51,18 +51,24 @@ class Server extends SignalLoop
     /**
      * IPC server.
      */
-    private IpcServer $server;
+    protected IpcServer $server;
+    /**
+     * Callback IPC server.
+     */
+    private ServerCallback $callback;
     /**
      * Set IPC path.
      *
-     * @param string $path IPC path
+     * @param SessionPaths $session Session
      *
      * @return void
      */
-    public function setIpcPath(string $path): void
+    public function setIpcPath(SessionPaths $session): void
     {
         self::$shutdownDeferred = new Deferred;
-        $this->server = new IpcServer($path);
+        $this->server = new IpcServer($session->getIpcPath());
+        $this->callback = new ServerCallback($this->API);
+        $this->callback->setIpcPath($session);
     }
     /**
      * Start IPC server in background.
@@ -134,15 +140,16 @@ class Server extends SignalLoop
             Tools::callFork($this->clientLoop($socket));
         }
         $this->server->close();
+        $this->callback->signal(null);
     }
     /**
      * Client handler loop.
      *
      * @param ChannelledSocket $socket Client
      *
-     * @return \Generator
+     * @return \Generator|Promise
      */
-    private function clientLoop(ChannelledSocket $socket): \Generator
+    protected function clientLoop(ChannelledSocket $socket)
     {
         $this->API->logger("Accepted IPC client connection!");
 
@@ -167,13 +174,16 @@ class Server extends SignalLoop
      *
      * @param ChannelledSocket $socket  Socket
      * @param integer          $id      Request ID
-     * @param array            $payload Payload
+     * @param array|Wrapper    $payload Payload
      *
      * @return \Generator
      */
-    public function clientRequest(ChannelledSocket $socket, int $id, $payload): \Generator
+    private function clientRequest(ChannelledSocket $socket, int $id, $payload): \Generator
     {
         try {
+            if ($payload[1] instanceof Wrapper) {
+                $payload[1] = $this->callback->unwrap($payload[1]);
+            }
             $result = $this->API->{$payload[0]}(...$payload[1]);
             $result = $result instanceof \Generator ? yield from $result : yield $result;
         } catch (\Throwable $e) {

@@ -40,11 +40,19 @@ class Client
     /**
      * IPC server socket.
      */
-    private ChannelledSocket $server;
+    protected ChannelledSocket $server;
+    /**
+     * Callback IPC server socket.
+     */
+    private ?ChannelledSocket $serverCallback = null;
     /**
      * Requests promise array.
      */
     private array $requests = [];
+    /**
+     * Wrappers array.
+     */
+    private array $wrappers = [];
     /**
      * Whether to run loop.
      */
@@ -102,6 +110,9 @@ class Client
                 } else {
                     $promise = $this->requests[$id];
                     unset($this->requests[$id]);
+                    if (isset($this->wrappers[$id])) {
+                        unset($this->wrappers[$id]);
+                    }
                     if ($payload instanceof ExitFailure) {
                         $promise->fail($payload->getException());
                     } else {
@@ -123,7 +134,7 @@ class Client
      *
      * @param callable $callback Async callable to run
      *
-     * @return mixed
+     * @return \Generator
      */
     public function loop(callable $callback): \Generator
     {
@@ -180,14 +191,17 @@ class Client
     /**
      * Call function.
      *
-     * @param string $function  Function name
-     * @param array  $arguments Arguments
+     * @param string|int    $function  Function name
+     * @param array|Wrapper $arguments Arguments
      *
      * @return \Generator
      */
-    public function __call(string $function, array $arguments): \Generator
+    public function __call($function, $arguments): \Generator
     {
         $this->requests []= $deferred = new Deferred;
+        if ($arguments instanceof Wrapper) {
+            $this->wrappers[count($this->requests) - 1] = $arguments;
+        }
         yield $this->server->send([$function, $arguments]);
         return yield $deferred->promise();
     }

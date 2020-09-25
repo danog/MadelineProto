@@ -50,6 +50,10 @@ class SessionPaths
      */
     private string $ipcPath;
     /**
+     * IPC callback socket path.
+     */
+    private string $ipcCallbackPath;
+    /**
      * IPC light state path.
      */
     private string $ipcStatePath;
@@ -75,6 +79,7 @@ class SessionPaths
         $this->lightStatePath = "$session.lightState.php";
         $this->lockPath = "$session.lock";
         $this->ipcPath = "$session.ipc";
+        $this->ipcCallbackPath = "$session.callback.ipc";
         $this->ipcStatePath = "$session.ipcState.php";
     }
     /**
@@ -242,5 +247,15 @@ class SessionPaths
     {
         $this->lightState = new LightState($state);
         return $this->serialize($this->lightState, $this->getLightStatePath());
+    }
+
+    /**
+     * Get IPC callback socket path.
+     *
+     * @return string
+     */
+    public function getIpcCallbackPath(): string
+    {
+        return $this->ipcCallbackPath;
     }
 }

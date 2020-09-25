@@ -32,6 +32,7 @@ use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Db\MemoryArray;
 use danog\MadelineProto\Ipc\Server;
+use danog\MadelineProto\Ipc\ServerCallback;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
@@ -206,7 +207,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Instance of wrapper API.
      *
-     * @var null|APIWrapper
+     * @var APIWrapper
      */
     public $wrapper;
     /**
@@ -825,7 +826,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         if (!$this->ipcServer) {
             $this->ipcServer = new Server($this);
-            $this->ipcServer->setIpcPath($this->wrapper->getIpcPath());
+            $this->ipcServer->setIpcPath($this->wrapper->session);
         }
         $this->callCheckerLoop->start();
         $this->serializeLoop->start();
