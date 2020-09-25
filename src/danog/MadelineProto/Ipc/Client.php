@@ -18,53 +18,29 @@
 
 namespace danog\MadelineProto\Ipc;
 
-use Amp\Deferred;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Promise;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProtoTools\FilesLogic;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
-
-use function Amp\Ipc\connect;
 
 /**
  * IPC client.
  */
-class Client
+class Client extends ClientAbstract
 {
     use \danog\MadelineProto\Wrappers\Start;
     use \danog\MadelineProto\Wrappers\Templates;
+    use FilesLogic;
 
-    /**
-     * IPC server socket.
-     */
-    protected ChannelledSocket $server;
-    /**
-     * Callback IPC server socket.
-     */
-    private ?ChannelledSocket $serverCallback = null;
-    /**
-     * Requests promise array.
-     */
-    private array $requests = [];
-    /**
-     * Wrappers array.
-     */
-    private array $wrappers = [];
-    /**
-     * Whether to run loop.
-     */
-    private bool $run = true;
     /**
      * Session.
      */
-    private SessionPaths $session;
-    /**
-     * Logger instance.
-     */
-    public Logger $logger;
+    protected SessionPaths $session;
     /**
      * Constructor function.
      *
@@ -78,56 +54,6 @@ class Client
         $this->server = $server;
         $this->session = $session;
         Tools::callFork($this->loopInternal());
-    }
-    /**
-     * Logger.
-     *
-     * @param string $param Parameter
-     * @param int    $level Logging level
-     * @param string $file  File where the message originated
-     *
-     * @return void
-     */
-    public function logger($param, int $level = Logger::NOTICE, string $file = ''): void
-    {
-        if ($file === null) {
-            $file = \basename(\debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
-        }
-        isset($this->logger) ? $this->logger->logger($param, $level, $file) : Logger::$default->logger($param, $level, $file);
-    }
-    /**
-     * Main loop.
-     *
-     * @return \Generator
-     */
-    private function loopInternal(): \Generator
-    {
-        while ($this->run) {
-            while ($payload = yield $this->server->receive()) {
-                [$id, $payload] = $payload;
-                if (!isset($this->requests[$id])) {
-                    Logger::log("Got response for non-existing ID $id!");
-                } else {
-                    $promise = $this->requests[$id];
-                    unset($this->requests[$id]);
-                    if (isset($this->wrappers[$id])) {
-                        unset($this->wrappers[$id]);
-                    }
-                    if ($payload instanceof ExitFailure) {
-                        $promise->fail($payload->getException());
-                    } else {
-                        $promise->resolve($payload);
-                    }
-                    unset($promise);
-                }
-            }
-            if ($this->run) {
-                $this->logger("Reconnecting to IPC server!");
-                yield $this->server->disconnect();
-                Server::startMe($this->session);
-                $this->server = yield connect($this->session->getIpcPath());
-            }
-        }
     }
     /**
      * Run the provided async callable.
@@ -147,18 +73,7 @@ class Client
      */
     public function unreference(): void
     {
-        $this->run = false;
-        Tools::wait($this->server->disconnect());
-    }
-    /**
-     * Disconnect cleanly from main instance.
-     *
-     * @return Promise
-     */
-    public function disconnect(): Promise
-    {
-        $this->run = false;
-        return $this->server->disconnect();
+        Tools::wait($this->disconnect());
     }
     /**
      * Stop IPC server instance.
@@ -188,22 +103,145 @@ class Client
     {
         return true;
     }
+
     /**
-     * Call function.
+     * Upload file from URL.
      *
-     * @param string|int    $function  Function name
-     * @param array|Wrapper $arguments Arguments
+     * @param string|FileCallbackInterface $url       URL of file
+     * @param integer                      $size      Size of file
+     * @param string                       $fileName  File name
+     * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean                      $encrypted Whether to encrypt file for secret chats
      *
      * @return \Generator
      */
-    public function __call($function, $arguments): \Generator
+    public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false): \Generator
     {
-        $this->requests []= $deferred = new Deferred;
-        if ($arguments instanceof Wrapper) {
-            $this->wrappers[count($this->requests) - 1] = $arguments;
+        if (\is_object($url) && $url instanceof FileCallbackInterface) {
+            $cb = $url;
+            $url = $url->getFile();
         }
-        yield $this->server->send([$function, $arguments]);
-        return yield $deferred->promise();
+        $params = [$url, $size, $fileName, &$cb, $encrypted];
+        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($cb, false);
+        return yield from $this->__call('uploadFromUrl', $wrapper);
+    }
+    /**
+     * Upload file from callable.
+     *
+     * The callable must accept two parameters: int $offset, int $size
+     * The callable must return a string with the contest of the file at the specified offset and size.
+     *
+     * @param mixed    $callable  Callable
+     * @param integer  $size      File size
+     * @param string   $mime      Mime type
+     * @param string   $fileName  File name
+     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean  $seekable  Whether chunks can be fetched out of order
+     * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return \Generator<array>
+     */
+    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', $cb = null, bool $seekable = true, bool $encrypted = false): \Generator
+    {
+        if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
+            $cb = $callable;
+            $callable = $callable->getFile();
+        }
+        $params = [&$callable, $size, $mime, $fileName, &$cb, $seekable, $encrypted];
+        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($cb, false);
+        $wrapper->wrap($callable, false);
+        return yield from $this->__call('uploadFromCallable', $wrapper);
+    }
+    /**
+     * Reupload telegram file.
+     *
+     * @param mixed    $media     Telegram file
+     * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
+     * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return \Generator<array>
+     */
+    public function uploadFromTgfile($media, $cb = null, bool $encrypted = false): \Generator
+    {
+        if (\is_object($media) && $media instanceof FileCallbackInterface) {
+            $cb = $media;
+            $media = $media->getFile();
+        }
+        $params = [$media, &$cb, $encrypted];
+        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($cb, false);
+        return yield from $this->__call('uploadFromTgfile', $wrapper);
+    }
+    /**
+     * Download file to directory.
+     *
+     * @param mixed                        $messageMedia File to download
+     * @param string|FileCallbackInterface $dir           Directory where to download the file
+     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     *
+     * @return \Generator<string> Downloaded file path
+     */
+    public function downloadToDir($messageMedia, $dir, $cb = null): \Generator
+    {
+        if (\is_object($dir) && $dir instanceof FileCallbackInterface) {
+            $cb = $dir;
+            $dir = $dir->getFile();
+        }
+        $params = [$messageMedia, $dir, &$cb];
+        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($cb, false);
+        return yield from $this->__call('downloadToDir', $wrapper);
+    }
+    /**
+     * Download file.
+     *
+     * @param mixed                        $messageMedia File to download
+     * @param string|FileCallbackInterface $file          Downloaded file path
+     * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
+     *
+     * @return \Generator<string> Downloaded file path
+     */
+    public function downloadToFile($messageMedia, $file, $cb = null): \Generator
+    {
+        if (\is_object($file) && $file instanceof FileCallbackInterface) {
+            $cb = $file;
+            $file = $file->getFile();
+        }
+        $params = [$messageMedia, $file, &$cb];
+        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($cb, false);
+        return yield from $this->__call('downloadToFile', $wrapper);
+    }
+    /**
+     * Download file to callable.
+     * The callable must accept two parameters: string $payload, int $offset
+     * The callable will be called (possibly out of order, depending on the value of $seekable).
+     * The callable should return the number of written bytes.
+     *
+     * @param mixed                          $messageMedia File to download
+     * @param callable|FileCallbackInterface $callable      Chunk callback
+     * @param callable                       $cb            Status callback (DEPRECATED, use FileCallbackInterface)
+     * @param bool                           $seekable      Whether the callable can be called out of order
+     * @param int                            $offset        Offset where to start downloading
+     * @param int                            $end           Offset where to stop downloading (inclusive)
+     * @param int                            $part_size     Size of each chunk
+     *
+     * @return \Generator<bool>
+     */
+    public function downloadToCallable($messageMedia, callable $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null): \Generator
+    {
+        $messageMedia = (yield from $this->getDownloadInfo($messageMedia));
+        if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
+            $cb = $callable;
+            $callable = $callable->getFile();
+        }
+        $params = [$messageMedia, &$callable, &$cb, $seekable, $offset, $end, $part_size, ];
+        $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($callable, false);
+        $wrapper->wrap($cb, false);
+        return yield from $this->__call('downloadToCallable', $wrapper);
     }
     /**
      * Placeholder.

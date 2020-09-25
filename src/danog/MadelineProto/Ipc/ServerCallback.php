@@ -66,8 +66,8 @@ class ServerCallback extends Server
      */
     protected function clientLoop(ChannelledSocket $socket)
     {
-        $this->API->logger("Accepted IPC callback connection!");
         $id = $this->id++;
+        $this->API->logger("Accepted IPC callback connection, assigning ID $id!");
         $this->socketList[$id] = $socket;
         $this->watcherList[$id] = Loop::delay(30*1000, function () use ($id) {
             unset($this->watcherList[$id], $this->socketList[$id]);
@@ -78,7 +78,7 @@ class ServerCallback extends Server
 
 
     /**
-     * Unwrap value
+     * Unwrap value.
      *
      * @param Wrapper $wrapper
      * @return mixed

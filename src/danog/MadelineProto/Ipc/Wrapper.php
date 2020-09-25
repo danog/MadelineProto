@@ -6,10 +6,12 @@ use Amp\ByteStream\InputStream as ByteStreamInputStream;
 use Amp\ByteStream\OutputStream as ByteStreamOutputStream;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Parallel\Sync\ExitFailure;
+use Amp\Promise;
 use danog\MadelineProto\Ipc\Wrapper\InputStream;
 use danog\MadelineProto\Ipc\Wrapper\Obj;
 use danog\MadelineProto\Ipc\Wrapper\OutputStream;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
 
 use function Amp\Ipc\connect;
@@ -17,7 +19,7 @@ use function Amp\Ipc\connect;
 /**
  * Callback payload wrapper.
  */
-class Wrapper extends Client
+class Wrapper extends ClientAbstract
 {
     /**
      * Payload data.
@@ -46,29 +48,29 @@ class Wrapper extends Client
      */
     private int $remoteId = 0;
     /**
-     * Logger instance.
-     */
-    private Logger $logger;
-    /**
      * Constructor.
      *
-     * @param mixed  $data Payload data
-     * @param string $ipc  IPC URI
+     * @param mixed        $data Payload data
+     * @param SessionPaths $ipc  IPC URI
      *
-     * @return \Generator
+     * @return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, Wrapper>
      */
-    public static function create(&$data, string $ipc, Logger $logger): \Generator
+    public static function create(&$data, SessionPaths $session, Logger $logger): \Generator
     {
         $instance = new self;
         $instance->data = &$data;
-        $instance->server = yield connect($ipc);
-        $instance->remoteId = yield $instance->server->receive();
         $instance->logger = $logger;
+        $instance->run = false;
+
+        $logger->logger("Connecting to callback IPC server...");
+        $instance->server = yield connect($session->getIpcCallbackPath());
+        $logger->logger("Connected to callback IPC server!");
+
+        $instance->remoteId = yield $instance->server->receive();
+        $logger->logger("Got ID {$instance->remoteId} from callback IPC server!");
+
         Tools::callFork($instance->receiverLoop());
         return $instance;
-    }
-    private function __construct()
-    {
     }
     /**
      * Serialization function.
@@ -77,41 +79,42 @@ class Wrapper extends Client
      */
     public function __sleep(): array
     {
-        return ['data', 'callbackIds'];
+        return ['data', 'callbackIds', 'remoteId'];
     }
     /**
      * Wrap a certain callback object.
      *
-     * @param object|callable $callback Object to wrap
+     * @param object|callable $callback    Callback to wrap
+     * @param bool            $wrapObjects Whether to wrap object methods, too
      *
      * @param-out int $callback Callback ID
      *
      * @return void
      */
-    public function wrap(&$callback): void
+    public function wrap(&$callback, bool $wrapObjects = true): void
     {
-        if (\is_object($callback)) {
+        if (\is_object($callback) && $wrapObjects) {
             $ids = [];
             foreach (\get_class_methods($callback) as $method) {
                 $id = $this->id++;
                 $this->callbacks[$id] = [$callback, $method];
                 $ids[$method] = $id;
             }
-            $callback = $ids;
-            $this->callbackIds[] = &$callback;
-        } else {
-            $id = $this->id++;
-            $this->callbacks[$id] = self::copy($callback);
             $class = Obj::class;
             if ($callback instanceof ByteStreamInputStream) {
                 $class = InputStream::class;
-            } else if ($callback instanceof ByteStreamOutputStream) {
+            } elseif ($callback instanceof ByteStreamOutputStream) {
                 $class = OutputStream::class;
             }
-            if ($class !== Obj::class && method_exists($callback, 'seek')) {
+            if ($class !== Obj::class && \method_exists($callback, 'seek')) {
                 $class = "Seekable$class";
             }
-            $callback = [$class, $id]; // Will be re-filled later
+            $callback = [$class, $ids]; // Will be re-filled later
+            $this->callbackIds[] = &$callback;
+        } elseif (\is_callable($callback)) {
+            $id = $this->id++;
+            $this->callbacks[$id] = self::copy($callback);
+            $callback = $id;
             $this->callbackIds[] = &$callback;
         }
     }

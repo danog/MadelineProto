@@ -3,7 +3,6 @@
 namespace danog\MadelineProto\Ipc\Runner;
 
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Tools;
 
 final class ProcessRunner extends RunnerAbstract
 {

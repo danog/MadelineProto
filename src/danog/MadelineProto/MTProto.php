@@ -32,7 +32,6 @@ use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Db\MemoryArray;
 use danog\MadelineProto\Ipc\Server;
-use danog\MadelineProto\Ipc\ServerCallback;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
