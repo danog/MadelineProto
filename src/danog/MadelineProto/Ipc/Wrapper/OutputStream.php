@@ -4,7 +4,6 @@ namespace danog\MadelineProto\Ipc\Wrapper;
 
 use Amp\ByteStream\OutputStream as AmpOutputStream;
 use Amp\Promise;
-use danog\MadelineProto\Ipc\Wrapper\Obj;
 use danog\MadelineProto\Tools;
 
 class OutputStream extends Obj implements AmpOutputStream

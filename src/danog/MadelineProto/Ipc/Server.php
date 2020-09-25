@@ -70,6 +70,10 @@ class Server extends SignalLoop
         $this->callback = new ServerCallback($this->API);
         $this->callback->setIpcPath($session);
     }
+    public function start(): bool
+    {
+        return $this instanceof ServerCallback ? parent::start() : $this->callback->start() && parent::start();
+    }
     /**
      * Start IPC server in background.
      *
@@ -140,7 +144,7 @@ class Server extends SignalLoop
             Tools::callFork($this->clientLoop($socket));
         }
         $this->server->close();
-        $this->callback->signal(null);
+        if (isset($this->callback)) $this->callback->signal(null);
     }
     /**
      * Client handler loop.
@@ -182,13 +186,18 @@ class Server extends SignalLoop
     {
         try {
             if ($payload[1] instanceof Wrapper) {
-                $payload[1] = $this->callback->unwrap($payload[1]);
+                $wrapper = $payload[1];
+                $payload[1] = $this->callback->unwrap($wrapper);
             }
             $result = $this->API->{$payload[0]}(...$payload[1]);
             $result = $result instanceof \Generator ? yield from $result : yield $result;
         } catch (\Throwable $e) {
             $this->API->logger("Got error while calling IPC method: $e", Logger::ERROR);
             $result = new ExitFailure($e);
+        } finally {
+            if (isset($wrapper)) {
+                yield $wrapper->disconnect();
+            }
         }
         try {
             yield $socket->send([$id, $result]);

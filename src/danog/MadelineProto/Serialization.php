@@ -22,7 +22,6 @@ namespace danog\MadelineProto;
 use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
-use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\MTProtoSession\Session;
@@ -225,6 +224,7 @@ abstract class Serialization
             try {
                 \clearstatcache(true, $ipcPath);
                 $socket = yield connect($ipcPath);
+                Logger::log("Connected to IPC socket!");
                 if ($cancelFull) {
                     $cancelFull->resolve(true);
                 }

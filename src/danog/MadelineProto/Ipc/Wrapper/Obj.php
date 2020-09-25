@@ -16,11 +16,11 @@ class Obj
      */
     private array $methods = [];
     /**
-     * Wrapper
+     * Wrapper.
      */
     private Wrapper $wrapper;
     /**
-     * Constructor
+     * Constructor.
      *
      * @param Wrapper $wrapper
      * @param array $methods
