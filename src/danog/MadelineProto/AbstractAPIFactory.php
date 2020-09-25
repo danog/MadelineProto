@@ -33,14 +33,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      */
     private string $namespace = '';
     /**
-     * MTProto instance.
-     *
-     * @internal
-     *
-     * @var MTProto|Client
-     */
-    public $API;
-    /**
      * Whether lua is being used.
      *
      * @internal
@@ -95,7 +87,6 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      */
     protected static function link(self $a, self $b): void
     {
-        $a->API =& $b->API;
         $a->lua =& $b->lua;
         $a->async =& $b->async;
         $a->methods =& $b->methods;
@@ -187,7 +178,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
             $aargs = isset($arguments[1]) && \is_array($arguments[1]) ? $arguments[1] : [];
             $aargs['apifactory'] = true;
             $args = isset($arguments[0]) && \is_array($arguments[0]) ? $arguments[0] : [];
-            return yield from $this->API->methodCallAsyncRead($name, $args, $aargs);
+            return yield from $this->mainAPI->API->methodCallAsyncRead($name, $args, $aargs);
         }
         if ($lower_name === 'seteventhandler'
             || ($lower_name === 'loop' && !isset($arguments[0]))

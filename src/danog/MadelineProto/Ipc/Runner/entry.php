@@ -96,6 +96,7 @@ use danog\MadelineProto\Tools;
         try {
             Magic::classExists();
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
+
             $API = new API($ipcPath, (new Settings)->getSerialization()->setForceFull(true));
 
             while (true) {
@@ -112,9 +113,8 @@ use danog\MadelineProto\Tools;
             }
         } catch (\Throwable $e) {
             Logger::log("Got exception $e in IPC server, exiting...", Logger::FATAL_ERROR);
-            \trigger_error("Got exception $e in IPC server, exiting...", E_USER_ERROR);
             $ipc = Tools::wait($session->getIpcState());
-            if (!($ipc && $ipc->getRunnerId() === $runnerId && !$ipc->getException())) {
+            if (!($ipc && $ipc->getStartupId() === $runnerId && !$ipc->getException())) {
                 Tools::wait($session->storeIpcState(new IpcState($runnerId, $e)));
             }
         }

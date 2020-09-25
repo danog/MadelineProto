@@ -23,7 +23,6 @@ final class ProcessRunner extends RunnerAbstract
      */
     public static function start(string $session, int $request): void
     {
-        $request = Tools::randomInt();
         if (\PHP_SAPI === "cli") {
             $binary = \PHP_BINARY;
         } else {
