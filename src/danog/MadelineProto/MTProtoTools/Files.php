@@ -1074,7 +1074,7 @@ trait Files
      */
     public function downloadToStream($messageMedia, $stream, $cb = null, int $offset = 0, int $end = -1): \Generator
     {
-        $messageMedia = (yield from $this->getDownloadInfo($messageMedia));
+        $messageMedia = yield from $this->getDownloadInfo($messageMedia);
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
             $stream = $stream->getFile();
