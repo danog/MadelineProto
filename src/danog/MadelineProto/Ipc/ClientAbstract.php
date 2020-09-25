@@ -122,7 +122,7 @@ abstract class ClientAbstract
     {
         $this->run = false;
         yield $this->server->disconnect();
-        yield \array_map(fn (ChannelledSocket $w): Promise => $w->disconnect(), $this->wrappers);
+        foreach ($this->wrappers as $w) { yield from $w->disconnect(); }
     }
     /**
      * Call function.
