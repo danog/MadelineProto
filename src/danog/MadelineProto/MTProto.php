@@ -505,6 +505,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             return $data;
         }
         yield $this->session['data'] = \serialize($data);
+        var_dump($this);
         return $this->session;
     }
 
@@ -614,7 +615,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             'hook_url',
 
             // Web login template
-            'web_template',
+            'webTemplate',
 
             // Settings
             'settings',

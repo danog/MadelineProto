@@ -30,9 +30,9 @@ class DbPropertiesFactory
         $config = $propertyType['config'] ?? [];
         $propertyType = \is_array($propertyType) ? $propertyType['type'] : $propertyType;
         $propertyType = \strtolower($propertyType);
-        $class = $config['enableCache'] ?? true && !$dbSettings instanceof Memory
-            ? __NAMESPACE__
-            : __NAMESPACE__.'\\NullCache';
+        $class = !($config['enableCache'] ?? true) && !$dbSettings instanceof Memory
+            ? __NAMESPACE__.'\\NullCache'
+            : __NAMESPACE__;
 
         switch (true) {
             case $dbSettings instanceof Memory:

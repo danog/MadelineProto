@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use danog\MadelineProto\Lang;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 
@@ -41,17 +42,20 @@ trait Start
         if ((yield $this->getAuthorization()) === MTProto::LOGGED_IN) {
             return $this instanceof \danog\MadelineProto\Ipc\Client ? yield from $this->getSelf() : yield from $this->fullGetSelf();
         }
+        if ($this->getWebTemplate() === 'legacy') {
+            $this->setWebTemplate((yield $this->getSettings())->getTemplates()->getHtmlTemplate());
+        }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
-            if (\strpos(yield Tools::readLine('Do you want to login as user or bot (u/b)? '), 'b') !== false) {
-                yield from $this->botLogin(yield Tools::readLine('Enter your bot token: '));
+            if (\strpos(yield Tools::readLine(Lang::$current_lang['loginChoosePrompt']), 'b') !== false) {
+                yield from $this->botLogin(yield Tools::readLine(Lang::$current_lang['loginBot']));
             } else {
-                yield from $this->phoneLogin(yield Tools::readLine('Enter your phone number: '));
-                $authorization = (yield from $this->completePhoneLogin(yield Tools::readLine('Enter the phone code: ')));
+                yield from $this->phoneLogin(yield Tools::readLine(Lang::$current_lang['loginUser']));
+                $authorization = (yield from $this->completePhoneLogin(yield Tools::readLine(Lang::$current_lang['loginUserCode'])));
                 if ($authorization['_'] === 'account.password') {
-                    $authorization = (yield from $this->complete2faLogin(yield Tools::readLine('Please enter your password (hint '.$authorization['hint'].'): ')));
+                    $authorization = (yield from $this->complete2faLogin(yield Tools::readLine(\sprintf(Lang::$current_lang['loginUserPass'], $authorization['hint']))));
                 }
                 if ($authorization['_'] === 'account.needSignup') {
-                    $authorization = (yield from $this->completeSignup(yield Tools::readLine('Please enter your first name: '), yield Tools::readLine('Please enter your last name (can be empty): ')));
+                    $authorization = (yield from $this->completeSignup(yield Tools::readLine(Lang::$current_lang['signupFirstName']), yield Tools::readLine(Lang::$current_lang['signupLastName'])));
                 }
             }
             $this->serialize();
@@ -69,19 +73,19 @@ trait Start
             if (isset($_POST['phone_code'])) {
                 yield from $this->webCompletePhoneLogin();
             } else {
-                yield from $this->webEcho("You didn't provide a phone code!");
+                yield from $this->webEcho(Lang::$current_lang['loginNoCode']);
             }
         } elseif ((yield $this->getAuthorization()) === MTProto::WAITING_PASSWORD) {
             if (isset($_POST['password'])) {
                 yield from $this->webComplete2faLogin();
             } else {
-                yield from $this->webEcho("You didn't provide the password!");
+                yield from $this->webEcho(Lang::$current_lang['loginNoPass']);
             }
         } elseif ((yield $this->getAuthorization()) === MTProto::WAITING_SIGNUP) {
             if (isset($_POST['first_name'])) {
                 yield from $this->webCompleteSignup();
             } else {
-                yield from $this->webEcho("You didn't provide the first name!");
+                yield from $this->webEcho(Lang::$current_lang['loginNoName']);
             }
         }
         if ((yield $this->getAuthorization()) === MTProto::LOGGED_IN) {
@@ -96,9 +100,9 @@ trait Start
             yield from $this->phoneLogin($_POST['phone_number']);
             yield from $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
     private function webCompletePhoneLogin(): \Generator
@@ -107,9 +111,9 @@ trait Start
             yield from $this->completePhoneLogin($_POST['phone_code']);
             yield from $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
     private function webComplete2faLogin(): \Generator
@@ -118,9 +122,9 @@ trait Start
             yield from $this->complete2faLogin($_POST['password']);
             yield from $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
     private function webCompleteSignup(): \Generator
@@ -129,9 +133,9 @@ trait Start
             yield from $this->completeSignup($_POST['first_name'], isset($_POST['last_name']) ? $_POST['last_name'] : '');
             yield from $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
     private function webBotLogin(): \Generator
@@ -140,9 +144,9 @@ trait Start
             yield from $this->botLogin($_POST['token']);
             yield from $this->webEcho();
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
 }

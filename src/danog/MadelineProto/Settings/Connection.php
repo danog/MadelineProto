@@ -87,10 +87,6 @@ class Connection extends SettingsAbstract
     protected bool $retry = true;
 
     /**
-     * Whether the connection settings changed.
-     */
-    private bool $changed = true;
-    /**
      * Subdomains of web.telegram.org for https protocol.
      */
     protected array $sslSubdomains = [
@@ -218,24 +214,6 @@ class Connection extends SettingsAbstract
         }
     }
     /**
-     * Whether the settings have changed.
-     *
-     * @return boolean
-     */
-    public function haveChanged(): bool
-    {
-        return $this->changed;
-    }
-    /**
-     * Signal that changes have been applied.
-     *
-     * @return void
-     */
-    public function applyChanges(): void
-    {
-        $this->changed = false;
-    }
-    /**
      * Get protocol identifier.
      *
      * @return string
@@ -257,7 +235,6 @@ class Connection extends SettingsAbstract
         if (!isset(\class_implements($protocol)[MTProtoBufferInterface::class])) {
             throw new Exception("An invalid protocol was specified!");
         }
-        $this->changed = true;
         $this->protocol = $protocol;
 
         return $this;
@@ -282,7 +259,6 @@ class Connection extends SettingsAbstract
      */
     public function setIpv6(bool $ipv6): self
     {
-        $this->changed = true;
         $this->ipv6 = $ipv6;
 
         return $this;
@@ -307,7 +283,6 @@ class Connection extends SettingsAbstract
      */
     public function setSslSubdomains(array $sslSubdomains): self
     {
-        $this->changed = true;
         $this->sslSubdomains = $sslSubdomains;
 
         return $this;
@@ -332,7 +307,6 @@ class Connection extends SettingsAbstract
      */
     public function setMinMediaSocketCount(int $minMediaSocketCount): self
     {
-        $this->changed = true;
         $this->minMediaSocketCount = $minMediaSocketCount;
 
         return $this;
@@ -357,7 +331,6 @@ class Connection extends SettingsAbstract
      */
     public function setMaxMediaSocketCount(int $maxMediaSocketCount): self
     {
-        $this->changed = true;
         $this->maxMediaSocketCount = $maxMediaSocketCount;
 
         return $this;
@@ -382,7 +355,6 @@ class Connection extends SettingsAbstract
      */
     public function setRobinPeriod(int $robinPeriod): self
     {
-        $this->changed = true;
         $this->robinPeriod = $robinPeriod;
 
         return $this;
@@ -416,7 +388,6 @@ class Connection extends SettingsAbstract
      */
     public function setDefaultDc(int $defaultDc): self
     {
-        $this->changed = true;
         $this->defaultDc = $defaultDc;
         $this->defaultDcParams = ['datacenter' => $defaultDc];
 
@@ -449,7 +420,6 @@ class Connection extends SettingsAbstract
         if (!isset($this->proxy[$proxy])) {
             $this->proxy[$proxy] = [];
         }
-        $this->changed = true;
         $this->proxy[$proxy][] = $extra;
 
         return $this;
@@ -483,7 +453,6 @@ class Connection extends SettingsAbstract
         if (false === $index = \array_search($extra, $this->proxy[$proxy])) {
             return $this;
         }
-        $this->changed = true;
         unset($this->proxy[$proxy][$index]);
         if (empty($this->proxy[$proxy])) {
             unset($this->proxy[$proxy]);
@@ -509,7 +478,6 @@ class Connection extends SettingsAbstract
      */
     public function setObfuscated(bool $obfuscated): self
     {
-        $this->changed = true;
         $this->obfuscated = $obfuscated;
 
         return $this;
@@ -534,7 +502,6 @@ class Connection extends SettingsAbstract
      */
     public function setTestMode(bool $testMode): self
     {
-        $this->changed = true;
         $this->testMode = $testMode;
 
         return $this;
@@ -562,7 +529,6 @@ class Connection extends SettingsAbstract
         if (!isset(\class_implements($transport)[RawStreamInterface::class])) {
             throw new Exception("An invalid transport was specified!");
         }
-        $this->changed = true;
         $this->transport = $transport;
 
         return $this;
@@ -587,7 +553,6 @@ class Connection extends SettingsAbstract
      */
     public function setRetry(bool $retry): self
     {
-        $this->changed = true;
         $this->retry = $retry;
 
         return $this;
@@ -612,7 +577,6 @@ class Connection extends SettingsAbstract
      */
     public function setTimeout(int $timeout): self
     {
-        $this->changed = true;
         $this->timeout = $timeout;
 
         return $this;

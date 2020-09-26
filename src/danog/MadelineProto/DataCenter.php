@@ -200,7 +200,7 @@ class DataCenter
     {
         $this->API = $API;
         $changed = [];
-        $changedSettings = $settings->haveChanged();
+        $changedSettings = $settings->hasChanged();
         if (!$reconnectAll) {
             $changed = [];
             $test = $API->getCachedConfig()['test_mode'] ?? false ? 'test' : 'main';

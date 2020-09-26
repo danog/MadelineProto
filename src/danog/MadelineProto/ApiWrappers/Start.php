@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\ApiWrappers;
 
+use danog\MadelineProto\Lang;
 use danog\MadelineProto\MyTelegramOrgWrapper;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
@@ -41,31 +42,37 @@ trait Start
         if (\defined(\MADELINE_WORKER::class)) {
             throw new \danog\MadelineProto\Exception('Not inited!');
         }
+        if ($this->getWebAPITemplate() === 'legacy') {
+            $this->setWebAPITemplate($settings->getTemplates()->getHtmlTemplate());
+        }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             $stdout = getStdout();
-            yield $stdout->write('You did not define a valid API ID/API hash. Do you want to define it now manually, or automatically? (m/a)
-Note that you can also provide the API parameters directly in the code using the settings: https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id'.PHP_EOL);
-            if (\strpos(yield Tools::readLine('Your choice (m/a): '), 'm') !== false) {
-                yield $stdout->write('1) Login to my.telegram.org
-2) Go to API development tools
-3) App title: your app\'s name, can be anything
-    Short name: your app\'s short name, can be anything
-    URL: your app/website\'s URL, or t.me/yourusername
-    Platform: anything
-    Description: Describe your app here
-4) Click on create application'.PHP_EOL);
-                $app['api_id'] = yield Tools::readLine('5) Enter your API ID: ');
-                $app['api_hash'] = yield Tools::readLine('6) Enter your API hash: ');
+            $prepare = Lang::$current_lang['apiChooseManualAuto'].PHP_EOL;
+            $prepare .= \sprintf(Lang::$current_lang['apiChooseManualAutoTip'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id');
+            $prepare .= PHP_EOL;
+            yield $stdout->write($prepare);
+            if (\strpos(yield Tools::readLine(Lang::$current_lang['apiChoosePrompt']), 'm') !== false) {
+                yield $stdout->write("1) ".Lang::$current_lang['apiManualInstructions0'].PHP_EOL);
+                yield $stdout->write("2) ".Lang::$current_lang['apiManualInstructions1'].PHP_EOL);
+                yield $stdout->write("3) ");
+                foreach (['App title', 'Short name', 'URL', 'Platform', 'Description'] as $k => $key) {
+                    yield $stdout->write($k ? "    $key: " : "$key: ");
+                    yield $stdout->write(Lang::$current_lang["apiAppInstructionsManual$k"].PHP_EOL);
+                }
+                yield $stdout->write("4) ".Lang::$current_lang['apiManualInstructions2'].PHP_EOL);
+
+                $app['api_id'] = yield Tools::readLine("5) ".Lang::$current_lang['apiManualPrompt0']);
+                $app['api_hash'] = yield Tools::readLine("6) ".Lang::$current_lang['apiManualPrompt1']);
                 return $app;
             }
             $this->myTelegramOrgWrapper = new \danog\MadelineProto\MyTelegramOrgWrapper($settings);
-            yield from $this->myTelegramOrgWrapper->login(yield Tools::readLine('Enter a phone number that is already registered on Telegram: '));
-            yield from $this->myTelegramOrgWrapper->completeLogin(yield Tools::readLine('Enter the verification code you received in telegram: '));
+            yield from $this->myTelegramOrgWrapper->login(yield Tools::readLine(Lang::$current_lang['apiAutoPrompt0']));
+            yield from $this->myTelegramOrgWrapper->completeLogin(yield Tools::readLine(Lang::$current_lang['apiAutoPrompt1']));
             if (!(yield from $this->myTelegramOrgWrapper->hasApp())) {
-                $app_title = yield Tools::readLine('Enter the app\'s name, can be anything: ');
-                $short_name = yield Tools::readLine('Enter the app\'s short name, can be anything: ');
-                $url = yield Tools::readLine('Enter the app/website\'s URL, or t.me/yourusername: ');
-                $description = yield Tools::readLine('Describe your app: ');
+                $app_title = yield Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto0']);
+                $short_name = yield Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto1']);
+                $url = yield Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto2']);
+                $description = yield Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto4']);
                 $app = (yield from $this->myTelegramOrgWrapper->createApp(['app_title' => $app_title, 'app_shortname' => $short_name, 'app_url' => $url, 'app_platform' => 'web', 'app_desc' => $description]));
             } else {
                 $app = (yield from $this->myTelegramOrgWrapper->getApp());
@@ -82,7 +89,7 @@ Note that you can also provide the API parameters directly in the code using the
             } elseif (isset($_POST['phone_number'])) {
                 yield from $this->webAPIPhoneLogin($settings);
             } else {
-                yield from $this->webAPIEcho();
+                yield $this->webAPIEcho();
             }
         } elseif (!$this->myTelegramOrgWrapper->loggedIn()) {
             if (isset($_POST['code'])) {
@@ -90,7 +97,7 @@ Note that you can also provide the API parameters directly in the code using the
                 if (yield from $this->myTelegramOrgWrapper->hasApp()) {
                     return yield from $this->myTelegramOrgWrapper->getApp();
                 }
-                yield from $this->webAPIEcho();
+                yield $this->webAPIEcho();
             } elseif (isset($_POST['api_id']) && isset($_POST['api_hash'])) {
                 $app['api_id'] = (int) $_POST['api_id'];
                 $app['api_hash'] = $_POST['api_hash'];
@@ -100,7 +107,7 @@ Note that you can also provide the API parameters directly in the code using the
                 yield from $this->webAPIPhoneLogin($settings);
             } else {
                 $this->myTelegramOrgWrapper = null;
-                yield from $this->webAPIEcho();
+                yield $this->webAPIEcho();
             }
         } else {
             if (isset($_POST['app_title'], $_POST['app_shortname'], $_POST['app_url'], $_POST['app_platform'], $_POST['app_desc'])) {
@@ -108,7 +115,7 @@ Note that you can also provide the API parameters directly in the code using the
                 $this->gettingApiId = false;
                 return $app;
             }
-            yield from $this->webAPIEcho("You didn't provide all of the required parameters!");
+            yield from $this->webAPIEcho(Lang::$current_lang['apiParamsError']);
         }
         return null;
     }
@@ -117,9 +124,9 @@ Note that you can also provide the API parameters directly in the code using the
         try {
             $this->myTelegramOrgWrapper = new MyTelegramOrgWrapper($settings);
             yield from $this->myTelegramOrgWrapper->login($_POST['phone_number']);
-            yield from $this->webAPIEcho();
+            yield $this->webAPIEcho();
         } catch (\Throwable $e) {
-            yield from $this->webAPIEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
     private function webAPICompleteLogin(): \Generator
@@ -127,9 +134,9 @@ Note that you can also provide the API parameters directly in the code using the
         try {
             yield from $this->myTelegramOrgWrapper->completeLogin($_POST['code']);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webAPIEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webAPIEcho('ERROR: '.$e->getMessage().'. Try again.');
+            yield from $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
     private function webAPICreateApp(): \Generator
@@ -140,9 +147,9 @@ Note that you can also provide the API parameters directly in the code using the
             $app = (yield from $this->myTelegramOrgWrapper->createApp($params));
             return $app;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield from $this->webAPIEcho('ERROR: '.$e->getMessage().' Try again.');
+            yield from $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         } catch (\danog\MadelineProto\Exception $e) {
-            yield from $this->webAPIEcho('ERROR: '.$e->getMessage().' Try again.');
+            yield from $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
 }

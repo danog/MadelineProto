@@ -20,7 +20,9 @@ abstract class SettingsAbstract
      *
      * @return void
      */
-    abstract public function mergeArray(array $settings): void;
+    public function mergeArray(array $settings): void
+    {
+    }
 
     /**
      * Merge with other settings instance.
@@ -35,6 +37,9 @@ abstract class SettingsAbstract
         $defaults = $class->getDefaultProperties();
         foreach ($class->getProperties(ReflectionProperty::IS_PROTECTED|ReflectionProperty::IS_PUBLIC) as $property) {
             $name = $property->getName();
+            if ($name === 'changed') {
+                continue;
+            }
             $uc = \ucfirst($name);
             if (isset($other->{$name})
                 && (

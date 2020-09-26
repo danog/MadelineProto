@@ -23,8 +23,8 @@ use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Loop;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
+use danog\MadelineProto\Settings\Ipc as SettingsIpc;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
-use danog\MadelineProto\Settings\Serialization as SettingsSerialization;
 
 /**
  * Main API wrapper for MadelineProto.
@@ -128,7 +128,7 @@ class API extends InternalDoc
     /**
      * Async constructor function.
      *
-     * @param Settings|SettingsEmpty|SettingsSerialization $settings Settings
+     * @param Settings|SettingsEmpty|SettingsIpc $settings Settings
      *
      * @return \Generator
      */
@@ -136,13 +136,15 @@ class API extends InternalDoc
     {
         Logger::constructorFromSettings($settings instanceof Settings
             ? $settings->getLogger()
-            : new SettingsLogger);
+            : ($settings instanceof SettingsLogger ? $settings : new SettingsLogger));
 
         if (yield from $this->connectToMadelineProto($settings)) {
             return; // OK
         }
         if (!$settings instanceof Settings) {
-            $settings = new Settings;
+            $newSettings = new Settings;
+            $newSettings->merge($settings);
+            $settings = $newSettings;
         }
 
         $appInfo = $settings->getAppInfo();
@@ -184,7 +186,7 @@ class API extends InternalDoc
      */
     protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false): \Generator
     {
-        if ($settings instanceof SettingsSerialization) {
+        if ($settings instanceof SettingsIpc) {
             $forceFull = $forceFull || $settings->getForceFull();
         } elseif ($settings instanceof Settings) {
             $forceFull = $forceFull || $settings->getSerialization()->getForceFull();
@@ -218,7 +220,7 @@ class API extends InternalDoc
 
                 unset($unserialized);
 
-                if ($settings instanceof SettingsSerialization) {
+                if ($settings instanceof SettingsIpc) {
                     $settings = new SettingsEmpty;
                 }
                 yield from $this->API->wakeup($settings, $this->wrapper);
