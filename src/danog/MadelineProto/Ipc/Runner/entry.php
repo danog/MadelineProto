@@ -22,7 +22,7 @@ use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SessionPaths;
-use danog\MadelineProto\Settings;
+use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Tools;
 
 (static function (): void {
@@ -97,7 +97,7 @@ use danog\MadelineProto\Tools;
             Magic::classExists();
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
 
-            $API = new API($ipcPath, (new Settings)->getSerialization()->setForceFull(true));
+            $API = new API($ipcPath, (new Ipc)->setForceFull(true));
 
             while (true) {
                 try {

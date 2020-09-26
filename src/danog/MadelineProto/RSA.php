@@ -55,12 +55,9 @@ class RSA
      */
     public function load(TL $TL, string $rsa_key): \Generator
     {
-        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['rsa_init'], Logger::ULTRA_VERBOSE);
-        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['loading_key'], Logger::ULTRA_VERBOSE);
         $key = \tgseclib\Crypt\RSA::load($rsa_key);
         $this->n = Tools::getVar($key, 'modulus');
         $this->e = Tools::getVar($key, 'exponent');
-        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['computing_fingerprint'], Logger::ULTRA_VERBOSE);
         $this->fp = \substr(\sha1((yield from $TL->serializeObject(['type' => 'bytes'], $this->n->toBytes(), 'key')).(yield from $TL->serializeObject(['type' => 'bytes'], $this->e->toBytes(), 'key')), true), -8);
         return $this;
     }

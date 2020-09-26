@@ -28,6 +28,7 @@ use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\SessionPaths;
+use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Tools;
 
 /**
@@ -56,6 +57,10 @@ class Server extends SignalLoop
      * Callback IPC server.
      */
     private ServerCallback $callback;
+    /**
+     * IPC settings.
+     */
+    private Ipc $settings;
     /**
      * Set IPC path.
      *
@@ -220,5 +225,19 @@ class Server extends SignalLoop
     public function __toString(): string
     {
         return "IPC server";
+    }
+
+    /**
+     * Set IPC settings.
+     *
+     * @param Ipc $settings IPC settings
+     *
+     * @return self
+     */
+    public function setSettings(Ipc $settings): self
+    {
+        $this->settings = $settings;
+
+        return $this;
     }
 }

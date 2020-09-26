@@ -98,7 +98,7 @@ trait AuthKeyHandler
             throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
         }
         $user = $user['InputUser'];
-        $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['calling_user'], $user['user_id']), \danog\MadelineProto\Logger::VERBOSE);
+        $this->logger->logger(\sprintf("Calling %s...", $user['user_id']), \danog\MadelineProto\Logger::VERBOSE);
         $dh_config = (yield from $this->getDhConfig());
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['generating_a'], \danog\MadelineProto\Logger::VERBOSE);
         $a = \tgseclib\Math\BigInteger::randomRange(\danog\MadelineProto\Magic::$two, $dh_config['p']->subtract(\danog\MadelineProto\Magic::$two));

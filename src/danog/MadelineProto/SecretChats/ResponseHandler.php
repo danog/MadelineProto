@@ -26,9 +26,6 @@ trait ResponseHandler
 {
     private function handleDecryptedUpdate($update): \Generator
     {
-        /*if (isset($update['message']['decrypted_message']['random_bytes']) && strlen($update['message']['decrypted_message']['random_bytes']) < 15) {
-              throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['rand_bytes_too_short']);
-          }*/
         // already checked in TL.php
         switch ($update['message']['decrypted_message']['_']) {
             case 'decryptedMessageService':
@@ -92,7 +89,7 @@ trait ResponseHandler
                 }
                 break;
             default:
-                throw new \danog\MadelineProto\ResponseException(\danog\MadelineProto\Lang::$current_lang['unrecognized_dec_msg'].\var_export($update, true));
+                throw new \danog\MadelineProto\ResponseException('Unrecognized decrypted message received: '.\var_export($update, true));
                 break;
         }
     }
