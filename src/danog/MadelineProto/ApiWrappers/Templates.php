@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto\ApiWrappers;
 
+use Amp\Promise;
+use danog\MadelineProto\Lang;
+
 use function Amp\ByteStream\getOutputBufferStream;
 
 trait Templates
@@ -28,7 +31,7 @@ trait Templates
      *
      * @var string
      */
-    private $webApiTemplate = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><p>%s</p><form method="POST">%s<button type="submit"/>Go</button></form></body></html>';
+    private $webApiTemplate = 'legacy';
     /**
      * Generate page from template.
      *
@@ -39,7 +42,7 @@ trait Templates
      */
     private function webAPIEchoTemplate(string $message, string $form): string
     {
-        return \sprintf($this->webApiTemplate, $message, $form);
+        return \sprintf($this->webApiTemplate, $message, $form, Lang::$current_lang['go']);
     }
     /**
      * Get web API login HTML template string.
@@ -64,72 +67,86 @@ trait Templates
      *
      * @param string $message Message to echo
      *
-     * @return \Generator
+     * @return Promise
      */
-    private function webAPIEcho(string $message = ''): \Generator
+    private function webAPIEcho(string $message = ''): Promise
     {
-        $stdout = getOutputBufferStream();
+        $message = \htmlentities($message);
         if (!isset($this->myTelegramOrgWrapper)) {
             if (isset($_POST['type'])) {
                 if ($_POST['type'] === 'manual') {
-                    yield $stdout->write($this->webAPIEchoTemplate('Enter your API ID and API hash<br><b>'.$message.'</b><ol>
-<li>Login to my.telegram.org</li>
-<li>Go to API development tools</li>
-<li>
-  <ul>
-    <li>App title: your app&apos;s name, can be anything</li>
-    <li>Short name: your app&apos;s short name, only numbers and letters</li>
-    <li>Platform: Web</li>
-    <li>Description: describe your app here</li>
-  </ul>
-</li>
-<li>Click on create application</li>
-</ol>', '<input type="string" name="api_id" placeholder="API ID" required/><input type="string" name="api_hash" placeholder="API hash" required/>'));
+                    $title = \htmlentities(Lang::$current_lang['apiManualWeb']);
+                    $title .= "<br><b>$message</b>";
+                    $title .= "<ol>";
+                    $title .= "<li>".\htmlentities(Lang::$current_lang['apiManualInstructions0'])."</li>";
+                    $title .= "<li>".\htmlentities(Lang::$current_lang['apiManualInstructions1'])."</li>";
+                    $title .= "<li><ul>";
+                    foreach (['App title', 'Short name', 'URL', 'Platform', 'Description'] as $k => $key) {
+                        $title .= "<li>$key: ";
+                        $title .= \htmlentities(Lang::$current_lang["apiAppInstructionsManual$k"]);
+                        $title .= "</li>";
+                    }
+                    $title .= "</li></ul>";
+                    $title .= "<li>".\htmlentities(Lang::$current_lang['apiManualInstructions2'])."</li>";
+                    $title .= "</ol>";
+                    $form = '<input type="string" name="api_id" placeholder="API ID" required/>';
+                    $form .= '<input type="string" name="api_hash" placeholder="API hash" required/>';
                 } else {
-                    yield $stdout->write($this->webAPIEchoTemplate('Enter a phone number that is <b>already registered</b> on telegram to get the API ID<br><b>'.$message.'</b>', '<input type="text" name="phone_number" placeholder="Phone number" required/>'));
+                    $title = Lang::$current_lang['apiAutoWeb'];
+                    $title .= "<br><b>$message</b>";
+                    $phone = \htmlentities(Lang::$current_lang['loginUserPhoneWeb']);
+                    $form = "<input type='text' name='phone_number' placeholder='$phone' required/>";
                 }
             } else {
                 if ($message) {
                     $message = '<br><br>'.$message;
                 }
-                yield $stdout->write($this->webAPIEchoTemplate('Do you want to enter the API id and the API hash manually or automatically?<br>Note that you can also provide it directly in the code using the <a href="https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id">settings</a>.<b>'.$message.'</b>', '<select name="type"><option value="automatic">Automatically</option><option value="manual">Manually</option></select>'));
+                $title = \htmlentities(Lang::$current_lang['apiChooseManualAutoWeb']);
+                $title .= "<br>";
+                $title .= \sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html#settingsapp_infoapi_id');
+                $title .= "<b>$message</b>";
+
+                $automatically = \htmlentities(Lang::$current_lang['apiChooseAutomaticallyWeb']);
+                $manually = \htmlentities(Lang::$current_lang['apiChooseManuallyWeb']);
+
+                $form = "<select name='type'><option value='automatic'>$automatically</option><option value='manual'>$manually</option></select>";
             }
         } else {
             if (!$this->myTelegramOrgWrapper->loggedIn()) {
-                yield $stdout->write($this->webAPIEchoTemplate('Enter your code<br><b>'.$message.'</b>', '<input type="text" name="code" placeholder="Code" required/>'));
+                $title = \htmlentities(Lang::$current_lang['loginUserCode']);
+                $title .= "<br><b>$message</b>";
+
+                $code = \htmlentities(Lang::$current_lang['loginUserPhoneCodeWeb']);
+                $form = "<input type='text' name='code' placeholder='$code' required/>";
             } else {
-                yield $stdout->write($this->webAPIEchoTemplate('Enter the API info<br><b>'.$message.'</b>', '<input type="hidden" name="creating_app" value="yes" required/>
-                    Enter the app name, can be anything: <br><input type="text" name="app_title" required/><br>
-                    <br>Enter the app&apos;s short name, alphanumeric, 5-32 chars: <br><input type="text" name="app_shortname" required/><br>
-                    <br>Enter the app/website URL, or https://t.me/yourusername: <br><input type="text" name="app_url" required/><br>
-                    <br>Enter the app platform: <br>
-          <label>
-            <input type="radio" name="app_platform" value="android" checked> Android
-          </label>
-          <label>
-            <input type="radio" name="app_platform" value="ios"> iOS
-          </label>
-          <label>
-            <input type="radio" name="app_platform" value="wp"> Windows Phone
-          </label>
-          <label>
-            <input type="radio" name="app_platform" value="bb"> BlackBerry
-          </label>
-          <label>
-            <input type="radio" name="app_platform" value="desktop"> Desktop
-          </label>
-          <label>
-            <input type="radio" name="app_platform" value="web"> Web
-          </label>
-          <label>
-            <input type="radio" name="app_platform" value="ubp"> Ubuntu phone
-          </label>
-          <label>
-            <input type="radio" name="app_platform" value="other"> Other (specify in description)
-          </label>
-          <br><br>Enter the app description, can be anything: <br><textarea name="app_desc" required></textarea><br><br>
-                    '));
+                $title = \htmlentities(Lang::$current_lang['apiAppWeb']);
+                $title .= "<br><b>$message</b>";
+
+                $form = '<input type="hidden" name="creating_app" value="yes" required/>';
+                foreach (['app_title', 'app_shortname', 'app_url', 'app_platform', 'app_desc'] as $field) {
+                    $desc = \htmlentities(Lang::$current_lang["apiAppInstructionsAuto$field"]);
+                    if ($field == 'app_platform') {
+                        $form .= "$desc<br>";
+                        foreach ([
+                            'android' => 'Android',
+                            'ios' => 'iOS',
+                            'wp' => 'Windows Phone',
+                            'bb' => 'BlackBerry',
+                            'desktop' => 'Desktop',
+                            'web' => 'Web',
+                            'ubp' => 'Ubuntu phone',
+                            'other' => \htmlentities(Lang::$current_lang['apiAppInstructionsAutoTypeOther'])
+                        ] as $key => $desc) {
+                            $form .= "<label><input type='radio' name='app_platform' value='$key' checked> $desc</label>";
+                        }
+                    } elseif ($field === 'app_desc') {
+                        $form .= "$desc<br><textarea name='$field' required></textarea><br><br>";
+                    } else {
+                        $form .= "$desc<br><input type='text' name='$field' required/><br><br>";
+                    }
+                }
             }
         }
+        return getOutputBufferStream()->write($this->webAPIEchoTemplate($title, $form));
     }
 }

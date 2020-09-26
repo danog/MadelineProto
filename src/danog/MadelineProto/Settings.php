@@ -18,6 +18,7 @@ use danog\MadelineProto\Settings\Pwr;
 use danog\MadelineProto\Settings\RPC;
 use danog\MadelineProto\Settings\SecretChats;
 use danog\MadelineProto\Settings\Serialization;
+use danog\MadelineProto\Settings\Templates;
 use danog\MadelineProto\Settings\TLSchema;
 
 class Settings extends SettingsAbstract
@@ -74,6 +75,10 @@ class Settings extends SettingsAbstract
      * DatabaseAbstract settings.
      */
     protected DatabaseAbstract $db;
+    /**
+     * Template settings.
+     */
+    protected Templates $templates;
 
     /**
      * Create settings object from possibly legacy settings array.
@@ -111,6 +116,7 @@ class Settings extends SettingsAbstract
         $this->serialization = new Serialization;
         $this->schema = new TLSchema;
         $this->db = new DatabaseMemory;
+        $this->templates = new Templates;
         $this->ipc = new IPc;
     }
     /**
@@ -185,6 +191,8 @@ class Settings extends SettingsAbstract
                 $this->schema->merge($settings);
             } elseif ($settings instanceof Ipc) {
                 $this->ipc->merge($settings);
+            } elseif ($settings instanceof Templates) {
+                $this->templates->merge($settings);
             } elseif ($settings instanceof DatabaseAbstract) {
                 if (!$this->db instanceof $settings) {
                     $this->db = $settings;
@@ -206,6 +214,7 @@ class Settings extends SettingsAbstract
         $this->serialization->merge($settings->serialization);
         $this->schema->merge($settings->schema);
         $this->ipc->merge($settings->ipc);
+        $this->templates->merge($settings->templates);
 
         if (!$this->db instanceof $settings->db) {
             $this->db = $settings->db;
@@ -561,8 +570,34 @@ class Settings extends SettingsAbstract
     public function applyChanges(): SettingsAbstract
     {
         foreach (\get_object_vars($this) as $setting) {
-            $setting->applyChanges();
+            if ($setting instanceof SettingsAbstract) {
+                $setting->applyChanges();
+            }
         }
+        return $this;
+    }
+
+    /**
+     * Get template settings.
+     *
+     * @return Templates
+     */
+    public function getTemplates(): Templates
+    {
+        return $this->templates;
+    }
+
+    /**
+     * Set template settings.
+     *
+     * @param Templates $templates Template settings
+     *
+     * @return self
+     */
+    public function setTemplates(Templates $templates): self
+    {
+        $this->templates = $templates;
+
         return $this;
     }
 }

@@ -70,6 +70,9 @@ class AppInfo extends SettingsAbstract
     {
         Magic::classExists(true);
         // Detect language pack
+        if (isset(Lang::$lang[$this->langCode])) {
+            Lang::$current_lang =& Lang::$lang[$this->langCode];
+        }
         $this->appVersion = MTProto::RELEASE.' ('.MTProto::V.', '.\str_replace(' (AN UPDATE IS REQUIRED)', '', Magic::$revision).')';
     }
 

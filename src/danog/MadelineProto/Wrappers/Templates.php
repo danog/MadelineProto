@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\Wrappers;
 
 use \danog\MadelineProto\MTProto;
+use danog\MadelineProto\Lang;
 use function Amp\ByteStream\getOutputBufferStream;
 
 trait Templates
@@ -33,36 +34,48 @@ trait Templates
      */
     private function webEcho(string $message = ''): \Generator
     {
-        $stdout = getOutputBufferStream();
-        switch (yield $this->getAuthorization()) {
-            case MTProto::NOT_LOGGED_IN:
-                if (isset($_POST['type'])) {
-                    if ($_POST['type'] === 'phone') {
-                        yield $stdout->write($this->webEchoTemplate('Enter your phone number<br><b>'.$message.'</b>', '<input type="text" name="phone_number" placeholder="Phone number" required/>'));
-                    } else {
-                        yield $stdout->write($this->webEchoTemplate('Enter your bot token<br><b>'.$message.'</b>', '<input type="text" name="token" placeholder="Bot token" required/>'));
-                    }
+        $auth = yield $this->getAuthorization();
+        if ($auth === MTProto::NOT_LOGGED_IN) {
+            if (isset($_POST['type'])) {
+                if ($_POST['type'] === 'phone') {
+                    $title = \str_replace(':', '', Lang::$current_lang['loginUser']);
+                    $phone = \htmlentities(Lang::$current_lang['loginUserPhoneWeb']);
+                    $form = "<input type='text' name='phone_number' placeholder='$phone' required/>";
                 } else {
-                    yield $stdout->write($this->webEchoTemplate('Do you want to login as user or bot?<br><b>'.$message.'</b>', '<select name="type"><option value="phone">User</option><option value="bot">Bot</option></select>'));
+                    $title = \str_replace(':', '', Lang::$current_lang['loginBot']);
+                    $token = \htmlentities(Lang::$current_lang['loginBotTokenWeb']);
+                    $form = "<input type='text' name='token' placeholder='$token' required/>";
                 }
-                break;
-            case MTProto::WAITING_CODE:
-                yield $stdout->write($this->webEchoTemplate('Enter your code<br><b>'.$message.'</b>', '<input type="text" name="phone_code" placeholder="Phone code" required/>'));
-                break;
-            case MTProto::WAITING_PASSWORD:
-                yield $stdout->write($this->webEchoTemplate('Enter your password<br><b>'.$message.'</b>', '<input type="password" name="password" placeholder="Hint: '.$this->authorization['hint'].'" required/>'));
-                break;
-            case MTProto::WAITING_SIGNUP:
-                yield $stdout->write($this->webEchoTemplate('Sign up please<br><b>'.$message.'</b>', '<input type="text" name="first_name" placeholder="First name" required/><input type="text" name="last_name" placeholder="Last name"/>'));
-                break;
+            } else {
+                $title = Lang::$current_lang['loginChoosePromptWeb'];
+                $optionBot = \htmlentities(Lang::$current_lang['loginOptionBot']);
+                $optionUser = \htmlentities(Lang::$current_lang['loginOptionUser']);
+                $form = "<select name='type'><option value='phone'>$optionUser</option><option value='bot'>$optionBot</option></select>";
+            }
+        } elseif ($auth === MTProto::WAITING_CODE) {
+            $title = \str_replace(':', '', Lang::$current_lang['loginUserCode']);
+            $phone = \htmlentities(Lang::$current_lang['loginUserPhoneCodeWeb']);
+            $form = "<input type='text' name='phone_code' placeholder='$phone' required/>";
+        } elseif ($auth === MTProto::WAITING_PASSWORD) {
+            $title = Lang::$current_lang['loginUserPassWeb'];
+            $hint = \htmlentities(\sprintf(Lang::$current_lang['loginUserPassHint'], $this->authorization['hint']));
+            $form = "<input type='password' name='password' placeholder='$hint' required/>";
+        } elseif ($auth === MTProto::WAITING_SIGNUP) {
+            $title = Lang::$current_lang['signupWeb'];
+            $firstName = Lang::$current_lang['signupFirstNameWeb'];
+            $lastName = Lang::$current_lang['signupLastNameWeb'];
+            $form = "<input type='text' name='first_name' placeholder='$firstName' required/><input type='text' name='last_name' placeholder='$lastName'/>";
         }
+        $title = \htmlentities($title);
+        $message = \htmlentities($message);
+        return getOutputBufferStream()->write($this->webEchoTemplate("$title<br><b>$message</b>", $form));
     }
     /**
      * Web template.
      *
      * @var string
      */
-    private $web_template = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><form method="POST">%s<button type="submit"/>Go</button></form><p>%s</p></body></html>';
+    private $webTemplate = 'legacy';
     /**
      * Format message according to template.
      *
@@ -73,7 +86,7 @@ trait Templates
      */
     private function webEchoTemplate(string $message, string $form): string
     {
-        return \sprintf($this->web_template, $form, $message);
+        return \sprintf($this->webTemplate, $message, $form, Lang::$current_lang['go']);
     }
     /**
      * Get web template.
@@ -82,7 +95,7 @@ trait Templates
      */
     public function getWebTemplate(): string
     {
-        return $this->web_template;
+        return $this->webTemplate;
     }
     /**
      * Set web template.
@@ -93,6 +106,6 @@ trait Templates
      */
     public function setWebTemplate(string $template): void
     {
-        $this->web_template = $template;
+        $this->webTemplate = $template;
     }
 }

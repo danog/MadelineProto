@@ -189,7 +189,7 @@ final class APIWrapper
             }
 
             yield from $this->session->serialize(
-                yield from $this->API->serializeSession($this),
+                $this->API ? yield from $this->API->serializeSession($this) : $this,
                 $this->session->getSessionPath()
             );
 
