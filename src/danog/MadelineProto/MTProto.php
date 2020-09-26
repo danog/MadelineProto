@@ -45,6 +45,7 @@ use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
+use Psr\Log\LoggerInterface;
 
 use function Amp\File\exists;
 use function Amp\File\size;
@@ -532,19 +533,16 @@ class MTProto extends AsyncConstruct implements TLCallback
         // Initialize needed stuffs
         Magic::classExists();
         // Parse and store settings
-        yield from $this->updateSettings($settings, false);
+        $this->updateSettingsInternal($settings);
         // Actually instantiate needed classes like a boss
-        $this->logger->logger(Lang::$current_lang['inst_dc'], Logger::ULTRA_VERBOSE);
         yield from $this->cleanupProperties();
         // Load rsa keys
-        $this->logger->logger(Lang::$current_lang['load_rsa'], Logger::ULTRA_VERBOSE);
         $this->rsa_keys = [];
         foreach ($this->settings->getAuth()->getRsaKeys() as $key) {
             $key = (yield from (new RSA())->load($this->TL, $key));
             $this->rsa_keys[$key->fp] = $key;
         }
         // (re)-initialize TL
-        $this->logger->logger(Lang::$current_lang['TL_translation'], Logger::ULTRA_VERBOSE);
         $callbacks = [$this, $this->referenceDatabase];
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks[] = $this->minDatabase;
@@ -570,6 +568,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->startUpdateSystem(true);
         $this->v = self::V;
 
+        $this->settings->applyChanges();
         GarbageCollector::start();
     }
     /**
@@ -734,12 +733,17 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Get logger.
-     *
-     * @return Logger
      */
     public function getLogger(): Logger
     {
         return $this->logger;
+    }
+    /**
+     * Get PSR logger.
+     */
+    public function getPsrLogger(): LoggerInterface
+    {
+        return $this->logger->getPsrLogger();
     }
     /**
      * Get async HTTP client.
@@ -828,6 +832,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         if (!$this->ipcServer) {
             $this->ipcServer = new Server($this);
+            $this->ipcServer->setSettings($this->settings->getIpc());
             $this->ipcServer->setIpcPath($this->wrapper->session);
         }
         $this->callCheckerLoop->start();
@@ -933,7 +938,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         if (!isset($this->TL)) {
             $this->TL = new TL($this);
-            $this->logger->logger(Lang::$current_lang['TL_translation'], Logger::ULTRA_VERBOSE);
             $callbacks = [$this, $this->referenceDatabase];
             if (!($this->authorization['user']['bot'] ?? false)) {
                 $callbacks[] = $this->minDatabase;
@@ -1075,7 +1079,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         // Reset MTProto session (not related to user session)
         $this->resetMTProtoSession();
         // Update settings from constructor
-        yield from $this->updateSettings($settings, false);
+        $this->updateSettingsInternal($settings);
         // Session update process for BC
         $forceDialogs = false;
         if (!isset($this->v)
@@ -1178,12 +1182,40 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Parse, update and store settings.
      *
-     * @param Settings|SettingsEmpty $settings Settings
-     * @param bool                   $reinit   Whether to reinit the instance
+     * @param SettingsAbstract $settings Settings
      *
      * @return \Generator
      */
-    public function updateSettings(SettingsAbstract $settings, bool $reinit = true): \Generator
+    public function updateSettings(SettingsAbstract $settings): \Generator
+    {
+        $this->updateSettingsInternal($settings);
+
+        if ($this->settings->getDb()->hasChanged()) {
+            yield from $this->initDb($this);
+            $this->settings->getDb()->applyChanges();
+        }
+        if ($this->settings->getIpc()->hasChanged()) {
+            $this->ipcServer->setSettings($this->settings->getIpc()->applyChanges());
+        }
+        if ($this->settings->getSerialization()->hasChanged()) {
+            $this->serializeLoop->signal(true);
+            $this->serializeLoop = new PeriodicLoopInternal($this, [$this, 'serialize'], 'serialize', $this->settings->getSerialization()->applyChanges()->getInterval() * 1000);
+        }
+        if ($this->settings->getAuth()->hasChanged()
+            || $this->settings->getConnection()->hasChanged()
+            || $this->settings->getSchema()->hasChanged()
+            || $this->settings->getSchema()->needsUpgrade()) {
+            yield from $this->__construct_async($this->settings);
+        }
+    }
+    /**
+     * Parse, update and store settings.
+     *
+     * @param SettingsAbstract $settings Settings
+     *
+     * @return void
+     */
+    private function updateSettingsInternal(SettingsAbstract $settings): void
     {
         if ($settings instanceof SettingsEmpty) {
             if (!isset($this->settings)) {
@@ -1208,10 +1240,8 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
 
         // Setup logger
-        $this->setupLogger();
-
-        if ($reinit) {
-            yield from $this->__construct_async($this->settings);
+        if ($this->settings->getLogger()->hasChanged() || !$this->logger) {
+            $this->setupLogger();
         }
     }
     /**

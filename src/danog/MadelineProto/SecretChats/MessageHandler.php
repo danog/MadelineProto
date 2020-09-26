@@ -135,7 +135,7 @@ trait MessageHandler
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['msg_data_length_too_big']);
         }
         if ($message_key != \substr(\sha1(\substr($decrypted_data, 0, 4 + $message_data_length), true), -16)) {
-            throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['msg_key_mismatch']);
+            throw new \danog\MadelineProto\SecurityException('Msg_key mismatch');
         }
         if (\strlen($decrypted_data) - 4 - $message_data_length > 15) {
             throw new \danog\MadelineProto\SecurityException('difference between message_data_length and the length of the remaining decrypted buffer is too big');
@@ -155,7 +155,7 @@ trait MessageHandler
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['msg_data_length_too_big']);
         }
         if ($message_key != \substr(\hash('sha256', \substr($this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 8 : 0), 32).$decrypted_data, true), 8, 16)) {
-            throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['msg_key_mismatch']);
+            throw new \danog\MadelineProto\SecurityException('Msg_key mismatch');
         }
         if (\strlen($decrypted_data) - 4 - $message_data_length < 12) {
             throw new \danog\MadelineProto\SecurityException('padding is too small');

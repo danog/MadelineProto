@@ -23,6 +23,7 @@ use Amp\ByteStream\ResourceOutputStream;
 use Amp\Failure;
 use Amp\Loop;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
+use Psr\Log\LoggerInterface;
 
 use function Amp\ByteStream\getStderr;
 use function Amp\ByteStream\getStdout;
@@ -94,6 +95,10 @@ class Logger
      * Log rotation loop ID.
      */
     private string $rotateId = '';
+    /**
+     * PSR logger.
+     */
+    private PsrLogger $psr;
     /**
      * Ultra verbose logging.
      */
@@ -171,6 +176,7 @@ class Logger
      */
     public function __construct(SettingsLogger $settings, string $prefix = '')
     {
+        $this->psr = new PsrLogger($this);
         $this->prefix = $prefix === '' ? '' : ', '.$prefix;
 
         $this->mode = $settings->getType();
@@ -237,7 +243,7 @@ class Logger
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             try {
                 \error_reporting(E_ALL);
-                \ini_set('log_errors', 1);
+                \ini_set('log_errors', "1");
                 \ini_set('error_log', $this->mode === self::FILE_LOGGER
                     ? $this->optional
                     : Magic::$script_cwd.'/MadelineProto.log');
@@ -326,5 +332,15 @@ class Logger
                     break;
             }
         }
+    }
+
+    /**
+     * Get PSR logger.
+     *
+     * @return LoggerInterface
+     */
+    public function getPsrLogger(): LoggerInterface
+    {
+        return $this->psr;
     }
 }

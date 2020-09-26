@@ -69,7 +69,7 @@ trait AuthKeyHandler
         $req_pq = $cdn ? 'req_pq' : 'req_pq_multi';
         for ($retry_id_total = 1; $retry_id_total <= $this->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
             try {
-                $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['req_pq'], \danog\MadelineProto\Logger::VERBOSE);
+                $this->logger->logger("Requesting pq...", \danog\MadelineProto\Logger::VERBOSE);
                 /**
                  * ***********************************************************************
                  * Make pq request, DH exchange initiation.

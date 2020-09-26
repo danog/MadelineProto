@@ -878,7 +878,7 @@ class TL
                     }
                 }
                 if (!\is_string($x)) {
-                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialize_not_str']);
+                    throw new Exception("Generated value isn't a string");
                 }
                 return $type['type'] === 'bytes' ? new Types\Bytes($x) : $x;
             case 'Vector t':
@@ -908,7 +908,7 @@ class TL
                     case 'vector':
                         break;
                     default:
-                        throw new Exception(\danog\MadelineProto\Lang::$current_lang['vector_invalid'].$constructorData['predicate']);
+                        throw new Exception('Invalid vector constructor: '.$constructorData['predicate']);
                 }
             // no break
             case 'vector':

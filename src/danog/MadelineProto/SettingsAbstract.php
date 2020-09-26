@@ -8,6 +8,12 @@ use ReflectionProperty;
 abstract class SettingsAbstract
 {
     /**
+     * Whether this setting was changed.
+     *
+     * @var boolean
+     */
+    protected $changed = true;
+    /**
      * Merge legacy settings array.
      *
      * @param array $settings Settings array
@@ -29,13 +35,16 @@ abstract class SettingsAbstract
         $defaults = $class->getDefaultProperties();
         foreach ($class->getProperties(ReflectionProperty::IS_PROTECTED|ReflectionProperty::IS_PUBLIC) as $property) {
             $name = $property->getName();
+            $uc = \ucfirst($name);
             if (isset($other->{$name})
                 && (
                     !isset($defaults[$name])
                     || $other->{$name} !== $defaults[$name] // Isn't equal to the default value
                 )
+                && $other->{$name} !== $this->{"get$uc"}
             ) {
-                $this->{'set'.\ucfirst($name)}($other->{$name});
+                $this->{"set$uc"}($other->{$name});
+                $this->changed = true;
             }
         }
     }
@@ -53,5 +62,25 @@ abstract class SettingsAbstract
             $result['set'.\ucfirst(Tools::toCamelCase($prop))] = $prop;
         }
         return $result;
+    }
+
+    /**
+     * Get whether this setting was changed, also applies changes.
+     *
+     * @return boolean
+     */
+    public function hasChanged(): bool
+    {
+        return $this->changed;
+    }
+    /**
+     * Apply changes.
+     *
+     * @return static
+     */
+    public function applyChanges(): self
+    {
+        $this->changed = false;
+        return $this;
     }
 }

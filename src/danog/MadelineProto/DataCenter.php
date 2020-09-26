@@ -216,7 +216,6 @@ class DataCenter
         $this->settings = $settings;
         foreach ($this->sockets as $key => $socket) {
             if ($socket instanceof DataCenterConnection && !\strpos($key, '_bk')) {
-                //$this->API->logger->logger(\sprintf(Lang::$current_lang['dc_con_stop'], $key), Logger::VERBOSE);
                 if ($reconnectAll || isset($changed[$id])) {
                     $this->API->logger->logger("Disconnecting all before reconnect!");
                     $socket->needReconnect(true);

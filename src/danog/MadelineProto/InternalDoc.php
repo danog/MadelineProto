@@ -5133,8 +5133,6 @@ class InternalDoc extends APIFactory
     }
     /**
      * Get logger.
-     *
-     * @return Logger
      */
     public function getLogger(): \danog\MadelineProto\Logger
     {
@@ -5208,6 +5206,13 @@ class InternalDoc extends APIFactory
     public function getPropicInfo($data, array $extra = [])
     {
         return $this->__call(__FUNCTION__, [$data, $extra]);
+    }
+    /**
+     * Get PSR logger.
+     */
+    public function getPsrLogger(): \Psr\Log\LoggerInterface
+    {
+        return $this->API->getPsrLogger();
     }
     /**
      * Get full info about peer (including full list of channel members), returns a Chat object.
@@ -6123,14 +6128,13 @@ class InternalDoc extends APIFactory
     /**
      * Parse, update and store settings.
      *
-     * @param Settings|SettingsEmpty $settings Settings
-     * @param bool                   $reinit   Whether to reinit the instance
+     * @param SettingsAbstract $settings Settings
      *
      * @return \Generator
      */
-    public function updateSettings(\danog\MadelineProto\SettingsAbstract $settings, bool $reinit = true, array $extra = [])
+    public function updateSettings(\danog\MadelineProto\SettingsAbstract $settings, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$settings, $reinit, $extra]);
+        return $this->__call(__FUNCTION__, [$settings, $extra]);
     }
     /**
      * Upload file.

@@ -11,6 +11,7 @@ use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 use danog\MadelineProto\Settings\Files;
+use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Settings\Logger;
 use danog\MadelineProto\Settings\Peer;
 use danog\MadelineProto\Settings\Pwr;
@@ -37,6 +38,10 @@ class Settings extends SettingsAbstract
      * File management settings.
      */
     protected Files $files;
+    /**
+     * IPC server settings.
+     */
+    protected Ipc $ipc;
     /**
      * Logger settings.
      */
@@ -106,6 +111,7 @@ class Settings extends SettingsAbstract
         $this->serialization = new Serialization;
         $this->schema = new TLSchema;
         $this->db = new DatabaseMemory;
+        $this->ipc = new IPc;
     }
     /**
      * Merge legacy array settings.
@@ -177,6 +183,8 @@ class Settings extends SettingsAbstract
                 $this->serialization->merge($settings);
             } elseif ($settings instanceof TLSchema) {
                 $this->schema->merge($settings);
+            } elseif ($settings instanceof Ipc) {
+                $this->ipc->merge($settings);
             } elseif ($settings instanceof DatabaseAbstract) {
                 if (!$this->db instanceof $settings) {
                     $this->db = $settings;
@@ -197,6 +205,7 @@ class Settings extends SettingsAbstract
         $this->secretChats->merge($settings->secretChats);
         $this->serialization->merge($settings->serialization);
         $this->schema->merge($settings->schema);
+        $this->ipc->merge($settings->ipc);
 
         if (!$this->db instanceof $settings->db) {
             $this->db = $settings->db;
@@ -522,6 +531,38 @@ class Settings extends SettingsAbstract
     {
         $this->db = $db;
 
+        return $this;
+    }
+
+    /**
+     * Get IPC server settings.
+     *
+     * @return Ipc
+     */
+    public function getIpc(): Ipc
+    {
+        return $this->ipc;
+    }
+
+    /**
+     * Set IPC server settings.
+     *
+     * @param Ipc $ipc IPC server settings.
+     *
+     * @return self
+     */
+    public function setIpc(Ipc $ipc): self
+    {
+        $this->ipc = $ipc;
+
+        return $this;
+    }
+
+    public function applyChanges(): SettingsAbstract
+    {
+        foreach (\get_object_vars($this) as $setting) {
+            $setting->applyChanges();
+        }
         return $this;
     }
 }

@@ -10,12 +10,6 @@ class Serialization extends SettingsAbstract
      * Serialization interval, in seconds.
      */
     protected int $interval = 30;
-    /**
-     * Whether to force full deserialization of instance, without using the IPC server/client.
-     *
-     * WARNING: this will cause slow startup if enabled.
-     */
-    protected bool $forceFull = false;
 
     public function mergeArray(array $settings): void
     {
@@ -43,30 +37,6 @@ class Serialization extends SettingsAbstract
     public function setInterval(int $interval): self
     {
         $this->interval = $interval;
-
-        return $this;
-    }
-
-    /**
-     * Get WARNING: this will cause slow startup if enabled.
-     *
-     * @return bool
-     */
-    public function getForceFull(): bool
-    {
-        return $this->forceFull;
-    }
-
-    /**
-     * Set WARNING: this will cause slow startup if enabled.
-     *
-     * @param bool $forceFull WARNING: this will cause slow startup if enabled.
-     *
-     * @return self
-     */
-    public function setForceFull(bool $forceFull): self
-    {
-        $this->forceFull = $forceFull;
 
         return $this;
     }
