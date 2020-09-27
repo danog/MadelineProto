@@ -245,6 +245,10 @@ class Magic
                     //$this->logger->logger('Could not enable PHP logging');
                 }
             }
+            try {
+                \ini_set('memory_limit', -1);
+            } catch (\danog\MadelineProto\Exception $e) {
+            }
             // Check if we're in a console, for colorful log output
             try {
                 self::$isatty = \defined(\STDOUT::class) && hasColorSupport();
