@@ -52,6 +52,7 @@ class Shutdown
         foreach (self::$callbacks as $callback) {
             $callback();
         }
+        Magic::shutdown(0);
     }
     /**
      * Add a callback for script shutdown.

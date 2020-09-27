@@ -426,6 +426,18 @@ class Connection extends SettingsAbstract
     }
 
     /**
+     * Set proxies.
+     *
+     * @param array $proxies Proxies
+     *
+     * @return self
+     */
+    public function setProxy(array $proxies): self
+    {
+        $this->proxy = $proxies;
+        return $this;
+    }
+    /**
      * Clear proxies.
      *
      * @return self
