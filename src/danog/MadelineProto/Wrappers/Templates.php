@@ -65,6 +65,8 @@ trait Templates
             $firstName = Lang::$current_lang['signupFirstNameWeb'];
             $lastName = Lang::$current_lang['signupLastNameWeb'];
             $form = "<input type='text' name='first_name' placeholder='$firstName' required/><input type='text' name='last_name' placeholder='$lastName'/>";
+        } else {
+            $title = '';
         }
         $title = \htmlentities($title);
         $message = \htmlentities($message);
