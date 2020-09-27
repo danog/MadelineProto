@@ -356,7 +356,7 @@ class DataCenter
             $default = [[DefaultStream::class, []], [BufferedRawStream::class, []]];
         }
         $combos[] = $default;
-        if (!$this->settings->getRetry()) {
+        if ($this->settings->getRetry()) {
             if (isset($this->dclist[$test][$ipv6][$dc_number]['tcpo_only']) && $this->dclist[$test][$ipv6][$dc_number]['tcpo_only'] || isset($this->dclist[$test][$ipv6][$dc_number]['secret'])) {
                 $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];
                 $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, $extra], [IntermediatePaddedStream::class, []]];
@@ -442,7 +442,7 @@ class DataCenter
                             if (\strpos($dc_number, '_cdn') !== false) {
                                 continue;
                             }
-                            $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\\D+/', '', $dc_number)];
+                            $subdomain = $this->settings->getSslSubdomains()[\preg_replace('/\\D+/', '', $dc_number)];
                             if (\strpos($dc_number, '_media') !== false) {
                                 $subdomain .= '-1';
                             }
@@ -454,14 +454,14 @@ class DataCenter
                             $uri = 'tcp://'.$address.':'.$port;
                         }
                         if ($combo[1][0] === WssStream::class) {
-                            $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\\D+/', '', $dc_number)];
+                            $subdomain = $this->settings->getSslSubdomains()[\preg_replace('/\\D+/', '', $dc_number)];
                             if (\strpos($dc_number, '_media') !== false) {
                                 $subdomain .= '-1';
                             }
                             $path = $this->settings->getTestMode() ? 'apiws_test' : 'apiws';
                             $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
                         } elseif ($combo[1][0] === WsStream::class) {
-                            $subdomain = $this->dclist['ssl_subdomains'][\preg_replace('/\\D+/', '', $dc_number)];
+                            $subdomain = $this->settings->getSslSubdomains()[\preg_replace('/\\D+/', '', $dc_number)];
                             if (\strpos($dc_number, '_media') !== false) {
                                 $subdomain .= '-1';
                             }
