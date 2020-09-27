@@ -255,7 +255,7 @@ class API extends InternalDoc
                 $this->API->destructing = true;
                 $this->API->unreference();
             }
-            if (isset($this->wrapper)) {
+            if (isset($this->wrapper) && !Magic::$signaled) {
                 $this->logger->logger('Prompting final serialization...');
                 Tools::wait($this->wrapper->serialize());
                 $this->logger->logger('Done final serialization!');

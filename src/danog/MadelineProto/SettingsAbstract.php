@@ -46,7 +46,7 @@ abstract class SettingsAbstract
                     !isset($defaults[$name])
                     || $other->{$name} !== $defaults[$name] // Isn't equal to the default value
                 )
-                && $other->{$name} !== $this->{"get$uc"}
+                && $other->{$name} !== $this->{$name}
             ) {
                 $this->{"set$uc"}($other->{$name});
                 $this->changed = true;

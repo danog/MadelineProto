@@ -205,6 +205,20 @@ class MTProto extends AsyncConstruct implements TLCallback
     ];
     const DEFAULT_GETUPDATES_PARAMS = ['offset' => 0, 'limit' => null, 'timeout' => 100];
     /**
+     * Array of references to all instances of MTProto.
+     *
+     * This seems like a recipe for memory leaks, but this is actually required to allow saving the session on shutdown.
+     * When using a network I/O-based database+the EvDriver of AMPHP, calling die(); causes premature garbage collection of the event loop.
+     * This garbage collection happens always, even if a reference to the event handler is already present elsewhere (probably ev dark magic).
+     *
+     * Finally, this causes the process to hang on shutdown, since the database driver cannot receive a reply from the server, because the event loop is down.
+     *
+     * To avoid this, we store each MTProto instance in here (unreferencing on shutdown in unreference()), and call serialize() on all instances before calling die; in Magic.
+     *
+     * @var self[]
+     */
+    public static array $references = [];
+    /**
      * Instance of wrapper API.
      *
      * @var APIWrapper
@@ -505,8 +519,22 @@ class MTProto extends AsyncConstruct implements TLCallback
             return $data;
         }
         yield $this->session->offsetSet('data', $data);
-        var_dump("Saved!");
         return $this->session;
+    }
+    /**
+     * Serialize all instances.
+     *
+     * CALLED ONLY ON SHUTDOWN.
+     *
+     * @return void
+     */
+    public static function serializeAll(): void
+    {
+        Logger::log('Prompting final serialization (SHUTDOWN)...');
+        foreach (self::$references as $instance) {
+            Tools::wait($instance->wrapper->serialize());
+        }
+        Logger::log('Done final serialization (SHUTDOWN)!');
     }
 
     /**
@@ -519,6 +547,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function __magic_construct(SettingsAbstract $settings, APIWrapper $wrapper)
     {
+        self::$references[\spl_object_hash($this)] = $this;
         $this->wrapper = $wrapper;
         $this->setInitPromise($this->__construct_async($settings));
     }
@@ -1023,6 +1052,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function wakeup(SettingsAbstract $settings, APIWrapper $wrapper): \Generator
     {
+        // Set reference to itself
+        self::$references[\spl_object_hash($this)] = $this;
         // Set API wrapper
         $this->wrapper = $wrapper;
         // BC stuff
@@ -1132,6 +1163,9 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function unreference(): void
     {
         $this->logger->logger("Will unreference instance");
+        if (isset(self::$references[\spl_object_hash($this)])) {
+            unset(self::$references[\spl_object_hash($this)]);
+        }
         $this->stopLoops();
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->signal(true);
@@ -1153,7 +1187,6 @@ class MTProto extends AsyncConstruct implements TLCallback
             $datacenter->disconnect();
         }
         $this->logger->logger("Unreferenced instance");
-
     }
     /**
      * Destructor.
