@@ -195,7 +195,10 @@ abstract class Serialization
             if ($unserialized instanceof DriverArray) {
                 Logger::log("Extracting session from database...");
                 yield from $unserialized->initConnection($unserialized->dbSettings);
-                $unserialized = \unserialize(yield $unserialized['data']);
+                $unserialized = yield $unserialized['data'];
+                if (!$unserialized) {
+                    throw new Exception("Could not extract session from database!");
+                }
             }
         } else {
             $unserialized = yield from self::legacyUnserialize($session->getLegacySessionPath());

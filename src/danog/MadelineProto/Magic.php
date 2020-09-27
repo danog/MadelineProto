@@ -59,6 +59,10 @@ class Magic
      */
     public static $isFork = false;
     /**
+     * Whether this is an IPC worker
+     */
+    public static bool $isIpcWorker = false;
+    /**
      * Whether we can get our PID.
      *
      * @var boolean
@@ -230,6 +234,7 @@ class Magic
             // Setup error reporting
             \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
             \set_exception_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
+            self::$isIpcWorker = defined(\MADELINE_WORKER_TYPE::class) ? \MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
             if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
                 try {
                     \error_reporting(E_ALL);
@@ -261,11 +266,11 @@ class Magic
                     \pcntl_signal(SIGINT, SIG_DFL);
                     Loop::unreference(Loop::onSignal(SIGINT, static function () {
                         Logger::log('Got sigint', Logger::FATAL_ERROR);
-                        Magic::shutdown(1);
+                        Magic::shutdown(self::$isIpcWorker ? 0 : 1);
                     }));
                     Loop::unreference(Loop::onSignal(SIGTERM, static function () {
                         Logger::log('Got sigterm', Logger::FATAL_ERROR);
-                        Magic::shutdown(1);
+                        Magic::shutdown(self::$isIpcWorker ? 0 : 1);
                     }));
                 } catch (\Throwable $e) {
                 }

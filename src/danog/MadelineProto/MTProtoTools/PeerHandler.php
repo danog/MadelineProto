@@ -130,7 +130,7 @@ trait PeerHandler
                             $user['access_hash'] = $existingChat['access_hash'];
                         }
                     }
-                    $this->chats[$user['id']] = $user;
+                    yield $this->chats->offsetSet($user['id'], $user);
                     $this->cachePwrChat($user['id'], false, true);
                 }
                 $this->cacheChatUsername($user['id'], $user);
@@ -159,7 +159,7 @@ trait PeerHandler
                 $existingChat = yield $this->chats[-$chat['id']];
                 if (!$existingChat || $existingChat !== $chat) {
                     $this->logger->logger("Updated chat -{$chat['id']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-                    $this->chats[-$chat['id']] = $chat;
+                    yield $this->chats->offsetSet(-$chat['id'], $chat);
                     $this->cachePwrChat(-$chat['id'], $this->getSettings()->getPeer()->getFullFetch(), true);
                 }
                 $this->cacheChatUsername(-$chat['id'], $chat);
@@ -197,7 +197,7 @@ trait PeerHandler
                         }
                         $chat = $newchat;
                     }
-                    $this->chats[$bot_api_id] = $chat;
+                    yield $this->chats->offsetSet($bot_api_id, $chat);
                     $fullChat = yield $this->full_chats[$bot_api_id];
                     if ($this->getSettings()->getPeer()->getFullFetch() && (!$fullChat || $fullChat['full']['participants_count'] !== (yield from $this->getFullInfo($bot_api_id))['full']['participants_count'])) {
                         $this->cachePwrChat($bot_api_id, $this->getSettings()->getPeer()->getFullFetch(), true);

@@ -98,11 +98,11 @@ use danog\MadelineProto\Tools;
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
 
             $API = new API($ipcPath, (new Ipc)->setForceFull(true));
+            $API->init();
+            $API->initSelfRestart();
 
             while (true) {
                 try {
-                    $API->init();
-                    $API->initSelfRestart();
                     Tools::wait($session->storeIpcState(new IpcState($runnerId)));
                     Tools::wait(Server::waitShutdown());
                     return;
@@ -112,10 +112,15 @@ use danog\MadelineProto\Tools;
                 }
             }
         } catch (\Throwable $e) {
-            Logger::log("Got exception $e in IPC server, exiting...", Logger::FATAL_ERROR);
+            Logger::log("$e", Logger::FATAL_ERROR);
+            Logger::log("Got exception in IPC server, exiting...", Logger::FATAL_ERROR);
             $ipc = Tools::wait($session->getIpcState());
             if (!($ipc && $ipc->getStartupId() === $runnerId && !$ipc->getException())) {
+                Logger::log("Reporting error!");
                 Tools::wait($session->storeIpcState(new IpcState($runnerId, $e)));
+                Logger::log("Reported error!");
+            } else {
+                Logger::log("Not reporting error!");
             }
         }
     }
