@@ -34,7 +34,7 @@ class AsyncConstruct
     /**
      * Async init promise.
      *
-     * @var Promise
+     * @var Promise|null|boolean
      */
     private $asyncInitPromise;
     /**
@@ -93,10 +93,9 @@ class AsyncConstruct
         $this->asyncInitPromise = Tools::call($promise);
         $this->asyncInitPromise->onResolve(
             function (?\Throwable $error, $result): void {
-                if ($error) {
-                    throw $error;
+                if (!$error) {
+                    $this->asyncInitPromise = null;
                 }
-                $this->asyncInitPromise = null;
             }
         );
     }

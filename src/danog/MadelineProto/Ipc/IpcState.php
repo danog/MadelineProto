@@ -18,7 +18,7 @@ final class IpcState
     /**
      * Exception.
      */
-    private ?\Throwable $exception;
+    private ?ExitFailure $exception;
     /**
      * Construct.
      *
@@ -29,7 +29,7 @@ final class IpcState
     {
         $this->startupTime = \microtime(true);
         $this->startupId = $startupId;
-        $this->exception = $exception;
+        $this->exception = $exception ? new ExitFailure($exception) : null;
     }
 
     /**
@@ -59,6 +59,6 @@ final class IpcState
      */
     public function getException(): ?\Throwable
     {
-        return $this->exception;
+        return $this->exception ? $this->exception->getException() : null;
     }
 }

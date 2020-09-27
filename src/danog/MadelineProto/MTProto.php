@@ -504,8 +504,8 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!$this->session || $this->session instanceof MemoryArray) {
             return $data;
         }
-        yield $this->session['data'] = \serialize($data);
-        var_dump($this);
+        yield $this->session->offsetSet('data', $data);
+        var_dump("Saved!");
         return $this->session;
     }
 
@@ -981,7 +981,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         while (yield $iterator->advance()) {
             [$id, $full] = $iterator->getCurrent();
             if (isset($full['full'], $full['last_update'])) {
-                $this->full_chats[$id] = ['full' => $full['full'], 'last_update' => $full['last_update']];
+                yield $this->full_chats->offsetSet($id, ['full' => $full['full'], 'last_update' => $full['last_update']]);
             }
         }
 
@@ -1152,6 +1152,8 @@ class MTProto extends AsyncConstruct implements TLCallback
         foreach ($this->datacenter->getDataCenterConnections() as $datacenter) {
             $datacenter->disconnect();
         }
+        $this->logger->logger("Unreferenced instance");
+
     }
     /**
      * Destructor.

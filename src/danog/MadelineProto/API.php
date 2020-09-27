@@ -189,7 +189,7 @@ class API extends InternalDoc
         if ($settings instanceof SettingsIpc) {
             $forceFull = $forceFull || $settings->getForceFull();
         } elseif ($settings instanceof Settings) {
-            $forceFull = $forceFull || $settings->getSerialization()->getForceFull();
+            $forceFull = $forceFull || $settings->getIpc()->getForceFull();
         }
 
         [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(
@@ -250,13 +250,15 @@ class API extends InternalDoc
         $this->init();
         if (!$this->oldInstance) {
             $this->logger->logger('Shutting down MadelineProto ('.static::class.')');
+            $this->destructing = true;
             if ($this->API) {
                 $this->API->destructing = true;
                 $this->API->unreference();
             }
-            $this->destructing = true;
             if (isset($this->wrapper)) {
+                $this->logger->logger('Prompting final serialization...');
                 Tools::wait($this->wrapper->serialize());
+                $this->logger->logger('Done final serialization!');
             }
             if ($this->unlock) {
                 ($this->unlock)();

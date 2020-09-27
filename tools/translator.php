@@ -60,13 +60,11 @@ $count = \count(Lang::$lang[$lang_code]);
 $curcount = 0;
 \ksort(Lang::$current_lang);
 foreach (Lang::$current_lang as $key => $value) {
-    if (!isset(Lang::$lang[$lang_code][$key])) {
+    if (!(Lang::$lang[$lang_code][$key] ?? '')) {
         Lang::$lang[$lang_code][$key] = $value;
     }
 
-    if (Lang::$lang[$lang_code][$key] === $value && (
-        $lang_code !== 'en' || $value == ''
-    )) {
+    if (Lang::$lang[$lang_code][$key] === '' || (Lang::$lang[$lang_code][$key] === Lang::$lang['en'][$key] && Lang::$lang[$lang_code][$key] !== 'Bot')) {
         $value = Lang::$lang[$lang_code][$key];
         if (\in_array($key, ['v_error', 'v_tgerror'])) {
             $value = \hex2bin($value);
