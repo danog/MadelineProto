@@ -2,9 +2,9 @@
 
 namespace danog\MadelineProto\Db\NullCache;
 
-use danog\MadelineProto\Settings\Database\Postgres;
+use danog\MadelineProto\Db\PostgresArray as DbPostgresArray;
 
-class PostgresArray extends Postgres
+class PostgresArray extends DbPostgresArray
 {
     use NullCacheTrait;
 }
