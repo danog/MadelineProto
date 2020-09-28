@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\Wrappers;
 
 use Amp\Promise;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Shutdown;
 
@@ -180,7 +181,7 @@ trait Loop
      */
     public function closeConnection($message = 'OK!')
     {
-        if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || isset($GLOBALS['exited']) || \headers_sent()) {
+        if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || isset($GLOBALS['exited']) || \headers_sent() || isset($_GET['MadelineSelfRestart']) || Magic::$isIpcWorker) {
             return;
         }
         $this->logger->logger($message);
