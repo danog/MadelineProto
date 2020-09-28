@@ -187,9 +187,9 @@ class API extends InternalDoc
     protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false): \Generator
     {
         if ($settings instanceof SettingsIpc) {
-            $forceFull = $forceFull || $settings->getForceFull();
+            $forceFull = $forceFull || $settings->getSlow();
         } elseif ($settings instanceof Settings) {
-            $forceFull = $forceFull || $settings->getIpc()->getForceFull();
+            $forceFull = $forceFull || $settings->getIpc()->getSlow();
         }
 
         [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(

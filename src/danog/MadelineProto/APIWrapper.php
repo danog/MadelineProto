@@ -125,7 +125,7 @@ final class APIWrapper
      */
     public static function __sleep(): array
     {
-        return ['API', 'webApiTemplate', 'gettingApiId', 'myTelegramOrgWrapper', 'storage', 'lua']; //, 'async'];
+        return ['API', 'webApiTemplate', 'gettingApiId', 'myTelegramOrgWrapper', 'storage', 'lua'];
     }
 
     /**

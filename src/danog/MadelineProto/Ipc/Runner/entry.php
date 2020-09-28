@@ -97,7 +97,7 @@ use danog\MadelineProto\Tools;
             Magic::classExists();
             Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
 
-            $API = new API($ipcPath, (new Ipc)->setForceFull(true));
+            $API = new API($ipcPath, (new Ipc)->setSlow(true));
             $API->init();
             $API->initSelfRestart();
 

@@ -11,7 +11,7 @@ class Ipc extends SettingsAbstract
      *
      * WARNING: this will cause slow startup if enabled.
      */
-    protected bool $forceFull = false;
+    protected bool $slow = false;
 
     public function mergeArray(array $settings): void
     {
@@ -22,21 +22,23 @@ class Ipc extends SettingsAbstract
      *
      * @return bool
      */
-    public function getForceFull(): bool
+    public function getSlow(): bool
     {
-        return $this->forceFull;
+        return $this->slow;
     }
 
     /**
-     * Set WARNING: this will cause slow startup if enabled.
+     * Whether to force full deserialization of instance, without using the IPC server/client.
+     * 
+     * WARNING: this will cause slow startup if enabled.
      *
-     * @param bool $forceFull WARNING: this will cause slow startup if enabled.
+     * @param bool $slow WARNING: this will cause slow startup if enabled.
      *
      * @return self
      */
-    public function setForceFull(bool $forceFull): self
+    public function setSlow(bool $slow): self
     {
-        $this->forceFull = $forceFull;
+        $this->slow = $slow;
 
         return $this;
     }

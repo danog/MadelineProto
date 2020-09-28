@@ -160,6 +160,15 @@ abstract class AbstractAPIFactory extends AsyncConstruct
         return $res;
     }
     /**
+     * Sleep function.
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return [];
+    }
+    /**
      * Call async wrapper function.
      *
      * @param string $name      Method name
