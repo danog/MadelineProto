@@ -32,6 +32,7 @@ abstract class DriverArray implements DbArray
     }
 
     abstract public function initConnection($settings): \Generator;
+    abstract public function initStartup(): \Generator;
 
     /**
      * @param self $new

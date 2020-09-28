@@ -20,6 +20,16 @@ abstract class SqlArray extends DriverArray
     abstract protected function renameTable(string $from, string $to): \Generator;
 
     /**
+     * Initialize on startup.
+     *
+     * @return \Generator
+     */
+    public function initStartup(): \Generator
+    {
+        return $this->initConnection($this->dbSettings);
+    }
+
+    /**
      * @param string $name
      * @param DbArray|array|null $value
      * @param string $tablePrefix
@@ -49,7 +59,7 @@ abstract class SqlArray extends DriverArray
             // Skip migrations if its same object
             if ($instance !== $value) {
                 if ($value instanceof DriverArray) {
-                    yield from $value->initConnection($value->dbSettings);
+                    yield from $value->initStartup();
                 }
                 yield from static::renameTmpTable($instance, $value);
                 yield from static::migrateDataToDb($instance, $value);

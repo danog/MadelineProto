@@ -16,7 +16,7 @@ use function Amp\call;
 class RedisArray extends SqlArray
 {
     protected string $table;
-    public DatabaseRedis $dbSettings;
+    protected DatabaseRedis $dbSettings;
     private RedisRedis $db;
 
     // Legacy
@@ -55,6 +55,7 @@ class RedisArray extends SqlArray
             $this->db = yield from Redis::getConnection($settings);
         }
     }
+
 
     public function __sleep()
     {

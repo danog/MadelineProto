@@ -29,7 +29,7 @@ class Ipc extends SettingsAbstract
 
     /**
      * Whether to force full deserialization of instance, without using the IPC server/client.
-     * 
+     *
      * WARNING: this will cause slow startup if enabled.
      *
      * @param bool $slow WARNING: this will cause slow startup if enabled.

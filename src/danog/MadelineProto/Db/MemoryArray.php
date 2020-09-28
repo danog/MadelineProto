@@ -35,7 +35,7 @@ class MemoryArray extends \ArrayIterator implements DbArray
             if ($value instanceof DbArray) {
                 Logger::log("Loading database to memory. Please wait.", Logger::WARNING);
                 if ($value instanceof DriverArray) {
-                    yield from $value->initConnection($value->dbSettings);
+                    yield from $value->initStartup();
                 }
                 $value = yield $value->getArrayCopy();
             }
