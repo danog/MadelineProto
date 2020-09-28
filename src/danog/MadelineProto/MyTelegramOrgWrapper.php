@@ -47,8 +47,10 @@ class MyTelegramOrgWrapper
     private string $creation_hash = '';
     /**
      * Settings.
+     *
+     * @var Settings
      */
-    private Settings $settings;
+    private $settings;
     /**
      * Async setting.
      */

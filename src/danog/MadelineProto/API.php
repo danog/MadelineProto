@@ -362,8 +362,8 @@ class API extends InternalDoc
         while (true) {
             try {
                 yield $this->start();
-                $started = true;
                 yield $this->setEventHandler($eventHandler);
+                $started = true;
                 return yield from $this->API->loop();
             } catch (\Throwable $e) {
                 $errors = [\time() => $errors[\time()] ?? 0];
