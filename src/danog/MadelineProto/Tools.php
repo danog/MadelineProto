@@ -665,7 +665,9 @@ abstract class Tools extends StrTools
      *
      * @internal Generator function
      *
-     * @return \Generator<string>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, Promise|Promise<null|string>, mixed, mixed|null>
      */
     public static function readLineGenerator(string $prompt = ''): \Generator
     {
@@ -933,7 +935,8 @@ abstract class Tools extends StrTools
      *
      * @psalm-suppress InvalidScope
      *
-     * @return mixed
+     * @return void
+     *
      * @access public
      */
     public static function setVar($obj, string $var, &$val): void

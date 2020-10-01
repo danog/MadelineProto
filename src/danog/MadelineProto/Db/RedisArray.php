@@ -22,6 +22,11 @@ class RedisArray extends SqlArray
     // Legacy
     protected array $settings;
 
+    /**
+     * @return Generator
+     *
+     * @psalm-return Generator<int, Success<null>, mixed, void>
+     */
     protected function prepareTable(): Generator
     {
         yield new Success;

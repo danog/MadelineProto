@@ -82,7 +82,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async close.
      *
-     * @return \Generator
+     * @return void
      */
     public function disconnect()
     {
@@ -97,7 +97,7 @@ class PremadeStream implements RawStreamInterface, ProxyStreamInterface
             \danog\MadelineProto\Logger::log('Got exception while closing stream: '.$e->getMessage());
         }
     }
-    public function close()
+    public function close(): void
     {
         $this->disconnect();
     }

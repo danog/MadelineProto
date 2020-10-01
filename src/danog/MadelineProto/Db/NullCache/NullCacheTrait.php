@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Db\NullCache;
 
 trait NullCacheTrait
 {
+    /**
+     * @return void
+     */
     protected function getCache(string $key, $default = null)
     {
     }

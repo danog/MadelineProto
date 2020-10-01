@@ -24,7 +24,7 @@ use danog\MadelineProto\Tools;
 
 trait Constructors
 {
-    public function mkConstructors()
+    public function mkConstructors(): void
     {
         foreach (\glob('constructors/'.$this->any) as $unlink) {
             \unlink($unlink);

@@ -114,7 +114,7 @@ class SeqLoop extends ResumableSignalLoop
             yield from $this->save($update);
         }
     }
-    public function feed($updates)
+    public function feed($updates): void
     {
         $this->API->logger->logger('Was fed updates of type '.$updates['_'].'...', \danog\MadelineProto\Logger::VERBOSE);
         $this->incomingUpdates[] = $updates;
@@ -123,7 +123,7 @@ class SeqLoop extends ResumableSignalLoop
     {
         $this->pendingWakeups += (yield from $this->feeder->feed($updates['updates']));
     }
-    public function addPendingWakeups($wakeups)
+    public function addPendingWakeups($wakeups): void
     {
         $this->pendingWakeups += $wakeups;
     }

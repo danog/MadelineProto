@@ -18,7 +18,6 @@ class Redis
      * @param string $user
      * @param string $password
      * @param string $db
-     *
      * @param int $maxConnections
      * @param int $idleTimeout
      *
@@ -26,7 +25,9 @@ class Redis
      * @throws \Amp\Sql\FailureException
      * @throws \Throwable
      *
-     * @return \Generator<RedisRedis>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, \Amp\Promise<void>, mixed, RedisRedis>
      */
     public static function getConnection(DatabaseRedis $settings): \Generator
     {

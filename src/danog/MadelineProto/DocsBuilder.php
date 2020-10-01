@@ -75,7 +75,7 @@ class DocsBuilder
 
     public $types = [];
     public $any = '*';
-    public function mkDocs()
+    public function mkDocs(): void
     {
         \danog\MadelineProto\Logger::log('Generating documentation index...', \danog\MadelineProto\Logger::NOTICE);
         \file_put_contents($this->index, $this->template('index', $this->settings['title'], $this->settings['description']));
@@ -145,7 +145,7 @@ class DocsBuilder
         }
         \danog\MadelineProto\Logger::log('Done!', \danog\MadelineProto\Logger::NOTICE);
     }
-    public static function addToLang(string $key, string $value = '', bool $force = false)
+    public static function addToLang(string $key, string $value = '', bool $force = false): void
     {
         if (!isset(\danog\MadelineProto\Lang::$lang['en'][$key]) || $force) {
             \danog\MadelineProto\Lang::$lang['en'][$key] = $value;

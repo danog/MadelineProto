@@ -13,7 +13,7 @@ function __coalesce($ifNotNull, $then)
 {
     return $ifNotNull ?: $then;
 }
-function __destructure($list, $value)
+function __destructure($list, $value): array
 {
     $res = [];
     foreach ($list as $key) {

@@ -166,7 +166,7 @@ class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
     {
         return $this->stream->write($data);
     }
-    private function getProxyAuthHeader()
+    private function getProxyAuthHeader(): string
     {
         if (!isset($this->extra['username']) || !isset($this->extra['password'])) {
             return '';

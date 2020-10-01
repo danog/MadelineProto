@@ -116,7 +116,9 @@ abstract class ClientAbstract
     /**
      * Disconnect cleanly from main instance.
      *
-     * @return Promise
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, Promise, mixed, void>
      */
     public function disconnect(): \Generator
     {

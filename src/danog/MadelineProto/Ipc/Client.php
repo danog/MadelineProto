@@ -140,7 +140,9 @@ class Client extends ClientAbstract
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator<array>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
     public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', $cb = null, bool $seekable = true, bool $encrypted = false): \Generator
     {
@@ -161,7 +163,9 @@ class Client extends ClientAbstract
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator<array>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
     public function uploadFromTgfile($media, $cb = null, bool $encrypted = false): \Generator
     {
@@ -181,7 +185,9 @@ class Client extends ClientAbstract
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      *
-     * @return \Generator<string> Downloaded file path
+     * @return \Generator Downloaded file path
+     *
+     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
     public function downloadToDir($messageMedia, $dir, $cb = null): \Generator
     {
@@ -201,7 +207,9 @@ class Client extends ClientAbstract
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      *
-     * @return \Generator<string> Downloaded file path
+     * @return \Generator Downloaded file path
+     *
+     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
     public function downloadToFile($messageMedia, $file, $cb = null): \Generator
     {
@@ -228,7 +236,9 @@ class Client extends ClientAbstract
      * @param int                            $end           Offset where to stop downloading (inclusive)
      * @param int                            $part_size     Size of each chunk
      *
-     * @return \Generator<bool>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, mixed>
      */
     public function downloadToCallable($messageMedia, callable $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null): \Generator
     {

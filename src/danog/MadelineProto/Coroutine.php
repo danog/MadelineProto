@@ -176,8 +176,10 @@ final class Coroutine implements Promise, \ArrayAccess
     }
     /**
      * @param \Throwable $reason Failure reason.
+     *
+     * @return void
      */
-    public function fail(\Throwable $reason)
+    public function fail(\Throwable $reason): void
     {
         $this->resolve(new Failure($reason));
     }
@@ -199,7 +201,7 @@ final class Coroutine implements Promise, \ArrayAccess
             return $result[$offset];
         })());
     }
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): Promise
     {
         return Tools::call((function () use ($offset, $value): \Generator {
             $result = yield $this;
@@ -209,7 +211,7 @@ final class Coroutine implements Promise, \ArrayAccess
             return $result[$offset] = $value;
         })());
     }
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): Promise
     {
         return Tools::call((function () use ($offset): \Generator {
             $result = yield $this;

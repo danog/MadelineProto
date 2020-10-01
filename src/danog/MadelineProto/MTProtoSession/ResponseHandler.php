@@ -30,7 +30,7 @@ use danog\MadelineProto\MTProto;
 trait ResponseHandler
 {
     public $n = 0;
-    public function handleMessages()
+    public function handleMessages(): bool
     {
         $only_updates = true;
         while ($this->new_incoming) {
@@ -287,6 +287,9 @@ trait ResponseHandler
             $this->logger->logger("Rejecting: {$data}");
         }
     }
+    /**
+     * @return void
+     */
     public function handleResponse($request_id, $response_id)
     {
         $response =& $this->incoming_messages[$response_id]['content'];

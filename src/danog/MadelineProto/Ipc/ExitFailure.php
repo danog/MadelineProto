@@ -48,7 +48,7 @@ final class ExitFailure
         }
     }
 
-    public function getException()
+    public function getException(): object
     {
         $previous = $this->previous ? $this->previous->getException() : null;
 

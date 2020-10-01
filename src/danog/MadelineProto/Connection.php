@@ -319,7 +319,9 @@ class Connection extends Session
      *
      * @param ConnectionContext $ctx Connection context
      *
-     * @return \Amp\Promise
+     * @return \Generator
+     *
+     * @psalm-return \Generator<mixed, StreamInterface, mixed, void>
      */
     public function connect(ConnectionContext $ctx): \Generator
     {
@@ -475,9 +477,9 @@ class Connection extends Session
     /**
      * Get main instance.
      *
-     * @return MTProto
+     * @return MTProtoSession\MTProto
      */
-    public function getExtra()
+    public function getExtra(): MTProtoSession\MTProto
     {
         return $this->API;
     }

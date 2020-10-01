@@ -51,7 +51,9 @@ class RSA
      * @param TL     $TL      TL serializer
      * @param string $rsa_key RSA key
      *
-     * @return \Generator<self>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<mixed, string, mixed, self>
      */
     public function load(TL $TL, string $rsa_key): \Generator
     {

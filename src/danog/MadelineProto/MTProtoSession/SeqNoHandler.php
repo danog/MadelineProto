@@ -37,7 +37,7 @@ trait SeqNoHandler
         //$this->API->logger->logger("OUT: $value + $in = ".$this->session_out_seq_no);
         return $value * 2 + $in;
     }
-    public function checkInSeqNo($current_msg_id)
+    public function checkInSeqNo($current_msg_id): void
     {
         $type = isset($this->incoming_messages[$current_msg_id]['content']['_']) ? $this->incoming_messages[$current_msg_id]['content']['_'] : '-';
         if (isset($this->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generateInSeqNo($this->contentRelated($this->incoming_messages[$current_msg_id]['content']))) !== $this->incoming_messages[$current_msg_id]['seq_no']) {
@@ -52,7 +52,7 @@ trait SeqNoHandler
         //$this->API->logger->logger("IN: $value + $in = ".$this->session_in_seq_no);
         return $value * 2 + $in;
     }
-    public function contentRelated($method)
+    public function contentRelated($method): bool
     {
         $method = \is_array($method) && isset($method['_']) ? $method['_'] : $method;
         return \is_string($method) ? !\in_array($method, MTProto::NOT_CONTENT_RELATED) : true;

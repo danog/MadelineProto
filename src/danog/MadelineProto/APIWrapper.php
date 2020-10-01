@@ -131,9 +131,9 @@ final class APIWrapper
     /**
      * Get MTProto instance.
      *
-     * @return MTProto|null
+     * @return Client|MTProto|null
      */
-    public function &getAPI(): ?MTProto
+    public function &getAPI()
     {
         return $this->API;
     }

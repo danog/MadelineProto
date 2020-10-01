@@ -247,11 +247,11 @@ class FeedLoop extends ResumableSignalLoop
         $this->incomingUpdates[] = $update;
         return $this->channelId;
     }
-    public function save($update)
+    public function save($update): void
     {
         $this->parsedUpdates[] = $update;
     }
-    public function saveMessages($messages)
+    public function saveMessages($messages): void
     {
         foreach ($messages as $message) {
             if (!$this->API->checkMsgId($message)) {

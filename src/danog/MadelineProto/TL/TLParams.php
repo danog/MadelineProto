@@ -21,7 +21,7 @@ namespace danog\MadelineProto\TL;
 
 trait TLParams
 {
-    public function parseParams($key, $mtproto = false)
+    public function parseParams($key, $mtproto = false): void
     {
         foreach ($this->by_id[$key]['params'] as $kkey => $param) {
             if (\preg_match('/(\\w*)\\.(\\d*)\\?(.*)/', $param['type'], $matches)) {

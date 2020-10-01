@@ -198,8 +198,11 @@ class MysqlArray extends SqlArray
     /**
      * Create table for property.
      *
-     * @return array|null
+     * @return \Generator
+     *
      * @throws \Throwable
+     *
+     * @psalm-return \Generator<int, Promise, mixed, mixed>
      */
     protected function prepareTable(): \Generator
     {

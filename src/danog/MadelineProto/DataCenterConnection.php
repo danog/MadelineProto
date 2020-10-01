@@ -507,16 +507,18 @@ class DataCenterConnection implements JsonSerializable
      *
      * @param integer $id Connection ID
      *
-     * @return boolean
+     * @return bool|int
      */
-    public function hasConnection(int $id = -1): bool
+    public function hasConnection(int $id = -1)
     {
         return $id < 0 ? \count($this->connections) : isset($this->connections[$id]);
     }
     /**
      * Get best socket in round robin, asynchronously.
      *
-     * @return \Generator<Connection>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, Promise, mixed, Connection>
      */
     public function waitGetConnection(): \Generator
     {

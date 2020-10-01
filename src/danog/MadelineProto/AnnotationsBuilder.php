@@ -44,7 +44,7 @@ class AnnotationsBuilder
         $this->settings = $settings;
         $this->output = $output;
     }
-    public function mkAnnotations()
+    public function mkAnnotations(): void
     {
         \danog\MadelineProto\Logger::log('Generating annotations...', \danog\MadelineProto\Logger::NOTICE);
         $this->setProperties();

@@ -68,9 +68,11 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Promise
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, Promise, mixed, Failure<mixed>|Success<object>>
      */
-    public function getReadBuffer(&$length): Promise
+    public function getReadBuffer(&$length): \Generator
     {
         if (!$this->stream) {
             return new Failure(new ClosedException("MadelineProto stream was disconnected"));

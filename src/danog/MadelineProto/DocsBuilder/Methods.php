@@ -24,7 +24,7 @@ use danog\MadelineProto\Tools;
 
 trait Methods
 {
-    public function mkMethods()
+    public function mkMethods(): void
     {
         static $bots;
         if (!$bots) {

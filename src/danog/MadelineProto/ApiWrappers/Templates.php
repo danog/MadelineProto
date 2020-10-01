@@ -56,7 +56,7 @@ trait Templates
     /**
      * Set web API login HTML template string.
      *
-     * @return string
+     * @return void
      */
     public function setWebAPITemplate(string $template): void
     {

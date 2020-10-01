@@ -75,8 +75,10 @@ class Exception extends \Exception
      * ExceptionErrorHandler.
      *
      * Error handler
+     *
+     * @return false
      */
-    public static function exceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null)
+    public static function exceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null): bool
     {
         // If error is suppressed with @, don't throw an exception
         if (\error_reporting() === 0 || \strpos($errstr, 'headers already sent') || $errfile && (\strpos($errfile, 'vendor/amphp') !== false || \strpos($errfile, 'vendor/league') !== false)) {
@@ -88,8 +90,10 @@ class Exception extends \Exception
      * ExceptionErrorHandler.
      *
      * Error handler
+     *
+     * @return void
      */
-    public static function exceptionHandler($exception)
+    public static function exceptionHandler($exception): void
     {
         Logger::log($exception, Logger::FATAL_ERROR);
         Magic::shutdown(1);

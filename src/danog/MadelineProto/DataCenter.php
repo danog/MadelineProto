@@ -546,7 +546,9 @@ class DataCenter
      *
      * @param string $url URL to fetch
      *
-     * @return \Generator<string>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, \Amp\Promise<string>, mixed, string>
      */
     public function fileGetContents(string $url): \Generator
     {
@@ -579,7 +581,9 @@ class DataCenter
      *
      * @param string $dc DC ID
      *
-     * @return \Generator<Connection>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, \Amp\Promise, mixed, Connection>
      */
     public function waitGetConnection(string $dc): \Generator
     {

@@ -75,6 +75,9 @@ class Lua
             $this->MadelineProto->{$namespace}->lua = true;
         }
     }
+    /**
+     * @return \Generator|int
+     */
     public function tdcliFunction($params, $cb = null, $cb_extra = null)
     {
         $params = $this->MadelineProto->td_to_mtproto($this->MadelineProto->tdcliToTd($params));
@@ -96,7 +99,7 @@ class Lua
         self::convertObjects($result);
         return $result;
     }
-    public function tdcliUpdateCallback($update)
+    public function tdcliUpdateCallback($update): void
     {
         $this->Lua->tdcliUpdateCallback($this->MadelineProto->mtproto_to_tdcli($update));
     }
@@ -111,7 +114,7 @@ class Lua
             }, \array_flip($array)));
         }
     }
-    private function isSequential(array $arr)
+    private function isSequential(array $arr): bool
     {
         if ([] === $arr) {
             return false;
@@ -150,7 +153,7 @@ class Lua
     {
         return $this->Lua->{$name} = $value;
     }
-    public static function convertObjects(&$data)
+    public static function convertObjects(&$data): void
     {
         \array_walk_recursive($data, function (&$value, $key) {
             if (\is_object($value) && !$value instanceof \tgseclib\Math\BigInteger) {
