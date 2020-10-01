@@ -163,7 +163,7 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Check if auth key is present.
      *
-     * @param boolean|null $temp Whether to fetch the temporary auth key
+     * @param bool $temp
      *
      * @return bool
      */
@@ -175,7 +175,7 @@ class DataCenterConnection implements JsonSerializable
      * Set auth key.
      *
      * @param AuthKey|null $key  The auth key
-     * @param boolean|null $temp Whether to set the temporary auth key
+     * @param bool $temp
      *
      * @return void
      */
@@ -186,7 +186,7 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Get temporary authorization key.
      *
-     * @return AuthKey
+     * @return TempAuthKey
      */
     public function getTempAuthKey(): TempAuthKey
     {
@@ -195,7 +195,7 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Get permanent authorization key.
      *
-     * @return AuthKey
+     * @return PermAuthKey
      */
     public function getPermAuthKey(): PermAuthKey
     {

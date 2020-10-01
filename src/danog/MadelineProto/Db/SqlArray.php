@@ -12,7 +12,8 @@ abstract class SqlArray extends DriverArray
     /**
      * Create table for property.
      *
-     * @return array|null
+     * @return \Generator
+     *
      * @throws \Throwable
      */
     abstract protected function prepareTable(): \Generator;

@@ -89,7 +89,7 @@ class APIFactory extends AbstractAPIFactory
      * @param string $name     Method name
      * @param array $arguments Arguments
      *
-     * @return mixed
+     * @return \Generator
      */
     public function __call_async(string $name, array $arguments): \Generator
     {

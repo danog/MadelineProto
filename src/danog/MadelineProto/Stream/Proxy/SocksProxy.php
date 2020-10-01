@@ -148,7 +148,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param int $length Length of data that is going to be written to the write buffer
      *
-     * @return \Generator
+     * @return Promise
      */
     public function getWriteBuffer(int $length, string $append = ''): Promise
     {
@@ -159,7 +159,7 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return \Generator
+     * @return Promise
      */
     public function getReadBuffer(&$length): Promise
     {

@@ -98,7 +98,7 @@ class TL
     /**
      * Get constructors.
      *
-     * @param int $td Whether to get TD or normal methods
+     * @param bool $td
      *
      * @return TLConstructors
      */
@@ -109,7 +109,7 @@ class TL
     /**
      * Get methods.
      *
-     * @param int $td Whether to get TD or normal methods
+     * @param bool $td
      *
      * @return TLMethods
      */

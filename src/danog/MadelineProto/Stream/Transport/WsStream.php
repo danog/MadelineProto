@@ -121,7 +121,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * {@inheritdoc}
      *
-     * @return \Amp\Socket\Socket
+     * @return EncryptableSocket
      */
     public function getSocket(): EncryptableSocket
     {

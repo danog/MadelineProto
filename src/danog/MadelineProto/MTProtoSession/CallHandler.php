@@ -188,7 +188,7 @@ trait CallHandler
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return Promise
+     * @return \Generator
      */
     public function objectCall(string $object, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
