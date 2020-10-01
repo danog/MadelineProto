@@ -3559,7 +3559,7 @@ interface channels
     public function getMessages($params);
 
     /**
-     * Get the participants of a channel.
+     * Get the participants of a [supergroup/channel](https://core.telegram.org/api/channel).
      *
      * Parameters:
      * * `InputChannel`              **channel** - Channel

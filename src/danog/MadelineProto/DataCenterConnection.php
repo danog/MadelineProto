@@ -33,6 +33,9 @@ use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use JsonSerializable;
 
+/**
+ * Datacenter connection
+ */
 class DataCenterConnection implements JsonSerializable
 {
     const READ_WEIGHT = 1;
@@ -65,13 +68,13 @@ class DataCenterConnection implements JsonSerializable
     /**
      * Connections open to a certain DC.
      *
-     * @var array<string, Connection>
+     * @var array<int, Connection>
      */
     private $connections = [];
     /**
      * Connection weights.
      *
-     * @var array<string, int>
+     * @var array<int, int>
      */
     private $availableConnections = [];
     /**
@@ -394,7 +397,7 @@ class DataCenterConnection implements JsonSerializable
      *
      * @param integer $count Number of sockets to open
      *
-     * @return void
+     * @return \Generator
      */
     private function connectMore(int $count): \Generator
     {

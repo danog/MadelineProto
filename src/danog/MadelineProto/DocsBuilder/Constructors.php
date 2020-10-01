@@ -175,6 +175,7 @@ trait Constructors
             $description = isset($this->TL->getDescriptions()['constructors'][$constructor]) ? $this->TL->getDescriptions()['constructors'][$constructor]['description'] : $constructor.' attributes, type and example';
             $symFile = \str_replace('.', '_', $constructor.$layer);
             $redir = $symFile !== $constructor.$layer ? "\nredirect_from: /API_docs/constructors/{$symFile}.html" : '';
+            $description = \rtrim(\explode("\n", $description)[0], ':');
             $header = '---
 title: '.$constructor.'
 description: '.$description.'

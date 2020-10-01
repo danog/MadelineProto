@@ -203,6 +203,7 @@ trait Methods
             $description = isset($this->td_descriptions['methods'][$method]) ? $this->td_descriptions['methods'][$method]['description'] : $method.' parameters, return type and example';
             $symFile = \str_replace('.', '_', $method);
             $redir = $symFile !== $method ? "\nredirect_from: /API_docs/methods/{$symFile}.html" : '';
+            $description = \rtrim(\explode("\n", $description)[0], ':');
             $header = $this->template('Method', $method, $description, $redir, StrTools::markdownEscape($method));
             if ($this->td) {
                 $header .= "YOU CANNOT USE THIS METHOD IN MADELINEPROTO\n\n\n\n\n";
