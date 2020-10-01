@@ -40,10 +40,10 @@ $logger->logger('Upgrading layer...', Logger::NOTICE);
 $layer = maxLayer($schemas);
 layerUpgrade($layer);
 
-$logger->logger('Initing docs...', Logger::NOTICE);
+$logger->logger("Initing docs (layer $layer)...", Logger::NOTICE);
 $docs = [
     [
-        'tl_schema'   => ['mtproto' => "$d/schemas/TL_mtproto_v1.tl"],
+        'tl_schema'   => ['mtproto' => "$d/schemas/TL_mtproto_v1.tl", 'telegram' => '', 'secret' => ''],
         'title'       => 'MadelineProto API documentation (mtproto)',
         'description' => 'MadelineProto API documentation (mtproto)',
         'output_dir'  => "$d/docs/docs/MTProto_docs",
@@ -51,7 +51,7 @@ $docs = [
         'readme'      => false,
     ],
     [
-        'tl_schema'   => ['telegram' => "$d/schemas/TL_telegram_v$layer.tl", 'secret' => "$d/schemas/TL_secret.tl", 'td' => "$d/schemas/TL_td.tl"],
+        'tl_schema'   => ['mtproto' => '', 'telegram' => "$d/schemas/TL_telegram_v$layer.tl", 'secret' => "$d/schemas/TL_secret.tl", 'td' => "$d/schemas/TL_td.tl"],
         'title'       => "MadelineProto API documentation (layer $layer)",
         'description' => "MadelineProto API documentation (layer $layer)",
         'output_dir'  => "$d/docs/docs/API_docs",

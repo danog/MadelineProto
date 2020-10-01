@@ -840,6 +840,29 @@ abstract class Tools extends StrTools
         return $header.\substr($stripped, 3).$footer;
     }
     /**
+     * Get maximum photo size.
+     *
+     * @internal
+     *
+     * @param array $sizes
+     * @return array
+     */
+    public static function maxSize(array $sizes): array
+    {
+        $maxPixels = 0;
+        $max = null;
+        foreach ($sizes as $size) {
+            if (isset($size['w'], $size['h'])) {
+                $curPixels = $size['w'] * $size['h'];
+                if ($curPixels > $maxPixels) {
+                    $maxPixels = $curPixels;
+                    $max = $size;
+                }
+            }
+        }
+        return $max;
+    }
+    /**
      * Get final element of array.
      *
      * @param array $what Array

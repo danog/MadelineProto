@@ -130,11 +130,11 @@ trait UpdateHandler
      */
     public function checkMsgId(array $message): bool
     {
-        if (!isset($message['to_id'])) {
+        if (!isset($message['peer_id'])) {
             return true;
         }
         try {
-            $peer_id = $this->getId($message['to_id']);
+            $peer_id = $this->getId($message['peer_id']);
         } catch (\danog\MadelineProto\Exception $e) {
             return true;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -258,9 +258,9 @@ trait UpdateHandler
                 }
                 $message = $updates;
                 $message['_'] = 'message';
-                $message['from_id'] = $from_id;
                 try {
-                    $message['to_id'] = (yield from $this->getInfo($to_id))['Peer'];
+                    $message['from_id'] = (yield from $this->getInfo($from_id))['Peer'];
+                    $message['peer_id'] = (yield from $this->getInfo($to_id))['Peer'];
                 } catch (\danog\MadelineProto\Exception $e) {
                     $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
                     //$this->pending_updates[] = $updates;
@@ -409,7 +409,7 @@ trait UpdateHandler
         if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') {
             return;
         }
-        if (isset($update['message']['from_id']) && $update['message']['from_id'] === $this->authorization['user']['id']) {
+        if (isset($update['message']['from_id']['user_id']) && $update['message']['from_id']['user_id'] === $this->authorization['user']['id']) {
             $update['message']['out'] = true;
         }
         // First save to array, then once the feed loop signals resumal of loop, resume and handle

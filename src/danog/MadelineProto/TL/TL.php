@@ -143,12 +143,12 @@ class TL
         $this->tdConstructors = new TLConstructors();
         $this->tdMethods = new TLMethods();
         $this->tdDescriptions = ['types' => [], 'constructors' => [], 'methods' => []];
-        foreach ([
+        foreach (\array_filter([
             'api' => $files->getAPISchema(),
             'mtproto' => $files->getMTProtoSchema(),
             'secret' => $files->getSecretSchema(),
             ...$files->getOther()
-        ] as $scheme_type => $file) {
+        ]) as $scheme_type => $file) {
             $this->API->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['file_parsing'], \basename($file)), \danog\MadelineProto\Logger::VERBOSE);
             $filec = \file_get_contents(Tools::absolute($file));
             $TL_dict = \json_decode($filec, true);

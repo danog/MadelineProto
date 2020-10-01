@@ -52,7 +52,12 @@ class Button implements \JsonSerializable, \ArrayAccess
     public function __construct(MTProto $API, array $message, array $button)
     {
         $this->button = $button;
-        $this->peer = $message['to_id'] === ['_' => 'peerUser', 'user_id' => $API->authorization['user']['id']] ? $message['from_id'] : $message['to_id'];
+        $this->peer = $message['peer_id'] === [
+            '_' => 'peerUser',
+            'user_id' => $API->authorization['user']['id']
+        ]
+            ? $message['from_id']
+            : $message['peer_id'];
         $this->id = $message['id'];
         $this->API = $API;
     }

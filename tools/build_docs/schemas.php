@@ -43,7 +43,7 @@ function initDocs(array $layers): array
     foreach (\array_slice($layers, 0, -1) as $layer => $file) {
         $layer = "v$layer";
         $docs[] = [
-            'tl_schema'   => ['telegram' => $file],
+            'tl_schema'   => ['telegram' => $file, 'mtproto' => '', 'secret' => '', 'td' => ''],
             'title'       => 'MadelineProto API documentation (layer '.$layer.')',
             'description' => 'MadelineProto API documentation (layer '.$layer.')',
             'output_dir'  => \getcwd()."/docs/old_docs/API_docs_".$layer,

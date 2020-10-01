@@ -24,6 +24,7 @@ use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Tools;
 
 use const danog\Decoder\PROFILE_PHOTO;
 
@@ -381,10 +382,13 @@ trait PeerHandler
                     return $this->toSupergroup($id['channel_id']);
                 case 'message':
                 case 'messageService':
-                    if (!isset($id['from_id']) || $id['to_id']['_'] !== 'peerUser' || $id['to_id']['user_id'] !== $this->authorization['user']['id']) {
-                        return $this->getId($id['to_id']);
+                    if (!isset($id['from_id'])
+                        || $id['peer_id']['_'] !== 'peerUser'
+                        || $id['peer_id']['user_id'] !== $this->authorization['user']['id']
+                    ) {
+                        return $this->getId($id['peer_id']);
                     }
-                    return $id['from_id'];
+                    return $this->getId($id['from_id']);
                 case 'updateChannelReadMessagesContents':
                 case 'updateChannelAvailableMessages':
                 case 'updateChannel':
@@ -875,7 +879,7 @@ trait PeerHandler
             $photo = [];
             foreach ([
                 'small' => $res['photo']['sizes'][0],
-                'big' => \end($res['photo']['sizes']),
+                'big' => Tools::maxSize($res['photo']['sizes']),
             ] as $type => $size) {
                 $fileId = new FileId;
                 $fileId->setId($res['photo']['id'] ?? 0);

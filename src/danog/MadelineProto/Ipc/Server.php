@@ -197,7 +197,11 @@ class Server extends SignalLoop
                 $payload[1] = $this->callback->unwrap($wrapper);
             }
             $result = $this->API->{$payload[0]}(...$payload[1]);
-            $result = $result instanceof \Generator ? yield from $result : yield $result;
+            $result = $result instanceof \Generator
+                ? yield from $result
+                : ($result instanceof Promise
+                    ? yield $result
+                    : $result);
         } catch (\Throwable $e) {
             $this->API->logger("Got error while calling IPC method: $e", Logger::ERROR);
             $result = new ExitFailure($e);

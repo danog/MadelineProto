@@ -119,7 +119,7 @@ class MinDatabase implements TLCallback
         switch ($location['_']) {
             case 'messageFwdHeader':
                 if (isset($location['from_id'])) {
-                    $peers[$location['from_id']] = true;
+                    $peers[$this->API->getId($location['from_id'])] = true;
                 }
                 if (isset($location['channel_id'])) {
                     $peers[$this->API->toSupergroup($location['channel_id'])] = true;
@@ -132,9 +132,9 @@ class MinDatabase implements TLCallback
                 }
                 break;
             case 'message':
-                $peers[$this->API->getId($location['to_id'])] = true;
+                $peers[$this->API->getId($location['peer_id'])] = true;
                 if (isset($location['from_id'])) {
-                    $peers[$location['from_id']] = true;
+                    $peers[$this->API->getId($location['from_id'])] = true;
                 }
                 break;
             default:

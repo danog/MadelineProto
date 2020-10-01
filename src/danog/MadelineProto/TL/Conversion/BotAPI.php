@@ -221,7 +221,7 @@ trait BotAPI
                 if (isset($data['from_id'])) {
                     $newd['from'] = (yield from $this->getPwrChat($data['from_id']));
                 }
-                $newd['chat'] = (yield from $this->getPwrChat($data['to_id']));
+                $newd['chat'] = (yield from $this->getPwrChat($data['peer_id']));
                 if (isset($data['entities'])) {
                     $newd['entities'] = (yield from $this->MTProtoToBotAPI($data['entities']));
                 }

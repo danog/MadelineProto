@@ -141,7 +141,7 @@ class FeedLoop extends ResumableSignalLoop
                     $this->incomingUpdates = [];
                     continue;
                 }
-                if (isset($update['message']['id'], $update['message']['to_id']) && !\in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage', 'updateMessageID'])) {
+                if (isset($update['message']['id'], $update['message']['peer_id']) && !\in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage', 'updateMessageID'])) {
                     if (!$this->API->checkMsgId($update['message'])) {
                         $logger('MSGID duplicate');
                         continue;
@@ -171,7 +171,7 @@ class FeedLoop extends ResumableSignalLoop
         switch ($update['_']) {
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
-                $channelId = isset($update['message']['to_id']['channel_id']) ? $update['message']['to_id']['channel_id'] : self::GENERIC;
+                $channelId = isset($update['message']['peer_id']['channel_id']) ? $update['message']['peer_id']['channel_id'] : self::GENERIC;
                 if (!$channelId) {
                     return false;
                 }
@@ -207,13 +207,14 @@ class FeedLoop extends ResumableSignalLoop
                 $from = false;
                 $via_bot = false;
                 $entities = false;
-                if ($update['message']['_'] !== 'messageEmpty' && (($from = isset($update['message']['from_id']) && !(yield from $this->API->peerIsset($update['message']['from_id']))) || ($to = !(yield from $this->API->peerIsset($update['message']['to_id']))) || ($via_bot = isset($update['message']['via_bot_id']) && !(yield from $this->API->peerIsset($update['message']['via_bot_id']))) || ($entities = isset($update['message']['entities']) && !(yield from $this->API->entitiesPeerIsset($update['message']['entities']))))) {
+                if ($update['message']['_'] !== 'messageEmpty' && (($from = isset($update['message']['from_id']) && !(yield from $this->API->peerIsset($update['message']['from_id']))) || ($to = !(yield from $this->API->peerIsset($update['message']['peer_id']))) || ($via_bot = isset($update['message']['via_bot_id']) && !(yield from $this->API->peerIsset($update['message']['via_bot_id']))) || ($entities = isset($update['message']['entities']) && !(yield from $this->API->entitiesPeerIsset($update['message']['entities']))))) {
                     $log = '';
                     if ($from) {
-                        $log .= "from_id {$update['message']['from_id']}, ";
+                        $from_id = $this->API->getId($update['message']['from_id']);
+                        $log .= "from_id {$from_id}, ";
                     }
                     if ($to) {
-                        $log .= 'to_id '.\json_encode($update['message']['to_id']).', ';
+                        $log .= 'peer_id '.\json_encode($update['message']['peer_id']).', ';
                     }
                     if ($via_bot) {
                         $log .= "via_bot {$update['message']['via_bot_id']}, ";

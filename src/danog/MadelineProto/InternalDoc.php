@@ -1157,7 +1157,7 @@ interface contacts
      * Adds the user to the blacklist.
      *
      * Parameters:
-     * * `InputUser` **id** - User ID
+     * * `InputPeer` **id** -
      *
      * @param array $params Parameters
      *
@@ -1169,7 +1169,7 @@ interface contacts
      * Deletes the user from the blacklist.
      *
      * Parameters:
-     * * `InputUser` **id** - User ID
+     * * `InputPeer` **id** -
      *
      * @param array $params Parameters
      *
@@ -1319,6 +1319,21 @@ interface contacts
      * @return Updates
      */
     public function getLocated($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean` **delete_message** - Optional:
+     * * `boolean` **delete_history** - Optional:
+     * * `boolean` **report_spam**    - Optional:
+     * * `int`     **msg_id**         -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function blockFromReplies($params);
 }
 
 interface messages
@@ -1379,6 +1394,7 @@ interface messages
      * * `InputPeer`      **peer**       - User or chat, histories with which are searched, or [(inputPeerEmpty)](https://docs.madelineproto.xyz/API_docs/constructors/inputPeerEmpty.html) constructor for global search
      * * `string`         **q**          - Text search request
      * * `InputUser`      **from_id**    - Optional: Only return messages sent by the specified user ID
+     * * `int`            **top_msg_id** - Optional:
      * * `MessagesFilter` **filter**     - Filter to return only specified message types
      * * `int`            **min_date**   - If a positive value was transferred, only messages with a sending date bigger than the transferred one will be returned
      * * `int`            **max_date**   - If a positive value was transferred, only messages with a sending date smaller than the transferred one will be returned
@@ -1452,8 +1468,9 @@ interface messages
      * Sends a current user typing event (see [SendMessageAction](https://docs.madelineproto.xyz/API_docs/types/SendMessageAction.html) for all event types) to a conversation partner or group.
      *
      * Parameters:
-     * * `InputPeer`         **peer**   - Target user or group
-     * * `SendMessageAction` **action** - Type of action<br>Parameter added in [Layer 17](https://core.telegram.org/api/layers#layer-17).
+     * * `InputPeer`         **peer**       - Target user or group
+     * * `int`               **top_msg_id** - Optional:
+     * * `SendMessageAction` **action**     - Type of action<br>Parameter added in [Layer 17](https://core.telegram.org/api/layers#layer-17).
      *
      * @param array $params Parameters
      *
@@ -1510,7 +1527,6 @@ interface messages
      * * `boolean`   **silent**        - Optional: Whether to send messages silently (no notification will be triggered on the destination clients)
      * * `boolean`   **background**    - Optional: Whether to send the message in background
      * * `boolean`   **with_my_score** - Optional: When forwarding games, whether to include your score in the game
-     * * `boolean`   **grouped**       - Optional: Whether the specified messages represent an album (grouped media)
      * * `InputPeer` **from_peer**     - Source of messages
      * * `[int]`     **id**            - IDs of messages
      * * `InputPeer` **to_peer**       - Destination peer
@@ -1732,6 +1748,7 @@ interface messages
      * Sends a text message to a secret chat.
      *
      * Parameters:
+     * * `boolean`            **silent**  - Optional:
      * * `InputEncryptedChat` **peer**    - Secret chat ID
      * * `DecryptedMessage`   **message** -
      *
@@ -1745,6 +1762,7 @@ interface messages
      * Sends a message with a file attachment to a secret chat.
      *
      * Parameters:
+     * * `boolean`            **silent**  - Optional:
      * * `InputEncryptedChat` **peer**    - Secret chat ID
      * * `DecryptedMessage`   **message** -
      * * `InputEncryptedFile` **file**    - File attachment for the secret chat
@@ -1939,7 +1957,7 @@ interface messages
      *
      * @param array $params Parameters
      *
-     * @return  of int[]
+     * @return messages.MessageViews
      */
     public function getMessagesViews($params);
 
@@ -1973,12 +1991,15 @@ interface messages
      * Search for messages and peers globally.
      *
      * Parameters:
-     * * `int`       **folder_id**   - Optional: [Peer folder ID, for more info click here](https://core.telegram.org/api/folders#peer-folders)
-     * * `string`    **q**           - Query
-     * * `int`       **offset_rate** - Initially 0, then set to the [`next_rate` parameter of messages.messagesSlice](https://docs.madelineproto.xyz/API_docs/constructors/messages.messagesSlice.html)
-     * * `InputPeer` **offset_peer** - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
-     * * `int`       **offset_id**   - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
-     * * `int`       **limit**       - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * * `int`            **folder_id**   - Optional: [Peer folder ID, for more info click here](https://core.telegram.org/api/folders#peer-folders)
+     * * `string`         **q**           - Query
+     * * `MessagesFilter` **filter**      -
+     * * `int`            **min_date**    -
+     * * `int`            **max_date**    -
+     * * `int`            **offset_rate** - Initially 0, then set to the [`next_rate` parameter of messages.messagesSlice](https://docs.madelineproto.xyz/API_docs/constructors/messages.messagesSlice.html)
+     * * `InputPeer`      **offset_peer** - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * * `int`            **offset_id**   - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * * `int`            **limit**       - [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
      *
      * @param array $params Parameters
      *
@@ -2145,10 +2166,11 @@ interface messages
      * Press an inline callback button and get a callback answer from the bot.
      *
      * Parameters:
-     * * `boolean`   **game**   - Optional: Whether this is a "play game" button
-     * * `InputPeer` **peer**   - Where was the inline keyboard sent
-     * * `int`       **msg_id** - ID of the Message with the inline keyboard
-     * * `bytes`     **data**   - Optional: Callback data
+     * * `boolean`               **game**     - Optional: Whether this is a "play game" button
+     * * `InputPeer`             **peer**     - Where was the inline keyboard sent
+     * * `int`                   **msg_id**   - ID of the Message with the inline keyboard
+     * * `bytes`                 **data**     - Optional: Callback data
+     * * `InputCheckPasswordSRP` **password** - Optional:
      *
      * @param array $params Parameters
      *
@@ -2980,6 +3002,53 @@ interface messages
      * @return messages.FeaturedStickers
      */
     public function getOldFeaturedStickers($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**        -
+     * * `int`       **msg_id**      -
+     * * `int`       **offset_id**   -
+     * * `int`       **offset_date** -
+     * * `int`       **add_offset**  -
+     * * `int`       **limit**       -
+     * * `int`       **max_id**      -
+     * * `int`       **min_id**      -
+     * * `[int]`     **hash**        - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.Messages
+     */
+    public function getReplies($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**   -
+     * * `int`       **msg_id** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.DiscussionMessage
+     */
+    public function getDiscussionMessage($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**        -
+     * * `int`       **msg_id**      -
+     * * `int`       **read_max_id** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function readDiscussion($params);
 }
 
 interface updates
@@ -3406,6 +3475,19 @@ interface help
      * @return bool
      */
     public function dismissSuggestion($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string` **lang_code** -
+     * * `[int]`  **hash**      - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return help.CountriesList
+     */
+    public function getCountriesList($params);
 }
 
 interface channels
@@ -3666,9 +3748,10 @@ interface channels
      * Get link and embed info of a message in a [channel/supergroup](https://core.telegram.org/api/channel).
      *
      * Parameters:
+     * * `boolean`      **grouped** - Optional:
+     * * `boolean`      **thread**  - Optional:
      * * `InputChannel` **channel** - Channel
      * * `int`          **id**      - Message ID
-     * * `Bool`         **grouped** - Whether to include other grouped media (for albums)
      *
      * @param array $params Parameters
      *
@@ -4327,6 +4410,37 @@ interface stats
      * @return stats.MegagroupStats
      */
     public function getMegagroupStats($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputChannel` **channel**     -
+     * * `int`          **msg_id**      -
+     * * `int`          **offset_rate** -
+     * * `InputPeer`    **offset_peer** -
+     * * `int`          **offset_id**   -
+     * * `int`          **limit**       -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.Messages
+     */
+    public function getMessagePublicForwards($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`      **dark**    - Optional:
+     * * `InputChannel` **channel** -
+     * * `int`          **msg_id**  -.
+     *
+     * @param array $params Parameters
+     *
+     * @return stats.MessageStats
+     */
+    public function getMessageStats($params);
 }
 
 class InternalDoc extends APIFactory
@@ -5796,6 +5910,17 @@ class InternalDoc extends APIFactory
     public function secretChatStatus(int $chat): int
     {
         return $this->API->secretChatStatus($chat);
+    }
+    /**
+     * Serialize all instances.
+     *
+     * CALLED ONLY ON SHUTDOWN.
+     *
+     * @return void
+     */
+    public function serializeAll(): void
+    {
+        \danog\MadelineProto\MTProto::serializeAll();
     }
     /**
      * Set update handling callback.

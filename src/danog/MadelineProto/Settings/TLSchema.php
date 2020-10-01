@@ -9,7 +9,7 @@ class TLSchema extends SettingsAbstract
     /**
      * TL layer version.
      */
-    protected int $layer = 117;
+    protected int $layer = 119;
     /**
      * MTProto schema path.
      */
@@ -17,7 +17,7 @@ class TLSchema extends SettingsAbstract
     /**
      * API schema path.
      */
-    protected string $APISchema = __DIR__.'/../TL_telegram_v117.tl';
+    protected string $APISchema = __DIR__.'/../TL_telegram_v119.tl';
     /**
      * Secret schema path.
      */
@@ -53,8 +53,8 @@ class TLSchema extends SettingsAbstract
      */
     public function __wakeup()
     {
-        if (!\file_exists($this->APISchema)                          // Scheme was upgraded
-            && $this->APISchema !== __DIR__.'/../TL_mtproto_v117.tl' // Session path has changed
+        if (!\file_exists($this->APISchema)                           // Scheme was upgraded
+            || $this->APISchema !== __DIR__.'/../TL_telegram_v119.tl' // Session path has changed
         ) {
             $new = new self;
             $this->setAPISchema($new->getAPISchema());

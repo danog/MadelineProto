@@ -29,13 +29,14 @@ function layerUpgrade(int $layer): void
     $doc = \str_replace(
         [
             "layer = $prevLayer",
-            "TL_telegram_$prevLayer",
+            "TL_telegram_v$prevLayer",
         ],
         [
             "layer = $layer",
-            "TL_telegram_$layer",
+            "TL_telegram_v$layer",
         ],
         $doc
     );
-    \file_put_contents('src/danog/MadelineProto/MTProto.php', $doc);
+
+    \file_put_contents('src/danog/MadelineProto/Settings/TLSchema.php', $doc);
 }

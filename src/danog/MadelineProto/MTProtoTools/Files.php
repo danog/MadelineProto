@@ -633,7 +633,7 @@ trait Files
                 }
                 $res['MessageMedia'] = $messageMedia;
                 $messageMedia = $messageMedia['photo'];
-                $size = \end($messageMedia['sizes']);
+                $size = Tools::maxSize($messageMedia['sizes']);
                 $res = \array_merge($res, yield from $this->getDownloadInfo($size));
                 $res['InputFileLocation'] = ['_' => 'inputPhotoFileLocation', 'thumb_size' => $res['thumb_size'] ?? 'x', 'dc_id' => $messageMedia['dc_id'], 'access_hash' => $messageMedia['access_hash'], 'id' => $messageMedia['id'], 'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $messageMedia)];
                 return $res;
