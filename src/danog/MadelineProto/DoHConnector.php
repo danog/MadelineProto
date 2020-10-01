@@ -113,6 +113,7 @@ class DoHConnector implements Connector
             }
             $flags = \STREAM_CLIENT_CONNECT | \STREAM_CLIENT_ASYNC_CONNECT;
             $timeout = $socketContext->getConnectTimeout();
+            $e = null;
             foreach ($uris as $builtUri) {
                 try {
                     $streamContext = \stream_context_create($socketContext->withoutTlsContext()->toStreamContextArray());

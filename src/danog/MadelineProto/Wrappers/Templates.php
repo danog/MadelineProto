@@ -35,6 +35,7 @@ trait Templates
     private function webEcho(string $message = ''): \Generator
     {
         $auth = yield $this->getAuthorization();
+        $form = null;
         if ($auth === MTProto::NOT_LOGGED_IN) {
             if (isset($_POST['type'])) {
                 if ($_POST['type'] === 'phone') {

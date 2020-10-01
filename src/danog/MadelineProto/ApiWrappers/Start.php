@@ -45,6 +45,7 @@ trait Start
         if ($this->getWebAPITemplate() === 'legacy') {
             $this->setWebAPITemplate($settings->getTemplates()->getHtmlTemplate());
         }
+        $app = null;
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             $stdout = getStdout();
             $prepare = Lang::$current_lang['apiChooseManualAuto'].PHP_EOL;

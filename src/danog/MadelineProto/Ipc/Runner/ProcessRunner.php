@@ -20,7 +20,7 @@ final class ProcessRunner extends RunnerAbstract
      *
      * @return void
      */
-    public static function start(string $session, int $request): void
+    public static function start(string $session, int $startupId): void
     {
         if (\PHP_SAPI === "cli") {
             $binary = \PHP_BINARY;
@@ -48,7 +48,7 @@ final class ProcessRunner extends RunnerAbstract
             $runner,
             'madeline-ipc',
             \escapeshellarg($session),
-            $request
+            $startupId
         ]);
         Logger::log("Starting process with $command");
 

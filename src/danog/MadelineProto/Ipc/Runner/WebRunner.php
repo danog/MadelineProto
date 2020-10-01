@@ -22,7 +22,7 @@ final class WebRunner extends RunnerAbstract
      *
      * @return void
      */
-    public static function start(string $session, int $id): void
+    public static function start(string $session, int $startupId): void
     {
         if (!isset($_SERVER['SERVER_NAME'])) {
             return;
@@ -75,7 +75,7 @@ final class WebRunner extends RunnerAbstract
         }
 
         $params = [
-            'argv' => ['madeline-ipc', $session, $id],
+            'argv' => ['madeline-ipc', $session, $startupId],
             'cwd' => Magic::getcwd()
         ];
 
