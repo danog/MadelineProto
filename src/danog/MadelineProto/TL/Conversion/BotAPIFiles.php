@@ -90,6 +90,7 @@ trait BotAPIFiles
 
         $photoSize = $fileId->hasPhotoSizeSource() ? $fileId->getPhotoSizeSource() : null;
 
+        $res = null;
         switch ($fileId->getType()) {
             case PROFILE_PHOTO:
                 /**

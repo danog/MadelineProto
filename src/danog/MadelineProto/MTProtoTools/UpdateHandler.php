@@ -55,7 +55,9 @@ trait UpdateHandler
      *
      * @internal
      *
-     * @return \Generator<array>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, \Amp\Promise<mixed|null>, mixed, list<array{update_id: mixed, update: mixed}>|mixed>
      */
     public function getUpdates($params = []): \Generator
     {
@@ -152,7 +154,7 @@ trait UpdateHandler
      *
      * @internal
      *
-     * @return UpdatesState|UpdatesState[]
+     * @return \Generator
      */
     public function loadUpdateState(): \Generator
     {

@@ -53,7 +53,7 @@ class RSA
      *
      * @return \Generator
      *
-     * @psalm-return \Generator<mixed, string, mixed, self>
+     * @psalm-return \Generator<int|mixed, array|mixed, mixed, self>
      */
     public function load(TL $TL, string $rsa_key): \Generator
     {

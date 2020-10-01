@@ -137,7 +137,9 @@ trait FilesLogic
      * @param ServerRequest $request      Request
      * @param callable      $cb           Status callback (can also use FileCallback)
      *
-     * @return \Generator<Response> Returned response
+     * @return \Generator Returned response
+     *
+     * @psalm-return \Generator<mixed, array, mixed, \Amp\Http\Server\Response>
      */
     public function downloadToResponse($messageMedia, ServerRequest $request, callable $cb = null): \Generator
     {
@@ -188,7 +190,7 @@ trait FilesLogic
      *
      * @return \Generator
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|array, mixed, mixed>
+     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|\Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<int>|\Amp\Promise<mixed>|\Amp\Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, mixed>
      */
     public function uploadEncrypted($file, string $fileName = '', $cb = null): \Generator
     {

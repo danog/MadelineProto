@@ -86,7 +86,7 @@ trait AuthKeyHandler
      *
      * @param mixed $user User
      *
-     * @return void
+     * @return \Generator
      */
     public function requestCall($user): \Generator
     {
@@ -276,7 +276,7 @@ trait AuthKeyHandler
      * Discard call.
      *
      * @param array   $call       Call
-     * @param string  $reason     Discard reason
+     * @param array $reason
      * @param array   $rating     Rating
      * @param boolean $need_debug Need debug?
      *

@@ -202,7 +202,9 @@ trait Login
     /**
      * Export authorization.
      *
-     * @return \Generator<array>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<mixed, array|bool, mixed, array{0: int|string, 1: string}>
      */
     public function exportAuthorization(): \Generator
     {

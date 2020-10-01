@@ -48,6 +48,7 @@ use function Amp\Promise\all;
 trait Files
 {
     use FilesLogic;
+
     /**
      * Upload file from URL.
      *
@@ -1049,7 +1050,7 @@ trait Files
         } while (true);
     }
     private $cdn_hashes = [];
-    private function addCdnHashes($file, $hashes)
+    private function addCdnHashes($file, $hashes): void
     {
         if (!isset($this->cdn_hashes[$file])) {
             $this->cdn_hashes = [];
@@ -1075,7 +1076,10 @@ trait Files
         }
         return true;
     }
-    private function clearCdnHashes($file)
+    /**
+     * @return true
+     */
+    private function clearCdnHashes($file): bool
     {
         unset($this->cdn_hashes[$file]);
         return true;

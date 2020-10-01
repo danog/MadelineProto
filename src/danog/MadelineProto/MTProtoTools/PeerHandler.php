@@ -45,7 +45,7 @@ trait PeerHandler
      *
      * @param int $id MTProto channel ID
      *
-     * @return int
+     * @return float|int
      */
     public static function toSupergroup($id)
     {
@@ -56,9 +56,9 @@ trait PeerHandler
      *
      * @param int $id Bot API channel ID
      *
-     * @return int
+     * @return float|int
      */
-    public static function fromSupergroup($id): int
+    public static function fromSupergroup($id)
     {
         return -$id - \pow(10, (int) \floor(\log(-$id, 10)));
     }
@@ -149,7 +149,9 @@ trait PeerHandler
      *
      * @internal
      *
-     * @return \Generator<void>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, \Amp\Promise|null, mixed, void>
      */
     public function addChat($chat): \Generator
     {
@@ -209,14 +211,14 @@ trait PeerHandler
         }
     }
 
-    private function cacheChatUsername(int $id, array $chat)
+    private function cacheChatUsername(int $id, array $chat): void
     {
         if ($id && !empty($chat['username'])) {
             $this->usernames[\strtolower($chat['username'])] = $id;
         }
     }
 
-    private function cachePwrChat($id, $full_fetch, $send)
+    private function cachePwrChat($id, $full_fetch, $send): void
     {
         \danog\MadelineProto\Tools::callFork((function () use ($id, $full_fetch, $send): \Generator {
             try {
@@ -233,7 +235,9 @@ trait PeerHandler
      *
      * @param mixed $id Peer
      *
-     * @return \Generator<boolean>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, bool>
      */
     public function peerIsset($id): \Generator
     {
@@ -469,7 +473,9 @@ trait PeerHandler
      *
      * @see https://docs.madelineproto.xyz/Info.html
      *
-     * @return \Generator<array> Info object
+     * @return \Generator Info object
+     *
+     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<string>|array, mixed, array|mixed>
      */
     public function getInfo($id, $recursive = true): \Generator
     {
@@ -627,7 +633,12 @@ trait PeerHandler
         }
         throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
     }
-    private function genAll($constructor, $folder_id = null)
+    /**
+     * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
+     *
+     * @psalm-return array{InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}, Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}, DialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}}, NotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}}, InputDialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}}, InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}}, bot_api_id: int|mixed, type: string}
+     */
+    private function genAll($constructor, $folder_id = null): array
     {
         $res = [$this->TL->getConstructors()->findByPredicate($constructor['_'])['type'] => $constructor];
         switch ($constructor['_']) {
@@ -706,7 +717,9 @@ trait PeerHandler
      *
      * @see https://docs.madelineproto.xyz/FullInfo.html
      *
-     * @return \Generator<array> FullInfo object
+     * @return \Generator FullInfo object
+     *
+     * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, array>
      */
     public function getFullInfo($id): \Generator
     {
@@ -714,6 +727,7 @@ trait PeerHandler
         if (\time() - (yield from $this->fullChatLastUpdated($partial['bot_api_id'])) < $this->getSettings()->getPeer()->getFullInfoCacheTime()) {
             return \array_merge($partial, yield $this->full_chats[$partial['bot_api_id']]);
         }
+        $full = null;
         switch ($partial['type']) {
             case 'user':
             case 'bot':
@@ -992,7 +1006,7 @@ trait PeerHandler
         }
         return $has_more;
     }
-    private function fetchParticipantsCache($channel, $filter, $q, $offset, $limit)
+    private function fetchParticipantsCache($channel, $filter, $q, $offset, $limit): \Generator
     {
         return (yield $this->channel_participants[$channel['channel_id']])[$filter][$q][$offset][$limit];
     }

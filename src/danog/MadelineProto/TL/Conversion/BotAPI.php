@@ -36,9 +36,9 @@ trait BotAPI
      *
      * @param string $text Text
      *
-     * @return int
+     * @return float|int
      */
-    public static function mbStrlen(string $text): int
+    public static function mbStrlen(string $text)
     {
         $length = 0;
         $textlength = \strlen($text);
@@ -107,7 +107,12 @@ trait BotAPI
         }
         return $result;
     }
-    private function parseButtons($rows)
+    /**
+     * @return ((bool|mixed|string)[][]|string)[][]
+     *
+     * @psalm-return array<int|int, array{_: string, buttons: array<int|int, array{_: string, text: mixed, same_peer?: bool, query?: mixed, data?: mixed, url?: mixed}>}>
+     */
+    private function parseButtons($rows): array
     {
         $newrows = [];
         $key = 0;
@@ -190,6 +195,7 @@ trait BotAPI
             }
             return $newd;
         }
+        $res = null;
         switch ($data['_']) {
             case 'updateShortSentMessage':
                 $newd['message_id'] = $data['id'];
@@ -679,7 +685,12 @@ trait BotAPI
         }
         return $multiple_args;
     }
-    private function multipleExplodeKeepDelimiters($delimiters, $string)
+    /**
+     * @return string[]
+     *
+     * @psalm-return list<string>
+     */
+    private function multipleExplodeKeepDelimiters($delimiters, $string): array
     {
         $initialArray = \explode(\chr(1), \str_replace($delimiters, \chr(1), $string));
         $finalArray = [];
@@ -693,7 +704,7 @@ trait BotAPI
         }
         return $finalArray;
     }
-    private function htmlFixtags($text)
+    private function htmlFixtags($text): string
     {
         $diff = 0;
         \preg_match_all('#(.*?)(<(\\bu\\b|\\bs\\b|\\ba\\b|\\bb\\b|\\bstrong\\b|\\bblockquote\\b|\\bstrike\\b|\\bdel\\b|\\bem\\b|i|\\bcode\\b|\\bpre\\b)[^>]*>)(.*?)([<]\\s*/\\s*\\3[>])#is', $text, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
@@ -728,7 +739,12 @@ trait BotAPI
         }
         return \htmlentities($text);
     }
-    private function buildRows($button_list)
+    /**
+     * @return ((array|string)[][]|string)[]
+     *
+     * @psalm-return array{_: string, rows: list<array{_: string, buttons: list<mixed>}>}
+     */
+    private function buildRows($button_list): array
     {
         $end = false;
         $rows = [];

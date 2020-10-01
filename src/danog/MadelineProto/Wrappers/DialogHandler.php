@@ -33,7 +33,9 @@ trait DialogHandler
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
      *
-     * @return \Generator<array<array>>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, \Amp\Promise<bool>, mixed, list<mixed>>
      */
     public function getDialogs(bool $force = true): \Generator
     {

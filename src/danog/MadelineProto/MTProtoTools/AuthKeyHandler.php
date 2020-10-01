@@ -60,7 +60,9 @@ trait AuthKeyHandler
      *
      * @internal
      *
-     * @return \Generator<AuthKey>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<mixed, mixed|string, mixed, \danog\MadelineProto\MTProto\PermAuthKey|\danog\MadelineProto\MTProto\TempAuthKey|null>
      */
     public function createAuthKey(int $expires_in, string $datacenter): \Generator
     {
@@ -508,7 +510,9 @@ trait AuthKeyHandler
      *
      * @internal
      *
-     * @return \Generator<bool>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int|mixed, array|mixed, mixed, true>
      */
     public function bindTempAuthKey(int $expires_in, string $datacenter): \Generator
     {
@@ -552,7 +556,9 @@ trait AuthKeyHandler
      *
      * @param string|integer $what Number to factorize
      *
-     * @return \Generator<string|bool>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, \Amp\Promise<string>, mixed, false|int|string>
      */
     private function wolframSingle($what): \Generator
     {

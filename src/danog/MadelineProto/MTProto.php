@@ -798,7 +798,9 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @param string $url URL
      *
-     * @return \Generator<string>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, Promise<string>, mixed, string>
      */
     public function fileGetContents(string $url): \Generator
     {
@@ -816,9 +818,9 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Get main DC ID.
      *
-     * @return int
+     * @return int|string
      */
-    public function getDataCenterId(): int
+    public function getDataCenterId()
     {
         return $this->datacenter->curdc;
     }
@@ -937,9 +939,11 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @internal
      *
-     * @return void
+     * @return \Generator
+     *
+     * @psalm-return \Generator<mixed, mixed, mixed, void>
      */
-    private function cleanupProperties()
+    private function cleanupProperties(): \Generator
     {
         if (!$this->channels_state instanceof CombinedUpdatesState) {
             $this->channels_state = new CombinedUpdatesState($this->channels_state);

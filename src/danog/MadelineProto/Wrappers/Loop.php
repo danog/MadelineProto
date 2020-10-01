@@ -94,7 +94,7 @@ trait Loop
      *
      * @param callable|null $callback Async callable to run
      *
-     * @return mixed
+     * @return \Generator
      */
     public function loop($callback = null): \Generator
     {

@@ -401,7 +401,9 @@ class TL
      * @param string  $ctx    Context
      * @param integer $layer  Layer version
      *
-     * @return \Generator<string>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int|mixed, array|mixed, mixed, false|mixed|null|string>
      */
     public function serializeObject(array $type, $object, $ctx, int $layer = -1): \Generator
     {
@@ -581,7 +583,9 @@ class TL
      * @param string $method    Method name
      * @param mixed  $arguments Arguments
      *
-     * @return \Generator<string>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int|mixed, Promise|Promise<\Amp\File\File>|Promise<\Amp\Ipc\Sync\ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<null|string>|Promise<string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, string>
      */
     public function serializeMethod(string $method, $arguments): \Generator
     {
@@ -662,7 +666,9 @@ class TL
      * @param string  $ctx       Context
      * @param integer $layer     Layer
      *
-     * @return \Generator<string>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int|mixed, Promise|Promise<\Amp\File\File>|Promise<\Amp\Ipc\Sync\ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, string>
      */
     private function serializeParams(array $tl, $arguments, $ctx, int $layer = -1): \Generator
     {

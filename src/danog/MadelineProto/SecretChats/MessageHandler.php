@@ -125,6 +125,9 @@ trait MessageHandler
         $this->secret_chats[$message['message']['chat_id']]['incoming'][$this->secret_chats[$message['message']['chat_id']]['in_seq_no']] = $message['message'];
         yield from $this->handleDecryptedUpdate($message);
     }
+    /**
+     * @return false|string
+     */
     private function tryMTProtoV1Decrypt($message_key, $chat_id, $old, $encrypted_data)
     {
         list($aes_key, $aes_iv) = Crypt::oldAesCalculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], true);
@@ -145,6 +148,9 @@ trait MessageHandler
         }
         return $message_data;
     }
+    /**
+     * @return false|string
+     */
     private function tryMTProtoV2Decrypt($message_key, $chat_id, $old, $encrypted_data)
     {
         list($aes_key, $aes_iv) = Crypt::aesCalculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], !$this->secret_chats[$chat_id]['admin']);
