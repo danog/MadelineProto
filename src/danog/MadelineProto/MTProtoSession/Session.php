@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use danog\MadelineProto\MTProto;
+
 /**
  * Manages MTProto session-specific data.
  *

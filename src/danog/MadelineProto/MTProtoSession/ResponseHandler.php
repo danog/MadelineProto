@@ -344,6 +344,7 @@ trait ResponseHandler
                         case 401:
                             switch ($response['error_message']) {
                                 case 'USER_DEACTIVATED':
+                                case 'USER_DEACTIVATED_BAN':
                                 case 'SESSION_REVOKED':
                                 case 'SESSION_EXPIRED':
                                     $this->gotResponseForOutgoingMessageId($request_id);
@@ -353,11 +354,11 @@ trait ResponseHandler
                                         $socket->setPermAuthKey(null);
                                         $socket->resetSession();
                                     }
-                                    if ($response['error_message'] === 'USER_DEACTIVATED') {
+                                    if (in_array($response['error_message'],['USER_DEACTIVATED', 'USER_DEACTIVATED_BAN'], true)) {
                                         $this->logger->logger('!!!!!!! WARNING !!!!!!!', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger("Telegram's flood prevention system suspended this account.", \danog\MadelineProto\Logger::ERROR);
                                         $this->logger->logger('To continue, manual verification is required.', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $phone = isset($this->authorization['user']['phone']) ? '+'.$this->authorization['user']['phone'] : 'you are currently using';
+                                        $phone = isset($this->API->authorization['user']['phone']) ? '+'.$this->API->authorization['user']['phone'] : 'you are currently using';
                                         $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number '.$phone.', and shortly describe what will you do with this phone number.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger('Then login again.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger('If you intentionally deleted this account, ignore this message.', \danog\MadelineProto\Logger::FATAL_ERROR);
@@ -392,7 +393,7 @@ trait ResponseHandler
                                         $this->logger->logger('!!!!!!! WARNING !!!!!!!', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger("Telegram's flood prevention system suspended this account.", \danog\MadelineProto\Logger::ERROR);
                                         $this->logger->logger('To continue, manual verification is required.', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $phone = isset($this->authorization['user']['phone']) ? '+'.$this->authorization['user']['phone'] : 'you are currently using';
+                                        $phone = isset($this->API->authorization['user']['phone']) ? '+'.$this->API->authorization['user']['phone'] : 'you are currently using';
                                         $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number '.$phone.', and quickly describe what will you do with this phone number.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger('Then login again.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger('If you intentionally deleted this account, ignore this message.', \danog\MadelineProto\Logger::FATAL_ERROR);
