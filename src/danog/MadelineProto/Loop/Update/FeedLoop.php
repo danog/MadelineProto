@@ -108,7 +108,7 @@ class FeedLoop extends ResumableSignalLoop
             }
         }
     }
-    public function parse($updates): \Generator
+    public function parse(array $updates): \Generator
     {
         \reset($updates);
         while ($updates) {

@@ -20,7 +20,6 @@
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\Deferred;
-use Amp\Promise;
 use danog\MadelineProto\Async\AsyncParameters;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;

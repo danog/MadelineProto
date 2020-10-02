@@ -47,6 +47,12 @@ use function Amp\Promise\wait;
 abstract class Tools extends StrTools
 {
     /**
+     * Boolean to avoid problems with exceptions thrown by forked strands, see tools.
+     *
+     * @var boolean
+     */
+    public bool $destructing = false;
+    /**
      * Sanify TL obtained from JSON for TL serialization.
      *
      * @param array $input Data to sanitize
@@ -412,15 +418,20 @@ abstract class Tools extends StrTools
      *
      * If the timeout expires before the promise is resolved, a default value is returned
      *
+     * @template TReturnAlt
      * @template TReturn
+     * @template TGenerator as Generator<mixed, mixed, mixed, TReturn>
      *
      * @param Promise<TReturn>|\Generator $promise Promise to which the timeout is applied.
      * @param int                         $timeout Timeout in milliseconds.
-     * @param TReturn                     $default
+     * @param mixed                       $default
      *
-     * @return Promise<TReturn>
+     * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
+     * @psalm-param TReturnAlt $timeout
      *
-     * @throws \TypeError If $promise is not an instance of \Amp\Promise or \React\Promise\PromiseInterface.
+     * @return Promise<TReturn|TReturnAlt>
+     *
+     * @throws \TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
      */
     public static function timeoutWithDefault($promise, int $timeout, $default = null): Promise
     {
@@ -547,7 +558,7 @@ abstract class Tools extends StrTools
      */
     public static function after($a, $b): Promise
     {
-        $a = self::call($a());
+        $a = self::call($a);
         $deferred = new Deferred();
         $a->onResolve(static function ($e, $res) use ($b, $deferred) {
             if ($e) {
@@ -558,7 +569,7 @@ abstract class Tools extends StrTools
                 }
                 return;
             }
-            $b = self::call($b());
+            $b = self::call($b);
             $b->onResolve(function ($e, $res) use ($deferred) {
                 if ($e) {
                     if (isset($this)) {

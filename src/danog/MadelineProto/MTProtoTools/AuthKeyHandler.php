@@ -22,7 +22,6 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Http\Client\Request;
 use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProto\AuthKey;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\Settings;

@@ -34,7 +34,7 @@ use danog\MadelineProto\Stream\Transport\WssStream;
 use JsonSerializable;
 
 /**
- * Datacenter connection
+ * Datacenter connection.
  */
 class DataCenterConnection implements JsonSerializable
 {

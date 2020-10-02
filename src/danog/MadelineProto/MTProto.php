@@ -404,12 +404,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public $updaters = [];
     /**
-     * Boolean to avoid problems with exceptions thrown by forked strands, see tools.
-     *
-     * @var boolean
-     */
-    public bool $destructing = false;
-    /**
      * DataCenter instance.
      *
      * @var DataCenter

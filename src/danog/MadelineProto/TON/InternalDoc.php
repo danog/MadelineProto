@@ -1366,7 +1366,8 @@ class InternalDoc extends APIFactory
      *
      * @psalm-suppress InvalidScope
      *
-     * @return mixed
+     * @return void
+     *
      * @access public
      */
     public function setVar($obj, string $var, &$val): void

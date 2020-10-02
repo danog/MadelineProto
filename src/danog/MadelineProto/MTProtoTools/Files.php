@@ -48,7 +48,6 @@ use function Amp\Promise\all;
 trait Files
 {
     use FilesLogic;
-
     /**
      * Upload file from URL.
      *
@@ -58,7 +57,9 @@ trait Files
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      *
-     * @return array
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\Http\Client\Response>|\Amp\Promise<int>|\Amp\Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, mixed>
      */
     public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false): \Generator
     {
@@ -106,7 +107,9 @@ trait Files
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator<array>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int, \Amp\Promise|\Amp\Promise<array>, mixed, array{_: string, id: string, parts: int, name: string, mime_type: string, key_fingerprint?: mixed, key?: mixed, iv?: mixed, md5_checksum: string}>
      */
     public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', $cb = null, bool $seekable = true, bool $encrypted = false): \Generator
     {
@@ -134,6 +137,9 @@ trait Files
         $constructor = 'input'.($encrypted === true ? 'Encrypted' : '').($size > 10 * 1024 * 1024 ? 'FileBig' : 'File').($encrypted === true ? 'Uploaded' : '');
         $file_id = Tools::random(8);
         $ige = null;
+        $fingerprint = null;
+        $iv = null;
+        $key = null;
         if ($encrypted === true) {
             $key = Tools::random(32);
             $iv = Tools::random(32);
@@ -227,7 +233,9 @@ trait Files
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator<array>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, mixed>
      */
     public function uploadFromTgfile($media, $cb = null, bool $encrypted = false): \Generator
     {
@@ -756,7 +764,9 @@ trait Files
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      *
-     * @return \Generator<string> Downloaded file path
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|\Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<callable|null>|\Amp\Promise<mixed>|array|bool|mixed, mixed, false|string>
      */
     public function downloadToDir($messageMedia, $dir, $cb = null): \Generator
     {
@@ -774,7 +784,9 @@ trait Files
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      *
-     * @return \Generator<string> Downloaded file path
+     * @return \Generator Downloaded file path
+     *
+     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|\Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<callable|null>|\Amp\Promise<mixed>|array|bool|mixed, mixed, false|string>
      */
     public function downloadToFile($messageMedia, $file, $cb = null): \Generator
     {
@@ -817,7 +829,9 @@ trait Files
      * @param int                            $end           Offset where to stop downloading (inclusive)
      * @param int                            $part_size     Size of each chunk
      *
-     * @return \Generator<bool>
+     * @return \Generator
+     *
+     * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, true>
      */
     public function downloadToCallable($messageMedia, callable $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, int $part_size = null): \Generator
     {

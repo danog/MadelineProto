@@ -23,6 +23,7 @@ use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
 use danog\MadelineProto\Db\DriverArray;
+use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\MTProtoSession\Session;
 
@@ -102,6 +103,8 @@ abstract class Serialization
      * @internal
      *
      * @return \Generator
+     * 
+     * @psalm-return \Generator<void, mixed, mixed, array{0: callable|null, 1: Client|MTProto}>
      */
     public static function unserialize(SessionPaths $session, bool $forceFull = false): \Generator
     {

@@ -477,9 +477,9 @@ class Connection extends Session
     /**
      * Get main instance.
      *
-     * @return MTProtoSession\MTProto
+     * @return MTProto
      */
-    public function getExtra(): MTProtoSession\MTProto
+    public function getExtra(): MTProto
     {
         return $this->API;
     }
