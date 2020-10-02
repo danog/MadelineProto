@@ -15,6 +15,7 @@ class Ipc extends SettingsAbstract
 
     public function mergeArray(array $settings): void
     {
+        $this->setSlow($settings['ipc']['slow'] ?? $this->getSlow());
     }
 
     /**

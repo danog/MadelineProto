@@ -139,6 +139,7 @@ class Settings extends SettingsAbstract
         $this->secretChats->mergeArray($settings);
         $this->serialization->mergeArray($settings);
         $this->schema->mergeArray($settings);
+        $this->ipc->mergeArray($settings);
 
         switch ($settings['db']['type'] ?? 'memory') {
             case 'memory':
