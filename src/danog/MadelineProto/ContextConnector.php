@@ -37,10 +37,10 @@ class ContextConnector implements Connector
         $this->fromDns = $fromDns;
         $this->logger = $dataCenter->getAPI()->getLogger();
     }
-    public function connect(string $uri, ?ConnectContext $ctx = null, ?CancellationToken $token = null): Promise
+    public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Promise
     {
-        return Tools::call((function () use ($uri, $ctx, $token): \Generator {
-            $ctx = $ctx ?? new ConnectContext();
+        return Tools::call((function () use ($uri, $context, $token): \Generator {
+            $ctx = $context ?? new ConnectContext();
             $token = $token ?? new NullCancellationToken();
             $ctxs = $this->dataCenter->generateContexts(0, $uri, $ctx);
             if (empty($ctxs)) {

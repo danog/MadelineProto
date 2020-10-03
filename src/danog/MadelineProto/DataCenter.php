@@ -62,7 +62,7 @@ class DataCenter
     /**
      * All socket connections to DCs.
      *
-     * @var array<string, DataCenterConnection>
+     * @var array<string|int, DataCenterConnection>
      */
     public $sockets = [];
     /**
@@ -138,11 +138,12 @@ class DataCenter
         $array = [];
         foreach ($this->sockets as $id => $socket) {
             if ($socket instanceof \danog\MadelineProto\Connection) {
-                if ($socket->temp_auth_key) {
+                if (isset($socket->temp_auth_key) && $socket->temp_auth_key) {
                     $array[$id]['tempAuthKey'] = $socket->temp_auth_key;
                 }
-                if ($socket->auth_key) {
+                if (isset($socket->auth_key) && $socket->auth_key) {
                     $array[$id]['permAuthKey'] = $socket->auth_key;
+                    /** @psalm-suppress UndefinedPropertyFetch */
                     $array[$id]['permAuthKey']['authorized'] = $socket->authorized;
                 }
             }

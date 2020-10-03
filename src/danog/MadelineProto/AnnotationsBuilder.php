@@ -27,6 +27,30 @@ use phpDocumentor\Reflection\DocBlockFactory;
 
 class AnnotationsBuilder
 {
+    /**
+     * Reflection classes
+     */
+    private array $reflectionClasses = [];
+    /**
+     * Logger
+     */
+    private Logger $logger;
+    /**
+     * Namespace
+     */
+    private string $namespace;
+    /**
+     * TL instance
+     */
+    private TL $TL;
+    /**
+     * Settings
+     */
+    private array $settings;
+    /**
+     * Output file
+     */
+    private string $output;
     public function __construct(Logger $logger, array $settings, string $output, array $reflectionClasses, string $namespace)
     {
         $this->reflectionClasses = $reflectionClasses;

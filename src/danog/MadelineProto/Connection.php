@@ -101,9 +101,9 @@ class Connection extends Session
     /**
      * Date of last chunk received.
      *
-     * @var integer
+     * @var float
      */
-    private $lastChunk = 0;
+    private float $lastChunk = 0;
     /**
      * Logger instance.
      *
@@ -167,31 +167,13 @@ class Connection extends Session
         return $this->needsReconnect;
     }
     /**
-     * Check if the socket is writing stuff.
-     *
-     * @return boolean
-     */
-    public function isWriting(): bool
-    {
-        return $this->writing;
-    }
-    /**
-     * Check if the socket is reading stuff.
-     *
-     * @return boolean
-     */
-    public function isReading(): bool
-    {
-        return $this->reading;
-    }
-    /**
      * Set writing boolean.
      *
      * @param boolean $writing
      *
      * @return void
      */
-    public function writing(bool $writing)
+    public function writing(bool $writing): void
     {
         $this->shared->writing($writing, $this->id);
     }
@@ -202,7 +184,7 @@ class Connection extends Session
      *
      * @return void
      */
-    public function reading(bool $reading)
+    public function reading(bool $reading): void
     {
         $this->shared->reading($reading, $this->id);
     }
@@ -218,9 +200,9 @@ class Connection extends Session
     /**
      * Get the receive date of the latest chunk of data from the socket.
      *
-     * @return int
+     * @return float
      */
-    public function getLastChunk(): int
+    public function getLastChunk(): float
     {
         return $this->lastChunk;
     }

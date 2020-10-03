@@ -179,7 +179,7 @@ class DataCenterConnection implements JsonSerializable
      *
      * @return void
      */
-    public function setAuthKey(?AuthKey $key, bool $temp = true)
+    public function setAuthKey(?AuthKey $key, bool $temp = true): void
     {
         $this->{$temp ? 'tempAuthKey' : 'permAuthKey'} = $key;
     }
@@ -226,9 +226,9 @@ class DataCenterConnection implements JsonSerializable
      *
      * @return void
      */
-    public function setTempAuthKey(?TempAuthKey $key)
+    public function setTempAuthKey(?TempAuthKey $key): void
     {
-        return $this->setAuthKey($key, true);
+        $this->setAuthKey($key, true);
     }
     /**
      * Set permanent authorization key.
@@ -237,9 +237,9 @@ class DataCenterConnection implements JsonSerializable
      *
      * @return void
      */
-    public function setPermAuthKey(?PermAuthKey $key)
+    public function setPermAuthKey(?PermAuthKey $key): void
     {
-        return $this->setAuthKey($key, false);
+        $this->setAuthKey($key, false);
     }
     /**
      * Bind temporary and permanent auth keys.

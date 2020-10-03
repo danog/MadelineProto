@@ -61,7 +61,7 @@ class PasswordCalculator
     /**
      * SRP b parameter for hashing.
      *
-     * @var BigInteger
+     * @var string
      */
     private $srp_BForHash;
     /**

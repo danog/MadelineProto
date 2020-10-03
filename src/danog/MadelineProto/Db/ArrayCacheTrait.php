@@ -5,6 +5,11 @@ namespace danog\MadelineProto\Db;
 use Amp\Loop;
 use danog\MadelineProto\Logger;
 
+/**
+ * Array caching trait
+ * 
+ * @property string $table
+ */
 trait ArrayCacheTrait
 {
     /**

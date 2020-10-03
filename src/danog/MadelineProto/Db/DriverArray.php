@@ -6,6 +6,11 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\SettingsAbstract;
 use ReflectionClass;
 
+/**
+ * Array caching trait
+ * 
+ * @property string $table
+ */
 abstract class DriverArray implements DbArray
 {
     use ArrayCacheTrait;

@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
@@ -40,10 +41,14 @@ trait Start
     public function start(): \Generator
     {
         if ((yield $this->getAuthorization()) === MTProto::LOGGED_IN) {
-            return $this instanceof \danog\MadelineProto\Ipc\Client ? yield from $this->getSelf() : yield from $this->fullGetSelf();
+            return $this instanceof Client ? yield from $this->getSelf() : yield from $this->fullGetSelf();
         }
         if ($this->getWebTemplate() === 'legacy') {
-            $this->setWebTemplate((yield $this->getSettings())->getTemplates()->getHtmlTemplate());
+            if ($this instanceof Client) {
+                $this->setWebTemplate(yield from $this->getSettings());
+            } else {
+                $this->setWebTemplate($this->settings);
+            }
         }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             if (\strpos(yield Tools::readLine(Lang::$current_lang['loginChoosePrompt']), 'b') !== false) {

@@ -458,9 +458,14 @@ abstract class Tools extends StrTools
     /**
      * Convert generator, promise or any other value to a promise.
      *
+     * @template TReturn
+     *
      * @param \Generator|Promise|mixed $promise
      *
+     * @psalm-param \Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
+     *
      * @return Promise
+     * @psalm-return Promise<TReturn>
      */
     public static function call($promise): Promise
     {
@@ -512,7 +517,7 @@ abstract class Tools extends StrTools
      */
     public static function callForkDefer($promise): void
     {
-        Loop::defer([__CLASS__, 'callFork'], $promise);
+        Loop::defer([self::class, 'callFork'], $promise);
     }
     /**
      * Rethrow error catched in strand.

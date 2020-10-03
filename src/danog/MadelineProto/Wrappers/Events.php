@@ -46,7 +46,7 @@ trait Events
     /**
      * Event handler method list.
      *
-     * @var array<string>
+     * @var array<string, callable>
      */
     private $eventHandlerMethods = [];
     /**
