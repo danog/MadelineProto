@@ -51,7 +51,7 @@ abstract class AbstractAPIFactory extends AsyncConstruct
     /**
      * Method list.
      *
-     * @var string[]
+     * @var array<string, callable>
      */
     protected array $methods = [];
 

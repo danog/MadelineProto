@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Loop\Update;
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\UpdatesState;
 
 /**
  * Update feed loop.
@@ -55,6 +56,10 @@ class FeedLoop extends ResumableSignalLoop
      * @var UpdateLoop
      */
     private ?UpdateLoop $updater = null;
+    /**
+     * Update state
+     */
+    private ?UpdatesState $state = null;
     /**
      * Constructor.
      *

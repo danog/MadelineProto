@@ -157,8 +157,9 @@ class DoHConnector implements Connector
 
             // This is reached if either all URIs failed or the maximum number of attempts is reached.
             /** @noinspection PhpUndefinedVariableInspection */
-
-            throw $e;
+            if ($e) {
+                throw $e;
+            }
         })());
     }
 }

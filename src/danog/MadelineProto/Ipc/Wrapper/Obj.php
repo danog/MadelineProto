@@ -36,7 +36,7 @@ class Obj
      * @param string $name
      * @param array $arguments
      *
-     * @return \Generator
+     * @return \Generator<mixed, mixed, mixed, mixed>
      */
     public function __call(string $name, array $arguments = []): \Generator
     {

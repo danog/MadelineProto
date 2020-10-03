@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\Ipc\Wrapper;
 
 use Amp\ByteStream\InputStream as AmpInputStream;
+use Amp\ByteStream\PendingReadError;
 use Amp\Promise;
 use danog\MadelineProto\Tools;
 

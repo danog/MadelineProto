@@ -122,7 +122,7 @@ trait TD
             } else {
                 switch (\end($mtproto)) {
                     case 'choose_chat_id_from_botapi':
-                        $newparams[$td] = (yield from $this->getInfo($params[$mtproto[0]]))['bot_api_id'] == $this->authorization['user']['id'] ? $this->getId($params['from_id']) : (yield from $this->getInfo($params[$mtproto[0]])['bot_api_id']);
+                        $newparams[$td] = (yield from $this->getInfo($params[$mtproto[0]]))['bot_api_id'] == $this->authorization['user']['id'] ? $this->getId($params['from_id']) : (yield from $this->getInfo($params[$mtproto[0]]))['bot_api_id'];
                         break;
                     case 'choose_incoming_or_sent':
                         $newparams[$td] = ['_' => $params['out'] ? 'messageIsSuccessfullySent' : 'messageIsIncoming'];

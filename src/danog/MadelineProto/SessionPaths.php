@@ -191,6 +191,7 @@ class SessionPaths
     /**
      * Get IPC state.
      *
+     * @psalm-suppress InvalidReturnType
      * @return Promise<?IpcState>
      */
     public function getIpcState(): Promise
@@ -222,6 +223,7 @@ class SessionPaths
     /**
      * Get light state.
      *
+     * @psalm-suppress InvalidReturnType
      * @return Promise<LightState>
      */
     public function getLightState(): Promise

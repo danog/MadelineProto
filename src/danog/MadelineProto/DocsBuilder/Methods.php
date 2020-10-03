@@ -84,22 +84,22 @@ trait Methods
                 $param[$type_or_subtype] = '['.StrTools::markdownEscape($param[$type_or_subtype]).'](../'.$type_or_bare_type.'/'.$param[$type_or_subtype].'.md)';
                 $params .= "'".$param['name']."' => ".(isset($param['subtype']) ? '\\['.$param[$type_or_subtype].'\\]' : $param[$type_or_subtype]).', ';
             }
-            if (!isset($this->td_descriptions['methods'][$method])) {
+            if (!isset($this->tdDescriptions['methods'][$method])) {
                 $this->addToLang('method_'.$method);
                 if (\danog\MadelineProto\Lang::$lang['en']['method_'.$method] !== '') {
-                    $this->td_descriptions['methods'][$method]['description'] = \danog\MadelineProto\Lang::$lang['en']['method_'.$method];
+                    $this->tdDescriptions['methods'][$method]['description'] = \danog\MadelineProto\Lang::$lang['en']['method_'.$method];
                 }
             }
             $md_method = '['.$phpMethod.']('.$method.'.md)';
             $this->docs_methods[$method] = '$MadelineProto->'.$md_method.'(\\['.$params.'\\]) === [$'.StrTools::markdownEscape($type).'](../types/'.$php_type.'.md)<a name="'.$method.'"></a>  
 
 ';
-            if (isset($this->td_descriptions['methods'][$method])) {
-                $desc = \Parsedown::instance()->line(\trim(\explode("\n", $this->td_descriptions['methods'][$method]['description'])[0], '.'));
+            if (isset($this->tdDescriptions['methods'][$method])) {
+                $desc = \Parsedown::instance()->line(\trim(\explode("\n", $this->tdDescriptions['methods'][$method]['description'])[0], '.'));
                 $dom = new \DOMDocument();
                 $dom->loadHTML(\mb_convert_encoding($desc, 'HTML-ENTITIES', 'UTF-8'));
                 $desc = $dom->textContent;
-                $this->human_docs_methods[$this->td_descriptions['methods'][$method]['description'].': '.$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$desc.': '.$method.'</a>
+                $this->human_docs_methods[$this->tdDescriptions['methods'][$method]['description'].': '.$method] = '* <a href="'.$method.'.html" name="'.$method.'">'.$desc.': '.$method.'</a>
 
 ';
             }
@@ -112,7 +112,7 @@ trait Methods
 | Name     |    Type       | Required |
 |----------|---------------|----------|
 ';
-            if (isset($this->td_descriptions['methods'][$method]) && !empty($data['params'])) {
+            if (isset($this->tdDescriptions['methods'][$method]) && !empty($data['params'])) {
                 $table = '### Parameters:
 
 | Name     |    Type       | Description | Required |
@@ -164,13 +164,13 @@ trait Methods
                     $human_ptype = 'File path or '.$ptype;
                 }
                 $type_or_bare_type = \ctype_upper(Tools::end(\explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53']) ? 'types' : 'constructors';
-                if (!isset($this->td_descriptions['methods'][$method]['params'][$param['name']])) {
-                    if (isset($this->td_descriptions['methods'][$method]['description'])) {
-                        $this->td_descriptions['methods'][$method]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['method_'.$method.'_param_'.$param['name'].'_type_'.$param['type']] ?? '';
+                if (!isset($this->tdDescriptions['methods'][$method]['params'][$param['name']])) {
+                    if (isset($this->tdDescriptions['methods'][$method]['description'])) {
+                        $this->tdDescriptions['methods'][$method]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['method_'.$method.'_param_'.$param['name'].'_type_'.$param['type']] ?? '';
                     }
                 }
-                if (isset($this->td_descriptions['methods'][$method])) {
-                    $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->td_descriptions['methods'][$method]['params'][$param['name']].' | '.(isset($param['pow']) || ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
+                if (isset($this->tdDescriptions['methods'][$method])) {
+                    $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->tdDescriptions['methods'][$method]['params'][$param['name']].' | '.(isset($param['pow']) || ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 } else {
                     $table .= '|'.StrTools::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.StrTools::markdownEscape($human_ptype).'](../'.$type_or_bare_type.'/'.$ptype.'.md) | '.(isset($param['pow']) || ($id = $this->TL->getConstructors($this->td)->findByPredicate(\lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors($this->td)->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 }
@@ -200,7 +200,7 @@ trait Methods
                     $pwr_params = "parseMode - string\n";
                 }
             }
-            $description = isset($this->td_descriptions['methods'][$method]) ? $this->td_descriptions['methods'][$method]['description'] : $method.' parameters, return type and example';
+            $description = isset($this->tdDescriptions['methods'][$method]) ? $this->tdDescriptions['methods'][$method]['description'] : $method.' parameters, return type and example';
             $symFile = \str_replace('.', '_', $method);
             $redir = $symFile !== $method ? "\nredirect_from: /API_docs/methods/{$symFile}.html" : '';
             $description = \rtrim(\explode("\n", $description)[0], ':');
@@ -208,7 +208,7 @@ trait Methods
             if ($this->td) {
                 $header .= "YOU CANNOT USE THIS METHOD IN MADELINEPROTO\n\n\n\n\n";
             }
-            $header .= isset($this->td_descriptions['methods'][$method]) ? $this->td_descriptions['methods'][$method]['description'].PHP_EOL.PHP_EOL : '';
+            $header .= isset($this->tdDescriptions['methods'][$method]) ? $this->tdDescriptions['methods'][$method]['description'].PHP_EOL.PHP_EOL : '';
             $table .= '
 
 ';

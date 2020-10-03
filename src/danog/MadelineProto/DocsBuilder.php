@@ -39,10 +39,16 @@ class DocsBuilder
     use \danog\MadelineProto\DocsBuilder\Methods;
     use \danog\MadelineProto\DocsBuilder\Constructors;
     public $td = false;
-    public function __construct($logger, $settings)
+    protected array $settings;
+    protected string $index;
+    protected Logger $logger;
+    protected TL $TL;
+    protected array $tdDescriptions;
+    public function __construct(Logger $logger, array $settings)
     {
         $this->logger = $logger;
         \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
+        /** @psalm-suppress InvalidArgument */
         $this->TL = new TL(new class($logger) {
             public function __construct($logger)
             {
@@ -119,8 +125,8 @@ class DocsBuilder
                     }
                 }
             }
-            if (isset($this->td_descriptions['types'][$otype])) {
-                $header = "{$this->td_descriptions['types'][$otype]}\n\n$header";
+            if (isset($this->tdDescriptions['types'][$otype])) {
+                $header = "{$this->tdDescriptions['types'][$otype]}\n\n$header";
             }
             $header = \sprintf(
                 $this->templates['Type'],

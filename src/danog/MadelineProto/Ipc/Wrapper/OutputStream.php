@@ -2,7 +2,9 @@
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
+use Amp\ByteStream\ClosedException;
 use Amp\ByteStream\OutputStream as AmpOutputStream;
+use Amp\ByteStream\StreamException;
 use Amp\Promise;
 use danog\MadelineProto\Tools;
 

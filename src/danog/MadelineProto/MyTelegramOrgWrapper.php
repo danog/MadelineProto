@@ -86,6 +86,11 @@ class MyTelegramOrgWrapper
     public function __construct($settings)
     {
         $this->settings = Settings::parseFromLegacy($settings);
+        if (!$this->settings instanceof Settings) {
+            $settings = new Settings;
+            $settings->merge($this->settings);
+            $this->settings = $settings;
+        }
         $this->__wakeup();
     }
     /**

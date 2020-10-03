@@ -56,6 +56,7 @@ class AnnotationsBuilder
         $this->reflectionClasses = $reflectionClasses;
         $this->logger = $logger;
         $this->namespace = $namespace;
+        /** @psalm-suppress InvalidArgument */
         $this->TL = new TL(new class($logger) {
             public function __construct($logger)
             {

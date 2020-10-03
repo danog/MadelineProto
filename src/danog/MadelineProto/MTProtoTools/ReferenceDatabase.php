@@ -504,6 +504,7 @@ class ReferenceDatabase implements TLCallback
                 $local_id = \danog\MadelineProto\Tools::packSignedInt($location['local_id']);
                 return $locationType.$dc_id.$volume_id.$local_id;
         }
+        throw new \danog\MadelineProto\Exception("Invalid location type specified!");
     }
     public function __debugInfo()
     {

@@ -427,7 +427,7 @@ abstract class Tools extends StrTools
      * @param mixed                       $default
      *
      * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
-     * @psalm-param TReturnAlt $timeout
+     * @psalm-param TReturnAlt $default
      *
      * @return Promise<TReturn|TReturnAlt>
      *

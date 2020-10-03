@@ -19,6 +19,8 @@ use Amp\Http\Status;
 use Amp\Producer;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
+use danog\MadelineProto\Ipc\Client;
+use danog\MadelineProto\Settings;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -225,7 +227,9 @@ trait FilesLogic
         if (\is_resource($file) || (\is_object($file) && $file instanceof InputStream)) {
             return yield from $this->uploadFromStream($file, 0, '', $fileName, $cb, $encrypted);
         }
-        if (!$this->settings->getFiles()->getAllowAutomaticUpload()) {
+        /** @var Settings */
+        $settings = $this instanceof Client ? yield $this->getSettings() : $this->settings;
+        if (!$settings->getFiles()->getAllowAutomaticUpload()) {
             return yield from $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted);
         }
         $file = Tools::absolute($file);
