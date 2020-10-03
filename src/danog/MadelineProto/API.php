@@ -192,6 +192,7 @@ class API extends InternalDoc
             $forceFull = $forceFull || $settings->getIpc()->getSlow();
         }
 
+        /** @psalm-trace $unserialized */
         [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(
             Serialization::unserialize($this->session, $forceFull),
             30000,

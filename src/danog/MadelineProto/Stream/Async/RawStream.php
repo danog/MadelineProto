@@ -42,10 +42,9 @@ trait RawStream
     {
         if (\method_exists($this, 'endGenerator')) {
             return \danog\MadelineProto\Tools::call($this->endGenerator($finalData));
-        } else {
-            $promise = $this->write($finalData);
-            $promise->onResolve(fn () => $this->disconnect());
-            return $promise;
         }
+        $promise = $this->write($finalData);
+        $promise->onResolve(fn () => $this->disconnect());
+        return $promise;
     }
 }

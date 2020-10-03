@@ -6153,12 +6153,12 @@ class InternalDoc extends APIFactory
      * @template TReturn
      * @template TGenerator as \Generator<mixed, mixed, mixed, TReturn>
      *
-     * @param Promise<TReturn>|\Generator $promise Promise to which the timeout is applied.
-     * @param int                         $timeout Timeout in milliseconds.
-     * @param mixed                       $default
+     * @param Promise|Generator $promise Promise to which the timeout is applied.
+     * @param int               $timeout Timeout in milliseconds.
+     * @param mixed             $default
      *
      * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
-     * @psalm-param TReturnAlt $timeout
+     * @psalm-param TReturnAlt $default
      *
      * @return Promise<TReturn|TReturnAlt>
      *

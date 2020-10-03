@@ -637,8 +637,8 @@ trait PeerHandler
      * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
      *
      * @psalm-return array{
-     *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}, 
-     *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}, 
+     *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
+     *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed},
      *      DialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
      *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
      *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}},
@@ -647,8 +647,8 @@ trait PeerHandler
      *      user_id?: int,
      *      chat_id?: int,
      *      channel_id?: int,
-     *      InputUser?: {_: string, user_id?: int, access_hash?: mixed, min?: bool}, 
-     *      InputChannel?: {_: string, channel_id: int, access_hash: mixed, min: bool}, 
+     *      InputUser?: {_: string, user_id?: int, access_hash?: mixed, min?: bool},
+     *      InputChannel?: {_: string, channel_id: int, access_hash: mixed, min: bool},
      *      type: string
      * }
      */

@@ -415,6 +415,9 @@ trait UpdateHandler
         if (isset($update['message']['from_id']['user_id']) && $update['message']['from_id']['user_id'] === $this->authorization['user']['id']) {
             $update['message']['out'] = true;
         }
+        if (isset($update['message']['peer_id'])) {
+            $update['message']['to_id'] = $update['message']['peer_id'];
+        }
         // First save to array, then once the feed loop signals resumal of loop, resume and handle
         $this->updates[$this->updates_key++] = $update;
     }

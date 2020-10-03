@@ -31,7 +31,6 @@ class Lua
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['script_not_exist']);
         }
         $this->MadelineProto = $MadelineProto;
-        $this->MadelineProto->API->datacenter->sockets[$this->MadelineProto->getSettings()->getConnection()->getDefaultDc()]->startUpdateLoop();
         $this->script = $script;
         $this->__wakeup();
     }
@@ -84,7 +83,7 @@ class Lua
         if ($params === 0) {
             return 0;
         }
-        $result = $this->MadelineProto->API->methodCall($params['_'], $params, ['datacenter' => $this->MadelineProto->API->datacenter->curdc]);
+        $result = $this->MadelineProto->API->methodCall($params['_'], $params);
         if (\is_callable($cb)) {
             $cb($this->MadelineProto->mtproto_to_td($result), $cb_extra);
         }
@@ -92,7 +91,7 @@ class Lua
     }
     public function madelineFunction($params, $cb = null, $cb_extra = null)
     {
-        $result = $this->MadelineProto->API->methodCall($params['_'], $params, ['datacenter' => $this->MadelineProto->API->datacenter->curdc]);
+        $result = $this->MadelineProto->API->methodCall($params['_'], $params);
         if (\is_callable($cb)) {
             $cb($result, $cb_extra);
         }

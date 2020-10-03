@@ -19,12 +19,13 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use danog\MadelineProto\Connection;
 use danog\MadelineProto\MTProto;
 
 /**
  * Manages MTProto session-specific data.
  *
- * @property MTProto $API
+ * @extends Connection
  */
 abstract class Session
 {
