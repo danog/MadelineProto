@@ -36,6 +36,12 @@ use danog\MadelineProto\Stream\RawStreamInterface;
 class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInterface
 {
     use RawStream;
+    /**
+     * Stream.
+     *
+     * @var RawStreamInterface
+     */
+    protected $stream;
     private $extra;
     /**
      * Connect to stream.

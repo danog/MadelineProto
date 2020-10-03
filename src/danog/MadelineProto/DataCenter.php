@@ -604,7 +604,7 @@ class DataCenter
     /**
      * Get all DataCenterConnection instances.
      *
-     * @return array<string, DataCenterConnection>
+     * @return array<int|string, DataCenterConnection>
      */
     public function getDataCenterConnections(): array
     {

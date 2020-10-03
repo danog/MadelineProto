@@ -155,11 +155,11 @@ class DocsBuilder
      * Get formatted template string.
      *
      * @param string   $name      Template name
-     * @param string[] ...$params Params
+     * @param string   ...$params Params
      *
      * @return string
      */
-    protected function template(string $name, ...$params): string
+    protected function template(string $name, string ...$params): string
     {
         return \sprintf($this->templates[$name], ...$params);
     }

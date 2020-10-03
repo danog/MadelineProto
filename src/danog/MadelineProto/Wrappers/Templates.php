@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\Wrappers;
 
 use \danog\MadelineProto\MTProto;
+use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Lang;
 use function Amp\ByteStream\getOutputBufferStream;
 
@@ -59,7 +60,10 @@ trait Templates
             $form = "<input type='text' name='phone_code' placeholder='$phone' required/>";
         } elseif ($auth === MTProto::WAITING_PASSWORD) {
             $title = Lang::$current_lang['loginUserPassWeb'];
-            $hint = \htmlentities(\sprintf(Lang::$current_lang['loginUserPassHint'], $this->authorization['hint']));
+            $hint = \htmlentities(\sprintf(
+                Lang::$current_lang['loginUserPassHint'],
+                $this instanceof Client ? yield from $this->getHint() : $this->getHint()
+            ));
             $form = "<input type='password' name='password' placeholder='$hint' required/>";
         } elseif ($auth === MTProto::WAITING_SIGNUP) {
             $title = Lang::$current_lang['signupWeb'];

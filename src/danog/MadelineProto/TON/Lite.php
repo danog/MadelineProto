@@ -20,6 +20,8 @@
 namespace danog\MadelineProto\TON;
 
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\Logger as SettingsLogger;
+use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
 use function Amp\File\get;
@@ -38,9 +40,9 @@ class Lite
     /**
      * Misc settings.
      *
-     * @var array
+     * @var SettingsLogger
      */
-    private $settings = [];
+    private SettingsLogger $settings;
     /**
      * TL serializer instance.
      *
@@ -62,14 +64,17 @@ class Lite
     /**
      * Construct settings.
      *
-     * @param array $settings
+     * @param SettingsLogger $settings
      */
-    public function __construct(array $settings)
+    public function __construct(SettingsLogger $settings)
     {
         $this->settings = $settings;
-        $this->logger = Logger::getLoggerFromSettings($this->settings);
+        $this->logger = Logger::constructorFromSettings($this->settings);
+        $schema = new TLSchema;
+        $schema->setOther(['lite_api' => __DIR__.'/../../../../schemas/TON/lite_api.tl', 'ton_api' => __DIR__.'/../../../../schemas/TON/ton_api.tl']);
+        /** @psalm-suppress InvalidArgument */
         $this->TL = new TL($this);
-        $this->TL->init(['lite_api' => __DIR__.'/../../../../schemas/TON/lite_api.tl', 'ton_api' => __DIR__.'/../../../../schemas/TON/ton_api.tl']);
+        $this->TL->init($schema);
     }
     /**
      * Connect to the lite endpoints specified in the config file.

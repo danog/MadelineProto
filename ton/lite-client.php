@@ -1,17 +1,11 @@
 <?php
 
-use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\TON\API;
 
 require 'vendor/autoload.php';
 
-$API = new API(
-    [
-        'logger' => [
-            'logger' => Logger::ECHO_LOGGER
-        ]
-    ]
-);
+$API = new API(new SettingsLogger);
 
 $API->async(true);
 $API->loop(

@@ -37,6 +37,12 @@ class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamInterfac
 {
     const REPS = [0 => 'succeeded', 1 => 'general SOCKS server failure', 2 => 'connection not allowed by ruleset', 3 => 'Network unreachable', 4 => 'Host unreachable', 5 => 'Connection refused', 6 => 'TTL expired', 7 => 'Command not supported', 8 => 'Address type not supported'];
     use RawStream;
+    /**
+     * Stream.
+     *
+     * @var RawStreamInterface
+     */
+    protected $stream;
     private $extra;
     /**
      * Connect to stream.

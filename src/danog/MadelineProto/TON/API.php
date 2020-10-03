@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\TON;
 
 use danog\MadelineProto\Magic;
+use danog\MadelineProto\Settings\Logger;
 
 /**
  * TON API.
@@ -29,9 +30,9 @@ class API extends InternalDoc
     /**
      * Construct API.
      *
-     * @param array $settings Settings
+     * @param Logger $settings Settings
      */
-    public function __construct(array $settings)
+    public function __construct(Logger $settings)
     {
         Magic::classExists();
         $this->API = new Lite($settings);

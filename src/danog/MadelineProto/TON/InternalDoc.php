@@ -987,7 +987,7 @@ class InternalDoc extends APIFactory
      *
      * @param array $parameters Parameters
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function botAPItoMTProto(array $parameters, array $extra = [])
     {
@@ -998,7 +998,11 @@ class InternalDoc extends APIFactory
      *
      * @param \Generator|Promise|mixed $promise
      *
+     * @template TReturn
+     * @psalm-param \Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
+     *
      * @return Promise
+     * @psalm-return Promise<TReturn>
      */
     public function call($promise)
     {
@@ -1035,7 +1039,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $config Path to config file
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function connect(string $config, array $extra = [])
     {
@@ -1189,7 +1193,7 @@ class InternalDoc extends APIFactory
      *
      * @param callable $func Function
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function loop(callable $func, array $extra = [])
     {
@@ -1212,7 +1216,7 @@ class InternalDoc extends APIFactory
      * @param string $methodName Method name
      * @param array  $args       Arguments
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function methodCall(string $methodName, array $args = [
     ], array $aargs = [
@@ -1416,15 +1420,20 @@ class InternalDoc extends APIFactory
      *
      * If the timeout expires before the promise is resolved, a default value is returned
      *
+     * @template TReturnAlt
      * @template TReturn
+     * @template TGenerator as \Generator<mixed, mixed, mixed, TReturn>
      *
      * @param Promise<TReturn>|\Generator $promise Promise to which the timeout is applied.
      * @param int                         $timeout Timeout in milliseconds.
-     * @param TReturn                     $default
+     * @param mixed                       $default
      *
-     * @return Promise<TReturn>
+     * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
+     * @psalm-param TReturnAlt $timeout
      *
-     * @throws \TypeError If $promise is not an instance of \Amp\Promise or \React\Promise\PromiseInterface.
+     * @return Promise<TReturn|TReturnAlt>
+     *
+     * @throws \TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
      */
     public function timeoutWithDefault($promise, int $timeout, $default = null)
     {

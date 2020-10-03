@@ -115,7 +115,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
             /**
              * Destructor function.
              */
-            public function __destruct(): void
+            public function __destruct()
             {
                 \fclose($this->buffer);
             }

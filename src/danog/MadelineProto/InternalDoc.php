@@ -4450,7 +4450,7 @@ class InternalDoc extends APIFactory
          *
          * @param array $data Data
          *
-         * @return \Generator<array>
+         * @return \Amp\Promise<array>
          */
     public function MTProtoToBotAPI(array $data, array $extra = [])
     {
@@ -4461,7 +4461,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $params Params
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function MTProtoToTd(&$params, array $extra = [])
     {
@@ -4472,7 +4472,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $params Params
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function MTProtoToTdcli($params, array $extra = [])
     {
@@ -4483,7 +4483,7 @@ class InternalDoc extends APIFactory
      *
      * @param array $call Call
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function acceptCall(array $call, array $extra = [])
     {
@@ -4494,7 +4494,7 @@ class InternalDoc extends APIFactory
      *
      * @param array $params Secret chat ID
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function acceptSecretChat($params, array $extra = [])
     {
@@ -4503,7 +4503,7 @@ class InternalDoc extends APIFactory
     /**
      * Accept terms of service update.
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function acceptTos(array $extra = [])
     {
@@ -4514,7 +4514,7 @@ class InternalDoc extends APIFactory
      *
      * @param array $user User info
      *
-     * @return \Generator
+     * @return \Amp\Promise
      * @throws \danog\MadelineProto\Exception
      */
     public function addUser(array $user, array $extra = [])
@@ -4596,7 +4596,7 @@ class InternalDoc extends APIFactory
      *
      * @param array $arguments Arguments
      *
-     * @return \Generator<array>
+     * @return \Amp\Promise<array>
      */
     public function botAPIToMTProto(array $arguments, array $extra = [])
     {
@@ -4607,7 +4607,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $token Bot token
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function botLogin(string $token, array $extra = [])
     {
@@ -4618,7 +4618,11 @@ class InternalDoc extends APIFactory
      *
      * @param \Generator|Promise|mixed $promise
      *
+     * @template TReturn
+     * @psalm-param \Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
+     *
      * @return Promise
+     * @psalm-return Promise<TReturn>
      */
     public function call($promise)
     {
@@ -4673,7 +4677,7 @@ class InternalDoc extends APIFactory
     /**
      * Check for terms of service update.
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function checkTos(array $extra = [])
     {
@@ -4704,7 +4708,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $password Password
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function complete2faLogin(string $password, array $extra = [])
     {
@@ -4715,7 +4719,7 @@ class InternalDoc extends APIFactory
      *
      * @param array $params Params
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function completeCall(array $params, array $extra = [])
     {
@@ -4726,7 +4730,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $code Login code
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function completePhoneLogin($code, array $extra = [])
     {
@@ -4738,7 +4742,7 @@ class InternalDoc extends APIFactory
      * @param string $first_name First name
      * @param string $last_name  Last name
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function completeSignup(string $first_name, string $last_name = '', array $extra = [])
     {
@@ -4749,7 +4753,7 @@ class InternalDoc extends APIFactory
      *
      * @param array $params Params
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function confirmCall(array $params, array $extra = [])
     {
@@ -4760,7 +4764,7 @@ class InternalDoc extends APIFactory
      *
      * @param boolean $reconnectAll Whether to reconnect to all DCs
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function connectToAllDcs(bool $reconnectAll = true, array $extra = [])
     {
@@ -4771,7 +4775,7 @@ class InternalDoc extends APIFactory
      *
      * THIS WILL DELETE YOUR ACCOUNT!
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function declineTos(array $extra = [])
     {
@@ -4785,7 +4789,7 @@ class InternalDoc extends APIFactory
      * @param array   $rating     Rating
      * @param boolean $need_debug Need debug?
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function discardCall(array $call, array $reason, array $rating = [
     ], bool $need_debug = true, array $extra = [])
@@ -4797,7 +4801,7 @@ class InternalDoc extends APIFactory
      *
      * @param int $chat Secret chat ID
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function discardSecretChat(int $chat, array $extra = [])
     {
@@ -4811,7 +4815,7 @@ class InternalDoc extends APIFactory
      * @param array|string $messageMedia File to download
      * @param callable     $cb           Status callback (can also use FileCallback)
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function downloadToBrowser($messageMedia, ?callable $cb = null, array $extra = [])
     {
@@ -4831,9 +4835,9 @@ class InternalDoc extends APIFactory
      * @param int                            $end           Offset where to stop downloading (inclusive)
      * @param int                            $part_size     Size of each chunk
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, true>
+     * @psalm-return \Amp\Promise<true>
      */
     public function downloadToCallable($messageMedia, callable $callable, $cb = null, bool $seekable = true, int $offset = 0, int $end = -1, ?int $part_size = null, array $extra = [])
     {
@@ -4846,9 +4850,9 @@ class InternalDoc extends APIFactory
      * @param string|FileCallbackInterface $dir           Directory where to download the file
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|\Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<callable|null>|\Amp\Promise<mixed>|array|bool|mixed, mixed, false|string>
+     * @psalm-return \Amp\Promise<false|string>
      */
     public function downloadToDir($messageMedia, $dir, $cb = null, array $extra = [])
     {
@@ -4861,9 +4865,9 @@ class InternalDoc extends APIFactory
      * @param string|FileCallbackInterface $file          Downloaded file path
      * @param callable                     $cb            Callback (DEPRECATED, use FileCallbackInterface)
      *
-     * @return \Generator Downloaded file path
+     * @return \Amp\Promise Downloaded file path
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|\Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<callable|null>|\Amp\Promise<mixed>|array|bool|mixed, mixed, false|string>
+     * @psalm-return \Amp\Promise<false|string>
      */
     public function downloadToFile($messageMedia, $file, $cb = null, array $extra = [])
     {
@@ -4878,9 +4882,9 @@ class InternalDoc extends APIFactory
      * @param ServerRequest $request      Request
      * @param callable      $cb           Status callback (can also use FileCallback)
      *
-     * @return \Generator Returned response
+     * @return \Amp\Promise Returned response
      *
-     * @psalm-return \Generator<mixed, array, mixed, \Amp\Http\Server\Response>
+     * @psalm-return \Amp\Promise<\Amp\Http\Server\Response>
      */
     public function downloadToResponse($messageMedia, \Amp\Http\Server\Request $request, ?callable $cb = null, array $extra = [])
     {
@@ -4895,9 +4899,9 @@ class InternalDoc extends APIFactory
      * @param int                         $offset        Offset where to start downloading
      * @param int                         $end           Offset where to end download
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<int, \Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<mixed>|mixed, mixed, mixed>
+     * @psalm-return \Amp\Promise<mixed>
      */
     public function downloadToStream($messageMedia, $stream, $cb = null, int $offset = 0, int $end = -1, array $extra = [])
     {
@@ -4928,9 +4932,9 @@ class InternalDoc extends APIFactory
     /**
      * Export authorization.
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<mixed, array|bool, mixed, array{0: int|string, 1: string}>
+     * @psalm-return \Amp\Promise<array{0: int|string, 1: string}>
      */
     public function exportAuthorization(array $extra = [])
     {
@@ -4952,9 +4956,9 @@ class InternalDoc extends APIFactory
      *
      * @param string $url URL
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<int, Promise<string>, mixed, string>
+     * @psalm-return \Amp\Promise<string>
      */
     public function fileGetContents(string $url, array $extra = [])
     {
@@ -5003,7 +5007,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $id Chat ID
      *
-     * @return \Generator<integer>
+     * @return \Amp\Promise<integer>
      */
     public function fullChatLastUpdated($id, array $extra = [])
     {
@@ -5012,7 +5016,7 @@ class InternalDoc extends APIFactory
     /**
      * Get info about the logged-in user, not cached.
      *
-     * @return \Generator<array|bool>
+     * @return \Amp\Promise<array|bool>
      */
     public function fullGetSelf(array $extra = [])
     {
@@ -5072,7 +5076,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $datacenter DC ID
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function getCdnConfig(string $datacenter, array $extra = [])
     {
@@ -5084,7 +5088,7 @@ class InternalDoc extends APIFactory
      * @param array $config  Current config
      * @param array $options Options for method call
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function getConfig(array $config = [
     ], array $options = [
@@ -5124,9 +5128,9 @@ class InternalDoc extends APIFactory
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<int, \Amp\Promise<bool>, mixed, list<mixed>>
+     * @psalm-return \Amp\Promise<list<mixed>>
      */
     public function getDialogs(bool $force = true, array $extra = [])
     {
@@ -5143,7 +5147,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $messageMedia File ID
      *
-     * @return \Generator<array>
+     * @return \Amp\Promise<array>
      */
     public function getDownloadInfo($messageMedia, array $extra = [])
     {
@@ -5186,7 +5190,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $constructor File ID
      *
-     * @return \Generator<array>
+     * @return \Amp\Promise<array>
      */
     public function getFileInfo($constructor, array $extra = [])
     {
@@ -5208,7 +5212,7 @@ class InternalDoc extends APIFactory
      *
      * @param boolean $force Whether to refetch all dialogs ignoring cache
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function getFullDialogs(bool $force = true, array $extra = [])
     {
@@ -5221,9 +5225,9 @@ class InternalDoc extends APIFactory
      *
      * @see https://docs.madelineproto.xyz/FullInfo.html
      *
-     * @return \Generator FullInfo object
+     * @return \Amp\Promise FullInfo object
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, array>
+     * @psalm-return \Amp\Promise<array>
      */
     public function getFullInfo($id, array $extra = [])
     {
@@ -5237,6 +5241,15 @@ class InternalDoc extends APIFactory
     public function getHTTPClient(): \Amp\Http\Client\HttpClient
     {
         return $this->API->getHTTPClient();
+    }
+    /**
+     * Get current password hint.
+     *
+     * @return string
+     */
+    public function getHint(): string
+    {
+        return $this->API->getHint();
     }
     /**
      * Get bot API ID from peer object.
@@ -5257,9 +5270,9 @@ class InternalDoc extends APIFactory
      *
      * @see https://docs.madelineproto.xyz/Info.html
      *
-     * @return \Generator Info object
+     * @return \Amp\Promise Info object
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<string>|array, mixed, array|mixed>
+     * @psalm-return \Amp\Promise<array|mixed>
      */
     public function getInfo($id, $recursive = true, array $extra = [])
     {
@@ -5335,7 +5348,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $messageMedia File ID
      *
-     * @return \Generator<array>
+     * @return \Amp\Promise<array>
      */
     public function getPropicInfo($data, array $extra = [])
     {
@@ -5355,7 +5368,7 @@ class InternalDoc extends APIFactory
      *
      * @see https://docs.madelineproto.xyz/Chat.html
      *
-     * @return \Generator<array> Chat object
+     * @return \Amp\Promise<array> Chat object
      */
     public function getPwrChat($id, bool $fullfetch = true, bool $send = true, array $extra = [])
     {
@@ -5486,7 +5499,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $authorization Authorization info
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function importAuthorization($authorization, array $extra = [])
     {
@@ -5508,7 +5521,7 @@ class InternalDoc extends APIFactory
      *
      * @param MTProto $MadelineProto
      * @param boolean $reset
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function initDb(\danog\MadelineProto\MTProto $MadelineProto, bool $reset = false, array $extra = [])
     {
@@ -5579,7 +5592,7 @@ class InternalDoc extends APIFactory
     /**
      * Log out currently logged in user.
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function logout(array $extra = [])
     {
@@ -5590,7 +5603,7 @@ class InternalDoc extends APIFactory
      *
      * @param callable|null $callback Async callable to run
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function loop($callback = null, array $extra = [])
     {
@@ -5661,7 +5674,7 @@ class InternalDoc extends APIFactory
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function methodCall(string $method, $args = [
     ], array $aargs = [
@@ -5677,7 +5690,7 @@ class InternalDoc extends APIFactory
      * @param array  $args   Arguments
      * @param array  $aargs  Additional arguments
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function methodCallWrite(string $method, $args = [
     ], array $aargs = [
@@ -5746,9 +5759,9 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $id Peer
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, bool>
+     * @psalm-return \Amp\Promise<bool>
      */
     public function peerIsset($id, array $extra = [])
     {
@@ -5760,7 +5773,7 @@ class InternalDoc extends APIFactory
      * @param string  $number   Phone number
      * @param integer $sms_type SMS type
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function phoneLogin($number, $sms_type = 5, array $extra = [])
     {
@@ -5817,7 +5830,7 @@ class InternalDoc extends APIFactory
      *
      * @param int $chat Secret chat to rekey
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function rekey(int $chat, array $extra = [])
     {
@@ -5829,7 +5842,7 @@ class InternalDoc extends APIFactory
      * @param string $message   Error to report
      * @param string $parseMode Parse mode
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function report(string $message, string $parseMode = '', array $extra = [])
     {
@@ -5840,7 +5853,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $user User
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function requestCall($user, array $extra = [])
     {
@@ -5851,7 +5864,7 @@ class InternalDoc extends APIFactory
      *
      * @param mixed $user User to start secret chat with
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function requestSecretChat($user, array $extra = [])
     {
@@ -5871,7 +5884,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $username Username
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function resolveUsername(string $username, array $extra = [])
     {
@@ -5960,7 +5973,7 @@ class InternalDoc extends APIFactory
      *
      * @param class-string<EventHandler> $eventHandler Event handler
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function setEventHandler(string $eventHandler, array $extra = [])
     {
@@ -5980,7 +5993,7 @@ class InternalDoc extends APIFactory
      *
      * @param int|string $userOrId Username(s) or peer ID(s)
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function setReportPeers($userOrId, array $extra = [])
     {
@@ -6068,7 +6081,7 @@ class InternalDoc extends APIFactory
     /**
      * Log in to telegram (via CLI or web).
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function start(array $extra = [])
     {
@@ -6088,7 +6101,7 @@ class InternalDoc extends APIFactory
      *
      * @param array $params Parameters
      *
-     * @return \Generator<array>
+     * @return \Amp\Promise<array>
      */
     public function tdToMTProto(array $params, array $extra = [])
     {
@@ -6136,15 +6149,20 @@ class InternalDoc extends APIFactory
      *
      * If the timeout expires before the promise is resolved, a default value is returned
      *
+     * @template TReturnAlt
      * @template TReturn
+     * @template TGenerator as \Generator<mixed, mixed, mixed, TReturn>
      *
      * @param Promise<TReturn>|\Generator $promise Promise to which the timeout is applied.
      * @param int                         $timeout Timeout in milliseconds.
-     * @param TReturn                     $default
+     * @param mixed                       $default
      *
-     * @return Promise<TReturn>
+     * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
+     * @psalm-param TReturnAlt $timeout
      *
-     * @throws \TypeError If $promise is not an instance of \Amp\Promise or \React\Promise\PromiseInterface.
+     * @return Promise<TReturn|TReturnAlt>
+     *
+     * @throws \TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
      */
     public function timeoutWithDefault($promise, int $timeout, $default = null)
     {
@@ -6267,7 +6285,7 @@ class InternalDoc extends APIFactory
      *
      * @param array $params The params
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function update2fa(array $params, array $extra = [])
     {
@@ -6278,7 +6296,7 @@ class InternalDoc extends APIFactory
      *
      * @param SettingsAbstract $settings Settings
      *
-     * @return \Generator
+     * @return \Amp\Promise
      */
     public function updateSettings(\danog\MadelineProto\SettingsAbstract $settings, array $extra = [])
     {
@@ -6292,9 +6310,9 @@ class InternalDoc extends APIFactory
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                            $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|\Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<int>|\Amp\Promise<mixed>|\Amp\Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, mixed>
+     * @psalm-return \Amp\Promise<mixed>
      */
     public function upload($file, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
@@ -6307,9 +6325,9 @@ class InternalDoc extends APIFactory
      * @param string                             $fileName  File name
      * @param callable                           $cb        Callback (DEPRECATED, use FileCallbackInterface)
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\File\File>|\Amp\Promise<\Amp\Ipc\Sync\ChannelledSocket>|\Amp\Promise<int>|\Amp\Promise<mixed>|\Amp\Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, mixed>
+     * @psalm-return \Amp\Promise<mixed>
      */
     public function uploadEncrypted($file, string $fileName = '', $cb = null, array $extra = [])
     {
@@ -6329,9 +6347,9 @@ class InternalDoc extends APIFactory
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<int, \Amp\Promise|\Amp\Promise<array>, mixed, array{_: string, id: string, parts: int, name: string, mime_type: string, key_fingerprint?: mixed, key?: mixed, iv?: mixed, md5_checksum: string}>
+     * @psalm-return \Amp\Promise<array{_: string, id: string, parts: int, name: string, mime_type: string, key_fingerprint?: mixed, key?: mixed, iv?: mixed, md5_checksum: string}>
      */
     public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', $cb = null, bool $seekable = true, bool $encrypted = false, array $extra = [])
     {
@@ -6347,9 +6365,9 @@ class InternalDoc extends APIFactory
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<int>|\Amp\Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, mixed>
+     * @psalm-return \Amp\Promise<mixed>
      */
     public function uploadFromStream($stream, int $size, string $mime, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
     {
@@ -6362,9 +6380,9 @@ class InternalDoc extends APIFactory
      * @param callable $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|array, mixed, mixed>
+     * @psalm-return \Amp\Promise<mixed>
      */
     public function uploadFromTgfile($media, $cb = null, bool $encrypted = false, array $extra = [])
     {
@@ -6379,9 +6397,9 @@ class InternalDoc extends APIFactory
      * @param callable                     $cb        Callback (DEPRECATED, use FileCallbackInterface)
      * @param boolean                      $encrypted Whether to encrypt file for secret chats
      *
-     * @return \Generator
+     * @return \Amp\Promise
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<\Amp\Http\Client\Response>|\Amp\Promise<int>|\Amp\Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, mixed>
+     * @psalm-return \Amp\Promise<mixed>
      */
     public function uploadFromUrl($url, int $size = 0, string $fileName = '', $cb = null, bool $encrypted = false, array $extra = [])
     {

@@ -41,7 +41,7 @@ trait DialogHandler
     {
         if ($this->authorization['user']['bot']) {
             $res = [];
-            /** @uses  DbArray::getIterator() */
+            /** @uses DbArray::getIterator() */
             $iterator = $this->chats->getIterator();
             while (yield $iterator->advance()) {
                 [$id, $chat] = $iterator->getCurrent();

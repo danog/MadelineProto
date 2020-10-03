@@ -263,7 +263,8 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Whether we're authorized.
      *
-     * @var integer
+     * @var int
+     * @psalm-var self::NOT_LOGGED_IN|self::WAITING_*|self::LOGGED_IN
      */
     public $authorized = self::NOT_LOGGED_IN;
     /**
@@ -387,6 +388,10 @@ class MTProto extends AsyncConstruct implements TLCallback
      * RPC reporting loop.
      */
     private ?PeriodicLoopInternal $rpcLoop = null;
+    /**
+     * SEQ update loop.
+     */
+    private ?SeqLoop $seqUpdater = null;
     /**
      * IPC server.
      */
@@ -1677,6 +1682,18 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function getAuthorization(): int
     {
         return $this->authorized;
+    }
+    /**
+     * Get current password hint.
+     *
+     * @return string
+     */
+    public function getHint(): string
+    {
+        if ($this->authorized !== self::WAITING_PASSWORD) {
+            throw new Exception("Not waiting for the password!");
+        }
+        return $this->authorization['hint'];
     }
     /**
      * IDs of peers where to report errors.

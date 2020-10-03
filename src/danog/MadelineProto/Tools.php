@@ -420,7 +420,7 @@ abstract class Tools extends StrTools
      *
      * @template TReturnAlt
      * @template TReturn
-     * @template TGenerator as Generator<mixed, mixed, mixed, TReturn>
+     * @template TGenerator as \Generator<mixed, mixed, mixed, TReturn>
      *
      * @param Promise<TReturn>|\Generator $promise Promise to which the timeout is applied.
      * @param int                         $timeout Timeout in milliseconds.
@@ -458,10 +458,9 @@ abstract class Tools extends StrTools
     /**
      * Convert generator, promise or any other value to a promise.
      *
-     * @template TReturn
-     *
      * @param \Generator|Promise|mixed $promise
      *
+     * @template TReturn
      * @psalm-param \Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
      *
      * @return Promise
@@ -517,7 +516,7 @@ abstract class Tools extends StrTools
      */
     public static function callForkDefer($promise): void
     {
-        Loop::defer([self::class, 'callFork'], $promise);
+        Loop::defer(fn () => self::callFork($promise));
     }
     /**
      * Rethrow error catched in strand.
@@ -616,7 +615,7 @@ abstract class Tools extends StrTools
      *
      * @internal Generator function
      *
-     * @return \Generator
+     * @return \Generator<mixed, mixed, mixed, ?callable>
      */
     public static function flockGenerator(string $file, int $operation, float $polling, ?Promise $token = null, $failureCb = null): \Generator
     {

@@ -33,6 +33,7 @@ use danog\MadelineProto\Tools;
 /**
  * Manages updates.
  *
+ * @extend MTProto
  * @property Settings $settings Settings
  */
 trait UpdateHandler

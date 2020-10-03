@@ -28,27 +28,27 @@ use phpDocumentor\Reflection\DocBlockFactory;
 class AnnotationsBuilder
 {
     /**
-     * Reflection classes
+     * Reflection classes.
      */
     private array $reflectionClasses = [];
     /**
-     * Logger
+     * Logger.
      */
     private Logger $logger;
     /**
-     * Namespace
+     * Namespace.
      */
     private string $namespace;
     /**
-     * TL instance
+     * TL instance.
      */
     private TL $TL;
     /**
-     * Settings
+     * Settings.
      */
     private array $settings;
     /**
-     * Output file
+     * Output file.
      */
     private string $output;
     public function __construct(Logger $logger, array $settings, string $output, array $reflectionClasses, string $namespace)
@@ -309,7 +309,15 @@ class AnnotationsBuilder
             if (!$type) {
                 Logger::log("{$name} has no return type!", Logger::FATAL_ERROR);
             }
-            $internalDoc['InternalDoc'][$name]['method'] = $method->getDocComment() ?? '';
+            $promise = '\\'.Promise::class;
+            $phpdoc = $method->getDocComment() ?? '';
+            $phpdoc = \str_replace("@return \\Generator", "@return $promise", $phpdoc);
+            $phpdoc = \preg_replace(
+                "/@psalm-return \\\\Generator<(?:[^,]+), (?:[^,]+), (?:[^,]+), (.+)>/",
+                "@psalm-return $promise<$1>",
+                $phpdoc
+            );
+            $internalDoc['InternalDoc'][$name]['method'] = $phpdoc;
             $internalDoc['InternalDoc'][$name]['method'] .= "\n    ".\implode("\n    ", \explode("\n", $doc));
         }
         \fwrite($handle, "<?php\n");

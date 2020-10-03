@@ -103,7 +103,7 @@ abstract class Serialization
      * @internal
      *
      * @return \Generator
-     * 
+     *
      * @psalm-return \Generator<void, mixed, mixed, array{0: callable|null, 1: Client|MTProto}>
      */
     public static function unserialize(SessionPaths $session, bool $forceFull = false): \Generator

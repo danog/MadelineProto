@@ -26,6 +26,8 @@ use danog\MadelineProto\MTProto;
 
 /**
  * Manages responses.
+ *
+ * @extend Session
  */
 trait ResponseHandler
 {
@@ -357,7 +359,7 @@ trait ResponseHandler
                                         $socket->setPermAuthKey(null);
                                         $socket->resetSession();
                                     }
-                                    if (in_array($response['error_message'],['USER_DEACTIVATED', 'USER_DEACTIVATED_BAN'], true)) {
+                                    if (\in_array($response['error_message'], ['USER_DEACTIVATED', 'USER_DEACTIVATED_BAN'], true)) {
                                         $this->logger->logger('!!!!!!! WARNING !!!!!!!', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger("Telegram's flood prevention system suspended this account.", \danog\MadelineProto\Logger::ERROR);
                                         $this->logger->logger('To continue, manual verification is required.', \danog\MadelineProto\Logger::FATAL_ERROR);

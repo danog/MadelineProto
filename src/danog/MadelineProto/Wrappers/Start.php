@@ -45,10 +45,11 @@ trait Start
         }
         if ($this->getWebTemplate() === 'legacy') {
             if ($this instanceof Client) {
-                $this->setWebTemplate(yield from $this->getSettings());
+                $settings = yield from $this->getSettings();
             } else {
-                $this->setWebTemplate($this->settings);
+                $settings = $this->settings;
             }
+            $this->setWebTemplate($settings->getTemplates()->getHtmlTemplate());
         }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
             if (\strpos(yield Tools::readLine(Lang::$current_lang['loginChoosePrompt']), 'b') !== false) {

@@ -50,19 +50,6 @@ trait Events
      */
     private $eventHandlerMethods = [];
     /**
-     * Initialize existing event handler.
-     *
-     * @internal
-     *
-     * @return void
-     */
-    public function initExistingEventHandler(): void
-    {
-        if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->API->event_handler, EventHandler::class)) {
-            $this->initEventHandler($this->API->event_handler);
-        }
-    }
-    /**
      * Initialize event handler.
      *
      * @param class-string<EventHandler> $eventHandler
