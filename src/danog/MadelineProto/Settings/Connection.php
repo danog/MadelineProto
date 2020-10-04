@@ -135,7 +135,8 @@ class Connection extends SettingsAbstract
             $this->setRetry(false);
         }
         if (isset($settings['proxy'])) {
-            foreach (\is_iterable($settings['proxy']) ? $settings['proxy'] : [$settings['proxy']] as $key => $proxy) {
+            $isProxyArray = \is_iterable($settings['proxy']);
+            foreach ($isProxyArray ? $settings['proxy'] : [$settings['proxy']] as $key => $proxy) {
                 if ($proxy === '\\Socket') {
                     $proxy = DefaultStream::class;
                 } elseif ($proxy === '\\SocksProxy') {
@@ -146,7 +147,7 @@ class Connection extends SettingsAbstract
                     $proxy = ObfuscatedStream::class;
                 }
                 if ($proxy !== DefaultStream::class) {
-                    $this->addProxy($proxy, $settings['proxy_extra'][$key]);
+                    $this->addProxy($proxy, $isProxyArray ? $settings['proxy_extra'][$key] : $settings['proxy_extra']);
                 }
             }
         }
