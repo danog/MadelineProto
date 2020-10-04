@@ -58,7 +58,8 @@ class AnnotationsBuilder
         $this->namespace = $namespace;
         /** @psalm-suppress InvalidArgument */
         $this->TL = new TL(new class($logger) {
-            public function __construct($logger)
+            public Logger $logger;
+            public function __construct(Logger $logger)
             {
                 $this->logger = $logger;
             }

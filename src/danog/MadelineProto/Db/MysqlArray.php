@@ -79,7 +79,7 @@ class MysqlArray extends SqlArray
      *
      * @link https://php.net/manual/en/arrayiterator.offsetset.php
      *
-     * @param string $index <p>
+     * @param string|int $index <p>
      * The index to set for.
      * </p>
      * @param $value
@@ -118,7 +118,7 @@ class MysqlArray extends SqlArray
      *
      * @link https://php.net/manual/en/arrayiterator.offsetunset.php
      *
-     * @param string $index <p>
+     * @param string|int $index <p>
      * The offset to unset.
      * </p>
      *
@@ -138,12 +138,6 @@ class MysqlArray extends SqlArray
         );
     }
 
-    /**
-     * Get array copy.
-     *
-     * @return Promise<array>
-     * @throws \Throwable
-     */
     public function getArrayCopy(): Promise
     {
         return call(function () {

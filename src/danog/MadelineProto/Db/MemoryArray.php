@@ -24,7 +24,7 @@ class MemoryArray extends \ArrayIterator implements DbArray
      * @param mixed  $value
      * @param string $tablePrefix
      * @param Memory $settings
-     * @return Promise
+     * @return Promise<self>
      */
     public static function getInstance(string $name, $value = null, string $tablePrefix = '', $settings): Promise
     {
