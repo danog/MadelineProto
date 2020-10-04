@@ -429,6 +429,7 @@ trait PeerHandler
                 case 'updateBotPrecheckoutQuery':
                 case 'updateBotShippingQuery':
                 case 'updateUserPinnedMessage':
+                case 'contact':
                     return $id['user_id'];
                 case 'updatePhoneCall':
                     return $id->getOtherID();
