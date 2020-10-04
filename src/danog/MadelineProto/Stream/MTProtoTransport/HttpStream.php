@@ -38,7 +38,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
 {
     use BufferedStream;
     /**
-     * Stream
+     * Stream.
      *
      * @var RawStreamInterface
      */

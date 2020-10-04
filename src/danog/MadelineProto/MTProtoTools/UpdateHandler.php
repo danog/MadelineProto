@@ -155,7 +155,7 @@ trait UpdateHandler
      *
      * @internal
      *
-     * @return \Generator
+     * @return \Generator<mixed, mixed, mixed, UpdatesState>
      */
     public function loadUpdateState(): \Generator
     {

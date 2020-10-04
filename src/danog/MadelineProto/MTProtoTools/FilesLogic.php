@@ -25,6 +25,7 @@ use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
+use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\Tools;
 
 
@@ -245,7 +246,7 @@ trait FilesLogic
             throw new \danog\MadelineProto\Exception('Given file is too big!');
         }
         $stream = yield open($file, 'rb');
-        $mime = $this->getMimeFromFile($file);
+        $mime = Extension::getMimeFromFile($file);
         try {
             return yield from $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
         } finally {

@@ -787,8 +787,8 @@ class TL
     /**
      * Get length of TL payload.
      *
-     * @param resource $stream Stream
-     * @param array    $type   Type identifier
+     * @param resource|string $stream Stream
+     * @param array           $type   Type identifier
      *
      * @return int
      */

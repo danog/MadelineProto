@@ -1106,6 +1106,29 @@ class InternalDoc extends APIFactory
         return \danog\MadelineProto\Tools::genVectorHash($ints);
     }
     /**
+     * Get extension from file location.
+     *
+     * @param mixed  $location File location
+     * @param string $default  Default extension
+     *
+     * @return string
+     */
+    public function getExtensionFromLocation($location, string $default): string
+    {
+        return \danog\MadelineProto\TL\Conversion\Extension::getExtensionFromLocation($location, $default);
+    }
+    /**
+     * Get extension from mime type.
+     *
+     * @param string $mime MIME type
+     *
+     * @return string
+     */
+    public function getExtensionFromMime(string $mime): string
+    {
+        return \danog\MadelineProto\TL\Conversion\Extension::getExtensionFromMime($mime);
+    }
+    /**
      * Get TL method namespaces.
      *
      * @return array
@@ -1113,6 +1136,40 @@ class InternalDoc extends APIFactory
     public function getMethodNamespaces(): array
     {
         return $this->API->getMethodNamespaces();
+    }
+    /**
+     * Get mime type from buffer.
+     *
+     * @param string $buffer Buffer
+     *
+     * @return string
+     */
+    public function getMimeFromBuffer(string $buffer): string
+    {
+        return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromBuffer($buffer);
+    }
+    /**
+     * Get mime type from file extension.
+     *
+     * @param string $extension File extension
+     * @param string $default   Default mime type
+     *
+     * @return string
+     */
+    public function getMimeFromExtension(string $extension, string $default): string
+    {
+        return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromExtension($extension, $default);
+    }
+    /**
+     * Get mime type of file.
+     *
+     * @param string $file File
+     *
+     * @return string
+     */
+    public function getMimeFromFile(string $file): string
+    {
+        return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromFile($file);
     }
     /**
      * Accesses a private variable from an object.

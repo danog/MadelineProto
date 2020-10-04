@@ -7,8 +7,6 @@ use danog\MadelineProto\Logger;
 
 /**
  * Array caching trait.
- *
- * @property string $table
  */
 trait ArrayCacheTrait
 {
@@ -94,8 +92,8 @@ trait ArrayCacheTrait
 
         Logger::log(
             \sprintf(
-                "cache for table:%s; keys left: %s; keys removed: %s",
-                $this->table,
+                "cache for table: %s; keys left: %s; keys removed: %s",
+                (string) $this,
                 \count($this->cache),
                 $oldCount
             ),

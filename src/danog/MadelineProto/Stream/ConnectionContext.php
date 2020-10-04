@@ -100,7 +100,7 @@ class ConnectionContext
     /**
      * An array of arrays containing an array with the stream name and the extra parameter to pass to it.
      *
-     * @var array<array<string, mixed>>
+     * @var array<0: class-string, 1: mixed>[]
      */
     private $nextStreams = [];
     /**
@@ -344,7 +344,9 @@ class ConnectionContext
      * Add a stream to the stream chain.
      *
      * @param string $streamName
-     * @param mixed    $extra
+     * @param mixed  $extra
+     *
+     * @psalm-param class-string $streamName
      *
      * @return self
      */

@@ -393,7 +393,9 @@ class Connection
     {
         $deferred = new Deferred();
         if (!isset($message['serialized_body'])) {
-            $body = \is_object($message['body']) ? yield from $message['body'] : $message['body'];
+            $body = $message['body'] instanceof \Generator
+                ? yield from $message['body']
+                : $message['body'];
             $refreshNext = $message['refreshReferences'] ?? false;
             if ($refreshNext) {
                 $this->API->referenceDatabase->refreshNext(true);

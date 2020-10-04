@@ -18,14 +18,16 @@ class FileCallback extends Obj implements FileCallbackInterface
     /**
      * Invoke callback.
      *
-     * @param int $percent Percent
-     * @param int $speed   Speed in mbps
-     * @param int $time    Time
+     * @param float $percent Percent
+     * @param float $speed   Speed in mbps
+     * @param float $time    Time
+     *
+     * @psalm-suppress MethodSignatureMismatch
      *
      * @return mixed
      */
-    public function __invoke(...$args)
+    public function __invoke($percent, $speed, $time)
     {
-        return $this->__call('__invoke', $args);
+        return $this->__call('__invoke', [$percent, $speed, $time]);
     }
 }

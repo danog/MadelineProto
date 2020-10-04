@@ -22,6 +22,20 @@ class MysqlArray extends SqlArray
     // Legacy
     protected array $settings;
 
+    /**
+     * Initialize on startup.
+     *
+     * @return \Generator
+     */
+    public function initStartup(): \Generator
+    {
+        return $this->initConnection($this->dbSettings);
+    }
+    public function __toString(): string
+    {
+        return $this->table;
+    }
+
     public function __sleep(): array
     {
         return ['table', 'dbSettings'];

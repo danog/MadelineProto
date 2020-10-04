@@ -40,7 +40,8 @@
         "danog/loop": "^0.1.0",
         "danog/tgseclib": "^3",
         "amphp/redis": "^1.0",
-        "symfony/polyfill-php80": "^1.18"
+        "symfony/polyfill-php80": "^1.18",
+        "amphp/websocket-client": "^1.0"
     },
     "require-dev": {
         "vlucas/phpdotenv": "^3",
@@ -51,8 +52,6 @@
         "haydenpierce/class-finder": "^0.4",
         "amphp/http-server": "dev-master",
         "amphp/http": "^1.6",
-        "amphp/websocket-client": "dev-master as 1",
-        "amphp/websocket": "dev-master as 1",
         "ext-ctype": "*",
         "danog/7to70": "^1",
         "danog/7to5": "^1",

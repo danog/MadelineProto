@@ -26,6 +26,8 @@ class Button implements \JsonSerializable, \ArrayAccess
 {
     /**
      * Button data.
+     *
+     * @psalm-var non-empty-array<array-key, mixed>
      */
     private array $button;
     /**
@@ -139,7 +141,7 @@ class Button implements \JsonSerializable, \ArrayAccess
      *
      * @param $name Field name
      *
-     * @return void
+     * @return mixed
      */
     public function offsetGet($name)
     {

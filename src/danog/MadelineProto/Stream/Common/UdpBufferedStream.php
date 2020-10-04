@@ -42,7 +42,6 @@ use danog\MadelineProto\Stream\WriteBufferInterface;
 class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface, MTProtoBufferInterface
 {
     use BufferedStream;
-    private RawStreamInterface $stream;
     /**
      * Connect to stream.
      *
@@ -72,7 +71,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      *
      * @psalm-return \Generator<int, Promise, mixed, Failure<mixed>|Success<object>>
      */
-    public function getReadBuffer(&$length): \Generator
+    public function getReadBufferGenerator(&$length): \Generator
     {
         if (!$this->stream) {
             return new Failure(new ClosedException("MadelineProto stream was disconnected"));
@@ -185,7 +184,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      */
     public function getSocket(): EncryptableSocket
     {
-        return $this->stream->getSocket();
+        return $this->getSocket();
     }
     /**
      * {@inheritDoc}
@@ -194,7 +193,7 @@ class UdpBufferedStream extends DefaultStream implements BufferedStreamInterface
      */
     public function getStream(): RawStreamInterface
     {
-        return $this->stream;
+        return $this;
     }
     public static function getName(): string
     {

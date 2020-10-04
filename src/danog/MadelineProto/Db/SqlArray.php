@@ -9,6 +9,8 @@ use function Amp\call;
 
 abstract class SqlArray extends DriverArray
 {
+    protected string $table;
+
     /**
      * Create table for property.
      *
@@ -20,15 +22,6 @@ abstract class SqlArray extends DriverArray
 
     abstract protected function renameTable(string $from, string $to): \Generator;
 
-    /**
-     * Initialize on startup.
-     *
-     * @return \Generator
-     */
-    public function initStartup(): \Generator
-    {
-        return $this->initConnection($this->dbSettings);
-    }
 
     /**
      * @param string $name
@@ -37,7 +30,7 @@ abstract class SqlArray extends DriverArray
      * @param DatabaseAbstract $settings
      *
      * @return Promise
-     * 
+     *
      * @psalm-return Promise<static>
      */
     public static function getInstance(string $name, $value = null, string $tablePrefix = '', $settings): Promise
@@ -50,6 +43,7 @@ abstract class SqlArray extends DriverArray
             $instance->table = $tableName;
         }
 
+        /** @psalm-suppress UndefinedPropertyAssignment */
         $instance->dbSettings = $settings;
         $instance->ttl = $settings->getCacheTtl();
 

@@ -104,11 +104,17 @@ class MyTelegramOrgWrapper
             $this->settings = new Settings;
         } elseif (\is_array($this->settings)) {
             $this->settings = Settings::parseFromLegacy($this->settings);
+            if (!$this->settings instanceof Settings) {
+                $settings = new Settings;
+                $settings->merge($this->settings);
+                $this->settings = $settings;
+            }
         }
         if (!$this->jar || !$this->jar instanceof InMemoryCookieJar) {
             $this->jar = new InMemoryCookieJar();
         }
         $this->datacenter = new DataCenter(new class(new Logger($this->settings->getLogger())) {
+            public Logger $logger;
             public function __construct(Logger $logger)
             {
                 $this->logger = $logger;
@@ -347,7 +353,7 @@ class MyTelegramOrgWrapper
      * @param string $name      Function name
      * @param array  $arguments Arguments
      *
-     * @return void
+     * @return mixed
      */
     public function __call(string $name, array $arguments)
     {

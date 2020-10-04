@@ -229,6 +229,7 @@ trait AuthKeyHandler
                  * Separate answer and hash
                  */
                 $answer_hash = \substr($answer_with_hash, 0, 20);
+                /** @var string */
                 $answer = \substr($answer_with_hash, 20);
                 /*
                  * ***********************************************************************
@@ -553,6 +554,7 @@ trait AuthKeyHandler
             foreach ($dcs as $id => &$dc) {
                 $dc = $dc();
             }
+            /** @var \Generator[] $dcs */
             yield \danog\MadelineProto\Tools::all($dcs);
             foreach ($postpone as $id => $socket) {
                 yield from $this->initAuthorizationSocket($id, $socket);

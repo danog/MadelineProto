@@ -432,7 +432,7 @@ trait PeerHandler
                 case 'contact':
                     return $id['user_id'];
                 case 'updatePhoneCall':
-                    return $id->getOtherID();
+                    return $id['phone_call']->getOtherID();
                 case 'updateReadHistoryInbox':
                 case 'updateReadHistoryOutbox':
                     return $this->getId($id['peer']);

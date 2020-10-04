@@ -23,6 +23,19 @@ class PostgresArray extends SqlArray
     protected array $settings;
 
     /**
+     * Initialize on startup.
+     *
+     * @return \Generator
+     */
+    public function initStartup(): \Generator
+    {
+        return $this->initConnection($this->dbSettings);
+    }
+    public function __toString(): string
+    {
+        return $this->table;
+    }
+    /**
      * Initialize connection.
      *
      * @param DatabasePostgres $settings

@@ -117,13 +117,13 @@ class DoHConnector implements Connector
             foreach ($uris as $builtUri) {
                 try {
                     $streamContext = \stream_context_create($socketContext->withoutTlsContext()->toStreamContextArray());
-                    /** @psalm-ignore NullArgument */
+                    /** @psalm-suppress NullArgument */
                     if (!($socket = @\stream_socket_client($builtUri, $errno, $errstr, null, $flags, $streamContext))) {
                         throw new ConnectException(\sprintf('Connection to %s failed: [Error #%d] %s%s', $uri, $errno, $errstr, $failures ? '; previous attempts: '.\implode($failures) : ''), $errno);
                     }
                     \stream_set_blocking($socket, false);
                     $deferred = new Deferred();
-                    /** @psalm-ignore InvalidArgument */
+                    /** @psalm-suppress InvalidArgument */
                     $watcher = Loop::onWritable($socket, [$deferred, 'resolve']);
                     $id = $token->subscribe([$deferred, 'fail']);
                     try {

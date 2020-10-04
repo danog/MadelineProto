@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Loop\Update;
 
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Loop\InternalLoop;
+use danog\MadelineProto\MTProtoTools\UpdatesState;
 
 /**
  * update feed loop.
@@ -42,6 +43,10 @@ class SeqLoop extends ResumableSignalLoop
      * Pending updates.
      */
     private array $pendingWakeups = [];
+    /**
+     * State.
+     */
+    private ?UpdatesState $state = null;
     /**
      * Main loop.
      *

@@ -20,7 +20,6 @@
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\Deferred;
-use danog\MadelineProto\Async\AsyncParameters;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
 
@@ -79,9 +78,11 @@ trait CallHandler
      *
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
-     * @param string $method Method name
-     * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
+     * @param string            $method Method name
+     * @param array|\Generator  $args   Arguments
+     * @param array             $aargs  Additional arguments
+     *
+     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
      * @return \Generator
      */
@@ -100,9 +101,11 @@ trait CallHandler
     /**
      * Call method and make sure it is asynchronously sent (generator).
      *
-     * @param string $method Method name
-     * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
+     * @param string            $method Method name
+     * @param array|\Generator  $args   Arguments
+     * @param array             $aargs  Additional arguments
+     *
+     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
      * @return \Generator
      */
@@ -160,6 +163,7 @@ trait CallHandler
             $aargs,
             [
                 '_' => $method,
+                'body' => $args,
                 'type' => $methodInfo['type'],
                 'contentRelated' => $this->contentRelated($method),
                 'promise' => $deferred,
@@ -167,16 +171,11 @@ trait CallHandler
                 'unencrypted' => !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false
             ]
         );
-        if (\is_object($args) && $args instanceof AsyncParameters) {
-            $message['body'] = yield $args->fetchParameters();
-        } else {
-            $message['body'] = $args;
-        }
         if ($method === 'users.getUsers' && $args === ['id' => [['_' => 'inputUserSelf']]] || $method === 'auth.exportAuthorization' || $method === 'updates.getDifference') {
             $message['user_related'] = true;
         }
         $aargs['postpone'] = $aargs['postpone'] ?? false;
-        $deferred = (yield from $this->sendMessage($message, !$aargs['postpone']));
+        $deferred = yield from $this->sendMessage($message, !$aargs['postpone']);
         $this->checker->resume();
         return $deferred;
     }

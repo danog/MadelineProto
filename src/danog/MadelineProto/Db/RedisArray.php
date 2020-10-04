@@ -15,13 +15,25 @@ use function Amp\call;
 
 class RedisArray extends SqlArray
 {
-    protected string $table;
     protected DatabaseRedis $dbSettings;
     private RedisRedis $db;
 
     // Legacy
     protected array $settings;
 
+    /**
+     * Initialize on startup.
+     *
+     * @return \Generator
+     */
+    public function initStartup(): \Generator
+    {
+        return $this->initConnection($this->dbSettings);
+    }
+    public function __toString(): string
+    {
+        return $this->table;
+    }
     /**
      * @return Generator
      *

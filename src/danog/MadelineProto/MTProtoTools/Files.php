@@ -172,7 +172,9 @@ trait Files
         $exception = null;
         $start = \microtime(true);
         while ($part_num < $part_total_num) {
-            $writePromise = Tools::call($this->methodCallAsyncWrite($method, $callable($part_num), ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]));
+            $resa = $callable($part_num);
+            \var_dump($resa);
+            $writePromise = Tools::call($this->methodCallAsyncWrite($method, $resa, ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]));
             if (!$seekable) {
                 yield $writePromise;
             }
@@ -622,10 +624,10 @@ trait Files
                     }
                 }
                 if (!isset($res['ext']) || $res['ext'] === '') {
-                    $res['ext'] = $this->getExtensionFromLocation($res['InputFileLocation'], $this->getExtensionFromMime($res['mime'] ?? 'image/jpeg'));
+                    $res['ext'] = Tools::getExtensionFromLocation($res['InputFileLocation'], Tools::getExtensionFromMime($res['mime'] ?? 'image/jpeg'));
                 }
                 if (!isset($res['mime']) || $res['mime'] === '') {
-                    $res['mime'] = $this->getMimeFromExtension($res['ext'], 'image/jpeg');
+                    $res['mime'] = Tools::getMimeFromExtension($res['ext'], 'image/jpeg');
                 }
                 if (!isset($res['name']) || $res['name'] === '') {
                     $res['name'] = Tools::unpackSignedLongString($messageMedia['file']['access_hash']);
@@ -680,8 +682,8 @@ trait Files
                 $res['thumb_size'] = $messageMedia['type'];
                 if ($messageMedia['location']['_'] === 'fileLocationUnavailable') {
                     $res['name'] = Tools::unpackSignedLongString($messageMedia['volume_id']).'_'.$messageMedia['local_id'];
-                    $res['mime'] = $this->getMimeFromBuffer($res['data']);
-                    $res['ext'] = $this->getExtensionFromMime($res['mime']);
+                    $res['mime'] = Tools::getMimeFromBuffer($res['data']);
+                    $res['ext'] = TOols::getExtensionFromMime($res['mime']);
                 } else {
                     $res = \array_merge($res, yield from $this->getDownloadInfo($messageMedia['location']));
                 }
@@ -699,13 +701,13 @@ trait Files
             case 'fileLocation':
                 $res['name'] = Tools::unpackSignedLongString($messageMedia['volume_id']).'_'.$messageMedia['local_id'];
                 $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $messageMedia['volume_id'], 'local_id' => $messageMedia['local_id'], 'secret' => $messageMedia['secret'], 'dc_id' => $messageMedia['dc_id'], 'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION_LOCATION, $messageMedia)];
-                $res['ext'] = $this->getExtensionFromLocation($res['InputFileLocation'], '.jpg');
-                $res['mime'] = $this->getMimeFromExtension($res['ext'], 'image/jpeg');
+                $res['ext'] = Tools::getExtensionFromLocation($res['InputFileLocation'], '.jpg');
+                $res['mime'] = Tools::getMimeFromExtension($res['ext'], 'image/jpeg');
                 return $res;
             case 'fileLocationToBeDeprecated':
                 $res['name'] = Tools::unpackSignedLongString($messageMedia['volume_id']).'_'.$messageMedia['local_id'];
                 $res['ext'] = '.jpg';
-                $res['mime'] = $this->getMimeFromExtension($res['ext'], 'image/jpeg');
+                $res['mime'] = Tools::getMimeFromExtension($res['ext'], 'image/jpeg');
                 $res['InputFileLocation'] = [
                     '_' => 'inputFileLocationTemp',
                     // Will be overwritten
@@ -742,7 +744,7 @@ trait Files
                 }
                 $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $messageMedia['document']['id'], 'access_hash' => $messageMedia['document']['access_hash'], 'version' => isset($messageMedia['document']['version']) ? $messageMedia['document']['version'] : 0, 'dc_id' => $messageMedia['document']['dc_id'], 'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $messageMedia['document'])];
                 if (!isset($res['ext']) || $res['ext'] === '') {
-                    $res['ext'] = $this->getExtensionFromLocation($res['InputFileLocation'], $this->getExtensionFromMime($messageMedia['document']['mime_type']));
+                    $res['ext'] = Tools::getExtensionFromLocation($res['InputFileLocation'], Tools::getExtensionFromMime($messageMedia['document']['mime_type']));
                 }
                 if (!isset($res['name']) || $res['name'] === '') {
                     $res['name'] = Tools::unpackSignedLongString($messageMedia['document']['access_hash']);
@@ -962,7 +964,7 @@ trait Files
      * @param array    $messageMedia File object
      * @param bool     $cdn           Whether this is a CDN file
      * @param string   $datacenter    DC ID
-     * @param string   $old_dc        Previous DC ID
+     * @param ?string   $old_dc        Previous DC ID
      * @param AES      $ige           IGE decryptor instance
      * @param callable $cb            Status callback
      * @param array    $offset        Offset

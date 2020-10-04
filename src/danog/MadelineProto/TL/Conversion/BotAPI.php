@@ -22,6 +22,7 @@ namespace danog\MadelineProto\TL\Conversion;
 use danog\Decoder\FileId;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\PeerHandler;
+use danog\MadelineProto\Tools;
 
 use const danog\Decoder\TYPES_IDS;
 
@@ -387,7 +388,7 @@ trait BotAPI
                     $res['file_name'] .= $res['ext'];
                     unset($res['ext']);
                 } else {
-                    $res['file_name'] .= $this->getExtensionFromMime($data['document']['mime_type']);
+                    $res['file_name'] .= Tools::getExtensionFromMime($data['document']['mime_type']);
                 }
                 $res['file_size'] = $data['document']['size'];
                 $res['mime_type'] = $data['document']['mime_type'];
@@ -698,9 +699,8 @@ trait BotAPI
         $delimOffset = 0;
         foreach ($initialArray as $item) {
             $delimOffset += $this->mbStrlen($item);
-            //if ($this->mbStrlen($item) > 0) {
+            /** @var int $delimOffset */
             $finalArray[] = $item.($delimOffset < $this->mbStrlen($string) ? $string[$delimOffset] : '');
-            //}
             $delimOffset++;
         }
         return $finalArray;

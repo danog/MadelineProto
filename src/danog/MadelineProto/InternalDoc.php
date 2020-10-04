@@ -5172,7 +5172,7 @@ class InternalDoc extends APIFactory
      */
     public function getExtensionFromLocation($location, string $default): string
     {
-        return \danog\MadelineProto\MTProto::getExtensionFromLocation($location, $default);
+        return \danog\MadelineProto\TL\Conversion\Extension::getExtensionFromLocation($location, $default);
     }
     /**
      * Get extension from mime type.
@@ -5183,7 +5183,7 @@ class InternalDoc extends APIFactory
      */
     public function getExtensionFromMime(string $mime): string
     {
-        return \danog\MadelineProto\MTProto::getExtensionFromMime($mime);
+        return \danog\MadelineProto\TL\Conversion\Extension::getExtensionFromMime($mime);
     }
     /**
      * Get info about file.
@@ -5272,7 +5272,21 @@ class InternalDoc extends APIFactory
      *
      * @return \Amp\Promise Info object
      *
-     * @psalm-return \Amp\Promise<array|mixed>
+     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<string>|array, mixed, array{
+     *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
+     *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed},
+     *      DialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
+     *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
+     *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}},
+     *      InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}},
+     *      bot_api_id: int|string,
+     *      user_id?: int,
+     *      chat_id?: int,
+     *      channel_id?: int,
+     *      InputUser?: {_: string, user_id?: int, access_hash?: mixed, min?: bool},
+     *      InputChannel?: {_: string, channel_id: int, access_hash: mixed, min: bool},
+     *      type: string
+     * }>
      */
     public function getInfo($id, $recursive = true, array $extra = [])
     {
@@ -5312,7 +5326,7 @@ class InternalDoc extends APIFactory
      */
     public function getMimeFromBuffer(string $buffer): string
     {
-        return \danog\MadelineProto\MTProto::getMimeFromBuffer($buffer);
+        return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromBuffer($buffer);
     }
     /**
      * Get mime type from file extension.
@@ -5324,7 +5338,7 @@ class InternalDoc extends APIFactory
      */
     public function getMimeFromExtension(string $extension, string $default): string
     {
-        return \danog\MadelineProto\MTProto::getMimeFromExtension($extension, $default);
+        return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromExtension($extension, $default);
     }
     /**
      * Get mime type of file.
@@ -5335,7 +5349,7 @@ class InternalDoc extends APIFactory
      */
     public function getMimeFromFile(string $file): string
     {
-        return \danog\MadelineProto\MTProto::getMimeFromFile($file);
+        return \danog\MadelineProto\TL\Conversion\Extension::getMimeFromFile($file);
     }
     /**
      * Get download info of the propic of a user
@@ -5670,9 +5684,11 @@ class InternalDoc extends APIFactory
      *
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
-     * @param string $method Method name
-     * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
+     * @param string            $method Method name
+     * @param array|\Generator  $args   Arguments
+     * @param array             $aargs  Additional arguments
+     *
+     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
      * @return \Amp\Promise
      */
@@ -5686,9 +5702,11 @@ class InternalDoc extends APIFactory
     /**
      * Call method and make sure it is asynchronously sent.
      *
-     * @param string $method Method name
-     * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
+     * @param string            $method Method name
+     * @param array|\Generator  $args   Arguments
+     * @param array             $aargs  Additional arguments
+     *
+     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
      * @return \Amp\Promise
      */

@@ -8,8 +8,6 @@ use ReflectionClass;
 
 /**
  * Array caching trait.
- *
- * @property string $table
  */
 abstract class DriverArray implements DbArray
 {
@@ -20,6 +18,12 @@ abstract class DriverArray implements DbArray
         $this->stopCacheCleanupLoop();
     }
 
+    /**
+     * Get string representation of driver/table.
+     *
+     * @return string
+     */
+    abstract public function __toString(): string;
 
     public function __wakeup()
     {
@@ -62,7 +66,7 @@ abstract class DriverArray implements DbArray
                 $counter++;
                 if ($counter % 500 === 0) {
                     yield $new->offsetSet($key, $item);
-                    Logger::log("Loading data to table {$new->table}: $counter/$total", Logger::WARNING);
+                    Logger::log("Loading data to table {$new}: $counter/$total", Logger::WARNING);
                 } else {
                     $new->offsetSet($key, $item);
                 }

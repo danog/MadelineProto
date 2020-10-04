@@ -122,7 +122,7 @@ class DataCenter
     /**
      * DoH connector.
      */
-    private Rfc6455Connector $webSocketConnnector;
+    private Rfc6455Connector $webSocketConnector;
 
     public function __sleep()
     {
@@ -238,7 +238,7 @@ class DataCenter
 
             $this->dnsConnector = new DnsConnector(new Rfc1035StubResolver());
             if (\class_exists(Rfc6455Connector::class)) {
-                $this->webSocketConnnector = new Rfc6455Connector($this->HTTPClient);
+                $this->webSocketConnector = new Rfc6455Connector($this->HTTPClient);
             }
         }
         $this->settings->applyChanges();
@@ -420,6 +420,7 @@ class DataCenter
                             if ($stream[0] === DefaultStream::class && $stream[1] === []) {
                                 $stream[1] = $useDoH ? new DoHConnector($this, $ctx) : $this->dnsConnector;
                             }
+                            /** @var array{0: class-string, 1: mixed} $stream */
                             $ctx->addStream(...$stream);
                         }
                         $ctxs[] = $ctx;
@@ -480,8 +481,9 @@ class DataCenter
                                 if (!\class_exists(Handshake::class)) {
                                     throw new Exception('Please install amphp/websocket-client by running "composer require amphp/websocket-client:dev-master"');
                                 }
-                                $stream[1] = $this->webSocketConnnector;
+                                $stream[1] = $this->webSocketConnector;
                             }
+                            /** @var array{0: class-string, 1: mixed} $stream */
                             $ctx->addStream(...$stream);
                         }
                         $ctxs[] = $ctx;

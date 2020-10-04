@@ -33,9 +33,9 @@ interface FileCallbackInterface
     /**
      * Invoke callback.
      *
-     * @param int $percent Percent
-     * @param int $speed   Speed in mbps
-     * @param int $time    Time
+     * @param float $percent Percent
+     * @param float $speed   Speed in mbps
+     * @param float $time    Time
      *
      * @return mixed
      */

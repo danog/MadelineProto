@@ -31,9 +31,11 @@ trait CallHandler
     /**
      * Synchronous wrapper for methodCall.
      *
-     * @param string $method Method name
-     * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
+     * @param string            $method Method name
+     * @param array|\Generator  $args   Arguments
+     * @param array             $aargs  Additional arguments
+     *
+     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
      * @return mixed
      */
@@ -46,9 +48,11 @@ trait CallHandler
      *
      * If the $aargs['noResponse'] is true, will not wait for a response.
      *
-     * @param string $method Method name
-     * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
+     * @param string            $method Method name
+     * @param array|\Generator  $args   Arguments
+     * @param array             $aargs  Additional arguments
+     *
+     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
      * @return \Generator
      */
@@ -59,9 +63,11 @@ trait CallHandler
     /**
      * Call method and make sure it is asynchronously sent.
      *
-     * @param string $method Method name
-     * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
+     * @param string            $method Method name
+     * @param array|\Generator  $args   Arguments
+     * @param array             $aargs  Additional arguments
+     *
+     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
      *
      * @return \Generator
      */

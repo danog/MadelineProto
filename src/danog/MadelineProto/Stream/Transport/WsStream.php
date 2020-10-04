@@ -19,11 +19,14 @@
 
 namespace danog\MadelineProto\Stream\Transport;
 
+use Amp\Http\Client\HttpClientBuilder;
 use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
 use Amp\Websocket\Client\Connection;
 use Amp\Websocket\Client\Connector;
 use Amp\Websocket\Client\Handshake;
+use Amp\Websocket\Client\Rfc6455Connector;
+use Amp\Websocket\ClosedException;
 use Amp\Websocket\Message;
 use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -73,7 +76,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
         $uri = $ctx->getStringUri();
         $uri = \str_replace('tcp://', $ctx->isSecure() ? 'wss://' : 'ws://', $uri);
         $handshake = new Handshake($uri);
-        $this->stream = yield ($this->connector ?? connector())->connect($handshake, $ctx->getCancellationToken());
+        $this->stream = yield ($this->connector ?? new Rfc6455Connector(HttpClientBuilder::buildDefault()))->connect($handshake, $ctx->getCancellationToken());
         if (\strlen($header)) {
             yield $this->write($header);
         }
@@ -100,7 +103,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
                 $this->message = null;
             }
         } catch (\Throwable $e) {
-            if ($e instanceof Amp\Websocket\ClosedException && $e->getReason() !== 'Client closed the underlying TCP connection') {
+            if ($e instanceof ClosedException && $e->getReason() !== 'Client closed the underlying TCP connection') {
                 throw $e;
             }
             return null;

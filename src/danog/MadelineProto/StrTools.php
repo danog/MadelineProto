@@ -19,10 +19,12 @@
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\TL\Conversion\Extension;
+
 /**
  * Some tools.
  */
-abstract class StrTools
+abstract class StrTools extends Extension
 {
     /**
      * Convert to camelCase.
