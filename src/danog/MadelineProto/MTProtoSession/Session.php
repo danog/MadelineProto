@@ -27,7 +27,7 @@ use danog\MadelineProto\MTProto;
  *
  * @extends Connection
  */
-abstract class Session
+trait Session
 {
     use AckHandler;
     use ResponseHandler;

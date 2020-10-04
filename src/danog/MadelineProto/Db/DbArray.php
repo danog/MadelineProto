@@ -33,31 +33,31 @@ interface DbArray extends DbType, \ArrayAccess, \Countable
     /**
      * Get element.
      *
-     * @param string|int $offset
+     * @param string|int $index
      *
      * @psalm-return Promise<T>
      *
      * @return Promise
      */
-    public function offsetGet($offset): Promise;
+    public function offsetGet($index): Promise;
     /**
      * Set element.
      *
-     * @param string|int $offset
+     * @param string|int $index
      * @param mixed      $value
      *
      * @psalm-param T $value
      *
      * @return void
      */
-    public function offsetSet($offset, $value);
+    public function offsetSet($index, $value);
     /**
      * Unset element.
      *
-     * @param string|int $offset Offset
+     * @param string|int $index Offset
      * @return Promise
      */
-    public function offsetUnset($offset): Promise;
+    public function offsetUnset($index): Promise;
     /**
      * Count number of elements.
      *
@@ -76,9 +76,9 @@ interface DbArray extends DbType, \ArrayAccess, \Countable
      * @internal
      * @see DbArray::isset();
      *
-     * @param mixed $offset
+     * @param mixed $index
      *
      * @return bool
      */
-    public function offsetExists($offset);
+    public function offsetExists($index);
 }

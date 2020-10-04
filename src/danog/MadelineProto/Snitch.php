@@ -90,7 +90,7 @@ class Snitch
      */
     public function __wakeup()
     {
-        if (\defined(\HAD_MADELINE_PHAR::class)) {
+        if (\defined('HAD_MADELINE_PHAR')) {
             $this->hadInstalled []= \HAD_MADELINE_PHAR;
             if (\count($this->hadInstalled) > self::MAX_NO_PHAR_STARTS) {
                 \array_shift($this->hadInstalled);

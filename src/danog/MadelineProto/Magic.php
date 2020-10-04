@@ -234,7 +234,7 @@ class Magic
             // Setup error reporting
             \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
             \set_exception_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
-            self::$isIpcWorker = \defined(\MADELINE_WORKER_TYPE::class) ? \MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
+            self::$isIpcWorker = \defined('MADELINE_WORKER_TYPE') ? \MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
             if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
                 try {
                     \error_reporting(E_ALL);
@@ -251,7 +251,7 @@ class Magic
             }
             // Check if we're in a console, for colorful log output
             try {
-                self::$isatty = \defined(\STDOUT::class) && hasColorSupport();
+                self::$isatty = \defined('STDOUT') && hasColorSupport();
             } catch (\danog\MadelineProto\Exception $e) {
             }
             // Important, obtain root relative to caller script
@@ -263,7 +263,7 @@ class Magic
             } catch (\danog\MadelineProto\Exception $e) {
             }
             // Define signal handlers
-            if (\defined(\SIGINT::class)) {
+            if (\defined('SIGINT')) {
                 //if (function_exists('pcntl_async_signals')) pcntl_async_signals(true);
                 try {
                     \pcntl_signal(SIGINT, fn () => null);
@@ -281,8 +281,8 @@ class Magic
             }
             self::$initedLight = true;
             if ($light) {
-                if (!\defined(\AMP_WORKER::class)) {
-                    \define(\AMP_WORKER::class, true);
+                if (!\defined('AMP_WORKER')) {
+                    \define('AMP_WORKER', true);
                 }
                 return;
             }

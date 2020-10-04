@@ -1431,7 +1431,7 @@ class InternalDoc extends APIFactory
      * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
      * @psalm-param TReturnAlt $default
      *
-     * @return Promise<TReturn|TReturnAlt>
+     * @return Promise<TReturn>|Promise<TReturnAlt>
      *
      * @throws \TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
      */

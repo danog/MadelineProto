@@ -20,10 +20,10 @@
 namespace danog\MadelineProto;
 
 use Amp\Deferred;
+use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Loop;
 use Amp\Promise;
 use danog\MadelineProto\Db\DriverArray;
-use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\MTProtoSession\Session;
 
@@ -104,7 +104,7 @@ abstract class Serialization
      *
      * @return \Generator
      *
-     * @psalm-return \Generator<void, mixed, mixed, array{0: callable|null, 1: Client|MTProto}>
+     * @psalm-return \Generator<void, mixed, mixed, array{0: ChannelledSocket|APIWrapper|\Throwable|null|0, 1: callable|null}>
      */
     public static function unserialize(SessionPaths $session, bool $forceFull = false): \Generator
     {
@@ -222,7 +222,10 @@ abstract class Serialization
      * @param Promise   $cancelConnect Cancelation token (triggers cancellation of connection)
      * @param ?Deferred $cancelFull    Cancelation token source (can trigger cancellation of full unserialization)
      *
+     * @psalm-param Promise<\Throwable|null> $cancelConnect
+     *
      * @return \Generator
+     * @psalm-return \Generator<mixed, mixed, mixed, array{0: ChannelledSocket|\Throwable|0, 1: null}>
      */
     private static function tryConnect(string $ipcPath, Promise $cancelConnect, ?Deferred $cancelFull = null): \Generator
     {
@@ -247,6 +250,7 @@ abstract class Serialization
                 $cancelConnect = (new Deferred)->promise();
             }
         }
+        return [0, null];
     }
 
     /**

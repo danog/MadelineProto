@@ -106,6 +106,8 @@ class SessionPaths
      * @param string $path Object path, defaults to session path
      *
      * @return \Generator
+     * 
+     * @psalm-return \Generator<mixed, mixed, mixed, object>
      */
     public function unserialize(string $path = ''): \Generator
     {

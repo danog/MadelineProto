@@ -17,7 +17,7 @@ abstract class RunnerAbstract
         /**
          * If using madeline.php, simply return madeline.php path.
          */
-        if (\defined(\MADELINE_PHP::class)) {
+        if (\defined('MADELINE_PHP')) {
             return \MADELINE_PHP;
         }
         // Write process runner to external file if inside a PHAR different from madeline.phar,

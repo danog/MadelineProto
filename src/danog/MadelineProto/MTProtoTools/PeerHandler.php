@@ -476,7 +476,21 @@ trait PeerHandler
      *
      * @return \Generator Info object
      *
-     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<string>|array, mixed, array|mixed>
+     * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<string>|array, mixed, array{
+     *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
+     *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed},
+     *      DialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
+     *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
+     *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}},
+     *      InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}},
+     *      bot_api_id: int|string,
+     *      user_id?: int,
+     *      chat_id?: int,
+     *      channel_id?: int,
+     *      InputUser?: {_: string, user_id?: int, access_hash?: mixed, min?: bool},
+     *      InputChannel?: {_: string, channel_id: int, access_hash: mixed, min: bool},
+     *      type: string
+     * }>
      */
     public function getInfo($id, $recursive = true): \Generator
     {

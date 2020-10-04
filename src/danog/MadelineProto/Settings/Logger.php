@@ -123,7 +123,7 @@ class Logger extends SettingsAbstract
      */
     public function getType(): int
     {
-        return \defined(\MADELINE_WORKER::class) ? MadelineProtoLogger::FILE_LOGGER : $this->type;
+        return \defined('MADELINE_WORKER') ? MadelineProtoLogger::FILE_LOGGER : $this->type;
     }
 
     /**

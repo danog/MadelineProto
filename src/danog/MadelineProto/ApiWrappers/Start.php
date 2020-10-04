@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\ApiWrappers;
 
 use danog\MadelineProto\Lang;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\MyTelegramOrgWrapper;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
@@ -39,7 +40,7 @@ trait Start
      */
     private function APIStart(Settings $settings): \Generator
     {
-        if (\defined(\MADELINE_WORKER::class)) {
+        if (Magic::$isIpcWorker) {
             throw new \danog\MadelineProto\Exception('Not inited!');
         }
         if ($this->getWebAPITemplate() === 'legacy') {

@@ -37,7 +37,12 @@ use Psr\Http\Message\UriInterface;
 class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
 {
     use BufferedStream;
-    private $stream;
+    /**
+     * Stream
+     *
+     * @var RawStreamInterface
+     */
+    protected $stream;
     private $code;
     private $ctx;
     private $header = '';

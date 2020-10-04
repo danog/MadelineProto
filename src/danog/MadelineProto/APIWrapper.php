@@ -88,6 +88,11 @@ final class APIWrapper
      * @var AbstractAPIFactory
      */
     private AbstractAPIFactory $factory;
+
+    /**
+     * Property storage.
+     */
+    public array $storage = [];
     /**
      * API wrapper.
      *

@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use danog\MadelineProto\Connection;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler\MsgIdHandler32;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler\MsgIdHandler64;
 
@@ -29,16 +30,14 @@ abstract class MsgIdHandler
 {
     /**
      * Session instance.
-     *
-     * @var Session
      */
-    protected $session;
+    protected Connection $session;
     /**
      * Constructor.
      *
-     * @param Session $session Session
+     * @param Connection $session Session
      */
-    private function __construct(Session $session)
+    private function __construct(Connection $session)
     {
         $this->session = $session;
     }
@@ -46,11 +45,11 @@ abstract class MsgIdHandler
     /**
      * Create MsgIdHandler instance.
      *
-     * @param Session $session Session
+     * @param Connection $session Session
      *
      * @return self
      */
-    public static function createInstance(Session $session): self
+    public static function createInstance(Connection $session): self
     {
         if (PHP_INT_SIZE === 8) {
             return new MsgIdHandler64($session);

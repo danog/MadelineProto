@@ -41,8 +41,9 @@ use danog\MadelineProto\Stream\Transport\WsStream;
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
-class Connection extends Session
+class Connection
 {
+    use Session;
     use \danog\Serializable;
     /**
      * Writer loop.

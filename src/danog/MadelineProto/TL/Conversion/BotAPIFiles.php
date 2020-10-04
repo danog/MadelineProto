@@ -94,7 +94,7 @@ trait BotAPIFiles
         switch ($fileId->getType()) {
             case PROFILE_PHOTO:
                 /**
-                 * @var $photoSize PhotoSizeSourceDialogPhoto
+                 * @var PhotoSizeSourceDialogPhoto $photoSize
                  */
                 if ($photoSize->getDialogId() < 0) {
                     $res['Chat'] = [
@@ -132,6 +132,9 @@ trait BotAPIFiles
                 ];
                 return $res;
             case THUMBNAIL:
+                /**
+                 * @var PhotoSizeSourceThumbnail $photoSize
+                 */
                 $res['InputFileLocation'] = [
                     '_' => $photoSize->getThumbFileType() === THUMBNAIL ? 'inputDocumentFileLocation' : 'inputPhotoFileLocation',
                     'id' => $fileId->getId(),

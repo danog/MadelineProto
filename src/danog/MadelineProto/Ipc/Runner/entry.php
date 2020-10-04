@@ -26,12 +26,12 @@ use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Tools;
 
 (static function (): void {
-    if (\defined(\MADELINE_ENTRY::class)) {
+    if (\defined('MADELINE_ENTRY')) {
         // Already called
         return;
     }
-    \define(\MADELINE_ENTRY::class, 1);
-    if (!\defined(\MADELINE_WORKER_TYPE::class)) {
+    \define('MADELINE_ENTRY', 1);
+    if (!\defined('MADELINE_WORKER_TYPE')) {
         if (\count(\debug_backtrace(0)) !== 1) {
             // We're not being included directly
             return;
@@ -46,11 +46,11 @@ use danog\MadelineProto\Tools;
             \trigger_error("Not enough arguments!", E_USER_ERROR);
             exit(1);
         }
-        \define(\MADELINE_WORKER_TYPE::class, \array_shift($arguments));
-        \define(\MADELINE_WORKER_ARGS::class, $arguments);
+        \define('MADELINE_WORKER_TYPE', \array_shift($arguments));
+        \define('MADELINE_WORKER_ARGS', $arguments);
     }
 
-    if (\defined(\SIGHUP::class)) {
+    if (\defined('SIGHUP')) {
         try {
             \pcntl_signal(SIGHUP, fn () => null);
         } catch (\Throwable $e) {
@@ -82,13 +82,13 @@ use danog\MadelineProto\Tools;
             \trigger_error("IPC session $ipcPath does not exist!", E_USER_ERROR);
             exit(1);
         }
-        if (\function_exists(\cli_set_process_title::class)) {
+        if (\function_exists('cli_set_process_title')) {
             @\cli_set_process_title("MadelineProto worker $ipcPath");
         }
         if (isset($_GET['cwd'])) {
             @\chdir($_GET['cwd']);
         }
-        \define(\MADELINE_WORKER::class, 1);
+        \define('MADELINE_WORKER', 1);
 
         $runnerId = \MADELINE_WORKER_ARGS[1];
         $session = new SessionPaths($ipcPath);

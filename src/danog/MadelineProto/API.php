@@ -192,12 +192,12 @@ class API extends InternalDoc
             $forceFull = $forceFull || $settings->getIpc()->getSlow();
         }
 
-        /** @psalm-trace $unserialized */
         [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(
             Serialization::unserialize($this->session, $forceFull),
             30000,
             [0, null]
         );
+
         if ($unserialized === 0) {
             // Timeout
             throw new \RuntimeException("Could not connect to MadelineProto, please check the logs for more details.");
@@ -253,7 +253,9 @@ class API extends InternalDoc
             $this->logger->logger('Shutting down MadelineProto ('.static::class.')');
             $this->destructing = true;
             if ($this->API) {
-                $this->API->destructing = true;
+                if ($this->API instanceof Tools) {
+                    $this->API->destructing = true;
+                }
                 $this->API->unreference();
             }
             if (isset($this->wrapper) && !Magic::$signaled) {

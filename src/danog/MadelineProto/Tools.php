@@ -336,6 +336,7 @@ abstract class Tools extends StrTools
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
         }
+        /** @var Promise[] $promises */
         return all($promises);
     }
     /**
@@ -350,6 +351,7 @@ abstract class Tools extends StrTools
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
         }
+        /** @var Promise[] $promises */
         return any($promises);
     }
     /**
@@ -365,6 +367,7 @@ abstract class Tools extends StrTools
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
         }
+        /** @var Promise[] $promises */
         return some($promises);
     }
     /**
@@ -379,6 +382,7 @@ abstract class Tools extends StrTools
         foreach ($promises as &$promise) {
             $promise = self::call($promise);
         }
+        /** @var Promise[] $promises */
         return first($promises);
     }
     /**
@@ -429,7 +433,7 @@ abstract class Tools extends StrTools
      * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
      * @psalm-param TReturnAlt $default
      *
-     * @return Promise<TReturn|TReturnAlt>
+     * @return Promise<TReturn>|Promise<TReturnAlt>
      *
      * @throws \TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
      */

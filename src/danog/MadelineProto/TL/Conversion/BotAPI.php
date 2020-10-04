@@ -694,6 +694,7 @@ trait BotAPI
     {
         $initialArray = \explode(\chr(1), \str_replace($delimiters, \chr(1), $string));
         $finalArray = [];
+        /** @var int */
         $delimOffset = 0;
         foreach ($initialArray as $item) {
             $delimOffset += $this->mbStrlen($item);

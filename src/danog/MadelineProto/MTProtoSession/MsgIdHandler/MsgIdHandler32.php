@@ -20,28 +20,25 @@
 namespace danog\MadelineProto\MTProtoSession\MsgIdHandler;
 
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
-use danog\MadelineProto\MTProtoSession\Session;
 use tgseclib\Math\BigInteger;
 
 /**
  * Manages message ids.
- *
- * @property Session $session
  */
 class MsgIdHandler32 extends MsgIdHandler
 {
     /**
      * Maximum incoming ID.
      *
-     * @var BigInteger
+     * @var ?BigInteger
      */
-    private $maxIncomingId;
+    private $maxIncomingId = null;
     /**
      * Maximum outgoing ID.
      *
-     * @var BigInteger
+     * @var ?BigInteger
      */
-    private $maxOutgoingId;
+    private $maxOutgoingId = null;
     /**
      * Check validity of given message ID.
      *

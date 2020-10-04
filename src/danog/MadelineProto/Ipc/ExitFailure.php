@@ -26,7 +26,7 @@ final class ExitFailure
     /** @var self|null */
     private $previous;
 
-    /** @var self|null */
+    /** @var string|null */
     private $localized;
 
     public function __construct(\Throwable $exception)

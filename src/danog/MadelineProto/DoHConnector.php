@@ -52,10 +52,10 @@ class DoHConnector implements Connector
         $this->dataCenter = $dataCenter;
         $this->ctx = $ctx;
     }
-    public function connect(string $uri, ?ConnectContext $socketContext = null, ?CancellationToken $token = null): Promise
+    public function connect(string $uri, ?ConnectContext $context = null, ?CancellationToken $token = null): Promise
     {
-        return Tools::call((function () use ($uri, $socketContext, $token): \Generator {
-            $socketContext = $socketContext ?? new ConnectContext();
+        return Tools::call((function () use ($uri, $context, $token): \Generator {
+            $socketContext = $context ?? new ConnectContext();
             $token = $token ?? new NullCancellationToken();
             $attempt = 0;
             $uris = [];
@@ -117,11 +117,13 @@ class DoHConnector implements Connector
             foreach ($uris as $builtUri) {
                 try {
                     $streamContext = \stream_context_create($socketContext->withoutTlsContext()->toStreamContextArray());
+                    /** @psalm-ignore NullArgument */
                     if (!($socket = @\stream_socket_client($builtUri, $errno, $errstr, null, $flags, $streamContext))) {
                         throw new ConnectException(\sprintf('Connection to %s failed: [Error #%d] %s%s', $uri, $errno, $errstr, $failures ? '; previous attempts: '.\implode($failures) : ''), $errno);
                     }
                     \stream_set_blocking($socket, false);
                     $deferred = new Deferred();
+                    /** @psalm-ignore InvalidArgument */
                     $watcher = Loop::onWritable($socket, [$deferred, 'resolve']);
                     $id = $token->subscribe([$deferred, 'fail']);
                     try {

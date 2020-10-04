@@ -87,6 +87,7 @@ trait Constructors
             if (!isset($this->TL->getDescriptions()['constructors'][$constructor])) {
                 $this->addToLang('object_'.$constructor);
                 if (\danog\MadelineProto\Lang::$lang['en']['object_'.$constructor] !== '') {
+                    /** @psalm-suppress InvalidArrayAssignment */
                     $this->TL->getDescriptions()['constructors'][$constructor]['description'] = \danog\MadelineProto\Lang::$lang['en']['object_'.$constructor];
                 }
             }
@@ -150,6 +151,7 @@ trait Constructors
                 if (!isset($this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']])) {
                     $this->addToLang('object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']);
                     if (isset($this->TL->getDescriptions()['constructors'][$constructor]['description'])) {
+                        /** @psalm-suppress InvalidArrayAssignment */
                         $this->TL->getDescriptions()['constructors'][$constructor]['params'][$param['name']] = \danog\MadelineProto\Lang::$lang['en']['object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']];
                     }
                 }

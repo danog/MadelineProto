@@ -1072,6 +1072,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $this->updateHandler = $this->settings['updates']['callback'];
             }
 
+            /** @psalm-suppress InvalidArrayOffset */
             $this->dcList = $this->settings['connection'] ?? $this->dcList;
         }
         $this->settings = Settings::parseFromLegacy($this->settings);

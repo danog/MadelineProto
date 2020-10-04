@@ -37,6 +37,8 @@ abstract class SqlArray extends DriverArray
      * @param DatabaseAbstract $settings
      *
      * @return Promise
+     * 
+     * @psalm-return Promise<static>
      */
     public static function getInstance(string $name, $value = null, string $tablePrefix = '', $settings): Promise
     {
