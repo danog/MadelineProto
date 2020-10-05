@@ -71,7 +71,7 @@ trait Templates
             $lastName = Lang::$current_lang['signupLastNameWeb'];
             $form = "<input type='text' name='first_name' placeholder='$firstName' required/><input type='text' name='last_name' placeholder='$lastName'/>";
         } else {
-            $title = '';
+            return;
         }
         $title = \htmlentities($title);
         $message = \htmlentities($message);
