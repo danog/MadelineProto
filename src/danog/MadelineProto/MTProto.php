@@ -615,7 +615,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         $db = $this->settings->getDb();
         if ($db instanceof Memory && $db->getCleanup()) {
-            $this->cleanup();
+            Tools::wait($this->cleanup());
         }
         $res = [
             // Databases
@@ -689,9 +689,9 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Cleanup memory and session file.
      *
-     * @return void
+     * @return \Generator
      */
-    public function cleanup(): void
+    public function cleanup(): \Generator
     {
         $this->referenceDatabase = new ReferenceDatabase($this);
         yield from $this->referenceDatabase->init();
