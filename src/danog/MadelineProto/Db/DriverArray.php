@@ -29,8 +29,8 @@ abstract class DriverArray implements DbArray
     {
         if (isset($this->settings) && \is_array($this->settings)) {
             $clazz = (new ReflectionClass($this))->getProperty('dbSettings')->getType()->getName();
-            /** 
-             * @var SettingsAbstract 
+            /**
+             * @var SettingsAbstract
              * @psalm-suppress UndefinedThisPropertyAssignment
              */
             $this->dbSettings = new $clazz;

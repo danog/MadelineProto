@@ -4659,20 +4659,22 @@ class InternalDoc extends APIFactory
      *
      * @param int $id Call ID
      *
-     * @return integer
+     * @psalm-return int|\Amp\Promise<int>
+     * @return mixed
      */
-    public function callStatus($id): int
+    public function callStatus($id)
     {
-        return $this->API->callStatus($id);
+        return $this->__call(__FUNCTION__, [$id]);
     }
     /**
      * Check state of calls.
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
+     * @return mixed
      */
-    public function checkCalls(): void
+    public function checkCalls()
     {
-        $this->API->checkCalls();
+        $this->__call(__FUNCTION__, []);
     }
     /**
      * Check for terms of service update.
@@ -4686,11 +4688,11 @@ class InternalDoc extends APIFactory
     /**
      * Cleanup memory and session file.
      *
-     * @return void
+     * @return \Amp\Promise
      */
-    public function cleanup(): void
+    public function cleanup(array $extra = [])
     {
-        $this->API->cleanup();
+        return $this->__call(__FUNCTION__, [$extra]);
     }
     /**
      * Close connection with client, connected via web.
@@ -5036,40 +5038,44 @@ class InternalDoc extends APIFactory
     /**
      * Get full list of MTProto and API methods.
      *
-     * @return array
+     * @psalm-return array|\Amp\Promise<array>
+     * @return mixed
      */
-    public function getAllMethods(): array
+    public function getAllMethods()
     {
-        return $this->API->getAllMethods();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get authorization info.
      *
-     * @return int
+     * @psalm-return int|\Amp\Promise<int>
+     * @return mixed
      */
-    public function getAuthorization(): int
+    public function getAuthorization()
     {
-        return $this->API->getAuthorization();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get cached server-side config.
      *
-     * @return array
+     * @psalm-return array|\Amp\Promise<array>
+     * @return mixed
      */
-    public function getCachedConfig(): array
+    public function getCachedConfig()
     {
-        return $this->API->getCachedConfig();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get call info.
      *
      * @param int $call Call ID
      *
-     * @return array
+     * @psalm-return array|\Amp\Promise<array>
+     * @return mixed
      */
-    public function getCall($call): array
+    public function getCall($call)
     {
-        return $this->API->getCall($call);
+        return $this->__call(__FUNCTION__, [$call]);
     }
     /**
      * Store RSA keys for CDN datacenters.
@@ -5099,20 +5105,22 @@ class InternalDoc extends APIFactory
     /**
      * Get async DNS client.
      *
-     * @return \Amp\Dns\Resolver
+     * @psalm-return \Amp\Dns\Resolver|\Amp\Promise<\Amp\Dns\Resolver>
+     * @return mixed
      */
-    public function getDNSClient(): \Amp\Dns\Resolver
+    public function getDNSClient()
     {
-        return $this->API->getDNSClient();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get all datacenter connections.
      *
-     * @return array<DataCenterConnection>
+     * @psalm-return array<DataCenterConnection>|\Amp\Promise<array<DataCenterConnection>>
+     * @return mixed
      */
-    public function getDataCenterConnections(): array
+    public function getDataCenterConnections()
     {
-        return $this->API->getDataCenterConnections();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get main DC ID.
@@ -5156,11 +5164,12 @@ class InternalDoc extends APIFactory
     /**
      * Get event handler.
      *
-     * @return EventHandler
+     * @psalm-return \danog\MadelineProto\EventHandler|\Amp\Promise<\danog\MadelineProto\EventHandler>
+     * @return mixed
      */
-    public function getEventHandler(): \danog\MadelineProto\EventHandler
+    public function getEventHandler()
     {
-        return $this->API->getEventHandler();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get extension from file location.
@@ -5236,20 +5245,22 @@ class InternalDoc extends APIFactory
     /**
      * Get async HTTP client.
      *
-     * @return \Amp\Http\Client\HttpClient
+     * @psalm-return \Amp\Http\Client\HttpClient|\Amp\Promise<\Amp\Http\Client\HttpClient>
+     * @return mixed
      */
-    public function getHTTPClient(): \Amp\Http\Client\HttpClient
+    public function getHTTPClient()
     {
-        return $this->API->getHTTPClient();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get current password hint.
      *
-     * @return string
+     * @psalm-return string|\Amp\Promise<string>
+     * @return mixed
      */
-    public function getHint(): string
+    public function getHint()
     {
-        return $this->API->getHint();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get bot API ID from peer object.
@@ -5295,27 +5306,29 @@ class InternalDoc extends APIFactory
     /**
      * Get logger.
      */
-    public function getLogger(): \danog\MadelineProto\Logger
+    public function getLogger()
     {
-        return $this->API->getLogger();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get TL namespaces.
      *
-     * @return array
+     * @psalm-return array|\Amp\Promise<array>
+     * @return mixed
      */
-    public function getMethodNamespaces(): array
+    public function getMethodNamespaces()
     {
-        return $this->API->getMethodNamespaces();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get namespaced methods (method => namespace).
      *
-     * @return array
+     * @psalm-return array|\Amp\Promise<array>
+     * @return mixed
      */
-    public function getMethodsNamespaced(): array
+    public function getMethodsNamespaced()
     {
-        return $this->API->getMethodsNamespaced();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get mime type from buffer.
@@ -5371,9 +5384,9 @@ class InternalDoc extends APIFactory
     /**
      * Get PSR logger.
      */
-    public function getPsrLogger(): \Psr\Log\LoggerInterface
+    public function getPsrLogger()
     {
-        return $this->API->getPsrLogger();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get full info about peer (including full list of channel members), returns a Chat object.
@@ -5393,11 +5406,12 @@ class InternalDoc extends APIFactory
      *
      * @param array|int $chat Secret chat ID
      *
-     * @return array
+     * @psalm-return array|\Amp\Promise<array>
+     * @return mixed
      */
-    public function getSecretChat($chat): array
+    public function getSecretChat($chat)
     {
-        return $this->API->getSecretChat($chat);
+        return $this->__call(__FUNCTION__, [$chat]);
     }
     /**
      * Get info about the logged-in user, cached.
@@ -5416,20 +5430,22 @@ class InternalDoc extends APIFactory
     /**
      * Return current settings.
      *
-     * @return Settings
+     * @psalm-return \danog\MadelineProto\Settings|\Amp\Promise<\danog\MadelineProto\Settings>
+     * @return mixed
      */
-    public function getSettings(): \danog\MadelineProto\Settings
+    public function getSettings()
     {
-        return $this->API->getSettings();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get TL serializer.
      *
-     * @return TL
+     * @psalm-return \danog\MadelineProto\TL\TL|\Amp\Promise<\danog\MadelineProto\TL\TL>
+     * @return mixed
      */
-    public function getTL(): \danog\MadelineProto\TL\TL
+    public function getTL()
     {
-        return $this->API->getTL();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Accesses a private variable from an object.
@@ -5449,49 +5465,54 @@ class InternalDoc extends APIFactory
     /**
      * Get web template.
      *
-     * @return string
+     * @psalm-return string|\Amp\Promise<string>
+     * @return mixed
      */
-    public function getWebTemplate(): string
+    public function getWebTemplate()
     {
-        return $this->API->getWebTemplate();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Checks whether all datacenters are authorized.
      *
-     * @return boolean
+     * @psalm-return bool|\Amp\Promise<bool>
+     * @return mixed
      */
-    public function hasAllAuth(): bool
+    public function hasAllAuth()
     {
-        return $this->API->hasAllAuth();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Check if an event handler instance is present.
      *
-     * @return boolean
+     * @psalm-return bool|\Amp\Promise<bool>
+     * @return mixed
      */
-    public function hasEventHandler(): bool
+    public function hasEventHandler()
     {
-        return $this->API->hasEventHandler();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Check if has report peers.
      *
-     * @return boolean
+     * @psalm-return bool|\Amp\Promise<bool>
+     * @return mixed
      */
-    public function hasReportPeers(): bool
+    public function hasReportPeers()
     {
-        return $this->API->hasReportPeers();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Check whether secret chat exists.
      *
      * @param array|int $chat Secret chat ID
      *
-     * @return boolean
+     * @psalm-return bool|\Amp\Promise<bool>
+     * @return mixed
      */
-    public function hasSecretChat($chat): bool
+    public function hasSecretChat($chat)
     {
-        return $this->API->hasSecretChat($chat);
+        return $this->__call(__FUNCTION__, [$chat]);
     }
     /**
      * Checks private property exists in an object.
@@ -5544,11 +5565,12 @@ class InternalDoc extends APIFactory
     /**
      * Initialize self-restart hack.
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
+     * @return mixed
      */
-    public function initSelfRestart(): void
+    public function initSelfRestart()
     {
-        $this->API->initSelfRestart();
+        $this->__call(__FUNCTION__, []);
     }
     /**
      * Whether this is altervista.
@@ -5573,11 +5595,12 @@ class InternalDoc extends APIFactory
     /**
      * Whether we're an IPC client instance.
      *
-     * @return boolean
+     * @psalm-return bool|\Amp\Promise<bool>
+     * @return mixed
      */
-    public function isIpc(): bool
+    public function isIpc()
     {
-        return $this->API->isIpc();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Check whether provided bot API ID is a channel.
@@ -5597,11 +5620,12 @@ class InternalDoc extends APIFactory
      * @param int    $level Logging level
      * @param string $file  File where the message originated
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
+     * @return mixed
      */
-    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = ''): void
+    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = '')
     {
-        $this->API->logger($param, $level, $file);
+        $this->__call(__FUNCTION__, [$param, $level, $file]);
     }
     /**
      * Log out currently logged in user.
@@ -5891,11 +5915,12 @@ class InternalDoc extends APIFactory
     /**
      * Reset the update state and fetch all updates from the beginning.
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
+     * @return mixed
      */
-    public function resetUpdateState(): void
+    public function resetUpdateState()
     {
-        $this->API->resetUpdateState();
+        $this->__call(__FUNCTION__, []);
     }
     /**
      * Resolve username (use getInfo instead).
@@ -5958,11 +5983,12 @@ class InternalDoc extends APIFactory
      *
      * @param int $chat Chat ID
      *
-     * @return int One of MTProto::SECRET_EMPTY, MTProto::SECRET_REQUESTED, MTProto::SECRET_READY
+     * @psalm-return int|\Amp\Promise<int>
+     * @return mixed
      */
-    public function secretChatStatus(int $chat): int
+    public function secretChatStatus(int $chat)
     {
-        return $this->API->secretChatStatus($chat);
+        return $this->__call(__FUNCTION__, [$chat]);
     }
     /**
      * Serialize all instances.
@@ -5980,11 +6006,12 @@ class InternalDoc extends APIFactory
      *
      * @param callable $callback Callback
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
+     * @return mixed
      */
-    public function setCallback($callback): void
+    public function setCallback($callback)
     {
-        $this->API->setCallback($callback);
+        $this->__call(__FUNCTION__, [$callback]);
     }
     /**
      * Set event handler.
@@ -6000,11 +6027,12 @@ class InternalDoc extends APIFactory
     /**
      * Set NOOP update handler, ignoring all updates.
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
+     * @return mixed
      */
-    public function setNoop(): void
+    public function setNoop()
     {
-        $this->API->setNoop();
+        $this->__call(__FUNCTION__, []);
     }
     /**
      * Set peer(s) where to send errors occurred in the event loop.
@@ -6039,11 +6067,12 @@ class InternalDoc extends APIFactory
      *
      * @param string $template Template
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
+     * @return mixed
      */
-    public function setWebTemplate(string $template): void
+    public function setWebTemplate(string $template)
     {
-        $this->API->setWebTemplate($template);
+        $this->__call(__FUNCTION__, [$template]);
     }
     /**
      * Set webhook update handler.
@@ -6051,27 +6080,29 @@ class InternalDoc extends APIFactory
      * @param string $hook_url Webhook URL
      * @param string $pem_path PEM path for self-signed certificate
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
+     * @return mixed
      */
-    public function setWebhook(string $hook_url, string $pem_path = ''): void
+    public function setWebhook(string $hook_url, string $pem_path = '')
     {
-        $this->API->setWebhook($hook_url, $pem_path);
+        $this->__call(__FUNCTION__, [$hook_url, $pem_path]);
     }
     /**
      * Set API wrapper needed for triggering serialization functions.
      */
-    public function setWrapper(\danog\MadelineProto\APIWrapper $wrapper): void
+    public function setWrapper(\danog\MadelineProto\APIWrapper $wrapper)
     {
-        $this->API->setWrapper($wrapper);
+        $this->__call(__FUNCTION__, [$wrapper]);
     }
     /**
      * Setup logger.
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
+     * @return mixed
      */
-    public function setupLogger(): void
+    public function setupLogger()
     {
-        $this->API->setupLogger();
+        $this->__call(__FUNCTION__, []);
     }
     /**
      * Asynchronously sleep.
@@ -6142,11 +6173,12 @@ class InternalDoc extends APIFactory
      * @param array $params Params
      * @param array $key    Key
      *
-     * @return array
+     * @psalm-return array|\Amp\Promise<array>
+     * @return mixed
      */
-    public function tdcliToTd(&$params, $key = null): array
+    public function tdcliToTd(&$params, $key = null)
     {
-        return $this->API->tdcliToTd($params, $key);
+        return $this->__call(__FUNCTION__, [$params, $key]);
     }
     /**
      * Create an artificial timeout for any \Generator or Promise.
@@ -6246,11 +6278,12 @@ class InternalDoc extends APIFactory
      *
      * @param string $fileId Bot API file ID
      *
-     * @return array Unpacked file ID
+     * @psalm-return array|\Amp\Promise<array>
+     * @return mixed
      */
-    public function unpackFileId(string $fileId): array
+    public function unpackFileId(string $fileId)
     {
-        return $this->API->unpackFileId($fileId);
+        return $this->__call(__FUNCTION__, [$fileId]);
     }
     /**
      * Unpack base256 signed int.
@@ -6290,11 +6323,12 @@ class InternalDoc extends APIFactory
      *
      * @param bool $disableUpdateHandling Whether to also disable internal update handling (will cause errors, otherwise will simply use the NOOP handler)
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
+     * @return mixed
      */
-    public function unsetEventHandler(bool $disableUpdateHandling = false): void
+    public function unsetEventHandler(bool $disableUpdateHandling = false)
     {
-        $this->API->unsetEventHandler($disableUpdateHandling);
+        $this->__call(__FUNCTION__, [$disableUpdateHandling]);
     }
     /**
      * Update the 2FA password.

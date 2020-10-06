@@ -1131,11 +1131,12 @@ class InternalDoc extends APIFactory
     /**
      * Get TL method namespaces.
      *
-     * @return array
+     * @psalm-return array|\Amp\Promise<array>
+     * @return mixed
      */
-    public function getMethodNamespaces(): array
+    public function getMethodNamespaces()
     {
-        return $this->API->getMethodNamespaces();
+        return $this->__call(__FUNCTION__, []);
     }
     /**
      * Get mime type from buffer.
@@ -1239,11 +1240,12 @@ class InternalDoc extends APIFactory
      * @param int    $level Logging level
      * @param string $file  File where the message originated
      *
-     * @return void
+     * @psalm-return void|\Amp\Promise<void>
+     * @return mixed
      */
-    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = ''): void
+    public function logger($param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = '')
     {
-        $this->API->logger($param, $level, $file);
+        $this->__call(__FUNCTION__, [$param, $level, $file]);
     }
     /**
      * Asynchronously run async callable.

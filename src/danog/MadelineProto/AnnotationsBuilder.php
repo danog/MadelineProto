@@ -277,7 +277,7 @@ class AnnotationsBuilder
             $paramList = \rtrim($paramList, ', ');
             $doc .= ")";
             $async = true;
-            if ($hasReturnValue) {
+            if ($hasReturnValue && $static) {
                 $doc .= ': ';
                 if ($type->allowsNull()) {
                     $doc .= '?';
@@ -314,6 +314,24 @@ class AnnotationsBuilder
             $promise = '\\'.Promise::class;
             $phpdoc = $method->getDocComment() ?? '';
             $phpdoc = \str_replace("@return \\Generator", "@return $promise", $phpdoc);
+            if ($hasReturnValue && $async && \preg_match("/@return (.*)/", $phpdoc, $matches)) {
+                $ret = $matches[1];
+                $new = $ret;
+                if ($type && !str_contains($ret, '<')) {
+                    $new = '';
+                    if ($type->allowsNull()) {
+                        $new .= '?';
+                    }
+                    if (!$type->isBuiltin()) {
+                        $new .= '\\';
+                    }
+                    $new .= $type->getName() === 'self' ? $this->reflectionClasses['API'] : $type->getName();
+                }
+                $phpdoc = \str_replace("@return ".$ret, "@return mixed", $phpdoc);
+                if (!str_contains($phpdoc, '@psalm-return')) {
+                    $phpdoc = \str_replace("@return ", "@psalm-return $new|$promise<$new>\n     * @return ", $phpdoc);
+                }
+            }
             $phpdoc = \preg_replace(
                 "/@psalm-return \\\\Generator<(?:[^,]+), (?:[^,]+), (?:[^,]+), (.+)>/",
                 "@psalm-return $promise<$1>",

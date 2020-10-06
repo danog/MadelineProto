@@ -314,6 +314,8 @@ trait AuthKeyHandler
     /**
      * Check state of calls.
      *
+     * @internal
+     *
      * @return void
      */
     public function checkCalls(): void
