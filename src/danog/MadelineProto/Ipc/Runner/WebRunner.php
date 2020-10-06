@@ -42,7 +42,7 @@ final class WebRunner extends RunnerAbstract
             }
             $rootDir = \dirname($rootDir).DIRECTORY_SEPARATOR;
             $uriDir = \dirname($uri);
-            if ($uriDir !== '/') {
+            if ($uriDir !== '/' && $uriDir !== '\\') {
                 $uriDir .= DIRECTORY_SEPARATOR;
             }
 
