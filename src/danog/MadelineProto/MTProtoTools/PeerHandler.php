@@ -386,8 +386,10 @@ trait PeerHandler
                     return $this->toSupergroup($id['channel_id']);
                 case 'message':
                 case 'messageService':
-                    if (!isset($id['from_id'])
+                    if (!isset($id['from_id']) // No other option
+                        // It's a channel/chat, 100% what we need
                         || $id['peer_id']['_'] !== 'peerUser'
+                        // It is a user, and it's not ourselves
                         || $id['peer_id']['user_id'] !== $this->authorization['user']['id']
                     ) {
                         return $this->getId($id['peer_id']);

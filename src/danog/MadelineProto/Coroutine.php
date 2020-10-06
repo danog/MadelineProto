@@ -272,4 +272,9 @@ final class Coroutine implements Promise, \ArrayAccess
         }
         return [];
     }
+
+    public function __debugInfo()
+    {
+        return ['_' => 'To obtain a result from a Coroutine object, yield the result or disable async (not recommended). See https://docs.madelineproto.xyz/docs/ASYNC.html for more information on async.'];
+    }
 }

@@ -212,7 +212,22 @@ class FeedLoop extends ResumableSignalLoop
                 $from = false;
                 $via_bot = false;
                 $entities = false;
-                if ($update['message']['_'] !== 'messageEmpty' && (($from = isset($update['message']['from_id']) && !(yield from $this->API->peerIsset($update['message']['from_id']))) || ($to = !(yield from $this->API->peerIsset($update['message']['peer_id']))) || ($via_bot = isset($update['message']['via_bot_id']) && !(yield from $this->API->peerIsset($update['message']['via_bot_id']))) || ($entities = isset($update['message']['entities']) && !(yield from $this->API->entitiesPeerIsset($update['message']['entities']))))) {
+                if ($update['message']['_'] !== 'messageEmpty' && (
+                    (
+                        $from = isset($update['message']['from_id'])
+                        && !(yield from $this->API->peerIsset($update['message']['from_id']))
+                    ) || (
+                        $to = !(yield from $this->API->peerIsset($update['message']['peer_id']))
+                    )
+                        || (
+                            $via_bot = isset($update['message']['via_bot_id'])
+                            && !(yield from $this->API->peerIsset($update['message']['via_bot_id']))
+                        ) || (
+                            $entities = isset($update['message']['entities'])
+                            && !(yield from $this->API->entitiesPeerIsset($update['message']['entities']))
+                        )
+                )
+                ) {
                     $log = '';
                     if ($from) {
                         $from_id = $this->API->getId($update['message']['from_id']);

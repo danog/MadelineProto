@@ -26,6 +26,7 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
+use danog\MadelineProto\MTProtoTools\GarbageCollector;
 use tgseclib\Math\BigInteger;
 use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;
@@ -690,16 +691,21 @@ abstract class Tools extends StrTools
      */
     public static function readLineGenerator(string $prompt = ''): \Generator
     {
-        $stdin = getStdin();
-        $stdout = getStdout();
-        if ($prompt) {
-            yield $stdout->write($prompt);
-        }
-        static $lines = [''];
-        while (\count($lines) < 2 && ($chunk = yield $stdin->read()) !== null) {
-            $chunk = \explode("\n", \str_replace(["\r", "\n\n"], "\n", $chunk));
-            $lines[\count($lines) - 1] .= \array_shift($chunk);
-            $lines = \array_merge($lines, $chunk);
+        try {
+            GarbageCollector::$log = false;
+            $stdin = getStdin();
+            $stdout = getStdout();
+            if ($prompt) {
+                yield $stdout->write($prompt);
+            }
+            static $lines = [''];
+            while (\count($lines) < 2 && ($chunk = yield $stdin->read()) !== null) {
+                $chunk = \explode("\n", \str_replace(["\r", "\n\n"], "\n", $chunk));
+                $lines[\count($lines) - 1] .= \array_shift($chunk);
+                $lines = \array_merge($lines, $chunk);
+            }
+        } finally {
+            GarbageCollector::$log = true;
         }
         return \array_shift($lines);
     }

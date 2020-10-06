@@ -80,6 +80,7 @@ class MyEventHandler extends EventHandler
             return;
         }
 
+
         $res = \json_encode($update, JSON_PRETTY_PRINT);
         yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
         if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
