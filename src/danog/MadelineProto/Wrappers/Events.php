@@ -79,6 +79,7 @@ trait Events
         }
         $this->initEventHandler($eventHandler);
         $this->eventHandlerMethods = [];
+        $this->loop_callback = null;
         foreach (\get_class_methods($this->event_handler) as $method) {
             if ($method === 'onLoop') {
                 $this->loop_callback = [$this->event_handler_instance, 'onLoop'];
@@ -96,9 +97,7 @@ trait Events
             }
         }
         yield from $this->setReportPeers($this->event_handler_instance->getReportPeers());
-        if (\method_exists($this->event_handler_instance, 'onStart')) {
-            Tools::callFork($this->event_handler_instance->onStart());
-        }
+        Tools::callFork($this->event_handler_instance->startInternal());
         $this->updateHandler = [$this, 'eventUpdateHandler'];
         if ($this->inited()) {
             $this->startUpdateSystem();

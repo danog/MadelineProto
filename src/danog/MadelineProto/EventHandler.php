@@ -25,6 +25,10 @@ namespace danog\MadelineProto;
 abstract class EventHandler extends InternalDoc
 {
     /**
+     * Whether the event handler was started.
+     */
+    private bool $startedInternal = false;
+    /**
      * Internal constructor.
      *
      * @internal
@@ -40,6 +44,23 @@ abstract class EventHandler extends InternalDoc
         foreach ($this->API->getMethodNamespaces() as $namespace) {
             $this->{$namespace} = $this->exportNamespace($namespace);
         }
+    }
+    /**
+     * Start method handler.
+     *
+     * @internal
+     *
+     * @return \Generator
+     */
+    public function startInternal(): \Generator
+    {
+        if ($this->startedInternal) {
+            return;
+        }
+        if (\method_exists($this, 'onStart')) {
+            yield $this->onStart();
+        }
+        $this->startedInternal = true;
     }
     /**
      * Get peers where to send error reports.
