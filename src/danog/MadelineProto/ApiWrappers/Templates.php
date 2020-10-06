@@ -123,8 +123,8 @@ trait Templates
                 $title .= "<br><b>$message</b>";
 
                 $form = '<input type="hidden" name="creating_app" value="yes" required/>';
-                foreach (['app_title', 'app_shortname', 'app_url', 'app_platform', 'app_desc'] as $field) {
-                    $desc = \htmlentities(Lang::$current_lang["apiAppInstructionsAuto$field"]);
+                foreach (['app_title', 'app_shortname', 'app_url', 'app_platform', 'app_desc'] as $k => $field) {
+                    $desc = \htmlentities(Lang::$current_lang["apiAppInstructionsAuto$k"]);
                     if ($field == 'app_platform') {
                         $form .= "$desc<br>";
                         foreach ([
