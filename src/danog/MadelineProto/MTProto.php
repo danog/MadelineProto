@@ -694,6 +694,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function cleanup(): void
     {
         $this->referenceDatabase = new ReferenceDatabase($this);
+        yield from $this->referenceDatabase->init();
         $callbacks = [$this, $this->referenceDatabase];
         if (!($this->authorization['user']['bot'] ?? false)) {
             $callbacks[] = $this->minDatabase;
