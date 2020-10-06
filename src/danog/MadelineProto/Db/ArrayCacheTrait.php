@@ -22,7 +22,7 @@ trait ArrayCacheTrait
     /**
      * TTL interval.
      */
-    protected int $ttl = 5 * 60;
+    protected string $ttl = '+5 minutes';
     /**
      * TTL cleanup interval.
      */

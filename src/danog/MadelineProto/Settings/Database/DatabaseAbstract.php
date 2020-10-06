@@ -11,8 +11,9 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
 {
     /**
      * For how long to keep records in memory after last read, for cached backends.
+     * @var string //serialization issues
      */
-    protected int $cacheTtl = 5 * 60;
+    protected $cacheTtl = "+5 minutes";
     /**
      * Database password.
      */
@@ -26,9 +27,6 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
             'cache_ttl'
         ]) as $object => $array) {
             if (isset($settings[$array])) {
-                if ($array === 'cache_ttl' && \is_string($settings[$array])) {
-                    $settings[$array] = \strtotime($settings[$array]);
-                }
                 $this->{$object}($settings[$array]);
             }
         }
@@ -50,9 +48,9 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
     /**
      * Get for how long to keep records in memory after last read, for cached backends.
      *
-     * @return int
+     * @return string
      */
-    public function getCacheTtl(): int
+    public function getCacheTtl(): string
     {
         return $this->cacheTtl;
     }
@@ -60,11 +58,11 @@ abstract class DatabaseAbstract extends SettingsDatabaseAbstract
     /**
      * Set for how long to keep records in memory after last read, for cached backends.
      *
-     * @param int $cacheTtl For how long to keep records in memory after last read, for cached backends.
+     * @param string $cacheTtl For how long to keep records in memory after last read, for cached backends.
      *
      * @return self
      */
-    public function setCacheTtl(int $cacheTtl): self
+    public function setCacheTtl(string $cacheTtl): self
     {
         $this->cacheTtl = $cacheTtl;
 
