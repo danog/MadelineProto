@@ -34,6 +34,7 @@ use Amp\Failure;
 use Amp\Internal;
 use Amp\Promise;
 use Amp\Success;
+use JsonSerializable;
 use ReflectionGenerator;
 
 /**
@@ -43,7 +44,7 @@ use ReflectionGenerator;
  * value is sent into the generator, while a failure reason is thrown into the generator. Using a coroutine,
  * asynchronous code can be written without callbacks and be structured like synchronous code.
  */
-final class Coroutine implements Promise, \ArrayAccess
+final class Coroutine implements Promise, \ArrayAccess, JsonSerializable
 {
     use Internal\Placeholder {
         fail as internalFail;
@@ -273,8 +274,14 @@ final class Coroutine implements Promise, \ArrayAccess
         return [];
     }
 
+    private const WARNING = 'To obtain a result from a Coroutine object, yield the result or disable async (not recommended). See https://docs.madelineproto.xyz/docs/ASYNC.html for more information on async.';
     public function __debugInfo()
     {
-        return ['_' => 'To obtain a result from a Coroutine object, yield the result or disable async (not recommended). See https://docs.madelineproto.xyz/docs/ASYNC.html for more information on async.'];
+        return [self::WARNING];
+    }
+
+    public function jsonSerialize()
+    {
+        return self::WARNING;
     }
 }
