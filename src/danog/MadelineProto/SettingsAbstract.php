@@ -44,7 +44,10 @@ abstract class SettingsAbstract
             if (isset($other->{$name})
                 && (
                     !isset($defaults[$name])
-                    || $other->{$name} !== $defaults[$name] // Isn't equal to the default value
+                    || (
+                        $other->{$name} !== $defaults[$name]  // Isn't equal to the default value
+                        || $other->{$name} !== $this->{$name} // Is equal, but current value is not the default one
+                    )
                 )
                 && $other->{$name} !== $this->{$name}
             ) {
