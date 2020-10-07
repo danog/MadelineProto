@@ -92,6 +92,11 @@ class Connection extends SettingsAbstract
     protected bool $useDoH = true;
 
     /**
+     * Bind on specific address and port.
+     */
+    private ?string $bindTo = null;
+
+    /**
      * Subdomains of web.telegram.org for https protocol.
      */
     protected array $sslSubdomains = [
@@ -620,6 +625,30 @@ class Connection extends SettingsAbstract
     public function setUseDoH(bool $useDoH): self
     {
         $this->useDoH = $useDoH;
+
+        return $this;
+    }
+
+    /**
+     * Get bind on specific address and port.
+     *
+     * @return ?string
+     */
+    public function getBindTo(): ?string
+    {
+        return $this->bindTo;
+    }
+
+    /**
+     * Set bind on specific address and port.
+     *
+     * @param ?string $bindTo Bind on specific address and port.
+     *
+     * @return self
+     */
+    public function setBindTo(?string $bindTo): self
+    {
+        $this->bindTo = $bindTo;
 
         return $this;
     }
