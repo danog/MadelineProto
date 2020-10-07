@@ -87,6 +87,11 @@ class Connection extends SettingsAbstract
     protected bool $retry = true;
 
     /**
+     * Whether to use DNS over HTTPS.
+     */
+    protected bool $useDoH = true;
+
+    /**
      * Subdomains of web.telegram.org for https protocol.
      */
     protected array $sslSubdomains = [
@@ -591,6 +596,30 @@ class Connection extends SettingsAbstract
     public function setTimeout(int $timeout): self
     {
         $this->timeout = $timeout;
+
+        return $this;
+    }
+
+    /**
+     * Get whether to use DNS over HTTPS.
+     *
+     * @return bool
+     */
+    public function getUseDoH(): bool
+    {
+        return $this->useDoH;
+    }
+
+    /**
+     * Set whether to use DNS over HTTPS.
+     *
+     * @param bool $useDoH Whether to use DNS over HTTPS
+     *
+     * @return self
+     */
+    public function setUseDoH(bool $useDoH): self
+    {
+        $this->useDoH = $useDoH;
 
         return $this;
     }

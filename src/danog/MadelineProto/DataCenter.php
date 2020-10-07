@@ -98,13 +98,13 @@ class DataCenter
     /**
      * DNS over HTTPS client.
      *
-     * @var \Amp\DoH\Rfc8484StubResolver
+     * @var Rfc8484StubResolver|Rfc1035StubResolver
      */
     private $DoHClient;
     /**
      * Non-proxied DNS over HTTPS client.
      *
-     * @var \Amp\DoH\Rfc8484StubResolver
+     * @var Rfc8484StubResolver|Rfc1035StubResolver
      */
     private $nonProxiedDoHClient;
     /**
@@ -233,13 +233,15 @@ class DataCenter
             $DoHHTTPClient = (new HttpClientBuilder())->interceptNetwork(new CookieInterceptor($this->CookieJar))->usingPool(new UnlimitedConnectionPool(new DefaultConnectionFactory(new ContextConnector($this, true))))->build();
             $DoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')], $DoHHTTPClient);
             $nonProxiedDoHConfig = new DoHConfig([new Nameserver('https://mozilla.cloudflare-dns.com/dns-query'), new Nameserver('https://dns.google/resolve')]);
-            $this->DoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($DoHConfig);
-            $this->nonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost ? new Rfc1035StubResolver() : new Rfc8484StubResolver($nonProxiedDoHConfig);
+            $this->DoHClient = Magic::$altervista || Magic::$zerowebhost || !$settings->getUseDoH()
+                ? new Rfc1035StubResolver()
+                : new Rfc8484StubResolver($DoHConfig);
+            $this->nonProxiedDoHClient = Magic::$altervista || Magic::$zerowebhost || !$settings->getUseDoH()
+                ? new Rfc1035StubResolver()
+                : new Rfc8484StubResolver($nonProxiedDoHConfig);
 
             $this->dnsConnector = new DnsConnector(new Rfc1035StubResolver());
-            if (\class_exists(Rfc6455Connector::class)) {
-                $this->webSocketConnector = new Rfc6455Connector($this->HTTPClient);
-            }
+            $this->webSocketConnector = new Rfc6455Connector($this->HTTPClient);
         }
         $this->settings->applyChanges();
     }

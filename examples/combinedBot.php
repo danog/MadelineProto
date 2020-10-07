@@ -60,7 +60,7 @@ class MyEventHandler extends EventHandler
      *
      * @param array $update Update
      *
-     * @return void
+     * @return \Generator
      */
     public function onUpdateNewChannelMessage(array $update): \Generator
     {

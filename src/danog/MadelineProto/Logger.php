@@ -82,7 +82,7 @@ class Logger
     /**
      * Default logger instance.
      *
-     * @var ?self
+     * @var self
      */
     public static $default;
     /**
