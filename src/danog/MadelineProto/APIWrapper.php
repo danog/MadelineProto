@@ -210,4 +210,14 @@ final class APIWrapper
             return true;
         })());
     }
+
+    /**
+     * Get session path.
+     *
+     * @return SessionPaths
+     */
+    public function getSession(): SessionPaths
+    {
+        return $this->session;
+    }
 }

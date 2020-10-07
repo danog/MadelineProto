@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto\TL;
 
+/**
+ * TL deserialization exception.
+ */
 class Exception extends \Exception
 {
     use PrettyException;

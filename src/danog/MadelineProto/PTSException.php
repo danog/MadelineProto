@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto;
 
+/**
+ * Internal error indicating a problem with Telegram's servers.
+ */
 class PTSException extends \Exception
 {
     use TL\PrettyException;

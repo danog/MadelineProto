@@ -8,6 +8,9 @@ use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\SettingsAbstract;
 
+/**
+ * App information.
+ */
 class AppInfo extends SettingsAbstract
 {
     /**

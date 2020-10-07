@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Settings\Database;
 
 use danog\MadelineProto\Settings\Database;
 
+/**
+ * Generic db backend settings.
+ */
 abstract class SqlAbstract extends DatabaseAbstract
 {
     /**

@@ -9,6 +9,9 @@ use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 
 use function Amp\Postgres\Pool;
 
+/**
+ * Postgres driver wrapper.
+ */
 class Postgres
 {
     /** @var Pool[] */

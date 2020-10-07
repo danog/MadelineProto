@@ -13,6 +13,9 @@ use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 
 use function Amp\call;
 
+/**
+ * Postgres database backend.
+ */
 class PostgresArray extends SqlArray
 {
     protected string $table;

@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto;
 
+/**
+ * Indicates an error returned by Telegram's API.
+ */
 class RPCErrorException extends \Exception
 {
     use TL\PrettyException;

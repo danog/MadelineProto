@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto;
 
+/**
+ * Indicates a security error.
+ */
 class SecurityException extends \Exception
 {
 }

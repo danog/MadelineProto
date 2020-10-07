@@ -21,6 +21,9 @@ use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
 
+/**
+ * Connection settings.
+ */
 class Connection extends SettingsAbstract
 {
     /**

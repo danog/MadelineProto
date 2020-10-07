@@ -19,13 +19,15 @@
 
 namespace danog\MadelineProto;
 
+/**
+ * Lua interface.
+ */
 class Lua
 {
-    use \danog\Serializable;
     public API $MadelineProto;
     protected $Lua;
-    protected $script;
-    public function __magic_construct($script, $MadelineProto)
+    protected string $script;
+    public function __construct(string $script, API $MadelineProto)
     {
         if (!\file_exists($script)) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['script_not_exist']);

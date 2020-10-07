@@ -7,6 +7,9 @@ use danog\MadelineProto\Magic;
 use danog\MadelineProto\SettingsAbstract;
 use danog\MadelineProto\Tools;
 
+/**
+ * Logger settings.
+ */
 class Logger extends SettingsAbstract
 {
     /**

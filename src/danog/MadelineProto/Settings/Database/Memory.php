@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Settings\Database;
 
 use danog\MadelineProto\Settings\DatabaseAbstract;
 
+/**
+ * Memory backend settings.
+ */
 class Memory extends DatabaseAbstract
 {
     /**

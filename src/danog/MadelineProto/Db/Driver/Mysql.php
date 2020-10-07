@@ -9,6 +9,9 @@ use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
 
 use function Amp\Mysql\Pool;
 
+/**
+ * MySQL driver wrapper.
+ */
 class Mysql
 {
     /** @var Pool[] */

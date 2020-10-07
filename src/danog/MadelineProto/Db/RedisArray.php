@@ -13,6 +13,9 @@ use Generator;
 
 use function Amp\call;
 
+/**
+ * Redis database backend.
+ */
 class RedisArray extends SqlArray
 {
     protected DatabaseRedis $dbSettings;

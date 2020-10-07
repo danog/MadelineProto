@@ -2,6 +2,9 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
+/**
+ * Postgres backend settings.
+ */
 class Postgres extends SqlAbstract
 {
     public function mergeArray(array $settings): void

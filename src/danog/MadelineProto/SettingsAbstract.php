@@ -18,6 +18,8 @@ abstract class SettingsAbstract
      *
      * @param array $settings Settings array
      *
+     * @internal
+     *
      * @return void
      */
     public function mergeArray(array $settings): void
@@ -28,6 +30,8 @@ abstract class SettingsAbstract
      * Merge with other settings instance.
      *
      * @param self $other
+     *
+     * @internal
      *
      * @return void
      */
@@ -83,6 +87,8 @@ abstract class SettingsAbstract
     }
     /**
      * Apply changes.
+     *
+     * @internal
      *
      * @return static
      */

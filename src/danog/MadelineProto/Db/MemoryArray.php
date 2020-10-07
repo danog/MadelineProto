@@ -10,6 +10,9 @@ use danog\MadelineProto\Settings\Database\Memory;
 
 use function Amp\call;
 
+/**
+ * Memory database backend.
+ */
 class MemoryArray extends \ArrayIterator implements DbArray
 {
     protected function __construct($array = [], $flags = 0)

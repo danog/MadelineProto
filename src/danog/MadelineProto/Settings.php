@@ -21,6 +21,9 @@ use danog\MadelineProto\Settings\Serialization;
 use danog\MadelineProto\Settings\Templates;
 use danog\MadelineProto\Settings\TLSchema;
 
+/**
+ * Settings class used for configuring MadelineProto.
+ */
 class Settings extends SettingsAbstract
 {
     /**

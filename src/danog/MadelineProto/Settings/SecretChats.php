@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
 
+/**
+ * Secret chat settings.
+ */
 class SecretChats extends SettingsAbstract
 {
     /**

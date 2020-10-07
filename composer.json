@@ -44,12 +44,12 @@
         "amphp/websocket-client": "^1.0"
     },
     "require-dev": {
+        "phpdocumentor/reflection-docblock": "^5.2",
         "vlucas/phpdotenv": "^3",
-        "phpdocumentor/reflection-docblock": "^4.3",
         "ennexa/amp-update-cache": "dev-master",
         "phpunit/phpunit": "^8",
         "amphp/php-cs-fixer-config": "dev-master",
-        "haydenpierce/class-finder": "^0.4",
+        "haydenpierce/class-finder": "^0.4.2",
         "amphp/http-server": "dev-master",
         "amphp/http": "^1.6",
         "ext-ctype": "*",

@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
 
+/**
+ * TL schema settings.
+ */
 class TLSchema extends SettingsAbstract
 {
     /**

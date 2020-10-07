@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto;
 
+/**
+ * Basic exception.
+ */
 class Exception extends \Exception
 {
     use TL\PrettyException;

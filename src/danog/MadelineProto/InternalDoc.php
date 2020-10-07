@@ -6062,13 +6062,6 @@ class InternalDoc extends APIFactory
         $this->__call(__FUNCTION__, [$hook_url, $pem_path]);
     }
     /**
-     * Set API wrapper needed for triggering serialization functions.
-     */
-    public function setWrapper(\danog\MadelineProto\APIWrapper $wrapper)
-    {
-        $this->__call(__FUNCTION__, [$wrapper]);
-    }
-    /**
      * Setup logger.
      *
      * @psalm-return void|\Amp\Promise<void>

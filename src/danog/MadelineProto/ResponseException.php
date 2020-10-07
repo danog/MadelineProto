@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto;
 
+/**
+ * Indicates an error thrown when an unexpected response is received from telegram's servers.
+ */
 class ResponseException extends \Exception
 {
 }

@@ -601,10 +601,21 @@ class MTProto extends AsyncConstruct implements TLCallback
     }
     /**
      * Set API wrapper needed for triggering serialization functions.
+     *
+     * @internal
      */
     public function setWrapper(APIWrapper $wrapper): void
     {
         $this->wrapper = $wrapper;
+    }
+    /**
+     * Get API wrapper.
+     *
+     * @internal
+     */
+    public function getWrapper(): APIWrapper
+    {
+        return $this->wrapper;
     }
     /**
      * Sleep function.

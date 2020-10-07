@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
 
+/**
+ * RPC settings.
+ */
 class RPC extends SettingsAbstract
 {
     /**

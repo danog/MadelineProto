@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
 
+/**
+ * Peer database settings.
+ */
 class Peer extends SettingsAbstract
 {
     /**

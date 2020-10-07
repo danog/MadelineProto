@@ -19,8 +19,8 @@
 
 namespace danog\MadelineProto;
 
-/*
- * Controls script shutdown
+/**
+ * Class that controls script shutdown.
  */
 class Shutdown
 {

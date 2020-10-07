@@ -179,7 +179,7 @@ class API extends InternalDoc
     /**
      * Connect to MadelineProto.
      *
-     * @param Settings|SettingsEmpty $settings Settings
+     * @param SettingsAbstract $settings Settings
      * @param bool $forceFull Whether to force full initialization
      *
      * @return \Generator

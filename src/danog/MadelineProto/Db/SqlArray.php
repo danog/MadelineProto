@@ -7,6 +7,9 @@ use danog\MadelineProto\Settings\Database\DatabaseAbstract;
 
 use function Amp\call;
 
+/**
+ * Generic SQL database backend.
+ */
 abstract class SqlArray extends DriverArray
 {
     protected string $table;

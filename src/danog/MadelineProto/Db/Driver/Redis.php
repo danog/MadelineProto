@@ -7,6 +7,9 @@ use Amp\Redis\Redis as RedisRedis;
 use Amp\Redis\RemoteExecutorFactory;
 use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
 
+/**
+ * Redis driver wrapper.
+ */
 class Redis
 {
     /** @var RedisRedis[] */

@@ -2,6 +2,9 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
+/**
+ * Redis backend settings.
+ */
 class Redis extends DatabaseAbstract
 {
     /**

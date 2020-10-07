@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto\TL\Conversion;
 
+/**
+ * TL conversion exception.
+ */
 class Exception extends \Exception
 {
     use \danog\MadelineProto\TL\PrettyException;

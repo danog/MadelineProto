@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
 
+/**
+ * Cryptography settings.
+ */
 class Auth extends SettingsAbstract
 {
     /**

@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
 
+/**
+ * IPC server settings.
+ */
 class Ipc extends SettingsAbstract
 {
     /**

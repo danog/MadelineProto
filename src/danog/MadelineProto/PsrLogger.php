@@ -5,6 +5,9 @@ namespace danog\MadelineProto;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 
+/**
+ * PSR-3 wrapper for MadelineProto's Logger.
+ */
 class PsrLogger extends AbstractLogger
 {
     private const LEVEL_MAP = [

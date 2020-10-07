@@ -4,6 +4,15 @@ namespace danog\MadelineProto\Db;
 
 use danog\MadelineProto\MTProto;
 
+/**
+ * Include this trait and call DbPropertiesTrait::initDb to use MadelineProto's database backend for properties.
+ *
+ * You will have to define a `$dbProperties` static array property, with a list of properties you want to store to a database.
+ *
+ * @see DbPropertiesFactory For a list of allowed property types
+ *
+ * @property array<string, DbPropertiesFactory::TYPE_*> $dbProperties
+ */
 trait DbPropertiesTrait
 {
     /**

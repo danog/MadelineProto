@@ -2,6 +2,11 @@
 
 namespace danog\MadelineProto\Db\NullCache;
 
+/**
+ * Trait that disables database caching.
+ *
+ * @internal
+ */
 trait NullCacheTrait
 {
     /**

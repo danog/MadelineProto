@@ -4,6 +4,9 @@ namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
 
+/**
+ * File management settings.
+ */
 class Files extends SettingsAbstract
 {
     /**

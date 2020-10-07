@@ -9,7 +9,10 @@ use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 
-class DbPropertiesFactory
+/**
+ * This factory class initializes the correct database backend for MadelineProto.
+ */
+abstract class DbPropertiesFactory
 {
     /**
      * Indicates a simple K-V array stored in a database backend.
@@ -23,6 +26,8 @@ class DbPropertiesFactory
      * @param $value
      *
      * @return Promise<DbType>
+     *
+     * @internal
      *
      * @uses \danog\MadelineProto\Db\MemoryArray
      * @uses \danog\MadelineProto\Db\MysqlArray

@@ -2,6 +2,9 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
+/**
+ * MySQL backend settings.
+ */
 class Mysql extends SqlAbstract
 {
     public function mergeArray(array $settings): void

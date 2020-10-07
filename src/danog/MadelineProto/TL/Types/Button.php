@@ -19,9 +19,13 @@
 
 namespace danog\MadelineProto\TL\Types;
 
+use danog\MadelineProto\API;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Tools;
 
+/**
+ * Clickable button.
+ */
 class Button implements \JsonSerializable, \ArrayAccess
 {
     /**
@@ -31,9 +35,15 @@ class Button implements \JsonSerializable, \ArrayAccess
      */
     private array $button;
     /**
-     * MTProto instance.
+     * Session name.
      */
-    private MTProto $API;
+    private string $session;
+    /**
+     * MTProto instance.
+     *
+     * @var MTProto|API
+     */
+    private $API;
     /**
      * Message ID.
      */
@@ -62,6 +72,7 @@ class Button implements \JsonSerializable, \ArrayAccess
             : $message['peer_id'];
         $this->id = $message['id'];
         $this->API = $API;
+        $this->session = $API->getWrapper()->getSession()->getLegacySessionPath();
     }
     /**
      * Sleep function.
@@ -70,7 +81,7 @@ class Button implements \JsonSerializable, \ArrayAccess
      */
     public function __sleep(): array
     {
-        return ['button', 'peer', 'id', 'API'];
+        return ['button', 'peer', 'id', 'session'];
     }
     /**
      * Click on button.
@@ -81,7 +92,11 @@ class Button implements \JsonSerializable, \ArrayAccess
      */
     public function click(bool $donotwait = true)
     {
-        $async = isset($this->API->wrapper) ? $this->API->wrapper->isAsync() : true;
+        if (!isset($this->API)) {
+            $this->API = new API($this->session);
+        } else {
+            $async = isset($this->API->wrapper) ? $this->API->wrapper->isAsync() : true;
+        }
         $method = $donotwait ? 'methodCallAsyncWrite' : 'methodCallAsyncRead';
         switch ($this->button['_']) {
             default:

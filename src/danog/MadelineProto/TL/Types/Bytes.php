@@ -19,6 +19,9 @@
 
 namespace danog\MadelineProto\TL\Types;
 
+/**
+ * Bytes wrapper.
+ */
 class Bytes implements \JsonSerializable, \ArrayAccess
 {
     /**

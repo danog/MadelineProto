@@ -13,6 +13,9 @@ use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
 
 use function Amp\call;
 
+/**
+ * MySQL database backend.
+ */
 class MysqlArray extends SqlArray
 {
     protected string $table;
