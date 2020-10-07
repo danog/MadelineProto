@@ -172,9 +172,9 @@ class AnnotationsBuilder
             $internalDoc[$namespace][$method]['return'] = $type;
         }
         $class = new \ReflectionClass($this->reflectionClasses['MTProto']);
-        $methods = $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
+        $methods = $class->getMethods((\ReflectionMethod::IS_STATIC & \ReflectionMethod::IS_PUBLIC) | \ReflectionMethod::IS_PUBLIC);
         $class = new \ReflectionClass(Tools::class);
-        $methods = \array_merge($methods, $class->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC));
+        $methods = \array_merge($methods, $class->getMethods((\ReflectionMethod::IS_STATIC & \ReflectionMethod::IS_PUBLIC) | \ReflectionMethod::IS_PUBLIC));
         foreach ($methods as $key => $method) {
             $name = $method->getName();
             if ($method == 'methodCallAsyncRead') {

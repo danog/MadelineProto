@@ -12,10 +12,14 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
 class DbPropertiesFactory
 {
     /**
+     * Indicates a simple K-V array stored in a database backend.
+     * Values can be objects or other arrays, but when lots of nesting is required, it's best to split the array into multiple arrays.
+     */
+    const TYPE_ARRAY = 'array';
+    /**
      * @param DatabaseAbstract $dbSettings
-     * @param string $namePrefix
-     * @param string|array $propertyType
-     * @param string $name
+     * @param string $table
+     * @param self::TYPE_*|array $propertyType
      * @param $value
      *
      * @return Promise<DbType>
@@ -25,7 +29,7 @@ class DbPropertiesFactory
      * @uses \danog\MadelineProto\Db\PostgresArray
      * @uses \danog\MadelineProto\Db\RedisArray
      */
-    public static function get(DatabaseAbstract $dbSettings, string $namePrefix, $propertyType, string $name, $value = null): Promise
+    public static function get(DatabaseAbstract $dbSettings, string $table, $propertyType, $value = null): Promise
     {
         $config = $propertyType['config'] ?? [];
         $propertyType = \is_array($propertyType) ? $propertyType['type'] : $propertyType;
@@ -54,13 +58,13 @@ class DbPropertiesFactory
 
         /** @var DbType $class */
         switch (\strtolower($propertyType)) {
-            case 'array':
+            case self::TYPE_ARRAY:
                 $class .= 'Array';
                 break;
             default:
                 throw new \InvalidArgumentException("Unknown $propertyType: {$propertyType}");
         }
 
-        return $class::getInstance($name, $value, $namePrefix, $dbSettings);
+        return $class::getInstance($table, $value, $dbSettings);
     }
 }

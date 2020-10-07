@@ -193,7 +193,7 @@ class API extends InternalDoc
         }
 
         [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(
-            Serialization::unserialize($this->session, $forceFull),
+            Serialization::unserialize($this->session, $settings, $forceFull),
             30000,
             [0, null]
         );

@@ -23,9 +23,11 @@ use Amp\Deferred;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Loop;
 use Amp\Promise;
+use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\MTProtoSession\Session;
+use danog\MadelineProto\Settings\DatabaseAbstract;
 
 use function Amp\File\exists;
 use function Amp\File\get;
@@ -97,8 +99,9 @@ abstract class Serialization
      *   - Start IPC server
      *   - Store IPC state
      *
-     * @param SessionPaths $session   Session name
-     * @param bool         $forceFull Whether to force full session deserialization
+     * @param SessionPaths     $session   Session name
+     * @param SettingsAbstract $settings  Settings
+     * @param bool             $forceFull Whether to force full session deserialization
      *
      * @internal
      *
@@ -106,7 +109,7 @@ abstract class Serialization
      *
      * @psalm-return \Generator<void, mixed, mixed, array{0: ChannelledSocket|APIWrapper|\Throwable|null|0, 1: callable|null}>
      */
-    public static function unserialize(SessionPaths $session, bool $forceFull = false): \Generator
+    public static function unserialize(SessionPaths $session, SettingsAbstract $settings, bool $forceFull = false): \Generator
     {
         if (yield exists($session->getSessionPath())) {
             // Is new session
@@ -197,7 +200,20 @@ abstract class Serialization
             $unserialized = yield from $session->unserialize();
             if ($unserialized instanceof DriverArray) {
                 Logger::log("Extracting session from database...");
-                yield from $unserialized->initStartup();
+                if ($settings instanceof Settings) {
+                    $settings = $settings->getDb();
+                }
+                if ($settings instanceof DatabaseAbstract) {
+                    $tableName = (string) $unserialized;
+                    $unserialized = yield DbPropertiesFactory::get(
+                        $settings,
+                        $tableName,
+                        DbPropertiesFactory::TYPE_ARRAY,
+                        $unserialized
+                    );
+                } else {
+                    yield from $unserialized->initStartup();
+                }
                 $unserialized = yield $unserialized['data'];
                 if (!$unserialized) {
                     throw new Exception("Could not extract session from database!");

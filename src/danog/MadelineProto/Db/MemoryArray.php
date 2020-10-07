@@ -20,13 +20,12 @@ class MemoryArray extends \ArrayIterator implements DbArray
     /**
      * Get instance.
      *
-     * @param string $name
+     * @param string $table
      * @param mixed  $value
-     * @param string $tablePrefix
      * @param Memory $settings
      * @return Promise<self>
      */
-    public static function getInstance(string $name, $value = null, string $tablePrefix = '', $settings): Promise
+    public static function getInstance(string $table, $value = null, $settings): Promise
     {
         return call(static function () use ($value) {
             if ($value instanceof MemoryArray) {

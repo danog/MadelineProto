@@ -24,23 +24,21 @@ abstract class SqlArray extends DriverArray
 
 
     /**
-     * @param string $name
+     * @param string $table
      * @param DbArray|array|null $value
-     * @param string $tablePrefix
      * @param DatabaseAbstract $settings
      *
      * @return Promise
      *
      * @psalm-return Promise<static>
      */
-    public static function getInstance(string $name, $value = null, string $tablePrefix = '', $settings): Promise
+    public static function getInstance(string $table, $value = null, $settings): Promise
     {
-        $tableName = "{$tablePrefix}_{$name}";
-        if ($value instanceof static && $value->table === $tableName) {
+        if ($value instanceof static && $value->table === $table) {
             $instance = &$value;
         } else {
             $instance = new static();
-            $instance->table = $tableName;
+            $instance->table = $table;
         }
 
         /** @psalm-suppress UndefinedPropertyAssignment */

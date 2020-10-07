@@ -9,6 +9,8 @@ trait DbPropertiesTrait
     /**
      * Initialize database instance.
      *
+     * @internal
+     *
      * @param MTProto $MadelineProto
      * @param boolean $reset
      * @return \Generator
@@ -25,7 +27,8 @@ trait DbPropertiesTrait
             if ($reset) {
                 unset($this->{$property});
             } else {
-                $this->{$property} = yield DbPropertiesFactory::get($dbSettings, $prefix, $type, $property, $this->{$property});
+                $table = "{$prefix}_{$property}";
+                $this->{$property} = yield DbPropertiesFactory::get($dbSettings, $table, $type, $this->{$property});
             }
         }
     }

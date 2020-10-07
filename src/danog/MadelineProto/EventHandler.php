@@ -19,11 +19,16 @@
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\Db\DbPropertiesTrait;
+
 /**
  * Event handler.
  */
 abstract class EventHandler extends InternalDoc
 {
+    use DbPropertiesTrait {
+        DbPropertiesTrait::initDb as private internalInitDb;
+    }
     /**
      * Whether the event handler was started.
      */
@@ -56,6 +61,9 @@ abstract class EventHandler extends InternalDoc
     {
         if ($this->startedInternal) {
             return;
+        }
+        if (isset(static::$dbProperties)) {
+            yield from $this->internalInitDb($this->API);
         }
         if (\method_exists($this, 'onStart')) {
             yield $this->onStart();

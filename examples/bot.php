@@ -22,6 +22,8 @@
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings;
+use danog\MadelineProto\Settings\Database\Redis;
 
 /*
  * Various ways to load MadelineProto
@@ -80,7 +82,6 @@ class MyEventHandler extends EventHandler
             return;
         }
 
-
         $res = \json_encode($update, JSON_PRETTY_PRINT);
         yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
         if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
@@ -88,14 +89,12 @@ class MyEventHandler extends EventHandler
         }
     }
 }
-$settings = [
-    'logger' => [
-        'logger_level' => Logger::ULTRA_VERBOSE
-    ],
-    'serialization' => [
-        'serialization_interval' => 30,
-    ]
-];
+
+$settings = new Settings;
+$settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
+
+// You can also use MySQL or PostgreSQL
+// $settings->setDb(new Redis);
 
 $MadelineProto = new API('bot.madeline', $settings);
 

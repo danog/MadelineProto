@@ -4667,16 +4667,6 @@ class InternalDoc extends APIFactory
         return $this->__call(__FUNCTION__, [$id]);
     }
     /**
-     * Check state of calls.
-     *
-     * @psalm-return void|\Amp\Promise<void>
-     * @return mixed
-     */
-    public function checkCalls()
-    {
-        $this->__call(__FUNCTION__, []);
-    }
-    /**
      * Check for terms of service update.
      *
      * @return \Amp\Promise
@@ -5422,11 +5412,6 @@ class InternalDoc extends APIFactory
     {
         return $this->__call(__FUNCTION__, [$extra]);
     }
-
-    public function getSessionId(\danog\MadelineProto\MTProto $madelineProto): string
-    {
-        return \danog\MadelineProto\MTProto::getSessionId($madelineProto);
-    }
     /**
      * Return current settings.
      *
@@ -5550,17 +5535,6 @@ class InternalDoc extends APIFactory
     public function inflateStripped(string $stripped): string
     {
         return \danog\MadelineProto\Tools::inflateStripped($stripped);
-    }
-    /**
-     * Initialize database instance.
-     *
-     * @param MTProto $MadelineProto
-     * @param boolean $reset
-     * @return \Amp\Promise
-     */
-    public function initDb(\danog\MadelineProto\MTProto $MadelineProto, bool $reset = false, array $extra = [])
-    {
-        return $this->__call(__FUNCTION__, [$MadelineProto, $reset, $extra]);
     }
     /**
      * Initialize self-restart hack.

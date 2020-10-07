@@ -8,12 +8,11 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
 interface DbType
 {
     /**
-     * @param string $name
-     * @param null $value
-     * @param string $tablePrefix
-     * @param DatabaseAbstract $settings
+     * @param string            $table
+     * @param null|DbType|array $value
+     * @param DatabaseAbstract  $settings
      *
      * @return Promise<self>
      */
-    public static function getInstance(string $name, $value = null, string $tablePrefix = '', $settings): Promise;
+    public static function getInstance(string $table, $value = null, $settings): Promise;
 }
