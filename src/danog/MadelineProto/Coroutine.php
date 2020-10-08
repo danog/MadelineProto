@@ -237,7 +237,7 @@ final class Coroutine implements Promise, \ArrayAccess, JsonSerializable
     {
         return Tools::call((function () use ($name, $arguments): \Generator {
             $result = yield $this;
-            return $result->{$name}($arguments);
+            return $result->{$name}(...$arguments);
         })());
     }
     /**
