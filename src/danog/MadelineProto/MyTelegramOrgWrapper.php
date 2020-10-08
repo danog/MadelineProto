@@ -68,7 +68,7 @@ class MyTelegramOrgWrapper
     /**
      * Endpoint.
      */
-    const MY_TELEGRAM_URL = 'https://my.telegram.org';
+    private const MY_TELEGRAM_URL = 'https://my.telegram.org';
     /**
      * Sleep function.
      *

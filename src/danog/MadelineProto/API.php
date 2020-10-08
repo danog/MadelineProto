@@ -371,8 +371,8 @@ class API extends InternalDoc
             } catch (\Throwable $e) {
                 $errors = [\time() => $errors[\time()] ?? 0];
                 $errors[\time()]++;
-                if ($errors[\time()] > 100 && (!$this->inited() || !$started)) {
-                    $this->logger->logger("More than 100 errors in a second and not inited, exiting!", Logger::FATAL_ERROR);
+                if ($errors[\time()] > 10 && (!$this->inited() || !$started)) {
+                    $this->logger->logger("More than 10 errors in a second and not inited, exiting!", Logger::FATAL_ERROR);
                     return;
                 }
                 echo $e;

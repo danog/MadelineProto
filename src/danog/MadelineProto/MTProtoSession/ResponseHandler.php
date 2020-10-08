@@ -369,7 +369,7 @@ trait ResponseHandler
                                         $this->logger->logger('If you intentionally deleted this account, ignore this message.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                     }
                                     $this->API->resetSession();
-                                    \danog\MadelineProto\Tools::callFork((function () use (&$request, &$response): \Generator {
+                                    \danog\MadelineProto\Tools::callFork((function () use ($request, &$response): \Generator {
                                         yield from $this->API->initAuthorization();
                                         $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request['_'] ?? ''));
                                     })());
@@ -378,7 +378,7 @@ trait ResponseHandler
                                 case 'AUTH_KEY_INVALID':
                                     if ($this->API->authorized !== MTProto::LOGGED_IN) {
                                         $this->gotResponseForOutgoingMessageId($request_id);
-                                        \danog\MadelineProto\Tools::callFork((function () use (&$request, &$response): \Generator {
+                                        \danog\MadelineProto\Tools::callFork((function () use ($request, &$response): \Generator {
                                             yield from $this->API->initAuthorization();
                                             $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request['_'] ?? ''));
                                         })());
@@ -403,7 +403,7 @@ trait ResponseHandler
                                         $this->logger->logger('Then login again.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->logger->logger('If you intentionally deleted this account, ignore this message.', \danog\MadelineProto\Logger::FATAL_ERROR);
                                         $this->API->resetSession();
-                                        \danog\MadelineProto\Tools::callFork((function () use (&$request, &$response): \Generator {
+                                        \danog\MadelineProto\Tools::callFork((function () use ($request, &$response): \Generator {
                                             yield from $this->API->initAuthorization();
                                             $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request['_'] ?? ''));
                                         })());

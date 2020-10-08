@@ -34,7 +34,7 @@ use danog\MadelineProto\Tools;
 class WriteLoop extends ResumableSignalLoop
 {
     const MAX_COUNT = 1020;
-    const MAX_SIZE = 1 << 15;
+    private const MAX_SIZE = 1 << 15;
     const MAX_IDS = 8192;
 
     use Common;

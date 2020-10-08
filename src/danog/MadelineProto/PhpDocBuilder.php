@@ -28,6 +28,7 @@ use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\TL\TL;
+use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\TL\TLConstructors;
 use danog\MadelineProto\TL\TLMethods;
 use danog\MadelineProto\TON\ADNLConnection;
@@ -44,63 +45,70 @@ use phpDocumentor\Reflection\DocBlock\Tags\See;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
 use ReflectionClassConstant;
+use ReflectionMethod;
 
 class PhpDocBuilder
 {
+    private const DISALLOW = [
+        AnnotationsBuilder::class,
+        APIFactory::class,
+        APIWrapper::class,
+        AbstractAPIFactory::class,
+        Bug74586Exception::class,
+        Connection::class,
+        ContextConnector::class,
+        DataCenter::class,
+        DataCenterConnection::class,
+        DoHConnector::class,
+        DocsBuilder::class,
+        InternalDoc::class,
+        Lang::class,
+        LightState::class,
+        Magic::class,
+        PhpDocBuilder::class,
+        RSA::class,
+        Serialization::class,
+        SessionPaths::class,
+        SettingsEmpty::class,
+        SettingsAbstract::class,
+        Snitch::class,
+        AsyncConstruct::class,
+        Server::class, // Remove when done
+        VoIP::class,
+
+        Crypt::class,
+        NothingInTheSocketException::class,
+
+        GarbageCollector::class,
+        MinDatabase::class,
+        PasswordCalculator::class,
+        ReferenceDatabase::class,
+        UpdatesState::class,
+
+        TL::class,
+        TLConstructors::class,
+        TLMethods::class,
+        TLCallback::class,
+
+        ADNLConnection::class,
+        TAPIFactory::class,
+        TInternalDoc::class,
+        Lite::class,
+
+        \ArrayIterator::class,
+    ];
     private DocBlockFactory $factory;
-    public function __construct()
+    private string $output;
+    public function __construct(string $output)
     {
         $this->factory = DocBlockFactory::createInstance();
+        $this->output = $output;
     }
     public function run()
     {
         $classes = ClassFinder::getClassesInNamespace('danog\\MadelineProto', ClassFinder::RECURSIVE_MODE);
         foreach ($classes as $class) {
-            if (\in_array($class, [
-                AnnotationsBuilder::class,
-                APIFactory::class,
-                APIWrapper::class,
-                AbstractAPIFactory::class,
-                Bug74586Exception::class,
-                Connection::class,
-                ContextConnector::class,
-                DataCenter::class,
-                DataCenterConnection::class,
-                DoHConnector::class,
-                DocsBuilder::class,
-                InternalDoc::class,
-                Lang::class,
-                LightState::class,
-                Magic::class,
-                PhpDocBuilder::class,
-                RSA::class,
-                Serialization::class,
-                SessionPaths::class,
-                SettingsEmpty::class,
-                SettingsAbstract::class,
-                Snitch::class,
-                AsyncConstruct::class,
-                Server::class, // Remove when done
-                VoIP::class,
-
-                Crypt::class,
-                NothingInTheSocketException::class,
-
-                GarbageCollector::class,
-                MinDatabase::class,
-                PasswordCalculator::class,
-                ReferenceDatabase::class,
-                UpdatesState::class,
-
-                TL::class,
-                TLConstructors::class,
-                TLMethods::class,
-
-                ADNLConnection::class,
-                TAPIFactory::class,
-                TInternalDoc::class,
-                Lite::class,
-            ]) || str_starts_with($class, 'danog\\MadelineProto\\Ipc')
+            if (\in_array($class, self::DISALLOW) || str_starts_with($class, 'danog\\MadelineProto\\Ipc')
             || str_starts_with($class, 'danog\\MadelineProto\\Loop\\Update')
             || str_starts_with($class, 'danog\\MadelineProto\\Loop\\Connection')
             || str_starts_with($class, 'danog\\MadelineProto\\MTProto\\')
@@ -117,9 +125,29 @@ class PhpDocBuilder
         $this->generate(new ReflectionClass(DbPropertiesTrait::class));
     }
 
+    /**
+     * Create directory recursively.
+     *
+     * @param string $file
+     * @return string
+     */
+    private static function createDir(string $file): string
+    {
+        $dir = \dirname($file);
+        if (!\file_exists($dir)) {
+            $this->createDir($dir);
+        }
+        return $file;
+    }
+
     private function generate(ReflectionClass $class): void
     {
         $name = $class->getName();
+        $fName = $this->output;
+        $fName .= \str_replace(['\\', 'danog\\MadelineProto'], ['/', ''], $name);
+        $fName .= '.md';
+        $handle = \fopen(self::createDir($fName), 'w+');
+
         $doc = $class->getDocComment();
         if (!$doc) {
             throw new Exception("$name has no PHPDOC!");
@@ -163,15 +191,48 @@ class PhpDocBuilder
             }
         }
 
+        fwrite($handle, "---\n");
+        fwrite($handle, "title: $name: $title\n");
+        fwrite($handle, "description: $description\n");
+        fwrite($handle, "image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png\n");
+        fwrite($handle, "---\n");
+        fwrite($handle, "# $name: $title\n");
+        fwrite($handle, "[Back to API index](index.md)\n\n");
+
+        fwrite($handle, "> Author: $author  \n");
+
         $constants = [];
         foreach ($class->getConstants() as $key => $value) {
             $refl = new ReflectionClassConstant($name, $key);
-            $doc = $this->factory->create($refl->getDocComment() ?? '');
+            if (!$refl->isPublic()) {
+                continue;
+            }
+            $description = '';
+            if ($refl->getDocComment()) {
+                $docConst = $this->factory->create($refl->getDocComment());
+                if (\in_array($refl->getDeclaringClass()->getName(), self::DISALLOW)) {
+                    continue;
+                }
+                $description .= $docConst->getSummary();
+                if ($docConst->getDescription()) {
+                    $description .= "\n\n";
+                    $description .= $docConst->getDescription();
+                }
+                if ($docConst->getTagsByName('internal')) {
+                    continue;
+                }
+            }
+            $description = \trim($description);
             $constants[$key] = [
                 $value,
-                $description,
-                $doc->getDescription()
+                $description
             ];
         }
+
+        $methods = [];
+        foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+        }
+
+
     }
 }

@@ -99,7 +99,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     const V = 147;
     /**
-     * String release version.
+     * Release version.
      *
      * @var string
      */
@@ -137,12 +137,16 @@ class MTProto extends AsyncConstruct implements TLCallback
     /**
      * Bad message error codes.
      *
+     * @internal
+     * 
      * @var array
      */
     const BAD_MSG_ERROR_CODES = [16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the â€œcorrectâ€ msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)', 17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)', 18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)', 19 => 'container msg_id is the same as msg_id of a previously received message (this must never happen)', 20 => 'message too old, and it cannot be verified whether the server has received a message with this msg_id or not', 32 => 'msg_seqno too low (the server has already received a message with a lower msg_id but with either a higher or an equal and odd seqno)', 33 => 'msg_seqno too high (similarly, there is a message with a higher msg_id but with either a lower or an equal and odd seqno)', 34 => 'an even msg_seqno expected (irrelevant message), but odd received', 35 => 'odd msg_seqno expected (relevant message), but even received', 48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)', 64 => 'invalid container'];
     /**
      * Localized message info flags.
      *
+     * @internal
+     * 
      * @var array
      */
     const MSGS_INFO_FLAGS = [1 => 'nothing is known about the message (msg_id too low, the other party may have forgotten it)', 2 => 'message not received (msg_id falls within the range of stored identifiers; however, the other party has certainly not received a message like that)', 3 => 'message not received (msg_id too high; however, the other party has certainly not received it yet)', 4 => 'message received (note that this response is also at the same time a receipt acknowledgment)', 8 => ' and message already acknowledged', 16 => ' and message not requiring acknowledgment', 32 => ' and RPC query contained in message being processed or processing already complete', 64 => ' and content-related response to message already generated', 128 => ' and other party knows for a fact that message is already received'];
@@ -164,44 +168,29 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @var int
      */
     const SECRET_READY = 2;
+    /**
+     * @internal
+     */
     const GETUPDATES_HANDLER = 'getUpdates';
+    /**
+     * @internal
+     */
     const TD_PARAMS_CONVERSION = ['updateNewMessage' => ['_' => 'updateNewMessage', 'disable_notification' => ['message', 'silent'], 'message' => ['message']], 'message' => ['_' => 'message', 'id' => ['id'], 'sender_user_id' => ['from_id'], 'chat_id' => ['peer_id', 'choose_chat_id_from_botapi'], 'send_state' => ['choose_incoming_or_sent'], 'can_be_edited' => ['choose_can_edit'], 'can_be_deleted' => ['choose_can_delete'], 'is_post' => ['post'], 'date' => ['date'], 'edit_date' => ['edit_date'], 'forward_info' => ['fwd_info', 'choose_forward_info'], 'reply_to_message_id' => ['reply_to_msg_id'], 'ttl' => ['choose_ttl'], 'ttl_expires_in' => ['choose_ttl_expires_in'], 'via_bot_user_id' => ['via_bot_id'], 'views' => ['views'], 'content' => ['choose_message_content'], 'reply_markup' => ['reply_markup']], 'messages.sendMessage' => ['chat_id' => ['peer'], 'reply_to_message_id' => ['reply_to_msg_id'], 'disable_notification' => ['silent'], 'from_background' => ['background'], 'input_message_content' => ['choose_message_content'], 'reply_markup' => ['reply_markup']]];
+    /**
+     * @internal
+     */
     const TD_REVERSE = ['sendMessage' => 'messages.sendMessage'];
+    /**
+     * @internal
+     */
     const TD_IGNORE = ['updateMessageID'];
+    /**
+     * @internal
+     */
     const BOTAPI_PARAMS_CONVERSION = ['disable_web_page_preview' => 'no_webpage', 'disable_notification' => 'silent', 'reply_to_message_id' => 'reply_to_msg_id', 'chat_id' => 'peer', 'text' => 'message'];
-    // Not content related constructors
-    const NOT_CONTENT_RELATED = [
-        //'rpc_result',
-        //'rpc_error',
-        'rpc_drop_answer',
-        'rpc_answer_unknown',
-        'rpc_answer_dropped_running',
-        'rpc_answer_dropped',
-        'get_future_salts',
-        'future_salt',
-        'future_salts',
-        'ping',
-        'pong',
-        'ping_delay_disconnect',
-        'destroy_session',
-        'destroy_session_ok',
-        'destroy_session_none',
-        //'new_session_created',
-        'msg_container',
-        'msg_copy',
-        'gzip_packed',
-        'http_wait',
-        'msgs_ack',
-        'bad_msg_notification',
-        'bad_server_salt',
-        'msgs_state_req',
-        'msgs_state_info',
-        'msgs_all_info',
-        'msg_detailed_info',
-        'msg_new_detailed_info',
-        'msg_resend_req',
-        'msg_resend_ans_req',
-    ];
+    /**
+     * @internal
+     */
     const DEFAULT_GETUPDATES_PARAMS = ['offset' => 0, 'limit' => null, 'timeout' => 100];
     /**
      * Array of references to all instances of MTProto.

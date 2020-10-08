@@ -37,7 +37,7 @@ use danog\MadelineProto\Stream\RawStreamInterface;
 class BufferedRawStream implements BufferedStreamInterface, BufferInterface, RawStreamInterface
 {
     use RawStream;
-    const MAX_SIZE = 10 * 1024 * 1024;
+    private const MAX_SIZE = 10 * 1024 * 1024;
     protected $stream;
     protected $memory_stream;
     private $append = '';
