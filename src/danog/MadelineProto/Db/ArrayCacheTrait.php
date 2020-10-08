@@ -38,7 +38,7 @@ trait ArrayCacheTrait
         if (!isset($this->ttlValues[$key])) {
             return $default;
         }
-        $this->ttlValues[$key] = \strtotime($this->ttl);
+        $this->ttlValues[$key] = time() + $this->ttl;
         return $this->cache[$key];
     }
 
@@ -51,7 +51,7 @@ trait ArrayCacheTrait
     protected function setCache(string $key, $value): void
     {
         $this->cache[$key] = $value;
-        $this->ttlValues[$key] = \strtotime($this->ttl);
+        $this->ttlValues[$key] = time() + $this->ttl;
     }
 
     /**
