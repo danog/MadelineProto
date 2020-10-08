@@ -155,7 +155,8 @@ trait UpdateHandler
      *
      * @internal
      *
-     * @return \Generator<mixed, mixed, mixed, UpdatesState>
+     * @return \Generator
+     * @psalm-return <mixed, mixed, mixed, UpdatesState>
      */
     public function loadUpdateState(): \Generator
     {

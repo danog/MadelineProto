@@ -292,7 +292,7 @@ abstract class Serialization
             if ($e->getFile() === 'MadelineProto' && $e->getLine() === 1) {
                 throw $e;
             }
-            if (@\constant("MADELINEPROTO_TEST") === 'pony') {
+            if (\defined('MADELINEPROTO_TEST') && \constant("MADELINEPROTO_TEST") === 'pony') {
                 throw $e;
             }
             \class_exists('\\Volatile');

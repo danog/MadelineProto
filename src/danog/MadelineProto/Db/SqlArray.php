@@ -35,7 +35,7 @@ abstract class SqlArray extends DriverArray
      *
      * @psalm-return Promise<static>
      */
-    public static function getInstance(string $table, $value = null, $settings): Promise
+    public static function getInstance(string $table, $value, $settings): Promise
     {
         if ($value instanceof static && $value->table === $table) {
             $instance = &$value;

@@ -152,10 +152,12 @@ abstract class AbstractAPIFactory extends AsyncConstruct
      */
     public function __debugInfo(): array
     {
-        $keys = APIWrapper::__sleep();
+        $keys = APIWrapper::properties();
         $res = [];
         foreach ($keys as $key) {
-            $res[$key] = Tools::getVar($this, $key);
+            if (Tools::hasVar($this, $key)) {
+                $res[$key] = Tools::getVar($this, $key);
+            }
         }
         return $res;
     }

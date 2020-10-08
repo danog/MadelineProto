@@ -620,7 +620,8 @@ abstract class Tools extends StrTools
      *
      * @internal Generator function
      *
-     * @return \Generator<mixed, mixed, mixed, ?callable>
+     * @return \Generator
+     * @psalm-return \Generator<mixed, mixed, mixed, ?callable>
      */
     public static function flockGenerator(string $file, int $operation, float $polling, ?Promise $token = null, $failureCb = null): \Generator
     {

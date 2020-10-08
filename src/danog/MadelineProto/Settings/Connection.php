@@ -411,7 +411,8 @@ class Connection extends SettingsAbstract
     /**
      * Get proxy identifiers.
      *
-     * @return array<class-string<StreamInterface>, array>
+     * @return array
+     * @psalm-return array<class-string<StreamInterface>, array>
      */
     public function getProxies(): array
     {

@@ -289,7 +289,7 @@ class DataCenter
                 $this->API->logger->logger('OK!', Logger::WARNING);
                 return true;
             } catch (\Throwable $e) {
-                if (@\constant("MADELINEPROTO_TEST")  === 'pony') {
+                if (\defined("MADELINEPROTO_TEST") && \constant("MADELINEPROTO_TEST") === 'pony') {
                     throw $e;
                 }
                 $this->API->logger->logger("Connection failed ({$dc_number}): ".$e->getMessage(), Logger::ERROR);
@@ -496,7 +496,7 @@ class DataCenter
         if (empty($ctxs)) {
             unset($this->sockets[$dc_number]);
             $this->API->logger->logger("No info for DC {$dc_number}", Logger::ERROR);
-        } elseif (@\constant("MADELINEPROTO_TEST")  === 'pony') {
+        } elseif (\defined('MADELINEPROTO_TEST') && \constant("MADELINEPROTO_TEST") === 'pony') {
             return [$ctxs[0]];
         }
         return $ctxs;

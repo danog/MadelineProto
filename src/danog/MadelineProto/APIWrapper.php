@@ -115,22 +115,30 @@ final class APIWrapper
      */
     public static function link($a, $b): void
     {
-        foreach (self::__sleep() as $var) {
+        foreach (self::properties() as $var) {
             Tools::setVar($a, $var, Tools::getVar($b, $var));
         }
         Tools::setVar($a, 'session', Tools::getVar($b, 'session'));
     }
 
     /**
-     * Sleep function.
-     *
-     * @internal
+     * Property list
      *
      * @return array
      */
-    public static function __sleep(): array
+    public static function properties(): array
     {
         return ['API', 'webApiTemplate', 'gettingApiId', 'myTelegramOrgWrapper', 'storage', 'lua'];
+    }
+
+    /**
+     * Sleep function
+     *
+     * @return array
+     */
+    public function __sleep(): array
+    {
+        return self::properties();
     }
 
     /**

@@ -27,6 +27,7 @@ use danog\MadelineProto\MTProtoTools\MinDatabase;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
+use danog\MadelineProto\PhpDoc\ClassDoc;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\TL\TLConstructors;
@@ -37,19 +38,13 @@ use danog\MadelineProto\TON\InternalDoc as TInternalDoc;
 use danog\MadelineProto\TON\Lite;
 use HaydenPierce\ClassFinder\ClassFinder;
 use phpDocumentor\Reflection\DocBlock\Tags\Author;
-use phpDocumentor\Reflection\DocBlock\Tags\Deprecated;
-use phpDocumentor\Reflection\DocBlock\Tags\Generic;
-use phpDocumentor\Reflection\DocBlock\Tags\InvalidTag;
-use phpDocumentor\Reflection\DocBlock\Tags\Property;
-use phpDocumentor\Reflection\DocBlock\Tags\See;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
-use ReflectionClassConstant;
 use ReflectionMethod;
 
 class PhpDocBuilder
 {
-    private const DISALLOW = [
+    const DISALLOW = [
         AnnotationsBuilder::class,
         APIFactory::class,
         APIWrapper::class,
@@ -97,11 +92,11 @@ class PhpDocBuilder
 
         \ArrayIterator::class,
     ];
-    private DocBlockFactory $factory;
+    public static DocBlockFactory $factory;
     private string $output;
     public function __construct(string $output)
     {
-        $this->factory = DocBlockFactory::createInstance();
+        self::$factory = DocBlockFactory::createInstance();
         $this->output = $output;
     }
     public function run()
@@ -113,6 +108,7 @@ class PhpDocBuilder
             || str_starts_with($class, 'danog\\MadelineProto\\Loop\\Connection')
             || str_starts_with($class, 'danog\\MadelineProto\\MTProto\\')
             || str_starts_with($class, 'danog\\MadelineProto\\MTProtoSession\\')
+            || str_starts_with($class, 'danog\\MadelineProto\\PhpDoc\\')
             || str_starts_with($class, 'danog\\MadelineProto\\Db\\NullCache')) {
                 continue;
             }
@@ -135,7 +131,8 @@ class PhpDocBuilder
     {
         $dir = \dirname($file);
         if (!\file_exists($dir)) {
-            $this->createDir($dir);
+            self::createDir($dir);
+            \mkdir($dir);
         }
         return $file;
     }
@@ -148,91 +145,17 @@ class PhpDocBuilder
         $fName .= '.md';
         $handle = \fopen(self::createDir($fName), 'w+');
 
-        $doc = $class->getDocComment();
-        if (!$doc) {
-            throw new Exception("$name has no PHPDOC!");
-        }
-        $doc = $this->factory->create($doc);
-        $title = $doc->getSummary();
-        $description = $doc->getDescription();
-        $tags = $doc->getTags();
+        $class = new ClassDoc($class);
+        /*
+        \fwrite($handle, "---\n");
+        \fwrite($handle, "title: $name: $title\n");
+        \fwrite($handle, "description: $description\n");
+        \fwrite($handle, "image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png\n");
+        \fwrite($handle, "---\n");
+        \fwrite($handle, "# $name: $title\n");
+        \fwrite($handle, "[Back to API index](index.md)\n\n");
 
-        $seeAlso = [];
-        $properties = [];
-
-        $author = new Author("Daniil Gentili", "daniil@daniil.it");
-        foreach ($tags as $tag) {
-            if ($tag instanceof Author) {
-                $author = $tag;
-            }
-            if ($tag instanceof Deprecated) {
-                return;
-            }
-            if ($tag instanceof Generic && $tag->getName() === 'internal') {
-                return;
-            }
-            if ($tag instanceof See) {
-                $seeAlso[$tag->getReference()->__toString()] = $tag->render();
-            }
-            if ($tag instanceof Property) {
-                $properties[$tag->getVariableName()] = [
-                    $tag->getType(),
-                    $tag->getDescription()
-                ];
-            }
-            if ($tag instanceof InvalidTag && $tag->getName() === 'property') {
-                [$type, $description] = \explode(" $", $tag->render(), 2);
-                $description .= ' ';
-                [$varName, $description] = \explode(" ", $description, 2);
-                $properties[$varName] = [
-                    \str_replace('@property ', '', $type),
-                    $description ?? ''
-                ];
-            }
-        }
-
-        fwrite($handle, "---\n");
-        fwrite($handle, "title: $name: $title\n");
-        fwrite($handle, "description: $description\n");
-        fwrite($handle, "image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png\n");
-        fwrite($handle, "---\n");
-        fwrite($handle, "# $name: $title\n");
-        fwrite($handle, "[Back to API index](index.md)\n\n");
-
-        fwrite($handle, "> Author: $author  \n");
-
-        $constants = [];
-        foreach ($class->getConstants() as $key => $value) {
-            $refl = new ReflectionClassConstant($name, $key);
-            if (!$refl->isPublic()) {
-                continue;
-            }
-            $description = '';
-            if ($refl->getDocComment()) {
-                $docConst = $this->factory->create($refl->getDocComment());
-                if (\in_array($refl->getDeclaringClass()->getName(), self::DISALLOW)) {
-                    continue;
-                }
-                $description .= $docConst->getSummary();
-                if ($docConst->getDescription()) {
-                    $description .= "\n\n";
-                    $description .= $docConst->getDescription();
-                }
-                if ($docConst->getTagsByName('internal')) {
-                    continue;
-                }
-            }
-            $description = \trim($description);
-            $constants[$key] = [
-                $value,
-                $description
-            ];
-        }
-
-        $methods = [];
-        foreach ($class->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-        }
-
-
+        \fwrite($handle, "> Author: $author  \n");
+*/
     }
 }

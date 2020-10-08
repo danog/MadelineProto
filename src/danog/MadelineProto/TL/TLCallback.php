@@ -25,40 +25,40 @@ namespace danog\MadelineProto\TL;
 interface TLCallback
 {
     /**
-     * Called after serializing a method
-     * 
+     * Called after serializing a method.
+     *
      * @internal
      *
      * @var int
      */
     const METHOD_CALLBACK = 0;
     /**
-     * Called before serializing a method
-     * 
+     * Called before serializing a method.
+     *
      * @internal
      *
      * @var int
      */
     const METHOD_BEFORE_CALLBACK = 1;
     /**
-     * Called after serializing a constructor
-     * 
+     * Called after serializing a constructor.
+     *
      * @internal
      *
      * @var int
      */
     const CONSTRUCTOR_CALLBACK = 2;
     /**
-     * Called before serializing a constructor
-     * 
+     * Called before serializing a constructor.
+     *
      * @internal
      *
      * @var int
      */
     const CONSTRUCTOR_BEFORE_CALLBACK = 3;
     /**
-     * Called on constructor serialization
-     * 
+     * Called on constructor serialization.
+     *
      * @internal
      *
      * @var int

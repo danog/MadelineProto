@@ -29,7 +29,7 @@ class GarbageCollector
     /**
      * Whether to enable logging.
      */
-    public static bool $log = false;
+    public static bool $log = true;
 
     /**
      * Memory consumption after last cleanup.

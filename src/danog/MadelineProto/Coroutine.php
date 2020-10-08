@@ -280,7 +280,12 @@ final class Coroutine implements Promise, \ArrayAccess, JsonSerializable
         return [self::WARNING];
     }
 
-    public function jsonSerialize()
+    /**
+     * Obtain
+     *
+     * @return string
+     */
+    public function jsonSerialize(): string
     {
         return self::WARNING;
     }
