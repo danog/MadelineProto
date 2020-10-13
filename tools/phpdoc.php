@@ -1,6 +1,5 @@
 <?php
 
-use Amp\Sync\Internal\MutexStorage;
 use danog\MadelineProto\AbstractAPIFactory;
 use danog\MadelineProto\AnnotationsBuilder;
 use danog\MadelineProto\APIFactory;

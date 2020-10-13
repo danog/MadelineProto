@@ -96,10 +96,10 @@ class PhpDocBuilder
         }
 
         if (!$this->namespace) {
-            $namespaces = array_keys($json['autoload']['psr-4']);
+            $namespaces = \array_keys($json['autoload']['psr-4']);
             $this->namespace = $namespaces[0];
             foreach ($namespaces as $namespace) {
-                if (strlen($namespace) && strlen($namespace) < strlen($this->namespace)) {
+                if (\strlen($namespace) && \strlen($namespace) < \strlen($this->namespace)) {
                     $this->namespace = $namespace;
                 }
             }
