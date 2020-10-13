@@ -37,9 +37,11 @@ abstract class GenericDoc
      */
     protected array $seeAlso = [];
     /**
-     * Author.
+     * Authors.
+     *
+     * @var Author[]
      */
-    protected Author $author;
+    protected array $authors;
     /**
      * Ignore this class.
      */
@@ -60,10 +62,10 @@ abstract class GenericDoc
         $this->description = $doc->getDescription();
         $tags = $doc->getTags();
 
-        $this->author = new Author("Daniil Gentili", "daniil@daniil.it");
+        $this->authors = $this->builder->getAuthors();
         foreach ($tags as $tag) {
             if ($tag instanceof Author) {
-                $this->author = $tag;
+                $this->authors []= $tag;
             }
             if ($tag instanceof Deprecated) {
                 $this->ignore = true;
@@ -118,6 +120,10 @@ abstract class GenericDoc
     }
     public function format(): string
     {
+        $authors = '';
+        foreach ($this->authors as $author) {
+            $authors .= "> Author: $author  \n";
+        }
         $seeAlso = $this->seeAlso();
         return <<<EOF
         ---
@@ -128,7 +134,7 @@ abstract class GenericDoc
         # `$this->name`: $this->title
         [Back to API index](index.md)
 
-        > Author: $this->author  
+        $authors
 
         $this->description
         $seeAlso

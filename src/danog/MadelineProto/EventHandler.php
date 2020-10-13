@@ -83,4 +83,14 @@ abstract class EventHandler extends InternalDoc
     {
         return [];
     }
+
+    /**
+     * Get API instance.
+     *
+     * @return MTProto
+     */
+    public function getAPI(): MTProto
+    {
+        return $this->API;
+    }
 }

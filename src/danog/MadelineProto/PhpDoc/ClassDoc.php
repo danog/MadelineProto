@@ -15,7 +15,7 @@ class ClassDoc extends GenericDoc
     /**
      * Properties.
      *
-     * @var array<string, PropertyDoc>
+     * @var array<string, array>
      */
     private array $properties = [];
     /**
@@ -24,6 +24,10 @@ class ClassDoc extends GenericDoc
      * @var array<string, MethodDoc>
      */
     private array $methods = [];
+    /**
+     * Constants.
+     */
+    private array $constants = [];
     public function __construct(PhpDocBuilder $builder, ReflectionClass $reflectionClass)
     {
         $this->builder = $builder;
@@ -41,12 +45,10 @@ class ClassDoc extends GenericDoc
         $tags = $doc->getTags();
         foreach ($tags as $tag) {
             if ($tag instanceof Property) {
-                $this->properties[$tag->getVariableName()] = new PropertyDoc(
-                    $this->builder,
-                    $tag->getName(),
+                $this->properties[$tag->getVariableName()] = [
                     $tag->getType(),
                     $tag->getDescription()
-                );
+                ];
             }
             if ($tag instanceof InvalidTag && $tag->getName() === 'property') {
                 [$type, $description] = \explode(" $", $tag->render(), 2);
@@ -54,15 +56,12 @@ class ClassDoc extends GenericDoc
                 [$varName, $description] = \explode(" ", $description, 2);
                 $type = \str_replace('@property ', '', $type);
                 $description ??= '';
-                $this->properties[$varName] = new PropertyDoc(
-                    $this->builder,
-                    $varName,
+                $this->properties[$varName] = [
                     $type,
                     $description
-                );
+                ];
             }
         }
-        $constants = [];
         foreach ($reflectionClass->getConstants() as $key => $value) {
             $refl = new ReflectionClassConstant($reflectionClass->getName(), $key);
             if (!$refl->isPublic()) {
@@ -84,7 +83,7 @@ class ClassDoc extends GenericDoc
                 }
             }
             $description = \trim($description);
-            $constants[$key] = [
+            $this->constants[$key] = [
                 $value,
                 $description
             ];
@@ -99,32 +98,39 @@ class ClassDoc extends GenericDoc
         }
 
         $this->methods = \array_filter($this->methods, fn (MethodDoc $doc): bool => !$doc->shouldIgnore());
-        //$this->properties = \array_filter($this->properties, fn (PropertyDoc $doc): bool => !$doc->shouldIgnore());
     }
 
     public function format(): string
     {
         $init = parent::format();
-        $methods = '';
-        $properties = '';
+        if ($this->constants) {
+            $init .= "\n";
+            $init .= "## Constants\n";
+            foreach ($this->constants as $name => [, $description]) {
+                $description = \trim($description);
+                $description = \str_replace("\n", "\n  ", $description);
+                $init .= "* {$this->className}::$name: $description\n";
+                $init .= "\n";
+            }
+        }
         if ($this->methods) {
             $init .= "\n";
+            $init .= "## Method list:\n";
             foreach ($this->methods as $method) {
-                $init .= "* ".$method->getSignature()."\n";
+                $init .= "* `".$method->getSignature()."`\n";
             }
             $init .= "\n";
-            $init .= "## Methods:\n$methods\n";
+            $init .= "## Methods:\n";
             foreach ($this->methods as $method) {
                 $init .= $method->format();
                 $init .= "\n";
             }
         }
-        if ($properties) {
-            $init .= "## Properties:\n$properties\n";
-            /*foreach ($this->properties as $property) {
-                $init .= $property->format();
-                $init .= "\n";
-            }*/
+        if ($this->properties) {
+            $init .= "## Properties\n";
+            foreach ($this->properties as $name => [$type, $description]) {
+                $init .= "* `\$$name`: `$type` $description";
+            }
         }
         return $init;
     }

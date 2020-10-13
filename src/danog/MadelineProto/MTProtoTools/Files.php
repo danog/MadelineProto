@@ -173,7 +173,6 @@ trait Files
         $start = \microtime(true);
         while ($part_num < $part_total_num) {
             $resa = $callable($part_num);
-            \var_dump($resa);
             $writePromise = Tools::call($this->methodCallAsyncWrite($method, $resa, ['heavy' => true, 'file' => true, 'datacenter' => &$datacenter]));
             if (!$seekable) {
                 yield $writePromise;

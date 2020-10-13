@@ -13,8 +13,10 @@ use ReflectionMethod;
 
 class MethodDoc extends GenericDoc
 {
-    private $return;
+    private Return_ $return;
+    private string $psalmReturn;
     private array $params = [];
+    private array $psalmParams = [];
     public function __construct(PhpDocBuilder $phpDocBuilder, ReflectionFunctionAbstract $method)
     {
         $this->builder = $phpDocBuilder;
@@ -39,10 +41,10 @@ class MethodDoc extends GenericDoc
                     $tag->getType(),
                     $tag->getDescription()
                 ];
-            } elseif ($tag instanceof Return_ && !$this->return) {
+            } elseif ($tag instanceof Return_ && !isset($this->return)) {
                 $this->return = $tag;
             } elseif ($tag instanceof Generic && $tag->getName() === 'psalm-return') {
-                $this->return = $tag;
+                $this->psalmReturn = $tag;
             } elseif ($tag instanceof Generic && $tag->getName() === 'psalm-param') {
                 [$type, $description] = \explode(" $", $tag->getDescription(), 2);
                 $description .= ' ';
@@ -52,7 +54,7 @@ class MethodDoc extends GenericDoc
                 } else {
                     $description = new Description($description);
                 }
-                $this->params[$varName] = [
+                $this->psalmParams[$varName] = [
                     $type,
                     $description
                 ];
@@ -71,22 +73,44 @@ class MethodDoc extends GenericDoc
         }
         $sig = \trim($sig, ', ');
         $sig .= ')';
-        if ($this->return) {
+        if (isset($this->return)) {
             $sig .= ': ';
-            $sig .= $this->return;
+            $sig .= $this->builder->resolveTypeAlias($this->className, $this->return);
         }
         return $sig;
     }
     public function format(): string
     {
-        $sig = '### '.$this->getSignature();
+        $sig = '### `'.$this->getSignature()."`";
         $sig .= "\n\n";
         $sig .= $this->title;
         $sig .= "\n";
         $sig .= $this->description;
         $sig .= "\n";
-        if ($this->return && $this->return->getDescription() && $this->return->getDescription()->render()) {
+        if ($this->psalmParams || $this->params) {
+            $sig .= "\nParameters:\n";
+            foreach ($this->params as $name => [$type, $description]) {
+                if ($type) {
+                    $type = $this->builder->resolveTypeAlias($this->className, $type);
+                }
+                $sig .= "* `\$$name`: `$type` $description  \n";
+                if (isset($this->psalmParams[$name])) {
+                    [$psalmType] = $this->psalmParams[$name];
+                    $psalmType = \trim(\str_replace("\n", "\n  ", $psalmType));
+
+                    $sig .= "  Full type:\n";
+                    $sig .= "  ```\n";
+                    $sig .= "  $psalmType\n";
+                    $sig .= "  ```\n";
+                }
+            }
+            $sig .= "\n";
+        }
+        if (isset($this->return) && $this->return->getDescription() && $this->return->getDescription()->render()) {
             $sig .= "\nReturn value: ".$this->return->getDescription()."\n";
+        }
+        if (isset($this->psalmReturn)) {
+            $sig .= "\nFully typed return value:\n```\n".$this->psalmReturn."\n```";
         }
         $sig .= $this->seeAlso();
         $sig .= "\n";

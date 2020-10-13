@@ -21,6 +21,7 @@ namespace danog\MadelineProto;
 use danog\ClassFinder\ClassFinder;
 use danog\MadelineProto\PhpDoc\ClassDoc;
 use danog\MadelineProto\PhpDoc\FunctionDoc;
+use phpDocumentor\Reflection\DocBlock\Tags\Author;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
 use ReflectionFunction;
@@ -39,6 +40,10 @@ class PhpDocBuilder
      * Docblock factory.
      */
     private DocBlockFactory $factory;
+    /**
+     * Authors.
+     */
+    private array $authors = [];
     /**
      * Classes/interfaces/traits to ignore.
      *
@@ -59,12 +64,12 @@ class PhpDocBuilder
     /**
      * Create docblock builder.
      *
-     * @param string $namespace Namespace
+     * @param string $namespace Namespace (defaults to package namespace)
      * @param int    $mode      Finder mode, an OR-selection of ClassFinder::ALLOW_*
      *
      * @return self
      */
-    public static function fromNamespace(string $namespace, int $mode = ClassFinder::ALLOW_ALL): self
+    public static function fromNamespace(string $namespace = '', int $mode = ClassFinder::ALLOW_ALL): self
     {
         return new self($namespace, $mode);
     }
@@ -79,6 +84,26 @@ class PhpDocBuilder
         $this->factory = DocBlockFactory::createInstance();
         $this->namespace = $namespace;
         $this->mode = $mode;
+
+        $appRoot = new \danog\ClassFinder\AppConfig;
+        $appRoot = $appRoot->getAppRoot();
+        $appRoot .= "/composer.json";
+        $json = \json_decode(\file_get_contents($appRoot), true);
+        $authors = $json['authors'] ?? [];
+
+        foreach ($authors as $author) {
+            $this->authors []= new Author($author['name'], $author['email']);
+        }
+
+        if (!$this->namespace) {
+            $namespaces = array_keys($json['autoload']['psr-4']);
+            $this->namespace = $namespaces[0];
+            foreach ($namespaces as $namespace) {
+                if (strlen($namespace) && strlen($namespace) < strlen($this->namespace)) {
+                    $this->namespace = $namespace;
+                }
+            }
+        }
     }
     /**
      * Set filter to ignore certain classes.
@@ -120,7 +145,7 @@ class PhpDocBuilder
             $this->addTypeAliases($class);
         }
         foreach ($classes as $class) {
-            if ($this->ignore && ($this->ignore)($class)) {
+            if ($this->ignore && $this->shouldIgnore($class)) {
                 continue;
             }
             $class = \function_exists($class)
@@ -233,6 +258,30 @@ class PhpDocBuilder
      */
     public function shouldIgnore(string $class): bool
     {
-        return ($this->ignore)($class);
+        return !($this->ignore)($class);
+    }
+
+    /**
+     * Get authors.
+     *
+     * @return Author[]
+     */
+    public function getAuthors(): array
+    {
+        return $this->authors;
+    }
+
+    /**
+     * Set authors.
+     *
+     * @param Author[] $authors Authors
+     *
+     * @return self
+     */
+    public function setAuthors(array $authors): self
+    {
+        $this->authors = $authors;
+
+        return $this;
     }
 }
