@@ -24,22 +24,25 @@ class ClassDoc extends GenericDoc
      * @var array<string, MethodDoc>
      */
     private array $methods = [];
-    public function __construct(ReflectionClass $reflectionClass)
+    public function __construct(PhpDocBuilder $builder, ReflectionClass $reflectionClass)
     {
+        $this->builder = $builder;
+        $this->name = $reflectionClass->getName();
         $doc = $reflectionClass->getDocComment();
         if (!$doc) {
             Logger::log($reflectionClass->getName()." has no PHPDOC");
             $this->ignore = true;
             return;
         }
-        $doc = PhpDocBuilder::$factory->create($doc);
+        $doc = $this->builder->getFactory()->create($doc);
 
-        parent::__construct($doc);
+        parent::__construct($doc, $reflectionClass);
 
         $tags = $doc->getTags();
         foreach ($tags as $tag) {
             if ($tag instanceof Property) {
                 $this->properties[$tag->getVariableName()] = new PropertyDoc(
+                    $this->builder,
                     $tag->getName(),
                     $tag->getType(),
                     $tag->getDescription()
@@ -52,6 +55,7 @@ class ClassDoc extends GenericDoc
                 $type = \str_replace('@property ', '', $type);
                 $description ??= '';
                 $this->properties[$varName] = new PropertyDoc(
+                    $this->builder,
                     $varName,
                     $type,
                     $description
@@ -66,8 +70,8 @@ class ClassDoc extends GenericDoc
             }
             $description = '';
             if ($refl->getDocComment()) {
-                $docConst = PhpDocBuilder::$factory->create($refl->getDocComment());
-                if (\in_array($refl->getDeclaringClass()->getName(), PhpDocBuilder::DISALLOW)) {
+                $docConst = $this->builder->getFactory()->create($refl->getDocComment());
+                if ($this->builder->shouldIgnore($refl->getDeclaringClass()->getName())) {
                     continue;
                 }
                 $description .= $docConst->getSummary();
@@ -88,12 +92,40 @@ class ClassDoc extends GenericDoc
 
 
         foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            if (str_starts_with($method->getName(), '__') && $method !== '__construct') continue;
-            $this->methods[$method->getName()] = new MethodDoc($method);
+            if (str_starts_with($method->getName(), '__') && $method !== '__construct') {
+                continue;
+            }
+            $this->methods[$method->getName()] = new MethodDoc($this->builder, $method);
         }
+
+        $this->methods = \array_filter($this->methods, fn (MethodDoc $doc): bool => !$doc->shouldIgnore());
+        //$this->properties = \array_filter($this->properties, fn (PropertyDoc $doc): bool => !$doc->shouldIgnore());
     }
 
     public function format(): string
     {
+        $init = parent::format();
+        $methods = '';
+        $properties = '';
+        if ($this->methods) {
+            $init .= "\n";
+            foreach ($this->methods as $method) {
+                $init .= "* ".$method->getSignature()."\n";
+            }
+            $init .= "\n";
+            $init .= "## Methods:\n$methods\n";
+            foreach ($this->methods as $method) {
+                $init .= $method->format();
+                $init .= "\n";
+            }
+        }
+        if ($properties) {
+            $init .= "## Properties:\n$properties\n";
+            /*foreach ($this->properties as $property) {
+                $init .= $property->format();
+                $init .= "\n";
+            }*/
+        }
+        return $init;
     }
 }

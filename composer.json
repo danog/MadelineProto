@@ -44,12 +44,12 @@
         "amphp/websocket-client": "^1.0"
     },
     "require-dev": {
+        "danog/class-finder": "dev-master",
         "phpdocumentor/reflection-docblock": "^5.2",
         "vlucas/phpdotenv": "^3",
         "ennexa/amp-update-cache": "dev-master",
-        "phpunit/phpunit": "^8",
+        "phpunit/phpunit": "^9",
         "amphp/php-cs-fixer-config": "dev-master",
-        "haydenpierce/class-finder": "^0.4.2",
         "amphp/http-server": "dev-master",
         "amphp/http": "^1.6",
         "ext-ctype": "*",
@@ -57,8 +57,7 @@
         "danog/7to5": "^1",
         "vimeo/psalm": "dev-master",
         "phpstan/phpstan": "^0.12.14",
-        "friendsofphp/php-cs-fixer": "^2.16",
-        "squizlabs/php_codesniffer": "^3.5"
+        "friendsofphp/php-cs-fixer": "^2"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)"

@@ -2,11 +2,11 @@
 
 namespace danog\MadelineProto\PhpDoc;
 
-use phpDocumentor\Reflection\DocBlock\Tags\Property;
+use danog\MadelineProto\PhpDocBuilder;
 
 class PropertyDoc
 {
-    public function __construct(string $name, $type, $description)
+    public function __construct(PhpDocBuilder $phpDocBuilder, string $name, $type, $description)
     {
     }
 

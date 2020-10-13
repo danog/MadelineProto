@@ -122,7 +122,7 @@ final class APIWrapper
     }
 
     /**
-     * Property list
+     * Property list.
      *
      * @return array
      */
@@ -132,7 +132,7 @@ final class APIWrapper
     }
 
     /**
-     * Sleep function
+     * Sleep function.
      *
      * @return array
      */

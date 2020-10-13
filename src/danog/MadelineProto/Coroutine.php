@@ -281,7 +281,7 @@ final class Coroutine implements Promise, \ArrayAccess, JsonSerializable
     }
 
     /**
-     * Obtain
+     * Obtain.
      *
      * @return string
      */

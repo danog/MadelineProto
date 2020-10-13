@@ -18,109 +18,159 @@
 
 namespace danog\MadelineProto;
 
-use danog\MadelineProto\Async\AsyncConstruct;
-use danog\MadelineProto\Db\DbPropertiesTrait;
-use danog\MadelineProto\Files\Server;
-use danog\MadelineProto\MTProtoTools\Crypt;
-use danog\MadelineProto\MTProtoTools\GarbageCollector;
-use danog\MadelineProto\MTProtoTools\MinDatabase;
-use danog\MadelineProto\MTProtoTools\PasswordCalculator;
-use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
-use danog\MadelineProto\MTProtoTools\UpdatesState;
+use danog\ClassFinder\ClassFinder;
 use danog\MadelineProto\PhpDoc\ClassDoc;
-use danog\MadelineProto\TL\TL;
-use danog\MadelineProto\TL\TLCallback;
-use danog\MadelineProto\TL\TLConstructors;
-use danog\MadelineProto\TL\TLMethods;
-use danog\MadelineProto\TON\ADNLConnection;
-use danog\MadelineProto\TON\APIFactory as TAPIFactory;
-use danog\MadelineProto\TON\InternalDoc as TInternalDoc;
-use danog\MadelineProto\TON\Lite;
-use HaydenPierce\ClassFinder\ClassFinder;
-use phpDocumentor\Reflection\DocBlock\Tags\Author;
+use danog\MadelineProto\PhpDoc\FunctionDoc;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
-use ReflectionMethod;
+use ReflectionFunction;
 
 class PhpDocBuilder
 {
-    const DISALLOW = [
-        AnnotationsBuilder::class,
-        APIFactory::class,
-        APIWrapper::class,
-        AbstractAPIFactory::class,
-        Bug74586Exception::class,
-        Connection::class,
-        ContextConnector::class,
-        DataCenter::class,
-        DataCenterConnection::class,
-        DoHConnector::class,
-        DocsBuilder::class,
-        InternalDoc::class,
-        Lang::class,
-        LightState::class,
-        Magic::class,
-        PhpDocBuilder::class,
-        RSA::class,
-        Serialization::class,
-        SessionPaths::class,
-        SettingsEmpty::class,
-        SettingsAbstract::class,
-        Snitch::class,
-        AsyncConstruct::class,
-        Server::class, // Remove when done
-        VoIP::class,
-
-        Crypt::class,
-        NothingInTheSocketException::class,
-
-        GarbageCollector::class,
-        MinDatabase::class,
-        PasswordCalculator::class,
-        ReferenceDatabase::class,
-        UpdatesState::class,
-
-        TL::class,
-        TLConstructors::class,
-        TLMethods::class,
-        TLCallback::class,
-
-        ADNLConnection::class,
-        TAPIFactory::class,
-        TInternalDoc::class,
-        Lite::class,
-
-        \ArrayIterator::class,
-    ];
-    public static DocBlockFactory $factory;
+    /**
+     * Namespace.
+     */
+    private string $namespace;
+    /**
+     * Scan mode.
+     */
+    private int $mode;
+    /**
+     * Docblock factory.
+     */
+    private DocBlockFactory $factory;
+    /**
+     * Classes/interfaces/traits to ignore.
+     *
+     * @var ?callable
+     * @psalm-var null|callable(class-string)
+     */
+    private $ignore;
+    /**
+     * Output directory.
+     */
     private string $output;
-    public function __construct(string $output)
+    /**
+     * Use map.
+     *
+     * array<class-string, array<class-string, class-string>>
+     */
+    private array $useMap = [];
+    /**
+     * Create docblock builder.
+     *
+     * @param string $namespace Namespace
+     * @param int    $mode      Finder mode, an OR-selection of ClassFinder::ALLOW_*
+     *
+     * @return self
+     */
+    public static function fromNamespace(string $namespace, int $mode = ClassFinder::ALLOW_ALL): self
     {
-        self::$factory = DocBlockFactory::createInstance();
-        $this->output = $output;
+        return new self($namespace, $mode);
     }
-    public function run()
+    /**
+     * Constructor.
+     *
+     * @param string $namespace
+     * @param int    $mode
+     */
+    private function __construct(string $namespace, int $mode)
     {
-        $classes = ClassFinder::getClassesInNamespace('danog\\MadelineProto', ClassFinder::RECURSIVE_MODE);
+        $this->factory = DocBlockFactory::createInstance();
+        $this->namespace = $namespace;
+        $this->mode = $mode;
+    }
+    /**
+     * Set filter to ignore certain classes.
+     *
+     * @param callable $ignore
+     *
+     * @psalm-param callable(class-string) $ignore
+     *
+     * @return self
+     */
+    public function setFilter(callable $ignore): self
+    {
+        $this->ignore = $ignore;
+
+        return $this;
+    }
+    /**
+     * Set output directory.
+     *
+     * @param string $output Output directory
+     *
+     * @return self
+     */
+    public function setOutput(string $output): self
+    {
+        $this->output = $output;
+
+        return $this;
+    }
+    /**
+     * Run documentor.
+     *
+     * @return self
+     */
+    public function run(): self
+    {
+        $classes = ClassFinder::getClassesInNamespace($this->namespace, $this->mode | ClassFinder::RECURSIVE_MODE);
         foreach ($classes as $class) {
-            if (\in_array($class, self::DISALLOW) || str_starts_with($class, 'danog\\MadelineProto\\Ipc')
-            || str_starts_with($class, 'danog\\MadelineProto\\Loop\\Update')
-            || str_starts_with($class, 'danog\\MadelineProto\\Loop\\Connection')
-            || str_starts_with($class, 'danog\\MadelineProto\\MTProto\\')
-            || str_starts_with($class, 'danog\\MadelineProto\\MTProtoSession\\')
-            || str_starts_with($class, 'danog\\MadelineProto\\PhpDoc\\')
-            || str_starts_with($class, 'danog\\MadelineProto\\Db\\NullCache')) {
+            $this->addTypeAliases($class);
+        }
+        foreach ($classes as $class) {
+            if ($this->ignore && ($this->ignore)($class)) {
                 continue;
             }
-            $class = new ReflectionClass($class);
-            if ($class->isTrait()) {
-                continue;
-            }
+            $class = \function_exists($class)
+                ? new ReflectionFunction($class)
+                : new ReflectionClass($class);
             $this->generate($class);
         }
-        $this->generate(new ReflectionClass(DbPropertiesTrait::class));
-    }
 
+        return $this;
+    }
+    /**
+     * Resolve type alias.
+     *
+     * @internal
+     *
+     * @param string $fromClass Class from where this function is called
+     * @param string $name      Name to resolve
+     *
+     * @psalm-param class-string $fromClass Class from where this function is called
+     * @psalm-param class-string $name      Name to resolve
+     *
+     * @return string
+     */
+    public function resolveTypeAlias(string $fromClass, string $name): string
+    {
+        return $this->useMap[$fromClass][$name] ?? $name;
+    }
+    /**
+     * Add type alias.
+     *
+     * @param string $class
+     *
+     * @psalm-param class-string $class
+     *
+     * @return void
+     */
+    private function addTypeAliases(string $class)
+    {
+        $reflectionClass = \function_exists($class)
+            ? new ReflectionFunction($class)
+            : new ReflectionClass($class);
+        $payload = \file_get_contents($reflectionClass->getFileName());
+        \preg_match_all("/use *(function)? +(.*?)(?: +as +(.+))? *;/", $payload, $matches, PREG_SET_ORDER|PREG_UNMATCHED_AS_NULL);
+        foreach ($matches as [, $function, $import, $alias]) {
+            $import = "\\$import";
+            $alias ??= \basename(\str_replace('\\', '/', $import));
+            $this->useMap[$class][$alias] = $import;
+            $this->useMap[$class]['\\'.$alias] = $import;
+        }
+    }
     /**
      * Create directory recursively.
      *
@@ -137,25 +187,52 @@ class PhpDocBuilder
         return $file;
     }
 
-    private function generate(ReflectionClass $class): void
+    /**
+     * Generate documentation for class.
+     *
+     * @param ReflectionClass|ReflectionFunction $class Class
+     *
+     * @return void
+     */
+    private function generate($class): void
     {
         $name = $class->getName();
         $fName = $this->output;
-        $fName .= \str_replace(['\\', 'danog\\MadelineProto'], ['/', ''], $name);
+        $fName .= \str_replace('\\', DIRECTORY_SEPARATOR, $name);
         $fName .= '.md';
+
+        $class = $class instanceof ReflectionFunction
+            ? new FunctionDoc($this, $class)
+            : new ClassDoc($this, $class);
+        if ($class->shouldIgnore()) {
+            return;
+        }
+        $class = $class->format();
+
         $handle = \fopen(self::createDir($fName), 'w+');
+        \fwrite($handle, $class);
+        \fclose($handle);
+    }
 
-        $class = new ClassDoc($class);
-        /*
-        \fwrite($handle, "---\n");
-        \fwrite($handle, "title: $name: $title\n");
-        \fwrite($handle, "description: $description\n");
-        \fwrite($handle, "image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png\n");
-        \fwrite($handle, "---\n");
-        \fwrite($handle, "# $name: $title\n");
-        \fwrite($handle, "[Back to API index](index.md)\n\n");
+    /**
+     * Get docblock factory.
+     *
+     * @internal
+     *
+     * @return DocBlockFactory
+     */
+    public function getFactory(): DocBlockFactory
+    {
+        return $this->factory;
+    }
 
-        \fwrite($handle, "> Author: $author  \n");
-*/
+    /**
+     * Whether should ignore trait/class/interface.
+     *
+     * @return bool
+     */
+    public function shouldIgnore(string $class): bool
+    {
+        return ($this->ignore)($class);
     }
 }

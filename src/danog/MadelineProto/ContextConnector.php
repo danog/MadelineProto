@@ -55,7 +55,7 @@ class ContextConnector implements Connector
                     $this->logger->logger('OK!', \danog\MadelineProto\Logger::WARNING);
                     return $result->getSocket();
                 } catch (\Throwable $e) {
-                    if (defined('MADELINEPROTO_TEST') && \constant("MADELINEPROTO_TEST")  === 'pony') {
+                    if (\defined('MADELINEPROTO_TEST') && \constant("MADELINEPROTO_TEST")  === 'pony') {
                         throw $e;
                     }
                     $this->logger->logger('Connection failed: '.$e, \danog\MadelineProto\Logger::ERROR);

@@ -146,6 +146,7 @@ class DataCenter
                     /** @psalm-suppress UndefinedPropertyFetch */
                     $array[$id]['permAuthKey']['authorized'] = $socket->authorized;
                 }
+                $array[$id] = [];
             }
         }
         $this->setDataCenterConnections($array);

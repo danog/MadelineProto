@@ -8,7 +8,7 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Tools;
 use PHPUnit\Framework\TestCase;
 
-\define("MADELINEPROTO_TEST", "pony");
+\define('MADELINEPROTO_TEST', 'pony');
 
 final class DataCenterTest extends TestCase
 {

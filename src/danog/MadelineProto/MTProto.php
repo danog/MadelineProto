@@ -862,9 +862,13 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->rpcLoop = new PeriodicLoopInternal($this, [$this, 'rpcReport'], 'config', 60 * 1000);
         }
         if (!$this->ipcServer) {
-            $this->ipcServer = new Server($this);
-            $this->ipcServer->setSettings($this->settings->getIpc());
-            $this->ipcServer->setIpcPath($this->wrapper->session);
+            try {
+                $this->ipcServer = new Server($this);
+                $this->ipcServer->setSettings($this->settings->getIpc());
+                $this->ipcServer->setIpcPath($this->wrapper->session);
+            } catch (\Throwable $e) {
+                $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
+            }
         }
         $this->callCheckerLoop->start();
         $this->serializeLoop->start();
@@ -872,7 +876,11 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->configLoop->start();
         $this->checkTosLoop->start();
         $this->rpcLoop->start();
-        $this->ipcServer->start();
+        try {
+            $this->ipcServer->start();
+        } catch (\Throwable $e) {
+            $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
+        }
     }
     /**
      * Stop all internal loops.
@@ -1167,6 +1175,9 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function unreference(): void
     {
+        if (!isset($this->logger)) {
+            $this->logger = new Logger(new \danog\MadelineProto\Settings\Logger);
+        }
         $this->logger->logger("Will unreference instance");
         if (isset(self::$references[\spl_object_hash($this)])) {
             unset(self::$references[\spl_object_hash($this)]);
@@ -1175,21 +1186,25 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->signal(true);
         }
-        $channelIds = [];
-        foreach ($this->channels_state->get() as $state) {
-            $channelIds[] = $state->getChannel();
-        }
-        \sort($channelIds);
-        foreach ($channelIds as $channelId) {
-            if (isset($this->feeders[$channelId])) {
-                $this->feeders[$channelId]->signal(true);
+        if (isset($this->channels_state)) {
+            $channelIds = [];
+            foreach ($this->channels_state->get() as $state) {
+                $channelIds[] = $state->getChannel();
             }
-            if (isset($this->updaters[$channelId])) {
-                $this->updaters[$channelId]->signal(true);
+            \sort($channelIds);
+            foreach ($channelIds as $channelId) {
+                if (isset($this->feeders[$channelId])) {
+                    $this->feeders[$channelId]->signal(true);
+                }
+                if (isset($this->updaters[$channelId])) {
+                    $this->updaters[$channelId]->signal(true);
+                }
             }
         }
-        foreach ($this->datacenter->getDataCenterConnections() as $datacenter) {
-            $datacenter->disconnect();
+        if (isset($this->datacenter)) {
+            foreach ($this->datacenter->getDataCenterConnections() as $datacenter) {
+                $datacenter->disconnect();
+            }
         }
         $this->logger->logger("Unreferenced instance");
     }

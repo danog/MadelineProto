@@ -170,7 +170,9 @@ class Logger extends SettingsAbstract
     public function setExtra($extra): self
     {
         if ($this->type === MadelineProtoLogger::CALLABLE_LOGGER && !\is_callable($extra)) {
-            $this->setType(MadelineProtoLogger::NO_LOGGER);
+            $this->setType((PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')
+                    ? MadelineProtoLogger::ECHO_LOGGER
+                    : MadelineProtoLogger::FILE_LOGGER);
             return $this;
         }
         $this->extra = $extra;

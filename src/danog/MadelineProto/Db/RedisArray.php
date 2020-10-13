@@ -208,10 +208,10 @@ class RedisArray extends SqlArray
         return call(function () {
             $iterator = $this->getIterator();
             $result = [];
-            $len = strlen($this->rKey(''));
+            $len = \strlen($this->rKey(''));
             while (yield $iterator->advance()) {
                 [$key, $value] = $iterator->getCurrent();
-                $key = substr($key, $len);
+                $key = \substr($key, $len);
                 $result[$key] = $value;
             }
             return $result;

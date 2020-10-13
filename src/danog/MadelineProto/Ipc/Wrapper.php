@@ -53,7 +53,8 @@ class Wrapper extends ClientAbstract
      * @param mixed        $data Payload data
      * @param SessionPaths $ipc  IPC URI
      *
-     * @return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, Wrapper>
+     * @return \Generator
+     * @psalm-return \Generator<int, Promise<ChannelledSocket>|Promise<mixed>, mixed, Wrapper>
      */
     public static function create(&$data, SessionPaths $session, Logger $logger): \Generator
     {
