@@ -314,6 +314,8 @@ class AnnotationsBuilder
             $promise = '\\'.Promise::class;
             $phpdoc = $method->getDocComment() ?? '';
             $phpdoc = \str_replace("@return \\Generator", "@return $promise", $phpdoc);
+            $phpdoc = \str_replace("@return \\Promise", "@return $promise", $phpdoc);
+            $phpdoc = \str_replace("@return Promise", "@return $promise", $phpdoc);
             if ($hasReturnValue && $async && \preg_match("/@return (.*)/", $phpdoc, $matches)) {
                 $ret = $matches[1];
                 $new = $ret;

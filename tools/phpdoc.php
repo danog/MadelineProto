@@ -23,7 +23,6 @@ use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\NothingInTheSocketException;
-use danog\MadelineProto\PhpDocBuilder;
 use danog\MadelineProto\RSA;
 use danog\MadelineProto\Serialization;
 use danog\MadelineProto\SessionPaths;
@@ -39,6 +38,7 @@ use danog\MadelineProto\TON\APIFactory as TONAPIFactory;
 use danog\MadelineProto\TON\InternalDoc as TONInternalDoc;
 use danog\MadelineProto\TON\Lite;
 use danog\MadelineProto\VoIP;
+use danog\PhpDoc\PhpDocBuilder;
 
 require 'vendor/autoload.php';
 
@@ -100,6 +100,7 @@ $filter = function (string $class) use ($ignore): bool {
     || str_starts_with($class, 'danog\\MadelineProto\\MTProto\\')
     || str_starts_with($class, 'danog\\MadelineProto\\MTProtoSession\\')
     || str_starts_with($class, 'danog\\MadelineProto\\PhpDoc\\')
+    || str_starts_with($class, 'danog\\MadelineProto\\Stream\\')
     || str_starts_with($class, 'danog\\MadelineProto\\Db\\NullCache')) {
         return false;
     }

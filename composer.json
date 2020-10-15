@@ -57,7 +57,8 @@
         "danog/7to5": "^1",
         "vimeo/psalm": "dev-master",
         "phpstan/phpstan": "^0.12.14",
-        "friendsofphp/php-cs-fixer": "^2"
+        "friendsofphp/php-cs-fixer": "dev-master",
+        "danog/phpdoc": "^0.1"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)"
@@ -97,8 +98,13 @@
         ],
         "build": [
             "@docs",
+            "@phpdocs",
             "@cs-fix",
             "@psalm"
+        ],
+        "phpdocs": [
+            "@phpdocsInternal",
+            "@phpdocsMain"
         ],
         "check": [
             "@cs",
@@ -109,6 +115,8 @@
         "cs": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff --dry-run",
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff",
         "psalm": "psalm",
+        "phpdocsMain": "php tools/phpdoc.php",
+        "phpdocsInternal": "phpdoc docs/docs/PHPInternal",
         "docs": "php tools/build_docs.php",
         "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text --config tests/phpunit.xml"
     }

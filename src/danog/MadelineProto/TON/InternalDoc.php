@@ -920,7 +920,7 @@ class InternalDoc extends APIFactory
          *
          * @psalm-suppress InvalidScope
          *
-         * @return Promise
+         * @return \Amp\Promise
          */
     public function after($a, $b)
     {
@@ -932,7 +932,7 @@ class InternalDoc extends APIFactory
      *
      * @param array<\Generator|Promise> $promises Promises
      *
-     * @return Promise
+     * @return \Amp\Promise
      */
     public function all(array $promises)
     {
@@ -943,7 +943,7 @@ class InternalDoc extends APIFactory
      *
      * @param array<Promise|\Generator> $promises Promises
      *
-     * @return Promise
+     * @return \Amp\Promise
      */
     public function any(array $promises)
     {
@@ -1001,7 +1001,7 @@ class InternalDoc extends APIFactory
      * @template TReturn
      * @psalm-param \Generator<mixed, mixed, mixed, TReturn>|Promise<TReturn>|TReturn $promise
      *
-     * @return Promise
+     * @return \Amp\Promise
      * @psalm-return Promise<TReturn>
      */
     public function call($promise)
@@ -1017,7 +1017,7 @@ class InternalDoc extends APIFactory
      *
      * @psalm-suppress InvalidScope
      *
-     * @return Promise|mixed
+     * @return \Amp\Promise|mixed
      */
     public function callFork($promise, $actual = null, $file = '')
     {
@@ -1050,7 +1050,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $string Message to echo
      *
-     * @return Promise
+     * @return \Amp\Promise
      */
     public function echo(string $string)
     {
@@ -1072,7 +1072,7 @@ class InternalDoc extends APIFactory
      *
      * @param array<Promise|\Generator> $promises Promises
      *
-     * @return Promise
+     * @return \Amp\Promise
      */
     public function first(array $promises)
     {
@@ -1088,7 +1088,7 @@ class InternalDoc extends APIFactory
      * @param ?Promise  $token     Cancellation token
      * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
      *
-     * @return Promise<?callable>
+     * @return \Amp\Promise<?callable>
      */
     public function flock(string $file, int $operation, float $polling = 0.1, ?\Amp\Promise $token = null, $failureCb = null)
     {
@@ -1378,7 +1378,7 @@ class InternalDoc extends APIFactory
      *
      * @param string $prompt Prompt
      *
-     * @return Promise<string>
+     * @return \Amp\Promise<string>
      */
     public function readLine(string $prompt = '')
     {
@@ -1442,7 +1442,7 @@ class InternalDoc extends APIFactory
      *
      * @param int|float $time Number of seconds to sleep for
      *
-     * @return Promise
+     * @return \Amp\Promise
      */
     public function sleep($time)
     {
@@ -1454,7 +1454,7 @@ class InternalDoc extends APIFactory
      *
      * @param array<Promise|\Generator> $promises Promises
      *
-     * @return Promise
+     * @return \Amp\Promise
      */
     public function some(array $promises)
     {
@@ -1466,7 +1466,7 @@ class InternalDoc extends APIFactory
      * @param \Generator|Promise $promise
      * @param integer $timeout
      *
-     * @return Promise
+     * @return \Amp\Promise
      */
     public function timeout($promise, int $timeout)
     {
@@ -1490,7 +1490,7 @@ class InternalDoc extends APIFactory
      * @psalm-param Promise<TReturn>|TGenerator $promise Promise to which the timeout is applied.
      * @psalm-param TReturnAlt $default
      *
-     * @return Promise<TReturn>|Promise<TReturnAlt>
+     * @return \Amp\Promise<TReturn>|Promise<TReturnAlt>
      *
      * @throws \TypeError If $promise is not an instance of \Amp\Promise, \Generator or \React\Promise\PromiseInterface.
      */

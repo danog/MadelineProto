@@ -202,7 +202,8 @@ class MinDatabase implements TLCallback
      *
      * @param float|int $id Peer ID
      *
-     * @return boolean<Promise>
+     * @return Promise
+     * @psalm-return Promise<bool>
      */
     public function hasPeer($id): Promise
     {

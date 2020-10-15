@@ -33,7 +33,8 @@ interface BufferedStreamInterface extends StreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      *
-     * @return Promise<BufferInterface>
+     * @return Promise
+     * @psalm-return Promise<BufferInterface>
      */
     public function getReadBuffer(&$length): Promise;
     /**

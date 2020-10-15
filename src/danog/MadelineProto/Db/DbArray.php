@@ -15,7 +15,7 @@ interface DbArray extends DbType, \ArrayAccess, \Countable
     /**
      * Get Array copy.
      *
-     * @psalm-return Promise<array<string|int, T>> $value
+     * @psalm-return Promise<array<string|int, T>>
      *
      * @return Promise
      */

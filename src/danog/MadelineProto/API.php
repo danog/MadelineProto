@@ -31,6 +31,60 @@ use danog\MadelineProto\Settings\Logger as SettingsLogger;
  */
 class API extends InternalDoc
 {
+    /**
+     * Release version.
+     *
+     * @var string
+     */
+    const RELEASE = MTProto::RELEASE;
+    /**
+     * We're not logged in.
+     *
+     * @var int
+     */
+    const NOT_LOGGED_IN = MTProto::NOT_LOGGED_IN;
+    /**
+     * We're waiting for the login code.
+     *
+     * @var int
+     */
+    const WAITING_CODE = MTProto::WAITING_CODE;
+    /**
+     * We're waiting for parameters to sign up.
+     *
+     * @var int
+     */
+    const WAITING_SIGNUP = MTProto::WAITING_SIGNUP;
+    /**
+     * We're waiting for the 2FA password.
+     *
+     * @var int
+     */
+    const WAITING_PASSWORD = MTProto::WAITING_PASSWORD;
+    /**
+     * We're logged in.
+     *
+     * @var int
+     */
+    const LOGGED_IN = MTProto::LOGGED_IN;
+    /**
+     * Secret chat was not found.
+     *
+     * @var int
+     */
+    const SECRET_EMPTY = MTProto::SECRET_EMPTY;
+    /**
+     * Secret chat was requested.
+     *
+     * @var int
+     */
+    const SECRET_REQUESTED = MTProto::SECRET_REQUESTED;
+    /**
+     * Secret chat was found.
+     *
+     * @var int
+     */
+    const SECRET_READY = MTProto::SECRET_READY;
     use \danog\Serializable;
     use \danog\MadelineProto\ApiWrappers\Start;
     use \danog\MadelineProto\ApiWrappers\Templates;

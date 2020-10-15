@@ -95,6 +95,8 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * Increased every time the default settings array or something big changes
      *
+     * @internal
+     *
      * @var int
      */
     const V = 147;

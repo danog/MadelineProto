@@ -489,8 +489,8 @@ trait PeerHandler
      *      user_id?: int,
      *      chat_id?: int,
      *      channel_id?: int,
-     *      InputUser?: {_: string, user_id?: int, access_hash?: mixed, min?: bool},
-     *      InputChannel?: {_: string, channel_id: int, access_hash: mixed, min: bool},
+     *      InputUser?: array{_: string, user_id?: int, access_hash?: mixed, min?: bool},
+     *      InputChannel?: array{_: string, channel_id: int, access_hash: mixed, min: bool},
      *      type: string
      * }>
      */
