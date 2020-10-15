@@ -86,6 +86,8 @@ class Settings extends SettingsAbstract
     /**
      * Create settings object from possibly legacy settings array.
      *
+     * @internal
+     *
      * @param SettingsAbstract|array $settings Settings
      *
      * @return SettingsAbstract
@@ -104,6 +106,8 @@ class Settings extends SettingsAbstract
     }
     /**
      * Constructor.
+     *
+     * @internal
      */
     public function __construct()
     {
@@ -126,6 +130,8 @@ class Settings extends SettingsAbstract
      * Merge legacy array settings.
      *
      * @param array $settings Settings
+     *
+     * @internal
      *
      * @return void
      */
