@@ -85,6 +85,9 @@ use danog\MadelineProto\Tools;
         if (\function_exists('cli_set_process_title')) {
             @\cli_set_process_title("MadelineProto worker $ipcPath");
         }
+        if (\function_exists('posix_setsid')) {
+            @\posix_setsid();
+        }
         if (isset($_GET['cwd'])) {
             @\chdir($_GET['cwd']);
         }
