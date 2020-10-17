@@ -98,13 +98,13 @@
         ],
         "build": [
             "@docs",
-            "@phpdocs",
+            "@phpdoc",
             "@cs-fix",
             "@psalm"
         ],
-        "phpdocs": [
-            "@phpdocsInternal",
-            "@phpdocsMain"
+        "phpdoc": [
+            "@phpdocInternal",
+            "@phpdocMain"
         ],
         "check": [
             "@cs",
@@ -115,8 +115,8 @@
         "cs": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff --dry-run",
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff",
         "psalm": "psalm",
-        "phpdocsMain": "php tools/phpdoc.php",
-        "phpdocsInternal": "phpdoc docs/docs/PHPInternal",
+        "phpdocMain": "php tools/phpdoc.php",
+        "phpdocInternal": "phpdoc docs/docs/PHPInternal",
         "docs": "php tools/build_docs.php",
         "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text --config tests/phpunit.xml"
     }

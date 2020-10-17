@@ -52,6 +52,8 @@ use function Amp\File\size;
 
 /**
  * Manages all of the mtproto stuff.
+ * 
+ * @internal
  */
 class MTProto extends AsyncConstruct implements TLCallback
 {

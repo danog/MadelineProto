@@ -21,6 +21,8 @@ namespace danog\MadelineProto\MTProtoTools;
 
 /**
  * Stores multiple update states.
+ * 
+ * @internal
  */
 class CombinedUpdatesState
 {

@@ -6,6 +6,8 @@ use danog\MadelineProto\Db\MysqlArray as DbMysqlArray;
 
 /**
  * MySQL database backend, no caching.
+ * 
+ * @internal
  */
 class MysqlArray extends DbMysqlArray
 {

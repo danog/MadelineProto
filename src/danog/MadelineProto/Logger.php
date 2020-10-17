@@ -278,15 +278,18 @@ class Logger
             Snitch::logFile($this->optional);
             $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a'));
             if ($maxSize !== -1) {
+                $optional = &$this->optional;
+                $stdout = &$this->stdout;
                 $this->rotateId = Loop::repeat(
                     10*1000,
-                    function () use ($maxSize) {
-                        \clearstatcache(true, $this->optional);
-                        if (\file_exists($this->optional) && \filesize($this->optional) >= $maxSize) {
-                            $this->stdout = null;
-                            \unlink($this->optional);
-                            $this->stdout = new ResourceOutputStream(\fopen($this->optional, 'a'));
-                            $this->logger("Automatically truncated logfile to $maxSize");
+                    static function () use ($maxSize, $optional, &$stdout) {
+                        \clearstatcache(true, $optional);
+                        if (\file_exists($optional) && \filesize($optional) >= $maxSize) {
+                            $stdout->close();
+                            $stdout = null;
+                            \unlink($optional);
+                            $stdout = new ResourceOutputStream(\fopen($optional, 'a'));
+                            self::log("Automatically truncated logfile to $maxSize");
                         }
                     }
                 );
@@ -303,9 +306,7 @@ class Logger
             }
         }
 
-        if (!self::$default) {
-            self::$default = $this;
-        }
+        self::$default = $this;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             try {
                 \error_reporting(E_ALL);

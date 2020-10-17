@@ -114,4 +114,6 @@ $filter = function (string $class) use ($ignore): bool {
 PhpDocBuilder::fromNamespace()
     ->setFilter($filter)
     ->setOutput(__DIR__.'/../docs/docs/PHP/')
+    ->setImage("https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png")
     ->run();
+

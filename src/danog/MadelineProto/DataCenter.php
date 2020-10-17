@@ -365,6 +365,7 @@ class DataCenter
                 $extra = isset($this->dclist[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->dclist[$test][$ipv6][$dc_number]['secret']] : [];
                 $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, $extra], [IntermediatePaddedStream::class, []]];
             }
+            $proxyCombos = [];
             foreach ($this->settings->getProxies() as $proxy => $extras) {
                 if (!$dc_number && $proxy === ObfuscatedStream::class) {
                     continue;
@@ -373,7 +374,7 @@ class DataCenter
                     if ($proxy === ObfuscatedStream::class && \in_array(\strlen($extra['secret']), [17, 34])) {
                         $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
                     }
-                    foreach ($combos as $k => $orig) {
+                    foreach ($combos as $orig) {
                         $combo = [];
                         if ($proxy === ObfuscatedStream::class) {
                             $combo = $orig;
@@ -386,21 +387,21 @@ class DataCenter
                             }
                         } else {
                             if ($orig[1][0] === BufferedRawStream::class) {
-                                list($first, $second) = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
+                                [$first, $second] = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
                                 $first[] = [$proxy, $extra];
                                 $combo = \array_merge($first, $second);
                             } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class])) {
-                                list($first, $second) = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
+                                [$first, $second] = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
                                 $first[] = [BufferedRawStream::class, []];
                                 $first[] = [$proxy, $extra];
                                 $combo = \array_merge($first, $second);
                             }
                         }
-                        \array_unshift($combos, $combo);
-                        //unset($combos[$k]);
+                        $proxyCombos []= $combo;
                     }
                 }
             }
+            $combos = array_merge($proxyCombos, $combos);
             if ($dc_number) {
                 $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
             }
