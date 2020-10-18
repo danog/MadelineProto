@@ -980,12 +980,12 @@ trait PeerHandler
             return $promises;
         }
 
-        $yielded = yield Tools::all($promises);
+        $yielded = [...yield Tools::all($promises)];
         while ($yielded) {
             $newYielded = [];
 
-            foreach (\array_chunk([...$yielded], 10) as $promises) {
-                $newYielded = \array_merge(yield Tools::all($promises), $newYielded);
+            foreach (\array_chunk($yielded, 10) as $promises) {
+                $newYielded = \array_merge($newYielded, ...(yield Tools::all($promises)));
             }
 
             $yielded = $newYielded;
