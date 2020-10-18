@@ -387,7 +387,7 @@ trait UpdateHandler
                     }
                     break;
                 case 'encryptedChatDiscarded':
-                    $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user', \danog\MadelineProto\Logger::NOTICE);
+                    $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user (it was probably accepted by another client)', \danog\MadelineProto\Logger::NOTICE);
                     if (isset($this->secret_chats[$update['chat']['id']])) {
                         unset($this->secret_chats[$update['chat']['id']]);
                     }

@@ -51,23 +51,23 @@ trait CallHandler
             : [$message_id];
         foreach ($message_ids as $message_id) {
             if (isset($this->outgoing_messages[$message_id])
-                && $this->outgoing_messages[$message_id]->canGarbageCollect()) {
+                && !$this->outgoing_messages[$message_id]->canGarbageCollect()) {
                 if ($datacenter) {
                     /** @var OutgoingMessage */
                     $message = $this->outgoing_messages[$message_id];
+                    $this->gotResponseForOutgoingMessage($message);
                     $message->setMsgId(null);
                     $message->setSeqNo(null);
                     Tools::call($this->API->datacenter->waitGetConnection($datacenter))->onResolve(function ($e, $r) use ($message) {
                         Tools::callFork($r->sendMessage($message, false));
                     });
-                    $this->gotResponseForOutgoingMessage($message);
                 } else {
                     /** @var OutgoingMessage */
                     $message = $this->outgoing_messages[$message_id];
-                    Tools::callFork($this->sendMessage($message, false));
                     if (!$message->hasSeqNo()) {
                         $this->gotResponseForOutgoingMessage($message);
                     }
+                    Tools::callFork($this->sendMessage($message, false));
                 }
             } else {
                 $this->logger->logger('Could not resend '.($this->outgoing_messages[$message_id] ?? $message_id));

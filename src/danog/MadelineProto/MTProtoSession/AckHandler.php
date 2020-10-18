@@ -140,6 +140,7 @@ trait AckHandler
                 }
                 if ($message->getState() & OutgoingMessage::STATE_REPLIED) {
                     $this->logger->logger("Already replied to message $message, but still in new_outgoing");
+                    unset($this->new_outgoing[$message_id]);
                     continue;
                 }
                 $result[] = $message_id;
