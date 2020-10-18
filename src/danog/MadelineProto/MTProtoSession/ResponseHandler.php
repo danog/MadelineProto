@@ -179,7 +179,7 @@ trait ResponseHandler
         /** @var OutgoingMessage */
         $request = $this->outgoing_messages[$requestId];
         if ($request->getState() & OutgoingMessage::STATE_REPLIED) {
-            $this->logger->logger("Already got a reponse to $request, but there is another reply $message with message ID $requestId!", Logger::FATAL_ERROR);
+            $this->logger->logger("Already got a response to $request, but there is another reply $message with message ID $requestId!", Logger::FATAL_ERROR);
             return;
         }
         if ($response['_'] === 'rpc_result') {

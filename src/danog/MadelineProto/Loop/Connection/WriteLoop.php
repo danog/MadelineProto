@@ -118,6 +118,7 @@ class WriteLoop extends ResumableSignalLoop
                 $API->logger->logger("Sent $message as unencrypted message to DC $datacenter!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
 
                 unset($connection->pendingOutgoing[$k]);
+                $message->setMsgId($message_id);
                 $connection->outgoing_messages[$message_id] = $message;
                 $connection->new_outgoing[$message_id] = $message;
 

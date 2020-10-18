@@ -37,6 +37,9 @@ abstract class EventHandler extends InternalDoc
      * API instance.
      */
     protected MTProto $API;
+    public function __construct($API) // BC
+    {
+    }
     /**
      * Internal constructor.
      *

@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\MTProtoSession;
 
 use danog\MadelineProto\DataCenterConnection;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProto\OutgoingMessage;
 
@@ -58,6 +59,8 @@ trait AckHandler
         // The server acknowledges that it received my message
         if (isset($this->new_outgoing[$outgoingMessage->getMsgId()])) {
             unset($this->new_outgoing[$outgoingMessage->getMsgId()]);
+        } else {
+            $this->logger->logger("Could not find $outgoingMessage in new_outgoing!", Logger::FATAL_ERROR);
         }
     }
     /**

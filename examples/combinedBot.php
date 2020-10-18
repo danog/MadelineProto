@@ -21,9 +21,7 @@
 
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\RPCErrorException;
 
 /*
  * Various ways to load MadelineProto
@@ -80,17 +78,9 @@ class MyEventHandler extends EventHandler
         }
         $res = \json_encode($update, JSON_PRETTY_PRINT);
 
-        try {
-            yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
-            if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
-                yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
-            }
-        } catch (RPCErrorException $e) {
-            $this->report("Surfaced: $e");
-        } catch (Exception $e) {
-            if (\stripos($e->getMessage(), 'invalid constructor given') === false) {
-                $this->report("Surfaced: $e");
-            }
+        yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
+        if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
+            yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
         }
     }
 }
