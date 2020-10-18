@@ -49,7 +49,7 @@ class IncomingMessage extends Message
         'future_salts' => 'req_msg_id',
         'msgs_state_info' => 'req_msg_id',
         'bad_server_salt' => 'bad_msg_id',
-        'bad_message_notification' => 'bad_msg_id',
+        'bad_msg_notification' => 'bad_msg_id',
         'pong' => 'msg_id',
     ];
     /**

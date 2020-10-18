@@ -68,6 +68,9 @@ class SecretHandler extends \danog\MadelineProto\EventHandler
         if ($update['message']['message'] === 'request') {
             yield $this->requestSecretChat($update);
         }
+        if ($update['message']['message'] === 'ping') {
+            yield $this->messages->sendMessage(['message' => 'lmao', 'peer' => $update]);
+        }
     }
     /**
      * Handle secret chat messages.

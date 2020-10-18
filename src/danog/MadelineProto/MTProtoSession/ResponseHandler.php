@@ -271,8 +271,12 @@ trait ResponseHandler
         }
         if (\strpos($response['error_message'], 'FILE_REFERENCE_') === 0) {
             $this->logger->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
+            $this->gotResponseForOutgoingMessage($request);
+            $msgId = $request->getMsgId();
             $request->setRefreshReferences(true);
-            $this->methodRecall('', ['message_id' => $request->getMsgId(), 'postpone' => true]);
+            $request->setMsgId(null);
+            $request->setSeqNo(null);
+            $this->methodRecall('', ['message_id' => $msgId, 'postpone' => true]);
             return null;
         }
 
@@ -384,10 +388,11 @@ trait ResponseHandler
                 if (\is_numeric($seconds) && $seconds < $limit) {
                     $this->logger->logger("Flood, waiting $seconds seconds before repeating async call of $request...", Logger::NOTICE);
                     $this->gotResponseForOutgoingMessage($request);
+                    $msgId = $request->getMsgId();
                     $request->setSent(($request->getSent() ?? \time()) + $seconds);
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
-                    Loop::delay($seconds * 1000, [$this, 'methodRecall'], ['message_id' => $request->getMsgId()]);
+                    Loop::delay($seconds * 1000, [$this, 'methodRecall'], ['message_id' => $msgId]);
                     return null;
                 }
             // no break
