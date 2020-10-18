@@ -52,7 +52,7 @@ use function Amp\File\size;
 
 /**
  * Manages all of the mtproto stuff.
- * 
+ *
  * @internal
  */
 class MTProto extends AsyncConstruct implements TLCallback
@@ -101,7 +101,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var int
      */
-    const V = 147;
+    const V = 148;
     /**
      * Release version.
      *
@@ -301,7 +301,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var DbArray|Promise[]
      */
-    public $channel_participants;
+    public $channelParticipants;
     /**
      * When we last stored data in remote peer database (now doesn't exist anymore).
      *
@@ -491,7 +491,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     protected static array $dbProperties = [
         'chats' => 'array',
         'full_chats' => 'array',
-        'channel_participants' => 'array',
+        'channelParticipants' => 'array',
         'usernames' => 'array',
         'session' => [
             'type' => 'array',
@@ -574,7 +574,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->datacenter->curdc = 2;
         if ((!isset($this->authorization['user']['bot']) || !$this->authorization['user']['bot']) && $this->datacenter->getDataCenterConnection($this->datacenter->curdc)->hasTempAuthKey()) {
             try {
-                $nearest_dc = yield from $this->methodCallAsyncRead('help.getNearestDc', [], ['datacenter' => $this->datacenter->curdc]);
+                $nearest_dc = yield from $this->methodCallAsyncRead('help.getNearestDc', []);
                 $this->logger->logger(\sprintf(Lang::$current_lang['nearest_dc'], $nearest_dc['country'], $nearest_dc['nearest_dc']), Logger::NOTICE);
                 if ($nearest_dc['nearest_dc'] != $nearest_dc['this_dc']) {
                     $this->settings->setDefaultDc($this->datacenter->curdc = (int) $nearest_dc['nearest_dc']);
@@ -585,7 +585,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 }
             }
         }
-        yield from $this->getConfig([], ['datacenter' => $this->datacenter->curdc]);
+        yield from $this->getConfig([]);
         $this->startUpdateSystem(true);
         $this->v = self::V;
 
@@ -627,7 +627,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             'full_chats',
             'referenceDatabase',
             'minDatabase',
-            'channel_participants',
+            'channelParticipants',
             'usernames',
 
             // Misc caching
@@ -1029,6 +1029,39 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
         }
 
+        if (isset($this->channel_participants)) {
+            if (\is_array($this->channel_participants)) {
+                foreach ($this->channel_participants as $channelId => $filters) {
+                    foreach ($filters as $filter => $qs) {
+                        foreach ($qs as $q => $offsets) {
+                            foreach ($offsets as $offset => $limits) {
+                                foreach ($limits as $limit => $data) {
+                                    $this->channelParticipants[$this->participantsKey($channelId, $filter, $q, $offset, $limit)] = $data;
+                                }
+                            }
+                        }
+                    }
+                    unset($this->channel_participants[$channelId]);
+                }
+            } else {
+                self::$dbProperties['channel_participants'] = 'array';
+                yield from $this->initDb($this);
+                $iterator = $this->channel_participants->getIterator();
+                while (yield $iterator->advance()) {
+                    [$channelId, $filters] = $iterator->getCurrent();
+                    foreach ($filters as $filter => $qs) {
+                        foreach ($qs as $q => $offsets) {
+                            foreach ($offsets as $offset => $limits) {
+                                foreach ($limits as $limit => $data) {
+                                    $this->channelParticipants[$this->participantsKey($channelId, $filter, $q, $offset, $limit)] = $data;
+                                }
+                            }
+                        }
+                    }
+                    unset($this->channel_participants[$channelId]);
+                }
+            }
+        }
         foreach ($this->secret_chats as $key => &$chat) {
             if (!\is_array($chat)) {
                 unset($this->secret_chats[$key]);
@@ -1157,6 +1190,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         // onStart event handler
         if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->event_handler, EventHandler::class)) {
             yield from $this->setEventHandler($this->event_handler);
+        } else {
+            $this->event_handler = null;
+            $this->event_handler_instance = null;
         }
         $this->startUpdateSystem(true);
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings->getPeer()->getCacheAllPeersOnStartup()) {
@@ -1550,11 +1586,20 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $this->updaters[$channelId]->resume();
             }
         }
-        foreach ($this->datacenter->getDataCenterConnections() as $datacenter) {
-            $datacenter->flush();
-        }
+        $this->flushAll();
         if ($this->seqUpdater->start()) {
             $this->seqUpdater->resume();
+        }
+    }
+    /**
+     * Flush all datacenter connections.
+     *
+     * @return void
+     */
+    private function flushAll(): void
+    {
+        foreach ($this->datacenter->getDataCenterConnections() as $datacenter) {
+            $datacenter->flush();
         }
     }
     /**
@@ -1688,7 +1733,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     public function fullGetSelf(): \Generator
     {
         try {
-            $this->authorization = ['user' => (yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']]], ['datacenter' => $this->datacenter->curdc]))[0]];
+            $this->authorization = ['user' => (yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']]]))[0]];
         } catch (RPCErrorException $e) {
             $this->logger->logger($e->getMessage());
             return false;

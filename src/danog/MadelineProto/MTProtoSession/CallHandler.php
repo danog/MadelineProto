@@ -20,6 +20,8 @@
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\Deferred;
+use danog\MadelineProto\MTProto\Container;
+use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
 
@@ -44,25 +46,31 @@ trait CallHandler
         if ($datacenter === $this->datacenter) {
             $datacenter = false;
         }
-        $message_ids = $this->outgoing_messages[$message_id]['container'] ?? [$message_id];
+        $message_ids = $this->outgoing_messages[$message_id] instanceof Container
+            ? $this->outgoing_messages[$message_id]->getIds()
+            : [$message_id];
         foreach ($message_ids as $message_id) {
-            if (isset($this->outgoing_messages[$message_id]['body'])) {
+            if (isset($this->outgoing_messages[$message_id])
+                && $this->outgoing_messages[$message_id]->canGarbageCollect()) {
                 if ($datacenter) {
-                    unset($this->outgoing_messages[$message_id]['msg_id'], $this->outgoing_messages[$message_id]['seqno']);
-                    Tools::call($this->API->datacenter->waitGetConnection($datacenter))->onResolve(function ($e, $r) use ($message_id) {
-                        Tools::callFork($r->sendMessage($this->outgoing_messages[$message_id], false));
+                    /** @var OutgoingMessage */
+                    $message = $this->outgoing_messages[$message_id];
+                    $message->setMsgId(null);
+                    $message->setSeqNo(null);
+                    Tools::call($this->API->datacenter->waitGetConnection($datacenter))->onResolve(function ($e, $r) use ($message) {
+                        Tools::callFork($r->sendMessage($message, false));
                     });
-                    $this->ackOutgoingMessageId($message_id);
-                    $this->gotResponseForOutgoingMessageId($message_id);
+                    $this->gotResponseForOutgoingMessage($message);
                 } else {
-                    Tools::callFork($this->sendMessage($this->outgoing_messages[$message_id], false));
-                    if (!isset($this->outgoing_messages[$message_id]['seqno'])) {
-                        $this->ackOutgoingMessageId($message_id);
-                        $this->gotResponseForOutgoingMessageId($message_id);
+                    /** @var OutgoingMessage */
+                    $message = $this->outgoing_messages[$message_id];
+                    Tools::callFork($this->sendMessage($message, false));
+                    if (!$message->hasSeqNo()) {
+                        $this->gotResponseForOutgoingMessage($message);
                     }
                 }
             } else {
-                $this->logger->logger('Could not resend '.(isset($this->outgoing_messages[$message_id]['_']) ? $this->outgoing_messages[$message_id]['_'] : $message_id));
+                $this->logger->logger('Could not resend '.($this->outgoing_messages[$message_id] ?? $message_id));
             }
         }
         if (!$postpone) {
@@ -154,25 +162,28 @@ trait CallHandler
                 $args['ping_id'] = Tools::packSignedLong($args['ping_id']);
             }
         }
-        $deferred = new Deferred();
         $methodInfo = $this->API->getTL()->getMethods()->findByMethod($method);
         if (!$methodInfo) {
             throw new Exception("Could not find method $method!");
         }
-        $message = \array_merge(
-            $aargs,
-            [
-                '_' => $method,
-                'body' => $args,
-                'type' => $methodInfo['type'],
-                'contentRelated' => $this->contentRelated($method),
-                'promise' => $deferred,
-                'method' => true,
-                'unencrypted' => !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false
-            ]
+        $message = new OutgoingMessage(
+            $args,
+            $method,
+            $methodInfo['type'],
+            true,
+            !$this->shared->hasTempAuthKey() && \strpos($method, '.') === false
         );
         if ($method === 'users.getUsers' && $args === ['id' => [['_' => 'inputUserSelf']]] || $method === 'auth.exportAuthorization' || $method === 'updates.getDifference') {
-            $message['user_related'] = true;
+            $message->setUserRelated(true);
+        }
+        if (isset($aargs['msg_id'])) {
+            $message->setMsgId($aargs['msg_id']);
+        }
+        if ($aargs['file'] ?? false) {
+            $message->setFileRelated(true);
+        }
+        if (isset($aargs['FloodWaitLimit'])) {
+            $message->setFloodWaitLimit($aargs['FloodWaitLimit']);
         }
         $aargs['postpone'] = $aargs['postpone'] ?? false;
         $deferred = yield from $this->sendMessage($message, !$aargs['postpone']);
@@ -190,11 +201,17 @@ trait CallHandler
      */
     public function objectCall(string $object, $args = [], array $aargs = ['msg_id' => null]): \Generator
     {
-        $message = ['_' => $object, 'body' => $args, 'contentRelated' => $this->contentRelated($object), 'unencrypted' => !$this->shared->hasTempAuthKey(), 'method' => false];
+        $message = new OutgoingMessage(
+            $args,
+            $object,
+            '',
+            false,
+            !$this->shared->hasTempAuthKey()
+        );
         if (isset($aargs['promise'])) {
-            $message['promise'] = $aargs['promise'];
+            $message->setPromise($aargs['promise']);
         }
         $aargs['postpone'] = $aargs['postpone'] ?? false;
-        return $this->sendMessage($message, !$aargs['postpone']);
+        return yield from $this->sendMessage($message, !$aargs['postpone']);
     }
 }

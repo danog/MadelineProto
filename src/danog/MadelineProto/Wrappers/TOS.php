@@ -34,7 +34,7 @@ trait TOS
         if ($this->authorized === self::LOGGED_IN && !$this->authorization['user']['bot']) {
             if ($this->tos['expires'] < \time()) {
                 $this->logger->logger('Fetching TOS...');
-                $this->tos = yield from $this->methodCallAsyncRead('help.getTermsOfServiceUpdate', [], ['datacenter' => $this->datacenter->curdc]);
+                $this->tos = yield from $this->methodCallAsyncRead('help.getTermsOfServiceUpdate', []);
                 $this->tos['accepted'] = $this->tos['_'] === 'help.termsOfServiceUpdateEmpty';
             }
             if (!$this->tos['accepted']) {
@@ -55,7 +55,7 @@ trait TOS
      */
     public function acceptTos(): \Generator
     {
-        $this->tos['accepted'] = yield from $this->methodCallAsyncRead('help.acceptTermsOfService', ['id' => $this->tos['terms_of_service']['id']], ['datacenter' => $this->datacenter->curdc]);
+        $this->tos['accepted'] = yield from $this->methodCallAsyncRead('help.acceptTermsOfService', ['id' => $this->tos['terms_of_service']['id']]);
         if ($this->tos['accepted']) {
             $this->logger->logger('TOS accepted successfully');
         } else {
@@ -71,7 +71,7 @@ trait TOS
      */
     public function declineTos(): \Generator
     {
-        yield from $this->methodCallAsyncRead('account.deleteAccount', ['reason' => 'Decline ToS update'], ['datacenter' => $this->datacenter->curdc]);
+        yield from $this->methodCallAsyncRead('account.deleteAccount', ['reason' => 'Decline ToS update']);
         yield from $this->logout();
     }
 }

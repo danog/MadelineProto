@@ -19,10 +19,14 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use Amp\Failure;
 use Amp\Loop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProto\IncomingMessage;
+use danog\MadelineProto\MTProto\OutgoingMessage;
+use danog\MadelineProto\Tools;
 
 /**
  * Manages responses.
@@ -32,492 +36,360 @@ use danog\MadelineProto\MTProto;
 trait ResponseHandler
 {
     public $n = 0;
-    public function handleMessages(): bool
+    public function handleMessages(): void
     {
-        $only_updates = true;
         while ($this->new_incoming) {
             \reset($this->new_incoming);
             $current_msg_id = \key($this->new_incoming);
-            if (!isset($this->incoming_messages[$current_msg_id])) {
-                unset($this->new_incoming[$current_msg_id]);
-                continue;
+
+            /** @var IncomingMessage */
+            $message = $this->new_incoming[$current_msg_id];
+            unset($this->new_incoming[$current_msg_id]);
+
+
+            $this->logger->logger($message->log($this->datacenter), Logger::ULTRA_VERBOSE);
+
+            $type = $message->getType();
+            if ($type !== 'msg_container') {
+                $this->checkInSeqNo($message);
             }
-            $this->logger->logger((isset($this->incoming_messages[$current_msg_id]['from_container']) ? 'Inside of container, received ' : 'Received ').$this->incoming_messages[$current_msg_id]['content']['_'].' from DC '.$this->datacenter, \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            switch ($this->incoming_messages[$current_msg_id]['content']['_']) {
+            switch ($type) {
                 case 'msgs_ack':
-                    unset($this->new_incoming[$current_msg_id]);
-                    $this->checkInSeqNo($current_msg_id);
-                    $only_updates = false;
-                    foreach ($this->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
-                        $this->ackOutgoingMessageId($msg_id);
+                    foreach ($message->read()['msg_ids'] as $msg_id) {
                         // Acknowledge that the server received my message
+                        $this->ackOutgoingMessageId($msg_id);
                     }
-                    unset($this->incoming_messages[$current_msg_id]['content']);
                     break;
                 case 'rpc_result':
-                    unset($this->new_incoming[$current_msg_id]);
-                    $this->ackIncomingMessageId($current_msg_id);
-                    $only_updates = false;
-                    // Acknowledge that the server received my request
-                    $req_msg_id = $this->incoming_messages[$current_msg_id]['content']['req_msg_id'];
-                    $this->incoming_messages[$current_msg_id]['content'] = $this->incoming_messages[$current_msg_id]['content']['result'];
-                    $this->checkInSeqNo($current_msg_id);
-                    $this->handleResponse($req_msg_id, $current_msg_id);
-                    break;
+                    $this->ackIncomingMessage($message);
+                    // no break
                 case 'future_salts':
                 case 'msgs_state_info':
-                    $msg_id_type = 'req_msg_id';
-                // no break
                 case 'bad_server_salt':
                 case 'bad_msg_notification':
-                    $msg_id_type = isset($msg_id_type) ? $msg_id_type : 'bad_msg_id';
-                // no break
                 case 'pong':
-                    $msg_id_type = isset($msg_id_type) ? $msg_id_type : 'msg_id';
-                    unset($this->new_incoming[$current_msg_id]);
-                    $this->checkInSeqNo($current_msg_id);
-                    $only_updates = false;
-                    $this->handleResponse($this->incoming_messages[$current_msg_id]['content'][$msg_id_type], $current_msg_id);
-                    unset($msg_id_type);
+                    $this->handleResponse($message);
                     break;
                 case 'new_session_created':
-                    unset($this->new_incoming[$current_msg_id]);
-                    $this->checkInSeqNo($current_msg_id);
-                    $only_updates = false;
-                    $this->shared->getTempAuthKey()->setServerSalt($this->incoming_messages[$current_msg_id]['content']['server_salt']);
-                    $this->ackIncomingMessageId($current_msg_id);
-                    // Acknowledge that I received the server's response
+                    $this->ackIncomingMessage($message);
+                    $this->shared->getTempAuthKey()->setServerSalt($message->read()['server_salt']);
                     if ($this->API->authorized === MTProto::LOGGED_IN && !$this->API->isInitingAuthorization() && $this->API->datacenter->getDataCenterConnection($this->API->datacenter->curdc)->hasTempAuthKey() && isset($this->API->updaters[UpdateLoop::GENERIC])) {
                         $this->API->updaters[UpdateLoop::GENERIC]->resumeDefer();
                     }
-                    unset($this->incoming_messages[$current_msg_id]['content']);
                     break;
                 case 'msg_container':
-                    unset($this->new_incoming[$current_msg_id]);
-                    $only_updates = false;
-                    foreach ($this->incoming_messages[$current_msg_id]['content']['messages'] as $message) {
+                    foreach ($message->read()['messages'] as $message) {
                         $this->msgIdHandler->checkMessageId($message['msg_id'], ['outgoing' => false, 'container' => true]);
-                        $this->incoming_messages[$message['msg_id']] = ['seq_no' => $message['seqno'], 'content' => $message['body'], 'from_container' => true];
-                        $this->new_incoming[$message['msg_id']] = $message['msg_id'];
+                        $newMessage = new IncomingMessage($message['body'], $message['msg_id'], true);
+                        $newMessage->setSeqNo($message['seqno']);
+                        $this->new_incoming[$message['msg_id']] = $this->incoming_messages[$message['msg_id']] = $newMessage;
                     }
+                    unset($newMessage, $message);
                     \ksort($this->new_incoming);
-                    //$this->handleMessages();
-                    //$this->checkInSeqNo($current_msg_id);
-                    unset($this->incoming_messages[$current_msg_id]['content']);
                     break;
                 case 'msg_copy':
-                    unset($this->new_incoming[$current_msg_id]);
-                    $this->checkInSeqNo($current_msg_id);
-                    $only_updates = false;
-                    $this->ackIncomingMessageId($current_msg_id);
-                    // Acknowledge that I received the server's response
-                    if (isset($this->incoming_messages[$this->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id']])) {
-                        $this->ackIncomingMessageId($this->incoming_messages[$current_msg_id]['content']['orig_message']['msg_id']);
-                    // Acknowledge that I received the server's response
+                    $this->ackIncomingMessage($message);
+                    $content = $message->read();
+                    $referencedMsgId = $content['msg_id'];
+                    if (isset($this->incoming_messages[$referencedMsgId])) {
+                        $this->ackIncomingMessage($this->incoming_messages[$referencedMsgId]);
                     } else {
-                        $message = $this->incoming_messages[$current_msg_id]['content'];
-                        $this->msgIdHandler->checkMessageId($message['orig_message']['msg_id'], ['outgoing' => false, 'container' => true]);
-                        $this->incoming_messages[$message['orig_message']['msg_id']] = ['content' => $this->incoming_messages[$current_msg_id]['content']['orig_message']];
-                        $this->new_incoming[$message['orig_message']['msg_id']] = $message['orig_message']['msg_id'];
+                        $this->msgIdHandler->checkMessageId($referencedMsgId, ['outgoing' => false, 'container' => true]);
+                        $message = new IncomingMessage($content['orig_message'], $referencedMsgId);
+                        $this->new_incoming[$referencedMsgId] = $this->incoming_messages[$referencedMsgId] = $message;
+                        unset($message);
                     }
-                    unset($this->incoming_messages[$current_msg_id]['content']);
+                    unset($content, $referencedMsgId);
                     break;
                 case 'http_wait':
-                    unset($this->new_incoming[$current_msg_id]);
-                    $this->checkInSeqNo($current_msg_id);
-                    $only_updates = false;
-                    $this->logger->logger($this->incoming_messages[$current_msg_id]['content'], \danog\MadelineProto\Logger::NOTICE);
-                    unset($this->incoming_messages[$current_msg_id]['content']);
+                    $this->logger->logger($message->read(), Logger::NOTICE);
                     break;
                 case 'msgs_state_req':
-                    $this->checkInSeqNo($current_msg_id);
-                    $only_updates = false;
-                    unset($this->new_incoming[$current_msg_id]);
-                    \danog\MadelineProto\Tools::callFork($this->sendMsgsStateInfo($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
-                    unset($this->incoming_messages[$current_msg_id]['content']);
+                    $this->sendMsgsStateInfo($message->read()['msg_ids'], $current_msg_id);
                     break;
                 case 'msgs_all_info':
-                    $this->checkInSeqNo($current_msg_id);
-                    $only_updates = false;
-                    unset($this->new_incoming[$current_msg_id]);
-                    foreach ($this->incoming_messages[$current_msg_id]['content']['msg_ids'] as $key => $msg_id) {
-                        $info = \ord($this->incoming_messages[$current_msg_id]['content']['info'][$key]);
-                        $msg_id = new \tgseclib\Math\BigInteger(\strrev($msg_id), 256);
-                        $status = 'Status for message id '.$msg_id.': ';
-                        /*if ($info & 4) {
-                         *$this->gotResponseForOutgoingMessageId($msg_id);
-                         *}
-                         */
-                        foreach (MTProto::MSGS_INFO_FLAGS as $flag => $description) {
-                            if (($info & $flag) !== 0) {
-                                $status .= $description;
-                            }
-                        }
-                        $this->logger->logger($status, \danog\MadelineProto\Logger::NOTICE);
-                    }
+                    $this->onMsgsAllInfo($message->read());
                     break;
                 case 'msg_detailed_info':
-                    $this->checkInSeqNo($current_msg_id);
-                    unset($this->new_incoming[$current_msg_id]);
-                    $only_updates = false;
-                    if (isset($this->outgoing_messages[$this->incoming_messages[$current_msg_id]['content']['msg_id']])) {
-                        if (isset($this->incoming_messages[$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {
-                            $this->handleResponse($this->incoming_messages[$current_msg_id]['content']['msg_id'], $this->incoming_messages[$current_msg_id]['content']['answer_msg_id']);
-                        } else {
-                            \danog\MadelineProto\Tools::callFork($this->objectCall('msg_resend_req', ['msg_ids' => [$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['postpone' => true]));
-                        }
-                    }
+                    $this->onMsgDetailedInfo($message->read());
                     break;
                 case 'msg_new_detailed_info':
-                    $this->checkInSeqNo($current_msg_id);
-                    $only_updates = false;
-                    unset($this->new_incoming[$current_msg_id]);
-                    if (isset($this->incoming_messages[$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']])) {
-                        $this->ackIncomingMessageId($this->incoming_messages[$current_msg_id]['content']['answer_msg_id']);
-                    } else {
-                        \danog\MadelineProto\Tools::callFork($this->objectCall('msg_resend_req', ['msg_ids' => [$this->incoming_messages[$current_msg_id]['content']['answer_msg_id']]], ['postpone' => true]));
-                    }
+                    $this->onNewMsgDetailedInfo($message->read());
                     break;
                 case 'msg_resend_req':
-                    $this->checkInSeqNo($current_msg_id);
-                    $only_updates = false;
-                    unset($this->new_incoming[$current_msg_id]);
-                    $ok = true;
-                    foreach ($this->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
-                        if (!isset($this->outgoing_messages[$msg_id]) || isset($this->incoming_messages[$msg_id])) {
-                            $ok = false;
-                        }
-                    }
-                    if ($ok) {
-                        foreach ($this->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
-                            $this->methodRecall('', ['message_id' => $msg_id, 'postpone' => true]);
-                        }
-                    } else {
-                        \danog\MadelineProto\Tools::callFork($this->sendMsgsStateInfo($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
-                    }
+                    $this->onMsgResendReq($message->read(), $current_msg_id);
                     break;
                 case 'msg_resend_ans_req':
-                    $this->checkInSeqNo($current_msg_id);
-                    $only_updates = false;
-                    unset($this->new_incoming[$current_msg_id]);
-                    \danog\MadelineProto\Tools::callFork($this->sendMsgsStateInfo($current_msg_id, $this->incoming_messages[$current_msg_id]['content']['msg_ids']));
-                    foreach ($this->incoming_messages[$current_msg_id]['content']['msg_ids'] as $msg_id) {
-                        if (isset($this->incoming_messages[$msg_id]['response']) && isset($this->outgoing_messages[$this->incoming_messages[$msg_id]['response']])) {
-                            \danog\MadelineProto\Tools::callFork($this->objectCall($this->outgoing_messages[$this->incoming_messages[$msg_id]['response']]['_'], $this->outgoing_messages[$this->incoming_messages[$msg_id]['response']]['body'], ['postpone' => true]));
-                        }
-                    }
+                    $this->onMsgResendAnsReq($message->read(), $current_msg_id);
                     break;
                 default:
-                    $this->checkInSeqNo($current_msg_id);
-                    $this->ackIncomingMessageId($current_msg_id);
-                    // Acknowledge that I received the server's response
-                    $response_type = $this->API->getTL()->getConstructors()->findByPredicate($this->incoming_messages[$current_msg_id]['content']['_'])['type'];
-                    switch ($response_type) {
-                        case 'Updates':
-                            unset($this->new_incoming[$current_msg_id]);
-                            if (!$this->isCdn()) {
-                                \danog\MadelineProto\Tools::callForkDefer($this->API->handleUpdates($this->incoming_messages[$current_msg_id]['content']));
-                            }
-                            unset($this->incoming_messages[$current_msg_id]['content']);
-                            $only_updates = true && $only_updates;
-                            break;
-                        default:
-                            $only_updates = false;
-                            $this->logger->logger('Trying to assign a response of type '.$response_type.' to its request...', \danog\MadelineProto\Logger::VERBOSE);
-                            foreach ($this->new_outgoing as $key => $expecting_msg_id) {
-                                $expecting = $this->outgoing_messages[$expecting_msg_id];
-                                if (!isset($expecting['type'])) {
-                                    continue;
-                                }
-                                $this->logger->logger('Does the request of return type '.$expecting['type'].' match?', \danog\MadelineProto\Logger::VERBOSE);
-                                if ($response_type === $expecting['type']) {
-                                    $this->logger->logger('Yes', \danog\MadelineProto\Logger::VERBOSE);
-                                    unset($this->new_incoming[$current_msg_id]);
-                                    $this->handleResponse($expecting_msg_id, $current_msg_id);
-                                    break 2;
-                                }
-                                $this->logger->logger('No', \danog\MadelineProto\Logger::VERBOSE);
-                            }
-                            $this->logger->logger('Dunno how to handle '.PHP_EOL.\var_export($this->incoming_messages[$current_msg_id]['content'], true), \danog\MadelineProto\Logger::FATAL_ERROR);
-                            unset($this->new_incoming[$current_msg_id]);
-                            break;
+                    $this->ackIncomingMessage($message);
+                    $response_type = $this->API->getTL()->getConstructors()->findByPredicate($message->getContent()['_'])['type'];
+                    if ($response_type == 'Updates') {
+                        if (!$this->isCdn()) {
+                            Tools::callForkDefer($this->API->handleUpdates($message->read()));
+                        }
+                        break;
                     }
+
+                    $this->logger->logger('Trying to assign a response of type '.$response_type.' to its request...', Logger::VERBOSE);
+                    foreach ($this->new_outgoing as $expecting_msg_id => $expecting) {
+                        if (!$type = $expecting->getType()) {
+                            continue;
+                        }
+                        $this->logger->logger("Does the request of return type $type match?", Logger::VERBOSE);
+                        if ($response_type === $type) {
+                            $this->logger->logger('Yes', Logger::VERBOSE);
+                            $this->handleResponse($message, $expecting_msg_id);
+                            break 2;
+                        }
+                        $this->logger->logger('No', Logger::VERBOSE);
+                    }
+                    $this->logger->logger('Dunno how to handle '.PHP_EOL.\var_export($message->read(), true), Logger::FATAL_ERROR);
                     break;
             }
         }
-        if ($this->pending_outgoing) {
+        if ($this->pendingOutgoing) {
             $this->writer->resume();
         }
-        return $only_updates;
     }
+    public function handleReject(OutgoingMessage $message, \Throwable $data): void
+    {
+        $this->gotResponseForOutgoingMessage($message);
+        Loop::defer(fn () => $message->reply(new Failure($data)));
+    }
+
     /**
-     * Reject request with exception.
+     * Handle RPC response.
      *
-     * @param array      $request Request
-     * @param \Throwable $data    Exception
+     * @param IncomingMessage $message   Incoming message
+     * @param string          $requestId Request ID
      *
      * @return void
      */
-    public function handleReject(&$request, \Throwable $data)
+    private function handleResponse(IncomingMessage $message, $requestId = null): void
     {
-        if (isset($request['promise']) && \is_object($request['promise'])) {
-            Loop::defer(function () use (&$request, $data) {
-                if (isset($request['promise'])) {
-                    $this->logger->logger('Rejecting: '.(isset($request['_']) ? $request['_'] : '-'));
-                    $this->logger->logger("Rejecting: {$data}");
-                    $promise = $request['promise'];
-                    unset($request['promise']);
-                    try {
-                        $promise->fail($data);
-                    } catch (\Error $e) {
-                        if (\strpos($e->getMessage(), "Promise has already been resolved") !== 0) {
-                            throw $e;
-                        }
-                        $this->logger->logger("Got promise already resolved error", \danog\MadelineProto\Logger::FATAL_ERROR);
-                    }
-                } else {
-                    $this->logger->logger('Rejecting: already got response for '.(isset($request['_']) ? $request['_'] : '-'));
-                    $this->logger->logger("Rejecting: {$data}");
-                }
-            });
-        } elseif (isset($request['container'])) {
-            foreach ($request['container'] as $message_id) {
-                $this->handleReject($this->outgoing_messages[$message_id], $data);
-            }
-        } else {
-            $this->logger->logger('Rejecting: already got response for '.(isset($request['_']) ? $request['_'] : '-'));
-            $this->logger->logger("Rejecting: {$data}");
-        }
-    }
-    /**
-     * @return void
-     */
-    public function handleResponse($request_id, $response_id)
-    {
-        $response =& $this->incoming_messages[$response_id]['content'];
-        unset($this->incoming_messages[$response_id]['content']);
-        $request =& $this->outgoing_messages[$request_id];
-        if (isset($response['_'])) {
-            switch ($response['_']) {
-                case 'rpc_error':
-                    if (($request['method'] ?? false) && $request['_'] !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
-                        $this->shared->getTempAuthKey()->init(true);
-                    }
-                    if (\in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_INVALID'])) {
-                        $this->gotResponseForOutgoingMessageId($request_id);
-                        $this->handleReject($request, new \danog\MadelineProto\PTSException($response['error_message']));
-                        return;
-                    }
-                    if ($response['error_message'] === 'PERSISTENT_TIMESTAMP_OUTDATED') {
-                        $response['error_code'] = 500;
-                    }
-                    if (\strpos($response['error_message'], 'FILE_REFERENCE_') === 0) {
-                        $this->logger->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
-                        $request['refreshReferences'] = true;
-                        if (isset($request['serialized_body'])) {
-                            unset($request['serialized_body']);
-                        }
-                        $this->methodRecall('', ['message_id' => $request_id, 'postpone' => true]);
-                        return;
-                    }
-                    switch ($response['error_code']) {
-                        case 500:
-                        case -500:
-                            if ($response['error_message'] === 'MSG_WAIT_FAILED') {
-                                $this->call_queue[$request['queue']] = [];
-                                $this->methodRecall('', ['message_id' => $request_id, 'postpone' => true]);
-                                return;
-                            }
-                            if (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'HISTORY_GET_FAILED', 'RPC_CONNECT_FAILED', 'RPC_CALL_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running', 'No workers running'])) {
-                                Loop::delay(1 * 1000, [$this, 'methodRecall'], ['message_id' => $request_id]);
-                                return;
-                            }
-                            $this->gotResponseForOutgoingMessageId($request_id);
-                            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request['_'] ?? ''));
-                            return;
-                        case 303:
-                            $this->API->datacenter->curdc = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
-                            if (isset($request['file']) && $request['file'] && $this->API->datacenter->has($datacenter.'_media')) {
-                                $datacenter .= '_media';
-                            }
-                            if (isset($request['user_related']) && $request['user_related']) {
-                                $this->API->settings->setDefaultDc($this->API->authorized_dc = $this->API->datacenter->curdc);
-                            }
-                            Loop::defer([$this, 'methodRecall'], ['message_id' => $request_id, 'datacenter' => $datacenter]);
-                            //$this->API->methodRecall('', ['message_id' => $request_id, 'datacenter' => $datacenter, 'postpone' => true]);
-                            return;
-                        case 401:
-                            switch ($response['error_message']) {
-                                case 'USER_DEACTIVATED':
-                                case 'USER_DEACTIVATED_BAN':
-                                case 'SESSION_REVOKED':
-                                case 'SESSION_EXPIRED':
-                                    $this->gotResponseForOutgoingMessageId($request_id);
-                                    $this->logger->logger($response['error_message'], \danog\MadelineProto\Logger::FATAL_ERROR);
-                                    foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
-                                        $socket->setTempAuthKey(null);
-                                        $socket->setPermAuthKey(null);
-                                        $socket->resetSession();
-                                    }
-                                    if (\in_array($response['error_message'], ['USER_DEACTIVATED', 'USER_DEACTIVATED_BAN'], true)) {
-                                        $this->logger->logger('!!!!!!! WARNING !!!!!!!', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $this->logger->logger("Telegram's flood prevention system suspended this account.", \danog\MadelineProto\Logger::ERROR);
-                                        $this->logger->logger('To continue, manual verification is required.', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $phone = isset($this->API->authorization['user']['phone']) ? '+'.$this->API->authorization['user']['phone'] : 'you are currently using';
-                                        $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number '.$phone.', and shortly describe what will you do with this phone number.', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $this->logger->logger('Then login again.', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $this->logger->logger('If you intentionally deleted this account, ignore this message.', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                    }
-                                    $this->API->resetSession();
-                                    \danog\MadelineProto\Tools::callFork((function () use ($request, &$response): \Generator {
-                                        yield from $this->API->initAuthorization();
-                                        $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request['_'] ?? ''));
-                                    })());
-                                    return;
-                                case 'AUTH_KEY_UNREGISTERED':
-                                case 'AUTH_KEY_INVALID':
-                                    if ($this->API->authorized !== MTProto::LOGGED_IN) {
-                                        $this->gotResponseForOutgoingMessageId($request_id);
-                                        \danog\MadelineProto\Tools::callFork((function () use ($request, &$response): \Generator {
-                                            yield from $this->API->initAuthorization();
-                                            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request['_'] ?? ''));
-                                        })());
-                                        return;
-                                    }
-                                    $this->session_id = null;
-                                    $this->shared->setTempAuthKey(null);
-                                    $this->shared->setPermAuthKey(null);
-                                    $this->logger->logger('Auth key not registered, resetting temporary and permanent auth keys...', \danog\MadelineProto\Logger::ERROR);
-                                    if ($this->API->authorized_dc === $this->datacenter && $this->API->authorized === MTProto::LOGGED_IN) {
-                                        $this->gotResponseForOutgoingMessageId($request_id);
-                                        $this->logger->logger('Permanent auth key was main authorized key, logging out...', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
-                                            $socket->setTempAuthKey(null);
-                                            $socket->setPermAuthKey(null);
-                                        }
-                                        $this->logger->logger('!!!!!!! WARNING !!!!!!!', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $this->logger->logger("Telegram's flood prevention system suspended this account.", \danog\MadelineProto\Logger::ERROR);
-                                        $this->logger->logger('To continue, manual verification is required.', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $phone = isset($this->API->authorization['user']['phone']) ? '+'.$this->API->authorization['user']['phone'] : 'you are currently using';
-                                        $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number '.$phone.', and quickly describe what will you do with this phone number.', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $this->logger->logger('Then login again.', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $this->logger->logger('If you intentionally deleted this account, ignore this message.', \danog\MadelineProto\Logger::FATAL_ERROR);
-                                        $this->API->resetSession();
-                                        \danog\MadelineProto\Tools::callFork((function () use ($request, &$response): \Generator {
-                                            yield from $this->API->initAuthorization();
-                                            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request['_'] ?? ''));
-                                        })());
-                                        return;
-                                    }
-                                    \danog\MadelineProto\Tools::callFork((function () use ($request_id): \Generator {
-                                        yield from $this->API->initAuthorization();
-                                        $this->methodRecall('', ['message_id' => $request_id]);
-                                    })());
-                                    return;
-                                case 'AUTH_KEY_PERM_EMPTY':
-                                    $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', \danog\MadelineProto\Logger::ERROR);
-                                    $this->shared->setTempAuthKey(null);
-                                    \danog\MadelineProto\Tools::callFork((function () use ($request_id): \Generator {
-                                        yield from $this->API->initAuthorization();
-                                        $this->methodRecall('', ['message_id' => $request_id]);
-                                    })());
-                                    return;
-                            }
-                            $this->gotResponseForOutgoingMessageId($request_id);
-                            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request['_'] ?? ''));
-                            return;
-                        case 420:
-                            $seconds = \preg_replace('/[^0-9]+/', '', $response['error_message']);
-                            $limit = $request['FloodWaitLimit'] ?? $this->API->settings->getRPC()->getFloodTimeout();
-                            if (\is_numeric($seconds) && $seconds < $limit) {
-                                //$this->gotResponseForOutgoingMessageId($request_id);
-                                $this->logger->logger('Flood, waiting '.$seconds.' seconds before repeating async call of '.($request['_'] ?? '').'...', \danog\MadelineProto\Logger::NOTICE);
-                                $request['sent'] = ($request['sent'] ?? \time()) + $seconds;
-                                Loop::delay($seconds * 1000, [$this, 'methodRecall'], ['message_id' => $request_id]);
-                                return;
-                            }
-                        // no break
-                        default:
-                            $this->gotResponseForOutgoingMessageId($request_id);
-                            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request['_'] ?? ''));
-                            return;
-                    }
-                    return;
-                case 'boolTrue':
-                case 'boolFalse':
-                    $response = $response['_'] === 'boolTrue';
-                    break;
-                case 'bad_server_salt':
-                case 'bad_msg_notification':
-                    $this->logger->logger('Received bad_msg_notification: '.MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], \danog\MadelineProto\Logger::WARNING);
-                    switch ($response['error_code']) {
-                        case 48:
-                            $this->shared->getTempAuthKey()->setServerSalt($response['new_server_salt']);
-                            $this->methodRecall('', ['message_id' => $request_id, 'postpone' => true]);
-                            return;
-                        case 20:
-                            $this->methodRecall('', ['message_id' => $request_id, 'postpone' => true]);
-                            return;
-                        case 16:
-                        case 17:
-                            $this->time_delta = (int) (new \tgseclib\Math\BigInteger(\strrev($response_id), 256))->bitwise_rightShift(32)->subtract(new \tgseclib\Math\BigInteger(\time()))->toString();
-                            $this->logger->logger('Set time delta to '.$this->time_delta, \danog\MadelineProto\Logger::WARNING);
-                            $this->API->resetMTProtoSession();
-                            $this->shared->setTempAuthKey(null);
-                            \danog\MadelineProto\Tools::callFork((function () use ($request_id): \Generator {
-                                yield from $this->API->initAuthorization();
-                                $this->methodRecall('', ['message_id' => $request_id]);
-                            })());
-                            return;
-                    }
-                    $this->gotResponseForOutgoingMessageId($request_id);
-                    $this->handleReject($request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request['_'] ?? ''));
-                    return;
-            }
-        }
-        if (($request['method'] ?? false) && $request['_'] !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
-            $this->shared->getTempAuthKey()->init(true);
-        }
-        if (!isset($request['promise'])) {
-            $this->gotResponseForOutgoingMessageId($request_id);
-            $this->logger->logger('Response: already got response for '.(isset($request['_']) ? $request['_'] : '-').' with message ID '.$request_id);
+        $requestId ??= $message->getRequestId();
+        $response = $message->read();
+        if (!isset($this->outgoing_messages[$requestId])) {
+            $requestId = MsgIdHandler::toString($requestId);
+            $this->logger->logger("Got a reponse $message with message ID $requestId, but there is no request!", Logger::FATAL_ERROR);
             return;
         }
-        $botAPI = isset($request['botAPI']) && $request['botAPI'];
-        if (isset($response['_']) && !$this->isCdn() && $this->API->getTL()->getConstructors()->findByPredicate($response['_'])['type'] === 'Updates') {
-            $body = [];
-            if (isset($request['body']['peer'])) {
-                $body['peer'] = \is_string($request['body']['peer']) ? $request['body']['peer'] : $this->API->getId($request['body']['peer']);
-            }
-            if (isset($request['body']['message'])) {
-                $body['message'] = (string) $request['body']['message'];
-            }
-            $response['request'] = ['_' => $request['_'], 'body' => $body];
-            \danog\MadelineProto\Tools::callForkDefer($this->API->handleUpdates($response));
+        /** @var OutgoingMessage */
+        $request = $this->outgoing_messages[$requestId];
+        if ($request->getState() & OutgoingMessage::STATE_REPLIED) {
+            $this->logger->logger("Already got a reponse to $request, but there is another reply $message with message ID $requestId!", Logger::FATAL_ERROR);
+            return;
         }
-        unset($request);
-        $this->gotResponseForOutgoingMessageId($request_id);
-        $r = isset($response['_']) ? $response['_'] : \json_encode($response);
+        if ($response['_'] === 'rpc_result') {
+            $response = $response['result'];
+        }
+        $constructor = $response['_'] ?? '';
+        if ($constructor === 'rpc_error') {
+            try {
+                $exception = $this->handleRpcError($request, $response);
+            } catch (\Throwable $e) {
+                $exception = $e;
+            }
+            if ($exception) {
+                $this->handleReject($request, $exception);
+            }
+            return;
+        }
+        if ($constructor === 'bad_server_salt' || $constructor === 'bad_msg_notification') {
+            $this->logger->logger('Received bad_msg_notification: '.MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], Logger::WARNING);
+            switch ($response['error_code']) {
+                case 48:
+                    $this->shared->getTempAuthKey()->setServerSalt($response['new_server_salt']);
+                    $this->methodRecall('', ['message_id' => $requestId, 'postpone' => true]);
+                    return;
+                case 20:
+                    $this->methodRecall('', ['message_id' => $requestId, 'postpone' => true]);
+                    return;
+                case 16:
+                case 17:
+                    $this->time_delta = (int) (new \tgseclib\Math\BigInteger(\strrev($message->getMsgId()), 256))->bitwise_rightShift(32)->subtract(new \tgseclib\Math\BigInteger(\time()))->toString();
+                    $this->logger->logger('Set time delta to '.$this->time_delta, Logger::WARNING);
+                    $this->API->resetMTProtoSession();
+                    $this->shared->setTempAuthKey(null);
+                    Tools::callFork((function () use ($requestId): \Generator {
+                        yield from $this->API->initAuthorization();
+                        $this->methodRecall('', ['message_id' => $requestId]);
+                    })());
+                    return;
+            }
+            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
+            return;
+        }
+
+        if ($request->isMethod() && $request->getConstructor() !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
+            $this->shared->getTempAuthKey()->init(true);
+        }
+        $botAPI = $request->getBotAPI();
+        if (isset($response['_']) && !$this->isCdn() && $this->API->getTL()->getConstructors()->findByPredicate($response['_'])['type'] === 'Updates') {
+            $body = $request->getBodyOrEmpty();
+            $trimmed = [];
+            if (isset($body['peer'])) {
+                $trimmed['peer'] = \is_string($body['peer']) ? $body['peer'] : $this->API->getId($body['peer']);
+            }
+            if (isset($body['message'])) {
+                $trimmed['message'] = (string) $body['message'];
+            }
+            $response['request'] = ['_' => $request->getConstructor(), 'body' => $trimmed];
+            unset($body);
+            Tools::callForkDefer($this->API->handleUpdates($response));
+        }
+        $this->gotResponseForOutgoingMessage($request);
+
+        $r = $response['_'] ?? \json_encode($response);
         $this->logger->logger("Defer sending {$r} to deferred", Logger::ULTRA_VERBOSE);
-        \danog\MadelineProto\Tools::callFork((function () use ($request_id, $response, $botAPI): \Generator {
-            $r = isset($response['_']) ? $response['_'] : \json_encode($response);
-            $this->logger->logger("Deferred: sent {$r} to deferred", Logger::ULTRA_VERBOSE);
-            if ($botAPI) {
-                $response = (yield from $this->API->MTProtoToBotAPI($response));
-            }
-            if (isset($this->outgoing_messages[$request_id]['promise'])) {
-                // This should not happen but happens, should debug
-                $promise = $this->outgoing_messages[$request_id]['promise'];
-                unset($this->outgoing_messages[$request_id]['promise']);
-                try {
-                    $promise->resolve($response);
-                } catch (\Error $e) {
-                    if (\strpos($e->getMessage(), "Promise has already been resolved") !== 0) {
-                        throw $e;
-                    }
-                    $this->logger->logger("Got promise already resolved error", \danog\MadelineProto\Logger::FATAL_ERROR);
+
+        if (!$botAPI) {
+            Tools::callForkDefer((function () use ($request, $message, $response): \Generator {
+                yield from $message->yieldSideEffects();
+                $request->reply($response);
+            })());
+        } else {
+            Tools::callForkDefer((function () use ($request, $message, $response): \Generator {
+                yield from $message->yieldSideEffects();
+                $response = yield from $this->API->MTProtoToBotAPI($response);
+                $request->reply($response);
+            })());
+        }
+    }
+    public function handleRpcError(OutgoingMessage $request, array $response): ?\Throwable
+    {
+        if ($request->isMethod() && $request->getConstructor() !== 'auth.bindTempAuthKey' && $this->shared->hasTempAuthKey() && !$this->shared->getTempAuthKey()->isInited()) {
+            $this->shared->getTempAuthKey()->init(true);
+        }
+        if (\in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_INVALID'])) {
+            return new \danog\MadelineProto\PTSException($response['error_message']);
+        }
+        if ($response['error_message'] === 'PERSISTENT_TIMESTAMP_OUTDATED') {
+            $response['error_code'] = 500;
+        }
+        if (\strpos($response['error_message'], 'FILE_REFERENCE_') === 0) {
+            $this->logger->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
+            $request->setRefreshReferences(true);
+            $this->methodRecall('', ['message_id' => $request->getMsgId(), 'postpone' => true]);
+            return null;
+        }
+
+        switch ($response['error_code']) {
+            case 500:
+            case -500:
+                if ($response['error_message'] === 'MSG_WAIT_FAILED') {
+                    $this->call_queue[$request->getQueueId()] = [];
+                    $this->methodRecall('', ['message_id' => $request->getMsgId(), 'postpone' => true]);
+                    return null;
                 }
-            }
-        })());
+                if (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'HISTORY_GET_FAILED', 'RPC_CONNECT_FAILED', 'RPC_CALL_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running', 'No workers running'])) {
+                    Loop::delay(1 * 1000, [$this, 'methodRecall'], ['message_id' => $request->getMsgId()]);
+                    return null;
+                }
+                return new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+            case 303:
+                $this->API->datacenter->curdc = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
+                if ($request->isFileRelated() && $this->API->datacenter->has($datacenter.'_media')) {
+                    $datacenter .= '_media';
+                }
+                if ($request->isUserRelated()) {
+                    $this->API->settings->setDefaultDc($this->API->authorized_dc = $this->API->datacenter->curdc);
+                }
+                Loop::defer([$this, 'methodRecall'], ['message_id' => $request->getMsgId(), 'datacenter' => $datacenter]);
+                //$this->API->methodRecall('', ['message_id' => $requestId, 'datacenter' => $datacenter, 'postpone' => true]);
+                return null;
+            case 401:
+                switch ($response['error_message']) {
+                    case 'USER_DEACTIVATED':
+                    case 'USER_DEACTIVATED_BAN':
+                    case 'SESSION_REVOKED':
+                    case 'SESSION_EXPIRED':
+                        $this->logger->logger($response['error_message'], Logger::FATAL_ERROR);
+                        foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
+                            $socket->setTempAuthKey(null);
+                            $socket->setPermAuthKey(null);
+                            $socket->resetSession();
+                        }
+                        if (\in_array($response['error_message'], ['USER_DEACTIVATED', 'USER_DEACTIVATED_BAN'], true)) {
+                            $this->logger->logger('!!!!!!! WARNING !!!!!!!', Logger::FATAL_ERROR);
+                            $this->logger->logger("Telegram's flood prevention system suspended this account.", Logger::ERROR);
+                            $this->logger->logger('To continue, manual verification is required.', Logger::FATAL_ERROR);
+                            $phone = isset($this->API->authorization['user']['phone']) ? '+'.$this->API->authorization['user']['phone'] : 'you are currently using';
+                            $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number '.$phone.', and shortly describe what will you do with this phone number.', Logger::FATAL_ERROR);
+                            $this->logger->logger('Then login again.', Logger::FATAL_ERROR);
+                            $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
+                        }
+                        $this->API->resetSession();
+                        $this->gotResponseForOutgoingMessage($request);
+                        Tools::callFork((function () use ($request, $response): \Generator {
+                            yield from $this->API->initAuthorization();
+                            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
+                        })());
+                        return null;
+                    case 'AUTH_KEY_UNREGISTERED':
+                    case 'AUTH_KEY_INVALID':
+                        if ($this->API->authorized !== MTProto::LOGGED_IN) {
+                            $this->gotResponseForOutgoingMessage($request);
+                            Tools::callFork((function () use ($request, $response): \Generator {
+                                yield from $this->API->initAuthorization();
+                                $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
+                            })());
+                            return null;
+                        }
+                        $this->session_id = null;
+                        $this->shared->setTempAuthKey(null);
+                        $this->shared->setPermAuthKey(null);
+                        $this->logger->logger('Auth key not registered, resetting temporary and permanent auth keys...', Logger::ERROR);
+                        if ($this->API->authorized_dc === $this->datacenter && $this->API->authorized === MTProto::LOGGED_IN) {
+                            $this->logger->logger('Permanent auth key was main authorized key, logging out...', Logger::FATAL_ERROR);
+                            foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
+                                $socket->setTempAuthKey(null);
+                                $socket->setPermAuthKey(null);
+                            }
+                            $this->logger->logger('!!!!!!! WARNING !!!!!!!', Logger::FATAL_ERROR);
+                            $this->logger->logger("Telegram's flood prevention system suspended this account.", Logger::ERROR);
+                            $this->logger->logger('To continue, manual verification is required.', Logger::FATAL_ERROR);
+                            $phone = isset($this->API->authorization['user']['phone']) ? '+'.$this->API->authorization['user']['phone'] : 'you are currently using';
+                            $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number '.$phone.', and quickly describe what will you do with this phone number.', Logger::FATAL_ERROR);
+                            $this->logger->logger('Then login again.', Logger::FATAL_ERROR);
+                            $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
+                            $this->API->resetSession();
+                            $this->gotResponseForOutgoingMessage($request);
+                            Tools::callFork((function () use ($request, &$response): \Generator {
+                                yield from $this->API->initAuthorization();
+                                $this->handleReject($request, new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor()));
+                            })());
+                            return null;
+                        }
+                        Tools::callFork((function () use ($request): \Generator {
+                            yield from $this->API->initAuthorization();
+                            $this->methodRecall('', ['message_id' => $request->getMsgId()]);
+                        })());
+                        return null;
+                    case 'AUTH_KEY_PERM_EMPTY':
+                        $this->logger->logger('Temporary auth key not bound, resetting temporary auth key...', Logger::ERROR);
+                        $this->shared->setTempAuthKey(null);
+                        Tools::callFork((function () use ($request): \Generator {
+                            yield from $this->API->initAuthorization();
+                            $this->methodRecall('', ['message_id' => $request->getMsgId()]);
+                        })());
+                        return null;
+                }
+                return new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+            case 420:
+                $seconds = \preg_replace('/[^0-9]+/', '', $response['error_message']);
+                $limit = $request->getFloodWaitLimit() ?? $this->API->settings->getRPC()->getFloodTimeout();
+                if (\is_numeric($seconds) && $seconds < $limit) {
+                    $this->logger->logger("Flood, waiting '.$seconds.' seconds before repeating async call of $request...", Logger::NOTICE);
+                    $request->setSent(($request->getSent() ?? \time()) + $seconds);
+                    Loop::delay($seconds * 1000, [$this, 'methodRecall'], ['message_id' => $request->getMsgId()]);
+                    return null;
+                }
+            // no break
+            default:
+                return new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+        }
     }
 }

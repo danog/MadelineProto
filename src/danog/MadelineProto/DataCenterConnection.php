@@ -24,6 +24,7 @@ use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\MTProto\AuthKey;
+use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\Settings\Connection as ConnectionSettings;
@@ -327,7 +328,7 @@ class DataCenterConnection implements JsonSerializable
      *
      * @return void
      */
-    public function flush()
+    public function flush(): void
     {
         foreach ($this->connections as $socket) {
             $socket->flush();
@@ -424,11 +425,11 @@ class DataCenterConnection implements JsonSerializable
         $backup = $this->connections[$id]->backupSession();
         $list = '';
         foreach ($backup as $k => $message) {
-            if (($message['_'] ?? '') === 'msgs_state_req') {
+            if ($message->getConstructor() === 'msgs_state_req') {
                 unset($backup[$k]);
                 continue;
             }
-            $list .= $message['_'] ?? '-';
+            $list .= $message->getConstructor();
             $list .= ', ';
         }
         $this->API->logger->logger("Backed up {$list} from DC {$this->datacenter}.{$id}");
@@ -480,14 +481,15 @@ class DataCenterConnection implements JsonSerializable
         $this->backup = [];
         $count = \count($backup);
         $this->API->logger->logger("Restoring {$count} messages to DC {$this->datacenter}");
+        /** @var OutgoingMessage */
         foreach ($backup as $message) {
-            if (isset($message['seqno'])) {
-                unset($message['seqno']);
+            if ($message->hasSeqno()) {
+                $message->setSeqno(null);
             }
-            if (isset($message['msg_id'])) {
-                unset($message['msg_id']);
+            if ($message->hasMsgId()) {
+                $message->setMsgId(null);
             }
-            if (isset($message['body'])) {
+            if (!($message->getState() & OutgoingMessage::STATE_REPLIED)) {
                 Tools::callFork($this->getConnection()->sendMessage($message, false));
             }
         }

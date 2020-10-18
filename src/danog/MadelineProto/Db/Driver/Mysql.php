@@ -11,7 +11,7 @@ use function Amp\Mysql\Pool;
 
 /**
  * MySQL driver wrapper.
- * 
+ *
  * @internal
  */
 class Mysql

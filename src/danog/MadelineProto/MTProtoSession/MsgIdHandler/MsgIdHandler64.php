@@ -65,15 +65,8 @@ class MsgIdHandler64 extends MsgIdHandler
             if ($newMessageId <= $this->maxOutgoingId) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$this->maxOutgoingId.'). Consider syncing your date.');
             }
-            if (\count($this->session->outgoing_messages) > $this->session->API->settings->getRpc()->getLimitOutgoing()) {
-                \reset($this->session->outgoing_messages);
-                $key = \key($this->session->outgoing_messages);
-                if (!isset($this->session->outgoing_messages[$key]['promise'])) {
-                    unset($this->session->outgoing_messages[$key]);
-                }
-            }
+            $this->cleanup(false);
             $this->maxOutgoingId = $newMessageId;
-            $this->session->outgoing_messages[Tools::packSignedLong($newMessageId)] = [];
         } else {
             if (!($newMessageId % 2)) {
                 throw new \danog\MadelineProto\Exception('message id mod 4 != 1 or 3');
@@ -88,15 +81,8 @@ class MsgIdHandler64 extends MsgIdHandler
                     $this->session->API->logger->logger('WARNING: Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::WARNING);
                 }
             }
-            if (\count($this->session->incoming_messages) > $this->session->API->settings->getRpc()->getLimitIncoming()) {
-                \reset($this->session->incoming_messages);
-                $key = \key($this->session->incoming_messages);
-                if (!isset($this->session->incoming_messages[$key]['promise'])) {
-                    unset($this->session->incoming_messages[$key]);
-                }
-            }
+            $this->cleanup(true);
             $this->maxIncomingId = $newMessageId;
-            $this->session->incoming_messages[Tools::packSignedLong($newMessageId)] = [];
         }
     }
     /**
@@ -123,5 +109,16 @@ class MsgIdHandler64 extends MsgIdHandler
     public function getMaxId(bool $incoming)
     {
         return $this->{$incoming ? 'maxIncomingId' : 'maxOutgoingId'};
+    }
+
+    /**
+     * Get readable representation of message ID.
+     *
+     * @param string $messageId
+     * @return string
+     */
+    protected static function toStringInternal(string $messageId): string
+    {
+        return (string) Tools::unpackSignedLong($messageId);
     }
 }

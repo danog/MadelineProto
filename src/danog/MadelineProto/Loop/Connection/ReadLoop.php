@@ -25,6 +25,7 @@ use Amp\Loop;
 use Amp\Websocket\ClosedException;
 use danog\Loop\SignalLoop;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProto\IncomingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Tools;
@@ -70,8 +71,8 @@ class ReadLoop extends SignalLoop
                             $API->logger->logger("WARNING: Resetting auth key in DC {$datacenter}...", Logger::WARNING);
                             $shared->setTempAuthKey(null);
                             $shared->resetSession();
-                            foreach ($connection->new_outgoing as $message_id) {
-                                $connection->outgoing_messages[$message_id]['sent'] = 0;
+                            foreach ($connection->new_outgoing as $message) {
+                                $message->resetSent();
                             }
                             yield from $shared->reconnect();
                             yield from $API->initAuthorization();
@@ -146,7 +147,6 @@ class ReadLoop extends SignalLoop
                     }
                     yield $buffer->bufferRead($left);
                 }
-                $connection->incoming_messages[$message_id] = [];
             } elseif ($auth_key_id === $shared->getTempAuthKey()->getID()) {
                 $message_key = yield $buffer->bufferRead(16);
                 list($aes_key, $aes_iv) = Crypt::aesCalculate($message_key, $shared->getTempAuthKey()->getAuthKey(), false);
@@ -191,18 +191,22 @@ class ReadLoop extends SignalLoop
                 if ($message_key != \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
                     throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
                 }
-                $connection->incoming_messages[$message_id] = ['seq_no' => $seq_no];
             } else {
                 $API->logger->logger('Got unknown auth_key id', Logger::ERROR);
                 return -404;
             }
-            $deserialized = yield from $API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $connection]);
+            [$deserialized, $sideEffects] = $API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $connection]);
             if (isset($API->referenceDatabase)) {
                 $API->referenceDatabase->reset();
             }
-            $connection->incoming_messages[$message_id]['content'] = $deserialized;
-            $connection->incoming_messages[$message_id]['response'] = -1;
-            $connection->new_incoming[$message_id] = $message_id;
+            $message = new IncomingMessage($deserialized, $message_id);
+            if (isset($seq_no)) {
+                $message->setSeqNo($seq_no);
+            }
+            if ($sideEffects) {
+                $message->setSideEffects($sideEffects);
+            }
+            $connection->new_incoming[$message_id] = $connection->incoming_messages[$message_id] = $message;
             $API->logger->logger('Received payload from DC '.$datacenter, Logger::ULTRA_VERBOSE);
         } finally {
             $connection->reading(false);

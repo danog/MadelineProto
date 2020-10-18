@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\Loop\Connection;
 
 use danog\Loop\ResumableSignalLoop;
+use danog\MadelineProto\MTProto\OutgoingMessage;
 
 /**
  * HttpWait loop.
@@ -56,8 +57,16 @@ class HttpWaitLoop extends ResumableSignalLoop
                 }
             }
             $API->logger->logger("DC {$datacenter}: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
-            if ($connection->countHttpSent() === $connection->countHttpReceived() && (!empty($connection->pending_outgoing) || !empty($connection->new_outgoing) && !$connection->hasPendingCalls())) {
-                yield from $connection->sendMessage(['_' => 'http_wait', 'body' => ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0], 'contentRelated' => true, 'unencrypted' => false, 'method' => false]);
+            if ($connection->countHttpSent() === $connection->countHttpReceived() && (!empty($connection->pendingOutgoing) || !empty($connection->new_outgoing) && !$connection->hasPendingCalls())) {
+                yield from $connection->sendMessage(
+                    new OutgoingMessage(
+                        ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0],
+                        'http_wait',
+                        '',
+                        false,
+                        false
+                    )
+                );
             }
             $API->logger->logger("DC {$datacenter}: request {$connection->countHttpSent()}, response {$connection->countHttpReceived()}");
         }

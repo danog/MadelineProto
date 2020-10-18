@@ -19,20 +19,108 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Tools;
+
 /**
  * Manages responses.
  */
 trait Reliable
 {
     /**
+     * Called when receiving a new_msg_detailed_info.
+     *
+     * @param array $content
+     * @return void
+     */
+    public function onNewMsgDetailedInfo(array $content): void
+    {
+        if (isset($this->incoming_messages[$content['answer_msg_id']])) {
+            $this->ackIncomingMessage($this->incoming_messages[$content['answer_msg_id']]);
+        } else {
+            Tools::callFork($this->objectCall('msg_resend_req', ['msg_ids' => [$content['answer_msg_id']]], ['postpone' => true]));
+        }
+    }
+    /**
+     * Called when receiving a msg_detailed_info.
+     *
+     * @param array $content
+     * @return void
+     */
+    public function onMsgDetailedInfo(array $content): void
+    {
+        if (isset($this->outgoing_messages[$content['msg_id']])) {
+            $this->onNewMsgDetailedInfo($content);
+        }
+    }
+    /**
+     * Called when receiving a msg_resend_req.
+     *
+     * @param array  $content
+     * @param string $current_msg_id
+     * @return void
+     */
+    public function onMsgResendReq(array $content, $current_msg_id): void
+    {
+        $ok = true;
+        foreach ($content['msg_ids'] as $msg_id) {
+            if (!isset($this->outgoing_messages[$msg_id]) || isset($this->incoming_messages[$msg_id])) {
+                $ok = false;
+            }
+        }
+        if ($ok) {
+            foreach ($content['msg_ids'] as $msg_id) {
+                $this->methodRecall('', ['message_id' => $msg_id, 'postpone' => true]);
+            }
+        } else {
+            $this->sendMsgsStateInfo($content['msg_ids'], $current_msg_id);
+        }
+    }
+    /**
+     * Called when receiving a msg_resend_ans_req.
+     *
+     * @param array  $content
+     * @param string $current_msg_id
+     * @return void
+     */
+    public function onMsgResendAnsReq(array $content, $current_msg_id): void
+    {
+        $this->sendMsgsStateInfo($content['msg_ids'], $current_msg_id);
+    }
+
+    /**
+     * Called when receiving a msgs_all_info.
+     *
+     * @param array  $content
+     * @return void
+     */
+    public function onMsgsAllInfo(array $content): void
+    {
+        foreach ($content['msg_ids'] as $key => $msg_id) {
+            $info = \ord($content['info'][$key]);
+            $msg_id = MsgIdHandler::toString($msg_id);
+            $status = 'Status for message id '.$msg_id.': ';
+            /*if ($info & 4) {
+             *$this->gotResponseForOutgoingMessageId($msg_id);
+             *}
+             */
+            foreach (MTProto::MSGS_INFO_FLAGS as $flag => $description) {
+                if (($info & $flag) !== 0) {
+                    $status .= $description;
+                }
+            }
+            $this->logger->logger($status, \danog\MadelineProto\Logger::NOTICE);
+        }
+    }
+    /**
      * Send state info for message IDs.
      *
-     * @param string|int $req_msg_id Message ID of msgs_state_req that initiated this
      * @param array      $msg_ids    Message IDs to send info about
+     * @param string|int $req_msg_id Message ID of msgs_state_req that initiated this
      *
-     * @return \Generator
+     * @return void
      */
-    public function sendMsgsStateInfo($req_msg_id, array $msg_ids): \Generator
+    public function sendMsgsStateInfo(array $msg_ids, $req_msg_id): void
     {
         $this->logger->logger('Sending state info for '.\count($msg_ids).' message IDs');
         $info = '';
@@ -52,10 +140,10 @@ trait Reliable
                 }
             } else {
                 $this->logger->logger("Know about {$msg_id}");
-                $cur_info |= 4;
+                $cur_info = $this->incoming_messages[$msg_id]->getState();
             }
             $info .= \chr($cur_info);
         }
-        $this->outgoing_messages[yield from $this->objectCall('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['postpone' => true])]['response'] = $req_msg_id;
+        Tools::callFork($this->objectCall('msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], ['postpone' => true]));
     }
 }

@@ -243,7 +243,7 @@ trait AuthKeyHandler
                  *         int            $server_time
                  * ]
                  */
-                $server_DH_inner_data = yield from $this->TL->deserialize($answer, ['type' => '']);
+                [$server_DH_inner_data] = $this->TL->deserialize($answer, ['type' => '']);
                 /*
                  * ***********************************************************************
                  * Do some checks
@@ -411,7 +411,7 @@ trait AuthKeyHandler
      */
     public function getDhConfig(): \Generator
     {
-        $dh_config = yield from $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0], ['datacenter' => $this->datacenter->curdc]);
+        $dh_config = yield from $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0]);
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {
             $this->logger->logger('DH configuration not modified', \danog\MadelineProto\Logger::VERBOSE);
             return $this->dh_config;

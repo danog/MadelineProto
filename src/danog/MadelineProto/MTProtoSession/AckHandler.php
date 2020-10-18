@@ -20,6 +20,8 @@
 namespace danog\MadelineProto\MTProtoSession;
 
 use danog\MadelineProto\DataCenterConnection;
+use danog\MadelineProto\MTProto\IncomingMessage;
+use danog\MadelineProto\MTProto\OutgoingMessage;
 
 /**
  * Manages acknowledgement of messages.
@@ -45,45 +47,33 @@ trait AckHandler
         return true;
     }
     /**
-     * We have gotten response for outgoing message ID.
+     * We have gotten a response for an outgoing message.
      *
-     * @param string|int $message_id Message ID
+     * @param OutgoingMessage $message Message
      *
-     * @return boolean
+     * @return void
      */
-    public function gotResponseForOutgoingMessageId($message_id): bool
+    public function gotResponseForOutgoingMessage(OutgoingMessage $outgoingMessage): void
     {
         // The server acknowledges that it received my message
-        if (isset($this->new_outgoing[$message_id])) {
-            unset($this->new_outgoing[$message_id]);
+        if (isset($this->new_outgoing[$outgoingMessage->getMsgId()])) {
+            unset($this->new_outgoing[$outgoingMessage->getMsgId()]);
         }
-        if (!isset($this->outgoing_messages[$message_id])) {
-            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of outgoing messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
-            return false;
-        }
-        if (isset($this->outgoing_messages[$message_id]['body'])) {
-            unset($this->outgoing_messages[$message_id]['body']);
-        }
-        if (isset($this->outgoing_messages[$message_id]['serialized_body'])) {
-            unset($this->outgoing_messages[$message_id]['serialized_body']);
-        }
-        return true;
     }
     /**
      * Acknowledge incoming message ID.
      *
-     * @param string|int $message_id Message ID
+     * @param IncomingMessage $message Message
      *
-     * @return boolean
+     * @return void
      */
-    public function ackIncomingMessageId($message_id): bool
+    public function ackIncomingMessage(IncomingMessage $message): void
     {
+        // Not exactly true, but we don't care
+        $message->ack();
+        $message_id = $message->getMsgId();
         // I let the server know that I received its message
-        if (!isset($this->incoming_messages[$message_id])) {
-            $this->logger->logger("WARNING: Couldn't find message id ".$message_id.' in the array of incoming messages. Maybe try to increase its size?', \danog\MadelineProto\Logger::WARNING);
-        }
         $this->ack_queue[$message_id] = $message_id;
-        return true;
     }
 
     /**
@@ -98,9 +88,13 @@ trait AckHandler
         $unencrypted = !$this->shared->hasTempAuthKey();
         $notBound = !$this->shared->isBound();
         $pfsNotBound = $pfs && $notBound;
-        foreach ($this->new_outgoing as $message_id) {
-            if (isset($this->outgoing_messages[$message_id]['sent']) && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time() && $unencrypted === $this->outgoing_messages[$message_id]['unencrypted'] && $this->outgoing_messages[$message_id]['_'] !== 'msgs_state_req') {
-                if ($pfsNotBound && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+        /** @var OutgoingMessage */
+        foreach ($this->new_outgoing as $message) {
+            if ($message->wasSent()
+                && $message->getSent() + $timeout < \time()
+                && $message->isUnencrypted() === $unencrypted
+                && $message->getConstructor() !== 'msgs_state_req') {
+                if ($pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
                     continue;
                 }
                 return true;
@@ -124,18 +118,25 @@ trait AckHandler
         $notBound = !$this->shared->isBound();
         $pfsNotBound = $pfs && $notBound;
         $result = [];
-        foreach ($this->new_outgoing as $k => $message_id) {
-            if (isset($this->outgoing_messages[$message_id]['sent']) && $this->outgoing_messages[$message_id]['sent'] + $timeout < \time() && $unencrypted === $this->outgoing_messages[$message_id]['unencrypted']) {
-                if ($pfsNotBound && $this->outgoing_messages[$message_id]['_'] !== 'auth.bindTempAuthKey') {
+        /** @var OutgoingMessage $message */
+        foreach ($this->new_outgoing as $message_id => $message) {
+            if ($message->wasSent()
+                && $message->getSent() + $timeout < \time()
+                && $message->isUnencrypted() === $unencrypted
+            ) {
+                if ($pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
                     continue;
                 }
-                if ($this->outgoing_messages[$message_id]['_'] === 'msgs_state_req') {
-                    unset($this->new_outgoing[$k], $this->outgoing_messages[$message_id]);
+                if ($message->getConstructor() === 'msgs_state_req') {
+                    unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
                     continue;
                 }
-                if ($this->outgoing_messages[$message_id]['sent'] + $dropTimeout < \time()) {
-                    $this->gotResponseForOutgoingMessageId($message_id);
-                    $this->handleReject($this->outgoing_messages[$message_id], new \danog\MadelineProto\Exception("Request timeout"));
+                if ($message->getSent() + $dropTimeout < \time()) {
+                    $this->handleReject($message, new \danog\MadelineProto\Exception("Request timeout"));
+                    continue;
+                }
+                if ($message->getState() & OutgoingMessage::STATE_REPLIED) {
+                    $this->logger->logger("Already replied to message $message, but still in new_outgoing");
                     continue;
                 }
                 $result[] = $message_id;

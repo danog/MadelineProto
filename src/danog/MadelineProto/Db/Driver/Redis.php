@@ -9,7 +9,7 @@ use danog\MadelineProto\Settings\Database\Redis as DatabaseRedis;
 
 /**
  * Redis driver wrapper.
- * 
+ *
  * @internal
  */
 class Redis

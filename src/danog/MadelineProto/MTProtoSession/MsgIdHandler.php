@@ -80,4 +80,50 @@ abstract class MsgIdHandler
      * @return mixed
      */
     abstract public function getMaxId(bool $incoming);
+
+    /**
+     * Get readable representation of message ID.
+     *
+     * @param string $messageId
+     * @return string
+     */
+    abstract protected static function toStringInternal(string $messageId): string;
+
+    /**
+     * Cleanup incoming or outgoing messages.
+     *
+     * @param boolean $incoming
+     * @return void
+     */
+    protected function cleanup(bool $incoming): void
+    {
+        if ($incoming) {
+            $array = &$this->session->incoming_messages;
+        } else {
+            $array = &$this->session->outgoing_messages;
+        }
+        if (\count($array) > $this->session->API->settings->getRpc()->getLimitOutgoing()) {
+            \reset($array);
+            $key = \key($array);
+            foreach ($array as $key => $message) {
+                if ($message->canGarbageCollect()) {
+                    unset($array[$key]);
+                    break;
+                }
+                $this->session->API->logger->logger("Can't garbage collect $message", \danog\MadelineProto\Logger::VERBOSE);
+            }
+        }
+    }
+    /**
+     * Get readable representation of message ID.
+     *
+     * @param string $messageId
+     * @return string
+     */
+    public static function toString(string $messageId): string
+    {
+        return PHP_INT_SIZE === 8
+            ? MsgIdHandler64::toStringInternal($messageId)
+            : MsgIdHandler32::toStringInternal($messageId);
+    }
 }

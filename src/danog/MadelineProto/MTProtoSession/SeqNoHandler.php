@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use danog\MadelineProto\MTProto\IncomingMessage;
+
 /**
  * Manages sequence number.
  */
@@ -35,11 +37,16 @@ trait SeqNoHandler
         //$this->API->logger->logger("OUT: $value + $in = ".$this->session_out_seq_no);
         return $value * 2 + $in;
     }
-    public function checkInSeqNo($current_msg_id): void
+    public function checkInSeqNo(IncomingMessage $message): void
     {
-        $type = isset($this->incoming_messages[$current_msg_id]['content']['_']) ? $this->incoming_messages[$current_msg_id]['content']['_'] : '-';
-        if (isset($this->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generateInSeqNo($this->contentRelated($this->incoming_messages[$current_msg_id]['content']))) !== $this->incoming_messages[$current_msg_id]['seq_no']) {
-            $this->API->logger->logger('SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$this->incoming_messages[$current_msg_id]['seq_no'].', '.$type.')', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        if ($message->hasSeqNo()) {
+            $seq_no = $this->generateInSeqNo($message->isContentRelated());
+            if ($seq_no !== $message->getSeqNo()) {
+                if ($message->isContentRelated()) {
+                    $this->session_in_seq_no -= 1;
+                }
+                $this->API->logger->logger('SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$message->getSeqNo().", $message)", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            }
         }
     }
     public function generateInSeqNo($contentRelated)

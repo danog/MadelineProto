@@ -1015,12 +1015,12 @@ trait Files
                 $datacenter = $res['dc_id'].'_cdn';
                 if (!$this->datacenter->has($datacenter)) {
                     $this->config['expires'] = -1;
-                    yield from $this->getConfig([], ['datacenter' => $this->datacenter->curdc]);
+                    yield from $this->getConfig([]);
                 }
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['stored_on_cdn'], \danog\MadelineProto\Logger::NOTICE);
             } elseif ($res['_'] === 'upload.cdnFileReuploadNeeded') {
                 $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['cdn_reupload'], \danog\MadelineProto\Logger::NOTICE);
-                yield from $this->getConfig([], ['datacenter' => $this->datacenter->curdc]);
+                yield from $this->getConfig([]);
                 try {
                     $this->addCdnHashes($messageMedia['file_token'], yield from $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc]));
                 } catch (\danog\MadelineProto\RPCErrorException $e) {

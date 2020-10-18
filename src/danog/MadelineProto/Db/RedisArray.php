@@ -208,10 +208,8 @@ class RedisArray extends SqlArray
         return call(function () {
             $iterator = $this->getIterator();
             $result = [];
-            $len = \strlen($this->rKey(''));
             while (yield $iterator->advance()) {
                 [$key, $value] = $iterator->getCurrent();
-                $key = \substr($key, $len);
                 $result[$key] = $value;
             }
             return $result;
@@ -223,8 +221,10 @@ class RedisArray extends SqlArray
         return new Producer(function (callable $emit) {
             $request = $this->db->scan($this->itKey());
 
+            $len = \strlen($this->rKey(''));
             while (yield $request->advance()) {
-                yield $emit([$key = $request->getCurrent(), \unserialize(yield $this->db->get($key))]);
+                $key = $request->getCurrent();
+                yield $emit([\substr($key, $len), \unserialize(yield $this->db->get($key))]);
             }
         });
     }

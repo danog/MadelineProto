@@ -401,7 +401,7 @@ class DataCenter
                     }
                 }
             }
-            $combos = array_merge($proxyCombos, $combos);
+            $combos = \array_merge($proxyCombos, $combos);
             if ($dc_number) {
                 $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
             }

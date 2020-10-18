@@ -79,40 +79,41 @@ class CheckLoop extends ResumableSignalLoop
                                 continue;
                             }
                             if (!isset($connection->new_outgoing[$message_id])) {
-                                $API->logger->logger('Already got response for '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.$message_id);
+                                $API->logger->logger('Already got response for '.$connection->outgoing_messages[$message_id]);
                                 continue;
                             }
+                            $message = $connection->new_outgoing[$message_id];
                             $chr = \ord($chr);
                             switch ($chr & 7) {
                                     case 0:
-                                        $API->logger->logger('Wrong message status 0 for '.$connection->outgoing_messages[$message_id]['_'], \danog\MadelineProto\Logger::FATAL_ERROR);
+                                        $API->logger->logger("Wrong message status 0 for $message", \danog\MadelineProto\Logger::FATAL_ERROR);
                                         break;
                                     case 1:
                                     case 2:
                                     case 3:
-                                        if ($connection->outgoing_messages[$message_id]['_'] === 'msgs_state_req') {
-                                            $connection->gotResponseForOutgoingMessageId($message_id);
+                                        if ($message->getConstructor() === 'msgs_state_req') {
+                                            $connection->gotResponseForOutgoingMessage($message);
                                             break;
                                         }
-                                        $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.$message_id.' not received by server, resending...', \danog\MadelineProto\Logger::ERROR);
+                                        $API->logger->logger("Message $message not received by server, resending...", \danog\MadelineProto\Logger::ERROR);
                                         $connection->methodRecall('watcherId', ['message_id' => $message_id, 'postpone' => true]);
                                         break;
                                     case 4:
                                         if ($chr & 32) {
-                                            if ($connection->outgoing_messages[$message_id]['sent'] + $timeoutResend < \time()) {
-                                                $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.$message_id.' received by server and is being processed for way too long, resending request...', \danog\MadelineProto\Logger::ERROR);
+                                            if ($message->getSent() + $timeoutResend < \time()) {
+                                                $API->logger->logger("Message $message received by server and is being processed for way too long, resending request...", \danog\MadelineProto\Logger::ERROR);
                                                 $connection->methodRecall('', ['message_id' => $message_id, 'postpone' => true]);
                                             } else {
-                                                $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.$message_id.' received by server and is being processed, waiting...', \danog\MadelineProto\Logger::ERROR);
+                                                $API->logger->logger("Message $message received by server and is being processed, waiting...", \danog\MadelineProto\Logger::ERROR);
                                             }
                                         } elseif ($chr & 64) {
-                                            $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.$message_id.' received by server and was already processed, requesting reply...', \danog\MadelineProto\Logger::ERROR);
+                                            $API->logger->logger("Message $message received by server and was already processed, requesting reply...", \danog\MadelineProto\Logger::ERROR);
                                             $reply[] = $message_id;
                                         } elseif ($chr & 128) {
-                                            $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.$message_id.' received by server and was already sent, requesting reply...', \danog\MadelineProto\Logger::ERROR);
+                                            $API->logger->logger("Message $message received by server and was already sent, requesting reply...", \danog\MadelineProto\Logger::ERROR);
                                             $reply[] = $message_id;
                                         } else {
-                                            $API->logger->logger('Message '.$connection->outgoing_messages[$message_id]['_'].' with message ID '.$message_id.' received by server, waiting...', \danog\MadelineProto\Logger::ERROR);
+                                            $API->logger->logger("Message $message received by server, waiting...", \danog\MadelineProto\Logger::ERROR);
                                             $reply[] = $message_id;
                                         }
                                 }
@@ -128,16 +129,19 @@ class CheckLoop extends ResumableSignalLoop
                     $list = '';
                     // Don't edit this here pls
                     foreach ($message_ids as $message_id) {
-                        $list .= $connection->outgoing_messages[$message_id]['_'].', ';
+                        $list .= $connection->outgoing_messages[$message_id]->getConstructor().', ';
                     }
                     $API->logger->logger("Still missing {$list} on DC {$datacenter}, sending state request", \danog\MadelineProto\Logger::ERROR);
                     yield from $connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], ['promise' => $deferred]);
                 }
             } else {
-                foreach ($connection->new_outgoing as $message_id) {
-                    if (isset($connection->outgoing_messages[$message_id]['sent']) && $connection->outgoing_messages[$message_id]['sent'] + $timeout < \time() && $connection->outgoing_messages[$message_id]['unencrypted']) {
-                        $API->logger->logger('Still missing '.$connection->outgoing_messages[$message_id]['_'].' with message id '.$message_id." on DC {$datacenter}, resending", \danog\MadelineProto\Logger::ERROR);
-                        $connection->methodRecall('', ['message_id' => $message_id, 'postpone' => true]);
+                foreach ($connection->new_outgoing as $message_id => $message) {
+                    if ($message->wasSent()
+                        && $message->getSent() + $timeout < \time()
+                        && $message->isUnencrypted()
+                    ) {
+                        $API->logger->logger("Still missing $message on DC $datacenter, resending", \danog\MadelineProto\Logger::ERROR);
+                        $connection->methodRecall('', ['message_id' => $message->getMsgId(), 'postpone' => true]);
                     }
                 }
                 $connection->flush();

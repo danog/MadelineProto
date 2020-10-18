@@ -11,7 +11,7 @@ use function Amp\Postgres\Pool;
 
 /**
  * Postgres driver wrapper.
- * 
+ *
  * @internal
  */
 class Postgres

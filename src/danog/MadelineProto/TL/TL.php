@@ -21,6 +21,7 @@ namespace danog\MadelineProto\TL;
 
 use Amp\Promise;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\Tools;
 
@@ -812,16 +813,17 @@ class TL
      * @param string|resource $stream Stream
      * @param array           $type   Type identifier
      *
-     * @return \Generator<mixed>
+     * @return array
+     * @psalm-return array{0: mixed, 1: \Amp\Promise}
      */
-    public function deserialize($stream, $type = ['type' => '']): \Generator
+    public function deserialize($stream, $type = ['type' => '']): array
     {
         $promises = [];
         $result = $this->deserializeInternal($stream, $promises, $type);
-        if ($promises) {
-            yield $promises;
-        }
-        return $result;
+        return [
+            $result,
+            $promises ? Tools::all($promises) : null
+        ];
     }
 
     /**
@@ -1009,14 +1011,14 @@ class TL
             if (\in_array($arg['name'], ['peer_tag', 'file_token', 'cdn_key', 'cdn_iv'])) {
                 $arg['type'] = 'string';
             }
-            if ($x['_'] === 'rpc_result' && $arg['name'] === 'result') {
-                if (isset($type['connection']->outgoing_messages[$x['req_msg_id']]['_']) && isset($this->callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']])) {
-                    foreach ($this->callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {
-                        $callback($type['connection']->outgoing_messages[$x['req_msg_id']]['_']);
-                    }
+            if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($type['connection']->outgoing_messages[$x['req_msg_id']])) {
+                /** @var OutgoingMessage */
+                $message = $type['connection']->outgoing_messages[$x['req_msg_id']];
+                foreach ($this->callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$message->getConstructor()] ?? [] as $callback) {
+                    $callback($type['connection']->outgoing_messages[$x['req_msg_id']]['_']);
                 }
-                if (isset($type['connection']->outgoing_messages[$x['req_msg_id']]['type']) && \stripos($type['connection']->outgoing_messages[$x['req_msg_id']]['type'], '<') !== false) {
-                    $arg['subtype'] = \str_replace(['Vector<', '>'], '', $type['connection']->outgoing_messages[$x['req_msg_id']]['type']);
+                if ($message->getType() && \stripos($message->getType(), '<') !== false) {
+                    $arg['subtype'] = \str_replace(['Vector<', '>'], '', $message->getType());
                 }
             }
             if (isset($type['connection'])) {
@@ -1059,8 +1061,10 @@ class TL
                     $promises []= $promise;
                 }
             }
-        } elseif ($x['_'] === 'rpc_result' && isset($type['connection']->outgoing_messages[$x['req_msg_id']]['_']) && isset($this->callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']])) {
-            foreach ($this->callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]['_']] as $callback) {
+        } elseif ($x['_'] === 'rpc_result'
+            && isset($type['connection']->outgoing_messages[$x['req_msg_id']])
+            && isset($this->callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor()])) {
+            foreach ($this->callbacks[TLCallback::METHOD_CALLBACK][$type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor()] as $callback) {
                 $callback($type['connection']->outgoing_messages[$x['req_msg_id']], $x['result']);
             }
         }

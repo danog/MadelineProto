@@ -200,7 +200,7 @@ class ReferenceDatabase implements TLCallback
             throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$type}");
         }
         $originContext = self::CONSTRUCTOR_CONTEXT[$type];
-        $this->API->logger->logger("Adding origin context {$originContext} for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        //$this->API->logger->logger("Adding origin context {$originContext} for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
     public function addOrigin(array $data = []): \Generator
@@ -211,7 +211,7 @@ class ReferenceDatabase implements TLCallback
         }
         $originType = \array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
-            $this->API->logger->logger("Removing origin context {$originType} for {$data['_']}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            //$this->API->logger->logger("Removing origin context {$originType} for {$data['_']}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             return;
         }
         $cache = $this->cache[$key];
@@ -412,7 +412,7 @@ class ReferenceDatabase implements TLCallback
         \ksort($locationValue['origins']);
         $this->db[$location] = $locationValue;
         $count = 0;
-        foreach ((yield $this->db[$location]['origins']) as $originType => &$origin) {
+        foreach ((yield $this->db[$location])['origins'] as $originType => &$origin) {
             $count++;
             $this->API->logger->logger("Try {$count} refreshing file reference with origin type {$originType}", \danog\MadelineProto\Logger::VERBOSE);
             switch ($originType) {
@@ -492,7 +492,7 @@ class ReferenceDatabase implements TLCallback
         }
         return (yield $this->db[$locationString])['reference'];
     }
-    private function serializeLocation(int $locationType, array $location): string
+    private static function serializeLocation(int $locationType, array $location): string
     {
         switch ($locationType) {
             case self::DOCUMENT_LOCATION:

@@ -21,11 +21,13 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ClosedException;
 use Amp\Deferred;
+use Amp\Failure;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
 use danog\MadelineProto\Loop\Connection\PingLoop;
 use danog\MadelineProto\Loop\Connection\ReadLoop;
 use danog\MadelineProto\Loop\Connection\WriteLoop;
+use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\MTProtoSession\Session;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
@@ -39,6 +41,8 @@ use danog\MadelineProto\Stream\Transport\WsStream;
  *
  * Manages connection to Telegram datacenters
  *
+ * @internal
+ * 
  * @author Daniil Gentili <daniil@daniil.it>
  */
 class Connection
@@ -336,11 +340,12 @@ class Connection
         if (!isset($this->pinger) && ($this->ctx->hasStreamName(WssStream::class) || $this->ctx->hasStreamName(WsStream::class))) {
             $this->pinger = new PingLoop($this);
         }
-        foreach ($this->new_outgoing as $message_id) {
-            if ($this->outgoing_messages[$message_id]['unencrypted']) {
-                $promise = $this->outgoing_messages[$message_id]['promise'];
-                \Amp\Loop::defer(function () use ($promise) {
-                    $promise->fail(new Exception('Restart because we were reconnected'));
+        foreach ($this->new_outgoing as $message_id => $message) {
+            if ($message->isUnencrypted()) {
+                \Amp\Loop::defer(function () use ($message) {
+                    if (!($message->getState() & OutgoingMessage::STATE_REPLIED)) {
+                        $message->reply(new Failure(new Exception('Restart because we were reconnected')));
+                    }
                 });
                 unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
             }
@@ -384,40 +389,37 @@ class Connection
      *     'tries' => number
      * ]
      *
-     * @param array   $message The message to send
-     * @param boolean $flush   Whether to flush the message right away
+     * @param OutgoingMessage $message The message to send
+     * @param boolean         $flush   Whether to flush the message right away
      *
      * @return \Generator
      */
-    public function sendMessage(array $message, bool $flush = true): \Generator
+    public function sendMessage(OutgoingMessage $message, bool $flush = true): \Generator
     {
-        $deferred = new Deferred();
-        if (!isset($message['serialized_body'])) {
-            $body = $message['body'] instanceof \Generator
-                ? yield from $message['body']
-                : $message['body'];
-            $refreshNext = $message['refreshReferences'] ?? false;
-            if ($refreshNext) {
+        $message->trySend();
+        $promise = $message->getSendPromise();
+        if (!$message->hasSerializedBody() || $message->shouldRefreshReferences()) {
+            $body = yield from $message->getBody();
+            if ($message->shouldRefreshReferences()) {
                 $this->API->referenceDatabase->refreshNext(true);
             }
-            if ($message['method']) {
-                $body = (yield from $this->API->getTL()->serializeMethod($message['_'], $body));
+            if ($message->isMethod()) {
+                $body = yield from $this->API->getTL()->serializeMethod($message->getConstructor(), $body);
             } else {
-                $body['_'] = $message['_'];
-                $body = (yield from $this->API->getTL()->serializeObject(['type' => ''], $body, $message['_']));
+                $body['_'] = $message->getConstructor();
+                $body = yield from $this->API->getTL()->serializeObject(['type' => ''], $body, $message->getConstructor());
             }
-            if ($refreshNext) {
+            if ($message->shouldRefreshReferences()) {
                 $this->API->referenceDatabase->refreshNext(false);
             }
-            $message['serialized_body'] = $body;
+            $message->setSerializedBody($body);
             unset($body);
         }
-        $message['send_promise'] = $deferred;
-        $this->pending_outgoing[$this->pending_outgoing_key++] = $message;
+        $this->pendingOutgoing[$this->pendingOutgoingKey++] = $message;
         if ($flush && isset($this->writer)) {
             $this->writer->resume();
         }
-        return yield $deferred->promise();
+        return yield $promise;
     }
     /**
      * Flush pending packets.

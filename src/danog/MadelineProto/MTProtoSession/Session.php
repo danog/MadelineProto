@@ -21,6 +21,8 @@ namespace danog\MadelineProto\MTProtoSession;
 
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProto\IncomingMessage;
+use danog\MadelineProto\MTProto\OutgoingMessage;
 
 /**
  * Manages MTProto session-specific data.
@@ -37,39 +39,39 @@ trait Session
     /**
      * Incoming message array.
      *
-     * @var array
+     * @var IncomingMessage[]
      */
     public $incoming_messages = [];
     /**
      * Outgoing message array.
      *
-     * @var array
+     * @var OutgoingMessage[]
      */
     public $outgoing_messages = [];
     /**
      * New incoming message ID array.
      *
-     * @var array
+     * @var IncomingMessage[]
      */
     public $new_incoming = [];
     /**
-     * New outgoing message ID array.
+     * New outgoing message array.
      *
-     * @var array
+     * @var OutgoingMessage[]
      */
     public $new_outgoing = [];
     /**
      * Pending outgoing messages.
      *
-     * @var array
+     * @var OutgoingMessage[]
      */
-    public $pending_outgoing = [];
+    public $pendingOutgoing = [];
     /**
      * Pending outgoing key.
      *
      * @var string
      */
-    public $pending_outgoing_key = 'a';
+    public $pendingOutgoingKey = 'a';
     /**
      * Time delta with server.
      *
@@ -113,16 +115,19 @@ trait Session
      */
     public function resetSession(): void
     {
+        $this->API->logger->logger("Resetting session in DC {$this->datacenterId}...", \danog\MadelineProto\Logger::WARNING);
         $this->session_id = \danog\MadelineProto\Tools::random(8);
         $this->session_in_seq_no = 0;
         $this->session_out_seq_no = 0;
-        $this->msgIdHandler = MsgIdHandler::createInstance($this);
+        if (!isset($this->msgIdHandler)) {
+            $this->msgIdHandler = MsgIdHandler::createInstance($this);
+        }
         foreach ($this->outgoing_messages as &$msg) {
-            if (isset($msg['msg_id'])) {
-                unset($msg['msg_id']);
+            if ($msg->hasMsgId()) {
+                $msg->setMsgId(null);
             }
-            if (isset($msg['seqno'])) {
-                unset($msg['seqno']);
+            if ($msg->hasSeqNo()) {
+                $msg->setSeqNo(null);
             }
         }
     }
@@ -144,10 +149,7 @@ trait Session
      */
     public function backupSession(): array
     {
-        $pending = \array_values($this->pending_outgoing);
-        foreach ($this->new_outgoing as $id) {
-            $pending[] = $this->outgoing_messages[$id];
-        }
-        return $pending;
+        $pending = \array_values($this->pendingOutgoing);
+        return \array_merge($pending, $this->new_outgoing);
     }
 }

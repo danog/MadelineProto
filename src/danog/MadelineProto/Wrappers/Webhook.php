@@ -68,7 +68,7 @@ trait Webhook
             $result = \json_decode($result, true);
             if (\is_array($result) && isset($result['method']) && $result['method'] != '' && \is_string($result['method'])) {
                 try {
-                    $this->logger->logger('Reverse webhook command returned', yield from $this->methodCallAsyncRead($result['method'], $result, ['datacenter' => $this->datacenter->curdc]));
+                    $this->logger->logger('Reverse webhook command returned', yield from $this->methodCallAsyncRead($result['method'], $result));
                 } catch (\Throwable $e) {
                     $this->logger->logger("Reverse webhook command returned: {$e}");
                 }
