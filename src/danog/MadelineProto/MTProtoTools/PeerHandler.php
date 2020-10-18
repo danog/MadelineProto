@@ -481,7 +481,7 @@ trait PeerHandler
      *
      * @template TConstructor
      * @psalm-param $id array{_: TConstructor}|mixed
-     * 
+     *
      * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
      *
      * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<string>|array, mixed, array{
@@ -660,7 +660,7 @@ trait PeerHandler
     /**
      * @template TConstructor
      * @psalm-param $constructor array{_: TConstructor}
-     * 
+     *
      * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
      *
      * @psalm-return array{

@@ -42,7 +42,7 @@ use danog\MadelineProto\Stream\Transport\WsStream;
  * Manages connection to Telegram datacenters
  *
  * @internal
- * 
+ *
  * @author Daniil Gentili <daniil@daniil.it>
  */
 class Connection

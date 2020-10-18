@@ -5273,7 +5273,13 @@ class InternalDoc extends APIFactory
      *
      * @return \Amp\Promise Info object
      *
+     * @template TConstructor
+     * @psalm-param $id array{_: TConstructor}|mixed
+     *
+     * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
+     *
      * @psalm-return \Generator<int|mixed, \Amp\Promise|\Amp\Promise<string>|array, mixed, array{
+     *      TConstructor: array
      *      InputPeer: array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed},
      *      Peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed},
      *      DialogPeer: array{_: string, peer: array{_: string, user_id?: mixed, chat_id?: mixed, channel_id?: mixed}},
@@ -5385,7 +5391,7 @@ class InternalDoc extends APIFactory
      *
      * @see https://docs.madelineproto.xyz/Chat.html
      *
-     * @return \Amp\Promise<array> Chat object
+     * @return \Amp\Promise Chat object
      */
     public function getPwrChat($id, bool $fullfetch = true, bool $send = true, array $extra = [])
     {

@@ -105,7 +105,7 @@ class OutgoingMessage extends Message
     private bool $fileRelated = false;
 
     /**
-     * Custom flood wait limit for this bot
+     * Custom flood wait limit for this bot.
      */
     private ?int $floodWaitLimit = null;
 
@@ -578,7 +578,7 @@ class OutgoingMessage extends Message
     }
 
     /**
-     * Get custom flood wait limit for this bot
+     * Get custom flood wait limit for this bot.
      *
      * @return ?int
      */
@@ -588,7 +588,7 @@ class OutgoingMessage extends Message
     }
 
     /**
-     * Set custom flood wait limit for this bot
+     * Set custom flood wait limit for this bot.
      *
      * @param ?int $floodWaitLimit Custom flood wait limit for this bot
      *
