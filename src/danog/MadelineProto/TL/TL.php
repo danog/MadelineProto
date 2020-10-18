@@ -652,6 +652,10 @@ class TL
             } elseif (isset($arguments['id'])) {
                 $method = 'photos.updateProfilePhoto';
             }
+        } else if ($method === 'messages.uploadMedia') {
+            if (!isset($arguments['peer']) && !$this->API->getSelf()['bot']) {
+                $arguments['peer'] = 'me';
+            }
         }
         $tl = $this->methods->findByMethod($method);
         if ($tl === false) {
