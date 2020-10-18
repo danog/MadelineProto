@@ -71,7 +71,7 @@ class TLConstructors
                 }
             }
             if (!isset($chosenid)) {
-                return false;
+                return $this->findByPredicate($predicate);
             }
             $constructor = $this->by_id[$chosenid];
             $constructor['id'] = $chosenid;
