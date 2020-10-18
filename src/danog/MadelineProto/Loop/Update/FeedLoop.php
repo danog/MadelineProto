@@ -263,7 +263,7 @@ class FeedLoop extends ResumableSignalLoop
                 return yield from $this->API->feeders[self::GENERIC]->feedSingle($update);
             }
         }
-        $this->API->logger->logger('Was fed an update of type '.$update['_']." in {$this}...", \danog\MadelineProto\Logger::VERBOSE);
+        $this->API->logger->logger('Was fed an update of type '.$update['_']." in {$this}...", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->incomingUpdates[] = $update;
         return $this->channelId;
     }

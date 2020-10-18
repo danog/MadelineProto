@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Loop\Update;
 
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
@@ -123,7 +124,7 @@ class UpdateLoop extends ResumableSignalLoop
                     if (isset($difference['timeout'])) {
                         $timeout = $difference['timeout'];
                     }
-                    $API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::VERBOSE);
+                    $API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     switch ($difference['_']) {
                         case 'updates.channelDifferenceEmpty':
                             $state->update($difference);
@@ -202,13 +203,13 @@ class UpdateLoop extends ResumableSignalLoop
                     }
                 }
             }
-            $API->logger->logger("Finished parsing updates in {$this}, now resuming feeders");
+            $API->logger->logger("Finished parsing updates in {$this}, now resuming feeders", Logger::ULTRA_VERBOSE);
             foreach ($result as $channelId => $boh) {
                 $API->feeders[$channelId]->resumeDefer();
             }
-            $API->logger->logger("Finished resuming feeders in {$this}, signaling updates");
+            $API->logger->logger("Finished resuming feeders in {$this}, signaling updates", Logger::ULTRA_VERBOSE);
             $API->signalUpdate();
-            $API->logger->logger("Finished signaling updates in {$this}, pausing");
+            $API->logger->logger("Finished signaling updates in {$this}, pausing", Logger::ULTRA_VERBOSE);
             $first = false;
             if (yield $this->waitSignal($this->pause($timeout * 1000))) {
                 $API->logger->logger("Exiting {$this} due to signal");
