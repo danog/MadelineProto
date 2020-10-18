@@ -382,7 +382,7 @@ trait ResponseHandler
                 $seconds = \preg_replace('/[^0-9]+/', '', $response['error_message']);
                 $limit = $request->getFloodWaitLimit() ?? $this->API->settings->getRPC()->getFloodTimeout();
                 if (\is_numeric($seconds) && $seconds < $limit) {
-                    $this->logger->logger("Flood, waiting '.$seconds.' seconds before repeating async call of $request...", Logger::NOTICE);
+                    $this->logger->logger("Flood, waiting $seconds seconds before repeating async call of $request...", Logger::NOTICE);
                     $request->setSent(($request->getSent() ?? \time()) + $seconds);
                     Loop::delay($seconds * 1000, [$this, 'methodRecall'], ['message_id' => $request->getMsgId()]);
                     return null;

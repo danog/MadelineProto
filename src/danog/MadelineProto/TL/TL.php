@@ -537,7 +537,6 @@ class TL
                     return $object;
                 }
         }
-        $auto = false;
         if ($type['type'] === 'InputMessage' && !\is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];
         } elseif (isset($this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
@@ -569,7 +568,6 @@ class TL
             $type['type'] = \substr($type['type'], 1);
         }
         if ($predicate === $type['type']) {
-            //} && !$auto) {
             $bare = true;
         }
         if ($predicate === 'messageEntityMentionName') {
@@ -652,7 +650,7 @@ class TL
             } elseif (isset($arguments['id'])) {
                 $method = 'photos.updateProfilePhoto';
             }
-        } else if ($method === 'messages.uploadMedia') {
+        } elseif ($method === 'messages.uploadMedia') {
             if (!isset($arguments['peer']) && !$this->API->getSelf()['bot']) {
                 $arguments['peer'] = 'me';
             }

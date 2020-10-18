@@ -365,7 +365,12 @@ trait UpdateHandler
                 $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], \danog\MadelineProto\Logger::VERBOSE);
                 yield from $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])], $this->settings->getDefaultDcParams());
             }
-            yield from $this->handleEncryptedUpdate($update);
+            if (!isset($this->secret_chats[$update['message']['chat_id']])) {
+                $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
+                return false;
+            }
+            $this->secretFeeders[$update['message']['chat_id']]->feed($update);
+            $this->secretFeeders[$update['message']['chat_id']]->resume();
             return;
         }
         /*

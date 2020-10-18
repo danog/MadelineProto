@@ -34,6 +34,7 @@ use danog\MadelineProto\Db\MemoryArray;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\Loop\Update\FeedLoop;
+use danog\MadelineProto\Loop\Update\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
@@ -394,6 +395,12 @@ class MTProto extends AsyncConstruct implements TLCallback
      * @var array<\danog\MadelineProto\Loop\Update\FeedLoop>
      */
     public $feeders = [];
+    /**
+     * Secret chat feeder loops.
+     *
+     * @var array<\danog\MadelineProto\Loop\Update\SecretFeedLoop>
+     */
+    public $secretFeeders = [];
     /**
      * Updater loops.
      *
@@ -1563,6 +1570,14 @@ class MTProto extends AsyncConstruct implements TLCallback
             return;
         }
         $this->logger("Starting update system");
+        foreach ($this->secret_chats as $id => $chat) {
+            if (!isset($this->secretFeeders[$id])) {
+                $this->secretFeeders[$id] = new SecretFeedLoop($this, $id);
+            }
+            if ($this->secretFeeders[$id]->start() && isset($this->secretFeeders[$id])) {
+                $this->secretFeeders[$id]->resume();
+            }
+        }
         if (!isset($this->seqUpdater)) {
             $this->seqUpdater = new SeqLoop($this);
         }

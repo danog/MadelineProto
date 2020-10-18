@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\SecretChats;
 
+use danog\MadelineProto\Logger;
+
 /**
  * Manages sequence numbers.
  */
@@ -31,6 +33,7 @@ trait SeqNoHandler
         foreach ($this->secret_chats[$chat_id]['incoming'] as $message) {
             if (isset($message['decrypted_message']['in_seq_no'])) {
                 if (($message['decrypted_message']['in_seq_no'] - $this->secret_chats[$chat_id]['out_seq_no_x']) / 2 < $last) {
+                    $this->logger->logger("Discarding secret chat $chat_id, in_seq_no is not increasing", Logger::LEVEL_FATAL);
                     yield from $this->discardSecretChat($chat_id);
                     throw new \danog\MadelineProto\SecurityException('in_seq_no is not increasing');
                 }
@@ -38,6 +41,7 @@ trait SeqNoHandler
             }
         }
         if ($seqno > $this->secret_chats[$chat_id]['out_seq_no'] + 1) {
+            $this->logger->logger("Discarding secret chat $chat_id, in_seq_no is too big", Logger::LEVEL_FATAL);
             yield from $this->discardSecretChat($chat_id);
             throw new \danog\MadelineProto\SecurityException('in_seq_no is too big');
         }
@@ -49,9 +53,11 @@ trait SeqNoHandler
         $C = 0;
         foreach ($this->secret_chats[$chat_id]['incoming'] as $message) {
             if (isset($message['decrypted_message']['out_seq_no']) && $C < $this->secret_chats[$chat_id]['in_seq_no']) {
-                if (($message['decrypted_message']['out_seq_no'] - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2 !== $C) {
+                $temp = ($message['decrypted_message']['out_seq_no'] - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2;
+                if ($temp !== $C) {
+                    $this->logger->logger("Discarding secret chat $chat_id, out_seq_no hole: should be $C, is $temp", Logger::LEVEL_FATAL);
                     yield from $this->discardSecretChat($chat_id);
-                    throw new \danog\MadelineProto\SecurityException('out_seq_no hole: should be '.$C.', is '.($message['decrypted_message']['out_seq_no'] - $this->secret_chats[$chat_id]['in_seq_no_x']) / 2);
+                    throw new \danog\MadelineProto\SecurityException("out_seq_no hole: should be $C, is $temp");
                 }
                 $C++;
             }
@@ -64,6 +70,7 @@ trait SeqNoHandler
         }
         if ($seqno > $C) {
             // > C+1
+            $this->logger->logger("Discarding secret chat $chat_id, out_seq_no gap detected: ($seqno > $C)", Logger::LEVEL_FATAL);
             yield from $this->discardSecretChat($chat_id);
             throw new \danog\MadelineProto\SecurityException('WARNING: out_seq_no gap detected ('.$seqno.' > '.$C.')!');
         }

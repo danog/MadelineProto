@@ -52,7 +52,8 @@ trait MessageHandler
             $this->secret_chats[$chat_id]['out_seq_no']++;
         }
         $this->secret_chats[$chat_id]['outgoing'][$this->secret_chats[$chat_id]['out_seq_no']] = $message;
-        $message = (yield from $this->TL->serializeObject(['type' => $constructor = $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer'], $message, $constructor, $this->secret_chats[$chat_id]['layer']));
+        $constructor = $this->secret_chats[$chat_id]['layer'] === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer';
+        $message = yield from $this->TL->serializeObject(['type' => $constructor], $message, $constructor, $this->secret_chats[$chat_id]['layer']);
         $message = \danog\MadelineProto\Tools::packUnsignedInt(\strlen($message)).$message;
         if ($this->secret_chats[$chat_id]['mtproto'] === 2) {
             $padding = \danog\MadelineProto\Tools::posmod(-\strlen($message), 16);
@@ -70,7 +71,15 @@ trait MessageHandler
         $message = $this->secret_chats[$chat_id]['key']['fingerprint'].$message_key.Crypt::igeEncrypt($message, $aes_key, $aes_iv);
         return $message;
     }
-    private function handleEncryptedUpdate(array $message): \Generator
+    /**
+     * Handle encrypted update.
+     *
+     * @internal
+     *
+     * @param array $message
+     * @return \Generator
+     */
+    public function handleEncryptedUpdate(array $message): \Generator
     {
         if (!isset($this->secret_chats[$message['message']['chat_id']])) {
             $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $message['message']['chat_id']));
@@ -127,6 +136,7 @@ trait MessageHandler
         $message['message']['decrypted_message'] = $deserialized;
         $this->secret_chats[$message['message']['chat_id']]['incoming'][$this->secret_chats[$message['message']['chat_id']]['in_seq_no']] = $message['message'];
         yield from $this->handleDecryptedUpdate($message);
+        return true;
     }
     /**
      * @return false|string
