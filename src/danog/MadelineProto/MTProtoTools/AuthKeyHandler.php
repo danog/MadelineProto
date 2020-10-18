@@ -543,7 +543,7 @@ trait AuthKeyHandler
                     $this->pending_auth = true;
                     continue;
                 }
-                $dcs[$id] = function () use ($id, $socket) {
+                $dcs[$id] = function () use ($id, $socket): \Generator {
                     return $this->initAuthorizationSocket($id, $socket);
                 };
             }

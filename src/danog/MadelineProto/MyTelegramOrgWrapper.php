@@ -119,7 +119,7 @@ class MyTelegramOrgWrapper
             {
                 $this->logger = $logger;
             }
-            public function getLogger()
+            public function getLogger(): Logger
             {
                 return $this->logger;
             }

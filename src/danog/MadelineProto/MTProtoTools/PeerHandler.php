@@ -1089,7 +1089,7 @@ trait PeerHandler
     {
         return $this->channelParticipants[$this->participantsKey($channel['channel_id'], $filter, $q, $offset, $limit)];
     }
-    private function storeParticipantsCache($gres, $channel, $filter, $q, $offset, $limit)
+    private function storeParticipantsCache($gres, $channel, $filter, $q, $offset, $limit): void
     {
         unset($gres['users']);
         $ids = [];

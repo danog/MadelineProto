@@ -126,7 +126,7 @@ class FeedLoop extends ResumableSignalLoop
                 continue;
             }
             if (isset($update['pts'], $update['pts_count'])) {
-                $logger = function ($msg) use ($update) {
+                $logger = function ($msg) use ($update): void {
                     $pts_count = $update['pts_count'];
                     $mid = isset($update['message']['id']) ? $update['message']['id'] : '-';
                     $mypts = $this->state->pts();

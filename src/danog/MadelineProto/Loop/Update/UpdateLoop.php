@@ -216,7 +216,7 @@ class UpdateLoop extends ResumableSignalLoop
             }
         }
     }
-    public function setLimit($toPts): void
+    public function setLimit(int $toPts): void
     {
         $this->toPts = $toPts;
     }

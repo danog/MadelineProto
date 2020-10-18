@@ -64,7 +64,7 @@ abstract class Tools extends StrTools
      */
     public static function convertJsonTL(array $input): array
     {
-        $cb = static function (&$val) use (&$cb) {
+        $cb = static function (&$val) use (&$cb): void {
             if (isset($val['@type'])) {
                 $val['_'] = $val['@type'];
             } elseif (\is_array($val)) {

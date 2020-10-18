@@ -100,7 +100,7 @@ final class Coroutine implements Promise, \ArrayAccess, JsonSerializable
          * @param \Throwable|null $exception Exception to be thrown into the generator.
          * @param mixed           $value Value to be sent into the generator.
          */
-        $this->onResolve = function ($exception, $value) {
+        $this->onResolve = function ($exception, $value): void {
             $this->exception = $exception;
             $this->value = $value;
             if (!$this->immediate) {

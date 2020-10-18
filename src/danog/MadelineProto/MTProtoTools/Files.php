@@ -121,7 +121,7 @@ trait Files
             throw new Exception('Invalid callable provided');
         }
         if ($cb === null) {
-            $cb = function ($percent) {
+            $cb = function ($percent): void {
                 $this->logger->logger('Upload status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
             };
         }
@@ -155,7 +155,7 @@ trait Files
         $promises = [];
         $speed = 0;
         $time = 0;
-        $cb = function () use ($cb, $part_total_num, &$speed, &$time) {
+        $cb = function () use ($cb, $part_total_num, &$speed, &$time): void {
             static $cur = 0;
             $cur++;
             Tools::callFork($cb($cur * 100 / $part_total_num, $speed, $time));
@@ -845,7 +845,7 @@ trait Files
             throw new Exception('Wrong callable provided');
         }
         if ($cb === null) {
-            $cb = function ($percent) {
+            $cb = function ($percent): void {
                 $this->logger->logger('Download status: '.$percent.'%', \danog\MadelineProto\Logger::NOTICE);
             };
         }
@@ -898,7 +898,7 @@ trait Files
         $time = 0;
         $speed = 0;
         $origCb = $cb;
-        $cb = static function () use ($cb, $count, &$time, &$speed) {
+        $cb = static function () use ($cb, $count, &$time, &$speed): void {
             static $cur = 0;
             $cur++;
             Tools::callFork($cb($cur * 100 / $count, $time, $speed));
