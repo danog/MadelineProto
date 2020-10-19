@@ -19,6 +19,8 @@
 
 namespace danog\MadelineProto\SecretChats;
 
+use Amp\Deferred;
+use Amp\Promise;
 use danog\MadelineProto\MTProtoTools\Crypt;
 
 /**
@@ -27,16 +29,23 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 trait MessageHandler
 {
     /**
+     * Secret queue.
+     *
+     * @var Promise[]
+     */
+    private $secretQueue = [];
+    /**
      * Encrypt secret chat message.
      *
-     * @param integer $chat_id Chat ID
-     * @param array   $message Message to encrypt
+     * @param integer  $chat_id      Chat ID
+     * @param array    $message      Message to encrypt
+     * @param Deferred $queuePromise Queue promise
      *
      * @internal
      *
      * @return \Generator
      */
-    public function encryptSecretMessage(int $chat_id, array $message): \Generator
+    public function encryptSecretMessage(int $chat_id, array $message, Deferred $queuePromise): \Generator
     {
         if (!isset($this->secret_chats[$chat_id])) {
             $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['secret_chat_skipping'], $chat_id));
@@ -47,6 +56,13 @@ trait MessageHandler
         if ($this->secret_chats[$chat_id]['layer'] > 8) {
             if (($this->secret_chats[$chat_id]['ttr'] <= 0 || \time() - $this->secret_chats[$chat_id]['updated'] > 7 * 24 * 60 * 60) && $this->secret_chats[$chat_id]['rekeying'][0] === 0) {
                 yield from $this->rekey($chat_id);
+            }
+            if (isset($this->secretQueue[$chat_id])) {
+                $promise = $this->secretQueue[$chat_id];
+                $this->secretQueue[$chat_id] = $queuePromise->promise();
+                yield $promise;
+            } else {
+                $this->secretQueue[$chat_id] = $queuePromise->promise();
             }
             $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->secret_chats[$chat_id]['layer'], 'in_seq_no' => $this->generateSecretInSeqNo($chat_id), 'out_seq_no' => $this->generateSecretOutSeqNo($chat_id), 'message' => $message];
             $this->secret_chats[$chat_id]['out_seq_no']++;

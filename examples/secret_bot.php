@@ -134,7 +134,7 @@ if (\file_exists('.env')) {
 echo 'Loading settings...'.PHP_EOL;
 $settings = \json_decode(\getenv('MTPROTO_SETTINGS'), true) ?: [];
 
-$MadelineProto = new \danog\MadelineProto\API('s.madeline', $settings);
+$MadelineProto = new \danog\MadelineProto\API('secret.madeline', $settings);
 
 // Reduce boilerplate with new wrapper method
 $MadelineProto->startAndLoop(SecretHandler::class);

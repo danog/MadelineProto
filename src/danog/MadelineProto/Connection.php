@@ -361,33 +361,92 @@ class Connection
         }
     }
     /**
+     * Apply method abstractions.
+     *
+     * @param string $method    Method name
+     * @param array  $arguments Arguments
+     *
+     * @return \Generator Whether we need to resolve a queue promise
+     */
+    private function methodAbstractions(string &$method, array &$arguments): \Generator
+    {
+        if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && \preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
+            if ($matches[1] === '') {
+                $method = 'channels.joinChannel';
+                $arguments['channel'] = $matches[2];
+            } else {
+                $arguments['hash'] = $matches[2];
+            }
+        } elseif ($method === 'messages.checkChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && \preg_match('@(?:t|telegram)\\.(?:me|dog)/joinchat/([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
+            $arguments['hash'] = $matches[1];
+        } elseif ($method === 'channels.joinChannel' && isset($arguments['channel']) && \is_string($arguments['channel']) && \preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['channel'], $matches)) {
+            if ($matches[1] !== '') {
+                $method = 'messages.importChatInvite';
+                $arguments['hash'] = $matches[2];
+            }
+        } elseif ($method === 'messages.sendMessage' && isset($arguments['peer']['_']) && \in_array($arguments['peer']['_'], ['inputEncryptedChat', 'updateEncryption', 'updateEncryptedChatTyping', 'updateEncryptedMessagesRead', 'updateNewEncryptedMessage', 'encryptedMessage', 'encryptedMessageService'])) {
+            $method = 'messages.sendEncrypted';
+            $arguments = ['peer' => $arguments['peer'], 'message' => $arguments];
+            if (!isset($arguments['message']['_'])) {
+                $arguments['message']['_'] = 'decryptedMessage';
+            }
+            if (!isset($arguments['message']['ttl'])) {
+                $arguments['message']['ttl'] = 0;
+            }
+            if (isset($arguments['message']['reply_to_msg_id'])) {
+                $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to_msg_id'];
+            }
+        } elseif ($method === 'messages.sendEncryptedFile') {
+            if (isset($arguments['file'])) {
+                if ((!\is_array($arguments['file']) || !(isset($arguments['file']['_']) && $this->API->getTL()->getConstructors()->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')) && $this->API->getSettings()->getFiles()->getAllowAutomaticUpload()) {
+                    $arguments['file'] = (yield from $this->API->uploadEncrypted($arguments['file']));
+                }
+                if (isset($arguments['file']['key'])) {
+                    $arguments['message']['media']['key'] = $arguments['file']['key'];
+                }
+                if (isset($arguments['file']['iv'])) {
+                    $arguments['message']['media']['iv'] = $arguments['file']['iv'];
+                }
+            }
+            $arguments['queuePromise'] = new Deferred;
+            return $arguments['queuePromise'];
+        } elseif (\in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && isset($arguments['chat_id']) && (!\is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
+            $res = (yield from $this->API->getInfo($arguments['chat_id']));
+            if ($res['type'] !== 'chat') {
+                throw new \danog\MadelineProto\Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
+            }
+            $arguments['chat_id'] = $res['chat_id'];
+        } elseif ($method === 'photos.updateProfilePhoto') {
+            if (isset($arguments['id'])) {
+                if (!\is_array($arguments['id'])) {
+                    $method = 'photos.uploadProfilePhoto';
+                    $arguments['file'] = $arguments['id'];
+                }
+            } elseif (isset($arguments['file'])) {
+                $method = 'photos.uploadProfilePhoto';
+            }
+        } elseif ($method === 'photos.uploadProfilePhoto') {
+            if (isset($arguments['file'])) {
+                if (\is_array($arguments['file']) && !\in_array($arguments['file']['_'], ['inputFile', 'inputFileBig'])) {
+                    $method = 'photos.uploadProfilePhoto';
+                    $arguments['id'] = $arguments['file'];
+                }
+            } elseif (isset($arguments['id'])) {
+                $method = 'photos.updateProfilePhoto';
+            }
+        } elseif ($method === 'messages.uploadMedia') {
+            if (!isset($arguments['peer']) && !$this->API->getSelf()['bot']) {
+                $arguments['peer'] = 'me';
+            }
+        }
+        if ($method === 'messages.sendEncrypted' || $method === 'messages.sendEncryptedService') {
+            $arguments['queuePromise'] = new Deferred;
+            return $arguments['queuePromise'];
+        }
+        return null;
+    }
+    /**
      * Send an MTProto message.
-     *
-     * Structure of message array:
-     * [
-     *     // only in outgoing messages
-     *     'body' => deserialized body, (optional if container)
-     *     'serialized_body' => 'serialized body', (optional if container)
-     *     'contentRelated' => bool,
-     *     '_' => 'predicate',
-     *     'promise' => deferred promise that gets resolved when a response to the message is received (optional),
-     *     'send_promise' => deferred promise that gets resolved when the message is sent (optional),
-     *     'file' => bool (optional),
-     *     'type' => 'type' (optional),
-     *     'queue' => queue ID (optional),
-     *     'container' => [message ids] (optional),
-     *
-     *     // only in incoming messages
-     *     'content' => deserialized body,
-     *     'seq_no' => number (optional),
-     *     'from_container' => bool (optional),
-     *
-     *     // can be present in both
-     *     'response' => message id (optional),
-     *     'msg_id' => message id (optional),
-     *     'sent' => timestamp,
-     *     'tries' => number
-     * ]
      *
      * @param OutgoingMessage $message The message to send
      * @param boolean         $flush   Whether to flush the message right away
@@ -404,7 +463,9 @@ class Connection
                 $this->API->referenceDatabase->refreshNext(true);
             }
             if ($message->isMethod()) {
-                $body = yield from $this->API->getTL()->serializeMethod($message->getConstructor(), $body);
+                $method = $message->getConstructor();
+                $queuePromise = yield from $this->methodAbstractions($method, $body);
+                $body = yield from $this->API->getTL()->serializeMethod($method, $body);
             } else {
                 $body['_'] = $message->getConstructor();
                 $body = yield from $this->API->getTL()->serializeObject(['type' => ''], $body, $message->getConstructor());
@@ -416,6 +477,9 @@ class Connection
             unset($body);
         }
         $this->pendingOutgoing[$this->pendingOutgoingKey++] = $message;
+        if (isset($queuePromise)) {
+            $queuePromise->resolve();
+        }
         if ($flush && isset($this->writer)) {
             $this->writer->resume();
         }

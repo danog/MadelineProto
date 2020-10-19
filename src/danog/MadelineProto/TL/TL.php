@@ -520,7 +520,7 @@ class TL
                 $concat = $this->constructors->findByPredicate('vector')['id'];
                 $concat .= \danog\MadelineProto\Tools::packUnsignedInt(\count($object));
                 foreach ($object as $k => $current_object) {
-                    $concat .= (yield from $this->serializeObject(['type' => $type['subtype']], $current_object, $k));
+                    $concat .= (yield from $this->serializeObject(['type' => $type['subtype']], $current_object, $k, $layer));
                 }
                 return $concat;
             case 'vector':
@@ -529,7 +529,7 @@ class TL
                 }
                 $concat = \danog\MadelineProto\Tools::packUnsignedInt(\count($object));
                 foreach ($object as $k => $current_object) {
-                    $concat .= (yield from $this->serializeObject(['type' => $type['subtype']], $current_object, $k));
+                    $concat .= (yield from $this->serializeObject(['type' => $type['subtype']], $current_object, $k, $layer));
                 }
                 return $concat;
             case 'Object':
@@ -574,7 +574,7 @@ class TL
             $constructorData = $this->constructors->findByPredicate('inputMessageEntityMentionName');
         }
         $concat = $bare ? '' : $constructorData['id'];
-        return $concat.(yield from $this->serializeParams($constructorData, $object, '', $layer));
+        return $concat.(yield from $this->serializeParams($constructorData, $object, '', $layer, null));
     }
     /**
      * Serialize method.
@@ -588,78 +588,11 @@ class TL
      */
     public function serializeMethod(string $method, $arguments): \Generator
     {
-        if ($method === 'messages.importChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && \preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
-            if ($matches[1] === '') {
-                $method = 'channels.joinChannel';
-                $arguments['channel'] = $matches[2];
-            } else {
-                $arguments['hash'] = $matches[2];
-            }
-        } elseif ($method === 'messages.checkChatInvite' && isset($arguments['hash']) && \is_string($arguments['hash']) && \preg_match('@(?:t|telegram)\\.(?:me|dog)/joinchat/([a-z0-9_-]*)@i', $arguments['hash'], $matches)) {
-            $arguments['hash'] = $matches[1];
-        } elseif ($method === 'channels.joinChannel' && isset($arguments['channel']) && \is_string($arguments['channel']) && \preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/)?([a-z0-9_-]*)@i', $arguments['channel'], $matches)) {
-            if ($matches[1] !== '') {
-                $method = 'messages.importChatInvite';
-                $arguments['hash'] = $matches[2];
-            }
-        } elseif ($method === 'messages.sendMessage' && isset($arguments['peer']['_']) && \in_array($arguments['peer']['_'], ['inputEncryptedChat', 'updateEncryption', 'updateEncryptedChatTyping', 'updateEncryptedMessagesRead', 'updateNewEncryptedMessage', 'encryptedMessage', 'encryptedMessageService'])) {
-            $method = 'messages.sendEncrypted';
-            $arguments = ['peer' => $arguments['peer'], 'message' => $arguments];
-            if (!isset($arguments['message']['_'])) {
-                $arguments['message']['_'] = 'decryptedMessage';
-            }
-            if (!isset($arguments['message']['ttl'])) {
-                $arguments['message']['ttl'] = 0;
-            }
-            if (isset($arguments['message']['reply_to_msg_id'])) {
-                $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to_msg_id'];
-            }
-        } elseif ($method === 'messages.sendEncryptedFile') {
-            if (isset($arguments['file'])) {
-                if ((!\is_array($arguments['file']) || !(isset($arguments['file']['_']) && $this->constructors->findByPredicate($arguments['file']['_']) === 'InputEncryptedFile')) && $this->API->getSettings()->getFiles()->getAllowAutomaticUpload()) {
-                    $arguments['file'] = (yield from $this->API->uploadEncrypted($arguments['file']));
-                }
-                if (isset($arguments['file']['key'])) {
-                    $arguments['message']['media']['key'] = $arguments['file']['key'];
-                }
-                if (isset($arguments['file']['iv'])) {
-                    $arguments['message']['media']['iv'] = $arguments['file']['iv'];
-                }
-            }
-        } elseif (\in_array($method, ['messages.addChatUser', 'messages.deleteChatUser', 'messages.editChatAdmin', 'messages.editChatPhoto', 'messages.editChatTitle', 'messages.getFullChat', 'messages.exportChatInvite', 'messages.editChatAdmin', 'messages.migrateChat']) && isset($arguments['chat_id']) && (!\is_numeric($arguments['chat_id']) || $arguments['chat_id'] < 0)) {
-            $res = (yield from $this->API->getInfo($arguments['chat_id']));
-            if ($res['type'] !== 'chat') {
-                throw new \danog\MadelineProto\Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
-            }
-            $arguments['chat_id'] = $res['chat_id'];
-        } elseif ($method === 'photos.updateProfilePhoto') {
-            if (isset($arguments['id'])) {
-                if (!\is_array($arguments['id'])) {
-                    $method = 'photos.uploadProfilePhoto';
-                    $arguments['file'] = $arguments['id'];
-                }
-            } elseif (isset($arguments['file'])) {
-                $method = 'photos.uploadProfilePhoto';
-            }
-        } elseif ($method === 'photos.uploadProfilePhoto') {
-            if (isset($arguments['file'])) {
-                if (\is_array($arguments['file']) && !\in_array($arguments['file']['_'], ['inputFile', 'inputFileBig'])) {
-                    $method = 'photos.uploadProfilePhoto';
-                    $arguments['id'] = $arguments['file'];
-                }
-            } elseif (isset($arguments['id'])) {
-                $method = 'photos.updateProfilePhoto';
-            }
-        } elseif ($method === 'messages.uploadMedia') {
-            if (!isset($arguments['peer']) && !$this->API->getSelf()['bot']) {
-                $arguments['peer'] = 'me';
-            }
-        }
         $tl = $this->methods->findByMethod($method);
         if ($tl === false) {
             throw new Exception(\danog\MadelineProto\Lang::$current_lang['method_not_found'].$method);
         }
-        return $tl['id'].(yield from $this->serializeParams($tl, $arguments, $method));
+        return $tl['id'].(yield from $this->serializeParams($tl, $arguments, $method, -1, $arguments['queuePromise'] ?? null));
     }
     /**
      * Serialize parameters.
@@ -673,7 +606,7 @@ class TL
      *
      * @psalm-return \Generator<int|mixed, Promise|Promise<\Amp\File\File>|Promise<\Amp\Ipc\Sync\ChannelledSocket>|Promise<int>|Promise<mixed>|Promise<null|string>|\danog\MadelineProto\Stream\StreamInterface|array|int|mixed, mixed, string>
      */
-    private function serializeParams(array $tl, $arguments, $ctx, int $layer = -1): \Generator
+    private function serializeParams(array $tl, $arguments, $ctx, int $layer, $promise): \Generator
     {
         $serialized = '';
         $arguments = (yield from $this->API->botAPIToMTProto($arguments));
@@ -706,11 +639,11 @@ class TL
                     continue;
                 }
                 if ($current_argument['name'] === 'random_bytes') {
-                    $serialized .= (yield from $this->serializeObject(['type' => 'bytes'], \danog\MadelineProto\Tools::random(15 + 4 * \danog\MadelineProto\Tools::randomInt($modulus = 3)), 'random_bytes'));
+                    $serialized .= yield from $this->serializeObject(['type' => 'bytes'], \danog\MadelineProto\Tools::random(15 + 4 * \danog\MadelineProto\Tools::randomInt($modulus = 3)), 'random_bytes');
                     continue;
                 }
                 if ($current_argument['name'] === 'data' && isset($tl['method']) && \in_array($tl['method'], ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService']) && isset($arguments['message'])) {
-                    $serialized .= (yield from $this->serializeObject($current_argument, yield from $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message']), 'data'));
+                    $serialized .= yield from $this->serializeObject($current_argument, yield from $this->API->encryptSecretMessage($arguments['peer']['chat_id'], $arguments['message'], $promise), 'data');
                     continue;
                 }
                 if ($current_argument['name'] === 'random_id') {
