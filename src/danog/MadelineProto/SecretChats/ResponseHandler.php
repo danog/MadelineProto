@@ -80,7 +80,7 @@ trait ResponseHandler
             if ((yield from $this->checkSecretOutSeqNo($chatId, $decryptedMessage['out_seq_no']))
                 && (yield from $this->checkSecretInSeqNo($chatId, $decryptedMessage['in_seq_no']))) {
                 $this->secret_chats[$chatId]['in_seq_no']++;
-                if ($decryptedMessage['layer'] >= 17) {
+                if ($decryptedMessage['layer'] >= 17 && $decryptedMessage['layer'] !== $this->secret_chats[$chatId]['layer']) {
                     $this->secret_chats[$chatId]['layer'] = $decryptedMessage['layer'];
                     if ($decryptedMessage['layer'] >= 17 && \time() - $this->secret_chats[$chatId]['created'] > 15) {
                         yield from $this->notifyLayer($chatId);
