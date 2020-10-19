@@ -222,6 +222,7 @@ trait Files
             $constructor['key_fingerprint'] = $fingerprint;
             $constructor['key'] = $key;
             $constructor['iv'] = $iv;
+            $constructor['size'] = $size;
         }
         $constructor['md5_checksum'] = '';
         //\hash_final($ctx);

@@ -407,6 +407,9 @@ class Connection
                 if (isset($arguments['file']['iv'])) {
                     $arguments['message']['media']['iv'] = $arguments['file']['iv'];
                 }
+                if (isset($arguments['file']['size'])) {
+                    $arguments['message']['media']['size'] = $arguments['file']['size'];
+                }
             }
             $arguments['queuePromise'] = new Deferred;
             return $arguments['queuePromise'];
