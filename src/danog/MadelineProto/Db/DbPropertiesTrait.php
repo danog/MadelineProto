@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\Db;
 
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Tools;
 
 /**
  * Include this trait and call DbPropertiesTrait::initDb to use MadelineProto's database backend for properties.
@@ -32,13 +33,18 @@ trait DbPropertiesTrait
         $dbSettings = $MadelineProto->settings->getDb();
         $prefix = static::getSessionId($MadelineProto);
 
+        $promises = [];
         foreach (static::$dbProperties as $property => $type) {
             if ($reset) {
                 unset($this->{$property});
             } else {
                 $table = "{$prefix}_{$property}";
-                $this->{$property} = yield DbPropertiesFactory::get($dbSettings, $table, $type, $this->{$property});
+                $promises[$property] = DbPropertiesFactory::get($dbSettings, $table, $type, $this->{$property});
             }
+        }
+        $promises = yield Tools::all($promises);
+        foreach ($promises as $key => $data) {
+            $this->{$key} = $data;
         }
     }
 

@@ -3,22 +3,16 @@
 namespace danog\MadelineProto\Db;
 
 use Amp\Mysql\Pool;
-use Amp\Producer;
 use Amp\Promise;
-use Amp\Sql\ResultSet;
-use Amp\Success;
 use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
-
-use function Amp\call;
 
 /**
  * MySQL database backend.
  */
 class MysqlArray extends SqlArray
 {
-    protected string $table;
     protected DatabaseMysql $dbSettings;
     private Pool $db;
 
@@ -32,157 +26,39 @@ class MysqlArray extends SqlArray
      */
     public function initStartup(): \Generator
     {
-        return $this->initConnection($this->dbSettings);
-    }
-    public function __toString(): string
-    {
-        return $this->table;
-    }
-
-    public function __sleep(): array
-    {
-        return ['table', 'dbSettings'];
+        yield from $this->initConnection($this->dbSettings);
+        yield from $this->prepareStatements();
     }
 
     /**
-     * Check if key isset.
+     * Prepare statements.
      *
-     * @param $key
-     *
-     * @return Promise<bool> true if the offset exists, otherwise false
+     * @return \Generator
      */
-    public function isset($key): Promise
+    protected function prepareStatements(): \Generator
     {
-        return call(fn () => yield $this->offsetGet($key) !== null);
-    }
-
-
-    public function offsetGet($offset): Promise
-    {
-        return call(function () use ($offset) {
-            if ($cached = $this->getCache($offset)) {
-                return $cached;
-            }
-
-            $row = yield $this->request(
-                "SELECT `value` FROM `{$this->table}` WHERE `key` = :index LIMIT 1",
-                ['index' => $offset]
-            );
-
-            if ($value = $this->getValue($row)) {
-                $this->setCache($offset, $value);
-            }
-
-            return $value;
-        });
-    }
-
-    /**
-     * Set value for an offset.
-     *
-     * @link https://php.net/manual/en/arrayiterator.offsetset.php
-     *
-     * @param string|int $index <p>
-     * The index to set for.
-     * </p>
-     * @param $value
-     *
-     * @throws \Throwable
-     */
-
-    public function offsetSet($index, $value): Promise
-    {
-        if ($this->getCache($index) === $value) {
-            return new Success();
-        }
-
-        $this->setCache($index, $value);
-
-        $request = $this->request(
-            "
+        $this->get = yield $this->db->prepare(
+            "SELECT `value` FROM `{$this->table}` WHERE `key` = :index LIMIT 1"
+        );
+        $this->set = yield $this->db->prepare("
             INSERT INTO `{$this->table}` 
             SET `key` = :index, `value` = :value 
             ON DUPLICATE KEY UPDATE `value` = :value
-        ",
-            [
-                'index' => $index,
-                'value' => \serialize($value),
-            ]
-        );
-
-        //Ensure that cache is synced with latest insert in case of concurrent requests.
-        $request->onResolve(fn () => $this->setCache($index, $value));
-
-        return $request;
+        ");
+        $this->unset = yield $this->db->prepare("
+            DELETE FROM `{$this->table}`
+            WHERE `key` = :index
+        ");
+        $this->count = yield $this->db->prepare("
+            SELECT count(`key`) as `count` FROM `{$this->table}`
+        ");
+        $this->iterate = yield $this->db->prepare("
+            SELECT `key`, `value` FROM `{$this->table}`
+        ");
     }
 
-    /**
-     * Unset value for an offset.
-     *
-     * @link https://php.net/manual/en/arrayiterator.offsetunset.php
-     *
-     * @param string|int $index <p>
-     * The offset to unset.
-     * </p>
-     *
-     * @return Promise
-     * @throws \Throwable
-     */
-    public function offsetUnset($index): Promise
-    {
-        $this->unsetCache($index);
 
-        return $this->request(
-            "
-                    DELETE FROM `{$this->table}`
-                    WHERE `key` = :index
-                ",
-            ['index' => $index]
-        );
-    }
-
-    public function getArrayCopy(): Promise
-    {
-        return call(function () {
-            $iterator = $this->getIterator();
-            $result = [];
-            while (yield $iterator->advance()) {
-                [$key, $value] = $iterator->getCurrent();
-                $result[$key] = $value;
-            }
-            return $result;
-        });
-    }
-
-    public function getIterator(): Producer
-    {
-        return new Producer(function (callable $emit) {
-            $request = yield $this->db->execute("SELECT `key`, `value` FROM `{$this->table}`");
-
-            while (yield $request->advance()) {
-                $row = $request->getCurrent();
-                yield $emit([$row['key'], $this->getValue($row)]);
-            }
-        });
-    }
-
-    /**
-     * Count elements.
-     *
-     * @link https://php.net/manual/en/arrayiterator.count.php
-     * @return Promise<int> The number of elements or public properties in the associated
-     * array or object, respectively.
-     * @throws \Throwable
-     */
-    public function count(): Promise
-    {
-        return call(function () {
-            $row = yield $this->request("SELECT count(`key`) as `count` FROM `{$this->table}`");
-            return $row[0]['count'] ?? 0;
-        });
-    }
-
-    private function getValue(array $row)
+    protected function getValue(array $row)
     {
         if ($row) {
             if (!empty($row[0]['value'])) {
@@ -218,7 +94,7 @@ class MysqlArray extends SqlArray
     protected function prepareTable(): \Generator
     {
         Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
-        return yield $this->request("
+        return yield $this->db->query("
             CREATE TABLE IF NOT EXISTS `{$this->table}`
             (
                 `key` VARCHAR(255) NOT NULL,
@@ -235,55 +111,12 @@ class MysqlArray extends SqlArray
     protected function renameTable(string $from, string $to): \Generator
     {
         Logger::log("Renaming table {$from} to {$to}", Logger::WARNING);
-        yield $this->request("
+        yield $this->db->query("
+            DROP TABLE IF EXISTS `{$to}`;
+        ");
+
+        yield $this->db->query("
             ALTER TABLE `{$from}` RENAME TO `{$to}`;
         ");
-
-        yield $this->request("
-            DROP TABLE IF EXISTS `{$from}`;
-        ");
-    }
-
-    /**
-     * Perform async request to db.
-     *
-     * @param string $query
-     * @param array $params
-     *
-     * @return Promise
-     * @throws \Throwable
-     */
-    private function request(string $query, array $params = []): Promise
-    {
-        return call(function () use ($query, $params) {
-            //Logger::log([$query, $params], Logger::VERBOSE);
-
-            if (empty($this->db) || !$this->db->isAlive()) {
-                Logger::log('No database connection', Logger::WARNING);
-                return [];
-            }
-
-            if (
-                !empty($params['index'])
-                && !\mb_check_encoding($params['index'], 'UTF-8')
-            ) {
-                $params['index'] = \mb_convert_encoding($params['index'], 'UTF-8');
-            }
-
-            try {
-                $request = yield $this->db->execute($query, $params);
-            } catch (\Throwable $e) {
-                Logger::log($e->getMessage(), Logger::ERROR);
-                return [];
-            }
-
-            $result = [];
-            if ($request instanceof ResultSet) {
-                while (yield $request->advance()) {
-                    $result[] = $request->getCurrent();
-                }
-            }
-            return $result;
-        });
     }
 }

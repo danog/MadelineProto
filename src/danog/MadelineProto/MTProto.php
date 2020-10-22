@@ -528,6 +528,11 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public static function serializeAll(): void
     {
+        static $done = false;
+        if ($done) {
+            return;
+        }
+        $done = true;
         Logger::log('Prompting final serialization (SHUTDOWN)...');
         foreach (self::$references as $instance) {
             Tools::wait($instance->wrapper->serialize());
@@ -976,17 +981,18 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!isset($this->datacenter)) {
             $this->datacenter ??= new DataCenter($this, $this->dcList, $this->settings->getConnection());
         }
+        $db = [];
         if (!isset($this->referenceDatabase)) {
             $this->referenceDatabase = new ReferenceDatabase($this);
-            yield from $this->referenceDatabase->init();
+            $db []= $this->referenceDatabase->init();
         } else {
-            yield from $this->referenceDatabase->init();
+            $db []= $this->referenceDatabase->init();
         }
         if (!isset($this->minDatabase)) {
             $this->minDatabase = new MinDatabase($this);
-            yield from $this->minDatabase->init();
+            $db []= $this->minDatabase->init();
         } else {
-            yield from $this->minDatabase->init();
+            $db []= $this->minDatabase->init();
         }
         if (!isset($this->TL)) {
             $this->TL = new TL($this);
@@ -997,7 +1003,8 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->TL->init($this->settings->getSchema(), $callbacks);
         }
 
-        yield from $this->initDb($this);
+        $db []= $this->initDb($this);
+        yield Tools::all($db);
         yield from $this->fillUsernamesCache();
     }
 

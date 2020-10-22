@@ -16,7 +16,7 @@ use function Amp\call;
 /**
  * Redis database backend.
  */
-class RedisArray extends SqlArray
+class RedisArray extends DriverArray
 {
     protected DatabaseRedis $dbSettings;
     private RedisRedis $db;
@@ -33,10 +33,6 @@ class RedisArray extends SqlArray
     {
         return $this->initConnection($this->dbSettings);
     }
-    public function __toString(): string
-    {
-        return $this->table;
-    }
     /**
      * @return Generator
      *
@@ -46,7 +42,6 @@ class RedisArray extends SqlArray
     {
         yield new Success;
     }
-
 
     protected function renameTable(string $from, string $to): \Generator
     {
@@ -76,11 +71,6 @@ class RedisArray extends SqlArray
         }
     }
 
-
-    public function __sleep()
-    {
-        return ['table', 'dbSettings'];
-    }
 
     /**
      * Get redis key name.

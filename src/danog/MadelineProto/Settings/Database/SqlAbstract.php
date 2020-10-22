@@ -21,7 +21,7 @@ abstract class SqlAbstract extends DatabaseAbstract
     /**
      * Maximum connection limit.
      */
-    protected int $maxConnections = 10;
+    protected int $maxConnections = 100;
 
     /**
      * Idle timeout.
@@ -49,6 +49,12 @@ abstract class SqlAbstract extends DatabaseAbstract
         parent::mergeArray($settings);
     }
 
+    public function __wakeup()
+    {
+        if ($this->maxConnections < 40) {
+            $this->maxConnections = 100;
+        }
+    }
     /**
      * Get maximum connection limit.
      *

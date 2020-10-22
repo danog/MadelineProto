@@ -45,7 +45,7 @@ class Mysql
                 ->withDatabase($settings->getDatabase());
 
             yield from static::createDb($config);
-            static::$connections[$dbKey] = pool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
+            static::$connections[$dbKey] = new Pool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());
         }
 
         return static::$connections[$dbKey];

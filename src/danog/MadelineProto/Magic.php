@@ -232,8 +232,8 @@ class Magic
         }
         if (!self::$initedLight) {
             // Setup error reporting
-            \set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-            \set_exception_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionHandler']);
+            \set_error_handler([Exception::class, 'ExceptionErrorHandler']);
+            \set_exception_handler([Exception::class, 'ExceptionHandler']);
             self::$isIpcWorker = \defined('MADELINE_WORKER_TYPE') ? \MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
             if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
                 try {
