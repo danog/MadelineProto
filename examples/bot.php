@@ -24,6 +24,8 @@ use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Database\Redis;
+use danog\MadelineProto\Settings\Database\Mysql;
+use danog\MadelineProto\Settings\Database\Postgres;
 
 /*
  * Various ways to load MadelineProto
@@ -93,8 +95,10 @@ class MyEventHandler extends EventHandler
 $settings = new Settings;
 $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 
-// You can also use MySQL or PostgreSQL
-// $settings->setDb(new Redis);
+// You can also use Redis, MySQL or PostgreSQL
+// $settings->setDb((new Redis)->setDatabase(0)->setPassword('pony'));
+// $settings->setDb((new Postgres)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
+// $settings->setDb((new Mysql)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 
 $MadelineProto = new API('bot.madeline', $settings);
 
