@@ -24,24 +24,24 @@ class MemoryArray extends \ArrayIterator implements DbArray
      * Get instance.
      *
      * @param string $table
-     * @param mixed  $value
+     * @param mixed  $previous
      * @param Memory $settings
      * @return Promise<self>
      */
-    public static function getInstance(string $table, $value, $settings): Promise
+    public static function getInstance(string $table, $previous, $settings): Promise
     {
-        return call(static function () use ($value) {
-            if ($value instanceof MemoryArray) {
-                return $value;
+        return call(static function () use ($previous) {
+            if ($previous instanceof MemoryArray) {
+                return $previous;
             }
-            if ($value instanceof DbArray) {
+            if ($previous instanceof DbArray) {
                 Logger::log("Loading database to memory. Please wait.", Logger::WARNING);
-                if ($value instanceof DriverArray) {
-                    yield from $value->initStartup();
+                if ($previous instanceof DriverArray) {
+                    yield from $previous->initStartup();
                 }
-                $value = yield $value->getArrayCopy();
+                $previous = yield $previous->getArrayCopy();
             }
-            return new static($value);
+            return new static($previous);
         });
     }
 

@@ -34,7 +34,7 @@ abstract class SqlArray extends DriverArray
      * Get value from row.
      *
      * @param array $row
-     * @return void
+     * @return null|mixed
      */
     abstract protected function getValue(array $row);
 

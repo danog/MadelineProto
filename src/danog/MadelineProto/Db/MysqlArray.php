@@ -58,6 +58,12 @@ class MysqlArray extends SqlArray
     }
 
 
+    /**
+     * Get value from row.
+     *
+     * @param array $row
+     * @return null|mixed
+     */
     protected function getValue(array $row)
     {
         if ($row) {

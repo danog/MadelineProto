@@ -23,9 +23,9 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
+use danog\MadelineProto\Settings\Database\Redis;
 
 /*
  * Various ways to load MadelineProto

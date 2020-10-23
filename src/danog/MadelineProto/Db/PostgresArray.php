@@ -72,6 +72,12 @@ class PostgresArray extends SqlArray
         }
     }
 
+    /**
+     * Get value from row.
+     *
+     * @param array $row
+     * @return null|mixed
+     */
     protected function getValue(array $row)
     {
         if ($row) {
@@ -82,7 +88,7 @@ class PostgresArray extends SqlArray
                 return $row['value'];
             }
             if ($row['value'][0] === '\\') {
-                $row['value'] = hex2bin(substr($row['value'], 2));
+                $row['value'] = \hex2bin(\substr($row['value'], 2));
             }
             return \unserialize($row['value']);
         }
@@ -158,7 +164,7 @@ class PostgresArray extends SqlArray
     protected function renameTable(string $from, string $to): \Generator
     {
         Logger::log("Renaming table {$from} to {$to}", Logger::WARNING);
-        
+
         yield $this->db->query("
             DROP TABLE IF EXISTS \"{$to}\";
         ");
