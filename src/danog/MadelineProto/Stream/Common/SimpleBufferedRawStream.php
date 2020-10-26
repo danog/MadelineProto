@@ -24,7 +24,7 @@ use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\RawStreamInterface;
 
 /**
- * Buffered raw stream.
+ * Buffered raw stream, that simply returns less data on EOF instead of throwing.
  *
  * @author Daniil Gentili <daniil@daniil.it>
  */
@@ -48,7 +48,6 @@ class SimpleBufferedRawStream extends BufferedRawStream implements BufferedStrea
         while ($buffer_length < $length) {
             $chunk = yield $this->read();
             if ($chunk === null) {
-                \fseek($this->memory_stream, $offset);
                 break;
             }
             \fwrite($this->memory_stream, $chunk);
