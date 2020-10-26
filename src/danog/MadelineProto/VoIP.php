@@ -12,11 +12,20 @@ If not, see <http://www.gnu.org/licenses/>.
 
 namespace danog\MadelineProto;
 
+use Amp\Delayed;
+use danog\MadelineProto\MTProto\PermAuthKey;
+use danog\MadelineProto\Stream\Common\FileBufferedStream;
+use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\Ogg\Ogg;
+use danog\MadelineProto\VoIP\Endpoint;
+
+use function Amp\File\open;
+
 if (\extension_loaded('php-libtgvoip')) {
     return;
 }
 
-class VoIP extends Tools
+class VoIP
 {
     use \danog\MadelineProto\VoIP\MessageHandler;
     use \danog\MadelineProto\VoIP\AckHandler;
@@ -125,6 +134,16 @@ class VoIP extends Tools
     private $outputFile;
     private $isPlaying = false;
 
+    private bool $creator;
+
+    private PermAuthKey $authKey;
+    private int $peerVersion;
+
+    /**
+     * @var Endpoint[]
+     */
+    private array $sockets = [];
+
     private $connection_settings = [];
     private $dclist = [];
 
@@ -191,13 +210,12 @@ class VoIP extends Tools
 
     public function startTheMagic()
     {
-        while (true) {
-            $waiting = $this->datacenter->select();
-            foreach ($waiting as $dc) {
-                if ($packet = $this->recv_message($dc)) {
-                    $this->handlePacket($dc, $packet);
+        foreach ($this->sockets as $socket) {
+            Tools::callFork(function () use ($socket) {
+                while ($payload = $this->recv_message($socket)) {
+                    Tools::callFork($this->handlePacket($socket, $payload));
                 }
-            }
+            });
         }
         return $this;
     }
@@ -205,19 +223,36 @@ class VoIP extends Tools
     {
         \var_dump($packet);
         switch ($packet['_']) {
-                case self::PKT_INIT:
-                    $this->voip_state = self::STATE_WAIT_INIT_ACK;
-                    $this->send_message(['_' => self::PKT_INIT_ACK, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'all_streams' => [['id' => 0, 'type' => self::STREAM_TYPE_AUDIO, 'codec' => self::CODEC_OPUS, 'frame_duration' => 60, 'enabled' => 1]]], $datacenter);
-                    //$a = fopen('paloma.opus', 'rb');
-                    //(new Ogg($a, [$this, 'oggCallback']))->run();
-                    break;
-                case self::PKT_INIT_ACK:
+            case self::PKT_INIT:
+                $this->voip_state = self::STATE_WAIT_INIT_ACK;
+                $this->send_message(['_' => self::PKT_INIT_ACK, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'all_streams' => [['id' => 0, 'type' => self::STREAM_TYPE_AUDIO, 'codec' => self::CODEC_OPUS, 'frame_duration' => 60, 'enabled' => 1]]], $datacenter);
+                break;
+            case self::PKT_INIT_ACK:
+                if ($this->voip_state !== self::STATE_ESTABLISHED) {
                     $this->voip_state = self::STATE_ESTABLISHED;
-                    $a = \fopen('paloma.opus', 'rb');
-                    (new Ogg($a, [$this, 'oggCallback']))->run();
 
-                    break;
-            }
+                    $ctx = new ConnectionContext;
+                    $ctx->addStream(FileBufferedStream::class, yield open('kda.opus', 'r'));
+                    $stream = yield from $ctx->getStream();
+                    $ogg = yield from Ogg::init($stream, 60000);
+                    $it = $ogg->getEmitter()->iterate();
+                    Tools::callFork($ogg->read());
+                    Tools::callFork(function () use ($it) {
+                        $timestamp = 0;
+                        $t = microtime(true);
+                        while (yield $it->advance()) {
+                            $elapsed = microtime(true) - $t;
+                            $t = microtime(true);
+
+                            yield new Delayed((int) (60000 - $elapsed / 1000));
+                            
+                            yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $it->getCurrent(), 'timestamp' => $this->timestamp], $datacenter);
+                            $timestamp += 60;
+                        }
+                    });
+                }
+                break;
+        }
     }
     public $timestamp = 0;
     public function oggCallback($data)
@@ -279,11 +314,6 @@ class VoIP extends Tools
         return $this->callID;
     }
 
-    public function isCreator()
-    {
-        return $this->creator;
-    }
-
     public function whenCreated()
     {
         return isset($this->internalStorage['created']) ? $this->internalStorage['created'] : false;
@@ -291,36 +321,16 @@ class VoIP extends Tools
 
     public function parseConfig()
     {
+        $this->authKey = new PermAuthKey();
+        $this->authKey->setAuthKey($this->configuration['auth_key']);
         if (\count($this->configuration['endpoints'])) {
-            $this->connection_settings['all'] = $this->MadelineProto->settings['connection_settings']['all'];
-            $this->connection_settings['all']['protocol'] = 'obfuscated2';
-            $this->connection_settings['all']['timeout'] = 1;
-            $this->connection_settings['all']['do_not_retry'] = true;
-
-            $test = $this->connection_settings['all']['test_mode'] ? 'test' : 'main';
             foreach ($this->configuration['endpoints'] as $endpoint) {
-                $this->dclist[$test]['ipv6'][$endpoint['id']] = ['ip_address' => $endpoint['ipv6'], 'port' => $endpoint['port'], 'peer_tag' => $endpoint['peer_tag']];
-                $this->dclist[$test]['ipv4'][$endpoint['id']] = ['ip_address' => $endpoint['ip'], 'port' => $endpoint['port'], 'peer_tag' => $endpoint['peer_tag']];
+                $this->sockets['v6 '.$endpoint['id']] = new Endpoint($endpoint['ipv6'], $endpoint['port'], $endpoint['peer_tag'], true, $this);
+                $this->sockets['v4 '.$endpoint['id']] = new Endpoint($endpoint['ip'], $endpoint['port'], $endpoint['peer_tag'], true, $this);
             }
-            if (!isset($this->datacenter)) {
-                $this->datacenter = new DataCenter($this->dclist, $this->connection_settings);
+            foreach ($this->sockets as $socket) {
+                yield from $socket->connect();
             }
-            //$this->datacenter->__construct($this->dclist, $this->connection_settings);
-
-            foreach ($this->datacenter->get_dcs() as $new_dc) {
-                try {
-                    $this->datacenter->dc_connect($new_dc);
-                } catch (\danog\MadelineProto\Exception $e) {
-                }
-            }
-            $this->init_all();
-            foreach ($this->datacenter->get_dcs(false) as $new_dc) {
-                try {
-                    $this->datacenter->dc_connect($new_dc);
-                } catch (\danog\MadelineProto\Exception $e) {
-                }
-            }
-            $this->init_all();
         }
     }
 
@@ -328,29 +338,8 @@ class VoIP extends Tools
     {
         $test = $this->connection_settings['all']['test_mode'] ? 'test' : 'main';
         foreach ($this->datacenter->sockets as $dc_id => $socket) {
-            if ($socket->auth_key === null) {
-                $socket->auth_key = ['id' => $this->configuration['auth_key_id'], 'auth_key' => $this->configuration['auth_key'], 'connection_inited' => false];
-            }
-            if ($socket->type === Connection::API_ENDPOINT) {
-                $socket->type = Connection::VOIP_TCP_REFLECTOR_ENDPOINT;
-            }
-            if ($socket->peer_tag === null) {
-                switch ($socket->type) {
-                        case Connection::VOIP_TCP_REFLECTOR_ENDPOINT:
-                        case Connection::VOIP_UDP_REFLECTOR_ENDPOINT:
-                            $socket->peer_tag = $this->dclist[$test]['ipv4'][$dc_id]['peer_tag'];
-                            break;
-                        default:
-                            $socket->peer_tag = $this->configuration['call_id'];
-                    }
-            }
-            //if ($this->voip_state === self::STATE_CREATED) {
-            $this->send_message(['_' => self::PKT_INIT, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'audio_streams' => [self::CODEC_OPUS], 'video_streams' => []], $dc_id);
+            $this->send_message(['_' => self::PKT_INIT, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'audio_streams' => [self::CODEC_OPUS], 'video_streams' => []], $socket);
             $this->voip_state = self::STATE_WAIT_INIT;
-            //}
-            if (isset($this->datacenter->sockets[$dc_id])) {
-                $this->send_message(['_' => self::PKT_PING], $dc_id);
-            }
         }
     }
 
@@ -382,5 +371,35 @@ class VoIP extends Tools
     public function getSignalBarsCount()
     {
         return $this->signal;
+    }
+
+    /**
+     * Get the value of creator.
+     *
+     * @return bool
+     */
+    public function isCreator(): bool
+    {
+        return $this->creator;
+    }
+
+    /**
+     * Get the value of authKey.
+     *
+     * @return PermAuthKey
+     */
+    public function getAuthKey(): PermAuthKey
+    {
+        return $this->authKey;
+    }
+
+    /**
+     * Get the value of peerVersion.
+     *
+     * @return int
+     */
+    public function getPeerVersion(): int
+    {
+        return $this->peerVersion;
     }
 }

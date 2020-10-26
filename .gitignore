@@ -125,9 +125,4 @@ tempConv
 extracted.json
 .phpunit.result.cache
 
-src/danog/MadelineProto/VoIP.php
-src/danog/MadelineProto/VoIP/AckHandler.php
-src/danog/MadelineProto/VoIP/MessageHandler.php
-src/danog/MadelineProto/OpusStream.php
-
 ponyScripts

@@ -19,7 +19,7 @@ trait AckHandler
     {
         return $s1 > $s2;
     }
-    public function received_packet($datacenter, $last_ack_id, $packet_seq_no, $ack_mask)
+    public function received_packet($last_ack_id, $packet_seq_no, $ack_mask)
     {
         if ($this->seqgt($packet_seq_no, $this->session_in_seq_no)) {
             $diff = $packet_seq_no - $this->session_in_seq_no;
