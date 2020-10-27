@@ -187,6 +187,9 @@ class Ogg
                     for ($x = 0; $x < $count; $x++) {
                         $sizes[]= $this->readLen($content, $offset);
                     }
+                    if (!$selfDelimited) {
+                        $sizes []= ($len - ($offset + $padding));
+                    }
                 } else { // CBR
                     $size = $selfDelimited
                         ? $this->readLen($content, $offset)
@@ -241,6 +244,7 @@ class Ogg
         while (true) {
             $init = yield $this->stream->bufferRead(4+23);
             if (empty($init)) {
+                $this->emitter->complete();
                 return false; // EOF
             }
             if (\substr($init, 0, 4) !== self::CAPTURE_PATTERN) {

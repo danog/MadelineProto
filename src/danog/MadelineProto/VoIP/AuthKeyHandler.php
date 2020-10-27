@@ -137,7 +137,7 @@ trait AuthKeyHandler
         $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
         Crypt::checkG($g_b, $dh_config['p']);
         try {
-            $res = yield from $this->methodCallAsyncRead('phone.acceptCall', ['peer' => $call, 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => \danog\MadelineProto\VoIP::getConnectionMaxLayer()]]);
+            $res = yield from $this->methodCallAsyncRead('phone.acceptCall', ['peer' => ['id' => $call['id'], 'access_hash' => $call['access_hash'], '_' => 'inputPhoneCall'], 'g_b' => $g_b->toBytes(), 'protocol' => ['_' => 'phoneCallProtocol', 'udp_reflector' => true, 'udp_p2p' => true, 'min_layer' => 65, 'max_layer' => \danog\MadelineProto\VoIP::getConnectionMaxLayer()]]);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
             if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
                 $this->logger->logger(\sprintf(\danog\MadelineProto\Lang::$current_lang['call_already_accepted'], $call['id']));
@@ -322,6 +322,7 @@ trait AuthKeyHandler
     {
         \array_walk($this->calls, function ($controller, $id) {
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
+                $this->logger("Discarding ended call...");
                 $controller->discard();
             }
         });

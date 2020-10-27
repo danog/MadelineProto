@@ -19,11 +19,13 @@
 
 namespace danog\MadelineProto;
 
-if (\class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
+if (\class_exists(VoIPServerConfig::class)) {
+    return;
+}
     /**
      * Manages storage of VoIP server config.
      */
-    class VoIPServerConfig extends VoIPServerConfigInternal
+    class VoIPServerConfig
     {
         /**
          * The configuration.
@@ -47,7 +49,6 @@ if (\class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
         public static function update(array $config)
         {
             self::$_config = $config;
-            self::updateInternal(self::getFinal());
         }
         /**
          * Get shared call settings.
@@ -68,7 +69,6 @@ if (\class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
         public static function updateDefault(array $configDefault)
         {
             self::$_configDefault = $configDefault;
-            self::updateInternal(self::getFinal());
         }
         /**
          * Get default shared call settings.
@@ -89,4 +89,3 @@ if (\class_exists('\\danog\\MadelineProto\\VoIPServerConfigInternal')) {
             return \array_merge(self::$_configDefault, self::$_config);
         }
     }
-}

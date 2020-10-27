@@ -28,12 +28,12 @@ trait MessageHandler
         if ($l <= 253) {
             $concat .= \chr($l);
             $concat .= $object;
-            $concat .= \pack('@'.$this->posmod(-$l - 1, 4));
+            $concat .= \pack('@'.Tools::posmod(-$l - 1, 4));
         } else {
             $concat .= \chr(254);
             $concat .= \substr(Tools::packSignedInt($l), 0, 3);
             $concat .= $object;
-            $concat .= \pack('@'.$this->posmod(-$l, 4));
+            $concat .= \pack('@'.Tools::posmod(-$l, 4));
         }
 
         return $concat;
@@ -47,13 +47,13 @@ trait MessageHandler
         if ($l === 254) {
             $long_len = \unpack('V', \stream_get_contents($stream, 3).\chr(0))[1];
             $x = \stream_get_contents($stream, $long_len);
-            $resto = $this->posmod(-$long_len, 4);
+            $resto = Tools::posmod(-$long_len, 4);
             if ($resto > 0) {
                 \stream_get_contents($stream, $resto);
             }
         } else {
             $x = \stream_get_contents($stream, $l);
-            $resto = $this->posmod(-($l + 1), 4);
+            $resto = Tools::posmod(-($l + 1), 4);
             if ($resto > 0) {
                 \stream_get_contents($stream, $resto);
             }
@@ -78,8 +78,9 @@ trait MessageHandler
                 $message .= Tools::packUnsignedInt($flags);
                 $message .= \chr(\count($args['audio_streams']));
                 foreach ($args['audio_streams'] as $codec) {
-                    $message .= \chr($codec);
+                    $message .= $codec;
                 }
+                $message .= chr(0);
                 $message .= \chr(\count($args['video_streams']));
                 foreach ($args['video_streams'] as $codec) {
                     $message .= \chr($codec);
@@ -95,7 +96,7 @@ trait MessageHandler
                 foreach ($args['all_streams'] as $stream) {
                     $message .= \chr($stream['id']);
                     $message .= \chr($stream['type']);
-                    $message .= \chr($stream['codec']);
+                    $message .= $stream['codec'];
                     $message .= \pack('v', $stream['frame_duration']);
                     $message .= \chr($stream['enabled']);
                 }
@@ -184,11 +185,18 @@ trait MessageHandler
             }
         }
 
-        if (\in_array($this->voip_state, [\danog\MadelineProto\VoIP::STATE_WAIT_INIT, \danog\MadelineProto\VoIP::STATE_WAIT_INIT_ACK])) {
+        if ($this->peerVersion >= 8 || (!$this->peerVersion && true)) {
+            $payload = \chr($args['_']);
+            $payload .= Tools::packUnsignedInt($this->session_in_seq_no);
+            $payload .= Tools::packUnsignedInt($this->session_out_seq_no);
+            $payload .= Tools::packUnsignedInt($ack_mask);
+            $payload .= \chr(0);
+            $payload .= $message;
+        } elseif (\in_array($this->voip_state, [\danog\MadelineProto\VoIP::STATE_WAIT_INIT, \danog\MadelineProto\VoIP::STATE_WAIT_INIT_ACK])) {
             $payload = $this->TLID_DECRYPTED_AUDIO_BLOCK;
-            $payload .= $this->random(8);
+            $payload .= Tools::random(8);
             $payload .= \chr(7);
-            $payload .= $this->random(7);
+            $payload .= Tools::random(7);
             $flags = 0;
             $flags = $flags | 4; // call_id
             $flags = $flags | 16; // seqno
@@ -211,9 +219,9 @@ trait MessageHandler
             }
         } else {
             $payload = $this->TLID_SIMPLE_AUDIO_BLOCK;
-            $payload .= $this->random(8);
+            $payload .= Tools::random(8);
             $payload .= \chr(7);
-            $payload .= $this->random(7);
+            $payload .= Tools::random(7);
             $message = \chr($args['_']).Tools::packUnsignedInt($this->session_in_seq_no).Tools::packUnsignedInt($this->session_out_seq_no).Tools::packUnsignedInt($ack_mask).$message;
 
             $payload .= $this->pack_string($message);
@@ -295,8 +303,29 @@ trait MessageHandler
                 $result['peer_port'] = Tools::unpackSignedInt(\stream_get_contents($payload, 4));
                 return $result;
             default:
-                \danog\MadelineProto\Logger::log('Unknown packet received: '.\bin2hex($crc), \danog\MadelineProto\Logger::ERROR);
-                return false;
+                if ($this->peerVersion >= 8 || (!$this->peerVersion && true)) {
+                    \fseek($payload, 0);
+                    $result['_'] = \ord(\stream_get_contents($payload, 1));
+                    $in_seq_no = \unpack('V', \stream_get_contents($payload, 4))[1];
+                    $out_seq_no = \unpack('V', \stream_get_contents($payload, 4))[1];
+                    $ack_mask = \unpack('V', \stream_get_contents($payload, 4))[1];
+                    $flags = \ord(\stream_get_contents($payload, 1));
+                    if ($flags & 1) {
+                        $result['extra'] = [];
+                        $count = \ord(\stream_get_contents($payload, 1));
+                        for ($x = 0; $x < $count; $x++) {
+                            $len = \ord(\stream_get_contents($payload, 1));
+                            $result['extra'][]= \stream_get_contents($payload, $len);
+                        }
+                    }
+                    $message = \fopen('php://memory', 'rw+b');
+
+                    \fwrite($message, \stream_get_contents($payload));
+                    \fseek($message, 0);
+                } else {
+                    \danog\MadelineProto\Logger::log('Unknown packet received: '.\bin2hex($crc), \danog\MadelineProto\Logger::ERROR);
+                    return false;
+                }
         }
         if (!$this->received_packet($in_seq_no, $out_seq_no, $ack_mask)) {
             return false;
@@ -306,19 +335,14 @@ trait MessageHandler
             //
             // packetInit#1 protocol:int min_protocol:int flags:# data_saving_enabled:flags.0?true audio_streams:byteVector<streamTypeSimple> video_streams:byteVector<streamTypeSimple> = Packet;
             case \danog\MadelineProto\VoIP::PKT_INIT:
-                $result['protocol'] = Tools::unpackSignedInt(\stream_get_contents($message, 4));
+                $result['protocol'] = $this->peerVersion = Tools::unpackSignedInt(\stream_get_contents($message, 4));
                 $result['min_protocol'] = Tools::unpackSignedInt(\stream_get_contents($message, 4));
                 $flags = \unpack('V', \stream_get_contents($message, 4))[1];
                 $result['data_saving_enabled'] = (bool) ($flags & 1);
                 $result['audio_streams'] = [];
                 $length = \ord(\stream_get_contents($message, 1));
                 for ($x = 0; $x < $length; $x++) {
-                    $result['audio_streams'][$x] = \ord(\stream_get_contents($message, 1));
-                }
-                $result['video_streams'] = [];
-                $length = \ord(\stream_get_contents($message, 1));
-                for ($x = 0; $x < $length; $x++) {
-                    $result['video_streams'][$x] = \ord(\stream_get_contents($message, 1));
+                    $result['audio_streams'][$x] = \stream_get_contents($message, 4);
                 }
                 break;
             // streamType id:int8 type:int8 codec:int8 frame_duration:int16 enabled:int8 = StreamType;
@@ -331,7 +355,7 @@ trait MessageHandler
                 $length = \ord(\stream_get_contents($message, 1));
                 for ($x = 0; $x < $length; $x++) {
                     $result['all_streams'][$x]['id'] = \ord(\stream_get_contents($message, 1));
-                    $result['all_streams'][$x]['type'] = \ord(\stream_get_contents($message, 1));
+                    $result['all_streams'][$x]['type'] = \stream_get_contents($message, 4);
                     $result['all_streams'][$x]['codec'] = \ord(\stream_get_contents($message, 1));
                     $result['all_streams'][$x]['frame_duration'] = \unpack('v', \stream_get_contents($message, 2))[1];
                     $result['all_streams'][$x]['enabled'] = \ord(\stream_get_contents($message, 1));
