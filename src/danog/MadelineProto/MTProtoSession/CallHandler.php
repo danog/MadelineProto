@@ -46,7 +46,7 @@ trait CallHandler
         if ($datacenter === $this->datacenter) {
             $datacenter = false;
         }
-        $message_ids = $this->outgoing_messages[$message_id] instanceof Container
+        $message_ids = ($this->outgoing_messages[$message_id] ?? null) instanceof Container
             ? $this->outgoing_messages[$message_id]->getIds()
             : [$message_id];
         foreach ($message_ids as $message_id) {
