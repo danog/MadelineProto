@@ -74,7 +74,7 @@ abstract class SqlAbstract extends DatabaseAbstract
      */
     public function setMaxConnections(int $maxConnections): self
     {
-        $this->maxConnections = $maxConnections;
+        $this->maxConnections = max($maxConnections, 40);
 
         return $this;
     }
