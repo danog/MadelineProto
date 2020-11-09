@@ -950,7 +950,7 @@ class TL
                 /** @var OutgoingMessage */
                 $message = $type['connection']->outgoing_messages[$x['req_msg_id']];
                 foreach ($this->callbacks[TLCallback::METHOD_BEFORE_CALLBACK][$message->getConstructor()] ?? [] as $callback) {
-                    $callback($type['connection']->outgoing_messages[$x['req_msg_id']]['_']);
+                    $callback($type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor());
                 }
                 if ($message->getType() && \stripos($message->getType(), '<') !== false) {
                     $arg['subtype'] = \str_replace(['Vector<', '>'], '', $message->getType());
