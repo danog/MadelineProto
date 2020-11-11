@@ -49,12 +49,6 @@ abstract class SqlAbstract extends DatabaseAbstract
         parent::mergeArray($settings);
     }
 
-    public function __wakeup()
-    {
-        if ($this->maxConnections < 40) {
-            $this->maxConnections = 100;
-        }
-    }
     /**
      * Get maximum connection limit.
      *
@@ -74,7 +68,7 @@ abstract class SqlAbstract extends DatabaseAbstract
      */
     public function setMaxConnections(int $maxConnections): self
     {
-        $this->maxConnections = max($maxConnections, 40);
+        $this->maxConnections = $maxConnections;
 
         return $this;
     }
