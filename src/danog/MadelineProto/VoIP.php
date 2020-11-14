@@ -19,7 +19,6 @@ use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\Ogg\Ogg;
 use danog\MadelineProto\VoIP\Endpoint;
 
-use function Amp\delay;
 use function Amp\File\open;
 
 if (\extension_loaded('php-libtgvoip')) {
@@ -270,10 +269,10 @@ class VoIP
                             $frames []= $it->getCurrent();
                         }
                         foreach ($frames as $frame) {
-                            $t = (microtime(true) / 1000) + 60;
+                            $t = (\microtime(true) / 1000) + 60;
                             yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $frame, 'timestamp' => $timestamp], $datacenter);
 
-                            yield new Delayed((int) ($t - (microtime(true) / 1000)));
+                            yield new Delayed((int) ($t - (\microtime(true) / 1000)));
 
                             $timestamp += 60;
                         }

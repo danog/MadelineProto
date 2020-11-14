@@ -1393,7 +1393,7 @@ interface messages
      * Parameters:
      * * `InputPeer`      **peer**       - User or chat, histories with which are searched, or [(inputPeerEmpty)](https://docs.madelineproto.xyz/API_docs/constructors/inputPeerEmpty.html) constructor for global search
      * * `string`         **q**          - Text search request
-     * * `InputUser`      **from_id**    - Optional: Only return messages sent by the specified user ID
+     * * `InputPeer`      **from_id**    - Optional:
      * * `int`            **top_msg_id** - Optional:
      * * `MessagesFilter` **filter**     - Filter to return only specified message types
      * * `int`            **min_date**   - If a positive value was transferred, only messages with a sending date bigger than the transferred one will be returned
@@ -2675,9 +2675,11 @@ interface messages
      * Pin a message.
      *
      * Parameters:
-     * * `boolean`   **silent** - Optional: Pin the message silently, without triggering a notification
-     * * `InputPeer` **peer**   - The peer where to pin the message
-     * * `int`       **id**     - The message to pin, can be 0 to unpin any currently pinned messages
+     * * `boolean`   **silent**     - Optional: Pin the message silently, without triggering a notification
+     * * `boolean`   **unpin**      - Optional:
+     * * `boolean`   **pm_oneside** - Optional:
+     * * `InputPeer` **peer**       - The peer where to pin the message
+     * * `int`       **id**         - The message to pin, can be 0 to unpin any currently pinned messages
      *
      * @param array $params Parameters
      *
@@ -3049,6 +3051,18 @@ interface messages
      * @return bool
      */
     public function readDiscussion($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.AffectedHistory
+     */
+    public function unpinAllMessages($params);
 }
 
 interface updates

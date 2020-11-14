@@ -58,13 +58,15 @@ class Ogg
      */
     private Emitter $emitter;
 
-    private function __construct() {}
+    private function __construct()
+    {
+    }
     /**
      * Constructor.
      *
      * @param BufferedStreamInterface $stream        The stream
      * @param int                     $frameDuration Required frame duration, microseconds
-     * 
+     *
      * @return \Generator
      * @psalm-return \Generator<mixed, mixed, mixed, self>
      */
@@ -145,7 +147,7 @@ class Ogg
             } else {
                 $frameDuration = 2**($conf % 4) * 2500;
             }
-            
+
             $paddingLen = 0;
             if ($c === 0) {
                 // Exactly 1 frame
@@ -201,7 +203,7 @@ class Ogg
             $totalDuration = \count($sizes) * $frameDuration;
             if (!$selfDelimited && $totalDuration + $this->currentDuration <= $this->frameDuration) {
                 $this->currentDuration += $totalDuration;
-                $sum = array_sum($sizes);
+                $sum = \array_sum($sizes);
                 $this->opusPayload .= \substr($content, $preOffset, ($offset - $preOffset) + $sum + $paddingLen);
                 if ($this->currentDuration === $this->frameDuration) {
                     yield $this->emitter->emit($this->opusPayload);
@@ -214,8 +216,8 @@ class Ogg
             }
 
             foreach ($sizes as $size) {
-                $this->opusPayload .= chr($toc & ~3);
-                $this->opusPayload .= substr($content, $offset, $size);
+                $this->opusPayload .= \chr($toc & ~3);
+                $this->opusPayload .= \substr($content, $offset, $size);
                 $offset += $size;
                 $this->currentDuration += $frameDuration;
                 if ($this->currentDuration >= $this->frameDuration) {

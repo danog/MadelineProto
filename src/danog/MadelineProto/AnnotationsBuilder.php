@@ -319,7 +319,7 @@ class AnnotationsBuilder
             if ($hasReturnValue && $async && \preg_match("/@return (.*)/", $phpdoc, $matches)) {
                 $ret = $matches[1];
                 $new = $ret;
-                if ($type && !str_contains($ret, '<')) {
+                if ($type && !\str_contains($ret, '<')) {
                     $new = '';
                     if ($type->allowsNull()) {
                         $new .= '?';
@@ -330,7 +330,7 @@ class AnnotationsBuilder
                     $new .= $type->getName() === 'self' ? $this->reflectionClasses['API'] : $type->getName();
                 }
                 $phpdoc = \str_replace("@return ".$ret, "@return mixed", $phpdoc);
-                if (!str_contains($phpdoc, '@psalm-return')) {
+                if (!\str_contains($phpdoc, '@psalm-return')) {
                     $phpdoc = \str_replace("@return ", "@psalm-return $new|$promise<$new>\n     * @return ", $phpdoc);
                 }
             }

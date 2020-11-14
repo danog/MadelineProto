@@ -200,7 +200,7 @@ trait TD
             if ($key === '_') {
                 $newparams['ID'] = \ucfirst($value);
             } else {
-                if (!\is_numeric($key) && !str_ends_with($key, '_')) {
+                if (!\is_numeric($key) && !\str_ends_with($key, '_')) {
                     $key = $key.'_';
                 }
                 $newparams[$key] = $this->tdToTdcli($value);

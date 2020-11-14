@@ -80,7 +80,7 @@ trait MessageHandler
                 foreach ($args['audio_streams'] as $codec) {
                     $message .= $codec;
                 }
-                $message .= chr(0);
+                $message .= \chr(0);
                 $message .= \chr(\count($args['video_streams']));
                 foreach ($args['video_streams'] as $codec) {
                     $message .= \chr($codec);

@@ -23,9 +23,7 @@ use Amp\ByteStream\ClosedException;
 use Amp\File\File;
 use Amp\Promise;
 use Amp\Socket\Socket;
-use Amp\Success;
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\Stream\Async\RawStream;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -43,7 +41,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
     private int $append_after;
     private string $append;
     /**
-     * Connect
+     * Connect.
      *
      * @param ConnectionContext $ctx
      * @param string $header
@@ -169,7 +167,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
         return $this->write($data);
     }
     /**
-     * Set file handle
+     * Set file handle.
      *
      * @param File $extra
      * @return void
@@ -192,7 +190,7 @@ class FileBufferedStream implements BufferedStreamInterface, BufferInterface, Pr
      */
     public function getSocket(): Socket
     {
-        throw new \RuntimeException("Can't get underlying socket, is a File handle!");        
+        throw new \RuntimeException("Can't get underlying socket, is a File handle!");
     }
     /**
      * Get class name.

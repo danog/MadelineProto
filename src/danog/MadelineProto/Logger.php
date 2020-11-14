@@ -255,7 +255,7 @@ class Logger
             if (!\file_exists(\pathinfo($this->optional, PATHINFO_DIRNAME))) {
                 $this->optional = Magic::$script_cwd.'/MadelineProto.log';
             }
-            if (!str_ends_with($this->optional, '.log')) {
+            if (!\str_ends_with($this->optional, '.log')) {
                 $this->optional .= '.log';
             }
             if ($maxSize !== -1 && \file_exists($this->optional) && \filesize($this->optional) > $maxSize) {
