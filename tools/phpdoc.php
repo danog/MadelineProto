@@ -94,14 +94,14 @@ $filter = function (string $class) use ($ignore): bool {
     if (\in_array($class, $ignore)) {
         return false;
     }
-    if (str_starts_with($class, 'danog\\MadelineProto\\Ipc')
-    || str_starts_with($class, 'danog\\MadelineProto\\Loop\\Update')
-    || str_starts_with($class, 'danog\\MadelineProto\\Loop\\Connection')
-    || str_starts_with($class, 'danog\\MadelineProto\\MTProto\\')
-    || str_starts_with($class, 'danog\\MadelineProto\\MTProtoSession\\')
-    || str_starts_with($class, 'danog\\MadelineProto\\PhpDoc\\')
-    || str_starts_with($class, 'danog\\MadelineProto\\Stream\\')
-    || str_starts_with($class, 'danog\\MadelineProto\\Db\\NullCache')) {
+    if (\str_starts_with($class, 'danog\\MadelineProto\\Ipc')
+    || \str_starts_with($class, 'danog\\MadelineProto\\Loop\\Update')
+    || \str_starts_with($class, 'danog\\MadelineProto\\Loop\\Connection')
+    || \str_starts_with($class, 'danog\\MadelineProto\\MTProto\\')
+    || \str_starts_with($class, 'danog\\MadelineProto\\MTProtoSession\\')
+    || \str_starts_with($class, 'danog\\MadelineProto\\PhpDoc\\')
+    || \str_starts_with($class, 'danog\\MadelineProto\\Stream\\')
+    || \str_starts_with($class, 'danog\\MadelineProto\\Db\\NullCache')) {
         return false;
     }
     if ($class === DbPropertiesTrait::class) {
