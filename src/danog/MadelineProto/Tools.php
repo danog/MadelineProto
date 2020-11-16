@@ -305,6 +305,7 @@ abstract class Tools extends StrTools
         $resolved = false;
         do {
             try {
+                Logger::log("Starting event loop...");
                 Loop::run(function () use (&$resolved, &$value, &$exception, $promise) {
                     $promise->onResolve(function ($e, $v) use (&$resolved, &$value, &$exception) {
                         Loop::stop();
@@ -405,7 +406,7 @@ abstract class Tools extends StrTools
             $deferred = null;
             $temp->fail(new TimeoutException);
         });
-        Loop::unreference($watcher);
+        //Loop::unreference($watcher);
 
         $promise->onResolve(function () use (&$deferred, $promise, $watcher) {
             if ($deferred !== null) {
@@ -449,7 +450,7 @@ abstract class Tools extends StrTools
             $deferred = null;
             $temp->resolve($default);
         });
-        Loop::unreference($watcher);
+        //Loop::unreference($watcher);
 
         $promise->onResolve(function () use (&$deferred, $promise, $watcher) {
             if ($deferred !== null) {
