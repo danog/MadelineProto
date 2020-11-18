@@ -692,6 +692,8 @@ class TL
                     case 'vector':
                         $arguments[$current_argument['name']] = [];
                         break;
+                    default:
+                        throw new Exception("Missing required parameter ".$current_argument['name']);
                 }
             }
             if (\in_array($current_argument['type'], ['DataJSON', '%DataJSON'])) {
