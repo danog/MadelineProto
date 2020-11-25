@@ -60,23 +60,36 @@ class MyEventHandler extends EventHandler
     {
         return [self::ADMIN];
     }
-    public function onStart() {
+    /**
+     * Handle updates from supergroups and channels.
+     *
+     * @param array $update Update
+     *
+     * @return void
+     */
+    public function onUpdateNewChannelMessage(array $update): \Generator
+    {
+        return $this->onUpdateNewMessage($update);
     }
     /**
      * Handle updates from users.
      *
      * @param array $update Update
      *
-     * @return void
+     * @return \Generator
      */
-    public function onUpdateNewMessage(array $update)
+    public function onUpdateNewMessage(array $update): \Generator
     {
-        $this->logger($update);
+        if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
+            return;
+        }
+
+        $res = \json_encode($update, JSON_PRETTY_PRINT);
+        yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
+        if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
+            yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
+        }
     }
-  public function onAny(array $update)
-  {
-      $this->logger($update);
-  }
 }
 
 $settings = new Settings;
@@ -87,85 +100,8 @@ $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 // $settings->setDb((new Postgres)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 // $settings->setDb((new Mysql)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 
-$MadelineProto = new API('aaa.madeline', $settings);
-var_dump($MadelineProto->messages->sendVote(['peer' => -1001049295266, 'msg_id' => 272778]));
-/*
-$a = $MadelineProto->channels->getMessages([
-  'channel' => 'pony2jkanflk', 
-  'id' => [6],
-  'offset_id' => 4200, 
-  'offset_date' => 0,
-  'add_offset' => 0,
-  'max_id' => 0,
-  'min_id' => 0,
-  
-  'limit' => 100
-])['messages'][0];
+$MadelineProto = new API('bot.madeline', $settings);
 
-var_dump($MadelineProto->messages->sendVote(['peer' => 'pony2jkanflk', 'msg_id' => 6, 'options' => ['0']]));
-
-readline();
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//$MadelineProto->photos->uploadProfilePhoto(['video' => '../../Video/o.mp4', 'file' => 'tests/faust.jpg', 'video_start_ts' => 1]);
-
-/*var_dumP($MadelineProto->users->getFullUser(['id' => 'me']));
-var_dumP($MadelineProto->downloadToDir($MadelineProto->getPropicInfo('me'), '/tmp'));
-readline();*/
-//var_dump($MadelineProto->channels->getChannels(['id' => ['https://t.me/joinchat/Bgrajz6K-aJS2Dc5HJ7dsA']]));
-
-//var_dump($MadelineProto->messages->sendMessage(['peer' => 'danogentili', 'message' => 'lmao', 'schedule_date' => time() + 11]));
-/*//var_duMP($MadelineProto->channels->getMessages(['peer' => -1001218943867, 'msg_id' => 4368]));
-$id = 272211;
-$id = 272319;
-var_dump($MadelineProto->messages->search(['peer' => -1001049295266, 'min_date' => 0, 'max_date' => 0, 'offset_id' => 0, 'limit' => 100, 'max_id' => 0, 'min_id' => 0, 'add_offset' => 0, 'top_msg_id' => 268793]));
-readline();
-$s = $MadelineProto->channels->getMessages(['channel' => -1001049295266, 'id' => [$id]])['messages'][0]['media']['photo'];
-var_dump($s);
-readline();
-$s = (string) $s[0]['bytes'];
-function uploadSvgPathDecode($encoded) {
-    $path = 'M';
-    $len = strlen($encoded);
-    for ($i = 0; $i < $len; $i++) {
-      $num = ord($encoded[$i]);
-      if ($num >= 128 + 64) {
-        $path .= substr('AACAAAAHAAALMAAAQASTAVAAAZaacaaaahaaalmaaaqastava.az0123456789-,', $num - 128 - 64, 1);
-      } else {
-        if ($num >= 128) {
-          $path .= ',';
-        } else if ($num >= 64) {
-          $path .= '-';
-        }
-        var_dump($num & 63);
-        $path .= $num & 63;
-      }
-    }
-    $path .= 'z';
-    return $path;
-  }
-var_dump(uploadSvgPathDecode($s));
-
-//var_dump($MadelineProto->stats->getBroadcastStats(['channel' => 'pony2jkanflk']));
-readline();
-//var_dump($MadelineProto->getFullInfo('davtur19'));
-//->getMessagePublicForwards(['channel' => 'ponatqjoa', 'msg_id' => 2, 'offset_rate' => 0, 'offset_id' => 0, 'limit' => 0]));
-die;*/
 // Reduce boilerplate with new wrapper method.
 // Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
 $MadelineProto->startAndLoop(MyEventHandler::class);
