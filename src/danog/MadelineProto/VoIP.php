@@ -233,8 +233,10 @@ class VoIP
                 $this->sockets['v6 '.$endpoint['id']] = new Endpoint('['.$endpoint['ipv6'].']', $endpoint['port'], $endpoint['peer_tag'], true, $this);
                 $this->sockets['v4 '.$endpoint['id']] = new Endpoint($endpoint['ip'], $endpoint['port'], $endpoint['peer_tag'], true, $this);
             }
-            foreach ($this->sockets as $socket) {
-                yield from $socket->connect();
+            foreach ($this->sockets as $k => $socket) {
+                try {
+                    yield from $socket->connect();
+                } catch (\Throwable $e) { Logger::log($e); unset($this->sockets[$k]); }
             }
             $this->init_all();
             Tools::callFork((function () use ($socket) {

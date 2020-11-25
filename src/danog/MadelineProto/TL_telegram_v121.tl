@@ -1,33 +1,3 @@
-///////////////////////////////
-/////////////////// Layer cons
-///////////////////////////////
-
-//invokeAfterMsg#cb9f372d msg_id:long query:!X = X;
-//invokeAfterMsgs#3dc4b4f0 msg_ids:Vector<long> query:!X = X;
-//invokeWithLayer1#53835315 query:!X = X;
-//invokeWithLayer2#289dd1f6 query:!X = X;
-//invokeWithLayer3#b7475268 query:!X = X;
-//invokeWithLayer4#dea0d430 query:!X = X;
-//invokeWithLayer5#417a57ae query:!X = X;
-//invokeWithLayer6#3a64d54d query:!X = X;
-//invokeWithLayer7#a5be56d3 query:!X = X;
-//invokeWithLayer8#e9abd9fd query:!X = X;
-//invokeWithLayer9#76715a63 query:!X = X;
-//invokeWithLayer10#39620c41 query:!X = X;
-//invokeWithLayer11#a6b88fdf query:!X = X;
-//invokeWithLayer12#dda60d3c query:!X = X;
-//invokeWithLayer13#427c8ea2 query:!X = X;
-//invokeWithLayer14#2b9b08fa query:!X = X;
-//invokeWithLayer15#b4418b64 query:!X = X;
-//invokeWithLayer16#cf5f0987 query:!X = X;
-//invokeWithLayer17#50858a19 query:!X = X;
-//invokeWithLayer18#1c900537 query:!X = X;
-//invokeWithLayer#da9b0d0d layer:int query:!X = X; // after 18 layer
-
-///////////////////////////////
-///////// Main application API
-///////////////////////////////
-
 boolFalse#bc799737 = Bool;
 boolTrue#997275b5 = Bool;
 
@@ -194,6 +164,7 @@ photoSize#77bfb61b type:string location:FileLocation w:int h:int size:int = Phot
 photoCachedSize#e9a734fa type:string location:FileLocation w:int h:int bytes:bytes = PhotoSize;
 photoStrippedSize#e0b0bc2e type:string bytes:bytes = PhotoSize;
 photoSizeProgressive#5aa86a51 type:string location:FileLocation w:int h:int sizes:Vector<int> = PhotoSize;
+photoPathSize#d8214d41 type:string bytes:bytes = PhotoSize;
 
 geoPointEmpty#1117dd5f = GeoPoint;
 geoPoint#b2a2f663 flags:# long:double lat:double access_hash:long accuracy_radius:flags.0?int = GeoPoint;
@@ -902,6 +873,7 @@ account.webAuthorizations#ed56c9fc authorizations:Vector<WebAuthorization> users
 inputMessageID#a676a322 id:int = InputMessage;
 inputMessageReplyTo#bad88395 id:int = InputMessage;
 inputMessagePinned#86872538 = InputMessage;
+inputMessageCallbackQuery#acfa1a7e id:int query_id:long = InputMessage;
 
 inputDialogPeer#fcaafeb7 peer:InputPeer = InputDialogPeer;
 inputDialogPeerFolder#64600527 folder_id:int = InputDialogPeer;
@@ -1546,5 +1518,3 @@ stats.loadAsyncGraph#621d5fa0 flags:# token:string x:flags.0?long = StatsGraph;
 stats.getMegagroupStats#dcdf8607 flags:# dark:flags.0?true channel:InputChannel = stats.MegagroupStats;
 stats.getMessagePublicForwards#5630281b channel:InputChannel msg_id:int offset_rate:int offset_peer:InputPeer offset_id:int limit:int = messages.Messages;
 stats.getMessageStats#b6e0a3f5 flags:# dark:flags.0?true channel:InputChannel msg_id:int = stats.MessageStats;
-
-// LAYER 120

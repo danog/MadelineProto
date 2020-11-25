@@ -24,6 +24,7 @@ use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\TL\TLCallback;
 
 /**
@@ -292,7 +293,7 @@ class ReferenceDatabase implements TLCallback
         $this->API->logger->logger("Adding origin context {$originContext} for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
         $this->cacheContexts[] = $originContext;
     }
-    public function addOriginMethod(array $data, array $res): \Generator
+    public function addOriginMethod(OutgoingMessage $data, array $res): \Generator
     {
         $key = \count($this->cacheContexts) - 1;
         if ($key === -1) {
@@ -300,14 +301,15 @@ class ReferenceDatabase implements TLCallback
         }
         $originType = \array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
-            $this->API->logger->logger("Removing origin context {$originType} for {$data['_']}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+            $this->API->logger->logger("Removing origin context {$originType} for {$constructor}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
             return;
         }
         $cache = $this->cache[$key];
         unset($this->cache[$key]);
         $origin = [];
-        $body = $data['body'];
-        switch ($data['_']) {
+        $constructor = $data->getConstructor();
+        $body = $data->getBodyOrEmpty();
+        switch ($body ?? '') {
             case 'photos.updateProfilePhoto':
                 $origin['max_id'] = $res['photo_id'] ?? 0;
                 $origin['offset'] = -1;
@@ -350,18 +352,18 @@ class ReferenceDatabase implements TLCallback
                         }
                     }
                 }
-                $this->API->logger->logger("Added origin {$originType} ({$data['_']}) to {$count} references", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                $this->API->logger->logger("Added origin {$originType} ($constructor) to {$count} references", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                 return;
             case 'messages.getStickers':
                 $origin['emoticon'] = $body['emoticon'];
                 break;
             default:
-                throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$data['_']}");
+                throw new \danog\MadelineProto\Exception("Unknown origin type provided: {$constructor}");
         }
         foreach ($cache as $location => $reference) {
             yield from $this->storeReference($location, $reference, $originType, $origin);
         }
-        $this->API->logger->logger("Added origin {$originType} ({$data['_']}) to ".\count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+        $this->API->logger->logger("Added origin {$originType} ({$constructor}) to ".\count($cache).' references', \danog\MadelineProto\Logger::ULTRA_VERBOSE);
     }
     public function storeReference(string $location, string $reference, int $originType, array $origin): \Generator
     {

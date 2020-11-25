@@ -576,8 +576,11 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->rsa_keys[$key->fp] = $key;
         }
         // (re)-initialize TL
-        $callbacks = [$this, $this->referenceDatabase];
-        if (!($this->authorization['user']['bot'] ?? false)) {
+        $callbacks = [$this];
+        if ($this->settings->getDb()->getEnableFileReferenceDb()) {
+            $callbacks []= $this->referenceDatabase;
+        }
+        if (!($this->authorization['user']['bot'] ?? false) && $this->settings->getDb()->getEnableMinDb()) {
             $callbacks[] = $this->minDatabase;
         }
         $this->TL->init($this->settings->getSchema(), $callbacks);
