@@ -186,7 +186,7 @@ class MinDatabase implements TLCallback
         if ($dbObject) {
             $new = \array_merge($object, $dbObject);
             $new['_'] .= 'FromMessage';
-            $new['peer'] = (yield from $this->API->getInfo($new['peer']))['InputPeer'];
+            $new['peer'] = yield from $this->API->getInputPeer($new['peer']);
             if ($new['peer']['min']) {
                 $this->API->logger->logger("Don't have origin peer subinfo with min peer {$id}, this may fail");
                 return $object;

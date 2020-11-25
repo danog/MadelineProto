@@ -28,6 +28,7 @@ use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 
@@ -500,7 +501,7 @@ trait Files
      */
     public function getPropicInfo($data): \Generator
     {
-        return yield from $this->getDownloadInfo(yield $this->chats[(yield from $this->getInfo($data))['bot_api_id']]);
+        return yield from $this->getDownloadInfo(yield $this->chats[yield from $this->getInfo($data, MTProto::INFO_TYPE_ID)]);
     }
     /**
      * Extract file info from bot API message.
@@ -657,9 +658,9 @@ trait Files
                 if (\is_array($messageMedia) && ($messageMedia['min'] ?? false) && isset($messageMedia['access_hash'])) {
                     // bot API file ID
                     $messageMedia['min'] = false;
-                    $peer = $this->genAll($messageMedia)['InputPeer'];
+                    $peer = $this->genAll($messageMedia, MTProto::INFO_TYPE_PEER);
                 } else {
-                    $peer = (yield from $this->getInfo($messageMedia))['InputPeer'];
+                    $peer = yield from $this->getInfo($messageMedia, MTProto::INFO_TYPE_PEER);
                 }
                 $res['InputFileLocation'] = ['_' => 'inputPeerPhotoFileLocation', 'big' => $res['big'], 'dc_id' => $res['InputFileLocation']['dc_id'], 'peer' => $peer, 'volume_id' => $res['InputFileLocation']['volume_id'], 'local_id' => $res['InputFileLocation']['local_id']];
                 return $res;

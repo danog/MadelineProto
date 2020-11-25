@@ -236,7 +236,10 @@ class VoIP
             foreach ($this->sockets as $k => $socket) {
                 try {
                     yield from $socket->connect();
-                } catch (\Throwable $e) { Logger::log($e); unset($this->sockets[$k]); }
+                } catch (\Throwable $e) {
+                    Logger::log($e);
+                    unset($this->sockets[$k]);
+                }
             }
             $this->init_all();
             Tools::callFork((function () use ($socket) {

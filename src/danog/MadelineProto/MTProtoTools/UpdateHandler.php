@@ -248,7 +248,7 @@ trait UpdateHandler
                 if (!isset($updates['request']['body'])) {
                     break;
                 }
-                $updates['user_id'] = (yield from $this->getInfo($updates['request']['body']['peer']))['bot_api_id'];
+                $updates['user_id'] = yield from $this->getInfo($updates['request']['body']['peer'], MTProto::INFO_TYPE_ID);
                 $updates['message'] = $updates['request']['body']['message'];
                 unset($updates['request']);
             // no break

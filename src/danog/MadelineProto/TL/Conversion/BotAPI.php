@@ -504,7 +504,7 @@ trait BotAPI
                 $length = $this->mbStrlen($text);
                 $href = $node->getAttribute('href');
                 if (\preg_match('|mention:(.*)|', $href, $matches) || \preg_match('|tg://user\\?id=(.*)|', $href, $matches)) {
-                    $mention = (yield from $this->getInfo($matches[1]));
+                    $mention = yield from $this->getInfo($matches[1]);
                     if (!isset($mention['InputUser'])) {
                         throw new \danog\MadelineProto\Exception(\danog\MadelineProto\Lang::$current_lang['peer_not_in_db']);
                     }

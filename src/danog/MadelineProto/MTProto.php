@@ -190,6 +190,22 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     const TD_IGNORE = ['updateMessageID'];
     /**
+     * Whether to generate only peer information.
+     */
+    const INFO_TYPE_PEER = 0;
+    /**
+     * Whether to generate only constructor information.
+     */
+    const INFO_TYPE_CONSTRUCTOR = 1;
+    /**
+     * Whether to generate only ID information.
+     */
+    const INFO_TYPE_ID = 2;
+    /**
+     * Whether to generate all information.
+     */
+    const INFO_TYPE_ALL = 3;
+    /**
      * @internal
      */
     const BOTAPI_PARAMS_CONVERSION = ['disable_web_page_preview' => 'no_webpage', 'disable_notification' => 'silent', 'reply_to_message_id' => 'reply_to_msg_id', 'chat_id' => 'peer', 'text' => 'message'];
@@ -1959,7 +1975,43 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     public function getTypeMismatchCallbacks(): array
     {
-        return \array_merge(\array_fill_keys(['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer', 'InputDialogPeer', 'InputNotifyPeer'], [$this, 'getInfo']), \array_fill_keys(['InputMedia', 'InputDocument', 'InputPhoto'], [$this, 'getFileInfo']), \array_fill_keys(['InputFileLocation'], [$this, 'getDownloadInfo']));
+        return \array_merge(
+            \array_fill_keys(
+                [
+                    'InputPeer',
+                ],
+                [$this, 'getInputPeer']
+            ),
+            \array_fill_keys(
+                [
+                    'InputUser',
+                    'InputChannel',
+                ],
+                [$this, 'getInputConstructor']
+            ),
+            \array_fill_keys(
+                [
+                    'User',
+                    'Chat',
+                    'Peer',
+                    'InputDialogPeer',
+                    'InputNotifyPeer'
+                ],
+                [$this, 'getInfo']
+            ),
+            \array_fill_keys(
+                [
+                    'InputMedia',
+                    'InputDocument',
+                    'InputPhoto'
+                ],
+                [$this, 'getFileInfo']
+            ),
+            \array_fill_keys(
+                ['InputFileLocation'],
+                [$this, 'getDownloadInfo']
+            )
+        );
     }
     /**
      * Get debug information for var_dump.

@@ -24,6 +24,7 @@ use Amp\Promise;
 use danog\Decoder\FileId;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 use danog\MadelineProto\Db\DbArray;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 
@@ -203,7 +204,7 @@ trait PeerHandler
                     }
                     yield $this->chats->offsetSet($bot_api_id, $chat);
                     $fullChat = yield $this->full_chats[$bot_api_id];
-                    if ($this->getSettings()->getPeer()->getFullFetch() && (!$fullChat || $fullChat['full']['participants_count'] !== (yield from $this->getFullInfo($bot_api_id))['full']['participants_count'])) {
+                    if ($this->getSettings()->getPeer()->getFullFetch() && $this->getSetings()->getDb()->getEnableFullPeerDb() && (!$fullChat || $fullChat['full']['participants_count'] !== (yield from $this->getFullInfo($bot_api_id))['full']['participants_count'])) {
                         $this->cachePwrChat($bot_api_id, $this->getSettings()->getPeer()->getFullFetch(), true);
                     }
                 }
@@ -243,9 +244,7 @@ trait PeerHandler
     public function peerIsset($id): \Generator
     {
         try {
-            $info = yield from $this->getInfo($id);
-            $chatId = $info['bot_api_id'];
-            return (yield $this->chats[$chatId]) !== null;
+            return (yield $this->chats[yield from $this->getInfo($id, MTProto::INFO_TYPE_ID)]) !== null;
         } catch (\danog\MadelineProto\Exception $e) {
             return false;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -470,10 +469,35 @@ trait PeerHandler
         return false;
     }
     /**
+     * Get InputPeer object.
+     *
+     * @internal
+     *
+     * @param mixed $id Peer
+     * @return \Generator
+     */
+    public function getInputPeer($id): \Generator
+    {
+        return $this->getInfo($id, MTProto::INFO_TYPE_PEER);
+    }
+    /**
+     * Get InputUser/InputChannel object.
+     *
+     * @internal
+     *
+     * @param mixed $id Peer
+     * @return \Generator
+     */
+    public function getInputConstructor($id): \Generator
+    {
+        return $this->getInfo($id, MTProto::INFO_TYPE_CONSTRUCTOR);
+    }
+    /**
      * Get info about peer, returns an Info object.
      *
-     * @param mixed   $id        Peer
-     * @param boolean $recursive Internal
+     * @param mixed                $id        Peer
+     * @param MTProto::INFO_TYPE_* $type      Whether to generate an Input*, an InputPeer or the full set of constructors
+     * @param boolean              $recursive Internal
      *
      * @see https://docs.madelineproto.xyz/Info.html
      *
@@ -499,9 +523,9 @@ trait PeerHandler
      *      InputUser?: array{_: string, user_id?: int, access_hash?: mixed, min?: bool},
      *      InputChannel?: array{_: string, channel_id: int, access_hash: mixed, min: bool},
      *      type: string
-     * }>
+     * }>|int|array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}|array{_: string, user_id?: int, access_hash?: mixed, min?: bool}|array{_: string, channel_id: int, access_hash: mixed, min: bool}
      */
-    public function getInfo($id, $recursive = true): \Generator
+    public function getInfo($id, int $type = MTProto::INFO_TYPE_ALL, $recursive = true): \Generator
     {
         if (\is_array($id)) {
             switch ($id['_']) {
@@ -530,7 +554,7 @@ trait PeerHandler
         }
         $tried_simple = false;
         if (\is_numeric($id)) {
-            if (! yield $this->chats[$id]) {
+            if (!yield $this->chats[$id]) {
                 try {
                     $this->logger->logger("Try fetching {$id} with access hash 0");
                     $this->caching_simple[$id] = true;
@@ -560,9 +584,9 @@ trait PeerHandler
                     $this->logger->logger("Only have min peer for {$id} in database, trying to fetch full info");
                     try {
                         if ($id < 0) {
-                            yield from $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll(yield $this->chats[$id], $folder_id)['InputChannel']]]);
+                            yield from $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll(yield $this->chats[$id], $folder_id, MTProto::INFO_TYPE_CONSTRUCTOR)]]);
                         } else {
-                            yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll(yield $this->chats[$id], $folder_id)['InputUser']]]);
+                            yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll(yield $this->chats[$id], $folder_id, MTProto::INFO_TYPE_CONSTRUCTOR)]]);
                         }
                     } catch (\danog\MadelineProto\Exception $e) {
                         $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
@@ -573,7 +597,7 @@ trait PeerHandler
                     }
                 }
                 try {
-                    return $this->genAll(yield $this->chats[$id], $folder_id);
+                    return $this->genAll(yield $this->chats[$id], $folder_id, $type);
                 } catch (\danog\MadelineProto\Exception $e) {
                     if ($e->getMessage() === 'This peer is not present in the internal peer database') {
                         yield $this->chats->offsetUnset($id);/** @uses DbArray::offsetUnset() */
@@ -591,14 +615,14 @@ trait PeerHandler
                 }
                 if (isset($dbres['ok']) && $dbres['ok']) {
                     yield from $this->resolveUsername('@'.$dbres['result']);
-                    return yield from $this->getInfo($id, false);
+                    return yield from $this->getInfo($id, $type, false);
                 }
             }
             if ($tried_simple && isset($this->caching_possible_username[$id])) {
                 $this->logger->logger("No access hash with {$id}, trying to fetch by username...");
                 $user = $this->caching_possible_username[$id];
                 unset($this->caching_possible_username[$id]);
-                return yield from $this->getInfo($user);
+                return yield from $this->getInfo($user, $type);
             }
             throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
         }
@@ -608,20 +632,20 @@ trait PeerHandler
             } else {
                 $invite = yield from $this->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $matches[2]]);
                 if (isset($invite['chat'])) {
-                    return yield from $this->getInfo($invite['chat']);
+                    return yield from $this->getInfo($invite['chat'], $type);
                 }
                 throw new \danog\MadelineProto\Exception('You have not joined this chat');
             }
         }
         $id = \strtolower(\str_replace('@', '', $id));
         if ($id === 'me') {
-            return yield from $this->getInfo($this->authorization['user']['id']);
+            return yield from $this->getInfo($this->authorization['user']['id'], $type);
         }
         if ($id === 'support') {
             if (!$this->supportUser) {
                 yield from $this->methodCallAsyncRead('help.getSupport', [], $this->settings->getDefaultDcParams());
             }
-            return yield from $this->getInfo($this->supportUser);
+            return yield from $this->getInfo($this->supportUser, $type);
         }
         if ($bot_api_id = yield $this->usernames[$id]) {
             $chat = yield $this->chats[$bot_api_id];
@@ -635,9 +659,9 @@ trait PeerHandler
                     $this->logger->logger("Only have min peer for {$bot_api_id} in database, trying to fetch full info");
                     try {
                         if ($bot_api_id < 0) {
-                            yield from $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll(yield $this->chats[$bot_api_id], $folder_id)['InputChannel']]]);
+                            yield from $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll(yield $this->chats[$bot_api_id], $folder_id, MTProto::INFO_TYPE_CONSTRUCTOR)]]);
                         } else {
-                            yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll(yield $this->chats[$bot_api_id], $folder_id)['InputUser']]]);
+                            yield from $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll(yield $this->chats[$bot_api_id], $folder_id, MTProto::INFO_TYPE_CONSTRUCTOR)]]);
                         }
                     } catch (\danog\MadelineProto\Exception $e) {
                         $this->logger->logger($e->getMessage(), \danog\MadelineProto\Logger::WARNING);
@@ -647,19 +671,20 @@ trait PeerHandler
                         unset($this->caching_full_info[$bot_api_id]);
                     }
                 }
-                return $this->genAll(yield $this->chats[$bot_api_id], $folder_id);
+                return $this->genAll(yield $this->chats[$bot_api_id], $folder_id, $type);
             }
         }
 
         if ($recursive) {
             yield from $this->resolveUsername($id);
-            return yield from $this->getInfo($id, false);
+            return yield from $this->getInfo($id, $type, false);
         }
         throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
     }
     /**
      * @template TConstructor
      * @psalm-param $constructor array{_: TConstructor}
+     * @psalm-param $type        bool|null
      *
      * @return (((mixed|string)[]|mixed|string)[]|int|mixed|string)[]
      *
@@ -680,8 +705,35 @@ trait PeerHandler
      *      type: string
      * }
      */
-    private function genAll($constructor, $folder_id = null): array
+    private function genAll($constructor, $folder_id, int $type): array
     {
+        if ($type === MTProto::INFO_TYPE_CONSTRUCTOR) {
+            if ($constructor['_'] === 'user') {
+                return ($constructor['self'] ?? false) ? ['_' => 'inputUserSelf'] : ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min']];
+            }
+            if ($constructor['_'] === 'channel') {
+                return ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min']];
+            }
+        }
+        if ($type === MTProto::INFO_TYPE_PEER) {
+            if ($constructor['_'] === 'user') {
+                return ($constructor['self'] ?? false) ? ['_' => 'inputPeerSelf'] : ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min']];
+            }
+            if ($constructor['_'] === 'channel') {
+                return ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min']];
+            }
+        }
+        if ($type === MTProto::INFO_TYPE_ID) {
+            if ($constructor['_'] === 'user') {
+                return $constructor['id'];
+            }
+            if ($constructor['_'] === 'channel') {
+                return $this->toSupergroup($constructor['id']);
+            }
+            if ($constructor['_'] === 'chat' || $constructor['_'] === 'chatForbidden') {
+                return -$constructor['id'];
+            }
+        }
         $res = [$this->TL->getConstructors()->findByPredicate($constructor['_'])['type'] => $constructor];
         switch ($constructor['_']) {
             case 'user':
@@ -801,7 +853,7 @@ trait PeerHandler
      */
     public function getPwrChat($id, bool $fullfetch = true, bool $send = true): \Generator
     {
-        $full = $fullfetch ? yield from $this->getFullInfo($id) : (yield from $this->getInfo($id));
+        $full = $fullfetch ? yield from $this->getFullInfo($id) : yield from $this->getInfo($id);
         $res = ['id' => $full['bot_api_id'], 'type' => $full['type']];
         switch ($full['type']) {
             case 'user':
