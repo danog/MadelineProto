@@ -228,7 +228,7 @@ trait PeerHandler
                     }
                     yield $this->chats->offsetSet($bot_api_id, $chat);
                     $fullChat = yield $this->full_chats[$bot_api_id];
-                    if ($this->getSettings()->getPeer()->getFullFetch() && $this->getSetings()->getDb()->getEnableFullPeerDb() && (!$fullChat || $fullChat['full']['participants_count'] !== (yield from $this->getFullInfo($bot_api_id))['full']['participants_count'])) {
+                    if ($this->getSettings()->getPeer()->getFullFetch() && $this->getSettings()->getDb()->getEnableFullPeerDb() && (!$fullChat || $fullChat['full']['participants_count'] !== (yield from $this->getFullInfo($bot_api_id))['full']['participants_count'])) {
                         $this->cachePwrChat($bot_api_id, $this->getSettings()->getPeer()->getFullFetch(), true);
                     }
                 }

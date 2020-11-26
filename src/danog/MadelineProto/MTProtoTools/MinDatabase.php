@@ -55,7 +55,7 @@ class MinDatabase implements TLCallback
     private $API;
 
     /**
-     * Whether we cleaned up old database information
+     * Whether we cleaned up old database information.
      *
      * @var boolean
      */

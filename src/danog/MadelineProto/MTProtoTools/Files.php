@@ -658,7 +658,7 @@ trait Files
                 if (\is_array($messageMedia) && ($messageMedia['min'] ?? false) && isset($messageMedia['access_hash'])) {
                     // bot API file ID
                     $messageMedia['min'] = false;
-                    $peer = $this->genAll($messageMedia, MTProto::INFO_TYPE_PEER);
+                    $peer = $this->genAll($messageMedia, null, MTProto::INFO_TYPE_PEER);
                 } else {
                     $peer = yield from $this->getInfo($messageMedia, MTProto::INFO_TYPE_PEER);
                 }

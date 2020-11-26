@@ -19,7 +19,6 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\Promise;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
@@ -302,6 +301,7 @@ class ReferenceDatabase implements TLCallback
         if ($key === -1) {
             throw new \danog\MadelineProto\Exception('Trying to add origin with no origin context set');
         }
+        $constructor = $data->getConstructor();
         $originType = \array_pop($this->cacheContexts);
         if (!isset($this->cache[$key])) {
             $this->API->logger->logger("Removing origin context {$originType} for {$constructor}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
@@ -310,7 +310,6 @@ class ReferenceDatabase implements TLCallback
         $cache = $this->cache[$key];
         unset($this->cache[$key]);
         $origin = [];
-        $constructor = $data->getConstructor();
         $body = $data->getBodyOrEmpty();
         switch ($body ?? '') {
             case 'photos.updateProfilePhoto':

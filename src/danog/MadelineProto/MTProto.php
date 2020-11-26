@@ -1062,7 +1062,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             }
             yield $this->chats->offsetSet(0, []);
             $this->logger("Cleaned up peer database!");
-        } else if (yield $this->chats->isset(0)) {
+        } elseif (yield $this->chats->isset(0)) {
             $this->chats->offsetUnset(0);
         }
     }

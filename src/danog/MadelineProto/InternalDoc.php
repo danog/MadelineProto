@@ -5280,8 +5280,9 @@ class InternalDoc extends APIFactory
     /**
      * Get info about peer, returns an Info object.
      *
-     * @param mixed   $id        Peer
-     * @param boolean $recursive Internal
+     * @param mixed                $id        Peer
+     * @param MTProto::INFO_TYPE_* $type      Whether to generate an Input*, an InputPeer or the full set of constructors
+     * @param boolean              $recursive Internal
      *
      * @see https://docs.madelineproto.xyz/Info.html
      *
@@ -5307,11 +5308,11 @@ class InternalDoc extends APIFactory
      *      InputUser?: array{_: string, user_id?: int, access_hash?: mixed, min?: bool},
      *      InputChannel?: array{_: string, channel_id: int, access_hash: mixed, min: bool},
      *      type: string
-     * }>
+     * }>|int|array{_: string, user_id?: mixed, access_hash?: mixed, min?: mixed, chat_id?: mixed, channel_id?: mixed}|array{_: string, user_id?: int, access_hash?: mixed, min?: bool}|array{_: string, channel_id: int, access_hash: mixed, min: bool}
      */
-    public function getInfo($id, $recursive = true, array $extra = [])
+    public function getInfo($id, int $type = \danog\MadelineProto\MTProto::INFO_TYPE_ALL, $recursive = true, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$id, $recursive, $extra]);
+        return $this->__call(__FUNCTION__, [$id, $type, $recursive, $extra]);
     }
     /**
      * Get logger.

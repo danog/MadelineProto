@@ -130,7 +130,7 @@ class PostgresArray extends SqlArray
         $this->setCache($index, $value);
 
         $request = $this->execute(
-            $this->set,
+            self::STATEMENT_SET,
             [
                 'index' => $index,
                 'value' => new ByteA(\serialize($value)),
