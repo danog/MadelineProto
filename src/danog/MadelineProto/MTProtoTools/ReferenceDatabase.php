@@ -70,7 +70,7 @@ class ReferenceDatabase implements TLCallback
     /**
      * References indexed by location.
      *
-     * @var DbArray|Promise[]
+     * @var DbArray
      */
     private $db;
     private $cache = [];
@@ -99,7 +99,10 @@ class ReferenceDatabase implements TLCallback
     }
     public function init(): \Generator
     {
-        return $this->initDb($this->API);
+        yield from $this->initDb($this->API);
+        if (!$this->API->getSettings()->getDb()->getEnableFileReferenceDb()) {
+            yield $this->db->clear();
+        }
     }
     public function getMethodCallbacks(): array
     {

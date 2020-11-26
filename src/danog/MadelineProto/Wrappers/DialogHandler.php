@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 
 /**
@@ -44,9 +45,9 @@ trait DialogHandler
             /** @uses DbArray::getIterator() */
             $iterator = $this->chats->getIterator();
             while (yield $iterator->advance()) {
-                [$id, $chat] = $iterator->getCurrent();
+                [, $chat] = $iterator->getCurrent();
                 try {
-                    $res[] = $this->genAll($chat)['Peer'];
+                    $res[] = $this->genAll($chat, null, MTProto::INFO_TYPE_ALL)['Peer'];
                 } catch (\Throwable $e) {
                     continue;
                 }

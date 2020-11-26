@@ -38,7 +38,7 @@ class MinDatabase implements TLCallback
     /**
      * References indexed by location.
      *
-     * @var DbArray|Promise[]
+     * @var DbArray
      */
     private $db;
     /**
@@ -55,6 +55,13 @@ class MinDatabase implements TLCallback
     private $API;
 
     /**
+     * Whether we cleaned up old database information
+     *
+     * @var boolean
+     */
+    private $clean = false;
+
+    /**
      * List of properties stored in database (memory or external).
      * @see DbPropertiesFactory
      * @var array
@@ -69,11 +76,18 @@ class MinDatabase implements TLCallback
     }
     public function __sleep()
     {
-        return ['db', 'API'];
+        return ['db', 'API', 'clean'];
     }
     public function init(): \Generator
     {
         yield from $this->initDb($this->API);
+        if (!$this->API->getSettings()->getDb()->getEnableMinDb()) {
+            yield $this->db->clear();
+        }
+        if ($this->clean || yield $this->db->count() === 0) {
+            $this->clean = true;
+            return;
+        }
         $iterator = $this->db->getIterator();
         while (yield $iterator->advance()) {
             [$id, $origin] = $iterator->getCurrent();

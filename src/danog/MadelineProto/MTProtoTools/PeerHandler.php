@@ -133,6 +133,14 @@ trait PeerHandler
                             $user['access_hash'] = $existingChat['access_hash'];
                         }
                     }
+                    if (!$this->getSettings()->getDb()->getEnablePeerInfoDb()) {
+                        $user = [
+                            '_' => $user['_'],
+                            'id' => $user['id'],
+                            'access_hash' => $user['access_hash'],
+                            'min' => $user['min'] ?? false,
+                        ];
+                    }
                     yield $this->chats->offsetSet($user['id'], $user);
                     $this->cachePwrChat($user['id'], false, true);
                 }
@@ -164,6 +172,14 @@ trait PeerHandler
                 $existingChat = yield $this->chats[-$chat['id']];
                 if (!$existingChat || $existingChat !== $chat) {
                     $this->logger->logger("Updated chat -{$chat['id']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
+                    if (!$this->getSettings()->getDb()->getEnablePeerInfoDb()) {
+                        $chat = [
+                            '_' => $chat['_'],
+                            'id' => $chat['id'],
+                            'access_hash' => $chat['access_hash'],
+                            'min' => $chat['min'] ?? false,
+                        ];
+                    }
                     yield $this->chats->offsetSet(-$chat['id'], $chat);
                     $this->cachePwrChat(-$chat['id'], $this->getSettings()->getPeer()->getFullFetch(), true);
                 }
@@ -202,6 +218,14 @@ trait PeerHandler
                         }
                         $chat = $newchat;
                     }
+                    if (!$this->getSettings()->getDb()->getEnablePeerInfoDb()) {
+                        $chat = [
+                            '_' => $chat['_'],
+                            'id' => $chat['id'],
+                            'access_hash' => $chat['access_hash'],
+                            'min' => $chat['min'] ?? false,
+                        ];
+                    }
                     yield $this->chats->offsetSet($bot_api_id, $chat);
                     $fullChat = yield $this->full_chats[$bot_api_id];
                     if ($this->getSettings()->getPeer()->getFullFetch() && $this->getSetings()->getDb()->getEnableFullPeerDb() && (!$fullChat || $fullChat['full']['participants_count'] !== (yield from $this->getFullInfo($bot_api_id))['full']['participants_count'])) {
@@ -215,7 +239,7 @@ trait PeerHandler
 
     private function cacheChatUsername($id, array $chat): void
     {
-        if ($id && !empty($chat['username'])) {
+        if ($id && !empty($chat['username']) && $this->getSettings()->getDb()->getEnableUsernameDb()) {
             $this->usernames[\strtolower($chat['username'])] = $id;
         }
     }
@@ -853,7 +877,7 @@ trait PeerHandler
      */
     public function getPwrChat($id, bool $fullfetch = true, bool $send = true): \Generator
     {
-        $full = $fullfetch ? yield from $this->getFullInfo($id) : yield from $this->getInfo($id);
+        $full = $fullfetch && $this->getSettings()->getDb()->getEnableFullPeerDb() ? yield from $this->getFullInfo($id) : yield from $this->getInfo($id);
         $res = ['id' => $full['bot_api_id'], 'type' => $full['type']];
         switch ($full['type']) {
             case 'user':

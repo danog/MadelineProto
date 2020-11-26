@@ -742,6 +742,10 @@ class MTProto extends AsyncConstruct implements TLCallback
 
     private function fillUsernamesCache(): \Generator
     {
+        if (!$this->settings->getDb()->getEnableUsernameDb()) {
+            yield $this->usernames->clear();
+            return;
+        }
         if (yield $this->usernames->count() === 0) {
             $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
             $iterator = $this->chats->getIterator();
@@ -1028,6 +1032,39 @@ class MTProto extends AsyncConstruct implements TLCallback
         $db []= $this->initDb($this);
         yield Tools::all($db);
         yield from $this->fillUsernamesCache();
+
+        if (!$this->settings->getDb()->getEnableFullPeerDb()) {
+            yield $this->full_chats->clear();
+        }
+        if (!$this->settings->getDb()->getEnablePeerInfoDb()) {
+            if (yield $this->chats->isset(0)) {
+                return;
+            }
+            $this->logger("Cleaning up peer database...");
+            $k = 0;
+            $total = yield $this->chats->count();
+            $iterator = $this->chats->getIterator();
+            while (yield $iterator->advance()) {
+                [$key, $value] = $iterator->getCurrent();
+                $value = [
+                    '_' => $value['_'],
+                    'id' => $value['id'],
+                    'access_hash' => $value['access_hash'],
+                    'min' => $value['min'] ?? false,
+                ];
+                $k++;
+                if ($k % 500 === 0 || $k === $total) {
+                    $this->logger("Cleaning up peer database ($k/$total)...");
+                    yield $this->chats->offsetSet($key, $value);
+                } else {
+                    $this->chats->offsetSet($key, $value);
+                }
+            }
+            yield $this->chats->offsetSet(0, []);
+            $this->logger("Cleaned up peer database!");
+        } else if (yield $this->chats->isset(0)) {
+            $this->chats->offsetUnset(0);
+        }
     }
 
     /**

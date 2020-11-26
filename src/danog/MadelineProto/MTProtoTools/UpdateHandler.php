@@ -300,7 +300,7 @@ trait UpdateHandler
             $this->config['expires'] = 0;
             yield from $this->getConfig();
         }
-        if (\in_array($update['_'], ['updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'])) {
+        if (\in_array($update['_'], ['updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink']) && $this->getSettings()->getDb()->getEnableFullPeerDb()) {
             $id = $this->getId($update);
             $chat = yield $this->full_chats[$id];
             $chat['last_update'] = 0;
