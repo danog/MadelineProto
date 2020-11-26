@@ -16,19 +16,29 @@ use function Amp\call;
  */
 abstract class SqlArray extends DriverArray
 {
-    protected Statement $get;
-    protected Statement $set;
-    protected Statement $unset;
-    protected Statement $count;
+    /**
+     * Statement array.
+     *
+     * @var Statement[]
+     */
+    private array $statements = [];
 
-    protected Statement $iterate;
+    protected const STATEMENT_GET = 0;
+    protected const STATEMENT_SET = 1;
+    protected const STATEMENT_UNSET = 2;
+    protected const STATEMENT_COUNT = 3;
+    protected const STATEMENT_ITERATE = 4;
+    protected const STATEMENT_CLEAR = 5;
+
 
     /**
      * Prepare statements.
      *
-     * @return \Generator
+     * @param SqlArray::STATEMENT_* $type
+     *
+     * @return Promise
      */
-    abstract protected function prepareStatements(): \Generator;
+    abstract protected function prepareStatements(int $type): Promise;
 
     /**
      * Get value from row.
@@ -42,7 +52,10 @@ abstract class SqlArray extends DriverArray
     public function getIterator(): Producer
     {
         return new Producer(function (callable $emit) {
-            $request = yield $this->iterate->execute();
+            if (!isset($this->statements[self::STATEMENT_ITERATE])) {
+                $this->statements[self::STATEMENT_ITERATE] = yield $this->prepareStatements(self::STATEMENT_ITERATE);
+            }
+            $request = yield $this->statements[self::STATEMENT_ITERATE]->execute();
 
             while (yield $request->advance()) {
                 $row = $request->getCurrent();
@@ -93,7 +106,7 @@ abstract class SqlArray extends DriverArray
         $this->unsetCache($index);
 
         return $this->execute(
-            $this->unset,
+            self::STATEMENT_UNSET,
             ['index' => $index]
         );
     }
@@ -109,9 +122,19 @@ abstract class SqlArray extends DriverArray
     public function count(): Promise
     {
         return call(function () {
-            $row = yield $this->execute($this->count);
+            $row = yield $this->execute(self::STATEMENT_COUNT);
             return $row[0]['count'] ?? 0;
         });
+    }
+
+    /**
+     * Clear all elements.
+     *
+     * @return Promise
+     */
+    public function clear(): Promise
+    {
+        return $this->execute(self::STATEMENT_CLEAR);
     }
 
     public function offsetGet($offset): Promise
@@ -121,7 +144,7 @@ abstract class SqlArray extends DriverArray
                 return $cached;
             }
 
-            $row = yield $this->execute($this->get, ['index' => $offset]);
+            $row = yield $this->execute(self::STATEMENT_GET, ['index' => $offset]);
 
             if ($value = $this->getValue($row)) {
                 $this->setCache($offset, $value);
@@ -153,7 +176,7 @@ abstract class SqlArray extends DriverArray
         $this->setCache($index, $value);
 
         $request = $this->execute(
-            $this->set,
+            self::STATEMENT_SET,
             [
                 'index' => $index,
                 'value' => \serialize($value),
@@ -169,13 +192,15 @@ abstract class SqlArray extends DriverArray
     /**
      * Perform async request to db.
      *
-     * @param Statement $query
+     * @param int $stmt
      * @param array $params
+     *
+     * @psalm-param self::STATEMENT_* $stmt
      *
      * @return Promise
      * @throws \Throwable
      */
-    protected function execute(Statement $stmt, array $params = []): Promise
+    protected function execute(int $stmt, array $params = []): Promise
     {
         return call(function () use ($stmt, $params) {
             if (
@@ -185,8 +210,11 @@ abstract class SqlArray extends DriverArray
                 $params['index'] = \mb_convert_encoding($params['index'], 'UTF-8');
             }
 
+            if (!isset($this->statements[$stmt])) {
+                $this->statements[$stmt] = yield $this->prepareStatements($stmt);
+            }
             try {
-                $request = yield $stmt->execute($params);
+                $request = yield $this->statements[$stmt]->execute($params);
             } catch (\Throwable $e) {
                 Logger::log($e->getMessage(), Logger::ERROR);
                 return [];

@@ -7,6 +7,7 @@ use Amp\Postgres\Pool;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Db\Driver\Postgres;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 
@@ -24,29 +25,43 @@ class PostgresArray extends SqlArray
     /**
      * Prepare statements.
      *
-     * @return \Generator
+     * @param SqlArray::STATEMENT_* $type
+     *
+     * @return Promise
      */
-    protected function prepareStatements(): \Generator
+    protected function prepareStatements(int $type): Promise
     {
-        $this->get = yield $this->db->prepare(
-            "SELECT value FROM \"{$this->table}\" WHERE key = :index LIMIT 1",
-        );
-        $this->set = yield $this->db->prepare("
-            INSERT INTO \"{$this->table}\"
-            (key,value)
-            VALUES (:index, :value)
-            ON CONFLICT (key) DO UPDATE SET value = :value
-        ");
-        $this->unset = yield $this->db->prepare("
-            DELETE FROM \"{$this->table}\"
-            WHERE key = :index
-        ");
-        $this->count = yield $this->db->prepare("
-            SELECT count(key) as count FROM \"{$this->table}\"
-        ");
-        $this->iterate = yield $this->db->prepare("
-            SELECT key, value FROM \"{$this->table}\"
-        ");
+        switch ($type) {
+        case SqlArray::STATEMENT_GET:
+            return $this->db->prepare(
+                "SELECT value FROM \"{$this->table}\" WHERE key = :index LIMIT 1",
+            );
+        case SqlArray::STATEMENT_SET:
+            return $this->db->prepare("
+                INSERT INTO \"{$this->table}\"
+                (key,value)
+                VALUES (:index, :value)
+                ON CONFLICT (key) DO UPDATE SET value = :value
+            ");
+        case SqlArray::STATEMENT_UNSET:
+            return $this->db->prepare("
+                DELETE FROM \"{$this->table}\"
+                WHERE key = :index
+            ");
+        case SqlArray::STATEMENT_COUNT:
+            return $this->db->prepare("
+                SELECT count(key) as count FROM \"{$this->table}\"
+            ");
+        case SqlArray::STATEMENT_ITERATE:
+            return $this->db->prepare("
+                SELECT key, value FROM \"{$this->table}\"
+            ");
+        case SqlArray::STATEMENT_CLEAR:
+            return $this->db->prepare("
+                DELETE FROM \"{$this->table}\"
+            ");
+        }
+        throw new Exception("An invalid statement type $type was provided!");
     }
 
     /**
@@ -57,7 +72,6 @@ class PostgresArray extends SqlArray
     public function initStartup(): \Generator
     {
         yield from $this->initConnection($this->dbSettings);
-        yield from $this->prepareStatements();
     }
     /**
      * Initialize connection.

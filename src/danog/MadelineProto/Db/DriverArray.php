@@ -5,6 +5,7 @@ namespace danog\MadelineProto\Db;
 use Amp\Promise;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\DatabaseAbstract;
+use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\SettingsAbstract;
 use ReflectionClass;
 
@@ -105,14 +106,7 @@ abstract class DriverArray implements DbArray
                     yield from $previous->initStartup();
                 }
                 yield from static::renameTmpTable($instance, $previous);
-                if ($instance instanceof SqlArray) {
-                    Logger::log("Preparing statements...");
-                    yield from $instance->prepareStatements();
-                }
                 yield from static::migrateDataToDb($instance, $previous);
-            } elseif ($instance instanceof SqlArray) {
-                Logger::log("Preparing statements...");
-                yield from $instance->prepareStatements();
             }
 
             return $instance;
@@ -155,22 +149,24 @@ abstract class DriverArray implements DbArray
         if (!empty($old) && !$old instanceof static) {
             Logger::log('Converting database to '.\get_class($new), Logger::ERROR);
 
-            if ($old instanceof DbArray) {
-                $old = yield $old->getArrayCopy();
-            } else {
-                $old = (array) $old;
+            if (!$old instanceof DbArray) {
+                $old = yield MemoryArray::getInstance('', $old, new Memory);
             }
             $counter = 0;
-            $total = \count($old);
-            foreach ($old as $key => $item) {
+            $total = yield $old->count();
+            $iterator = $old->getIterator();
+            while (yield $iterator->advance()) {
                 $counter++;
-                if ($counter % 500 === 0) {
-                    yield $new->offsetSet($key, $item);
+                if ($counter % 500 === 0 || $counter === $total) {
+                    yield $new->offsetSet(...$iterator->getCurrent());
                     Logger::log("Loading data to table {$new}: $counter/$total", Logger::WARNING);
                 } else {
-                    $new->offsetSet($key, $item);
+                    $new->offsetSet(...$iterator->getCurrent());
                 }
+                $new->ttlValues = [];
+                $new->cache = [];
             }
+            yield $old->clear();
             Logger::log('Converting database done.', Logger::ERROR);
         }
     }

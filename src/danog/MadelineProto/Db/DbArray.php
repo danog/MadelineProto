@@ -65,6 +65,12 @@ interface DbArray extends DbType, \ArrayAccess, \Countable
      */
     public function count(): Promise;
     /**
+     * Clear all elements.
+     *
+     * @return Promise
+     */
+    public function clear(): Promise;
+    /**
      * Get iterator.
      *
      * @return Producer<array{0: string|int, 1: T}>

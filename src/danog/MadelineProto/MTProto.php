@@ -730,8 +730,11 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         $this->referenceDatabase = new ReferenceDatabase($this);
         yield from $this->referenceDatabase->init();
-        $callbacks = [$this, $this->referenceDatabase];
-        if (!($this->authorization['user']['bot'] ?? false)) {
+        $callbacks = [$this];
+        if ($this->settings->getDb()->getEnableFileReferenceDb()) {
+            $callbacks[] = $this->referenceDatabase;
+        }
+        if ($this->settings->getDb()->getEnableMinDb() && !($this->authorization['user']['bot'] ?? false)) {
             $callbacks[] = $this->minDatabase;
         }
         $this->TL->updateCallbacks($callbacks);
@@ -1206,11 +1209,13 @@ class MTProto extends AsyncConstruct implements TLCallback
         // Cleanup old properties, init new stuffs
         yield from $this->cleanupProperties();
         // Update TL callbacks
-        $callbacks = [$this, $this->referenceDatabase];
-        if (!($this->authorization['user']['bot'] ?? false)) {
+        $callbacks = [$this];
+        if ($this->settings->getDb()->getEnableFileReferenceDb()) {
+            $callbacks[] = $this->referenceDatabase;
+        }
+        if ($this->settings->getDb()->getEnableMinDb() && !($this->authorization['user']['bot'] ?? false)) {
             $callbacks[] = $this->minDatabase;
         }
-        $this->TL->updateCallbacks($callbacks);
         // Connect to all DCs, start internal loops
         yield from $this->connectToAllDcs();
         $this->startLoops();

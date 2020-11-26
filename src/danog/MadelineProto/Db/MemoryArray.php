@@ -39,7 +39,9 @@ class MemoryArray extends \ArrayIterator implements DbArray
                 if ($previous instanceof DriverArray) {
                     yield from $previous->initStartup();
                 }
-                $previous = yield $previous->getArrayCopy();
+                $temp = yield $previous->getArrayCopy();
+                yield $previous->clear();
+                $previous = $temp;
             }
             return new static($previous);
         });
@@ -73,6 +75,12 @@ class MemoryArray extends \ArrayIterator implements DbArray
     public function getArrayCopy(): Promise
     {
         return new Success(parent::getArrayCopy());
+    }
+
+    public function clear(): Promise
+    {
+        parent::__construct([], parent::getFlags());
+        return new Success();
     }
 
     public function getIterator(): Producer

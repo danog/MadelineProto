@@ -240,4 +240,30 @@ class RedisArray extends DriverArray
             return $count;
         });
     }
+
+    /**
+     * Clear all elements.
+     *
+     * @return Promise
+     */
+    public function clear(): Promise
+    {
+        return call(function () {
+            $request = $this->db->scan($this->itKey());
+
+            $keys = [];
+            $k = 0;
+            while (yield $request->advance()) {
+                $keys[$k++] = $request->getCurrent();
+                if ($k === 10) {
+                    yield $this->db->delete(...$keys);
+                    $keys = [];
+                    $k = 0;
+                }
+            }
+            if (!empty($keys)) {
+                yield $this->db->delete(...$keys);
+            }
+        });
+    }
 }
