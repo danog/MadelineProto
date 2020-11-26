@@ -542,10 +542,12 @@ class TL
         } elseif (isset($this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
             $object = $this->callbacks[TLCallback::TYPE_MISMATCH_CALLBACK][$type['type']]($object);
             $object = $object instanceof \Generator ? yield from $object : yield $object;
-            if (!isset($object[$type['type']])) {
-                throw new \danog\MadelineProto\Exception("Could not convert {$type['type']} object");
+            if (!isset($object['_'])) {
+                if (!isset($object[$type['type']])) {
+                    throw new \danog\MadelineProto\Exception("Could not convert {$type['type']} object");
+                }
+                $object = $object[$type['type']];
             }
-            $object = $object[$type['type']];
         }
         if (!isset($object['_'])) {
             $constructorData = $this->constructors->findByPredicate($type['type'], $layer);

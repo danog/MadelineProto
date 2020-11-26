@@ -1049,7 +1049,7 @@ class MTProto extends AsyncConstruct implements TLCallback
                 $value = [
                     '_' => $value['_'],
                     'id' => $value['id'],
-                    'access_hash' => $value['access_hash'],
+                    'access_hash' => $value['access_hash'] ?? null,
                     'min' => $value['min'] ?? false,
                 ];
                 $k++;

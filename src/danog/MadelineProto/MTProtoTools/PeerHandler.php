@@ -137,7 +137,7 @@ trait PeerHandler
                         $user = [
                             '_' => $user['_'],
                             'id' => $user['id'],
-                            'access_hash' => $user['access_hash'],
+                            'access_hash' => $user['access_hash'] ?? null,
                             'min' => $user['min'] ?? false,
                         ];
                     }
@@ -176,7 +176,7 @@ trait PeerHandler
                         $chat = [
                             '_' => $chat['_'],
                             'id' => $chat['id'],
-                            'access_hash' => $chat['access_hash'],
+                            'access_hash' => $chat['access_hash'] ?? null,
                             'min' => $chat['min'] ?? false,
                         ];
                     }
@@ -222,7 +222,7 @@ trait PeerHandler
                         $chat = [
                             '_' => $chat['_'],
                             'id' => $chat['id'],
-                            'access_hash' => $chat['access_hash'],
+                            'access_hash' => $chat['access_hash'] ?? null,
                             'min' => $chat['min'] ?? false,
                         ];
                     }
@@ -729,7 +729,7 @@ trait PeerHandler
      *      type: string
      * }
      */
-    private function genAll($constructor, $folder_id, int $type): array
+    private function genAll($constructor, $folder_id, int $type)
     {
         if ($type === MTProto::INFO_TYPE_CONSTRUCTOR) {
             if ($constructor['_'] === 'user') {

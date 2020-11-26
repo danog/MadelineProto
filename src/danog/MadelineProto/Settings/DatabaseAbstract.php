@@ -12,23 +12,23 @@ abstract class DatabaseAbstract extends SettingsAbstract
     /**
      * Whether to enable the file reference database. If disabled, will break file downloads.
      */
-    private bool $enableFileReferenceDb = true;
+    protected bool $enableFileReferenceDb = true;
     /**
      * Whether to enable the min database. If disabled, will break sendMessage (and other methods) in certain conditions.
      */
-    private bool $enableMinDb = true;
+    protected bool $enableMinDb = true;
     /**
      * Whether to enable the username database. If disabled, will break sendMessage (and other methods) with usernames.
      */
-    private bool $enableUsernameDb = true;
+    protected bool $enableUsernameDb = true;
     /**
      * Whether to enable the full peer info database. If disabled, will break getFullInfo.
      */
-    private bool $enableFullPeerDb = true;
+    protected bool $enableFullPeerDb = true;
     /**
      * Whether to enable the peer info database. If disabled, will break getInfo.
      */
-    private bool $enablePeerInfoDb = true;
+    protected bool $enablePeerInfoDb = true;
 
     /**
      * Get whether to enable the file reference database. If disabled, will break file downloads.
