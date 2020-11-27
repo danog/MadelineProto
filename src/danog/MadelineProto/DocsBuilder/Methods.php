@@ -219,7 +219,7 @@ trait Methods
             $example = '';
             if (!isset($this->settings['td'])) {
                 $example .= '### Can bots use this method: **'.($bot ? 'YES' : 'NO')."**\n\n\n";
-                $example .= \str_replace('[]', '', $this->template('method-example', $type, $phpMethod, $params, $method, $lua_params));
+                $example .= \str_replace('[]', '', $this->template('method-example', \str_replace('.', '_', $type), $phpMethod, $params, $method, $lua_params));
                 if ($hasreplymarkup) {
                     $example .= $this->template('reply_markup');
                 }

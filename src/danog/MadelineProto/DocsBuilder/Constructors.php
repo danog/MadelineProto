@@ -202,7 +202,7 @@ image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png'.$redi
 ';
             $example = '';
             if (!isset($this->settings['td'])) {
-                $example = $this->template('constructor-example', $constructor.$layer, $params, $lua_params);
+                $example = $this->template('constructor-example', \str_replace('.', '_', $constructor.$layer), $params, $lua_params);
                 if ($hasreplymarkup) {
                     $example .= $this->template('reply_markup');
                 }
