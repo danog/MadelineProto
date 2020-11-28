@@ -85,7 +85,7 @@ abstract class SqlArray extends DriverArray
      */
     public function isset($key): Promise
     {
-        return call(fn () => yield $this->offsetGet($key) !== null);
+        return call(fn () => null !== yield $this->offsetGet($key));
     }
 
 

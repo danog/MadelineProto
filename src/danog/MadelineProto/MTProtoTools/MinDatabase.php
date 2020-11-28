@@ -84,7 +84,7 @@ class MinDatabase implements TLCallback
         if (!$this->API->getSettings()->getDb()->getEnableMinDb()) {
             yield $this->db->clear();
         }
-        if ($this->clean || yield $this->db->count() === 0) {
+        if ($this->clean || 0 === yield $this->db->count()) {
             $this->clean = true;
             return;
         }

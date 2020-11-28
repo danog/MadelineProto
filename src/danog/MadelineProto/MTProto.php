@@ -746,7 +746,7 @@ class MTProto extends AsyncConstruct implements TLCallback
             yield $this->usernames->clear();
             return;
         }
-        if (yield $this->usernames->count() === 0) {
+        if (!yield $this->usernames->count()) {
             $this->logger('Filling database cache. This can take few minutes.', Logger::WARNING);
             $iterator = $this->chats->getIterator();
             while (yield $iterator->advance()) {
