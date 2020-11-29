@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\Stream\Ogg;
 
 use Amp\Emitter;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
@@ -307,7 +308,6 @@ class Ogg
                             }
                         }
                         $this->streamCount = $opus_head['channel_mapping']['stream_count'];
-                        \var_dump($opus_head);
                         $state = self::STATE_READ_COMMENT;
                     } elseif ($state === self::STATE_READ_COMMENT) {
                         $vendor_string_length = \unpack('V', \substr($content, 8, 4))[1];

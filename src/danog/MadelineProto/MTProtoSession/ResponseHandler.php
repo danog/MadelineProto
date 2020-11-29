@@ -231,7 +231,10 @@ trait ResponseHandler
             $body = $request->getBodyOrEmpty();
             $trimmed = [];
             if (isset($body['peer'])) {
-                $trimmed['peer'] = \is_string($body['peer']) ? $body['peer'] : $this->API->getId($body['peer']);
+                try {
+                    $trimmed['peer'] = \is_string($body['peer']) ? $body['peer'] : $this->API->getId($body['peer']);
+                } catch (\Throwable $e) {
+                }
             }
             if (isset($body['message'])) {
                 $trimmed['message'] = (string) $body['message'];

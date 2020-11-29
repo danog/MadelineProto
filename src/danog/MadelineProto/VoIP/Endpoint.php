@@ -4,6 +4,7 @@ namespace danog\MadelineProto\VoIP;
 
 use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
+use Amp\Success;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\VoIP;
@@ -37,7 +38,7 @@ class Endpoint
     /**
      * The socket.
      */
-    private EncryptableSocket $socket;
+    private ?EncryptableSocket $socket = null;
 
     /**
      * Whether we're the creator.
@@ -78,6 +79,18 @@ class Endpoint
         $this->socket = yield connect("udp://{$this->ip}:{$this->port}");
     }
 
+    /**
+     * Disconnect from endpoint.
+     *
+     * @return void
+     */
+    public function disconnect(): void
+    {
+        if ($this->socket !== null) {
+            $this->socket->close();
+            $this->socket = null;
+        }
+    }
     /**
      * Read packet.
      *
@@ -139,6 +152,9 @@ class Endpoint
      */
     public function write(string $payload): Promise
     {
+        if ($this->socket === null) {
+            return new Success(0);
+        }
         $plaintext = \pack('v', \strlen($payload)).$payload;
         $padding = 16 - (\strlen($plaintext) % 16);
         if ($padding < 16) {

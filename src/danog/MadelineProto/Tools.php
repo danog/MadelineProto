@@ -305,7 +305,7 @@ abstract class Tools extends StrTools
         $resolved = false;
         do {
             try {
-                Logger::log("Starting event loop...");
+                //Logger::log("Starting event loop...");
                 Loop::run(function () use (&$resolved, &$value, &$exception, $promise) {
                     $promise->onResolve(function ($e, $v) use (&$resolved, &$value, &$exception) {
                         Loop::stop();

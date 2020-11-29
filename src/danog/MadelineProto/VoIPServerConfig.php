@@ -82,7 +82,7 @@ if (\class_exists(VoIPServerConfig::class)) {
         /**
          * Get final settings.
          *
-         * @return void
+         * @return array
          */
         public static function getFinal(): array
         {

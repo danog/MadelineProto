@@ -13,6 +13,7 @@ If not, see <http://www.gnu.org/licenses/>.
 namespace danog\MadelineProto;
 
 use Amp\Delayed;
+use Amp\Loop;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\Stream\Common\FileBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -113,7 +114,8 @@ class VoIP
     private $TLID_REFLECTOR_SELF_INFO;
     private $TLID_REFLECTOR_PEER_INFO;
 
-    private $MadelineProto;
+    private MTProto $MadelineProto;
+    public MTProto $madeline;
     public $received_timestamp_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     public $remote_ack_timestamp_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     public $session_out_seq_no = 0;
@@ -123,7 +125,7 @@ class VoIP
     public $storage = [];
     public $internalStorage = [];
     private $signal = 0;
-    private $callState;
+    private int $callState;
     private $callID;
     private $creatorID;
     private $otherID;
@@ -139,69 +141,135 @@ class VoIP
     private PermAuthKey $authKey;
     private int $peerVersion = 0;
 
+
     /**
      * @var Endpoint[]
      */
     private array $sockets = [];
 
+    /**
+     * Timeout watcher.
+     */
+    private string $timeoutWatcher;
+
     private $connection_settings = [];
     private $dclist = [];
 
-    private $datacenter;
+    private $socket;
 
-    public function __construct(bool $creator, int $otherID, MTProto $MadelineProto, $callState)
+    /**
+     * Constructor.
+     *
+     * @param boolean $creator
+     * @param integer $otherID
+     * @param MTProto $MadelineProto
+     * @param integer $callState
+     */
+    public function __construct(bool $creator, int $otherID, MTProto $MadelineProto, int $callState)
     {
         $this->creator = $creator;
         $this->otherID = $otherID;
-        //$this->callID = $callID;
         $this->madeline = $this->MadelineProto = $MadelineProto;
         $this->callState = $callState;
-        //$this->protocol = $protocol;
         $this->TLID_REFLECTOR_SELF_INFO = \strrev(\hex2bin(self::TLID_REFLECTOR_SELF_INFO_HEX));
         $this->TLID_REFLECTOR_PEER_INFO = \strrev(\hex2bin(self::TLID_REFLECTOR_PEER_INFO_HEX));
         $this->TLID_DECRYPTED_AUDIO_BLOCK = \strrev(\hex2bin(self::TLID_DECRYPTED_AUDIO_BLOCK_HEX));
         $this->TLID_SIMPLE_AUDIO_BLOCK = \strrev(\hex2bin(self::TLID_SIMPLE_AUDIO_BLOCK_HEX));
     }
 
+    /**
+     * Get max layer.
+     *
+     * @return integer
+     */
     public static function getConnectionMaxLayer(): int
     {
         return 92;
     }
 
-    public function deInitVoIPController()
-    {
-    }
-
+    /**
+     * Get debug string.
+     *
+     * @return string
+     */
     public function getDebugString(): string
     {
         return '';
     }
 
-    public function setCall($callID)
+    /**
+     * Set call constructor.
+     *
+     * @param array $callID
+     * @return void
+     */
+    public function setCall(array $callID): void
     {
-        $this->callID = $callID;
+        $this->protocol = $callID['protocol'];
+        $this->callID = [
+            '_' => 'inputPhoneCall',
+            'id' => $callID['id'],
+            'access_hash' => $callID['access_hash']
+        ];
     }
 
-    public function setVisualization($visualization)
+    /**
+     * Set emojis.
+     *
+     * @param array $visualization
+     * @return void
+     */
+    public function setVisualization(array $visualization): void
     {
         $this->visualization = $visualization;
     }
 
-    public function getVisualization()
+    /**
+     * Get emojis.
+     *
+     * @return array
+     */
+    public function getVisualization(): array
     {
         return $this->visualization;
     }
 
+    /**
+     * Discard call.
+     *
+     * @param array $reason
+     * @param array $rating
+     * @param boolean $debug
+     * @return self|false
+     */
     public function discard($reason = ['_' => 'phoneCallDiscardReasonDisconnect'], $rating = [], $debug = false)
     {
         if ($this->callState === self::CALL_STATE_ENDED || empty($this->configuration)) {
             return false;
         }
-        $this->deinitVoIPController();
+        Logger::log("Now closing $this");
+        if (isset($this->timeoutWatcher)) {
+            Loop::cancel($this->timeoutWatcher);
+        }
+
+        Logger::log("Closing all sockets in $this");
+        foreach ($this->sockets as $socket) {
+            $socket->disconnect();
+        }
+        Logger::log("Closed all sockets, discarding $this");
 
         return Tools::callFork($this->MadelineProto->discardCall($this->callID, $reason, $rating, $debug));
     }
 
+    public function __destruct()
+    {
+        $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
+    }
+    /**
+     * Accept call.
+     *
+     * @return self|false
+     */
     public function accept()
     {
         if ($this->callState !== self::CALL_STATE_INCOMING) {
@@ -218,13 +286,26 @@ class VoIP
         return $this;
     }
 
-    public function close()
+    /**
+     * Last incoming timestamp.
+     *
+     * @var float
+     */
+    private $lastIncomingTimestamp = 0.0;
+    /**
+     * Start the actual call.
+     */
+    public function startTheMagic(): self
     {
-        $this->deinitVoIPController();
-    }
-
-    public function startTheMagic()
-    {
+        if ($this->voip_state !== self::STATE_CREATED) {
+            return $this;
+        }
+        $this->voip_state = self::STATE_WAIT_INIT;
+        $this->timeoutWatcher = Loop::repeat(10000, function () {
+            if (\microtime(true) - $this->lastIncomingTimestamp > 10) {
+                $this->discard(['_' => 'phoneCallDiscardReasonDisconnect']);
+            }
+        });
         Tools::callFork((function () {
             $this->authKey = new PermAuthKey();
             $this->authKey->setAuthKey($this->configuration['auth_key']);
@@ -237,160 +318,257 @@ class VoIP
                 try {
                     yield from $socket->connect();
                 } catch (\Throwable $e) {
-                    Logger::log($e);
                     unset($this->sockets[$k]);
                 }
             }
-            $this->init_all();
-            Tools::callFork((function () use ($socket) {
-                while ($payload = yield from $this->recv_message($socket)) {
-                    Tools::callFork($this->handlePacket($socket, $payload));
-                }
-            })());
+            foreach ($this->sockets as $socket) {
+                $this->send_message(['_' => self::PKT_INIT, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'audio_streams' => [self::CODEC_OPUS], 'video_streams' => []], $socket);
+                Tools::callFork((function () use ($socket) {
+                    while ($payload = yield from $this->recv_message($socket)) {
+                        $this->lastIncomingTimestamp = \microtime(true);
+                        Tools::callFork($this->handlePacket($socket, $payload));
+                    }
+                    Logger::log("Exiting VoIP read loop in $this!");
+                })());
+            }
         })());
         return $this;
     }
-    public function handlePacket($datacenter, $packet)
+    /**
+     * Handle incoming packet.
+     */
+    private function handlePacket(Endpoint $socket, array $packet): \Generator
     {
-        //\var_dump($packet);
         switch ($packet['_']) {
             case self::PKT_INIT:
                 //$this->voip_state = self::STATE_WAIT_INIT_ACK;
-                $this->send_message(['_' => self::PKT_INIT_ACK, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'all_streams' => [['id' => 0, 'type' => self::STREAM_TYPE_AUDIO, 'codec' => self::CODEC_OPUS, 'frame_duration' => 60, 'enabled' => 1]]], $datacenter);
+                $this->send_message(['_' => self::PKT_INIT_ACK, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'all_streams' => [['id' => 0, 'type' => self::STREAM_TYPE_AUDIO, 'codec' => self::CODEC_OPUS, 'frame_duration' => 60, 'enabled' => 1]]], $socket);
 
-                if ($this->voip_state !== self::STATE_ESTABLISHED) {
-                    $this->voip_state = self::STATE_ESTABLISHED;
-
-                    $ctx = new ConnectionContext;
-                    $ctx->addStream(FileBufferedStream::class, yield open('kda.opus', 'r'));
-                    $stream = yield from $ctx->getStream();
-                    $ogg = yield from Ogg::init($stream, 60000);
-                    $it = $ogg->getEmitter()->iterate();
-                    Tools::callFork($ogg->read());
-                    Tools::callFork((function () use ($it, $datacenter) {
-                        $timestamp = 0;
-                        $frames = [];
-                        while (yield $it->advance()) {
-                            $frames []= $it->getCurrent();
-                        }
-                        foreach ($frames as $frame) {
-                            $t = (\microtime(true) / 1000) + 60;
-                            yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $frame, 'timestamp' => $timestamp], $datacenter);
-
-                            yield new Delayed((int) ($t - (\microtime(true) / 1000)));
-
-                            $timestamp += 60;
-                        }
-                    })());
-                }
+                yield from $this->startWriteLoop($socket);
                 break;
             case self::PKT_INIT_ACK:
+                yield from $this->startWriteLoop($socket);
                 break;
         }
     }
-    public $timestamp = 0;
-    public function oggCallback($data)
+    /**
+     * Start write loop.
+     *
+     * @param Endpoint $socket
+     * @return \Generator
+     */
+    private function startWriteLoop(Endpoint $socket): \Generator
     {
-        \var_dump(\strlen($data));
-        $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $data, 'timestamp' => $this->timestamp]);
-        $this->timestamp += 60;
+        if ($this->voip_state !== self::STATE_ESTABLISHED) {
+            $this->voip_state = self::STATE_ESTABLISHED;
+
+            $ctx = new ConnectionContext;
+            $ctx->addStream(FileBufferedStream::class, yield open('kda.opus', 'r'));
+            $stream = yield from $ctx->getStream();
+            $ogg = yield from Ogg::init($stream, 60000);
+            $it = $ogg->getEmitter()->iterate();
+            Tools::callFork($ogg->read());
+            Tools::callFork((function () use ($it, $socket) {
+                $timestamp = 0;
+                $frames = [];
+                while (yield $it->advance()) {
+                    $frames []= $it->getCurrent();
+                }
+                foreach ($frames as $k => $frame) {
+                    $t = (\microtime(true) / 1000) + 60;
+                    if (!yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $frame, 'timestamp' => $timestamp], $socket)) {
+                        Logger::log("Exiting VoIP write loop in $this!");
+                        return;
+                    }
+
+
+                    Logger::log("Writing $k in $this!");
+                    yield new Delayed((int) ($t - (\microtime(true) / 1000)));
+
+                    $timestamp += 60;
+                }
+            })());
+        }
     }
-    public function play($file)
+    /**
+     * Play file.
+     *
+     * @param string $file
+     * @return self
+     */
+    public function play(string $file): self
     {
         $this->inputFiles[] = $file;
 
         return $this;
     }
 
-    public function then($file)
+    /**
+     * Play file.
+     *
+     * @param string $file
+     * @return self
+     */
+    public function then(string $file): self
     {
         $this->inputFiles[] = $file;
 
         return $this;
     }
 
-    public function playOnHold($files)
+    /**
+     * Files to play on hold.
+     *
+     * @param array $files
+     * @return self
+     */
+    public function playOnHold(array $files): self
     {
         $this->holdFiles = $files;
 
         return $this;
     }
 
-    public function setOutputFile($file)
+    /**
+     * Set output file.
+     *
+     * @param string $file
+     * @return self
+     */
+    public function setOutputFile(string $file): self
     {
         $this->outputFile = $file;
 
         return $this;
     }
 
-    public function unsetOutputFile()
+    /**
+     * Unset output file.
+     *
+     * @return self
+     */
+    public function unsetOutputFile(): self
     {
         $this->outputFile = null;
+
+        return $this;
     }
 
-    public function setMadeline($MadelineProto)
+
+    /**
+     * Set MadelineProto instance.
+     *
+     * @param MTProto $MadelineProto
+     * @return void
+     */
+    public function setMadeline(MTProto $MadelineProto): void
     {
-        $this->MadelineProto = $MadelineProto;
+        $this->MadelineProto = $this->madeline = $MadelineProto;
     }
 
-    public function getProtocol()
+    /**
+     * Get call protocol.
+     *
+     * @return array
+     */
+    public function getProtocol(): array
     {
         return $this->protocol;
     }
 
-    public function getOtherID()
+    /**
+     * Get ID of other user.
+     *
+     * @return int
+     */
+    public function getOtherID(): int
     {
         return $this->otherID;
     }
 
+    /**
+     * Get call ID.
+     *
+     * @return string|int
+     */
     public function getCallID()
     {
         return $this->callID;
     }
 
+    /**
+     * Get creation date.
+     *
+     * @return int|bool
+     */
     public function whenCreated()
     {
         return isset($this->internalStorage['created']) ? $this->internalStorage['created'] : false;
     }
 
-    public function parseConfig()
+    /**
+     * Parse config.
+     *
+     * @return void
+     */
+    public function parseConfig(): void
     {
     }
 
-    private function init_all()
-    {
-        foreach ($this->sockets as $socket) {
-            $this->send_message(['_' => self::PKT_INIT, 'protocol' => self::PROTOCOL_VERSION, 'min_protocol' => self::MIN_PROTOCOL_VERSION, 'audio_streams' => [self::CODEC_OPUS], 'video_streams' => []], $socket);
-            $this->voip_state = self::STATE_WAIT_INIT;
-        }
-    }
-
-    public function getCallState()
+    /**
+     * Get call state.
+     *
+     * @return int
+     */
+    public function getCallState(): int
     {
         return $this->callState;
     }
 
-    public function getVersion()
+    /**
+     * Get library version.
+     *
+     * @return string
+     */
+    public function getVersion(): string
     {
         return 'libponyvoip-1.0';
     }
 
-    public function getPreferredRelayID()
+    /**
+     * Get preferred relay ID.
+     *
+     * @return integer
+     */
+    public function getPreferredRelayID(): int
     {
         return 0;
     }
 
-    public function getLastError()
+    /**
+     * Get last error.
+     *
+     * @return string
+     */
+    public function getLastError(): string
     {
         return '';
     }
 
-    public function getDebugLog()
+    /**
+     * Get debug log.
+     *
+     * @return string
+     */
+    public function getDebugLog(): string
     {
         return '';
     }
 
-    public function getSignalBarsCount()
+    /**
+     * Get signal bar count.
+     */
+    public function getSignalBarsCount(): int
     {
         return $this->signal;
     }
@@ -423,5 +601,16 @@ class VoIP
     public function getPeerVersion(): int
     {
         return $this->peerVersion;
+    }
+
+    /**
+     * Get call representation.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $id = $this->callID['id'];
+        return "call {$id} with {$this->otherID}";
     }
 }
