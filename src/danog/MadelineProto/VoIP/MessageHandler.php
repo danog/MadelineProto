@@ -328,7 +328,7 @@ trait MessageHandler
                 }
         }
         if (!$this->received_packet($in_seq_no, $out_seq_no, $ack_mask)) {
-            return false;
+            return yield from $this->recv_message($endpoint);
         }
         switch ($result['_']) {
             // streamTypeSimple codec:int8 = StreamType;

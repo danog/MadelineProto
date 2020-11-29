@@ -132,7 +132,7 @@ class VoIP
     private $protocol;
     private $visualization;
     private $holdFiles = [];
-    private $inputFiles;
+    private $inputFiles = [];
     private $outputFile;
     private $isPlaying = false;
 
@@ -247,6 +247,7 @@ class VoIP
         if ($this->callState === self::CALL_STATE_ENDED || empty($this->configuration)) {
             return false;
         }
+        $this->callState = self::CALL_STATE_ENDED;
         Logger::log("Now closing $this");
         if (isset($this->timeoutWatcher)) {
             Loop::cancel($this->timeoutWatcher);
@@ -349,6 +350,17 @@ class VoIP
             case self::PKT_INIT_ACK:
                 yield from $this->startWriteLoop($socket);
                 break;
+            case self::PKT_STREAM_DATA:
+                $cnt = 1;
+                break;
+            case self::PKT_STREAM_DATA_X2:
+                $cnt = 2;
+                break;
+            case self::PKT_STREAM_DATA_X3:
+                $cnt = 3;
+                break;
+        }
+        if (isset($cnt)) {
         }
     }
     /**
@@ -359,36 +371,73 @@ class VoIP
      */
     private function startWriteLoop(Endpoint $socket): \Generator
     {
-        if ($this->voip_state !== self::STATE_ESTABLISHED) {
-            $this->voip_state = self::STATE_ESTABLISHED;
+        if ($this->voip_state === self::STATE_ESTABLISHED) {
+            return;
+        }
+        $this->voip_state = self::STATE_ESTABLISHED;
 
-            $ctx = new ConnectionContext;
-            $ctx->addStream(FileBufferedStream::class, yield open('kda.opus', 'r'));
-            $stream = yield from $ctx->getStream();
-            $ogg = yield from Ogg::init($stream, 60000);
-            $it = $ogg->getEmitter()->iterate();
-            Tools::callFork($ogg->read());
-            Tools::callFork((function () use ($it, $socket) {
-                $timestamp = 0;
-                $frames = [];
+        $holdFiles = [];
+        $timestamp = 0;
+        while (true) {
+            $file = \array_shift($this->inputFiles);
+            if (!$file) {
+                if (empty($holdFiles)) {
+                    $holdFiles = $this->holdFiles;
+                }
+                if (empty($holdFiles)) {
+                    return;
+                }
+                $file = \array_shift($holdFiles);
+            }
+            $it = yield from $this->openFile($file);
+            $frames = [];
+            if ($this->MadelineProto->getSettings()->getVoip()->getPreloadAudio()) {
                 while (yield $it->advance()) {
                     $frames []= $it->getCurrent();
                 }
-                foreach ($frames as $k => $frame) {
+                foreach ($frames as $frame) {
                     $t = (\microtime(true) / 1000) + 60;
                     if (!yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $frame, 'timestamp' => $timestamp], $socket)) {
                         Logger::log("Exiting VoIP write loop in $this!");
                         return;
                     }
 
-
-                    Logger::log("Writing $k in $this!");
+                    //Logger::log("Writing $timestamp in $this!");
                     yield new Delayed((int) ($t - (\microtime(true) / 1000)));
 
                     $timestamp += 60;
                 }
-            })());
+            } else {
+                while (yield $it->advance()) {
+                    $t = (\microtime(true) / 1000) + 60;
+                    if (!yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $it->getCurrent(), 'timestamp' => $timestamp], $socket)) {
+                        Logger::log("Exiting VoIP write loop in $this!");
+                        return;
+                    }
+
+                    //Logger::log("Writing $timestamp in $this!");
+                    yield new Delayed((int) ($t - (\microtime(true) / 1000)));
+
+                    $timestamp += 60;
+                }
+            }
         }
+    }
+    /**
+     * Open OGG file for reading.
+     *
+     * @param string $file
+     * @return \Generator
+     */
+    private function openFile(string $file): \Generator
+    {
+        $ctx = new ConnectionContext;
+        $ctx->addStream(FileBufferedStream::class, yield open($file, 'r'));
+        $stream = yield from $ctx->getStream();
+        $ogg = yield from Ogg::init($stream, 60000);
+        $it = $ogg->getEmitter()->iterate();
+        Tools::callFork($ogg->read());
+        return $it;
     }
     /**
      * Play file.

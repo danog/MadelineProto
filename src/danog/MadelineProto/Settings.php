@@ -20,6 +20,7 @@ use danog\MadelineProto\Settings\SecretChats;
 use danog\MadelineProto\Settings\Serialization;
 use danog\MadelineProto\Settings\Templates;
 use danog\MadelineProto\Settings\TLSchema;
+use danog\MadelineProto\Settings\VoIP;
 
 /**
  * Settings class used for configuring MadelineProto.
@@ -82,6 +83,10 @@ class Settings extends SettingsAbstract
      * Template settings.
      */
     protected Templates $templates;
+    /**
+     * VoIP settings.
+     */
+    protected VoIP $voip;
 
     /**
      * Create settings object from possibly legacy settings array.
@@ -125,6 +130,13 @@ class Settings extends SettingsAbstract
         $this->db = new DatabaseMemory;
         $this->templates = new Templates;
         $this->ipc = new IPc;
+        $this->voip = new VoIP;
+    }
+    public function __wakeup()
+    {
+        if (!isset($this->voip)) {
+            $this->voip = new VoIP;
+        }
     }
     /**
      * Merge legacy array settings.
@@ -149,6 +161,7 @@ class Settings extends SettingsAbstract
         $this->serialization->mergeArray($settings);
         $this->schema->mergeArray($settings);
         $this->ipc->mergeArray($settings);
+        $this->voip->mergeArray($settings);
 
         switch ($settings['db']['type'] ?? 'memory') {
             case 'memory':
@@ -203,6 +216,8 @@ class Settings extends SettingsAbstract
                 $this->ipc->merge($settings);
             } elseif ($settings instanceof Templates) {
                 $this->templates->merge($settings);
+            } elseif ($settings instanceof VoIP) {
+                $this->voip->merge($settings);
             } elseif ($settings instanceof DatabaseAbstract) {
                 if (!$this->db instanceof $settings) {
                     $this->db = $settings;
@@ -225,6 +240,7 @@ class Settings extends SettingsAbstract
         $this->schema->merge($settings->schema);
         $this->ipc->merge($settings->ipc);
         $this->templates->merge($settings->templates);
+        $this->voip->merge($settings->voip);
 
         if (!$this->db instanceof $settings->db) {
             $this->db = $settings->db;
@@ -607,6 +623,30 @@ class Settings extends SettingsAbstract
     public function setTemplates(Templates $templates): self
     {
         $this->templates = $templates;
+
+        return $this;
+    }
+
+    /**
+     * Get voIP settings.
+     *
+     * @return VoIP
+     */
+    public function getVoip(): VoIP
+    {
+        return $this->voip;
+    }
+
+    /**
+     * Set voIP settings.
+     *
+     * @param VoIP $voip VoIP settings.
+     *
+     * @return self
+     */
+    public function setVoip(VoIP $voip): self
+    {
+        $this->voip = $voip;
 
         return $this;
     }
