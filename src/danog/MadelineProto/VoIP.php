@@ -19,6 +19,7 @@ use danog\MadelineProto\Stream\Common\FileBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\Ogg\Ogg;
 use danog\MadelineProto\VoIP\Endpoint;
+use SplQueue;
 
 use function Amp\File\open;
 
@@ -152,11 +153,50 @@ class VoIP
      */
     private string $timeoutWatcher;
 
-    private $connection_settings = [];
-    private $dclist = [];
-
-    private $socket;
-
+    /**
+     * Last incoming timestamp.
+     *
+     * @var float
+     */
+    private $lastIncomingTimestamp = 0.0;
+    /**
+     * The outgoing timestamp
+     * 
+     * @var int
+     */
+    private $timestamp = 0;
+    /**
+     * Packet queue
+     * 
+     * @var SplQueue
+     */
+    private $packetQueue;
+    /**
+     * Temporary holdfile array
+     */
+    private array $tempHoldFiles = [];
+    /**
+     * Sleep function
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        $vars = get_object_vars($this);
+        unset($vars['sockets']);
+        unset($vars['timeoutWatcher']);
+        return array_keys($vars);
+    }
+    /**
+     * Wakeup function
+     */
+    public function __wakeup()
+    {
+        if ($this->voip_state === self::STATE_ESTABLISHED) {
+            $this->voip_state = self::STATE_CREATED;
+            $this->startTheMagic();
+        }
+    }
     /**
      * Constructor.
      *
@@ -171,6 +211,7 @@ class VoIP
         $this->otherID = $otherID;
         $this->madeline = $this->MadelineProto = $MadelineProto;
         $this->callState = $callState;
+        $this->packetQueue = new SplQueue;
         $this->TLID_REFLECTOR_SELF_INFO = \strrev(\hex2bin(self::TLID_REFLECTOR_SELF_INFO_HEX));
         $this->TLID_REFLECTOR_PEER_INFO = \strrev(\hex2bin(self::TLID_REFLECTOR_PEER_INFO_HEX));
         $this->TLID_DECRYPTED_AUDIO_BLOCK = \strrev(\hex2bin(self::TLID_DECRYPTED_AUDIO_BLOCK_HEX));
@@ -288,12 +329,6 @@ class VoIP
     }
 
     /**
-     * Last incoming timestamp.
-     *
-     * @var float
-     */
-    private $lastIncomingTimestamp = 0.0;
-    /**
      * Start the actual call.
      */
     public function startTheMagic(): self
@@ -376,49 +411,49 @@ class VoIP
         }
         $this->voip_state = self::STATE_ESTABLISHED;
 
-        $holdFiles = [];
-        $timestamp = 0;
+        $this->tempHoldFiles = [];
         while (true) {
             $file = \array_shift($this->inputFiles);
             if (!$file) {
-                if (empty($holdFiles)) {
-                    $holdFiles = $this->holdFiles;
+                if (empty($this->tempHoldFiles)) {
+                    $this->tempHoldFiles = $this->holdFiles;
                 }
-                if (empty($holdFiles)) {
+                if (empty($this->tempHoldFiles)) {
                     return;
                 }
-                $file = \array_shift($holdFiles);
+                $file = \array_shift($this->tempHoldFiles);
             }
             $it = yield from $this->openFile($file);
-            $frames = [];
             if ($this->MadelineProto->getSettings()->getVoip()->getPreloadAudio()) {
                 while (yield $it->advance()) {
-                    $frames []= $it->getCurrent();
+                    $this->packetQueue->enqueue($it->getCurrent());
                 }
-                foreach ($frames as $frame) {
-                    $t = (\microtime(true) / 1000) + 60;
-                    if (!yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $frame, 'timestamp' => $timestamp], $socket)) {
+                $t = (\microtime(true) / 1000) + 60;
+                while (!$this->packetQueue->isEmpty()) {
+                    if (!yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $this->packetQueue->dequeue(), 'timestamp' => $this->timestamp], $socket)) {
                         Logger::log("Exiting VoIP write loop in $this!");
                         return;
                     }
 
-                    //Logger::log("Writing $timestamp in $this!");
+                    //Logger::log("Writing {$this->timestamp} in $this!");
                     yield new Delayed((int) ($t - (\microtime(true) / 1000)));
+                    $t = (\microtime(true) / 1000) + 60;
 
-                    $timestamp += 60;
+                    $this->timestamp += 60;
                 }
             } else {
+                $t = (\microtime(true) / 1000) + 60;
                 while (yield $it->advance()) {
-                    $t = (\microtime(true) / 1000) + 60;
-                    if (!yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $it->getCurrent(), 'timestamp' => $timestamp], $socket)) {
+                    if (!yield $this->send_message(['_' => self::PKT_STREAM_DATA, 'stream_id' => 0, 'data' => $it->getCurrent(), 'timestamp' => $this->timestamp], $socket)) {
                         Logger::log("Exiting VoIP write loop in $this!");
                         return;
                     }
 
-                    //Logger::log("Writing $timestamp in $this!");
+                    //Logger::log("Writing {$this->timestamp} in $this!");
                     yield new Delayed((int) ($t - (\microtime(true) / 1000)));
+                    $t = (\microtime(true) / 1000) + 60;
 
-                    $timestamp += 60;
+                    $this->timestamp += 60;
                 }
             }
         }
