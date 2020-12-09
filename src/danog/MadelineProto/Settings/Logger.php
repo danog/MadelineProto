@@ -62,7 +62,7 @@ class Logger extends SettingsAbstract
             case 'ERROR':
                 $settings['logger']['logger_level'] = 1;
                 break;
-            case 'FATAL ERROR':
+            case 'FATAL_ERROR':
                 $settings['logger']['logger_level'] = 0;
                 break;
         }
