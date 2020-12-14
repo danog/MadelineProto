@@ -26,7 +26,6 @@ use Amp\Loop;
 use Amp\Promise;
 use Amp\Success;
 use Amp\TimeoutException;
-use danog\MadelineProto\MTProtoTools\GarbageCollector;
 use tgseclib\Math\BigInteger;
 use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdin;
@@ -694,7 +693,7 @@ abstract class Tools extends StrTools
     public static function readLineGenerator(string $prompt = ''): \Generator
     {
         try {
-            GarbageCollector::$log = false;
+            Magic::togglePeriodicLogging();
             $stdin = getStdin();
             $stdout = getStdout();
             if ($prompt) {
@@ -707,7 +706,7 @@ abstract class Tools extends StrTools
                 $lines = \array_merge($lines, $chunk);
             }
         } finally {
-            GarbageCollector::$log = true;
+            Magic::togglePeriodicLogging();
         }
         return \array_shift($lines);
     }

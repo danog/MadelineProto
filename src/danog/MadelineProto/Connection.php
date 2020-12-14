@@ -314,7 +314,7 @@ class Connection
     {
         $this->ctx = $ctx->getCtx();
         $this->datacenter = $ctx->getDc();
-        $this->datacenterId = $this->datacenter.'.'.$this->id;
+        $this->datacenterId = $this->datacenter . '.' . $this->id;
         $this->API->logger->logger("Connecting to DC {$this->datacenterId}", \danog\MadelineProto\Logger::WARNING);
         $this->createSession();
         $ctx->setReadCallback([$this, 'haveRead']);
@@ -342,11 +342,9 @@ class Connection
         }
         foreach ($this->new_outgoing as $message_id => $message) {
             if ($message->isUnencrypted()) {
-                \Amp\Loop::defer(function () use ($message) {
-                    if (!($message->getState() & OutgoingMessage::STATE_REPLIED)) {
-                        $message->reply(new Failure(new Exception('Restart because we were reconnected')));
-                    }
-                });
+                if (!($message->getState() & OutgoingMessage::STATE_REPLIED)) {
+                    $message->reply(new Failure(new Exception('Restart because we were reconnected')));
+                }
                 unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
             }
         }

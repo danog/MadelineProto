@@ -160,35 +160,35 @@ class VoIP
      */
     private $lastIncomingTimestamp = 0.0;
     /**
-     * The outgoing timestamp
-     * 
+     * The outgoing timestamp.
+     *
      * @var int
      */
     private $timestamp = 0;
     /**
-     * Packet queue
-     * 
+     * Packet queue.
+     *
      * @var SplQueue
      */
     private $packetQueue;
     /**
-     * Temporary holdfile array
+     * Temporary holdfile array.
      */
     private array $tempHoldFiles = [];
     /**
-     * Sleep function
+     * Sleep function.
      *
      * @return array
      */
     public function __sleep()
     {
-        $vars = get_object_vars($this);
-        unset($vars['sockets']);
-        unset($vars['timeoutWatcher']);
-        return array_keys($vars);
+        $vars = \get_object_vars($this);
+        unset($vars['sockets'], $vars['timeoutWatcher']);
+
+        return \array_keys($vars);
     }
     /**
-     * Wakeup function
+     * Wakeup function.
      */
     public function __wakeup()
     {

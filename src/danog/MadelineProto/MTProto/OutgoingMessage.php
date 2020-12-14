@@ -20,7 +20,9 @@
 namespace danog\MadelineProto\MTProto;
 
 use Amp\Deferred;
+use Amp\Loop;
 use Amp\Promise;
+use danog\MadelineProto\Coroutine;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 
@@ -205,7 +207,12 @@ class OutgoingMessage extends Message
         if ($this->promise) { // Sometimes can get an RPC error for constructors
             $promise = $this->promise;
             $this->promise = null;
-            $promise->resolve($result);
+            Loop::defer(static function () use ($promise, $result) {
+                if ($result instanceof \Generator) {
+                    $result = new Coroutine($result);
+                }
+                $promise->resolve($result);
+            });
         }
     }
 

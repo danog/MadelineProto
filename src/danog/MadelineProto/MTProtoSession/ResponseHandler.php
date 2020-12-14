@@ -132,7 +132,7 @@ trait ResponseHandler
                         break;
                     }
 
-                    $this->logger->logger('Trying to assign a response of type '.$response_type.' to its request...', Logger::VERBOSE);
+                    $this->logger->logger('Trying to assign a response of type ' . $response_type . ' to its request...', Logger::VERBOSE);
                     foreach ($this->new_outgoing as $expecting_msg_id => $expecting) {
                         if (!$type = $expecting->getType()) {
                             continue;
@@ -145,7 +145,7 @@ trait ResponseHandler
                         }
                         $this->logger->logger('No', Logger::VERBOSE);
                     }
-                    $this->logger->logger('Dunno how to handle '.PHP_EOL.\var_export($message->read(), true), Logger::FATAL_ERROR);
+                    $this->logger->logger('Dunno how to handle ' . PHP_EOL . \var_export($message->read(), true), Logger::FATAL_ERROR);
                     break;
             }
         }
@@ -156,7 +156,7 @@ trait ResponseHandler
     public function handleReject(OutgoingMessage $message, \Throwable $data): void
     {
         $this->gotResponseForOutgoingMessage($message);
-        Loop::defer(fn () => $message->reply(new Failure($data)));
+        $message->reply(new Failure($data));
     }
 
     /**
@@ -198,7 +198,7 @@ trait ResponseHandler
             return;
         }
         if ($constructor === 'bad_server_salt' || $constructor === 'bad_msg_notification') {
-            $this->logger->logger('Received bad_msg_notification: '.MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], Logger::WARNING);
+            $this->logger->logger('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], Logger::WARNING);
             switch ($response['error_code']) {
                 case 48:
                     $this->shared->getTempAuthKey()->setServerSalt($response['new_server_salt']);
@@ -210,7 +210,7 @@ trait ResponseHandler
                 case 16:
                 case 17:
                     $this->time_delta = (int) (new \tgseclib\Math\BigInteger(\strrev($message->getMsgId()), 256))->bitwise_rightShift(32)->subtract(new \tgseclib\Math\BigInteger(\time()))->toString();
-                    $this->logger->logger('Set time delta to '.$this->time_delta, Logger::WARNING);
+                    $this->logger->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
                     $this->API->resetMTProtoSession();
                     $this->shared->setTempAuthKey(null);
                     Tools::callFork((function () use ($requestId): \Generator {
@@ -219,7 +219,7 @@ trait ResponseHandler
                     })());
                     return;
             }
-            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: '.MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
+            $this->handleReject($request, new \danog\MadelineProto\RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
             return;
         }
 
@@ -248,18 +248,10 @@ trait ResponseHandler
         $r = $response['_'] ?? \json_encode($response);
         $this->logger->logger("Defer sending {$r} to deferred", Logger::ULTRA_VERBOSE);
 
-        if (!$botAPI) {
-            Tools::callForkDefer((function () use ($request, $message, $response): \Generator {
-                yield from $message->yieldSideEffects();
-                $request->reply($response);
-            })());
-        } else {
-            Tools::callForkDefer((function () use ($request, $message, $response): \Generator {
-                yield from $message->yieldSideEffects();
-                $response = yield from $this->API->MTProtoToBotAPI($response);
-                $request->reply($response);
-            })());
-        }
+        $request->reply((function () use ($message, $response, $botAPI): \Generator {
+            yield from $message->yieldSideEffects();
+            return $botAPI ? yield from $this->API->MTProtoToBotAPI($response) : $response;
+        })());
     }
     public function handleRpcError(OutgoingMessage $request, array $response): ?\Throwable
     {
@@ -298,7 +290,7 @@ trait ResponseHandler
                 return new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 303:
                 $this->API->datacenter->curdc = $datacenter = (int) \preg_replace('/[^0-9]+/', '', $response['error_message']);
-                if ($request->isFileRelated() && $this->API->datacenter->has($datacenter.'_media')) {
+                if ($request->isFileRelated() && $this->API->datacenter->has($datacenter . '_media')) {
                     $datacenter .= '_media';
                 }
                 if ($request->isUserRelated()) {
@@ -323,8 +315,8 @@ trait ResponseHandler
                             $this->logger->logger('!!!!!!! WARNING !!!!!!!', Logger::FATAL_ERROR);
                             $this->logger->logger("Telegram's flood prevention system suspended this account.", Logger::ERROR);
                             $this->logger->logger('To continue, manual verification is required.', Logger::FATAL_ERROR);
-                            $phone = isset($this->API->authorization['user']['phone']) ? '+'.$this->API->authorization['user']['phone'] : 'you are currently using';
-                            $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number '.$phone.', and shortly describe what will you do with this phone number.', Logger::FATAL_ERROR);
+                            $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : 'you are currently using';
+                            $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number ' . $phone . ', and shortly describe what will you do with this phone number.', Logger::FATAL_ERROR);
                             $this->logger->logger('Then login again.', Logger::FATAL_ERROR);
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
                         }
@@ -358,8 +350,8 @@ trait ResponseHandler
                             $this->logger->logger('!!!!!!! WARNING !!!!!!!', Logger::FATAL_ERROR);
                             $this->logger->logger("Telegram's flood prevention system suspended this account.", Logger::ERROR);
                             $this->logger->logger('To continue, manual verification is required.', Logger::FATAL_ERROR);
-                            $phone = isset($this->API->authorization['user']['phone']) ? '+'.$this->API->authorization['user']['phone'] : 'you are currently using';
-                            $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number '.$phone.', and quickly describe what will you do with this phone number.', Logger::FATAL_ERROR);
+                            $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : 'you are currently using';
+                            $this->logger->logger('Send an email to recover@telegram.org, asking to unban the phone number ' . $phone . ', and quickly describe what will you do with this phone number.', Logger::FATAL_ERROR);
                             $this->logger->logger('Then login again.', Logger::FATAL_ERROR);
                             $this->logger->logger('If you intentionally deleted this account, ignore this message.', Logger::FATAL_ERROR);
                             $this->API->resetSession();
@@ -398,7 +390,7 @@ trait ResponseHandler
                     Loop::delay($seconds * 1000, [$this, 'methodRecall'], ['message_id' => $msgId]);
                     return null;
                 }
-            // no break
+                // no break
             default:
                 return new \danog\MadelineProto\RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
         }

@@ -213,6 +213,12 @@ class Magic
      */
     public static $signaled = false;
     /**
+     * Whether to suspend certain stdout log printing, when reading input.
+     *
+     * @var bool
+     */
+    public static $enablePeriodicLogging = true;
+    /**
      * Encoded emojis.
      *
      * @var string
@@ -425,5 +431,12 @@ class Magic
         MTProto::serializeAll();
         Loop::stop();
         die($code);
+    }
+    /**
+     * Toggle periodic logging.
+     */
+    public static function togglePeriodicLogging(): void
+    {
+        self::$enablePeriodicLogging = !self::$enablePeriodicLogging;
     }
 }
