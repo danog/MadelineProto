@@ -87,10 +87,6 @@
             "tools/build_docs/layerUpgrade.php"
         ]
     },
-    "repositories": [{
-        "type": "git",
-        "url": "https://github.com/danog/dns"
-    }],
     "scripts": {
         "post-autoload-dump": [
             "git submodule init && git submodule update"
