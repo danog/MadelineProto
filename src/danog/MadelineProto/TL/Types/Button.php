@@ -33,11 +33,11 @@ class Button implements \JsonSerializable, \ArrayAccess
      *
      * @psalm-var non-empty-array<array-key, mixed>
      */
-    private array $button;
+    private array $button = [];
     /**
      * Session name.
      */
-    private string $session;
+    private string $session = '';
     /**
      * MTProto instance.
      *
