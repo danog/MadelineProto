@@ -253,7 +253,7 @@ trait Login
         }
         $this->authorized = MTProto::NOT_LOGGED_IN;
         $hasher = new PasswordCalculator($this->logger);
-        $hasher->addInfo($this->authorization);
+        $hasher->addInfo(yield from $this->methodCallAsyncRead('account.getPassword', []));
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_user'], \danog\MadelineProto\Logger::NOTICE);
         $this->authorization = yield from $this->methodCallAsyncRead('auth.checkPassword', ['password' => $hasher->getCheckPassword($password)]);
         $this->authorized = MTProto::LOGGED_IN;
