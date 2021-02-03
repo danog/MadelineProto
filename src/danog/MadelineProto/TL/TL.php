@@ -408,6 +408,9 @@ class TL
      */
     public function serializeObject(array $type, $object, $ctx, int $layer = -1): \Generator
     {
+        if ($object instanceof \Generator) {
+            $object = yield from $object;
+        }
         switch ($type['type']) {
             case 'int':
                 if (!\is_numeric($object)) {
