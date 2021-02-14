@@ -697,6 +697,13 @@ trait Files
                     $res['size'] = $messageMedia['size'];
                 }
                 return $res;
+            case 'photoSizeProgressive':
+                $res = (yield from $this->getDownloadInfo($messageMedia['location']));
+                $res['thumb_size'] = $messageMedia['type'];
+                if (isset($messageMedia['sizes'])) {
+                    $res['size'] = end($messageMedia['sizes']);
+                }
+                return $res;
             case 'fileLocationUnavailable':
                 throw new \danog\MadelineProto\Exception('File location unavailable');
             case 'fileLocation':
