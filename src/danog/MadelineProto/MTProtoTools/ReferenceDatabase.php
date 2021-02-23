@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Loop;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
@@ -99,9 +100,11 @@ class ReferenceDatabase implements TLCallback
     public function init(): \Generator
     {
         yield from $this->initDb($this->API);
-        if (!$this->API->getSettings()->getDb()->getEnableFileReferenceDb()) {
-            yield $this->db->clear();
-        }
+
+        //Clear table on each start to fix fatals with invalid references
+        Loop::defer(fn()=>yield $this->db->clear());
+        //Clear table every day
+        Loop::repeat(24*1000*3600, fn()=>yield $this->db->clear());
     }
     public function getMethodCallbacks(): array
     {
