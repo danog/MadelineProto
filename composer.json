@@ -60,7 +60,8 @@
         "danog/phpdoc": "^0.1.7"
     },
     "suggest": {
-        "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)"
+        "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)",
+        "ext-pdo": "Install pdo extension to support database used as cache"
     },
     "authors": [{
         "name": "Daniil Gentili",

@@ -49,7 +49,6 @@ abstract class SqlArray extends DriverArray
 
     public function getIterator(): Producer
     {
-        debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         return new Producer(function (callable $emit) {
             $request = yield from $this->executeRaw($this->getSqlQuery(self::SQL_ITERATE));
 

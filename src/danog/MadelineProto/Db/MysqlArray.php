@@ -94,7 +94,12 @@ class MysqlArray extends SqlArray
      */
     public function initConnection($settings): \Generator
     {
-        $this->pdo = new \PDO('mysql:');
+        $urlArray = parse_url($settings->getUri());
+        $this->pdo = new \PDO(
+            "mysql:host={$urlArray['host']};port={$urlArray['port']};charset=UTF8",
+            $settings->getUsername(),
+            $settings->getPassword()
+        );
         if (!isset($this->db)) {
             $this->db = yield from Mysql::getConnection($settings);
         }
