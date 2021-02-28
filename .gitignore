@@ -78,26 +78,28 @@ target/
 # emacs auto-saving files
 \#*#
 .#*#
-*.swp
 vendor
 *bak
 token.php
 *~uploading*
-session.mad
-*.madeline
-*.madeline.lock
 enc.tar.xz
 a
 web_data.php
 web_API.log
 db_connect.php
+
 sessions
 docs_md
+session.mad
+*.madeline
+*.madeline.*
+madeline.phar
+madeline.phar.version
+madeline.php
 
 .env
 composer.lock
 b.php
-*.log
 telegram-cli*
 src/danog/MadelineProto/Fuzzer.php
 fuzzer.php
@@ -107,22 +109,16 @@ tests/500mb
 *.save.*
 phar7
 phar5
-madeline.phar
-madeline.phar.version
 big
 *.phar
-madeline.php
 .phpunit.result.cache
 .vscode/*
 .vscode
 custom.md
-composer.lock
 phpunit.xml
-vendor
 .php_cs.cache
 coverage
 tempConv
 extracted.json
-.phpunit.result.cache
 
 ponyScripts
