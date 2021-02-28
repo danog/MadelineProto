@@ -17,7 +17,6 @@ use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 class PostgresArray extends SqlArray
 {
     public DatabasePostgres $dbSettings;
-    private Pool $db;
 
     // Legacy
     protected array $settings;
@@ -27,39 +26,37 @@ class PostgresArray extends SqlArray
      *
      * @param SqlArray::STATEMENT_* $type
      *
-     * @return Promise
+     * @return string
      */
-    protected function prepareStatements(int $type): Promise
+    protected function getSqlQuery(int $type): string
     {
         switch ($type) {
-        case SqlArray::STATEMENT_GET:
-            return $this->db->prepare(
-                "SELECT value FROM \"{$this->table}\" WHERE key = :index LIMIT 1",
-            );
-        case SqlArray::STATEMENT_SET:
-            return $this->db->prepare("
+        case SqlArray::SQL_GET:
+            return "SELECT value FROM \"{$this->table}\" WHERE key = :index LIMIT 1";
+        case SqlArray::SQL_SET:
+            return "
                 INSERT INTO \"{$this->table}\"
                 (key,value)
                 VALUES (:index, :value)
                 ON CONFLICT (key) DO UPDATE SET value = :value
-            ");
-        case SqlArray::STATEMENT_UNSET:
-            return $this->db->prepare("
+            ";
+        case SqlArray::SQL_UNSET:
+            return "
                 DELETE FROM \"{$this->table}\"
                 WHERE key = :index
-            ");
-        case SqlArray::STATEMENT_COUNT:
-            return $this->db->prepare("
+            ";
+        case SqlArray::SQL_COUNT:
+            return "
                 SELECT count(key) as count FROM \"{$this->table}\"
-            ");
-        case SqlArray::STATEMENT_ITERATE:
-            return $this->db->prepare("
+            ";
+        case SqlArray::SQL_ITERATE:
+            return "
                 SELECT key, value FROM \"{$this->table}\"
-            ");
-        case SqlArray::STATEMENT_CLEAR:
-            return $this->db->prepare("
+            ";
+        case SqlArray::SQL_CLEAR:
+            return "
                 DELETE FROM \"{$this->table}\"
-            ");
+            ";
         }
         throw new Exception("An invalid statement type $type was provided!");
     }
@@ -81,6 +78,12 @@ class PostgresArray extends SqlArray
      */
     public function initConnection($settings): \Generator
     {
+        $urlArray = parse_url($settings->getUri());
+        $this->pdo = new \PDO(
+            "postgre:host={$urlArray['host']};port={$urlArray['port']};charset=UTF8",
+            $settings->getUsername(),
+            $settings->getPassword()
+        );
         if (!isset($this->db)) {
             $this->db = yield from Postgres::getConnection($settings);
         }
@@ -130,7 +133,7 @@ class PostgresArray extends SqlArray
         $this->setCache($index, $value);
 
         $request = $this->execute(
-            self::STATEMENT_SET,
+            $this->getSqlQuery(self::SQL_SET),
             [
                 'index' => $index,
                 'value' => new ByteA(\serialize($value)),

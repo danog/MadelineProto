@@ -4,8 +4,9 @@ namespace danog\MadelineProto\Db;
 
 use Amp\Producer;
 use Amp\Promise;
+use Amp\Sql\CommandResult;
+use Amp\Sql\Pool;
 use Amp\Sql\ResultSet;
-use Amp\Sql\Statement;
 use Amp\Success;
 use danog\MadelineProto\Logger;
 
@@ -16,19 +17,16 @@ use function Amp\call;
  */
 abstract class SqlArray extends DriverArray
 {
-    /**
-     * Statement array.
-     *
-     * @var Statement[]
-     */
-    private array $statements = [];
+    protected Pool $db;
+    //Pdo driver used for value quoting, to prevent sql injections.
+    protected \PDO $pdo;
 
-    protected const STATEMENT_GET = 0;
-    protected const STATEMENT_SET = 1;
-    protected const STATEMENT_UNSET = 2;
-    protected const STATEMENT_COUNT = 3;
-    protected const STATEMENT_ITERATE = 4;
-    protected const STATEMENT_CLEAR = 5;
+    protected const SQL_GET = 0;
+    protected const SQL_SET = 1;
+    protected const SQL_UNSET = 2;
+    protected const SQL_COUNT = 3;
+    protected const SQL_ITERATE = 4;
+    protected const SQL_CLEAR = 5;
 
 
     /**
@@ -36,9 +34,9 @@ abstract class SqlArray extends DriverArray
      *
      * @param SqlArray::STATEMENT_* $type
      *
-     * @return Promise
+     * @return string
      */
-    abstract protected function prepareStatements(int $type): Promise;
+    abstract protected function getSqlQuery(int $type): string;
 
     /**
      * Get value from row.
@@ -52,10 +50,7 @@ abstract class SqlArray extends DriverArray
     public function getIterator(): Producer
     {
         return new Producer(function (callable $emit) {
-            if (!isset($this->statements[self::STATEMENT_ITERATE])) {
-                $this->statements[self::STATEMENT_ITERATE] = yield $this->prepareStatements(self::STATEMENT_ITERATE);
-            }
-            $request = yield $this->statements[self::STATEMENT_ITERATE]->execute();
+            $request = yield from $this->executeRaw($this->getSqlQuery(self::SQL_ITERATE));
 
             while (yield $request->advance()) {
                 $row = $request->getCurrent();
@@ -106,7 +101,7 @@ abstract class SqlArray extends DriverArray
         $this->unsetCache($index);
 
         return $this->execute(
-            self::STATEMENT_UNSET,
+            $this->getSqlQuery(self::SQL_UNSET),
             ['index' => $index]
         );
     }
@@ -122,7 +117,7 @@ abstract class SqlArray extends DriverArray
     public function count(): Promise
     {
         return call(function () {
-            $row = yield $this->execute(self::STATEMENT_COUNT);
+            $row = yield $this->execute($this->getSqlQuery(self::SQL_COUNT));
             return $row[0]['count'] ?? 0;
         });
     }
@@ -134,7 +129,7 @@ abstract class SqlArray extends DriverArray
      */
     public function clear(): Promise
     {
-        return $this->execute(self::STATEMENT_CLEAR);
+        return $this->execute($this->getSqlQuery(self::SQL_CLEAR));
     }
 
     public function offsetGet($offset): Promise
@@ -144,7 +139,7 @@ abstract class SqlArray extends DriverArray
                 return $cached;
             }
 
-            $row = yield $this->execute(self::STATEMENT_GET, ['index' => $offset]);
+            $row = yield $this->execute($this->getSqlQuery(self::SQL_GET), ['index' => $offset]);
 
             if ($value = $this->getValue($row)) {
                 $this->setCache($offset, $value);
@@ -176,7 +171,7 @@ abstract class SqlArray extends DriverArray
         $this->setCache($index, $value);
 
         $request = $this->execute(
-            self::STATEMENT_SET,
+            $this->getSqlQuery(self::SQL_SET),
             [
                 'index' => $index,
                 'value' => \serialize($value),
@@ -192,34 +187,18 @@ abstract class SqlArray extends DriverArray
     /**
      * Perform async request to db.
      *
-     * @param int $stmt
+     * @param string $sql
      * @param array $params
      *
      * @psalm-param self::STATEMENT_* $stmt
      *
-     * @return Promise
+     * @return Promise<array>
      * @throws \Throwable
      */
-    protected function execute(int $stmt, array $params = []): Promise
+    protected function execute(string $sql, array $params = []): Promise
     {
-        return call(function () use ($stmt, $params) {
-            if (
-                !empty($params['index'])
-                && !\mb_check_encoding($params['index'], 'UTF-8')
-            ) {
-                $params['index'] = \mb_convert_encoding($params['index'], 'UTF-8');
-            }
-
-            if (!isset($this->statements[$stmt])) {
-                $this->statements[$stmt] = yield $this->prepareStatements($stmt);
-            }
-            try {
-                $request = yield $this->statements[$stmt]->execute($params);
-            } catch (\Throwable $e) {
-                Logger::log($e->getMessage(), Logger::ERROR);
-                return [];
-            }
-
+        return call(function () use ($sql, $params) {
+            $request = yield from $this->executeRaw($sql, $params);
             $result = [];
             if ($request instanceof ResultSet) {
                 while (yield $request->advance()) {
@@ -229,4 +208,37 @@ abstract class SqlArray extends DriverArray
             return $result;
         });
     }
+
+    /**
+     * Return raw query result.
+     *
+     * @param string $sql
+     * @param array $params
+     *
+     * @return \Generator<CommandResult|ResultSet>
+     */
+    protected function executeRaw(string $sql, array $params = []): \Generator
+    {
+        if (
+            !empty($params['index'])
+            && !\mb_check_encoding($params['index'], 'UTF-8')
+        ) {
+            $params['index'] = \mb_convert_encoding($params['index'], 'UTF-8');
+        }
+
+        try {
+            foreach ($params as $key => $value) {
+                $value = $this->pdo->quote($value);
+                $sql = str_replace(":$key", $value, $sql);
+            }
+
+            $request = yield $this->db->query($sql);
+        } catch (\Throwable $e) {
+            Logger::log($e->getMessage(), Logger::ERROR);
+            return [];
+        }
+
+        return $request;
+    }
+
 }

@@ -15,7 +15,6 @@ use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
 class MysqlArray extends SqlArray
 {
     protected DatabaseMysql $dbSettings;
-    private Pool $db;
 
     // Legacy
     protected array $settings;
@@ -35,38 +34,36 @@ class MysqlArray extends SqlArray
      *
      * @param SqlArray::STATEMENT_* $type
      *
-     * @return Promise
+     * @return string
      */
-    protected function prepareStatements(int $type): Promise
+    protected function getSqlQuery(int $type): string
     {
         switch ($type) {
-        case SqlArray::STATEMENT_GET:
-            return $this->db->prepare(
-                "SELECT `value` FROM `{$this->table}` WHERE `key` = :index LIMIT 1"
-            );
-        case SqlArray::STATEMENT_SET:
-            return $this->db->prepare("
-                INSERT INTO `{$this->table}` 
-                SET `key` = :index, `value` = :value 
-                ON DUPLICATE KEY UPDATE `value` = :value
-            ");
-        case SqlArray::STATEMENT_UNSET:
-            return $this->db->prepare("
-                DELETE FROM `{$this->table}`
-                WHERE `key` = :index
-            ");
-        case SqlArray::STATEMENT_COUNT:
-            return $this->db->prepare("
-                SELECT count(`key`) as `count` FROM `{$this->table}`
-            ");
-        case SqlArray::STATEMENT_ITERATE:
-            return $this->db->prepare("
-                SELECT `key`, `value` FROM `{$this->table}`
-            ");
-        case SqlArray::STATEMENT_CLEAR:
-            return $this->db->prepare("
-                DELETE FROM `{$this->table}`
-            ");
+            case SqlArray::SQL_GET:
+                return "SELECT `value` FROM `{$this->table}` WHERE `key` = :index LIMIT 1";
+            case SqlArray::SQL_SET:
+                return "
+                    INSERT INTO `{$this->table}` 
+                    SET `key` = :index, `value` = :value 
+                    ON DUPLICATE KEY UPDATE `value` = :value
+                ";
+            case SqlArray::SQL_UNSET:
+                return "
+                    DELETE FROM `{$this->table}`
+                    WHERE `key` = :index
+                ";
+            case SqlArray::SQL_COUNT:
+                return "
+                    SELECT count(`key`) as `count` FROM `{$this->table}`
+                ";
+            case SqlArray::SQL_ITERATE:
+                return "
+                    SELECT `key`, `value` FROM `{$this->table}`
+                ";
+            case SqlArray::SQL_CLEAR:
+                return "
+                    DELETE FROM `{$this->table}`
+                ";
         }
         throw new Exception("An invalid statement type $type was provided!");
     }
@@ -97,6 +94,12 @@ class MysqlArray extends SqlArray
      */
     public function initConnection($settings): \Generator
     {
+        $urlArray = parse_url($settings->getUri());
+        $this->pdo = new \PDO(
+            "mysql:host={$urlArray['host']};port={$urlArray['port']};charset=UTF8",
+            $settings->getUsername(),
+            $settings->getPassword()
+        );
         if (!isset($this->db)) {
             $this->db = yield from Mysql::getConnection($settings);
         }
