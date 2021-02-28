@@ -75,11 +75,11 @@ class MsgIdHandler32 extends MsgIdHandler
             $key = $this->getMaxId($incoming = true);
             if ($aargs['container']) {
                 if ($newMessageId->compare($key = $this->getMaxId($incoming = true)) >= 0) {
-                    $this->session->API->logger->logger('WARNING: Given message id ('.$newMessageId.') is bigger than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::WARNING);
+                    $this->session->API->logger->logger('Given message id ('.$newMessageId.') is bigger than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::NOTICE);
                 }
             } else {
                 if ($newMessageId->compare($key = $this->getMaxId($incoming = true)) <= 0) {
-                    $this->session->API->logger->logger('WARNING: Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::WARNING);
+                    $this->session->API->logger->logger('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::NOTICE);
                 }
             }
             $this->cleanup(true);
