@@ -58,7 +58,7 @@ class SecretChats extends SettingsAbstract
      */
     public function canAccept(int $id): bool
     {
-        if ($this->accept) {
+        if (!$this->accept) {
             return false;
         }
         if ($this->accept === true) {
