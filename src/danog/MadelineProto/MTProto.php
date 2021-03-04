@@ -1835,6 +1835,15 @@ class MTProto extends AsyncConstruct implements TLCallback
         return $this->authorized;
     }
     /**
+     * Set authorization info.
+     *
+     * @return void
+     */
+    public function setAuthorization(int $value): void
+    {
+        $this->authorized = $value;
+    }
+    /**
      * Get current password hint.
      *
      * @return string
