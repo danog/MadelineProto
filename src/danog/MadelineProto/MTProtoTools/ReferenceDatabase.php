@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Loop;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Exception;
@@ -99,9 +100,11 @@ class ReferenceDatabase implements TLCallback
     public function init(): \Generator
     {
         yield from $this->initDb($this->API);
-        if (!$this->API->getSettings()->getDb()->getEnableFileReferenceDb()) {
-            yield $this->db->clear();
-        }
+
+        //Clear table on each start to fix fatals with invalid references
+        Loop::defer(fn()=>yield $this->db->clear());
+        //Clear table every day
+        Loop::repeat(24*1000*3600, fn()=>yield $this->db->clear());
     }
     public function getMethodCallbacks(): array
     {
@@ -194,7 +197,7 @@ class ReferenceDatabase implements TLCallback
         if (!isset($this->cache[$key])) {
             $this->cache[$key] = [];
         }
-        $this->cache[$key][$this->serializeLocation($locationType, $location)] = (string) $location['file_reference'];
+        $this->cache[$key][self::serializeLocation($locationType, $location)] = (string) $location['file_reference'];
         return true;
     }
     public function addOriginContext(string $type): void
@@ -255,7 +258,7 @@ class ReferenceDatabase implements TLCallback
                 break;
             case 'channelFull':
             case 'channel':
-                $origin['peer'] = $this->API->toSupergroup($data['id']);
+                $origin['peer'] = $this->API::toSupergroup($data['id']);
                 break;
             case 'document':
                 foreach ($data['attributes'] as $attribute) {
@@ -332,7 +335,7 @@ class ReferenceDatabase implements TLCallback
                 foreach ($res['photos'] as $photo) {
                     $origin['max_id'] = $photo['id'];
                     $dc_id = $photo['dc_id'];
-                    $location = $this->serializeLocation(self::PHOTO_LOCATION, $photo);
+                    $location = self::serializeLocation(self::PHOTO_LOCATION, $photo);
                     if (isset($cache[$location])) {
                         $reference = $cache[$location];
                         unset($cache[$location]);
@@ -343,7 +346,7 @@ class ReferenceDatabase implements TLCallback
                         foreach ($photo['sizes'] as $size) {
                             if (isset($size['location'])) {
                                 $size['location']['dc_id'] = $dc_id;
-                                $location = $this->serializeLocation(self::PHOTO_LOCATION_LOCATION, $size['location']);
+                                $location = self::serializeLocation(self::PHOTO_LOCATION_LOCATION, $size['location']);
                                 if (isset($cache[$location])) {
                                     $reference = $cache[$location];
                                     unset($cache[$location]);
@@ -404,7 +407,7 @@ class ReferenceDatabase implements TLCallback
     }
     public function refreshReference(int $locationType, array $location): \Generator
     {
-        return $this->refreshReferenceInternal($this->serializeLocation($locationType, $location));
+        return $this->refreshReferenceInternal(self::serializeLocation($locationType, $location));
     }
     public function refreshReferenceInternal(string $location): \Generator
     {
@@ -478,7 +481,7 @@ class ReferenceDatabase implements TLCallback
     }
     public function getReference(int $locationType, array $location): \Generator
     {
-        $locationString = $this->serializeLocation($locationType, $location);
+        $locationString = self::serializeLocation($locationType, $location);
         if (!isset((yield $this->db[$locationString])['reference'])) {
             if (isset($location['file_reference'])) {
                 $this->API->logger->logger("Using outdated file reference for location of type {$locationType} object {$location['_']}", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
