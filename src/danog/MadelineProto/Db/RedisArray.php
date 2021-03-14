@@ -45,7 +45,7 @@ class RedisArray extends DriverArray
 
     protected function renameTable(string $from, string $to): \Generator
     {
-        Logger::log("Renaming table {$from} to {$to}", Logger::WARNING);
+        Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
         $from = "va:$from";
         $to = "va:$to";
 
@@ -53,8 +53,11 @@ class RedisArray extends DriverArray
 
         $lenK = \strlen($from);
         while (yield $request->advance()) {
-            $key = $request->getCurrent();
-            yield $this->db->rename($key, $to.\substr($key, $lenK));
+            $oldKey = $request->getCurrent();
+            $newKey = $to.\substr($oldKey, $lenK);
+            $value = yield $this->db->get($oldKey);
+            $this->db->set($newKey, $value);
+            $this->db->delete($oldKey);
         }
     }
 

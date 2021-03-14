@@ -180,14 +180,17 @@ class PostgresArray extends SqlArray
 
     protected function renameTable(string $from, string $to): \Generator
     {
-        Logger::log("Renaming table {$from} to {$to}", Logger::WARNING);
+        Logger::log("Moving data from {$from} to {$to}", Logger::WARNING);
 
-        yield $this->db->query("
-            DROP TABLE IF EXISTS \"{$to}\";
+        yield $this->db->query(/** @lang PostgreSQL */ "
+            INSERT INTO \"{$to}\" AS t 
+            SELECT * FROM \"{$from}\" as f
+            ON CONFLICT DO UPDATE 
+                SET t.value = f.value;
         ");
 
         yield $this->db->query("
-            ALTER TABLE \"{$from}\" RENAME TO \"{$to}\";
+            DROP TABLE \"{$from}\";
         ");
     }
 }
