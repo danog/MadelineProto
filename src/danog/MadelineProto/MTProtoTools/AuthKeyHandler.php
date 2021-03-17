@@ -653,7 +653,7 @@ trait AuthKeyHandler
                 }
                 if ($authorized_socket->hasTempAuthKey() && $authorized_socket->hasPermAuthKey() && $authorized_socket->isAuthorized() && $this->authorized === MTProto::LOGGED_IN && !$socket->isAuthorized() && !$authorized_socket->isCDN()) {
                     try {
-                        $this->logger->logger('Trying to copy authorization from dc '.$authorized_dc_id.' to dc '.$id);
+                        $this->logger->logger('Trying to copy authorization from DC '.$authorized_dc_id.' to DC '.$id);
                         $exported_authorization = yield from $this->methodCallAsyncRead('auth.exportAuthorization', ['dc_id' => \preg_replace('|_.*|', '', $id)], ['datacenter' => $authorized_dc_id]);
                         $authorization = yield from $this->methodCallAsyncRead('auth.importAuthorization', $exported_authorization, ['datacenter' => $id]);
                         $socket->authorized(true);

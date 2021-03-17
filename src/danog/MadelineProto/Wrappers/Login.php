@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\PermAuthKey;
+use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 
 use danog\MadelineProto\Settings;
@@ -166,28 +167,37 @@ trait Login
     /**
      * Import authorization.
      *
-     * @param mixed $authorization Authorization info
+     * @param array<int, string> $authorization Authorization info
+     * @param int $mainDcID Main DC ID
      *
      * @return \Generator
      */
-    public function importAuthorization($authorization): \Generator
+    public function importAuthorization(array $authorization, int $mainDcID): \Generator
     {
         if ($this->authorized === MTProto::LOGGED_IN) {
             $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['already_loggedIn'], \danog\MadelineProto\Logger::NOTICE);
             yield from $this->logout();
         }
         $this->logger->logger(\danog\MadelineProto\Lang::$current_lang['login_auth_key'], \danog\MadelineProto\Logger::NOTICE);
-        list($dc_id, $auth_key) = $authorization;
-        if (!\is_array($auth_key)) {
-            $auth_key = ['auth_key' => $auth_key];
+        foreach ($this->datacenter->getDataCenterConnections() as $connection) {
+            $connection->resetSession();
+            $connection->setPermAuthKey(null);
+            $connection->setTempAuthKey(null);
+            $connection->authorized(false);
         }
-        $auth_key = new PermAuthKey($auth_key);
-        $this->authorized_dc = $dc_id;
-        $dataCenterConnection = $this->datacenter->getDataCenterConnection($dc_id);
-        $dataCenterConnection->resetSession();
-        $dataCenterConnection->setPermAuthKey($auth_key);
-        $dataCenterConnection->authorized(true);
+        foreach ($authorization as $dc_id => $auth_key) {
+            $this->logger->logger("Setting auth key in DC $dc_id", \danog\MadelineProto\Logger::NOTICE);
+            if (!\is_array($auth_key)) {
+                $auth_key = ['auth_key' => $auth_key];
+            }
+            $auth_key = new PermAuthKey($auth_key);
+            $auth_key->authorized(true);
+            $dataCenterConnection = $this->datacenter->getDataCenterConnection($dc_id);
+            $dataCenterConnection->setPermAuthKey($auth_key);
+        }
+        $this->authorized_dc = $mainDcID;
         $this->authorized = MTProto::LOGGED_IN;
+        yield from $this->connectToAllDcs(true);
         yield from $this->initAuthorization();
         yield from $this->getPhoneConfig();
         $res = (yield from $this->fullGetSelf());

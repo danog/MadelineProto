@@ -52,8 +52,6 @@
         "amphp/http-server": "dev-master",
         "amphp/http": "^1.6",
         "ext-ctype": "*",
-        "danog/7to70": "^1",
-        "danog/7to5": "^1",
         "vimeo/psalm": "dev-master",
         "phpstan/phpstan": "^0.12.14",
         "friendsofphp/php-cs-fixer": "^2.16",

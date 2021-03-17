@@ -122,3 +122,5 @@ tempConv
 extracted.json
 
 ponyScripts
+
+*.madeline.*

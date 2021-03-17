@@ -5538,13 +5538,14 @@ class InternalDoc extends APIFactory
     /**
      * Import authorization.
      *
-     * @param mixed $authorization Authorization info
+     * @param array<int, string> $authorization Authorization info
+     * @param int $mainDcID Main DC ID
      *
      * @return \Amp\Promise
      */
-    public function importAuthorization($authorization, array $extra = [])
+    public function importAuthorization(array $authorization, int $mainDcID, array $extra = [])
     {
-        return $this->__call(__FUNCTION__, [$authorization, $extra]);
+        return $this->__call(__FUNCTION__, [$authorization, $mainDcID, $extra]);
     }
     /**
      * Inflate stripped photosize to full JPG payload.

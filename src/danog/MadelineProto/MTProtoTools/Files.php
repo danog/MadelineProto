@@ -701,7 +701,7 @@ trait Files
                 $res = (yield from $this->getDownloadInfo($messageMedia['location']));
                 $res['thumb_size'] = $messageMedia['type'];
                 if (isset($messageMedia['sizes'])) {
-                    $res['size'] = end($messageMedia['sizes']);
+                    $res['size'] = \end($messageMedia['sizes']);
                 }
                 return $res;
             case 'fileLocationUnavailable':

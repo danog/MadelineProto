@@ -110,6 +110,25 @@ class Settings extends SettingsAbstract
         return $settings;
     }
     /**
+     * Create full settings object from possibly legacy settings array.
+     *
+     * @internal
+     *
+     * @param SettingsAbstract|array $settings Settings
+     *
+     * @return Settings
+     */
+    public static function parseFromLegacyFull($settings): Settings
+    {
+        $settings = self::parseFromLegacy($settings);
+        if (!$settings instanceof Settings) {
+            $newSettings = new Settings;
+            $newSettings->merge($settings);
+            $settings = $newSettings;
+        }
+        return $settings;
+    }
+    /**
      * Constructor.
      *
      * @internal
