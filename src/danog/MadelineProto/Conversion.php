@@ -372,7 +372,11 @@ class Conversion
                     $main_dc_id = Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)));
                     $length = Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)));
                     for ($x = 0; $x < $length; $x++) {
-                        $auth_keys[Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)))] = \stream_get_contents($main, 256);
+                        $dc = Tools::unpackSignedInt(\strrev(\stream_get_contents($main, 4)));
+                        $auth_key = \stream_get_contents($main, 256);
+                        if ($dc <= 5) {
+                            $auth_keys[$dc] = $auth_key;
+                        }
                     }
                     break 2;
                 case self::dbiAutoDownload:
