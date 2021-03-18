@@ -37,6 +37,7 @@ class Conversion
         $settings = Settings::parseFromLegacyFull($settings);
         $settings->getIpc()->setSlow(true);
         $settings->getLogger()->setLevel(Logger::ULTRA_VERBOSE);
+        $settings->getAuth()->setPfs(true);
         $MadelineProto = new \danog\MadelineProto\API($session, $settings);
         yield $MadelineProto->help->getConfig();
         yield $MadelineProto->logger("About to import auth!", Logger::FATAL_ERROR);
