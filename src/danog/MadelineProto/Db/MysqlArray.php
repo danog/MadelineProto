@@ -2,7 +2,6 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Mysql\Pool;
 use Amp\Promise;
 use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Exception;
@@ -43,9 +42,8 @@ class MysqlArray extends SqlArray
                 return "SELECT `value` FROM `{$this->table}` WHERE `key` = :index LIMIT 1";
             case SqlArray::SQL_SET:
                 return "
-                    INSERT INTO `{$this->table}` 
+                    REPLACE INTO `{$this->table}` 
                     SET `key` = :index, `value` = :value 
-                    ON DUPLICATE KEY UPDATE `value` = :value
                 ";
             case SqlArray::SQL_UNSET:
                 return "
