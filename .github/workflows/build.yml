@@ -15,7 +15,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           ssh-key: ${{ secrets.DEPLOY_KEY }}
-          fetch-depth: 0
 
       - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
