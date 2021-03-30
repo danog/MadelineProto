@@ -172,10 +172,6 @@ runTestSimple
 echo "Checking syntax of madeline.php"
 php -l ./tools/phar.php
 
-eval "$(ssh-agent -s)"
-echo -e "$private_key" > madeline_rsa
-chmod 600 madeline_rsa
-ssh-add madeline_rsa
 git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
 
