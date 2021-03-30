@@ -169,8 +169,8 @@ echo "Testing with new version (reload)"
 cp tests/testingBackup.php tests/testing.php
 runTestSimple
 
-
-
+echo "Checking syntax of madeline.php"
+php -l ./tools/phar.php
 
 eval "$(ssh-agent -s)"
 echo -e "$private_key" > madeline_rsa

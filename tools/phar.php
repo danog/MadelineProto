@@ -70,19 +70,13 @@ function ___install_madeline()
         $custom_branch = '';
     }
 
-    $release_branch = "-$custom_branch";
-    if ($release_branch === '-') {
-        $release_branch = '';
+    $version = (string) min(80, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
+    if ($custom_branch === '') {
+        $release_branch = $version;
+    } else {
+        $release_branch = "$version-$custom_branch";
     }
-    $release_fallback_branch = '';
-
-    if (PHP_MAJOR_VERSION <= 5) {
-        $release_branch = '5'.$release_branch;
-        $release_fallback_branch = '5'.$release_fallback_branch;
-    } elseif (PHP_MAJOR_VERSION === 7) {
-        $release_branch = PHP_MAJOR_VERSION.PHP_MINOR_VERSION.$release_branch;
-        $release_fallback_branch = PHP_MAJOR_VERSION.PHP_MINOR_VERSION.$release_fallback_branch;
-    }
+    $release_fallback_branch = $version;
 
     // Checking if defined branch/default branch builds can be downloaded
     if (!($release = @\file_get_contents(\sprintf($release_template, $release_branch)))) {
