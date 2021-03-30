@@ -44,6 +44,7 @@ composer() {
 }
 
 php8.0 -v
+php -v
 
 # Install
 echo '{
