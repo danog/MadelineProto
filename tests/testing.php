@@ -19,7 +19,7 @@ If not, see <http://www.gnu.org/licenses/>.
 $loader = false;
 if (!\file_exists(__DIR__.'/../vendor/autoload.php')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
-    if ($phar = \getenv('TRAVIS_PHAR')) {
+    if ($phar = \getenv('ACTIONS_PHAR')) {
         $loader = include $phar;
     } else {
         if (!\file_exists('madeline.php')) {
@@ -93,12 +93,14 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     /**
      * A small example message to use for tests.
      */
-    $message = (\getenv('TRAVIS_COMMIT') == '') ? 'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' : ('Travis ci tests in progress: commit '.\getenv('TRAVIS_COMMIT').', job '.\getenv('TRAVIS_JOB_NUMBER').', PHP version: '.\getenv('TRAVIS_PHP_VERSION'));
+    $message = \getenv('GITHUB_SHA') == '' ?
+        'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' :
+        ('Github actions tests in progress: commit '.\getenv('GITHUB_SHA').', job '.\getenv('GITHUB_JOB').', PHP version: '.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;
 
     /*
      * Try making a phone call
      */
-    if (!\getenv('TRAVIS_COMMIT') && \stripos(yield $MadelineProto->readline('Do you want to make a call? (y/n): '), 'y') !== false) {
+    if (!\getenv('GITHUB_SHA') && \stripos(yield $MadelineProto->readline('Do you want to make a call? (y/n): '), 'y') !== false) {
         $controller = yield $MadelineProto->requestCall(\getenv('TEST_SECRET_CHAT'))->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
         while ($controller->getCallState() < \danog\MadelineProto\VoIP::CALL_STATE_READY) {
             yield $MadelineProto->sleep(1);
@@ -112,7 +114,7 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     /*
      * Try receiving a phone call
      */
-    if (!\getenv('TRAVIS_COMMIT') && \stripos(yield $MadelineProto->readline('Do you want to handle incoming calls? (y/n): '), 'y') !== false) {
+    if (!\getenv('GITHUB_SHA') && \stripos(yield $MadelineProto->readline('Do you want to handle incoming calls? (y/n): '), 'y') !== false) {
         $howmany = yield $MadelineProto->readline('How many calls would you like me to handle? ');
         $offset = 0;
         while ($howmany > 0) {
@@ -134,7 +136,7 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     /*
      * Secret chat usage
      */
-    if (!\getenv('TRAVIS_COMMIT') && \stripos(yield $MadelineProto->readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
+    if (!\getenv('GITHUB_SHA') && \stripos(yield $MadelineProto->readline('Do you want to make the secret chat tests? (y/n): '), 'y') !== false) {
         /**
          * Request a secret chat.
          */

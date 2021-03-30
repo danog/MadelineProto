@@ -254,7 +254,7 @@ class FileIdTest extends TestCase
             'document' => 'https://github.com/danog/danog.github.io/raw/master/lol/index_htm_files/0.gif',
             'voice' => 'https://daniil.it/audio_2020-02-01_18-09-08.ogg',
         ];
-        if (\getenv('TRAVIS_COMMIT')) {
+        if (\getenv('GITHUB_SHA')) {
             $res['video_note'] = 'https://daniil.it/round.mp4';
         }
         return $res;

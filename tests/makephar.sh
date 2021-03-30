@@ -4,7 +4,11 @@
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 
-[ "$(git rev-list --tags --max-count=1)" == "$TRAVIS_COMMIT" ] && IS_RELEASE=y || IS_RELEASE=n
+BRANCH=$(git rev-parse --abbrev-ref $GITHUB_SHA)
+TAG=$(git tag --points-at $GITHUB_SHA)
+COMMIT_MESSAGE="$(git log -1 --pretty=%B $GITHUB_SHA)"
+
+[ "$(git rev-list --tags --max-count=1)" == "$GITHUB_SHA" ] && IS_RELEASE=y || IS_RELEASE=n
 
 echo "Is release: $IS_RELEASE"
 
@@ -29,7 +33,7 @@ rm -rf phar7 phar5 MadelineProtoPhar
 mkdir phar7
 cd phar7
 
-[ "$IS_RELEASE" == "y" ] && composer=$TRAVIS_BRANCH || composer="dev-$TRAVIS_BRANCH"
+[ "$IS_RELEASE" == "y" ] && composer=$BRANCH || composer="dev-$BRANCH"
 
 sudo add-apt-repository ppa:ondrej/php -y
 sudo apt-get update -q
@@ -124,7 +128,7 @@ find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
 # Not needed anymore, tests/testing.php preloads all classes
 #for f in $(find phar5 -type f -name '*.php'); do php -l $f;done
 
-branch="-$TRAVIS_BRANCH"
+branch="-$BRANCH"
 cd $madelinePath
 
 export TEST_SECRET_CHAT=test
@@ -156,8 +160,8 @@ cp tests/testing.php tests/testingBackup.php
 runTest
 
 echo "Testing with new version (upgrade)..."
-php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" $TRAVIS_COMMIT
-export TRAVIS_PHAR="madeline$php$branch.phar"
+php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" $GITHUB_SHA
+export ACTIONS_PHAR="madeline$php$branch.phar"
 runTestSimple
 
 echo "Testing with new version (restart)"
@@ -177,7 +181,7 @@ cd MadelineProtoPhar
 
 cp "../madeline$php$branch.phar" .
 cp ../tools/phar.php ../examples/mtproxyd .
-echo -n "$TRAVIS_COMMIT-$php" > release$php$branch
+echo -n "$GITHUB_SHA-$php" > release$php$branch
 
 [ "$IS_RELEASE" == "y" ] && {
     cp release$php$branch release$php
@@ -185,7 +189,7 @@ echo -n "$TRAVIS_COMMIT-$php" > release$php$branch
 }
 
 git add -A
-git commit -am "Release $TRAVIS_BRANCH - $TRAVIS_COMMIT_MESSAGE"
+git commit -am "Release $BRANCH - $COMMIT_MESSAGE"
 while :; do
     git push origin master && break || {
         git fetch
@@ -194,13 +198,13 @@ while :; do
 done
 
 cd ..
-echo "$TRAVIS_COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
+echo "$COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
 
 [ -d JSON.sh ] || git clone https://github.com/dominictarr/JSON.sh
 for chat_id in $destinations;do
-    ID=$(curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$TRAVIS_BRANCH</b>
-        <a href=\"https://github.com/danog/MadelineProto/commit/$TRAVIS_COMMIT\">$TRAVIS_COMMIT_MESSAGE (PHP $PHP_MAJOR_VERSION.$PHP_MINOR_VERSION)</a>
+    ID=$(curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$BRANCH</b>
+        <a href=\"https://github.com/danog/MadelineProto/commit/$GITHUB_SHA\">$COMMIT_MESSAGE (PHP $PHP_MAJOR_VERSION.$PHP_MINOR_VERSION)</a>
         
-    $TRAVIS_COMMIT_MESSAGE" -F parse_mode="HTML" -F chat_id=$chat_id | JSON.sh/JSON.sh -s | egrep '\["result","message_id"\]' | cut -f 2 | cut -d '"' -f 2)
+    $COMMIT_MESSAGE" -F parse_mode="HTML" -F chat_id=$chat_id | JSON.sh/JSON.sh -s | egrep '\["result","message_id"\]' | cut -f 2 | cut -d '"' -f 2)
     
 done

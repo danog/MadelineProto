@@ -1,4 +1,4 @@
-name: test
+name: build
 on: [push]
 jobs:
   run:
@@ -13,7 +13,7 @@ jobs:
           - 7.1
           - 7.0
           - 5.6
-    name: PHP ${{ matrix.php }} Build on ${{ matrix.os }}
+    name: PHP ${{ matrix.php }} build
     env:
       PHP_CS_FIXER_IGNORE_ENV: 1
     steps:
