@@ -4,9 +4,9 @@
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 
-BRANCH=$(git rev-parse --abbrev-ref $GITHUB_SHA)
-TAG=$(git tag --points-at $GITHUB_SHA)
-COMMIT_MESSAGE="$(git log -1 --pretty=%B $GITHUB_SHA)"
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+TAG=$(git tag --points-at HEAD)
+COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
 
 [ "$(git rev-list --tags --max-count=1)" == "$GITHUB_SHA" ] && IS_RELEASE=y || IS_RELEASE=n
 
