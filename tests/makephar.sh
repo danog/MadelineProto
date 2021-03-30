@@ -33,7 +33,7 @@ rm -rf phar7 phar5 MadelineProtoPhar
 mkdir phar7
 cd phar7
 
-[ "$IS_RELEASE" == "y" ] && composer=$BRANCH || composer="dev-$BRANCH"
+[ "$IS_RELEASE" == "y" ] && composer=$BRANCH || composer="dev-$BRANCH#$GITHUB_SHA"
 
 sudo add-apt-repository ppa:ondrej/php -y
 sudo apt-get update -q
@@ -51,9 +51,7 @@ echo '{
     "minimum-stability":"dev",
     "require": {
         "danog/madelineproto": "'$composer'",
-        "phabel/phabel": "dev-master",
-        "amphp/websocket-client": "dev-master as 1.0.0-rc2",
-        "amphp/dns": "dev-master#eb0b0a2 as v1"
+        "phabel/phabel": "dev-master"
     },
     "authors": [
         {
@@ -64,7 +62,6 @@ echo '{
 }' > composer.json
 composer clearcache
 composer update
-composer require amphp/mysql
 cp -a $madelinePath/src vendor/danog/madelineproto
 cd ..
 
