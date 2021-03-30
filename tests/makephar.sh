@@ -39,7 +39,9 @@ sudo add-apt-repository ppa:ondrej/php -y
 sudo apt-get update -q
 sudo apt-get install php8.0-cli php8.0-mbstring php8.0-curl php8.0-xml -y
 
-alias composer="php8.0 $(which composer)"
+composer() {
+    php8.0 $(which composer) --no-plugins "$@"
+}
 
 php8.0 -v
 

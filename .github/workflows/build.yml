@@ -24,10 +24,6 @@ jobs:
           coverage: none
           ini-values: phar.readonly=0
 
-      - name: Wait for packagist
-        run: |
-          tests/waitPackagist.php
-
       - name: Build
         run: |
           tests/makephar.sh
