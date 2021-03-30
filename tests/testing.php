@@ -95,7 +95,7 @@ $MadelineProto->loop(function () use ($MadelineProto) {
      */
     $message = \getenv('GITHUB_SHA') == '' ?
         'I iz works always (io laborare sembre) (yo lavorar siempre) (mi labori ĉiam) (я всегда работать) (Ik werkuh altijd) (Ngimbonga ngaso sonke isikhathi ukusebenza)' :
-        ('Github actions tests in progress: commit '.\getenv('GITHUB_SHA').', job '.\getenv('GITHUB_JOB').', PHP version: '.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;
+        ('Github actions tests in progress: commit '.\getenv('GITHUB_SHA').', job '.\getenv('GITHUB_JOB').', PHP version: '.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION);
 
     /*
      * Try making a phone call
