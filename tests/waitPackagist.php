@@ -5,6 +5,8 @@ $commit = getenv('GITHUB_SHA');
 $branch = \trim(\shell_exec("git rev-parse --abbrev-ref $commit"));
 $tag = \trim(\shell_exec("git tag --points-at $commit"));
 
+echo "Waiting for commit $commit on branch $branch (tag $tag)...".PHP_EOL;
+
 $branch = $tag ? $tag : "dev-$branch";
 
 while (true) {
