@@ -30,7 +30,7 @@ rm -rf phar7 phar5 MadelineProtoPhar
 madelinePath=$PWD
 cd
 rm -rf phar7 phar5 MadelineProtoPhar
-mkdir phar7
+mkdir phar7 phar5
 cd phar7
 
 [ "$IS_RELEASE" == "y" ] && composer=$BRANCH || composer="dev-$BRANCH#$GITHUB_SHA"
