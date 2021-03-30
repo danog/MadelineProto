@@ -68,9 +68,7 @@ cd ..
 
 phabel() {
     cd phar7
-    php8.0 vendor/bin/phabel ../phar5
-    cd ../phar5
-    composer dumpautoload --optimize
+    php8.0 vendor/bin/phabel . ../phar5
     cd ..
 }
 
@@ -91,8 +89,6 @@ php=$PHABEL_TARGET
     ls
     $madelinePath/tests/conversion/after-5.sh
     cd ..
-    
-    php -v
 }
 [ $PHP_MAJOR_VERSION -eq 7 ] && {
     cd phar7
@@ -108,11 +104,11 @@ php=$PHABEL_TARGET
     cd ..
 } || {
     cp -a phar7 phar5
-
-    cd phar5
-    composer dumpautoload --optimize
-    cd ..
 }
+
+cd phar5
+composer dumpautoload --optimize
+cd ..
 
 find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
 
