@@ -13,14 +13,14 @@ COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
 echo "Is release: $IS_RELEASE"
 
 skip=n
-[ $PHP_MAJOR_VERSION -eq 7 ] && [ $PHP_MINOR_VERSION -ge 4 ] && {
+[ $PHP_MAJOR_VERSION -eq 8 ] && [ $PHP_MINOR_VERSION -ge 0 ] && {
     composer update
     composer test || {
         cat tests/MadelineProto.log
         exit 1
     }
     cat tests/MadelineProto.log
-    } || {
+} || {
     skip=y
     echo "Skip"
 }
@@ -37,7 +37,7 @@ cd phar7
 
 sudo add-apt-repository ppa:ondrej/php -y
 sudo apt-get update -q
-sudo apt-get install php8.0-cli php8.0-json php8.0-mbstring php8.0-curl php8.0-xml php8.0-json -y
+sudo apt-get install php8.0-cli php8.0-mbstring php8.0-curl php8.0-xml -y
 
 alias composer="php8.0 $(which composer)"
 
