@@ -41,6 +41,8 @@ sudo apt-get install php8.0-cli php8.0-mbstring php8.0-curl php8.0-xml -y
 
 alias composer="php8.0 $(which composer)"
 
+php8.0 -v
+
 # Install
 echo '{
     "name": "danog/madelineprototests",
@@ -67,7 +69,6 @@ echo '{
         }
     ]
 }' > composer.json
-composer config platform.php "8.0"
 composer clearcache
 composer update
 composer require amphp/mysql
