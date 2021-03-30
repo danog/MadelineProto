@@ -190,7 +190,7 @@ cd ..
 echo "$COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
 
 [ -d JSON.sh ] || git clone https://github.com/dominictarr/JSON.sh
-for chat_id in $destinations;do
+for chat_id in $DESTINATIONS;do
     ID=$(curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$BRANCH</b>
         <a href=\"https://github.com/danog/MadelineProto/commit/$GITHUB_SHA\">$COMMIT_MESSAGE (PHP $PHP_MAJOR_VERSION.$PHP_MINOR_VERSION)</a>
         
