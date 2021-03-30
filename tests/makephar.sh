@@ -4,8 +4,6 @@
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 
-git fetch
-
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 TAG=$(git tag --points-at HEAD)
 COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
@@ -57,15 +55,6 @@ echo '{
         "amphp/websocket-client": "dev-master as 1.0.0-rc2",
         "amphp/dns": "dev-master#eb0b0a2 as v1"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "'$madelinePath'",
-            "options": {
-                "symlink": false
-            }
-        }
-    ],
     "authors": [
         {
             "name": "Daniil Gentili",
