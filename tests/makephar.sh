@@ -68,6 +68,7 @@ cd ..
 
 phabel() {
     cd phar7
+    rm -rf vendor/phabel/phabel/testsGenerated
     php8.0 vendor/bin/phabel . ../phar5
     cd ..
 }
