@@ -36,11 +36,11 @@ function ___install_madeline()
         }
         echo "**********************************************************************************$newline";
         echo "**********************************************************************************$newline$newline";
-        echo "YOU ARE USING AN OLD AND BUGGED VERSION OF PHP, PLEASE UPDATE TO PHP 7.3$newline";
+        echo "YOU ARE USING AN OLD AND BUGGED VERSION OF PHP, PLEASE UPDATE TO PHP 8.0$newline";
         echo "PHP 5/7.0 USERS WILL NOT RECEIVE PHP UPDATES AND BUGFIXES: https://www.php.net/eol.php$newline";
         echo "PHP 5/7.0 USERS WILL NOT RECEIVE MADELINEPROTO UPDATES AND BUGFIXES$newline$newline";
-        echo "SUPPORTED VERSIONS: PHP 7.1, 7.2, 7.3+$newline";
-        echo "RECOMMENDED VERSION: PHP 7.3$newline$newline";
+        echo "SUPPORTED VERSIONS: PHP 7.1, 7.2, 7.3, 7.4, 8.0+$newline";
+        echo "RECOMMENDED VERSION: PHP 8.0$newline$newline";
         echo "**********************************************************************************$newline";
         echo "**********************************************************************************$newline";
         unset($newline);
@@ -79,9 +79,9 @@ function ___install_madeline()
     if (PHP_MAJOR_VERSION <= 5) {
         $release_branch = '5'.$release_branch;
         $release_fallback_branch = '5'.$release_fallback_branch;
-    } elseif (PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION < 4) {
-        $release_branch = '70'.$release_branch;
-        $release_fallback_branch = '70'.$release_fallback_branch;
+    } elseif (PHP_MAJOR_VERSION === 7) {
+        $release_branch = PHP_MAJOR_VERSION.PHP_MINOR_VERSION.$release_branch;
+        $release_fallback_branch = PHP_MAJOR_VERSION.PHP_MINOR_VERSION.$release_fallback_branch;
     }
 
     // Checking if defined branch/default branch builds can be downloaded

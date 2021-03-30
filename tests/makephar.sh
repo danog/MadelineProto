@@ -16,7 +16,7 @@ skip=n
         exit 1
     }
     cat tests/MadelineProto.log
-} || {
+    } || {
     skip=y
     echo "Skip"
 }
@@ -31,12 +31,19 @@ cd phar7
 
 [ "$IS_RELEASE" == "y" ] && composer=$TRAVIS_BRANCH || composer="dev-$TRAVIS_BRANCH"
 
+sudo add-apt-repository ppa:ondrej/php -y
+sudo apt-get update -q
+sudo apt-get install php8.0-cli php8.0-json php8.0-mbstring php8.0-curl php8.0-xml php8.0-json -y
+
+alias composer="php8.0 $(which composer)"
+
 # Install
 echo '{
     "name": "danog/madelineprototests",
     "minimum-stability":"dev",
     "require": {
         "danog/madelineproto": "'$composer'",
+        "phabel/phabel": "dev-master",
         "amphp/websocket-client": "dev-master as 1.0.0-rc2",
         "amphp/dns": "dev-master#eb0b0a2 as v1"
     },
@@ -56,73 +63,59 @@ echo '{
         }
     ]
 }' > composer.json
-composer config platform.php "7.4"
+composer config platform.php "8.0"
 composer clearcache
 composer update
 composer require amphp/mysql
-[ $PHP_MAJOR_VERSION -eq 5 ] && {
-    composer require dstuecken/php7ify
-    composer require symfony/polyfill-php70
-    composer require symfony/polyfill-php71
-    composer require symfony/polyfill-php72
-    composer require symfony/polyfill-php73
-}
-[ $PHP_MAJOR_VERSION -eq 7 ] && [ $PHP_MINOR_VERSION -eq 0 ] && {
-    composer require symfony/polyfill-php71
-    composer require symfony/polyfill-php72
-    composer require symfony/polyfill-php73
-}
-composer dumpautoload --optimize
 cp -a $madelinePath/src vendor/danog/madelineproto
 cd ..
 
-[ $PHP_MAJOR_VERSION -eq 5 ] && {
-    sudo add-apt-repository ppa:ondrej/php -y
-    sudo apt-get update -q
-    sudo apt-get install php7.3-cli php7.3-json php7.3-mbstring php7.3-curl php7.3-xml php7.3-json -y
-    
-    composer global require danog/7to5
-    [ -f $HOME/.composer/vendor/bin/php7to5 ] && php7to5=$HOME/.composer/vendor/bin/php7to5
-    [ -f $HOME/.config/composer/vendor/bin/php7to5 ] && php7to5=$HOME/.config/composer/vendor/bin/php7to5
+phabel() {
+    cd phar7
+    php8.0 vendor/bin/phabel ../phar5
+    cd ../phar5
+    composer dumpautoload --optimize
+    cd ..
+}
 
+export PHABEL_TARGET="$PHP_MAJOR_VERSION$PHP_MINOR_VERSION"
+
+php=$PHABEL_TARGET
+
+[ $PHP_MAJOR_VERSION -eq 5 ] && {
+    
     cd phar7
     ls
     $madelinePath/tests/conversion/prepare-5.sh
     cd ..
-
-    php7.3 $php7to5 convert --copy-all phar7 phar5
-
+    
+    phabel
+    
     cd phar5
     ls
     $madelinePath/tests/conversion/after-5.sh
     cd ..
-
-    php -v
     
-    php=5
+    php -v
 }
 [ $PHP_MAJOR_VERSION -eq 7 ] && {
-    [ $PHP_MINOR_VERSION -eq 0 ] && {
-        composer global require danog/7to70
-        [ -f $HOME/.composer/vendor/bin/php7to70 ] && php7to70=$HOME/.composer/vendor/bin/php7to70
-        [ -f $HOME/.config/composer/vendor/bin/php7to70 ] && php7to70=$HOME/.config/composer/vendor/bin/php7to70
-
-        cd phar7
+    cd phar7
     ls
-        $madelinePath/tests/conversion/prepare-70.sh
-        cd ..
-
-        $php7to70 convert --copy-all phar7 phar5
-
-        cd phar5
+    $madelinePath/tests/conversion/prepare-70.sh
+    cd ..
+    
+    phabel
+    
+    cd phar5
     ls
-        $madelinePath/tests/conversion/after-70.sh
-        cd ..
+    $madelinePath/tests/conversion/after-70.sh
+    cd ..
+} || {
+    cp -a phar7 phar5
 
-        php=70
-    } || {
-        cp -a phar7 phar5
-    }
+    cd phar5
+    composer dumpautoload --optimize
+    cd ..
 }
 
 find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
@@ -186,13 +179,6 @@ ssh-add madeline_rsa
 git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
 
-[ "$php" == "70" ] && {
-    while [ "$(cat release$branch)" != "$TRAVIS_COMMIT"- ]; do sleep 1; git pull; done
-}
-[ "$php" == "5" ] && {
-    while [ "$(cat release70$branch)" != "$TRAVIS_COMMIT"-70 ]; do sleep 1; git pull; done
-}
-
 cp "../madeline$php$branch.phar" .
 cp ../tools/phar.php ../examples/mtproxyd .
 echo -n "$TRAVIS_COMMIT-$php" > release$php$branch
@@ -204,8 +190,12 @@ echo -n "$TRAVIS_COMMIT-$php" > release$php$branch
 
 git add -A
 git commit -am "Release $TRAVIS_BRANCH - $TRAVIS_COMMIT_MESSAGE"
-git push origin master
-
+while :; do
+    git push origin master && break || {
+        git fetch
+        git rebase origin/master
+    }
+done
 
 cd ..
 echo "$TRAVIS_COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
