@@ -182,6 +182,9 @@ trait CallHandler
         if ($aargs['file'] ?? false) {
             $message->setFileRelated(true);
         }
+        if ($aargs['botAPI'] ?? false) {
+            $message->setBotAPI(true);
+        }
         if (isset($aargs['FloodWaitLimit'])) {
             $message->setFloodWaitLimit($aargs['FloodWaitLimit']);
         }

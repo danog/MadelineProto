@@ -888,6 +888,16 @@ abstract class Tools extends StrTools
                 }
             }
         }
+        if (!$max) {
+            $maxType = 0;
+            foreach ($sizes as $size) {
+                $curType = ord($size['type']);
+                if ($curType > $maxType) {
+                    $maxType = $curType;
+                    $max = $size;
+                }
+            }
+        }
         return $max;
     }
     /**

@@ -425,7 +425,7 @@ class DataCenterConnection implements JsonSerializable
         $backup = $this->connections[$id]->backupSession();
         $list = '';
         foreach ($backup as $k => $message) {
-            if ($message->getConstructor() === 'msgs_state_req') {
+            if ($message->getConstructor() === 'msgs_state_req' || $message->isUnencrypted()) {
                 unset($backup[$k]);
                 continue;
             }

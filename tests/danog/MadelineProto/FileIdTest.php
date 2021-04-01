@@ -241,7 +241,7 @@ class FileIdTest extends TestCase
     }
     public function provideChats(): array
     {
-        return [\getenv('DEST'), '@MadelineProto', -382346236];
+        return [\getenv('DEST'), '@MadelineProto', -559184257];
     }
     public function provideUrls(): array
     {

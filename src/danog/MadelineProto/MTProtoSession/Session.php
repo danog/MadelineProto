@@ -145,7 +145,7 @@ trait Session
     /**
      * Backup eventual unsent messages before session deletion.
      *
-     * @return array
+     * @return OutgoingMessage[]
      */
     public function backupSession(): array
     {

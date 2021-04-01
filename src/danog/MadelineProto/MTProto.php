@@ -560,12 +560,15 @@ class MTProto extends AsyncConstruct implements TLCallback
      * Constructor function.
      *
      * @param Settings|SettingsEmpty $settings Settings
-     * @param APIWrapper             $wrapper  API wrapper
+     * @param ?APIWrapper            $wrapper  API wrapper
      *
      * @return void
      */
-    public function __magic_construct(SettingsAbstract $settings, APIWrapper $wrapper)
+    public function __magic_construct(SettingsAbstract $settings, ?APIWrapper $wrapper = null)
     {
+        if (static::class !== self::class || !$wrapper) {
+            return;
+        }
         self::$references[\spl_object_hash($this)] = $this;
         $this->wrapper = $wrapper;
         $this->setInitPromise($this->__construct_async($settings));

@@ -5,6 +5,8 @@ namespace danog\MadelineProto\Test;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Settings;
+use danog\MadelineProto\SettingsEmpty;
 use danog\MadelineProto\Tools;
 use PHPUnit\Framework\TestCase;
 
@@ -12,6 +14,59 @@ use PHPUnit\Framework\TestCase;
 
 final class DataCenterTest extends TestCase
 {
+
+    /**
+     * DC list.
+     */
+    protected array $dcList = [
+        'test' => [
+            // Test datacenters
+            'ipv4' => [
+                // ipv4 addresses
+                2 => [
+                    // The rest will be fetched using help.getConfig
+                    'ip_address' => '149.154.167.40',
+                    'port' => 443,
+                    'media_only' => false,
+                    'tcpo_only' => false,
+                ],
+            ],
+            'ipv6' => [
+                // ipv6 addresses
+                2 => [
+                    // The rest will be fetched using help.getConfig
+                    'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000e',
+                    'port' => 443,
+                    'media_only' => false,
+                    'tcpo_only' => false,
+                ],
+            ],
+        ],
+        'main' => [
+            // Main datacenters
+            'ipv4' => [
+                // ipv4 addresses
+                2 => [
+                    // The rest will be fetched using help.getConfig
+                    'ip_address' => '149.154.167.51',
+                    'port' => 443,
+                    'media_only' => false,
+                    'tcpo_only' => false,
+                ],
+            ],
+            'ipv6' => [
+                // ipv6 addresses
+                2 => [
+                    // The rest will be fetched using help.getConfig
+                    'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000a',
+                    'port' => 443,
+                    'media_only' => false,
+                    'tcpo_only' => false,
+                ],
+            ],
+        ]
+    ];
+
     /**
      * Protocol connection test.
      *
@@ -27,7 +82,7 @@ final class DataCenterTest extends TestCase
      */
     public function testCanUseProtocol(string $transport, bool $obfuscated, string $protocol, bool $test_mode, bool $ipv6): void
     {
-        $settings = MTProto::parseSettings(
+        $settings = Settings::parseFromLegacyFull(
             [
                 'connection_settings' => [
                     'all' => [
@@ -47,30 +102,45 @@ final class DataCenterTest extends TestCase
                 ]
             ]
         );
+        $datacenter = null;
+        $API = new class(new SettingsEmpty) extends MTProto {
+            /**
+             * Constructor.
+             *
+             * @param Settings $settings Logger settings
+             * @param ?DataCenter $datacenter Datacenter
+             */
+            public function initTests(Settings $settings, ?DataCenter &$dataCenter)
+            {
+                $this->logger = Logger::constructorFromSettings($settings->getLogger());
+                $this->settings = $settings;
+                $this->datacenter = &$dataCenter;
+            }
+            /**
+             * Get logger.
+             *
+             * @return Logger
+             */
+            public function getLogger(): Logger
+            {
+                return $this->logger;
+            }
+
+            /**
+             * Get settings
+             *
+             * @return Settings
+             */
+            public function getSettings(): Settings
+            {
+                return $this->settings;
+            }
+        };
+        $API->initTests($settings, $datacenter);
         $datacenter = new DataCenter(
-            $API = new class($settings) {
-                /**
-                 * Constructor.
-                 *
-                 * @param array $settings Logger settings
-                 */
-                public function __construct(array $settings)
-                {
-                    $this->logger = Logger::getLoggerFromSettings($settings);
-                    $this->settings = $settings;
-                }
-                /**
-                 * Get logger.
-                 *
-                 * @return Logger
-                 */
-                public function getLogger(): Logger
-                {
-                    return $this->logger;
-                }
-            },
-            $settings['connection'],
-            $settings['connection_settings'],
+            $API,
+            $this->dcList,
+            $settings->getConnection(),
         );
         $API->datacenter = $datacenter;
 

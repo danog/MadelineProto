@@ -746,6 +746,9 @@ trait PeerHandler
             if ($constructor['_'] === 'channel') {
                 return ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min']];
             }
+            if ($constructor['_'] === 'chat' || $constructor['_'] === 'chatForbidden') {
+                return ['_' => 'inputPeerChat', 'chat_id' => $constructor['id']];
+            }
         }
         if ($type === MTProto::INFO_TYPE_ID) {
             if ($constructor['_'] === 'user') {

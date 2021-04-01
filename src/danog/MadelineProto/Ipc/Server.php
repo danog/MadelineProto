@@ -170,6 +170,8 @@ class Server extends SignalLoop
             while ($payload = yield $socket->receive()) {
                 Tools::callFork($this->clientRequest($socket, $id++, $payload));
             }
+        } catch (\Throwable $e) {
+            Logger::log("Exception in IPC connection: $e");
         } finally {
             yield $socket->disconnect();
             if ($payload === self::SHUTDOWN) {
