@@ -67,7 +67,7 @@ cp -a $madelinePath/src vendor/danog/madelineproto
 cd ..
 
 phabel() {
-    mkdir phar7
+    mkdir phar5
     cd phar7
     rm -rf vendor/phabel/phabel/testsGenerated
     php8.0 vendor/bin/phabel . ../phar5
