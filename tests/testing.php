@@ -19,7 +19,7 @@ If not, see <http://www.gnu.org/licenses/>.
 $loader = false;
 if ($phar = \getenv('ACTIONS_PHAR')) {
     $loader = include $phar;
-} else if (!\file_exists(__DIR__.'/../vendor/autoload.php')) {
+} else if (!\file_exists(__DIR__.'/../vendor/autoload.php') || getenv('ACTIONS_FORCE_PREVIOUS')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
     if (!\file_exists('madeline.php')) {
         \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
@@ -45,14 +45,14 @@ if ($loader) {
 /*
  * Load .env for settings
  */
-if (\file_exists('.env')) {
+if (\file_exists('.env') && class_exists(Dotenv\Dotenv::class)) {
     echo 'Loading .env...'.PHP_EOL;
     $dotenv = Dotenv\Dotenv::create(\getcwd());
     $dotenv->load();
-}
-if (\getenv('TEST_SECRET_CHAT') == '') {
-    echo('TEST_SECRET_CHAT is not defined in .env, please define it (copy .env.example).'.PHP_EOL);
-    die(1);
+    if (\getenv('TEST_SECRET_CHAT') == '') {
+        echo('TEST_SECRET_CHAT is not defined in .env, please define it (copy .env.example).'.PHP_EOL);
+        die(1);
+    }
 }
 echo 'Loading settings...'.PHP_EOL;
 $settings = \json_decode(\getenv('MTPROTO_SETTINGS'), true) ?: [];

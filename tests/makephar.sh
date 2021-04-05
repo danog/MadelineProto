@@ -25,6 +25,12 @@ skip=n
     echo "Skip"
 }
 
+which apt-get &>/dev/null && {
+    sudo add-apt-repository ppa:ondrej/php -y
+    sudo apt-get update -q
+    sudo apt-get install php8.0-cli php8.0-mbstring php8.0-curl php8.0-xml -y
+}
+
 # Clean up
 rm -rf phar7 phar5 MadelineProtoPhar
 madelinePath=$PWD
@@ -34,10 +40,6 @@ mkdir phar7
 cd phar7
 
 [ "$IS_RELEASE" == "y" ] && composer=$BRANCH || composer="dev-$BRANCH#$GITHUB_SHA"
-
-sudo add-apt-repository ppa:ondrej/php -y
-sudo apt-get update -q
-sudo apt-get install php8.0-cli php8.0-mbstring php8.0-curl php8.0-xml -y
 
 composer() {
     php8.0 $(which composer) --no-plugins "$@"
@@ -49,7 +51,6 @@ php -v
 # Install
 echo '{
     "name": "danog/madelineprototests",
-    "minimum-stability":"dev",
     "require": {
         "danog/madelineproto": "'$composer'",
         "phabel/phabel": "dev-master"
@@ -75,8 +76,8 @@ phabel() {
     composer require symfony/polyfill-php74 --ignore-platform-reqs
     composer require symfony/polyfill-php73 --ignore-platform-reqs
     composer require symfony/polyfill-php72 --ignore-platform-reqs
-    composer require symfony/polyfill-php71 --ignore-platform-reqs
-    composer require symfony/polyfill-php70 --ignore-platform-reqs
+    composer require symfony/polyfill-php71:1.19.0 --ignore-platform-reqs
+    composer require symfony/polyfill-php70:1.19.0 --ignore-platform-reqs
 
     rm -rf vendor/phabel/phabel/testsGenerated
     php8.0 vendor/bin/phabel . ../phar5
@@ -152,16 +153,19 @@ n
 EOF
 }
 
+rm madeline.phar
+
 echo "Testing with previous version..."
+export ACTIONS_FORCE_PREVIOUS=1
 cp tests/testing.php tests/testingBackup.php
-runTest php8.0
-pkill -f 'MadelineProto .*'
+runTest
+pkill -f 'MadelineProto worker .*'
 
 echo "Testing with new version (upgrade)..."
 php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" $GITHUB_SHA
 export ACTIONS_PHAR="madeline$php$branch.phar"
 runTestSimple
-pkill -f 'MadelineProto .*'
+pkill -f 'MadelineProto  worker .*'
 
 echo "Testing with new version (restart)"
 cp tests/testingBackup.php tests/testing.php
