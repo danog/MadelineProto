@@ -61,6 +61,7 @@ echo '{
         }
     ]
 }' > composer.json
+composer config platform.php "8.0"
 composer clearcache
 composer update --ignore-platform-reqs
 cp -a $madelinePath/src vendor/danog/madelineproto

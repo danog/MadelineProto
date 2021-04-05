@@ -34,6 +34,9 @@ if ($loader) {
         if (\in_array($class, ['Amp\\Sync\\Internal\\MutexStorage', 'Amp\\Sync\\Internal\\SemaphoreStorage', 'Amp\\Parallel\\Sync\\Internal\\ParcelStorage', 'Amp\\Parallel\\Context\\Internal\\Thread'])) {
             continue;
         }
+        if (str_starts_with($class, 'League\\Uri') && str_ends_with($class, 'Test')) {
+            continue;
+        }
         //echo "Requiring $class => $file\n";
         require_once($file);
     }
