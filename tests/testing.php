@@ -17,19 +17,14 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 $loader = false;
-if (!\file_exists(__DIR__.'/../vendor/autoload.php')) {
+if ($phar = \getenv('ACTIONS_PHAR')) {
+    $loader = include $phar;
+} else if (!\file_exists(__DIR__.'/../vendor/autoload.php')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
-    if ($phar = \getenv('ACTIONS_PHAR')) {
-        $loader = include $phar;
-    } else {
-        if (!\file_exists('madeline.php')) {
-            \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
-        }
-        include 'madeline.php';
+    if (!\file_exists('madeline.php')) {
+        \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
-} elseif (isset($argv[1]) && \file_exists("/tmp/tempConv{$argv[1]}/vendor/autoload.php")) {
-    \define('TESTING_VERSIONS', 1);
-    $loader = require_once("/tmp/tempConv{$argv[1]}/vendor/autoload.php");
+    include 'madeline.php';
 } else {
     require_once 'vendor/autoload.php';
 }

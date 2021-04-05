@@ -62,13 +62,21 @@ echo '{
     ]
 }' > composer.json
 composer clearcache
-composer update
+composer update --ignore-platform-reqs
 cp -a $madelinePath/src vendor/danog/madelineproto
 cd ..
 
 phabel() {
     mkdir phar5
     cd phar7
+
+    composer require symfony/polyfill-php80 --ignore-platform-reqs
+    composer require symfony/polyfill-php74 --ignore-platform-reqs
+    composer require symfony/polyfill-php73 --ignore-platform-reqs
+    composer require symfony/polyfill-php72 --ignore-platform-reqs
+    composer require symfony/polyfill-php71 --ignore-platform-reqs
+    composer require symfony/polyfill-php70 --ignore-platform-reqs
+
     rm -rf vendor/phabel/phabel/testsGenerated
     php8.0 vendor/bin/phabel . ../phar5
     cd ..
@@ -79,7 +87,6 @@ export PHABEL_TARGET="$PHP_MAJOR_VERSION$PHP_MINOR_VERSION"
 php=$PHABEL_TARGET
 
 [ $PHP_MAJOR_VERSION -eq 5 ] && {
-    
     cd phar7
     ls
     $madelinePath/tests/conversion/prepare-5.sh
@@ -109,10 +116,8 @@ php=$PHABEL_TARGET
 }
 
 cd phar5
-composer dumpautoload --optimize
+composer dumpautoload --optimize --ignore-platform-reqs
 cd ..
-
-find phar5 -type f -exec sed 's/\w* \.\.\./.../' -i {} +
 
 # Make sure conversion worked
 # Not needed anymore, tests/testing.php preloads all classes
@@ -132,7 +137,8 @@ runTestSimple()
 }
 runTest()
 {
-    tests/testing.php <<EOF
+    [ "$1" != "" ] && p="$1" || p=php
+    $p tests/testing.php <<EOF
 m
 $API_ID
 $API_HASH
@@ -147,19 +153,26 @@ EOF
 
 echo "Testing with previous version..."
 cp tests/testing.php tests/testingBackup.php
-runTest
+runTest php8.0
+pkill -f 'MadelineProto .*'
 
 echo "Testing with new version (upgrade)..."
 php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" $GITHUB_SHA
 export ACTIONS_PHAR="madeline$php$branch.phar"
 runTestSimple
+pkill -f 'MadelineProto .*'
 
 echo "Testing with new version (restart)"
 cp tests/testingBackup.php tests/testing.php
-rm testing.madeline
+rm testing.madeline*
 runTest
 
 echo "Testing with new version (reload)"
+cp tests/testingBackup.php tests/testing.php
+runTestSimple
+pkill -f 'MadelineProto .*'
+
+echo "Testing with new version (kill+reload)"
 cp tests/testingBackup.php tests/testing.php
 runTestSimple
 
