@@ -15,7 +15,7 @@ use function Amp\call;
  */
 class MemoryArray extends \ArrayIterator implements DbArray
 {
-    protected function __construct($array = [], $flags = 0)
+    public function __construct($array = [], $flags = 0)
     {
         parent::__construct((array) $array, $flags | self::STD_PROP_LIST);
     }
