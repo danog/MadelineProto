@@ -6,6 +6,5 @@ rm -rf vendor/danog/madelineproto/docs
 #php $(dirname $0)/prepare-5.php
 
 #sed -i 's/handleConnectionWindowIncrement[(]\$windowSize[)]/handleConnectionWindowIncrement(int $windowSize)/g' vendor/amphp/http-client/src/Connection/Internal/Http2ConnectionProcessor.php
-for f in $(grep -lr Closure::fromCallable vendor/);do
-    grep -qi CallableMaker $f || sed -ri 's/^\{/{ use \\MyCallableMaker;/g;s/\\Closure::fromCallable[(]\[(.+), (.+)\][)]/\1->callableFromInstanceMethod(\2)/g' $f
-done
+
+#sed -ri 's/^\{/{ use \\MyCallableMaker;/g;s/\\Closure::fromCallable[(]\[(.+), (.+)\][)]/\1->callableFromInstanceMethod(\2)/g;s/Closure::fromCallable[(]\[(.+), (.+)\][)]/\1->callableFromInstanceMethod(\2)/g' $l

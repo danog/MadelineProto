@@ -153,19 +153,19 @@ n
 EOF
 }
 
-rm madeline.phar
+rm -f madeline.phar
 
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
 cp tests/testing.php tests/testingBackup.php
 runTest
-pkill -f 'MadelineProto worker .*'
+pkill -f 'MadelineProto worker .*' || echo
 
 echo "Testing with new version (upgrade)..."
 php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" $GITHUB_SHA
 export ACTIONS_PHAR="madeline$php$branch.phar"
 runTestSimple
-pkill -f 'MadelineProto  worker .*'
+pkill -f 'MadelineProto worker .*' || echo
 
 echo "Testing with new version (restart)"
 cp tests/testingBackup.php tests/testing.php

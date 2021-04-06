@@ -34,7 +34,7 @@ if ($loader) {
         if (\in_array($class, ['Amp\\Sync\\Internal\\MutexStorage', 'Amp\\Sync\\Internal\\SemaphoreStorage', 'Amp\\Parallel\\Sync\\Internal\\ParcelStorage', 'Amp\\Parallel\\Context\\Internal\\Thread', 'Monolog\\Test\\TestCase', 'Phabel\\Composer\\Plugin'])) {
             continue;
         }
-        if (str_ends_with($class, 'Test')) {
+        if (str_ends_with($class, 'Test') || class_exists($class) || interface_exists($class)) {
             continue;
         }
         //echo "Requiring $class => $file\n";
