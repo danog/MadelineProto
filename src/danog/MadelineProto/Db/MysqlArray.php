@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Mysql\ConnectionConfig;
 use Amp\Promise;
 use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Exception;
@@ -92,9 +93,11 @@ class MysqlArray extends SqlArray
      */
     public function initConnection($settings): \Generator
     {
-        $urlArray = parse_url($settings->getUri());
+        $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
+        $host = $config->getHost();
+        $port = $config->getPort();
         $this->pdo = new \PDO(
-            "mysql:host={$urlArray['host']};port={$urlArray['port']};charset=UTF8",
+            "mysql:host={$host};port={$port};charset=UTF8",
             $settings->getUsername(),
             $settings->getPassword()
         );

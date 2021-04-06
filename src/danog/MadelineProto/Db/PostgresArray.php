@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\Db;
 
 use Amp\Postgres\ByteA;
+use Amp\Postgres\ConnectionConfig;
 use Amp\Postgres\Pool;
 use Amp\Promise;
 use Amp\Success;
@@ -78,9 +79,11 @@ class PostgresArray extends SqlArray
      */
     public function initConnection($settings): \Generator
     {
-        $urlArray = parse_url($settings->getUri());
+        $config = ConnectionConfig::fromString("host=".\str_replace("tcp://", "", $settings->getUri()));
+        $host = $config->getHost();
+        $port = $config->getPort();
         $this->pdo = new \PDO(
-            "postgre:host={$urlArray['host']};port={$urlArray['port']};charset=UTF8",
+            "postgre:host={$host};port={$port};charset=UTF8",
             $settings->getUsername(),
             $settings->getPassword()
         );
