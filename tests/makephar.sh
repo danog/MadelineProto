@@ -40,7 +40,7 @@ rm -rf phar7 phar5 MadelineProtoPhar
 mkdir phar7
 cd phar7
 
-[ "$IS_RELEASE" == "y" ] && composer=$BRANCH || composer="dev-$BRANCH#$GITHUB_SHA"
+[ "$IS_RELEASE" == "y" ] && composer="$TAG" || composer="dev-$BRANCH#$GITHUB_SHA"
 
 composer() {
     php8.0 $(which composer) --no-plugins "$@"
