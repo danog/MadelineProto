@@ -3,6 +3,8 @@
 namespace danog\MadelineProto\Ipc\Runner;
 
 use Amp\Parallel\Context\ContextException;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 
 final class WebRunner extends RunnerAbstract
@@ -81,8 +83,19 @@ final class WebRunner extends RunnerAbstract
 
         $params = \http_build_query($params);
 
-        $address = ($_SERVER['HTTPS'] ?? false ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
-        $port = $_SERVER['SERVER_PORT'];
+        foreach ($_SERVER['HTTPS'] ?? false ? ['tls', 'tcp'] : ['tcp', 'tls'] as $proto) {
+            try {
+                $address = $proto.'://'.$_SERVER['SERVER_NAME'];
+                $port = $_SERVER['SERVER_PORT'];
+                $res = \fsockopen($address, $port);
+                break;
+            } catch (\Throwable $e) {
+                Logger::log("Error while connecting to ourselves: $res");
+            }
+        }
+        if (!isset($res)) {
+            throw new Exception("Could not connect to ourselves, please check the server configuration!");
+        }
 
         $uri = self::$runPath.'?'.$params;
 
@@ -90,7 +103,7 @@ final class WebRunner extends RunnerAbstract
 
         // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
         // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
-        \fwrite($res = \fsockopen($address, $port), $payload);
+        \fwrite($res, $payload);
         self::$resources []= $res;
     }
 }

@@ -14,12 +14,12 @@ echo "Is release: $IS_RELEASE"
 
 skip=n
 [ $PHP_MAJOR_VERSION -eq 8 ] && [ $PHP_MINOR_VERSION -ge 0 ] && {
-    composer update
-    composer test || {
-        cat tests/MadelineProto.log
-        exit 1
-    }
-    cat tests/MadelineProto.log
+    #composer update
+    #composer test || {
+    #    cat tests/MadelineProto.log
+    #    exit 1
+    #}
+    #cat tests/MadelineProto.log
 } || {
     skip=y
     echo "Skip"
