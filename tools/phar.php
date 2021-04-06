@@ -97,8 +97,11 @@ function ___install_madeline()
                     return [];
                 }
                 $composer = \json_decode(\file_get_contents("phar://madeline.phar$ext/vendor/composer/installed.json"), true) ?: [];
+                if (!isset($composer['packages'])) {
+                    return [];
+                }
                 $packages = [];
-                foreach ($composer as $dep) {
+                foreach ($composer['packages'] as $dep) {
                     $packages[$dep['name']] = $dep['version_normalized'];
                 }
                 return $packages;
