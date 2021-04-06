@@ -153,7 +153,7 @@ n
 EOF
 }
 
-rm -f madeline.phar
+rm -f madeline.phar testing.madeline*
 
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
