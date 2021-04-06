@@ -83,7 +83,7 @@ final class WebRunner extends RunnerAbstract
 
         $params = \http_build_query($params);
 
-        foreach ($_SERVER['HTTPS'] ?? false ? ['tls', 'tcp'] : ['tcp', 'tls'] as $proto) {
+        foreach (($_SERVER['HTTPS'] ?? 'off') === 'on' ? ['tls', 'tcp'] : ['tcp', 'tls'] as $proto) {
             try {
                 $address = $proto.'://'.$_SERVER['SERVER_NAME'];
                 $port = $_SERVER['SERVER_PORT'];

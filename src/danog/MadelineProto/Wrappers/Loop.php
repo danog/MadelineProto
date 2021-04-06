@@ -63,7 +63,7 @@ trait Loop
                 $this->logger->logger("Adding restart callback!");
                 $logger = $this->logger;
                 $id = Shutdown::addCallback(static function () use (&$logger) {
-                    $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
+                    $address = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'tls' : 'tcp').'://'.$_SERVER['SERVER_NAME'];
                     $port = $_SERVER['SERVER_PORT'];
                     $uri = $_SERVER['REQUEST_URI'];
                     $params = $_GET;
