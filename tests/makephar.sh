@@ -160,23 +160,23 @@ echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
 cp tests/testing.php tests/testingBackup.php
 runTest
-pkill -f 'MadelineProto worker .*' || echo
+pkill -f 'MadelineProto worker .*' || echo "No old process"
 
 echo "Testing with new version (upgrade)..."
 php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" $GITHUB_SHA
 export ACTIONS_PHAR="madeline$php$branch.phar"
 runTestSimple
-pkill -f 'MadelineProto worker .*' || echo
+pkill -f 'MadelineProto worker .*' || echo "No old process"
 
 echo "Testing with new version (restart)"
 cp tests/testingBackup.php tests/testing.php
-rm testing.madeline*
+rm -f testing.madeline* || echo
 runTest
 
 echo "Testing with new version (reload)"
 cp tests/testingBackup.php tests/testing.php
 runTestSimple
-pkill -f 'MadelineProto .*'
+pkill -f 'MadelineProto .*' || echo "No old process"
 
 echo "Testing with new version (kill+reload)"
 cp tests/testingBackup.php tests/testing.php
