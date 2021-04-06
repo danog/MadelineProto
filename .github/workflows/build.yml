@@ -41,5 +41,6 @@ jobs:
           TOKEN: ${{ secrets.BOT_TOKEN }}
           DEST: ${{ secrets.DEST }}
           DESTINATIONS: ${{ secrets.DESTINATIONS }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
           tests/makephar.sh

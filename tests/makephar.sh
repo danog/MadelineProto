@@ -190,7 +190,7 @@ if [ "$SSH_KEY" != "" ]; then
     echo -e "$SSH_KEY" > madeline_rsa
     chmod 600 madeline_rsa
     ssh-add madeline_rsa
-done
+fi
 
 git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
