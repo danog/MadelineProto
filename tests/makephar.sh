@@ -14,6 +14,7 @@ echo "Is release: $IS_RELEASE"
 
 skip=n
 [ $PHP_MAJOR_VERSION -eq 8 ] && [ $PHP_MINOR_VERSION -ge 0 ] && {
+    echo
     #composer update
     #composer test || {
     #    cat tests/MadelineProto.log
@@ -183,6 +184,13 @@ runTestSimple
 
 echo "Checking syntax of madeline.php"
 php -l ./tools/phar.php
+
+if [ "$SSH_KEY" != "" ]; then
+    eval "$(ssh-agent -s)"
+    echo -e "$SSH_KEY" > madeline_rsa
+    chmod 600 madeline_rsa
+    ssh-add madeline_rsa
+done
 
 git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar

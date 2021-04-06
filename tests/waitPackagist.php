@@ -9,10 +9,12 @@ echo "Waiting for commit $commit on branch $branch (tag $tag)...".PHP_EOL;
 
 $branch = $tag ? $tag : "dev-$branch";
 
+$cur = 0;
 while (true) {
-    $json = \json_decode(\file_get_contents('https://repo.packagist.org/p/danog/madelineproto.json'), true);
-    \sleep(1);
+    $json = \json_decode(\file_get_contents("https://repo.packagist.org/p/danog/madelineproto.json?v=$cur"), true);
     if ($json["packages"]["danog/madelineproto"][$branch]["source"]["reference"] === $commit) {
         return;
     }
+    \sleep(1);
+    $cur++;
 }
