@@ -192,6 +192,9 @@ if [ "$SSH_KEY" != "" ]; then
     ssh-add madeline_rsa
 fi
 
+git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+git config --local user.name "Github Actions"
+
 git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
 

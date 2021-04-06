@@ -71,25 +71,31 @@ function ___install_madeline()
     }
 
     $version = (string) min(80, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
+    $versions = [];
     if ($custom_branch === '') {
-        $release_branch = $version;
+        $versions []= $version;
+        $versions []= 70;
     } else {
-        $release_branch = "$version-$custom_branch";
+        $versions []= "$version-$custom_branch";
+        $versions []= "70-$custom_branch";
+        $versions []= $version;
+        $versions []= 70;
     }
-    $release_fallback_branch = $version;
 
     // Checking if defined branch/default branch builds can be downloaded
-    if (!($release = @\file_get_contents(\sprintf($release_template, $release_branch)))) {
-        if (!($release = @\file_get_contents(\sprintf($release_template, $release_fallback_branch)))) {
-            return;
+    foreach ($versions as $chosen) {
+        if ($release = @\file_get_contents(\sprintf($release_template, $chosen))) {
+            break;
         }
-        $release_branch = $release_fallback_branch;
+    }
+    if (!$release) {
+        return;
     }
 
     \define('HAD_MADELINE_PHAR', \file_exists('madeline.phar'));
 
     if (!\file_exists('madeline.phar') || !\file_exists('madeline.phar.version') || \file_get_contents('madeline.phar.version') !== $release) {
-        $phar = \file_get_contents(\sprintf($phar_template, $release_branch));
+        $phar = \file_get_contents(\sprintf($phar_template, $chosen));
 
         if ($phar) {
             $extractVersions = static function ($ext = '') {
