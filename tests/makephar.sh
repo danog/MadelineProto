@@ -136,7 +136,10 @@ export MTPROTO_SETTINGS='{"logger":{"logger_level":5}}'
 
 runTestSimple()
 {
-    tests/testing.php
+    tests/testing.php || {
+        cat MadelineProto.log
+        exit 1
+    }
 }
 runTest()
 {
