@@ -144,8 +144,7 @@ runTestSimple()
 runTest()
 {
     [ "$1" != "" ] && p="$1" || p=php
-    $p tests/testing.php <<EOF
-m
+    echo "m
 $API_ID
 $API_HASH
 b
@@ -153,8 +152,10 @@ $BOT_TOKEN
 n
 n
 n
-
-EOF
+" | $p tests/testing.php || {
+        cat MadelineProto.log
+        exit 1
+    }
 }
 
 rm -f madeline.phar testing.madeline*
