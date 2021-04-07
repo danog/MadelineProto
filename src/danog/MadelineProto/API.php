@@ -141,6 +141,13 @@ class API extends InternalDoc
     private bool $destructing = false;
 
     /**
+     * Whether we need a full instance.
+     *
+     * @var boolean
+     */
+    private bool $forceFull = false;
+
+    /**
      * API wrapper (to avoid circular references).
      *
      * @var APIWrapper
@@ -249,9 +256,9 @@ class API extends InternalDoc
     protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false): \Generator
     {
         if ($settings instanceof SettingsIpc) {
-            $forceFull = $forceFull || $settings->getSlow();
+            $forceFull = $forceFull || $this->forceFull || $settings->getSlow();
         } elseif ($settings instanceof Settings) {
-            $forceFull = $forceFull || $settings->getIpc()->getSlow();
+            $forceFull = $forceFull || $this->forceFull || $settings->getIpc()->getSlow();
         }
 
         [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(
@@ -416,6 +423,7 @@ class API extends InternalDoc
     {
         $errors = [];
         $this->async(true);
+        $this->forceFull = true;
 
         if (!yield from $this->reconnectFull()) {
             return;
