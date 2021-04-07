@@ -225,6 +225,9 @@ class API extends InternalDoc
     protected function reconnectFull(): \Generator
     {
         if ($this->API instanceof Client) {
+            if (yield $this->API->hasEventHandler()) {
+                return;
+            }
             yield $this->API->stopIpcServer();
             yield $this->API->disconnect();
             yield from $this->connectToMadelineProto(new SettingsEmpty, true);
