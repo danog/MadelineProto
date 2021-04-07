@@ -63,13 +63,17 @@ class Button implements \JsonSerializable, \ArrayAccess
      */
     public function __construct(MTProto $API, array $message, array $button)
     {
+        if (!isset($message['from_id']) // No other option
+            // It's a channel/chat, 100% what we need
+            || $message['peer_id']['_'] !== 'peerUser'
+            // It is a user, and it's not ourselves
+            || $message['peer_id']['user_id'] !== $API->authorization['user']['id']
+        ) {
+            $this->peer = $message['peer_id'];
+        } else {
+            $this->peer = $message['from_id'];
+        }
         $this->button = $button;
-        $this->peer = $message['peer_id'] === [
-            '_' => 'peerUser',
-            'user_id' => $API->authorization['user']['id']
-        ]
-            ? $message['from_id']
-            : $message['peer_id'];
         $this->id = $message['id'];
         $this->API = $API;
         $this->session = $API->getWrapper()->getSession()->getLegacySessionPath();
