@@ -421,7 +421,6 @@ class API extends InternalDoc
             return;
         }
 
-        $errors = [\time() => $errors[\time()] ?? 0];
         $started = false;
         while (true) {
             try {
@@ -430,8 +429,10 @@ class API extends InternalDoc
                 $started = true;
                 return yield from $this->API->loop();
             } catch (\Throwable $e) {
-                $errors[\time()]++;
-                if ($errors[\time()] > 10 && (!$this->inited() || !$started)) {
+                $t = \time();
+                $errors = [$t => $errors[$t] ?? 0];
+                $errors[$t]++;
+                if ($errors[$t] > 10 && (!$this->inited() || !$started)) {
                     $this->logger->logger("More than 10 errors in a second and not inited, exiting!", Logger::FATAL_ERROR);
                     return;
                 }
