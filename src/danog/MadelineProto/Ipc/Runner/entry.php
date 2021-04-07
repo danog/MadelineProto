@@ -23,6 +23,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
+use danog\MadelineProto\Shutdown;
 use danog\MadelineProto\Tools;
 
 (static function (): void {
@@ -108,6 +109,7 @@ use danog\MadelineProto\Tools;
                 try {
                     Tools::wait($session->storeIpcState(new IpcState($runnerId)));
                     Tools::wait(Server::waitShutdown());
+                    Shutdown::removeCallback('restarter');
                     return;
                 } catch (\Throwable $e) {
                     Logger::log((string) $e, Logger::FATAL_ERROR);

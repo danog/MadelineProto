@@ -72,14 +72,13 @@ trait Loop
                     $url = \explode('?', $uri, 2)[0] ?? '';
                     $query = \http_build_query($params);
                     $uri = \implode('?', [$url, $query]);
-                    $payload = $_SERVER['REQUEST_METHOD'].' '.$uri.' '.$_SERVER['SERVER_PROTOCOL']."\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n";
+                    $payload = $_SERVER['REQUEST_METHOD'].' '.$uri." HTTP/1.1\r\n".'Host: '.$_SERVER['SERVER_NAME']."\r\n\r\n";
                     $logger->logger("Connecting to {$address}:{$port}");
                     $a = \fsockopen($address, $port);
                     $logger->logger("Sending self-restart payload");
                     $logger->logger($payload);
                     \fwrite($a, $payload);
                     $logger->logger("Payload sent with token {$params['MadelineSelfRestart']}, waiting for self-restart");
-                    \sleep(10);
                     \fclose($a);
                     $logger->logger("Shutdown of self-restart callback");
                 }, 'restarter');
