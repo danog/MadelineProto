@@ -138,6 +138,7 @@ runTestSimple()
 {
     tests/testing.php || {
         cat MadelineProto.log
+        sleep 10
         exit 1
     }
 }
@@ -154,6 +155,7 @@ n
 n
 " | $p tests/testing.php || {
         cat MadelineProto.log
+        sleep 10
         exit 1
     }
 }
