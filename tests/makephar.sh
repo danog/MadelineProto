@@ -169,7 +169,7 @@ runTest
 pkill -f 'MadelineProto worker .*' || echo "No old process"
 
 echo "Testing with new version (upgrade)..."
-php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" $GITHUB_SHA
+php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" "$GITHUB_SHA-$php"
 export ACTIONS_PHAR="madeline$php$branch.phar"
 runTestSimple
 pkill -f 'MadelineProto worker .*' || echo "No old process"

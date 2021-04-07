@@ -410,6 +410,9 @@ class API extends InternalDoc
         $this->async(true);
 
         if ($this->API instanceof Client) {
+            if (yield $this->API->hasEventHandler()) {
+                return;
+            }
             yield $this->API->stopIpcServer();
             yield $this->API->disconnect();
             yield from $this->connectToMadelineProto(new SettingsEmpty, true);
