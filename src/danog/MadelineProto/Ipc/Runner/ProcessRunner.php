@@ -52,7 +52,8 @@ final class ProcessRunner extends RunnerAbstract
         ]);
         Logger::log("Starting process with $command");
 
-        self::$resources []= \proc_open($command, [], $foo);
+        $pipes = [];
+        self::$resources []= \proc_open($command, [], $pipes);
     }
     private static function locateBinary(): string
     {
