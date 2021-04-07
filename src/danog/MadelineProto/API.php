@@ -228,14 +228,15 @@ class API extends InternalDoc
             try {
                 if (!isset($_GET['MadelineSelfRestart']) && yield $this->API->hasEventHandler()) {
                     MTProto::closeConnection('The bot is already running!');
-                    return;
+                    return false;
                 }
                 yield $this->API->stopIpcServer();
                 yield $this->API->disconnect();
-            } catch (\Amp\Ipc\Sync\ChannelException $e) {
+            } catch (\Throwable $e) {
             }
             yield from $this->connectToMadelineProto(new SettingsEmpty, true);
         }
+        return true;
     }
     /**
      * Connect to MadelineProto.
@@ -416,7 +417,9 @@ class API extends InternalDoc
         $errors = [];
         $this->async(true);
 
-        yield from $this->reconnectFull();
+        if (!yield from $this->reconnectFull()) {
+            return;
+        }
 
         $errors = [\time() => $errors[\time()] ?? 0];
         $started = false;

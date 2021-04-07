@@ -262,7 +262,7 @@ class Client extends ClientAbstract
      */
     public function setEventHandler(...$params): void
     {
-        throw new Exception("Can't use ".__FUNCTION__." in an IPC client instance, please use a full ".API::class." instance, instead!");
+        throw new Exception("Can't use ".__FUNCTION__." in an IPC client instance, please use startAndLoop, instead!");
     }
     /**
      * Placeholder.
@@ -273,6 +273,6 @@ class Client extends ClientAbstract
      */
     public function getEventHandler(...$params): void
     {
-        throw new Exception("Can't use ".__FUNCTION__." in an IPC client instance, please use a full ".API::class." instance, instead!");
+        throw new Exception("Can't use ".__FUNCTION__." in an IPC client instance, please use startAndLoop, instead!");
     }
 }
