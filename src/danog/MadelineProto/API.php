@@ -225,12 +225,15 @@ class API extends InternalDoc
     protected function reconnectFull(): \Generator
     {
         if ($this->API instanceof Client) {
-            if (!isset($_GET['MadelineSelfRestart']) && yield $this->API->hasEventHandler()) {
-                MTProto::closeConnection('The bot is already running!');
-                return;
+            try {
+                if (!isset($_GET['MadelineSelfRestart']) && yield $this->API->hasEventHandler()) {
+                    MTProto::closeConnection('The bot is already running!');
+                    return;
+                }
+                yield $this->API->stopIpcServer();
+                yield $this->API->disconnect();
+            } catch (\Amp\Ipc\Sync\ChannelException $e) {
             }
-            yield $this->API->stopIpcServer();
-            yield $this->API->disconnect();
             yield from $this->connectToMadelineProto(new SettingsEmpty, true);
         }
     }
