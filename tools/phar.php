@@ -92,17 +92,18 @@ function ___install_madeline()
         return;
     }
 
-    \define('HAD_MADELINE_PHAR', \file_exists('madeline.phar'));
+    $madeline_phar = "madeline-$version.phar";
+    \define('HAD_MADELINE_PHAR', \file_exists($madeline_phar));
 
-    if (!\file_exists('madeline.phar') || !\file_exists('madeline.phar.version') || \file_get_contents('madeline.phar.version') !== $release) {
+    if (!\file_exists($madeline_phar) || !\file_exists("$madeline_phar.version") || \file_get_contents("$madeline_phar.version") !== $release) {
         $phar = \file_get_contents(\sprintf($phar_template, $chosen));
 
         if ($phar) {
-            $extractVersions = static function ($ext = '') {
-                if (!\file_exists("phar://madeline.phar$ext/vendor/composer/installed.json")) {
+            $extractVersions = static function ($ext = '') use ($madeline_phar) {
+                if (!\file_exists("phar://$madeline_phar$ext/vendor/composer/installed.json")) {
                     return [];
                 }
-                $composer = \json_decode(\file_get_contents("phar://madeline.phar$ext/vendor/composer/installed.json"), true) ?: [];
+                $composer = \json_decode(\file_get_contents("phar://$madeline_phar$ext/vendor/composer/installed.json"), true) ?: [];
                 if (!isset($composer['packages'])) {
                     return [];
                 }
@@ -113,15 +114,15 @@ function ___install_madeline()
                 return $packages;
             };
             $previous = [];
-            if (\file_exists('madeline.phar')) {
-                \copy('madeline.phar', 'madeline.phar.old');
+            if (\file_exists($madeline_phar)) {
+                \copy($madeline_phar, "$madeline_phar.old");
                 $previous = $extractVersions('.old');
-                \unlink('madeline.phar.old');
+                \unlink("$madeline_phar.old");
             }
             $previous['danog/madelineproto'] = 'old';
 
-            \file_put_contents('madeline.phar', $phar);
-            \file_put_contents('madeline.phar.version', $release);
+            \file_put_contents($madeline_phar, $phar);
+            \file_put_contents("$madeline_phar.version", $release);
 
             $current = $extractVersions();
             $postData = ['downloads' => []];
@@ -164,6 +165,4 @@ function ___install_madeline()
     }
 }
 
-___install_madeline();
-
-return require_once 'madeline.phar';
+return require_once ___install_madeline();
