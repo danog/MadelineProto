@@ -163,6 +163,8 @@ function ___install_madeline()
             @\file_get_contents("https://packagist.org/downloads/", false, \stream_context_create($opts));
         }
     }
+
+    return $madeline_phar;
 }
 
 return require_once ___install_madeline();
