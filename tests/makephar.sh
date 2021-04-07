@@ -160,19 +160,24 @@ n
     }
 }
 
+k()
+{
+    while :; do pkill -f 'MadelineProto worker .*' || break && sleep 1; done
+}
+
 rm -f madeline.phar testing.madeline*
 
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
 cp tests/testing.php tests/testingBackup.php
 runTest
-pkill -f 'MadelineProto worker .*' || echo "No old process"
+k
 
 echo "Testing with new version (upgrade)..."
 php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" "$GITHUB_SHA-$php"
 export ACTIONS_PHAR="madeline$php$branch.phar"
 runTestSimple
-pkill -f 'MadelineProto worker .*' || echo "No old process"
+k
 
 echo "Testing with new version (restart)"
 cp tests/testingBackup.php tests/testing.php
@@ -182,7 +187,7 @@ runTest
 echo "Testing with new version (reload)"
 cp tests/testingBackup.php tests/testing.php
 runTestSimple
-pkill -f 'MadelineProto .*' || echo "No old process"
+k
 
 echo "Testing with new version (kill+reload)"
 cp tests/testingBackup.php tests/testing.php
