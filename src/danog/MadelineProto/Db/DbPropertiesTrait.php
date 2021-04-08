@@ -16,7 +16,7 @@ use danog\MadelineProto\Tools;
  */
 trait DbPropertiesTrait
 {
-    private ?string $tmpDbPrefix = null;
+    public ?string $tmpDbPrefix = null;
 
     /**
      * Initialize database instance.
