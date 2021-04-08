@@ -603,7 +603,7 @@ abstract class Tools extends StrTools
      * @param ?Promise  $token     Cancellation token
      * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
      *
-     * @return Promise<?callable>
+     * @return Promise<$token is null ? callable : ?callable>
      */
     public static function flock(string $file, int $operation, float $polling = 0.1, ?Promise $token = null, $failureCb = null): Promise
     {

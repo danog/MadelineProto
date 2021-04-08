@@ -269,7 +269,7 @@ class API extends InternalDoc
 
         if ($unserialized === 0) {
             // Timeout
-            throw new \RuntimeException("Could not connect to MadelineProto, please check the logs for more details.");
+            throw new Exception("Could not connect to MadelineProto, please check the logs for more details.");
         } elseif ($unserialized instanceof \Throwable) {
             // IPC server error, try fetching full session
             return yield from $this->connectToMadelineProto($settings, true);
@@ -370,6 +370,7 @@ class API extends InternalDoc
      */
     public function startAndLoop(string $eventHandler): void
     {
+        $this->forceFull = true;
         while (true) {
             try {
                 Tools::wait($this->startAndLoopAsync($eventHandler));
@@ -399,6 +400,7 @@ class API extends InternalDoc
             try {
                 $promises = [];
                 foreach ($instances as $k => $instance) {
+                    $instance->forceFull = true;
                     $instance->start(['async' => false]);
                     $promises []= $instance->startAndLoopAsync($eventHandler[$k]);
                 }
@@ -422,8 +424,8 @@ class API extends InternalDoc
     public function startAndLoopAsync(string $eventHandler): \Generator
     {
         $errors = [];
-        $this->async(true);
         $this->forceFull = true;
+        $this->async(true);
 
         if (!yield from $this->reconnectFull()) {
             return;

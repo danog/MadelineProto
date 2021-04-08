@@ -205,6 +205,8 @@ trait ResponseHandler
                     $this->methodRecall('', ['message_id' => $requestId, 'postpone' => true]);
                     return;
                 case 20:
+                    $request->setMsgId(null);
+                    $request->setSeqNo(null);
                     $this->methodRecall('', ['message_id' => $requestId, 'postpone' => true]);
                     return;
                 case 16:

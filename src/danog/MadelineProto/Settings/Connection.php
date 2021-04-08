@@ -77,7 +77,7 @@ class Connection extends SettingsAbstract
     /**
      * Whether to use ipv6.
      */
-    protected bool $ipv6;
+    protected bool $ipv6 = false;
 
     /**
      * Connection timeout.

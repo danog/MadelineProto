@@ -27,6 +27,7 @@ use danog\MadelineProto\Ipc\IpcState;
 use function Amp\File\exists;
 use function Amp\File\open;
 use function Amp\File\rename;
+use function Amp\File\stat;
 
 /**
  * Session path information.
@@ -91,13 +92,22 @@ class SessionPaths
      */
     public function serialize(object $object, string $path): \Generator
     {
-        $file = yield open("$path.temp.php", 'bw+');
-        yield $file->write(Serialization::PHP_HEADER);
-        yield $file->write(\chr(Serialization::VERSION));
-        yield $file->write(\serialize($object));
-        yield $file->close();
+        Logger::log("Waiting for exclusive lock of $path.lock...");
+        $unlock = yield from Tools::flockGenerator("$path.lock", LOCK_EX, 0.1);
 
-        yield rename("$path.temp.php", $path);
+        try {
+            Logger::log("Got exclusive lock of $path.temp.php.lock...");
+
+            $file = yield open("$path.temp.php", 'bw+');
+            yield $file->write(Serialization::PHP_HEADER);
+            yield $file->write(\chr(Serialization::VERSION));
+            yield $file->write(\serialize($object));
+            yield $file->close();
+
+            yield \rename("$path.temp.php", $path);
+        } finally {
+            $unlock();
+        }
     }
 
     /**
@@ -119,14 +129,22 @@ class SessionPaths
         }
         $headerLen = \strlen(Serialization::PHP_HEADER) + 1;
 
-        $file = yield open($path, 'rb');
-        $size = yield \stat($path);
-        $size = $size['size'] ?? $headerLen;
+        Logger::log("Waiting for shared lock of $path.lock...");
+        $unlock = yield from Tools::flockGenerator("$path.lock", LOCK_SH, 0.1);
 
-        yield $file->seek($headerLen); // Skip version for now
-        $unserialized = \unserialize((yield $file->read($size - $headerLen)) ?? '');
-        yield $file->close();
+        try {
+            Logger::log("Got shared lock of $path.lock...");
 
+            $file = yield open($path, 'rb');
+            $size = yield stat($path);
+            $size = $size['size'] ?? $headerLen;
+
+            yield $file->seek($headerLen); // Skip version for now
+            $unserialized = \unserialize((yield $file->read($size - $headerLen)) ?? '');
+            yield $file->close();
+        } finally {
+            $unlock();
+        }
         return $unserialized;
     }
 
