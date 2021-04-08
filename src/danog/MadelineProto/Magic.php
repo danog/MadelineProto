@@ -333,11 +333,15 @@ class Magic
         self::$altervista = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
         self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
         self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
-        self::$revision = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/master');
+        try {
+            self::$revision = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/master');
+        } catch (\Throwable $e) {}
         if (self::$revision) {
             self::$revision = \trim(self::$revision);
-            $latest = @\file_get_contents('https://phar.madelineproto.xyz/release');
-            if ($latest) {
+            try {
+                $latest = @\file_get_contents('https://phar.madelineproto.xyz/release');
+            } catch (\Throwable $e) {}
+            if ($latest ?? null) {
                 $latest = self::$revision === \trim($latest) ? '' : ' (AN UPDATE IS REQUIRED)';
             }
             self::$revision = 'Revision: '.self::$revision.$latest;
@@ -368,8 +372,10 @@ class Magic
         if (!self::$can_parallel && !\defined('AMP_WORKER')) {
             \define('AMP_WORKER', 1);
         }
-        $res = \json_decode(@\file_get_contents('https://rpc.madelineproto.xyz/v3.json'), true);
-        if (isset($res['ok']) && $res['ok']) {
+        try {
+            $res = \json_decode(@\file_get_contents('https://rpc.madelineproto.xyz/v3.json'), true);
+        } catch (\Throwable $e) {}
+        if (isset($res, $res['ok']) && $res['ok']) {
             RPCErrorException::$errorMethodMap = $res['result'];
             RPCErrorException::$descriptions += $res['human_result'];
         }

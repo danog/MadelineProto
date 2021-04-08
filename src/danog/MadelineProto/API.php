@@ -293,6 +293,7 @@ class API extends InternalDoc
                 if ($settings instanceof SettingsIpc) {
                     $settings = new SettingsEmpty;
                 }
+                $this->methods = self::getInternalMethodList($this->API, MTProto::class);
                 yield from $this->API->wakeup($settings, $this->wrapper);
                 $this->APIFactory();
                 $this->logger->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
