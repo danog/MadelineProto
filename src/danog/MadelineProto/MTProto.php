@@ -664,6 +664,8 @@ class MTProto extends AsyncConstruct implements TLCallback
             'channelParticipants',
             'usernames',
 
+            'tmpDbPrefix',
+
             // Misc caching
             'dialog_params',
             'last_stored',

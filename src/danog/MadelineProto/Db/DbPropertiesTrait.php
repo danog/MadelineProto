@@ -16,6 +16,8 @@ use danog\MadelineProto\Tools;
  */
 trait DbPropertiesTrait
 {
+    private ?string $tmpDbPrefix = '';
+
     /**
      * Initialize database instance.
      *
@@ -52,8 +54,8 @@ trait DbPropertiesTrait
     {
         $result = $madelineProto->getSelf()['id'] ?? null;
         if (!$result) {
-            $result = 'tmp_';
-            $result .= \str_replace('0', '', \spl_object_hash($madelineProto));
+            $madelineProto->tmpDbPrefix ??= 'tmp_'.\str_replace('0', '', \spl_object_hash($madelineProto));
+            $result = $madelineProto->tmpDbPrefix;
         }
 
         $className = \explode('\\', static::class);

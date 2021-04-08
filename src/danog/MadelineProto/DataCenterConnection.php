@@ -159,6 +159,9 @@ class DataCenterConnection implements JsonSerializable
      */
     public function getAuthKey(bool $temp = true): AuthKey
     {
+        if ($this->{$temp ? 'tempAuthKey' : 'permAuthKey'} === null) {
+            throw new NothingInTheSocketException();
+        }
         return $this->{$temp ? 'tempAuthKey' : 'permAuthKey'};
     }
     /**
