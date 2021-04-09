@@ -259,7 +259,7 @@ class Logger
                 $this->optional .= '.log';
             }
             if ($maxSize !== -1 && \file_exists($this->optional) && \filesize($this->optional) > $maxSize) {
-                file_put_contents($this->optional, '');
+                \file_put_contents($this->optional, '');
             }
         }
         $this->colors[self::ULTRA_VERBOSE] = \implode(';', [self::FOREGROUND['light_gray'], self::SET['dim']]);
@@ -285,7 +285,7 @@ class Logger
                     static function () use ($maxSize, $optional, &$stdout) {
                         \clearstatcache(true, $optional);
                         if (\file_exists($optional) && \filesize($optional) >= $maxSize) {
-                            ftruncate($stdout->getResource(), 0);
+                            \ftruncate($stdout->getResource(), 0);
                             self::log("Automatically truncated logfile to $maxSize");
                         }
                     }

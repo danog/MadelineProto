@@ -20,7 +20,6 @@ namespace danog\MadelineProto\Ipc;
 
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Promise;
-use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Logger;
@@ -73,7 +72,11 @@ class Client extends ClientAbstract
      */
     public function unreference(): void
     {
-        Tools::wait($this->disconnect());
+        try {
+            Tools::wait($this->disconnect());
+        } catch (\Throwable $e) {
+            $this->logger("An error occurred while disconnecting the client: $e");
+        }
     }
     /**
      * Stop IPC server instance.

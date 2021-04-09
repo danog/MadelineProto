@@ -26,7 +26,6 @@ use danog\MadelineProto\Ipc\IpcState;
 
 use function Amp\File\exists;
 use function Amp\File\open;
-use function Amp\File\rename;
 use function Amp\File\stat;
 
 /**

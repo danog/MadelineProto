@@ -127,7 +127,7 @@ final class DataCenterTest extends TestCase
             }
 
             /**
-             * Get settings
+             * Get settings.
              *
              * @return Settings
              */

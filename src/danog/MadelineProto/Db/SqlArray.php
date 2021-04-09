@@ -229,7 +229,7 @@ abstract class SqlArray extends DriverArray
         try {
             foreach ($params as $key => $value) {
                 $value = $this->pdo->quote($value);
-                $sql = str_replace(":$key", $value, $sql);
+                $sql = \str_replace(":$key", $value, $sql);
             }
 
             $request = yield $this->db->query($sql);
@@ -240,5 +240,4 @@ abstract class SqlArray extends DriverArray
 
         return $request;
     }
-
 }

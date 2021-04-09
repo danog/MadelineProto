@@ -43,7 +43,7 @@ final class WebRunner extends RunnerAbstract
                 throw new ContextException('Could not get entry file!');
             }
             $rootDir = \dirname($rootDir).DIRECTORY_SEPARATOR;
-            $uriDir = str_replace('/', DIRECTORY_SEPARATOR, \dirname($uri));
+            $uriDir = \str_replace('/', DIRECTORY_SEPARATOR, \dirname($uri));
             if ($uriDir !== '/' && $uriDir !== '\\') {
                 $uriDir .= DIRECTORY_SEPARATOR;
             }

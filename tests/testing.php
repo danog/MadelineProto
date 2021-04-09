@@ -19,7 +19,7 @@ If not, see <http://www.gnu.org/licenses/>.
 $loader = false;
 if ($phar = \getenv('ACTIONS_PHAR')) {
     $loader = include $phar;
-} else if (!\file_exists(__DIR__.'/../vendor/autoload.php') || getenv('ACTIONS_FORCE_PREVIOUS')) {
+} elseif (!\file_exists(__DIR__.'/../vendor/autoload.php') || \getenv('ACTIONS_FORCE_PREVIOUS')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
     if (!\file_exists('madeline.php')) {
         \copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
@@ -34,7 +34,7 @@ if ($loader) {
         if (\in_array($class, ['Amp\\Sync\\Internal\\MutexStorage', 'Amp\\Sync\\Internal\\SemaphoreStorage', 'Amp\\Parallel\\Sync\\Internal\\ParcelStorage', 'Amp\\Parallel\\Context\\Internal\\Thread', 'Monolog\\Test\\TestCase', 'Phabel\\Composer\\Plugin'])) {
             continue;
         }
-        if (str_ends_with($class, 'Test') || class_exists($class) || interface_exists($class)) {
+        if (\str_ends_with($class, 'Test') || \class_exists($class) || \interface_exists($class)) {
             continue;
         }
         //echo "Requiring $class => $file\n";
@@ -45,7 +45,7 @@ if ($loader) {
 /*
  * Load .env for settings
  */
-if (\file_exists('.env') && class_exists(Dotenv\Dotenv::class)) {
+if (\file_exists('.env') && \class_exists(Dotenv\Dotenv::class)) {
     echo 'Loading .env...'.PHP_EOL;
     $dotenv = Dotenv\Dotenv::create(\getcwd());
     $dotenv->load();

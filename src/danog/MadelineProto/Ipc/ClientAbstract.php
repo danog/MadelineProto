@@ -82,7 +82,15 @@ abstract class ClientAbstract
     protected function loopInternal(): \Generator
     {
         do {
-            while ($payload = yield $this->server->receive()) {
+            while (true) {
+                $payload = null;
+                try {
+                    $payload = yield $this->server->receive();
+                } catch (\Throwable $e) {
+                }
+                if (!$payload) {
+                    break;
+                }
                 [$id, $payload] = $payload;
                 if (!isset($this->requests[$id])) {
                     Logger::log("Got response for non-existing ID $id!");
@@ -103,7 +111,10 @@ abstract class ClientAbstract
             }
             if ($this->run) {
                 $this->logger("Reconnecting to IPC server!");
-                yield $this->server->disconnect();
+                try {
+                    yield $this->server->disconnect();
+                } catch (\Throwable $e) {
+                }
                 if ($this instanceof Client) {
                     Server::startMe($this->session);
                     $this->server = yield connect($this->session->getIpcPath());

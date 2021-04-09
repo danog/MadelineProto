@@ -176,7 +176,7 @@ class API extends InternalDoc
         $this->session = new SessionPaths($session);
         $this->wrapper = new APIWrapper($this, $this->exportNamespace());
 
-        $this->setInitPromise($this->internalInitAPI($settings));
+        $this->setInitPromise((function () use ($settings) { yield new \Amp\Success; return yield from $this->internalInitAPI($settings); })());
         foreach (\get_class_vars(APIFactory::class) as $key => $var) {
             if (\in_array($key, ['namespace', 'API', 'lua', 'async', 'asyncAPIPromise', 'methods'])) {
                 continue;
@@ -260,6 +260,7 @@ class API extends InternalDoc
         } elseif ($settings instanceof Settings) {
             $forceFull = $forceFull || $this->forceFull || $settings->getIpc()->getSlow();
         }
+        $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']);
 
         [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(
             Serialization::unserialize($this->session, $settings, $forceFull),

@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-$commit = getenv('GITHUB_SHA');
+$commit = \getenv('GITHUB_SHA');
 $branch = \trim(\shell_exec("git rev-parse --abbrev-ref HEAD"));
 $tag = \trim(\shell_exec("git tag --points-at HEAD"));
 

@@ -70,7 +70,7 @@ function ___install_madeline()
         $custom_branch = '';
     }
 
-    $version = (string) min(80, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
+    $version = (string) \min(80, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
     $versions = [];
     if ($custom_branch === '') {
         $versions []= $version;

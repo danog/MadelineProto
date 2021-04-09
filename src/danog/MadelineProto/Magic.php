@@ -335,12 +335,14 @@ class Magic
         self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
         try {
             self::$revision = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/master');
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
         if (self::$revision) {
             self::$revision = \trim(self::$revision);
             try {
                 $latest = @\file_get_contents('https://phar.madelineproto.xyz/release');
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+            }
             if ($latest ?? null) {
                 $latest = self::$revision === \trim($latest) ? '' : ' (AN UPDATE IS REQUIRED)';
             }
@@ -374,7 +376,8 @@ class Magic
         }
         try {
             $res = \json_decode(@\file_get_contents('https://rpc.madelineproto.xyz/v3.json'), true);
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
         if (isset($res, $res['ok']) && $res['ok']) {
             RPCErrorException::$errorMethodMap = $res['result'];
             RPCErrorException::$descriptions += $res['human_result'];

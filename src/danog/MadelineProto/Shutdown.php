@@ -52,6 +52,7 @@ class Shutdown
         foreach (self::$callbacks as $callback) {
             $callback();
         }
+        self::$callbacks = [];
         Magic::shutdown(0);
     }
     /**

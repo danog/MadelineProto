@@ -4,7 +4,6 @@ namespace danog\MadelineProto\Db;
 
 use Amp\Postgres\ByteA;
 use Amp\Postgres\ConnectionConfig;
-use Amp\Postgres\Pool;
 use Amp\Promise;
 use Amp\Success;
 use danog\MadelineProto\Db\Driver\Postgres;

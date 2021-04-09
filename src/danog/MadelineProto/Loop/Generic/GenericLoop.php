@@ -56,6 +56,6 @@ class GenericLoop extends GenericGenericLoop
      */
     public function pause(?int $time = null): Promise
     {
-        return parent::pause(is_integer($time) ? $time * 1000 : $time);
+        return parent::pause(\is_integer($time) ? $time * 1000 : $time);
     }
 }

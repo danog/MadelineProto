@@ -21,7 +21,6 @@ namespace danog\MadelineProto\Wrappers;
 
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\PermAuthKey;
-use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 
 use danog\MadelineProto\Settings;

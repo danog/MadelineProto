@@ -23,6 +23,7 @@ use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Promise;
 use danog\Loop\SignalLoop;
+use danog\MadelineProto\Exception as Exception;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
@@ -89,32 +90,40 @@ class Server extends SignalLoop
     public static function startMe(SessionPaths $session): Promise
     {
         $id = Tools::randomInt(2000000000);
+        $started = false;
         try {
             Logger::log("Starting IPC server $session (process)");
             ProcessRunner::start($session, $id);
+            $started = true;
             WebRunner::start($session, $id);
-            return Tools::call(self::monitor($session, $id));
+            return Tools::call(self::monitor($session, $id, $started));
         } catch (\Throwable $e) {
             Logger::log($e);
         }
         try {
             Logger::log("Starting IPC server $session (web)");
             WebRunner::start($session, $id);
+            $started = true;
         } catch (\Throwable $e) {
             Logger::log($e);
         }
-        return Tools::call(self::monitor($session, $id));
+        return Tools::call(self::monitor($session, $id, $started));
     }
     /**
      * Monitor session.
      *
      * @param SessionPaths $session
      * @param int          $id
+     * @param bool         $started
      *
      * @return \Generator
      */
-    private static function monitor(SessionPaths $session, int $id): \Generator
+    private static function monitor(SessionPaths $session, int $id, bool $started): \Generator
     {
+        if (!$started) {
+            Logger::log("It looks like the server couldn't be started, trying to connect anyway...");
+        }
+        $count = 0;
         while (true) {
             $state = yield $session->getIpcState();
             if ($state && $state->getStartupId() === $id) {
@@ -124,8 +133,11 @@ class Server extends SignalLoop
                 }
                 Logger::log("IPC server started successfully!");
                 return true;
+            } elseif (!$started && $count > 0 && $count > 2*($state ? 3 : 1)) {
+                return new Exception("We couldn't start the IPC server, please check the logs!");
             }
-            yield Tools::sleep(1);
+            yield Tools::sleep(0.5);
+            $count++;
         }
         return false;
     }
@@ -173,7 +185,10 @@ class Server extends SignalLoop
         } catch (\Throwable $e) {
             Logger::log("Exception in IPC connection: $e");
         } finally {
-            yield $socket->disconnect();
+            try {
+                yield $socket->disconnect();
+            } catch (\Throwable $e) {
+            }
             if ($payload === self::SHUTDOWN) {
                 $this->signal(null);
                 if (self::$shutdownDeferred) {
@@ -185,9 +200,8 @@ class Server extends SignalLoop
     /**
      * Handle client request.
      *
-     * @param ChannelledSocket $socket  Socket
-     * @param integer          $id      Request ID
-     * @param array|Wrapper    $payload Payload
+     * @param ChannelledSocket                   $socket  Socket
+     * @param array{0: string, 1: array|Wrapper} $payload Payload
      *
      * @return \Generator
      */
@@ -209,7 +223,10 @@ class Server extends SignalLoop
             $result = new ExitFailure($e);
         } finally {
             if (isset($wrapper)) {
-                yield $wrapper->disconnect();
+                try {
+                    yield $wrapper->disconnect();
+                } catch (\Throwable $e) {
+                }
             }
         }
         try {

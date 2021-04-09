@@ -20,7 +20,6 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Promise;
-use danog\Loop\Loop;
 use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\MTProto;
@@ -89,7 +88,7 @@ class MinDatabase implements TLCallback
             $this->clean = true;
             return;
         }
-        \Amp\Loop::defer(function() {
+        \Amp\Loop::defer(function () {
             $iterator = $this->db->getIterator();
             while (yield $iterator->advance()) {
                 [$id, $origin] = $iterator->getCurrent();
@@ -98,7 +97,6 @@ class MinDatabase implements TLCallback
                 }
             }
         });
-
     }
     public function getMethodCallbacks(): array
     {
