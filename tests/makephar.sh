@@ -144,7 +144,6 @@ runTestSimple()
 }
 runTest()
 {
-return
     [ "$1" != "" ] && p="$1" || p=php
     echo "m
 $API_ID
@@ -163,7 +162,6 @@ n
 
 k()
 {
-return
     while :; do pkill -f 'MadelineProto worker .*' || break && sleep 1; done
 }
 
