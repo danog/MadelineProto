@@ -20,7 +20,6 @@ namespace danog\MadelineProto\Ipc;
 
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Promise;
-use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Logger;
@@ -38,25 +37,26 @@ class Client extends ClientAbstract
     use FilesLogic;
 
     /**
-     * Instances
+     * Instances.
      */
     private static array $instances = [];
 
     /**
-     * Returns an instance of a client by session name
+     * Returns an instance of a client by session name.
      *
      * @param string $session
      * @return Client
      */
-    public static function giveInstanceBySession(string $session): Client {
+    public static function giveInstanceBySession(string $session): Client
+    {
         return self::$instances[$session];
     }
 
     /**
-     * Whether the wrapper API is async
+     * Whether the wrapper API is async.
      */
     public bool $async;
-    
+
     /**
      * Session.
      */
@@ -101,7 +101,9 @@ class Client extends ClientAbstract
         } catch (\Throwable $e) {
             $this->logger("An error occurred while disconnecting the client: $e");
         }
-        unset(self::$instances[$this->session->getLegacySessionPath()]);
+        if (isset(self::$instances[$this->session->getLegacySessionPath()])) {
+            unset(self::$instances[$this->session->getLegacySessionPath()]);
+        }
     }
     /**
      * Stop IPC server instance.
