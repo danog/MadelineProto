@@ -276,7 +276,7 @@ class API extends InternalDoc
             return yield from $this->connectToMadelineProto($settings, true);
         } elseif ($unserialized instanceof ChannelledSocket) {
             // Success, IPC client
-            $this->API = new Client($unserialized, $this->session, Logger::$default);
+            $this->API = new Client($unserialized, $this->session, Logger::$default, $this->async);
             $this->APIFactory();
             return true;
         } elseif ($unserialized) {

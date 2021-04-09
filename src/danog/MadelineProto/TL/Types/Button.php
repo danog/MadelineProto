@@ -20,6 +20,7 @@
 namespace danog\MadelineProto\TL\Types;
 
 use danog\MadelineProto\API;
+use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Tools;
 
@@ -41,9 +42,9 @@ class Button implements \JsonSerializable, \ArrayAccess
     /**
      * MTProto instance.
      *
-     * @var MTProto|API
+     * @var MTProto|Client|null
      */
-    private $API;
+    private $API = null;
     /**
      * Message ID.
      */
@@ -97,24 +98,22 @@ class Button implements \JsonSerializable, \ArrayAccess
     public function click(bool $donotwait = true)
     {
         if (!isset($this->API)) {
-            $this->API = new API($this->session);
-        } else {
-            $async = isset($this->API->wrapper) ? $this->API->wrapper->isAsync() : true;
+            $this->API = Client::giveInstanceBySession($this->session);
         }
-        $method = $donotwait ? 'methodCallAsyncWrite' : 'methodCallAsyncRead';
+        $async = $this->API instanceof Client ? $this->API->async : $this->API->wrapper->isAsync();
         switch ($this->button['_']) {
             default:
                 return false;
             case 'keyboardButtonUrl':
                 return $this->button['url'];
             case 'keyboardButton':
-                $res = $this->API->methodCallAsyncRead('messages.sendMessage', ['peer' => $this->peer, 'message' => $this->button['text'], 'reply_to_msg_id' => $this->id], ['datacenter' => $this->API->datacenter->curdc]);
+                $res = $this->API->clickInternal($donotwait, 'messages.sendMessage', ['peer' => $this->peer, 'message' => $this->button['text'], 'reply_to_msg_id' => $this->id]);
                 break;
             case 'keyboardButtonCallback':
-                $res = $this->API->{$method}('messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'data' => $this->button['data']], ['datacenter' => $this->API->datacenter->curdc]);
+                $res = $this->API->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'data' => $this->button['data']]);
                 break;
             case 'keyboardButtonGame':
-                $res = $this->API->{$method}('messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true], ['datacenter' => $this->API->datacenter->curdc]);
+                $res = $this->API->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true]);
                 break;
         }
         return $async ? $res : Tools::wait($res);

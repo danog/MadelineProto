@@ -72,6 +72,7 @@ class MTProto extends AsyncConstruct implements TLCallback
     use \danog\MadelineProto\TL\Conversion\BotAPIFiles;
     use \danog\MadelineProto\TL\Conversion\TD;
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
+    use \danog\MadelineProto\Wrappers\Button;
     use \danog\MadelineProto\Wrappers\DialogHandler;
     use \danog\MadelineProto\Wrappers\Events;
     use \danog\MadelineProto\Wrappers\Webhook;
