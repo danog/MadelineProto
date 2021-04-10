@@ -245,7 +245,7 @@ class Magic
                 try {
                     \error_reporting(E_ALL);
                     \ini_set('log_errors', 1);
-                    \ini_set('error_log', Magic::$script_cwd.'/MadelineProto.log');
+                    \ini_set('error_log', Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
                     \error_log('Enabled PHP logging');
                 } catch (\danog\MadelineProto\Exception $e) {
                     //$this->logger->logger('Could not enable PHP logging');
@@ -333,9 +333,11 @@ class Magic
         self::$altervista = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], 'altervista.org');
         self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && \strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
         self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
-        try {
-            self::$revision = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/master');
-        } catch (\Throwable $e) {
+        if (\file_exists(__DIR__.'/../../../.git/refs/heads/master')) {
+            try {
+                self::$revision = @\file_get_contents(__DIR__.'/../../../.git/refs/heads/master');
+            } catch (\Throwable $e) {
+            }
         }
         if (self::$revision) {
             self::$revision = \trim(self::$revision);

@@ -281,12 +281,12 @@ class Conversion
         $settings['old_session_passcode'] ??= '';
 
         if (\basename($session) !== 'tdata') {
-            $session .= '/tdata';
+            $session .= DIRECTORY_SEPARATOR.'tdata';
         }
 
         list($part_one_md5, $part_two_md5) = \str_split(self::tdesktop_md5($settings['old_session_key']), 16);
-        self::$tdesktop_base_path = $session.'/';
-        self::$tdesktop_user_base_path = self::$tdesktop_base_path.$part_one_md5.'/';
+        self::$tdesktop_base_path = $session.DIRECTORY_SEPARATOR;
+        self::$tdesktop_user_base_path = self::$tdesktop_base_path.$part_one_md5.DIRECTORY_SEPARATOR;
 
         $data = self::tdesktop_fopen('map');
 

@@ -111,7 +111,7 @@ class Snitch
         Shutdown::removeCallback('restarter');
         $message = "Please do not remove madeline.phar, madeline.php and MadelineProto.log, or else MadelineProto will crash. If you have any problem with MadelineProto, report it to https://github.com/danog/MadelineProto or https://t.me/pwrtelegramgroup";
         Logger::log($message, Logger::FATAL_ERROR);
-        \file_put_contents(Magic::$cwd.'/DO_NOT_REMOVE_MADELINEPROTO_LOG_SESSION', $message);
+        \file_put_contents(Magic::$cwd.DIRECTORY_SEPARATOR.'DO_NOT_REMOVE_MADELINEPROTO_LOG_SESSION', $message);
         die("$message\n");
     }
 }
