@@ -71,6 +71,9 @@ function ___install_madeline()
     }
 
     $version = (string) \min(80, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
+    if ($version === "56") {
+        $version = 5;
+    }
     $versions = [];
     if ($custom_branch !== '') {
         $versions []= "$version-$custom_branch";
@@ -78,7 +81,6 @@ function ___install_madeline()
     }
     $versions []= $version;
     $versions []= 70;
-    $versions []= 5;
 
     // Checking if defined branch/default branch builds can be downloaded
     foreach ($versions as $chosen) {
