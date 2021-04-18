@@ -82,7 +82,7 @@ class PostgresArray extends SqlArray
         $host = $config->getHost();
         $port = $config->getPort();
         $this->pdo = new \PDO(
-            "postgre:host={$host};port={$port};charset=UTF8",
+            "pgsql:host={$host};port={$port};charset=UTF8",
             $settings->getUsername(),
             $settings->getPassword()
         );
