@@ -95,7 +95,7 @@ class SessionPaths
         $unlock = yield from Tools::flockGenerator("$path.lock", LOCK_EX, 0.1);
 
         try {
-            Logger::log("Got exclusive lock of $path.temp.php.lock...");
+            Logger::log("Got exclusive lock of $path.lock...");
 
             $file = yield open("$path.temp.php", 'bw+');
             yield $file->write(Serialization::PHP_HEADER);

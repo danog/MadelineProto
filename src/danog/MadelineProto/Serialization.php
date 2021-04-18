@@ -243,7 +243,7 @@ abstract class Serialization
      * @return \Generator
      * @psalm-return \Generator<mixed, mixed, mixed, array{0: ChannelledSocket|\Throwable|0, 1: null}>
      */
-    private static function tryConnect(string $ipcPath, Promise $cancelConnect, ?Deferred $cancelFull = null): \Generator
+    public static function tryConnect(string $ipcPath, Promise $cancelConnect, ?Deferred $cancelFull = null): \Generator
     {
         for ($x = 0; $x < 30; $x++) {
             Logger::log("Trying to connect to IPC socket...");

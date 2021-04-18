@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Deferred;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Loop;
 use danog\MadelineProto\Ipc\Client;
@@ -248,7 +249,23 @@ class API extends InternalDoc
                 $this->logger->logger("Restarting to full instance: error $e");
             }
             $this->logger->logger("Restarting to full instance: reconnecting...");
+            $cancel = new Deferred;
+            $cb = function () use ($cancel, &$cb): \Generator {
+                [$result] = yield from Serialization::tryConnect($this->session->getIpcPath(), $cancel->promise());
+                if ($result instanceof ChannelledSocket) {
+                    try {
+                        $this->logger->logger("Restarting to full instance: stopping another IPC server...");
+                        yield $result->send(Server::SHUTDOWN);
+                        yield $result->disconnect();
+                    } catch (\Throwable $e) {
+                        $this->logger->logger("Restarting to full instance: error in stop loop $e");
+                    }
+                    Tools::callFork($cb());
+                }
+            };
+            Tools::callFork($cb());
             yield from $this->connectToMadelineProto(new SettingsEmpty, true);
+            $cancel->resolve(new Exception('Connected!'));
         }
         return true;
     }
