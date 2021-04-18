@@ -324,6 +324,7 @@ trait AuthKeyHandler
             if ($controller->getCallState() === \danog\MadelineProto\VoIP::CALL_STATE_ENDED) {
                 $this->logger("Discarding ended call...");
                 $controller->discard();
+                unset($this->calls[$id]);
             }
         });
     }

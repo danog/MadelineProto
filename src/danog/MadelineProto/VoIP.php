@@ -285,7 +285,7 @@ class VoIP
      */
     public function discard($reason = ['_' => 'phoneCallDiscardReasonDisconnect'], $rating = [], $debug = false)
     {
-        if ($this->callState === self::CALL_STATE_ENDED || empty($this->configuration)) {
+        if (($this->callState ?? self::CALL_STATE_ENDED) === self::CALL_STATE_ENDED || empty($this->configuration)) {
             return false;
         }
         $this->callState = self::CALL_STATE_ENDED;
@@ -606,7 +606,7 @@ class VoIP
      */
     public function getCallState(): int
     {
-        return $this->callState;
+        return $this->callState ?? self::CALL_STATE_ENDED;
     }
 
     /**

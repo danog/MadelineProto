@@ -92,8 +92,9 @@ class API extends InternalDoc
      * Session paths.
      *
      * @internal
+     * @var SessionPaths
      */
-    public SessionPaths $session;
+    public $session;
 
     /**
      * Instance of MadelineProto.
@@ -343,7 +344,7 @@ class API extends InternalDoc
             if ($this->unlock) {
                 ($this->unlock)();
             }
-        } else {
+        } else if ($this->logger) {
             $this->logger->logger('Shutting down MadelineProto (old deserialized instance of API)');
         }
     }
