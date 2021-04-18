@@ -192,7 +192,7 @@ class OutgoingMessage extends Message
     /**
      * Set reply to message.
      *
-     * @param mixed $result
+     * @param Promise|mixed $result
      * @return void
      */
     public function reply($result): void
@@ -207,12 +207,7 @@ class OutgoingMessage extends Message
         if ($this->promise) { // Sometimes can get an RPC error for constructors
             $promise = $this->promise;
             $this->promise = null;
-            Loop::defer(static function () use ($promise, $result) {
-                if ($result instanceof \Generator) {
-                    $result = new Coroutine($result);
-                }
-                $promise->resolve($result);
-            });
+            Loop::defer(fn () => $promise->resolve($result));
         }
     }
 

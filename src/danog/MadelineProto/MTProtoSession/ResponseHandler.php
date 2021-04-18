@@ -19,8 +19,10 @@
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use Amp\Deferred;
 use Amp\Failure;
 use Amp\Loop;
+use danog\MadelineProto\Coroutine;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
@@ -250,10 +252,28 @@ trait ResponseHandler
         $r = $response['_'] ?? \json_encode($response);
         $this->logger->logger("Defer sending {$r} to deferred", Logger::ULTRA_VERBOSE);
 
-        $request->reply((function () use ($message, $response, $botAPI): \Generator {
-            yield from $message->yieldSideEffects();
-            return $botAPI ? yield from $this->API->MTProtoToBotAPI($response) : $response;
-        })());
+        if ($side = $message->getSideEffects($response)) {
+            if ($botAPI) {
+                $deferred = new Deferred;
+                $promise = $deferred->promise();
+                $side->onResolve(function ($result, $error) use ($deferred): void {
+                    if ($error) {
+                        $deferred->fail($error);
+                        return;
+                    }
+                    $deferred->resolve(new Coroutine($this->API->MTProtoToBotAPI($result)));
+                });
+                $request->reply($promise);
+            } else {
+                $request->reply($side);
+            }
+        } else {
+            if ($botAPI) {
+                $request->reply(new Coroutine($this->API->MTProtoToBotAPI($response)));
+            } else {
+                $request->reply($response);
+            }
+        }
     }
     public function handleRpcError(OutgoingMessage $request, array $response): ?\Throwable
     {

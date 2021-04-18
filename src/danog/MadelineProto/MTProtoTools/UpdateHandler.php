@@ -21,6 +21,7 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Deferred;
 use Amp\Loop;
+use Amp\Promise;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
@@ -65,7 +66,6 @@ trait UpdateHandler
         $this->updateHandler = MTProto::GETUPDATES_HANDLER;
         $params = MTProto::DEFAULT_GETUPDATES_PARAMS + $params;
         if (empty($this->updates)) {
-            $this->update_deferred = new Deferred();
             $params['timeout'] *= 1000;
             yield Tools::timeoutWithDefault($this->waitUpdate(), $params['timeout'] ?: 100000);
         }
@@ -85,23 +85,18 @@ trait UpdateHandler
         }
         return $updates;
     }
-    public $update_resolved = false;
-    public $update_deferred;
+    private ?Deferred $update_deferred = null;
     /**
      * Wait for update.
      *
      * @internal
      *
-     * @return \Generator
+     * @return Promise
      */
-    public function waitUpdate(): \Generator
+    public function waitUpdate(): Promise
     {
-        if (!$this->update_deferred) {
-            $this->update_deferred = new Deferred();
-        }
-        yield $this->update_deferred->promise();
-        $this->update_resolved = false;
         $this->update_deferred = new Deferred();
+        return $this->update_deferred->promise();
     }
     /**
      * Signal update.
@@ -112,15 +107,11 @@ trait UpdateHandler
      */
     public function signalUpdate(): void
     {
-        if (!$this->update_deferred) {
-            $this->update_deferred = new Deferred();
+        if ($this->update_deferred) {
+            $deferred = $this->update_deferred;
+            $this->update_deferred = null;
+            $deferred->resolve();
         }
-        Loop::defer(function () {
-            if (!$this->update_resolved) {
-                $this->update_resolved = true;
-                $this->update_deferred->resolve();
-            }
-        });
     }
     /**
      * Check message ID.
@@ -267,11 +258,9 @@ trait UpdateHandler
                     $message['peer_id'] = (yield from $this->getInfo($to_id))['Peer'];
                 } catch (\danog\MadelineProto\Exception $e) {
                     $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
-                    //$this->pending_updates[] = $updates;
                     break;
                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                     $this->logger->logger('Still did not get user in database, postponing update', \danog\MadelineProto\Logger::ERROR);
-                    //$this->pending_updates[] = $updates;
                     break;
                 }
                 $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];

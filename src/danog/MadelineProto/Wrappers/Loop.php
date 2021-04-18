@@ -124,23 +124,27 @@ trait Loop
         $this->stopLoop = false;
         do {
             if (!$this->updateHandler) {
-                yield from $this->waitUpdate();
-                continue;
-            }
-            $updates = $this->updates;
-            $this->updates = [];
-            foreach ($updates as $update) {
-                $r = ($this->updateHandler)($update);
-                if (\is_object($r)) {
-                    \danog\MadelineProto\Tools::callFork($r);
+                yield $this->waitUpdate();
+                if (!$this->updateHandler) {
+                    continue;
                 }
             }
-            $updates = [];
+            while ($this->updates) {
+                $updates = $this->updates;
+                $this->updates = [];
+                foreach ($updates as $update) {
+                    $r = ($this->updateHandler)($update);
+                    if (\is_object($r)) {
+                        \danog\MadelineProto\Tools::callFork($r);
+                    }
+                }
+                $updates = [];
+            }
             if ($this->loop_callback !== null) {
                 $callback = $this->loop_callback;
                 Tools::callForkDefer($callback());
             }
-            yield from $this->waitUpdate();
+            yield $this->waitUpdate();
         } while (!$this->stopLoop);
         $this->stopLoop = false;
     }

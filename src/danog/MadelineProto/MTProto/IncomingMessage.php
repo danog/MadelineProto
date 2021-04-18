@@ -19,7 +19,9 @@
 
 namespace danog\MadelineProto\MTProto;
 
+use Amp\Deferred;
 use Amp\Promise;
+use danog\MadelineProto\Tools;
 
 /**
  * Incoming message.
@@ -71,8 +73,10 @@ class IncomingMessage extends Message
 
     /**
      * DB side effects to be resolved before using the content.
+     * 
+     * @var Promise[]
      */
-    private ?Promise $sideEffects = null;
+    private $sideEffects = [];
 
     /**
      * Constructor.
@@ -202,11 +206,11 @@ class IncomingMessage extends Message
     /**
      * Set DB side effects to be resolved before using the content.
      *
-     * @param ?Promise $sideEffects DB side effects to be resolved before using the content
+     * @param Promise[] $sideEffects DB side effects to be resolved before using the content
      *
      * @return self
      */
-    public function setSideEffects(?Promise $sideEffects): self
+    public function setSideEffects(array $sideEffects): self
     {
         $this->sideEffects = $sideEffects;
 
@@ -214,16 +218,48 @@ class IncomingMessage extends Message
     }
 
     /**
-     * yield DB side effects to be resolved before using the content.
+     * Get DB side effects to be resolved before using the specified content.
+     * 
+     * @template T
+     * 
+     * @param T $return Return value
      *
-     * @return \Generator
+     * @return ?Promise<T>
      */
-    public function yieldSideEffects(): \Generator
+    public function getSideEffects($return): ?Promise
     {
-        if ($this->sideEffects) {
-            yield $this->sideEffects;
+        if (!$this->sideEffects) {
+            return null;
         }
+
+        $deferred = new Deferred;
+        $result = $deferred->promise();
+
+        $pending = \count($this->sideEffects);
+
+        foreach ($this->sideEffects as $promise) {
+            $promise = Tools::call($promise);
+            $promise->onResolve(function ($exception, $value) use (&$deferred, &$pending, $return) {
+                if ($pending === 0) {
+                    return;
+                }
+
+                if ($exception) {
+                    $pending = 0;
+                    $deferred->fail($exception);
+                    $deferred = null;
+                    return;
+                }
+
+                if (0 === --$pending) {
+                    $deferred->resolve($return);
+                }
+            });
+        }
+        $this->sideEffects = [];
+        return $result;
     }
+
 
     /**
      * Get receive date.

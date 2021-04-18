@@ -756,7 +756,7 @@ class TL
      * @param array           $type   Type identifier
      *
      * @return array
-     * @psalm-return array{0: mixed, 1: \Amp\Promise}
+     * @psalm-return array{0: mixed, 1: \Amp\Promise[]}
      */
     public function deserialize($stream, $type = ['type' => '']): array
     {
@@ -764,7 +764,7 @@ class TL
         $result = $this->deserializeInternal($stream, $promises, $type);
         return [
             $result,
-            $promises ? Tools::all($promises) : null
+            $promises
         ];
     }
 
