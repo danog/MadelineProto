@@ -232,15 +232,21 @@ class API extends InternalDoc
     protected function reconnectFull(): \Generator
     {
         if ($this->API instanceof Client) {
+            $this->logger->logger("Restarting to full instance...");
             try {
                 if (!isset($_GET['MadelineSelfRestart']) && yield $this->API->hasEventHandler()) {
+                    $this->logger->logger("Restarting to full instance: the bot is already running!");
                     MTProto::closeConnection('The bot is already running!');
                     return false;
                 }
+                $this->logger->logger("Restarting to full instance: stopping IPC server...");
                 yield $this->API->stopIpcServer();
+                $this->logger->logger("Restarting to full instance: disconnecting from IPC server...");
                 yield $this->API->disconnect();
             } catch (\Throwable $e) {
+                $this->logger->logger("Restarting to full instance: error $e");
             }
+            $this->logger->logger("Restarting to full instance: reconnecting...");
             yield from $this->connectToMadelineProto(new SettingsEmpty, true);
         }
         return true;
