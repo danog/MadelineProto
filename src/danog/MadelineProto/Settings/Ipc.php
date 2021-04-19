@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\Settings;
 
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\SettingsAbstract;
 
 /**
@@ -16,6 +17,11 @@ class Ipc extends SettingsAbstract
      */
     protected bool $slow = false;
 
+    public function __construct()
+    {
+        Magic::classExists(true);
+    }
+
     public function mergeArray(array $settings): void
     {
         $this->setSlow($settings['ipc']['slow'] ?? $this->getSlow());
@@ -28,7 +34,7 @@ class Ipc extends SettingsAbstract
      */
     public function getSlow(): bool
     {
-        return $this->slow;
+        return Magic::$isIpcWorker;
     }
 
     /**

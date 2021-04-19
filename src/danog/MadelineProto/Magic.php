@@ -346,7 +346,7 @@ class Magic
             } catch (\Throwable $e) {
             }
             if ($latest ?? null) {
-                $latest = self::$revision === \trim($latest) ? '' : ' (AN UPDATE IS REQUIRED)';
+                $latest = \trim(self::$revision) === \trim($latest) ? '' : ' (AN UPDATE IS REQUIRED)';
             }
             self::$revision = 'Revision: '.self::$revision.$latest;
         }
