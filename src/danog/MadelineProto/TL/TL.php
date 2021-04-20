@@ -890,7 +890,6 @@ class TL
                 }
             }
         }
-        //var_dump($constructorData);
         if ($constructorData['predicate'] === 'gzip_packed') {
             if (!isset($type['subtype'])) {
                 $type['subtype'] = '';

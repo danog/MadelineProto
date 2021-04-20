@@ -87,6 +87,7 @@ abstract class ClientAbstract
                 try {
                     $payload = yield $this->server->receive();
                 } catch (\Throwable $e) {
+                    Logger::log("Got exception while receiving in IPC client: $e");
                 }
                 if (!$payload) {
                     break;

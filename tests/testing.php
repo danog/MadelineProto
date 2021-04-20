@@ -260,13 +260,7 @@ $MadelineProto->loop(function () use ($MadelineProto) {
     $message = 'yay '.\PHP_VERSION_ID;
     $mention = yield $MadelineProto->getInfo(\getenv('TEST_USERNAME')); // Returns an array with all of the constructors that can be extracted from a username or an id
     $mention = $mention['user_id']; // Selects only the numeric user id
-
-/*
-$t = time();
-yield $MadelineProto->upload('big');
-var_dump(time()-$t);
- */
-
+    
     foreach (\json_decode(\getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
         $sentMessage = yield $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => \mb_strlen($message), 'user_id' => $mention]]]);
         $MadelineProto->logger($sentMessage, \danog\MadelineProto\Logger::NOTICE);

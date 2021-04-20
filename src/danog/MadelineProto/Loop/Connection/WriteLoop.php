@@ -112,7 +112,6 @@ class WriteLoop extends ResumableSignalLoop
                 $pad = \danog\MadelineProto\Tools::random($pad_length);
                 $buffer = yield $connection->stream->getWriteBuffer(8 + 8 + 4 + $pad_length + $length);
                 yield $buffer->bufferWrite("\0\0\0\0\0\0\0\0".$message_id.\danog\MadelineProto\Tools::packUnsignedInt($length).$message->getSerializedBody().$pad);
-                //var_dump("plain ".bin2hex($message_id));
                 $connection->httpSent();
 
                 $API->logger->logger("Sent $message as unencrypted message to DC $datacenter!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
