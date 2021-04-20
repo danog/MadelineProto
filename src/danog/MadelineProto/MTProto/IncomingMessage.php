@@ -73,7 +73,7 @@ class IncomingMessage extends Message
 
     /**
      * DB side effects to be resolved before using the content.
-     * 
+     *
      * @var Promise[]
      */
     private $sideEffects = [];
@@ -219,9 +219,9 @@ class IncomingMessage extends Message
 
     /**
      * Get DB side effects to be resolved before using the specified content.
-     * 
+     *
      * @template T
-     * 
+     *
      * @param T $return Return value
      *
      * @return ?Promise<T>

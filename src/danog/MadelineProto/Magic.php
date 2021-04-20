@@ -111,6 +111,12 @@ class Magic
      */
     private static $inited = false;
     /**
+     * Whether we've inited the ipv6 property.
+     *
+     * @var boolean
+     */
+    private static $initedIpv6 = false;
+    /**
      * Bigint zero.
      *
      * @var \tgseclib\Math\BigInteger
@@ -304,10 +310,6 @@ class Magic
         self::$BIG_ENDIAN = \pack('L', 1) === \pack('N', 1);
         self::$bigint = PHP_INT_SIZE < 8;
         try {
-            self::$ipv6 = (bool) \strlen(@\file_get_contents('http://ipv6.google.com/', false, \stream_context_create(['http' => ['timeout' => 1]]))) > 0;
-        } catch (\Throwable $e) {
-        }
-        try {
             \preg_match('/const V = (\\d+);/', @\file_get_contents('https://raw.githubusercontent.com/danog/MadelineProto/master/src/danog/MadelineProto/MTProto.php'), $matches);
             if (isset($matches[1]) && \danog\MadelineProto\MTProto::V < (int) $matches[1]) {
                 throw new \danog\MadelineProto\Exception(\hex2bin(\danog\MadelineProto\Lang::$current_lang['v_error']), 0, null, 'MadelineProto', 1);
@@ -449,5 +451,20 @@ class Magic
     public static function togglePeriodicLogging(): void
     {
         self::$enablePeriodicLogging = !self::$enablePeriodicLogging;
+    }
+
+    /**
+     * Set whether we can use ipv6.
+     *
+     * @param bool $ipv6 Whether we can use ipv6.
+     *
+     * @return void
+     */
+    public static function setIpv6(bool $ipv6): void
+    {
+        if (!self::$initedIpv6) {
+            self::$ipv6 = $ipv6;
+            self::$initedIpv6 = true;
+        }
     }
 }

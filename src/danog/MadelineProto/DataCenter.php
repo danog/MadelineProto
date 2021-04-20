@@ -287,6 +287,9 @@ class DataCenter
                     $this->sockets[$dc_number]->setExtra($this->API);
                     yield from $this->sockets[$dc_number]->connect($ctx);
                 }
+                if ($ctx->getIpv6()) {
+                    Magic::setIpv6(true);
+                }
                 $this->API->logger->logger('OK!', Logger::WARNING);
                 return true;
             } catch (\Throwable $e) {
@@ -305,7 +308,7 @@ class DataCenter
      * @param string         $uri       URI
      * @param ConnectContext $context   Connection context
      *
-     * @return array
+     * @return ConnectionContext[]
      */
     public function generateContexts($dc_number = 0, string $uri = '', ConnectContext $context = null): array
     {

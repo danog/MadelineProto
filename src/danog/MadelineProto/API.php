@@ -361,7 +361,7 @@ class API extends InternalDoc
             if ($this->unlock) {
                 ($this->unlock)();
             }
-        } else if ($this->logger) {
+        } elseif ($this->logger) {
             $this->logger->logger('Shutting down MadelineProto (old deserialized instance of API)');
         }
     }

@@ -22,7 +22,6 @@ namespace danog\MadelineProto\MTProto;
 use Amp\Deferred;
 use Amp\Loop;
 use Amp\Promise;
-use danog\MadelineProto\Coroutine;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 
