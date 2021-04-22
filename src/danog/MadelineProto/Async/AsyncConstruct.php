@@ -34,7 +34,7 @@ class AsyncConstruct
     /**
      * Async init promise.
      *
-     * @var Promise|null|boolean
+     * @var Promise|\Generator|null|boolean
      */
     private $asyncInitPromise;
     /**
@@ -46,6 +46,7 @@ class AsyncConstruct
     {
         if ($this->asyncInitPromise) {
             Tools::wait($this->asyncInitPromise);
+            $this->asyncInitPromise = null;
         }
     }
     /**
@@ -57,6 +58,7 @@ class AsyncConstruct
     {
         if ($this->asyncInitPromise) {
             yield $this->asyncInitPromise;
+            $this->asyncInitPromise = null;
         }
     }
     /**
@@ -90,13 +92,6 @@ class AsyncConstruct
      */
     public function setInitPromise($promise): void
     {
-        $this->asyncInitPromise = Tools::call($promise);
-        $this->asyncInitPromise->onResolve(
-            function (?\Throwable $error, $result): void {
-                if (!$error) {
-                    $this->asyncInitPromise = null;
-                }
-            }
-        );
+        $this->asyncInitPromise = $promise;
     }
 }

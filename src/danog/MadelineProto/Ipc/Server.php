@@ -192,7 +192,9 @@ class Server extends SignalLoop
             if ($payload === self::SHUTDOWN) {
                 $this->signal(null);
                 if (self::$shutdownDeferred) {
-                    self::$shutdownDeferred->resolve();
+                    $deferred = self::$shutdownDeferred;
+                    self::$shutdownDeferred = null;
+                    $deferred->resolve();
                 }
             }
         }

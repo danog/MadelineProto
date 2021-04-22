@@ -178,7 +178,7 @@ class API extends InternalDoc
         $this->session = new SessionPaths($session);
         $this->wrapper = new APIWrapper($this, $this->exportNamespace());
 
-        $this->setInitPromise((function () use ($settings) { yield new \Amp\Success; return yield from $this->internalInitAPI($settings); })());
+        $this->setInitPromise($this->internalInitAPI($settings));
         foreach (\get_class_vars(APIFactory::class) as $key => $var) {
             if (\in_array($key, ['namespace', 'API', 'lua', 'async', 'asyncAPIPromise', 'methods'])) {
                 continue;

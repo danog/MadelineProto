@@ -782,7 +782,7 @@ trait Files
     {
         if (\is_object($dir) && $dir instanceof FileCallbackInterface) {
             $cb = $dir;
-            $dir = $dir->getFile();
+            $dir = yield $dir->getFile();
         }
         $messageMedia = (yield from $this->getDownloadInfo($messageMedia));
         return yield from $this->downloadToFile($messageMedia, $dir.'/'.$messageMedia['name'].$messageMedia['ext'], $cb);
@@ -802,7 +802,7 @@ trait Files
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
-            $file = $file->getFile();
+            $file = yield $file->getFile();
         }
         $file = Tools::absolute(\preg_replace('|/+|', '/', $file));
         if (!yield exists($file)) {
@@ -848,7 +848,7 @@ trait Files
         $messageMedia = (yield from $this->getDownloadInfo($messageMedia));
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
-            $callable = $callable->getFile();
+            $callable = yield $callable->getFile();
         }
         if (!\is_callable($callable)) {
             throw new Exception('Wrong callable provided');
