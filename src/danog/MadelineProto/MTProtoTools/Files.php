@@ -66,7 +66,7 @@ trait Files
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
-            $url = $url->getFile();
+            $url = yield $url->getFile();
         }
         /** @var $response \Amp\Http\Client\Response */
         $request = new Request($url);
@@ -116,7 +116,7 @@ trait Files
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
-            $callable = $callable->getFile();
+            $callable = yield $callable->getFile();
         }
         if (!\is_callable($callable)) {
             throw new Exception('Invalid callable provided');
@@ -244,7 +244,7 @@ trait Files
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
-            $media = $media->getFile();
+            $media = yield $media->getFile();
         }
         $media = (yield from $this->getDownloadInfo($media));
         if (!isset($media['size'], $media['mime'])) {

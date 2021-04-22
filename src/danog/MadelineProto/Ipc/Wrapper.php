@@ -7,9 +7,13 @@ use Amp\ByteStream\OutputStream as ByteStreamOutputStream;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Parallel\Sync\ExitFailure;
 use Amp\Promise;
+use danog\MadelineProto\FileCallbackInterface;
+use danog\MadelineProto\Ipc\Wrapper\FileCallback;
 use danog\MadelineProto\Ipc\Wrapper\InputStream;
 use danog\MadelineProto\Ipc\Wrapper\Obj;
 use danog\MadelineProto\Ipc\Wrapper\OutputStream;
+use danog\MadelineProto\Ipc\Wrapper\SeekableInputStream;
+use danog\MadelineProto\Ipc\Wrapper\SeekableOutputStream;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Tools;
@@ -103,12 +107,11 @@ class Wrapper extends ClientAbstract
             }
             $class = Obj::class;
             if ($callback instanceof ByteStreamInputStream) {
-                $class = InputStream::class;
+                $class = \method_exists($callback, 'seek') ? InputStream::class : SeekableInputStream::class;
             } elseif ($callback instanceof ByteStreamOutputStream) {
-                $class = OutputStream::class;
-            }
-            if ($class !== Obj::class && \method_exists($callback, 'seek')) {
-                $class = "Seekable$class";
+                $class = \method_exists($callback, 'seek') ? OutputStream::class : SeekableOutputStream::class;
+            } elseif ($callback instanceof FileCallbackInterface) {
+                $class = FileCallback::class;
             }
             $callback = [$class, $ids]; // Will be re-filled later
             $this->callbackIds[] = &$callback;

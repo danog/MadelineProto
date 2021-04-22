@@ -49,7 +49,7 @@ trait FilesLogic
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
-            $messageMedia = $messageMedia->getFile();
+            $messageMedia = yield $messageMedia->getFile();
         }
 
         $headers = [];
@@ -103,7 +103,7 @@ trait FilesLogic
         $messageMedia = yield from $this->getDownloadInfo($messageMedia);
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
-            $stream = $stream->getFile();
+            $stream = yield $stream->getFile();
         }
         /** @var $stream \Amp\ByteStream\OutputStream */
         if (!\is_object($stream)) {
@@ -148,7 +148,7 @@ trait FilesLogic
     {
         if (\is_object($messageMedia) && $messageMedia instanceof FileCallbackInterface) {
             $cb = $messageMedia;
-            $messageMedia = $messageMedia->getFile();
+            $messageMedia = yield $messageMedia->getFile();
         }
 
         $messageMedia = yield from $this->getDownloadInfo($messageMedia);
@@ -216,7 +216,7 @@ trait FilesLogic
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
-            $file = $file->getFile();
+            $file = yield $file->getFile();
         }
         if (\is_string($file) || \is_object($file) && \method_exists($file, '__toString')) {
             if (\filter_var($file, FILTER_VALIDATE_URL)) {
@@ -272,7 +272,7 @@ trait FilesLogic
     {
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
-            $stream = $stream->getFile();
+            $stream = yield $stream->getFile();
         }
         /* @var $stream \Amp\ByteStream\OutputStream */
         if (!\is_object($stream)) {

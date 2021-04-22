@@ -149,7 +149,7 @@ class Client extends ClientAbstract
     {
         if (\is_object($url) && $url instanceof FileCallbackInterface) {
             $cb = $url;
-            $url = $url->getFile();
+            $url = yield $url->getFile();
         }
         $params = [$url, $size, $fileName, &$cb, $encrypted];
         $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
@@ -178,7 +178,7 @@ class Client extends ClientAbstract
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
-            $callable = $callable->getFile();
+            $callable = yield $callable->getFile();
         }
         $params = [&$callable, $size, $mime, $fileName, &$cb, $seekable, $encrypted];
         $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
@@ -201,12 +201,52 @@ class Client extends ClientAbstract
     {
         if (\is_object($media) && $media instanceof FileCallbackInterface) {
             $cb = $media;
-            $media = $media->getFile();
+            $media = yield $media->getFile();
         }
         $params = [$media, &$cb, $encrypted];
         $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
         return yield from $this->__call('uploadFromTgfile', $wrapper);
+    }
+    /**
+     * Call method and wait asynchronously for response.
+     *
+     * If the $aargs['noResponse'] is true, will not wait for a response.
+     *
+     * @param string            $method Method name
+     * @param array|\Generator  $args   Arguments
+     * @param array             $aargs  Additional arguments
+     *
+     * @psalm-param array|\Generator<mixed, mixed, mixed, array> $args
+     *
+     * @return \Generator
+     */
+    public function methodCallAsyncRead(string $method, $args, array $aargs)
+    {
+        if (\is_array($args)) {
+            if (($method === 'messages.editInlineBotMessage' ||
+                $method === 'messages.uploadMedia' ||
+                $method === 'messages.sendMedia' ||
+                $method === 'messages.editMessage') &&
+                isset($args['media']['file']) &&
+                $args['media']['file'] instanceof FileCallbackInterface
+            ) {
+                $params = [$method, &$args, $aargs];
+                $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+                $wrapper->wrap($args['media']['file'], true);
+                return yield from $this->__call('methodCallAsyncRead', $wrapper);
+            } elseif ($method === 'messages.sendMultiMedia' && isset($args['multi_media'])) {
+                $params = [$method, &$args, $aargs];
+                $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
+                foreach ($args['multi_media'] as &$media) {
+                    if (isset($media['media']['file']) && $media['media']['file'] instanceof FileCallbackInterface) {
+                        $wrapper->wrap($media['media']['file'], true);
+                    }
+                }
+                return yield from $this->__call('methodCallAsyncRead', $wrapper);
+            }
+        }
+        return yield from $this->__call('methodCallAsyncRead', [$method, $args, $aargs]);
     }
     /**
      * Download file to directory.
@@ -223,7 +263,7 @@ class Client extends ClientAbstract
     {
         if (\is_object($dir) && $dir instanceof FileCallbackInterface) {
             $cb = $dir;
-            $dir = $dir->getFile();
+            $dir = yield $dir->getFile();
         }
         $params = [$messageMedia, $dir, &$cb];
         $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
@@ -245,7 +285,7 @@ class Client extends ClientAbstract
     {
         if (\is_object($file) && $file instanceof FileCallbackInterface) {
             $cb = $file;
-            $file = $file->getFile();
+            $file = yield $file->getFile();
         }
         $params = [$messageMedia, $file, &$cb];
         $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
@@ -259,12 +299,12 @@ class Client extends ClientAbstract
      * The callable should return the number of written bytes.
      *
      * @param mixed                          $messageMedia File to download
-     * @param callable|FileCallbackInterface $callable      Chunk callback
-     * @param callable                       $cb            Status callback (DEPRECATED, use FileCallbackInterface)
-     * @param bool                           $seekable      Whether the callable can be called out of order
-     * @param int                            $offset        Offset where to start downloading
-     * @param int                            $end           Offset where to stop downloading (inclusive)
-     * @param int                            $part_size     Size of each chunk
+     * @param callable|FileCallbackInterface $callable     Chunk callback
+     * @param callable                       $cb           Status callback (DEPRECATED, use FileCallbackInterface)
+     * @param bool                           $seekable     Whether the callable can be called out of order
+     * @param int                            $offset       Offset where to start downloading
+     * @param int                            $end          Offset where to stop downloading (inclusive)
+     * @param int                            $part_size    Size of each chunk
      *
      * @return \Generator
      *
@@ -275,7 +315,7 @@ class Client extends ClientAbstract
         $messageMedia = (yield from $this->getDownloadInfo($messageMedia));
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
-            $callable = $callable->getFile();
+            $callable = yield $callable->getFile();
         }
         $params = [$messageMedia, &$callable, &$cb, $seekable, $offset, $end, $part_size, ];
         $wrapper = yield from Wrapper::create($params, $this->session, $this->logger);
