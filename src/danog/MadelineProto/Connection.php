@@ -482,7 +482,7 @@ class Connection
             $queuePromise->resolve();
         }
         if ($flush && isset($this->writer)) {
-            $this->writer->resume();
+            $this->writer->resumeDeferOnce();
         }
         return yield $promise;
     }
@@ -494,7 +494,7 @@ class Connection
     public function flush()
     {
         if (isset($this->writer)) {
-            $this->writer->resume();
+            $this->writer->resumeDeferOnce();
         }
     }
     /**

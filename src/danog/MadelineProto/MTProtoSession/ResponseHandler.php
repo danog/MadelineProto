@@ -363,7 +363,7 @@ trait ResponseHandler
                         $this->shared->setTempAuthKey(null);
                         $this->shared->setPermAuthKey(null);
                         $this->logger->logger("Auth key not registered in DC {$this->datacenter} with RPC error ${response['error_message']}, resetting temporary and permanent auth keys...", Logger::ERROR);
-                        if ($this->API->authorized_dc === $this->datacenter && $this->API->authorized === MTProto::LOGGED_IN) {
+                        if ($this->API->authorized_dc == $this->datacenter && $this->API->authorized === MTProto::LOGGED_IN) {
                             $this->logger->logger('Permanent auth key was main authorized key, logging out...', Logger::FATAL_ERROR);
                             foreach ($this->API->datacenter->getDataCenterConnections() as $socket) {
                                 $socket->setTempAuthKey(null);

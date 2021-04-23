@@ -143,13 +143,6 @@ class API extends InternalDoc
     private bool $destructing = false;
 
     /**
-     * Whether we need a full instance.
-     *
-     * @var boolean
-     */
-    private bool $forceFull = false;
-
-    /**
      * API wrapper (to avoid circular references).
      *
      * @var APIWrapper
@@ -233,10 +226,13 @@ class API extends InternalDoc
      */
     protected function reconnectFull(): \Generator
     {
+        if (!$this->API) {
+            yield from $this->initAsynchronously();
+        }
         if ($this->API instanceof Client) {
             $this->logger->logger("Restarting to full instance...");
             try {
-                if (!isset($_GET['MadelineSelfRestart']) && yield $this->API->hasEventHandler()) {
+                if (!isset($_GET['MadelineSelfRestart']) && yield $this->hasEventHandler()) {
                     $this->logger->logger("Restarting to full instance: the bot is already running!");
                     MTProto::closeConnection('The bot is already running!');
                     return false;
@@ -280,9 +276,9 @@ class API extends InternalDoc
     protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false): \Generator
     {
         if ($settings instanceof SettingsIpc) {
-            $forceFull = $forceFull || $this->forceFull || $settings->getSlow();
+            $forceFull = $forceFull || $settings->getSlow();
         } elseif ($settings instanceof Settings) {
-            $forceFull = $forceFull || $this->forceFull || $settings->getIpc()->getSlow();
+            $forceFull = $forceFull || $settings->getIpc()->getSlow();
         }
         $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']);
 
@@ -396,7 +392,6 @@ class API extends InternalDoc
      */
     public function startAndLoop(string $eventHandler): void
     {
-        $this->forceFull = true;
         while (true) {
             try {
                 Tools::wait($this->startAndLoopAsync($eventHandler));
@@ -426,7 +421,6 @@ class API extends InternalDoc
             try {
                 $promises = [];
                 foreach ($instances as $k => $instance) {
-                    $instance->forceFull = true;
                     $instance->start(['async' => false]);
                     $promises []= $instance->startAndLoopAsync($eventHandler[$k]);
                 }
@@ -450,7 +444,6 @@ class API extends InternalDoc
     public function startAndLoopAsync(string $eventHandler): \Generator
     {
         $errors = [];
-        $this->forceFull = true;
         $this->async(true);
 
         if (!yield from $this->reconnectFull()) {
