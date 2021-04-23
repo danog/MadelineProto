@@ -24,6 +24,7 @@ use Amp\Loop;
 use danog\Loop\ResumableSignalLoop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\Container;
+use danog\MadelineProto\MTProto\OutgoingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
 
@@ -159,6 +160,11 @@ class WriteLoop extends ResumableSignalLoop
             $has_http_wait = false;
             foreach ($connection->pendingOutgoing as $k => $message) {
                 if ($message->isUnencrypted()) {
+                    continue;
+                }
+                if ($message->getState() & OutgoingMessage::STATE_REPLIED) {
+                    unset($connection->pendingOutgoing[$k]);
+                    $API->logger->logger("Skipping resending of $message, we already got a reply in DC $datacenter");
                     continue;
                 }
                 if ($message instanceof Container) {

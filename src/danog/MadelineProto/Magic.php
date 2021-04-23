@@ -344,7 +344,11 @@ class Magic
         if (self::$revision) {
             self::$revision = \trim(self::$revision);
             try {
-                $latest = @\file_get_contents('https://phar.madelineproto.xyz/release');
+                $version = (string) \min(80, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
+                if ($version === "56") {
+                    $version = "5";
+                }
+                $latest = @\file_get_contents("https://phar.madelineproto.xyz/release$version");
             } catch (\Throwable $e) {
             }
             if ($latest ?? null) {
