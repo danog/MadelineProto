@@ -52,6 +52,10 @@ class Server extends SignalLoop
      */
     private static ?Deferred $shutdownDeferred = null;
     /**
+     * Boolean whether to shut down worker, if started.
+     */
+    private static bool $shutdownNow = false;
+    /**
      * IPC server.
      */
     protected IpcServer $server;
@@ -72,7 +76,7 @@ class Server extends SignalLoop
      */
     public function setIpcPath(SessionPaths $session): void
     {
-        self::$shutdownDeferred = new Deferred;
+        self::$shutdownDeferred ??= new Deferred;
         $this->server = new IpcServer($session->getIpcPath());
         $this->callback = new ServerCallback($this->API);
         $this->callback->setIpcPath($session);
@@ -149,7 +153,11 @@ class Server extends SignalLoop
      */
     public static function waitShutdown(): Promise
     {
-        return self::$shutdownDeferred ? self::$shutdownDeferred->promise() : new Success;
+        if (self::$shutdownNow) {
+            return new Success;
+        }
+        self::$shutdownDeferred ??= new Deferred;
+        return self::$shutdownDeferred;
     }
     /**
      * Main loop.
@@ -193,6 +201,7 @@ class Server extends SignalLoop
             if ($payload === self::SHUTDOWN) {
                 $this->signal(null);
                 if (self::$shutdownDeferred) {
+                    self::$shutdownNow = true;
                     $deferred = self::$shutdownDeferred;
                     self::$shutdownDeferred = null;
                     $deferred->resolve();
