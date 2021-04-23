@@ -110,7 +110,7 @@ trait UpdateHandler
         if ($this->update_deferred) {
             $deferred = $this->update_deferred;
             $this->update_deferred = null;
-            $deferred->resolve();
+            Loop::defer(fn () => $deferred->resolve());
         }
     }
     /**

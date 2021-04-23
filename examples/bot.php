@@ -78,7 +78,7 @@ class MyEventHandler extends EventHandler
      *
      * @return \Generator
      */
-    public function onUpdateNewMessage(array $update)
+    public function onUpdateNewMessage(array $update): \Generator
     {
         if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
             return;
@@ -86,7 +86,7 @@ class MyEventHandler extends EventHandler
 
         $res = \json_encode($update, JSON_PRETTY_PRINT);
         yield $this->messages->sendMessage(['peer' => $update, 'message' => "<code>$res</code>", 'reply_to_msg_id' => isset($update['message']['id']) ? $update['message']['id'] : null, 'parse_mode' => 'HTML']);
-        if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame') {
+        if (isset($update['message']['media']) && $update['message']['media']['_'] !== 'messageMediaGame' && $update['message']['media']['_'] !== 'messageMediaWebPage') {
             yield $this->messages->sendMedia(['peer' => $update, 'message' => $update['message']['message'], 'media' => $update]);
         }
     }

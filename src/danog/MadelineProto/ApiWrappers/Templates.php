@@ -78,7 +78,7 @@ trait Templates
                     $title = \htmlentities(Lang::$current_lang['apiManualWeb']);
                     $title .= "<br><b>$message</b>";
                     $title .= "<ol>";
-                    $title .= "<li>".\htmlentities(Lang::$current_lang['apiManualInstructions0'])."</li>";
+                    $title .= "<li>".\str_replace('https://my.telegram.org', '<a href="https://my.telegram.org" target="_blank">https://my.telegram.org</a>', \htmlentities(Lang::$current_lang['apiManualInstructions0']))."</li>";
                     $title .= "<li>".\htmlentities(Lang::$current_lang['apiManualInstructions1'])."</li>";
                     $title .= "<li><ul>";
                     foreach (['App title', 'Short name', 'URL', 'Platform', 'Description'] as $k => $key) {

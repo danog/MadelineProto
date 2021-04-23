@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto\Wrappers;
 
+use Amp\Loop as AmpLoop;
 use Amp\Promise;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
@@ -122,6 +123,9 @@ trait Loop
         $this->startUpdateSystem();
         $this->logger->logger('Started update loop', \danog\MadelineProto\Logger::NOTICE);
         $this->stopLoop = false;
+        if ($this->loop_callback !== null) {
+            $repeat = AmpLoop::repeat(1000, fn () => Tools::callFork(($this->loop_callback)()));
+        }
         do {
             if (!$this->updateHandler) {
                 yield $this->waitUpdate();
@@ -140,13 +144,12 @@ trait Loop
                 }
                 $updates = [];
             }
-            if ($this->loop_callback !== null) {
-                $callback = $this->loop_callback;
-                Tools::callForkDefer($callback());
-            }
             yield $this->waitUpdate();
         } while (!$this->stopLoop);
         $this->stopLoop = false;
+        if (isset($repeat)) {
+            AmpLoop::cancel($repeat);
+        }
     }
     /**
      * Stop update loop.
