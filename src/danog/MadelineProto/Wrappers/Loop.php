@@ -80,7 +80,8 @@ trait Loop
                     $logger->logger($payload);
                     \fwrite($a, $payload);
                     $logger->logger("Payload sent with token {$params['MadelineSelfRestart']}, waiting for self-restart");
-                    \fclose($a);
+                    // Keep around resource for a bit more
+                    $GLOBALS['MadelineShutdown'] = $a;
                     $logger->logger("Shutdown of self-restart callback");
                 }, 'restarter');
                 $this->logger->logger("Added restart callback with ID $id!");

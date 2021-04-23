@@ -22,6 +22,7 @@ use Amp\Deferred;
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Promise;
+use Amp\Success;
 use danog\Loop\SignalLoop;
 use danog\MadelineProto\Exception as Exception;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
@@ -148,7 +149,7 @@ class Server extends SignalLoop
      */
     public static function waitShutdown(): Promise
     {
-        return self::$shutdownDeferred->promise();
+        return self::$shutdownDeferred ? self::$shutdownDeferred->promise() : new Success;
     }
     /**
      * Main loop.
