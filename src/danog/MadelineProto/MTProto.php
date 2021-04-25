@@ -1190,6 +1190,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->authorized === true) {
             $this->authorized = self::LOGGED_IN;
         }
+        if (!isset($this->snitch)) {
+            $this->snitch = new Snitch;
+        }
         // Convert old array settings to new settings object
         if (\is_array($this->settings)) {
             if (($this->settings['updates']['callback'] ?? '') === 'getUpdatesUpdateHandler') {
