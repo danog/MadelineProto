@@ -26,6 +26,7 @@ use danog\MadelineProto\Ipc\IpcState;
 
 use function Amp\File\exists;
 use function Amp\File\open;
+use function Amp\File\rename as renameAsync;
 use function Amp\File\stat;
 
 /**
@@ -103,7 +104,7 @@ class SessionPaths
             yield $file->write(\serialize($object));
             yield $file->close();
 
-            yield \rename("$path.temp.php", $path);
+            yield renameAsync("$path.temp.php", $path);
         } finally {
             $unlock();
         }

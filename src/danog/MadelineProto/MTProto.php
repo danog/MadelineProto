@@ -721,7 +721,8 @@ class MTProto extends AsyncConstruct implements TLCallback
             // Report URI
             'reportDest',
 
-            'calls'
+            'calls',
+            'snitch',
         ];
         if (!$this->updateHandler instanceof Closure) {
             $res[] = 'updateHandler';

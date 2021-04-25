@@ -224,7 +224,7 @@ class IncomingMessage extends Message
      *
      * @param T $return Return value
      *
-     * @return ?Promise<T>
+     * @psalm-return ?Promise<T>
      */
     public function getSideEffects($return): ?Promise
     {

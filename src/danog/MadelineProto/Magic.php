@@ -343,6 +343,7 @@ class Magic
         }
         if (self::$revision) {
             self::$revision = \trim(self::$revision);
+            $latest = '';
             try {
                 $version = (string) \min(80, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
                 if ($version === "56") {
@@ -351,7 +352,7 @@ class Magic
                 $latest = @\file_get_contents("https://phar.madelineproto.xyz/release$version");
             } catch (\Throwable $e) {
             }
-            if ($latest ?? null) {
+            if ($latest) {
                 $latest = \trim(self::$revision) === \trim($latest) ? '' : ' (AN UPDATE IS REQUIRED)';
             }
             self::$revision = 'Revision: '.self::$revision.$latest;
