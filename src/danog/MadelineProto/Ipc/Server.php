@@ -157,7 +157,7 @@ class Server extends SignalLoop
             return new Success;
         }
         self::$shutdownDeferred ??= new Deferred;
-        return self::$shutdownDeferred;
+        return self::$shutdownDeferred->promise();
     }
     /**
      * Main loop.
