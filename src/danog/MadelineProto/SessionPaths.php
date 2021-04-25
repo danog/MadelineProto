@@ -98,12 +98,17 @@ class SessionPaths
         try {
             Logger::log("Got exclusive lock of $path.lock...");
 
+            $object = \serialize($object);
+
             $file = yield open("$path.temp.php", 'bw+');
-            yield $file->write(Serialization::PHP_HEADER);
-            yield $file->write(\chr(Serialization::VERSION));
-            yield $file->write(\serialize($object));
+            $l = yield $file->write(Serialization::PHP_HEADER);
+            $l += yield $file->write(\chr(Serialization::VERSION));
+            $l += yield $file->write($object);
             yield $file->close();
 
+            if ($l !== ($need = strlen(Serialization::PHP_HEADER)+1+strlen($object))) {
+                throw new Exception("Did not write all the data (need $need, wrote $l)");
+            }
             yield renameAsync("$path.temp.php", $path);
         } finally {
             $unlock();
