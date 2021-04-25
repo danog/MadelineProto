@@ -1016,6 +1016,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!isset($this->datacenter)) {
             $this->datacenter ??= new DataCenter($this, $this->dcList, $this->settings->getConnection());
         }
+        if (!isset($this->snitch)) {
+            $this->snitch = new Snitch;
+        }
         $db = [];
         if (!isset($this->referenceDatabase)) {
             $this->referenceDatabase = new ReferenceDatabase($this);
