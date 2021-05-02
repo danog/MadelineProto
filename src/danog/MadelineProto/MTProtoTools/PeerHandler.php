@@ -1101,7 +1101,7 @@ trait PeerHandler
             }
             $promises = [];
             foreach ($gres['participants'] as $participant) {
-                $promises []= Tools::call(function () use (&$res, $participant) {
+                $promises []= Tools::call((function () use (&$res, $participant) {
                     $newres = [];
                     $newres['user'] = (yield from $this->getPwrChat($participant['user_id'] ?? $participant['peer'], false, true));
                     if (isset($participant['inviter_id'])) {
@@ -1143,7 +1143,7 @@ trait PeerHandler
                             break;
                     }
                     $res['participants'][$participant['user_id'] ?? $this->getId($participant['peer'])] = $newres;
-                });
+                })());
             }
             yield Tools::all($promises);
             $this->logger->logger('Fetched '.\count($gres['participants'])." channel participants with filter {$filter}, query {$q}, offset {$offset}, limit {$limit}, hash {$hash}: ".($cached ? 'cached' : 'not cached').', '.($offset + \count($gres['participants'])).' participants out of '.$gres['count'].', in total fetched '.\count($res['participants']).' out of '.$total_count);
