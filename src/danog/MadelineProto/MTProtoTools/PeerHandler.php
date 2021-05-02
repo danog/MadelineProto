@@ -468,7 +468,7 @@ trait PeerHandler
                 case 'updateEditChannelMessage':
                     return $this->getId($id['message']);
                 default:
-                    throw new \danog\MadelineProto\Exception('Invalid constructor given '.\var_export($id, true));
+                    throw new \danog\MadelineProto\Exception('Invalid constructor given '.$id['_']);
             }
         }
         if (\is_string($id)) {
@@ -812,7 +812,7 @@ trait PeerHandler
             case 'channelForbidden':
                 throw new \danog\MadelineProto\Exception('This peer is not present in the internal peer database');
             default:
-                throw new \danog\MadelineProto\Exception('Invalid constructor given '.\var_export($constructor, true));
+                throw new \danog\MadelineProto\Exception('Invalid constructor given '.$constructor['_']);
         }
         if ($folder_id) {
             $res['FolderPeer'] = ['_' => 'folderPeer', 'peer' => $res['Peer'], 'folder_id' => $folder_id];
@@ -949,7 +949,7 @@ trait PeerHandler
         if (isset($res['participants']) && $fullfetch) {
             foreach ($res['participants'] as $key => $participant) {
                 $newres = [];
-                $newres['user'] = (yield from $this->getPwrChat($participant['user_id'], false, true));
+                $newres['user'] = (yield from $this->getPwrChat($participant['user_id'] ?? $participant['peer'], false, true));
                 if (isset($participant['inviter_id'])) {
                     $newres['inviter'] = (yield from $this->getPwrChat($participant['inviter_id'], false, true));
                 }
@@ -1028,8 +1028,8 @@ trait PeerHandler
                 $fileId->setDcId($res['photo']['dc_id']);
                 $fileId->setType(PROFILE_PHOTO);
 
-                $fileId->setLocalId($size['location']['local_id']);
-                $fileId->setVolumeId($size['location']['volume_id']);
+                $fileId->setLocalId($size['location']['local_id'] ?? 0);
+                $fileId->setVolumeId($size['location']['volume_id'] ?? 0);
 
                 $photoSize = new PhotoSizeSourceDialogPhoto;
                 $photoSize->setDialogId($res['id']);
@@ -1099,49 +1099,53 @@ trait PeerHandler
             } else {
                 $last_count = $gres['count'];
             }
+            $promises = [];
             foreach ($gres['participants'] as $participant) {
-                $newres = [];
-                $newres['user'] = (yield from $this->getPwrChat($participant['user_id'], false, true));
-                if (isset($participant['inviter_id'])) {
-                    $newres['inviter'] = (yield from $this->getPwrChat($participant['inviter_id'], false, true));
-                }
-                if (isset($participant['kicked_by'])) {
-                    $newres['kicked_by'] = (yield from $this->getPwrChat($participant['kicked_by'], false, true));
-                }
-                if (isset($participant['promoted_by'])) {
-                    $newres['promoted_by'] = (yield from $this->getPwrChat($participant['promoted_by'], false, true));
-                }
-                if (isset($participant['date'])) {
-                    $newres['date'] = $participant['date'];
-                }
-                if (isset($participant['rank'])) {
-                    $newres['rank'] = $participant['rank'];
-                }
-                if (isset($participant['admin_rights'])) {
-                    $newres['admin_rights'] = $participant['admin_rights'];
-                }
-                if (isset($participant['banned_rights'])) {
-                    $newres['banned_rights'] = $participant['banned_rights'];
-                }
-                switch ($participant['_']) {
-                    case 'channelParticipantSelf':
-                        $newres['role'] = 'user';
-                        break;
-                    case 'channelParticipant':
-                        $newres['role'] = 'user';
-                        break;
-                    case 'channelParticipantCreator':
-                        $newres['role'] = 'creator';
-                        break;
-                    case 'channelParticipantAdmin':
-                        $newres['role'] = 'admin';
-                        break;
-                    case 'channelParticipantBanned':
-                        $newres['role'] = 'banned';
-                        break;
-                }
-                $res['participants'][$participant['user_id']] = $newres;
+                $promises []= Tools::call(function () use (&$res, $participant) {
+                    $newres = [];
+                    $newres['user'] = (yield from $this->getPwrChat($participant['user_id'] ?? $participant['peer'], false, true));
+                    if (isset($participant['inviter_id'])) {
+                        $newres['inviter'] = (yield from $this->getPwrChat($participant['inviter_id'], false, true));
+                    }
+                    if (isset($participant['kicked_by'])) {
+                        $newres['kicked_by'] = (yield from $this->getPwrChat($participant['kicked_by'], false, true));
+                    }
+                    if (isset($participant['promoted_by'])) {
+                        $newres['promoted_by'] = (yield from $this->getPwrChat($participant['promoted_by'], false, true));
+                    }
+                    if (isset($participant['date'])) {
+                        $newres['date'] = $participant['date'];
+                    }
+                    if (isset($participant['rank'])) {
+                        $newres['rank'] = $participant['rank'];
+                    }
+                    if (isset($participant['admin_rights'])) {
+                        $newres['admin_rights'] = $participant['admin_rights'];
+                    }
+                    if (isset($participant['banned_rights'])) {
+                        $newres['banned_rights'] = $participant['banned_rights'];
+                    }
+                    switch ($participant['_']) {
+                        case 'channelParticipantSelf':
+                            $newres['role'] = 'user';
+                            break;
+                        case 'channelParticipant':
+                            $newres['role'] = 'user';
+                            break;
+                        case 'channelParticipantCreator':
+                            $newres['role'] = 'creator';
+                            break;
+                        case 'channelParticipantAdmin':
+                            $newres['role'] = 'admin';
+                            break;
+                        case 'channelParticipantBanned':
+                            $newres['role'] = 'banned';
+                            break;
+                    }
+                    $res['participants'][$participant['user_id'] ?? $this->getId($participant['peer'])] = $newres;
+                });
             }
+            yield Tools::all($promises);
             $this->logger->logger('Fetched '.\count($gres['participants'])." channel participants with filter {$filter}, query {$q}, offset {$offset}, limit {$limit}, hash {$hash}: ".($cached ? 'cached' : 'not cached').', '.($offset + \count($gres['participants'])).' participants out of '.$gres['count'].', in total fetched '.\count($res['participants']).' out of '.$total_count);
             $offset += \count($gres['participants']);
         } while (\count($gres['participants']));
@@ -1173,7 +1177,9 @@ trait PeerHandler
         unset($gres['users']);
         $ids = [];
         foreach ($gres['participants'] as $participant) {
-            $ids[] = $participant['user_id'];
+            if (isset($participant['user_id'])) {
+                $ids[] = $participant['user_id'];
+            }
         }
         \sort($ids, SORT_NUMERIC);
         $gres['hash'] = \danog\MadelineProto\Tools::genVectorHash($ids);

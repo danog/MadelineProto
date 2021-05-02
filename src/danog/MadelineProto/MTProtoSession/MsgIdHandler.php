@@ -32,6 +32,7 @@ abstract class MsgIdHandler
      * Session instance.
      */
     protected Connection $session;
+
     /**
      * Constructor.
      *
@@ -90,28 +91,38 @@ abstract class MsgIdHandler
     abstract protected static function toStringInternal(string $messageId): string;
 
     /**
-     * Cleanup incoming or outgoing messages.
+     * Cleanup incoming and outgoing messages.
      *
-     * @param boolean $incoming
      * @return void
      */
-    protected function cleanup(bool $incoming): void
+    public function cleanup(): void
     {
-        if ($incoming) {
-            $array = &$this->session->incoming_messages;
-        } else {
-            $array = &$this->session->outgoing_messages;
-        }
-        if (\count($array) > $this->session->API->settings->getRpc()->getLimitOutgoing()) {
-            \reset($array);
-            $key = \key($array);
-            foreach ($array as $key => $message) {
-                if ($message->canGarbageCollect()) {
-                    unset($array[$key]);
-                    break;
-                }
+        $count = 0;
+        foreach ($this->session->incoming_messages as $key => $message) {
+            if ($message->canGarbageCollect()) {
+                unset($this->session->incoming_messages[$key]);
+                $count++;
+            } else {
                 $this->session->API->logger->logger("Can't garbage collect $message", \danog\MadelineProto\Logger::VERBOSE);
             }
+        }
+        $total = \count($this->session->incoming_messages);
+        if ($count+$total) {
+            $this->session->API->logger->logger("Garbage collected $count incoming messages, $total left", \danog\MadelineProto\Logger::VERBOSE);
+        }
+
+        $count = 0;
+        foreach ($this->session->outgoing_messages as $key => $message) {
+            if ($message->canGarbageCollect()) {
+                unset($this->session->outgoing_messages[$key]);
+                $count++;
+            } else {
+                $this->session->API->logger->logger("Can't garbage collect $message", \danog\MadelineProto\Logger::VERBOSE);
+            }
+        }
+        $total = \count($this->session->outgoing_messages);
+        if ($count+$total) {
+            $this->session->API->logger->logger("Garbage collected $count outgoing messages, $total left", \danog\MadelineProto\Logger::VERBOSE);
         }
     }
     /**

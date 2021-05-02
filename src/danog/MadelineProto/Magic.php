@@ -21,6 +21,7 @@ namespace danog\MadelineProto;
 
 use Amp\Loop;
 use Amp\Loop\Driver;
+use danog\MadelineProto\TL\Conversion\Extension;
 use ReflectionClass;
 use function Amp\ByteStream\getStdin;
 use function Amp\Log\hasColorSupport;
@@ -225,6 +226,12 @@ class Magic
      */
     public static $enablePeriodicLogging = true;
     /**
+     * All mime types.
+     *
+     * @var array<string, string>
+     */
+    public static $allMimes = [];
+    /**
      * Encoded emojis.
      *
      * @var string
@@ -390,6 +397,14 @@ class Magic
         if (isset($res, $res['ok']) && $res['ok']) {
             RPCErrorException::$errorMethodMap = $res['result'];
             RPCErrorException::$descriptions += $res['human_result'];
+        }
+        foreach (Extension::ALL_MIMES as $ext => $mimes) {
+            $ext = ".$ext";
+            foreach ($mimes as $mime) {
+                if (!isset(self::$allMimes[$mime])) {
+                    self::$allMimes[$mime] = $ext;
+                }
+            }
         }
         self::$inited = true;
     }

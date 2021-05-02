@@ -159,8 +159,8 @@ trait Loop
      */
     public function stop()
     {
-        $this->stopLoop = true;
-        $this->signalUpdate();
+        \danog\MadelineProto\Shutdown::removeCallback('restarter');
+        $this->restart();
     }
     /**
      * Restart update loop.
@@ -169,7 +169,8 @@ trait Loop
      */
     public function restart()
     {
-        $this->stop();
+        $this->stopLoop = true;
+        $this->signalUpdate();
     }
     /**
      * Start MadelineProto's update handling loop in background.

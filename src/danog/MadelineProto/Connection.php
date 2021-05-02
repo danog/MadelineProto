@@ -23,6 +23,7 @@ use Amp\ByteStream\ClosedException;
 use Amp\Deferred;
 use Amp\Failure;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
+use danog\MadelineProto\Loop\Connection\CleanupLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
 use danog\MadelineProto\Loop\Connection\PingLoop;
 use danog\MadelineProto\Loop\Connection\ReadLoop;
@@ -79,6 +80,12 @@ class Connection
      * @var \danog\MadelineProto\Loop\Connection\PingLoop
      */
     protected $pinger;
+    /**
+     * Cleanup loop.
+     *
+     * @var \danog\MadelineProto\Loop\Connection\CleanupLoop
+     */
+    protected $cleanup;
     /**
      * The actual socket.
      *
@@ -334,6 +341,9 @@ class Connection
         if (!isset($this->checker)) {
             $this->checker = new CheckLoop($this);
         }
+        if (!isset($this->cleanup)) {
+            $this->cleanup = new CleanupLoop($this);
+        }
         if (!isset($this->waiter)) {
             $this->waiter = new HttpWaitLoop($this);
         }
@@ -353,6 +363,7 @@ class Connection
         if (!$this->checker->start()) {
             $this->checker->resume();
         }
+        $this->cleanup->start();
         $this->waiter->start();
         if ($this->pinger) {
             $this->pinger->start();
@@ -555,7 +566,7 @@ class Connection
     {
         $this->API->logger->logger("Disconnecting from DC {$this->datacenterId}");
         $this->needsReconnect = true;
-        foreach (['reader', 'writer', 'checker', 'waiter', 'updater', 'pinger'] as $loop) {
+        foreach (['reader', 'writer', 'checker', 'waiter', 'updater', 'pinger', 'cleanup'] as $loop) {
             if (isset($this->{$loop}) && $this->{$loop}) {
                 $this->{$loop}->signal($loop === 'reader' ? new NothingInTheSocketException() : true);
             }

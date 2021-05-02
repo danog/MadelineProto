@@ -263,7 +263,7 @@ class Connection extends SettingsAbstract
      */
     public function getIpv6(): bool
     {
-        return $this->ipv6 ?? Magic::$ipv6;
+        return $this->ipv6;
     }
 
     /**

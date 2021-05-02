@@ -47,8 +47,8 @@ trait BotAPIFiles
         $fileId->setFileReference($photo['file_reference'] ?? '');
         $fileId->setDcId($photo['dc_id'] ?? 0);
 
-        $fileId->setLocalId($photoSize['location']['local_id']);
-        $fileId->setVolumeId($photoSize['location']['volume_id']);
+        $fileId->setLocalId($photoSize['location']['local_id'] ?? 0);
+        $fileId->setVolumeId($photoSize['location']['volume_id'] ?? 0);
 
         $photoSizeSource = new PhotoSizeSourceThumbnail;
         $photoSizeSource->setThumbType($photoSize['type']);
@@ -69,7 +69,7 @@ trait BotAPIFiles
             'height' => $photoSize['h'],
             'file_size' => $photoSize['size'] ?? \strlen($photoSize['bytes']),
             'mime_type' => 'image/jpeg',
-            'file_name' => $photoSize['location']['volume_id'].'_'.$photoSize['location']['local_id'].'.jpg'
+            'file_name' => isset($photoSize['location']) ? $photoSize['location']['volume_id'].'_'.$photoSize['location']['local_id'].'.jpg' : $photo['id'].'.jpg'
         ];
     }
     /**

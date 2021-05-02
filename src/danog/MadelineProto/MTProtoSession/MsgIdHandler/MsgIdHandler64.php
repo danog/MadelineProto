@@ -65,7 +65,6 @@ class MsgIdHandler64 extends MsgIdHandler
             if ($newMessageId <= $this->maxOutgoingId) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$this->maxOutgoingId.'). Consider syncing your date.');
             }
-            $this->cleanup(false);
             $this->maxOutgoingId = $newMessageId;
         } else {
             if (!($newMessageId % 2)) {
@@ -81,7 +80,6 @@ class MsgIdHandler64 extends MsgIdHandler
                     $this->session->API->logger->logger('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::NOTICE);
                 }
             }
-            $this->cleanup(true);
             $this->maxIncomingId = $newMessageId;
         }
     }

@@ -66,7 +66,6 @@ class MsgIdHandler32 extends MsgIdHandler
             if ($newMessageId->compare($key = $this->getMaxId($incoming = false)) <= 0) {
                 throw new \danog\MadelineProto\Exception('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', 1);
             }
-            $this->cleanup(false);
             $this->maxOutgoingId = $newMessageId;
         } else {
             if (!$newMessageId->divide(\danog\MadelineProto\Magic::$four)[1]->equals(\danog\MadelineProto\Magic::$one) && !$newMessageId->divide(\danog\MadelineProto\Magic::$four)[1]->equals(\danog\MadelineProto\Magic::$three)) {
@@ -82,7 +81,6 @@ class MsgIdHandler32 extends MsgIdHandler
                     $this->session->API->logger->logger('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Consider syncing your date.', \danog\MadelineProto\Logger::NOTICE);
                 }
             }
-            $this->cleanup(true);
             $this->maxIncomingId = $newMessageId;
         }
     }

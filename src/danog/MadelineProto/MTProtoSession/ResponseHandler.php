@@ -256,7 +256,7 @@ trait ResponseHandler
             if ($botAPI) {
                 $deferred = new Deferred;
                 $promise = $deferred->promise();
-                $side->onResolve(function ($result, $error) use ($deferred): void {
+                $side->onResolve(function (?\Throwable $error, $result) use ($deferred): void {
                     if ($error) {
                         $deferred->fail($error);
                         return;
