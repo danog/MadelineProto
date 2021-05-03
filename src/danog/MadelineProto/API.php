@@ -250,9 +250,16 @@ class API extends InternalDoc
                 [$result] = yield from Serialization::tryConnect($this->session->getIpcPath(), $cancel->promise());
                 if ($result instanceof ChannelledSocket) {
                     try {
+                        if (!$this->API instanceof Client) {
+                            $this->logger->logger("Restarting to full instance (again): the bot is already running!");
+                            yield $result->disconnect();
+                            return;
+                        }
                         $API = new Client($result, $this->session, Logger::$default, $this->async);
                         if (yield from $API->hasEventHandler()) {
                             $this->logger->logger("Restarting to full instance (again): the bot is already running!");
+                            yield $API->disconnect();
+                            $API->unreference();
                             return;
                         }
                         $this->logger->logger("Restarting to full instance: stopping another IPC server...");
@@ -310,6 +317,7 @@ class API extends InternalDoc
             // Success, full session
             if ($this->API) {
                 $this->API->unreference();
+                $this->API = null;
             }
             $unserialized->storage = $unserialized->storage ?? [];
             $unserialized->session = $this->session;
