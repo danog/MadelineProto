@@ -250,9 +250,16 @@ class API extends InternalDoc
                 [$result] = yield from Serialization::tryConnect($this->session->getIpcPath(), $cancel->promise());
                 if ($result instanceof ChannelledSocket) {
                     try {
+                        $API = new Client($result, $this->session, Logger::$default, $this->async);
+                        if (yield from $API->hasEventHandler()) {
+                            $this->logger->logger("Restarting to full instance (again): the bot is already running!");
+                            return;
+                        }
                         $this->logger->logger("Restarting to full instance: stopping another IPC server...");
-                        yield $result->send(Server::SHUTDOWN);
-                        yield $result->disconnect();
+                        yield $API->stopIpcServer();
+                        $this->logger->logger("Restarting to full instance: disconnecting from IPC server...");
+                        yield $API->disconnect();
+                        $API->unreference();
                     } catch (\Throwable $e) {
                         $this->logger->logger("Restarting to full instance: error in stop loop $e");
                     }
@@ -301,6 +308,9 @@ class API extends InternalDoc
             return true;
         } elseif ($unserialized) {
             // Success, full session
+            if ($this->API) {
+                $this->API->unreference();
+            }
             $unserialized->storage = $unserialized->storage ?? [];
             $unserialized->session = $this->session;
             APIWrapper::link($this, $unserialized);
