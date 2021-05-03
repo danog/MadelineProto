@@ -1,5 +1,5 @@
 name: build
-on: [push]
+on: [create]
 jobs:
   run:
     runs-on: ubuntu-latest
