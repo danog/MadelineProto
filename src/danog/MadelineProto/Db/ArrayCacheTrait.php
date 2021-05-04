@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\Db;
 
 use Amp\Loop;
+use Closure;
 use danog\MadelineProto\Logger;
 
 /**
@@ -23,10 +24,6 @@ trait ArrayCacheTrait
      * TTL interval.
      */
     protected int $ttl = 5 * 60;
-    /**
-     * TTL cleanup interval.
-     */
-    private int $ttlCheckInterval = 60;
 
     /**
      * Cache cleanup watcher ID.
@@ -66,7 +63,10 @@ trait ArrayCacheTrait
 
     protected function startCacheCleanupLoop(): void
     {
-        $this->cacheCleanupId = Loop::repeat($this->ttlCheckInterval * 1000, fn () => $this->cleanupCache());
+        $this->cacheCleanupId = Loop::repeat(
+            \max(1000, ($this->ttl * 1000) / 5),
+            Closure::fromCallable([$this, 'cleanupCache']),
+        );
     }
     protected function stopCacheCleanupLoop(): void
     {

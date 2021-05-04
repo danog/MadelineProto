@@ -84,7 +84,7 @@ abstract class DriverArray implements DbArray
      */
     public static function getInstance(string $table, $previous, $settings): Promise
     {
-        if ($previous instanceof static && $previous->getTable() === $table) {
+        if ($previous && \get_class($previous) === static::class && $previous->getTable() === $table) {
             $instance = &$previous;
         } else {
             $instance = new static();
@@ -125,7 +125,7 @@ abstract class DriverArray implements DbArray
      */
     protected static function renameTmpTable(self $new, $old): \Generator
     {
-        if ($old instanceof static && $old->getTable()) {
+        if ($old && \str_replace('NullCache\\', '', \get_class($old)) === \str_replace('NullCache\\', '', \get_class($new)) && $old->getTable()) {
             if (
                 $old->getTable() !== $new->getTable() &&
                 \mb_strpos($new->getTable(), 'tmp') !== 0
@@ -147,7 +147,10 @@ abstract class DriverArray implements DbArray
     protected static function migrateDataToDb(self $new, $old): \Generator
     {
         if (!empty($old) && !$old instanceof static) {
-            Logger::log('Converting database to '.\get_class($new), Logger::ERROR);
+            if (\str_replace('NullCache\\', '', \get_class($old)) === \str_replace('NullCache\\', '', \get_class($new))) {
+                return;
+            }
+            Logger::log('Converting '.\get_class($old).' to '.\get_class($new), Logger::ERROR);
 
             if (!$old instanceof DbArray) {
                 $old = yield MemoryArray::getInstance('', $old, new Memory);

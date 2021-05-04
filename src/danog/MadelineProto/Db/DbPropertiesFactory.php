@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\Db;
 
 use Amp\Promise;
+use danog\MadelineProto\Settings\Database\DatabaseAbstract as DatabaseDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Memory;
 use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
@@ -40,7 +41,7 @@ abstract class DbPropertiesFactory
         $config = $propertyType['config'] ?? [];
         $propertyType = \is_array($propertyType) ? $propertyType['type'] : $propertyType;
         $propertyType = \strtolower($propertyType);
-        $class = !($config['enableCache'] ?? true) && !$dbSettings instanceof Memory
+        $class = $dbSettings instanceof DatabaseDatabaseAbstract && (!($config['enableCache'] ?? true) || !$dbSettings->getCacheTtl())
             ? __NAMESPACE__.'\\NullCache'
             : __NAMESPACE__;
 
