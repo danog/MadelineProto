@@ -37,18 +37,18 @@ if (\file_exists('vendor/autoload.php')) {
 $MadelineProto = new \danog\MadelineProto\API('bot.madeline');
 
 $MadelineProto->async(true);
-$MadelineProto->loop(static function() use($MadelineProto) {
+$MadelineProto->loop(static function () use ($MadelineProto) {
     yield $MadelineProto->start();
 
     $lastMessageId = 0;
     $threads = 5;
     $step = 20;
     $totalMessages = 0;
-    $start = microtime(true);
-    while(true) {
+    $start = \microtime(true);
+    while (true) {
         $promises = [];
         for ($i = 0; $i < $threads; $i++) {
-            $promises[] = $MadelineProto->messages->getMessages(['id' => range($lastMessageId+1, $lastMessageId+$step)]);
+            $promises[] = $MadelineProto->messages->getMessages(['id' => \range($lastMessageId+1, $lastMessageId+$step)]);
             $lastMessageId +=$step;
         }
         $results = yield \Amp\Promise\all($promises);
@@ -62,6 +62,6 @@ $MadelineProto->loop(static function() use($MadelineProto) {
             }
         }
     };
-    $time = microtime(true)-$start;
+    $time = \microtime(true)-$start;
     yield $MadelineProto->echo("\nTime: {$time}\n");
 });

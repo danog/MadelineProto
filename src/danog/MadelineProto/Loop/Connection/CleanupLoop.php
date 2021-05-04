@@ -19,10 +19,8 @@
 
 namespace danog\MadelineProto\Loop\Connection;
 
-use Amp\Deferred;
 use Amp\Loop;
 use danog\Loop\ResumableSignalLoop;
-use danog\MadelineProto\Tools;
 
 /**
  * Message cleanup loop.

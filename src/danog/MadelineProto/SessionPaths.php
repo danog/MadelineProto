@@ -106,7 +106,7 @@ class SessionPaths
             $l += yield $file->write($object);
             yield $file->close();
 
-            if ($l !== ($need = strlen(Serialization::PHP_HEADER)+1+strlen($object))) {
+            if ($l !== ($need = \strlen(Serialization::PHP_HEADER)+1+\strlen($object))) {
                 throw new Exception("Did not write all the data (need $need, wrote $l)");
             }
             yield renameAsync("$path.temp.php", $path);

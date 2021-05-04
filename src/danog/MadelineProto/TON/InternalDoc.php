@@ -1088,7 +1088,7 @@ class InternalDoc extends APIFactory
      * @param ?Promise  $token     Cancellation token
      * @param ?callable $failureCb Failure callback, called only once if the first locking attempt fails.
      *
-     * @return \Amp\Promise<?callable>
+     * @return \Amp\Promise<$token is null ? callable : ?callable>
      */
     public function flock(string $file, int $operation, float $polling = 0.1, ?\Amp\Promise $token = null, $failureCb = null)
     {

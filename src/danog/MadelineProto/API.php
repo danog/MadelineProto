@@ -232,7 +232,7 @@ class API extends InternalDoc
         if ($this->API instanceof Client) {
             $this->logger->logger("Restarting to full instance...");
             try {
-                if (!isset($_GET['MadelineSelfRestart']) && yield $this->hasEventHandler()) {
+                if (!isset($_GET['MadelineSelfRestart']) && ((yield $this->hasEventHandler()) || !(yield $this->isIpcWorker()))) {
                     $this->logger->logger("Restarting to full instance: the bot is already running!");
                     MTProto::closeConnection('The bot is already running!');
                     return false;
@@ -256,7 +256,7 @@ class API extends InternalDoc
                             return;
                         }
                         $API = new Client($result, $this->session, Logger::$default, $this->async);
-                        if (yield from $API->hasEventHandler()) {
+                        if ((yield from $API->hasEventHandler()) || !(yield from $API->isIpcWorker())) {
                             $this->logger->logger("Restarting to full instance (again): the bot is already running!");
                             yield $API->disconnect();
                             $API->unreference();

@@ -1366,6 +1366,15 @@ class MTProto extends AsyncConstruct implements TLCallback
         return false;
     }
     /**
+     * Whether we're an IPC server process (as opposed to an event handler).
+     *
+     * @return boolean
+     */
+    public function isIpcWorker(): bool
+    {
+        return Magic::$isIpcWorker;
+    }
+    /**
      * Parse, update and store settings.
      *
      * @param SettingsAbstract $settings Settings
