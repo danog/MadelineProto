@@ -14,6 +14,7 @@ trait NullCacheTrait
      */
     protected function getCache(string $key, $default = null)
     {
+        return $default;
     }
 
     /**

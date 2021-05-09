@@ -245,7 +245,7 @@ abstract class Serialization
      */
     public static function tryConnect(string $ipcPath, Promise $cancelConnect, ?Deferred $cancelFull = null): \Generator
     {
-        for ($x = 0; $x < 30; $x++) {
+        for ($x = 0; $x < 60; $x++) {
             Logger::log("Trying to connect to IPC socket...");
             try {
                 \clearstatcache(true, $ipcPath);

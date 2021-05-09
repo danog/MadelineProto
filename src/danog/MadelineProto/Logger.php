@@ -353,7 +353,11 @@ class Logger
      */
     public function logger($param, int $level = self::NOTICE, string $file = ''): void
     {
-        if ($level > $this->level || $this->mode === self::NO_LOGGER) {
+        if ($level > $this->level) {
+            return;
+        }
+        if (Magic::$suspendPeriodicLogging) {
+            Magic::$suspendPeriodicLogging->promise()->onResolve(fn () => $this->logger($param, $level, $file));
             return;
         }
         if (!self::$printed) {

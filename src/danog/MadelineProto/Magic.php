@@ -19,6 +19,7 @@
 
 namespace danog\MadelineProto;
 
+use Amp\Deferred;
 use Amp\Loop;
 use Amp\Loop\Driver;
 use danog\MadelineProto\TL\Conversion\Extension;
@@ -222,9 +223,9 @@ class Magic
     /**
      * Whether to suspend certain stdout log printing, when reading input.
      *
-     * @var bool
+     * @var ?Deferred
      */
-    public static $enablePeriodicLogging = true;
+    public static $suspendPeriodicLogging;
     /**
      * All mime types.
      *
@@ -470,7 +471,13 @@ class Magic
      */
     public static function togglePeriodicLogging(): void
     {
-        self::$enablePeriodicLogging = !self::$enablePeriodicLogging;
+        if (self::$suspendPeriodicLogging) {
+            $deferred = self::$suspendPeriodicLogging;
+            self::$suspendPeriodicLogging = null;
+            $deferred->resolve();
+        } else {
+            self::$suspendPeriodicLogging = new Deferred;
+        }
     }
 
     /**

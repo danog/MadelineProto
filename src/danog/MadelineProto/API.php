@@ -410,11 +410,21 @@ class API extends InternalDoc
      */
     public function startAndLoop(string $eventHandler): void
     {
+        $errors = [];
+        $started = false;
         while (true) {
             try {
-                Tools::wait($this->startAndLoopAsync($eventHandler));
+                Tools::wait($this->startAndLoopAsyncInternal($eventHandler, $started));
                 return;
             } catch (\Throwable $e) {
+                $t = \time();
+                $errors = [$t => $errors[$t] ?? 0];
+                $errors[$t]++;
+                if ($errors[$t] > 10 && (!$this->inited() || !$started)) {
+                    $this->logger->logger("More than 10 errors in a second and not inited, exiting!", Logger::FATAL_ERROR);
+                    return;
+                }
+                echo $e;
                 $this->logger->logger((string) $e, Logger::FATAL_ERROR);
                 $this->report("Surfaced: $e");
             }
@@ -434,17 +444,27 @@ class API extends InternalDoc
             $eventHandler = \array_fill_keys(\array_keys($instances), $eventHandler);
         }
 
+        $errors = [];
+        $started = array_fill_keys(array_keys($instances), false);
         $instanceOne = \array_values($instances)[0];
         while (true) {
             try {
                 $promises = [];
                 foreach ($instances as $k => $instance) {
                     $instance->start(['async' => false]);
-                    $promises []= $instance->startAndLoopAsync($eventHandler[$k]);
+                    $promises []= $instance->startAndLoopAsyncInternal($eventHandler[$k], $started[$k]);
                 }
                 Tools::wait(Tools::all($promises));
                 return;
             } catch (\Throwable $e) {
+                $t = \time();
+                $errors = [$t => $errors[$t] ?? 0];
+                $errors[$t]++;
+                if ($errors[$t] > 10 && array_sum($started) !== count($eventHandler)) {
+                    $instanceOne->logger("More than 10 errors in a second and not inited, exiting!", Logger::FATAL_ERROR);
+                    return;
+                }
+                echo $e;
                 $instanceOne->logger((string) $e, Logger::FATAL_ERROR);
                 $instanceOne->report("Surfaced: $e");
             }
@@ -461,14 +481,28 @@ class API extends InternalDoc
      */
     public function startAndLoopAsync(string $eventHandler): \Generator
     {
-        $errors = [];
+        $started = false;
+        return $this->startAndLoopAsyncInternal($eventHandler, $started);
+    }
+
+    /**
+     * Start MadelineProto and the event handler (enables async).
+     *
+     * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
+     *
+     * @param string $eventHandler Event handler class name
+     *
+     * @return \Generator
+     */
+    private function startAndLoopAsyncInternal(string $eventHandler, bool &$started): \Generator
+    {
         $this->async(true);
 
         if (!yield from $this->reconnectFull()) {
             return;
         }
 
-        $started = false;
+        $errors = [];
         while (true) {
             try {
                 yield $this->start();
