@@ -45,7 +45,6 @@ class AsyncConstruct
     public function init(): void
     {
         if ($this->asyncInitPromise) {
-            $this->asyncInitPromise = Tools::call($this->asyncInitPromise);
             Tools::wait($this->asyncInitPromise);
             $this->asyncInitPromise = null;
         }
@@ -58,7 +57,6 @@ class AsyncConstruct
     public function initAsynchronously(): \Generator
     {
         if ($this->asyncInitPromise) {
-            $this->asyncInitPromise = Tools::call($this->asyncInitPromise);
             yield $this->asyncInitPromise;
             $this->asyncInitPromise = null;
         }
@@ -94,6 +92,6 @@ class AsyncConstruct
      */
     public function setInitPromise($promise): void
     {
-        $this->asyncInitPromise = $promise;
+        $this->asyncInitPromise = Tools::call($promise);
     }
 }
