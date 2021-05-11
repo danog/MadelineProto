@@ -1281,6 +1281,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         if ($this->event_handler && \class_exists($this->event_handler) && \is_subclass_of($this->event_handler, EventHandler::class)) {
             yield from $this->setEventHandler($this->event_handler);
         } else {
+            $this->setNoop();
             $this->event_handler = null;
             $this->event_handler_instance = null;
         }
