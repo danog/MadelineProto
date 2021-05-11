@@ -80,7 +80,7 @@ abstract class SettingsAbstract
      * Get whether this setting was changed, also applies changes.
      *
      * @internal
-     * 
+     *
      * @return boolean
      */
     public function hasChanged(): bool

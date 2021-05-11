@@ -445,7 +445,7 @@ class API extends InternalDoc
         }
 
         $errors = [];
-        $started = array_fill_keys(array_keys($instances), false);
+        $started = \array_fill_keys(\array_keys($instances), false);
         $instanceOne = \array_values($instances)[0];
         while (true) {
             try {
@@ -460,7 +460,7 @@ class API extends InternalDoc
                 $t = \time();
                 $errors = [$t => $errors[$t] ?? 0];
                 $errors[$t]++;
-                if ($errors[$t] > 10 && array_sum($started) !== count($eventHandler)) {
+                if ($errors[$t] > 10 && \array_sum($started) !== \count($eventHandler)) {
                     $instanceOne->logger("More than 10 errors in a second and not inited, exiting!", Logger::FATAL_ERROR);
                     return;
                 }
