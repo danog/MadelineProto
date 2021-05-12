@@ -187,11 +187,6 @@ abstract class Serialization
                 Logger::log("Please start the event handler or unset it to use the IPC server.", Logger::ERROR);
                 return $ipcSocket ?? yield from self::tryConnect($session->getIpcPath(), $cancelIpc->promise());
             }
-        } elseif (!$forceFull) {
-            // Unlock and fork
-            $unlock();
-            $cancelIpc->resolve(Server::startMe($session));
-            return $ipcSocket ?? yield from self::tryConnect($session->getIpcPath(), $cancelIpc->promise());
         }
 
         $tempId = Shutdown::addCallback($unlock = static function () use ($unlock) {
