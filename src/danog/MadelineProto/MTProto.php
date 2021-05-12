@@ -1336,6 +1336,7 @@ class MTProto extends AsyncConstruct implements TLCallback
         }
         if (isset($this->datacenter)) {
             foreach ($this->datacenter->getDataCenterConnections() as $datacenter) {
+                $datacenter->setExtra($this);
                 $datacenter->disconnect();
             }
         }
@@ -1886,6 +1887,25 @@ class MTProto extends AsyncConstruct implements TLCallback
     {
         return (bool) $this->reportDest;
     }
+    /**
+     * Get a message to show to the user when starting the bot.
+     *
+     * @param string $message
+     */
+    public function getWebMessage(string $message): string
+    {
+        Logger::log($message);
+
+        $warning = '';
+        if (!$this->hasReportPeers() && $this->hasEventHandler()) {
+            Logger::log("!!! Warning: no report peers are set, please add the following method to your event handler !!!", Logger::FATAL_ERROR);
+            Logger::log("!!! public function getReportPeers() { return '@yourtelegramusername'; } !!!", Logger::FATAL_ERROR);
+            $warning .= "<h2 style='color:red;'>Warning: no report peers are set, please add the following method to your event handler:</h2>";
+            $warning .= "<code>public function getReportPeers() { return '@yourtelegramusername'; }</code>";
+        }
+        return "<html><body><h1>$message</h1>$warning</body></html>";
+    }
+
     /**
      * Set peer(s) where to send errors occurred in the event loop.
      *

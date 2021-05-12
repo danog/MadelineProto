@@ -21,8 +21,6 @@ namespace danog\MadelineProto\Wrappers;
 
 use Amp\Loop as AmpLoop;
 use Amp\Promise;
-use danog\MadelineProto\Logger;
-use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Shutdown;
 
@@ -87,7 +85,7 @@ trait Loop
                 $this->logger->logger("Added restart callback with ID $id!");
             }
             $this->logger->logger("Done webhost init process!");
-            $this->closeConnection('Bot was started');
+            Tools::closeConnection($this->getWebMessage("The bot was started!"));
             $inited = true;
         }
     }
@@ -180,30 +178,5 @@ trait Loop
     public function loopFork(): Promise
     {
         return Tools::callFork($this->loop());
-    }
-    /**
-     * Close connection with client, connected via web.
-     *
-     * @param string $message Message
-     *
-     * @return void
-     */
-    public static function closeConnection($message = 'OK!')
-    {
-        if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || isset($GLOBALS['exited']) || \headers_sent() || isset($_GET['MadelineSelfRestart']) || Magic::$isIpcWorker) {
-            return;
-        }
-        Logger::log($message);
-        $buffer = @\ob_get_clean() ?: '';
-        $buffer .= '<html><body><h1>'.\htmlentities($message).'</h1></body></html>';
-        \ignore_user_abort(true);
-        \header('Connection: close');
-        \header('Content-Type: text/html');
-        echo $buffer;
-        \flush();
-        $GLOBALS['exited'] = true;
-        if (\function_exists('fastcgi_finish_request')) {
-            \fastcgi_finish_request();
-        }
     }
 }

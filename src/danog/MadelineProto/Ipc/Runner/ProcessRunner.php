@@ -3,6 +3,7 @@
 namespace danog\MadelineProto\Ipc\Runner;
 
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Magic;
 
 final class ProcessRunner extends RunnerAbstract
 {
@@ -52,8 +53,14 @@ final class ProcessRunner extends RunnerAbstract
         ]);
         Logger::log("Starting process with $command");
 
+        $params = [
+            'argv' => ['madeline-ipc', $session, $startupId],
+            'cwd' => Magic::getcwd()
+        ];
+        $params = \http_build_query($params);
+
         $pipes = [];
-        self::$resources []= \proc_open($command, [], $pipes);
+        self::$resources []= \proc_open($command, [], $pipes, null, ['QUERY_STRING' => $params]);
     }
     private static function locateBinary(): string
     {

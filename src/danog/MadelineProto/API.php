@@ -197,6 +197,7 @@ class API extends InternalDoc
         if (yield from $this->connectToMadelineProto($settings)) {
             return; // OK
         }
+
         if (!$settings instanceof Settings) {
             $newSettings = new Settings;
             $newSettings->merge($settings);
@@ -234,7 +235,7 @@ class API extends InternalDoc
             try {
                 if (!isset($_GET['MadelineSelfRestart']) && ((yield $this->hasEventHandler()) || !(yield $this->isIpcWorker()))) {
                     $this->logger->logger("Restarting to full instance: the bot is already running!");
-                    MTProto::closeConnection('The bot is already running!');
+                    Tools::closeConnection(yield $this->getWebMessage("The bot is already running!"));
                     return false;
                 }
                 $this->logger->logger("Restarting to full instance: stopping IPC server...");
@@ -498,6 +499,7 @@ class API extends InternalDoc
     {
         $this->async(true);
 
+        yield $this->start();
         if (!yield from $this->reconnectFull()) {
             return;
         }
@@ -505,7 +507,6 @@ class API extends InternalDoc
         $errors = [];
         while (true) {
             try {
-                yield $this->start();
                 yield $this->setEventHandler($eventHandler);
                 $started = true;
                 return yield from $this->API->loop();

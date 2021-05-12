@@ -868,6 +868,30 @@ abstract class Tools extends StrTools
         return $header.\substr($stripped, 3).$footer;
     }
     /**
+     * Close connection with client, connected via web.
+     *
+     * @param string $message Message
+     *
+     * @return void
+     */
+    public static function closeConnection($message)
+    {
+        if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || isset($GLOBALS['exited']) || \headers_sent() || isset($_GET['MadelineSelfRestart']) || Magic::$isIpcWorker) {
+            return;
+        }
+        $buffer = @\ob_get_clean() ?: '';
+        $buffer .= $message;
+        \ignore_user_abort(true);
+        \header('Connection: close');
+        \header('Content-Type: text/html');
+        echo $buffer;
+        \flush();
+        $GLOBALS['exited'] = true;
+        if (\function_exists('fastcgi_finish_request')) {
+            \fastcgi_finish_request();
+        }
+    }
+    /**
      * Get maximum photo size.
      *
      * @internal

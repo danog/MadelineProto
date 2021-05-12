@@ -40,6 +40,10 @@ class Server extends SignalLoop
 {
     use InternalLoop;
     /**
+     * Server version.
+     */
+    const VERSION = 1;
+    /**
      * Shutdown server.
      */
     const SHUTDOWN = 0;
