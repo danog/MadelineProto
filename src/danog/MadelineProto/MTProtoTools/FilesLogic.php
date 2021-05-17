@@ -78,6 +78,9 @@ trait FilesLogic
         if (!\in_array($result->getCode(), [Status::OK, Status::PARTIAL_CONTENT])) {
             yield Tools::echo($result->getCodeExplanation());
         } elseif ($result->shouldServe()) {
+            if (!empty($messageMedia['name']) && !empty($messageMedia['ext'])) {
+                header("Content-Disposition: inline; filename=\"{$messageMedia['name']}{$messageMedia['ext']}\"");
+            }
             if (\ob_get_level()) {
                 \ob_end_flush();
                 \ob_implicit_flush();
@@ -179,6 +182,9 @@ trait FilesLogic
         $response = new Response($result->getCode(), $result->getHeaders(), $body);
         if ($result->shouldServe() && !empty($result->getHeaders()['Content-Length'])) {
             $response->setHeader('content-length', $result->getHeaders()['Content-Length']);
+            if (!empty($messageMedia['name']) && !empty($messageMedia['ext'])) {
+                $response->setHeader('content-disposition', "inline; filename=\"{$messageMedia['name']}{$messageMedia['ext']}\"");
+            }
         }
 
         return $response;
