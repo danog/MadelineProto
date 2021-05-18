@@ -104,7 +104,6 @@ use danog\MadelineProto\Tools;
             $API = new API($ipcPath, (new Ipc)->setSlow(true));
             $API->init();
             $API->initSelfRestart();
-
             while (true) {
                 try {
                     Tools::wait($session->storeIpcState(new IpcState($runnerId)));
@@ -117,6 +116,9 @@ use danog\MadelineProto\Tools;
                 }
             }
         } catch (\Throwable $e) {
+            echo "$e";
+            echo "Got exception in IPC server, exiting...";
+
             Logger::log("$e", Logger::FATAL_ERROR);
             Logger::log("Got exception in IPC server, exiting...", Logger::FATAL_ERROR);
             $ipc = Tools::wait($session->getIpcState());
