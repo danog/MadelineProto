@@ -79,7 +79,7 @@ trait FilesLogic
             yield Tools::echo($result->getCodeExplanation());
         } elseif ($result->shouldServe()) {
             if (!empty($messageMedia['name']) && !empty($messageMedia['ext'])) {
-                header("Content-Disposition: inline; filename=\"{$messageMedia['name']}{$messageMedia['ext']}\"");
+                \header("Content-Disposition: inline; filename=\"{$messageMedia['name']}{$messageMedia['ext']}\"");
             }
             if (\ob_get_level()) {
                 \ob_end_flush();

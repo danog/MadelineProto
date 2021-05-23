@@ -2,11 +2,8 @@
 
 namespace danog\MadelineProto\Ipc\Runner;
 
-use Amp\ByteStream\InputStream;
-use Amp\ByteStream\OutputStream;
 use Amp\Process\Internal\Posix\Runner;
 use Amp\Process\Internal\Windows\Runner as WindowsRunner;
-use Amp\Process\Process;
 use Amp\Process\ProcessInputStream;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
@@ -14,10 +11,28 @@ use danog\MadelineProto\Tools;
 
 use const Amp\Process\IS_WINDOWS;
 
-use function Amp\Process\escapeArguments;
-
 final class ProcessRunner extends RunnerAbstract
 {
+    private const CGI_VARS = [
+        "AUTH_TYPE",
+        "CONTENT_LENGTH",
+        "CONTENT_TYPE",
+        "GATEWAY_INTERFACE",
+        "PATH_INFO",
+        "PATH_TRANSLATED",
+        "QUERY_STRING",
+        "REMOTE_ADDR",
+        "REMOTE_HOST",
+        "REMOTE_IDENT",
+        "REMOTE_USER",
+        "REQUEST_METHOD",
+        "SCRIPT_NAME",
+        "SERVER_NAME",
+        "SERVER_PORT",
+        "SERVER_PROTOCOL",
+        "SERVER_SOFTWARE"
+    ];
+
     /** @var string|null Cached path to located PHP binary. */
     private static $binaryPath;
 
@@ -59,7 +74,10 @@ final class ProcessRunner extends RunnerAbstract
             'argv' => ['madeline-ipc', $session, $startupId],
             'cwd' => Magic::getcwd()
         ];
-        $envVars = ['QUERY_STRING' => \http_build_query($params)];
+        $envVars = \array_merge(
+            \array_filter($_SERVER, fn ($v, $k): bool => \is_string($v) && !\in_array($k, self::CGI_VARS), ARRAY_FILTER_USE_BOTH),
+            ['QUERY_STRING' => \http_build_query($params)]
+        );
 
         $runner = IS_WINDOWS ? new WindowsRunner : new Runner;
         $handle = $runner->start($command, null, $envVars);
@@ -81,12 +99,13 @@ final class ProcessRunner extends RunnerAbstract
         });
     }
     /**
-     * Unreference and read data from fd, logging results
+     * Unreference and read data from fd, logging results.
      *
      * @param ProcessInputStream $stream
      * @return \Generator
      */
-    private static function readUnref(ProcessInputStream $stream): \Generator {
+    private static function readUnref(ProcessInputStream $stream): \Generator
+    {
         $stream->unreference();
         $lastLine = '';
         try {
@@ -123,7 +142,7 @@ final class ProcessRunner extends RunnerAbstract
     }
 
     /**
-     * Format PHP options
+     * Format PHP options.
      *
      * @param array $options
      * @return list<string>

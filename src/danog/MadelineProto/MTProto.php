@@ -589,6 +589,21 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->updateSettingsInternal($settings);
         // Actually instantiate needed classes like a boss
         yield from $this->cleanupProperties();
+        // Start IPC server
+        if (!$this->ipcServer) {
+            try {
+                $this->ipcServer = new Server($this);
+                $this->ipcServer->setSettings($this->settings->getIpc());
+                $this->ipcServer->setIpcPath($this->wrapper->session);
+            } catch (\Throwable $e) {
+                $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
+            }
+        }
+        try {
+            $this->ipcServer->start();
+        } catch (\Throwable $e) {
+            $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
+        }
         // Load rsa keys
         $this->rsa_keys = [];
         foreach ($this->settings->getAuth()->getRsaKeys() as $key) {

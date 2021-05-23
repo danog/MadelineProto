@@ -224,6 +224,7 @@ class Server extends SignalLoop
     private function clientRequest(ChannelledSocket $socket, int $id, $payload): \Generator
     {
         try {
+            yield from $this->API->initAsynchronously();
             if ($payload[1] instanceof Wrapper) {
                 $wrapper = $payload[1];
                 $payload[1] = $this->callback->unwrap($wrapper);
