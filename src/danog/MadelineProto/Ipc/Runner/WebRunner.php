@@ -2,7 +2,10 @@
 
 namespace danog\MadelineProto\Ipc\Runner;
 
+use Amp\Failure;
 use Amp\Parallel\Context\ContextException;
+use Amp\Promise;
+use Amp\Success;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
@@ -22,12 +25,12 @@ final class WebRunner extends RunnerAbstract
      *
      * @param string $session Session path
      *
-     * @return void
+     * @return Promise<bool>
      */
-    public static function start(string $session, int $startupId): void
+    public static function start(string $session, int $startupId): Promise
     {
         if (!isset($_SERVER['SERVER_NAME'])) {
-            return;
+            return new Failure(new \Exception("Can't start the web runner!"));
         }
 
         if (!self::$runPath) {
@@ -105,5 +108,7 @@ final class WebRunner extends RunnerAbstract
         // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
         \fwrite($res, $payload);
         self::$resources []= $res;
+
+        return new Success(true);
     }
 }

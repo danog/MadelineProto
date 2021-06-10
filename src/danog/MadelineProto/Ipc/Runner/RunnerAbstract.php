@@ -2,6 +2,8 @@
 
 namespace danog\MadelineProto\Ipc\Runner;
 
+use Amp\Promise;
+
 abstract class RunnerAbstract
 {
     const SCRIPT_PATH = __DIR__."/entry.php";
@@ -59,10 +61,10 @@ abstract class RunnerAbstract
     /**
      * Runner.
      *
-     * @param string $session Session path
-     * @param int    $startup ID
+     * @param string   $session Session path
+     * @param int      $startup ID
      *
-     * @return void
+     * @return Promise<true>
      */
-    abstract public static function start(string $session, int $startupId): void;
+    abstract public static function start(string $session, int $startupId): Promise;
 }

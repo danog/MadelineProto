@@ -134,11 +134,11 @@ class SessionPaths
         }
         $headerLen = \strlen(Serialization::PHP_HEADER) + 1;
 
-        Logger::log("Waiting for shared lock of $path.lock...");
+        Logger::log("Waiting for shared lock of $path.lock...", Logger::ULTRA_VERBOSE);
         $unlock = yield from Tools::flockGenerator("$path.lock", LOCK_SH, 0.1);
 
         try {
-            Logger::log("Got shared lock of $path.lock...");
+            Logger::log("Got shared lock of $path.lock...", Logger::ULTRA_VERBOSE);
 
             $file = yield open($path, 'rb');
             $size = yield stat($path);

@@ -2,9 +2,12 @@
 
 namespace danog\MadelineProto\Ipc\Runner;
 
+use Amp\Deferred;
 use Amp\Process\Internal\Posix\Runner;
 use Amp\Process\Internal\Windows\Runner as WindowsRunner;
 use Amp\Process\ProcessInputStream;
+use Amp\Promise;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\Tools;
@@ -41,9 +44,9 @@ final class ProcessRunner extends RunnerAbstract
      *
      * @param string $session Session path
      *
-     * @return void
+     * @return Promise<true>
      */
-    public static function start(string $session, int $startupId): void
+    public static function start(string $session, int $startupId): Promise
     {
         if (\PHP_SAPI === "cli") {
             $binary = \PHP_BINARY;
@@ -79,24 +82,31 @@ final class ProcessRunner extends RunnerAbstract
             ['QUERY_STRING' => \http_build_query($params)]
         );
 
+        $resDeferred = new Deferred;
+
         $runner = IS_WINDOWS ? new WindowsRunner : new Runner;
         $handle = $runner->start($command, null, $envVars);
-        $handle->pidDeferred->promise()->onResolve(function (?\Throwable $e, ?int $pid) use ($handle, $runner) {
+        $handle->pidDeferred->promise()->onResolve(function (?\Throwable $e, ?int $pid) use ($handle, $runner, $resDeferred) {
             if ($e) {
                 Logger::log("Got exception while starting process worker: $e");
+                $resDeferred->resolve($e);
                 return;
             }
             Tools::callFork(self::readUnref($handle->stdout));
             Tools::callFork(self::readUnref($handle->stderr));
 
-            $runner->join($handle)->onResolve(function (?\Throwable $e, ?int $res) {
+            $runner->join($handle)->onResolve(function (?\Throwable $e, ?int $res) use ($runner, $handle, $resDeferred) {
+                $runner->destroy($handle);
                 if ($e) {
                     Logger::log("Got exception from process worker: $e");
+                    $resDeferred->fail($e);
                 } else {
                     Logger::log("Process worker exited with $res!");
+                    $resDeferred->fail(new Exception("Process worker exited with $res!"));
                 }
             });
         });
+        return $resDeferred->promise();
     }
     /**
      * Unreference and read data from fd, logging results.

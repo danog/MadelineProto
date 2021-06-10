@@ -246,7 +246,7 @@ abstract class Serialization
     public static function tryConnect(string $ipcPath, Promise $cancelConnect, ?Deferred $cancelFull = null): \Generator
     {
         for ($x = 0; $x < 60; $x++) {
-            Logger::log("Trying to connect to IPC socket...");
+            Logger::log("MadelineProto is starting, please wait...");
             try {
                 \clearstatcache(true, $ipcPath);
                 $socket = yield connect($ipcPath);
@@ -257,7 +257,9 @@ abstract class Serialization
                 return [$socket, null];
             } catch (\Throwable $e) {
                 $e = $e->getMessage();
-                Logger::log("$e while connecting to IPC socket");
+                if ($e !== 'The endpoint does not exist!') {
+                    Logger::log("$e while connecting to IPC socket");
+                }
             }
             if ($res = yield Tools::timeoutWithDefault($cancelConnect, 1000, null)) {
                 if ($res instanceof \Throwable) {

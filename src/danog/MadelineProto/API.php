@@ -305,7 +305,10 @@ class API extends InternalDoc
 
         if ($unserialized === 0) {
             // Timeout
-            throw new Exception("Could not connect to MadelineProto, please check the logs for more details.");
+            Logger::log("!!! Could not connect to MadelineProto, please check and report the logs for more details. !!!", Logger::FATAL_ERROR);
+            Logger::log("!!! Reconnecting using slower method. !!!", Logger::FATAL_ERROR);
+            // IPC server error, try fetching full session
+            return yield from $this->connectToMadelineProto($settings, true);
         } elseif ($unserialized instanceof \Throwable) {
             // IPC server error, try fetching full session
             return yield from $this->connectToMadelineProto($settings, true);

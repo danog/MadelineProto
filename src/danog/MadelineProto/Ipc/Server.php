@@ -33,6 +33,8 @@ use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Tools;
 
+use function Amp\Promise\first;
+
 /**
  * IPC server.
  */
@@ -100,34 +102,36 @@ class Server extends SignalLoop
     {
         $id = Tools::randomInt(2000000000);
         $started = false;
+        $promises = [];
         try {
             Logger::log("Starting IPC server $session (process)");
-            ProcessRunner::start($session, $id);
+            $promises []= ProcessRunner::start($session, $id);
             $started = true;
-            WebRunner::start($session, $id);
-            return Tools::call(self::monitor($session, $id, $started));
+            $promises []= WebRunner::start($session, $id);
+            return Tools::call(self::monitor($session, $id, $started, first($promises)));
         } catch (\Throwable $e) {
             Logger::log($e);
         }
         try {
             Logger::log("Starting IPC server $session (web)");
-            WebRunner::start($session, $id);
+            $promises []= WebRunner::start($session, $id);
             $started = true;
         } catch (\Throwable $e) {
             Logger::log($e);
         }
-        return Tools::call(self::monitor($session, $id, $started));
+        return Tools::call(self::monitor($session, $id, $started, first($promises)));
     }
     /**
      * Monitor session.
      *
-     * @param SessionPaths $session
-     * @param int          $id
-     * @param bool         $started
+     * @param SessionPaths  $session
+     * @param int           $id
+     * @param bool          $started
+     * @param Promise<bool> $cancelConnect
      *
      * @return \Generator
      */
-    private static function monitor(SessionPaths $session, int $id, bool $started): \Generator
+    private static function monitor(SessionPaths $session, int $id, bool $started, Promise $cancelConnect): \Generator
     {
         if (!$started) {
             Logger::log("It looks like the server couldn't be started, trying to connect anyway...");
@@ -145,7 +149,14 @@ class Server extends SignalLoop
             } elseif (!$started && $count > 0 && $count > 2*($state ? 3 : 1)) {
                 return new Exception("We couldn't start the IPC server, please check the logs!");
             }
-            yield Tools::sleep(0.5);
+            try {
+                yield Tools::timeoutWithDefault($cancelConnect, 500, null);
+                $cancelConnect = (new Deferred)->promise();
+            } catch (\Throwable $e) {
+                Logger::log("$e");
+                Logger::log("Could not start IPC server, please check the logs for more details!");
+                return $e;
+            }
             $count++;
         }
         return false;
