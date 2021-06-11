@@ -44,5 +44,3 @@ jobs:
           SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
           tests/makephar.sh
-          rm -rf "${{ github.workspace }}"
-          pkill -f 'MadelineProto .*'

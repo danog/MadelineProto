@@ -165,6 +165,7 @@ k()
     while :; do pkill -f 'MadelineProto worker .*' || break && sleep 1; done
 }
 
+k
 rm -f madeline.phar testing.madeline*
 
 echo "Testing with previous version..."
