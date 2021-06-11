@@ -2,7 +2,7 @@ name: build
 on: [create]
 jobs:
   run:
-    runs-on: ubuntu-latest
+    runs-on: daniil-proliant
     strategy:
       matrix:
         php:
