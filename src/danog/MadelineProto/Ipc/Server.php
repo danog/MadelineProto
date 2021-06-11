@@ -119,7 +119,7 @@ class Server extends SignalLoop
         } catch (\Throwable $e) {
             Logger::log($e);
         }
-        return Tools::call(self::monitor($session, $id, $started, first($promises)));
+        return Tools::call(self::monitor($session, $id, $started, $promises ? first($promises) : (new Deferred)->promise()));
     }
     /**
      * Monitor session.
