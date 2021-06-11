@@ -2,7 +2,7 @@ name: build
 on: [create]
 jobs:
   run:
-    runs-on: daniil-proliant
+    runs-on: linux
     strategy:
       matrix:
         php:
