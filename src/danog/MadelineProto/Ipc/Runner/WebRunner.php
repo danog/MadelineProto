@@ -93,7 +93,7 @@ final class WebRunner extends RunnerAbstract
                 $res = \fsockopen($address, $port);
                 break;
             } catch (\Throwable $e) {
-                Logger::log("Error while connecting to ourselves: $res");
+                Logger::log("Error while connecting to ourselves: $e");
             }
         }
         if (!isset($res)) {
