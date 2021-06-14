@@ -1936,6 +1936,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         foreach ($userOrId as $k => &$peer) {
             try {
                 $peer = (yield from $this->getInfo($peer))['bot_api_id'];
+                if ($peer === 101374607) {
+                    unset($userOrId[$k]);
+                }
             } catch (\Throwable $e) {
                 unset($userOrId[$k]);
                 $this->logger("Could not obtain info about report peer $peer: $e", Logger::FATAL_ERROR);
