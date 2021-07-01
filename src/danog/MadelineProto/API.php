@@ -288,7 +288,7 @@ class API extends InternalDoc
      *
      * @return \Generator
      */
-    protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false): \Generator
+    protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false, bool $tryReconnect = true): \Generator
     {
         if ($settings instanceof SettingsIpc) {
             $forceFull = $forceFull || $settings->getSlow();
@@ -306,9 +306,12 @@ class API extends InternalDoc
         if ($unserialized === 0) {
             // Timeout
             Logger::log("!!! Could not connect to MadelineProto, please check and report the logs for more details. !!!", Logger::FATAL_ERROR);
+            if (!$tryReconnect) {
+                throw new Exception('Could not connect to MadelineProto, please check the MadelineProto.log file to debug!');
+            }
             Logger::log("!!! Reconnecting using slower method. !!!", Logger::FATAL_ERROR);
             // IPC server error, try fetching full session
-            return yield from $this->connectToMadelineProto($settings, true);
+            return yield from $this->connectToMadelineProto($settings, true, false);
         } elseif ($unserialized instanceof \Throwable) {
             // IPC server error, try fetching full session
             return yield from $this->connectToMadelineProto($settings, true);
