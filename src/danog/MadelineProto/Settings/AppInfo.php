@@ -47,13 +47,13 @@ class AppInfo extends SettingsAbstract
         // Detect device model
         try {
             $this->deviceModel = \php_uname('s');
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (\Throwable $e) {
             $this->deviceModel = 'Web server';
         }
         // Detect system version
         try {
             $this->systemVersion = \php_uname('r');
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (\Throwable $e) {
             $this->systemVersion = PHP_VERSION;
         }
         // Detect language

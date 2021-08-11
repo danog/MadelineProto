@@ -261,18 +261,18 @@ class Magic
                     \ini_set('log_errors', 1);
                     \ini_set('error_log', Magic::$script_cwd.DIRECTORY_SEPARATOR.'MadelineProto.log');
                     \error_log('Enabled PHP logging');
-                } catch (\danog\MadelineProto\Exception $e) {
+                } catch (\Throwable $e) {
                     //$this->logger->logger('Could not enable PHP logging');
                 }
             }
             try {
                 \ini_set('memory_limit', -1);
-            } catch (\danog\MadelineProto\Exception $e) {
+            } catch (\Throwable $e) {
             }
             // Check if we're in a console, for colorful log output
             try {
                 self::$isatty = \defined('STDOUT') && hasColorSupport();
-            } catch (\danog\MadelineProto\Exception $e) {
+            } catch (\Throwable $e) {
             }
             // Important, obtain root relative to caller script
             $backtrace = \debug_backtrace(0);
@@ -280,7 +280,7 @@ class Magic
             try {
                 self::$cwd = \getcwd();
                 self::$can_getcwd = true;
-            } catch (\danog\MadelineProto\Exception $e) {
+            } catch (\Throwable $e) {
             }
             // Define signal handlers
             if (\defined('SIGINT')) {
@@ -427,7 +427,7 @@ class Magic
                 self::$pid = \getmypid();
             }
             return self::$isFork = self::$pid !== \getmypid();
-        } catch (\danog\MadelineProto\Exception $e) {
+        } catch (\Throwable $e) {
             return self::$can_getmypid = false;
         }
     }
