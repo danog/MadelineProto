@@ -129,7 +129,7 @@ trait AuthKeyHandler
                     'native_single',
                     'wolfram'
                 ] as $method) {
-                    $this->logger->logger("Factorizing with $method");
+                    $this->logger->logger("Factorizing with $method (please wait, might take a while)");
 
                     $q = new BigInteger(0);
                     try {

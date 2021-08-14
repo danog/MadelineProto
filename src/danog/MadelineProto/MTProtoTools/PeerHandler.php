@@ -28,6 +28,8 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 
+use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG;
+use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL;
 use const danog\Decoder\PROFILE_PHOTO;
 
 /**
@@ -1022,18 +1024,14 @@ trait PeerHandler
                 'big' => Tools::maxSize($res['photo']['sizes']),
             ] as $type => $size) {
                 $fileId = new FileId;
-                $fileId->setId($res['photo']['id'] ?? 0);
-                $fileId->setAccessHash($res['photo']['access_hash'] ?? 0);
-                $fileId->setFileReference($res['photo']['file_reference'] ?? '');
+                $fileId->setId($res['photo']['id']);
+                $fileId->setAccessHash($res['photo']['access_hash']);
+                $fileId->setFileReference($res['photo']['file_reference']);
                 $fileId->setDcId($res['photo']['dc_id']);
                 $fileId->setType(PROFILE_PHOTO);
 
-                $fileId->setLocalId($size['location']['local_id'] ?? 0);
-                $fileId->setVolumeId($size['location']['volume_id'] ?? 0);
-
-                $photoSize = new PhotoSizeSourceDialogPhoto;
+                $photoSize = new PhotoSizeSourceDialogPhoto($type === 'small' ? PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL : PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG);
                 $photoSize->setDialogId($res['id']);
-                $photoSize->setDialogPhotoSmall($type === 'small');
                 $photoSize->setDialogAccessHash($res['access_hash'] ?? 0);
 
                 $fileId->setPhotoSizeSource($photoSize);

@@ -148,7 +148,8 @@ interface auth
      * Reset the [2FA password](https://core.telegram.org/api/srp) using the recovery code sent using [auth.requestPasswordRecovery](https://docs.madelineproto.xyz/API_docs/methods/auth.requestPasswordRecovery.html).
      *
      * Parameters:
-     * * `string` **code** - Code received via email
+     * * `string`                        **code**         - Code received via email
+     * * `account.PasswordInputSettings` **new_settings** - Optional:
      *
      * @param array $params Parameters
      *
@@ -240,6 +241,18 @@ interface auth
      * @return Authorization
      */
     public function acceptLoginToken($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string` **code** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function checkRecoveryPassword($params);
 }
 
 interface account
@@ -349,8 +362,9 @@ interface account
      * Report a peer for violation of telegram's Terms of Service.
      *
      * Parameters:
-     * * `InputPeer`    **peer**   - The peer to report
-     * * `ReportReason` **reason** - The reason why this peer is being reported
+     * * `InputPeer`    **peer**    - The peer to report
+     * * `ReportReason` **reason**  - The reason why this peer is being reported
+     * * `string`       **message** -
      *
      * @param array $params Parameters
      *
@@ -1038,6 +1052,35 @@ interface account
      * @return GlobalPrivacySettings
      */
     public function setGlobalPrivacySettings($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer`    **peer**     -
+     * * `InputPhoto`   **photo_id** -
+     * * `ReportReason` **reason**   -
+     * * `string`       **message**  -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function reportProfilePhoto($params);
+
+    /**
+     *
+     *
+     * @return account.ResetPasswordResult
+     */
+    public function resetPassword();
+
+    /**
+     *
+     *
+     * @return bool
+     */
+    public function declinePasswordReset();
 }
 
 interface users
@@ -1566,9 +1609,10 @@ interface messages
      * Report a message in a chat for violation of telegram's Terms of Service.
      *
      * Parameters:
-     * * `InputPeer`    **peer**   - Peer
-     * * `[int]`        **id**     - IDs of messages to report
-     * * `ReportReason` **reason** - Why are these messages being reported
+     * * `InputPeer`    **peer**    - Peer
+     * * `[int]`        **id**      - IDs of messages to report
+     * * `ReportReason` **reason**  - Why are these messages being reported
+     * * `string`       **message** -
      *
      * @param array $params Parameters
      *
@@ -1644,8 +1688,9 @@ interface messages
      * Deletes a user from a chat and sends a service message on it.
      *
      * Parameters:
-     * * `InputPeer` **chat_id** -
-     * * `InputUser` **user_id** - User ID to be deleted
+     * * `boolean`   **revoke_history** - Optional:
+     * * `InputPeer` **chat_id**        -
+     * * `InputUser` **user_id**        - User ID to be deleted
      *
      * @param array $params Parameters
      *
@@ -1710,7 +1755,8 @@ interface messages
      * Cancels a request for creation and/or delete info on secret chat.
      *
      * Parameters:
-     * * `int` **chat_id** - Secret chat ID
+     * * `boolean` **delete_history** - Optional:
+     * * `int`     **chat_id**        - Secret chat ID
      *
      * @param array $params Parameters
      *
@@ -1864,7 +1910,10 @@ interface messages
      * Export an invite link for a chat.
      *
      * Parameters:
-     * * `InputPeer` **peer** - Chat
+     * * `boolean`   **legacy_revoke_permanent** - Optional:
+     * * `InputPeer` **peer**                    - Chat
+     * * `int`       **expire_date**             - Optional:
+     * * `int`       **usage_limit**             - Optional:
      *
      * @param array $params Parameters
      *
@@ -2832,9 +2881,10 @@ interface messages
      * Get more info about a Seamless Telegram Login authorization request, for more info [click here »](https://core.telegram.org/api/url-authorization).
      *
      * Parameters:
-     * * `InputPeer` **peer**      - Peer where the message is located
-     * * `int`       **msg_id**    - The message
-     * * `int`       **button_id** - The ID of the button with the authorization request
+     * * `InputPeer` **peer**      - Optional: Peer where the message is located
+     * * `int`       **msg_id**    - Optional: The message
+     * * `int`       **button_id** - Optional: The ID of the button with the authorization request
+     * * `string`    **url**       - Optional:
      *
      * @param array $params Parameters
      *
@@ -2847,9 +2897,10 @@ interface messages
      *
      * Parameters:
      * * `boolean`   **write_allowed** - Optional: Set this flag to allow the bot to send messages to you (if requested)
-     * * `InputPeer` **peer**          - The location of the message
-     * * `int`       **msg_id**        - Message ID of the message with the login button
-     * * `int`       **button_id**     - ID of the login button
+     * * `InputPeer` **peer**          - Optional: The location of the message
+     * * `int`       **msg_id**        - Optional: Message ID of the message with the login button
+     * * `int`       **button_id**     - Optional: ID of the login button
+     * * `string`    **url**           - Optional:
      *
      * @param array $params Parameters
      *
@@ -3063,6 +3114,209 @@ interface messages
      * @return messages.AffectedHistory
      */
     public function unpinAllMessages($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **chat_id** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function deleteChat($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean` **revoke** - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.AffectedFoundMessages
+     */
+    public function deletePhoneCallHistory($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string` **import_head** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.HistoryImportParsed
+     */
+    public function checkHistoryImport($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**        -
+     * * `InputFile` **file**        -
+     * * `int`       **media_count** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.HistoryImport
+     */
+    public function initHistoryImport($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer`  **peer**      -
+     * * `long`       **import_id** -
+     * * `string`     **file_name** -
+     * * `InputMedia` **media**     -.
+     *
+     * @param array $params Parameters
+     *
+     * @return MessageMedia
+     */
+    public function uploadImportedMedia($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**      -
+     * * `long`      **import_id** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function startHistoryImport($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`   **revoked**     - Optional:
+     * * `InputPeer` **peer**        -
+     * * `InputUser` **admin_id**    -
+     * * `int`       **offset_date** - Optional:
+     * * `string`    **offset_link** - Optional:
+     * * `int`       **limit**       -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.ExportedChatInvites
+     */
+    public function getExportedChatInvites($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer** -
+     * * `string`    **link** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.ExportedChatInvite
+     */
+    public function getExportedChatInvite($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`   **revoked**     - Optional:
+     * * `InputPeer` **peer**        -
+     * * `string`    **link**        -
+     * * `int`       **expire_date** - Optional:
+     * * `int`       **usage_limit** - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.ExportedChatInvite
+     */
+    public function editExportedChatInvite($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**     -
+     * * `InputUser` **admin_id** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function deleteRevokedExportedChatInvites($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer** -
+     * * `string`    **link** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function deleteExportedChatInvite($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.ChatAdminsWithInvites
+     */
+    public function getAdminsWithInvites($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**        -
+     * * `string`    **link**        -
+     * * `int`       **offset_date** -
+     * * `InputUser` **offset_user** -
+     * * `int`       **limit**       -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.ChatInviteImporters
+     */
+    public function getChatInviteImporters($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**   -
+     * * `int`       **period** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function setHistoryTTL($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return messages.CheckedHistoryImportPeer
+     */
+    public function checkHistoryImportPeer($params);
 }
 
 interface updates
@@ -3482,7 +3736,8 @@ interface help
      * Dismiss a suggestion.
      *
      * Parameters:
-     * * `string` **suggestion** - Suggestion
+     * * `InputPeer` **peer**       -
+     * * `string`    **suggestion** - Suggestion
      *
      * @param array $params Parameters
      *
@@ -3592,8 +3847,8 @@ interface channels
      * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant.
      *
      * Parameters:
-     * * `InputChannel` **channel** - Channel/supergroup
-     * * `InputUser`    **user_id** - ID of participant to get info about
+     * * `InputChannel` **channel**     - Channel/supergroup
+     * * `InputPeer`    **participant** -
      *
      * @param array $params Parameters
      *
@@ -3629,12 +3884,13 @@ interface channels
      * Create a [supergroup/channel](https://core.telegram.org/api/channel).
      *
      * Parameters:
-     * * `boolean`       **broadcast** - Optional: Whether to create a [channel](https://core.telegram.org/api/channel)
-     * * `boolean`       **megagroup** - Optional: Whether to create a [supergroup](https://core.telegram.org/api/channel)
-     * * `string`        **title**     - Channel title
-     * * `string`        **about**     - Channel description
-     * * `InputGeoPoint` **geo_point** - Optional: Geogroup location
-     * * `string`        **address**   - Optional: Geogroup address
+     * * `boolean`       **broadcast**  - Optional: Whether to create a [channel](https://core.telegram.org/api/channel)
+     * * `boolean`       **megagroup**  - Optional: Whether to create a [supergroup](https://core.telegram.org/api/channel)
+     * * `boolean`       **for_import** - Optional:
+     * * `string`        **title**      - Channel title
+     * * `string`        **about**      - Channel description
+     * * `InputGeoPoint` **geo_point**  - Optional: Geogroup location
+     * * `string`        **address**    - Optional: Geogroup address
      *
      * @param array $params Parameters
      *
@@ -3804,7 +4060,7 @@ interface channels
      *
      * Parameters:
      * * `InputChannel`     **channel**       - The [supergroup/channel](https://core.telegram.org/api/channel).
-     * * `InputUser`        **user_id**       - The ID of the user whose banned rights should be modified
+     * * `InputPeer`        **participant**   -
      * * `ChatBannedRights` **banned_rights** - The banned rights
      *
      * @param array $params Parameters
@@ -3965,6 +4221,18 @@ interface channels
      * @return messages.InactiveChats
      */
     public function getInactiveChannels();
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputChannel` **channel** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function convertToGigagroup($params);
 }
 
 interface bots
@@ -3999,13 +4267,41 @@ interface bots
      * Set bot command list.
      *
      * Parameters:
-     * * `[BotCommand]` **commands** - Bot commands
+     * * `BotCommandScope` **scope**     -
+     * * `string`          **lang_code** -
+     * * `[BotCommand]`    **commands**  - Bot commands
      *
      * @param array $params Parameters
      *
      * @return bool
      */
     public function setBotCommands($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `BotCommandScope` **scope**     -
+     * * `string`          **lang_code** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function resetBotCommands($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `BotCommandScope` **scope**     -
+     * * `string`          **lang_code** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return  of BotCommand[]
+     */
+    public function getBotCommands($params);
 }
 
 interface payments
@@ -4014,7 +4310,9 @@ interface payments
      * Get a payment form.
      *
      * Parameters:
-     * * `int` **msg_id** - Message ID of payment form
+     * * `InputPeer` **peer**         -
+     * * `int`       **msg_id**       - Message ID of payment form
+     * * `DataJSON`  **theme_params** - Optional:
      *
      * @param array $params Parameters
      *
@@ -4026,7 +4324,8 @@ interface payments
      * Get payment receipt.
      *
      * Parameters:
-     * * `int` **msg_id** - Message ID of receipt
+     * * `InputPeer` **peer**   -
+     * * `int`       **msg_id** - Message ID of receipt
      *
      * @param array $params Parameters
      *
@@ -4039,6 +4338,7 @@ interface payments
      *
      * Parameters:
      * * `boolean`              **save**   - Optional: Save order information to re-use it for future orders
+     * * `InputPeer`            **peer**   -
      * * `int`                  **msg_id** - Message ID of payment form
      * * `PaymentRequestedInfo` **info**   - Requested order information
      *
@@ -4052,10 +4352,13 @@ interface payments
      * Send compiled payment form.
      *
      * Parameters:
+     * * `long`                    **form_id**            -
+     * * `InputPeer`               **peer**               -
      * * `int`                     **msg_id**             - Message ID of form
      * * `string`                  **requested_info_id**  - Optional: ID of saved and validated [order info](https://docs.madelineproto.xyz/API_docs/constructors/payments.validatedRequestedInfo.html)
      * * `string`                  **shipping_option_id** - Optional: Chosen shipping option ID
      * * `InputPaymentCredentials` **credentials**        - Payment credentials
+     * * `long`                    **tip_amount**         - Optional:
      *
      * @param array $params Parameters
      *
@@ -4109,6 +4412,7 @@ interface stickers
      * * `string`                **short_name** - Sticker set name. Can contain only English letters, digits and underscores. Must end with *"*by*<bot username="">"</bot>* (*<bot_username></bot_username>* is case insensitive); 1-64 characters
      * * `InputDocument`         **thumb**      - Optional: Thumbnail
      * * `[InputStickerSetItem]` **stickers**   - Stickers
+     * * `string`                **software**   - Optional:
      *
      * @param array $params Parameters
      *
@@ -4166,6 +4470,30 @@ interface stickers
      * @return messages.StickerSet
      */
     public function setStickerSetThumb($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string` **short_name** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function checkShortName($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `string` **title** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return stickers.SuggestedShortName
+     */
+    public function suggestShortName($params);
 }
 
 interface phone
@@ -4289,6 +4617,264 @@ interface phone
      * @return bool
      */
     public function sendSignalingData($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**          -
+     * * `string`    **title**         - Optional:
+     * * `int`       **schedule_date** - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function createGroupCall($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`        **muted**         - Optional:
+     * * `boolean`        **video_stopped** - Optional:
+     * * `InputGroupCall` **call**          -
+     * * `InputPeer`      **join_as**       -
+     * * `string`         **invite_hash**   - Optional:
+     * * `DataJSON`       **params**        -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function joinGroupCall($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call**   -
+     * * `int`            **source** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function leaveGroupCall($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call**  -
+     * * `[InputUser]`    **users** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function inviteToGroupCall($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function discardGroupCall($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`        **reset_invite_hash** - Optional:
+     * * `InputGroupCall` **call**              -
+     * * `Bool`           **join_muted**        - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function toggleGroupCallSettings($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return phone.GroupCall
+     */
+    public function getGroupCall($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call**    -
+     * * `[InputPeer]`    **ids**     -
+     * * `[int]`          **sources** -
+     * * `string`         **offset**  -
+     * * `int`            **limit**   -.
+     *
+     * @param array $params Parameters
+     *
+     * @return phone.GroupParticipants
+     */
+    public function getGroupParticipants($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call**    -
+     * * `[int]`          **sources** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return  of int[]
+     */
+    public function checkGroupCall($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`        **start** - Optional:
+     * * `InputGroupCall` **call**  -
+     * * `string`         **title** - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function toggleGroupCallRecord($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call**                -
+     * * `InputPeer`      **participant**         -
+     * * `Bool`           **muted**               - Optional:
+     * * `int`            **volume**              - Optional:
+     * * `Bool`           **raise_hand**          - Optional:
+     * * `Bool`           **video_stopped**       - Optional:
+     * * `Bool`           **video_paused**        - Optional:
+     * * `Bool`           **presentation_paused** - Optional:.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function editGroupCallParticipant($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call**  -
+     * * `string`         **title** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function editGroupCallTitle($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return phone.JoinAsPeers
+     */
+    public function getGroupCallJoinAs($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `boolean`        **can_self_unmute** - Optional:
+     * * `InputGroupCall` **call**            -.
+     *
+     * @param array $params Parameters
+     *
+     * @return phone.ExportedGroupCallInvite
+     */
+    public function exportGroupCallInvite($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call**       -
+     * * `Bool`           **subscribed** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function toggleGroupCallStartSubscription($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function startScheduledGroupCall($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputPeer` **peer**    -
+     * * `InputPeer` **join_as** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return bool
+     */
+    public function saveDefaultGroupCallJoinAs($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call**   -
+     * * `DataJSON`       **params** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function joinGroupCallPresentation($params);
+
+    /**
+     *
+     *
+     * Parameters:
+     * * `InputGroupCall` **call** -.
+     *
+     * @param array $params Parameters
+     *
+     * @return Updates
+     */
+    public function leaveGroupCallPresentation($params);
 }
 
 interface langpack
@@ -4709,9 +5295,9 @@ class InternalDoc extends APIFactory
      *
      * @return void
      */
-    public function closeConnection($message = 'OK!')
+    public function closeConnection($message)
     {
-        return $this->__call(__FUNCTION__, [$message]);
+        return \danog\MadelineProto\Tools::closeConnection($message);
     }
     /**
      * Complete 2FA login.
@@ -5471,6 +6057,15 @@ class InternalDoc extends APIFactory
     public function getVar($obj, string $var)
     {
         return \danog\MadelineProto\Tools::getVar($obj, $var);
+    }
+    /**
+     * Get a message to show to the user when starting the bot.
+     *
+     * @param string $message
+     */
+    public function getWebMessage(string $message)
+    {
+        return $this->__call(__FUNCTION__, [$message]);
     }
     /**
      * Get web template.
@@ -6313,7 +6908,7 @@ class InternalDoc extends APIFactory
     /**
      * Unpack base256 signed long to string.
      *
-     * @param string $value base256 long
+     * @param string|int|array $value base256 long
      *
      * @return string
      */

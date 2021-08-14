@@ -646,8 +646,31 @@ trait Files
                 $res['MessageMedia'] = $messageMedia;
                 $messageMedia = $messageMedia['photo'];
                 $size = Tools::maxSize($messageMedia['sizes']);
-                $res = \array_merge($res, yield from $this->getDownloadInfo($size));
-                $res['InputFileLocation'] = ['_' => 'inputPhotoFileLocation', 'thumb_size' => $res['thumb_size'] ?? 'x', 'dc_id' => $messageMedia['dc_id'], 'access_hash' => $messageMedia['access_hash'], 'id' => $messageMedia['id'], 'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $messageMedia)];
+                if (isset($size['volume_id'])) {
+                    $res['InputFileLocation'] = [
+                        '_' => 'inputPhotoLegacyFileLocation',
+                        'id' => $messageMedia['id'],
+                        'access_hash' => $messageMedia['access_hash'],
+                        'dc_id' => $messageMedia['dc_id'],
+                        'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $messageMedia),
+                        'volume_id' => $size['volume_id'],
+                        'local_id' => $size['local_id'],
+                        'secret' => $size['secret'],
+                    ];
+                } else {
+                    $res = \array_merge($res, yield from $this->getDownloadInfo($size));
+                    $res['InputFileLocation'] = [
+                        '_' => 'inputPhotoFileLocation',
+                        'id' => $messageMedia['id'],
+                        'access_hash' => $messageMedia['access_hash'],
+                        'dc_id' => $messageMedia['dc_id'],
+                        'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION, $messageMedia),
+                        'thumb_size' => $res['thumb_size'] ?? 'x',
+                    ];
+                }
+                $res['name'] = Tools::unpackSignedLongString($messageMedia['id']).'_'.($res['thumb_size'] ?? 'x').'_'.$messageMedia['dc_id'];
+                $res['ext'] = '.jpg';
+                $res['mime'] = 'image/jpeg';
                 return $res;
             case 'user':
             case 'folder':
@@ -662,13 +685,20 @@ trait Files
                 } else {
                     $peer = yield from $this->getInfo($messageMedia, MTProto::INFO_TYPE_PEER);
                 }
-                $res['InputFileLocation'] = ['_' => 'inputPeerPhotoFileLocation', 'big' => $res['big'], 'dc_id' => $res['InputFileLocation']['dc_id'], 'peer' => $peer, 'volume_id' => $res['InputFileLocation']['volume_id'], 'local_id' => $res['InputFileLocation']['local_id']];
+                $res['InputFileLocation'] = [
+                    '_' => 'inputPeerPhotoFileLocation',
+                    'big' => true,
+                    'peer' => $peer,
+                    'photo_id' => $res['InputFileLocation']['photo_id']
+                ];
+                $res['name'] = Tools::unpackSignedLongString($messageMedia['id']).'_'.($res['thumb_size'] ?? 'x').'_'.$messageMedia['photo']['dc_id'];
+                $res['ext'] = '.jpg';
+                $res['mime'] = 'image/jpeg';
                 return $res;
             case 'userProfilePhoto':
             case 'chatPhoto':
-                $size = $messageMedia['photo_big'] ?? $messageMedia['photo_small'];
-                $res = (yield from $this->getDownloadInfo($size));
-                $res['big'] = isset($messageMedia['photo_big']);
+                $res['InputFileLocation']['has_video'] = $messageMedia['has_video'] ?? false;
+                $res['InputFileLocation']['photo_id'] = $messageMedia['photo_id'];
                 $res['InputFileLocation']['dc_id'] = $messageMedia['dc_id'];
                 return $res;
             case 'photoStrippedSize':
@@ -679,18 +709,9 @@ trait Files
             case 'photoCachedSize':
                 $res['size'] = \strlen($messageMedia['bytes']);
                 $res['data'] = $messageMedia['bytes'];
-                //$res['thumb_size'] = $res['data'];
                 $res['thumb_size'] = $messageMedia['type'];
-                if ($messageMedia['location']['_'] === 'fileLocationUnavailable') {
-                    $res['name'] = Tools::unpackSignedLongString($messageMedia['volume_id']).'_'.$messageMedia['local_id'];
-                    $res['mime'] = Tools::getMimeFromBuffer($res['data']);
-                    $res['ext'] = TOols::getExtensionFromMime($res['mime']);
-                } else {
-                    $res = \array_merge($res, yield from $this->getDownloadInfo($messageMedia['location']));
-                }
                 return $res;
             case 'photoSize':
-                $res = (yield from $this->getDownloadInfo($messageMedia['location']));
                 $res['thumb_size'] = $messageMedia['type'];
                 //$res['thumb_size'] = $size;
                 if (isset($messageMedia['size'])) {
@@ -698,30 +719,10 @@ trait Files
                 }
                 return $res;
             case 'photoSizeProgressive':
-                $res = (yield from $this->getDownloadInfo($messageMedia['location']));
                 $res['thumb_size'] = $messageMedia['type'];
                 if (isset($messageMedia['sizes'])) {
                     $res['size'] = \end($messageMedia['sizes']);
                 }
-                return $res;
-            case 'fileLocationUnavailable':
-                throw new \danog\MadelineProto\Exception('File location unavailable');
-            case 'fileLocation':
-                $res['name'] = Tools::unpackSignedLongString($messageMedia['volume_id']).'_'.$messageMedia['local_id'];
-                $res['InputFileLocation'] = ['_' => 'inputFileLocation', 'volume_id' => $messageMedia['volume_id'], 'local_id' => $messageMedia['local_id'], 'secret' => $messageMedia['secret'], 'dc_id' => $messageMedia['dc_id'], 'file_reference' => yield from $this->referenceDatabase->getReference(ReferenceDatabase::PHOTO_LOCATION_LOCATION, $messageMedia)];
-                $res['ext'] = Tools::getExtensionFromLocation($res['InputFileLocation'], '.jpg');
-                $res['mime'] = Tools::getMimeFromExtension($res['ext'], 'image/jpeg');
-                return $res;
-            case 'fileLocationToBeDeprecated':
-                $res['name'] = Tools::unpackSignedLongString($messageMedia['volume_id']).'_'.$messageMedia['local_id'];
-                $res['ext'] = '.jpg';
-                $res['mime'] = Tools::getMimeFromExtension($res['ext'], 'image/jpeg');
-                $res['InputFileLocation'] = [
-                    '_' => 'inputFileLocationTemp',
-                    // Will be overwritten
-                    'volume_id' => $messageMedia['volume_id'],
-                    'local_id' => $messageMedia['local_id'],
-                ];
                 return $res;
             // Documents
             case 'decryptedMessageMediaExternalDocument':

@@ -32,7 +32,7 @@ class Button implements \JsonSerializable, \ArrayAccess
     /**
      * Button data.
      *
-     * @psalm-var non-empty-array<array-key, mixed>
+     * @psalm-var array<array-key, mixed>
      */
     private array $button = [];
     /**

@@ -184,7 +184,7 @@ abstract class Tools extends StrTools
     /**
      * Unpack base256 signed long to string.
      *
-     * @param string $value base256 long
+     * @param string|int|array $value base256 long
      *
      * @return string
      */

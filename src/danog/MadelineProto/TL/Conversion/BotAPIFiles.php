@@ -30,6 +30,7 @@ use const danog\Decoder\ANIMATION;
 use const danog\Decoder\AUDIO;
 use const danog\Decoder\DOCUMENT;
 use const danog\Decoder\PHOTO;
+use const danog\Decoder\PHOTOSIZE_SOURCE_THUMBNAIL;
 use const danog\Decoder\PROFILE_PHOTO;
 use const danog\Decoder\STICKER;
 use const danog\Decoder\THUMBNAIL;
@@ -47,10 +48,12 @@ trait BotAPIFiles
         $fileId->setFileReference($photo['file_reference'] ?? '');
         $fileId->setDcId($photo['dc_id'] ?? 0);
 
-        $fileId->setLocalId($photoSize['location']['local_id'] ?? 0);
-        $fileId->setVolumeId($photoSize['location']['volume_id'] ?? 0);
+        if (isset($photoSize['location']['local_id'])) {
+            $fileId->setLocalId($photoSize['location']['local_id']);
+            $fileId->setVolumeId($photoSize['location']['volume_id']);
+        }
 
-        $photoSizeSource = new PhotoSizeSourceThumbnail;
+        $photoSizeSource = new PhotoSizeSourceThumbnail(PHOTOSIZE_SOURCE_THUMBNAIL);
         $photoSizeSource->setThumbType($photoSize['type']);
 
         if ($photo['_'] === 'photo') {
@@ -67,7 +70,7 @@ trait BotAPIFiles
             'file_unique_id' => $fileId->getUniqueBotAPI(),
             'width' => $photoSize['w'],
             'height' => $photoSize['h'],
-            'file_size' => $photoSize['size'] ?? \strlen($photoSize['bytes']),
+            'file_size' => $photoSize['size'] ?? (isset($photoSize['sizes']) ? \end($photoSize['sizes']) : \strlen($photoSize['bytes'])),
             'mime_type' => 'image/jpeg',
             'file_name' => isset($photoSize['location']) ? $photoSize['location']['volume_id'].'_'.$photoSize['location']['local_id'].'.jpg' : $photo['id'].'.jpg'
         ];
@@ -104,14 +107,17 @@ trait BotAPIFiles
                         'photo' => [
                             '_' => 'chatPhoto',
                             'dc_id' => $fileId->getDcId(),
-                            $photoSize->isSmallDialogPhoto() ? 'photo_small' : 'photo_big' => [
-                                '_' => 'fileLocationToBeDeprecated',
-                                'volume_id' => $fileId->getVolumeId(),
-                                'local_id' => $fileId->getLocalId()
-                            ]
+                            'photo_id' => $fileId->getId(),
                         ],
                         'min' => true
                     ];
+                    if ($fileId->hasVolumeId()) {
+                        $res['photo'][$photoSize->isSmallDialogPhoto() ? 'photo_small' : 'photo_big'] = [
+                            '_' => 'fileLocationToBeDeprecated',
+                            'volume_id' => $fileId->getVolumeId(),
+                            'local_id' => $fileId->getLocalId()
+                        ];
+                    }
                     return $res;
                 }
                 $res['User'] = [
@@ -122,14 +128,16 @@ trait BotAPIFiles
                         '_' => 'userProfilePhoto',
                         'dc_id' => $fileId->getDcId(),
                         'photo_id' => $fileId->getId(),
-                        $photoSize->isSmallDialogPhoto() ? 'photo_small' : 'photo_big' => [
-                            '_' => 'fileLocationToBeDeprecated',
-                            'volume_id' => $fileId->getVolumeId(),
-                            'local_id' => $fileId->getLocalId()
-                        ]
                     ],
                     'min' => true
                 ];
+                if ($fileId->hasVolumeId()) {
+                    $res['photo'][$photoSize->isSmallDialogPhoto() ? 'photo_small' : 'photo_big'] = [
+                        '_' => 'fileLocationToBeDeprecated',
+                        'volume_id' => $fileId->getVolumeId(),
+                        'local_id' => $fileId->getLocalId()
+                    ];
+                }
                 return $res;
             case THUMBNAIL:
                 /**
@@ -159,12 +167,6 @@ trait BotAPIFiles
                         [
                             '_' => 'photoSize',
                             'type' => $photoSize->getThumbType(),
-                            'location' => [
-                                '_' => 'fileLocationToBeDeprecated',
-                                'dc_id' => $fileId->getDcId(),
-                                'local_id' => $fileId->getLocalId(),
-                                'volume_id' => $fileId->getVolumeId()
-                            ]
                         ]
                     ];
                 }
@@ -184,8 +186,8 @@ trait BotAPIFiles
                     'location' => [
                         '_' => $photoSize instanceof PhotoSizeSourceLegacy ? 'fileLocation' : 'fileLocationToBeDeprecated',
                         'dc_id' => $fileId->getDcId(),
-                        'local_id' => $fileId->getLocalId(),
-                        'volume_id' => $fileId->getVolumeId(),
+                        'local_id' => $fileId->hasLocalId() ? $fileId->getLocalId() : null,
+                        'volume_id' => $fileId->hasVolumeId() ? $fileId->getVolumeId() : null,
                         'secret' => $photoSize instanceof PhotoSizeSourceLegacy ? $photoSize->getSecret() : ''
                     ]
                 ];

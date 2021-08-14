@@ -70,9 +70,9 @@ class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
         yield $this->getStream()->write($random);
     }
     /**
-     * Does nothing.
+     * Set extra.
      *
-     * @param void $data Nothing
+     * @param array $extra Extra
      *
      * @return void
      */

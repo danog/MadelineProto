@@ -515,6 +515,7 @@ class API extends InternalDoc
             try {
                 yield $this->setEventHandler($eventHandler);
                 $started = true;
+                /** @var API $this->API */
                 return yield from $this->API->loop();
             } catch (\Throwable $e) {
                 $t = \time();

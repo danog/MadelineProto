@@ -71,11 +71,7 @@ class FileIdTest extends TestCase
      */
     public static function stripForChat(string $fileId): string
     {
-        $file = FileId::fromBotAPI($fileId)->setAccessHash(0);
-        if ($file->getPhotoSizeSource()->getDialogId() < 0) {
-            $file->setId(0);
-        }
-        return $file;
+        return FileId::fromBotAPI($fileId)->setAccessHash(0);
     }
 
     /**
@@ -161,7 +157,7 @@ class FileIdTest extends TestCase
         $hasFileId = false;
         $hasFileUniqueId = false;
         $res = $type === 'photo' ? $res : [$res];
-        foreach ($res as $subRes) {
+        foreach ($res as $k => $subRes) {
             $this->assertArrayHasKey('file_id', $subRes);
             $this->assertArrayHasKey('file_unique_id', $subRes);
             $hasFileId |= self::stripFileReference($fileIdStr) === self::stripFileReference($subRes['file_id']);

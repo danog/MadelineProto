@@ -1035,6 +1035,17 @@ class InternalDoc extends APIFactory
         \danog\MadelineProto\Tools::callForkDefer($promise);
     }
     /**
+     * Close connection with client, connected via web.
+     *
+     * @param string $message Message
+     *
+     * @return void
+     */
+    public function closeConnection($message)
+    {
+        return \danog\MadelineProto\Tools::closeConnection($message);
+    }
+    /**
      * Connect to the lite endpoints specified in the config file.
      *
      * @param string $config Path to config file
@@ -1567,7 +1578,7 @@ class InternalDoc extends APIFactory
     /**
      * Unpack base256 signed long to string.
      *
-     * @param string $value base256 long
+     * @param string|int|array $value base256 long
      *
      * @return string
      */

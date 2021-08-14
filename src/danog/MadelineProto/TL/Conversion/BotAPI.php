@@ -312,7 +312,7 @@ trait BotAPI
                 }
                 $res['photo'] = [];
                 foreach ($data['photo']['sizes'] as $key => $photo) {
-                    if (\in_array($photo['_'], ['photoCachedSize', 'photoSize'])) {
+                    if (\in_array($photo['_'], ['photoCachedSize', 'photoSize', 'photoSizeProgressive'])) {
                         $res['photo'][$key] = $this->photosizeToBotAPI($photo, $data['photo']);
                     }
                 }
@@ -322,7 +322,7 @@ trait BotAPI
             case 'messageMediaDocument':
                 $type_name = 'document';
                 $res = [];
-                if (isset($data['document']['thumbs']) && $data['document']['thumbs'] && \in_array(\end($data['document']['thumbs'])['_'], ['photoCachedSize', 'photoSize'])) {
+                if (isset($data['document']['thumbs']) && $data['document']['thumbs'] && \in_array(\end($data['document']['thumbs'])['_'], ['photoCachedSize', 'photoSize', 'photoSizeProgressive'])) {
                     $res['thumb'] = $this->photosizeToBotAPI(\end($data['document']['thumbs']), $data['document'], true);
                 }
                 foreach ($data['document']['attributes'] as $attribute) {
