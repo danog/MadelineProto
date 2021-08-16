@@ -4,13 +4,26 @@
     "type": "project",
     "license": "AGPL-3.0-only",
     "homepage": "https://docs.madelineproto.xyz",
-    "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
+    "keywords": [
+        "telegram",
+        "mtproto",
+        "protocol",
+        "bytes",
+        "messenger",
+        "client",
+        "PHP",
+        "video",
+        "stickers",
+        "audio",
+        "files",
+        "GB"
+    ],
     "conflict": {
         "krakjoe/pthreads-polyfill": "*",
         "ext-pthreads": "*"
     },
     "require": {
-        "php": ">=7.4.0",
+        "php": ">=7.4",
         "danog/primemodule": "^1",
         "erusev/parsedown": "^1.7",
         "symfony/polyfill-mbstring": "*",
@@ -56,16 +69,19 @@
         "vimeo/psalm": "dev-master",
         "phpstan/phpstan": "^0.12.14",
         "friendsofphp/php-cs-fixer": "^2.16",
-        "danog/phpdoc": "^0.1.7"
+        "danog/phpdoc": "^0.1.7",
+        "phabel/phabel": "^1"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)",
         "ext-pdo": "Install pdo extension to support database used as cache"
     },
-    "authors": [{
-        "name": "Daniil Gentili",
-        "email": "daniil@daniil.it"
-    }],
+    "authors": [
+        {
+            "name": "Daniil Gentili",
+            "email": "daniil@daniil.it"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "danog\\MadelineProto\\": "src/danog/MadelineProto"
@@ -114,5 +130,10 @@
         "phpdocInternal": "phpdoc docs/docs/PHPInternal",
         "docs": "php tools/build_docs.php",
         "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text --config tests/phpunit.xml"
+    },
+    "extra": {
+        "phabel": {
+            "revision": 0
+        }
     }
 }
