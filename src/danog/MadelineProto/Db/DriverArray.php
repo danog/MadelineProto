@@ -84,12 +84,8 @@ abstract class DriverArray implements DbArray
      */
     public static function getInstance(string $table, $previous, $settings): Promise
     {
-        if ($previous && \get_class($previous) === static::class && $previous->getTable() === $table) {
-            $instance = &$previous;
-        } else {
-            $instance = new static();
-            $instance->setTable($table);
-        }
+        $instance = new static();
+        $instance->setTable($table);
 
         /** @psalm-suppress UndefinedPropertyAssignment */
         $instance->dbSettings = $settings;
@@ -101,7 +97,7 @@ abstract class DriverArray implements DbArray
             yield from $instance->initConnection($settings);
             yield from $instance->prepareTable();
 
-            if ($instance !== $previous) {
+            if (static::getClassName($previous) !== static::getClassName($instance)) {
                 if ($previous instanceof DriverArray) {
                     yield from $previous->initStartup();
                 }
@@ -125,7 +121,7 @@ abstract class DriverArray implements DbArray
      */
     protected static function renameTmpTable(self $new, $old): \Generator
     {
-        if ($old && \str_replace('NullCache\\', '', \get_class($old)) === \str_replace('NullCache\\', '', \get_class($new)) && $old->getTable()) {
+        if ($old instanceof SqlArray && $old->getTable()) {
             if (
                 $old->getTable() !== $new->getTable() &&
                 \mb_strpos($new->getTable(), 'tmp') !== 0
@@ -146,10 +142,7 @@ abstract class DriverArray implements DbArray
      */
     protected static function migrateDataToDb(self $new, $old): \Generator
     {
-        if (!empty($old) && !$old instanceof static) {
-            if (\str_replace('NullCache\\', '', \get_class($old)) === \str_replace('NullCache\\', '', \get_class($new))) {
-                return;
-            }
+        if (!empty($old) && static::getClassName($old) !== static::getClassName($new)) {
             Logger::log('Converting '.\get_class($old).' to '.\get_class($new), Logger::ERROR);
 
             if (!$old instanceof DbArray) {
@@ -216,5 +209,16 @@ abstract class DriverArray implements DbArray
     public function offsetExists($index): bool
     {
         throw new \RuntimeException('Native isset not support promises. Use isset method');
+    }
+
+    protected static function getClassName($instance): ?string
+    {
+        if ($instance === null) {
+            return null;
+        } elseif (is_array($instance)) {
+            return 'Array';
+        } else {
+            return \str_replace('NullCache\\', '', \get_class($instance));
+        }
     }
 }

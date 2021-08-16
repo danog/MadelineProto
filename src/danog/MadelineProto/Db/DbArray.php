@@ -48,7 +48,7 @@ interface DbArray extends DbType, \ArrayAccess, \Countable
      *
      * @psalm-param T $value
      *
-     * @return void
+     * @return Promise
      */
     public function offsetSet($index, $value);
     /**
