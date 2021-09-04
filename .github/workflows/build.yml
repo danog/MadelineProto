@@ -26,10 +26,6 @@ jobs:
         run: |
           echo "$HOME/.local/php/$PHP_VERSION" >> $GITHUB_PATH
 
-      - name: Wait for packagist
-        run: |
-          tests/waitPackagist.php
-
       - name: Build
         env:
           API_ID: ${{ secrets.API_ID }}

@@ -63,6 +63,7 @@ echo '{
 }' > composer.json
 composer update --no-cache
 composer dumpautoload --optimize
+rm -rf vendor/phabel/phabel/tests* vendor/danog/madelineproto/docs
 cd ..
 
 branch="-$BRANCH"

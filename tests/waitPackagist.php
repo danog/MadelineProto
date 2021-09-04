@@ -7,6 +7,10 @@ $tag = \trim(\shell_exec("git tag --points-at HEAD"));
 
 echo "Waiting for commit $commit on branch $branch (tag $tag)...".PHP_EOL;
 
+if (substr($tag, -5) === '.9999' || substr($tag, -5) === '.9998') {
+    die;
+}
+
 $branch = $tag ? $tag : "dev-$branch";
 
 $cur = 0;
