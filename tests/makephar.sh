@@ -71,6 +71,7 @@ echo '{
 composer update --no-cache
 composer dumpautoload --optimize
 rm -rf vendor/phabel/phabel/tests* vendor/danog/madelineproto/docs
+find vendor/amphp -type f -exec sed 's/private function __sleep/public function __sleep/g' -i {} +
 cd ..
 
 branch="-$BRANCH"
