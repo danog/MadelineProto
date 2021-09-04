@@ -215,10 +215,9 @@ abstract class DriverArray implements DbArray
     {
         if ($instance === null) {
             return null;
-        } elseif (is_array($instance)) {
+        } elseif (\is_array($instance)) {
             return 'Array';
-        } else {
-            return \str_replace('NullCache\\', '', \get_class($instance));
         }
+        return \str_replace('NullCache\\', '', \get_class($instance));
     }
 }
