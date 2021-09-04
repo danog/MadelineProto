@@ -11,7 +11,6 @@ jobs:
           - '7.3'
           - '7.2'
           - '7.1'
-          - '7.0'
     name: PHP ${{ matrix.php }} build
     env:
       PHP_CS_FIXER_IGNORE_ENV: 1
@@ -22,12 +21,10 @@ jobs:
           ssh-key: ${{ secrets.DEPLOY_KEY }}
 
       - name: Setup PHP ${{ matrix.php }}
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: mbstring, intl, sockets, gmp, curl, xml, json
-          coverage: none
-          ini-values: phar.readonly=0
+        env:
+          PHP_VERSION: ${{ matrix.php }}
+        run: |
+          echo "$HOME/.local/php/$PHP_VERSION" >> $GITHUB_PATH
 
       - name: Wait for packagist
         run: |

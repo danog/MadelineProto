@@ -8,6 +8,9 @@ BRANCH=$(git rev-parse --abbrev-ref HEAD)
 TAG=$(git tag --points-at HEAD)
 COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
 
+[[ "$TAG" == *.9999 ]] && exit 0
+[[ "$TAG" == *.9998 ]] && exit 0
+
 [ "$(git rev-list --tags --max-count=1)" == "$GITHUB_SHA" ] && IS_RELEASE=y || IS_RELEASE=n
 
 echo "Is release: $IS_RELEASE"
@@ -26,105 +29,41 @@ skip=n
     echo "Skip"
 }
 
-which apt-get &>/dev/null && {
-    sudo add-apt-repository ppa:ondrej/php -y
-    sudo apt-get update -q
-    sudo apt-get install php8.0-cli php8.0-mbstring php8.0-curl php8.0-xml -y
-}
-
 # Clean up
-rm -rf phar7 phar5 MadelineProtoPhar
 madelinePath=$PWD
-cd
-rm -rf phar7 phar5 MadelineProtoPhar
-mkdir phar7
-cd phar7
+[ "$IS_RELEASE" == "y" ] && ref="$TAG" || ref="$GITHUB_SHA"
 
-[ "$IS_RELEASE" == "y" ] && composer="$TAG" || composer="dev-$BRANCH#$GITHUB_SHA"
+php8.0 $(which composer) update
+php8.0 vendor/bin/phabel publish -d "$ref"
 
-composer() {
-    php8.0 $(which composer) --no-plugins "$@"
-}
+cd ..
+rm -rf phar
+mkdir phar
 
-php8.0 -v
-php -v
+cd phar
 
 # Install
 echo '{
-    "name": "danog/madelineprototests",
+    "name": "danog/madelineprotophar",
     "require": {
-        "danog/madelineproto": "'$composer'",
-        "phabel/phabel": "dev-master"
+        "danog/madelineproto": "'$ref'.9998"
     },
     "authors": [
         {
             "name": "Daniil Gentili",
             "email": "daniil@daniil.it"
         }
+    ],
+    "repositories": [
+        {
+            "type": "path",
+            "url": "'$madelinePath'"
+        }
     ]
 }' > composer.json
-composer config platform.php "8.0"
-composer clearcache
-composer update --ignore-platform-reqs
-cp -a $madelinePath/src vendor/danog/madelineproto
+composer update --no-cache
+composer dumpautoload --optimize
 cd ..
-
-phabel() {
-    mkdir phar5
-    cd phar7
-
-    composer require symfony/polyfill-php80 --ignore-platform-reqs
-    composer require symfony/polyfill-php74 --ignore-platform-reqs
-    composer require symfony/polyfill-php73 --ignore-platform-reqs
-    composer require symfony/polyfill-php72 --ignore-platform-reqs
-    composer require symfony/polyfill-php71:1.19.0 --ignore-platform-reqs
-    composer require symfony/polyfill-php70:1.19.0 --ignore-platform-reqs
-
-    rm -rf vendor/phabel/phabel/testsGenerated
-    php8.0 vendor/bin/phabel . ../phar5
-    cd ..
-}
-
-export PHABEL_TARGET="$PHP_MAJOR_VERSION$PHP_MINOR_VERSION"
-
-php=$PHABEL_TARGET
-
-[ $PHP_MAJOR_VERSION -eq 5 ] && {
-    cd phar7
-    ls
-    $madelinePath/tests/conversion/prepare-5.sh
-    cd ..
-    
-    phabel
-    
-    cd phar5
-    ls
-    $madelinePath/tests/conversion/after-5.sh
-    cd ..
-}
-[ $PHP_MAJOR_VERSION -eq 7 ] && {
-    cd phar7
-    ls
-    $madelinePath/tests/conversion/prepare-70.sh
-    cd ..
-    
-    phabel
-    
-    cd phar5
-    ls
-    $madelinePath/tests/conversion/after-70.sh
-    cd ..
-} || {
-    cp -a phar7 phar5
-}
-
-cd phar5
-composer dumpautoload --optimize --ignore-platform-reqs
-cd ..
-
-# Make sure conversion worked
-# Not needed anymore, tests/testing.php preloads all classes
-#for f in $(find phar5 -type f -name '*.php'); do php -l $f;done
 
 branch="-$BRANCH"
 cd $madelinePath
@@ -175,7 +114,7 @@ runTest
 k
 
 echo "Testing with new version (upgrade)..."
-php tools/makephar.php $HOME/phar5 "madeline$php$branch.phar" "$GITHUB_SHA-$php"
+php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$GITHUB_SHA-$php"
 export ACTIONS_PHAR="madeline$php$branch.phar"
 runTestSimple
 k
@@ -207,6 +146,7 @@ fi
 git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git config --global user.name "Github Actions"
 
+rm -rf MadelineProtoPhar
 git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
 
