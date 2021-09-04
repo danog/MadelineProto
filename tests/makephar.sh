@@ -4,16 +4,19 @@
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 
+COMMIT="$(git log -1 --pretty=%H)"
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-TAG=$(git tag --points-at HEAD)
+TAG=$(git tag --points-at $COMMIT)
 COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
-GITHUB_SHA="$(git log -1 --pretty=%H)"
 
 [[ "$TAG" == *.9999 ]] && exit 0
 [[ "$TAG" == *.9998 ]] && exit 0
 
-[ "$(git rev-list --tags --max-count=1)" == "$GITHUB_SHA" ] && IS_RELEASE=y || IS_RELEASE=n
+[ "$TAG" != "" ] && IS_RELEASE=y || IS_RELEASE=n
 
+echo "Branch: $BRANCH"
+echo "Commit: $COMMIT"
+echo "Latest tag: $TAG"
 echo "Is release: $IS_RELEASE"
 
 skip=n
@@ -32,7 +35,7 @@ skip=n
 
 # Clean up
 madelinePath=$PWD
-[ "$IS_RELEASE" == "y" ] && ref="$TAG" || ref="$GITHUB_SHA"
+[ "$IS_RELEASE" == "y" ] && ref="$TAG" || ref="$COMMIT"
 
 php8.0 $(which composer) update
 php8.0 vendor/bin/phabel publish -d "$ref"
@@ -118,7 +121,7 @@ runTest
 k
 
 echo "Testing with new version (upgrade)..."
-php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$GITHUB_SHA-$php"
+php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT-$php"
 export ACTIONS_PHAR="madeline$php$branch.phar"
 runTestSimple
 k
@@ -156,7 +159,7 @@ cd MadelineProtoPhar
 
 cp "../madeline$php$branch.phar" .
 cp ../tools/phar.php ../examples/mtproxyd .
-echo -n "$GITHUB_SHA-$php" > release$php$branch
+echo -n "$COMMIT-$php" > release$php$branch
 
 [ "$IS_RELEASE" == "y" ] && {
     cp release$php$branch release$php
@@ -178,7 +181,7 @@ echo "$COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
 [ -d JSON.sh ] || git clone https://github.com/dominictarr/JSON.sh
 for chat_id in $DESTINATIONS;do
     ID=$(curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$BRANCH</b>
-<a href=\"https://github.com/danog/MadelineProto/commit/$GITHUB_SHA\">$COMMIT_MESSAGE (PHP $PHP_MAJOR_VERSION.$PHP_MINOR_VERSION)</a>
+<a href=\"https://github.com/danog/MadelineProto/commit/$COMMIT\">$COMMIT_MESSAGE (PHP $PHP_MAJOR_VERSION.$PHP_MINOR_VERSION)</a>
         
 $COMMIT_MESSAGE" -F parse_mode="HTML" -F chat_id=$chat_id | JSON.sh/JSON.sh -s | egrep '\["result","message_id"\]' | cut -f 2 | cut -d '"' -f 2)
     
