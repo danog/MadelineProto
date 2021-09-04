@@ -7,6 +7,7 @@ PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 TAG=$(git tag --points-at HEAD)
 COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
+GITHUB_SHA="$(git log -1 --pretty=%H)"
 
 [[ "$TAG" == *.9999 ]] && exit 0
 [[ "$TAG" == *.9998 ]] && exit 0
