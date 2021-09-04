@@ -36,6 +36,8 @@ madelinePath=$PWD
 php8.0 $(which composer) update
 php8.0 vendor/bin/phabel publish -d "$ref"
 
+git checkout "$ref.9998"
+
 cd ..
 rm -rf phar
 mkdir phar
