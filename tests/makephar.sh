@@ -3,6 +3,7 @@
 # Configure
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
+php=$PHP_MAJOR_VERSION$PHP_MINOR_VERSION
 
 COMMIT="$(git log -1 --pretty=%H)"
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
