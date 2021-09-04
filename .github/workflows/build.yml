@@ -2,7 +2,7 @@ name: build
 on: [create]
 jobs:
   run:
-    runs-on: linux
+    runs-on: Linux
     strategy:
       matrix:
         php:
