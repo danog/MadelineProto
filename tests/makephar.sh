@@ -110,7 +110,7 @@ n
 
 k()
 {
-    while :; do pkill -f 'MadelineProto worker .*' || break && sleep 1; done
+    while :; do pkill -f 'MadelineProto worker .*' -P $$ || break && sleep 1; done
 }
 
 k
