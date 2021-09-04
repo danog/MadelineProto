@@ -117,8 +117,8 @@ abstract class ClientAbstract
                 } catch (\Throwable $e) {
                 }
                 if ($this instanceof Client) {
-                    Server::startMe($this->session);
                     try {
+                        yield Server::startMe($this->session);
                         $this->server = yield connect($this->session->getIpcPath());
                     } catch (\Throwable $e) {
                         Logger::log("Got exception while reconnecting in IPC client: $e");
