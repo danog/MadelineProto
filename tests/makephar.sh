@@ -63,7 +63,8 @@ echo '{
     "repositories": [
         {
             "type": "path",
-            "url": "'$madelinePath'"
+            "url": "'$madelinePath'",
+            "options":{"symlink": false}
         }
     ]
 }' > composer.json
