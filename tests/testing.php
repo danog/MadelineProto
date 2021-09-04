@@ -28,7 +28,6 @@ if ($phar = \getenv('ACTIONS_PHAR')) {
 } else {
     require_once 'vendor/autoload.php';
 }
-
 if ($loader) {
     foreach ($loader->getClassMap() as $class => $file) {
         if (\in_array($class, [
@@ -42,14 +41,15 @@ if ($loader) {
             'Phabel\\Amp\\Parallel\\Sync\\Internal\\ParcelStorage',
             'Phabel\\Amp\\Parallel\\Context\\Internal\\Thread',
             'Phabel\\Monolog\\Test\\TestCase',
+            'Phabel\\Symfony\\Component\\DependencyInjection\\Compiler\\CompilerPassInterface',
+            'Phabel\\Symfony\\Component\\String\\Slugger\\AsciiSlugger',
             'Phabel\\Composer\\Plugin'
         ])) {
             continue;
         }
-        if (\str_ends_with($class, 'Test') || \class_exists($class) || \interface_exists($class)) {
+        if (\str_starts_with($class, 'Phabel\\Symfony\\Component\\Console') || \str_ends_with($class, 'Test') || \class_exists($class) || \interface_exists($class)) {
             continue;
         }
-        //echo "Requiring $class => $file\n";
         require_once($file);
     }
 }
