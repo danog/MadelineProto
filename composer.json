@@ -104,9 +104,6 @@
         ]
     },
     "scripts": {
-        "post-autoload-dump": [
-            "git submodule init && git submodule update"
-        ],
         "build": [
             "@docs",
             "@phpdoc",
