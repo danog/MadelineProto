@@ -3,7 +3,6 @@
 namespace danog\MadelineProto\Db;
 
 use Amp\Iterator;
-use Amp\Producer;
 use Amp\Promise;
 
 /**

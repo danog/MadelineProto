@@ -113,6 +113,7 @@ $order = [
     'REQUIREMENTS',
     'INSTALLATION',
     'UPDATES',
+    'DATABASE',
     'SETTINGS',
     'SELF',
     'EXCEPTIONS',
