@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Iterator;
 use Amp\Producer;
 use Amp\Promise;
 
@@ -73,9 +74,9 @@ interface DbArray extends DbType, \ArrayAccess, \Countable
     /**
      * Get iterator.
      *
-     * @return Producer<array{0: string|int, 1: T}>
+     * @return Iterator<array{0: string|int, 1: T}>
      */
-    public function getIterator(): Producer;
+    public function getIterator(): Iterator;
 
     /**
      * @deprecated

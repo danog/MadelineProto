@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Iterator;
 use Amp\Producer;
 use Amp\Promise;
 use Amp\Success;
@@ -83,7 +84,7 @@ class MemoryArray extends \ArrayIterator implements DbArray
         return new Success();
     }
 
-    public function getIterator(): Producer
+    public function getIterator(): Iterator
     {
         return new Producer(function (callable $emit) {
             foreach ($this as $key => $value) {

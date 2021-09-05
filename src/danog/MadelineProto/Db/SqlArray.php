@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Iterator;
 use Amp\Producer;
 use Amp\Promise;
 use Amp\Sql\CommandResult;
@@ -47,7 +48,7 @@ abstract class SqlArray extends DriverArray
     abstract protected function getValue(array $row);
 
 
-    public function getIterator(): Producer
+    public function getIterator(): Iterator
     {
         return new Producer(function (callable $emit) {
             $request = yield from $this->executeRaw($this->getSqlQuery(self::SQL_ITERATE));

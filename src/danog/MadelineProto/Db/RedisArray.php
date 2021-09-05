@@ -2,6 +2,7 @@
 
 namespace danog\MadelineProto\Db;
 
+use Amp\Iterator;
 use Amp\Producer;
 use Amp\Promise;
 use Amp\Redis\Redis as RedisRedis;
@@ -209,7 +210,7 @@ class RedisArray extends DriverArray
         });
     }
 
-    public function getIterator(): Producer
+    public function getIterator(): Iterator
     {
         return new Producer(function (callable $emit) {
             $request = $this->db->scan($this->itKey());

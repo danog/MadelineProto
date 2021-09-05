@@ -4,6 +4,8 @@ namespace danog\MadelineProto\Settings\Database;
 
 /**
  * MySQL backend settings.
+ *
+ * MariaDb 10.2+ or Mysql 5.6+ required.
  */
 class Mysql extends SqlAbstract
 {
