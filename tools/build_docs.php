@@ -181,7 +181,13 @@ foreach ($orderedfiles as $key => $filename) {
         foreach ($matches[1] as $key => $match) {
             $spaces = "  $match";
             $name = $matches[2][$key];
-            $url = $matches[3][$key][0] === '#' ? $file.$matches[3][$key] : $matches[3][$key];
+            if ($matches[3][$key][0] === '#') {
+                $url = $file.$matches[3][$key];
+            } elseif (\substr($matches[3][$key], 0, 3) === '../') {
+                $url = 'https://docs.madelineproto.xyz/'.\str_replace('.md', '.html', \substr($matches[3][$key], 3));
+            } else {
+                $url = $matches[3][$key];
+            }
             $index .= "$spaces* [$name]($url)\n";
             if ($name === 'FULL API Documentation with descriptions') {
                 $spaces .= '  ';
