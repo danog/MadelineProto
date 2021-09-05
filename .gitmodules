@@ -9,4 +9,4 @@
 	url = https://github.com/danog/schemas.git
 [submodule "docs"]
 	path = docs
-	url = git@github.com:danog/MadelineProtoDocs
+	url = https://github.com/danog/MadelineProtoDocs.git
