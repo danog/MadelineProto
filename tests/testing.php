@@ -79,7 +79,6 @@ $MadelineProto = new \danog\MadelineProto\API(__DIR__.'/../testing.madeline', $s
 $MadelineProto->async(true);
 $MadelineProto->loop(function () use ($MadelineProto) {
     yield $MadelineProto->start();
-    $MadelineProto->getHttpClient();
     yield $MadelineProto->fileGetContents('https://google.com');
 
     try {
