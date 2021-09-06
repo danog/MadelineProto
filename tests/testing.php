@@ -28,6 +28,7 @@ if ($phar = \getenv('ACTIONS_PHAR')) {
 } else {
     require_once 'vendor/autoload.php';
 }
+define('MADELINEPROTO_TEST', 'pony');
 if ($loader) {
     foreach ($loader->getClassMap() as $class => $file) {
         if (\in_array($class, [

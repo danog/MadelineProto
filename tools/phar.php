@@ -109,7 +109,11 @@ function ___install_madeline()
                 }
                 $packages = [];
                 foreach ($composer['packages'] as $dep) {
-                    $packages[$dep['name']] = $dep['version_normalized'];
+                    $name = $dep['name'];
+                    if (strpos($name, 'phabel/transpiler') === 0) {
+                        $name = explode('/', $name, 3)[2];
+                    }
+                    $packages[$name] = $dep['version_normalized'];
                 }
                 return $packages;
             };
@@ -123,6 +127,7 @@ function ___install_madeline()
 
             \file_put_contents($madeline_phar, $phar, LOCK_EX);
             \file_put_contents("$madeline_phar.version", $release, LOCK_EX);
+            unset($phar);
 
             $current = $extractVersions();
             $postData = ['downloads' => []];
@@ -164,7 +169,11 @@ function ___install_madeline()
         }
     }
 
-    return $madeline_phar;
+    $result = require_once $madeline_phar;
+    if (defined('MADELINE_WORKER_TYPE') && constant('MADELINE_WORKER_TYPE') === 'madeline-ipc') {
+        require_once "phar://$madeline_phar/vendor/danog/madelineproto/src/danog/MadelineProto/Ipc/Runner/entry.php";
+    }
+    return $result;
 }
 
-return require_once ___install_madeline();
+return ___install_madeline();

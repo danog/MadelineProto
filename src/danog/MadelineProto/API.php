@@ -306,7 +306,7 @@ class API extends InternalDoc
         if ($unserialized === 0) {
             // Timeout
             Logger::log("!!! Could not connect to MadelineProto, please check and report the logs for more details. !!!", Logger::FATAL_ERROR);
-            if (!$tryReconnect) {
+            if (!$tryReconnect || (\defined('MADELINEPROTO_TEST') && \constant("MADELINEPROTO_TEST") === 'pony')) {
                 throw new Exception('Could not connect to MadelineProto, please check the MadelineProto.log file to debug!');
             }
             Logger::log("!!! Reconnecting using slower method. !!!", Logger::FATAL_ERROR);
