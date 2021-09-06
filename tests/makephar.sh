@@ -114,33 +114,38 @@ k()
     while :; do pkill -f 'MadelineProto worker .*' -P $$ || break && sleep 1; done
 }
 
+reset()
+{
+    sed 's|phar.madelineproto.xyz|empty.madelineproto.xyz|g' tools/phar.php > madeline.php
+}
 k
 rm -f madeline.phar testing.madeline*
 
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
-cp tests/testing.php tests/testingBackup.php
 runTest
 k
 
 echo "Testing with new version (upgrade)..."
 php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT-$php"
-export ACTIONS_PHAR="madeline$php$branch.phar"
+cp "madeline$php$branch.phar" "madeline-$php.phar"
+export ACTIONS_PHAR="madeline.php"
+reset
 runTestSimple
 k
 
 echo "Testing with new version (restart)"
-cp tests/testingBackup.php tests/testing.php
+reset
 rm -f testing.madeline* || echo
 runTest
 
 echo "Testing with new version (reload)"
-cp tests/testingBackup.php tests/testing.php
+reset
 runTestSimple
 k
 
 echo "Testing with new version (kill+reload)"
-cp tests/testingBackup.php tests/testing.php
+reset
 runTestSimple
 
 echo "Checking syntax of madeline.php"
