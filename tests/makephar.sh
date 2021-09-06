@@ -116,7 +116,8 @@ k()
 
 reset()
 {
-    sed 's|phar.madelineproto.xyz|empty.madelineproto.xyz|g' tools/phar.php > madeline.php
+    sed 's|phar.madelineproto.xyz/madeline|empty.madelineproto.xyz/madeline|g' tools/phar.php > madeline.php
+    cp madeline.php madelineBackup.php
 }
 k
 rm -f madeline.phar testing.madeline*
@@ -129,7 +130,7 @@ k
 echo "Testing with new version (upgrade)..."
 php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT-$php"
 cp "madeline$php$branch.phar" "madeline-$php.phar"
-export ACTIONS_PHAR="madeline.php"
+export ACTIONS_PHAR=1
 reset
 runTestSimple
 k
@@ -161,9 +162,9 @@ fi
 git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git config --global user.name "Github Actions"
 
-rm -rf MadelineProtoPhar
-git clone git@github.com:danog/MadelineProtoPhar
+[ ! -d MadelineProtoPhar ] && git clone git@github.com:danog/MadelineProtoPhar
 cd MadelineProtoPhar
+git pull
 
 cp "../madeline$php$branch.phar" .
 cp ../tools/phar.php ../examples/mtproxyd .

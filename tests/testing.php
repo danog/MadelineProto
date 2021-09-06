@@ -17,8 +17,9 @@ If not, see <http://www.gnu.org/licenses/>.
 
 
 $loader = false;
-if ($phar = \getenv('ACTIONS_PHAR')) {
-    $loader = include $phar;
+if (\getenv('ACTIONS_PHAR')) {
+    $loader = include 'madeline.php';
+    copy('madelineBackup.php', 'madeline.php');
 } elseif (!\file_exists(__DIR__.'/../vendor/autoload.php') || \getenv('ACTIONS_FORCE_PREVIOUS')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
     if (!\file_exists('madeline.php')) {
