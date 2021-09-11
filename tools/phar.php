@@ -110,8 +110,8 @@ function ___install_madeline()
                 $packages = [];
                 foreach ($composer['packages'] as $dep) {
                     $name = $dep['name'];
-                    if (strpos($name, 'phabel/transpiler') === 0) {
-                        $name = explode('/', $name, 3)[2];
+                    if (\strpos($name, 'phabel/transpiler') === 0) {
+                        $name = \explode('/', $name, 3)[2];
                     }
                     $packages[$name] = $dep['version_normalized'];
                 }
@@ -170,7 +170,7 @@ function ___install_madeline()
     }
 
     $result = require_once $madeline_phar;
-    if (defined('MADELINE_WORKER_TYPE') && constant('MADELINE_WORKER_TYPE') === 'madeline-ipc') {
+    if (\defined('MADELINE_WORKER_TYPE') && \constant('MADELINE_WORKER_TYPE') === 'madeline-ipc') {
         require_once "phar://$madeline_phar/vendor/danog/madelineproto/src/danog/MadelineProto/Ipc/Runner/entry.php";
     }
     return $result;

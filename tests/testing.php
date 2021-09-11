@@ -19,7 +19,7 @@ If not, see <http://www.gnu.org/licenses/>.
 $loader = false;
 if (\getenv('ACTIONS_PHAR')) {
     $loader = include 'madeline.php';
-    copy('madelineBackup.php', 'madeline.php');
+    \copy('madelineBackup.php', 'madeline.php');
 } elseif (!\file_exists(__DIR__.'/../vendor/autoload.php') || \getenv('ACTIONS_FORCE_PREVIOUS')) {
     echo 'You did not run composer update, using madeline.php'.PHP_EOL;
     if (!\file_exists('madeline.php')) {
@@ -29,7 +29,7 @@ if (\getenv('ACTIONS_PHAR')) {
 } else {
     require_once 'vendor/autoload.php';
 }
-define('MADELINEPROTO_TEST', 'testing');
+\define('MADELINEPROTO_TEST', 'testing');
 if ($loader) {
     foreach ($loader->getClassMap() as $class => $file) {
         if (\in_array($class, [

@@ -469,7 +469,11 @@ class Connection extends SettingsAbstract
     }
 
     /**
-     * Add proxy identifier to list.
+     * Add proxy identifier to list, one of:.
+     *
+     * * `\danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream::class`
+     * * `\danog\MadelineProto\Stream\Proxy\HttpProxy::class`
+     * * `\danog\MadelineProto\Stream\Proxy\SocksProxy::class`
      *
      * @param class-string<StreamInterface> $proxy Proxy identifier
      * @param array                         $extra Extra
