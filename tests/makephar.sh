@@ -7,7 +7,7 @@ php=$PHP_MAJOR_VERSION$PHP_MINOR_VERSION
 
 COMMIT="$(git log -1 --pretty=%H)"
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-TAG=$(git tag --points-at $COMMIT)
+TAG=$(git tag --points-at $COMMIT | grep -v '\.9999')
 COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
 
 [[ "$TAG" == *.9999 ]] && exit 0
