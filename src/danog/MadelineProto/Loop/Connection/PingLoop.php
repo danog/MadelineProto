@@ -40,7 +40,7 @@ class PingLoop extends ResumableSignalLoop
         $datacenter = $this->datacenter;
         $connection = $this->connection;
         $shared = $this->datacenterConnection;
-        $timeout = $shared->getSettings()->getTimeout();
+        $timeout = $shared->getSettings()->getPingInterval();
         $timeoutMs = $timeout * 1000;
         while (true) {
             while (!$shared->hasTempAuthKey()) {
@@ -51,7 +51,7 @@ class PingLoop extends ResumableSignalLoop
             if (yield $this->waitSignal($this->pause($timeoutMs))) {
                 return;
             }
-            if (\time() - $connection->getLastChunk() >= $timeout) {
+            if (\time() - $connection->getLastChunk() >= $timeout && $shared->hasTempAuthKey()) {
                 $API->logger->logger("Ping DC {$datacenter}");
                 try {
                     yield from $connection->methodCallAsyncRead('ping', ['ping_id' => \random_bytes(8)]);
