@@ -83,6 +83,10 @@ class Connection extends SettingsAbstract
      * Connection timeout.
      */
     protected int $timeout = 2;
+    /**
+     * Ping interval.
+     */
+    protected int $pingInterval = 10;
 
     /**
      * Whether to retry connection.
@@ -663,6 +667,30 @@ class Connection extends SettingsAbstract
     public function setTimeout(int $timeout): self
     {
         $this->timeout = $timeout;
+
+        return $this;
+    }
+
+    /**
+     * Get ping interval.
+     *
+     * @return int
+     */
+    public function getPingInterval(): int
+    {
+        return $this->pingInterval;
+    }
+
+    /**
+     * Set ping interval.
+     *
+     * @param int $pingInterval Ping interval
+     *
+     * @return self
+     */
+    public function setPingInterval(int $pingInterval): self
+    {
+        $this->pingInterval = $pingInterval;
 
         return $this;
     }
