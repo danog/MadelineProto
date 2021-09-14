@@ -29,7 +29,7 @@ final class WebRunner extends RunnerAbstract
      */
     public static function start(string $session, int $startupId): Promise
     {
-        if (!isset($_SERVER['SERVER_NAME'])) {
+        if (!isset($_SERVER['SERVER_NAME']) || !$_SERVER['SERVER_NAME']) {
             return new Failure(new \Exception("Can't start the web runner!"));
         }
 
