@@ -1,0 +1,9 @@
+{
+    "require": {
+        "vimeo/psalm": "dev-master",
+        "ennexa/amp-update-cache": "dev-master",
+        "phpunit/phpunit": "^9",
+        "amphp/php-cs-fixer-config": "dev-master",
+        "friendsofphp/php-cs-fixer": "^2.16"
+    }
+}

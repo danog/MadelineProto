@@ -23,7 +23,7 @@
         "ext-pthreads": "*"
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.0",
         "danog/primemodule": "^1",
         "erusev/parsedown": "^1.7",
         "symfony/polyfill-mbstring": "*",
@@ -59,18 +59,10 @@
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^5.2",
-        "vlucas/phpdotenv": "^3",
-        "ennexa/amp-update-cache": "dev-master",
-        "phpunit/phpunit": "^9",
-        "amphp/php-cs-fixer-config": "dev-master",
-        "amphp/http-server": "dev-master",
-        "amphp/http": "^1.6",
         "ext-ctype": "*",
-        "vimeo/psalm": "dev-master",
-        "phpstan/phpstan": "^0.12.14",
-        "friendsofphp/php-cs-fixer": "^2.16",
         "danog/phpdoc": "^0.1.7",
-        "phabel/phabel": "^1"
+        "phabel/phabel": "^1",
+        "bamarni/composer-bin-plugin": "^1.4"
     },
     "suggest": {
         "ext-libtgvoip": "Install the php-libtgvoip extension to make phone calls (https://github.com/danog/php-libtgvoip)",
@@ -125,7 +117,10 @@
         "phpdocMain": "php tools/phpdoc.php",
         "phpdocInternal": "phpdoc docs/docs/PHPInternal",
         "docs": "php tools/build_docs.php",
-        "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text --config tests/phpunit.xml"
+        "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text --config tests/phpunit.xml",
+        "bin": "echo 'bin not installed'",
+        "post-install-cmd": ["@composer bin all install --ansi"],
+        "post-update-cmd": ["@composer bin all update --ansi"]
     },
     "extra": {
         "phabel": {
