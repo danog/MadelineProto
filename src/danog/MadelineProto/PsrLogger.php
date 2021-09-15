@@ -44,7 +44,7 @@ class PsrLogger extends AbstractLogger
      *
      * @throws \Psr\Log\InvalidArgumentException
      */
-    public function log($level, \Stringable|string $message, array $context = [])
+    public function log($level, \Stringable|string $message, array $context = []): void
     {
         $this->logger->logger($message, self::LEVEL_MAP[$level]);
     }
