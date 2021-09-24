@@ -45,11 +45,18 @@ if ($loader) {
             'Phabel\\Monolog\\Test\\TestCase',
             'Phabel\\Symfony\\Component\\DependencyInjection\\Compiler\\CompilerPassInterface',
             'Phabel\\Symfony\\Component\\String\\Slugger\\AsciiSlugger',
-            'Phabel\\Composer\\Plugin'
+            'Phabel\\Composer\\Plugin',
+            'PhabelVendor\\Amp\\Sync\\Internal\\MutexStorage',
+            'PhabelVendor\\Amp\\Sync\\Internal\\SemaphoreStorage',
+            'PhabelVendor\\Amp\\Parallel\\Sync\\Internal\\ParcelStorage',
+            'PhabelVendor\\Amp\\Parallel\\Context\\Internal\\Thread',
+            'PhabelVendor\\Monolog\\Test\\TestCase',
+            'PhabelVendor\\Symfony\\Component\\DependencyInjection\\Compiler\\CompilerPassInterface',
+            'PhabelVendor\\Symfony\\Component\\String\\Slugger\\AsciiSlugger',
         ])) {
             continue;
         }
-        if (\str_starts_with($class, 'Phabel\\Symfony\\Component\\Console') || \str_ends_with($class, 'Test') || \class_exists($class) || \interface_exists($class)) {
+        if (\str_starts_with($class, 'PhabelVendor\\Symfony\\Component\\Console') || \str_starts_with($class, 'Phabel\\Symfony\\Component\\Console') || \str_ends_with($class, 'Test') || \class_exists($class) || \interface_exists($class)) {
             continue;
         }
         require_once($file);
