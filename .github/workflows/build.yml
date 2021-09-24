@@ -27,6 +27,9 @@ jobs:
         run: |
           echo "$HOME/.local/php/$PHP_VERSION" >> $GITHUB_PATH
 
+      - name: Set env
+        run: echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
       - name: Build
         env:
           API_ID: ${{ secrets.API_ID }}
