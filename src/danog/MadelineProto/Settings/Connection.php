@@ -229,6 +229,7 @@ class Connection extends SettingsAbstract
 
         if (Magic::$altervista) {
             $this->addProxy(HttpProxy::class, ['address' => 'localhost', 'port' => 80]);
+            $this->setProtocol(HttpStream::class);
         } else {
             $this->removeProxy(HttpProxy::class, ['address' => 'localhost', 'port' => 80]);
         }

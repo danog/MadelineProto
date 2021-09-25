@@ -187,11 +187,11 @@ done
 cd ..
 echo "$COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
 
-[ -d JSON.sh ] || git clone https://github.com/dominictarr/JSON.sh
 for chat_id in $DESTINATIONS;do
-    ID=$(curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$BRANCH</b>
+    curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$BRANCH</b>
 <a href=\"https://github.com/danog/MadelineProto/commit/$COMMIT\">$COMMIT_MESSAGE (PHP $PHP_MAJOR_VERSION.$PHP_MINOR_VERSION)</a>
         
-$COMMIT_MESSAGE" -F parse_mode="HTML" -F chat_id=$chat_id | JSON.sh/JSON.sh -s | egrep '\["result","message_id"\]' | cut -f 2 | cut -d '"' -f 2)
-    
+$COMMIT_MESSAGE" -F parse_mode=HTML -F chat_id="$chat_id"
 done
+
+k

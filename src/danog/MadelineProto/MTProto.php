@@ -602,6 +602,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         try {
             $this->ipcServer->start();
         } catch (\Throwable $e) {
+            if (Magic::$isIpcWorker) {
+                throw $e;
+            }
             $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
         }
         // Load rsa keys
@@ -945,6 +948,9 @@ class MTProto extends AsyncConstruct implements TLCallback
         try {
             $this->ipcServer->start();
         } catch (\Throwable $e) {
+            if (Magic::$isIpcWorker) {
+                throw $e;
+            }
             $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
         }
     }
