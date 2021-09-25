@@ -255,6 +255,9 @@ class Magic
             \set_error_handler([Exception::class, 'ExceptionErrorHandler']);
             \set_exception_handler([Exception::class, 'ExceptionHandler']);
             self::$isIpcWorker = \defined('MADELINE_WORKER_TYPE') ? \MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
+            // Important, obtain root relative to caller script
+            $backtrace = \debug_backtrace(0);
+            self::$script_cwd = self::$cwd = \dirname(\end($backtrace)['file']);
             if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
                 try {
                     \error_reporting(E_ALL);
@@ -274,9 +277,6 @@ class Magic
                 self::$isatty = \defined('STDOUT') && hasColorSupport();
             } catch (\Throwable $e) {
             }
-            // Important, obtain root relative to caller script
-            $backtrace = \debug_backtrace(0);
-            self::$script_cwd = self::$cwd = \dirname(\end($backtrace)['file']);
             try {
                 self::$cwd = \getcwd();
                 self::$can_getcwd = true;

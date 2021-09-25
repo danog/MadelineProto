@@ -109,7 +109,7 @@ class MTProto extends AsyncConstruct implements TLCallback
      *
      * @var string
      */
-    const RELEASE = '5.0';
+    const RELEASE = '6.0';
     /**
      * We're not logged in.
      *
