@@ -29,28 +29,25 @@ if (!file_exists('madeline.php')) {
 include 'madeline.php';
 
 $MadelineProto = new \danog\MadelineProto\API('session.madeline');
-$MadelineProto->async(true);
-$MadelineProto->loop(function () use ($MadelineProto) {
-    yield $MadelineProto->start();
+$MadelineProto->start();
 
-    $me = yield $MadelineProto->getSelf();
+$me = $MadelineProto->getSelf();
 
-    $MadelineProto->logger($me);
+$MadelineProto->logger($me);
 
-    if (!$me['bot']) {
-        yield $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => "Hi!\nThanks for creating MadelineProto! <3"]);
-        yield $MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
+if (!$me['bot']) {
+    $MadelineProto->messages->sendMessage(['peer' => '@danogentili', 'message' => "Hi!\nThanks for creating MadelineProto! <3"]);
+    $MadelineProto->channels->joinChannel(['channel' => '@MadelineProto']);
 
-        try {
-            yield $MadelineProto->messages->importChatInvite(['hash' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg']);
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
-            $MadelineProto->logger($e);
-        }
-
-        yield $MadelineProto->messages->sendMessage(['peer' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg', 'message' => 'Testing MadelineProto!']);
+    try {
+        $MadelineProto->messages->importChatInvite(['hash' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg']);
+    } catch (\danog\MadelineProto\RPCErrorException $e) {
+        $MadelineProto->logger($e);
     }
-    yield $MadelineProto->echo('OK, done!');
-});
+
+    $MadelineProto->messages->sendMessage(['peer' => 'https://t.me/joinchat/Bgrajz6K-aJKu0IpGsLpBg', 'message' => 'Testing MadelineProto!']);
+}
+$MadelineProto->echo('OK, done!');
 ```
 
 [Try this code now!](https://try.madelineproto.xyz) or run this code in a browser or in a console. 
