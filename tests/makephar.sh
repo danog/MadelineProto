@@ -162,12 +162,13 @@ fi
 git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git config --global user.name "Github Actions"
 
-[ ! -d MadelineProtoPhar ] && git clone git@github.com:danog/MadelineProtoPhar
-cd MadelineProtoPhar
+input=$PWD
+
+cd ~/MadelineProtoPhar
 git pull
 
-cp "../madeline$php$branch.phar" .
-cp ../tools/phar.php ../examples/mtproxyd .
+cp "$input/madeline$php$branch.phar" .
+cp "$input/tools/phar.php" "$input/examples/mtproxyd" .
 echo -n "$COMMIT-$php" > release$php$branch
 
 [ "$IS_RELEASE" == "y" ] && {
@@ -183,9 +184,6 @@ while :; do
         git rebase origin/master
     }
 done
-
-cd ..
-echo "$COMMIT_MESSAGE" | grep "Apply fixes from StyleCI" && exit
 
 for chat_id in $DESTINATIONS;do
     curl -s https://api.telegram.org/bot$BOT_TOKEN/sendMessage -F disable_web_page_preview=1 -F text=" <b>Recent Commits to MadelineProto:$BRANCH</b>

@@ -395,10 +395,6 @@ class MTProto extends AsyncConstruct implements TLCallback
      */
     private ?PeriodicLoopInternal $serializeLoop = null;
     /**
-     * RPC reporting loop.
-     */
-    private ?PeriodicLoopInternal $rpcLoop = null;
-    /**
      * SEQ update loop.
      */
     private ?SeqLoop $seqUpdater = null;
@@ -927,9 +923,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         if (!$this->configLoop) {
             $this->configLoop = new PeriodicLoopInternal($this, [$this, 'getConfig'], 'config', 24 * 3600 * 1000);
         }
-        if (!$this->rpcLoop) {
-            $this->rpcLoop = new PeriodicLoopInternal($this, [$this, 'rpcReport'], 'config', 60 * 1000);
-        }
         if (!$this->ipcServer) {
             try {
                 $this->ipcServer = new Server($this);
@@ -944,7 +937,6 @@ class MTProto extends AsyncConstruct implements TLCallback
         $this->phoneConfigLoop->start();
         $this->configLoop->start();
         $this->checkTosLoop->start();
-        $this->rpcLoop->start();
         try {
             $this->ipcServer->start();
         } catch (\Throwable $e) {
@@ -981,36 +973,9 @@ class MTProto extends AsyncConstruct implements TLCallback
             $this->checkTosLoop->signal(true);
             $this->checkTosLoop = null;
         }
-        if ($this->rpcLoop) {
-            $this->rpcLoop->signal(true);
-            $this->rpcLoop = null;
-        }
         if ($this->ipcServer) {
             $this->ipcServer->signal(null);
             $this->ipcServer = null;
-        }
-    }
-    /**
-     * Report RPC errors.
-     *
-     * @internal
-     *
-     * @return \Generator
-     */
-    public function rpcReport(): \Generator
-    {
-        $toReport = RPCErrorException::$toReport;
-        RPCErrorException::$toReport = [];
-        foreach ($toReport as [$method, $code, $error, $time]) {
-            try {
-                $res = \json_decode(yield from $this->fileGetContents('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error.'&t='.$time), true);
-                if (isset($res['ok']) && $res['ok'] && isset($res['result'])) {
-                    $description = $res['result'];
-                    RPCErrorException::$descriptions[$error] = $description;
-                    RPCErrorException::$errorMethodMap[$code][$method][$error] = $error;
-                }
-            } catch (\Throwable $e) {
-            }
         }
     }
     /**
