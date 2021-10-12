@@ -124,6 +124,7 @@ class UpdateLoop extends ResumableSignalLoop
                     if (isset($difference['timeout'])) {
                         $timeout = $difference['timeout'];
                     }
+                    $timeout = min(10*1000, $timeout);
                     $API->logger->logger('Got '.$difference['_'], \danog\MadelineProto\Logger::ULTRA_VERBOSE);
                     switch ($difference['_']) {
                         case 'updates.channelDifferenceEmpty':
