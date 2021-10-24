@@ -1,6 +1,8 @@
 #!/bin/bash -e
 
 # Configure
+export PATH="$HOME/.local/php/$PHP_VERSION:$PATH"
+
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
 php=$PHP_MAJOR_VERSION$PHP_MINOR_VERSION
@@ -15,6 +17,7 @@ COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
 
 [ "$TAG" != "" ] && IS_RELEASE=y || IS_RELEASE=n
 
+echo "PHP: $php"
 echo "Branch: $BRANCH"
 echo "Commit: $COMMIT"
 echo "Latest tag: $TAG"

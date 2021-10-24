@@ -21,12 +21,6 @@ jobs:
           ssh-key: ${{ secrets.DEPLOY_KEY }}
           submodules: false
 
-      - name: Setup PHP ${{ matrix.php }}
-        env:
-          PHP_VERSION: ${{ matrix.php }}
-        run: |
-          echo "$HOME/.local/php/$PHP_VERSION" >> $GITHUB_PATH
-
       - name: Set env
         run: echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
@@ -39,5 +33,6 @@ jobs:
           DEST: ${{ secrets.DEST }}
           DESTINATIONS: ${{ secrets.DESTINATIONS }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
+          PHP_VERSION: ${{ matrix.php }}
         run: |
           tests/makephar.sh
