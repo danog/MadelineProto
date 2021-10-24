@@ -72,8 +72,8 @@ echo '{
         }
     ]
 }' > composer.json
-composer update --no-cache
-composer dumpautoload --optimize
+php $(which composer) update --no-cache
+php $(which composer) dumpautoload --optimize
 rm -rf vendor/phabel/phabel/tests* vendor/danog/madelineproto/docs
 find vendor/ -type f -exec sed 's/private function __sleep/public function __sleep/g' -i {} +
 cd ..
