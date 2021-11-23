@@ -184,13 +184,13 @@ trait MessageHandler
     {
         list($aes_key, $aes_iv) = Crypt::aesCalculate($message_key, $this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], !$this->secret_chats[$chat_id]['admin']);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
+        if ($message_key != \substr(\hash('sha256', \substr($this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 8 : 0), 32).$decrypted_data, true), 8, 16)) {
+            throw new \danog\MadelineProto\SecurityException('Msg_key mismatch');
+        }
         $message_data_length = \unpack('V', \substr($decrypted_data, 0, 4))[1];
         $message_data = \substr($decrypted_data, 4, $message_data_length);
         if ($message_data_length > \strlen($decrypted_data)) {
             throw new \danog\MadelineProto\SecurityException(\danog\MadelineProto\Lang::$current_lang['msg_data_length_too_big']);
-        }
-        if ($message_key != \substr(\hash('sha256', \substr($this->secret_chats[$chat_id][$old ? 'old_key' : 'key']['auth_key'], 88 + ($this->secret_chats[$chat_id]['admin'] ? 8 : 0), 32).$decrypted_data, true), 8, 16)) {
-            throw new \danog\MadelineProto\SecurityException('Msg_key mismatch');
         }
         if (\strlen($decrypted_data) - 4 - $message_data_length < 12) {
             throw new \danog\MadelineProto\SecurityException('padding is too small');

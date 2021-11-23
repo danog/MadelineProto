@@ -156,6 +156,9 @@ class ReadLoop extends SignalLoop
                     $encrypted_data = \substr($encrypted_data, 0, -$protocol_padding);
                 }
                 $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
+                if ($message_key != \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
+                    throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
+                }
                 /*
                                 $server_salt = substr($decrypted_data, 0, 8);
                                 if ($server_salt != $shared->getTempAuthKey()->getServerSalt()) {
@@ -163,7 +166,7 @@ class ReadLoop extends SignalLoop
                                 }
                 */
                 $session_id = \substr($decrypted_data, 8, 8);
-                if ($session_id != $connection->session_id) {
+                if ($session_id !== $connection->session_id) {
                     $API->logger->logger("Session ID mismatch", Logger::FATAL_ERROR);
                     $connection->resetSession();
                     throw new NothingInTheSocketException();
@@ -188,9 +191,6 @@ class ReadLoop extends SignalLoop
                     throw new \danog\MadelineProto\SecurityException('message_data_length not divisible by 4');
                 }
                 $message_data = \substr($decrypted_data, 32, $message_data_length);
-                if ($message_key != \substr(\hash('sha256', \substr($shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
-                    throw new \danog\MadelineProto\SecurityException('msg_key mismatch');
-                }
             } else {
                 $API->logger->logger('Got unknown auth_key id', Logger::ERROR);
                 return -404;
