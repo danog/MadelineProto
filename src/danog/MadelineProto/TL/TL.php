@@ -436,7 +436,7 @@ class TL
                 if (\is_string($object) && \strlen($object) === 9 && $object[0] === 'a') {
                     return \substr($object, 1);
                 }
-				if (\is_array($object) && $type['name'] === 'hash') {
+                if (\is_array($object) && $type['name'] === 'hash') {
                     $object = \danog\MadelineProto\Tools::genVectorHash($object);
                 }
                 if (\is_array($object) && \count($object) === 2) {
