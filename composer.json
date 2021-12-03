@@ -1,5 +1,5 @@
 {
-    "name": "danog/madelineproto",
+    "name": "yura-rostov/madelineproto",
     "description": "PHP implementation of telegram's MTProto protocol.",
     "type": "project",
     "license": "AGPL-3.0-only",
