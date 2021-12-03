@@ -73,7 +73,11 @@ function ___install_madeline()
                     if (\strpos($name, 'phabel/transpiler') === 0) {
                         $name = \explode('/', $name, 3)[2];
                     }
-                    $packages[$name] = $dep['version_normalized'];
+                    $version = $dep['version_normalized'];
+                    if ($name === 'danog/madelineproto' && \substr($version, 0, 2) === '90') {
+                        $version = \substr($version, 2);
+                    }
+                    $packages[$name] = $version;
                 }
                 return $packages;
             };
@@ -113,7 +117,7 @@ function ___install_madeline()
                         'Content-Type: application/json',
                         \sprintf(
                             'User-Agent: Composer/%s (%s; %s; %s; %s%s)',
-                            'Madeline v7',
+                            'MProto v7',
                             \function_exists('php_uname') ? @\php_uname('s') : 'Unknown',
                             \function_exists('php_uname') ? @\php_uname('r') : 'Unknown',
                             $phpVersion,
