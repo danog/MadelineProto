@@ -295,7 +295,7 @@ class API extends InternalDoc
         } elseif ($settings instanceof Settings) {
             $forceFull = $forceFull || $settings->getIpc()->getSlow();
         }
-        $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']) || Magic::$altervista;
+        $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']); // || Magic::$altervista;
 
         [$unserialized, $this->unlock] = yield Tools::timeoutWithDefault(
             Serialization::unserialize($this->session, $settings, $forceFull),
