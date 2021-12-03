@@ -1,7 +1,7 @@
 <?php
 
 if (\defined('MADELINE_PHP')) {
-    return;
+    throw new \Exception('Please do not include madeline.php twice!');
 }
 
 if (\class_exists(\Composer\Autoload\ClassLoader::class)) {
@@ -48,14 +48,10 @@ function ___install_madeline()
             break;
         }
     }
-    if (!$release) {
-        return;
-    }
-
     $madeline_phar = "madeline-$version.phar";
     \define('HAD_MADELINE_PHAR', \file_exists($madeline_phar));
 
-    if (!\file_exists($madeline_phar) || !\file_exists("$madeline_phar.version") || \file_get_contents("$madeline_phar.version") !== $release) {
+    if ($release && !\file_exists($madeline_phar) || !\file_exists("$madeline_phar.version") || \file_get_contents("$madeline_phar.version") !== $release) {
         $phar = \file_get_contents(\sprintf($phar_template, $chosen));
 
         if ($phar) {

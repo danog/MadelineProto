@@ -128,7 +128,7 @@ trait Start
             yield from $this->myTelegramOrgWrapper->login($_POST['phone_number']);
             yield $this->webAPIEcho();
         } catch (\Throwable $e) {
-            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
+            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         }
     }
     private function webAPICompleteLogin(): \Generator
@@ -136,9 +136,9 @@ trait Start
         try {
             yield from $this->myTelegramOrgWrapper->completeLogin($_POST['code']);
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
+            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
+            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         }
     }
     private function webAPICreateApp(): \Generator
@@ -149,9 +149,9 @@ trait Start
             $app = (yield from $this->myTelegramOrgWrapper->createApp($params));
             return $app;
         } catch (\danog\MadelineProto\RPCErrorException $e) {
-            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
+            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         } catch (\danog\MadelineProto\Exception $e) {
-            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
+            yield $this->webAPIEcho(\sprintf(Lang::$current_lang['apiError'], 'Please use manual mode: '.$e->getMessage()));
         }
     }
 }
