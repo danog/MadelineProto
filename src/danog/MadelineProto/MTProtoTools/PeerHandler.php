@@ -386,7 +386,7 @@ trait PeerHandler
                 case 'user':
                     return $id['id'];
                 case 'userFull':
-                    return $id['user']['id'];
+                    return $id['id'];
                 case 'inputPeerUser':
                 case 'inputUser':
                 case 'peerUser':
